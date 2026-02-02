@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 class CacheManagerTest extends TestCase
 {
-    public function testCustomDriverClosureBoundObjectIsCacheManager()
+    public function testCustomDriverClosureBoundObjectIsCacheManager(): void
     {
         $cacheManager = new CacheManager([
             'config' => [
@@ -31,7 +31,7 @@ class CacheManagerTest extends TestCase
         $this->assertEquals($cacheManager, $cacheManager->store(__CLASS__));
     }
 
-    public function testCustomDriverOverridesInternalDrivers()
+    public function testCustomDriverOverridesInternalDrivers(): void
     {
         $userConfig = [
             'cache' => [
@@ -54,7 +54,7 @@ class CacheManagerTest extends TestCase
         $this->assertSame('mm(u_u)mm', $driver->flag);
     }
 
-    public function testItCanBuildRepositories()
+    public function testItCanBuildRepositories(): void
     {
         $app = $this->getApp([]);
         $cacheManager = new CacheManager($app);
@@ -66,7 +66,7 @@ class CacheManagerTest extends TestCase
         $this->assertInstanceOf(NullStore::class, $nullCache->getStore());
     }
 
-    public function testItMakesRepositoryWhenContainerHasNoDispatcher()
+    public function testItMakesRepositoryWhenContainerHasNoDispatcher(): void
     {
         $userConfig = [
             'cache' => [
@@ -99,7 +99,7 @@ class CacheManagerTest extends TestCase
         $this->assertNotNull($repo->getEventDispatcher());
     }
 
-    public function testItRefreshesDispatcherOnAllStores()
+    public function testItRefreshesDispatcherOnAllStores(): void
     {
         $userConfig = [
             'cache' => [
@@ -132,7 +132,7 @@ class CacheManagerTest extends TestCase
         $this->assertSame($dispatcher, $repo2->getEventDispatcher());
     }
 
-    public function testItSetsDefaultDriverChangesGlobalConfig()
+    public function testItSetsDefaultDriverChangesGlobalConfig(): void
     {
         $userConfig = [
             'cache' => [
@@ -156,7 +156,7 @@ class CacheManagerTest extends TestCase
         $this->assertEquals('><((((@>', $app->get('config')->get('cache.default'));
     }
 
-    public function testItPurgesMemoizedStoreObjects()
+    public function testItPurgesMemoizedStoreObjects(): void
     {
         $userConfig = [
             'cache' => [
@@ -197,7 +197,7 @@ class CacheManagerTest extends TestCase
         $this->assertSame($repo3, $repo7);
     }
 
-    public function testForgetDriver()
+    public function testForgetDriver(): void
     {
         $cacheManager = m::mock(CacheManager::class)
             ->shouldAllowMockingProtectedMethods()
@@ -221,7 +221,7 @@ class CacheManagerTest extends TestCase
         }
     }
 
-    public function testForgetDriverForgets()
+    public function testForgetDriverForgets(): void
     {
         $cacheManager = new CacheManager([
             'config' => [
@@ -240,7 +240,7 @@ class CacheManagerTest extends TestCase
         $this->assertNull($cacheManager->store('forget')->get('foo'));
     }
 
-    public function testThrowExceptionWhenUnknownDriverIsUsed()
+    public function testThrowExceptionWhenUnknownDriverIsUsed(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Driver [unknown_taxi_driver] is not supported.');
@@ -262,7 +262,7 @@ class CacheManagerTest extends TestCase
         $cacheManager->store('my_store');
     }
 
-    public function testThrowExceptionWhenUnknownStoreIsUsed()
+    public function testThrowExceptionWhenUnknownStoreIsUsed(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Cache store [alien_store] is not defined.');
@@ -284,7 +284,7 @@ class CacheManagerTest extends TestCase
         $cacheManager->store('alien_store');
     }
 
-    public function testMakesRepositoryWithoutDispatcherWhenEventsDisabled()
+    public function testMakesRepositoryWithoutDispatcherWhenEventsDisabled(): void
     {
         $userConfig = [
             'cache' => [

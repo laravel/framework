@@ -52,7 +52,7 @@ class ClearCommandTest extends TestCase
         $this->command->setLaravel($app);
     }
 
-    public function testClearWithNoStoreArgument()
+    public function testClearWithNoStoreArgument(): void
     {
         $this->files->shouldReceive('exists')->andReturn(true);
         $this->files->shouldReceive('files')->andReturn([]);
@@ -63,7 +63,7 @@ class ClearCommandTest extends TestCase
         $this->runCommand($this->command);
     }
 
-    public function testClearWithStoreArgument()
+    public function testClearWithStoreArgument(): void
     {
         $this->files->shouldReceive('exists')->andReturn(true);
         $this->files->shouldReceive('files')->andReturn([]);
@@ -74,7 +74,7 @@ class ClearCommandTest extends TestCase
         $this->runCommand($this->command, ['store' => 'foo']);
     }
 
-    public function testClearWithInvalidStoreArgument()
+    public function testClearWithInvalidStoreArgument(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -86,7 +86,7 @@ class ClearCommandTest extends TestCase
         $this->runCommand($this->command, ['store' => 'bar']);
     }
 
-    public function testClearWithTagsOption()
+    public function testClearWithTagsOption(): void
     {
         $this->files->shouldReceive('exists')->andReturn(true);
         $this->files->shouldReceive('files')->andReturn([]);
@@ -98,7 +98,7 @@ class ClearCommandTest extends TestCase
         $this->runCommand($this->command, ['--tags' => 'foo,bar']);
     }
 
-    public function testClearWithStoreArgumentAndTagsOption()
+    public function testClearWithStoreArgumentAndTagsOption(): void
     {
         $this->files->shouldReceive('exists')->andReturn(true);
         $this->files->shouldReceive('files')->andReturn([]);
@@ -110,7 +110,7 @@ class ClearCommandTest extends TestCase
         $this->runCommand($this->command, ['store' => 'redis', '--tags' => 'foo']);
     }
 
-    public function testClearWillClearRealTimeFacades()
+    public function testClearWillClearRealTimeFacades(): void
     {
         $this->cacheManager->shouldReceive('store')->once()->with(null)->andReturn($this->cacheRepository);
         $this->cacheRepository->shouldReceive('flush')->once();
@@ -122,7 +122,7 @@ class ClearCommandTest extends TestCase
         $this->runCommand($this->command);
     }
 
-    public function testClearWillNotClearRealTimeFacadesIfCacheDirectoryDoesntExist()
+    public function testClearWillNotClearRealTimeFacadesIfCacheDirectoryDoesntExist(): void
     {
         $this->cacheManager->shouldReceive('store')->once()->with(null)->andReturn($this->cacheRepository);
         $this->cacheRepository->shouldReceive('flush')->once();

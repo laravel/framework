@@ -14,7 +14,7 @@ class AuthListenersSendEmailVerificationNotificationHandleFunctionTest extends T
     /**
      * @return void
      */
-    public function testWillExecuted()
+    public function testWillExecuted(): void
     {
         $user = $this->getMockBuilder(MustVerifyEmail::class)->getMock();
         $user->method('hasVerifiedEmail')->willReturn(false);
@@ -28,7 +28,7 @@ class AuthListenersSendEmailVerificationNotificationHandleFunctionTest extends T
     /**
      * @return void
      */
-    public function testUserIsNotInstanceOfMustVerifyEmail()
+    public function testUserIsNotInstanceOfMustVerifyEmail(): void
     {
         $user = m::mock(User::class);
         $user->shouldNotReceive('sendEmailVerificationNotification');
@@ -41,7 +41,7 @@ class AuthListenersSendEmailVerificationNotificationHandleFunctionTest extends T
     /**
      * @return void
      */
-    public function testHasVerifiedEmailAsTrue()
+    public function testHasVerifiedEmailAsTrue(): void
     {
         $user = $this->getMockBuilder(MustVerifyEmail::class)->getMock();
         $user->method('hasVerifiedEmail')->willReturn(true);

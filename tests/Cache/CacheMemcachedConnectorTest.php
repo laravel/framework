@@ -11,7 +11,7 @@ use stdClass;
 
 class CacheMemcachedConnectorTest extends TestCase
 {
-    public function testServersAreAddedCorrectly()
+    public function testServersAreAddedCorrectly(): void
     {
         $memcached = $this->memcachedMockWithAddServer();
 
@@ -25,7 +25,7 @@ class CacheMemcachedConnectorTest extends TestCase
         $this->assertSame($result, $memcached);
     }
 
-    public function testServersAreAddedCorrectlyWithPersistentConnection()
+    public function testServersAreAddedCorrectlyWithPersistentConnection(): void
     {
         $persistentConnectionId = 'persistent_connection_id';
 
@@ -43,7 +43,7 @@ class CacheMemcachedConnectorTest extends TestCase
     }
 
     #[RequiresPhpExtension('memcached')]
-    public function testServersAreAddedCorrectlyWithValidOptions()
+    public function testServersAreAddedCorrectlyWithValidOptions(): void
     {
         $validOptions = [
             Memcached::OPT_NO_BLOCK => true,
@@ -64,7 +64,7 @@ class CacheMemcachedConnectorTest extends TestCase
     }
 
     #[RequiresPhpExtension('memcached')]
-    public function testServersAreAddedCorrectlyWithSaslCredentials()
+    public function testServersAreAddedCorrectlyWithSaslCredentials(): void
     {
         $saslCredentials = ['foo', 'bar'];
 

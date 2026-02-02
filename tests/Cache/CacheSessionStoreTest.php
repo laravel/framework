@@ -18,7 +18,7 @@ class CacheSessionStoreTest extends TestCase
         parent::tearDown();
     }
 
-    public function testItemsCanBeSetAndRetrieved()
+    public function testItemsCanBeSetAndRetrieved(): void
     {
         $store = new SessionStore(self::getSession());
         $result = $store->put('foo', 'bar', 10);
@@ -40,7 +40,7 @@ class CacheSessionStoreTest extends TestCase
         $this->assertNull($store->get('hello'));
     }
 
-    public function testMultipleItemsCanBeSetAndRetrieved()
+    public function testMultipleItemsCanBeSetAndRetrieved(): void
     {
         $store = new SessionStore(self::getSession());
         $result = $store->put('foo', 'bar', 10);
@@ -58,7 +58,7 @@ class CacheSessionStoreTest extends TestCase
         ], $store->many(['foo', 'fizz', 'quz', 'norf']));
     }
 
-    public function testItemsCanExpire()
+    public function testItemsCanExpire(): void
     {
         Carbon::setTestNow(Carbon::now());
 
@@ -71,7 +71,7 @@ class CacheSessionStoreTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testStoreItemForeverProperlyStoresInArray()
+    public function testStoreItemForeverProperlyStoresInArray(): void
     {
         $mock = $this->getMockBuilder(SessionStore::class)
             ->setConstructorArgs([self::getSession()])
@@ -84,7 +84,7 @@ class CacheSessionStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testValuesCanBeIncremented()
+    public function testValuesCanBeIncremented(): void
     {
         $store = new SessionStore(self::getSession());
         $store->put('foo', 1, 10);
@@ -97,7 +97,7 @@ class CacheSessionStoreTest extends TestCase
         $this->assertEquals(4, $store->get('foo'));
     }
 
-    public function testValuesGetCastedByIncrementOrDecrement()
+    public function testValuesGetCastedByIncrementOrDecrement(): void
     {
         $store = new SessionStore(self::getSession());
         $store->put('foo', '1', 10);
@@ -111,7 +111,7 @@ class CacheSessionStoreTest extends TestCase
         $this->assertEquals(0, $store->get('bar'));
     }
 
-    public function testIncrementNonNumericValues()
+    public function testIncrementNonNumericValues(): void
     {
         $store = new SessionStore(self::getSession());
         $store->put('foo', 'I am string', 10);
@@ -120,7 +120,7 @@ class CacheSessionStoreTest extends TestCase
         $this->assertEquals(1, $store->get('foo'));
     }
 
-    public function testNonExistingKeysCanBeIncremented()
+    public function testNonExistingKeysCanBeIncremented(): void
     {
         $store = new SessionStore(self::getSession());
         $result = $store->increment('foo');
@@ -132,7 +132,7 @@ class CacheSessionStoreTest extends TestCase
         $this->assertEquals(1, $store->get('foo'));
     }
 
-    public function testExpiredKeysAreIncrementedLikeNonExistingKeys()
+    public function testExpiredKeysAreIncrementedLikeNonExistingKeys(): void
     {
         Carbon::setTestNow(Carbon::now());
 
@@ -145,7 +145,7 @@ class CacheSessionStoreTest extends TestCase
         $this->assertEquals(1, $result);
     }
 
-    public function testValuesCanBeDecremented()
+    public function testValuesCanBeDecremented(): void
     {
         $store = new SessionStore(self::getSession());
         $store->put('foo', 1, 10);
@@ -158,7 +158,7 @@ class CacheSessionStoreTest extends TestCase
         $this->assertEquals(-2, $store->get('foo'));
     }
 
-    public function testItemsCanBeRemoved()
+    public function testItemsCanBeRemoved(): void
     {
         $store = new SessionStore(self::getSession());
         $store->put('foo', 'bar', 10);
@@ -167,7 +167,7 @@ class CacheSessionStoreTest extends TestCase
         $this->assertFalse($store->forget('foo'));
     }
 
-    public function testItemsCanBeFlushed()
+    public function testItemsCanBeFlushed(): void
     {
         $store = new SessionStore(self::getSession());
         $store->put('foo', 'bar', 10);
@@ -178,19 +178,19 @@ class CacheSessionStoreTest extends TestCase
         $this->assertNull($store->get('baz'));
     }
 
-    public function testCacheKey()
+    public function testCacheKey(): void
     {
         $store = new SessionStore(self::getSession());
         $this->assertEmpty($store->getPrefix());
     }
 
-    public function testItemKey()
+    public function testItemKey(): void
     {
         $store = new SessionStore(self::getSession(), 'custom_prefix');
         $this->assertEquals('custom_prefix.foo', $store->itemKey('foo'));
     }
 
-    public function testValuesAreStoredByReference()
+    public function testValuesAreStoredByReference(): void
     {
         $store = new SessionStore(self::getSession());
         $object = new stdClass;
@@ -205,7 +205,7 @@ class CacheSessionStoreTest extends TestCase
         $this->assertTrue($retrievedObject->bar);
     }
 
-    public function testCanGetAll()
+    public function testCanGetAll(): void
     {
         Carbon::setTestNow(Carbon::now());
 

@@ -44,7 +44,7 @@ class CacheSpyMemoTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_cache_spy_works_with_memoized_cache()
+    public function test_cache_spy_works_with_memoized_cache(): void
     {
         $cache = Cache::spy();
 
@@ -53,7 +53,7 @@ class CacheSpyMemoTest extends TestCase
         $cache->shouldHaveReceived('memo')->once();
     }
 
-    public function test_cache_spy_tracks_remember_on_memoized_cache_as_described_in_issue()
+    public function test_cache_spy_tracks_remember_on_memoized_cache_as_described_in_issue(): void
     {
         $cache = Cache::spy();
 
@@ -65,7 +65,7 @@ class CacheSpyMemoTest extends TestCase
         $memoizedCache->shouldHaveReceived('remember')->once()->with('key', 60, m::type(Closure::class));
     }
 
-    public function test_cache_spy_tracks_remember_calls_on_memoized_cache()
+    public function test_cache_spy_tracks_remember_calls_on_memoized_cache(): void
     {
         $cache = Cache::spy();
 
@@ -75,7 +75,7 @@ class CacheSpyMemoTest extends TestCase
         $memoizedCache->shouldHaveReceived('remember')->once()->with('key', 60, m::type(Closure::class));
     }
 
-    public function test_cache_spy_memo_returns_spied_repository()
+    public function test_cache_spy_memo_returns_spied_repository(): void
     {
         $cache = Cache::spy();
 

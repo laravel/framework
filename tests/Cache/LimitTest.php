@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class LimitTest extends TestCase
 {
-    public function testConstructors()
+    public function testConstructors(): void
     {
         $limit = new Limit('', 3, 1);
         $this->assertSame(1, $limit->decaySeconds);

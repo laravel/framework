@@ -29,7 +29,7 @@ class RedisBroadcasterTest extends TestCase
         });
     }
 
-    public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue()
+    public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue(): void
     {
         $this->broadcaster->channel('test', function () {
             return true;
@@ -43,7 +43,7 @@ class RedisBroadcasterTest extends TestCase
         );
     }
 
-    public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenCallbackReturnFalse()
+    public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenCallbackReturnFalse(): void
     {
         $this->expectException(AccessDeniedHttpException::class);
 
@@ -56,7 +56,7 @@ class RedisBroadcasterTest extends TestCase
         );
     }
 
-    public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenRequestUserNotFound()
+    public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenRequestUserNotFound(): void
     {
         $this->expectException(AccessDeniedHttpException::class);
 
@@ -69,7 +69,7 @@ class RedisBroadcasterTest extends TestCase
         );
     }
 
-    public function testAuthCallValidAuthenticationResponseWithPresenceChannelWhenCallbackReturnAnArray()
+    public function testAuthCallValidAuthenticationResponseWithPresenceChannelWhenCallbackReturnAnArray(): void
     {
         $returnData = [1, 2, 3, 4];
         $this->broadcaster->channel('test', function () use ($returnData) {
@@ -84,7 +84,7 @@ class RedisBroadcasterTest extends TestCase
         );
     }
 
-    public function testAuthThrowAccessDeniedHttpExceptionWithPresenceChannelWhenCallbackReturnNull()
+    public function testAuthThrowAccessDeniedHttpExceptionWithPresenceChannelWhenCallbackReturnNull(): void
     {
         $this->expectException(AccessDeniedHttpException::class);
 
@@ -97,7 +97,7 @@ class RedisBroadcasterTest extends TestCase
         );
     }
 
-    public function testAuthThrowAccessDeniedHttpExceptionWithPresenceChannelWhenRequestUserNotFound()
+    public function testAuthThrowAccessDeniedHttpExceptionWithPresenceChannelWhenRequestUserNotFound(): void
     {
         $this->expectException(AccessDeniedHttpException::class);
 
@@ -110,7 +110,7 @@ class RedisBroadcasterTest extends TestCase
         );
     }
 
-    public function testValidAuthenticationResponseWithPrivateChannel()
+    public function testValidAuthenticationResponseWithPrivateChannel(): void
     {
         $request = $this->getMockRequestWithUserForChannel('private-test');
 
@@ -120,7 +120,7 @@ class RedisBroadcasterTest extends TestCase
         );
     }
 
-    public function testValidAuthenticationResponseWithPresenceChannel()
+    public function testValidAuthenticationResponseWithPresenceChannel(): void
     {
         $request = $this->getMockRequestWithUserForChannel('presence-test');
 

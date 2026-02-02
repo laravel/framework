@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class EnsureEmailIsVerifiedTest extends TestCase
 {
-    public function testItCanGenerateDefinitionViaStaticMethod()
+    public function testItCanGenerateDefinitionViaStaticMethod(): void
     {
         $signature = EnsureEmailIsVerified::redirectTo('route.name');
         $this->assertSame('Illuminate\Auth\Middleware\EnsureEmailIsVerified:route.name', $signature);

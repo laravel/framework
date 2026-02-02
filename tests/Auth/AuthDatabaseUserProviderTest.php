@@ -14,7 +14,7 @@ use stdClass;
 
 class AuthDatabaseUserProviderTest extends TestCase
 {
-    public function testRetrieveByIDReturnsUserWhenUserIsFound()
+    public function testRetrieveByIDReturnsUserWhenUserIsFound(): void
     {
         $conn = m::mock(Connection::class);
         $conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
@@ -28,7 +28,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertSame('Dayle', $user->name);
     }
 
-    public function testRetrieveByIDReturnsNullWhenUserIsNotFound()
+    public function testRetrieveByIDReturnsNullWhenUserIsNotFound(): void
     {
         $conn = m::mock(Connection::class);
         $conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
@@ -40,7 +40,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertNull($user);
     }
 
-    public function testRetrieveByTokenReturnsUser()
+    public function testRetrieveByTokenReturnsUser(): void
     {
         $mockUser = new stdClass;
         $mockUser->remember_token = 'a';
@@ -55,7 +55,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertEquals(new GenericUser((array) $mockUser), $user);
     }
 
-    public function testRetrieveTokenWithBadIdentifierReturnsNull()
+    public function testRetrieveTokenWithBadIdentifierReturnsNull(): void
     {
         $conn = m::mock(Connection::class);
         $conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
@@ -67,7 +67,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertNull($user);
     }
 
-    public function testRetrieveByBadTokenReturnsNull()
+    public function testRetrieveByBadTokenReturnsNull(): void
     {
         $mockUser = new stdClass;
         $mockUser->remember_token = null;
@@ -82,7 +82,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertNull($user);
     }
 
-    public function testRetrieveByCredentialsReturnsUserWhenUserIsFound()
+    public function testRetrieveByCredentialsReturnsUserWhenUserIsFound(): void
     {
         $conn = m::mock(Connection::class);
         $conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
@@ -98,7 +98,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertSame('taylor', $user->name);
     }
 
-    public function testRetrieveByCredentialsAcceptsCallback()
+    public function testRetrieveByCredentialsAcceptsCallback(): void
     {
         $conn = m::mock(Connection::class);
         $conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
@@ -118,7 +118,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertSame('taylor', $user->name);
     }
 
-    public function testRetrieveByCredentialsReturnsNullWhenUserIsFound()
+    public function testRetrieveByCredentialsReturnsNullWhenUserIsFound(): void
     {
         $conn = m::mock(Connection::class);
         $conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
@@ -131,7 +131,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertNull($user);
     }
 
-    public function testRetrieveByCredentialsWithMultiplyPasswordsReturnsNull()
+    public function testRetrieveByCredentialsWithMultiplyPasswordsReturnsNull(): void
     {
         $conn = m::mock(Connection::class);
         $hasher = m::mock(Hasher::class);
@@ -144,7 +144,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertNull($user);
     }
 
-    public function testCredentialValidation()
+    public function testCredentialValidation(): void
     {
         $conn = m::mock(Connection::class);
         $hasher = m::mock(Hasher::class);
@@ -157,7 +157,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testCredentialValidationFails()
+    public function testCredentialValidationFails(): void
     {
         $conn = m::mock(Connection::class);
         $hasher = m::mock(Hasher::class);
@@ -170,7 +170,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function testCredentialValidationFailsGracefullyWithNullPassword()
+    public function testCredentialValidationFailsGracefullyWithNullPassword(): void
     {
         $conn = m::mock(Connection::class);
         $hasher = m::mock(Hasher::class);
@@ -183,7 +183,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function testRehashPasswordIfRequired()
+    public function testRehashPasswordIfRequired(): void
     {
         $hasher = m::mock(Hasher::class);
         $hasher->shouldReceive('needsRehash')->once()->with('hash')->andReturn(true);
@@ -205,7 +205,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $provider->rehashPasswordIfRequired($user, ['password' => 'plain']);
     }
 
-    public function testDontRehashPasswordIfNotRequired()
+    public function testDontRehashPasswordIfNotRequired(): void
     {
         $hasher = m::mock(Hasher::class);
         $hasher->shouldReceive('needsRehash')->once()->with('hash')->andReturn(false);

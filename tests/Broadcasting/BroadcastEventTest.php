@@ -13,7 +13,7 @@ use Throwable;
 
 class BroadcastEventTest extends TestCase
 {
-    public function testBasicEventBroadcastParameterFormatting()
+    public function testBasicEventBroadcastParameterFormatting(): void
     {
         $broadcaster = m::mock(Broadcaster::class);
 
@@ -30,7 +30,7 @@ class BroadcastEventTest extends TestCase
         (new BroadcastEvent($event))->handle($manager);
     }
 
-    public function testManualParameterSpecification()
+    public function testManualParameterSpecification(): void
     {
         $broadcaster = m::mock(Broadcaster::class);
 
@@ -47,7 +47,7 @@ class BroadcastEventTest extends TestCase
         (new BroadcastEvent($event))->handle($manager);
     }
 
-    public function testSpecificBroadcasterGiven()
+    public function testSpecificBroadcasterGiven(): void
     {
         $broadcaster = m::mock(Broadcaster::class);
 
@@ -62,7 +62,7 @@ class BroadcastEventTest extends TestCase
         (new BroadcastEvent($event))->handle($manager);
     }
 
-    public function testSpecificChannelsPerConnection()
+    public function testSpecificChannelsPerConnection(): void
     {
         $broadcaster = m::mock(Broadcaster::class);
 
@@ -84,7 +84,7 @@ class BroadcastEventTest extends TestCase
         (new BroadcastEvent($event))->handle($manager);
     }
 
-    public function testMiddlewareProxiesMiddlewareFromUnderlyingEvent()
+    public function testMiddlewareProxiesMiddlewareFromUnderlyingEvent(): void
     {
         $event = new class
         {
@@ -99,7 +99,7 @@ class BroadcastEventTest extends TestCase
         $this->assertSame(['foo', 'bar'], $job->middleware());
     }
 
-    public function testMiddlewareProxiesFailedHandlerFromUnderlyingEvent()
+    public function testMiddlewareProxiesFailedHandlerFromUnderlyingEvent(): void
     {
         $event = new class
         {

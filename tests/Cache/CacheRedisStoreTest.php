@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class CacheRedisStoreTest extends TestCase
 {
-    public function testGetReturnsNullWhenNotFound()
+    public function testGetReturnsNullWhenNotFound(): void
     {
         $redis = $this->getRedis();
         $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
@@ -17,7 +17,7 @@ class CacheRedisStoreTest extends TestCase
         $this->assertNull($redis->get('foo'));
     }
 
-    public function testRedisValueIsReturned()
+    public function testRedisValueIsReturned(): void
     {
         $redis = $this->getRedis();
         $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
@@ -25,7 +25,7 @@ class CacheRedisStoreTest extends TestCase
         $this->assertSame('foo', $redis->get('foo'));
     }
 
-    public function testRedisMultipleValuesAreReturned()
+    public function testRedisMultipleValuesAreReturned(): void
     {
         $redis = $this->getRedis();
         $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
@@ -45,7 +45,7 @@ class CacheRedisStoreTest extends TestCase
         $this->assertNull($results['null']);
     }
 
-    public function testRedisValueIsReturnedForNumerics()
+    public function testRedisValueIsReturnedForNumerics(): void
     {
         $redis = $this->getRedis();
         $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
@@ -53,7 +53,7 @@ class CacheRedisStoreTest extends TestCase
         $this->assertEquals(1, $redis->get('foo'));
     }
 
-    public function testSetMethodProperlyCallsRedis()
+    public function testSetMethodProperlyCallsRedis(): void
     {
         $redis = $this->getRedis();
         $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
@@ -62,7 +62,7 @@ class CacheRedisStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testSetMultipleMethodProperlyCallsRedis()
+    public function testSetMultipleMethodProperlyCallsRedis(): void
     {
         $redis = $this->getRedis();
         /** @var m\MockInterface $connection */
@@ -82,7 +82,7 @@ class CacheRedisStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testSetMethodProperlyCallsRedisForNumerics()
+    public function testSetMethodProperlyCallsRedisForNumerics(): void
     {
         $redis = $this->getRedis();
         $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
@@ -91,7 +91,7 @@ class CacheRedisStoreTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function testIncrementMethodProperlyCallsRedis()
+    public function testIncrementMethodProperlyCallsRedis(): void
     {
         $redis = $this->getRedis();
         $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
@@ -99,7 +99,7 @@ class CacheRedisStoreTest extends TestCase
         $redis->increment('foo', 5);
     }
 
-    public function testDecrementMethodProperlyCallsRedis()
+    public function testDecrementMethodProperlyCallsRedis(): void
     {
         $redis = $this->getRedis();
         $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
@@ -107,7 +107,7 @@ class CacheRedisStoreTest extends TestCase
         $redis->decrement('foo', 5);
     }
 
-    public function testStoreItemForeverProperlyCallsRedis()
+    public function testStoreItemForeverProperlyCallsRedis(): void
     {
         $redis = $this->getRedis();
         $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
@@ -116,7 +116,7 @@ class CacheRedisStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testForgetMethodProperlyCallsRedis()
+    public function testForgetMethodProperlyCallsRedis(): void
     {
         $redis = $this->getRedis();
         $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
@@ -124,7 +124,7 @@ class CacheRedisStoreTest extends TestCase
         $redis->forget('foo');
     }
 
-    public function testFlushesCached()
+    public function testFlushesCached(): void
     {
         $redis = $this->getRedis();
         $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
@@ -133,7 +133,7 @@ class CacheRedisStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testGetAndSetPrefix()
+    public function testGetAndSetPrefix(): void
     {
         $redis = $this->getRedis();
         $this->assertSame('prefix:', $redis->getPrefix());

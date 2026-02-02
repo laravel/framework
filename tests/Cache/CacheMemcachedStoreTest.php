@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 #[RequiresPhpExtension('memcached')]
 class CacheMemcachedStoreTest extends TestCase
 {
-    public function testGetReturnsNullWhenNotFound()
+    public function testGetReturnsNullWhenNotFound(): void
     {
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['get', 'getResultCode'])->getMock();
         $memcache->expects($this->once())->method('get')->with($this->equalTo('foo:bar'))->willReturn(null);
@@ -21,7 +21,7 @@ class CacheMemcachedStoreTest extends TestCase
         $this->assertNull($store->get('bar'));
     }
 
-    public function testMemcacheValueIsReturned()
+    public function testMemcacheValueIsReturned(): void
     {
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['get', 'getResultCode'])->getMock();
         $memcache->expects($this->once())->method('get')->willReturn('bar');
@@ -30,7 +30,7 @@ class CacheMemcachedStoreTest extends TestCase
         $this->assertSame('bar', $store->get('foo'));
     }
 
-    public function testMemcacheGetMultiValuesAreReturnedWithCorrectKeys()
+    public function testMemcacheGetMultiValuesAreReturnedWithCorrectKeys(): void
     {
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['getMulti', 'getResultCode'])->getMock();
         $memcache->expects($this->once())->method('getMulti')->with(
@@ -49,7 +49,7 @@ class CacheMemcachedStoreTest extends TestCase
         ]));
     }
 
-    public function testSetMethodProperlyCallsMemcache()
+    public function testSetMethodProperlyCallsMemcache(): void
     {
         Carbon::setTestNow($now = Carbon::now());
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['set'])->getMock();
@@ -60,7 +60,7 @@ class CacheMemcachedStoreTest extends TestCase
         Carbon::setTestNow(null);
     }
 
-    public function testIncrementMethodProperlyCallsMemcache()
+    public function testIncrementMethodProperlyCallsMemcache(): void
     {
         $memcached = m::mock(Memcached::class);
         $memcached->shouldReceive('increment')->with('foo', 5)->once()->andReturn(5);
@@ -69,7 +69,7 @@ class CacheMemcachedStoreTest extends TestCase
         $store->increment('foo', 5);
     }
 
-    public function testDecrementMethodProperlyCallsMemcache()
+    public function testDecrementMethodProperlyCallsMemcache(): void
     {
         $memcached = m::mock(Memcached::class);
         $memcached->shouldReceive('decrement')->with('foo', 5)->once()->andReturn(0);
@@ -78,7 +78,7 @@ class CacheMemcachedStoreTest extends TestCase
         $store->decrement('foo', 5);
     }
 
-    public function testStoreItemForeverProperlyCallsMemcached()
+    public function testStoreItemForeverProperlyCallsMemcached(): void
     {
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['set'])->getMock();
         $memcache->expects($this->once())->method('set')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0))->willReturn(true);
@@ -87,7 +87,7 @@ class CacheMemcachedStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testForgetMethodProperlyCallsMemcache()
+    public function testForgetMethodProperlyCallsMemcache(): void
     {
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['delete'])->getMock();
         $memcache->expects($this->once())->method('delete')->with($this->equalTo('foo'));
@@ -95,7 +95,7 @@ class CacheMemcachedStoreTest extends TestCase
         $store->forget('foo');
     }
 
-    public function testFlushesCached()
+    public function testFlushesCached(): void
     {
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['flush'])->getMock();
         $memcache->expects($this->once())->method('flush')->willReturn(true);
@@ -104,7 +104,7 @@ class CacheMemcachedStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testGetAndSetPrefix()
+    public function testGetAndSetPrefix(): void
     {
         $store = new MemcachedStore(new Memcached, 'bar');
         $this->assertSame('bar', $store->getPrefix());

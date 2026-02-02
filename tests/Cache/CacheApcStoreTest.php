@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class CacheApcStoreTest extends TestCase
 {
-    public function testGetReturnsNullWhenNotFound()
+    public function testGetReturnsNullWhenNotFound(): void
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['get'])->getMock();
         $apc->expects($this->once())->method('get')->with($this->equalTo('foobar'))->willReturn(null);
@@ -17,7 +17,7 @@ class CacheApcStoreTest extends TestCase
         $this->assertNull($store->get('bar'));
     }
 
-    public function testAPCValueIsReturned()
+    public function testAPCValueIsReturned(): void
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['get'])->getMock();
         $apc->expects($this->once())->method('get')->willReturn('bar');
@@ -25,7 +25,7 @@ class CacheApcStoreTest extends TestCase
         $this->assertSame('bar', $store->get('foo'));
     }
 
-    public function testAPCFalseValueIsReturned()
+    public function testAPCFalseValueIsReturned(): void
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['get'])->getMock();
         $apc->expects($this->once())->method('get')->willReturn(false);
@@ -33,7 +33,7 @@ class CacheApcStoreTest extends TestCase
         $this->assertFalse($store->get('foo'));
     }
 
-    public function testGetMultipleReturnsNullWhenNotFoundAndValueWhenFound()
+    public function testGetMultipleReturnsNullWhenNotFoundAndValueWhenFound(): void
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['get'])->getMock();
         $apc->expects($this->exactly(3))->method('get')->willReturnMap([
@@ -49,7 +49,7 @@ class CacheApcStoreTest extends TestCase
         ], $store->many(['foo', 'bar', 'baz']));
     }
 
-    public function testSetMethodProperlyCallsAPC()
+    public function testSetMethodProperlyCallsAPC(): void
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['put'])->getMock();
         $apc->expects($this->once())
@@ -60,7 +60,7 @@ class CacheApcStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testSetMultipleMethodProperlyCallsAPC()
+    public function testSetMultipleMethodProperlyCallsAPC(): void
     {
         $apc = m::mock(ApcWrapper::class);
 
@@ -88,7 +88,7 @@ class CacheApcStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testIncrementMethodProperlyCallsAPC()
+    public function testIncrementMethodProperlyCallsAPC(): void
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['increment'])->getMock();
         $apc->expects($this->once())->method('increment')->with($this->equalTo('foo'), $this->equalTo(5));
@@ -96,7 +96,7 @@ class CacheApcStoreTest extends TestCase
         $store->increment('foo', 5);
     }
 
-    public function testDecrementMethodProperlyCallsAPC()
+    public function testDecrementMethodProperlyCallsAPC(): void
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['decrement'])->getMock();
         $apc->expects($this->once())->method('decrement')->with($this->equalTo('foo'), $this->equalTo(5));
@@ -104,7 +104,7 @@ class CacheApcStoreTest extends TestCase
         $store->decrement('foo', 5);
     }
 
-    public function testStoreItemForeverProperlyCallsAPC()
+    public function testStoreItemForeverProperlyCallsAPC(): void
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['put'])->getMock();
         $apc->expects($this->once())
@@ -115,7 +115,7 @@ class CacheApcStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testForgetMethodProperlyCallsAPC()
+    public function testForgetMethodProperlyCallsAPC(): void
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['delete'])->getMock();
         $apc->expects($this->once())->method('delete')->with($this->equalTo('foo'))->willReturn(true);
@@ -124,7 +124,7 @@ class CacheApcStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testFlushesCached()
+    public function testFlushesCached(): void
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['flush'])->getMock();
         $apc->expects($this->once())->method('flush')->willReturn(true);

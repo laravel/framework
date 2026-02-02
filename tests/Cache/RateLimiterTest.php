@@ -40,7 +40,7 @@ class RateLimiterTest extends TestCase
         $this->assertNotNull($limiterClosure);
     }
 
-    public function testShouldUseOriginKeyAsPrefixWhenMultipleLimiterWithSameKey()
+    public function testShouldUseOriginKeyAsPrefixWhenMultipleLimiterWithSameKey(): void
     {
         $rateLimiter = new RateLimiter(new Repository(new ArrayStore));
 

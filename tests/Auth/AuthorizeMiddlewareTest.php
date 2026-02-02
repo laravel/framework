@@ -55,7 +55,7 @@ class AuthorizeMiddlewareTest extends TestCase
         parent::tearDown();
     }
 
-    public function testItCanGenerateDefinitionViaStaticMethod()
+    public function testItCanGenerateDefinitionViaStaticMethod(): void
     {
         $signature = Authorize::using('ability');
         $this->assertSame('Illuminate\Auth\Middleware\Authorize:ability', $signature);
@@ -67,7 +67,7 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->assertSame('Illuminate\Auth\Middleware\Authorize:ability,model,App\Models\Comment', $signature);
     }
 
-    public function testSimpleAbilityUnauthorized()
+    public function testSimpleAbilityUnauthorized(): void
     {
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage('This action is unauthorized.');
@@ -88,7 +88,7 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->router->dispatch(Request::create('dashboard', 'GET'));
     }
 
-    public function testSimpleAbilityAuthorized()
+    public function testSimpleAbilityAuthorized(): void
     {
         $this->gate()->define('view-dashboard', function ($user) {
             return true;
@@ -106,7 +106,7 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->assertSame('success', $response->content());
     }
 
-    public function testSimpleAbilityWithStringParameter()
+    public function testSimpleAbilityWithStringParameter(): void
     {
         $this->gate()->define('view-dashboard', function ($user, $param) {
             return $param === 'some string';
@@ -124,7 +124,7 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->assertSame('success', $response->content());
     }
 
-    public function testSimpleAbilityWithBackedEnumParameter()
+    public function testSimpleAbilityWithBackedEnumParameter(): void
     {
         $this->gate()->define('view-dashboard', function ($user) {
             return true;
@@ -141,7 +141,7 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->assertSame('success', $response->content());
     }
 
-    public function testSimpleAbilityWithNullParameter()
+    public function testSimpleAbilityWithNullParameter(): void
     {
         $this->gate()->define('view-dashboard', function ($user, $param = null) {
             $this->assertNull($param);
@@ -159,7 +159,7 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->router->dispatch(Request::create('dashboard', 'GET'));
     }
 
-    public function testSimpleAbilityWithOptionalParameter()
+    public function testSimpleAbilityWithOptionalParameter(): void
     {
         $post = new stdClass;
 
@@ -193,7 +193,7 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->assertSame('success', $response->content());
     }
 
-    public function testSimpleAbilityWithStringParameterFromRouteParameter()
+    public function testSimpleAbilityWithStringParameterFromRouteParameter(): void
     {
         $this->gate()->define('view-dashboard', function ($user, $param) {
             return $param === 'true';
@@ -211,7 +211,7 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->assertSame('success', $response->content());
     }
 
-    public function testSimpleAbilityWithStringParameter0FromRouteParameter()
+    public function testSimpleAbilityWithStringParameter0FromRouteParameter(): void
     {
         $this->gate()->define('view-dashboard', function ($user, $param) {
             return $param === '0';
@@ -229,7 +229,7 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->assertSame('success', $response->content());
     }
 
-    public function testModelTypeUnauthorized()
+    public function testModelTypeUnauthorized(): void
     {
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage('This action is unauthorized.');
@@ -250,7 +250,7 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->router->dispatch(Request::create('users/create', 'GET'));
     }
 
-    public function testModelTypeAuthorized()
+    public function testModelTypeAuthorized(): void
     {
         $this->gate()->define('create', function ($user, $model) {
             $this->assertSame('App\User', $model);
@@ -270,7 +270,7 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->assertSame('success', $response->content());
     }
 
-    public function testModelUnauthorized()
+    public function testModelUnauthorized(): void
     {
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage('This action is unauthorized.');
@@ -297,7 +297,7 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->router->dispatch(Request::create('posts/1/edit', 'GET'));
     }
 
-    public function testModelAuthorized()
+    public function testModelAuthorized(): void
     {
         $post = new stdClass;
 
@@ -323,7 +323,7 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->assertSame('success', $response->content());
     }
 
-    public function testModelInstanceAsParameter()
+    public function testModelInstanceAsParameter(): void
     {
         $instance = m::mock(Model::class);
 

@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class RedirectIfAuthenticatedMiddlewareTest extends TestCase
 {
-    public function testItCanGenerateDefinitionViaStaticMethod()
+    public function testItCanGenerateDefinitionViaStaticMethod(): void
     {
         $signature = RedirectIfAuthenticated::using('foo');
         $this->assertSame('Illuminate\Auth\Middleware\RedirectIfAuthenticated:foo', $signature);

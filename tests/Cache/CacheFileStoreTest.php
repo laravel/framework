@@ -20,7 +20,7 @@ class CacheFileStoreTest extends TestCase
         parent::tearDown();
     }
 
-    public function testNullIsReturnedIfFileDoesntExist()
+    public function testNullIsReturnedIfFileDoesntExist(): void
     {
         $files = $this->mockFilesystem();
         $files->expects($this->once())->method('get')->will($this->throwException(new FileNotFoundException));
@@ -29,7 +29,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertNull($value);
     }
 
-    public function testPutCreatesMissingDirectories()
+    public function testPutCreatesMissingDirectories(): void
     {
         $files = $this->mockFilesystem();
         $hash = sha1('foo');
@@ -42,7 +42,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testPutWillConsiderZeroAsEternalTime()
+    public function testPutWillConsiderZeroAsEternalTime(): void
     {
         $files = $this->mockFilesystem();
 
@@ -61,7 +61,7 @@ class CacheFileStoreTest extends TestCase
         (new FileStore($files, __DIR__))->put('O--L / key', 'gold', 0);
     }
 
-    public function testPutWillConsiderBigValuesAsEternalTime()
+    public function testPutWillConsiderBigValuesAsEternalTime(): void
     {
         $files = $this->mockFilesystem();
 
@@ -78,7 +78,7 @@ class CacheFileStoreTest extends TestCase
         (new FileStore($files, __DIR__))->put('O--L / key', 'gold', (int) $ten9s + 1);
     }
 
-    public function testExpiredItemsReturnNullAndGetDeleted()
+    public function testExpiredItemsReturnNullAndGetDeleted(): void
     {
         $files = $this->mockFilesystem();
         $contents = '0000000000';
@@ -89,7 +89,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertNull($value);
     }
 
-    public function testValidItemReturnsContents()
+    public function testValidItemReturnsContents(): void
     {
         $files = $this->mockFilesystem();
         $contents = '9999999999'.serialize('Hello World');
@@ -98,7 +98,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertSame('Hello World', $store->get('foo'));
     }
 
-    public function testStoreItemProperlyStoresValues()
+    public function testStoreItemProperlyStoresValues(): void
     {
         $files = $this->mockFilesystem();
         $store = $this->getMockBuilder(FileStore::class)->onlyMethods(['expiration'])->setConstructorArgs([$files, __DIR__])->getMock();
@@ -111,7 +111,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testStoreItemProperlySetsPermissions()
+    public function testStoreItemProperlySetsPermissions(): void
     {
         $files = m::mock(Filesystem::class);
         $files->shouldIgnoreMissing();
@@ -131,7 +131,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testStoreItemDirectoryProperlySetsPermissions()
+    public function testStoreItemDirectoryProperlySetsPermissions(): void
     {
         $files = m::mock(Filesystem::class);
         $files->shouldIgnoreMissing();
@@ -155,7 +155,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testForeversAreStoredWithHighTimestamp()
+    public function testForeversAreStoredWithHighTimestamp(): void
     {
         $files = $this->mockFilesystem();
         $contents = '9999999999'.serialize('Hello World');
@@ -167,7 +167,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testForeversAreNotRemovedOnIncrement()
+    public function testForeversAreNotRemovedOnIncrement(): void
     {
         $files = $this->mockFilesystem();
         $contents = '9999999999'.serialize('Hello World');
@@ -178,7 +178,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertSame('Hello World', $store->get('foo'));
     }
 
-    public function testIncrementExpiredKeys()
+    public function testIncrementExpiredKeys(): void
     {
         Carbon::setTestNow(Carbon::now());
 
@@ -195,7 +195,7 @@ class CacheFileStoreTest extends TestCase
         $result = $store->increment('foo', 3);
     }
 
-    public function testIncrementCanAtomicallyJump()
+    public function testIncrementCanAtomicallyJump(): void
     {
         $filePath = $this->getCachePath('foo');
         $files = $this->mockFilesystem();
@@ -210,7 +210,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertEquals(4, $result);
     }
 
-    public function testDecrementCanAtomicallyJump()
+    public function testDecrementCanAtomicallyJump(): void
     {
         $filePath = $this->getCachePath('foo');
 
@@ -226,7 +226,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertEquals(0, $result);
     }
 
-    public function testIncrementNonNumericValues()
+    public function testIncrementNonNumericValues(): void
     {
         $filePath = $this->getCachePath('foo');
 
@@ -241,7 +241,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertEquals(1, $result);
     }
 
-    public function testIncrementNonExistentKeys()
+    public function testIncrementNonExistentKeys(): void
     {
         $filePath = $this->getCachePath('foo');
 
@@ -256,7 +256,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertEquals(1, $result);
     }
 
-    public function testIncrementDoesNotExtendCacheLife()
+    public function testIncrementDoesNotExtendCacheLife(): void
     {
         Carbon::setTestNow(Carbon::now());
 
@@ -272,7 +272,7 @@ class CacheFileStoreTest extends TestCase
         $store->increment('foo');
     }
 
-    public function testRemoveDeletesFileDoesntExist()
+    public function testRemoveDeletesFileDoesntExist(): void
     {
         $files = $this->mockFilesystem();
         $hash = sha1('foobull');
@@ -282,7 +282,7 @@ class CacheFileStoreTest extends TestCase
         $store->forget('foobull');
     }
 
-    public function testRemoveDeletesFile()
+    public function testRemoveDeletesFile(): void
     {
         $files = new Filesystem;
         $store = new FileStore($files, __DIR__);
@@ -295,7 +295,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertFileDoesNotExist($store->path('foobar'));
     }
 
-    public function testFlushCleansDirectory()
+    public function testFlushCleansDirectory(): void
     {
         $files = $this->mockFilesystem();
         $files->expects($this->once())->method('isDirectory')->with($this->equalTo(__DIR__))->willReturn(true);
@@ -307,7 +307,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertTrue($result, 'Flush failed');
     }
 
-    public function testFlushFailsDirectoryClean()
+    public function testFlushFailsDirectoryClean(): void
     {
         $files = $this->mockFilesystem();
         $files->expects($this->once())->method('isDirectory')->with($this->equalTo(__DIR__))->willReturn(true);
@@ -319,7 +319,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertFalse($result, 'Flush should not have cleared directories');
     }
 
-    public function testFlushIgnoreNonExistingDirectory()
+    public function testFlushIgnoreNonExistingDirectory(): void
     {
         $files = $this->mockFilesystem();
         $files->expects($this->once())->method('isDirectory')->with($this->equalTo(__DIR__.'--wrong'))->willReturn(false);
@@ -329,7 +329,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertFalse($result, 'Flush should not clean directory');
     }
 
-    public function testItHandlesForgettingNonFlexibleKeys()
+    public function testItHandlesForgettingNonFlexibleKeys(): void
     {
         $store = new FileStore(new Filesystem, __DIR__);
 

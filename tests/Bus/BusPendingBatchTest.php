@@ -16,7 +16,7 @@ use stdClass;
 
 class BusPendingBatchTest extends TestCase
 {
-    public function test_pending_batch_may_be_configured_and_dispatched()
+    public function test_pending_batch_may_be_configured_and_dispatched(): void
     {
         $container = new Container;
 
@@ -60,7 +60,7 @@ class BusPendingBatchTest extends TestCase
         $pendingBatch->dispatch();
     }
 
-    public function test_batch_is_deleted_from_storage_if_exception_thrown_during_batching()
+    public function test_batch_is_deleted_from_storage_if_exception_thrown_during_batching(): void
     {
         $this->expectException(RuntimeException::class);
 
@@ -88,7 +88,7 @@ class BusPendingBatchTest extends TestCase
         $pendingBatch->dispatch();
     }
 
-    public function test_batch_is_dispatched_when_dispatchif_is_true()
+    public function test_batch_is_dispatched_when_dispatchif_is_true(): void
     {
         $container = new Container;
 
@@ -114,7 +114,7 @@ class BusPendingBatchTest extends TestCase
         $this->assertInstanceOf(Batch::class, $result);
     }
 
-    public function test_batch_is_not_dispatched_when_dispatchif_is_false()
+    public function test_batch_is_not_dispatched_when_dispatchif_is_false(): void
     {
         $container = new Container;
 
@@ -137,7 +137,7 @@ class BusPendingBatchTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function test_batch_is_dispatched_when_dispatchunless_is_false()
+    public function test_batch_is_dispatched_when_dispatchunless_is_false(): void
     {
         $container = new Container;
 
@@ -163,7 +163,7 @@ class BusPendingBatchTest extends TestCase
         $this->assertInstanceOf(Batch::class, $result);
     }
 
-    public function test_batch_is_not_dispatched_when_dispatchunless_is_true()
+    public function test_batch_is_not_dispatched_when_dispatchunless_is_true(): void
     {
         $container = new Container;
 
@@ -186,7 +186,7 @@ class BusPendingBatchTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function test_batch_before_event_is_called()
+    public function test_batch_before_event_is_called(): void
     {
         $container = new Container;
 

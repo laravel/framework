@@ -11,7 +11,7 @@ use stdClass;
 
 class AuthEloquentUserProviderTest extends TestCase
 {
-    public function testRetrieveByIDReturnsUser()
+    public function testRetrieveByIDReturnsUser(): void
     {
         $provider = $this->getProviderMock();
         $mock = m::mock(stdClass::class);
@@ -25,7 +25,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertSame('bar', $user);
     }
 
-    public function testRetrieveByTokenReturnsUser()
+    public function testRetrieveByTokenReturnsUser(): void
     {
         $mockUser = m::mock(stdClass::class);
         $mockUser->shouldReceive('getRememberToken')->once()->andReturn('a');
@@ -42,7 +42,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertEquals($mockUser, $user);
     }
 
-    public function testRetrieveTokenWithBadIdentifierReturnsNull()
+    public function testRetrieveTokenWithBadIdentifierReturnsNull(): void
     {
         $provider = $this->getProviderMock();
         $mock = m::mock(stdClass::class);
@@ -56,7 +56,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertNull($user);
     }
 
-    public function testRetrievingWithOnlyPasswordCredentialReturnsNull()
+    public function testRetrievingWithOnlyPasswordCredentialReturnsNull(): void
     {
         $provider = $this->getProviderMock();
         $user = $provider->retrieveByCredentials(['api_password' => 'foo']);
@@ -64,7 +64,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertNull($user);
     }
 
-    public function testRetrieveByBadTokenReturnsNull()
+    public function testRetrieveByBadTokenReturnsNull(): void
     {
         $mockUser = m::mock(stdClass::class);
         $mockUser->shouldReceive('getRememberToken')->once()->andReturn(null);
@@ -81,7 +81,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertNull($user);
     }
 
-    public function testRetrieveByCredentialsReturnsUser()
+    public function testRetrieveByCredentialsReturnsUser(): void
     {
         $provider = $this->getProviderMock();
         $mock = m::mock(stdClass::class);
@@ -95,7 +95,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertSame('bar', $user);
     }
 
-    public function testRetrieveByCredentialsAcceptsCallback()
+    public function testRetrieveByCredentialsAcceptsCallback(): void
     {
         $provider = $this->getProviderMock();
         $mock = m::mock(stdClass::class);
@@ -112,7 +112,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertSame('bar', $user);
     }
 
-    public function testRetrieveByCredentialsWithMultiplyPasswordsReturnsNull()
+    public function testRetrieveByCredentialsWithMultiplyPasswordsReturnsNull(): void
     {
         $provider = $this->getProviderMock();
         $user = $provider->retrieveByCredentials([
@@ -123,7 +123,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertNull($user);
     }
 
-    public function testCredentialValidation()
+    public function testCredentialValidation(): void
     {
         $hasher = m::mock(Hasher::class);
         $hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(true);
@@ -135,7 +135,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testCredentialValidationFailed()
+    public function testCredentialValidationFailed(): void
     {
         $hasher = m::mock(Hasher::class);
         $hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(false);
@@ -147,7 +147,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function testCredentialValidationFailsGracefullyWithNullPassword()
+    public function testCredentialValidationFailsGracefullyWithNullPassword(): void
     {
         $hasher = m::mock(Hasher::class);
         $hasher->shouldReceive('check')->never();
@@ -159,7 +159,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function testRehashPasswordIfRequired()
+    public function testRehashPasswordIfRequired(): void
     {
         $hasher = m::mock(Hasher::class);
         $hasher->shouldReceive('needsRehash')->once()->with('hash')->andReturn(true);
@@ -175,7 +175,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $provider->rehashPasswordIfRequired($user, ['password' => 'plain']);
     }
 
-    public function testDontRehashPasswordIfNotRequired()
+    public function testDontRehashPasswordIfNotRequired(): void
     {
         $hasher = m::mock(Hasher::class);
         $hasher->shouldReceive('needsRehash')->once()->with('hash')->andReturn(false);
@@ -191,7 +191,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $provider->rehashPasswordIfRequired($user, ['password' => 'plain']);
     }
 
-    public function testModelsCanBeCreated()
+    public function testModelsCanBeCreated(): void
     {
         $hasher = m::mock(Hasher::class);
         $provider = new EloquentUserProvider($hasher, EloquentProviderUserStub::class);
@@ -200,7 +200,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertInstanceOf(EloquentProviderUserStub::class, $model);
     }
 
-    public function testRegistersQueryHandler()
+    public function testRegistersQueryHandler(): void
     {
         $callback = function ($builder) {
             $builder->whereIn('group', ['one', 'two']);

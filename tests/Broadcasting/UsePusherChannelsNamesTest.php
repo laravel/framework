@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 class UsePusherChannelsNamesTest extends TestCase
 {
     #[DataProvider('channelsProvider')]
-    public function testChannelNameNormalization($requestChannelName, $normalizedName, $guarded)
+    public function testChannelNameNormalization($requestChannelName, $normalizedName, $guarded): void
     {
         $broadcaster = new FakeBroadcasterUsingPusherChannelsNames;
 
@@ -20,7 +20,7 @@ class UsePusherChannelsNamesTest extends TestCase
         );
     }
 
-    public function testChannelNameNormalizationSpecialCase()
+    public function testChannelNameNormalizationSpecialCase(): void
     {
         $broadcaster = new FakeBroadcasterUsingPusherChannelsNames;
 
@@ -30,7 +30,7 @@ class UsePusherChannelsNamesTest extends TestCase
         );
     }
 
-    public function testChannelNamePatternMatching()
+    public function testChannelNamePatternMatching(): void
     {
         $broadcaster = new FakeBroadcasterUsingPusherChannelsNames;
 
@@ -44,7 +44,7 @@ class UsePusherChannelsNamesTest extends TestCase
     }
 
     #[DataProvider('channelsProvider')]
-    public function testIsGuardedChannel($requestChannelName, $normalizedName, $guarded)
+    public function testIsGuardedChannel($requestChannelName, $normalizedName, $guarded): void
     {
         $broadcaster = new FakeBroadcasterUsingPusherChannelsNames;
 
@@ -117,7 +117,7 @@ class FakeBroadcasterUsingPusherChannelsNames extends Broadcaster
         //
     }
 
-    public function testChannelNameMatchesPattern($channel, $pattern)
+    public function testChannelNameMatchesPattern($channel, $pattern): void
     {
         return $this->channelNameMatchesPattern($channel, $pattern);
     }

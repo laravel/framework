@@ -27,7 +27,7 @@ class AblyBroadcasterTest extends TestCase
         $this->broadcaster = m::mock(AblyBroadcaster::class, [$this->ably])->makePartial();
     }
 
-    public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue()
+    public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue(): void
     {
         $this->broadcaster->channel('test', function () {
             return true;
@@ -41,7 +41,7 @@ class AblyBroadcasterTest extends TestCase
         );
     }
 
-    public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenCallbackReturnFalse()
+    public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenCallbackReturnFalse(): void
     {
         $this->expectException(AccessDeniedHttpException::class);
 
@@ -54,7 +54,7 @@ class AblyBroadcasterTest extends TestCase
         );
     }
 
-    public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenRequestUserNotFound()
+    public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenRequestUserNotFound(): void
     {
         $this->expectException(AccessDeniedHttpException::class);
 
@@ -67,7 +67,7 @@ class AblyBroadcasterTest extends TestCase
         );
     }
 
-    public function testAuthCallValidAuthenticationResponseWithPresenceChannelWhenCallbackReturnAnArray()
+    public function testAuthCallValidAuthenticationResponseWithPresenceChannelWhenCallbackReturnAnArray(): void
     {
         $returnData = [1, 2, 3, 4];
         $this->broadcaster->channel('test', function () use ($returnData) {
@@ -82,7 +82,7 @@ class AblyBroadcasterTest extends TestCase
         );
     }
 
-    public function testAuthThrowAccessDeniedHttpExceptionWithPresenceChannelWhenCallbackReturnNull()
+    public function testAuthThrowAccessDeniedHttpExceptionWithPresenceChannelWhenCallbackReturnNull(): void
     {
         $this->expectException(AccessDeniedHttpException::class);
 
@@ -95,7 +95,7 @@ class AblyBroadcasterTest extends TestCase
         );
     }
 
-    public function testAuthThrowAccessDeniedHttpExceptionWithPresenceChannelWhenRequestUserNotFound()
+    public function testAuthThrowAccessDeniedHttpExceptionWithPresenceChannelWhenRequestUserNotFound(): void
     {
         $this->expectException(AccessDeniedHttpException::class);
 

@@ -13,7 +13,7 @@ use stdClass;
 
 class CacheDatabaseStoreTest extends TestCase
 {
-    public function testNullIsReturnedWhenItemNotFound()
+    public function testNullIsReturnedWhenItemNotFound(): void
     {
         $store = $this->getStore();
         $table = m::mock(stdClass::class);
@@ -24,7 +24,7 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertNull($store->get('foo'));
     }
 
-    public function testNullIsReturnedAndItemDeletedWhenItemIsExpired()
+    public function testNullIsReturnedAndItemDeletedWhenItemIsExpired(): void
     {
         $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['forgetIfExpired'])->setConstructorArgs($this->getMocks())->getMock();
 
@@ -42,7 +42,7 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertNull($store->get('foo'));
     }
 
-    public function testDecryptedValueIsReturnedWhenItemIsValid()
+    public function testDecryptedValueIsReturnedWhenItemIsValid(): void
     {
         $store = $this->getStore();
         $table = m::mock(stdClass::class);
@@ -53,7 +53,7 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertSame('bar', $store->get('foo'));
     }
 
-    public function testValueIsReturnedOnPostgres()
+    public function testValueIsReturnedOnPostgres(): void
     {
         $store = $this->getPostgresStore();
         $table = m::mock(stdClass::class);
@@ -64,7 +64,7 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertSame('bar', $store->get('foo'));
     }
 
-    public function testValueIsReturnedOnSqlite()
+    public function testValueIsReturnedOnSqlite(): void
     {
         $store = $this->getSqliteStore();
         $table = m::mock(stdClass::class);
@@ -75,7 +75,7 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertSame("\0bar\0", $store->get('foo'));
     }
 
-    public function testValueIsUpserted()
+    public function testValueIsUpserted(): void
     {
         $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getMocks())->getMock();
         $table = m::mock(stdClass::class);
@@ -87,7 +87,7 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testValueIsUpsertedOnPostgres()
+    public function testValueIsUpsertedOnPostgres(): void
     {
         $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getPostgresMocks())->getMock();
         $table = m::mock(stdClass::class);
@@ -99,7 +99,7 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testValueIsUpsertedOnSqlite()
+    public function testValueIsUpsertedOnSqlite(): void
     {
         $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getSqliteMocks())->getMock();
         $table = m::mock(stdClass::class);
@@ -111,7 +111,7 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testForeverCallsStoreItemWithReallyLongTime()
+    public function testForeverCallsStoreItemWithReallyLongTime(): void
     {
         $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['put'])->setConstructorArgs($this->getMocks())->getMock();
         $store->expects($this->once())->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(315360000))->willReturn(true);
@@ -119,7 +119,7 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testItemsMayBeRemovedFromCache()
+    public function testItemsMayBeRemovedFromCache(): void
     {
         $store = $this->getStore();
         $table = m::mock(stdClass::class);
@@ -130,7 +130,7 @@ class CacheDatabaseStoreTest extends TestCase
         $store->forget('foo');
     }
 
-    public function testItemsMayBeFlushedFromCache()
+    public function testItemsMayBeFlushedFromCache(): void
     {
         $store = $this->getStore();
         $table = m::mock(stdClass::class);
@@ -141,7 +141,7 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testIncrementReturnsCorrectValues()
+    public function testIncrementReturnsCorrectValues(): void
     {
         $store = $this->getStore();
         $table = m::mock(stdClass::class);
@@ -180,7 +180,7 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertEquals(3, $store->increment('foo'));
     }
 
-    public function testDecrementReturnsCorrectValues()
+    public function testDecrementReturnsCorrectValues(): void
     {
         $store = $this->getStore();
         $table = m::mock(stdClass::class);

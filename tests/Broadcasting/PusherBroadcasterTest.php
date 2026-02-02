@@ -25,7 +25,7 @@ class PusherBroadcasterTest extends TestCase
         $this->broadcaster = m::mock(PusherBroadcaster::class, [$this->pusher])->makePartial();
     }
 
-    public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue()
+    public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue(): void
     {
         $this->broadcaster->channel('test', function () {
             return true;
@@ -39,7 +39,7 @@ class PusherBroadcasterTest extends TestCase
         );
     }
 
-    public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenCallbackReturnFalse()
+    public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenCallbackReturnFalse(): void
     {
         $this->expectException(AccessDeniedHttpException::class);
 
@@ -52,7 +52,7 @@ class PusherBroadcasterTest extends TestCase
         );
     }
 
-    public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenRequestUserNotFound()
+    public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenRequestUserNotFound(): void
     {
         $this->expectException(AccessDeniedHttpException::class);
 
@@ -65,7 +65,7 @@ class PusherBroadcasterTest extends TestCase
         );
     }
 
-    public function testAuthCallValidAuthenticationResponseWithPresenceChannelWhenCallbackReturnAnArray()
+    public function testAuthCallValidAuthenticationResponseWithPresenceChannelWhenCallbackReturnAnArray(): void
     {
         $returnData = [1, 2, 3, 4];
         $this->broadcaster->channel('test', function () use ($returnData) {
@@ -80,7 +80,7 @@ class PusherBroadcasterTest extends TestCase
         );
     }
 
-    public function testAuthThrowAccessDeniedHttpExceptionWithPresenceChannelWhenCallbackReturnNull()
+    public function testAuthThrowAccessDeniedHttpExceptionWithPresenceChannelWhenCallbackReturnNull(): void
     {
         $this->expectException(AccessDeniedHttpException::class);
 
@@ -93,7 +93,7 @@ class PusherBroadcasterTest extends TestCase
         );
     }
 
-    public function testAuthThrowAccessDeniedHttpExceptionWithPresenceChannelWhenRequestUserNotFound()
+    public function testAuthThrowAccessDeniedHttpExceptionWithPresenceChannelWhenRequestUserNotFound(): void
     {
         $this->expectException(AccessDeniedHttpException::class);
 
@@ -106,7 +106,7 @@ class PusherBroadcasterTest extends TestCase
         );
     }
 
-    public function testValidAuthenticationResponseCallPusherSocketAuthMethodWithPrivateChannel()
+    public function testValidAuthenticationResponseCallPusherSocketAuthMethodWithPrivateChannel(): void
     {
         $request = $this->getMockRequestWithUserForChannel('private-test');
 
@@ -124,7 +124,7 @@ class PusherBroadcasterTest extends TestCase
         );
     }
 
-    public function testValidAuthenticationResponseCallPusherPresenceAuthMethodWithPresenceChannel()
+    public function testValidAuthenticationResponseCallPusherPresenceAuthMethodWithPresenceChannel(): void
     {
         $request = $this->getMockRequestWithUserForChannel('presence-test');
 
@@ -146,7 +146,7 @@ class PusherBroadcasterTest extends TestCase
         );
     }
 
-    public function testUserAuthenticationForPusher()
+    public function testUserAuthenticationForPusher(): void
     {
         $this->pusher
             ->shouldReceive('getSettings')

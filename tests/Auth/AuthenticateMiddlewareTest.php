@@ -37,7 +37,7 @@ class AuthenticateMiddlewareTest extends TestCase
         parent::tearDown();
     }
 
-    public function testItCanGenerateDefinitionViaStaticMethod()
+    public function testItCanGenerateDefinitionViaStaticMethod(): void
     {
         $signature = Authenticate::using('foo');
         $this->assertSame('Illuminate\Auth\Middleware\Authenticate:foo', $signature);
@@ -49,7 +49,7 @@ class AuthenticateMiddlewareTest extends TestCase
         $this->assertSame('Illuminate\Auth\Middleware\Authenticate:foo,bar,baz', $signature);
     }
 
-    public function testItCanGenerateDefinitionViaStaticMethodForBasic()
+    public function testItCanGenerateDefinitionViaStaticMethodForBasic(): void
     {
         $signature = AuthenticateWithBasicAuth::using('guard');
         $this->assertSame('Illuminate\Auth\Middleware\AuthenticateWithBasicAuth:guard', $signature);
@@ -61,7 +61,7 @@ class AuthenticateMiddlewareTest extends TestCase
         $this->assertSame('Illuminate\Auth\Middleware\AuthenticateWithBasicAuth:,field', $signature);
     }
 
-    public function testDefaultUnauthenticatedThrows()
+    public function testDefaultUnauthenticatedThrows(): void
     {
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Unauthenticated.');
@@ -71,7 +71,7 @@ class AuthenticateMiddlewareTest extends TestCase
         $this->authenticate();
     }
 
-    public function testDefaultUnauthenticatedThrowsWithGuards()
+    public function testDefaultUnauthenticatedThrowsWithGuards(): void
     {
         try {
             $this->registerAuthDriver('default', false);
@@ -86,7 +86,7 @@ class AuthenticateMiddlewareTest extends TestCase
         $this->fail();
     }
 
-    public function testDefaultAuthenticatedKeepsDefaultDriver()
+    public function testDefaultAuthenticatedKeepsDefaultDriver(): void
     {
         $driver = $this->registerAuthDriver('default', true);
 
@@ -95,7 +95,7 @@ class AuthenticateMiddlewareTest extends TestCase
         $this->assertSame($driver, $this->auth->guard());
     }
 
-    public function testSecondaryAuthenticatedUpdatesDefaultDriver()
+    public function testSecondaryAuthenticatedUpdatesDefaultDriver(): void
     {
         $this->registerAuthDriver('default', false);
 
@@ -106,7 +106,7 @@ class AuthenticateMiddlewareTest extends TestCase
         $this->assertSame($secondary, $this->auth->guard());
     }
 
-    public function testMultipleDriversUnauthenticatedThrows()
+    public function testMultipleDriversUnauthenticatedThrows(): void
     {
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Unauthenticated.');
@@ -118,7 +118,7 @@ class AuthenticateMiddlewareTest extends TestCase
         $this->authenticate('default', 'secondary');
     }
 
-    public function testMultipleDriversUnauthenticatedThrowsWithGuards()
+    public function testMultipleDriversUnauthenticatedThrowsWithGuards(): void
     {
         $expectedGuards = ['default', 'secondary'];
 
@@ -137,7 +137,7 @@ class AuthenticateMiddlewareTest extends TestCase
         $this->fail();
     }
 
-    public function testMultipleDriversAuthenticatedUpdatesDefault()
+    public function testMultipleDriversAuthenticatedUpdatesDefault(): void
     {
         $this->registerAuthDriver('default', false);
 
