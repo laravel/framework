@@ -36,7 +36,8 @@ class MigrateCommand extends BaseCommand implements Isolatable
                 {--seed : Indicates if the seed task should be re-run}
                 {--seeder= : The class name of the root seeder}
                 {--step : Force the migrations to be run so they can be rolled back individually}
-                {--graceful : Return a successful exit code even if an error occurs}';
+                {--graceful : Return a successful exit code even if an error occurs}
+                {--skip=* : Migration file(s) to skip}';
 
     /**
      * The console command description.
@@ -116,6 +117,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
                 ->run($this->getMigrationPaths(), [
                     'pretend' => $this->option('pretend'),
                     'step' => $this->option('step'),
+                    'skip' => $this->option('skip'),
                 ]);
 
             // Finally, if the "seed" option has been given, we will re-run the database
