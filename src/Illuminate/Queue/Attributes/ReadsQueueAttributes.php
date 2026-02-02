@@ -21,11 +21,13 @@ trait ReadsQueueAttributes
         try {
             $reflection = new ReflectionClass($job);
 
-            $attributes = $reflection->getAttributes($attributeClass);
+            do {
+                $attributes = $reflection->getAttributes($attributeClass);
 
-            if (count($attributes) > 0) {
-                return $this->extractAttributeValue($attributes[0]->newInstance());
-            }
+                if (count($attributes) > 0) {
+                    return $this->extractAttributeValue($attributes[0]->newInstance());
+                }
+            } while ($reflection = $reflection->getParentClass());
         } catch (Exception) {
             //
         }

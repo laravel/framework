@@ -10,6 +10,13 @@ use ReflectionClass;
 trait ConditionallyLoadsAttributes
 {
     /**
+     * The cached preserve keys attribute values.
+     *
+     * @var array<class-string, bool>
+     */
+    protected static $cachedPreserveKeysAttributes = [];
+
+    /**
      * Filter the given data, removing any optional values.
      *
      * @param  array  $data

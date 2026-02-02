@@ -59,13 +59,6 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public static bool $forceWrapping = false;
 
     /**
-     * The cached preserve keys attribute values.
-     *
-     * @var array<class-string, bool>
-     */
-    protected static $cachedPreserveKeysAttributes = [];
-
-    /**
      * Create a new resource instance.
      *
      * @param  mixed  $resource
