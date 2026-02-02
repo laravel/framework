@@ -99,6 +99,26 @@ class TranslatorTest extends TestCase
         $this->app['translator']->handleMissingKeysUsing(null);
     }
 
+    public function testFileValidationDoesNotAttemptToTranslateAlreadyTranslatedMessages()
+    {
+        $keysLookedUp = [];
+
+        $this->app['translator']->handleMissingKeysUsing(function ($key) use (&$keysLookedUp) {
+            $keysLookedUp[] = $key;
+        });
+
+        $validator = $this->app['validator']->make(
+            ['file' => \Illuminate\Http\UploadedFile::fake()->create('file.pdf')],
+            ['file' => [\Illuminate\Validation\Rules\File::types(['txt'])]]
+        );
+
+        $validator->fails();
+
+        $this->assertNotContains('The file field must be a file of type: txt.', $keysLookedUp);
+
+        $this->app['translator']->handleMissingKeysUsing(null);
+    }
+
     #[DataProvider('greetingChoiceDataProvider')]
     public function testItCanHandleChoice(int $count, string $expected, ?string $locale = null)
     {
