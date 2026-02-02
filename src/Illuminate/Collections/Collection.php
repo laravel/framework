@@ -711,32 +711,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
-     * Determine if the collection contains exactly one item. If a callback is provided, determine if exactly one item matches the condition.
-     *
-     * @param  (callable(TValue, TKey): bool)|null  $callback
-     * @return bool
-     *
-     * @deprecated 12.49.0 Use the `hasSole()` method instead.
-     */
-    public function containsOneItem(?callable $callback = null): bool
-    {
-        return $this->hasSole($callback);
-    }
-
-    /**
-     * Determine if the collection contains multiple items.
-     *
-     * @param  (callable(TValue, TKey): bool)|null  $callback
-     * @return bool
-     *
-     * @deprecated 12.50.0 Use the `hasMany()` method instead.
-     */
-    public function containsManyItems(?callable $callback = null): bool
-    {
-        return $this->hasMany($callback);
-    }
-
-    /**
      * Join all items from the collection using a string. The final items can use a separate glue string.
      *
      * @param  string  $glue

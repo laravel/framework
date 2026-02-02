@@ -378,33 +378,6 @@ class SupportLazyCollectionTest extends TestCase
         $this->assertEquals(['a' => 1, 'b' => 2], $collapsed->all());
     }
 
-    public function testContainsOneItem()
-    {
-        $collection = new LazyCollection([5]);
-        $this->assertTrue($collection->containsOneItem());
-
-        $emptyCollection = new LazyCollection([]);
-        $this->assertFalse($emptyCollection->containsOneItem());
-
-        $multipleCollection = new LazyCollection([1, 2, 3]);
-        $this->assertFalse($multipleCollection->containsOneItem());
-    }
-
-    public function testContainsManyItems()
-    {
-        $emptyCollection = new LazyCollection([]);
-        $this->assertFalse($emptyCollection->containsManyItems());
-
-        $singleCollection = new LazyCollection([1]);
-        $this->assertFalse($singleCollection->containsManyItems());
-
-        $multipleCollection = new LazyCollection([1, 2]);
-        $this->assertTrue($multipleCollection->containsManyItems());
-
-        $manyCollection = new LazyCollection([1, 2, 3]);
-        $this->assertTrue($manyCollection->containsManyItems());
-    }
-
     public function testDoesntContain()
     {
         $collection = new LazyCollection([1, 2, 3, 4, 5]);

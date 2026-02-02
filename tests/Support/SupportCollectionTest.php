@@ -944,32 +944,6 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([1, 2, '', null, false, [], 'name'], $c->add('name')->values()->all());
     }
 
-    #[DataProvider('collectionClassProvider')]
-    public function testContainsOneItem($collection)
-    {
-        $this->assertFalse((new $collection([]))->containsOneItem());
-        $this->assertTrue((new $collection([1]))->containsOneItem());
-        $this->assertFalse((new $collection([1, 2]))->containsOneItem());
-
-        $this->assertFalse(collect([1, 2, 2])->containsOneItem(fn ($number) => $number === 2));
-        $this->assertTrue(collect(['ant', 'bear', 'cat'])->containsOneItem(fn ($word) => strlen($word) === 4));
-        $this->assertFalse(collect(['ant', 'bear', 'cat'])->containsOneItem(fn ($word) => strlen($word) > 4));
-    }
-
-    #[DataProvider('collectionClassProvider')]
-    public function testContainsManyItems($collection)
-    {
-        $this->assertFalse((new $collection([]))->containsManyItems());
-        $this->assertFalse((new $collection([1]))->containsManyItems());
-        $this->assertTrue((new $collection([1, 2]))->containsManyItems());
-        $this->assertTrue((new $collection([1, 2, 3]))->containsManyItems());
-
-        $this->assertTrue(collect([1, 2, 2])->containsManyItems(fn ($number) => $number === 2));
-        $this->assertFalse(collect(['ant', 'bear', 'cat'])->containsManyItems(fn ($word) => strlen($word) === 4));
-        $this->assertFalse(collect(['ant', 'bear', 'cat'])->containsManyItems(fn ($word) => strlen($word) > 4));
-        $this->assertTrue(collect(['ant', 'bear', 'cat'])->containsManyItems(fn ($word) => strlen($word) === 3));
-    }
-
     public function testIterable()
     {
         $c = new Collection(['foo']);

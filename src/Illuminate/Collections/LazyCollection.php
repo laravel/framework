@@ -668,31 +668,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
-     * Determine if the collection contains a single item.
-     *
-     * @param  (callable(TValue, TKey): bool)|null  $callback
-     * @return bool
-     *
-     * @deprecated 12.49.0 Use the `hasSole()` method instead.
-     */
-    public function containsOneItem(?callable $callback = null): bool
-    {
-        return $this->hasSole($callback);
-    }
-
-    /**
-     * Determine if the collection contains multiple items.
-     *
-     * @return bool
-     *
-     * @deprecated 12.50.0 Use the `hasMany()` method instead.
-     */
-    public function containsManyItems(): bool
-    {
-        return $this->hasMany();
-    }
-
-    /**
      * Join all items from the collection using a string. The final items can use a separate glue string.
      *
      * @param  string  $glue

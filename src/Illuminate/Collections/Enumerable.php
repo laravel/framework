@@ -624,20 +624,6 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function isNotEmpty();
 
     /**
-     * Determine if the collection contains a single item.
-     *
-     * @return bool
-     */
-    public function containsOneItem();
-
-    /**
-     * Determine if the collection contains multiple items.
-     *
-     * @return bool
-     */
-    public function containsManyItems();
-
-    /**
      * Join all items from the collection using a string. The final items can use a separate glue string.
      *
      * @param  string  $glue
