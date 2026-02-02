@@ -1412,7 +1412,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function assertSeeInHtml($string, $escape = true)
     {
-        $string = $escape ? EncodedHtmlString::convert($string, withQuote: isset($this->markdown)) : $string;
+        $string = $escape ? EncodedHtmlString::convert($string, withQuote: $escape) : $string;
 
         [$html] = $this->renderForAssertions();
 
@@ -1434,7 +1434,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function assertDontSeeInHtml($string, $escape = true)
     {
-        $string = $escape ? EncodedHtmlString::convert($string, withQuote: isset($this->markdown)) : $string;
+        $string = $escape ? EncodedHtmlString::convert($string, withQuote: $escape) : $string;
 
         [$html] = $this->renderForAssertions();
 
@@ -1456,8 +1456,8 @@ class Mailable implements MailableContract, Renderable
      */
     public function assertSeeInOrderInHtml($strings, $escape = true)
     {
-        $strings = $escape ? array_map(function ($string) {
-            return EncodedHtmlString::convert($string, withQuote: isset($this->markdown));
+        $strings = $escape ? array_map(function ($string) use ($escape) {
+            return EncodedHtmlString::convert($string, withQuote: $escape);
         }, $strings) : $strings;
 
         [$html] = $this->renderForAssertions();
