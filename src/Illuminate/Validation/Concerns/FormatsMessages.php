@@ -448,7 +448,7 @@ trait FormatsMessages
     }
 
     /**
-     * Get the word for a index or position segment.
+     * Get the word for an index or position segment.
      *
      * @param  int  $value
      * @return string

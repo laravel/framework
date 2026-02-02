@@ -153,7 +153,7 @@ class Rule
     }
 
     /**
-     * Get a exclude_if rule builder instance.
+     * Get an exclude_if rule builder instance.
      *
      * @param  (\Closure(): bool)|bool  $callback
      * @return \Illuminate\Validation\Rules\ExcludeIf
