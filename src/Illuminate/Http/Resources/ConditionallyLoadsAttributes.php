@@ -2,8 +2,10 @@
 
 namespace Illuminate\Http\Resources;
 
+use Illuminate\Http\Resources\Attributes\PreserveKeys;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Stringable;
+use ReflectionClass;
 
 trait ConditionallyLoadsAttributes
 {
@@ -83,6 +85,10 @@ trait ConditionallyLoadsAttributes
             } else {
                 $numericKeys = $numericKeys && is_numeric($key);
             }
+        }
+
+        if (count((new ReflectionClass($this))->getAttributes(PreserveKeys::class)) > 0) {
+            return $data;
         }
 
         if (property_exists($this, 'preserveKeys') && $this->preserveKeys === true) {

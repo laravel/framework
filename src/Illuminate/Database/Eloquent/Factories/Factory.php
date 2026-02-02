@@ -7,6 +7,7 @@ use Faker\Generator;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Factories\Attributes\UseModel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -15,6 +16,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
+use ReflectionClass;
 use Throwable;
 use UnitEnum;
 
@@ -892,6 +894,12 @@ abstract class Factory
      */
     public function modelName()
     {
+        $attribute = (new ReflectionClass($this))->getAttributes(UseModel::class);
+
+        if (count($attribute) > 0) {
+            return $attribute[0]->newInstance()->class;
+        }
+
         if ($this->model !== null) {
             return $this->model;
         }

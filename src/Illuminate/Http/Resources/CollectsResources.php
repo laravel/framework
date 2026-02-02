@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Resources;
 
+use Illuminate\Http\Resources\Attributes\Collects;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
@@ -49,7 +50,11 @@ trait CollectsResources
     {
         $collects = null;
 
-        if ($this->collects) {
+        $attribute = (new ReflectionClass($this))->getAttributes(Collects::class);
+
+        if (count($attribute) > 0) {
+            $collects = $attribute[0]->newInstance()->class;
+        } elseif ($this->collects) {
             $collects = $this->collects;
         } elseif (str_ends_with(class_basename($this), 'Collection') &&
             (class_exists($class = Str::replaceLast('Collection', '', get_class($this))) ||
