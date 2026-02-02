@@ -195,21 +195,25 @@ class MaintenanceModeTest extends TestCase
         Event::assertDispatched(MaintenanceModeDisabled::class);
     }
 
-    // #[DataProvider('retryAfterDatetimeProvider')]
-    // public function testMaintenanceModeRetryCanAcceptDatetime(string $datetime): void
-    // {
-    //     $this->artisan(DownCommand::class, ['--retry' => $datetime]);
+    #[DataProvider('retryAfterDatetimeProvider')]
+    public function test_maintenance_mode_retry_can_accept_datetime(string $datetime): void
+    {
+        Carbon::setTestNow('2023-01-01 00:00:00');
 
-    //     $data = json_decode(file_get_contents(storage_path('framework/down')), true);
+        $this->artisan(DownCommand::class, ['--retry' => $datetime]);
 
-    //     $expectedDate = Carbon::parse($datetime)->format(DateTimeInterface::RFC7231);
-    //     $this->assertSame($expectedDate, $data['retry']);
-    // }
+        $data = json_decode(file_get_contents(storage_path('framework/down')), true);
+
+        $expectedDate = Carbon::parse($datetime)->format(DateTimeInterface::RFC7231);
+        $this->assertSame($expectedDate, $data['retry']);
+
+        Carbon::setTestNow();
+    }
 
     public static function retryAfterDatetimeProvider(): array
     {
         return [
-            'ISO 8601 format' => [date('Y-m-d H:i:s', strtotime('+1 week'))],
+            'ISO 8601 format' => ['2023-01-08 00:00:00'],
             'natural language' => ['tomorrow 14:00'],
             'relative time' => ['+2 hours'],
         ];
