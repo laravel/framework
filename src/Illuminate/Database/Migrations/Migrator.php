@@ -128,7 +128,7 @@ class Migrator
         // run each of the outstanding migrations against a database connection.
         $files = $this->getMigrationFiles($paths);
 
-        self::withoutMigrations($options['skip'] ?? []);
+        self::withoutMigrations(array_merge(self::$withoutMigrations, $options['skip'] ?? []));
 
         $this->requireFiles($migrations = $this->pendingMigrations(
             $files, $this->repository->getRan()
