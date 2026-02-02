@@ -9,15 +9,12 @@ use Illuminate\Database\Eloquent\Attributes\DateFormat;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
-use Illuminate\Database\Eloquent\Attributes\Incrementing;
-use Illuminate\Database\Eloquent\Attributes\KeyType;
 use Illuminate\Database\Eloquent\Attributes\PrimaryKey;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\Timestamps;
 use Illuminate\Database\Eloquent\Attributes\Touches;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Attributes\Visible;
-use Illuminate\Database\Eloquent\Attributes\WithoutIncrementing;
 use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Database\Eloquent\Model;
 use PHPUnit\Framework\TestCase;
@@ -72,38 +69,28 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertSame('property_id', $model->getKeyName());
     }
 
-    public function test_key_type_attribute(): void
+    public function test_primary_key_attribute_with_type(): void
     {
-        $model = new ModelWithKeyTypeAttribute;
+        $model = new ModelWithPrimaryKeyTypeAttribute;
 
+        $this->assertSame('uuid', $model->getKeyName());
         $this->assertSame('string', $model->getKeyType());
     }
 
-    public function test_key_type_property_takes_precedence(): void
+    public function test_primary_key_attribute_with_incrementing(): void
     {
-        $model = new ModelWithKeyTypeAttributeAndProperty;
+        $model = new ModelWithPrimaryKeyIncrementingAttribute;
 
-        $this->assertSame('uuid', $model->getKeyType());
-    }
-
-    public function test_incrementing_attribute(): void
-    {
-        $model = new ModelWithIncrementingFalseAttribute;
-
+        $this->assertSame('uuid', $model->getKeyName());
         $this->assertFalse($model->getIncrementing());
     }
 
-    public function test_without_incrementing_attribute(): void
+    public function test_primary_key_attribute_with_all_options(): void
     {
-        $model = new ModelWithoutIncrementingAttribute;
+        $model = new ModelWithFullPrimaryKeyAttribute;
 
-        $this->assertFalse($model->getIncrementing());
-    }
-
-    public function test_incrementing_property_takes_precedence(): void
-    {
-        $model = new ModelWithIncrementingAttributeAndProperty;
-
+        $this->assertSame('uuid', $model->getKeyName());
+        $this->assertSame('string', $model->getKeyType());
         $this->assertFalse($model->getIncrementing());
     }
 
@@ -275,34 +262,22 @@ class ModelWithPrimaryKeyAttributeAndProperty extends Model
     protected $primaryKey = 'property_id';
 }
 
-#[KeyType('string')]
-class ModelWithKeyTypeAttribute extends Model
+#[PrimaryKey('uuid', type: 'string')]
+class ModelWithPrimaryKeyTypeAttribute extends Model
 {
     //
 }
 
-#[KeyType('string')]
-class ModelWithKeyTypeAttributeAndProperty extends Model
-{
-    protected $keyType = 'uuid';
-}
-
-#[Incrementing(false)]
-class ModelWithIncrementingFalseAttribute extends Model
+#[PrimaryKey('uuid', incrementing: false)]
+class ModelWithPrimaryKeyIncrementingAttribute extends Model
 {
     //
 }
 
-#[WithoutIncrementing]
-class ModelWithoutIncrementingAttribute extends Model
+#[PrimaryKey('uuid', type: 'string', incrementing: false)]
+class ModelWithFullPrimaryKeyAttribute extends Model
 {
     //
-}
-
-#[Incrementing(false)]
-class ModelWithIncrementingAttributeAndProperty extends Model
-{
-    public $incrementing = false;
 }
 
 #[Connection('secondary')]
