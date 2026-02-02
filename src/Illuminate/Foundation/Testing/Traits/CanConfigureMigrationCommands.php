@@ -2,6 +2,10 @@
 
 namespace Illuminate\Foundation\Testing\Traits;
 
+use Illuminate\Foundation\Testing\Attributes\Seed;
+use Illuminate\Foundation\Testing\Attributes\Seeder;
+use ReflectionClass;
+
 trait CanConfigureMigrationCommands
 {
     /**
@@ -49,6 +53,10 @@ trait CanConfigureMigrationCommands
      */
     protected function shouldSeed()
     {
+        if (count((new ReflectionClass($this))->getAttributes(Seed::class)) > 0) {
+            return true;
+        }
+
         return property_exists($this, 'seed') ? $this->seed : false;
     }
 
@@ -59,6 +67,12 @@ trait CanConfigureMigrationCommands
      */
     protected function seeder()
     {
+        $seeder = (new ReflectionClass($this))->getAttributes(Seeder::class);
+
+        if (count($seeder) > 0) {
+            return $seeder[0]->newInstance()->class;
+        }
+
         return property_exists($this, 'seeder') ? $this->seeder : false;
     }
 }
