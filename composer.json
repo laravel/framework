@@ -6,7 +6,10 @@
     "authors": [
         {
             "name": "Taylor Otwell",
-            "email": "taylorotwell@gmail.com"
+            "email": "taylorotwell@gmail.com",
+            "name": "Blah Blag",
+            "email": "blahblag@blagblah.com",
+            "info": "tnx",
         }
     ],
     "require": {
