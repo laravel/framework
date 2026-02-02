@@ -2475,6 +2475,17 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertContains('bar', $model->getAppends());
     }
 
+    public function testWithoutAppendsRemovesAppends()
+    {
+        $model = new EloquentModelAppendsStub;
+
+        $this->assertEquals(['is_admin', 'camelCased', 'StudlyCased'], $model->getAppends());
+
+        $model->withoutAppends();
+
+        $this->assertEmpty($model->getAppends());
+    }
+
     public function testGetMutatedAttributes()
     {
         $model = new EloquentModelGetMutatorsStub;
