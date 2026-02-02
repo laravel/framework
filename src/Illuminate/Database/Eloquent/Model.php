@@ -15,15 +15,12 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Attributes\Boot;
 use Illuminate\Database\Eloquent\Attributes\Connection;
-use Illuminate\Database\Eloquent\Attributes\Incrementing;
 use Illuminate\Database\Eloquent\Attributes\Initialize;
-use Illuminate\Database\Eloquent\Attributes\KeyType;
 use Illuminate\Database\Eloquent\Attributes\PrimaryKey;
 use Illuminate\Database\Eloquent\Attributes\Scope as LocalScope;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\Timestamps;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
-use Illuminate\Database\Eloquent\Attributes\WithoutIncrementing;
 use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -440,18 +437,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->connection ??= static::resolveClassAttribute(Connection::class, 'name');
 
         if ($this->primaryKey === 'id') {
-            $this->primaryKey = static::resolveClassAttribute(PrimaryKey::class, 'name') ?? $this->primaryKey;
-        }
+            if ($primaryKey = static::resolveClassAttribute(PrimaryKey::class)) {
+                $this->primaryKey = $primaryKey->name;
 
-        if ($this->keyType === 'int') {
-            $this->keyType = static::resolveClassAttribute(KeyType::class, 'type') ?? $this->keyType;
-        }
+                if ($this->keyType === 'int' && $primaryKey->type !== null) {
+                    $this->keyType = $primaryKey->type;
+                }
 
-        if ($this->incrementing === true) {
-            if (static::resolveClassAttribute(WithoutIncrementing::class) !== null) {
-                $this->incrementing = false;
-            } elseif (($value = static::resolveClassAttribute(Incrementing::class, 'enabled')) !== null) {
-                $this->incrementing = $value;
+                if ($this->incrementing === true && $primaryKey->incrementing !== null) {
+                    $this->incrementing = $primaryKey->incrementing;
+                }
             }
         }
     }

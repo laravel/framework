@@ -11,8 +11,13 @@ class PrimaryKey
      * Create a new attribute instance.
      *
      * @param  string  $name
+     * @param  string|null  $type
+     * @param  bool|null  $incrementing
      */
-    public function __construct(public string $name)
-    {
+    public function __construct(
+        public string $name,
+        public ?string $type = null,
+        public ?bool $incrementing = null,
+    ) {
     }
 }
