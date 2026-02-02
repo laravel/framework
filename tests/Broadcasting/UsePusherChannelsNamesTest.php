@@ -117,7 +117,7 @@ class FakeBroadcasterUsingPusherChannelsNames extends Broadcaster
         //
     }
 
-    public function testChannelNameMatchesPattern($channel, $pattern): void
+    public function testChannelNameMatchesPattern($channel, $pattern)
     {
         return $this->channelNameMatchesPattern($channel, $pattern);
     }
