@@ -78,6 +78,7 @@ class FileValidationTest extends TestCase
             'File two is not a file',
         ], $validator->messages()->all());
     }
+
     public function test_file_mimes_custom_validation_messages()
     {
         $validator = Validator::make(
