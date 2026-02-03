@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Support;
 
-use AssertionError;
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
