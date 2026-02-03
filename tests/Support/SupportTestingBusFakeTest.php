@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use AssertionError;
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
@@ -847,6 +848,81 @@ class SupportTestingBusFakeTest extends TestCase
         $serializingBusFake->assertBatched(function (PendingBatchFake $batchedCollection) {
             return $batchedCollection->jobs->count() === 1 && $batchedCollection->jobs->first()->value === 'hello';
         });
+    }
+
+    public function testCanAssertJobsOnPendingBatchFake()
+    {
+        $this->fake->batch([
+            new BusFakeJobWithSerialization('foo'),
+            new BusFakeJobWithSerialization('bar'),
+            new BusFakeJobWithSerialization('baz'),
+        ])->dispatch();
+
+        $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+            return $batchedCollection->assertJobs([
+                new BusFakeJobWithSerialization('foo'),
+                new BusFakeJobWithSerialization('bar'),
+                new BusFakeJobWithSerialization('baz'),
+            ]);
+        });
+
+        $this->fake->assertBatched([
+            new BusFakeJobWithSerialization('foo'),
+            new BusFakeJobWithSerialization('bar'),
+            new BusFakeJobWithSerialization('baz'),
+        ]);
+
+        try {
+            $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+                return $batchedCollection->assertJobs([
+                    new BusFakeJobWithSerialization('baz'),
+                    new BusFakeJobWithSerialization('foo'),
+                    new BusFakeJobWithSerialization('bar'),
+                ]);
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString("The expected batch was not dispatched.", $e->getMessage());
+        }
+
+        try {
+            $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+                return $batchedCollection->assertJobs([
+                    new BusFakeJobWithSerialization('foo'),
+                    new BusFakeJobWithSerialization('baaar'),
+                    new BusFakeJobWithSerialization('baz'),
+                ]);
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString("The expected batch was not dispatched.", $e->getMessage());
+        }
+
+        try {
+            $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+                return $batchedCollection->assertJobs([
+                    new BusFakeJobWithSerialization('foo'),
+                    new BusFakeJobWithSerialization('baz'),
+                ]);
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString("The expected batch was not dispatched.", $e->getMessage());
+        }
+
+        try {
+            $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+                return $batchedCollection->assertJobs([
+                    new BusFakeJobWithSerialization('foo'),
+                    new BusFakeJobWithSerialization('bar'),
+                    new BusFakeJobWithSerialization('baz'),
+                    new BusFakeJobWithSerialization('qux'),
+                ]);
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString("The expected batch was not dispatched.", $e->getMessage());
+        }
     }
 }
 

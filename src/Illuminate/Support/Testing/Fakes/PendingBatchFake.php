@@ -45,4 +45,23 @@ class PendingBatchFake extends PendingBatch
     {
         return $this->bus->recordPendingBatch($this);
     }
+
+    public function assertJobs(array $expectedJobs)
+    {
+        if (count($this->jobs) !== count($expectedJobs)) {
+            return false;
+        }
+
+        foreach ($expectedJobs as $index => $expectedJob) {
+            if (is_string($expectedJob)) {
+                if ($expectedJob != get_class($this->jobs[$index])) {
+                    return false;
+                }
+            } elseif (serialize($expectedJob) != serialize($this->jobs[$index])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
