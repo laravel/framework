@@ -5,6 +5,7 @@ namespace Illuminate\Support\Traits;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use stdClass;
 
@@ -283,6 +284,21 @@ trait InteractsWithData
     {
         return (float) $this->data($key, $default);
     }
+
+    /**
+     * Retrieve data clamped between min and max values.
+     *
+     * @param  string  $key
+     * @param  int|float  $min
+     * @param  int|float  $max
+     * @param  int|float  $default
+     * @return float|int
+     */
+    public function clamp($key, $min, $max, $default = 0)
+    {
+        return Number::clamp($this->data($key, $default), $min, $max);
+    }
+
 
     /**
      * Retrieve data from the instance as a Carbon instance.
