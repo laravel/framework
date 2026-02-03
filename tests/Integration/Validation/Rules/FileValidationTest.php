@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Integration\Validation\Rules;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\File;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\TestWith;
