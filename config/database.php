@@ -6,6 +6,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | N+1 Query Detection
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, Laravel will attempt to detect potential N+1 query patterns
+    | during a single request and emit a development-only warning to the log.
+    | This feature is disabled by default and is intended for local debugging.
+    |
+    */
+
+    'detect_n_plus_one' => env('DETECT_N_PLUS_ONE', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Default Database Connection Name
     |--------------------------------------------------------------------------
     |

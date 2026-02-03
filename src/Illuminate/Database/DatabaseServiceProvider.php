@@ -8,6 +8,8 @@ use Illuminate\Contracts\Database\ConcurrencyErrorDetector as ConcurrencyErrorDe
 use Illuminate\Contracts\Database\LostConnectionDetector as LostConnectionDetectorContract;
 use Illuminate\Contracts\Queue\EntityResolver;
 use Illuminate\Database\Connectors\ConnectionFactory;
+use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Database\Query\Listeners\DetectsNPlusOneQueries;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\QueueEntityResolver;
 use Illuminate\Support\ServiceProvider;
@@ -31,6 +33,8 @@ class DatabaseServiceProvider extends ServiceProvider
         Model::setConnectionResolver($this->app['db']);
 
         Model::setEventDispatcher($this->app['events']);
+
+        $this->registerNPlusOneDetector();
     }
 
     /**
@@ -123,5 +127,17 @@ class DatabaseServiceProvider extends ServiceProvider
         $this->app->singleton(EntityResolver::class, function () {
             return new QueueEntityResolver;
         });
+    }
+
+    /**
+     * Register the N+1 query detector listener.
+     *
+     * @return void
+     */
+    protected function registerNPlusOneDetector()
+    {
+        $this->app->singleton(DetectsNPlusOneQueries::class);
+
+        $this->app['events']->listen(QueryExecuted::class, DetectsNPlusOneQueries::class);
     }
 }
