@@ -115,4 +115,3 @@ class DetectsNPlusOneQueries
         return $this->queries;
     }
 }
-

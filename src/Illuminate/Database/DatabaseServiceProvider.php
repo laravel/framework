@@ -8,10 +8,10 @@ use Illuminate\Contracts\Database\ConcurrencyErrorDetector as ConcurrencyErrorDe
 use Illuminate\Contracts\Database\LostConnectionDetector as LostConnectionDetectorContract;
 use Illuminate\Contracts\Queue\EntityResolver;
 use Illuminate\Database\Connectors\ConnectionFactory;
-use Illuminate\Database\Events\QueryExecuted;
-use Illuminate\Database\Query\Listeners\DetectsNPlusOneQueries;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\QueueEntityResolver;
+use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Database\Query\Listeners\DetectsNPlusOneQueries;
 use Illuminate\Support\ServiceProvider;
 
 class DatabaseServiceProvider extends ServiceProvider
