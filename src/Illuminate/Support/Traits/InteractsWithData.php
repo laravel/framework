@@ -299,7 +299,6 @@ trait InteractsWithData
         return Number::clamp($this->data($key, $default), $min, $max);
     }
 
-
     /**
      * Retrieve data from the instance as a Carbon instance.
      *

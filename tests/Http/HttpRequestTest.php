@@ -1804,10 +1804,12 @@ class HttpRequestTest extends TestCase
 
     public function testItClampsValues()
     {
-        $request = Request::create('/', 'GET', ['per_page' => 100]);
-        $this->assertEquals(100, $request->clamp('per_page', 100, 101));
-        $this->assertEquals(10, $request->clamp('per_page', -10, 10));
-        $this->assertEquals(25, $request->clamp('per_page_2', 25, 100, 1));
-        $this->assertEquals(100, $request->clamp('per_page', 1, 250, 99));
+        $request = Request::create('/', 'GET', ['per_page' => 100, 'float' => 9.24]);
+        $this->assertSame(100, $request->clamp('per_page', 100, 101));
+        $this->assertSame(10, $request->clamp('per_page', -10, 10));
+        $this->assertSame(25, $request->clamp('per_page_2', 25, 100, 1));
+        $this->assertSame(100, $request->clamp('per_page', 1, 250, 99));
+        $this->assertSame(22.4, $request->clamp('per_page', 1.11, 22.4, 2));
+        $this->assertSame(9.24, $request->clamp('float', 1, 10));
     }
 }
