@@ -8,6 +8,7 @@ use Illuminate\Concurrency\ProcessDriver;
 use Illuminate\Encryption\EncryptionServiceProvider;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
+use Throwable;
 
 class ComposerScripts
 {
@@ -81,6 +82,8 @@ class ComposerScripts
             $laravel->make(ProcessDriver::class)->run(
                 static fn () => app()['events']->dispatch("composer_package.{$name}:pre_uninstall")
             );
+        } catch (Throwable $e) {
+            // We ignore this exception to prevent uninstall from failing
         }
     }
 
