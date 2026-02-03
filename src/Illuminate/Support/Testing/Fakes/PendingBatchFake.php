@@ -46,6 +46,12 @@ class PendingBatchFake extends PendingBatch
         return $this->bus->recordPendingBatch($this);
     }
 
+    /**
+     * Assert the jobs in the batch match the given jobs.
+     *
+     * @param  array  $expectedJobs
+     * @return bool
+     */
     public function assertJobs(array $expectedJobs)
     {
         if (count($this->jobs) !== count($expectedJobs)) {
