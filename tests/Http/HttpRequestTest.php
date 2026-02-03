@@ -1801,4 +1801,13 @@ class HttpRequestTest extends TestCase
 
         $this->assertTrue(json_last_error() === JSON_ERROR_NONE);
     }
+
+    public function testItClampsValues()
+    {
+        $request = Request::create('/', 'GET', ['per_page' => 100]);
+        $this->assertEquals(100, $request->clamp('per_page', 100, 101));
+        $this->assertEquals(10, $request->clamp('per_page', -10, 10));
+        $this->assertEquals(25, $request->clamp('per_page_2', 25, 100, 1));
+        $this->assertEquals(100, $request->clamp('per_page', 1, 250, 99));
+    }
 }
