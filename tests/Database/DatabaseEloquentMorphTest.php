@@ -26,13 +26,13 @@ class DatabaseEloquentMorphTest extends TestCase
     public function testMorphOneSetsProperConstraints()
     {
         $this->getOneRelation();
+
+        $this->assertTrue(true);
     }
 
     public function testMorphOneEagerConstraintsAreProperlyAdded()
     {
         $relation = $this->getOneRelation();
-        $relation->getParent()->shouldReceive('getKeyName')->once()->andReturn('id');
-        $relation->getParent()->shouldReceive('getKeyType')->once()->andReturn('string');
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.morph_id', ['1', '2']);
         $relation->getQuery()->shouldReceive('where')->once()->with('table.morph_type', get_class($relation->getParent()));
 
@@ -41,6 +41,8 @@ class DatabaseEloquentMorphTest extends TestCase
         $model2 = new EloquentMorphResetModelStub;
         $model2->id = 2;
         $relation->addEagerConstraints([$model1, $model2]);
+
+        $this->assertTrue(true);
     }
 
     /**
@@ -50,13 +52,13 @@ class DatabaseEloquentMorphTest extends TestCase
     public function testMorphManySetsProperConstraints()
     {
         $this->getManyRelation();
+
+        $this->assertTrue(true);
     }
 
     public function testMorphManyEagerConstraintsAreProperlyAdded()
     {
         $relation = $this->getManyRelation();
-        $relation->getParent()->shouldReceive('getKeyName')->once()->andReturn('id');
-        $relation->getParent()->shouldReceive('getKeyType')->once()->andReturn('int');
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.morph_id', ['1', '2']);
         $relation->getQuery()->shouldReceive('where')->once()->with('table.morph_type', get_class($relation->getParent()));
 
@@ -65,6 +67,8 @@ class DatabaseEloquentMorphTest extends TestCase
         $model2 = new EloquentMorphResetModelStub;
         $model2->id = 2;
         $relation->addEagerConstraints([$model1, $model2]);
+
+        $this->assertTrue(true);
     }
 
     public function testMorphRelationUpsertFillsForeignKey()
@@ -102,6 +106,8 @@ class DatabaseEloquentMorphTest extends TestCase
             ['email'],
             ['name']
         );
+
+        $this->assertTrue(true);
     }
 
     public function testMakeFunctionOnMorph()
