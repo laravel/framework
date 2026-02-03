@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Validation\Rules;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\File;
 use Orchestra\Testbench\TestCase;
@@ -119,7 +120,7 @@ class FileValidationTest extends TestCase
     {
         $validator = Validator::make(
             ['image' => UploadedFile::fake()->image('foo.jpg', 100, 100)],
-            ['image' => [File::image()->dimensions(new Dimensions(['min_width' => 50, 'min_height' => 50]))]],
+            ['image' => [File::image()->dimensions(Rule::dimensions()->width(50)->height(50))]],
             ['image.dimensions' => 'Invalid dimensions']
         );
 
