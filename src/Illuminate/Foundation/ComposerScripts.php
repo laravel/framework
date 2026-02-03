@@ -83,7 +83,7 @@ class ComposerScripts
                 static fn () => app()['events']->dispatch("composer_package.{$name}:pre_uninstall")
             );
         } catch (Throwable $e) {
-            // We ignore this exception to prevent uninstall from failing
+            // Ignore any errors to allow the composer uninstall to complete...
         }
     }
 
