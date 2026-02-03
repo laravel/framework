@@ -882,7 +882,7 @@ class SupportTestingBusFakeTest extends TestCase
             });
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString("The expected batch was not dispatched.", $e->getMessage());
+            $this->assertStringContainsString('The expected batch was not dispatched.', $e->getMessage());
         }
 
         try {
@@ -895,7 +895,7 @@ class SupportTestingBusFakeTest extends TestCase
             });
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString("The expected batch was not dispatched.", $e->getMessage());
+            $this->assertStringContainsString('The expected batch was not dispatched.', $e->getMessage());
         }
 
         try {
@@ -907,7 +907,7 @@ class SupportTestingBusFakeTest extends TestCase
             });
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString("The expected batch was not dispatched.", $e->getMessage());
+            $this->assertStringContainsString('The expected batch was not dispatched.', $e->getMessage());
         }
 
         try {
@@ -921,7 +921,7 @@ class SupportTestingBusFakeTest extends TestCase
             });
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString("The expected batch was not dispatched.", $e->getMessage());
+            $this->assertStringContainsString('The expected batch was not dispatched.', $e->getMessage());
         }
     }
 }
