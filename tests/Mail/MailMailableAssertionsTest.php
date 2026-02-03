@@ -286,6 +286,10 @@ class MailableAssertionsBladeEscapedStub extends Mailable
         </html>
         EOD;
 
+        /**
+         * Since stub override `renderForAssertions()` we should expect that `$html` is available from either `$this->view` or `$this->markdown`.
+         */
+
         return [$html, $text];
     }
 }
