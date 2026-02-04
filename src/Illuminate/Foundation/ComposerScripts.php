@@ -86,9 +86,9 @@ class ComposerScripts
                 static fn () => app()['events']->dispatch($eventName)
             );
         } catch (Throwable $e) {
-            // Ignore any errors to allow the composer uninstall to complete...
+            // Ignore any errors to allow the package removal to complete...
             $event->getIO()->write('There was an error dispatching or handling the ['.($eventName ?? 'unknown').'] event. Continuing with package removal...');
-            $event->getIO()->writeError('Exception message: '.$e->getMessage(), verbosity: IOInterface::VERBOSE);
+            $event->getIO()->writeError('Exception message: '.$e->getMessage(), verbosity: IOInterface::VERBOSE); // @phpstan-ignore class.notFound (Composer exists if this is running)
         }
     }
 
