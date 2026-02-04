@@ -116,6 +116,8 @@ class BusBatchTest extends TestCase
             Facade::setFacadeApplication(null);
         }
 
+        Container::setInstance(null);
+
         unset($_SERVER['__finally.batch'], $_SERVER['__progress.batch'], $_SERVER['__then.batch'], $_SERVER['__catch.batch'], $_SERVER['__catch.exception']);
 
         $this->schema()->drop('job_batches');
@@ -469,8 +471,6 @@ class BusBatchTest extends TestCase
         }));
 
         $batch->cancel();
-
-        Container::setInstance(null);
     }
 
     public function test_batch_can_be_deleted()
