@@ -61,7 +61,7 @@ class DatabaseEloquentMorphTest extends TestCase
     public function testMorphManyEagerConstraintsAreProperlyAdded()
     {
         $relation = $this->getManyRelation();
-         $relation->getParent()->shouldReceive('getKeyName')->once()->andReturn('id');
+        $relation->getParent()->shouldReceive('getKeyName')->once()->andReturn('id');
         $relation->getParent()->shouldReceive('getKeyType')->once()->andReturn('int');
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.morph_id', ['1', '2']);
         $relation->getQuery()->shouldReceive('where')->once()->with('table.morph_type', get_class($relation->getParent()));

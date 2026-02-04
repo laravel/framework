@@ -113,7 +113,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $user = HasOneOfManyTestUser::create();
         $relation = $user->latest_login();
         $relation->addEagerConstraints([$user]);
-        $this->assertSame('select MAX("logins"."id") as "id_aggregate", "logins"."user_id" from "logins" where "logins"."user_id" = ? and "logins"."user_id" is not null and "logins"."user_id" in (1) group by "logins"."user_id"', $relation->getOneOfManySubQuery()->toSql());
+        $this->assertSame('select MAX("logins"."id") as "id_aggregate", "logins"."user_id" from "logins" where "logins"."user_id" = ? and "logins"."user_id" is not null and "logins"."user_id" in (?) group by "logins"."user_id"', $relation->getOneOfManySubQuery()->toSql());
     }
 
     public function testGlobalScopeIsNotAppliedWhenRelationIsDefinedWithoutGlobalScope()
