@@ -156,6 +156,7 @@ class RedisManagerFailoverTest extends TestCase
             $configPassedToConnector = $config;
             $connection = m::mock(Connection::class);
             $connection->shouldReceive('setName')->andReturnSelf();
+
             return $connection;
         });
 
