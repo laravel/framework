@@ -113,6 +113,17 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('foo', $t->get('foo::bar.foo'));
     }
 
+    public function testGetDoesNotCallGetLineTwiceForMissingKeyWhenLocaleMatchesFallback()
+    {
+        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['getLine'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
+        $t->setFallback('en');
+        $t->getLoader()->shouldReceive('load')->with('en', '*', '*')->andReturn([]);
+
+        $t->expects($this->once())->method('getLine')->with('*', 'messages', 'en', 'test', [])->willReturn(null);
+
+        $t->get('messages.test', [], 'en');
+    }
+
     public function testGetMethodProperlyLoadsAndRetrievesItemForGlobalNamespace()
     {
         $t = new Translator($this->getLoader(), 'en');
