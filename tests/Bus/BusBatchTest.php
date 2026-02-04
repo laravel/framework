@@ -8,6 +8,7 @@ use Illuminate\Bus\Batchable;
 use Illuminate\Bus\BatchFactory;
 use Illuminate\Bus\DatabaseBatchRepository;
 use Illuminate\Bus\Dispatcher;
+use Illuminate\Bus\Events\BatchCancelled;
 use Illuminate\Bus\Events\BatchFinished;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Bus\Queueable;
@@ -454,6 +455,20 @@ class BusBatchTest extends TestCase
         $batch = $batch->fresh();
 
         $this->assertTrue($batch->cancelled());
+    }
+
+    public function test_batch_cancelled_event_is_dispatched()
+    {
+        Container::getInstance()->instance(EventDispatcher::class, $events = m::mock(EventDispatcher::class));
+
+        $queue = m::mock(Factory::class);
+        $batch = $this->createTestBatch($queue);
+
+        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) use ($batch) {
+            return $event instanceof BatchCancelled && $event->batch->id === $batch->id;
+        }));
+
+        $batch->cancel();
     }
 
     public function test_batch_can_be_deleted()

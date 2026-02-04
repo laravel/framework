@@ -4,6 +4,8 @@ namespace Illuminate\Bus;
 
 use Carbon\CarbonImmutable;
 use Closure;
+use Illuminate\Bus\Events\BatchCancelled;
+use Illuminate\Bus\Events\BatchDeleted;
 use Illuminate\Bus\Events\BatchFinished;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -421,6 +423,12 @@ class Batch implements Arrayable, JsonSerializable
     public function cancel()
     {
         $this->repository->cancel($this->id);
+
+        $container = Container::getInstance();
+
+        if ($container->bound(Dispatcher::class)) {
+            $container->make(Dispatcher::class)->dispatch(new BatchCancelled($this));
+        }
     }
 
     /**
