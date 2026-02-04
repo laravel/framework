@@ -5,7 +5,6 @@ namespace Illuminate\Bus;
 use Carbon\CarbonImmutable;
 use Closure;
 use Illuminate\Bus\Events\BatchCancelled;
-use Illuminate\Bus\Events\BatchDeleted;
 use Illuminate\Bus\Events\BatchFinished;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
