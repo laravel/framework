@@ -920,7 +920,7 @@ trait HasRelationships
      *
      * @param  string  $related
      * @param  \Illuminate\Database\Eloquent\Model|null  $instance
-     * @return string
+     * @return lowercase-string
      */
     public function joiningTable($related, $instance = null)
     {

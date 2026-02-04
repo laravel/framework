@@ -11,7 +11,7 @@ trait HasUlids
     /**
      * Generate a new unique key for the model.
      *
-     * @return string
+     * @return lowercase-string
      */
     public function newUniqueId()
     {
