@@ -373,7 +373,7 @@ trait InteractsWithData
      */
     protected function isBackedEnum($enumClass)
     {
-        return enum_exists($enumClass) && method_exists($enumClass, 'tryFrom');
+        return is_a($enumClass, \BackedEnum::class, true);
     }
 
     /**
