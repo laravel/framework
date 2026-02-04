@@ -21,6 +21,13 @@ trait HasTimestamps
     protected static $ignoreTimestampsOn = [];
 
     /**
+     * The callback that should be used to create fresh timestamps.
+     *
+     * @var (\Closure(): \Illuminate\Support\Carbon)|null
+     */
+    public static $freshTimestampsCallback;
+
+    /**
      * Update the model's update timestamp.
      *
      * @param  string|null  $attribute
@@ -105,12 +112,37 @@ trait HasTimestamps
     }
 
     /**
+     * Set a callback that should be used to create fresh timestamps.
+     *
+     * @param  \Closure(): \Illuminate\Support\Carbon  $callback
+     * @return void
+     */
+    public static function freshTimestampsUsing($callback)
+    {
+        static::$freshTimestampsCallback = $callback;
+    }
+
+    /**
+     * Create fresh timestamps without microseconds.
+     *
+     * @return void
+     */
+    public static function freshTimestampsWithoutMicroseconds()
+    {
+        static::$freshTimestampsCallback = fn () => Date::now()->startOfSecond();
+    }
+
+    /**
      * Get a fresh timestamp for the model.
      *
      * @return \Illuminate\Support\Carbon
      */
     public function freshTimestamp()
     {
+        if (static::$freshTimestampsCallback) {
+            return call_user_func(static::$freshTimestampsCallback);
+        }
+
         return Date::now();
     }
 
