@@ -178,5 +178,21 @@ assertType('non-empty-string', Arr::toCssStyles(['background: red']));
 assertType('non-empty-string', Arr::toCssStyles('background: red'));
 
 assertType('array{}', Arr::wrap(null));
+assertType('array{}', Arr::wrap([]));
 assertType('array{1}', Arr::wrap(1));
-assertType('array{1}', Arr::wrap([1]));
+assertType("array{'hello'}", Arr::wrap('hello'));
+assertType('array{stdClass}', Arr::wrap(new stdClass));
+assertType('array<0, 1>', Arr::wrap([1]));
+assertType("array<'a'|'b', 1|2>", Arr::wrap(['a' => 1, 'b' => 2]));
+/** @var list<object>|object $value */
+assertType('array<int<0, max>, object>', Arr::wrap($value));
+/** @var float[]|float|null $value */
+assertType('array<float>', Arr::wrap($value));
+/** @var string[]|float[]|string|float|null $value */
+assertType('array<float|string>', Arr::wrap($value));
+/** @var array<string, float>|float|null $value */
+assertType('array<0|string, float>', Arr::wrap($value));
+/** @var array<float[]> $value */
+assertType('array<array<float>>', Arr::wrap($value));
+/** @var stdClass|stdClass[]|null $value */
+assertType('array<stdClass>', Arr::wrap($value));
