@@ -469,6 +469,8 @@ class BusBatchTest extends TestCase
         }));
 
         $batch->cancel();
+
+        Container::setInstance(null);
     }
 
     public function test_batch_can_be_deleted()
