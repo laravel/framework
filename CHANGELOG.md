@@ -1,6 +1,50 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.49.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.50.0...12.x)
+
+## [v12.50.0](https://github.com/laravel/framework/compare/v12.49.0...v12.50.0) - 2026-02-04
+
+* [12.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/58531
+* [12.x] Resolve the correct queue factory when using laravel octane by [@BertvanHoekelen](https://github.com/BertvanHoekelen) in https://github.com/laravel/framework/pull/58530
+* [12.x] Clear parallel test view cache directories by [@eduPHP](https://github.com/eduPHP) in https://github.com/laravel/framework/pull/58525
+* [12.x] fix: allow phpstan to understand default value for Request::enum by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/58529
+* [12.x] feat: allow queued listeners to be unique by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/58402
+* [12.x] Use morphMap when serializing model identifiers by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/58482
+* [12.x] Add `authority`method to Support/Uri by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58534
+* [12.x] Use try/finally for buildStack cleanup in Container::build by [@comhon-project](https://github.com/comhon-project) in https://github.com/laravel/framework/pull/58536
+* [12.x] Update phpunit version constraints to address CVE by [@PerryvanderMeer](https://github.com/PerryvanderMeer) in https://github.com/laravel/framework/pull/58526
+* Bump tar from 7.5.6 to 7.5.7 in /src/Illuminate/Foundation/resources/exceptions/renderer by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/framework/pull/58539
+* [12.x] Ensure Validator message defaults if using custom size messages by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58554
+* [12.x] Add withoutAppends to HasAttributes by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/58552
+* [12.x] Refactor: simplify in `match` by [@alipowerful7](https://github.com/alipowerful7) in https://github.com/laravel/framework/pull/58547
+* Revert "[12.x] Update phpunit version constraints to address CVE" by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/58542
+* [12.x] Add `hasMany()` method to collections by [@JosephSilber](https://github.com/JosephSilber) in https://github.com/laravel/framework/pull/58550
+* [12.x] Retain associative keys on eager loaded relations by [@Jade-GG](https://github.com/Jade-GG) in https://github.com/laravel/framework/pull/58506
+* [12.x] Add typed getters on Cache  by [@ahinkle](https://github.com/ahinkle) in https://github.com/laravel/framework/pull/58451
+* [12.x] Add `MaintenanceMode` facade to docblock generator by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/58564
+* [12.x] Adjust docblock for formatActionForCli by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58562
+* [12.x] brick/math `of` float deprecation by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58563
+* [12.x] Improve migration types by [@shaedrich](https://github.com/shaedrich) in https://github.com/laravel/framework/pull/58561
+* [12.x] Remove extra space by [@amirhshokri](https://github.com/amirhshokri) in https://github.com/laravel/framework/pull/58573
+* [12.x] Drop foreach from preg_replace_callback helper by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58570
+* [12.x] Improve typing in console/command namespace by [@shaedrich](https://github.com/shaedrich) in https://github.com/laravel/framework/pull/58565
+* [12.x] Refactor: improve tests by [@alipowerful7](https://github.com/alipowerful7) in https://github.com/laravel/framework/pull/58582
+* [12.x] Update callback type hints for Context's `Repository` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/58581
+* [12.x] Exclude decorative ASCII art SVG from exception page in non-browser contexts by [@serhiilabs](https://github.com/serhiilabs) in https://github.com/laravel/framework/pull/58580
+* [12.x] Improve types of `Arr` helper by [@shaedrich](https://github.com/shaedrich) in https://github.com/laravel/framework/pull/58518
+* [12.x] Add tests for withoutAppends() method by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/58583
+* [12.x] Add tests for hasAppended() method by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/58587
+* [12.x] Sort flaky MaintenanceModeTest by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58590
+* [12.x] Preserve notification state mutations from via() in sendNow() by [@alimorgaan](https://github.com/alimorgaan) in https://github.com/laravel/framework/pull/58558
+* [12.x] Fix: add `|null` for `$name` in `storeAs()` by [@alipowerful7](https://github.com/alipowerful7) in https://github.com/laravel/framework/pull/58613
+* [12.x] Add `InteractsWithData::clamp()` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/58608
+* [12.x] try-catch all composer package uninstalls by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/58609
+* [12.x] `InteractsWithData@enum()` refactor by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/58607
+* [12.x] Enum support for Cache::get() with array keys by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58616
+* [12.x] Fixed precision checks for column types in SQL Server grammar by [@aimeos](https://github.com/aimeos) in https://github.com/laravel/framework/pull/58602
+* [12.x] Fix `illuminate/reflection` workflow directory by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/58600
+* [12.x] Ensure File fail doesn't double translate in fail() by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58598
+* [12.x] Ensure mailable HTML assertions properly escape quotes by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58595
 
 ## [v12.49.0](https://github.com/laravel/framework/compare/v12.48.1...v12.49.0) - 2026-01-28
 
