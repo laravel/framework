@@ -427,11 +427,11 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * This method belongs to Symfony HttpFoundation and is not usually needed when using Laravel.
      *
-     * Instead, you may use the "input" method.
-     *
      * @param  string  $key
      * @param  mixed  $default
      * @return mixed
+     *
+     * @deprecated since Symfony 7.4, you may use the "input" method instead.
      */
     #[\Override]
     public function get(string $key, mixed $default = null): mixed
