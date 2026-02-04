@@ -180,6 +180,60 @@ return [
             'backoff_cap' => env('REDIS_BACKOFF_CAP', 1000),
         ],
 
+        /*
+        |--------------------------------------------------------------------------
+        | Redis Failover Connection
+        |--------------------------------------------------------------------------
+        |
+        | You may define a Redis connection that tries multiple connections in
+        | order. This is useful when migrating between Redis providers or for
+        | high availability setups. Set REDIS_CACHE_CONNECTION or
+        | REDIS_QUEUE_CONNECTION to "failover" to use it.
+        |
+        | Each connection in the list can specify 'read_only' => true in its
+        | own config to indicate it only accepts read commands. Write commands
+        | will skip read-only connections in the failover chain.
+        |
+        | Example with inline read_only override:
+        |
+        | 'connections' => [
+        |     'cache',                                    // inherits read_only from config
+        |     ['name' => 'fallback', 'read_only' => true], // override read_only
+        | ],
+        |
+        */
+        'failover' => [
+            'connections' => [
+                env('REDIS_FAILOVER_PRIMARY', 'cache'),
+                env('REDIS_FAILOVER_FALLBACK', 'fallback'),
+            ],
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Redis Fallback Connection (Read-Only Example)
+        |--------------------------------------------------------------------------
+        |
+        | This is an example of a read-only fallback connection. When used in
+        | a failover connection, read commands (get, exists, etc.) will try
+        | this connection if the primary fails, but write commands (set, del,
+        | etc.) will skip it entirely.
+        |
+        */
+        'fallback' => [
+            'url' => env('REDIS_FALLBACK_URL'),
+            'host' => env('REDIS_FALLBACK_HOST', '127.0.0.1'),
+            'username' => env('REDIS_FALLBACK_USERNAME'),
+            'password' => env('REDIS_FALLBACK_PASSWORD'),
+            'port' => env('REDIS_FALLBACK_PORT', '6379'),
+            'database' => env('REDIS_FALLBACK_DB', '0'),
+            'read_only' => env('REDIS_FALLBACK_READ_ONLY', true),
+            'max_retries' => env('REDIS_MAX_RETRIES', 3),
+            'backoff_algorithm' => env('REDIS_BACKOFF_ALGORITHM', 'decorrelated_jitter'),
+            'backoff_base' => env('REDIS_BACKOFF_BASE', 100),
+            'backoff_cap' => env('REDIS_BACKOFF_CAP', 1000),
+        ],
+
     ],
 
 ];

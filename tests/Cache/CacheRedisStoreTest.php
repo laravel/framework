@@ -4,8 +4,12 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Redis\Factory;
+use Illuminate\Redis\Connections\Connection;
+use Illuminate\Redis\Connections\FailoverConnection;
+use Illuminate\Redis\RedisManager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class CacheRedisStoreTest extends TestCase
 {
@@ -141,6 +145,30 @@ class CacheRedisStoreTest extends TestCase
         $this->assertSame('foo', $redis->getPrefix());
         $redis->setPrefix(null);
         $this->assertEmpty($redis->getPrefix());
+    }
+
+    public function testGetFallsBackToFailoverConnectionWhenPrimaryFails()
+    {
+        $primary = m::mock(Connection::class);
+        $primary->shouldReceive('command')->once()->with('get', ['prefix:foo'])->andThrow(new RuntimeException('Connection refused'));
+
+        $fallback = m::mock(Connection::class);
+        $fallback->shouldReceive('command')->once()->with('get', ['prefix:foo'])->andReturn(serialize('from-fallback'));
+
+        $manager = m::mock(RedisManager::class);
+        $manager->shouldReceive('getConnectionConfig')->with('primary')->andReturn([]);
+        $manager->shouldReceive('getConnectionConfig')->with('fallback')->andReturn(['read_only' => true]);
+        $manager->shouldReceive('connection')->with('primary')->andReturn($primary);
+        $manager->shouldReceive('connection')->with('fallback')->andReturn($fallback);
+
+        $failover = new FailoverConnection($manager, ['primary', 'fallback']);
+
+        $factory = m::mock(Factory::class);
+        $factory->shouldReceive('connection')->once()->with('default')->andReturn($failover);
+
+        $store = new RedisStore($factory, 'prefix:', 'default');
+
+        $this->assertSame('from-fallback', $store->get('foo'));
     }
 
     protected function getRedis()

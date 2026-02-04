@@ -5,6 +5,7 @@ namespace Illuminate\Redis;
 use Closure;
 use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Redis\Connections\Connection;
+use Illuminate\Redis\Connections\FailoverConnection;
 use Illuminate\Redis\Connectors\PhpRedisConnector;
 use Illuminate\Redis\Connectors\PredisConnector;
 use Illuminate\Support\Arr;
@@ -108,8 +109,18 @@ class RedisManager implements Factory
         $options = $this->config['options'] ?? [];
 
         if (isset($this->config[$name])) {
+            $config = $this->config[$name];
+
+            // Failover connection - has 'connections' array
+            if (isset($config['connections']) && is_array($config['connections'])) {
+                $connections = array_values(array_filter($config['connections']));
+                if (! empty($connections)) {
+                    return new FailoverConnection($this, $connections);
+                }
+            }
+
             return $this->connector()->connect(
-                $this->parseConnectionConfiguration($this->config[$name]),
+                $this->parseConnectionConfiguration($config),
                 array_merge(Arr::except($options, 'parameters'), ['parameters' => Arr::get($options, 'parameters.'.$name, Arr::get($options, 'parameters', []))])
             );
         }
@@ -193,8 +204,19 @@ class RedisManager implements Factory
         }
 
         return array_filter($parsed, function ($key) {
-            return $key !== 'driver';
+            return ! in_array($key, ['driver', 'read_only', 'connections']);
         }, ARRAY_FILTER_USE_KEY);
+    }
+
+    /**
+     * Get the configuration for a connection.
+     *
+     * @param  string  $name
+     * @return array
+     */
+    public function getConnectionConfig(string $name): array
+    {
+        return $this->config[$name] ?? [];
     }
 
     /**
