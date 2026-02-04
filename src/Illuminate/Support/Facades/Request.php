@@ -171,6 +171,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool boolean(string|null $key = null, bool $default = false)
  * @method static int integer(string $key, int $default = 0)
  * @method static float float(string $key, float $default = 0)
+ * @method static float|int clamp(string $key, int|float $min, int|float $max, int|float $default = 0)
  * @method static \Illuminate\Support\Carbon|null date(string $key, string|null $format = null, \UnitEnum|string|null $tz = null)
  * @method static \BackedEnum|(\BackedEnum|null enum(string $key, string $enumClass, \BackedEnum|null $default = null)
  * @method static \BackedEnum[] enums(string $key, string $enumClass)
