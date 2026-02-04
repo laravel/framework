@@ -62,12 +62,14 @@ abstract class MorphOneOrMany extends HasOneOrMany
             );
 
             $this->getRelationQuery()->whereNotNull($this->foreignKey);
+            parent::addConstraints();
         }
     }
 
     /** @inheritDoc */
     public function addEagerConstraints(array $models)
     {
+        parent::addEagerConstraints($models);
         $this->whereInEager(
             'whereIn',
             $this->foreignKey,
