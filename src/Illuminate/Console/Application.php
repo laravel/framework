@@ -215,7 +215,6 @@ class Application extends SymfonyApplication implements ApplicationContract
      * @param  \Symfony\Component\Console\Command\Command  $command
      * @return \Symfony\Component\Console\Command\Command|null
      */
-    #[\Override]
     public function add(SymfonyCommand $command): ?SymfonyCommand
     {
         return $this->addCommand($command);
