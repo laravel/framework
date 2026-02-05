@@ -39,14 +39,14 @@ trait InteractsWithIO
     /**
      * The default verbosity of output commands.
      *
-     * @var int
+     * @var \Symfony\Component\Console\Output\OutputInterface::VERBOSITY_*
      */
     protected $verbosity = OutputInterface::VERBOSITY_NORMAL;
 
     /**
      * The mapping between human-readable verbosity levels and Symfony's OutputInterface.
      *
-     * @var array
+     * @var array<string, \Symfony\Component\Console\Output\OutputInterface::VERBOSITY_*>
      */
     protected $verbosityMap = [
         'v' => OutputInterface::VERBOSITY_VERBOSE,
@@ -71,7 +71,7 @@ trait InteractsWithIO
      * Get the value of a command argument.
      *
      * @param  string|null  $key
-     * @return array|string|bool|null
+     * @return ($key is null ? array<array|string|float|int|bool|null> : array|string|float|int|bool|null)
      */
     public function argument($key = null)
     {
@@ -85,7 +85,7 @@ trait InteractsWithIO
     /**
      * Get all of the arguments passed to the command.
      *
-     * @return array
+     * @return array<array|string|float|int|bool|null>
      */
     public function arguments()
     {
@@ -107,7 +107,7 @@ trait InteractsWithIO
      * Get the value of a command option.
      *
      * @param  string|null  $key
-     * @return string|array|bool|null
+     * @return ($key is null ? array<array|string|float|int|bool|null> : array|string|float|int|bool|null)
      */
     public function option($key = null)
     {
@@ -121,7 +121,7 @@ trait InteractsWithIO
     /**
      * Get all of the options passed to the command.
      *
-     * @return array
+     * @return array<array|string|float|int|bool|null>
      */
     public function options()
     {
@@ -169,7 +169,7 @@ trait InteractsWithIO
      * Prompt the user for input with auto completion.
      *
      * @param  string  $question
-     * @param  array|callable  $choices
+     * @param  iterable|(callable(string): string[])  $choices
      * @param  string|null  $default
      * @return mixed
      */
@@ -204,9 +204,9 @@ trait InteractsWithIO
      * Give the user a single choice from an array of answers.
      *
      * @param  string  $question
-     * @param  array  $choices
+     * @param  array<\Stringable|string|float|int|bool>  $choices
      * @param  string|int|null  $default
-     * @param  mixed  $attempts
+     * @param  ?positive-int  $attempts
      * @param  bool  $multiple
      * @return string|array
      */
@@ -225,7 +225,7 @@ trait InteractsWithIO
      * @param  array  $headers
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $rows
      * @param  \Symfony\Component\Console\Helper\TableStyle|string  $tableStyle
-     * @param  array  $columnStyles
+     * @param  array<int, \Symfony\Component\Console\Helper\TableStyle|string>  $columnStyles
      * @return void
      */
     public function table($headers, $rows, $tableStyle = 'default', array $columnStyles = [])
@@ -248,8 +248,11 @@ trait InteractsWithIO
     /**
      * Execute a given callback while advancing a progress bar.
      *
-     * @param  iterable|int  $totalSteps
-     * @param  \Closure  $callback
+     * @template TKey of array-key
+     * @template TValue
+     *
+     * @param  iterable<TKey, TValue>|int  $totalSteps
+     * @param  \Closure(\Symfony\Component\Console\Helper\ProgressBar|TValue, \Symfony\Component\Console\Helper\ProgressBar|null, TKey|null): void  $callback
      * @return mixed|void
      */
     public function withProgressBar($totalSteps, Closure $callback)
@@ -281,7 +284,7 @@ trait InteractsWithIO
      * Write a string as information output.
      *
      * @param  string  $string
-     * @param  int|string|null  $verbosity
+     * @param  'v'|'vv'|'vvv'|'quiet'|'normal'|\Symfony\Component\Console\Output\OutputInterface::VERBOSITY_*|null  $verbosity
      * @return void
      */
     public function info($string, $verbosity = null)
@@ -293,8 +296,8 @@ trait InteractsWithIO
      * Write a string as standard output.
      *
      * @param  string  $string
-     * @param  string|null  $style
-     * @param  int|string|null  $verbosity
+     * @param  'info'|'comment'|'question'|'error'|'warn'|'alert'|null  $style
+     * @param  'v'|'vv'|'vvv'|'quiet'|'normal'|\Symfony\Component\Console\Output\OutputInterface::VERBOSITY_*|null  $verbosity
      * @return void
      */
     public function line($string, $style = null, $verbosity = null)
@@ -308,7 +311,7 @@ trait InteractsWithIO
      * Write a string as comment output.
      *
      * @param  string  $string
-     * @param  int|string|null  $verbosity
+     * @param  'v'|'vv'|'vvv'|'quiet'|'normal'|\Symfony\Component\Console\Output\OutputInterface::VERBOSITY_*|null  $verbosity
      * @return void
      */
     public function comment($string, $verbosity = null)
@@ -320,7 +323,7 @@ trait InteractsWithIO
      * Write a string as question output.
      *
      * @param  string  $string
-     * @param  int|string|null  $verbosity
+     * @param  'v'|'vv'|'vvv'|'quiet'|'normal'|\Symfony\Component\Console\Output\OutputInterface::VERBOSITY_*|null  $verbosity
      * @return void
      */
     public function question($string, $verbosity = null)
@@ -332,7 +335,7 @@ trait InteractsWithIO
      * Write a string as error output.
      *
      * @param  string  $string
-     * @param  int|string|null  $verbosity
+     * @param  'v'|'vv'|'vvv'|'quiet'|'normal'|\Symfony\Component\Console\Output\OutputInterface::VERBOSITY_*|null  $verbosity
      * @return void
      */
     public function error($string, $verbosity = null)
@@ -344,7 +347,7 @@ trait InteractsWithIO
      * Write a string as warning output.
      *
      * @param  string  $string
-     * @param  int|string|null  $verbosity
+     * @param  'v'|'vv'|'vvv'|'quiet'|'normal'|\Symfony\Component\Console\Output\OutputInterface::VERBOSITY_*|null  $verbosity
      * @return void
      */
     public function warn($string, $verbosity = null)
@@ -362,7 +365,7 @@ trait InteractsWithIO
      * Write a string in an alert box.
      *
      * @param  string  $string
-     * @param  int|string|null  $verbosity
+     * @param  'v'|'vv'|'vvv'|'quiet'|'normal'|\Symfony\Component\Console\Output\OutputInterface::VERBOSITY_*|null  $verbosity
      * @return void
      */
     public function alert($string, $verbosity = null)
@@ -414,7 +417,7 @@ trait InteractsWithIO
     /**
      * Set the verbosity level.
      *
-     * @param  string|int  $level
+     * @param  'v'|'vv'|'vvv'|'quiet'|'normal'|\Symfony\Component\Console\Output\OutputInterface::VERBOSITY_*  $level
      * @return void
      */
     protected function setVerbosity($level)
@@ -425,7 +428,7 @@ trait InteractsWithIO
     /**
      * Get the verbosity level in terms of Symfony's OutputInterface level.
      *
-     * @param  string|int|null  $level
+     * @param  'v'|'vv'|'vvv'|'quiet'|'normal'|\Symfony\Component\Console\Output\OutputInterface::VERBOSITY_*|null  $level
      * @return int
      */
     protected function parseVerbosity($level = null)

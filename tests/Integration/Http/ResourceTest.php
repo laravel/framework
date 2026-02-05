@@ -1525,6 +1525,26 @@ class ResourceTest extends TestCase
         $response->assertJson(['data' => $data->toArray()]);
     }
 
+    public function testKeysArePreservedInAnAnonymousCollectionUsingPreserveKeysMethod()
+    {
+        $data = Collection::make([
+            ['id' => 1, 'title' => 'Test'],
+            ['id' => 2, 'title' => 'Test 2'],
+        ])->keyBy->id;
+
+        Route::get('/', function () use ($data) {
+            return JsonResource::collection($data)->preserveKeys();
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson(['data' => $data->toArray()]);
+    }
+
     public function testLeadingMergeKeyedValueIsMergedCorrectly()
     {
         $filter = new class

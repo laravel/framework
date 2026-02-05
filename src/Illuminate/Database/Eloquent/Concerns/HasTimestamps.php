@@ -111,7 +111,7 @@ trait HasTimestamps
      */
     public function freshTimestamp()
     {
-        return Date::now();
+        return Date::now()->startOfSecond();
     }
 
     /**

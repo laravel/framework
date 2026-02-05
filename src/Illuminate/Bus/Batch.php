@@ -4,6 +4,9 @@ namespace Illuminate\Bus;
 
 use Carbon\CarbonImmutable;
 use Closure;
+use Illuminate\Bus\Events\BatchFinished;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Factory as QueueFactory;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Queue\CallQueuedClosure;
@@ -247,6 +250,12 @@ class Batch implements Arrayable, JsonSerializable
 
         if ($counts->pendingJobs === 0) {
             $this->repository->markAsFinished($this->id);
+
+            $container = Container::getInstance();
+
+            if ($container->bound(Dispatcher::class)) {
+                $container->make(Dispatcher::class)->dispatch(new BatchFinished($this));
+            }
         }
 
         if ($counts->pendingJobs === 0 && $this->hasThenCallbacks()) {

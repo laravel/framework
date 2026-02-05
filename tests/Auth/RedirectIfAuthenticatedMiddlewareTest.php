@@ -9,13 +9,13 @@ class RedirectIfAuthenticatedMiddlewareTest extends TestCase
 {
     public function testItCanGenerateDefinitionViaStaticMethod()
     {
-        $signature = (string) RedirectIfAuthenticated::using('foo');
+        $signature = RedirectIfAuthenticated::using('foo');
         $this->assertSame('Illuminate\Auth\Middleware\RedirectIfAuthenticated:foo', $signature);
 
-        $signature = (string) RedirectIfAuthenticated::using('foo', 'bar');
+        $signature = RedirectIfAuthenticated::using('foo', 'bar');
         $this->assertSame('Illuminate\Auth\Middleware\RedirectIfAuthenticated:foo,bar', $signature);
 
-        $signature = (string) RedirectIfAuthenticated::using('foo', 'bar', 'baz');
+        $signature = RedirectIfAuthenticated::using('foo', 'bar', 'baz');
         $this->assertSame('Illuminate\Auth\Middleware\RedirectIfAuthenticated:foo,bar,baz', $signature);
     }
 }

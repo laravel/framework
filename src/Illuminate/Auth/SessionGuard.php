@@ -112,6 +112,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
 
     /**
      * The key used to hash recaller cookie values.
+     *
+     * @var string|null
      */
     protected $hashKey;
 
@@ -139,6 +141,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  \Illuminate\Support\Timebox|null  $timebox
      * @param  bool  $rehashOnLogin
      * @param  int  $timeboxDuration
+     * @param  string|null  $hashKey
      */
     public function __construct(
         $name,

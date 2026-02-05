@@ -209,6 +209,26 @@ class NotificationSenderTest extends TestCase
 
         $sender->sendNow($notifiable, new DummyNotificationWithViaConnections(), ['mail']);
     }
+
+    public function testItPreservesNotificationStateMutatedInViaMethod()
+    {
+        $notifiable = new AnonymousNotifiable;
+        $manager = m::mock(ChannelManager::class);
+        $manager->shouldReceive('driver')->andReturn($driver = m::mock());
+        $driver->shouldReceive('send')->once()->withArgs(function ($notifiable, $notification) {
+            return $notification->channelData === 'default';
+        });
+        $bus = m::mock(BusDispatcher::class);
+
+        $events = m::mock(EventDispatcher::class);
+        $events->shouldReceive('listen')->once();
+        $events->shouldReceive('until')->with(m::type(NotificationSending::class))->andReturn(true);
+        $events->shouldReceive('dispatch')->once();
+
+        $sender = new NotificationSender($manager, $bus, $events);
+
+        $sender->sendNow($notifiable, new DummyNotificationWithViaMutation);
+    }
 }
 
 class DummyQueuedNotificationWithStringVia extends Notification implements ShouldQueue
@@ -388,5 +408,17 @@ class TestDatabaseNotificationMiddleware
     public function handle($command, $next)
     {
         return $next($command);
+    }
+}
+
+class DummyNotificationWithViaMutation extends Notification
+{
+    public $channelData = null;
+
+    public function via($notifiable)
+    {
+        $this->channelData = $notifiable->routeConfig ?? 'default';
+
+        return 'mail';
     }
 }

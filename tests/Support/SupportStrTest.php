@@ -441,6 +441,9 @@ class SupportStrTest extends TestCase
         $this->assertSame('te', Str::afterLast('yv0et0te', 0));
         $this->assertSame('te', Str::afterLast('yv2et2te', 2));
         $this->assertSame('foo', Str::afterLast('----foo', '---'));
+        // Test with multibyte characters in search string
+        $this->assertSame('', Str::afterLast('café au café', 'café'));
+        $this->assertSame('', Str::afterLast('こんにちは世界こんにちは', 'こんにちは'));
     }
 
     #[DataProvider('strContainsProvider')]

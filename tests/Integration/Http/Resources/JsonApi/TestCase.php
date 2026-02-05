@@ -4,8 +4,6 @@ namespace Illuminate\Tests\Integration\Http\Resources\JsonApi;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\ArrayBackedJsonApiResource;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\User;
@@ -27,16 +25,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         Model::shouldBeStrict(true);
 
         parent::setUp();
-    }
-
-    /** {@inheritdoc} */
-    #[\Override]
-    protected function tearDown(): void
-    {
-        JsonResource::flushState();
-        JsonApiResource::flushState();
-
-        parent::tearDown();
     }
 
     /** {@inheritdoc} */

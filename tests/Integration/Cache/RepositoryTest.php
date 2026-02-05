@@ -287,6 +287,7 @@ class RepositoryTest extends TestCase
         // put / get / has / missing
         $cache->put(TestCacheKey::FOO, 'value');
         $this->assertSame('value', $cache->get(TestCacheKey::FOO));
+        $this->assertSame(['foo' => 'value', 'bar' => null], $cache->get([TestCacheKey::FOO, TestCacheKey::BAR]));
         $this->assertTrue($cache->has(TestCacheKey::FOO));
         $this->assertFalse($cache->missing(TestCacheKey::FOO));
 
@@ -317,6 +318,15 @@ class RepositoryTest extends TestCase
         $cache->put(TestCacheKey::FOO, 'x');
         $this->assertTrue($cache->forget(TestCacheKey::FOO));
         $this->assertNull($cache->get(TestCacheKey::FOO));
+
+        // flexible / withoutOverlapping
+        $this->assertSame('flexible', $cache->flexible(TestCacheKey::FOO, [5, 10], fn () => 'flexible'));
+        $this->assertSame('overlapping', $cache->withoutOverlapping(TestCacheKey::FOO, fn () => 'overlapping'));
+
+        // many / getMultiple
+        $cache->clear();
+        $this->assertSame(['foo' => null, 'bar' => null, 'baz' => null], $cache->many([TestCacheKey::FOO, TestCacheKey::BAR, TestCacheKey::BAZ]));
+        $this->assertSame(['foo' => 'default', 'qux' => 'default'], $cache->getMultiple([TestCacheKey::FOO, TestCacheKey::QUX], 'default'));
     }
 }
 

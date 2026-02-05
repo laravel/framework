@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsInverseRelations;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Support\Arr;
 
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
@@ -189,15 +190,27 @@ abstract class HasOneOrMany extends Relation
      * Build model dictionary keyed by the relation's foreign key.
      *
      * @param  \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>  $results
-     * @return array<array<int, TRelatedModel>>
+     * @return array<array<array-key, TRelatedModel>>
      */
     protected function buildDictionary(EloquentCollection $results)
     {
         $foreign = $this->getForeignKeyName();
 
-        return $results->mapToDictionary(function ($result) use ($foreign) {
-            return [$this->getDictionaryKey($result->{$foreign}) => $result];
-        })->all();
+        $dictionary = [];
+
+        $isAssociative = Arr::isAssoc($results->all());
+
+        foreach ($results as $key => $item) {
+            $pairKey = $this->getDictionaryKey($item->{$foreign});
+
+            if ($isAssociative) {
+                $dictionary[$pairKey][$key] = $item;
+            } else {
+                $dictionary[$pairKey][] = $item;
+            }
+        }
+
+        return $dictionary;
     }
 
     /**

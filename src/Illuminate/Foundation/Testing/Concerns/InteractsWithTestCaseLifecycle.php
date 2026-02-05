@@ -21,6 +21,7 @@ use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
+use Illuminate\Http\Client\Response;
 use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Http\Middleware\TrustProxies;
@@ -189,6 +190,7 @@ trait InteractsWithTestCaseLifecycle
         PreventRequestsDuringMaintenance::flushState();
         Queue::createPayloadUsing(null);
         RegisterProviders::flushState();
+        Response::flushState();
         Sleep::fake(false);
         TrimStrings::flushState();
         TrustProxies::flushState();

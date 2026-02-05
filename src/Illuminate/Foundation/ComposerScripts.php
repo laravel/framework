@@ -3,11 +3,13 @@
 namespace Illuminate\Foundation;
 
 use Composer\Installer\PackageEvent;
+use Composer\IO\IOInterface;
 use Composer\Script\Event;
 use Illuminate\Concurrency\ProcessDriver;
 use Illuminate\Encryption\EncryptionServiceProvider;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
+use Throwable;
 
 class ComposerScripts
 {
@@ -63,23 +65,31 @@ class ComposerScripts
             return;
         }
 
-        require_once $event->getComposer()->getConfig()->get('vendor-dir').'/autoload.php';
+        $eventName = null;
+        try {
+            require_once $event->getComposer()->getConfig()->get('vendor-dir').'/autoload.php';
 
-        $laravel = new Application(getcwd());
+            $laravel = new Application(getcwd());
 
-        $laravel->bootstrapWith([
-            LoadEnvironmentVariables::class,
-            LoadConfiguration::class,
-        ]);
+            $laravel->bootstrapWith([
+                LoadEnvironmentVariables::class,
+                LoadConfiguration::class,
+            ]);
 
-        // Ensure we can encrypt our serializable closure...
-        (new EncryptionServiceProvider($laravel))->register();
+            // Ensure we can encrypt our serializable closure...
+            (new EncryptionServiceProvider($laravel))->register();
 
-        $name = $event->getOperation()->getPackage()->getName();
+            $name = $event->getOperation()->getPackage()->getName();
+            $eventName = "composer_package.{$name}:pre_uninstall";
 
-        $laravel->make(ProcessDriver::class)->run(
-            static fn () => app()['events']->dispatch("composer_package.{$name}:pre_uninstall")
-        );
+            $laravel->make(ProcessDriver::class)->run(
+                static fn () => app()['events']->dispatch($eventName)
+            );
+        } catch (Throwable $e) {
+            // Ignore any errors to allow the package removal to complete...
+            $event->getIO()->write('There was an error dispatching or handling the ['.($eventName ?? 'unknown').'] event. Continuing with package removal...');
+            $event->getIO()->writeError('Exception message: '.$e->getMessage(), verbosity: IOInterface::VERBOSE); // @phpstan-ignore class.notFound (Composer exists if this is running)
+        }
     }
 
     /**

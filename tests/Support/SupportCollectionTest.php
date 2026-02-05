@@ -147,6 +147,62 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testHasSole($collection)
+    {
+        $collection = new $collection([
+            ['age' => 2],
+            ['age' => 3],
+        ]);
+
+        $this->assertFalse($collection->hasSole());
+        $this->assertFalse($collection->where('age', 1)->hasSole());
+        $this->assertTrue($collection->where('age', 2)->hasSole());
+
+        $this->assertFalse($collection->hasSole(fn () => true));
+        $this->assertFalse($collection->hasSole(fn () => false));
+        $this->assertTrue($collection->hasSole(fn ($item) => $item['age'] === 2));
+
+        $this->assertFalse($collection->hasSole('age', '>', 1));
+        $this->assertFalse($collection->hasSole('age', '<', 1));
+        $this->assertTrue($collection->hasSole('age', 2));
+
+        $data = new $collection([
+            (object) ['active' => true, 'verified' => true],
+            (object) ['active' => false, 'verified' => true],
+        ]);
+
+        $this->assertFalse($data->hasSole->verified);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testHasMany($collection)
+    {
+        $collection = new $collection([
+            ['age' => 2],
+            ['age' => 3],
+        ]);
+
+        $this->assertTrue($collection->hasMany());
+        $this->assertFalse($collection->where('age', 1)->hasMany());
+        $this->assertFalse($collection->where('age', 2)->hasMany());
+
+        $this->assertTrue($collection->hasMany(fn () => true));
+        $this->assertFalse($collection->hasMany(fn () => false));
+        $this->assertFalse($collection->hasMany(fn ($item) => $item['age'] === 2));
+
+        $this->assertTrue($collection->hasMany('age', '>', 1));
+        $this->assertFalse($collection->hasMany('age', '<', 1));
+        $this->assertFalse($collection->hasMany('age', 2));
+
+        $data = new $collection([
+            (object) ['active' => true, 'verified' => true],
+            (object) ['active' => false, 'verified' => true],
+        ]);
+
+        $this->assertTrue($data->hasMany->verified);
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testFirstOrFailReturnsFirstItemInCollection($collection)
     {
         $collection = new $collection([

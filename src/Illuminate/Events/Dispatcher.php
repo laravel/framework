@@ -4,14 +4,18 @@ namespace Illuminate\Events;
 
 use Closure;
 use Exception;
+use Illuminate\Bus\UniqueLock;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Support\Arr;
@@ -649,6 +653,11 @@ class Dispatcher implements DispatcherContract
     {
         [$listener, $job] = $this->createListenerAndJob($class, $method, $arguments);
 
+        if ($job->shouldBeUnique &&
+            ! (new UniqueLock($this->container->make(Cache::class)))->acquire($job)) {
+            return;
+        }
+
         $connection = $this->resolveQueue()->connection(method_exists($listener, 'viaConnection')
             ? (isset($arguments[0]) ? $listener->viaConnection($arguments[0]) : $listener->viaConnection())
             : $listener->connection ?? null);
@@ -720,6 +729,19 @@ class Dispatcher implements DispatcherContract
                 method_exists($listener, 'middleware') ? $listener->middleware(...$data) : [],
                 $listener->middleware ?? []
             ));
+
+            $job->shouldBeUnique = $listener instanceof ShouldBeUnique;
+            $job->shouldBeUniqueUntilProcessing = $listener instanceof ShouldBeUniqueUntilProcessing;
+
+            if ($job->shouldBeUnique) {
+                $job->uniqueId = method_exists($listener, 'uniqueId')
+                    ? $listener->uniqueId(...$data)
+                    : ($listener->uniqueId ?? null);
+
+                $job->uniqueFor = method_exists($listener, 'uniqueFor')
+                    ? $listener->uniqueFor(...$data)
+                    : ($listener->uniqueFor ?? 0);
+            }
         });
     }
 
