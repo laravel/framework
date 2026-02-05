@@ -55,6 +55,42 @@ class Benchmark
     }
 
     /**
+     * Measure a callable once and return the result and duration in provided time unit.
+     *
+     * @template TReturn of mixed
+     *
+     * @param  (callable(): TReturn)  $callback
+     * @param  'ns'|'μs'|'ms'|'s'  $unit  Supported: 'ns', 'μs', 'ms', 's'
+     * @return array{0: TReturn, 1: float}
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @example
+     *  [$result, $duration] = Benchmark::timed(fn() => sleep(1), 's');
+     *  // Returns: [null, 1.0]
+     */
+    public static function timed(callable $callback, string $unit = 'ms'): array
+    {
+        gc_collect_cycles();
+
+        $start = hrtime(true);
+        $result = $callback();
+        $duration = hrtime(true) - $start;
+
+        $divisor = match (strtolower($unit)) {
+            'ns' => 1,
+            'μs' => 1_000,
+            'ms' => 1_000_000,
+            's' => 1_000_000_000,
+            default => throw new \InvalidArgumentException(
+                "Unsupported time unit [{$unit}]. Supported units: ns, μs, ms, s."
+            ),
+        };
+
+        return [$result, $duration / $divisor];
+    }
+
+    /**
      * Measure a callable or array of callables over the given number of iterations, then dump and die.
      *
      * @param  \Closure|array  $benchmarkables
