@@ -139,7 +139,8 @@ class BusBatchTest extends TestCase
             use Batchable;
         };
 
-        $thirdJob = function () {};
+        $thirdJob = function () {
+        };
 
         $queue->shouldReceive('connection')->once()
             ->with('test-connection')
@@ -567,13 +568,16 @@ class BusBatchTest extends TestCase
         {
             use Batchable;
 
-            public function handle() {}
+            public function handle()
+            {
+            }
         };
 
         Bus::chain([
             Bus::batch([$TestBatchJob])->name('Batch 1'),
             Bus::batch([$TestBatchJob])->name('Batch 2'),
-            function () {},
+            function () {
+            },
         ])->dispatch();
 
         $this->assertTrue(true);
