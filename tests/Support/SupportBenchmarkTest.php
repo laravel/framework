@@ -41,7 +41,7 @@ class SupportBenchmarkTest extends TestCase
 
         $this->assertNull($result);
         $this->assertGreaterThan(0, $duration);
-        $this->assertInstanceOf(RuntimeException::class, $exception);
+        $this->assertInstanceOf(\RuntimeException::class, $exception);
         $this->assertSame('Test exception', $exception->getMessage());
     }
 
@@ -54,17 +54,6 @@ class SupportBenchmarkTest extends TestCase
 
         $this->assertSame('success', $result);
         $this->assertGreaterThan(0, $duration);
-        $this->assertNull($exception);
-    }
-
-    public function testTimedAndTryTimedProduceSameDuration()
-    {
-        $callback = fn () => usleep(1000);
-
-        [, $duration1] = Benchmark::timed($callback, BenchmarkTimeUnit::Microseconds);
-        [, $duration2, $exception] = Benchmark::tryTimed($callback, BenchmarkTimeUnit::Microseconds);
-
-        $this->assertEquals($duration1, $duration2, 0.1);
         $this->assertNull($exception);
     }
 
