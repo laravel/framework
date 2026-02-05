@@ -1757,7 +1757,7 @@ class Str
 
         return mb_substr($string, 0, $offset)
             .$replace
-            .mb_substr($string, $offset + $length);
+            .mb_substr(mb_substr($string, $offset), $length);
     }
 
     /**
