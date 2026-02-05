@@ -59,6 +59,20 @@ class Dispatcher implements QueueingDispatcher
     protected $allowsDispatchingAfterResponses = true;
 
     /**
+     * Indicates if the dispatcher is capturing jobs for a batch.
+     *
+     * @var bool
+     */
+    protected $capturingBatch = false;
+
+    /**
+     * The jobs captured for the current batch.
+     *
+     * @var array
+     */
+    protected $capturedJobs = [];
+
+    /**
      * Create a new command dispatcher instance.
      */
     public function __construct(Container $container, ?Closure $queueResolver = null)
@@ -76,9 +90,47 @@ class Dispatcher implements QueueingDispatcher
      */
     public function dispatch($command)
     {
+        if ($this->shouldCaptureForBatch($command)) {
+            $this->capturedJobs[] = $command;
+
+            return null;
+        }
+
         return $this->queueResolver && $this->commandShouldBeQueued($command)
             ? $this->dispatchToQueue($command)
             : $this->dispatchNow($command);
+    }
+
+    /**
+     * Determine if the given command should be captured for a batch.
+     *
+     * @param  mixed  $command
+     * @return bool
+     */
+    protected function shouldCaptureForBatch($command)
+    {
+        return $this->capturingBatch && ($this->commandShouldBeQueued($command) || $command instanceof PendingBatch);
+    }
+
+    /**
+     * Determine if the dispatcher is currently capturing jobs for a batch.
+     *
+     * @return bool
+     */
+    public function isCapturingBatch()
+    {
+        return $this->capturingBatch;
+    }
+
+    /**
+     * Add a job to the current batch being captured.
+     *
+     * @param  mixed  $job
+     * @return void
+     */
+    public function addToCapturedBatch($job)
+    {
+        $this->capturedJobs[] = $job;
     }
 
     /**
@@ -146,12 +198,42 @@ class Dispatcher implements QueueingDispatcher
     /**
      * Create a new batch of queueable jobs.
      *
-     * @param  \Illuminate\Support\Collection|mixed  $jobs
+     * @param  \Illuminate\Support\Collection|\Closure|mixed  $jobs
      * @return \Illuminate\Bus\PendingBatch
      */
     public function batch($jobs)
     {
+        if ($jobs instanceof Closure) {
+            return $this->collectForBatch($jobs);
+        }
+
         return new PendingBatch($this->container, Collection::wrap($jobs));
+    }
+
+    /**
+     * Collect jobs dispatched within the callback into a batch.
+     *
+     * @param  callable  $callback
+     * @return \Illuminate\Bus\PendingBatch
+     */
+    public function collectForBatch(callable $callback)
+    {
+        $wasCapturing = $this->capturingBatch;
+        $previousCaptured = $this->capturedJobs;
+
+        $this->capturingBatch = true;
+        $this->capturedJobs = [];
+
+        try {
+            $callback();
+
+            $jobs = ChainedBatch::prepareNestedBatches(Collection::wrap($this->capturedJobs));
+
+            return new PendingBatch($this->container, $jobs);
+        } finally {
+            $this->capturingBatch = $wasCapturing;
+            $this->capturedJobs = $previousCaptured;
+        }
     }
 
     /**

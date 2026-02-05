@@ -7,7 +7,8 @@ use Illuminate\Bus\Batchable;
 use Illuminate\Bus\BatchRepository;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Bus\Dispatcher as BusDispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Support\Collection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -20,10 +21,13 @@ class BusPendingBatchTest extends TestCase
     {
         $container = new Container;
 
-        $eventDispatcher = m::mock(Dispatcher::class);
+        $busDispatcher = m::mock(BusDispatcher::class);
+        $container->instance(BusDispatcher::class, $busDispatcher);
+
+        $eventDispatcher = m::mock(EventDispatcher::class);
         $eventDispatcher->shouldReceive('dispatch')->once();
 
-        $container->instance(Dispatcher::class, $eventDispatcher);
+        $container->instance(EventDispatcher::class, $eventDispatcher);
 
         $job = new class
         {
@@ -66,7 +70,8 @@ class BusPendingBatchTest extends TestCase
 
         $container = new Container;
 
-        $job = new class {
+        $job = new class
+        {
         };
 
         $pendingBatch = new PendingBatch($container, new Collection([$job]));
@@ -92,9 +97,12 @@ class BusPendingBatchTest extends TestCase
     {
         $container = new Container;
 
-        $eventDispatcher = m::mock(Dispatcher::class);
+        $busDispatcher = m::mock(BusDispatcher::class);
+        $container->instance(BusDispatcher::class, $busDispatcher);
+
+        $eventDispatcher = m::mock(EventDispatcher::class);
         $eventDispatcher->shouldReceive('dispatch')->once();
-        $container->instance(Dispatcher::class, $eventDispatcher);
+        $container->instance(EventDispatcher::class, $eventDispatcher);
 
         $job = new class
         {
@@ -118,9 +126,9 @@ class BusPendingBatchTest extends TestCase
     {
         $container = new Container;
 
-        $eventDispatcher = m::mock(Dispatcher::class);
+        $eventDispatcher = m::mock(EventDispatcher::class);
         $eventDispatcher->shouldNotReceive('dispatch');
-        $container->instance(Dispatcher::class, $eventDispatcher);
+        $container->instance(EventDispatcher::class, $eventDispatcher);
 
         $job = new class
         {
@@ -141,9 +149,12 @@ class BusPendingBatchTest extends TestCase
     {
         $container = new Container;
 
-        $eventDispatcher = m::mock(Dispatcher::class);
+        $busDispatcher = m::mock(BusDispatcher::class);
+        $container->instance(BusDispatcher::class, $busDispatcher);
+
+        $eventDispatcher = m::mock(EventDispatcher::class);
         $eventDispatcher->shouldReceive('dispatch')->once();
-        $container->instance(Dispatcher::class, $eventDispatcher);
+        $container->instance(EventDispatcher::class, $eventDispatcher);
 
         $job = new class
         {
@@ -167,9 +178,9 @@ class BusPendingBatchTest extends TestCase
     {
         $container = new Container;
 
-        $eventDispatcher = m::mock(Dispatcher::class);
+        $eventDispatcher = m::mock(EventDispatcher::class);
         $eventDispatcher->shouldNotReceive('dispatch');
-        $container->instance(Dispatcher::class, $eventDispatcher);
+        $container->instance(EventDispatcher::class, $eventDispatcher);
 
         $job = new class
         {
@@ -190,10 +201,13 @@ class BusPendingBatchTest extends TestCase
     {
         $container = new Container;
 
-        $eventDispatcher = m::mock(Dispatcher::class);
+        $busDispatcher = m::mock(BusDispatcher::class);
+        $container->instance(BusDispatcher::class, $busDispatcher);
+
+        $eventDispatcher = m::mock(EventDispatcher::class);
         $eventDispatcher->shouldReceive('dispatch')->once();
 
-        $container->instance(Dispatcher::class, $eventDispatcher);
+        $container->instance(EventDispatcher::class, $eventDispatcher);
 
         $job = new class
         {
@@ -221,7 +235,8 @@ class BusPendingBatchTest extends TestCase
 
     public function test_it_throws_exception_if_batched_job_is_not_batchable(): void
     {
-        $nonBatchableJob = new class {
+        $nonBatchableJob = new class
+        {
         };
 
         $this->expectException(RuntimeException::class);
@@ -237,7 +252,8 @@ class BusPendingBatchTest extends TestCase
         new PendingBatch(
             $container,
             new Collection(
-                [new PendingBatch($container, new Collection([new BatchableJob, new class {
+                [new PendingBatch($container, new Collection([new BatchableJob, new class
+                {
                 }]))]
             )
         );

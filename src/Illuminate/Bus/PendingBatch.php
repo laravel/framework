@@ -4,6 +4,7 @@ namespace Illuminate\Bus;
 
 use Closure;
 use Illuminate\Bus\Events\BatchDispatched;
+use Illuminate\Contracts\Bus\Dispatcher as BusDispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Support\Arr;
@@ -360,12 +361,20 @@ class PendingBatch
     /**
      * Dispatch the batch.
      *
-     * @return \Illuminate\Bus\Batch
+     * @return \Illuminate\Bus\Batch|null
      *
      * @throws \Throwable
      */
     public function dispatch()
     {
+        $dispatcher = $this->container->make(BusDispatcher::class);
+
+        if ($dispatcher instanceof Dispatcher && $dispatcher->isCapturingBatch()) {
+            $dispatcher->addToCapturedBatch($this);
+
+            return null;
+        }
+
         $repository = $this->container->make(BatchRepository::class);
 
         try {
