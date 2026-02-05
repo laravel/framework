@@ -432,7 +432,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @param  string  $key
      * @param  mixed  $default
      * @return mixed
-     * @deprecated use ->input(), ->request->get(), or ->query->get() instead
+     *
+     * @deprecated use ->input() instead
      */
     #[\Override]
     public function get(string $key, mixed $default = null): mixed
