@@ -268,8 +268,10 @@ class RouteUrlGenerator
             }
         }
 
+        $lengthParameter = count($namedParameters);
+
         // Starting from the offset, match any passed parameters from left to right...
-        for ($i = $offset; $i < count($namedParameters); $i++) {
+        for ($i = $offset; $i < $lengthParameter; $i++) {
             $key = array_keys($namedParameters)[$i];
 
             if ($namedParameters[$key] !== '') {
