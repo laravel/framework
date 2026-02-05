@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Illuminate\Tests\Database;
 
+use Closure;
 use Exception;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
@@ -15,6 +16,7 @@ use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
 use Mockery as m;
 use PDO;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
@@ -31,7 +33,8 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         parent::tearDown();
     }
 
-    public function testCreateOrFirstMethodCreatesNewRelated(): void
+    #[DataProvider('createOrFirstValues')]
+    public function testCreateOrFirstMethodCreatesNewRelated(array|Closure $values): void
     {
         $source = new BelongsToManyCreateOrFirstTestSourceModel();
         $source->id = 123;
@@ -53,7 +56,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
             [456, 123],
         )->andReturnTrue();
 
-        $result = $source->related()->createOrFirst(['attr' => 'foo'], ['val' => 'bar']);
+        $result = $source->related()->createOrFirst(['attr' => 'foo'], $values);
         $this->assertTrue($result->wasRecentlyCreated);
         $this->assertEquals([
             'id' => 456,
@@ -445,6 +448,14 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
             'created_at' => '2023-01-01T00:00:00.000000Z',
             'updated_at' => '2023-01-01T00:00:00.000000Z',
         ], $result->toArray());
+    }
+
+    public static function createOrFirstValues(): array
+    {
+        return [
+            'array' => [['val' => 'bar']],
+            'closure' => [fn () => ['val' => 'bar']],
+        ];
     }
 
     protected function mockConnectionForModels(array $models, string $database, array $lastInsertIds = []): void

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Closure;
 use Exception;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
@@ -11,6 +12,7 @@ use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
 use Mockery as m;
 use PDO;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
@@ -27,7 +29,8 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         parent::tearDown();
     }
 
-    public function testCreateOrFirstMethodCreatesNewRecord(): void
+    #[DataProvider('createOrFirstValues')]
+    public function testCreateOrFirstMethodCreatesNewRecord(array|Closure $values): void
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite', [123]);
@@ -39,7 +42,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
             ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
         )->andReturnTrue();
 
-        $result = $model->newQuery()->createOrFirst(['attr' => 'foo'], ['val' => 'bar']);
+        $result = $model->newQuery()->createOrFirst(['attr' => 'foo'], $values);
         $this->assertTrue($result->wasRecentlyCreated);
         $this->assertEquals([
             'id' => 123,
@@ -468,6 +471,14 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
             'created_at' => '2023-01-01T00:00:00.000000Z',
             'updated_at' => '2023-01-01T00:00:00.000000Z',
         ], $result->toArray());
+    }
+
+    public static function createOrFirstValues(): array
+    {
+        return [
+            'array' => [['val' => 'bar']],
+            'closure' => [fn () => ['val' => 'bar']],
+        ];
     }
 
     protected function mockConnectionForModel(Model $model, string $database, array $lastInsertIds = []): void
