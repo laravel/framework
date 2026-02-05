@@ -82,7 +82,7 @@ class DocsCommand extends Command
      *
      * @return void
      */
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
