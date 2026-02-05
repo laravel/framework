@@ -4,7 +4,7 @@ namespace Illuminate\Bus\Events;
 
 use Illuminate\Bus\Batch;
 
-class BatchCancelled
+class BatchCanceled
 {
     /**
      * Create a new event instance.
