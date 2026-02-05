@@ -58,11 +58,64 @@ class BatchClosureTest extends QueueTestCase
 
         $this->assertEquals(['outer', 'inner', 'inner-then', 'outer-then'], BatchClosureJobRecorder::$results);
     }
+
+    public function testNonQueueableJobsExecuteImmediatelyInBatchClosure()
+    {
+        Bus::batch(function () {
+            Bus::dispatch(new BatchClosureTestJob('queued'));
+            Bus::dispatch(new BatchClosureNonQueueableJob('sync'));
+        })->then(function () {
+            BatchClosureJobRecorder::record('then');
+        })->dispatch();
+
+        // The non-queueable job should have already executed synchronously
+        $this->assertContains('sync', BatchClosureJobRecorder::$results);
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+
+        // Final order: sync runs immediately, then queued job, then the then callback
+        $this->assertEquals(['sync', 'queued', 'then'], BatchClosureJobRecorder::$results);
+    }
+
+    public function testExceptionInClosureRestoresCapturingState()
+    {
+        /** @var \Illuminate\Bus\Dispatcher $dispatcher */
+        $dispatcher = $this->app->make(\Illuminate\Bus\Dispatcher::class);
+
+        $this->assertFalse($dispatcher->isCapturingBatch());
+
+        try {
+            Bus::batch(function () {
+                throw new \RuntimeException('Test exception');
+            })->dispatch();
+
+            $this->fail('Expected exception was not thrown');
+        } catch (\RuntimeException $e) {
+            $this->assertEquals('Test exception', $e->getMessage());
+        }
+
+        // State should be restored after exception
+        $this->assertFalse($dispatcher->isCapturingBatch());
+    }
 }
 
 class BatchClosureTestJob implements ShouldQueue
 {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable;
+
+    public function __construct(public string $value)
+    {
+    }
+
+    public function handle()
+    {
+        BatchClosureJobRecorder::record($this->value);
+    }
+}
+
+class BatchClosureNonQueueableJob
+{
+    use Dispatchable;
 
     public function __construct(public string $value)
     {
