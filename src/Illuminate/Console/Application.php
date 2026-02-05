@@ -226,7 +226,6 @@ class Application extends SymfonyApplication implements ApplicationContract
      * @param  \Symfony\Component\Console\Command\Command|callable  $command
      * @return \Symfony\Component\Console\Command\Command|null
      */
-    #[\Override]
     public function addCommand(SymfonyCommand|callable $command): ?SymfonyCommand
     {
         if ($command instanceof Command) {
