@@ -217,6 +217,35 @@ class Repository implements ArrayAccess, ConfigContract
     }
 
     /**
+     * Execute a callback with temporarily modified configuration values.
+     *
+     * @template TReturn
+     *
+     * @param  array<string, mixed>  $values
+     * @param  (callable(): TReturn)  $callback
+     * @return TReturn
+     *
+     * @throws \Throwable
+     */
+    public function scoped(array $values, callable $callback)
+    {
+        $original = [];
+
+        foreach ($values as $key => $value) {
+            $original[$key] = $this->get($key);
+            $this->set($key, $value);
+        }
+
+        try {
+            return $callback();
+        } finally {
+            foreach ($original as $key => $value) {
+                $this->set($key, $value);
+            }
+        }
+    }
+
+    /**
      * Prepend a value onto an array configuration value.
      *
      * @param  string  $key

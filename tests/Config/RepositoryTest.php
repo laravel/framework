@@ -372,4 +372,69 @@ class RepositoryTest extends TestCase
 
         $this->repository->float('a.b');
     }
+
+    public function testScopedModifiesConfigForDurationOfCallback(): void
+    {
+        $originalFoo = $this->repository->get('foo');
+
+        $result = $this->repository->scoped(['foo' => 'temporary'], function () {
+            return $this->repository->get('foo');
+        });
+
+        $this->assertSame('temporary', $result);
+        $this->assertSame($originalFoo, $this->repository->get('foo'));
+    }
+
+    public function testScopedHandlesMultipleConfigValues(): void
+    {
+        $result = $this->repository->scoped([
+            'foo' => 'temp_foo',
+            'bar' => 'temp_bar',
+        ], function () {
+            return [
+                'foo' => $this->repository->get('foo'),
+                'bar' => $this->repository->get('bar'),
+            ];
+        });
+
+        $this->assertSame(['foo' => 'temp_foo', 'bar' => 'temp_bar'], $result);
+        $this->assertSame('bar', $this->repository->get('foo'));
+        $this->assertSame('baz', $this->repository->get('bar'));
+    }
+
+    public function testScopedRestoresConfigAfterException(): void
+    {
+        $originalFoo = $this->repository->get('foo');
+
+        try {
+            $this->repository->scoped(['foo' => 'temporary'], function () {
+                $this->assertSame('temporary', $this->repository->get('foo'));
+                throw new \Exception('Test exception');
+            });
+        } catch (\Exception $e) {
+            // Expected exception
+        }
+
+        $this->assertSame($originalFoo, $this->repository->get('foo'));
+    }
+
+    public function testScopedReturnsCallbackResult(): void
+    {
+        $result = $this->repository->scoped(['foo' => 'temporary'], function () {
+            return 'callback_result';
+        });
+
+        $this->assertSame('callback_result', $result);
+    }
+
+    public function testScopedRestoresNestedConfig(): void
+    {
+        $originalValue = $this->repository->get('associate.x');
+
+        $this->repository->scoped(['associate.x' => 'temp_xxx'], function () {
+            $this->assertSame('temp_xxx', $this->repository->get('associate.x'));
+        });
+
+        $this->assertSame($originalValue, $this->repository->get('associate.x'));
+    }
 }
