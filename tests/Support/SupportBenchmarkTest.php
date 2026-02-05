@@ -22,6 +22,11 @@ class SupportBenchmarkTest extends TestCase
         $this->assertIsArray(Benchmark::value(fn () => 1 + 1));
     }
 
+    public function testTimed(): void
+    {
+        $this->assertIsArray(Benchmark::timed(fn () => 1 + 1));
+    }
+
     public function testMacroable(): void
     {
         $macroName = __FUNCTION__;
