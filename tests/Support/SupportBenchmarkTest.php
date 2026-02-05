@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Benchmark;
+use Illuminate\Support\BenchmarkTimeUnit;
 use PHPUnit\Framework\TestCase;
 
 class SupportBenchmarkTest extends TestCase
@@ -22,9 +23,49 @@ class SupportBenchmarkTest extends TestCase
         $this->assertIsArray(Benchmark::value(fn () => 1 + 1));
     }
 
-    public function testTimed(): void
+    public function testTimedThrowsException()
     {
-        $this->assertIsArray(Benchmark::timed(fn () => 1 + 1));
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Test exception');
+
+        Benchmark::timed(
+            fn () => throw new \RuntimeException('Test exception'),
+        );
+    }
+
+    public function testTryTimedReturnsException()
+    {
+        [$result, $duration, $exception] = Benchmark::tryTimed(
+            fn () => throw new \RuntimeException('Test exception'),
+        );
+
+        $this->assertNull($result);
+        $this->assertGreaterThan(0, $duration);
+        $this->assertInstanceOf(RuntimeException::class, $exception);
+        $this->assertSame('Test exception', $exception->getMessage());
+    }
+
+    public function testTryTimedReturnsResultWhenNoException()
+    {
+        [$result, $duration, $exception] = Benchmark::tryTimed(
+            fn () => 'success',
+            BenchmarkTimeUnit::Seconds
+        );
+
+        $this->assertSame('success', $result);
+        $this->assertGreaterThan(0, $duration);
+        $this->assertNull($exception);
+    }
+
+    public function testTimedAndTryTimedProduceSameDuration()
+    {
+        $callback = fn () => usleep(1000);
+
+        [, $duration1] = Benchmark::timed($callback, BenchmarkTimeUnit::Microseconds);
+        [, $duration2, $exception] = Benchmark::tryTimed($callback, BenchmarkTimeUnit::Microseconds);
+
+        $this->assertEquals($duration1, $duration2, 0.1);
+        $this->assertNull($exception);
     }
 
     public function testMacroable(): void

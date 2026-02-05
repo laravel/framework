@@ -45,31 +45,24 @@ class Benchmark
      */
     public static function value(callable $callback): array
     {
-        gc_collect_cycles();
-
-        $start = hrtime(true);
-
-        $result = $callback();
-
-        return [$result, (hrtime(true) - $start) / 1_000_000];
+        return static::timed($callback);
     }
 
     /**
-     * Measure a callable once and return the result and duration in provided time unit.
+     * Measure a callable once and return the result and duration in the provided time unit.
+     * If the callable throws an exception, it will be re-thrown.
      *
      * @template TReturn of mixed
      *
      * @param  (callable(): TReturn)  $callback
-     * @param  'ns'|'μs'|'ms'|'s'  $unit  Supported: 'ns', 'μs', 'ms', 's'
+     * @param  BenchmarkTimeUnit  $unit
      * @return array{0: TReturn, 1: float}
      *
-     * @throws \InvalidArgumentException
-     *
      * @example
-     *  [$result, $duration] = Benchmark::timed(fn() => sleep(1), 's');
-     *  // Returns: [null, 1.0]
+     * [$result, $duration] = Benchmark::timed(fn() => sleep(1), BenchmarkTimeUnit::Seconds);
+     * // Returns: [null, 1.0]
      */
-    public static function timed(callable $callback, string $unit = 'ms'): array
+    public static function timed(callable $callback, BenchmarkTimeUnit $unit = BenchmarkTimeUnit::Milliseconds): array
     {
         gc_collect_cycles();
 
@@ -77,17 +70,47 @@ class Benchmark
         $result = $callback();
         $duration = hrtime(true) - $start;
 
-        $divisor = match (strtolower($unit)) {
-            'ns' => 1,
-            'μs' => 1_000,
-            'ms' => 1_000_000,
-            's' => 1_000_000_000,
-            default => throw new \InvalidArgumentException(
-                "Unsupported time unit [{$unit}]. Supported units: ns, μs, ms, s."
-            ),
-        };
+        return [$result, $duration / $unit->divisor()];
+    }
 
-        return [$result, $duration / $divisor];
+    /**
+     * Measure a callable once and return the result and duration in the provided time unit.
+     * If the callable throws an exception, it will be caught and returned.
+     *
+     * @template TReturn of mixed
+     *
+     * @param  (callable(): TReturn)  $callback
+     * @param  BenchmarkTimeUnit  $unit
+     * @return array{
+     *     0: TReturn|null,
+     *     1: float,
+     *     2: \Throwable|null
+     * }
+     *
+     * @example
+     * [$result, $duration, $exception] = Benchmark::tryTimed(
+     *     fn() => throw new RuntimeException('Error'),
+     *     BenchmarkTimeUnit::Milliseconds
+     * );
+     * // Returns: [null, 0.123, RuntimeException]
+     */
+    public static function tryTimed(callable $callback, BenchmarkTimeUnit $unit = BenchmarkTimeUnit::Milliseconds): array
+    {
+        gc_collect_cycles();
+
+        $start = hrtime(true);
+        $result = null;
+        $exception = null;
+
+        try {
+            $result = $callback();
+        } catch (\Throwable $e) {
+            $exception = $e;
+        }
+
+        $duration = hrtime(true) - $start;
+
+        return [$result, $duration / $unit->divisor(), $exception];
     }
 
     /**
