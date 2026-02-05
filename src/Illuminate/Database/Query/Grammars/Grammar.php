@@ -1555,7 +1555,9 @@ class Grammar extends BaseGrammar
 
         $isStringLiteral = false;
 
-        for ($i = 0; $i < strlen($sql); $i++) {
+        $sqlLength = strlen($sql);
+
+        for ($i = 0; $i < $sqlLength; $i++) {
             $char = $sql[$i];
             $nextChar = $sql[$i + 1] ?? null;
 
