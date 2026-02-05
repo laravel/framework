@@ -56,6 +56,7 @@
         "symfony/polyfill-php85": "^1.33",
         "symfony/process": "^7.2.0",
         "symfony/routing": "^7.2.0",
+        "symfony/string": "^7.2.0",
         "symfony/uid": "^7.2.0",
         "symfony/var-dumper": "^7.2.0",
         "tijsverkoyen/css-to-inline-styles": "^2.2.5",
