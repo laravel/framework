@@ -580,4 +580,30 @@ class MySqlGrammar extends Grammar
 
         return 'json_extract('.$field.$path.')';
     }
+
+    /**
+     * Compile a select query into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    public function compileSelect(Builder $query)
+    {
+        $sql = parent::compileSelect($query);
+
+        if ($query->timeout === null) {
+            return $sql;
+        }
+
+        $milliseconds = $query->timeout * 1000;
+
+        $sql = preg_replace(
+            '/^select\b/i',
+            'select /*+ MAX_EXECUTION_TIME('.$milliseconds.') */',
+            $sql,
+            1
+        );
+
+        return $sql;
+    }
 }
