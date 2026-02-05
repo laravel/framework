@@ -812,7 +812,7 @@ class Arr
     /**
      * Explode the "value" and "key" arguments passed to "pluck".
      *
-     * @param  string|array|Closure  $value
+     * @param  Closure|array|string  $value
      * @param  string|array|Closure|null  $key
      * @return array
      */

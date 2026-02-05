@@ -703,7 +703,7 @@ class Builder implements BuilderContract
      * @param  (\Closure(): array)|array  $values
      * @return TModel
      */
-    public function firstOrCreate(array $attributes = [], array|Closure $values = [])
+    public function firstOrCreate(array $attributes = [], Closure|array $values = [])
     {
         if (! is_null($instance = (clone $this)->where($attributes)->first())) {
             return $instance;
@@ -719,7 +719,7 @@ class Builder implements BuilderContract
      * @param  (\Closure(): array)|array  $values
      * @return TModel
      */
-    public function createOrFirst(array $attributes = [], array|Closure $values = [])
+    public function createOrFirst(array $attributes = [], Closure|array $values = [])
     {
         try {
             return $this->withSavepointIfNeeded(fn () => $this->create(array_merge($attributes, value($values))));

@@ -34,7 +34,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
     }
 
     #[DataProvider('createOrFirstValues')]
-    public function testCreateOrFirstMethodCreatesNewRelated(array|Closure $values): void
+    public function testCreateOrFirstMethodCreatesNewRelated(Closure|array $values): void
     {
         $source = new BelongsToManyCreateOrFirstTestSourceModel();
         $source->id = 123;

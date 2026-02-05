@@ -33,7 +33,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
     }
 
     #[DataProvider('createOrFirstValues')]
-    public function testCreateOrFirstMethodCreatesNewRecord(array|Closure $values): void
+    public function testCreateOrFirstMethodCreatesNewRecord(Closure|array $values): void
     {
         $parent = new HasManyThroughCreateOrFirstTestParentModel();
         $parent->id = 123;

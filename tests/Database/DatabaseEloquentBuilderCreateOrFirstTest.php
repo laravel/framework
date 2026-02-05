@@ -30,7 +30,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
     }
 
     #[DataProvider('createOrFirstValues')]
-    public function testCreateOrFirstMethodCreatesNewRecord(array|Closure $values): void
+    public function testCreateOrFirstMethodCreatesNewRecord(Closure|array $values): void
     {
         $model = new EloquentBuilderCreateOrFirstTestModel();
         $this->mockConnectionForModel($model, 'SQLite', [123]);

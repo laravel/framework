@@ -223,7 +223,7 @@ abstract class HasOneOrManyThrough extends Relation
      * @param  (\Closure(): array)|array  $values
      * @return TRelatedModel
      */
-    public function firstOrCreate(array $attributes = [], array|Closure $values = [])
+    public function firstOrCreate(array $attributes = [], Closure|array $values = [])
     {
         if (! is_null($instance = (clone $this)->where($attributes)->first())) {
             return $instance;
@@ -239,7 +239,7 @@ abstract class HasOneOrManyThrough extends Relation
      * @param  (\Closure(): array)|array  $values
      * @return TRelatedModel
      */
-    public function createOrFirst(array $attributes = [], array|Closure $values = [])
+    public function createOrFirst(array $attributes = [], Closure|array $values = [])
     {
         try {
             return $this->getQuery()->withSavepointIfNeeded(fn () => $this->create(array_merge($attributes, value($values))));
