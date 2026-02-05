@@ -1929,7 +1929,12 @@ trait HasAttributes
         }
     }
 
-    private function mergeAttributeFromClassCasts(string $key): void
+    /**
+     * Merge the cast class attribute back into the model.
+     *
+     * @return void
+     */
+    protected function mergeAttributeFromClassCasts(string $key): void
     {
         if (! isset($this->classCastCache[$key])) {
             return;
@@ -1959,7 +1964,12 @@ trait HasAttributes
         }
     }
 
-    private function mergeAttributeFromAttributeCasts(string $key): void
+    /**
+     * Merge the cast class attribute back into the model.
+     *
+     * @return void
+     */
+    protected function mergeAttributeFromAttributeCasts(string $key): void
     {
         if (! isset($this->attributeCastCache[$key])) {
             return;
