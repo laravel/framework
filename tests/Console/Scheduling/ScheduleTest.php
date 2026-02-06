@@ -220,4 +220,20 @@ final class ScheduleTest extends TestCase
 
         self::assertSame('0 * * * 1-5', $event->expression);
     }
+
+    public function testSchedulableCommandInstanceConfiguresEvent(): void
+    {
+        $schedule = new Schedule();
+        $event = $schedule->command(new SchedulableCommand);
+
+        self::assertSame('0 * * * *', $event->expression);
+    }
+
+    public function testCommandWithStringNameIsUnaffected(): void
+    {
+        $schedule = new Schedule();
+        $event = $schedule->command('inspire');
+
+        self::assertSame('* * * * *', $event->expression);
+    }
 }
