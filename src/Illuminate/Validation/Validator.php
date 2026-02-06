@@ -15,6 +15,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\ValidatedInput;
 use InvalidArgumentException;
 use RuntimeException;
@@ -514,6 +515,46 @@ class Validator implements ValidatorContract
     public function fails()
     {
         return ! $this->passes();
+    }
+
+    /**
+     * Execute the callback if the data passes the validation rules.
+     *
+     * @template TWhenReturnType
+     *
+     * @param  (callable($this): TWhenReturnType)  $callback
+     * @param  (callable($this): TWhenReturnType)|null  $default
+     * @return $this|TWhenReturnType
+     */
+    public function whenPasses(callable $callback, ?callable $default = null)
+    {
+        if ($this->passes()) {
+            return $callback($this) ?? $this;
+        } elseif ($default) {
+            return $default($this) ?? $this;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Execute the callback if the data fails the validation rules.
+     *
+     * @template TWhenReturnType
+     *
+     * @param  (callable($this): TWhenReturnType)  $callback
+     * @param  (callable($this): TWhenReturnType)|null  $default
+     * @return $this|TWhenReturnType
+     */
+    public function whenFails(callable $callback, ?callable $default = null)
+    {
+        if ($this->fails()) {
+            return $callback($this) ?? $this;
+        } elseif ($default) {
+            return $default($this) ?? $this;
+        }
+
+        return $this;
     }
 
     /**
