@@ -126,6 +126,29 @@ final class ScheduleTest extends TestCase
         self::assertTrue($events[0]->withoutOverlapping);
     }
 
+    public function testSchedulableJobWorksWithinNestedGroups(): void
+    {
+        $schedule = new Schedule();
+
+        $this->eventMutex->shouldReceive('exists')->andReturn(false);
+
+        // Outer group sets evenInMaintenanceMode, inner group sets onOneServer,
+        // then Schedulable::schedule() sets daily()->at('10:00')->withoutOverlapping().
+        $schedule->evenInMaintenanceMode()->group(function ($schedule) {
+            $schedule->onOneServer()->group(function ($schedule) {
+                $schedule->job(new SchedulableJob);
+            });
+        });
+
+        $events = $schedule->events();
+
+        self::assertCount(1, $events);
+        self::assertTrue($events[0]->evenInMaintenanceMode);
+        self::assertTrue($events[0]->onOneServer);
+        self::assertSame('0 10 * * *', $events[0]->expression);
+        self::assertTrue($events[0]->withoutOverlapping);
+    }
+
     public function testSchedulableJobWithPendingAttributesBefore(): void
     {
         $schedule = new Schedule();
@@ -167,6 +190,24 @@ final class ScheduleTest extends TestCase
 
         self::assertCount(1, $events);
         self::assertTrue($events[0]->evenInMaintenanceMode);
+        self::assertSame('0 * * * *', $events[0]->expression);
+    }
+
+    public function testSchedulableCommandWorksWithinNestedGroups(): void
+    {
+        $schedule = new Schedule();
+
+        $schedule->evenInMaintenanceMode()->group(function ($schedule) {
+            $schedule->onOneServer()->group(function ($schedule) {
+                $schedule->command(SchedulableCommand::class);
+            });
+        });
+
+        $events = $schedule->events();
+
+        self::assertCount(1, $events);
+        self::assertTrue($events[0]->evenInMaintenanceMode);
+        self::assertTrue($events[0]->onOneServer);
         self::assertSame('0 * * * *', $events[0]->expression);
     }
 
