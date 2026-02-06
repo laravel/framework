@@ -183,4 +183,30 @@ final class ScheduleTest extends TestCase
         self::assertTrue($event->withoutOverlapping);
         self::assertSame('0 * * * 1-5', $event->expression);
     }
+
+    public function testSchedulableJobWithFluentOverriden(): void
+    {
+        $schedule = new Schedule();
+
+        $event = $schedule->evenInMaintenanceMode()
+            ->job(new SchedulableJobToTestWithSchedule)
+            ->at('11:00');
+
+        self::assertTrue($event->evenInMaintenanceMode);
+        self::assertSame('0 11 * * *', $event->expression);
+        self::assertTrue($event->withoutOverlapping);
+    }
+
+    public function testSchedulableCommandWithFluentOverriden(): void
+    {
+        $schedule = new Schedule();
+
+        $event = $schedule->evenInMaintenanceMode()
+            ->command(SchedulableCommandToTestWithSchedule::class)
+            ->hourlyAt(1);
+
+        self::assertTrue($event->evenInMaintenanceMode);
+        self::assertSame('1 * * * *', $event->expression);
+        self::assertTrue($event->withoutOverlapping);
+    }
 }
