@@ -1097,10 +1097,11 @@ class ProcessTest extends TestCase
     public function testWhenFailed()
     {
         $factory = new Factory;
+        $factory->fake(fn () => $factory->result(exitCode: 1));
 
         $executed = false;
 
-        $factory->run('exit 1')->whenFailed(function () use (&$executed) {
+        $factory->run('ls -la')->whenFailed(function () use (&$executed) {
             $executed = true;
         });
 
