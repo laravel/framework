@@ -58,6 +58,13 @@ class TranslationMessageSelectorTest extends TestCase
             ['second', '{0}first|[1,3]second|[4,*]third', 1],
             ['third', '{0}first|[1,3]second|[4,*]third', 9],
 
+            ['first', '[*,-1]first|{0}second|[1,*]third', -4],
+            ['first', '[*,-1] first|{0} second|[1,*] third', -4],
+            ['second', '[*,-1]first|{0}second|[1,*]third', 0],
+            ['second', '[*,-1] first|{0} second|[1,*] third', 0],
+            ['third', '[*,-1]first|{0}second|[1,*]third', 9],
+            ['first', '[-5,-1]first|{0}second|[1,*]third', -4],
+
             ['first', 'first|second|third', 1],
             ['second', 'first|second|third', 9],
             ['second', 'first|second|third', 0],
