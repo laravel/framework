@@ -269,42 +269,6 @@ class CallQueuedHandler
     }
 
     /**
-     * Ensure the batch is notified of a successful job completion when the job
-     * is deleted due to missing models.
-     *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  string  $class
-     * @return void
-     */
-    protected function ensureSuccessfulBatchJobIsRecordedForMissingModel(Job $job, string $class)
-    {
-        if (! in_array(Batchable::class, class_uses_recursive($class), true)) {
-            return;
-        }
-
-        if (! $this->container->bound(BatchRepository::class)) {
-            return;
-        }
-
-        $payload = $job->payload();
-        $batchId = $payload['data']['batchId'] ?? null;
-
-        if (! is_string($batchId) || $batchId === '') {
-            return;
-        }
-
-        $jobId = $job->uuid();
-
-        if (! is_string($jobId) || $jobId === '') {
-            return;
-        }
-
-        if ($batch = $this->container->make(BatchRepository::class)->find($batchId)) {
-            $batch->recordSuccessfulJob($jobId);
-        }
-    }
-
-    /**
      * Ensure the lock for a unique job is released via context.
      *
      * This is required when we can't unserialize the job due to missing models.
@@ -330,6 +294,35 @@ class CallQueuedHandler
                 ->store($store)
                 ->lock($key)
                 ->forceRelease();
+        }
+    }
+
+    /**
+     * Record a potentially batched job as successful when deleted because models were missing.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  string  $class
+     * @return void
+     */
+    protected function ensureSuccessfulBatchJobIsRecordedForMissingModel(Job $job, string $class)
+    {
+        if (! in_array(Batchable::class, class_uses_recursive($class), true)) {
+            return;
+        }
+
+        if (! $this->container->bound(BatchRepository::class)) {
+            return;
+        }
+
+        $batchId = $job->payload()['data']['batchId'] ?? null;
+
+        if ((! is_string($batchId) || $batchId === '') ||
+             ! is_string($job->uuid()) || $job->uuid() === '') {
+            return;
+        }
+
+        if ($batch = $this->container->make(BatchRepository::class)->find($batchId)) {
+            $batch->recordSuccessfulJob($job->uuid());
         }
     }
 
