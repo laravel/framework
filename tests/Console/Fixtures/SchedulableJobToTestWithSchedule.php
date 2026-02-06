@@ -8,7 +8,7 @@ use Illuminate\Console\Scheduling\Event;
 use Illuminate\Contracts\Console\Scheduling\Schedulable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-final class SchedulableJob implements ShouldQueue, Schedulable
+final class SchedulableJobToTestWithSchedule implements ShouldQueue, Schedulable
 {
     public function schedule(Event $event): void
     {

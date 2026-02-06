@@ -13,8 +13,8 @@ use Illuminate\Contracts\Console\Scheduling\Schedulable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Tests\Console\Fixtures\CommandToTestWithSchedule;
 use Illuminate\Tests\Console\Fixtures\JobToTestWithSchedule;
-use Illuminate\Tests\Console\Fixtures\SchedulableCommand;
-use Illuminate\Tests\Console\Fixtures\SchedulableJob;
+use Illuminate\Tests\Console\Fixtures\SchedulableCommandToTestWithSchedule;
+use Illuminate\Tests\Console\Fixtures\SchedulableJobToTestWithSchedule;
 use Mockery as m;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -98,7 +98,7 @@ final class ScheduleTest extends TestCase
     public function testSchedulableJobInstance(): void
     {
         $schedule = new Schedule();
-        $event = $schedule->job(new SchedulableJob);
+        $event = $schedule->job(new SchedulableJobToTestWithSchedule);
 
         self::assertSame('0 10 * * *', $event->expression);
         self::assertTrue($event->withoutOverlapping);
@@ -107,7 +107,7 @@ final class ScheduleTest extends TestCase
     public function testSchedulableJobClassName(): void
     {
         $schedule = new Schedule();
-        $event = $schedule->job(SchedulableJob::class);
+        $event = $schedule->job(SchedulableJobToTestWithSchedule::class);
 
         self::assertSame('0 10 * * *', $event->expression);
         self::assertTrue($event->withoutOverlapping);
@@ -116,9 +116,10 @@ final class ScheduleTest extends TestCase
     public function testSchedulableCommand(): void
     {
         $schedule = new Schedule();
-        $event = $schedule->command(SchedulableCommand::class);
+        $event = $schedule->command(SchedulableCommandToTestWithSchedule::class);
 
         self::assertSame('0 * * * *', $event->expression);
+        self::assertTrue($event->withoutOverlapping);
     }
 
     public function testSchedulableJobInGroups(): void
@@ -127,7 +128,7 @@ final class ScheduleTest extends TestCase
 
         $schedule->evenInMaintenanceMode()->group(function ($schedule) {
             $schedule->onOneServer()->group(function ($schedule) {
-                $schedule->job(new SchedulableJob);
+                $schedule->job(new SchedulableJobToTestWithSchedule);
             });
         });
 
@@ -146,7 +147,7 @@ final class ScheduleTest extends TestCase
 
         $schedule->evenInMaintenanceMode()->group(function ($schedule) {
             $schedule->onOneServer()->group(function ($schedule) {
-                $schedule->command(SchedulableCommand::class);
+                $schedule->command(SchedulableCommandToTestWithSchedule::class);
             });
         });
 
@@ -156,6 +157,7 @@ final class ScheduleTest extends TestCase
         self::assertTrue($events[0]->evenInMaintenanceMode);
         self::assertTrue($events[0]->onOneServer);
         self::assertSame('0 * * * *', $events[0]->expression);
+        self::assertTrue($events[0]->withoutOverlapping);
     }
 
     public function testSchedulableJobWithFluent(): void
@@ -163,7 +165,7 @@ final class ScheduleTest extends TestCase
         $schedule = new Schedule();
 
         $event = $schedule->evenInMaintenanceMode()
-            ->job(new SchedulableJob)
+            ->job(new SchedulableJobToTestWithSchedule)
             ->weekdays();
 
         self::assertTrue($event->evenInMaintenanceMode);
@@ -177,7 +179,7 @@ final class ScheduleTest extends TestCase
         $schedule = new Schedule();
 
         $event = $schedule->evenInMaintenanceMode()
-            ->command(SchedulableCommand::class)
+            ->command(SchedulableCommandToTestWithSchedule::class)
             ->weekdays();
 
         self::assertTrue($event->evenInMaintenanceMode);

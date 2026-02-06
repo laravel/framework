@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Contracts\Console\Scheduling\Schedulable;
 
-final class SchedulableCommand extends Command implements Schedulable
+final class SchedulableCommandToTestWithSchedule extends Command implements Schedulable
 {
     protected $signature = 'schedulable:command';
 
@@ -21,6 +21,6 @@ final class SchedulableCommand extends Command implements Schedulable
 
     public function schedule(Event $event): void
     {
-        $event->hourly()->appendOutputTo('/dev/null');
+        $event->hourly()->withoutOverlapping();
     }
 }
