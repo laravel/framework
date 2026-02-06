@@ -2,11 +2,16 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
+use Closure;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Traits\ReflectsClosures;
+use RuntimeException;
 
 class PendingBatchFake extends PendingBatch
 {
+    use ReflectsClosures;
+
     /**
      * The fake bus instance.
      *
@@ -47,19 +52,29 @@ class PendingBatchFake extends PendingBatch
     }
 
     /**
-     * Assert the jobs in the batch match the given jobs.
+     * Determine if the jobs in the batch match the given jobs.
      *
      * @param  array  $expectedJobs
      * @return bool
      */
-    public function assertJobs(array $expectedJobs)
+    public function hasJobs(array $expectedJobs)
     {
         if (count($this->jobs) !== count($expectedJobs)) {
             return false;
         }
 
         foreach ($expectedJobs as $index => $expectedJob) {
-            if (is_string($expectedJob)) {
+            if ($expectedJob instanceof Closure) {
+                $expectedType = $this->firstClosureParameterType($expectedJob);
+
+                if (! $this->jobs[$index] instanceof $expectedType) {
+                    return false;
+                }
+
+                if (! $expectedJob($this->jobs[$index])) {
+                    return false;
+                }
+            } elseif (is_string($expectedJob)) {
                 if ($expectedJob != get_class($this->jobs[$index])) {
                     return false;
                 }

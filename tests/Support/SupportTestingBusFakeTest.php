@@ -858,7 +858,7 @@ class SupportTestingBusFakeTest extends TestCase
         ])->dispatch();
 
         $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
-            return $batchedCollection->assertJobs([
+            return $batchedCollection->hasJobs([
                 new BusFakeJobWithSerialization('foo'),
                 new BusFakeJobWithSerialization('bar'),
                 new BusFakeJobWithSerialization('baz'),
@@ -867,7 +867,7 @@ class SupportTestingBusFakeTest extends TestCase
 
         try {
             $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
-                return $batchedCollection->assertJobs([
+                return $batchedCollection->hasJobs([
                     new BusFakeJobWithSerialization('baz'),
                     new BusFakeJobWithSerialization('foo'),
                     new BusFakeJobWithSerialization('bar'),
@@ -880,7 +880,7 @@ class SupportTestingBusFakeTest extends TestCase
 
         try {
             $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
-                return $batchedCollection->assertJobs([
+                return $batchedCollection->hasJobs([
                     new BusFakeJobWithSerialization('foo'),
                     new BusFakeJobWithSerialization('baaar'),
                     new BusFakeJobWithSerialization('baz'),
@@ -893,7 +893,7 @@ class SupportTestingBusFakeTest extends TestCase
 
         try {
             $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
-                return $batchedCollection->assertJobs([
+                return $batchedCollection->hasJobs([
                     new BusFakeJobWithSerialization('foo'),
                     new BusFakeJobWithSerialization('baz'),
                 ]);
@@ -905,11 +905,62 @@ class SupportTestingBusFakeTest extends TestCase
 
         try {
             $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
-                return $batchedCollection->assertJobs([
+                return $batchedCollection->hasJobs([
                     new BusFakeJobWithSerialization('foo'),
                     new BusFakeJobWithSerialization('bar'),
                     new BusFakeJobWithSerialization('baz'),
                     new BusFakeJobWithSerialization('qux'),
+                ]);
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected batch was not dispatched.', $e->getMessage());
+        }
+    }
+
+    public function testCanAssertJobsOnPendingBatchFakeWithClosures()
+    {
+        $this->fake->batch([
+            new BusFakeJobWithSerialization('foo'),
+            new BusFakeJobWithSerialization('bar'),
+            new BusFakeJobWithSerialization('baz'),
+        ])->dispatch();
+
+        $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+            return $batchedCollection->hasJobs([
+                fn (BusFakeJobWithSerialization $job) => $job->value === 'foo',
+                fn (BusFakeJobWithSerialization $job) => $job->value === 'bar',
+                fn (BusFakeJobWithSerialization $job) => $job->value === 'baz',
+            ]);
+        });
+
+        $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+            return $batchedCollection->hasJobs([
+                fn (BusFakeJobWithSerialization $job) => $job->value === 'foo',
+                BusFakeJobWithSerialization::class,
+                new BusFakeJobWithSerialization('baz'),
+            ]);
+        });
+
+        try {
+            $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+                return $batchedCollection->hasJobs([
+                    fn (BusFakeJobWithSerialization $job) => $job->value === 'foo',
+                    fn (BusFakeJobWithSerialization $job) => $job->value === 'wrong',
+                    fn (BusFakeJobWithSerialization $job) => $job->value === 'baz',
+                ]);
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected batch was not dispatched.', $e->getMessage());
+        }
+
+        try {
+            $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+                return $batchedCollection->hasJobs([
+                    fn (BusFakeJobWithSerialization $job) => $job->value === 'foo',
+                    fn (BusJobStub $job) => true,
+                    fn (BusFakeJobWithSerialization $job) => $job->value === 'baz',
                 ]);
             });
             $this->fail();
