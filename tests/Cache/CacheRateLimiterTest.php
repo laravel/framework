@@ -4,7 +4,9 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\RateLimiter;
+use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Support\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -98,6 +100,7 @@ class CacheRateLimiterTest extends TestCase
         $cache = m::mock(Cache::class);
         $cache->shouldReceive('forget')->once()->with('key');
         $cache->shouldReceive('forget')->once()->with('key:timer');
+        $cache->shouldReceive('forget')->once()->with('key:bucket');
         $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
         $rateLimiter = new RateLimiter($cache);
 
@@ -185,6 +188,49 @@ class CacheRateLimiterTest extends TestCase
             $executed = true;
         }, 1));
         $this->assertFalse($executed);
+    }
+
+    public function testTokenBucketConsumesAndRefillsTokens()
+    {
+        Carbon::setTestNow('2000-01-01 00:00:00.000000');
+
+        try {
+            $rateLimiter = new RateLimiter(new Repository(new ArrayStore));
+
+            $this->assertTrue($rateLimiter->tokenBucket('api', 3, 1)['allowed']);
+            $this->assertTrue($rateLimiter->tokenBucket('api', 3, 1)['allowed']);
+            $this->assertTrue($rateLimiter->tokenBucket('api', 3, 1)['allowed']);
+
+            $blocked = $rateLimiter->tokenBucket('api', 3, 1);
+
+            $this->assertFalse($blocked['allowed']);
+            $this->assertSame(1, $blocked['retryAfter']);
+            $this->assertSame(0, $rateLimiter->remainingTokens('api', 3, 1));
+
+            Carbon::setTestNow(now()->addSecond());
+
+            $this->assertTrue($rateLimiter->tokenBucket('api', 3, 1)['allowed']);
+            $this->assertSame(0, $rateLimiter->remainingTokens('api', 3, 1));
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
+    public function testTokenBucketCanEvaluateWithoutConsuming()
+    {
+        Carbon::setTestNow('2000-01-01 00:00:00.000000');
+
+        try {
+            $rateLimiter = new RateLimiter(new Repository(new ArrayStore));
+
+            $this->assertTrue($rateLimiter->tokenBucket('preview', 2, 1, consume: false)['allowed']);
+            $this->assertSame(2, $rateLimiter->remainingTokens('preview', 2, 1));
+
+            $this->assertTrue($rateLimiter->tokenBucket('preview', 2, 1)['allowed']);
+            $this->assertSame(1, $rateLimiter->remainingTokens('preview', 2, 1));
+        } finally {
+            Carbon::setTestNow();
+        }
     }
 
     public function testKeysAreSanitizedFromUnicodeCharacters()
