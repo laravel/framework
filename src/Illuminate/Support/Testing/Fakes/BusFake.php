@@ -499,7 +499,7 @@ class BusFake implements Fake, QueueingDispatcher
     /**
      * Assert if a batch was dispatched based on a truth-test callback.
      *
-     * @param  callable(\Illuminate\Bus\PendingBatch): bool|array  $callback
+     * @param  array|callable(\Illuminate\Bus\PendingBatch): bool  $callback
      * @return void
      */
     public function assertBatched(callable|array $callback)
