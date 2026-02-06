@@ -567,6 +567,22 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Group an associative array by many fields or callbacks.
+     *
+     * @param  array<array-key, (callable(TValue, TKey): mixed)|string>  $groupBy
+     * @param  bool  $preserveKeys
+     * @return static<array-key, static<($preserveKeys is true ? TKey : int), mixed>>
+     */
+    public function groupByMany(array $groupBy, $preserveKeys = false)
+    {
+        if ($groupBy === []) {
+            throw new InvalidArgumentException('The groupByMany method expects at least one grouping criterion.');
+        }
+
+        return $this->groupBy($groupBy, $preserveKeys);
+    }
+
+    /**
      * Key an associative array by a field or using a callback.
      *
      * @template TNewKey of array-key|\UnitEnum
@@ -778,6 +794,21 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         $finalItem = $collection->pop();
 
         return $collection->implode($glue).$finalGlue.$finalItem;
+    }
+
+    /**
+     * Join all items from the collection using a string after extracting each value.
+     *
+     * @param  (callable(TValue, TKey): mixed)|string|null  $value
+     * @param  string  $glue
+     * @param  string  $finalGlue
+     * @return string
+     */
+    public function joinBy($value, $glue, $finalGlue = '')
+    {
+        $value = $this->valueRetriever($value);
+
+        return $this->map(fn ($item, $key) => $value($item, $key))->join($glue, $finalGlue);
     }
 
     /**
@@ -1849,6 +1880,30 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
             $exists[] = $id;
         });
+    }
+
+    /**
+     * Return only distinct items from the collection using a key, callback, or key array.
+     *
+     * @param  (callable(TValue, TKey): mixed)|array<array-key, (callable(TValue, TKey): mixed)|string>|string|null  $key
+     * @param  bool  $strict
+     * @return static
+     */
+    public function distinctBy($key = null, $strict = false)
+    {
+        if (! is_array($key)) {
+            return $this->unique($key, $strict);
+        }
+
+        if ($key === []) {
+            throw new InvalidArgumentException('The distinctBy method expects at least one key when an array is provided.');
+        }
+
+        $retrievers = array_map(fn ($key) => $this->valueRetriever($key), $key);
+
+        return $this->unique(function ($item, $itemKey) use ($retrievers) {
+            return array_map(fn ($retriever) => $retriever($item, $itemKey), $retrievers);
+        }, $strict);
     }
 
     /**

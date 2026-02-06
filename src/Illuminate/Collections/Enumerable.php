@@ -528,6 +528,15 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function groupBy($groupBy, $preserveKeys = false);
 
     /**
+     * Group an associative array by many fields or callbacks.
+     *
+     * @param  array<array-key, (callable(TValue, TKey): mixed)|string>  $groupBy
+     * @param  bool  $preserveKeys
+     * @return static<array-key, static<($preserveKeys is true ? TKey : int), mixed>>
+     */
+    public function groupByMany(array $groupBy, $preserveKeys = false);
+
+    /**
      * Key an associative array by a field or using a callback.
      *
      * @template TNewKey of array-key
@@ -640,6 +649,16 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @return string
      */
     public function join($glue, $finalGlue = '');
+
+    /**
+     * Join all items from the collection using a string after extracting each value.
+     *
+     * @param  (callable(TValue, TKey): mixed)|string|null  $value
+     * @param  string  $glue
+     * @param  string  $finalGlue
+     * @return string
+     */
+    public function joinBy($value, $glue, $finalGlue = '');
 
     /**
      * Get the keys of the collection items.
@@ -1187,6 +1206,15 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @return static
      */
     public function unique($key = null, $strict = false);
+
+    /**
+     * Return only distinct items from the collection using a key, callback, or key array.
+     *
+     * @param  (callable(TValue, TKey): mixed)|array<array-key, (callable(TValue, TKey): mixed)|string>|string|null  $key
+     * @param  bool  $strict
+     * @return static
+     */
+    public function distinctBy($key = null, $strict = false);
 
     /**
      * Return only unique items from the collection array using strict comparison.

@@ -1908,6 +1908,37 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testDistinctBy($collection)
+    {
+        $c = new $collection([
+            10 => ['id' => 1, 'first' => 'Taylor', 'last' => 'Otwell'],
+            20 => ['id' => 2, 'first' => 'Taylor', 'last' => 'Otwell'],
+            30 => ['id' => 3, 'first' => 'Taylor', 'last' => 'Swift'],
+            40 => ['id' => 4, 'first' => 'Abigail', 'last' => 'Otwell'],
+        ]);
+
+        $this->assertEquals([
+            10 => ['id' => 1, 'first' => 'Taylor', 'last' => 'Otwell'],
+            40 => ['id' => 4, 'first' => 'Abigail', 'last' => 'Otwell'],
+        ], $c->distinctBy('first')->all());
+
+        $this->assertEquals([
+            10 => ['id' => 1, 'first' => 'Taylor', 'last' => 'Otwell'],
+            30 => ['id' => 3, 'first' => 'Taylor', 'last' => 'Swift'],
+            40 => ['id' => 4, 'first' => 'Abigail', 'last' => 'Otwell'],
+        ], $c->distinctBy(['first', 'last'])->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testDistinctByThrowsExceptionForEmptyKeyArray($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The distinctBy method expects at least one key when an array is provided.');
+
+        (new $collection([['id' => 1], ['id' => 2]]))->distinctBy([]);
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testCollapse($collection)
     {
         // Normal case: a two-dimensional array with different elements
@@ -1969,6 +2000,20 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('a', (new $collection(['a']))->join(', ', ' and '));
 
         $this->assertSame('', (new $collection([]))->join(', ', ' and '));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testJoinBy($collection)
+    {
+        $people = new $collection([
+            ['name' => 'Taylor'],
+            ['name' => 'Abigail'],
+            ['name' => 'Dayle'],
+        ]);
+
+        $this->assertSame('Taylor, Abigail and Dayle', $people->joinBy('name', ', ', ' and '));
+        $this->assertSame('TAYLOR | ABIGAIL | DAYLE', $people->joinBy(fn ($person) => strtoupper($person['name']), ' | '));
+        $this->assertSame('', (new $collection([]))->joinBy('name', ', ', ' and '));
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -3735,6 +3780,38 @@ class SupportCollectionTest extends TestCase
         ];
 
         $this->assertEquals($expected_result, $result->toArray());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testGroupByMany($collection)
+    {
+        $data = new $collection([
+            10 => ['user' => 1, 'skilllevel' => 1, 'roles' => ['Role_1', 'Role_3']],
+            20 => ['user' => 2, 'skilllevel' => 1, 'roles' => ['Role_1', 'Role_2']],
+            30 => ['user' => 3, 'skilllevel' => 2, 'roles' => ['Role_1']],
+            40 => ['user' => 4, 'skilllevel' => 2, 'roles' => ['Role_2']],
+        ]);
+
+        $groups = [
+            'skilllevel',
+            function ($item) {
+                return $item['roles'];
+            },
+        ];
+
+        $this->assertEquals(
+            $data->groupBy($groups, true)->toArray(),
+            $data->groupByMany($groups, true)->toArray()
+        );
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testGroupByManyThrowsExceptionForEmptyGroupArray($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The groupByMany method expects at least one grouping criterion.');
+
+        (new $collection([['id' => 1], ['id' => 2]]))->groupByMany([]);
     }
 
     #[DataProvider('collectionClassProvider')]

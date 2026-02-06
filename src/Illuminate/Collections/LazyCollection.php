@@ -553,6 +553,19 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * {@inheritDoc}
+     */
+    #[\Override]
+    public function groupByMany(array $groupBy, $preserveKeys = false)
+    {
+        if ($groupBy === []) {
+            throw new InvalidArgumentException('The groupByMany method expects at least one grouping criterion.');
+        }
+
+        return $this->passthru(__FUNCTION__, func_get_args());
+    }
+
+    /**
      * Key an associative array by a field or using a callback.
      *
      * @template TNewKey of array-key|\UnitEnum
@@ -718,6 +731,15 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     public function join($glue, $finalGlue = '')
     {
         return $this->collect()->join(...func_get_args());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    #[\Override]
+    public function joinBy($value, $glue, $finalGlue = '')
+    {
+        return $this->collect()->joinBy(...func_get_args());
     }
 
     /**
@@ -1739,6 +1761,27 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
                 }
             }
         });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    #[\Override]
+    public function distinctBy($key = null, $strict = false)
+    {
+        if (! is_array($key)) {
+            return $this->unique($key, $strict);
+        }
+
+        if ($key === []) {
+            throw new InvalidArgumentException('The distinctBy method expects at least one key when an array is provided.');
+        }
+
+        $retrievers = array_map(fn ($key) => $this->valueRetriever($key), $key);
+
+        return $this->unique(function ($item, $itemKey) use ($retrievers) {
+            return array_map(fn ($retriever) => $retriever($item, $itemKey), $retrievers);
+        }, $strict);
     }
 
     /**
