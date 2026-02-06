@@ -19,7 +19,7 @@ final class SchedulableCommandToTestWithSchedule extends Command implements Sche
         //
     }
 
-    public function schedule(Event $event): void
+    public static function schedule(Event $event): void
     {
         $event->hourly()->withoutOverlapping();
     }

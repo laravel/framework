@@ -10,7 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 
 final class SchedulableJobToTestWithSchedule implements ShouldQueue, Schedulable
 {
-    public function schedule(Event $event): void
+    public static function schedule(Event $event): void
     {
         $event->daily()->at('10:00')->withoutOverlapping();
     }

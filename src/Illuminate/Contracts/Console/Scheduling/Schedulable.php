@@ -12,5 +12,5 @@ interface Schedulable
      * @param  \Illuminate\Console\Scheduling\Event  $event
      * @return void
      */
-    public function schedule(Event $event): void;
+    public static function schedule(Event $event): void;
 }

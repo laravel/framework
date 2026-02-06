@@ -18,7 +18,6 @@ use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Traits\Macroable;
-use ReflectionClass;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 
@@ -168,7 +167,7 @@ class Schedule
             )->description($command->getDescription());
 
             if ($command instanceof Schedulable) {
-                $command->schedule($event);
+                $command::schedule($event);
             }
 
             return $event;
@@ -182,7 +181,7 @@ class Schedule
             )->description($command->getDescription());
 
             if ($command instanceof Schedulable) {
-                $command->schedule($event);
+                $command::schedule($event);
             }
 
             return $event;
@@ -230,11 +229,8 @@ class Schedule
 
         $this->mergePendingAttributes($event);
 
-        if (! is_string($job) && $job instanceof Schedulable) {
-            $job->schedule($event);
-        } elseif (is_a($job, Schedulable::class, true)) {
-            $job = new ReflectionClass($job)->newInstanceWithoutConstructor();
-            $job->schedule($event);
+        if (is_a($job, Schedulable::class, true)) {
+            $job::schedule($event);
         }
 
         return $event;
