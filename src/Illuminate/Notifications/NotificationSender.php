@@ -177,6 +177,10 @@ class NotificationSender
             throw $exception;
         }
 
+        if (method_exists($notification, 'afterSending')) {
+            $notification->afterSending($notifiable, $channel, $response);
+        }
+
         $this->events->dispatch(
             new NotificationSent($notifiable, $notification, $channel, $response)
         );
