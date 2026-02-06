@@ -9,7 +9,7 @@ use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\SchedulingMutex;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Console\Schedulable;
+use Illuminate\Contracts\Console\Scheduling\Schedulable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Tests\Console\Fixtures\JobToTestWithSchedule;
 use Illuminate\Tests\Console\Fixtures\SchedulableCommand;

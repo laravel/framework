@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Contracts\Console;
+namespace Illuminate\Contracts\Console\Scheduling;
 
 use Illuminate\Console\Scheduling\Event;
 

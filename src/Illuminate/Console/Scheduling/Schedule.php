@@ -11,7 +11,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Contracts\Console\Schedulable;
+use Illuminate\Contracts\Console\Scheduling\Schedulable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\CallQueuedClosure;

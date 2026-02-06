@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Illuminate\Tests\Console\Fixtures;
 
 use Illuminate\Console\Scheduling\Event;
-use Illuminate\Contracts\Console\Schedulable;
+use Illuminate\Contracts\Console\Scheduling\Schedulable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
 final class SchedulableJob implements ShouldQueue, Schedulable

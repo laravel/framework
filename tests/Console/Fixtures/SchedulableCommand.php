@@ -6,7 +6,7 @@ namespace Illuminate\Tests\Console\Fixtures;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Event;
-use Illuminate\Contracts\Console\Schedulable;
+use Illuminate\Contracts\Console\Scheduling\Schedulable;
 
 final class SchedulableCommand extends Command implements Schedulable
 {
