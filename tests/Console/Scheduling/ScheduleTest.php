@@ -169,7 +169,6 @@ final class ScheduleTest extends TestCase
         self::assertSame('0 10 * * 1-5', $event->expression);
     }
 
-
     public function testSchedulableCommandWithFluent(): void
     {
         $schedule = new Schedule();
