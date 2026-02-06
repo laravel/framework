@@ -65,7 +65,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(2, $statements);
         $this->assertSame('create table "users" ("id" serial not null primary key, "email" varchar(255) not null, "name" varchar(255) collate "nb_NO.utf8" not null)', $statements[0]);
-        $this->assertSame('alter sequence users_id_seq restart with 1000', $statements[1]);
+        $this->assertSame("select setval(pg_get_serial_sequence('\"users\"', 'id'), 1000, false)", $statements[1]);
     }
 
     public function testAddColumnsWithMultipleAutoIncrementStartingValue()
@@ -83,8 +83,8 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
             'alter table "users" add column "id" bigserial not null primary key',
             'alter table "users" add column "code" serial not null primary key',
             'alter table "users" add column "name" varchar(255) not null',
-            'alter sequence users_id_seq restart with 100',
-            'alter sequence users_code_seq restart with 200',
+            "select setval(pg_get_serial_sequence('\"users\"', 'id'), 100, false)",
+            "select setval(pg_get_serial_sequence('\"users\"', 'code'), 200, false)",
         ], $statements);
     }
 
