@@ -19,3 +19,13 @@ enum TestEnum
 {
     case test;
 }
+
+enum TestRequestFieldEnum: string
+{
+    case Name = 'name';
+    case Email = 'email';
+    case Age = 'age';
+    case City = 'city';
+    case IsActive = 'is_active';
+    case Count = 'count';
+}

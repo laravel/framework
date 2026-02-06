@@ -1812,4 +1812,102 @@ class HttpRequestTest extends TestCase
         $this->assertSame(22.4, $request->clamp('per_page', 1.11, 22.4, 2));
         $this->assertSame(9.24, $request->clamp('float', 1, 10));
     }
+
+    public function testBackedEnumKeySupport()
+    {
+        $request = Request::create('/', 'GET', [
+            'name' => 'Taylor',
+            'email' => 'taylor@laravel.com',
+            'age' => '',
+            'city' => null,
+            'is_active' => '1',
+            'count' => '42',
+        ]);
+
+        // Test has() with enum
+        $this->assertTrue($request->has(TestRequestFieldEnum::Name));
+        $this->assertTrue($request->has(TestRequestFieldEnum::Age));
+        $this->assertTrue($request->has(TestRequestFieldEnum::Name, TestRequestFieldEnum::Email));
+        $this->assertTrue($request->has([TestRequestFieldEnum::Name, TestRequestFieldEnum::Email]));
+
+        // Test hasAny() with enum
+        $this->assertTrue($request->hasAny(TestRequestFieldEnum::Name));
+        $this->assertTrue($request->hasAny([TestRequestFieldEnum::Name, TestRequestFieldEnum::Email]));
+
+        // Test filled() with enum
+        $this->assertTrue($request->filled(TestRequestFieldEnum::Name));
+        $this->assertFalse($request->filled(TestRequestFieldEnum::Age));
+        $this->assertTrue($request->filled(TestRequestFieldEnum::Name, TestRequestFieldEnum::Email));
+
+        // Test isNotFilled() with enum
+        $this->assertTrue($request->isNotFilled(TestRequestFieldEnum::Age));
+        $this->assertFalse($request->isNotFilled(TestRequestFieldEnum::Name));
+
+        // Test anyFilled() with enum
+        $this->assertTrue($request->anyFilled([TestRequestFieldEnum::Name, TestRequestFieldEnum::Age]));
+
+        // Test missing() with enum
+        $this->assertFalse($request->missing(TestRequestFieldEnum::Name));
+
+        // Test only() with enum
+        $this->assertSame(['name' => 'Taylor', 'email' => 'taylor@laravel.com'], $request->only(TestRequestFieldEnum::Name, TestRequestFieldEnum::Email));
+        $this->assertSame(['name' => 'Taylor'], $request->only([TestRequestFieldEnum::Name]));
+
+        // Test except() with enum
+        $result = $request->except(TestRequestFieldEnum::Age, TestRequestFieldEnum::City);
+        $this->assertArrayHasKey('name', $result);
+        $this->assertArrayNotHasKey('age', $result);
+        $this->assertArrayNotHasKey('city', $result);
+
+        // Test string() with enum
+        $this->assertSame('Taylor', $request->string(TestRequestFieldEnum::Name)->toString());
+
+        // Test str() with enum
+        $this->assertSame('Taylor', $request->str(TestRequestFieldEnum::Name)->toString());
+
+        // Test boolean() with enum
+        $this->assertTrue($request->boolean(TestRequestFieldEnum::IsActive));
+
+        // Test integer() with enum
+        $this->assertSame(42, $request->integer(TestRequestFieldEnum::Count));
+
+        // Test float() with enum
+        $this->assertSame(42.0, $request->float(TestRequestFieldEnum::Count));
+
+        // Test clamp() with enum
+        $this->assertSame(42, $request->clamp(TestRequestFieldEnum::Count, 0, 100));
+
+        // Test array() with enum
+        $this->assertSame(['Taylor'], $request->array(TestRequestFieldEnum::Name));
+        $this->assertSame(['name' => 'Taylor', 'email' => 'taylor@laravel.com'], $request->array([TestRequestFieldEnum::Name, TestRequestFieldEnum::Email]));
+
+        // Test collect() with enum
+        $this->assertSame('Taylor', $request->collect(TestRequestFieldEnum::Name)->first());
+    }
+
+    public function testWhenMethodsWithBackedEnum()
+    {
+        $request = Request::create('/', 'GET', [
+            'name' => 'Taylor',
+            'age' => '',
+        ]);
+
+        $name = null;
+        $request->whenHas(TestRequestFieldEnum::Name, function ($value) use (&$name) {
+            $name = $value;
+        });
+        $this->assertSame('Taylor', $name);
+
+        $filled = null;
+        $request->whenFilled(TestRequestFieldEnum::Name, function ($value) use (&$filled) {
+            $filled = $value;
+        });
+        $this->assertSame('Taylor', $filled);
+
+        $missing = false;
+        $request->whenMissing(TestRequestFieldEnum::Email, function () use (&$missing) {
+            $missing = true;
+        });
+        $this->assertTrue($missing);
+    }
 }
