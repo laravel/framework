@@ -1084,11 +1084,10 @@ class ProcessTest extends TestCase
     public function testWhenSuccessful()
     {
         $factory = new Factory;
-        $factory->fake();
 
         $executed = false;
 
-        $factory->run('ls -la')->whenSuccessful(function () use (&$executed) {
+        $factory->path(__DIR__)->run($this->ls())->whenSuccessful(function () use (&$executed) {
             $executed = true;
         });
 
@@ -1098,11 +1097,10 @@ class ProcessTest extends TestCase
     public function testWhenFailed()
     {
         $factory = new Factory;
-        $factory->fake(fn () => $factory->result(exitCode: 1));
 
         $executed = false;
 
-        $factory->run('ls -la')->whenFailed(function () use (&$executed) {
+        $factory->run('exit 1')->whenFailed(function () use (&$executed) {
             $executed = true;
         });
 
