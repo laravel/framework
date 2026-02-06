@@ -7,6 +7,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\HigherOrderTapProxy;
+use Illuminate\Support\Number;
+use Illuminate\Support\Numberable as SupportNumberable;
 use Illuminate\Support\Once;
 use Illuminate\Support\Onceable;
 use Illuminate\Support\Optional;
@@ -366,6 +368,34 @@ if (! function_exists('str')) {
         }
 
         return new SupportStringable($string);
+    }
+}
+
+if (! function_exists('number')) {
+    /**
+     * Get a new numberable object from the given number.
+     *
+     * @param  int|float|null  $number
+     * @return ($number is null ? object : \Illuminate\Support\Numberable)
+     */
+    function number($number = null)
+    {
+        if (func_num_args() === 0) {
+            return new class
+            {
+                public function __call($method, $parameters)
+                {
+                    return Number::$method(...$parameters);
+                }
+
+                public function __toString()
+                {
+                    return '';
+                }
+            };
+        }
+
+        return new SupportNumberable($number ?? 0);
     }
 }
 

@@ -10,6 +10,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Env;
+use Illuminate\Support\Numberable;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Stringable;
@@ -822,6 +823,26 @@ class SupportHelpersTest extends TestCase
         $strAccessor = str();
         $this->assertTrue((new ReflectionClass($strAccessor))->isAnonymous());
         $this->assertSame((string) $strAccessor, '');
+    }
+
+    public function testNumber()
+    {
+        $numberable = number(10.5);
+
+        $this->assertInstanceOf(Numberable::class, $numberable);
+        $this->assertSame(11.5, $numberable->add(1)->toFloat());
+
+        $numberable = number($value = null);
+        $this->assertInstanceOf(Numberable::class, $numberable);
+        $this->assertSame(0, $numberable->toInt());
+
+        $numberAccessor = number();
+        $this->assertTrue((new ReflectionClass($numberAccessor))->isAnonymous());
+        $this->assertSame(3, $numberAccessor->clamp(5, 1, 3));
+
+        $numberAccessor = number();
+        $this->assertTrue((new ReflectionClass($numberAccessor))->isAnonymous());
+        $this->assertSame((string) $numberAccessor, '');
     }
 
     public function testTap()

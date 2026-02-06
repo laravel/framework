@@ -35,6 +35,8 @@ assertType('1', retry(5, fn () => 1));
 
 assertType('object', str());
 assertType('Illuminate\Support\Stringable', str('foo'));
+assertType('object', number());
+assertType('Illuminate\Support\Numberable', number(10));
 
 assertType('User', tap(new User(), function ($user) {
     assertType('User', $user);
