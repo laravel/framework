@@ -73,8 +73,6 @@ final class ScheduleTest extends TestCase
         self::assertFalse($this->container->resolved(JobToTestWithSchedule::class));
     }
 
-
-
     public function testNonSchedulableJob(): void
     {
         $schedule = new Schedule();
@@ -92,8 +90,6 @@ final class ScheduleTest extends TestCase
         self::assertSame('* * * * *', $event->expression);
         self::assertFalse($event->withoutOverlapping);
     }
-
-
 
     public function testSchedulableJobInstance(): void
     {
