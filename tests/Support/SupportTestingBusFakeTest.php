@@ -865,6 +865,12 @@ class SupportTestingBusFakeTest extends TestCase
             ]);
         });
 
+        $this->fake->assertBatched([
+            new BusFakeJobWithSerialization('foo'),
+            new BusFakeJobWithSerialization('bar'),
+            new BusFakeJobWithSerialization('baz'),
+        ]);
+
         try {
             $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
                 return $batchedCollection->hasJobs([
