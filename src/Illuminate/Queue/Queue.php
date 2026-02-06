@@ -172,6 +172,7 @@ abstract class Queue
             'data' => [
                 'commandName' => $job,
                 'command' => $job,
+                'batchId' => $job->batchId ?? null,
             ],
             'createdAt' => Carbon::now()->getTimestamp(),
         ]);
