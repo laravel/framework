@@ -182,7 +182,7 @@ final class ScheduleTest extends TestCase
         self::assertSame('0 * * * 1-5', $event->expression);
     }
 
-    public function testSchedulableJobWithFluentOverriden(): void
+    public function testSchedulableJobWithFluentOverridden(): void
     {
         $schedule = new Schedule();
 
@@ -195,7 +195,7 @@ final class ScheduleTest extends TestCase
         self::assertTrue($event->withoutOverlapping);
     }
 
-    public function testSchedulableCommandWithFluentOverriden(): void
+    public function testSchedulableCommandWithFluentOverridden(): void
     {
         $schedule = new Schedule();
 
