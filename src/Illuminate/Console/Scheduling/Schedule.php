@@ -231,7 +231,6 @@ class Schedule
 
         if (is_a($job, Schedulable::class, true)) {
             $schedulable = is_string($job) ? Container::getInstance()->make($job) : $job;
-
             $schedulable->schedule($event);
         }
 
