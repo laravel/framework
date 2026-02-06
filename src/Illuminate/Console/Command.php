@@ -14,6 +14,7 @@ use Throwable;
 class Command extends SymfonyCommand
 {
     use Concerns\CallsCommands,
+        Concerns\ConfiguresFromAttributes,
         Concerns\ConfiguresPrompts,
         Concerns\HasParameters,
         Concerns\InteractsWithIO,
@@ -115,7 +116,9 @@ class Command extends SymfonyCommand
             $this->setAliases((array) $this->aliases);
         }
 
+        // Configure using PHP 8+ attributes if no signature is set
         if (! isset($this->signature)) {
+            $this->configureUsingAttributes();
             $this->specifyParameters();
         }
 
