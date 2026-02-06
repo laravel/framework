@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Illuminate\Tests\Console\Scheduling;
 
-use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\SchedulingMutex;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Console\Scheduling\Schedulable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Tests\Console\Fixtures\CommandToTestWithSchedule;
 use Illuminate\Tests\Console\Fixtures\JobToTestWithSchedule;
