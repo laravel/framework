@@ -98,6 +98,7 @@ final class ScheduleTest extends TestCase
 
         self::assertSame('0 10 * * *', $event->expression);
         self::assertTrue($event->withoutOverlapping);
+        self::assertFalse($this->container->resolved(SchedulableJobToTestWithSchedule::class));
     }
 
     public function testSchedulableJobClassName(): void
