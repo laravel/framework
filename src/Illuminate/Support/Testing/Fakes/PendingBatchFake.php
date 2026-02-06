@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ReflectsClosures;
-use RuntimeException;
 
 class PendingBatchFake extends PendingBatch
 {
