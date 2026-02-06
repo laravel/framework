@@ -3,6 +3,7 @@
 namespace Illuminate\Queue\Middleware;
 
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Redis\Connection;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Redis\Limiters\DurationLimiter;
 use Illuminate\Support\InteractsWithTime;
@@ -12,11 +13,18 @@ class RateLimitedWithRedis extends RateLimited
     use InteractsWithTime;
 
     /**
-     * The Redis factory implementation.
+     * The Redis connection instance.
      *
-     * @var \Illuminate\Contracts\Redis\Factory
+     * @var Connection
      */
     protected $redis;
+
+    /**
+     * The Redis connection that should be used.
+     *
+     * @var string|null
+     */
+    protected $connectionName = null;
 
     /**
      * The timestamp of the end of the current duration by key.
@@ -30,11 +38,12 @@ class RateLimitedWithRedis extends RateLimited
      *
      * @param  string  $limiterName
      */
-    public function __construct($limiterName)
+    public function __construct($limiterName, ?string $connectionName = null)
     {
         parent::__construct($limiterName);
 
-        $this->redis = Container::getInstance()->make(Redis::class);
+        $this->connectionName = $connectionName;
+        $this->redis = Container::getInstance()->make(Redis::class)->connection($this->connectionName);
     }
 
     /**
@@ -88,6 +97,11 @@ class RateLimitedWithRedis extends RateLimited
         return ($this->decaysAt[$key] - $this->currentTime()) + 3;
     }
 
+    public function __sleep()
+    {
+        return array_merge(parent::__sleep(), ['connectionName']);
+    }
+
     /**
      * Prepare the object after unserialization.
      *
@@ -97,6 +111,6 @@ class RateLimitedWithRedis extends RateLimited
     {
         parent::__wakeup();
 
-        $this->redis = Container::getInstance()->make(Redis::class);
+        $this->redis = Container::getInstance()->make(Redis::class)->connection($this->connectionName);
     }
 }
