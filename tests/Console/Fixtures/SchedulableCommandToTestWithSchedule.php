@@ -10,7 +10,7 @@ use Illuminate\Contracts\Console\Scheduling\Schedulable;
 
 final class SchedulableCommandToTestWithSchedule extends Command implements Schedulable
 {
-    protected $signature = 'schedulable:command';
+    protected $signature = 'test:schedulable-command';
 
     protected $description = 'A schedulable command for testing';
 
