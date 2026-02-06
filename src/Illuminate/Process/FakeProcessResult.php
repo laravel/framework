@@ -214,7 +214,7 @@ class FakeProcessResult implements ProcessResultContract
      * @param  callable  $callback
      * @return $this
      */
-    public function whenSuccessful(callable $callback)
+    public function onSuccess(callable $callback)
     {
         if ($this->successful()) {
             $callback($this);
@@ -229,7 +229,7 @@ class FakeProcessResult implements ProcessResultContract
      * @param  callable  $callback
      * @return $this
      */
-    public function whenFailed(callable $callback)
+    public function onFailure(callable $callback)
     {
         if ($this->failed()) {
             $callback($this);

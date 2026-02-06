@@ -1081,27 +1081,27 @@ class ProcessTest extends TestCase
         }, 2);
     }
 
-    public function testWhenSuccessful()
+    public function testOnSuccess()
     {
         $factory = new Factory;
 
         $executed = false;
 
-        $factory->path(__DIR__)->run($this->ls())->whenSuccessful(function () use (&$executed) {
+        $factory->path(__DIR__)->run($this->ls())->onSuccess(function () use (&$executed) {
             $executed = true;
         });
 
         $this->assertTrue($executed);
     }
 
-    public function testWhenFailed()
+    public function testOnFailure()
     {
         $factory = new Factory;
         $factory->fake(fn () => $factory->result(exitCode: 1));
 
         $executed = false;
 
-        $factory->run('ls -la')->whenFailed(function () use (&$executed) {
+        $factory->run('ls -la')->onFailure(function () use (&$executed) {
             $executed = true;
         });
 
