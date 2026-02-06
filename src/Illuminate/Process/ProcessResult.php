@@ -147,4 +147,34 @@ class ProcessResult implements ProcessResultContract
 
         return $this;
     }
+
+    /**
+     * Execute the given callback if the process was successful.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function whenSuccessful(callable $callback)
+    {
+        if ($this->successful()) {
+            $callback($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Execute the given callback if the process failed.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function whenFailed(callable $callback)
+    {
+        if ($this->failed()) {
+            $callback($this);
+        }
+
+        return $this;
+    }
 }

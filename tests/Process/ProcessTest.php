@@ -1081,6 +1081,34 @@ class ProcessTest extends TestCase
         }, 2);
     }
 
+    public function testWhenSuccessful()
+    {
+        $factory = new Factory;
+        $factory->fake();
+
+        $executed = false;
+
+        $factory->run('ls -la')->whenSuccessful(function () use (&$executed) {
+            $executed = true;
+        });
+
+        $this->assertTrue($executed);
+    }
+
+    public function testWhenFailed()
+    {
+        $factory = new Factory;
+        $factory->fake(fn () => $factory->result(exitCode: 1));
+
+        $executed = false;
+
+        $factory->run('ls -la')->whenFailed(function () use (&$executed) {
+            $executed = true;
+        });
+
+        $this->assertTrue($executed);
+    }
+
     protected function ls()
     {
         return windows_os() ? 'dir' : 'ls';
