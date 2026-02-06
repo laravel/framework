@@ -81,7 +81,7 @@ class ThrottlesExceptionsWithRedis extends ThrottlesExceptions
     }
 
     /**
-     * @param  string $name
+     * @param  string  $name
      * @return $this
      */
     public function connection(string $name)
