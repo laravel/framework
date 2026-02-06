@@ -136,6 +136,36 @@ class FakeProcessResult implements ProcessResultContract
     }
 
     /**
+     * Execute the given callback if the process was successful.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function onSuccess(callable $callback)
+    {
+        if ($this->successful()) {
+            $callback($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Execute the given callback if the process failed.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function onFailure(callable $callback)
+    {
+        if ($this->failed()) {
+            $callback($this);
+        }
+
+        return $this;
+    }
+
+    /**
      * Determine if the output contains the given string.
      *
      * @param  string  $output
@@ -203,36 +233,6 @@ class FakeProcessResult implements ProcessResultContract
     {
         if ($condition) {
             return $this->throw($callback);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Execute the given callback if the process was successful.
-     *
-     * @param  callable  $callback
-     * @return $this
-     */
-    public function onSuccess(callable $callback)
-    {
-        if ($this->successful()) {
-            $callback($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Execute the given callback if the process failed.
-     *
-     * @param  callable  $callback
-     * @return $this
-     */
-    public function onFailure(callable $callback)
-    {
-        if ($this->failed()) {
-            $callback($this);
         }
 
         return $this;
