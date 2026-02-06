@@ -11,6 +11,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Console\Schedulable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\CallQueuedClosure;
@@ -161,17 +162,29 @@ class Schedule
 
             $command = Container::getInstance()->make($command);
 
-            return $this->exec(
+            $event = $this->exec(
                 Application::formatCommandString($command->getName()), $parameters,
             )->description($command->getDescription());
+
+            if ($command instanceof Schedulable) {
+                $command->schedule($event);
+            }
+
+            return $event;
         }
 
         if (class_exists($command)) {
             $command = Container::getInstance()->make($command);
 
-            return $this->exec(
+            $event = $this->exec(
                 Application::formatCommandString($command->getName()), $parameters,
             )->description($command->getDescription());
+
+            if ($command instanceof Schedulable) {
+                $command->schedule($event);
+            }
+
+            return $event;
         }
 
         return $this->exec(
@@ -215,6 +228,12 @@ class Schedule
         $event->name($jobName);
 
         $this->mergePendingAttributes($event);
+
+        if (is_a($job, Schedulable::class, true)) {
+            $schedulable = is_string($job) ? Container::getInstance()->make($job) : $job;
+
+            $schedulable->schedule($event);
+        }
 
         return $event;
     }
