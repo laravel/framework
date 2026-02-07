@@ -33,6 +33,9 @@ class TypedFormRequestBuilder
     /** @var list<class-string> */
     protected array $ancestors = [];
 
+    /** @var array{rules: array, messages: array, attributes: array}|null */
+    protected ?array $nestedMetadata = null;
+
     /**
      * @param  class-string<T>  $requestClass
      * @param  Request  $request
@@ -257,32 +260,9 @@ class TypedFormRequestBuilder
             if ($paramRules !== []) {
                 $rules[$param->getName()] = $paramRules;
             }
-
-            // Recursively collect nested TypedFormRequest rules
-            $type = $param->getType();
-
-            if ($type instanceof ReflectionNamedType
-                && ! $type->isBuiltin()
-                && is_subclass_of($type->getName(), TypedFormRequest::class)
-                && ! in_array($type->getName(), $this->ancestors)) {
-                $name = $param->getName();
-                $parentIsOptional = $param->isDefaultValueAvailable() || $type->allowsNull();
-                $nestedRules = $this->nestedBuilder($type->getName())->validationRules();
-
-                foreach ($nestedRules as $field => $fieldRules) {
-                    if ($parentIsOptional) {
-                        $fieldRules = array_map(
-                            static fn ($rule) => $rule === 'required' ? "required_with:$name" : $rule,
-                            $fieldRules,
-                        );
-                    }
-
-                    $rules["$name.$field"] = $fieldRules;
-                }
-            }
         }
 
-        return $rules;
+        return array_merge($rules, $this->nestedMetadata()['rules']);
     }
 
     protected function rulesForParameter(ReflectionParameter $param): array
@@ -340,7 +320,6 @@ class TypedFormRequestBuilder
 
     protected function validationData(): array
     {
-        // @todo can we add an attribute to merge defaults?
         // @todo add in an attribute that will read the docblocks for things like `int<1, 100>` and convert them into the rules
         if (method_exists($this->requestClass, 'validationData')) {
             return Container::getInstance()->call(
@@ -400,20 +379,80 @@ class TypedFormRequestBuilder
 
     protected function messages(): array
     {
+        $messages = [];
+
         if (method_exists($this->requestClass, 'messages')) {
-            return Container::getInstance()->call([$this->requestClass, 'messages']);
+            $messages = Container::getInstance()->call([$this->requestClass, 'messages']);
         }
 
-        return [];
+        return array_merge($messages, $this->nestedMetadata()['messages']);
     }
 
     protected function attributes(): array
     {
+        $attributes = [];
+
         if (method_exists($this->requestClass, 'attributes')) {
-            return Container::getInstance()->call([$this->requestClass, 'attributes']);
+            $attributes = Container::getInstance()->call([$this->requestClass, 'attributes']);
         }
 
-        return [];
+        return array_merge($attributes, $this->nestedMetadata()['attributes']);
+    }
+
+    /**
+     * @return array{rules: array, messages: array, attributes: array}
+     */
+    protected function nestedMetadata(): array
+    {
+        if ($this->nestedMetadata !== null) {
+            return $this->nestedMetadata;
+        }
+
+        $rules = [];
+        $messages = [];
+        $attributes = [];
+
+        $constructor = $this->reflectRequest()->getConstructor();
+
+        if ($constructor === null) {
+            return $this->nestedMetadata = compact('rules', 'messages', 'attributes');
+        }
+
+        foreach ($constructor->getParameters() as $param) {
+            $type = $param->getType();
+
+            if (! $type instanceof ReflectionNamedType
+                || $type->isBuiltin()
+                || ! is_subclass_of($type->getName(), TypedFormRequest::class)
+                || in_array($type->getName(), $this->ancestors)) {
+                continue;
+            }
+
+            $name = $param->getName();
+            $parentIsOptional = $param->isDefaultValueAvailable() || $type->allowsNull();
+            $nested = $this->nestedBuilder($type->getName());
+
+            foreach ($nested->validationRules() as $field => $fieldRules) {
+                if ($parentIsOptional) {
+                    $fieldRules = array_map(
+                        static fn ($rule) => $rule === 'required' ? "required_with:$name" : $rule,
+                        $fieldRules,
+                    );
+                }
+
+                $rules["$name.$field"] = $fieldRules;
+            }
+
+            foreach ($nested->messages() as $key => $message) {
+                $messages["$name.$key"] = $message;
+            }
+
+            foreach ($nested->attributes() as $key => $attribute) {
+                $attributes["$name.$key"] = $attribute;
+            }
+        }
+
+        return $this->nestedMetadata = ['rules' => $rules, 'messages' => $message, 'attributes' => $attributes];
     }
 
     protected function shouldStopOnFirstFailure(): bool
