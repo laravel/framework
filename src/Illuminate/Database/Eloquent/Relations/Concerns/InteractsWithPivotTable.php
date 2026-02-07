@@ -582,6 +582,10 @@ trait InteractsWithPivotTable
             $query->where(...$arguments);
         }
 
+        foreach ($this->pivotWhereLikes as $arguments) {
+            $query->whereLike(...$arguments);
+        }
+
         foreach ($this->pivotWhereIns as $arguments) {
             $query->whereIn(...$arguments);
         }

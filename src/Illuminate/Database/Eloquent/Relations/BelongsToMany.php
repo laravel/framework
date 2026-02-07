@@ -89,6 +89,13 @@ class BelongsToMany extends Relation
     protected $pivotWheres = [];
 
     /**
+     * Any pivot table restrictions for whereLike clauses.
+     *
+     * @var array
+     */
+    protected $pivotWhereLikes = [];
+
+    /**
      * Any pivot table restrictions for whereIn clauses.
      *
      * @var array
@@ -461,6 +468,63 @@ class BelongsToMany extends Relation
     public function orWherePivot($column, $operator = null, $value = null)
     {
         return $this->wherePivot($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Add a "where like" clause for a pivot table column.
+     *
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  string  $value
+     * @param  bool  $caseSensitive
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function wherePivotLike($column, $value, $caseSensitive = false, $boolean = 'and', $not = false)
+    {
+        $this->pivotWhereLikes[] = func_get_args();
+
+        return $this->whereLike($this->qualifyPivotColumn($column), $value, $caseSensitive, $boolean, $not);
+    }
+
+    /**
+     * Add an "or where like" clause for a pivot table column.
+     *
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  string  $value
+     * @param  bool  $caseSensitive
+     * @return $this
+     */
+    public function orWherePivotLike($column, $value, $caseSensitive = false)
+    {
+        return $this->wherePivotLike($column, $value, $caseSensitive, 'or');
+    }
+
+    /**
+     * Add a "where not like" clause for a pivot table column.
+     *
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  string  $value
+     * @param  bool  $caseSensitive
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function wherePivotNotLike($column, $value, $caseSensitive = false, $boolean = 'and')
+    {
+        return $this->wherePivotLike($column, $value, $caseSensitive, $boolean, true);
+    }
+
+    /**
+     * Add an "or where not like" clause for a pivot table column.
+     *
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  string  $value
+     * @param  bool  $caseSensitive
+     * @return $this
+     */
+    public function orWherePivotNotLike($column, $value, $caseSensitive = false)
+    {
+        return $this->wherePivotNotLike($column, $value, $caseSensitive, 'or');
     }
 
     /**

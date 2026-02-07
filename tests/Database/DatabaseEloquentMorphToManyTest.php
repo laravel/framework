@@ -87,6 +87,12 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $builder->shouldReceive('whereIn')->with($column, [$value], 'and', false)->once()->andReturnSelf();
         $relation->wherePivotIn($column, [$value]);
 
+        $builder->shouldReceive('whereLike')->with($column, $value, false, 'and', false)->once()->andReturnSelf();
+        $relation->wherePivotLike($column, $value);
+
+        $builder->shouldReceive('whereLike')->with($column, $value, false, 'and', true)->once()->andReturnSelf();
+        $relation->wherePivotNotLike($column, $value);
+
         $builder->shouldReceive('whereNull')->with($column, 'and', false)->once()->andReturnSelf();
         $relation->wherePivotNull($column);
 

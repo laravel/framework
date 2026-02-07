@@ -1130,6 +1130,94 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
     }
 
+    public function testWherePivotLikeMethod()
+    {
+        $tag1 = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo'],
+        ]);
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag2->id, 'flag' => 'bar'],
+        ]);
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag3->id, 'flag' => 'baz'],
+        ]);
+
+        $relationTags = $post->tags()->wherePivotLike('flag', 'ba%')->get();
+
+        $this->assertEquals($relationTags->pluck('id')->toArray(), [$tag2->id, $tag3->id]);
+    }
+
+    public function testOrWherePivotLikeMethod()
+    {
+        $tag1 = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo'],
+        ]);
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag2->id, 'flag' => 'bar'],
+        ]);
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag3->id, 'flag' => 'baz'],
+        ]);
+
+        $relationTags = $post->tags()->wherePivotLike('flag', 'fo%')->orWherePivotLike('flag', 'ba%')->get();
+
+        $this->assertEquals($relationTags->pluck('id')->toArray(), [$tag1->id, $tag2->id, $tag3->id]);
+    }
+
+    public function testWherePivotNotLikeMethod()
+    {
+        $tag1 = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo'],
+        ]);
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag2->id, 'flag' => 'bar'],
+        ]);
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag3->id, 'flag' => 'baz'],
+        ]);
+
+        $relationTag = $post->tags()->wherePivotNotLike('flag', 'ba%')->first();
+
+        $this->assertEquals($tag1->id, $relationTag->id);
+    }
+
+    public function testOrWherePivotNotLikeMethod()
+    {
+        $tag1 = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'foo'],
+        ]);
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag2->id, 'flag' => 'bar'],
+        ]);
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag3->id, 'flag' => 'baz'],
+        ]);
+
+        $relationTags = $post->tags()->wherePivotLike('flag', 'ba%')->orWherePivotNotLike('flag', '%z')->get();
+
+        $this->assertEquals($relationTags->pluck('id')->toArray(), [$tag1->id, $tag2->id, $tag3->id]);
+    }
+
     public function testWherePivotInMethod()
     {
         $tag = Tag::create(['name' => Str::random()])->fresh();
