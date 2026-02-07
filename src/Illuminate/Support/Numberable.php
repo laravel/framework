@@ -606,6 +606,14 @@ class Numberable implements BaseStringable, JsonSerializable
             return false;
         }
 
+        $oldLocale = setLocale(LC_NUMERIC, 0);
+        $successful = setLocale(LC_NUMERIC, str_replace('-', '_', $locale)) !== false;
+        if ($successful) {
+            $decimalPoint = localeconv()['decimal_point'];
+            setLocale(LC_NUMERIC, $oldLocale);
+            return $decimalPoint === ',';
+        }
+
         $locale = strtolower(str_replace('_', '-', $locale));
 
         foreach ([
