@@ -106,6 +106,97 @@ class RequestDtoTest extends TestCase
 
         $this->app->make(MyTypedFormWithDefaults::class);
     }
+
+    public function testAutoRulesFromTypesWithNoManualRules()
+    {
+        $request = Request::create('', parameters: ['name' => 'Taylor', 'age' => 30]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(MyTypedFormAutoRules::class);
+
+        $this->assertSame('Taylor', $actual->name);
+        $this->assertSame(30, $actual->age);
+        $this->assertNull($actual->bio);
+        $this->assertSame(SortDirection::Asc, $actual->sort);
+    }
+
+    public function testAutoRulesRequiredFieldsMustBePresent()
+    {
+        $request = Request::create('');
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(MyTypedFormAutoRules::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('name', $e->errors());
+            $this->assertArrayHasKey('age', $e->errors());
+            $this->assertArrayNotHasKey('bio', $e->errors());
+            $this->assertArrayNotHasKey('sort', $e->errors());
+            $this->assertArrayNotHasKey('active', $e->errors());
+        }
+    }
+
+    public function testAutoRulesRejectsWrongType()
+    {
+        $this->expectException(ValidationException::class);
+
+        $request = Request::create('', parameters: ['name' => 'Taylor', 'age' => 'not-a-number']);
+        $this->app->instance('request', $request);
+
+        $this->app->make(MyTypedFormAutoRules::class);
+    }
+
+    public function testAutoRulesOptionalFieldsCanBeOmitted()
+    {
+        $request = Request::create('', parameters: ['name' => 'Taylor', 'age' => 25]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(MyTypedFormAutoRules::class);
+
+        $this->assertNull($actual->bio);
+        $this->assertSame(SortDirection::Asc, $actual->sort);
+        $this->assertTrue($actual->active);
+    }
+
+    public function testManualRulesMergeWithAutoRules()
+    {
+        // min:1 comes from manual rules(), required+integer come from auto-rules
+        // age=-5 should fail on min:1 (manual)
+        $this->expectException(ValidationException::class);
+
+        $request = Request::create('', parameters: ['name' => 'Taylor', 'age' => -5]);
+        $this->app->instance('request', $request);
+
+        $this->app->make(MyTypedFormAutoRulesWithOverride::class);
+    }
+
+    public function testAutoRulesStillApplyWhenManualRulesOmitThem()
+    {
+        // Manual rules() only has min:1,max:120 for age — no 'required' or 'integer'
+        // 'required' should still apply from auto-rules (age has no default)
+        $request = Request::create('', parameters: ['name' => 'Taylor']);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(MyTypedFormAutoRulesWithOverride::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('age', $e->errors());
+        }
+    }
+
+    public function testAutoRulesTypeCheckStillAppliesWhenManualRulesOmitIt()
+    {
+        // Manual rules() only has min:1,max:120 for age — no 'integer'
+        // 'integer' should still apply from auto-rules
+        $this->expectException(ValidationException::class);
+
+        $request = Request::create('', parameters: ['name' => 'Taylor', 'age' => 'not-a-number']);
+        $this->app->instance('request', $request);
+
+        $this->app->make(MyTypedFormAutoRulesWithOverride::class);
+    }
 }
 
 class MyTypedForm extends TypedFormRequest
@@ -162,6 +253,37 @@ class MyTypedFormWithDefaults extends TypedFormRequest
             'name' => ['required', 'string'],
             'perPage' => ['nullable', 'integer', 'min:1'],
             'sort' => ['nullable', Rule::enum(SortDirection::class)],
+        ];
+    }
+}
+
+// No rules() method — all validation comes from constructor types
+class MyTypedFormAutoRules extends TypedFormRequest
+{
+    public function __construct(
+        public string $name,
+        public int $age,
+        public ?string $bio = null,
+        public ?SortDirection $sort = SortDirection::Asc,
+        public bool $active = true,
+    ) {
+    }
+}
+
+// Auto-rules as base, manual rules() adds constraints on top
+class MyTypedFormAutoRulesWithOverride extends TypedFormRequest
+{
+    public function __construct(
+        public string $name,
+        public int $age,
+    ) {
+    }
+
+    // Only provides extra constraints — relies on auto-rules for 'required' and 'integer'
+    public static function rules(): array
+    {
+        return [
+            'age' => ['min:1', 'max:120'],
         ];
     }
 }

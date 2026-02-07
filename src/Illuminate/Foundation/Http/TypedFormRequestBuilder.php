@@ -10,10 +10,12 @@ use Illuminate\Foundation\Precognition;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Validator;
 use BackedEnum;
 use ReflectionClass;
 use ReflectionNamedType;
+use ReflectionParameter;
 use ReflectionProperty;
 
 use function Illuminate\Support\enum_value;
@@ -200,21 +202,96 @@ class TypedFormRequestBuilder
 
     protected function validationRules(): array
     {
-        $rules = [];
+        $rules = $this->rulesFromTypes();
 
         // @todo add in attribute check (read from #[Rules] attribute on the requestClass)
-        // @todo can we add an attribute to merge defaults set on the typed properties? like `public int $perPage = 25` will use per_page=25 if not specified
         if (method_exists($this->requestClass, 'rules')) {
-            $rules = array_merge(
-                $rules,
-                Container::getInstance()->call(
-                    [$this->requestClass, 'rules'],
-                    ['request' => $this->request]
-                )
+            $userRules = Container::getInstance()->call(
+                [$this->requestClass, 'rules'],
+                ['request' => $this->request]
             );
+
+            foreach ($userRules as $field => $fieldRules) {
+                $rules[$field] = array_merge($rules[$field] ?? [], Arr::wrap($fieldRules));
+            }
         }
 
         return $rules;
+    }
+
+    /**
+     * @return array<string, mixed>
+     *
+     * @throws \ReflectionException
+     */
+    protected function rulesFromTypes(): array
+    {
+        $constructor = $this->reflectRequest()->getConstructor();
+
+        if ($constructor === null) {
+            return [];
+        }
+
+        $rules = [];
+
+        foreach ($constructor->getParameters() as $param) {
+            $paramRules = $this->rulesForParameter($param);
+
+            if ($paramRules !== []) {
+                $rules[$param->getName()] = $paramRules;
+            }
+        }
+
+        return $rules;
+    }
+
+    protected function rulesForParameter(ReflectionParameter $param): array
+    {
+        $type = $param->getType();
+
+        if (! $type instanceof ReflectionNamedType) {
+            return [];
+        }
+
+        $rules = [];
+
+        // Presence: required vs sometimes vs nullable
+        if ($param->isDefaultValueAvailable()) {
+            $rules[] = 'sometimes';
+        }
+
+        if ($type->allowsNull()) {
+            $rules[] = 'nullable';
+        } elseif (! $param->isDefaultValueAvailable()) {
+            $rules[] = 'required';
+        }
+
+        // Type rule
+        $typeRule = match ($type->getName()) {
+            'int' => 'integer',
+            'float' => 'numeric',
+            'string' => 'string',
+            'bool' => 'boolean',
+            'array' => 'array',
+            default => $this->ruleForNonBuiltinType($type),
+        };
+
+        if ($typeRule !== null) {
+            $rules[] = $typeRule;
+        }
+
+        return $rules;
+    }
+
+    protected function ruleForNonBuiltinType(ReflectionNamedType $type): mixed
+    {
+        $name = $type->getName();
+
+        if (is_subclass_of($name, BackedEnum::class)) {
+            return new Enum($name);
+        }
+
+        return null;
     }
 
     protected function validationData(): array
