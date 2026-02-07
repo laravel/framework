@@ -147,7 +147,7 @@ class Numberable implements BaseStringable, JsonSerializable
      * @param  int|float  $value
      * @return static
      */
-    public function add(int|float $value)
+    public function add(int|float $value = 1)
     {
         return $this->newInstance(static::normalizeNumber($this->value + $value));
     }
@@ -158,7 +158,7 @@ class Numberable implements BaseStringable, JsonSerializable
      * @param  int|float  $value
      * @return static
      */
-    public function subtract(int|float $value)
+    public function subtract(int|float $value = 1)
     {
         return $this->newInstance(static::normalizeNumber($this->value - $value));
     }
