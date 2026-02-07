@@ -107,6 +107,28 @@ class Exception
     }
 
     /**
+     * Get all the previous exceptions.
+     *
+     * @return \Illuminate\Support\Collection<int, static>
+     */
+    public function previous()
+    {
+        return Collection::make($this->exception->getAllPrevious())->map(function ($exception) {
+            return new static($exception, $this->request, $this->listener, $this->basePath);
+        });
+    }
+
+    /**
+     * Determine if the current exceptions has previous exceptions.
+     *
+     * @return bool
+     */
+    public function hasPrevious()
+    {
+        return ! is_null($this->exception->getPrevious());
+    }
+
+    /**
      * Get the exception's frames.
      *
      * @return \Illuminate\Support\Collection<int, Frame>
