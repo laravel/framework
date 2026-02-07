@@ -332,6 +332,46 @@ class RequestDtoTest extends TestCase
         $this->assertNull($actual->formerAddress);
     }
 
+    public function testNestedMessagesArePrefixed()
+    {
+        $request = Request::create('', parameters: [
+            'item' => 'Widget',
+            'address' => [
+                // street and city missing — should trigger custom messages
+            ],
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(OrderWithAddressMessages::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $errors = $e->errors();
+            $this->assertArrayHasKey('address.street', $errors);
+            $this->assertStringContainsString('We need your street', $errors['address.street'][0]);
+        }
+    }
+
+    public function testNestedAttributesArePrefixed()
+    {
+        $request = Request::create('', parameters: [
+            'item' => 'Widget',
+            'address' => [
+                // street and city missing
+            ],
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(OrderWithAddressMessages::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $errors = $e->errors();
+            $this->assertArrayHasKey('address.city', $errors);
+            $this->assertStringContainsString('city name', $errors['address.city'][0]);
+        }
+    }
+
     public function testDeeplyNestedTypedFormRequestFailsValidation()
     {
         $request = Request::create('', parameters: [
@@ -472,6 +512,38 @@ class CreateOrderRequestWithOptionalAddress extends TypedFormRequest
     public function __construct(
         public string $item,
         public ?Address $address = null,
+    ) {
+    }
+}
+
+class AddressWithMessages extends TypedFormRequest
+{
+    public function __construct(
+        public string $street,
+        public string $city,
+    ) {
+    }
+
+    public static function messages(): array
+    {
+        return [
+            'street.required' => 'We need your street address.',
+        ];
+    }
+
+    public static function attributes(): array
+    {
+        return [
+            'city' => 'city name',
+        ];
+    }
+}
+
+class OrderWithAddressMessages extends TypedFormRequest
+{
+    public function __construct(
+        public string $item,
+        public AddressWithMessages $address,
     ) {
     }
 }

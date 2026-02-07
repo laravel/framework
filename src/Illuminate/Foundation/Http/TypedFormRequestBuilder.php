@@ -452,7 +452,7 @@ class TypedFormRequestBuilder
             }
         }
 
-        return $this->nestedMetadata = ['rules' => $rules, 'messages' => $message, 'attributes' => $attributes];
+        return $this->nestedMetadata = ['rules' => $rules, 'messages' => $messages, 'attributes' => $attributes];
     }
 
     protected function shouldStopOnFirstFailure(): bool
