@@ -35,12 +35,14 @@ class RequestDto implements SelfBuilding
 
         static::passedValidation();
 
+        // @todo validated only works on data which has been validated... they SHOULD always validate the data but it's possible they do not
         return static::buildDto($instance->validated());
     }
 
     protected static function buildDto(array $validated)
     {
         // @todo add ability to map request to DTO params
+        // @todo handle nested objects
         return new static(...$validated);
     }
 
