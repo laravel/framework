@@ -101,7 +101,7 @@ trait ResponseTrait
     /**
      * Remove a header or headers from the response.
      *
-     * @param  string|array  $key
+     * @param  array|string  $key
      * @return $this
      */
     public function withoutHeader($key)
