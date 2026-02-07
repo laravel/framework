@@ -33,7 +33,6 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Http\Request merge(array $input)
  * @method static \Illuminate\Http\Request mergeIfMissing(array $input)
  * @method static \Illuminate\Http\Request replace(array $input)
- * @method static mixed get(string $key, mixed $default = null)
  * @method static \Symfony\Component\HttpFoundation\InputBag|mixed json(string|null $key = null, mixed $default = null)
  * @method static \Illuminate\Http\Request createFrom(\Illuminate\Http\Request $from, \Illuminate\Http\Request|null $to = null)
  * @method static \Illuminate\Http\Request createFromBase(\Symfony\Component\HttpFoundation\Request $request)

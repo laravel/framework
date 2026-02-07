@@ -52,7 +52,7 @@ class ReloadCommand extends Command
     }
 
     /**
-     * Get the commands that should be run to clear the "optimization" files.
+     * Get the commands that should be reloaded.
      *
      * @return array
      */
@@ -60,6 +60,7 @@ class ReloadCommand extends Command
     {
         return [
             'queue' => 'queue:restart',
+            'schedule' => 'schedule:interrupt',
             ...ServiceProvider::$reloadCommands,
         ];
     }

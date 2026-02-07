@@ -38,7 +38,7 @@ use Illuminate\Support\Testing\Fakes\BusFake;
  * @method static void assertNothingChained()
  * @method static void assertDispatchedWithoutChain(string|\Closure $command, callable|null $callback = null)
  * @method static \Illuminate\Support\Testing\Fakes\ChainedBatchTruthTest chainedBatch(\Closure $callback)
- * @method static void assertBatched(callable $callback)
+ * @method static void assertBatched(array|callable $callback)
  * @method static void assertBatchCount(int $count)
  * @method static void assertNothingBatched()
  * @method static void assertNothingPlaced()

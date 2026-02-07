@@ -413,6 +413,27 @@ class NotificationChannelManagerTest extends TestCase
         $notification = (new NotificationChannelManagerTestQueuedNotificationWithDeduplicationId);
         $manager->send([new NotificationChannelManagerTestNotifiable], $notification);
     }
+
+    public function testAfterSendingMethodAfterSendingNotification()
+    {
+        $container = new Container;
+        $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
+        $container->instance(Bus::class, $bus = m::mock());
+        $container->instance(Dispatcher::class, $events = m::mock());
+        Container::setInstance($container);
+        $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
+        $manager->shouldReceive('driver')->andReturn($driver = m::mock());
+        $events->shouldReceive('listen')->once();
+        $events->shouldReceive('until')->with(m::type(NotificationSending::class))->andReturn(true);
+        $driver->shouldReceive('send')->once()->andReturn($response = m::mock());
+        $events->shouldReceive('dispatch')->with(m::type(NotificationSent::class));
+
+        $manager->send($notifiable = new NotificationChannelManagerTestNotifiable, new NotificationChannelManagerWithAfterSendingMethodNotification);
+
+        $this->assertSame($notifiable, NotificationChannelManagerWithAfterSendingMethodNotification::$afterSendingNotifiable);
+        $this->assertSame('test', NotificationChannelManagerWithAfterSendingMethodNotification::$afterSendingChannel);
+        $this->assertSame($response, NotificationChannelManagerWithAfterSendingMethodNotification::$afterSendingResponse);
+    }
 }
 
 class TestSendQueuedNotifications implements ShouldQueue
@@ -607,5 +628,24 @@ class NotificationChannelManagerTestQueuedNotificationWithDeduplicationId extend
     public function deduplicationId($payload, $queue)
     {
         return 'deduplication-id-1';
+    }
+}
+
+class NotificationChannelManagerWithAfterSendingMethodNotification extends Notification
+{
+    public static $afterSendingNotifiable;
+    public static $afterSendingChannel;
+    public static $afterSendingResponse;
+
+    public function via()
+    {
+        return ['test'];
+    }
+
+    public function afterSending($notifiable, $channel, $response)
+    {
+        static::$afterSendingNotifiable = $notifiable;
+        static::$afterSendingChannel = $channel;
+        static::$afterSendingResponse = $response;
     }
 }

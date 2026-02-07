@@ -949,7 +949,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  int  $step
      * @param  int  $offset
-     * @return static
+     * @return ($step is positive-int ? static : never)
      *
      * @throws \InvalidArgumentException
      */
@@ -1373,7 +1373,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * Split a collection into a certain number of groups.
      *
      * @param  int  $numberOfGroups
-     * @return static<int, static>
+     * @return ($numberOfGroups is positive-int ? static<int, static> : never)
      *
      * @throws \InvalidArgumentException
      */
@@ -1416,7 +1416,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * Split a collection into a certain number of groups, and fill the first groups completely.
      *
      * @param  int  $numberOfGroups
-     * @return static<int, static>
+     * @return ($numberOfGroups is positive-int ? static<int, static> : never)
      *
      * @throws \InvalidArgumentException
      */

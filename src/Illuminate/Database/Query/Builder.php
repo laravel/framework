@@ -220,6 +220,13 @@ class Builder implements BuilderContract
     public $lock;
 
     /**
+     * The query execution timeout in seconds.
+     *
+     * @var int|null
+     */
+    public $timeout;
+
+    /**
      * The callbacks that should be invoked before the query is executed.
      *
      * @var array
@@ -3205,6 +3212,25 @@ class Builder implements BuilderContract
     public function sharedLock()
     {
         return $this->lock(false);
+    }
+
+    /**
+     * Set a query execution timeout in seconds.
+     *
+     * @param  int|null  $seconds
+     * @return $this
+     *
+     * @throws InvalidArgumentException
+     */
+    public function timeout(?int $seconds): static
+    {
+        if ($seconds !== null && $seconds <= 0) {
+            throw new InvalidArgumentException('Timeout must be greater than zero.');
+        }
+
+        $this->timeout = $seconds;
+
+        return $this;
     }
 
     /**

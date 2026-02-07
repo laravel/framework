@@ -10032,6 +10032,66 @@ class ValidationValidatorTest extends TestCase
         ], $validator->messages()->messages());
     }
 
+    public function testWhenFails()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['text' => 'abcdef'], ['text' => 'string|max:5']);
+
+        $result = $v->whenFails(function () {
+            return 'whenFails';
+        });
+
+        $this->assertSame('whenFails', $result);
+
+        $v = new Validator($trans, ['text' => 'abc'], ['text' => 'string|max:5']);
+
+        $result = $v->whenFails(function () {
+            return 'whenFails';
+        });
+
+        $this->assertSame($v, $result);
+
+        $v = new Validator($trans, ['text' => 'abc'], ['text' => 'string|max:5']);
+
+        $result = $v->whenFails(function () {
+            return 'whenFails';
+        }, function () {
+            return 'whenNotFails';
+        });
+
+        $this->assertSame('whenNotFails', $result);
+    }
+
+    public function testWhenPasses()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['text' => 'abc'], ['text' => 'string|max:5']);
+
+        $result = $v->whenPasses(function () {
+            return 'whenPasses';
+        });
+
+        $this->assertSame('whenPasses', $result);
+
+        $v = new Validator($trans, ['text' => 'abcdef'], ['text' => 'string|max:5']);
+
+        $result = $v->whenPasses(function () {
+            return 'whenPasses';
+        });
+
+        $this->assertSame($v, $result);
+
+        $v = new Validator($trans, ['text' => 'abcdef'], ['text' => 'string|max:5']);
+
+        $result = $v->whenPasses(function () {
+            return 'whenPasses';
+        }, function () {
+            return 'whenNotPasses';
+        });
+
+        $this->assertSame('whenNotPasses', $result);
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);
