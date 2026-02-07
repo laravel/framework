@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Integration\Http;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Http\Attributes\Rules;
 use Illuminate\Foundation\Http\RequestDto;
-use Illuminate\Foundation\Http\SimplifiedRequestDto;
+use Illuminate\Foundation\Http\TypedFormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Orchestra\Testbench\TestCase;
@@ -29,9 +29,9 @@ class RequestDtoTest extends TestCase
         $request = Request::create('', parameters: ['number' => 42, 'string' => 'a']);
         $this->app->instance('request', $request);
 
-        $actual = $this->app->make(MySimplifiedDto::class);
+        $actual = $this->app->make(MyTypedForm::class);
 
-        $this->assertInstanceOf(MySimplifiedDto::class, $actual);
+        $this->assertInstanceOf(MyTypedForm::class, $actual);
         $this->assertEquals(42, $actual->number);
         $this->assertEquals('a', $actual->string);
     }
@@ -43,7 +43,7 @@ class RequestDtoTest extends TestCase
         $request = Request::create('', parameters: ['number' => 999, 'string' => 'z']);
         $this->app->instance('request', $request);
 
-        $this->app->make(MySimplifiedDto::class);
+        $this->app->make(MyTypedForm::class);
     }
 
     public function testSimplifiedRequestDtoFailsAuthorization()
@@ -53,7 +53,7 @@ class RequestDtoTest extends TestCase
         $request = Request::create('', parameters: ['number' => 42, 'string' => 'a']);
         $this->app->instance('request', $request);
 
-        $this->app->make(MyUnauthorizedSimplifiedDto::class);
+        $this->app->make(MyUnauthorizedTypedForm::class);
     }
 }
 
@@ -78,7 +78,7 @@ class MyRequestDto extends RequestDto
     }
 }
 
-class MySimplifiedDto extends SimplifiedRequestDto
+class MyTypedForm extends TypedFormRequest
 {
     public function __construct(
         public int $number,
@@ -95,7 +95,7 @@ class MySimplifiedDto extends SimplifiedRequestDto
     }
 }
 
-class MyUnauthorizedSimplifiedDto extends SimplifiedRequestDto
+class MyUnauthorizedTypedForm extends TypedFormRequest
 {
     public function __construct(
         public int $number,
