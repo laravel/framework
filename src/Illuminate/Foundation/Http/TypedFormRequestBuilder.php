@@ -39,7 +39,6 @@ class TypedFormRequestBuilder
 
     /**
      * @param  class-string<T>  $requestClass
-     * @param  Request  $request
      */
     public function __construct(
         protected string $requestClass,
@@ -57,6 +56,12 @@ class TypedFormRequestBuilder
         return $this->reflection ??= new ReflectionClass($this->requestClass);
     }
 
+    /**
+     * @template TSubType
+     *
+     * @param  class-string<TSubType>  $class
+     * @return static<TSubType>
+     */
     protected function nestedBuilder(string $class): static
     {
         $builder = Container::getInstance()
@@ -79,7 +84,7 @@ class TypedFormRequestBuilder
     /**
      * @return T
      */
-    public function handle(): TypedFormRequest
+    public function build(): TypedFormRequest
     {
         $this->prepareForValidation();
 
@@ -107,7 +112,6 @@ class TypedFormRequestBuilder
      */
     protected function buildDto(array $validated): TypedFormRequest
     {
-        // @todo add ability to map request to DTO params
         $dtoClass = $this->requestClass;
 
         return new $dtoClass(...$this->castValidatedData($validated)); // @phpstan-ignore new.noConstructor (this is a requirement for now)
@@ -197,14 +201,12 @@ class TypedFormRequestBuilder
     {
         $factory = Container::getInstance()->make(ValidationFactory::class);
 
-        if (method_exists($this->requestClass, 'validator')) {
-            $validator = Container::getInstance()->call(
+        $validator = method_exists($this->requestClass, 'validator')
+            ? Container::getInstance()->call(
                 [$this->requestClass, 'validator'],
                 ['factory' => $factory]
-            );
-        } else {
-            $validator = $this->createDefaultValidator($factory);
-        }
+            )
+            : $this->createDefaultValidator($factory);
 
         if (method_exists($this->requestClass, 'after')) {
             $validator->after(Container::getInstance()->call(
@@ -279,6 +281,9 @@ class TypedFormRequestBuilder
         return array_merge($rules, $this->nestedMetadata()['rules']);
     }
 
+    /**
+     * @return list<string|\Illuminate\Contracts\Validation\Rule|\Illuminate\Contracts\Validation\ValidatorAwareRule>
+     */
     protected function rulesForParameter(ReflectionParameter $param): array
     {
         $type = $param->getType();
@@ -317,6 +322,9 @@ class TypedFormRequestBuilder
         return $rules;
     }
 
+    /**
+     * @return string|\Illuminate\Contracts\Validation\ValidatorAwareRule|\Illuminate\Contracts\Validation\Rule
+     */
     protected function ruleForNonBuiltinType(ReflectionNamedType $type): mixed
     {
         $name = $type->getName();
@@ -332,6 +340,9 @@ class TypedFormRequestBuilder
         return null;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function validationData(): array
     {
         // @todo add in an attribute that will read the docblocks for things like `int<1, 100>` and convert them into the rules
@@ -398,7 +409,6 @@ class TypedFormRequestBuilder
      */
     protected function mapToNativeFromDefault(ReflectionProperty $prop): mixed
     {
-        // @todo probably have to see what the getDefaultValue returns. if it's an object then we're going to need to check if it can be translated into something. Maybe check Arrayble and check if it's a TypedFormRequest
         return enum_value($prop->getDefaultValue());
     }
 
@@ -425,7 +435,7 @@ class TypedFormRequestBuilder
     }
 
     /**
-     * @return array{rules: array, messages: array, attributes: array}
+     * @return array{rules: array<array-key, mixed>, messages: array<array-key, mixed>, attributes: array<array-key, mixed>}
      */
     protected function nestedMetadata(): array
     {
@@ -477,7 +487,11 @@ class TypedFormRequestBuilder
             }
         }
 
-        return $this->nestedMetadata = ['rules' => $rules, 'messages' => $messages, 'attributes' => $attributes];
+        return $this->nestedMetadata = [
+            'rules' => $rules,
+            'messages' => $messages,
+            'attributes' => $attributes,
+        ];
     }
 
     protected function shouldStopOnFirstFailure(): bool

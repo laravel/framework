@@ -11,6 +11,6 @@ class TypedFormRequest implements SelfBuilding
     {
         return Container::getInstance()
             ->make(TypedFormRequestBuilder::class, ['requestClass' => static::class])
-            ->handle();
+            ->build();
     }
 }
