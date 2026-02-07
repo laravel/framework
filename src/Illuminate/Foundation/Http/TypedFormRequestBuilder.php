@@ -55,7 +55,11 @@ class TypedFormRequestBuilder
 
     protected function nestedBuilder(string $class): static
     {
-        $builder = new static($class, $this->request);
+        $builder = Container::getInstance()
+            ->make(
+                TypedFormRequestBuilder::class,
+                ['requestClass' => $class, 'request' => $this->request]
+            );
         $builder->ancestors = [...$this->ancestors, $this->requestClass];
 
         return $builder;
@@ -84,7 +88,6 @@ class TypedFormRequestBuilder
 
         $this->passedValidation();
 
-        // @todo validated() only works on data which has been validated... they SHOULD always validate the data but it's possible they do not
         return $this->buildDto($this->validator->validated());
     }
 
@@ -269,7 +272,7 @@ class TypedFormRequestBuilder
                 foreach ($nestedRules as $field => $fieldRules) {
                     if ($parentIsOptional) {
                         $fieldRules = array_map(
-                            fn ($rule) => $rule === 'required' ? "required_with:$name" : $rule,
+                            static fn ($rule) => $rule === 'required' ? "required_with:$name" : $rule,
                             $fieldRules,
                         );
                     }
