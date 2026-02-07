@@ -10,7 +10,7 @@ use Illuminate\Foundation\Precognition;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Validator;
 
-class RequestDtoHandler
+class TypedFormRequestBuilder
 {
     protected Validator $validator;
 
