@@ -1476,16 +1476,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
-     * Return null if the underlying string value is empty.
-     *
-     * @return ?string
-     */
-    public function toNullableString()
-    {
-        return empty($this->value) ? null : $this->value;
-    }
-
-    /**
      * Get the underlying string value as an integer.
      *
      * @param  int  $base
