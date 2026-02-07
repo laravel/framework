@@ -263,10 +263,10 @@ class Numberable implements BaseStringable, JsonSerializable
     /**
      * Format the number using decimal separators.
      *
-     * @param  int  $decimals
+     * @param  non-negative-int  $decimals
      * @param  string  $decimalSeparator
      * @param  string  $thousandsSeparator
-     * @return string
+     * @return ($decimals is negative-int ? never : string)
      */
     public function format(int $decimals = 2, string $decimalSeparator = '.', string $thousandsSeparator = ',')
     {
