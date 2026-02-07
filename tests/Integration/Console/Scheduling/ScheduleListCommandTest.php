@@ -4,8 +4,10 @@ namespace Illuminate\Tests\Integration\Console\Scheduling;
 
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
+use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
+use Illuminate\Contracts\Console\Scheduling\Schedulable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\ProcessUtils;
@@ -306,6 +308,17 @@ class ScheduleListCommandTest extends TestCase
             ->expectsOutput('  * */3 * * * 1s   php artisan six ............... Next Due: 1 second from now');
     }
 
+    public function testDisplayScheduleWithSchedulable()
+    {
+        $this->schedule->command(SchedulableFooCommand::class);
+        $this->schedule->job(SchedulableFooJob::class);
+
+        $this->artisan(ScheduleListCommand::class)
+            ->assertSuccessful()
+            ->expectsOutput('  0 *  * * *  php artisan schedulable-foo:command .. Next Due: 1 hour from now')
+            ->expectsOutput('  0 10 * * *  Illuminate\Tests\Integration\Console\Scheduling\SchedulableFooJob  Next Due: 10 hours from now');
+    }
+
     protected function tearDown(): void
     {
         putenv('SHELL_VERBOSITY');
@@ -340,5 +353,25 @@ class FooCall
 
     public function fooFunction(): void
     {
+    }
+}
+
+class SchedulableFooCommand extends Command implements Schedulable
+{
+    protected $signature = 'schedulable-foo:command';
+
+    protected $description = 'A schedulable foo command.';
+
+    public static function schedule(Event $event): void
+    {
+        $event->hourly();
+    }
+}
+
+class SchedulableFooJob implements Schedulable
+{
+    public static function schedule(Event $event): void
+    {
+        $event->daily()->at('10:00');
     }
 }
