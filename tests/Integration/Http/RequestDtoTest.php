@@ -55,6 +55,38 @@ class RequestDtoTest extends TestCase
 
         $this->app->make(MyUnauthorizedTypedForm::class);
     }
+
+    public function testDefaultPropertyUsedWhenKeyMissingFromRequest()
+    {
+        $request = Request::create('', parameters: ['name' => 'Taylor']);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(MyTypedFormWithDefaults::class);
+
+        $this->assertInstanceOf(MyTypedFormWithDefaults::class, $actual);
+        $this->assertEquals('Taylor', $actual->name);
+        $this->assertEquals(25, $actual->perPage);
+    }
+
+    public function testDefaultPropertyNotUsedWhenKeyPresentInRequest()
+    {
+        $request = Request::create('', parameters: ['name' => 'Taylor', 'perPage' => 50]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(MyTypedFormWithDefaults::class);
+
+        $this->assertEquals(50, $actual->perPage);
+    }
+
+    public function testDefaultPropertyNotUsedWhenKeyPresentWithNullValue()
+    {
+        $request = Request::create('', parameters: ['name' => 'Taylor', 'perPage' => null]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(MyTypedFormWithDefaults::class);
+
+        $this->assertNull($actual->perPage);
+    }
 }
 
 #[Rules([
@@ -114,5 +146,22 @@ class MyUnauthorizedTypedForm extends TypedFormRequest
     public static function authorize(): bool
     {
         return false;
+    }
+}
+
+class MyTypedFormWithDefaults extends TypedFormRequest
+{
+    public function __construct(
+        public string $name,
+        public ?int $perPage = 25,
+    ) {
+    }
+
+    public static function rules(): array
+    {
+        return [
+            'name' => ['required', 'string'],
+            'perPage' => ['nullable', 'integer', 'min:1'],
+        ];
     }
 }

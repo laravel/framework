@@ -8,6 +8,8 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Foundation\Precognition;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\Validator;
 use ReflectionClass;
 
@@ -33,6 +35,7 @@ class TypedFormRequestBuilder
 
     /**
      * @return \ReflectionClass<T>
+     *
      * @throws \ReflectionException
      */
     protected function reflectRequest(): ReflectionClass
@@ -188,7 +191,23 @@ class TypedFormRequestBuilder
             );
         }
 
-        return $this->request->all();
+        return $this->mergeRequestData($this->request->all());
+    }
+
+    protected function mergeRequestData(array $data): array
+    {
+        (new Collection($this->reflectRequest()->getProperties(\ReflectionProperty::IS_PUBLIC)))
+            ->filter(fn (\ReflectionProperty $prop) => $prop->hasDefaultValue())
+            ->each(function (\ReflectionProperty $prop) use (&$data) {
+                if (Arr::has($data, $name = $prop->getName())) {
+                    return;
+                }
+
+                $data[$name] ??= $prop->getDefaultValue();
+            });
+
+        return $data;
+
     }
 
     protected function messages(): array
