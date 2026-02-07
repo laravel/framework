@@ -808,7 +808,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         $value = $this->valueRetriever($value);
 
-        return $this->map(fn ($item, $key) => $value($item, $key))->join($glue, $finalGlue);
+        return $this->map($value(...))->join($glue, $finalGlue);
     }
 
     /**
