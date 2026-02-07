@@ -763,6 +763,26 @@ class Builder implements BuilderContract
         });
     }
 
+
+    /**
+     * Create a record matching the attributes, or decrement the existing record.
+     *
+     * @param  array  $attributes
+     * @param  string  $column
+     * @param  int|float  $default
+     * @param  int|float  $step
+     * @param  array  $extra
+     * @return TModel
+     */
+    public function decrementOrCreate(array $attributes, string $column = 'count', $default = 1, $step = 1, array $extra = [])
+    {
+        return tap($this->firstOrCreate($attributes, [$column => $default]), function ($instance) use ($column, $step, $extra) {
+            if (! $instance->wasRecentlyCreated) {
+                $instance->decrement($column, $step, $extra);
+            }
+        });
+    }
+
     /**
      * Execute the query and get the first result or throw an exception.
      *

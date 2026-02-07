@@ -481,6 +481,175 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         ];
     }
 
+    public function testDecrementOrCreateMethodDecrementsExistingRecord(): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])
+            ->andReturn([[
+                'id' => 123,
+                'attr' => 'foo',
+                'count' => 2,
+                'created_at' => '2023-01-01 00:00:00',
+                'updated_at' => '2023-01-01 00:00:00',
+            ]]);
+
+        $model->getConnection()
+            ->expects('raw')
+            ->with('"count" - 1')
+            ->andReturn('1');
+
+        $model->getConnection()
+            ->expects('update')
+            ->with(
+                'update "table" set "count" = ?, "updated_at" = ? where "id" = ?',
+                ['1', '2023-01-01 00:00:00', 123],
+            )
+            ->andReturn(1);
+
+        $result = $model->newQuery()->decrementOrCreate(['attr' => 'foo'], 'count');
+        $this->assertFalse($result->wasRecentlyCreated);
+        $this->assertEquals([
+            'id' => 123,
+            'attr' => 'foo',
+            'count' => 1,
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ], $result->toArray());
+    }
+
+    public function testDecrementOrCreateMethodCreatesNewRecord(): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite', [123]);
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])
+            ->andReturn([]);
+
+        $model->getConnection()->expects('insert')->with(
+            'insert into "table" ("attr", "count", "updated_at", "created_at") values (?, ?, ?, ?)',
+            ['foo', '1', '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
+        )->andReturnTrue();
+
+        $result = $model->newQuery()->decrementOrCreate(['attr' => 'foo']);
+        $this->assertTrue($result->wasRecentlyCreated);
+        $this->assertEquals([
+            'id' => 123,
+            'attr' => 'foo',
+            'count' => 1,
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ], $result->toArray());
+    }
+
+    public function testDecrementOrCreateMethodDecrementParametersArePassed(): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])
+            ->andReturn([[
+                'id' => 123,
+                'attr' => 'foo',
+                'val' => 'bar',
+                'count' => 5,
+                'created_at' => '2023-01-01 00:00:00',
+                'updated_at' => '2023-01-01 00:00:00',
+            ]]);
+
+        $model->getConnection()
+            ->expects('raw')
+            ->with('"count" - 2')
+            ->andReturn('3');
+
+        $model->getConnection()
+            ->expects('update')
+            ->with(
+                'update "table" set "count" = ?, "val" = ?, "updated_at" = ? where "id" = ?',
+                ['3', 'baz', '2023-01-01 00:00:00', 123],
+            )
+            ->andReturn(1);
+
+        $result = $model->newQuery()->decrementOrCreate(['attr' => 'foo'], step: 2, extra: ['val' => 'baz']);
+        $this->assertFalse($result->wasRecentlyCreated);
+        $this->assertEquals([
+            'id' => 123,
+            'attr' => 'foo',
+            'count' => 3,
+            'val' => 'baz',
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ], $result->toArray());
+    }
+
+    public function testDecrementOrCreateMethodRetrievesRecordCreatedJustNow(): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])
+            ->andReturn([]);
+
+        $sql = 'insert into "table" ("attr", "count", "updated_at", "created_at") values (?, ?, ?, ?)';
+        $bindings = ['foo', '1', '2023-01-01 00:00:00', '2023-01-01 00:00:00'];
+
+        $model->getConnection()
+            ->expects('insert')
+            ->with($sql, $bindings)
+            ->andThrow(new UniqueConstraintViolationException('sqlite', $sql, $bindings, new Exception()));
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], false, [])
+            ->andReturn([[
+                'id' => 123,
+                'attr' => 'foo',
+                'count' => 2,
+                'created_at' => '2023-01-01 00:00:00',
+                'updated_at' => '2023-01-01 00:00:00',
+            ]]);
+
+        $model->getConnection()
+            ->expects('raw')
+            ->with('"count" - 1')
+            ->andReturn('1');
+
+        $model->getConnection()
+            ->expects('update')
+            ->with(
+                'update "table" set "count" = ?, "updated_at" = ? where "id" = ?',
+                ['1', '2023-01-01 00:00:00', 123],
+            )
+            ->andReturn(1);
+
+        $result = $model->newQuery()->decrementOrCreate(['attr' => 'foo']);
+        $this->assertFalse($result->wasRecentlyCreated);
+        $this->assertEquals([
+            'id' => 123,
+            'attr' => 'foo',
+            'count' => 1,
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ], $result->toArray());
+    }
+
     protected function mockConnectionForModel(Model $model, string $database, array $lastInsertIds = []): void
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
