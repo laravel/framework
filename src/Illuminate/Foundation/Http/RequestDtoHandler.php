@@ -12,14 +12,12 @@ use Illuminate\Validation\Validator;
 
 class RequestDtoHandler
 {
-    protected Request $request;
-
     protected Validator $validator;
 
     public function __construct(
-        protected string $dtoClass,
+        protected string $requestClass,
+        protected Request $request,
     ) {
-        $this->request = Container::getInstance()->make('request');
     }
 
     public function handle(): mixed
@@ -47,16 +45,16 @@ class RequestDtoHandler
 
     protected function buildDto(array $validated): mixed
     {
-        $dtoClass = $this->dtoClass;
+        $dtoClass = $this->requestClass;
 
         return new $dtoClass(...$validated);
     }
 
     protected function prepareForValidation(): void
     {
-        if (method_exists($this->dtoClass, 'prepareForValidation')) {
+        if (method_exists($this->requestClass, 'prepareForValidation')) {
             Container::getInstance()->call(
-                [$this->dtoClass, 'prepareForValidation'],
+                [$this->requestClass, 'prepareForValidation'],
                 ['request' => $this->request]
             );
         }
@@ -64,9 +62,9 @@ class RequestDtoHandler
 
     protected function passesAuthorization(): bool
     {
-        if (method_exists($this->dtoClass, 'authorize')) {
+        if (method_exists($this->requestClass, 'authorize')) {
             $result = Container::getInstance()->call(
-                [$this->dtoClass, 'authorize'],
+                [$this->requestClass, 'authorize'],
                 ['request' => $this->request]
             );
 
@@ -78,9 +76,9 @@ class RequestDtoHandler
 
     protected function failedAuthorization(): void
     {
-        if (method_exists($this->dtoClass, 'failedAuthorization')) {
+        if (method_exists($this->requestClass, 'failedAuthorization')) {
             Container::getInstance()->call(
-                [$this->dtoClass, 'failedAuthorization'],
+                [$this->requestClass, 'failedAuthorization'],
                 ['request' => $this->request]
             );
 
@@ -94,18 +92,18 @@ class RequestDtoHandler
     {
         $factory = Container::getInstance()->make(ValidationFactory::class);
 
-        if (method_exists($this->dtoClass, 'validator')) {
+        if (method_exists($this->requestClass, 'validator')) {
             $validator = Container::getInstance()->call(
-                [$this->dtoClass, 'validator'],
+                [$this->requestClass, 'validator'],
                 ['factory' => $factory]
             );
         } else {
             $validator = $this->createDefaultValidator($factory);
         }
 
-        if (method_exists($this->dtoClass, 'after')) {
+        if (method_exists($this->requestClass, 'after')) {
             $validator->after(Container::getInstance()->call(
-                [$this->dtoClass, 'after'],
+                [$this->requestClass, 'after'],
                 ['validator' => $validator]
             ));
         }
@@ -133,8 +131,8 @@ class RequestDtoHandler
 
     protected function validationRules(): array
     {
-        if (method_exists($this->dtoClass, 'rules')) {
-            return Container::getInstance()->call([$this->dtoClass, 'rules']);
+        if (method_exists($this->requestClass, 'rules')) {
+            return Container::getInstance()->call([$this->requestClass, 'rules']);
         }
 
         return [];
@@ -142,9 +140,9 @@ class RequestDtoHandler
 
     protected function validationData(): array
     {
-        if (method_exists($this->dtoClass, 'validationData')) {
+        if (method_exists($this->requestClass, 'validationData')) {
             return Container::getInstance()->call(
-                [$this->dtoClass, 'validationData'],
+                [$this->requestClass, 'validationData'],
                 ['request' => $this->request]
             );
         }
@@ -154,8 +152,8 @@ class RequestDtoHandler
 
     protected function messages(): array
     {
-        if (method_exists($this->dtoClass, 'messages')) {
-            return Container::getInstance()->call([$this->dtoClass, 'messages']);
+        if (method_exists($this->requestClass, 'messages')) {
+            return Container::getInstance()->call([$this->requestClass, 'messages']);
         }
 
         return [];
@@ -163,8 +161,8 @@ class RequestDtoHandler
 
     protected function attributes(): array
     {
-        if (method_exists($this->dtoClass, 'attributes')) {
-            return Container::getInstance()->call([$this->dtoClass, 'attributes']);
+        if (method_exists($this->requestClass, 'attributes')) {
+            return Container::getInstance()->call([$this->requestClass, 'attributes']);
         }
 
         return [];
@@ -172,8 +170,8 @@ class RequestDtoHandler
 
     protected function shouldStopOnFirstFailure(): bool
     {
-        if (method_exists($this->dtoClass, 'shouldStopOnFirstFailure')) {
-            return Container::getInstance()->call([$this->dtoClass, 'shouldStopOnFirstFailure']);
+        if (method_exists($this->requestClass, 'shouldStopOnFirstFailure')) {
+            return Container::getInstance()->call([$this->requestClass, 'shouldStopOnFirstFailure']);
         }
 
         return false;
@@ -181,9 +179,9 @@ class RequestDtoHandler
 
     protected function failedValidation(): void
     {
-        if (method_exists($this->dtoClass, 'failedValidation')) {
+        if (method_exists($this->requestClass, 'failedValidation')) {
             Container::getInstance()->call(
-                [$this->dtoClass, 'failedValidation'],
+                [$this->requestClass, 'failedValidation'],
                 ['validator' => $this->validator]
             );
 
@@ -197,8 +195,8 @@ class RequestDtoHandler
 
     protected function passedValidation(): void
     {
-        if (method_exists($this->dtoClass, 'passedValidation')) {
-            Container::getInstance()->call([$this->dtoClass, 'passedValidation']);
+        if (method_exists($this->requestClass, 'passedValidation')) {
+            Container::getInstance()->call([$this->requestClass, 'passedValidation']);
         }
     }
 }
