@@ -197,6 +197,78 @@ class RequestDtoTest extends TestCase
 
         $this->app->make(MyTypedFormAutoRulesWithOverride::class);
     }
+
+    public function testNestedTypedFormRequestValidatesAndBuilds()
+    {
+        $request = Request::create('', parameters: [
+            'item' => 'Widget',
+            'address' => [
+                'street' => '123 Main St',
+                'city' => 'Springfield',
+            ],
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(CreateOrderRequest::class);
+
+        $this->assertInstanceOf(CreateOrderRequest::class, $actual);
+        $this->assertSame('Widget', $actual->item);
+        $this->assertInstanceOf(Address::class, $actual->address);
+        $this->assertSame('123 Main St', $actual->address->street);
+        $this->assertSame('Springfield', $actual->address->city);
+        $this->assertNull($actual->address->zip);
+    }
+
+    public function testNestedTypedFormRequestFailsValidationOnMissingNestedField()
+    {
+        $request = Request::create('', parameters: [
+            'item' => 'Widget',
+            'address' => [
+                'city' => 'Springfield',
+                // street is missing
+            ],
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(CreateOrderRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('address.street', $e->errors());
+        }
+    }
+
+    public function testNestedTypedFormRequestDefaultsApply()
+    {
+        $request = Request::create('', parameters: [
+            'item' => 'Widget',
+            'address' => [
+                'street' => '123 Main St',
+                'city' => 'Springfield',
+                // zip omitted, should get default null
+            ],
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(CreateOrderRequest::class);
+
+        $this->assertNull($actual->address->zip);
+    }
+
+    public function testOptionalNestedTypedFormRequestOmittedEntirely()
+    {
+        $request = Request::create('', parameters: [
+            'item' => 'Widget',
+            // address is omitted entirely
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(CreateOrderRequestWithOptionalAddress::class);
+
+        $this->assertInstanceOf(CreateOrderRequestWithOptionalAddress::class, $actual);
+        $this->assertSame('Widget', $actual->item);
+        $this->assertNull($actual->address);
+    }
 }
 
 class MyTypedForm extends TypedFormRequest
@@ -292,4 +364,32 @@ enum SortDirection: string
 {
     case Asc = 'asc';
     case Desc = 'desc';
+}
+
+class Address extends TypedFormRequest
+{
+    public function __construct(
+        public string $street,
+        public string $city,
+        public ?string $zip = null,
+    ) {
+    }
+}
+
+class CreateOrderRequest extends TypedFormRequest
+{
+    public function __construct(
+        public string $item,
+        public Address $address,
+    ) {
+    }
+}
+
+class CreateOrderRequestWithOptionalAddress extends TypedFormRequest
+{
+    public function __construct(
+        public string $item,
+        public ?Address $address = null,
+    ) {
+    }
 }
