@@ -598,7 +598,7 @@ class Numberable implements BaseStringable, JsonSerializable
      * Determine if the locale generally uses commas as decimal separators.
      *
      * @param  string|null  $locale
-     * @return bool
+     * @return ($locale is null ? false : bool)
      */
     protected static function localeUsesCommaDecimal(?string $locale): bool
     {
