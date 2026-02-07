@@ -220,7 +220,7 @@ class Factory implements FactoryContract
      * Get the rendered contents of a partial from a loop.
      *
      * @param  string  $view
-     * @param  array  $data
+     * @param  iterable  $data
      * @param  string  $iterator
      * @param  string  $empty
      * @return string
@@ -228,22 +228,22 @@ class Factory implements FactoryContract
     public function renderEach($view, $data, $iterator, $empty = 'raw|')
     {
         $result = '';
+        $hasData = false;
 
-        // If is actually data in the array, we will loop through the data and append
-        // an instance of the partial view to the final result HTML passing in the
-        // iterated value of this data array, allowing the views to access them.
-        if (count($data) > 0) {
-            foreach ($data as $key => $value) {
-                $result .= $this->make(
-                    $view, ['key' => $key, $iterator => $value]
-                )->render();
-            }
+        // We will loop through the data and append an instance of the partial view
+        // to the final result HTML, allowing views to consume any iterable source.
+        foreach ($data as $key => $value) {
+            $hasData = true;
+
+            $result .= $this->make(
+                $view, ['key' => $key, $iterator => $value]
+            )->render();
         }
 
         // If there is no data in the array, we will render the contents of the empty
         // view. Alternatively, the "empty view" could be a raw string that begins
         // with "raw|" for convenience and to let this know that it is a string.
-        else {
+        if (! $hasData) {
             $result = str_starts_with($empty, 'raw|')
                 ? substr($empty, 4)
                 : $this->make($empty)->render();

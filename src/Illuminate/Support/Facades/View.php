@@ -8,7 +8,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Contracts\View\View first(array $views, \Illuminate\Contracts\Support\Arrayable|array $data = [], array $mergeData = [])
  * @method static string renderWhen(bool $condition, string $view, \Illuminate\Contracts\Support\Arrayable|array $data = [], array $mergeData = [])
  * @method static string renderUnless(bool $condition, string $view, \Illuminate\Contracts\Support\Arrayable|array $data = [], array $mergeData = [])
- * @method static string renderEach(string $view, array $data, string $iterator, string $empty = 'raw|')
+ * @method static string renderEach(string $view, iterable $data, string $iterator, string $empty = 'raw|')
  * @method static bool exists(string $view)
  * @method static \Illuminate\Contracts\View\Engine getEngineFromPath(string $path)
  * @method static mixed share(array|string $key, mixed $value = null)

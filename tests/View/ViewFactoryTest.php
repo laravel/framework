@@ -117,6 +117,19 @@ class ViewFactoryTest extends TestCase
         $this->assertSame('daylerees', $result);
     }
 
+    public function testRenderEachCreatesViewForEachItemInIterable()
+    {
+        $factory = m::mock(Factory::class.'[make]', $this->getFactoryArgs());
+        $factory->shouldReceive('make')->once()->with('foo', ['key' => 'bar', 'value' => 'baz'])->andReturn($mockView1 = m::mock(stdClass::class));
+        $factory->shouldReceive('make')->once()->with('foo', ['key' => 'breeze', 'value' => 'boom'])->andReturn($mockView2 = m::mock(stdClass::class));
+        $mockView1->shouldReceive('render')->once()->andReturn('dayle');
+        $mockView2->shouldReceive('render')->once()->andReturn('rees');
+
+        $result = $factory->renderEach('foo', LazyCollection::make(['bar' => 'baz', 'breeze' => 'boom']), 'value');
+
+        $this->assertSame('daylerees', $result);
+    }
+
     public function testEmptyViewsCanBeReturnedFromRenderEach()
     {
         $factory = m::mock(Factory::class.'[make]', $this->getFactoryArgs());
@@ -129,6 +142,19 @@ class ViewFactoryTest extends TestCase
     public function testRawStringsMayBeReturnedFromRenderEach()
     {
         $this->assertSame('foo', $this->getFactory()->renderEach('foo', [], 'item', 'raw|foo'));
+    }
+
+    public function testEmptyViewsCanBeReturnedFromRenderEachIterable()
+    {
+        $factory = m::mock(Factory::class.'[make]', $this->getFactoryArgs());
+        $factory->shouldReceive('make')->once()->with('foo')->andReturn($mockView = m::mock(stdClass::class));
+        $mockView->shouldReceive('render')->once()->andReturn('empty');
+
+        $this->assertSame('empty', $factory->renderEach('view', (function () {
+            if (false) {
+                yield;
+            }
+        })(), 'iterator', 'foo'));
     }
 
     public function testEnvironmentAddsExtensionWithCustomResolver()
