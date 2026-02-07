@@ -86,7 +86,7 @@ class TypedFormRequestBuilder
         // @todo handle nested objects
         $dtoClass = $this->requestClass;
 
-        return new $dtoClass(...$this->castValidatedData($validated));
+        return new $dtoClass(...$this->castValidatedData($validated)); // @phpstan-ignore new.noConstructor (this is a requirement for now)
     }
 
     protected function castValidatedData(array $validated): array
