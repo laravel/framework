@@ -9,6 +9,7 @@ use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Foundation\Precognition;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Validator;
+use ReflectionClass;
 
 /**
  * @template T of TypedFormRequest
@@ -16,6 +17,9 @@ use Illuminate\Validation\Validator;
 class TypedFormRequestBuilder
 {
     protected Validator $validator;
+
+    /** @var ReflectionClass<T>|null */
+    protected ?ReflectionClass $reflection = null;
 
     /**
      * @param  class-string<T>  $requestClass
@@ -25,6 +29,15 @@ class TypedFormRequestBuilder
         protected string $requestClass,
         protected Request $request,
     ) {
+    }
+
+    /**
+     * @return \ReflectionClass<T>
+     * @throws \ReflectionException
+     */
+    protected function reflectRequest(): ReflectionClass
+    {
+        return $this->reflection ??= new ReflectionClass($this->requestClass);
     }
 
     /**
@@ -147,13 +160,21 @@ class TypedFormRequestBuilder
 
     protected function validationRules(): array
     {
+        $rules = [];
+
         // @todo add in attribute check (read from #[Rules] attribute on the requestClass)
         // @todo can we add an attribute to merge defaults set on the typed properties? like `public int $perPage = 25` will use per_page=25 if not specified
         if (method_exists($this->requestClass, 'rules')) {
-            return Container::getInstance()->call([$this->requestClass, 'rules']);
+            $rules = array_merge(
+                $rules,
+                Container::getInstance()->call(
+                    [$this->requestClass, 'rules'],
+                    ['request' => $this->request]
+                )
+            );
         }
 
-        return [];
+        return $rules;
     }
 
     protected function validationData(): array
