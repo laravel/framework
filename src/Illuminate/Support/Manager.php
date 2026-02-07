@@ -50,7 +50,7 @@ abstract class Manager
     /**
      * Get the default driver name.
      *
-     * @return string
+     * @return string|null
      */
     abstract public function getDefaultDriver();
 

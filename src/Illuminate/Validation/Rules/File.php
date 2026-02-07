@@ -6,7 +6,6 @@ use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
@@ -44,6 +43,13 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      * @var null|int
      */
     protected $maximumFileSize = null;
+
+    /**
+     * The required file encoding.
+     *
+     * @var string|null
+     */
+    protected $encoding = null;
 
     /**
      * An array of custom rules that will be merged into the validation rules.
@@ -206,6 +212,19 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
+     * Indicate that the uploaded file should be in the given encoding.
+     *
+     * @param  string  $encoding
+     * @return $this
+     */
+    public function encoding($encoding)
+    {
+        $this->encoding = $encoding;
+
+        return $this;
+    }
+
+    /**
      * Convert a potentially human-friendly file size to kilobytes.
      *
      * @param  string|int  $size
@@ -219,7 +238,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
 
         $size = strtolower(trim($size));
 
-        $value = floatval($size);
+        $value = (float) $size;
 
         return round(match (true) {
             Str::endsWith($size, 'kb') => $value * 1,
@@ -291,11 +310,15 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
             default => "size:{$this->minimumFileSize}",
         };
 
+        if ($this->encoding) {
+            $rules[] = 'encoding:'.$this->encoding;
+        }
+
         return array_merge(array_filter($rules), $this->customRules);
     }
 
     /**
-     * Separate the given mimetypes from extensions and return an array of correct rules to validate against.
+     * Separate the given MIME types from extensions and return an array of correct rules to validate against.
      *
      * @return array
      */
@@ -333,11 +356,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     protected function fail($messages)
     {
-        $messages = Collection::wrap($messages)
-            ->map(fn ($message) => $this->validator->getTranslator()->get($message))
-            ->all();
-
-        $this->messages = array_merge($this->messages, $messages);
+        $this->messages = array_merge($this->messages, Arr::wrap($messages));
 
         return false;
     }

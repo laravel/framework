@@ -41,12 +41,16 @@ class ConnectorTest extends DatabaseTestCase
             'busy_timeout' => 12345,
             'journal_mode' => 'wal',
             'synchronous' => 'normal',
+            'pragmas' => [
+                'query_only' => true,
+            ],
         ])->getSchemaBuilder();
 
         $this->assertSame(1, $schema->pragma('foreign_keys'));
         $this->assertSame(12345, $schema->pragma('busy_timeout'));
         $this->assertSame('wal', $schema->pragma('journal_mode'));
         $this->assertSame(1, $schema->pragma('synchronous'));
+        $this->assertSame(1, $schema->pragma('query_only'));
 
         $schema->pragma('foreign_keys', 0);
         $schema->pragma('busy_timeout', 54321);

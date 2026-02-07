@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Contracts\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Attributes\Scope as NamedScope;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Model;
 
 class EloquentModelScopeTest extends DatabaseTestCase
@@ -37,7 +37,7 @@ class TestScopeModel1 extends Model
         return $builder;
     }
 
-    #[NamedScope]
+    #[Scope]
     protected function existsAsWell(Builder $builder)
     {
         return $builder;

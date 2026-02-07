@@ -22,7 +22,7 @@ class EnvironmentDecryptCommandTest extends TestCase
         File::swap($this->filesystem);
     }
 
-    public function testItFailsWithInvalidCipherFails()
+    public function testItFailsWithInvalidCipherFails(): void
     {
         $this->filesystem->shouldReceive('exists')
             ->once()
@@ -36,7 +36,7 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->assertExitCode(1);
     }
 
-    public function testItFailsUsingCipherWithInvalidKey()
+    public function testItFailsUsingCipherWithInvalidKey(): void
     {
         $this->filesystem->shouldReceive('exists')
             ->once()
@@ -50,7 +50,7 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->assertExitCode(1);
     }
 
-    public function testItFailsWhenEncryptionFileCannotBeFound()
+    public function testItFailsWhenEncryptionFileCannotBeFound(): void
     {
         $this->filesystem->shouldReceive('exists')->andReturn(true);
 
@@ -59,7 +59,7 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->assertExitCode(1);
     }
 
-    public function testItFailsWhenEnvironmentFileExists()
+    public function testItFailsWhenEnvironmentFileExists(): void
     {
         $this->filesystem->shouldReceive('exists')->andReturn(false);
 
@@ -68,7 +68,7 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->assertExitCode(1);
     }
 
-    public function testItGeneratesTheEnvironmentFileWithGeneratedKey()
+    public function testItGeneratesTheEnvironmentFileWithGeneratedKey(): void
     {
         $this->filesystem->shouldReceive('exists')
             ->once()
@@ -91,7 +91,7 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->with(base_path('.env'), 'APP_NAME=Laravel');
     }
 
-    public function testItGeneratesTheEnvironmentFileWithUserProvidedKey()
+    public function testItGeneratesTheEnvironmentFileWithUserProvidedKey(): void
     {
         $this->filesystem->shouldReceive('exists')
             ->once()
@@ -114,7 +114,7 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->with(base_path('.env'), 'APP_NAME="Laravel Two"');
     }
 
-    public function testItGeneratesTheEnvironmentFileWithKeyFromEnvironment()
+    public function testItGeneratesTheEnvironmentFileWithKeyFromEnvironment(): void
     {
         $_SERVER['LARAVEL_ENV_ENCRYPTION_KEY'] = 'ponmlkjihgfedcbaponmlkjihgfedcba';
 
@@ -141,7 +141,7 @@ class EnvironmentDecryptCommandTest extends TestCase
         unset($_SERVER['LARAVEL_ENV_ENCRYPTION_KEY']);
     }
 
-    public function testItGeneratesTheEnvironmentFileWhenForcing()
+    public function testItGeneratesTheEnvironmentFileWhenForcing(): void
     {
         $this->filesystem->shouldReceive('exists')
             ->once()
@@ -164,7 +164,7 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->with(base_path('.env'), 'APP_NAME="Laravel Two"');
     }
 
-    public function testItDecryptsMultiLineEnvironmentCorrectly()
+    public function testItDecryptsMultiLineEnvironmentCorrectly(): void
     {
         $contents = <<<'Text'
         APP_NAME=Laravel
@@ -205,7 +205,7 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->with(base_path('.env'), $contents);
     }
 
-    public function testItWritesTheEnvironmentFileCustomFilename()
+    public function testItWritesTheEnvironmentFileCustomFilename(): void
     {
         $this->filesystem->shouldReceive('exists')
             ->once()
@@ -228,7 +228,7 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->with(base_path('.env'), 'APP_NAME="Laravel Two"');
     }
 
-    public function testItWritesTheEnvironmentFileCustomPath()
+    public function testItWritesTheEnvironmentFileCustomPath(): void
     {
         $this->filesystem->shouldReceive('exists')
             ->once()
@@ -251,7 +251,7 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->with('/tmp'.DIRECTORY_SEPARATOR.'.env.production', 'APP_NAME="Laravel Two"');
     }
 
-    public function testItWritesTheEnvironmentFileCustomPathAndFilename()
+    public function testItWritesTheEnvironmentFileCustomPathAndFilename(): void
     {
         $this->filesystem->shouldReceive('exists')
             ->once()
@@ -274,7 +274,7 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->with('/tmp'.DIRECTORY_SEPARATOR.'.env', 'APP_NAME="Laravel Two"');
     }
 
-    public function testItCannotOverwriteEncryptedFiles()
+    public function testItCannotOverwriteEncryptedFiles(): void
     {
         $this->artisan('env:decrypt', ['--env' => 'production', '--key' => 'abcdefghijklmnop', '--filename' => '.env.production.encrypted'])
             ->expectsOutputToContain('Invalid filename.')
@@ -285,7 +285,7 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->assertExitCode(1);
     }
 
-    public function testItGeneratesTheEnvironmentFileWithInteractivelyUserProvidedKey()
+    public function testItGeneratesTheEnvironmentFileWithInteractivelyUserProvidedKey(): void
     {
         $this->filesystem->shouldReceive('exists')
             ->once()
@@ -307,5 +307,117 @@ class EnvironmentDecryptCommandTest extends TestCase
 
         $this->filesystem->shouldHaveReceived('put')
             ->with(base_path('.env'), 'APP_NAME="Laravel Two"');
+    }
+
+    public function testItAutoDetectsAndDecryptsReadableFormat(): void
+    {
+        $key = 'abcdefghijklmnopabcdefghijklmnop';
+        $encrypter = new Encrypter($key, 'AES-256-CBC');
+
+        // Create readable format encrypted content
+        $encryptedContent = 'APP_NAME='.$encrypter->encryptString('Laravel')."\n".
+                           'APP_ENV='.$encrypter->encryptString('local');
+
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(false)
+            ->shouldReceive('get')
+            ->once()
+            ->andReturn($encryptedContent);
+
+        $this->artisan('env:decrypt', ['--key' => $key])
+            ->expectsOutputToContain('Environment successfully decrypted.')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with(base_path('.env'), "APP_NAME=Laravel\nAPP_ENV=local\n");
+    }
+
+    public function testItStillDecryptsBlobFormat(): void
+    {
+        $key = 'abcdefghijklmnopabcdefghijklmnop';
+        $encrypter = new Encrypter($key, 'AES-256-CBC');
+
+        // Create blob format (entire file encrypted as one)
+        $originalContent = "APP_NAME=Laravel\nAPP_ENV=local";
+        $encryptedContent = $encrypter->encrypt($originalContent);
+
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(false)
+            ->shouldReceive('get')
+            ->once()
+            ->andReturn($encryptedContent);
+
+        $this->artisan('env:decrypt', ['--key' => $key])
+            ->expectsOutputToContain('Environment successfully decrypted.')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with(base_path('.env'), $originalContent);
+    }
+
+    public function testItDecryptsBlobFormatWithNewlineInContent(): void
+    {
+        $key = 'abcdefghijklmnopabcdefghijklmnop';
+        $encrypter = new Encrypter($key, 'AES-256-CBC');
+
+        // Create blob format and inject a newline (simulating wrapped base64)
+        $originalContent = "APP_NAME=Laravel\nAPP_ENV=local";
+        $encryptedContent = $encrypter->encrypt($originalContent);
+
+        // Insert a newline in the middle of the base64 string
+        $midpoint = (int) (strlen($encryptedContent) / 2);
+        $encryptedContentWithNewline = substr($encryptedContent, 0, $midpoint)."\n".substr($encryptedContent, $midpoint);
+
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(false)
+            ->shouldReceive('get')
+            ->once()
+            ->andReturn($encryptedContentWithNewline);
+
+        $this->artisan('env:decrypt', ['--key' => $key])
+            ->expectsOutputToContain('Environment successfully decrypted.')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with(base_path('.env'), $originalContent);
+    }
+
+    public function testItDecryptsReadableFormatWithBase64Values(): void
+    {
+        $key = 'abcdefghijklmnopabcdefghijklmnop';
+        $encrypter = new Encrypter($key, 'AES-256-CBC');
+
+        // Create readable format with base64 value containing = signs
+        $encryptedContent = 'APP_KEY='.$encrypter->encryptString('base64:Ge+W23u+VZI2tbrp5QCGWrsUuxgcD65i7jtTRR2ZqfY=')."\n".
+                           'APP_ENV='.$encrypter->encryptString('local');
+
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(false)
+            ->shouldReceive('get')
+            ->once()
+            ->andReturn($encryptedContent);
+
+        $this->artisan('env:decrypt', ['--key' => $key])
+            ->expectsOutputToContain('Environment successfully decrypted.')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with(base_path('.env'), "APP_KEY=base64:Ge+W23u+VZI2tbrp5QCGWrsUuxgcD65i7jtTRR2ZqfY=\nAPP_ENV=local\n");
     }
 }

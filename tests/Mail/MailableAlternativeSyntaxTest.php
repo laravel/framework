@@ -11,7 +11,7 @@ use ReflectionClass;
 
 class MailableAlternativeSyntaxTest extends TestCase
 {
-    public function testBasicMailableInspection()
+    public function testBasicMailableInspection(): void
     {
         $mailable = new MailableWithAlternativeSyntax;
 
@@ -40,7 +40,7 @@ class MailableAlternativeSyntaxTest extends TestCase
         $this->assertEquals(1, count($mailable->bcc));
     }
 
-    public function testEnvelopesCanReceiveAdditionalRecipients()
+    public function testEnvelopesCanReceiveAdditionalRecipients(): void
     {
         $envelope = new Envelope(to: ['taylor@example.com']);
         $envelope->to(new Address('taylorotwell@example.com'));

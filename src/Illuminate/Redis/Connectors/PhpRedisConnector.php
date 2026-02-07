@@ -8,6 +8,7 @@ use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Redis as RedisFacade;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use LogicException;
 use Redis;
 use RedisCluster;
@@ -92,7 +93,7 @@ class PhpRedisConnector implements Connector
             }
 
             if (array_key_exists('backoff_algorithm', $config)) {
-                $client->setOption(Redis::OPT_BACKOFF_ALGORITHM, $config['backoff_algorithm']);
+                $client->setOption(Redis::OPT_BACKOFF_ALGORITHM, $this->parseBackoffAlgorithm($config['backoff_algorithm']));
             }
 
             if (array_key_exists('backoff_base', $config)) {
@@ -141,6 +142,11 @@ class PhpRedisConnector implements Connector
 
             if (array_key_exists('compression_level', $config)) {
                 $client->setOption(Redis::OPT_COMPRESSION_LEVEL, $config['compression_level']);
+            }
+
+            if (defined('Redis::OPT_PACK_IGNORE_NUMBERS') &&
+                array_key_exists('pack_ignore_numbers', $config)) {
+                $client->setOption(Redis::OPT_PACK_IGNORE_NUMBERS, $config['pack_ignore_numbers']);
             }
         });
     }
@@ -240,5 +246,30 @@ class PhpRedisConnector implements Connector
         }
 
         return $options['host'];
+    }
+
+    /**
+     * Parse a "friendly" backoff algorithm name into an integer.
+     *
+     * @param  mixed  $algorithm
+     * @return int
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function parseBackoffAlgorithm(mixed $algorithm)
+    {
+        if (is_int($algorithm)) {
+            return $algorithm;
+        }
+
+        return match ($algorithm) {
+            'default' => Redis::BACKOFF_ALGORITHM_DEFAULT,
+            'decorrelated_jitter' => Redis::BACKOFF_ALGORITHM_DECORRELATED_JITTER,
+            'equal_jitter' => Redis::BACKOFF_ALGORITHM_EQUAL_JITTER,
+            'exponential' => Redis::BACKOFF_ALGORITHM_EXPONENTIAL,
+            'uniform' => Redis::BACKOFF_ALGORITHM_UNIFORM,
+            'constant' => Redis::BACKOFF_ALGORITHM_CONSTANT,
+            default => throw new InvalidArgumentException("Algorithm [{$algorithm}] is not a valid PhpRedis backoff algorithm.")
+        };
     }
 }

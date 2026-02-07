@@ -8,7 +8,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 class ParallelConsoleOutputTest extends TestCase
 {
-    public function testWrite()
+    public function testWrite(): void
     {
         $original = new BufferedOutput;
         $output = new ParallelConsoleOutput($original);

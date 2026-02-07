@@ -15,8 +15,9 @@ class DatabaseSchemaBlueprintTest extends TestCase
 {
     protected function tearDown(): void
     {
-        m::close();
         Builder::$defaultMorphKeyType = 'int';
+
+        parent::tearDown();
     }
 
     public function testToSqlRunsCommandsFromBlueprint()
@@ -138,7 +139,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table `users` add `created` datetime not null default CURRENT_TIMESTAMP'], $getSql('MySql'));
         $this->assertEquals(['alter table "users" add column "created" timestamp(0) without time zone not null default CURRENT_TIMESTAMP'], $getSql('Postgres'));
         $this->assertEquals(['alter table "users" add column "created" datetime not null default CURRENT_TIMESTAMP'], $getSql('SQLite'));
-        $this->assertEquals(['alter table "users" add "created" datetime not null default CURRENT_TIMESTAMP'], $getSql('SqlServer'));
+        $this->assertEquals(['alter table "users" add "created" datetime2(0) not null default CURRENT_TIMESTAMP'], $getSql('SqlServer'));
     }
 
     public function testDefaultCurrentTimestamp()
@@ -152,7 +153,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table `users` add `created` timestamp not null default CURRENT_TIMESTAMP'], $getSql('MySql'));
         $this->assertEquals(['alter table "users" add column "created" timestamp(0) without time zone not null default CURRENT_TIMESTAMP'], $getSql('Postgres'));
         $this->assertEquals(['alter table "users" add column "created" datetime not null default CURRENT_TIMESTAMP'], $getSql('SQLite'));
-        $this->assertEquals(['alter table "users" add "created" datetime not null default CURRENT_TIMESTAMP'], $getSql('SqlServer'));
+        $this->assertEquals(['alter table "users" add "created" datetime2(0) not null default CURRENT_TIMESTAMP'], $getSql('SqlServer'));
     }
 
     public function testDefaultCurrentYear()

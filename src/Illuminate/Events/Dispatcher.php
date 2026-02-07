@@ -4,14 +4,18 @@ namespace Illuminate\Events;
 
 use Closure;
 use Exception;
+use Illuminate\Bus\UniqueLock;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Support\Arr;
@@ -37,28 +41,28 @@ class Dispatcher implements DispatcherContract
     /**
      * The registered event listeners.
      *
-     * @var array
+     * @var array<string, callable|array|class-string|null>
      */
     protected $listeners = [];
 
     /**
      * The wildcard listeners.
      *
-     * @var array
+     * @var array<string, \Closure|string>
      */
     protected $wildcards = [];
 
     /**
      * The cached wildcard listeners.
      *
-     * @var array
+     * @var array<string, \Closure|string>
      */
     protected $wildcardsCache = [];
 
     /**
      * The queue resolver instance.
      *
-     * @var callable
+     * @var callable(): \Illuminate\Contracts\Queue\Queue
      */
     protected $queueResolver;
 
@@ -86,7 +90,7 @@ class Dispatcher implements DispatcherContract
     /**
      * The specific events to defer (null means defer all events).
      *
-     * @var array|null
+     * @var string[]|null
      */
     protected $eventsToDefer = null;
 
@@ -231,8 +235,8 @@ class Dispatcher implements DispatcherContract
     /**
      * Resolve the subscriber instance.
      *
-     * @param  object|string  $subscriber
-     * @return mixed
+     * @param  object|class-string  $subscriber
+     * @return $subscriber is object ? object : mixed
      */
     protected function resolveSubscriber($subscriber)
     {
@@ -248,7 +252,7 @@ class Dispatcher implements DispatcherContract
      *
      * @param  string|object  $event
      * @param  mixed  $payload
-     * @return mixed
+     * @return array|null
      */
     public function until($event, $payload = [])
     {
@@ -265,15 +269,15 @@ class Dispatcher implements DispatcherContract
      */
     public function dispatch($event, $payload = [], $halt = false)
     {
-        // When the given "event" is actually an object we will assume it is an event
-        // object and use the class as the event name and this event itself as the
-        // payload to the handler, which makes object based events quite simple.
-        [$isEventObject, $event, $payload] = [
+        // When the given "event" is actually an object, we will assume it is an event
+        // object, and use the class as the event name and this event itself as the
+        // payload to the handler, which makes object-based events quite simple.
+        [$isEventObject, $parsedEvent, $parsedPayload] = [
             is_object($event),
             ...$this->parseEventAndPayload($event, $payload),
         ];
 
-        if ($this->shouldDeferEvent($event)) {
+        if ($this->shouldDeferEvent($parsedEvent)) {
             $this->deferredEvents[] = func_get_args();
 
             return null;
@@ -283,16 +287,16 @@ class Dispatcher implements DispatcherContract
         // transaction is successful, we'll register a callback which will handle
         // dispatching this event on the next successful DB transaction commit.
         if ($isEventObject &&
-            $payload[0] instanceof ShouldDispatchAfterCommit &&
+            $parsedPayload[0] instanceof ShouldDispatchAfterCommit &&
             ! is_null($transactions = $this->resolveTransactionManager())) {
             $transactions->addCallback(
-                fn () => $this->invokeListeners($event, $payload, $halt)
+                fn () => $this->invokeListeners($parsedEvent, $parsedPayload, $halt)
             );
 
             return null;
         }
 
-        return $this->invokeListeners($event, $payload, $halt);
+        return $this->invokeListeners($parsedEvent, $parsedPayload, $halt);
     }
 
     /**
@@ -339,7 +343,7 @@ class Dispatcher implements DispatcherContract
      *
      * @param  mixed  $event
      * @param  mixed  $payload
-     * @return array
+     * @return array{string, array}
      */
     protected function parseEventAndPayload($event, $payload)
     {
@@ -466,7 +470,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Register an event listener with the dispatcher.
      *
-     * @param  \Closure|string|array  $listener
+     * @param  \Closure|string|array{class-string, string}  $listener
      * @param  bool  $wildcard
      * @return \Closure
      */
@@ -512,7 +516,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Create the class based event callable.
      *
-     * @param  array|string  $listener
+     * @param  array{class-string, string}|string  $listener
      * @return callable
      */
     protected function createClassCallable($listener)
@@ -540,7 +544,7 @@ class Dispatcher implements DispatcherContract
      * Parse the class listener into class and method.
      *
      * @param  string  $listener
-     * @return array
+     * @return array{class-string, string}
      */
     protected function parseClassCallable($listener)
     {
@@ -550,8 +554,10 @@ class Dispatcher implements DispatcherContract
     /**
      * Determine if the event handler class should be queued.
      *
-     * @param  string  $class
+     * @param  class-string  $class
      * @return bool
+     *
+     * @phpstan-assert-if-true \Illuminate\Contracts\Queue\ShouldQueue $class
      */
     protected function handlerShouldBeQueued($class)
     {
@@ -567,9 +573,9 @@ class Dispatcher implements DispatcherContract
     /**
      * Create a callable for putting an event handler on the queue.
      *
-     * @param  string  $class
+     * @param  class-string  $class
      * @param  string  $method
-     * @return \Closure
+     * @return \Closure(): void
      */
     protected function createQueuedHandlerCallable($class, $method)
     {
@@ -620,7 +626,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Determine if the event handler wants to be queued.
      *
-     * @param  string  $class
+     * @param  class-string  $class
      * @param  array  $arguments
      * @return bool
      */
@@ -647,6 +653,11 @@ class Dispatcher implements DispatcherContract
     {
         [$listener, $job] = $this->createListenerAndJob($class, $method, $arguments);
 
+        if ($job->shouldBeUnique &&
+            ! (new UniqueLock($this->container->make(Cache::class)))->acquire($job)) {
+            return;
+        }
+
         $connection = $this->resolveQueue()->connection(method_exists($listener, 'viaConnection')
             ? (isset($arguments[0]) ? $listener->viaConnection($arguments[0]) : $listener->viaConnection())
             : $listener->connection ?? null);
@@ -667,10 +678,12 @@ class Dispatcher implements DispatcherContract
     /**
      * Create the listener and job for a queued listener.
      *
-     * @param  string  $class
+     * @template TListener
+     *
+     * @param  class-string<TListener>  $class
      * @param  string  $method
      * @param  array  $arguments
-     * @return array
+     * @return array{TListener, mixed}
      */
     protected function createListenerAndJob($class, $method, $arguments)
     {
@@ -686,7 +699,7 @@ class Dispatcher implements DispatcherContract
      *
      * @param  mixed  $listener
      * @param  \Illuminate\Events\CallQueuedListener  $job
-     * @return mixed
+     * @return \Illuminate\Events\CallQueuedListener
      */
     protected function propagateListenerOptions($listener, $job)
     {
@@ -705,12 +718,30 @@ class Dispatcher implements DispatcherContract
             $job->shouldBeEncrypted = $listener instanceof ShouldBeEncrypted;
             $job->timeout = $listener->timeout ?? null;
             $job->failOnTimeout = $listener->failOnTimeout ?? false;
-            $job->tries = $listener->tries ?? null;
+            $job->tries = method_exists($listener, 'tries') ? $listener->tries(...$data) : ($listener->tries ?? null);
+            $job->messageGroup = method_exists($listener, 'messageGroup') ? $listener->messageGroup(...$data) : ($listener->messageGroup ?? null);
+            $job->withDeduplicator(method_exists($listener, 'deduplicator')
+                ? $listener->deduplicator(...$data)
+                : (method_exists($listener, 'deduplicationId') ? $listener->deduplicationId(...) : null)
+            );
 
             $job->through(array_merge(
                 method_exists($listener, 'middleware') ? $listener->middleware(...$data) : [],
                 $listener->middleware ?? []
             ));
+
+            $job->shouldBeUnique = $listener instanceof ShouldBeUnique;
+            $job->shouldBeUniqueUntilProcessing = $listener instanceof ShouldBeUniqueUntilProcessing;
+
+            if ($job->shouldBeUnique) {
+                $job->uniqueId = method_exists($listener, 'uniqueId')
+                    ? $listener->uniqueId(...$data)
+                    : ($listener->uniqueId ?? null);
+
+                $job->uniqueFor = method_exists($listener, 'uniqueFor')
+                    ? $listener->uniqueFor(...$data)
+                    : ($listener->uniqueFor ?? 0);
+            }
         });
     }
 
@@ -762,7 +793,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Set the queue resolver implementation.
      *
-     * @param  callable  $resolver
+     * @param  callable(): \Illuminate\Contracts\Queue\Queue  $resolver
      * @return $this
      */
     public function setQueueResolver(callable $resolver)
@@ -785,7 +816,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Set the database transaction manager resolver implementation.
      *
-     * @param  callable  $resolver
+     * @param  (callable(): \Illuminate\Database\DatabaseTransactionsManager|null)  $resolver
      * @return $this
      */
     public function setTransactionManagerResolver(callable $resolver)
@@ -798,9 +829,11 @@ class Dispatcher implements DispatcherContract
     /**
      * Execute the given callback while deferring events, then dispatch all deferred events.
      *
-     * @param  callable  $callback
-     * @param  array|null  $events
-     * @return mixed
+     * @template TResult
+     *
+     * @param  callable(): TResult  $callback
+     * @param  string[]|null  $events
+     * @return TResult
      */
     public function defer(callable $callback, ?array $events = null)
     {

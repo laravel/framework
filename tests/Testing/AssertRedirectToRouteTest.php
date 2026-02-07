@@ -41,7 +41,7 @@ class AssertRedirectToRouteTest extends TestCase
         $this->urlGenerator = $this->app->make(UrlGenerator::class);
     }
 
-    public function testAssertRedirectToRouteWithRouteName()
+    public function testAssertRedirectToRouteWithRouteName(): void
     {
         $this->router->get('test-route', function () {
             return new RedirectResponse($this->urlGenerator->route('named-route'));
@@ -51,7 +51,7 @@ class AssertRedirectToRouteTest extends TestCase
             ->assertRedirectToRoute('named-route');
     }
 
-    public function testAssertRedirectToRouteWithRouteNameAndParams()
+    public function testAssertRedirectToRouteWithRouteNameAndParams(): void
     {
         $this->router->get('test-route', function () {
             return new RedirectResponse($this->urlGenerator->route('named-route-with-param', 'hello'));
@@ -74,7 +74,7 @@ class AssertRedirectToRouteTest extends TestCase
             ]);
     }
 
-    public function testAssertRedirectToRouteWithRouteNameAndParamsWhenRouteUriIsEmpty()
+    public function testAssertRedirectToRouteWithRouteNameAndParamsWhenRouteUriIsEmpty(): void
     {
         $this->router->get('test-route', function () {
             return new RedirectResponse($this->urlGenerator->route('route-with-empty-uri', ['foo' => 'bar']));
@@ -86,8 +86,8 @@ class AssertRedirectToRouteTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Facade::setFacadeApplication(null);
+
+        parent::tearDown();
     }
 }

@@ -10,7 +10,7 @@ class ModelPruningStarting
      * @param  array<class-string>  $models  The class names of the models that will be pruned.
      */
     public function __construct(
-        public $models
+        public $models,
     ) {
     }
 }

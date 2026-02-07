@@ -10,6 +10,7 @@ use Illuminate\Container\Container;
 use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\ContextualAttribute;
+use Illuminate\Contracts\Container\SelfBuilding;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use stdClass;
@@ -20,6 +21,8 @@ class ContainerTest extends TestCase
     protected function tearDown(): void
     {
         Container::setInstance(null);
+
+        parent::tearDown();
     }
 
     public function testContainerSingleton()
@@ -137,6 +140,13 @@ class ContainerTest extends TestCase
         $firstInstantiation = $container->make('class');
         $secondInstantiation = $container->make('class');
         $this->assertSame($firstInstantiation, $secondInstantiation);
+    }
+
+    public function testScopedBindingsWithClosureReturnType()
+    {
+        $container = new Container;
+        $container->scoped(fn (): stdClass => new stdClass);
+        $container->forgetScopedInstances();
     }
 
     public function testScopedIf()
@@ -899,6 +909,20 @@ class ContainerTest extends TestCase
         $this->assertSame($original, $new);
     }
 
+    public function testWithFactoryHasDependency()
+    {
+        $container = new Container;
+        $_SERVER['__withFactory.email'] = 'taylor@laravel.com';
+        $_SERVER['__withFactory.userId'] = 999;
+
+        $container->bind(RequestDtoDependencyContract::class, RequestDtoDependency::class);
+        $r = $container->make(RequestDto::class);
+
+        $this->assertInstanceOf(RequestDto::class, $r);
+        $this->assertEquals(999, $r->userId);
+        $this->assertEquals('taylor@laravel.com', $r->email);
+    }
+
     // public function testContainerCanCatchCircularDependency()
     // {
     //     $this->expectException(\Illuminate\Contracts\Container\CircularDependencyException::class);
@@ -1170,4 +1194,35 @@ class IsScopedConcrete implements IsScoped
 #[Singleton]
 interface IsSingleton
 {
+}
+
+class RequestDto implements SelfBuilding
+{
+    public function __construct(
+        public readonly int $userId,
+        public readonly string $email,
+    ) {
+    }
+
+    public static function newInstance(RequestDtoDependencyContract $dependency): self
+    {
+        return new self(
+            $dependency->userId,
+            $_SERVER['__withFactory.email'],
+        );
+    }
+}
+
+interface RequestDtoDependencyContract
+{
+}
+
+class RequestDtoDependency implements RequestDtoDependencyContract
+{
+    public int $userId;
+
+    public function __construct()
+    {
+        $this->userId = $_SERVER['__withFactory.userId'];
+    }
 }

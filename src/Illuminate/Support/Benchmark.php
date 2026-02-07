@@ -3,9 +3,12 @@
 namespace Illuminate\Support;
 
 use Closure;
+use Illuminate\Support\Traits\Macroable;
 
 class Benchmark
 {
+    use Macroable;
+
     /**
      * Measure a callable or array of callables over the given number of iterations.
      *

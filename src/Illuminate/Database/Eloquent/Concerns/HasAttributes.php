@@ -41,6 +41,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
 use RuntimeException;
+use Stringable;
 use ValueError;
 
 use function Illuminate\Support\enum_value;
@@ -250,7 +251,7 @@ trait HasAttributes
     protected function addDateAttributesToArray(array $attributes)
     {
         foreach ($this->getDates() as $key) {
-            if (! isset($attributes[$key])) {
+            if (is_null($key) || ! isset($attributes[$key])) {
                 continue;
             }
 
@@ -790,6 +791,15 @@ trait HasAttributes
     {
         foreach ($casts as $attribute => $cast) {
             $casts[$attribute] = match (true) {
+                is_object($cast) => value(function () use ($cast, $attribute) {
+                    if ($cast instanceof Stringable) {
+                        return (string) $cast;
+                    }
+
+                    throw new InvalidArgumentException(
+                        "The cast object for the {$attribute} attribute must implement Stringable."
+                    );
+                }),
                 is_array($cast) => value(function () use ($cast) {
                     if (count($cast) === 1) {
                         return $cast[0];
@@ -1304,7 +1314,7 @@ trait HasAttributes
      * @param  string  $path
      * @param  string  $key
      * @param  mixed  $value
-     * @return $this
+     * @return array
      */
     protected function getArrayAttributeWithValue($path, $key, $value)
     {
@@ -1492,7 +1502,7 @@ trait HasAttributes
     protected function asDecimal($value, $decimals)
     {
         try {
-            return (string) BigDecimal::of($value)->toScale($decimals, RoundingMode::HALF_UP);
+            return (string) BigDecimal::of((string) $value)->toScale($decimals, RoundingMode::HALF_UP);
         } catch (BrickMathException $e) {
             throw new MathException('Unable to cast value to a decimal.', previous: $e);
         }
@@ -1612,7 +1622,7 @@ trait HasAttributes
     /**
      * Get the attributes that should be converted to dates.
      *
-     * @return array
+     * @return array<int, string|null>
      */
     public function getDates()
     {
@@ -1775,6 +1785,10 @@ trait HasAttributes
         $castType = $casts[$key];
 
         if (in_array($castType, static::$primitiveCastTypes)) {
+            return false;
+        }
+
+        if (is_subclass_of($castType, Castable::class)) {
             return false;
         }
 
@@ -2407,6 +2421,16 @@ trait HasAttributes
     public function hasAppended($attribute)
     {
         return in_array($attribute, $this->appends);
+    }
+
+    /**
+     * Remove all appended properties from the model.
+     *
+     * @return $this
+     */
+    public function withoutAppends()
+    {
+        return $this->setAppends([]);
     }
 
     /**

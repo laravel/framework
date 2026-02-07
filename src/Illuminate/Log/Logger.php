@@ -180,6 +180,10 @@ class Logger implements LoggerInterface
      */
     protected function writeLog($level, $message, $context): void
     {
+        if (method_exists($this->logger, 'isHandling') && ! $this->logger->isHandling($level)) {
+            return;
+        }
+
         $this->logger->{$level}(
             $message = $this->formatMessage($message),
             $context = array_merge($this->context, $context)
@@ -289,7 +293,7 @@ class Logger implements LoggerInterface
     /**
      * Get the event dispatcher instance.
      *
-     * @return \Illuminate\Contracts\Events\Dispatcher
+     * @return \Illuminate\Contracts\Events\Dispatcher|null
      */
     public function getEventDispatcher()
     {

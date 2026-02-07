@@ -5,7 +5,6 @@ namespace Illuminate\Support;
 use Closure;
 use Dotenv\Repository\Adapter\PutenvAdapter;
 use Dotenv\Repository\RepositoryBuilder;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use PhpOption\Option;
 use RuntimeException;
@@ -126,8 +125,8 @@ class Env
      * @param  bool  $overwrite
      * @return void
      *
-     * @throws RuntimeException
-     * @throws FileNotFoundException
+     * @throws \RuntimeException
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public static function writeVariables(array $variables, string $pathToFile, bool $overwrite = false): void
     {
@@ -155,8 +154,8 @@ class Env
      * @param  bool  $overwrite
      * @return void
      *
-     * @throws RuntimeException
-     * @throws FileNotFoundException
+     * @throws \RuntimeException
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public static function writeVariable(string $key, mixed $value, string $pathToFile, bool $overwrite = false): void
     {
@@ -285,7 +284,7 @@ class Env
      */
     protected static function prepareQuotedValue(string $input)
     {
-        return strpos($input, '"') !== false
+        return str_contains($input, '"')
             ? "'".self::addSlashesExceptFor($input, ['"'])."'"
             : '"'.self::addSlashesExceptFor($input, ["'"]).'"';
     }

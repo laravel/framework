@@ -7,7 +7,7 @@ use Symfony\Component\Mailer\Transport\RoundRobinTransport;
 
 class MailRoundRobinTransportTest extends TestCase
 {
-    public function testGetRoundRobinTransportWithConfiguredTransports()
+    public function testGetRoundRobinTransportWithConfiguredTransports(): void
     {
         $this->app['config']->set('mail.default', 'roundrobin');
 
@@ -34,7 +34,7 @@ class MailRoundRobinTransportTest extends TestCase
         $this->assertInstanceOf(RoundRobinTransport::class, $transport);
     }
 
-    public function testGetRoundRobinTransportWithLaravel6StyleMailConfiguration()
+    public function testGetRoundRobinTransportWithLaravel6StyleMailConfiguration(): void
     {
         $this->app['config']->set('mail.driver', 'roundrobin');
 

@@ -2,23 +2,27 @@
 
 namespace Illuminate\Tests\Events;
 
+use Illuminate\Bus\Dispatcher as BusDispatcher;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Cache\Lock;
+use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Events\CallQueuedListener;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Queue\CallQueuedHandler;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Testing\Fakes\QueueFake;
+use Laravel\SerializableClosure\SerializableClosure;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class QueuedEventsTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testQueuedEventHandlersAreQueued()
     {
         $d = new Dispatcher;
@@ -179,6 +183,100 @@ class QueuedEventsTest extends TestCase
         });
     }
 
+    public function testQueuePropagateTries()
+    {
+        $d = new Dispatcher;
+
+        $fakeQueue = new QueueFake(new Container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherOptions::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
+            return $job->tries === 5;
+        });
+    }
+
+    public function testQueuePropagateMessageGroupProperty()
+    {
+        $d = new Dispatcher;
+
+        $fakeQueue = new QueueFake(new Container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherWithMessageGroupProperty::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
+            return $job->messageGroup === 'group-property';
+        });
+    }
+
+    public function testQueuePropagateMessageGroupMethodOverProperty()
+    {
+        $d = new Dispatcher;
+
+        $fakeQueue = new QueueFake(new Container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherWithMessageGroupMethod::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
+            return $job->messageGroup === 'group-method';
+        });
+    }
+
+    public function testQueuePropagateDeduplicationIdMethod()
+    {
+        $d = new Dispatcher;
+
+        $fakeQueue = new QueueFake(new Container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherWithDeduplicationIdMethod::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
+            $this->assertInstanceOf(SerializableClosure::class, $job->deduplicator);
+
+            return is_callable($job->deduplicator) && call_user_func($job->deduplicator, '', null) === 'deduplication-id-method';
+        });
+    }
+
+    public function testQueuePropagateDeduplicatorMethodOverDeduplicationIdMethod()
+    {
+        $d = new Dispatcher;
+
+        $fakeQueue = new QueueFake(new Container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherWithDeduplicatorMethod::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
+            $this->assertInstanceOf(SerializableClosure::class, $job->deduplicator);
+
+            return is_callable($job->deduplicator) && call_user_func($job->deduplicator, '', null) === 'deduplicator-method';
+        });
+    }
+
     public function testQueuePropagateMiddleware()
     {
         $d = new Dispatcher;
@@ -215,6 +313,259 @@ class QueuedEventsTest extends TestCase
         $d->dispatch('some.event', ['foo', 'bar']);
 
         $fakeQueue->assertPushedOn('enumerated-queue', CallQueuedListener::class);
+    }
+
+    public function testQueuePropagatesShouldBeUnique()
+    {
+        $container = new Container;
+        $d = new Dispatcher($container);
+
+        $fakeQueue = new QueueFake($container);
+        $cache = m::mock(Cache::class);
+        $lock = m::mock(Lock::class);
+
+        $container->instance(Cache::class, $cache);
+
+        $cache->shouldReceive('lock')->once()->andReturn($lock);
+        $lock->shouldReceive('get')->once()->andReturn(true);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherShouldBeUnique::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
+            return $job->shouldBeUnique === true
+                && $job->shouldBeUniqueUntilProcessing === false
+                && $job->uniqueId === 'unique-listener-id'
+                && $job->uniqueFor === 60;
+        });
+    }
+
+    public function testUniqueListenerNotQueuedWhenLockNotAcquired()
+    {
+        $container = new Container;
+        $d = new Dispatcher($container);
+
+        $fakeQueue = new QueueFake($container);
+        $cache = m::mock(Cache::class);
+        $lock = m::mock(Lock::class);
+
+        $container->instance(Cache::class, $cache);
+
+        $cache->shouldReceive('lock')->once()->andReturn($lock);
+        $lock->shouldReceive('get')->once()->andReturn(false);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherShouldBeUnique::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertNothingPushed();
+    }
+
+    public function testQueuePropagatesShouldBeUniqueUntilProcessing()
+    {
+        $container = new Container;
+        $d = new Dispatcher($container);
+
+        $fakeQueue = new QueueFake($container);
+        $cache = m::mock(Cache::class);
+        $lock = m::mock(Lock::class);
+
+        $container->instance(Cache::class, $cache);
+
+        $cache->shouldReceive('lock')->once()->andReturn($lock);
+        $lock->shouldReceive('get')->once()->andReturn(true);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherShouldBeUniqueUntilProcessing::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
+            return $job->shouldBeUnique === true
+                && $job->shouldBeUniqueUntilProcessing === true;
+        });
+    }
+
+    public function testQueuePropagatesUniqueIdFromMethod()
+    {
+        $container = new Container;
+        $d = new Dispatcher($container);
+
+        $fakeQueue = new QueueFake($container);
+        $cache = m::mock(Cache::class);
+        $lock = m::mock(Lock::class);
+
+        $container->instance(Cache::class, $cache);
+
+        $cache->shouldReceive('lock')->once()->andReturn($lock);
+        $lock->shouldReceive('get')->once()->andReturn(true);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherUniqueIdFromMethod::class.'@handle');
+        $d->dispatch('some.event', [['id' => 'event-123'], 'bar']);
+
+        $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
+            return $job->uniqueId === 'unique-id-event-123';
+        });
+    }
+
+    public function testUniqueLockKeyUsesListenerClassName()
+    {
+        $listener = new CallQueuedListener(TestDispatcherShouldBeUnique::class, 'handle', []);
+        $listener->shouldBeUnique = true;
+        $listener->uniqueId = 'test-id';
+
+        $this->assertSame(TestDispatcherShouldBeUnique::class, $listener->displayName());
+        $this->assertSame(
+            'laravel_unique_job:'.TestDispatcherShouldBeUnique::class.':test-id',
+            \Illuminate\Bus\UniqueLock::getKey($listener)
+        );
+    }
+
+    public function testUniqueLockIsAcquiredWithListenerClassName()
+    {
+        $container = new Container;
+        $d = new Dispatcher($container);
+
+        $fakeQueue = new QueueFake($container);
+        $cache = m::mock(Cache::class);
+        $lock = m::mock(Lock::class);
+
+        $container->instance(Cache::class, $cache);
+
+        $expectedKey = 'laravel_unique_job:'.TestDispatcherShouldBeUnique::class.':unique-listener-id';
+
+        $cache->shouldReceive('lock')
+            ->once()
+            ->with($expectedKey, 60)
+            ->andReturn($lock);
+        $lock->shouldReceive('get')->once()->andReturn(true);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherShouldBeUnique::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushed(CallQueuedListener::class);
+    }
+
+    public function testUniqueViaUsesListenerCacheRepository()
+    {
+        $container = new Container;
+        $d = new Dispatcher($container);
+
+        $fakeQueue = new QueueFake($container);
+        $defaultCache = m::mock(Cache::class);
+        $uniqueCache = m::mock(Cache::class);
+        $lock = m::mock(Lock::class);
+
+        $container->instance(Cache::class, $defaultCache);
+
+        $defaultCache->shouldNotReceive('lock');
+
+        TestDispatcherShouldBeUniqueWithCustomCache::$cache = $uniqueCache;
+
+        $expectedKey = 'laravel_unique_job:'.TestDispatcherShouldBeUniqueWithCustomCache::class.':unique-listener-id';
+
+        $uniqueCache->shouldReceive('lock')
+            ->once()
+            ->with($expectedKey, 60)
+            ->andReturn($lock);
+        $lock->shouldReceive('get')->once()->andReturn(true);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherShouldBeUniqueWithCustomCache::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushed(CallQueuedListener::class);
+    }
+
+    public function testUniqueLockIsReleasedOnProcessingWithListenerClassName()
+    {
+        $container = new Container;
+        $cache = m::mock(Cache::class);
+        $lock = m::mock(Lock::class);
+
+        $container->instance(Cache::class, $cache);
+        $container->instance(BusDispatcher::class, new BusDispatcher($container));
+
+        $listener = new CallQueuedListener(TestDispatcherShouldBeUnique::class, 'handle', ['foo', 'bar']);
+        $listener->shouldBeUnique = true;
+        $listener->uniqueId = 'unique-listener-id';
+        $listener->uniqueFor = 60;
+
+        $expectedKey = 'laravel_unique_job:'.TestDispatcherShouldBeUnique::class.':unique-listener-id';
+
+        $cache->shouldReceive('lock')
+            ->once()
+            ->with($expectedKey)
+            ->andReturn($lock);
+        $lock->shouldReceive('forceRelease')->once();
+
+        $job = m::mock(Job::class);
+        $job->shouldReceive('hasFailed')->andReturn(false);
+        $job->shouldReceive('isDeleted')->andReturn(false);
+        $job->shouldReceive('isReleased')->andReturn(false);
+        $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
+        $job->shouldReceive('delete')->once();
+
+        $handler = new CallQueuedHandler(new BusDispatcher($container), $container);
+        $handler->call($job, ['command' => serialize($listener)]);
+    }
+
+    public function testUniqueUntilProcessingLockIsReleasedBeforeHandling()
+    {
+        $container = new Container;
+        $cache = m::mock(Cache::class);
+        $lock = m::mock(Lock::class);
+
+        $container->instance(Cache::class, $cache);
+        $container->instance(BusDispatcher::class, new BusDispatcher($container));
+
+        TestDispatcherShouldBeUniqueUntilProcessing::$lockReleasedBeforeHandling = null;
+        TestDispatcherShouldBeUniqueUntilProcessing::$cache = $cache;
+        TestDispatcherShouldBeUniqueUntilProcessing::$expectedLockKey = 'laravel_unique_job:'.TestDispatcherShouldBeUniqueUntilProcessing::class.':until-processing-id';
+
+        $listener = new CallQueuedListener(TestDispatcherShouldBeUniqueUntilProcessing::class, 'handle', ['foo', 'bar']);
+        $listener->shouldBeUnique = true;
+        $listener->shouldBeUniqueUntilProcessing = true;
+        $listener->uniqueId = 'until-processing-id';
+
+        $expectedKey = 'laravel_unique_job:'.TestDispatcherShouldBeUniqueUntilProcessing::class.':until-processing-id';
+
+        $cache->shouldReceive('lock')
+            ->with($expectedKey)
+            ->andReturn($lock);
+        $lock->shouldReceive('forceRelease')->once();
+
+        $job = m::mock(Job::class);
+        $job->shouldReceive('hasFailed')->andReturn(false);
+        $job->shouldReceive('isDeleted')->andReturn(false);
+        $job->shouldReceive('isReleased')->andReturn(false);
+        $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
+        $job->shouldReceive('delete')->once();
+
+        $handler = new CallQueuedHandler(new BusDispatcher($container), $container);
+        $handler->call($job, ['command' => serialize($listener)]);
+
+        $this->assertTrue(TestDispatcherShouldBeUniqueUntilProcessing::$lockReleasedBeforeHandling);
     }
 }
 
@@ -294,9 +645,70 @@ class TestDispatcherOptions implements ShouldQueue
         return now()->addHour(1);
     }
 
+    public function tries()
+    {
+        return 5;
+    }
+
     public function handle()
     {
         //
+    }
+}
+
+class TestDispatcherWithMessageGroupProperty implements ShouldQueue
+{
+    public $messageGroup = 'group-property';
+
+    public function handle()
+    {
+        //
+    }
+}
+
+class TestDispatcherWithMessageGroupMethod implements ShouldQueue
+{
+    public $messageGroup = 'group-property';
+
+    public function handle()
+    {
+        //
+    }
+
+    public function messageGroup($event)
+    {
+        return 'group-method';
+    }
+}
+
+class TestDispatcherWithDeduplicationIdMethod implements ShouldQueue
+{
+    public function handle()
+    {
+        //
+    }
+
+    public function deduplicationId($payload, $queue)
+    {
+        return 'deduplication-id-method';
+    }
+}
+
+class TestDispatcherWithDeduplicatorMethod implements ShouldQueue
+{
+    public function handle()
+    {
+        //
+    }
+
+    public function deduplicationId($payload, $queue)
+    {
+        return 'deduplication-id-method';
+    }
+
+    public function deduplicator($event)
+    {
+        return fn ($payload, $queue) => 'deduplicator-method';
     }
 }
 
@@ -395,5 +807,75 @@ class TestDispatcherViaQueueSupportsEnum implements ShouldQueue
     public function viaQueue()
     {
         return TestQueueType::EnumeratedQueue;
+    }
+}
+
+class TestDispatcherShouldBeUnique implements ShouldQueue, ShouldBeUnique
+{
+    public $uniqueId = 'unique-listener-id';
+
+    public $uniqueFor = 60;
+
+    public function handle()
+    {
+        //
+    }
+}
+
+class TestDispatcherShouldBeUniqueUntilProcessing implements ShouldQueue, ShouldBeUniqueUntilProcessing
+{
+    use InteractsWithQueue;
+
+    public static $lockReleasedBeforeHandling = null;
+    public static $cache = null;
+    public static $expectedLockKey = '';
+
+    public function handle()
+    {
+        $lock = m::mock(Lock::class);
+        $lock->shouldReceive('get')->andReturn(true);
+        static::$cache->shouldReceive('lock')
+            ->with(static::$expectedLockKey, 10)
+            ->andReturn($lock);
+
+        static::$lockReleasedBeforeHandling = static::$cache->lock(static::$expectedLockKey, 10)->get();
+    }
+}
+
+class TestDispatcherUniqueIdFromMethod implements ShouldQueue, ShouldBeUnique
+{
+    public function handle()
+    {
+        //
+    }
+
+    public function uniqueId($event)
+    {
+        return 'unique-id-'.$event['id'];
+    }
+}
+
+class TestDispatcherShouldBeUniqueWithCustomCache implements ShouldQueue, ShouldBeUnique
+{
+    public static $cache = null;
+
+    public function handle()
+    {
+        //
+    }
+
+    public function uniqueId()
+    {
+        return 'unique-listener-id';
+    }
+
+    public function uniqueFor()
+    {
+        return 60;
+    }
+
+    public function uniqueVia(): Cache
+    {
+        return static::$cache;
     }
 }

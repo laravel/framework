@@ -20,12 +20,12 @@ class CommandManualFailTest extends TestCase
         parent::setUp();
     }
 
-    public function testFailArtisanCommandManually()
+    public function testFailArtisanCommandManually(): void
     {
         $this->artisan('app:fail')->assertFailed();
     }
 
-    public function testCreatesAnExceptionFromString()
+    public function testCreatesAnExceptionFromString(): void
     {
         $this->expectException(ManuallyFailedException::class);
         $this->expectExceptionMessage('Whoops!');
@@ -33,7 +33,7 @@ class CommandManualFailTest extends TestCase
         $command->fail('Whoops!');
     }
 
-    public function testCreatesAnExceptionFromNull()
+    public function testCreatesAnExceptionFromNull(): void
     {
         $this->expectException(ManuallyFailedException::class);
         $this->expectExceptionMessage('Command failed manually.');
@@ -41,7 +41,7 @@ class CommandManualFailTest extends TestCase
         $command->fail();
     }
 
-    public function testThrowsTheOriginalThrowableInstance()
+    public function testThrowsTheOriginalThrowableInstance(): void
     {
         try {
             $command = new Command;

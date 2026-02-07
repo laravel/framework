@@ -9,7 +9,7 @@ class EnsureEmailIsVerifiedTest extends TestCase
 {
     public function testItCanGenerateDefinitionViaStaticMethod()
     {
-        $signature = (string) EnsureEmailIsVerified::redirectTo('route.name');
+        $signature = EnsureEmailIsVerified::redirectTo('route.name');
         $this->assertSame('Illuminate\Auth\Middleware\EnsureEmailIsVerified:route.name', $signature);
     }
 }

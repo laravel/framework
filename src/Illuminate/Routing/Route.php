@@ -1007,6 +1007,12 @@ class Route
             $this->domain($this->action['domain']);
         }
 
+        if (isset($this->action['can'])) {
+            foreach ($this->action['can'] as $can) {
+                $this->can($can[0], $can[1] ?? []);
+            }
+        }
+
         return $this;
     }
 

@@ -17,11 +17,6 @@ class SupportFacadeTest extends TestCase
         FacadeStub::setFacadeApplication(null);
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testFacadeCallsUnderlyingApplication()
     {
         $app = new ApplicationStub;
@@ -79,6 +74,40 @@ class SupportFacadeTest extends TestCase
 
         $this->assertInstanceOf(MockInterface::class, $mock = FacadeStub::expects('foo')->with('bar')->andReturn('baz')->getMock());
         $this->assertSame('baz', $app['foo']->foo('bar'));
+    }
+
+    public function testFacadeResolvesAgainAfterClearingSpecific()
+    {
+        $app = new ApplicationStub;
+        $app->setAttributes(['foo' => $mock = m::mock(stdClass::class)]);
+        $mock->shouldReceive('bar')->times(3)->andReturn('baz');
+
+        // Resolve for the first time
+        FacadeStub::setFacadeApplication($app);
+        $this->assertSame('baz', FacadeStub::bar());
+
+        // Clear resolved instance and resolve the second time
+        FacadeStub::clearResolvedInstance();
+        $this->assertSame('baz', FacadeStub::bar());
+
+        // Clear resolved instance through parent and resolve the third time
+        Facade::clearResolvedInstance('foo');
+        $this->assertSame('baz', FacadeStub::bar());
+    }
+
+    public function testFacadeResolvesAgainAfterClearingAll()
+    {
+        $app = new ApplicationStub;
+        $app->setAttributes(['foo' => $mock = m::mock(stdClass::class)]);
+        $mock->shouldReceive('bar')->times(2)->andReturn('baz');
+
+        // Resolve for the first time
+        FacadeStub::setFacadeApplication($app);
+        $this->assertSame('baz', FacadeStub::bar());
+
+        // Clear all resolved instances and resolve a second time
+        Facade::clearResolvedInstances();
+        $this->assertSame('baz', FacadeStub::bar());
     }
 }
 

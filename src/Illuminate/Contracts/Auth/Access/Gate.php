@@ -7,7 +7,7 @@ interface Gate
     /**
      * Determine if a given ability has been defined.
      *
-     * @param  string  $ability
+     * @param  \UnitEnum|string  $ability
      * @return bool
      */
     public function has($ability);
@@ -15,7 +15,7 @@ interface Gate
     /**
      * Define a new ability.
      *
-     * @param  string  $ability
+     * @param  \UnitEnum|string  $ability
      * @param  callable|string  $callback
      * @return $this
      */
@@ -59,7 +59,7 @@ interface Gate
     /**
      * Determine if all of the given abilities should be granted for the current user.
      *
-     * @param  iterable|string  $ability
+     * @param  iterable|\UnitEnum|string  $ability
      * @param  mixed  $arguments
      * @return bool
      */
@@ -68,7 +68,7 @@ interface Gate
     /**
      * Determine if any of the given abilities should be denied for the current user.
      *
-     * @param  iterable|string  $ability
+     * @param  iterable|\UnitEnum|string  $ability
      * @param  mixed  $arguments
      * @return bool
      */
@@ -77,7 +77,7 @@ interface Gate
     /**
      * Determine if all of the given abilities should be granted for the current user.
      *
-     * @param  iterable|string  $abilities
+     * @param  iterable|\UnitEnum|string  $abilities
      * @param  mixed  $arguments
      * @return bool
      */
@@ -86,7 +86,7 @@ interface Gate
     /**
      * Determine if any one of the given abilities should be granted for the current user.
      *
-     * @param  iterable|string  $abilities
+     * @param  iterable|\UnitEnum|string  $abilities
      * @param  mixed  $arguments
      * @return bool
      */
@@ -95,7 +95,7 @@ interface Gate
     /**
      * Determine if the given ability should be granted for the current user.
      *
-     * @param  string  $ability
+     * @param  \UnitEnum|string  $ability
      * @param  mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      *
@@ -106,7 +106,7 @@ interface Gate
     /**
      * Inspect the user for the given ability.
      *
-     * @param  string  $ability
+     * @param  \UnitEnum|string  $ability
      * @param  mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      */

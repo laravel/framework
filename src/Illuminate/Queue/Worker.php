@@ -32,7 +32,7 @@ class Worker
     /**
      * The name of the worker.
      *
-     * @var string
+     * @var string|null
      */
     protected $name;
 
@@ -98,6 +98,27 @@ class Worker
      * @var callable[]
      */
     protected static $popCallbacks = [];
+
+    /**
+     * The custom exit code to be used when memory is exceeded.
+     *
+     * @var int|null
+     */
+    public static $memoryExceededExitCode;
+
+    /**
+     * Indicates if the worker should check for the restart signal in the cache.
+     *
+     * @var bool
+     */
+    public static $restartable = true;
+
+    /**
+     * Indicates if the worker should check for the paused signal in the cache.
+     *
+     * @var bool
+     */
+    public static $pausable = true;
 
     /**
      * Create a new queue worker.
@@ -307,7 +328,7 @@ class Worker
     {
         return match (true) {
             $this->shouldQuit => static::EXIT_SUCCESS,
-            $this->memoryExceeded($options->memory) => static::EXIT_MEMORY_LIMIT,
+            $this->memoryExceeded($options->memory) => static::$memoryExceededExitCode ?? static::EXIT_MEMORY_LIMIT,
             $this->queueShouldRestart($lastRestart) => static::EXIT_SUCCESS,
             $options->stopWhenEmpty && is_null($job) => static::EXIT_SUCCESS,
             $options->maxTime && hrtime(true) / 1e9 - $startTime >= $options->maxTime => static::EXIT_SUCCESS,
@@ -353,11 +374,11 @@ class Worker
             return $connection->pop($queue, $index);
         };
 
-        $this->raiseBeforeJobPopEvent($connection->getConnectionName());
+        $this->raiseBeforeJobPopEvent($connection->getConnectionName(), $queue);
 
         try {
-            if (isset(static::$popCallbacks[$this->name])) {
-                if (! is_null($job = (static::$popCallbacks[$this->name])($popJobCallback, $queue))) {
+            if (isset(static::$popCallbacks[$this->name ?? ''])) {
+                if (! is_null($job = (static::$popCallbacks[$this->name ?? ''])($popJobCallback, $queue))) {
                     $this->raiseAfterJobPopEvent($connection->getConnectionName(), $job);
                 }
 
@@ -365,6 +386,10 @@ class Worker
             }
 
             foreach (explode(',', $queue) as $index => $queue) {
+                if ($this->queuePaused($connection->getConnectionName(), $queue)) {
+                    continue;
+                }
+
                 if (! is_null($job = $popJobCallback($queue, $index))) {
                     $this->raiseAfterJobPopEvent($connection->getConnectionName(), $job);
 
@@ -378,6 +403,22 @@ class Worker
 
             $this->sleep(1);
         }
+    }
+
+    /**
+     * Determine if a given connection and queue is paused.
+     *
+     * @param  string  $connectionName
+     * @param  string  $queue
+     * @return bool
+     */
+    protected function queuePaused($connectionName, $queue)
+    {
+        if (! static::$pausable) {
+            return false;
+        }
+
+        return $this->cache && $this->manager->isPaused($connectionName, $queue);
     }
 
     /**
@@ -490,10 +531,12 @@ class Worker
             // so it is not lost entirely. This'll let the job be retried at a later time by
             // another listener (or this same one). We will re-throw this exception after.
             if (! $job->isDeleted() && ! $job->isReleased() && ! $job->hasFailed()) {
-                $job->release($this->calculateBackoff($job, $options));
+                $backoff = $this->calculateBackoff($job, $options);
+
+                $job->release($backoff);
 
                 $this->events->dispatch(new JobReleasedAfterException(
-                    $connectionName, $job
+                    $connectionName, $job, $backoff
                 ));
             }
         }
@@ -643,11 +686,12 @@ class Worker
      * Raise an event indicating a job is being popped from the queue.
      *
      * @param  string  $connectionName
+     * @param  string|null  $queue
      * @return void
      */
-    protected function raiseBeforeJobPopEvent($connectionName)
+    protected function raiseBeforeJobPopEvent($connectionName, $queue = null)
     {
-        $this->events->dispatch(new JobPopping($connectionName));
+        $this->events->dispatch(new JobPopping($connectionName, $queue));
     }
 
     /**
@@ -715,6 +759,10 @@ class Worker
      */
     protected function queueShouldRestart($lastRestart)
     {
+        if (! static::$restartable) {
+            return false;
+        }
+
         return $this->getTimestampOfLastQueueRestart() != $lastRestart;
     }
 
@@ -725,6 +773,10 @@ class Worker
      */
     protected function getTimestampOfLastQueueRestart()
     {
+        if (! static::$restartable) {
+            return null;
+        }
+
         if ($this->cache) {
             return $this->cache->get('illuminate:queue:restart');
         }

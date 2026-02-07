@@ -49,15 +49,19 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
 
         User::create();
 
-        Post::create(['user_id' => 1]);
+        Post::insert([
+            ['user_id' => 1],
+            ['user_id' => 1],
+        ]);
 
-        Comment::create(['parent_id' => null, 'post_id' => 1]);
-        Comment::create(['parent_id' => 1, 'post_id' => 1]);
-        Comment::create(['parent_id' => 2, 'post_id' => 1]);
+        Comment::insert([
+            ['parent_id' => null, 'post_id' => 1],
+            ['parent_id' => 1, 'post_id' => 1],
+            ['parent_id' => 2, 'post_id' => 1],
+        ]);
 
         Revision::create(['comment_id' => 1]);
 
-        Post::create(['user_id' => 1]);
         PostRelation::create(['post_id' => 2]);
         PostSubRelation::create(['post_relation_id' => 1]);
         PostSubSubRelation::create(['post_sub_relation_id' => 1]);
@@ -110,6 +114,123 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
         $user = User::first();
         $user->loadMissing('posts.postRelation.postSubRelations.postSubSubRelations');
 
+        $this->assertEquals(2, $user->posts->count());
+        $this->assertNull($user->posts[0]->postRelation);
+        $this->assertInstanceOf(PostRelation::class, $user->posts[1]->postRelation);
+        $this->assertEquals(1, $user->posts[1]->postRelation->postSubRelations->count());
+        $this->assertInstanceOf(PostSubRelation::class, $user->posts[1]->postRelation->postSubRelations[0]);
+        $this->assertEquals(1, $user->posts[1]->postRelation->postSubRelations[0]->postSubSubRelations->count());
+        $this->assertInstanceOf(PostSubSubRelation::class, $user->posts[1]->postRelation->postSubRelations[0]->postSubSubRelations[0]);
+    }
+
+    public function testLoadMissingWithNestedArraySyntax()
+    {
+        $posts = Post::with('user')->get();
+
+        DB::enableQueryLog();
+
+        $posts->loadMissing([
+            'comments' => ['parent'],
+            'user',
+        ]);
+
+        $this->assertCount(2, DB::getQueryLog());
+        $this->assertTrue($posts[0]->comments[0]->relationLoaded('parent'));
+        $this->assertTrue($posts[0]->relationLoaded('user'));
+    }
+
+    public function testLoadMissingWithMultipleDotNotationRelations()
+    {
+        $posts = Post::with('comments')->get();
+
+        DB::enableQueryLog();
+
+        $posts->loadMissing([
+            'comments.parent',
+            'user.posts',
+        ]);
+
+        $this->assertCount(3, DB::getQueryLog());
+        $this->assertTrue($posts[0]->comments[0]->relationLoaded('parent'));
+        $this->assertTrue($posts[0]->relationLoaded('user'));
+        $this->assertTrue($posts[0]->user->relationLoaded('posts'));
+    }
+
+    public function testLoadMissingWithNestedArrayWithColon()
+    {
+        $posts = Post::with('comments')->get();
+
+        DB::enableQueryLog();
+
+        $posts->loadMissing(['comments' => ['parent:id']]);
+
+        $this->assertCount(1, DB::getQueryLog());
+        $this->assertTrue($posts[0]->comments[0]->relationLoaded('parent'));
+        $this->assertArrayNotHasKey('post_id', $posts[0]->comments[1]->parent->getAttributes());
+    }
+
+    public function testLoadMissingWithNestedArray()
+    {
+        $posts = Post::with('comments')->get();
+
+        DB::enableQueryLog();
+
+        $posts->loadMissing(['comments' => ['parent']]);
+
+        $this->assertCount(1, DB::getQueryLog());
+        $this->assertTrue($posts[0]->comments[0]->relationLoaded('parent'));
+    }
+
+    public function testLoadMissingWithNestedArrayWithClosure()
+    {
+        $posts = Post::with('comments')->get();
+
+        DB::enableQueryLog();
+
+        $posts->loadMissing(['comments' => ['parent' => function ($query) {
+            $query->select('id');
+        }]]);
+
+        $this->assertCount(1, DB::getQueryLog());
+        $this->assertTrue($posts[0]->comments[0]->relationLoaded('parent'));
+        $this->assertArrayNotHasKey('post_id', $posts[0]->comments[1]->parent->getAttributes());
+    }
+
+    public function testLoadMissingWithMultipleNestedArrays()
+    {
+        $users = User::get();
+        $users->loadMissing([
+            'posts' => [
+                'postRelation' => [
+                    'postSubRelations' => [
+                        'postSubSubRelations',
+                    ],
+                ],
+            ],
+        ]);
+
+        $user = $users->first();
+        $this->assertEquals(2, $user->posts->count());
+        $this->assertNull($user->posts[0]->postRelation);
+        $this->assertInstanceOf(PostRelation::class, $user->posts[1]->postRelation);
+        $this->assertEquals(1, $user->posts[1]->postRelation->postSubRelations->count());
+        $this->assertInstanceOf(PostSubRelation::class, $user->posts[1]->postRelation->postSubRelations[0]);
+        $this->assertEquals(1, $user->posts[1]->postRelation->postSubRelations[0]->postSubSubRelations->count());
+        $this->assertInstanceOf(PostSubSubRelation::class, $user->posts[1]->postRelation->postSubRelations[0]->postSubSubRelations[0]);
+    }
+
+    public function testLoadMissingWithMultipleNestedArraysCombinedWithDotNotation()
+    {
+        $users = User::get();
+        $users->loadMissing([
+            'posts' => [
+                'postRelation' => [
+                    'postSubRelations.postSubSubRelations',
+                ],
+            ],
+        ]);
+
+        $user = $users->first();
         $this->assertEquals(2, $user->posts->count());
         $this->assertNull($user->posts[0]->postRelation);
         $this->assertInstanceOf(PostRelation::class, $user->posts[1]->postRelation);
@@ -200,6 +321,7 @@ class Revision extends Model
 class User extends Model
 {
     public $timestamps = false;
+    protected $guarded = [];
 
     public function posts()
     {

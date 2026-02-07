@@ -2219,6 +2219,15 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals([
             'can:create',
         ], $route->middleware());
+
+        $route = new Route(['GET'], '/', []);
+        $route->can('create');
+        $route->can('update');
+
+        $this->assertEquals([
+            'can:create',
+            'can:update',
+        ], $route->middleware());
     }
 
     public function testItDispatchesEventsWhilePreparingRequest()

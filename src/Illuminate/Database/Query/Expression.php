@@ -16,7 +16,7 @@ class Expression implements ExpressionContract
      * @param  TValue  $value
      */
     public function __construct(
-        protected $value
+        protected $value,
     ) {
     }
 

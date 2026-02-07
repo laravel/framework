@@ -987,7 +987,11 @@ class Grammar extends BaseGrammar
      */
     protected function compileOrdersToArray(Builder $query, $orders)
     {
-        return array_map(function ($order) {
+        return array_map(function ($order) use ($query) {
+            if (isset($order['sql']) && $order['sql'] instanceof Expression) {
+                return $order['sql']->getValue($query->getGrammar());
+            }
+
             return $order['sql'] ?? $this->wrap($order['column']).' '.$order['direction'];
         }, $orders);
     }
@@ -1186,11 +1190,11 @@ class Grammar extends BaseGrammar
             return "insert into {$table} default values";
         }
 
-        if (! is_array(array_last($values))) {
+        if (! is_array(array_first($values))) {
             $values = [$values];
         }
 
-        $columns = $this->columnize(array_keys(array_last($values)));
+        $columns = $this->columnize(array_keys(array_first($values)));
 
         // We need to build a list of parameter place-holders of values that are bound
         // to the query. Each insert should have the exact same number of parameter

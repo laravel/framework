@@ -14,11 +14,6 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseMariaDbSchemaGrammarTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testBasicCreateTable()
     {
         $conn = $this->getConnection();
@@ -1435,7 +1430,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_unquote(json_extract(`my_json_column`, '$.\"some_attribute\"'))))", $statements[0]);
+        $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_value(`my_json_column`, '$.\"some_attribute\"')))", $statements[0]);
 
         $conn = $this->getConnection();
         $conn->shouldReceive('getConfig')->andReturn(null);
@@ -1448,7 +1443,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_unquote(json_extract(`my_json_column`, '$.\"some_attribute\".\"nested\"'))))", $statements[0]);
+        $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_value(`my_json_column`, '$.\"some_attribute\".\"nested\"')))", $statements[0]);
     }
 
     public function testCreateTableWithVirtualAsColumnWhenJsonColumnHasArrayKey()
@@ -1463,7 +1458,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame("create table `users` (`my_json_column` varchar(255) as (json_unquote(json_extract(`my_json_column`, '$.\"foo\"[0][1]'))))", $statements[0]);
+        $this->assertSame("create table `users` (`my_json_column` varchar(255) as (json_value(`my_json_column`, '$.\"foo\"[0][1]')))", $statements[0]);
     }
 
     public function testCreateTableWithStoredAsColumn()
@@ -1494,7 +1489,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_unquote(json_extract(`my_json_column`, '$.\"some_attribute\"'))) stored)", $statements[0]);
+        $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_value(`my_json_column`, '$.\"some_attribute\"')) stored)", $statements[0]);
 
         $conn = $this->getConnection();
         $conn->shouldReceive('getConfig')->andReturn(null);
@@ -1507,7 +1502,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_unquote(json_extract(`my_json_column`, '$.\"some_attribute\".\"nested\"'))) stored)", $statements[0]);
+        $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_value(`my_json_column`, '$.\"some_attribute\".\"nested\"')) stored)", $statements[0]);
     }
 
     public function testDropDatabaseIfExists()

@@ -73,6 +73,13 @@ abstract class ServiceProvider
     public static array $optimizeClearCommands = [];
 
     /**
+     * Commands that should be run during the "reload" command.
+     *
+     * @var array<string, string>
+     */
+    public static array $reloadCommands = [];
+
+    /**
      * Create a new service provider instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -483,6 +490,39 @@ abstract class ServiceProvider
      */
     protected function optimizes(?string $optimize = null, ?string $clear = null, ?string $key = null)
     {
+        $key = $this->getProviderKey($key);
+
+        if ($optimize) {
+            static::$optimizeCommands[$key] = $optimize;
+        }
+
+        if ($clear) {
+            static::$optimizeClearCommands[$key] = $clear;
+        }
+    }
+
+    /**
+     * Register commands that should run on "reload".
+     *
+     * @param  string|null  $reload
+     * @param  string|null  $key
+     * @return void
+     */
+    protected function reloads(string $reload, ?string $key = null)
+    {
+        $key = $this->getProviderKey($key);
+
+        static::$reloadCommands[$key] = $reload;
+    }
+
+    /**
+     * Get a short descriptive key for the current service provider.
+     *
+     * @param  string|null  $key
+     * @return string
+     */
+    protected function getProviderKey(?string $key = null): string
+    {
         $key ??= (string) Str::of(get_class($this))
             ->classBasename()
             ->before('ServiceProvider')
@@ -494,13 +534,7 @@ abstract class ServiceProvider
             $key = class_basename(get_class($this));
         }
 
-        if ($optimize) {
-            static::$optimizeCommands[$key] = $optimize;
-        }
-
-        if ($clear) {
-            static::$optimizeClearCommands[$key] = $clear;
-        }
+        return $key;
     }
 
     /**
@@ -547,7 +581,7 @@ abstract class ServiceProvider
      * Add the given provider to the application's provider bootstrap file.
      *
      * @param  string  $provider
-     * @param  string  $path
+     * @param  string|null  $path
      * @return bool
      */
     public static function addProviderToBootstrapFile(string $provider, ?string $path = null)
@@ -567,6 +601,51 @@ abstract class ServiceProvider
             ->unique()
             ->sort()
             ->values()
+            ->map(fn ($p) => '    '.$p.'::class,')
+            ->implode(PHP_EOL);
+
+        $content = '<?php
+
+return [
+'.$providers.'
+];';
+
+        file_put_contents($path, $content.PHP_EOL);
+
+        return true;
+    }
+
+    /**
+     * Remove a provider from the application's provider bootstrap file.
+     *
+     * @param  string|array  $providersToRemove
+     * @param  string|null  $path
+     * @param  bool  $strict
+     * @return bool
+     */
+    public static function removeProviderFromBootstrapFile(string|array $providersToRemove, ?string $path = null, bool $strict = false)
+    {
+        $path ??= app()->getBootstrapProvidersPath();
+
+        if (! file_exists($path)) {
+            return false;
+        }
+
+        if (function_exists('opcache_invalidate')) {
+            opcache_invalidate($path, true);
+        }
+
+        $providersToRemove = Arr::wrap($providersToRemove);
+
+        $providers = (new Collection(require $path))
+            ->unique()
+            ->sort()
+            ->values()
+            ->when(
+                $strict,
+                static fn (Collection $providerCollection) => $providerCollection->reject(fn (string $p) => in_array($p, $providersToRemove, true)),
+                static fn (Collection $providerCollection) => $providerCollection->reject(fn (string $p) => Str::contains($p, $providersToRemove))
+            )
             ->map(fn ($p) => '    '.$p.'::class,')
             ->implode(PHP_EOL);
 

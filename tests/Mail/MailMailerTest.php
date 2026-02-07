@@ -19,10 +19,10 @@ class MailMailerTest extends TestCase
     {
         unset($_SERVER['__mailer.test']);
 
-        m::close();
+        parent::tearDown();
     }
 
-    public function testMailerSendSendsMessageWithProperViewContent()
+    public function testMailerSendSendsMessageWithProperViewContent(): void
     {
         $view = m::mock(Factory::class);
         $view->shouldReceive('make')->once()->andReturn($view);
@@ -37,7 +37,7 @@ class MailMailerTest extends TestCase
         $this->assertStringContainsString('rendered.view', $sentMessage->toString());
     }
 
-    public function testMailerSendSendsMessageWithCcAndBccRecipients()
+    public function testMailerSendSendsMessageWithCcAndBccRecipients(): void
     {
         $view = m::mock(Factory::class);
         $view->shouldReceive('make')->once()->andReturn($view);
@@ -62,7 +62,7 @@ class MailMailerTest extends TestCase
         $this->assertTrue($recipients->contains('james@laravel.com'));
     }
 
-    public function testMailerSendSendsMessageWithProperViewContentUsingHtmlStrings()
+    public function testMailerSendSendsMessageWithProperViewContentUsingHtmlStrings(): void
     {
         $view = m::mock(Factory::class);
         $view->shouldReceive('render')->never();
@@ -81,7 +81,7 @@ class MailMailerTest extends TestCase
         $this->assertStringContainsString('Hello World', $sentMessage->toString());
     }
 
-    public function testMailerSendSendsMessageWithProperViewContentUsingStringCallbacks()
+    public function testMailerSendSendsMessageWithProperViewContentUsingStringCallbacks(): void
     {
         $view = m::mock(Factory::class);
         $view->shouldReceive('render')->never();
@@ -111,7 +111,7 @@ class MailMailerTest extends TestCase
         $this->assertStringContainsString('Hello World', $sentMessage->toString());
     }
 
-    public function testMailerSendSendsMessageWithProperViewContentUsingHtmlMethod()
+    public function testMailerSendSendsMessageWithProperViewContentUsingHtmlMethod(): void
     {
         $view = m::mock(Factory::class);
         $view->shouldReceive('render')->never();
@@ -125,7 +125,7 @@ class MailMailerTest extends TestCase
         $this->assertStringContainsString('<p>Hello World</p>', $sentMessage->toString());
     }
 
-    public function testMailerSendSendsMessageWithProperPlainViewContent()
+    public function testMailerSendSendsMessageWithProperPlainViewContent(): void
     {
         $view = m::mock(Factory::class);
         $view->shouldReceive('make')->twice()->andReturn($view);
@@ -157,7 +157,7 @@ class MailMailerTest extends TestCase
         $this->assertStringContainsString($expected, $sentMessage->toString());
     }
 
-    public function testMailerSendSendsMessageWithProperPlainViewContentWhenExplicit()
+    public function testMailerSendSendsMessageWithProperPlainViewContentWhenExplicit(): void
     {
         $view = m::mock(Factory::class);
         $view->shouldReceive('make')->twice()->andReturn($view);
@@ -189,7 +189,7 @@ class MailMailerTest extends TestCase
         $this->assertStringContainsString($expected, $sentMessage->toString());
     }
 
-    public function testToAllowsEmailAndName()
+    public function testToAllowsEmailAndName(): void
     {
         $view = m::mock(Factory::class);
         $view->shouldReceive('make')->once()->andReturn($view);
@@ -204,7 +204,7 @@ class MailMailerTest extends TestCase
         $this->assertSame('Taylor Otwell', $recipients[0]->getName());
     }
 
-    public function testGlobalFromIsRespectedOnAllMessages()
+    public function testGlobalFromIsRespectedOnAllMessages(): void
     {
         $view = m::mock(Factory::class);
         $view->shouldReceive('make')->once()->andReturn($view);
@@ -220,7 +220,7 @@ class MailMailerTest extends TestCase
         $this->assertSame('hello@laravel.com', $sentMessage->getEnvelope()->getSender()->getAddress());
     }
 
-    public function testGlobalReplyToIsRespectedOnAllMessages()
+    public function testGlobalReplyToIsRespectedOnAllMessages(): void
     {
         $view = m::mock(Factory::class);
         $view->shouldReceive('make')->once()->andReturn($view);
@@ -236,7 +236,7 @@ class MailMailerTest extends TestCase
         $this->assertStringContainsString('Reply-To: Taylor Otwell <taylor@laravel.com>', $sentMessage->toString());
     }
 
-    public function testGlobalToIsRespectedOnAllMessages()
+    public function testGlobalToIsRespectedOnAllMessages(): void
     {
         $view = m::mock(Factory::class);
         $view->shouldReceive('make')->once()->andReturn($view);
@@ -266,7 +266,7 @@ class MailMailerTest extends TestCase
         $this->assertFalse($recipients->contains('james@laravel.com'));
     }
 
-    public function testGlobalReturnPathIsRespectedOnAllMessages()
+    public function testGlobalReturnPathIsRespectedOnAllMessages(): void
     {
         $view = m::mock(Factory::class);
         $view->shouldReceive('make')->once()->andReturn($view);
@@ -282,7 +282,7 @@ class MailMailerTest extends TestCase
         $this->assertStringContainsString('Return-Path: <taylorotwell@gmail.com>', $sentMessage->toString());
     }
 
-    public function testEventsAreDispatched()
+    public function testEventsAreDispatched(): void
     {
         $view = m::mock(Factory::class);
         $view->shouldReceive('make')->once()->andReturn($view);
@@ -299,7 +299,7 @@ class MailMailerTest extends TestCase
         });
     }
 
-    public function testMacroable()
+    public function testMacroable(): void
     {
         Mailer::macro('foo', function () {
             return 'bar';

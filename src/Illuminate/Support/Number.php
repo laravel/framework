@@ -56,7 +56,7 @@ class Number
      * @param  string|null  $locale
      * @return int|float|false
      */
-    public static function parse(string $string, ?int $type = NumberFormatter::TYPE_DOUBLE, ?string $locale = null): int|float
+    public static function parse(string $string, ?int $type = NumberFormatter::TYPE_DOUBLE, ?string $locale = null): int|float|false
     {
         static::ensureIntlExtensionIsInstalled();
 
@@ -72,7 +72,7 @@ class Number
      * @param  string|null  $locale
      * @return int|false
      */
-    public static function parseInt(string $string, ?string $locale = null): int
+    public static function parseInt(string $string, ?string $locale = null): int|false
     {
         return self::parse($string, NumberFormatter::TYPE_INT32, $locale);
     }
@@ -84,7 +84,7 @@ class Number
      * @param  string|null  $locale
      * @return float|false
      */
-    public static function parseFloat(string $string, ?string $locale = null): float
+    public static function parseFloat(string $string, ?string $locale = null): float|false
     {
         return self::parse($string, NumberFormatter::TYPE_DOUBLE, $locale);
     }
@@ -207,7 +207,9 @@ class Number
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
-        for ($i = 0; ($bytes / 1024) > 0.9 && ($i < count($units) - 1); $i++) {
+        $unitCount = count($units);
+
+        for ($i = 0; ($bytes / 1024) > 0.9 && ($i < $unitCount - 1); $i++) {
             $bytes /= 1024;
         }
 
@@ -220,7 +222,7 @@ class Number
      * @param  int|float  $number
      * @param  int  $precision
      * @param  int|null  $maxPrecision
-     * @return bool|string
+     * @return string|false
      */
     public static function abbreviate(int|float $number, int $precision = 0, ?int $maxPrecision = null)
     {
@@ -275,7 +277,7 @@ class Number
         }
 
         switch (true) {
-            case floatval($number) === 0.0:
+            case (float) $number === 0.0:
                 return $precision > 0 ? static::format(0, $precision, $maxPrecision) : '0';
             case $number < 0:
                 return sprintf('-%s', static::summarize(abs($number), $precision, $maxPrecision, $units));
@@ -310,7 +312,7 @@ class Number
      * @param  int|float  $by
      * @param  int|float  $start
      * @param  int|float  $offset
-     * @return array
+     * @return list<array{int|float, int|float}>
      */
     public static function pairs(int|float $to, int|float $by, int|float $start = 0, int|float $offset = 1)
     {
@@ -343,9 +345,11 @@ class Number
     /**
      * Execute the given callback using the given locale.
      *
+     * @template TReturn
+     *
      * @param  string  $locale
-     * @param  callable  $callback
-     * @return mixed
+     * @param  callable(): TReturn  $callback
+     * @return TReturn
      */
     public static function withLocale(string $locale, callable $callback)
     {
@@ -363,9 +367,11 @@ class Number
     /**
      * Execute the given callback using the given currency.
      *
+     * @template TReturn
+     *
      * @param  string  $currency
-     * @param  callable  $callback
-     * @return mixed
+     * @param  callable(): TReturn  $callback
+     * @return TReturn
      */
     public static function withCurrency(string $currency, callable $callback)
     {

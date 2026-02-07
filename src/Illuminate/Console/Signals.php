@@ -17,7 +17,7 @@ class Signals
     /**
      * The signal registry's previous list of handlers.
      *
-     * @var array<int, array<int, callable>>|null
+     * @var array<int, array<int, callable(int): void>>|null
      */
     protected $previousHandlers;
 
@@ -51,21 +51,21 @@ class Signals
     {
         $this->previousHandlers[$signal] ??= $this->initializeSignal($signal);
 
-        with($this->getHandlers(), function ($handlers) use ($signal) {
-            $handlers[$signal] ??= $this->initializeSignal($signal);
+        $handlers = $this->getHandlers();
 
-            $this->setHandlers($handlers);
-        });
+        $handlers[$signal] ??= $this->initializeSignal($signal);
+
+        $this->setHandlers($handlers);
 
         $this->registry->register($signal, $callback);
 
-        with($this->getHandlers(), function ($handlers) use ($signal) {
-            $lastHandlerInserted = array_pop($handlers[$signal]);
+        $handlers = $this->getHandlers();
 
-            array_unshift($handlers[$signal], $lastHandlerInserted);
+        $lastHandlerInserted = array_pop($handlers[$signal]);
 
-            $this->setHandlers($handlers);
-        });
+        array_unshift($handlers[$signal], $lastHandlerInserted);
+
+        $this->setHandlers($handlers);
     }
 
     /**

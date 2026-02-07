@@ -686,11 +686,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeFloat(Fluent $column)
     {
-        if ($column->precision) {
-            return "float({$column->precision})";
-        }
-
-        return 'float';
+        return ! is_null($column->precision) ? "float($column->precision)" : 'float';
     }
 
     /**
@@ -808,7 +804,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeTime(Fluent $column)
     {
-        return $column->precision ? "time($column->precision)" : 'time';
+        return ! is_null($column->precision) ? "time($column->precision)" : 'time';
     }
 
     /**
@@ -834,7 +830,7 @@ class SqlServerGrammar extends Grammar
             $column->default(new Expression('CURRENT_TIMESTAMP'));
         }
 
-        return $column->precision ? "datetime2($column->precision)" : 'datetime';
+        return ! is_null($column->precision) ? "datetime2($column->precision)" : 'datetime';
     }
 
     /**
@@ -851,7 +847,7 @@ class SqlServerGrammar extends Grammar
             $column->default(new Expression('CURRENT_TIMESTAMP'));
         }
 
-        return $column->precision ? "datetimeoffset($column->precision)" : 'datetimeoffset';
+        return ! is_null($column->precision) ? "datetimeoffset($column->precision)" : 'datetimeoffset';
     }
 
     /**

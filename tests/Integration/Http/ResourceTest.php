@@ -3,11 +3,14 @@
 namespace Illuminate\Tests\Integration\Http;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
 use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Http\Resources\JsonApi\AnonymousResourceCollection;
 use Illuminate\Http\Resources\MergeValue;
 use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Pagination\Cursor;
@@ -50,6 +53,49 @@ use Orchestra\Testbench\TestCase;
 
 class ResourceTest extends TestCase
 {
+    public function testResourceMayBeConvetedToArray()
+    {
+        $resource = new class((new User)->forceFill(['id' => 1, 'name' => 'Taylor Otwell'])) extends JsonResource
+        {
+            public function toArray(Request $request)
+            {
+                return [
+                    'id' => $this->id,
+                    'name' => $this->name,
+                    'posts' => (new AnonymousResourceCollection([
+                        new Post([
+                            'id' => 5,
+                            'title' => 'Test Title',
+                            'abstract' => 'Test abstract',
+                        ]),
+                        new Post([
+                            'id' => 10,
+                            'title' => 'Another Test Title',
+                            'abstract' => 'Another Test abstract',
+                        ]),
+                    ], PostResource::class)),
+                ];
+            }
+        };
+
+        $request = Request::create('GET', '/users');
+
+        tap($resource->toArray($request), function ($userAsArray) use ($request) {
+            $this->assertSame(1, $userAsArray['id']);
+            $this->assertSame('Taylor Otwell', $userAsArray['name']);
+
+            $this->assertInstanceOf(AnonymousResourceCollection::class, $userAsArray['posts']);
+            $this->assertSame(PostResource::class, $userAsArray['posts']->collects);
+
+            tap($userAsArray['posts']->toArray($request), function ($postsAsArray) {
+                $this->assertIsArray($postsAsArray);
+                $this->assertCount(2, $postsAsArray);
+                $this->assertSame(['id' => 5, 'title' => 'Test Title', 'custom' => true], $postsAsArray[0]);
+                $this->assertSame(['id' => 10, 'title' => 'Another Test Title', 'custom' => true], $postsAsArray[1]);
+            });
+        });
+    }
+
     public function testResourcesMayBeConvertedToJson()
     {
         Route::get('/', function () {
@@ -1479,6 +1525,26 @@ class ResourceTest extends TestCase
         $response->assertJson(['data' => $data->toArray()]);
     }
 
+    public function testKeysArePreservedInAnAnonymousCollectionUsingPreserveKeysMethod()
+    {
+        $data = Collection::make([
+            ['id' => 1, 'title' => 'Test'],
+            ['id' => 2, 'title' => 'Test 2'],
+        ])->keyBy->id;
+
+        Route::get('/', function () use ($data) {
+            return JsonResource::collection($data)->preserveKeys();
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson(['data' => $data->toArray()]);
+    }
+
     public function testLeadingMergeKeyedValueIsMergedCorrectly()
     {
         $filter = new class
@@ -1851,6 +1917,157 @@ class ResourceTest extends TestCase
         } finally {
             Model::preventAccessingMissingAttributes($originalMode);
         }
+    }
+
+    public function testResourceSkipsWrappingWhenDataKeyExists()
+    {
+        $resource = new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
+        {
+            public static $wrap = 'data';
+        };
+
+        $response = $resource->toResponse(request());
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertEquals([
+            'id' => 5,
+            'title' => 'Test',
+            'data' => 'some data',
+        ], $content);
+    }
+
+    public function testResourceWrapsWhenDataKeyDoesNotExist()
+    {
+        $resource = new class(['id' => 5, 'title' => 'Test']) extends JsonResource
+        {
+            public static $wrap = 'data';
+        };
+
+        $response = $resource->toResponse(request());
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertEquals([
+            'data' => [
+                'id' => 5,
+                'title' => 'Test',
+            ],
+        ], $content);
+    }
+
+    public function testResourceCanOverridesWrapping()
+    {
+        $resource = new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
+        {
+            public static $wrap = 'results';
+            public static bool $forceWrapping = true;
+        };
+
+        JsonResource::flushState();
+
+        $response = $resource->toResponse(request());
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertEquals([
+            'results' => [
+                'id' => 5,
+                'title' => 'Test',
+                'data' => 'some data',
+            ],
+        ], $content);
+    }
+
+    public function testResourceCollectionCanOverridesWrapping()
+    {
+        $resource = new class([new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
+        {
+            public static $wrap = null;
+        },
+        ]) extends ResourceCollection {
+            public static $wrap = 'results';
+        };
+
+        JsonResource::flushState();
+
+        $response = $resource->toResponse(request());
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertEquals([
+            'results' => [
+                [
+                    'id' => 5,
+                    'title' => 'Test',
+                    'data' => 'some data',
+                ],
+            ],
+        ], $content);
+    }
+
+    public function testPaginatedResourceCollectionCanOverridesWrapping()
+    {
+        $resource = new class(new LengthAwarePaginator([new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
+        {
+            public static $wrap = null;
+        },
+        ], 10, 2)) extends ResourceCollection {
+            public static $wrap = 'results';
+        };
+
+        JsonResource::flushState();
+
+        $response = $resource->toResponse(request());
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertArrayHasKey('results', $content);
+        $this->assertArrayHasKey('links', $content);
+        $this->assertArrayHasKey('meta', $content);
+
+        $this->assertCount(1, $content['results']);
+        $this->assertEquals([
+            [
+                'id' => 5,
+                'title' => 'Test',
+                'data' => 'some data',
+            ],
+        ], $content['results']);
+    }
+
+    public function testEmptyPaginatedResourceCollectionCanOverridesWrapping()
+    {
+        $resource = new class(new LengthAwarePaginator([], 10, 2)) extends ResourceCollection
+        {
+            public static $wrap = 'results';
+        };
+
+        JsonResource::flushState();
+
+        $response = $resource->toResponse(request());
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertArrayHasKey('results', $content);
+        $this->assertArrayHasKey('links', $content);
+        $this->assertArrayHasKey('meta', $content);
+
+        $this->assertCount(0, $content['results']);
+    }
+
+    public function testResourceForceWrapOverridesDataKeyCheck()
+    {
+        $resource = new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
+        {
+            public static $wrap = 'data';
+            public static bool $forceWrapping = true;
+        };
+
+        $response = $resource->toResponse(request());
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertEquals([
+            'data' => [
+                'id' => 5,
+                'title' => 'Test',
+                'data' => 'some data',
+            ],
+        ], $content);
     }
 
     private function assertJsonResourceResponse($data, $expectedJson)

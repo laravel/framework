@@ -16,7 +16,8 @@ class DatabaseMigrationResetCommandTest extends TestCase
     protected function tearDown(): void
     {
         ResetCommand::prohibit(false);
-        m::close();
+
+        parent::tearDown();
     }
 
     public function testResetCommandCallsMigratorWithProperArguments()

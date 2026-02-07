@@ -32,32 +32,32 @@ class AuthenticateMiddlewareTest extends TestCase
 
     protected function tearDown(): void
     {
-        m::close();
-
         Container::setInstance(null);
+
+        parent::tearDown();
     }
 
     public function testItCanGenerateDefinitionViaStaticMethod()
     {
-        $signature = (string) Authenticate::using('foo');
+        $signature = Authenticate::using('foo');
         $this->assertSame('Illuminate\Auth\Middleware\Authenticate:foo', $signature);
 
-        $signature = (string) Authenticate::using('foo', 'bar');
+        $signature = Authenticate::using('foo', 'bar');
         $this->assertSame('Illuminate\Auth\Middleware\Authenticate:foo,bar', $signature);
 
-        $signature = (string) Authenticate::using('foo', 'bar', 'baz');
+        $signature = Authenticate::using('foo', 'bar', 'baz');
         $this->assertSame('Illuminate\Auth\Middleware\Authenticate:foo,bar,baz', $signature);
     }
 
     public function testItCanGenerateDefinitionViaStaticMethodForBasic()
     {
-        $signature = (string) AuthenticateWithBasicAuth::using('guard');
+        $signature = AuthenticateWithBasicAuth::using('guard');
         $this->assertSame('Illuminate\Auth\Middleware\AuthenticateWithBasicAuth:guard', $signature);
 
-        $signature = (string) AuthenticateWithBasicAuth::using('guard', 'field');
+        $signature = AuthenticateWithBasicAuth::using('guard', 'field');
         $this->assertSame('Illuminate\Auth\Middleware\AuthenticateWithBasicAuth:guard,field', $signature);
 
-        $signature = (string) AuthenticateWithBasicAuth::using(field: 'field');
+        $signature = AuthenticateWithBasicAuth::using(field: 'field');
         $this->assertSame('Illuminate\Auth\Middleware\AuthenticateWithBasicAuth:,field', $signature);
     }
 

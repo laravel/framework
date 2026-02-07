@@ -37,13 +37,13 @@ class ValidationEmailRuleTest extends TestCase
         $this->fails(
             Email::default(),
             12345,
-            [Email::class]
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
         );
 
         $this->fails(
             Rule::email(),
             12345,
-            [Email::class]
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
         );
 
         $this->passes(
@@ -904,5 +904,7 @@ class ValidationEmailRuleTest extends TestCase
         Facade::clearResolvedInstances();
 
         Facade::setFacadeApplication(null);
+
+        parent::tearDown();
     }
 }

@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Foundation\Mix;
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\Defer\DeferredCallbackCollection;
-use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Facades\Vite as ViteFacade;
 use Illuminate\Support\HtmlString;
 use Mockery;
 
@@ -36,9 +36,11 @@ trait InteractsWithContainer
     /**
      * Register an instance of an object in the container.
      *
+     * @template TSwap of object
+     *
      * @param  string  $abstract
-     * @param  object  $instance
-     * @return object
+     * @param  TSwap  $instance
+     * @return TSwap
      */
     protected function swap($abstract, $instance)
     {
@@ -48,9 +50,11 @@ trait InteractsWithContainer
     /**
      * Register an instance of an object in the container.
      *
+     * @template TInstance of object
+     *
      * @param  string  $abstract
-     * @param  object  $instance
-     * @return object
+     * @param  TInstance  $instance
+     * @return TInstance
      */
     protected function instance($abstract, $instance)
     {
@@ -119,7 +123,7 @@ trait InteractsWithContainer
             $this->originalVite = app(Vite::class);
         }
 
-        Facade::clearResolvedInstance(Vite::class);
+        ViteFacade::clearResolvedInstance();
 
         $this->swap(Vite::class, new class extends Vite
         {

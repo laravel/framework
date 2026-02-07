@@ -67,7 +67,7 @@ trait InteractsWithTime
      * Given a start time, format the total run time for human readability.
      *
      * @param  float  $startTime
-     * @param  float  $endTime
+     * @param  float|null  $endTime
      * @return string
      */
     protected function runTimeForHumans($startTime, $endTime = null)

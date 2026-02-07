@@ -181,6 +181,10 @@ class PostgresGrammar extends Grammar
             $mode = 'websearch_to_tsquery';
         }
 
+        if (($where['options']['mode'] ?? []) === 'raw') {
+            $mode = 'to_tsquery';
+        }
+
         return "({$columns}) @@ {$mode}('{$language}', {$this->parameter($where['value'])})";
     }
 
@@ -618,6 +622,7 @@ class PostgresGrammar extends Grammar
      * @param  array  $values
      * @return array
      */
+    #[\Override]
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
         $values = (new Collection($values))->map(function ($value, $column) {
@@ -627,6 +632,8 @@ class PostgresGrammar extends Grammar
         })->all();
 
         $cleanBindings = Arr::except($bindings, 'select');
+
+        $values = Arr::flatten(array_map(fn ($value) => value($value), $values));
 
         return array_values(
             array_merge($values, Arr::flatten($cleanBindings))

@@ -18,7 +18,7 @@ class PromptsValidationTest extends TestCase
         $app[Kernel::class]->registerCommand(new DummyPromptsWithLaravelRulesCommandWithInlineMessagesAndAttributesCommand());
     }
 
-    public function testValidationForPrompts()
+    public function testValidationForPrompts(): void
     {
         $this
             ->artisan(DummyPromptsValidationCommand::class)
@@ -26,7 +26,7 @@ class PromptsValidationTest extends TestCase
             ->expectsOutputToContain('Required!');
     }
 
-    public function testValidationWithLaravelRulesAndNoCustomization()
+    public function testValidationWithLaravelRulesAndNoCustomization(): void
     {
         $this
             ->artisan(DummyPromptsWithLaravelRulesCommand::class)
@@ -34,7 +34,7 @@ class PromptsValidationTest extends TestCase
             ->expectsOutputToContain('The answer field is required.');
     }
 
-    public function testValidationWithLaravelRulesInlineMessagesAndAttributes()
+    public function testValidationWithLaravelRulesInlineMessagesAndAttributes(): void
     {
         $this
             ->artisan(DummyPromptsWithLaravelRulesCommandWithInlineMessagesAndAttributesCommand::class)
@@ -42,7 +42,7 @@ class PromptsValidationTest extends TestCase
             ->expectsOutputToContain('Your full name is mandatory.');
     }
 
-    public function testValidationWithLaravelRulesMessagesAndAttributes()
+    public function testValidationWithLaravelRulesMessagesAndAttributes(): void
     {
         $this
             ->artisan(DummyPromptsWithLaravelRulesMessagesAndAttributesCommand::class)

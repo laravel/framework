@@ -8,14 +8,14 @@ use PHPUnit\Framework\TestCase;
 
 class MailMailableAssertionsTest extends TestCase
 {
-    public function testMailableAssertSeeInTextPassesWhenPresent()
+    public function testMailableAssertSeeInTextPassesWhenPresent(): void
     {
         $mailable = new MailableAssertionsStub;
 
         $mailable->assertSeeInText('First Item');
     }
 
-    public function testMailableAssertSeeInTextFailsWhenAbsent()
+    public function testMailableAssertSeeInTextFailsWhenAbsent(): void
     {
         $mailable = new MailableAssertionsStub;
 
@@ -24,14 +24,14 @@ class MailMailableAssertionsTest extends TestCase
         $mailable->assertSeeInText('Fourth Item');
     }
 
-    public function testMailableAssertDontSeeInTextPassesWhenAbsent()
+    public function testMailableAssertDontSeeInTextPassesWhenAbsent(): void
     {
         $mailable = new MailableAssertionsStub;
 
         $mailable->assertDontSeeInText('Fourth Item');
     }
 
-    public function testMailableAssertDontSeeInTextFailsWhenPresent()
+    public function testMailableAssertDontSeeInTextFailsWhenPresent(): void
     {
         $mailable = new MailableAssertionsStub;
 
@@ -40,7 +40,7 @@ class MailMailableAssertionsTest extends TestCase
         $mailable->assertDontSeeInText('First Item');
     }
 
-    public function testMailableAssertSeeInHtmlPassesWhenPresent()
+    public function testMailableAssertSeeInHtmlPassesWhenPresent(): void
     {
         $mailable = new MailableAssertionsStub;
 
@@ -49,7 +49,7 @@ class MailMailableAssertionsTest extends TestCase
         $mailable->assertSeeInHtml('<li>First Item</li>', false);
     }
 
-    public function testMailableAssertSeeInHtmlFailsWhenAbsent()
+    public function testMailableAssertSeeInHtmlFailsWhenAbsent(): void
     {
         $mailable = new MailableAssertionsStub;
 
@@ -58,14 +58,14 @@ class MailMailableAssertionsTest extends TestCase
         $mailable->assertSeeInHtml('<li>Fourth Item</li>');
     }
 
-    public function testMailableAssertDontSeeInHtmlPassesWhenAbsent()
+    public function testMailableAssertDontSeeInHtmlPassesWhenAbsent(): void
     {
         $mailable = new MailableAssertionsStub;
 
         $mailable->assertDontSeeInHtml('<li>Fourth Item</li>');
     }
 
-    public function testMailableAssertDontSeeInHtmlEscapedFailsWhenPresent()
+    public function testMailableAssertDontSeeInHtmlEscapedFailsWhenPresent(): void
     {
         $mailable = new MailableAssertionsStub;
 
@@ -74,7 +74,7 @@ class MailMailableAssertionsTest extends TestCase
         $mailable->assertDontSeeInHtml('Fourth & Fifth Item');
     }
 
-    public function testMailableAssertDontSeeInHtmlUnescapedFailsWhenPresent()
+    public function testMailableAssertDontSeeInHtmlUnescapedFailsWhenPresent(): void
     {
         $mailable = new MailableAssertionsStub;
 
@@ -83,7 +83,7 @@ class MailMailableAssertionsTest extends TestCase
         $mailable->assertDontSeeInHtml('<li>First Item</li>', false);
     }
 
-    public function testMailableAssertSeeInOrderTextPassesWhenPresentInOrder()
+    public function testMailableAssertSeeInOrderTextPassesWhenPresentInOrder(): void
     {
         $mailable = new MailableAssertionsStub;
 
@@ -94,7 +94,7 @@ class MailMailableAssertionsTest extends TestCase
         ]);
     }
 
-    public function testMailableAssertSeeInOrderTextFailsWhenAbsentInOrder()
+    public function testMailableAssertSeeInOrderTextFailsWhenAbsentInOrder(): void
     {
         $mailable = new MailableAssertionsStub;
 
@@ -107,7 +107,7 @@ class MailMailableAssertionsTest extends TestCase
         ]);
     }
 
-    public function testMailableAssertInOrderHtmlPassesWhenPresentInOrder()
+    public function testMailableAssertInOrderHtmlPassesWhenPresentInOrder(): void
     {
         $mailable = new MailableAssertionsStub;
 
@@ -124,7 +124,7 @@ class MailMailableAssertionsTest extends TestCase
         ], false);
     }
 
-    public function testMailableAssertInOrderHtmlFailsWhenAbsentInOrder()
+    public function testMailableAssertInOrderHtmlFailsWhenAbsentInOrder(): void
     {
         $mailable = new MailableAssertionsStub;
 
@@ -137,14 +137,14 @@ class MailMailableAssertionsTest extends TestCase
         ]);
     }
 
-    public function testMailableAssertSeeInTextWithApostrophePassesWhenPresent()
+    public function testMailableAssertSeeInTextWithApostrophePassesWhenPresent(): void
     {
         $mailable = new MailableAssertionsStub;
 
         $mailable->assertSeeInText("It's a wonderful day");
     }
 
-    public function testMailableAssertSeeInTextWithApostropheFailsWhenAbsent()
+    public function testMailableAssertSeeInTextWithApostropheFailsWhenAbsent(): void
     {
         $mailable = new MailableAssertionsStub;
 
@@ -153,14 +153,14 @@ class MailMailableAssertionsTest extends TestCase
         $mailable->assertSeeInText("It's not a wonderful day");
     }
 
-    public function testMailableAssertDontSeeInTextWithApostrophePassesWhenAbsent()
+    public function testMailableAssertDontSeeInTextWithApostrophePassesWhenAbsent(): void
     {
         $mailable = new MailableAssertionsStub;
 
         $mailable->assertDontSeeInText("It's not a wonderful day");
     }
 
-    public function testMailableAssertDontSeeInTextWithApostropheFailsWhenPresent()
+    public function testMailableAssertDontSeeInTextWithApostropheFailsWhenPresent(): void
     {
         $mailable = new MailableAssertionsStub;
 
@@ -169,7 +169,7 @@ class MailMailableAssertionsTest extends TestCase
         $mailable->assertDontSeeInText("It's a wonderful day");
     }
 
-    public function testMailableAssertSeeInHtmlWithApostropheFailsWhenAbsent()
+    public function testMailableAssertSeeInHtmlWithApostropheFailsWhenAbsent(): void
     {
         $mailable = new MailableAssertionsStub;
 
@@ -178,14 +178,14 @@ class MailMailableAssertionsTest extends TestCase
         $mailable->assertSeeInHtml("<li>It's not a wonderful day</li>");
     }
 
-    public function testMailableAssertDontSeeInHtmlWithApostrophePassesWhenAbsent()
+    public function testMailableAssertDontSeeInHtmlWithApostrophePassesWhenAbsent(): void
     {
         $mailable = new MailableAssertionsStub;
 
         $mailable->assertDontSeeInHtml("<li>It's not a wonderful day</li>");
     }
 
-    public function testMailableAssertDontSeeInHtmlWithApostropheFailsWhenPresent()
+    public function testMailableAssertDontSeeInHtmlWithApostropheFailsWhenPresent(): void
     {
         $mailable = new MailableAssertionsStub;
 
@@ -194,7 +194,14 @@ class MailMailableAssertionsTest extends TestCase
         $mailable->assertDontSeeInHtml("<li>It's a wonderful day</li>", false);
     }
 
-    public function testMailableAssertSeeInOrderInHtmlWithApostrophePassesWhenPresentInOrder()
+    public function testMailableAssertSeeInHtmlWithBladeEscapedApostrophePassesWhenPresent(): void
+    {
+        $mailable = new MailableAssertionsBladeEscapedStub;
+
+        $mailable->assertSeeInHtml("It's a wonderful day");
+    }
+
+    public function testMailableAssertSeeInOrderInHtmlWithApostrophePassesWhenPresentInOrder(): void
     {
         $mailable = new MailableAssertionsStub;
 
@@ -210,7 +217,7 @@ class MailMailableAssertionsTest extends TestCase
         ], false);
     }
 
-    public function testMailableAssertSeeInOrderInHtmlWithApostropheFailsWhenAbsentInOrder()
+    public function testMailableAssertSeeInOrderInHtmlWithApostropheFailsWhenAbsentInOrder(): void
     {
         $mailable = new MailableAssertionsStub;
 
@@ -259,6 +266,29 @@ class MailableAssertionsStub extends Mailable
         </body>
         </html>
         EOD;
+
+        return [$html, $text];
+    }
+}
+
+class MailableAssertionsBladeEscapedStub extends Mailable
+{
+    protected function renderForAssertions()
+    {
+        $text = "It's a wonderful day";
+
+        $html = <<<'EOD'
+        <!DOCTYPE html>
+        <html>
+        <body>
+        <div>It&#039;s a wonderful day</div>
+        </body>
+        </html>
+        EOD;
+
+        /**
+         * Since stub override `renderForAssertions()` we should expect that `$html` is available from either `$this->view` or `$this->markdown`.
+         */
 
         return [$html, $text];
     }

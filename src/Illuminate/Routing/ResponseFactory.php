@@ -203,7 +203,7 @@ class ResponseFactory implements FactoryContract
             return new StreamedResponse(function () use ($callback) {
                 foreach ($callback() as $chunk) {
                     echo $chunk;
-                    ob_flush();
+                    when(ob_get_level() > 0, fn () => ob_flush());
                     flush();
                 }
             }, $status, array_merge($headers, ['X-Accel-Buffering' => 'no']));

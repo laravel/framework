@@ -64,7 +64,7 @@ class CommandSchedulingTest extends TestCase
     }
 
     #[DataProvider('executionProvider')]
-    public function testExecutionOrder($background, $expected)
+    public function testExecutionOrder($background, $expected): void
     {
         $schedule = $this->app->make(Schedule::class);
         $event = $schedule

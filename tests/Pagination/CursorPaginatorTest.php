@@ -132,7 +132,7 @@ class CursorPaginatorTest extends TestCase
 
     public function testCursorPaginatorToPrettyJson()
     {
-        $paginator = new CursorPaginator([['id' => 1], ['id' => 2], ['id' => 3], ['id' => 4]], 2, null);
+        $paginator = new CursorPaginator([['id' => '1'], ['id' => '2'], ['id' => '3'], ['id' => '4']], 2, null);
         $results = $paginator->toPrettyJson();
         $expected = $paginator->toJson(JSON_PRETTY_PRINT);
 
@@ -140,6 +140,11 @@ class CursorPaginatorTest extends TestCase
         $this->assertSame($expected, $results);
         $this->assertStringContainsString("\n", $results);
         $this->assertStringContainsString('    ', $results);
+
+        $results = $paginator->toPrettyJson(JSON_NUMERIC_CHECK);
+        $this->assertStringContainsString("\n", $results);
+        $this->assertStringContainsString('    ', $results);
+        $this->assertStringContainsString('"id": 1', $results);
     }
 
     protected function getCursor($params, $isNext = true)

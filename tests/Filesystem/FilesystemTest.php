@@ -14,6 +14,8 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use SplFileInfo;
 
+use function Orchestra\Testbench\terminate;
+
 class FilesystemTest extends TestCase
 {
     private static $tempDir;
@@ -35,10 +37,10 @@ class FilesystemTest extends TestCase
 
     protected function tearDown(): void
     {
-        m::close();
-
         $files = new Filesystem;
         $files->deleteDirectory(self::$tempDir, $preserve = true);
+
+        parent::tearDown();
     }
 
     public function testGetRetrievesFiles()
@@ -523,6 +525,21 @@ class FilesystemTest extends TestCase
         $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'music', $directories);
     }
 
+    public function testAllDirectoriesFindsDirectories()
+    {
+        mkdir(self::$tempDir.'/film');
+        mkdir(self::$tempDir.'/music');
+        mkdir(self::$tempDir.'/music/rock');
+        mkdir(self::$tempDir.'/music/blues');
+
+        $directories = (new Filesystem)->allDirectories(self::$tempDir);
+
+        $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'film', $directories);
+        $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'music', $directories);
+        $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'music'.DIRECTORY_SEPARATOR.'rock', $directories);
+        $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'music'.DIRECTORY_SEPARATOR.'blues', $directories);
+    }
+
     public function testMakeDirectory()
     {
         $files = new Filesystem;
@@ -547,7 +564,7 @@ class FilesystemTest extends TestCase
                 $files->put(self::$tempDir.'/file.txt', $content, true);
                 $read = $files->get(self::$tempDir.'/file.txt', true);
 
-                exit(strlen($read) === strlen($content) ? 1 : 0);
+                terminate($this, strlen($read) === strlen($content) ? 1 : 0);
             }
         }
 

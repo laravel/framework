@@ -45,7 +45,7 @@ class CallbackSchedulingTest extends TestCase
         $container->instance(SchedulingMutex::class, new CacheSchedulingMutex($cache));
     }
 
-    public function testExecutionOrder()
+    public function testExecutionOrder(): void
     {
         $event = $this->app->make(Schedule::class)
             ->call($this->logger('call'))
@@ -59,7 +59,7 @@ class CallbackSchedulingTest extends TestCase
         $this->assertLogged('before 1', 'before 2', 'call', 'after 1', 'after 2');
     }
 
-    public function testCallbacksCannotRunInBackground()
+    public function testCallbacksCannotRunInBackground(): void
     {
         $this->expectException(RuntimeException::class);
 
@@ -68,7 +68,7 @@ class CallbackSchedulingTest extends TestCase
             ->runInBackground();
     }
 
-    public function testExceptionHandlingInCallback()
+    public function testExceptionHandlingInCallback(): void
     {
         $event = $this->app->make(Schedule::class)
             ->call($this->logger('call'))

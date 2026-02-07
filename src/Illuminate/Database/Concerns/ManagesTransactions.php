@@ -3,13 +3,12 @@
 namespace Illuminate\Database\Concerns;
 
 use Closure;
-use Illuminate\Database\Connection;
 use Illuminate\Database\DeadlockException;
 use RuntimeException;
 use Throwable;
 
 /**
- * @mixin Connection
+ * @mixin \Illuminate\Database\Connection
  */
 trait ManagesTransactions
 {
@@ -350,6 +349,23 @@ trait ManagesTransactions
     {
         if ($this->transactionsManager) {
             return $this->transactionsManager->addCallback($callback);
+        }
+
+        throw new RuntimeException('Transactions Manager has not been set.');
+    }
+
+    /**
+     * Execute the callback after a transaction rolls back.
+     *
+     * @param  callable  $callback
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    public function afterRollBack($callback)
+    {
+        if ($this->transactionsManager) {
+            return $this->transactionsManager->addCallbackForRollback($callback);
         }
 
         throw new RuntimeException('Transactions Manager has not been set.');

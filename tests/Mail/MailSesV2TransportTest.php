@@ -19,14 +19,7 @@ use Symfony\Component\Mime\Email;
 
 class MailSesV2TransportTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-
-        parent::tearDown();
-    }
-
-    public function testGetTransport()
+    public function testGetTransport(): void
     {
         $container = new Container;
 
@@ -52,7 +45,7 @@ class MailSesV2TransportTest extends TestCase
         $this->assertSame('ses-v2', (string) $transport);
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $message = new Email();
         $message->subject('Foo subject');
@@ -83,7 +76,7 @@ class MailSesV2TransportTest extends TestCase
         (new SesV2Transport($client))->send($message);
     }
 
-    public function testSendError()
+    public function testSendError(): void
     {
         $message = new Email();
         $message->subject('Foo subject');
@@ -100,7 +93,7 @@ class MailSesV2TransportTest extends TestCase
         (new SesV2Transport($client))->send($message);
     }
 
-    public function testSesV2LocalConfiguration()
+    public function testSesV2LocalConfiguration(): void
     {
         $container = new Container;
 

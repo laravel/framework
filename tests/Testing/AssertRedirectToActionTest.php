@@ -41,13 +41,13 @@ class AssertRedirectToActionTest extends TestCase
         $this->urlGenerator = $this->app->make(UrlGenerator::class);
     }
 
-    public function testAssertRedirectToActionWithoutParameters()
+    public function testAssertRedirectToActionWithoutParameters(): void
     {
         $this->get('redirect-to-index')
             ->assertRedirectToAction([TestActionController::class, 'index']);
     }
 
-    public function testAssertRedirectToActionWithParameters()
+    public function testAssertRedirectToActionWithParameters(): void
     {
         $this->get('redirect-to-show')
             ->assertRedirectToAction([TestActionController::class, 'show'], ['id' => 123]);
@@ -55,9 +55,9 @@ class AssertRedirectToActionTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Facade::setFacadeApplication(null);
+
+        parent::tearDown();
     }
 }
 
