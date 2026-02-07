@@ -23,12 +23,11 @@ class RequestDto implements SelfBuilding
             static::failedAuthorization($request);
         }
 
-        $instance = static::getValidatorInstance();
+        $instance = static::getValidatorInstance($request);
 
         if ($request->isPrecognitive()) {
             $instance->after(Precognition::afterValidationHook($request));
         }
-
 
         if ($instance->fails()) {
             static::failedValidation($instance);
@@ -36,7 +35,13 @@ class RequestDto implements SelfBuilding
 
         static::passedValidation();
 
-        // @todo set the values
+        return static::buildDto($instance->validated());
+    }
+
+    protected static function buildDto(array $validated)
+    {
+        // @todo add ability to map request to DTO params
+        return new static(...$validated);
     }
 
     /**
@@ -74,14 +79,14 @@ class RequestDto implements SelfBuilding
      *
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected static function getValidatorInstance()
+    protected static function getValidatorInstance(Request $request)
     {
         $factory = Container::getInstance()->make(ValidationFactory::class);
 
         if (method_exists(static::class, 'validator')) {
             $validator = Container::getInstance()->call(static::validator(...), ['factory' => $factory]);
         } else {
-            $validator = static::createDefaultValidator($factory);
+            $validator = static::createDefaultValidator($factory, $request);
         }
 
         if (method_exists(static::class, 'after')) {
@@ -108,10 +113,8 @@ class RequestDto implements SelfBuilding
      * @param  \Illuminate\Contracts\Validation\Factory  $factory
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected static function createDefaultValidator(ValidationFactory $factory)
+    protected static function createDefaultValidator(ValidationFactory $factory, Request $request)
     {
-        $request = static::getRequest();
-
         $validator = $factory->make(
             static::validationData(),
             static::validationRules(),
@@ -128,7 +131,7 @@ class RequestDto implements SelfBuilding
         return $validator;
     }
 
-    protected function shouldStopOnFirstFailure(): bool
+    protected static function shouldStopOnFirstFailure(): bool
     {
         // @todo use Taylor's attribute to check
         return false;

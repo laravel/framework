@@ -9,15 +9,16 @@ use Orchestra\Testbench\TestCase;
 
 class RequestDtoTest extends TestCase
 {
-    public function testResolve()
-    {
-        $this->app->make(MyRequestDto::class);
-    }
     public function testSimpleRequestDto()
     {
-        $request = Request::create('', parameters: ['hello' => 'world']);
+        $request = Request::create('', parameters: ['number' => 11, 'string' => 'abc']);
         $this->app->instance('request', $request);
-        dd(app('request'));
+
+        $actual = $this->app->make(MyRequestDto::class);
+
+        $this->assertInstanceOf(MyRequestDto::class, $actual);
+        $this->assertEquals(11, $actual->number);
+        $this->assertEquals('abc', $actual->string);
     }
 }
 
@@ -32,25 +33,12 @@ class MyRequestDto extends RequestDto
         public string $string,
     ) {
     }
-}
 
-class RequestBuilder
-{
-    /**
-     * @param  Request  $request
-     * @param  class-string  $class
-     * @param  \Closure  $rulesBuilder
-     * @param  \Closure  $auth
-     * @return void
-     */
-    public function build(
-        Request $request,
-        string $class,
-        \Closure $rulesBuilder,
-        \Closure $auth
-    ) {
-
-        $toValidate = $request->all();
-
+    protected static function rules()
+    {
+        return [
+            'number' => ['required', 'integer', 'min:1', 'max:100'],
+            'string' => ['required'],
+        ];
     }
 }
