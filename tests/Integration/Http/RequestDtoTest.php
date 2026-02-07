@@ -7,6 +7,7 @@ use Illuminate\Foundation\Http\Attributes\Rules;
 use Illuminate\Foundation\Http\RequestDto;
 use Illuminate\Foundation\Http\TypedFormRequest;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Orchestra\Testbench\TestCase;
 
@@ -87,6 +88,36 @@ class RequestDtoTest extends TestCase
 
         $this->assertNull($actual->perPage);
     }
+
+    public function testDefaultEnumPropertyUsedWhenKeyMissingFromRequest()
+    {
+        $request = Request::create('', parameters: ['name' => 'Taylor']);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(MyTypedFormWithDefaults::class);
+
+        $this->assertSame(SortDirection::Desc, $actual->sort);
+    }
+
+    public function testEnumPropertyOverriddenWhenKeyPresentInRequest()
+    {
+        $request = Request::create('', parameters: ['name' => 'Taylor', 'sort' => 'asc']);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(MyTypedFormWithDefaults::class);
+
+        $this->assertSame(SortDirection::Asc, $actual->sort);
+    }
+
+    public function testEnumPropertyFailsValidationWithInvalidValue()
+    {
+        $this->expectException(ValidationException::class);
+
+        $request = Request::create('', parameters: ['name' => 'Taylor', 'sort' => 'invalid']);
+        $this->app->instance('request', $request);
+
+        $this->app->make(MyTypedFormWithDefaults::class);
+    }
 }
 
 #[Rules([
@@ -154,6 +185,7 @@ class MyTypedFormWithDefaults extends TypedFormRequest
     public function __construct(
         public string $name,
         public ?int $perPage = 25,
+        public ?SortDirection $sort = SortDirection::Desc,
     ) {
     }
 
@@ -162,6 +194,13 @@ class MyTypedFormWithDefaults extends TypedFormRequest
         return [
             'name' => ['required', 'string'],
             'perPage' => ['nullable', 'integer', 'min:1'],
+            'sort' => ['nullable', Rule::enum(SortDirection::class)],
         ];
     }
+}
+
+enum SortDirection: string
+{
+    case Asc = 'asc';
+    case Desc = 'desc';
 }

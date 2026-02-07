@@ -11,7 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Validator;
+use BackedEnum;
 use ReflectionClass;
+use ReflectionNamedType;
 use ReflectionProperty;
 
 use function Illuminate\Support\enum_value;
@@ -82,7 +84,39 @@ class TypedFormRequestBuilder
         // @todo handle nested objects
         $dtoClass = $this->requestClass;
 
-        return new $dtoClass(...$validated);
+        return new $dtoClass(...$this->castValidatedData($validated));
+    }
+
+    protected function castValidatedData(array $validated): array
+    {
+        $constructor = $this->reflectRequest()->getConstructor();
+
+        if ($constructor === null) {
+            return $validated;
+        }
+
+        foreach ($constructor->getParameters() as $param) {
+            $name = $param->getName();
+
+            // This should never happen...
+            if (! array_key_exists($name, $validated)) {
+                continue;
+            }
+
+            $type = $param->getType();
+
+            if (! $type instanceof ReflectionNamedType || $type->isBuiltin()) {
+                continue;
+            }
+
+            if (is_subclass_of($type->getName(), BackedEnum::class)) {
+                $validated[$name] = $validated[$name] !== null
+                    ? $type->getName()::from($validated[$name])
+                    : null;
+            }
+        }
+
+        return $validated;
     }
 
     protected function prepareForValidation(): void
