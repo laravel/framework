@@ -10,17 +10,27 @@ use Illuminate\Foundation\Precognition;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Validator;
 
+/**
+ * @template T of TypedFormRequest
+ */
 class TypedFormRequestBuilder
 {
     protected Validator $validator;
 
+    /**
+     * @param  class-string<T>  $requestClass
+     * @param  Request  $request
+     */
     public function __construct(
         protected string $requestClass,
         protected Request $request,
     ) {
     }
 
-    public function handle(): mixed
+    /**
+     * @return T
+     */
+    public function handle(): TypedFormRequest
     {
         $this->prepareForValidation();
 
@@ -40,11 +50,17 @@ class TypedFormRequestBuilder
 
         $this->passedValidation();
 
+        // @todo validated() only works on data which has been validated... they SHOULD always validate the data but it's possible they do not
         return $this->buildDto($this->validator->validated());
     }
 
-    protected function buildDto(array $validated): mixed
+    /**
+     * @return T
+     */
+    protected function buildDto(array $validated): TypedFormRequest
     {
+        // @todo add ability to map request to DTO params
+        // @todo handle nested objects
         $dtoClass = $this->requestClass;
 
         return new $dtoClass(...$validated);
@@ -131,6 +147,8 @@ class TypedFormRequestBuilder
 
     protected function validationRules(): array
     {
+        // @todo add in attribute check (read from #[Rules] attribute on the requestClass)
+        // @todo can we add an attribute to merge defaults set on the typed properties? like `public int $perPage = 25` will use per_page=25 if not specified
         if (method_exists($this->requestClass, 'rules')) {
             return Container::getInstance()->call([$this->requestClass, 'rules']);
         }
@@ -140,6 +158,8 @@ class TypedFormRequestBuilder
 
     protected function validationData(): array
     {
+        // @todo can we add an attribute to merge defaults?
+        // @todo add in an attribute that will read the docblocks for things like `int<1, 100>` and convert them into the rules
         if (method_exists($this->requestClass, 'validationData')) {
             return Container::getInstance()->call(
                 [$this->requestClass, 'validationData'],
@@ -170,6 +190,7 @@ class TypedFormRequestBuilder
 
     protected function shouldStopOnFirstFailure(): bool
     {
+        // @todo use Taylor's attribute to check
         if (method_exists($this->requestClass, 'shouldStopOnFirstFailure')) {
             return Container::getInstance()->call([$this->requestClass, 'shouldStopOnFirstFailure']);
         }

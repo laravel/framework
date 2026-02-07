@@ -7,7 +7,7 @@ use Illuminate\Contracts\Container\SelfBuilding;
 
 class TypedFormRequest implements SelfBuilding
 {
-    public static function newInstance()
+    public static function newInstance(): static
     {
         return Container::getInstance()
             ->make(TypedFormRequestBuilder::class, ['requestClass' => static::class])
