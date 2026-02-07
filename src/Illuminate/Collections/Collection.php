@@ -571,7 +571,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  array<array-key, (callable(TValue, TKey): mixed)|string>  $groupBy
      * @param  bool  $preserveKeys
-     * @return static<array-key, static<($preserveKeys is true ? TKey : int), mixed>>
+     * @return ($groupBy is array{} ? never : static<array-key, static<($preserveKeys is true ? TKey : int), mixed>>)
      */
     public function groupByMany(array $groupBy, $preserveKeys = false)
     {
