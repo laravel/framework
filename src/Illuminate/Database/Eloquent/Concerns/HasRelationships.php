@@ -908,7 +908,7 @@ trait HasRelationships
         $caller = Arr::first(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), function ($trace) {
             return ! in_array(
                 $trace['function'],
-                array_merge(static::$manyMethods, ['guessBelongsToManyRelation'])
+                array_merge(static::$manyMethods, [__FUNCTION__])
             );
         });
 
