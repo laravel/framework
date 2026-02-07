@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Integration\Http;
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Http\Attributes\Rules;
-use Illuminate\Foundation\Http\RequestDto;
 use Illuminate\Foundation\Http\TypedFormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -269,6 +268,89 @@ class RequestDtoTest extends TestCase
         $this->assertSame('Widget', $actual->item);
         $this->assertNull($actual->address);
     }
+
+    public function testDeeplyNestedTypedFormRequestValidatesAndBuilds()
+    {
+        $request = Request::create('', parameters: [
+            'street' => '456 New Ave',
+            'city' => 'Shelbyville',
+            'formerAddress' => [
+                'street' => '123 Old St',
+                'city' => 'Springfield',
+            ],
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(AddressWithAddressChild::class);
+
+        $this->assertInstanceOf(AddressWithAddressChild::class, $actual);
+        $this->assertSame('456 New Ave', $actual->street);
+        $this->assertSame('Shelbyville', $actual->city);
+        $this->assertInstanceOf(AddressWithAddressChild::class, $actual->formerAddress);
+        $this->assertSame('123 Old St', $actual->formerAddress->street);
+        $this->assertSame('Springfield', $actual->formerAddress->city);
+        $this->assertNull($actual->formerAddress->zip);
+        $this->assertNull($actual->formerAddress->formerAddress);
+    }
+
+    public function testDeeplyNestedTypedFormRequestTwoLevelsDeep()
+    {
+        $request = Request::create('', parameters: [
+            'street' => '789 Current Rd',
+            'city' => 'Capital City',
+            'formerAddress' => [
+                'street' => '456 New Ave',
+                'city' => 'Shelbyville',
+                'formerAddress' => [
+                    'street' => '123 Old St',
+                    'city' => 'Springfield',
+                ],
+            ],
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(AddressWithAddressChild::class);
+
+        $this->assertInstanceOf(AddressWithAddressChild::class, $actual->formerAddress);
+        $this->assertInstanceOf(AddressWithAddressChild::class, $actual->formerAddress->formerAddress);
+        $this->assertSame('123 Old St', $actual->formerAddress->formerAddress->street);
+        $this->assertSame('Springfield', $actual->formerAddress->formerAddress->city);
+        $this->assertNull($actual->formerAddress->formerAddress->formerAddress);
+    }
+
+    public function testDeeplyNestedTypedFormRequestOmitted()
+    {
+        $request = Request::create('', parameters: [
+            'street' => '456 New Ave',
+            'city' => 'Shelbyville',
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(AddressWithAddressChild::class);
+
+        $this->assertSame('456 New Ave', $actual->street);
+        $this->assertNull($actual->formerAddress);
+    }
+
+    public function testDeeplyNestedTypedFormRequestFailsValidation()
+    {
+        $request = Request::create('', parameters: [
+            'street' => '456 New Ave',
+            'city' => 'Shelbyville',
+            'formerAddress' => [
+                'city' => 'Springfield',
+                // street is missing
+            ],
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(AddressWithAddressChild::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('formerAddress.street', $e->errors());
+        }
+    }
 }
 
 class MyTypedForm extends TypedFormRequest
@@ -392,4 +474,14 @@ class CreateOrderRequestWithOptionalAddress extends TypedFormRequest
         public ?Address $address = null,
     ) {
     }
+}
+
+class AddressWithAddressChild extends TypedFormRequest
+{
+    public function __construct(
+        public string $street,
+        public string $city,
+        public ?string $zip = null,
+        public ?AddressWithAddressChild $formerAddress = null
+    ) {}
 }

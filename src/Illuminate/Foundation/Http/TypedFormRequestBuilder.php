@@ -30,6 +30,9 @@ class TypedFormRequestBuilder
     /** @var ReflectionClass<T>|null */
     protected ?ReflectionClass $reflection = null;
 
+    /** @var list<class-string> */
+    protected array $ancestors = [];
+
     /**
      * @param  class-string<T>  $requestClass
      * @param  Request  $request
@@ -48,6 +51,14 @@ class TypedFormRequestBuilder
     protected function reflectRequest(): ReflectionClass
     {
         return $this->reflection ??= new ReflectionClass($this->requestClass);
+    }
+
+    protected function nestedBuilder(string $class): static
+    {
+        $builder = new static($class, $this->request);
+        $builder->ancestors = [...$this->ancestors, $this->requestClass];
+
+        return $builder;
     }
 
     /**
@@ -83,7 +94,6 @@ class TypedFormRequestBuilder
     protected function buildDto(array $validated): TypedFormRequest
     {
         // @todo add ability to map request to DTO params
-        // @todo handle nested objects
         $dtoClass = $this->requestClass;
 
         return new $dtoClass(...$this->castValidatedData($validated)); // @phpstan-ignore new.noConstructor (this is a requirement for now)
@@ -91,15 +101,7 @@ class TypedFormRequestBuilder
 
     protected function castValidatedData(array $validated): array
     {
-        return static::castValidatedDataFor($validated, $this->requestClass);
-    }
-
-    /**
-     * @param  class-string<TypedFormRequest>  $class
-     */
-    protected static function castValidatedDataFor(array $validated, string $class): array
-    {
-        $constructor = (new ReflectionClass($class))->getConstructor();
+        $constructor = $this->reflectRequest()->getConstructor();
 
         if ($constructor === null) {
             return $validated;
@@ -121,8 +123,8 @@ class TypedFormRequestBuilder
             $typeName = $type->getName();
 
             if (is_subclass_of($typeName, TypedFormRequest::class)) {
-                $nestedData = static::castValidatedDataFor($validated[$name], $typeName);
-                $validated[$name] = new $typeName(...$nestedData);
+                $nestedData = $this->nestedBuilder($typeName)->castValidatedData($validated[$name]);
+                $validated[$name] = new $typeName(...$nestedData); // @phpstan-ignore new.noConstructor
             } elseif (is_subclass_of($typeName, BackedEnum::class)) {
                 $validated[$name] = $validated[$name] !== null
                     ? $typeName::from($validated[$name])
@@ -238,17 +240,7 @@ class TypedFormRequestBuilder
      */
     protected function rulesFromTypes(): array
     {
-        return static::rulesFromTypesFor($this->requestClass);
-    }
-
-    /**
-     * @param  class-string<TypedFormRequest>  $class
-     * @param  string  $prefix
-     * @return array<string, mixed>
-     */
-    protected static function rulesFromTypesFor(string $class, string $prefix = ''): array
-    {
-        $constructor = (new ReflectionClass($class))->getConstructor();
+        $constructor = $this->reflectRequest()->getConstructor();
 
         if ($constructor === null) {
             return [];
@@ -257,11 +249,10 @@ class TypedFormRequestBuilder
         $rules = [];
 
         foreach ($constructor->getParameters() as $param) {
-            $paramRules = static::rulesForParameterStatic($param);
-            $key = $prefix.$param->getName();
+            $paramRules = $this->rulesForParameter($param);
 
             if ($paramRules !== []) {
-                $rules[$key] = $paramRules;
+                $rules[$param->getName()] = $paramRules;
             }
 
             // Recursively collect nested TypedFormRequest rules
@@ -269,12 +260,21 @@ class TypedFormRequestBuilder
 
             if ($type instanceof ReflectionNamedType
                 && ! $type->isBuiltin()
-                && is_subclass_of($type->getName(), TypedFormRequest::class)) {
+                && is_subclass_of($type->getName(), TypedFormRequest::class)
+                && ! in_array($type->getName(), $this->ancestors)) {
+                $name = $param->getName();
                 $parentIsOptional = $param->isDefaultValueAvailable() || $type->allowsNull();
-                $nestedRules = static::nestedRulesFor($type->getName(), $key.'.', $parentIsOptional ? $key : null);
+                $nestedRules = $this->nestedBuilder($type->getName())->validationRules();
 
-                foreach ($nestedRules as $nestedKey => $nestedFieldRules) {
-                    $rules[$nestedKey] = $nestedFieldRules;
+                foreach ($nestedRules as $field => $fieldRules) {
+                    if ($parentIsOptional) {
+                        $fieldRules = array_map(
+                            fn ($rule) => $rule === 'required' ? "required_with:$name" : $rule,
+                            $fieldRules,
+                        );
+                    }
+
+                    $rules["$name.$field"] = $fieldRules;
                 }
             }
         }
@@ -282,43 +282,7 @@ class TypedFormRequestBuilder
         return $rules;
     }
 
-    /**
-     * @param  class-string<TypedFormRequest>  $class
-     * @param  string  $prefix
-     * @param  string|null  $optionalParentKey  When set, 'required' rules become 'required_with:<key>'
-     * @return array<string, mixed>
-     */
-    protected static function nestedRulesFor(string $class, string $prefix, ?string $optionalParentKey = null): array
-    {
-        $rules = static::rulesFromTypesFor($class, $prefix);
-
-        if (method_exists($class, 'rules')) {
-            $userRules = Container::getInstance()->call([$class, 'rules']);
-
-            foreach ($userRules as $field => $fieldRules) {
-                $key = $prefix.$field;
-                $rules[$key] = array_merge($rules[$key] ?? [], Arr::wrap($fieldRules));
-            }
-        }
-
-        if ($optionalParentKey !== null) {
-            foreach ($rules as $key => $fieldRules) {
-                $rules[$key] = array_map(
-                    fn ($rule) => $rule === 'required' ? "required_with:{$optionalParentKey}" : $rule,
-                    $fieldRules,
-                );
-            }
-        }
-
-        return $rules;
-    }
-
     protected function rulesForParameter(ReflectionParameter $param): array
-    {
-        return static::rulesForParameterStatic($param);
-    }
-
-    protected static function rulesForParameterStatic(ReflectionParameter $param): array
     {
         $type = $param->getType();
 
@@ -346,7 +310,7 @@ class TypedFormRequestBuilder
             'string' => 'string',
             'bool' => 'boolean',
             'array' => 'array',
-            default => static::ruleForNonBuiltinTypeStatic($type),
+            default => $this->ruleForNonBuiltinType($type),
         };
 
         if ($typeRule !== null) {
@@ -357,11 +321,6 @@ class TypedFormRequestBuilder
     }
 
     protected function ruleForNonBuiltinType(ReflectionNamedType $type): mixed
-    {
-        return static::ruleForNonBuiltinTypeStatic($type);
-    }
-
-    protected static function ruleForNonBuiltinTypeStatic(ReflectionNamedType $type): mixed
     {
         $name = $type->getName();
 
@@ -392,44 +351,32 @@ class TypedFormRequestBuilder
 
     protected function mergeRequestData(array $data): array
     {
-        return static::mergeRequestDataFor($data, $this->requestClass);
-    }
-
-    /**
-     * @param  class-string<TypedFormRequest>  $class
-     */
-    protected static function mergeRequestDataFor(array $data, string $class): array
-    {
-        $reflection = new ReflectionClass($class);
-
-        (new Collection($reflection->getProperties(ReflectionProperty::IS_PUBLIC)))
+        (new Collection($this->reflectRequest()->getProperties(ReflectionProperty::IS_PUBLIC)))
             ->filter(fn (ReflectionProperty $prop) => $prop->hasDefaultValue())
             ->each(function (ReflectionProperty $prop) use (&$data) {
                 if (Arr::has($data, $name = $prop->getName())) {
                     return;
                 }
-                $data[$name] = static::mapToNativeFromDefaultStatic($prop);
+                $data[$name] = $this->mapToNativeFromDefault($prop);
             });
 
         // Recursively merge defaults for nested TypedFormRequest properties
-        $constructor = $reflection->getConstructor();
+        $constructor = $this->reflectRequest()->getConstructor();
 
-        if ($constructor === null) {
-            return $data;
-        }
+        if ($constructor !== null) {
+            foreach ($constructor->getParameters() as $param) {
+                $type = $param->getType();
 
-        foreach ($constructor->getParameters() as $param) {
-            $type = $param->getType();
+                if (! $type instanceof ReflectionNamedType || $type->isBuiltin()) {
+                    continue;
+                }
 
-            if (! $type instanceof ReflectionNamedType || $type->isBuiltin()) {
-                continue;
-            }
+                $typeName = $type->getName();
+                $name = $param->getName();
 
-            $typeName = $type->getName();
-            $name = $param->getName();
-
-            if (is_subclass_of($typeName, TypedFormRequest::class) && isset($data[$name]) && is_array($data[$name])) {
-                $data[$name] = static::mergeRequestDataFor($data[$name], $typeName);
+                if (is_subclass_of($typeName, TypedFormRequest::class) && isset($data[$name]) && is_array($data[$name])) {
+                    $data[$name] = $this->nestedBuilder($typeName)->mergeRequestData($data[$name]);
+                }
             }
         }
 
@@ -443,12 +390,6 @@ class TypedFormRequestBuilder
      * @return mixed
      */
     protected function mapToNativeFromDefault(ReflectionProperty $prop): mixed
-    {
-        // @todo probably have to see what the getDefaultValue returns. if it's an object then we're going to need to check if it can be translated into something. Maybe check Arrayble and check if it's a TypedFormRequest
-        return enum_value($prop->getDefaultValue());
-    }
-
-    protected static function mapToNativeFromDefaultStatic(ReflectionProperty $prop): mixed
     {
         // @todo probably have to see what the getDefaultValue returns. if it's an object then we're going to need to check if it can be translated into something. Maybe check Arrayble and check if it's a TypedFormRequest
         return enum_value($prop->getDefaultValue());
