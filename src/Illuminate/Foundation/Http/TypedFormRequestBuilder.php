@@ -12,6 +12,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Validator;
 use ReflectionClass;
+use ReflectionProperty;
+
+use function Illuminate\Support\enum_value;
 
 /**
  * @template T of TypedFormRequest
@@ -196,18 +199,28 @@ class TypedFormRequestBuilder
 
     protected function mergeRequestData(array $data): array
     {
-        (new Collection($this->reflectRequest()->getProperties(\ReflectionProperty::IS_PUBLIC)))
-            ->filter(fn (\ReflectionProperty $prop) => $prop->hasDefaultValue())
-            ->each(function (\ReflectionProperty $prop) use (&$data) {
+        (new Collection($this->reflectRequest()->getProperties(ReflectionProperty::IS_PUBLIC)))
+            ->filter(fn (ReflectionProperty $prop) => $prop->hasDefaultValue())
+            ->each(function (ReflectionProperty $prop) use (&$data) {
                 if (Arr::has($data, $name = $prop->getName())) {
                     return;
                 }
-
-                $data[$name] ??= $prop->getDefaultValue();
+                $data[$name] = $this->mapToNativeFromDefault($prop);
             });
 
         return $data;
+    }
 
+    /**
+     * Reflection property is assumed to have a default value.
+     *
+     * @param  ReflectionProperty  $prop
+     * @return mixed
+     */
+    protected function mapToNativeFromDefault(ReflectionProperty $prop): mixed
+    {
+        // @todo probably have to see what the getDefaultValue returns. if it's an object then we're going to need to check if it can be translated into something. Maybe check Arrayble and check if it's a TypedFormRequest
+        return enum_value($prop->getDefaultValue());
     }
 
     protected function messages(): array
