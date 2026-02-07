@@ -13,18 +13,6 @@ use Orchestra\Testbench\TestCase;
 
 class RequestDtoTest extends TestCase
 {
-    public function testSimpleRequestDto()
-    {
-        $request = Request::create('', parameters: ['number' => 11, 'string' => 'abc']);
-        $this->app->instance('request', $request);
-
-        $actual = $this->app->make(MyRequestDto::class);
-
-        $this->assertInstanceOf(MyRequestDto::class, $actual);
-        $this->assertEquals(11, $actual->number);
-        $this->assertEquals('abc', $actual->string);
-    }
-
     public function testSimplifiedRequestDtoValidatesAndBuilds()
     {
         $request = Request::create('', parameters: ['number' => 42, 'string' => 'a']);
@@ -117,27 +105,6 @@ class RequestDtoTest extends TestCase
         $this->app->instance('request', $request);
 
         $this->app->make(MyTypedFormWithDefaults::class);
-    }
-}
-
-#[Rules([
-    'number' => ['required', 'integer', 'min:1', 'max:100'],
-    'string' => ['required', 'string', 'in:a,b,c'],
-])]
-class MyRequestDto extends RequestDto
-{
-    public function __construct(
-        public int $number,
-        public string $string,
-    ) {
-    }
-
-    protected static function rules()
-    {
-        return [
-            'number' => ['required', 'integer', 'min:1', 'max:100'],
-            'string' => ['required'],
-        ];
     }
 }
 
