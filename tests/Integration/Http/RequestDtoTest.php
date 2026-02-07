@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Integration\Http;
 
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Foundation\Http\Attributes\Rules;
+use Illuminate\Foundation\Http\Attributes\MapFrom;
 use Illuminate\Foundation\Http\TypedFormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -391,6 +391,111 @@ class RequestDtoTest extends TestCase
             $this->assertArrayHasKey('formerAddress.street', $e->errors());
         }
     }
+
+    public function testMapFromMapsRequestFieldToParamName()
+    {
+        $request = Request::create('', parameters: [
+            'first_name' => 'Taylor',
+            'lastName' => 'Otwell',
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(MappedFieldRequest::class);
+
+        $this->assertInstanceOf(MappedFieldRequest::class, $actual);
+        $this->assertSame('Taylor', $actual->firstName);
+        $this->assertSame('Otwell', $actual->lastName);
+    }
+
+    public function testMapFromValidationRulesUseMappedFieldName()
+    {
+        $request = Request::create('', parameters: [
+            'lastName' => 'Otwell',
+            // first_name is missing — should be required
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(MappedFieldRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('first_name', $e->errors());
+            $this->assertArrayNotHasKey('firstName', $e->errors());
+        }
+    }
+
+    public function testMapFromWithNestedTypedFormRequest()
+    {
+        $request = Request::create('', parameters: [
+            'item' => 'Widget',
+            'shipping_address' => [
+                'street' => '123 Main St',
+                'city' => 'Springfield',
+            ],
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(OrderWithMappedAddress::class);
+
+        $this->assertInstanceOf(OrderWithMappedAddress::class, $actual);
+        $this->assertSame('Widget', $actual->item);
+        $this->assertInstanceOf(Address::class, $actual->shippingAddress);
+        $this->assertSame('123 Main St', $actual->shippingAddress->street);
+        $this->assertSame('Springfield', $actual->shippingAddress->city);
+    }
+
+    public function testMapFromNestedValidationErrorUseMappedFieldName()
+    {
+        $request = Request::create('', parameters: [
+            'item' => 'Widget',
+            'shipping_address' => [
+                'city' => 'Springfield',
+                // street is missing
+            ],
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(OrderWithMappedAddress::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('shipping_address.street', $e->errors());
+            $this->assertArrayNotHasKey('shippingAddress.street', $e->errors());
+        }
+    }
+
+    public function testMapFromWithManualRulesUsesMappedFieldName()
+    {
+        $request = Request::create('', parameters: [
+            'first_name' => 'T',
+            'lastName' => 'Otwell',
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(MappedFieldWithRulesRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            // Manual rule 'min:2' on 'first_name' should fail
+            $this->assertArrayHasKey('first_name', $e->errors());
+            $this->assertArrayNotHasKey('firstName', $e->errors());
+        }
+    }
+
+    public function testMapFromWithManualRulesPassesValidation()
+    {
+        $request = Request::create('', parameters: [
+            'first_name' => 'Taylor',
+            'lastName' => 'Otwell',
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(MappedFieldWithRulesRequest::class);
+
+        $this->assertInstanceOf(MappedFieldWithRulesRequest::class, $actual);
+        $this->assertSame('Taylor', $actual->firstName);
+        $this->assertSame('Otwell', $actual->lastName);
+    }
 }
 
 class MyTypedForm extends TypedFormRequest
@@ -556,4 +661,42 @@ class AddressWithAddressChild extends TypedFormRequest
         public ?string $zip = null,
         public ?AddressWithAddressChild $formerAddress = null
     ) {}
+}
+
+class MappedFieldRequest extends TypedFormRequest
+{
+    public function __construct(
+        #[MapFrom('first_name')]
+        public string $firstName,
+        public string $lastName,
+    ) {
+    }
+}
+
+class OrderWithMappedAddress extends TypedFormRequest
+{
+    public function __construct(
+        public string $item,
+        #[MapFrom('shipping_address')]
+        public Address $shippingAddress,
+    ) {
+    }
+}
+
+class MappedFieldWithRulesRequest extends TypedFormRequest
+{
+    public function __construct(
+        #[MapFrom('first_name')]
+        public string $firstName,
+        public string $lastName,
+    ) {
+    }
+
+    public static function rules(): array
+    {
+        return [
+            'first_name' => ['min:2', 'max:50'],
+            'lastName' => ['min:2'],
+        ];
+    }
 }

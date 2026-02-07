@@ -7,6 +7,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
+use Illuminate\Foundation\Http\Attributes\MapFrom;
 use Illuminate\Foundation\Precognition;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -68,6 +69,13 @@ class TypedFormRequestBuilder
         return $builder;
     }
 
+    protected function fieldNameFor(ReflectionParameter $param): string
+    {
+        $attr = $param->getAttributes(MapFrom::class)[0] ?? null;
+
+        return $attr ? $attr->newInstance()->name : $param->getName();
+    }
+
     /**
      * @return T
      */
@@ -114,10 +122,16 @@ class TypedFormRequestBuilder
         }
 
         foreach ($constructor->getParameters() as $param) {
+            $fieldName = $this->fieldNameFor($param);
             $name = $param->getName();
 
-            if (! array_key_exists($name, $validated)) {
+            if (! array_key_exists($fieldName, $validated)) {
                 continue;
+            }
+
+            if ($fieldName !== $name) {
+                $validated[$name] = $validated[$fieldName];
+                unset($validated[$fieldName]);
             }
 
             $type = $param->getType();
@@ -258,7 +272,7 @@ class TypedFormRequestBuilder
             $paramRules = $this->rulesForParameter($param);
 
             if ($paramRules !== []) {
-                $rules[$param->getName()] = $paramRules;
+                $rules[$this->fieldNameFor($param)] = $paramRules;
             }
         }
 
@@ -333,18 +347,29 @@ class TypedFormRequestBuilder
 
     protected function mergeRequestData(array $data): array
     {
+        $constructor = $this->reflectRequest()->getConstructor();
+
+        // Build a lookup of param name → field name for MapFrom resolution
+        $fieldNames = [];
+
+        if ($constructor !== null) {
+            foreach ($constructor->getParameters() as $param) {
+                $fieldNames[$param->getName()] = $this->fieldNameFor($param);
+            }
+        }
+
         (new Collection($this->reflectRequest()->getProperties(ReflectionProperty::IS_PUBLIC)))
             ->filter(fn (ReflectionProperty $prop) => $prop->hasDefaultValue())
-            ->each(function (ReflectionProperty $prop) use (&$data) {
-                if (Arr::has($data, $name = $prop->getName())) {
+            ->each(function (ReflectionProperty $prop) use (&$data, $fieldNames) {
+                $fieldName = $fieldNames[$prop->getName()] ?? $prop->getName();
+
+                if (Arr::has($data, $fieldName)) {
                     return;
                 }
-                $data[$name] = $this->mapToNativeFromDefault($prop);
+                $data[$fieldName] = $this->mapToNativeFromDefault($prop);
             });
 
         // Recursively merge defaults for nested TypedFormRequest properties
-        $constructor = $this->reflectRequest()->getConstructor();
-
         if ($constructor !== null) {
             foreach ($constructor->getParameters() as $param) {
                 $type = $param->getType();
@@ -354,7 +379,7 @@ class TypedFormRequestBuilder
                 }
 
                 $typeName = $type->getName();
-                $name = $param->getName();
+                $name = $this->fieldNameFor($param);
 
                 if (is_subclass_of($typeName, TypedFormRequest::class) && isset($data[$name]) && is_array($data[$name])) {
                     $data[$name] = $this->nestedBuilder($typeName)->mergeRequestData($data[$name]);
@@ -428,7 +453,7 @@ class TypedFormRequestBuilder
                 continue;
             }
 
-            $name = $param->getName();
+            $name = $this->fieldNameFor($param);
             $parentIsOptional = $param->isDefaultValueAvailable() || $type->allowsNull();
             $nested = $this->nestedBuilder($type->getName());
 
