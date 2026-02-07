@@ -2,10 +2,12 @@
 
 namespace Illuminate\Tests\Support;
 
+use Brick\Math\RoundingMode;
 use DivisionByZeroError;
 use Illuminate\Support\Numberable;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 class SupportNumberableTest extends TestCase
 {
@@ -19,6 +21,22 @@ class SupportNumberableTest extends TestCase
 
         $this->assertSame(45, $result->value());
         $this->assertTrue($result->isInt());
+    }
+
+    public function testRoundSupportsRoundingModes()
+    {
+        $this->assertSame(2.5, Numberable::make(2.55)->round(1, RoundingMode::Down)->toFloat());
+        $this->assertSame(2.6, Numberable::make(2.55)->round(1, RoundingMode::Up)->toFloat());
+        $this->assertSame(150, Numberable::make(145)->round(-1, RoundingMode::HalfUp)->toInt());
+        $this->assertSame(140, Numberable::make(145)->round(-1, RoundingMode::HalfDown)->toInt());
+    }
+
+    public function testRoundingModeCanBeConfiguredWithWither()
+    {
+        $number = Numberable::make(1.5)->withRoundingMode(RoundingMode::HalfEven);
+
+        $this->assertSame(2, $number->round()->toInt());
+        $this->assertSame(2, $number->add(1)->round()->toInt());
     }
 
     public function testDivisionByZeroThrowsException()
@@ -91,6 +109,20 @@ class SupportNumberableTest extends TestCase
         $this->assertNotSame('', $number->formatAs('ordinal'));
         $this->assertNotSame('', $number->formatAs('spell'));
         $this->assertNotSame('', $number->formatAs('spellOrdinal'));
+    }
+
+    public function testFallbackPercentageRespectsLocaleSymbolPlacementAndSpacing()
+    {
+        $method = new ReflectionMethod(Numberable::class, 'fallbackPercentage');
+        $method->setAccessible(true);
+
+        $number = Numberable::make(12.5);
+
+        $this->assertSame('12.5%', $method->invoke($number, 1, null, 'en'));
+        $this->assertSame('12.5 %', $method->invoke($number, 1, null, 'fr'));
+        $this->assertSame('%12.5', $method->invoke($number, 1, null, 'tr'));
+        $this->assertSame('12.5٪', $method->invoke($number, 1, null, 'fa'));
+        $this->assertSame('12.5٪؜', $method->invoke($number, 1, null, 'ar'));
     }
 
     public function testFormatAsCanBeExtendedWithCustomStyle()

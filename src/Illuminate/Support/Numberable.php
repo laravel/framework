@@ -2,6 +2,8 @@
 
 namespace Illuminate\Support;
 
+use Brick\Math\BigDecimal;
+use Brick\Math\RoundingMode;
 use DivisionByZeroError;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Dumpable;
@@ -53,6 +55,13 @@ class Numberable implements BaseStringable, JsonSerializable
     protected $maxPrecision;
 
     /**
+     * The rounding mode used by round operations.
+     *
+     * @var \Brick\Math\RoundingMode
+     */
+    protected $roundingMode;
+
+    /**
      * Remember the last requested cast format.
      *
      * @var array{type: string, payload: mixed}|null
@@ -74,6 +83,7 @@ class Numberable implements BaseStringable, JsonSerializable
     public function __construct(int|float $value = 0)
     {
         $this->value = $value;
+        $this->roundingMode = RoundingMode::HalfUp;
     }
 
     /**
@@ -96,7 +106,7 @@ class Numberable implements BaseStringable, JsonSerializable
      */
     public static function parse(string $value, ?string $locale = null)
     {
-        $parsed = static::parseNumber($value, $locale);
+        $parsed = static::parseNumber($value, $locale, type: 'float');
 
         if ($parsed === false) {
             throw new InvalidArgumentException('Unable to parse the given numeric string.');
@@ -233,11 +243,16 @@ class Numberable implements BaseStringable, JsonSerializable
      * Round the number.
      *
      * @param  int  $precision
+     * @param  \Brick\Math\RoundingMode|null  $roundingMode
      * @return static
      */
-    public function round(int $precision = 0)
+    public function round(int $precision = 0, ?RoundingMode $roundingMode = null)
     {
-        return $this->newInstance(static::normalizeNumber(round($this->value, $precision)));
+        return $this->newInstance(static::roundValue(
+            $this->value,
+            $precision,
+            $roundingMode ?? $this->roundingMode
+        ));
     }
 
     /**
@@ -433,6 +448,20 @@ class Numberable implements BaseStringable, JsonSerializable
     }
 
     /**
+     * Set the rounding mode used by round operations.
+     *
+     * @param  \Brick\Math\RoundingMode  $roundingMode
+     * @return static
+     */
+    public function withRoundingMode(RoundingMode $roundingMode)
+    {
+        $instance = $this->newInstance($this->value);
+        $instance->roundingMode = $roundingMode;
+
+        return $instance;
+    }
+
+    /**
      * Get the underlying numeric value.
      *
      * @return int|float
@@ -503,18 +532,21 @@ class Numberable implements BaseStringable, JsonSerializable
      *
      * @param  string  $value
      * @param  string|null  $locale
-     * @param  string  $type
+     * @param  'int'|'float'  $type
      * @return int|float|false
      */
     protected static function parseNumber(string $value, ?string $locale = null, string $type = 'float'): int|float|false
     {
+        if (! in_array($type, ['int', 'float'], true)) {
+            throw new InvalidArgumentException("Unsupported parse type [{$type}].");
+        }
+
         $parsed = static::parseNumberFallback($value, $locale);
 
         if ($parsed !== false) {
             return match ($type) {
                 'int' => (int) $parsed,
                 'float' => (float) $parsed,
-                default => $parsed,
             };
         }
 
@@ -522,7 +554,6 @@ class Numberable implements BaseStringable, JsonSerializable
             return match ($type) {
                 'int' => Number::parseInt($value, $locale),
                 'float' => Number::parseFloat($value, $locale),
-                default => Number::parse($value, locale: $locale),
             };
         }
 
@@ -701,7 +732,7 @@ class Numberable implements BaseStringable, JsonSerializable
 
         return $this->intlOrFallback(
             fn () => (string) Number::percentage($this->value, $precision, $maxPrecision, $locale),
-            fn () => $this->fallbackPercentage($precision, $maxPrecision)
+            fn () => $this->fallbackPercentage($precision, $maxPrecision, $locale)
         );
     }
 
@@ -871,13 +902,21 @@ class Numberable implements BaseStringable, JsonSerializable
      *
      * @param  int  $precision
      * @param  int|null  $maxPrecision
+     * @param  string|null  $locale
      * @return string
      */
-    protected function fallbackPercentage(int $precision, ?int $maxPrecision = null): string
+    protected function fallbackPercentage(int $precision, ?int $maxPrecision = null, ?string $locale = null): string
     {
         $formatted = static::fallbackFormat($this->value, $precision, $maxPrecision);
+        $symbol = static::resolvePercentageSymbol($locale);
 
-        return $formatted.'%';
+        if (static::localeUsesPrefixedPercentage($locale)) {
+            return $symbol.$formatted;
+        }
+
+        $separator = static::localeUsesSpacedPercentage($locale) ? ' ' : '';
+
+        return $formatted.$separator.$symbol;
     }
 
     /**
@@ -901,6 +940,66 @@ class Numberable implements BaseStringable, JsonSerializable
         }
 
         return $number.$suffix;
+    }
+
+    /**
+     * Resolve the percent symbol for the given locale.
+     *
+     * @param  string|null  $locale
+     * @return string
+     */
+    protected static function resolvePercentageSymbol(?string $locale): string
+    {
+        $language = static::localeLanguage($locale);
+
+        return match ($language) {
+            'ar' => '٪؜',
+            'fa' => '٪',
+            default => '%',
+        };
+    }
+
+    /**
+     * Determine if a locale writes percent signs before numbers.
+     *
+     * @param  string|null  $locale
+     * @return bool
+     */
+    protected static function localeUsesPrefixedPercentage(?string $locale): bool
+    {
+        return in_array(static::localeLanguage($locale), ['eu', 'ku', 'tr'], true);
+    }
+
+    /**
+     * Determine if a locale writes percent signs with a preceding space.
+     *
+     * @param  string|null  $locale
+     * @return bool
+     */
+    protected static function localeUsesSpacedPercentage(?string $locale): bool
+    {
+        return in_array(static::localeLanguage($locale), [
+            'cs', 'da', 'fo', 'fi', 'fr', 'gl', 'de', 'kl', 'lt', 'lb',
+            'mk', 'nb', 'nn', 'no', 'qu', 'ro', 'rm', 'ru', 'sk', 'sl',
+            'es', 'sv', 'tk',
+        ], true);
+    }
+
+    /**
+     * Resolve the normalized language code from a locale string.
+     *
+     * @param  string|null  $locale
+     * @return string|null
+     */
+    protected static function localeLanguage(?string $locale): ?string
+    {
+        if (is_null($locale) || $locale === '') {
+            return null;
+        }
+
+        $normalized = strtolower(str_replace('_', '-', $locale));
+
+        return explode('-', $normalized)[0];
     }
 
     /**
@@ -1046,6 +1145,7 @@ class Numberable implements BaseStringable, JsonSerializable
         $instance->currency = $this->currency;
         $instance->precision = $this->precision;
         $instance->maxPrecision = $this->maxPrecision;
+        $instance->roundingMode = $this->roundingMode;
         $instance->stringCast = $this->stringCast;
 
         return $instance;
@@ -1092,6 +1192,38 @@ class Numberable implements BaseStringable, JsonSerializable
         }
 
         return $value;
+    }
+
+    /**
+     * Round a value with support for all brick/math rounding modes.
+     *
+     * @param  int|float  $value
+     * @param  int  $precision
+     * @param  \Brick\Math\RoundingMode  $roundingMode
+     * @return int|float
+     */
+    protected static function roundValue(int|float $value, int $precision, RoundingMode $roundingMode): int|float
+    {
+        if (is_float($value) && ! is_finite($value)) {
+            return static::normalizeNumber(round($value, $precision));
+        }
+
+        $decimal = BigDecimal::of((string) $value);
+
+        if ($precision < 0) {
+            $offset = abs($precision);
+
+            $decimal = $decimal->withPointMovedLeft($offset)
+                ->toScale(0, $roundingMode)
+                ->withPointMovedRight($offset);
+        } else {
+            $decimal = $decimal->toScale($precision, $roundingMode);
+        }
+
+        /** @var int|float $rounded */
+        $rounded = (string) $decimal + 0;
+
+        return static::normalizeNumber($rounded);
     }
 
     /**
