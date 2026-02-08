@@ -5,8 +5,11 @@ namespace Illuminate\Foundation\Http;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Container\SelfBuilding;
 
-class TypedFormRequest implements SelfBuilding
+abstract class TypedFormRequest implements SelfBuilding
 {
+    /**
+     * Build a new TypedFormRequest instance.
+     */
     public static function newInstance(): static
     {
         return Container::getInstance()
