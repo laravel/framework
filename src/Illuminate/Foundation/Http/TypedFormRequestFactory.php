@@ -352,7 +352,7 @@ class TypedFormRequestFactory
         $nestedData = $this->nestedFactory($class)->castValidatedData($value);
 
         if (is_subclass_of($class, TypedFormRequest::class)) {
-            return new $class(...$nestedData); // @phpstan-ignore new.noConstructor
+            return new $class(...$nestedData);
         }
 
         return new $class(...$nestedData);
