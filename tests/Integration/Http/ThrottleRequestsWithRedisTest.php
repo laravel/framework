@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Throwable;
 
 #[WithConfig('hashing.driver', 'bcrypt')]
@@ -48,5 +49,58 @@ class ThrottleRequestsWithRedisTest extends TestCase
                 // $this->assertTrue(in_array($e->getHeaders()['X-RateLimit-Reset'], [$finish->getTimestamp() + 2, $finish->getTimestamp() + 3]));
             }
         });
+    }
+
+    public static function keyPrefixProvider()
+    {
+        return [
+            'default prefix' => [ThrottleRequestsWithRedis::class, 'throttle:'],
+            'override prefix' => [ThrottleRequestsWithRedisWithCustomPrefix::class, 'prefix:'],
+            'no prefix' => [ThrottleRequestsWithRedisWithNoPrefix::class, ''],
+        ];
+    }
+
+    #[DataProvider('keyPrefixProvider')]
+    public function testThrottleKeysArePrefixed($middleware, $expectedPrefix)
+    {
+        $this->ifRedisAvailable(function () use ($middleware, $expectedPrefix) {
+            Route::get('/', function () {
+                return 'Throttle test';
+            })->middleware($middleware.':2,1');
+
+            $this->withoutExceptionHandling()->get('/');
+
+            $keys = $this->app->make('redis')->connection()->keys('*');
+
+            $this->assertNotEmpty($keys, 'Throttle keys should exist in Redis');
+
+            if ($expectedPrefix !== '') {
+                $this->assertNotEmpty(
+                    array_filter($keys, fn ($key) => str_contains($key, $expectedPrefix)),
+                    "Throttle keys should contain the prefix '{$expectedPrefix}'"
+                );
+            } else {
+                $this->assertEmpty(
+                    array_filter($keys, fn ($key) => str_contains($key, 'throttle:')),
+                    'Throttle keys should not have a prefix when prefix is empty'
+                );
+            }
+        });
+    }
+}
+
+class ThrottleRequestsWithRedisWithCustomPrefix extends ThrottleRequestsWithRedis
+{
+    protected function keyPrefix()
+    {
+        return 'prefix:';
+    }
+}
+
+class ThrottleRequestsWithRedisWithNoPrefix extends ThrottleRequestsWithRedis
+{
+    protected function keyPrefix()
+    {
+        return '';
     }
 }
