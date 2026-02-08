@@ -64,6 +64,8 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      *
      * @param  static|callable|null  $callback
      * @return static|void
+     *
+     * @throws \InvalidArgumentException
      */
     public static function defaults($callback = null)
     {

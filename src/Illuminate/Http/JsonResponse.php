@@ -69,6 +69,8 @@ class JsonResponse extends BaseJsonResponse
      * {@inheritdoc}
      *
      * @return static
+     *
+     * @throws \InvalidArgumentException
      */
     #[\Override]
     public function setData($data = []): static
