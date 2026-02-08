@@ -232,7 +232,7 @@ class TypedFormRequestFactory
     {
         $requestClass = $this->requestClass;
 
-        return new $requestClass(...$this->castValidatedData($validated)); // @phpstan-ignore new.noConstructor (this is a requirement for now)
+        return new $requestClass(...$this->castValidatedData($validated));
     }
 
     /**
