@@ -538,7 +538,7 @@ class TypedRequestTest extends TestCase
 
     public function testMapFromDotNotationDefaultsApplyAndBuilds()
     {
-        $request = Request::create('', parameters: []);
+        $request = Request::create('');
         $this->app->instance('request', $request);
 
         $actual = $this->app->make(DotMappedDefaultRequest::class);
@@ -838,7 +838,6 @@ class TypedRequestTest extends TestCase
         $request = Request::create('', parameters: [
             'profile' => [
                 'daysSinceILastPartied' => 10,
-                'name' => 'Taylor',
             ],
         ]);
         $this->app->instance('request', $request);
@@ -848,7 +847,7 @@ class TypedRequestTest extends TestCase
         $this->assertInstanceOf(ProfileHydrationPropertyOptInRequest::class, $actual);
         $this->assertInstanceOf(PartyProfileWithoutClassOptIn::class, $actual->profile);
         $this->assertSame(10, $actual->profile->daysSinceILastPartied);
-        $this->assertSame('Taylor', $actual->profile->name);
+        $this->assertSame('Luke', $actual->profile->name);
     }
 
     public function testHydratableObjectPropertyOptInMissingNestedRequiredFieldFailsValidation()
@@ -1432,13 +1431,10 @@ class MappedFieldWithRulesRequest extends TypedFormRequest
 
 class DotMappedDefaultRequest extends TypedFormRequest
 {
-    public int $age = 18;
-
     public function __construct(
         #[MapFrom('meta.age')]
-        int $age,
+        public int $age = 18
     ) {
-        $this->age = $age;
     }
 }
 
@@ -1558,7 +1554,7 @@ class PartyProfileWithoutClassOptIn
 {
     public function __construct(
         public int $daysSinceILastPartied,
-        public string $name,
+        public string $name = 'Luke',
     ) {
     }
 }

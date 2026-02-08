@@ -28,7 +28,6 @@ use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionParameter;
-use ReflectionProperty;
 use ReflectionType;
 use ReflectionUnionType;
 
@@ -63,9 +62,9 @@ class TypedFormRequestFactory
     /**
      * The cached nested validation metadata.
      *
-     * @var array{rules: array<array-key, mixed>, messages: array<array-key, mixed>, attributes: array<array-key, mixed>}|null
+     * @var array{rules: array<array-key, mixed>, messages: array<array-key, mixed>, attributes: array<array-key, mixed>}
      */
-    protected ?array $nestedMetadata = null;
+    protected array $nestedMetadata;
 
     /**
      * The cached HydrateFromRequest attribute checks.
@@ -723,44 +722,33 @@ class TypedFormRequestFactory
      */
     protected function mergeRequestData(array $data): array
     {
-        $constructor = $this->reflectRequest()->getConstructor();
-
-        // Build a lookup of param name → field name for MapFrom resolution
-        $fieldNames = [];
-
-        if ($constructor !== null) {
-            foreach ($constructor->getParameters() as $param) {
-                $fieldNames[$param->getName()] = $this->fieldNameFor($param);
-            }
+        if (($constructor = $this->reflectRequest()->getConstructor()) === null) {
+            return $data;
         }
 
-        (new Collection($this->reflectRequest()->getProperties(ReflectionProperty::IS_PUBLIC)))
-            ->filter(fn (ReflectionProperty $prop) => $prop->hasDefaultValue())
-            ->each(function (ReflectionProperty $prop) use (&$data, $fieldNames) {
-                $fieldName = $fieldNames[$prop->getName()] ?? $prop->getName();
+        foreach ($constructor->getParameters() as $param) {
+            $fieldName = $this->fieldNameFor($param);
 
-                if (Arr::has($data, $fieldName)) {
-                    return;
-                }
+            // If no data for this field was included in the request, use the
+            // default value defined for that parameter from the object.
+            if ($param->isDefaultValueAvailable() && ! Arr::has($data, $fieldName)) {
+                Arr::set($data, $fieldName, $this->mapToNativeFromDefaultValue($param->getDefaultValue()));
+            }
 
-                Arr::set($data, $fieldName, $this->mapToNativeFromDefault($prop));
-            });
+            $type = $param->getType();
 
-        // Recursively merge defaults for nested TypedFormRequest properties
-        if ($constructor !== null) {
-            foreach ($constructor->getParameters() as $param) {
-                $type = $param->getType();
+            if (! $type instanceof ReflectionNamedType || $type->isBuiltin()) {
+                continue;
+            }
 
-                if (! $type instanceof ReflectionNamedType || $type->isBuiltin()) {
-                    continue;
-                }
+            $typeName = $type->getName();
 
-                $typeName = $type->getName();
-                $name = $this->fieldNameFor($param);
+            if (! is_subclass_of($typeName, TypedFormRequest::class)) {
+                continue;
+            }
 
-                if (is_subclass_of($typeName, TypedFormRequest::class) && Arr::has($data, $name) && is_array($value = Arr::get($data, $name))) {
-                    Arr::set($data, $name, $this->nestedFactory($typeName)->mergeRequestData($value));
-                }
+            if (Arr::has($data, $fieldName) && is_array($value = Arr::get($data, $fieldName))) {
+                Arr::set($data, $fieldName, $this->nestedFactory($typeName)->mergeRequestData($value));
             }
         }
 
@@ -770,11 +758,12 @@ class TypedFormRequestFactory
     /**
      * Convert a reflected default value to a native value.
      *
+     * @param  mixed  $value  The default value.
      * @return mixed
      */
-    protected function mapToNativeFromDefault(ReflectionProperty $prop): mixed
+    protected function mapToNativeFromDefaultValue(mixed $value): mixed
     {
-        return enum_value($prop->getDefaultValue());
+        return enum_value($value);
     }
 
     /**
@@ -816,7 +805,7 @@ class TypedFormRequestFactory
      */
     protected function nestedMetadata(): array
     {
-        if ($this->nestedMetadata !== null) {
+        if (isset($this->nestedMetadata)) {
             return $this->nestedMetadata;
         }
 
@@ -824,9 +813,7 @@ class TypedFormRequestFactory
         $messages = [];
         $attributes = [];
 
-        $constructor = $this->reflectRequest()->getConstructor();
-
-        if ($constructor === null) {
+        if (($constructor = $this->reflectRequest()->getConstructor()) === null) {
             return $this->nestedMetadata = ['rules' => $rules, 'messages' => $messages, 'attributes' => $attributes];
         }
 
