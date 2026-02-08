@@ -277,7 +277,7 @@ if (! function_exists('when')) {
      * @param  mixed  $condition
      * @param  TValue|\Closure(): TValue  $value
      * @param  TDefault|\Closure(): TDefault  $default
-     * @return ($condition is true ? TValue : ($condition is positive-int ? TValue : ($condition is non-falsy-string ? TValue : ($condition is non-empty-array ? TValue : ($condition is callable ? TValue|TDefault : TDefault)))))
+     * @return ($condition is true|positive-int|non-falsy-string|non-empty-array ? TValue : ($condition is callable ? TValue|TDefault : TDefault))
      */
     function when($condition, $value, $default = null)
     {
