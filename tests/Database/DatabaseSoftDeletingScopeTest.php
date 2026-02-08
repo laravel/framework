@@ -21,7 +21,8 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $builder = m::mock(EloquentBuilder::class);
         $model = m::mock(Model::class);
         $model->shouldReceive('getQualifiedDeletedAtColumn')->once()->andReturn('table.deleted_at');
-        $builder->shouldReceive('whereNull')->once()->with('table.deleted_at');
+        $model->shouldReceive('getUndeletedValue')->once()->andReturn(null);
+        $builder->shouldReceive('where')->once()->with('table.deleted_at', null);
 
         $scope->apply($builder, $model);
     }
@@ -40,6 +41,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $givenBuilder->shouldReceive('withTrashed')->once();
         $givenBuilder->shouldReceive('getModel')->once()->andReturn($model = m::mock(stdClass::class));
         $model->shouldReceive('getDeletedAtColumn')->once()->andReturn('deleted_at');
+        $model->shouldReceive('getUndeletedValue')->once()->andReturn(null);
         $givenBuilder->shouldReceive('update')->once()->with(['deleted_at' => null]);
 
         $callback($givenBuilder);
@@ -124,7 +126,8 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $givenBuilder->shouldReceive('getModel')->andReturn($model);
         $givenBuilder->shouldReceive('withoutGlobalScope')->with($scope)->andReturn($givenBuilder);
         $model->shouldReceive('getQualifiedDeletedAtColumn')->andReturn('table.deleted_at');
-        $givenBuilder->shouldReceive('whereNotNull')->once()->with('table.deleted_at');
+        $model->shouldReceive('getUndeletedValue')->andReturn(null);
+        $givenBuilder->shouldReceive('where')->once()->with('table.deleted_at', '!=', null);
         $result = $callback($givenBuilder);
 
         $this->assertEquals($givenBuilder, $result);
@@ -147,7 +150,8 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $givenBuilder->shouldReceive('getModel')->andReturn($model);
         $givenBuilder->shouldReceive('withoutGlobalScope')->with($scope)->andReturn($givenBuilder);
         $model->shouldReceive('getQualifiedDeletedAtColumn')->andReturn('table.deleted_at');
-        $givenBuilder->shouldReceive('whereNull')->once()->with('table.deleted_at');
+        $model->shouldReceive('getUndeletedValue')->andReturn(null);
+        $givenBuilder->shouldReceive('where')->once()->with('table.deleted_at', null);
         $result = $callback($givenBuilder);
 
         $this->assertEquals($givenBuilder, $result);
