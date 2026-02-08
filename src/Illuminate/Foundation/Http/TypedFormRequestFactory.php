@@ -75,6 +75,13 @@ class TypedFormRequestFactory
     protected array $hydrateFromRequestCache = [];
 
     /**
+     * The cached nested factories.
+     *
+     * @var array<class-string, static>
+     */
+    protected array $nestedFactories = [];
+
+    /**
      * Create a new TypedFormRequest factory instance.
      *
      * @param  class-string<T>  $requestClass  The request class being built.
@@ -101,7 +108,7 @@ class TypedFormRequestFactory
     /**
      * Determine if the given class should be hydrated from request data.
      *
-     * @param  class-string  $class  The class name to check.
+     * @param  class-string  $class
      */
     protected function shouldHydrateFromRequest(string $class): bool
     {
@@ -117,8 +124,8 @@ class TypedFormRequestFactory
     /**
      * Determine if the given constructor parameter should be hydrated from request data.
      *
-     * @param  ReflectionParameter  $param  The reflected parameter.
-     * @param  class-string  $class  The class name to check.
+     * @param  ReflectionParameter  $param
+     * @param  class-string  $class
      */
     protected function shouldHydrateParameter(ReflectionParameter $param, string $class): bool
     {
@@ -157,14 +164,20 @@ class TypedFormRequestFactory
      * @param  class-string<TSubType>  $class
      * @return static<TSubType>
      */
-    protected function nestedBuilder(string $class): static
+    protected function nestedFactory(string $class): static
     {
+        if (isset($this->nestedFactories[$class])) {
+            return $this->nestedFactories[$class];
+        }
+
         $builder = Container::getInstance()
             ->make(
                 TypedFormRequestFactory::class,
                 ['requestClass' => $class, 'request' => $this->request]
             );
         $builder->ancestors = [...$this->ancestors, $this->requestClass];
+
+        $this->nestedFactories[$class] = $builder;
 
         return $builder;
     }
@@ -336,7 +349,7 @@ class TypedFormRequestFactory
      */
     protected function instantiateFromValidatedArray(string $class, array $value): object
     {
-        $nestedData = $this->nestedBuilder($class)->castValidatedData($value);
+        $nestedData = $this->nestedFactory($class)->castValidatedData($value);
 
         if (is_subclass_of($class, TypedFormRequest::class)) {
             return new $class(...$nestedData); // @phpstan-ignore new.noConstructor
@@ -529,6 +542,8 @@ class TypedFormRequestFactory
 
         if ($param->isDefaultValueAvailable()) {
             $rules[] = 'sometimes';
+        } elseif ($type->allowsNull()) {
+            $rules[] = 'present';
         } else {
             $rules[] = 'required';
         }
@@ -732,7 +747,7 @@ class TypedFormRequestFactory
                 $name = $this->fieldNameFor($param);
 
                 if (is_subclass_of($typeName, TypedFormRequest::class) && Arr::has($data, $name) && is_array(data_get($data, $name))) {
-                    data_set($data, $name, $this->nestedBuilder($typeName)->mergeRequestData(data_get($data, $name)));
+                    data_set($data, $name, $this->nestedFactory($typeName)->mergeRequestData(data_get($data, $name)));
                 }
             }
         }
@@ -820,7 +835,7 @@ class TypedFormRequestFactory
                     continue;
                 }
 
-                $nested = $this->nestedBuilder($type->getName());
+                $nested = $this->nestedFactory($type->getName());
                 $excludeRule = null;
             } elseif ($type instanceof ReflectionUnionType) {
                 $nestedRequestClass = $this->nestedHydrationClassFromUnion($type, $param);
@@ -829,7 +844,7 @@ class TypedFormRequestFactory
                     continue;
                 }
 
-                $nested = $this->nestedBuilder($nestedRequestClass);
+                $nested = $this->nestedFactory($nestedRequestClass);
                 $excludeRule = Rule::excludeIf(fn () => ! is_array(data_get($this->validationData(), $name)));
             } else {
                 continue;
