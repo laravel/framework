@@ -275,6 +275,37 @@ class RequestDtoTest extends TestCase
         $this->assertNull($actual->address);
     }
 
+    public function testNestedTypedFormRequestRejectsScalarInputWithoutFatalError()
+    {
+        $request = Request::create('', parameters: [
+            'address' => 'not-an-array',
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(OptionalAddressWithoutInferredRulesRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('address', $e->errors());
+        }
+    }
+
+    public function testNestedTypedFormRequestWithMapFromRejectsScalarInputUsingMappedKey()
+    {
+        $request = Request::create('', parameters: [
+            'shipping_address' => 'not-an-array',
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(OptionalMappedAddressWithoutInferredRulesRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('shipping_address', $e->errors());
+            $this->assertArrayNotHasKey('address', $e->errors());
+        }
+    }
+
     public function testDeeplyNestedTypedFormRequestValidatesAndBuilds()
     {
         $request = Request::create('', parameters: [
@@ -1077,6 +1108,39 @@ class CreateOrderRequestWithOptionalAddress extends TypedFormRequest
         public string $item,
         public ?Address $address = null,
     ) {
+    }
+}
+
+class OptionalAddressWithoutInferredRulesRequest extends TypedFormRequest
+{
+    public function __construct(
+        #[WithoutInferringRules]
+        public ?Address $address = null,
+    ) {
+    }
+
+    public static function rules(): array
+    {
+        return [
+            'address' => ['nullable'],
+        ];
+    }
+}
+
+class OptionalMappedAddressWithoutInferredRulesRequest extends TypedFormRequest
+{
+    public function __construct(
+        #[MapFrom('shipping_address')]
+        #[WithoutInferringRules]
+        public ?Address $address = null,
+    ) {
+    }
+
+    public static function rules(): array
+    {
+        return [
+            'shipping_address' => ['nullable'],
+        ];
     }
 }
 

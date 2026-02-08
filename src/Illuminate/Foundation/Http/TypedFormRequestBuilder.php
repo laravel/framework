@@ -20,6 +20,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use ReflectionClass;
 use ReflectionNamedType;
@@ -113,17 +114,17 @@ class TypedFormRequestBuilder
 
         $this->passedValidation();
 
-        return $this->buildDto($this->validator->validated());
+        return $this->buildTypedFormRequest($this->validator->validated());
     }
 
     /**
      * @return T
      */
-    protected function buildDto(array $validated): TypedFormRequest
+    protected function buildTypedFormRequest(array $validated): TypedFormRequest
     {
-        $dtoClass = $this->requestClass;
+        $requestClass = $this->requestClass;
 
-        return new $dtoClass(...$this->castValidatedData($validated)); // @phpstan-ignore new.noConstructor (this is a requirement for now)
+        return new $requestClass(...$this->castValidatedData($validated)); // @phpstan-ignore new.noConstructor (this is a requirement for now)
     }
 
     protected function castValidatedData(array $validated): array
@@ -154,15 +155,15 @@ class TypedFormRequestBuilder
                     continue;
                 }
 
-                $dtoType = collect($type->getTypes())
+                $nestedRequestClass = (new Collection($type->getTypes()))
                     ->filter(fn (ReflectionNamedType $t) => $t->getName() !== 'null')
                     ->filter(fn (ReflectionNamedType $t) => ! $t->isBuiltin())
                     ->map(fn (ReflectionNamedType $t) => $t->getName())
                     ->first(fn (string $class) => is_subclass_of($class, TypedFormRequest::class));
 
-                if ($dtoType !== null && is_array($validated[$name])) {
-                    $nestedData = $this->nestedBuilder($dtoType)->castValidatedData($validated[$name]);
-                    $validated[$name] = new $dtoType(...$nestedData);
+                if ($nestedRequestClass !== null && is_array($validated[$name])) {
+                    $nestedData = $this->nestedBuilder($nestedRequestClass)->castValidatedData($validated[$name]);
+                    $validated[$name] = new $nestedRequestClass(...$nestedData);
                 }
 
                 continue;
@@ -185,6 +186,16 @@ class TypedFormRequestBuilder
             if ($this->isDateObjectType($typeName)) {
                 $validated[$name] = $this->castDateValue($typeName, $validated[$name]);
             } elseif (is_subclass_of($typeName, TypedFormRequest::class)) {
+                if ($validated[$name] === null) {
+                    continue;
+                }
+
+                if (! is_array($validated[$name])) {
+                    throw ValidationException::withMessages([
+                        $fieldName => ["The {$fieldName} field must be an array."],
+                    ]);
+                }
+
                 $nestedData = $this->nestedBuilder($typeName)->castValidatedData($validated[$name]);
                 $validated[$name] = new $typeName(...$nestedData); // @phpstan-ignore new.noConstructor
             } elseif (is_subclass_of($typeName, BackedEnum::class)) {
@@ -606,18 +617,18 @@ class TypedFormRequestBuilder
                 $nested = $this->nestedBuilder($type->getName());
                 $excludeRule = null;
             } elseif ($type instanceof ReflectionUnionType) {
-                $dtoType = collect($type->getTypes())
+                $nestedRequestClass = (new Collection($type->getTypes()))
                     ->filter(fn (ReflectionNamedType $t) => $t->getName() !== 'null')
                     ->filter(fn (ReflectionNamedType $t) => ! $t->isBuiltin())
                     ->map(fn (ReflectionNamedType $t) => $t->getName())
                     ->first(fn (string $class) => is_subclass_of($class, TypedFormRequest::class)
                         && ! in_array($class, $this->ancestors));
 
-                if ($dtoType === null) {
+                if ($nestedRequestClass === null) {
                     continue;
                 }
 
-                $nested = $this->nestedBuilder($dtoType);
+                $nested = $this->nestedBuilder($nestedRequestClass);
                 $excludeRule = Rule::excludeIf(fn () => ! is_array(data_get($this->validationData(), $name)));
             } else {
                 continue;
