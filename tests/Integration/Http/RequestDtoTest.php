@@ -832,6 +832,59 @@ class RequestDtoTest extends TestCase
         }
     }
 
+    public function testHydratableObjectPropertyOptInBuildsFromArray()
+    {
+        $request = Request::create('', parameters: [
+            'profile' => [
+                'daysSinceILastPartied' => 10,
+                'name' => 'Taylor',
+            ],
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(ProfileHydrationPropertyOptInRequest::class);
+
+        $this->assertInstanceOf(ProfileHydrationPropertyOptInRequest::class, $actual);
+        $this->assertInstanceOf(PartyProfileWithoutClassOptIn::class, $actual->profile);
+        $this->assertSame(10, $actual->profile->daysSinceILastPartied);
+        $this->assertSame('Taylor', $actual->profile->name);
+    }
+
+    public function testHydratableObjectPropertyOptInMissingNestedRequiredFieldFailsValidation()
+    {
+        $request = Request::create('', parameters: [
+            'profile' => [
+                'name' => 'Taylor',
+            ],
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(ProfileHydrationPropertyOptInRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('profile.daysSinceILastPartied', $e->errors());
+        }
+    }
+
+    public function testHydratableObjectPropertyOptInMapFromUsesMappedNestedErrorKey()
+    {
+        $request = Request::create('', parameters: [
+            'profile_data' => [
+                'name' => 'Taylor',
+            ],
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(ProfileHydrationPropertyOptInMappedRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('profile_data.daysSinceILastPartied', $e->errors());
+            $this->assertArrayNotHasKey('profile.daysSinceILastPartied', $e->errors());
+        }
+    }
+
     public function testCarbonTypeAcceptsValidDateStringAndBuildsCarbon()
     {
         $request = Request::create('', parameters: [
@@ -1392,6 +1445,34 @@ class ProfileHydrationMappedRequest extends TypedFormRequest
     public function __construct(
         #[MapFrom('profile_data')]
         public PartyProfile $profile,
+    ) {
+    }
+}
+
+class ProfileHydrationPropertyOptInRequest extends TypedFormRequest
+{
+    public function __construct(
+        #[HydrateFromRequest]
+        public PartyProfileWithoutClassOptIn $profile,
+    ) {
+    }
+}
+
+class ProfileHydrationPropertyOptInMappedRequest extends TypedFormRequest
+{
+    public function __construct(
+        #[MapFrom('profile_data')]
+        #[HydrateFromRequest]
+        public PartyProfileWithoutClassOptIn $profile,
+    ) {
+    }
+}
+
+class PartyProfileWithoutClassOptIn
+{
+    public function __construct(
+        public int $daysSinceILastPartied,
+        public string $name,
     ) {
     }
 }
