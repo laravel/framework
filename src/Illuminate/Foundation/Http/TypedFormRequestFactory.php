@@ -638,11 +638,7 @@ class TypedFormRequestFactory
             return 'date';
         }
 
-        if (is_a($name, stdClass::class, true)) {
-            return 'array';
-        }
-
-        if (is_subclass_of($name, TypedFormRequest::class) || is_a($name, Collection::class, true)) {
+        if (is_subclass_of($name, TypedFormRequest::class) || is_a($name, Collection::class, true) || is_a($name, stdClass::class, true)) {
             return 'array';
         }
 
