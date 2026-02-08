@@ -162,7 +162,7 @@ class TypedFormRequestBuilder
 
                 if ($dtoType !== null && is_array($validated[$name])) {
                     $nestedData = $this->nestedBuilder($dtoType)->castValidatedData($validated[$name]);
-                    $validated[$name] = new $dtoType(...$nestedData); // @phpstan-ignore new.noConstructor
+                    $validated[$name] = new $dtoType(...$nestedData);
                 }
 
                 continue;
