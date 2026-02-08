@@ -857,7 +857,7 @@ class TypedFormRequestFactory
                 }
 
                 $nested = $this->nestedFactory($nestedRequestClass);
-                $excludeRule = Rule::excludeIf(fn () => ! is_array(data_get($this->validationData(), $name)));
+                $excludeRule = Rule::excludeIf(fn () => ! is_array(Arr::get($this->validationData(), $name)));
             } else {
                 continue;
             }
