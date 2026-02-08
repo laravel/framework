@@ -45,6 +45,16 @@ assertType('Illuminate\Http\RedirectResponse', redirect('foo'));
 assertType('mixed', resolve('foo'));
 assertType('Illuminate\Config\Repository', resolve(Repository::class));
 
+assertType('mixed', resolve_if(true, 'foo'));
+assertType('null', resolve_if(false, 'foo'));
+assertType('object', resolve_if(true, Repository::class));
+assertType('null', resolve_if(false, Repository::class));
+
+assertType('null', resolve_unless(true, 'foo'));
+assertType('mixed', resolve_unless(false, 'foo'));
+assertType('null', resolve_unless(true, Repository::class));
+assertType('object', resolve_unless(false, Repository::class));
+
 assertType('Illuminate\Http\Request', request());
 assertType('mixed', request('foo'));
 assertType('array<string, mixed>', request(['foo', 'bar']));
