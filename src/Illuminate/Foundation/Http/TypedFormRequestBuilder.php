@@ -3,6 +3,10 @@
 namespace Illuminate\Foundation\Http;
 
 use BackedEnum;
+use Carbon\CarbonImmutable;
+use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Container\Container;
@@ -13,6 +17,7 @@ use Illuminate\Foundation\Precognition;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Validator;
 use ReflectionClass;
@@ -147,7 +152,9 @@ class TypedFormRequestBuilder
 
             $typeName = $type->getName();
 
-            if (is_subclass_of($typeName, TypedFormRequest::class)) {
+            if ($this->isDateObjectType($typeName)) {
+                $validated[$name] = $this->castDateValue($typeName, $validated[$name]);
+            } elseif (is_subclass_of($typeName, TypedFormRequest::class)) {
                 $nestedData = $this->nestedBuilder($typeName)->castValidatedData($validated[$name]);
                 $validated[$name] = new $typeName(...$nestedData); // @phpstan-ignore new.noConstructor
             } elseif (is_subclass_of($typeName, BackedEnum::class)) {
@@ -342,11 +349,37 @@ class TypedFormRequestBuilder
             return new Enum($name);
         }
 
+        if ($this->isDateObjectType($name)) {
+            return 'date';
+        }
+
         if (is_subclass_of($name, TypedFormRequest::class)) {
             return 'array';
         }
 
         return null;
+    }
+
+    protected function isDateObjectType(string $name): bool
+    {
+        return is_a($name, DateTimeInterface::class, true);
+    }
+
+    protected function castDateValue(string $typeName, mixed $value): mixed
+    {
+        if ($value === null || ($value instanceof DateTimeInterface && $value instanceof $typeName)) {
+            return $value;
+        }
+
+        $parsed = Date::parse($value);
+
+        return match (true) {
+            $typeName === DateTimeInterface::class => $parsed,
+            $typeName === DateTime::class => $parsed->toDateTime(),
+            $typeName === DateTimeImmutable::class => $parsed->toDateTimeImmutable(),
+            is_a($typeName, CarbonImmutable::class, true) => CarbonImmutable::instance($parsed),
+            default => $parsed,
+        };
     }
 
     /**

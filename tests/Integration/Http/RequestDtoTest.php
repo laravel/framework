@@ -2,6 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Http\Attributes\MapFrom;
 use Illuminate\Foundation\Http\Attributes\WithoutInferringRules;
@@ -533,7 +538,364 @@ class RequestDtoTest extends TestCase
 
         $actual = $this->app->make(OptOutInferenceOnClassRequest::class);
 
+        $this->assertInstanceOf(OptOutInferenceOnClassRequest::class, $actual);
         $this->assertSame('20', $actual->name); // coerced by PHP scalar typing
+    }
+
+    public function testUnionBuiltinAcceptsInt()
+    {
+        $this->markTestSkipped('add as follow up');
+
+        $request = Request::create('', parameters: [
+            'value' => 123,
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(UnionBuiltinRequest::class);
+
+        $this->assertInstanceOf(UnionBuiltinRequest::class, $actual);
+        $this->assertSame(123, $actual->value);
+    }
+
+    public function testUnionBuiltinAcceptsString()
+    {
+        $this->markTestSkipped('add as follow up');
+
+        $request = Request::create('', parameters: [
+            'value' => 'abc',
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(UnionBuiltinRequest::class);
+
+        $this->assertInstanceOf(UnionBuiltinRequest::class, $actual);
+        $this->assertSame('abc', $actual->value);
+    }
+
+    public function testUnionBuiltinRejectsArray()
+    {
+        $this->markTestSkipped('add as follow up');
+
+        $this->expectException(ValidationException::class);
+
+        $request = Request::create('', parameters: [
+            'value' => ['invalid'],
+        ]);
+        $this->app->instance('request', $request);
+
+        $this->app->make(UnionBuiltinRequest::class);
+    }
+
+    public function testUnionBuiltinMissingRequiredFieldFails()
+    {
+        $this->markTestSkipped('add as follow up');
+
+        $this->expectException(ValidationException::class);
+
+        $request = Request::create('');
+        $this->app->instance('request', $request);
+
+        $this->app->make(UnionBuiltinRequest::class);
+    }
+
+    public function testUnionNullableAllowsNull()
+    {
+        $this->markTestSkipped('add as follow up');
+
+        $request = Request::create('', parameters: [
+            'value' => null,
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(UnionNullableRequest::class);
+
+        $this->assertInstanceOf(UnionNullableRequest::class, $actual);
+        $this->assertNull($actual->value);
+    }
+
+    public function testUnionNullableRejectsArray()
+    {
+        $this->markTestSkipped('add as follow up');
+
+        $this->expectException(ValidationException::class);
+
+        $request = Request::create('', parameters: [
+            'value' => ['nope'],
+        ]);
+        $this->app->instance('request', $request);
+
+        $this->app->make(UnionNullableRequest::class);
+    }
+
+    public function testUnionNestedAcceptsArrayAndBuildsDto()
+    {
+        $this->markTestSkipped('add as follow up');
+
+        $request = Request::create('', parameters: [
+            'address' => [
+                'street' => '123 Main St',
+                'city' => 'Springfield',
+            ],
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(UnionNestedRequest::class);
+
+        $this->assertInstanceOf(UnionNestedRequest::class, $actual);
+        $this->assertInstanceOf(Address::class, $actual->address);
+        $this->assertSame('123 Main St', $actual->address->street);
+    }
+
+    public function testUnionNestedAcceptsString()
+    {
+        $this->markTestSkipped('add as follow up');
+
+        $request = Request::create('', parameters: [
+            'address' => 'raw string',
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(UnionNestedRequest::class);
+
+        $this->assertInstanceOf(UnionNestedRequest::class, $actual);
+        $this->assertSame('raw string', $actual->address);
+    }
+
+    public function testUnionNestedRejectsInt()
+    {
+        $this->markTestSkipped('add as follow up');
+
+        $this->expectException(ValidationException::class);
+
+        $request = Request::create('', parameters: [
+            'address' => 123,
+        ]);
+        $this->app->instance('request', $request);
+
+        $this->app->make(UnionNestedRequest::class);
+    }
+
+    public function testUnionNestedMissingFieldFailsValidation()
+    {
+        $this->markTestSkipped('add as follow up');
+
+        $this->expectException(ValidationException::class);
+
+        $request = Request::create('');
+        $this->app->instance('request', $request);
+
+        $this->app->make(UnionNestedRequest::class);
+    }
+
+    public function testUnionNestedArrayBranchValidatesNestedFields()
+    {
+        $this->markTestSkipped('add as follow up');
+
+        $request = Request::create('', parameters: [
+            'address' => [
+                'city' => 'Springfield',
+                // street is missing
+            ],
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(UnionNestedRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('address.street', $e->errors());
+        }
+    }
+
+    public function testUnionNestedMapFromArrayBranchUsesMappedValidationErrorKey()
+    {
+        $this->markTestSkipped('add as follow up');
+
+        $request = Request::create('', parameters: [
+            'shipping_address' => [
+                'city' => 'Springfield',
+                // street is missing
+            ],
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(UnionNestedMappedRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('shipping_address.street', $e->errors());
+            $this->assertArrayNotHasKey('shippingAddress.street', $e->errors());
+        }
+    }
+
+    public function testUnionNestedMapFromStringBranchPasses()
+    {
+        $this->markTestSkipped('add as follow up');
+
+        $this->markTestSkipped('add as follow up');
+        $request = Request::create('', parameters: [
+            'shipping_address' => 'raw string',
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(UnionNestedMappedRequest::class);
+
+        $this->assertInstanceOf(UnionNestedMappedRequest::class, $actual);
+        $this->assertSame('raw string', $actual->shippingAddress);
+    }
+
+    public function testCarbonTypeAcceptsValidDateStringAndBuildsCarbon()
+    {
+        $request = Request::create('', parameters: [
+            'publishedAt' => '2025-01-15 13:45:00',
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(CarbonTypedRequest::class);
+
+        $this->assertInstanceOf(CarbonTypedRequest::class, $actual);
+        $this->assertInstanceOf(Carbon::class, $actual->publishedAt);
+        $this->assertSame('2025-01-15 13:45:00', $actual->publishedAt->format('Y-m-d H:i:s'));
+    }
+
+    public function testCarbonTypeRejectsInvalidDateString()
+    {
+        $request = Request::create('', parameters: [
+            'publishedAt' => 'not-a-date',
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(CarbonTypedRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('publishedAt', $e->errors());
+        }
+    }
+
+    public function testCarbonTypeMissingRequiredFieldFailsValidation()
+    {
+        $request = Request::create('');
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(CarbonTypedRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('publishedAt', $e->errors());
+        }
+    }
+
+    public function testCarbonImmutableTypeAcceptsValidDateStringAndBuildsCarbonImmutable()
+    {
+        $request = Request::create('', parameters: [
+            'publishedAt' => '2025-01-15 13:45:00',
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(CarbonImmutableTypedRequest::class);
+
+        $this->assertInstanceOf(CarbonImmutableTypedRequest::class, $actual);
+        $this->assertInstanceOf(CarbonImmutable::class, $actual->publishedAt);
+        $this->assertSame('2025-01-15 13:45:00', $actual->publishedAt->format('Y-m-d H:i:s'));
+    }
+
+    public function testCarbonMapFromMissingFieldUsesMappedValidationKey()
+    {
+        $request = Request::create('', parameters: []);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(CarbonMappedTypedRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('published_at', $e->errors());
+            $this->assertArrayNotHasKey('publishedAt', $e->errors());
+        }
+    }
+
+    public function testCarbonMapFromInvalidDateUsesMappedValidationKey()
+    {
+        $request = Request::create('', parameters: [
+            'published_at' => 'not-a-date',
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(CarbonMappedTypedRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('published_at', $e->errors());
+            $this->assertArrayNotHasKey('publishedAt', $e->errors());
+        }
+    }
+
+    public function testDateTimeInterfaceTypeAcceptsValidDateStringAndBuildsDateTimeInterface()
+    {
+        $request = Request::create('', parameters: [
+            'publishedAt' => '2025-02-10 09:30:00',
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(DateTimeInterfaceTypedRequest::class);
+
+        $this->assertInstanceOf(DateTimeInterfaceTypedRequest::class, $actual);
+        $this->assertInstanceOf(DateTimeInterface::class, $actual->publishedAt);
+        $this->assertSame('2025-02-10 09:30:00', $actual->publishedAt->format('Y-m-d H:i:s'));
+    }
+
+    public function testDateTimeInterfaceTypeRejectsInvalidDateString()
+    {
+        $this->expectException(ValidationException::class);
+
+        $request = Request::create('', parameters: [
+            'publishedAt' => 'not-a-date',
+        ]);
+        $this->app->instance('request', $request);
+
+        $this->app->make(DateTimeInterfaceTypedRequest::class);
+    }
+
+    public function testDateTimeTypeAcceptsValidDateStringAndBuildsDateTime()
+    {
+        $request = Request::create('', parameters: [
+            'publishedAt' => '2025-02-10 09:30:00',
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(DateTimeTypedRequest::class);
+
+        $this->assertInstanceOf(DateTimeTypedRequest::class, $actual);
+        $this->assertInstanceOf(DateTime::class, $actual->publishedAt);
+        $this->assertSame('2025-02-10 09:30:00', $actual->publishedAt->format('Y-m-d H:i:s'));
+    }
+
+    public function testDateTimeImmutableTypeAcceptsValidDateStringAndBuildsDateTimeImmutable()
+    {
+        $request = Request::create('', parameters: [
+            'publishedAt' => '2025-02-10 09:30:00',
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(DateTimeImmutableTypedRequest::class);
+
+        $this->assertInstanceOf(DateTimeImmutableTypedRequest::class, $actual);
+        $this->assertInstanceOf(DateTimeImmutable::class, $actual->publishedAt);
+        $this->assertSame('2025-02-10 09:30:00', $actual->publishedAt->format('Y-m-d H:i:s'));
+    }
+
+    public function testDateTimeInterfaceMapFromMissingFieldUsesMappedValidationKey()
+    {
+        $request = Request::create('', parameters: []);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(DateTimeInterfaceMappedTypedRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('published_at', $e->errors());
+            $this->assertArrayNotHasKey('publishedAt', $e->errors());
+        }
     }
 }
 
@@ -773,3 +1135,93 @@ class OptOutInferenceOnClassRequest extends TypedFormRequest
     }
 }
 
+class UnionBuiltinRequest extends TypedFormRequest
+{
+    public function __construct(
+        public int|string $value,
+    ) {
+    }
+}
+
+class UnionNullableRequest extends TypedFormRequest
+{
+    public function __construct(
+        public int|string|null $value,
+    ) {
+    }
+}
+
+class UnionNestedRequest extends TypedFormRequest
+{
+    public function __construct(
+        public Address|string $address,
+    ) {
+    }
+}
+
+class UnionNestedMappedRequest extends TypedFormRequest
+{
+    public function __construct(
+        #[MapFrom('shipping_address')]
+        public Address|string $shippingAddress,
+    ) {
+    }
+}
+
+class CarbonTypedRequest extends TypedFormRequest
+{
+    public function __construct(
+        public Carbon $publishedAt,
+    ) {
+    }
+}
+
+class CarbonImmutableTypedRequest extends TypedFormRequest
+{
+    public function __construct(
+        public CarbonImmutable $publishedAt,
+    ) {
+    }
+}
+
+class CarbonMappedTypedRequest extends TypedFormRequest
+{
+    public function __construct(
+        #[MapFrom('published_at')]
+        public Carbon $publishedAt,
+    ) {
+    }
+}
+
+class DateTimeInterfaceTypedRequest extends TypedFormRequest
+{
+    public function __construct(
+        public DateTimeInterface $publishedAt,
+    ) {
+    }
+}
+
+class DateTimeInterfaceMappedTypedRequest extends TypedFormRequest
+{
+    public function __construct(
+        #[MapFrom('published_at')]
+        public DateTimeInterface $publishedAt,
+    ) {
+    }
+}
+
+class DateTimeTypedRequest extends TypedFormRequest
+{
+    public function __construct(
+        public DateTime $publishedAt,
+    ) {
+    }
+}
+
+class DateTimeImmutableTypedRequest extends TypedFormRequest
+{
+    public function __construct(
+        public DateTimeImmutable $publishedAt,
+    ) {
+    }
+}
