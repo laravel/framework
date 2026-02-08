@@ -41,6 +41,12 @@ trait SoftDeletes
         if (! isset($this->casts[$this->getDeletedAtColumn()])) {
             $this->casts[$this->getDeletedAtColumn()] = 'datetime';
         }
+
+        $undeleted = $this->getUndeletedValue();
+
+        if (! is_null($undeleted) && ! isset($this->attributes[$this->getDeletedAtColumn()])) {
+            $this->attributes[$this->getDeletedAtColumn()] = $undeleted;
+        }
     }
 
     /**
@@ -171,7 +177,7 @@ trait SoftDeletes
             return false;
         }
 
-        $this->{$this->getDeletedAtColumn()} = null;
+        $this->{$this->getDeletedAtColumn()} = $this->getUndeletedValue();
 
         // Once we have saved the model, we will fire the "restored" event so this
         // developer will do anything they need to after a restore operation is
@@ -202,7 +208,7 @@ trait SoftDeletes
      */
     public function trashed()
     {
-        return ! is_null($this->{$this->getDeletedAtColumn()});
+        return $this->{$this->getDeletedAtColumn()} != $this->getUndeletedValue();
     }
 
     /**
@@ -278,6 +284,18 @@ trait SoftDeletes
     public function getDeletedAtColumn()
     {
         return defined(static::class.'::DELETED_AT') ? static::DELETED_AT : 'deleted_at';
+    }
+
+    /**
+     * Get the value that indicates the model is not soft deleted.
+     *
+     * @return mixed
+     */
+    public function getUndeletedValue()
+    {
+        return property_exists($this, 'undeletedValue')
+            ? $this->undeletedValue
+            : null;
     }
 
     /**

@@ -22,7 +22,7 @@ class SoftDeletingScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        $builder->whereNull($model->getQualifiedDeletedAtColumn());
+        $builder->where($model->getQualifiedDeletedAtColumn(), $model->getUndeletedValue());
     }
 
     /**
@@ -72,7 +72,7 @@ class SoftDeletingScope implements Scope
         $builder->macro('restore', function (Builder $builder) {
             $builder->withTrashed();
 
-            return $builder->update([$builder->getModel()->getDeletedAtColumn() => null]);
+            return $builder->update([$builder->getModel()->getDeletedAtColumn() => $builder->getModel()->getUndeletedValue()]);
         });
     }
 
@@ -138,8 +138,9 @@ class SoftDeletingScope implements Scope
         $builder->macro('withoutTrashed', function (Builder $builder) {
             $model = $builder->getModel();
 
-            $builder->withoutGlobalScope($this)->whereNull(
-                $model->getQualifiedDeletedAtColumn()
+            $builder->withoutGlobalScope($this)->where(
+                $model->getQualifiedDeletedAtColumn(),
+                $model->getUndeletedValue()
             );
 
             return $builder;
@@ -157,8 +158,10 @@ class SoftDeletingScope implements Scope
         $builder->macro('onlyTrashed', function (Builder $builder) {
             $model = $builder->getModel();
 
-            $builder->withoutGlobalScope($this)->whereNotNull(
-                $model->getQualifiedDeletedAtColumn()
+            $builder->withoutGlobalScope($this)->where(
+                $model->getQualifiedDeletedAtColumn(),
+                '!=',
+                $model->getUndeletedValue()
             );
 
             return $builder;
