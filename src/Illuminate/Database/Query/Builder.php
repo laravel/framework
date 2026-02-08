@@ -1538,7 +1538,7 @@ class Builder implements BuilderContract
      * Resolve the start and end dates from a DatePeriod.
      *
      * @param  \DatePeriod  $period
-     * @return array
+     * @return array{\DateTimeInterface, \DateTimeInterface}
      */
     protected function resolveDatePeriodBounds(\DatePeriod $period)
     {
@@ -1548,7 +1548,8 @@ class Builder implements BuilderContract
         if ($end === null) {
             $end = clone $start;
 
-            for ($i = 0; $i < $period->getRecurrences(); $i++) {
+            $recurrences = $period->getRecurrences();
+            for ($i = 0; $i < $recurrences; $i++) {
                 $end = $end->add($period->getDateInterval());
             }
         }
