@@ -116,6 +116,16 @@ class MySqlSchemaState extends SchemaState
             $value .= ' --ssl-ca="${:LARAVEL_LOAD_SSL_CA}"';
         }
 
+        /** @phpstan-ignore class.notFound */
+        if (isset($config['options'][PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CERT : \PDO::MYSQL_ATTR_SSL_CERT])) {
+            $value .= ' --ssl-cert="${:LARAVEL_LOAD_SSL_CERT}"';
+        }
+
+        /** @phpstan-ignore class.notFound */
+        if (isset($config['options'][PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_KEY : \PDO::MYSQL_ATTR_SSL_KEY])) {
+            $value .= ' --ssl-key="${:LARAVEL_LOAD_SSL_KEY}"';
+        }
+
         // if (isset($config['options'][\PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT]) &&
         //     $config['options'][\PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] === false) {
         //     $value .= ' --ssl=off';
@@ -142,6 +152,8 @@ class MySqlSchemaState extends SchemaState
             'LARAVEL_LOAD_PASSWORD' => $config['password'] ?? '',
             'LARAVEL_LOAD_DATABASE' => $config['database'],
             'LARAVEL_LOAD_SSL_CA' => $config['options'][PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : \PDO::MYSQL_ATTR_SSL_CA] ?? '', // @phpstan-ignore class.notFound
+            'LARAVEL_LOAD_SSL_CERT' => $config['options'][PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CERT : \PDO::MYSQL_ATTR_SSL_CERT] ?? '', // @phpstan-ignore class.notFound
+            'LARAVEL_LOAD_SSL_KEY' => $config['options'][PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_KEY : \PDO::MYSQL_ATTR_SSL_KEY] ?? '', // @phpstan-ignore class.notFound
         ];
     }
 
