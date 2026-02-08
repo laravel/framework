@@ -825,6 +825,42 @@ if (! function_exists('resolve')) {
     }
 }
 
+if (! function_exists('resolve_if')) {
+    /**
+     * Resolve a service from the container if the given condition is true.
+     *
+     * @template TClass of object
+     *
+     * @param  bool  $boolean
+     * @param  string|class-string<TClass>  $name
+     * @return ($name is class-string<TClass> ? TClass : mixed)|null
+     */
+    function resolve_if($boolean, $name, array $parameters = [])
+    {
+        if ($boolean) {
+            return resolve($name, $parameters);
+        }
+    }
+}
+
+if (! function_exists('resolve_unless')) {
+    /**
+     * Resolve a service from the container unless the given condition is true.
+     *
+     * @template TClass of object
+     *
+     * @param  bool  $boolean
+     * @param  string|class-string<TClass>  $name
+     * @return ($name is class-string<TClass> ? TClass : mixed)|null
+     */
+    function resolve_unless($boolean, $name, array $parameters = [])
+    {
+        if (! $boolean) {
+            return resolve($name, $parameters);
+        }
+    }
+}
+
 if (! function_exists('resource_path')) {
     /**
      * Get the path to the resources folder.
