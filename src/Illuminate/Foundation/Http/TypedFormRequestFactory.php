@@ -24,13 +24,13 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
-use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionType;
 use ReflectionUnionType;
 
+use stdClass;
 use function Illuminate\Support\enum_value;
 
 /**
@@ -290,13 +290,12 @@ class TypedFormRequestFactory
                 continue;
             }
 
-            if ($type->isBuiltin()) {
+            $typeName = $type->getName();
+            if ($type->isBuiltin() || is_a($typeName, stdClass::class, true)) {
                 $arguments[$name] = $this->castBuiltinObjectValue($value);
 
                 continue;
             }
-
-            $typeName = $type->getName();
 
             if ($this->isDateObjectType($typeName)) {
                 $arguments[$name] = $this->castDateValue($typeName, $value);
@@ -639,6 +638,10 @@ class TypedFormRequestFactory
             return 'date';
         }
 
+        if (is_a($name, stdClass::class, true)) {
+            return 'array';
+        }
+
         if (is_subclass_of($name, TypedFormRequest::class) || is_a($name, Collection::class, true)) {
             return 'array';
         }
@@ -809,7 +812,6 @@ class TypedFormRequestFactory
 
             $name = $this->fieldNameFor($param);
             $parentIsOptional = $param->isDefaultValueAvailable() || ($type?->allowsNull() ?? false);
-
 
             if ($type instanceof ReflectionNamedType) {
                 if ($type->isBuiltin()

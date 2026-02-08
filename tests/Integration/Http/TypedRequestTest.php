@@ -833,6 +833,22 @@ class TypedRequestTest extends TestCase
         }
     }
 
+    public function testHydrateFromRequestClassAttributeAddsArrayValidationRule()
+    {
+        $request = Request::create('', parameters: [
+            'profile' => 'not-an-array',
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(ProfileHydrationRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('profile', $e->errors());
+            $this->assertSame('not-an-array', $e->validator->getData()['profile']);
+        }
+    }
+
     public function testHydratableObjectPropertyOptInBuildsFromArray()
     {
         $request = Request::create('', parameters: [
@@ -1662,7 +1678,7 @@ class ObjectMappedTypedRequest extends TypedFormRequest
 {
     public function __construct(
         #[MapFrom('metadata')]
-        public object $someObject,
+        public \stdClass $someObject,
     ) {
     }
 }
