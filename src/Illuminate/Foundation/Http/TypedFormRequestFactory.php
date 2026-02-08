@@ -11,6 +11,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
+use Illuminate\Foundation\Http\Attributes\HydrateFromRequest;
 use Illuminate\Foundation\Http\Attributes\MapFrom;
 use Illuminate\Foundation\Http\Attributes\WithoutInferringRules;
 use Illuminate\Foundation\Precognition;
@@ -22,6 +23,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionParameter;
@@ -34,7 +36,7 @@ use function Illuminate\Support\enum_value;
 /**
  * @template T of TypedFormRequest
  */
-class TypedFormRequestBuilder
+class TypedFormRequestFactory
 {
     protected Validator $validator;
 
@@ -46,6 +48,9 @@ class TypedFormRequestBuilder
 
     /** @var array{rules: array, messages: array, attributes: array}|null */
     protected ?array $nestedMetadata = null;
+
+    /** @var array<class-string, bool> */
+    protected array $hydrateFromRequestCache = [];
 
     /**
      * @param  class-string<T>  $requestClass
@@ -67,6 +72,20 @@ class TypedFormRequestBuilder
     }
 
     /**
+     * @param  class-string  $class
+     */
+    protected function shouldHydrateFromRequest(string $class): bool
+    {
+        if (isset($this->hydrateFromRequestCache[$class])) {
+            return $this->hydrateFromRequestCache[$class];
+        }
+
+        $reflection = new ReflectionClass($class);
+
+        return $this->hydrateFromRequestCache[$class] = $reflection->getAttributes(HydrateFromRequest::class, ReflectionAttribute::IS_INSTANCEOF) !== [];
+    }
+
+    /**
      * @template TSubType
      *
      * @param  class-string<TSubType>  $class
@@ -76,7 +95,7 @@ class TypedFormRequestBuilder
     {
         $builder = Container::getInstance()
             ->make(
-                TypedFormRequestBuilder::class,
+                TypedFormRequestFactory::class,
                 ['requestClass' => $class, 'request' => $this->request]
             );
         $builder->ancestors = [...$this->ancestors, $this->requestClass];
@@ -135,23 +154,23 @@ class TypedFormRequestBuilder
             return $validated;
         }
 
+        $arguments = [];
+
         foreach ($constructor->getParameters() as $param) {
             $fieldName = $this->fieldNameFor($param);
             $name = $param->getName();
 
-            if (! array_key_exists($fieldName, $validated)) {
+            if (! Arr::has($validated, $fieldName)) {
                 continue;
             }
 
-            if ($fieldName !== $name) {
-                $validated[$name] = $validated[$fieldName];
-                unset($validated[$fieldName]);
-            }
+            $value = data_get($validated, $fieldName);
 
             $type = $param->getType();
 
             if ($type instanceof ReflectionUnionType) {
-                if ($validated[$name] === null) {
+                if ($value === null) {
+                    $arguments[$name] = null;
                     continue;
                 }
 
@@ -159,23 +178,28 @@ class TypedFormRequestBuilder
                     ->filter(fn (ReflectionNamedType $t) => $t->getName() !== 'null')
                     ->filter(fn (ReflectionNamedType $t) => ! $t->isBuiltin())
                     ->map(fn (ReflectionNamedType $t) => $t->getName())
-                    ->first(fn (string $class) => is_subclass_of($class, TypedFormRequest::class));
+                    ->first(fn (string $class) => is_subclass_of($class, TypedFormRequest::class) || $this->shouldHydrateFromRequest($class));
 
-                if ($nestedRequestClass !== null && is_array($validated[$name])) {
-                    $nestedData = $this->nestedBuilder($nestedRequestClass)->castValidatedData($validated[$name]);
-                    $validated[$name] = new $nestedRequestClass(...$nestedData);
+                if ($nestedRequestClass !== null && is_array($value)) {
+                    $nestedData = $this->nestedBuilder($nestedRequestClass)->castValidatedData($value);
+                    $arguments[$name] = new $nestedRequestClass(...$nestedData);
+                } else {
+                    $arguments[$name] = $value;
                 }
 
                 continue;
             }
 
             if (! $type instanceof ReflectionNamedType) {
+                $arguments[$name] = $value;
                 continue;
             }
 
             if ($type->isBuiltin()) {
                 if ($type->getName() === 'object') {
-                    $validated[$name] = $this->castBuiltinObjectValue($validated[$name]);
+                    $arguments[$name] = $this->castBuiltinObjectValue($value);
+                } else {
+                    $arguments[$name] = $value;
                 }
 
                 continue;
@@ -184,28 +208,43 @@ class TypedFormRequestBuilder
             $typeName = $type->getName();
 
             if ($this->isDateObjectType($typeName)) {
-                $validated[$name] = $this->castDateValue($typeName, $validated[$name]);
-            } elseif (is_subclass_of($typeName, TypedFormRequest::class)) {
-                if ($validated[$name] === null) {
+                $arguments[$name] = $this->castDateValue($typeName, $value);
+            } elseif ($this->shouldHydrateFromRequest($typeName)) {
+                if ($value === null) {
+                    $arguments[$name] = null;
                     continue;
                 }
 
-                if (! is_array($validated[$name])) {
+                if (! is_array($value)) {
                     throw ValidationException::withMessages([
                         $fieldName => ["The {$fieldName} field must be an array."],
                     ]);
                 }
 
-                $nestedData = $this->nestedBuilder($typeName)->castValidatedData($validated[$name]);
-                $validated[$name] = new $typeName(...$nestedData); // @phpstan-ignore new.noConstructor
+                $nestedData = $this->nestedBuilder($typeName)->castValidatedData($value);
+                $arguments[$name] = new $typeName(...$nestedData);
+            } elseif (is_subclass_of($typeName, TypedFormRequest::class)) {
+                if ($value === null) {
+                    $arguments[$name] = null;
+                    continue;
+                }
+
+                if (! is_array($value)) {
+                    throw ValidationException::withMessages([
+                        $fieldName => ["The {$fieldName} field must be an array."],
+                    ]);
+                }
+
+                $nestedData = $this->nestedBuilder($typeName)->castValidatedData($value);
+                $arguments[$name] = new $typeName(...$nestedData); // @phpstan-ignore new.noConstructor
             } elseif (is_subclass_of($typeName, BackedEnum::class)) {
-                $validated[$name] = $validated[$name] !== null
-                    ? $typeName::from($validated[$name])
-                    : null;
+                $arguments[$name] = $value !== null ? $typeName::from($value) : null;
+            } else {
+                $arguments[$name] = $value;
             }
         }
 
-        return $validated;
+        return $arguments;
     }
 
     protected function castBuiltinObjectValue(mixed $value): mixed
@@ -447,6 +486,10 @@ class TypedFormRequestBuilder
     {
         $name = $type->getName();
 
+        if ($this->shouldHydrateFromRequest($name)) {
+            return 'array';
+        }
+
         if (is_subclass_of($name, BackedEnum::class)) {
             return new Enum($name);
         }
@@ -521,7 +564,8 @@ class TypedFormRequestBuilder
                 if (Arr::has($data, $fieldName)) {
                     return;
                 }
-                $data[$fieldName] = $this->mapToNativeFromDefault($prop);
+
+                data_set($data, $fieldName, $this->mapToNativeFromDefault($prop));
             });
 
         // Recursively merge defaults for nested TypedFormRequest properties
@@ -536,8 +580,8 @@ class TypedFormRequestBuilder
                 $typeName = $type->getName();
                 $name = $this->fieldNameFor($param);
 
-                if (is_subclass_of($typeName, TypedFormRequest::class) && isset($data[$name]) && is_array($data[$name])) {
-                    $data[$name] = $this->nestedBuilder($typeName)->mergeRequestData($data[$name]);
+                if (is_subclass_of($typeName, TypedFormRequest::class) && Arr::has($data, $name) && is_array(data_get($data, $name))) {
+                    data_set($data, $name, $this->nestedBuilder($typeName)->mergeRequestData(data_get($data, $name)));
                 }
             }
         }
@@ -609,7 +653,7 @@ class TypedFormRequestBuilder
 
             if ($type instanceof ReflectionNamedType) {
                 if ($type->isBuiltin()
-                    || ! is_subclass_of($type->getName(), TypedFormRequest::class)
+                    || (! is_subclass_of($type->getName(), TypedFormRequest::class) && ! $this->shouldHydrateFromRequest($type->getName()))
                     || in_array($type->getName(), $this->ancestors)) {
                     continue;
                 }
@@ -621,7 +665,7 @@ class TypedFormRequestBuilder
                     ->filter(fn (ReflectionNamedType $t) => $t->getName() !== 'null')
                     ->filter(fn (ReflectionNamedType $t) => ! $t->isBuiltin())
                     ->map(fn (ReflectionNamedType $t) => $t->getName())
-                    ->first(fn (string $class) => is_subclass_of($class, TypedFormRequest::class)
+                    ->first(fn (string $class) => (is_subclass_of($class, TypedFormRequest::class) || $this->shouldHydrateFromRequest($class))
                         && ! in_array($class, $this->ancestors));
 
                 if ($nestedRequestClass === null) {

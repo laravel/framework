@@ -8,6 +8,7 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Http\Attributes\HydrateFromRequest;
 use Illuminate\Foundation\Http\Attributes\MapFrom;
 use Illuminate\Foundation\Http\Attributes\WithoutInferringRules;
 use Illuminate\Foundation\Http\TypedFormRequest;
@@ -534,6 +535,17 @@ class RequestDtoTest extends TestCase
         $this->assertSame('Otwell', $actual->lastName);
     }
 
+    public function testMapFromDotNotationDefaultsApplyAndBuilds()
+    {
+        $request = Request::create('', parameters: []);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(DotMappedDefaultRequest::class);
+
+        $this->assertInstanceOf(DotMappedDefaultRequest::class, $actual);
+        $this->assertSame(18, $actual->age);
+    }
+
     public function testOptOutInferenceDoesNotAddStringRule()
     {
         $request = Request::create('', parameters: [
@@ -764,6 +776,60 @@ class RequestDtoTest extends TestCase
 
         $this->assertInstanceOf(UnionNestedMappedRequest::class, $actual);
         $this->assertSame('raw string', $actual->shippingAddress);
+    }
+
+    public function testHydratableObjectBuildsFromArray()
+    {
+        $request = Request::create('', parameters: [
+            'profile' => [
+                'daysSinceILastPartied' => 10,
+                'name' => 'Taylor',
+            ],
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(ProfileHydrationRequest::class);
+
+        $this->assertInstanceOf(ProfileHydrationRequest::class, $actual);
+        $this->assertInstanceOf(PartyProfile::class, $actual->profile);
+        $this->assertSame(10, $actual->profile->daysSinceILastPartied);
+        $this->assertSame('Taylor', $actual->profile->name);
+        $this->assertTrue($actual->profile->wantsToParty);
+    }
+
+    public function testHydratableObjectMissingNestedRequiredFieldFailsValidation()
+    {
+        $request = Request::create('', parameters: [
+            'profile' => [
+                'name' => 'Taylor',
+            ],
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(ProfileHydrationRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('profile.daysSinceILastPartied', $e->errors());
+        }
+    }
+
+    public function testHydratableObjectMapFromUsesMappedNestedErrorKey()
+    {
+        $request = Request::create('', parameters: [
+            'profile_data' => [
+                'name' => 'Taylor',
+            ],
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(ProfileHydrationMappedRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('profile_data.daysSinceILastPartied', $e->errors());
+            $this->assertArrayNotHasKey('profile.daysSinceILastPartied', $e->errors());
+        }
     }
 
     public function testCarbonTypeAcceptsValidDateStringAndBuildsCarbon()
@@ -1225,6 +1291,18 @@ class MappedFieldWithRulesRequest extends TypedFormRequest
     }
 }
 
+class DotMappedDefaultRequest extends TypedFormRequest
+{
+    public int $age = 18;
+
+    public function __construct(
+        #[MapFrom('meta.age')]
+        int $age,
+    ) {
+        $this->age = $age;
+    }
+}
+
 class OptOutInferenceRequest extends TypedFormRequest
 {
     public function __construct(
@@ -1286,6 +1364,34 @@ class UnionNestedMappedRequest extends TypedFormRequest
     public function __construct(
         #[MapFrom('shipping_address')]
         public Address|string $shippingAddress,
+    ) {
+    }
+}
+
+#[HydrateFromRequest]
+class PartyProfile
+{
+    public function __construct(
+        public int $daysSinceILastPartied,
+        public string $name,
+        public bool $wantsToParty = true,
+    ) {
+    }
+}
+
+class ProfileHydrationRequest extends TypedFormRequest
+{
+    public function __construct(
+        public PartyProfile $profile,
+    ) {
+    }
+}
+
+class ProfileHydrationMappedRequest extends TypedFormRequest
+{
+    public function __construct(
+        #[MapFrom('profile_data')]
+        public PartyProfile $profile,
     ) {
     }
 }
