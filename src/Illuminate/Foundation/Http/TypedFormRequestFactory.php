@@ -146,7 +146,8 @@ class TypedFormRequestFactory
 
         $reflection = new ReflectionClass($class);
 
-        return $this->hydrateFromRequestCache[$class] = $reflection->getAttributes(HydrateFromRequest::class, ReflectionAttribute::IS_INSTANCEOF) !== [];
+        return $this->hydrateFromRequestCache[$class] = $reflection->getAttributes(HydrateFromRequest::class,
+                ReflectionAttribute::IS_INSTANCEOF) !== [];
     }
 
     /**
@@ -275,7 +276,10 @@ class TypedFormRequestFactory
                 $nestedRequestClass = $this->nestedHydrationClassFromUnion($type, $param);
 
                 if ($nestedRequestClass !== null && is_array($value)) {
-                    $arguments[$name] = $this->instantiateFromValidatedArray($nestedRequestClass, $this->ensureArrayValue($fieldName, $value));
+                    $arguments[$name] = $this->instantiateFromValidatedArray(
+                        $nestedRequestClass,
+                        $this->ensureArrayValue($fieldName, $value)
+                    );
                 } else {
                     $arguments[$name] = $value;
                 }
@@ -303,16 +307,28 @@ class TypedFormRequestFactory
 
             if ($this->isDateObjectType($typeName)) {
                 $arguments[$name] = $this->castDateValue($typeName, $value);
-            } elseif ($this->shouldHydrateParameter($param, $typeName) || is_subclass_of($typeName, TypedFormRequest::class)) {
+            } elseif ($this->shouldHydrateParameter($param, $typeName)
+                || is_subclass_of($typeName, TypedFormRequest::class)) {
                 if ($value === null) {
                     $arguments[$name] = null;
 
                     continue;
                 }
 
-                $arguments[$name] = $this->instantiateFromValidatedArray($typeName, $this->ensureArrayValue($fieldName, $value));
+                $arguments[$name] = $this->instantiateFromValidatedArray(
+                    $typeName,
+                    $this->ensureArrayValue($fieldName, $value)
+                );
             } elseif (is_subclass_of($typeName, BackedEnum::class)) {
                 $arguments[$name] = $value !== null ? $typeName::from($value) : null;
+            } elseif (is_a($typeName, Collection::class, true)) {
+                if ($value === null) {
+                    $arguments[$name] = null;
+                } elseif ($value instanceof Collection) {
+                    $arguments[$name] = $value;
+                } else {
+                    $arguments[$name] = new $typeName($this->ensureArrayValue($fieldName, $value));
+                }
             } else {
                 $arguments[$name] = $value;
             }
@@ -645,7 +661,7 @@ class TypedFormRequestFactory
             return 'date';
         }
 
-        if (is_subclass_of($name, TypedFormRequest::class)) {
+        if (is_subclass_of($name, TypedFormRequest::class) || is_a($name, Collection::class, true)) {
             return 'array';
         }
 

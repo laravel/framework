@@ -13,6 +13,7 @@ use Illuminate\Foundation\Http\Attributes\MapFrom;
 use Illuminate\Foundation\Http\Attributes\WithoutInferringRules;
 use Illuminate\Foundation\Http\TypedFormRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Orchestra\Testbench\TestCase;
@@ -1039,6 +1040,75 @@ class TypedRequestTest extends TestCase
         }
     }
 
+    public function testCollectionTypeAcceptsArrayAndBuildsCollection()
+    {
+        $request = Request::create('', parameters: [
+            'items' => ['a', 'b'],
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(CollectionTypedRequest::class);
+
+        $this->assertInstanceOf(Collection::class, $actual->items);
+        $this->assertSame(['a', 'b'], $actual->items->all());
+    }
+
+    public function testNullableCollectionTypeAcceptsNull()
+    {
+        $request = Request::create('', parameters: [
+            'items' => null,
+        ]);
+
+        $this->app->instance('request', $request);
+        $actual = $this->app->make(CollectionTypedRequest::class);
+        $this->assertNull($actual->items);
+    }
+
+    public function testCollectionTypeRejectsScalarInputWithValidationErrorKey()
+    {
+        $request = Request::create('', parameters: [
+            'items' => 'not-an-array',
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(CollectionTypedRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('items', $e->errors());
+        }
+    }
+
+    public function testCollectionMapFromAcceptsArrayAndBuildsCollection()
+    {
+        $request = Request::create('', parameters: [
+            'item_list' => [1, 2],
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(CollectionMappedTypedRequest::class);
+
+        $this->assertInstanceOf(CollectionMappedTypedRequest::class, $actual);
+        $this->assertInstanceOf(Collection::class, $actual->items);
+        $this->assertSame([1, 2], $actual->items->all());
+    }
+
+    public function testCollectionMapFromRejectsScalarInputWithMappedValidationErrorKey()
+    {
+        $request = Request::create('', parameters: [
+            'item_list' => 'not-an-array',
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(CollectionMappedTypedRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('item_list', $e->errors());
+            $this->assertArrayNotHasKey('items', $e->errors());
+        }
+    }
+
     public function testObjectTypeAcceptsArrayAndBuildsStdClass()
     {
         $request = Request::create('', parameters: [
@@ -1531,6 +1601,23 @@ class DateTimeImmutableTypedRequest extends TypedFormRequest
 {
     public function __construct(
         public DateTimeImmutable $publishedAt,
+    ) {
+    }
+}
+
+class CollectionTypedRequest extends TypedFormRequest
+{
+    public function __construct(
+        public ?Collection $items,
+    ) {
+    }
+}
+
+class CollectionMappedTypedRequest extends TypedFormRequest
+{
+    public function __construct(
+        #[MapFrom('item_list')]
+        public Collection $items,
     ) {
     }
 }
