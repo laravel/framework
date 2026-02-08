@@ -819,7 +819,7 @@ if (! function_exists('resolve')) {
      * @param  string|class-string<TClass>  $name
      * @return ($name is class-string<TClass> ? TClass : mixed)
      */
-    function resolve($name, array $parameters = [])
+    function resolve(string $name, array $parameters = []): mixed
     {
         return app($name, $parameters);
     }
@@ -829,11 +829,12 @@ if (! function_exists('resolve_if')) {
     /**
      * Resolve a service from the container if the given condition is true.
      *
-     * @param  bool  $boolean
-     * @param  string  $name
-     * @return mixed
+     * @template TClass of object
+     *
+     * @param  string|class-string<TClass>  $name
+     * @return ($boolean is true ? ($name is class-string<TClass> ? TClass : mixed) : null)
      */
-    function resolve_if($boolean, $name, array $parameters = [])
+    function resolve_if(bool $boolean, string $name, array $parameters = []): mixed
     {
         if ($boolean) {
             return resolve($name, $parameters);
