@@ -357,15 +357,7 @@ class TypedFormRequestFactory
      */
     protected function castBuiltinObjectValue(mixed $value): mixed
     {
-        if ($value === null || is_object($value)) {
-            return $value;
-        }
-
-        if (is_array($value)) {
-            return (object) $value;
-        }
-
-        return $value;
+        return is_array($value) ? (object) $value : $value;
     }
 
     /**
