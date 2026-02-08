@@ -306,4 +306,36 @@ class FoundationHelpersTest extends TestCase
     {
         $this->assertInstanceOf(FakePendingBroadcast::class, broadcast_if(false, 'foo'));
     }
+
+    public function testResolveIfResolvesWhenConditionIsTrue()
+    {
+        $app = new Application;
+        $app->bind('foo', fn () => 'bar');
+
+        $this->assertSame('bar', resolve_if(true, 'foo'));
+    }
+
+    public function testResolveIfReturnsNullWhenConditionIsFalse()
+    {
+        $app = new Application;
+        $app->bind('foo', fn () => 'bar');
+
+        $this->assertNull(resolve_if(false, 'foo'));
+    }
+
+    public function testResolveUnlessResolvesWhenConditionIsFalse()
+    {
+        $app = new Application;
+        $app->bind('foo', fn () => 'bar');
+
+        $this->assertSame('bar', resolve_unless(false, 'foo'));
+    }
+
+    public function testResolveUnlessReturnsNullWhenConditionIsTrue()
+    {
+        $app = new Application;
+        $app->bind('foo', fn () => 'bar');
+
+        $this->assertNull(resolve_unless(true, 'foo'));
+    }
 }
