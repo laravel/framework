@@ -46,9 +46,9 @@ class TypedFormRequestFactory
     /**
      * The reflected request class.
      *
-     * @var ReflectionClass<T>|null
+     * @var ReflectionClass<T>
      */
-    protected ?ReflectionClass $reflection = null;
+    protected ReflectionClass $reflection;
 
     /**
      * The ancestor request classes being hydrated.
@@ -133,7 +133,8 @@ class TypedFormRequestFactory
     }
 
     /**
-     * Determine if the given class should be hydrated from request data.
+     * Determine if a given class should be hydrated from request data because
+     * it has the HydrateFromRequest applied at the class-level.
      *
      * @param  class-string  $class
      */
@@ -186,10 +187,10 @@ class TypedFormRequestFactory
     }
 
     /**
-     * @template TSubType
+     * @template TTypedFormRequest of TypedFormRequest
      *
-     * @param  class-string<TSubType>  $class
-     * @return static<TSubType>
+     * @param  class-string<TTypedFormRequest>  $class
+     * @return static<TTypedFormRequest>
      */
     protected function nestedFactory(string $class): static
     {
@@ -218,7 +219,7 @@ class TypedFormRequestFactory
     {
         $attr = $param->getAttributes(MapFrom::class)[0] ?? null;
 
-        return $attr ? $attr->newInstance()->name : $param->getName();
+        return $attr === null ? $param->getName() : $attr->newInstance()->name;
     }
 
     /**
@@ -244,9 +245,7 @@ class TypedFormRequestFactory
      */
     protected function castValidatedData(array $validated): array
     {
-        $constructor = $this->reflectRequest()->getConstructor();
-
-        if ($constructor === null) {
+        if (($constructor = $this->reflectRequest()->getConstructor()) === null) {
             return $validated;
         }
 
@@ -262,15 +261,15 @@ class TypedFormRequestFactory
 
             $value = Arr::get($validated, $fieldName);
 
+            if ($value === null) {
+                $arguments[$name] = null;
+
+                continue;
+            }
+
             $type = $param->getType();
 
             if ($type instanceof ReflectionUnionType) {
-                if ($value === null) {
-                    $arguments[$name] = null;
-
-                    continue;
-                }
-
                 $nestedRequestClass = $this->nestedHydrationClassFromUnion($type, $param);
 
                 if ($nestedRequestClass !== null && is_array($value)) {
@@ -292,11 +291,7 @@ class TypedFormRequestFactory
             }
 
             if ($type->isBuiltin()) {
-                if ($type->getName() === 'object') {
-                    $arguments[$name] = $this->castBuiltinObjectValue($value);
-                } else {
-                    $arguments[$name] = $value;
-                }
+                $arguments[$name] = $this->castBuiltinObjectValue($value);
 
                 continue;
             }
@@ -306,20 +301,14 @@ class TypedFormRequestFactory
             if ($this->isDateObjectType($typeName)) {
                 $arguments[$name] = $this->castDateValue($typeName, $value);
             } elseif ($this->shouldHydrateParameter($param, $typeName) || is_subclass_of($typeName, TypedFormRequest::class)) {
-                if ($value === null) {
-                    $arguments[$name] = null;
-
-                    continue;
-                }
-
                 $arguments[$name] = $this->instantiateFromValidatedArray(
                     $typeName,
                     $this->ensureArrayValue($fieldName, $value)
                 );
             } elseif (is_subclass_of($typeName, BackedEnum::class)) {
-                $arguments[$name] = $value !== null ? $typeName::from($value) : null;
+                $arguments[$name] = $typeName::from($value);
             } elseif (is_a($typeName, Collection::class, true)) {
-                if ($value === null || $value instanceof Collection) {
+                if ($value instanceof Collection) {
                     $arguments[$name] = $value;
                 } else {
                     $arguments[$name] = new $typeName($this->ensureArrayValue($fieldName, $value));
@@ -372,7 +361,7 @@ class TypedFormRequestFactory
     /**
      * Cast an "object" builtin value into a stdClass instance when appropriate.
      */
-    protected function castBuiltinObjectValue(mixed $value): ?object
+    protected function castBuiltinObjectValue(mixed $value): mixed
     {
         if ($value === null || is_object($value)) {
             return $value;
@@ -809,13 +798,13 @@ class TypedFormRequestFactory
             return $this->nestedMetadata;
         }
 
+        if (($constructor = $this->reflectRequest()->getConstructor()) === null) {
+            return $this->nestedMetadata = ['rules' => [], 'messages' => [], 'attributes' => []];
+        }
+
         $rules = [];
         $messages = [];
         $attributes = [];
-
-        if (($constructor = $this->reflectRequest()->getConstructor()) === null) {
-            return $this->nestedMetadata = ['rules' => $rules, 'messages' => $messages, 'attributes' => $attributes];
-        }
 
         foreach ($constructor->getParameters() as $param) {
             $type = $param->getType();
@@ -827,10 +816,11 @@ class TypedFormRequestFactory
             $name = $this->fieldNameFor($param);
             $parentIsOptional = $param->isDefaultValueAvailable() || ($type?->allowsNull() ?? false);
 
+
             if ($type instanceof ReflectionNamedType) {
                 if ($type->isBuiltin()
-                    || (! is_subclass_of($type->getName(), TypedFormRequest::class) && ! $this->shouldHydrateParameter($param, $type->getName()))
-                    || in_array($type->getName(), $this->ancestors)) {
+                    || in_array($type->getName(), $this->ancestors)
+                    || (! is_subclass_of($type->getName(), TypedFormRequest::class) && ! $this->shouldHydrateParameter($param, $type->getName()))) {
                     continue;
                 }
 
