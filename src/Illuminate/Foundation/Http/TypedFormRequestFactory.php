@@ -146,8 +146,7 @@ class TypedFormRequestFactory
 
         $reflection = new ReflectionClass($class);
 
-        return $this->hydrateFromRequestCache[$class] = $reflection->getAttributes(HydrateFromRequest::class,
-                ReflectionAttribute::IS_INSTANCEOF) !== [];
+        return $this->hydrateFromRequestCache[$class] = $reflection->getAttributes(HydrateFromRequest::class) !== [];
     }
 
     /**
@@ -262,7 +261,7 @@ class TypedFormRequestFactory
                 continue;
             }
 
-            $value = data_get($validated, $fieldName);
+            $value = Arr::get($validated, $fieldName);
 
             $type = $param->getType();
 
@@ -307,8 +306,7 @@ class TypedFormRequestFactory
 
             if ($this->isDateObjectType($typeName)) {
                 $arguments[$name] = $this->castDateValue($typeName, $value);
-            } elseif ($this->shouldHydrateParameter($param, $typeName)
-                || is_subclass_of($typeName, TypedFormRequest::class)) {
+            } elseif ($this->shouldHydrateParameter($param, $typeName) || is_subclass_of($typeName, TypedFormRequest::class)) {
                 if ($value === null) {
                     $arguments[$name] = null;
 
@@ -322,9 +320,7 @@ class TypedFormRequestFactory
             } elseif (is_subclass_of($typeName, BackedEnum::class)) {
                 $arguments[$name] = $value !== null ? $typeName::from($value) : null;
             } elseif (is_a($typeName, Collection::class, true)) {
-                if ($value === null) {
-                    $arguments[$name] = null;
-                } elseif ($value instanceof Collection) {
+                if ($value === null || $value instanceof Collection) {
                     $arguments[$name] = $value;
                 } else {
                     $arguments[$name] = new $typeName($this->ensureArrayValue($fieldName, $value));
@@ -747,7 +743,7 @@ class TypedFormRequestFactory
                     return;
                 }
 
-                data_set($data, $fieldName, $this->mapToNativeFromDefault($prop));
+                Arr::set($data, $fieldName, $this->mapToNativeFromDefault($prop));
             });
 
         // Recursively merge defaults for nested TypedFormRequest properties
@@ -762,8 +758,8 @@ class TypedFormRequestFactory
                 $typeName = $type->getName();
                 $name = $this->fieldNameFor($param);
 
-                if (is_subclass_of($typeName, TypedFormRequest::class) && Arr::has($data, $name) && is_array(data_get($data, $name))) {
-                    data_set($data, $name, $this->nestedFactory($typeName)->mergeRequestData(data_get($data, $name)));
+                if (is_subclass_of($typeName, TypedFormRequest::class) && Arr::has($data, $name) && is_array($value = Arr::get($data, $name))) {
+                    Arr::set($data, $name, $this->nestedFactory($typeName)->mergeRequestData($value));
                 }
             }
         }
