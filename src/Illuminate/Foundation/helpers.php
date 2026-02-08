@@ -829,11 +829,9 @@ if (! function_exists('resolve_if')) {
     /**
      * Resolve a service from the container if the given condition is true.
      *
-     * @template TClass of object
-     *
      * @param  bool  $boolean
-     * @param  string|class-string<TClass>  $name
-     * @return ($name is class-string<TClass> ? TClass : mixed)|null
+     * @param  string  $name
+     * @return mixed
      */
     function resolve_if($boolean, $name, array $parameters = [])
     {
@@ -847,11 +845,9 @@ if (! function_exists('resolve_unless')) {
     /**
      * Resolve a service from the container unless the given condition is true.
      *
-     * @template TClass of object
-     *
      * @param  bool  $boolean
-     * @param  string|class-string<TClass>  $name
-     * @return ($name is class-string<TClass> ? TClass : mixed)|null
+     * @param  string  $name
+     * @return mixed
      */
     function resolve_unless($boolean, $name, array $parameters = [])
     {
