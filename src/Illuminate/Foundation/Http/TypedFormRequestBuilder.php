@@ -146,7 +146,15 @@ class TypedFormRequestBuilder
 
             $type = $param->getType();
 
-            if (! $type instanceof ReflectionNamedType || $type->isBuiltin()) {
+            if (! $type instanceof ReflectionNamedType) {
+                continue;
+            }
+
+            if ($type->isBuiltin()) {
+                if ($type->getName() === 'object') {
+                    $validated[$name] = $this->castBuiltinObjectValue($validated[$name]);
+                }
+
                 continue;
             }
 
@@ -165,6 +173,19 @@ class TypedFormRequestBuilder
         }
 
         return $validated;
+    }
+
+    protected function castBuiltinObjectValue(mixed $value): mixed
+    {
+        if ($value === null || is_object($value)) {
+            return $value;
+        }
+
+        if (is_array($value)) {
+            return (object) $value;
+        }
+
+        return $value;
     }
 
     protected function prepareForValidation(): void
@@ -328,6 +349,7 @@ class TypedFormRequestBuilder
             'string' => 'string',
             'bool' => 'boolean',
             'array' => 'array',
+            'object' => 'array',
             default => $this->ruleForNonBuiltinType($type),
         };
 

@@ -897,6 +897,73 @@ class RequestDtoTest extends TestCase
             $this->assertArrayNotHasKey('publishedAt', $e->errors());
         }
     }
+
+    public function testObjectTypeAcceptsArrayAndBuildsStdClass()
+    {
+        $request = Request::create('', parameters: [
+            'someObject' => [
+                'name' => 'Taylor',
+                'days' => 3,
+            ],
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(ObjectTypedRequest::class);
+
+        $this->assertInstanceOf(ObjectTypedRequest::class, $actual);
+        $this->assertInstanceOf(\stdClass::class, $actual->someObject);
+        $this->assertSame('Taylor', $actual->someObject->name);
+        $this->assertSame(3, $actual->someObject->days);
+    }
+
+    public function testObjectTypeRejectsScalarInputWithValidationErrorKey()
+    {
+        $request = Request::create('', parameters: [
+            'someObject' => 'not-an-array',
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(ObjectTypedRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('someObject', $e->errors());
+        }
+    }
+
+    public function testObjectMapFromAcceptsArrayAndBuildsStdClass()
+    {
+        $request = Request::create('', parameters: [
+            'metadata' => [
+                'name' => 'Taylor',
+                'days' => 3,
+            ],
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(ObjectMappedTypedRequest::class);
+
+        $this->assertInstanceOf(ObjectMappedTypedRequest::class, $actual);
+        $this->assertInstanceOf(\stdClass::class, $actual->someObject);
+        $this->assertSame('Taylor', $actual->someObject->name);
+        $this->assertSame(3, $actual->someObject->days);
+    }
+
+    public function testObjectMapFromRejectsScalarInputWithMappedValidationErrorKey()
+    {
+        $request = Request::create('', parameters: [
+            'metadata' => 'not-an-array',
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(ObjectMappedTypedRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('metadata', $e->errors());
+            $this->assertArrayNotHasKey('someObject', $e->errors());
+        }
+    }
 }
 
 class MyTypedForm extends TypedFormRequest
@@ -1222,6 +1289,23 @@ class DateTimeImmutableTypedRequest extends TypedFormRequest
 {
     public function __construct(
         public DateTimeImmutable $publishedAt,
+    ) {
+    }
+}
+
+class ObjectTypedRequest extends TypedFormRequest
+{
+    public function __construct(
+        public object $someObject,
+    ) {
+    }
+}
+
+class ObjectMappedTypedRequest extends TypedFormRequest
+{
+    public function __construct(
+        #[MapFrom('metadata')]
+        public object $someObject,
     ) {
     }
 }
