@@ -91,6 +91,30 @@ class TypedFormRequestFactory
     }
 
     /**
+     * @return class-string|null
+     */
+    protected function nestedHydrationClassFromUnion(ReflectionUnionType $type, ReflectionParameter $param): ?string
+    {
+        foreach ($type->getTypes() as $named) {
+            if ($named->getName() === 'null' || $named->isBuiltin()) {
+                continue;
+            }
+
+            $class = $named->getName();
+
+            if (in_array($class, $this->ancestors)) {
+                continue;
+            }
+
+            if (is_subclass_of($class, TypedFormRequest::class) || $this->shouldHydrateParameter($param, $class)) {
+                return $class;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @template TSubType
      *
      * @param  class-string<TSubType>  $class
@@ -179,15 +203,10 @@ class TypedFormRequestFactory
                     continue;
                 }
 
-                $nestedRequestClass = (new Collection($type->getTypes()))
-                    ->filter(fn (ReflectionNamedType $t) => $t->getName() !== 'null')
-                    ->filter(fn (ReflectionNamedType $t) => ! $t->isBuiltin())
-                    ->map(fn (ReflectionNamedType $t) => $t->getName())
-                    ->first(fn (string $class) => is_subclass_of($class, TypedFormRequest::class) || $this->shouldHydrateParameter($param, $class));
+                $nestedRequestClass = $this->nestedHydrationClassFromUnion($type, $param);
 
                 if ($nestedRequestClass !== null && is_array($value)) {
-                    $nestedData = $this->nestedBuilder($nestedRequestClass)->castValidatedData($value);
-                    $arguments[$name] = new $nestedRequestClass(...$nestedData);
+                    $arguments[$name] = $this->instantiateFromValidatedArray($nestedRequestClass, $this->ensureArrayValue($fieldName, $value));
                 } else {
                     $arguments[$name] = $value;
                 }
@@ -214,34 +233,13 @@ class TypedFormRequestFactory
 
             if ($this->isDateObjectType($typeName)) {
                 $arguments[$name] = $this->castDateValue($typeName, $value);
-            } elseif ($this->shouldHydrateParameter($param, $typeName)) {
+            } elseif ($this->shouldHydrateParameter($param, $typeName) || is_subclass_of($typeName, TypedFormRequest::class)) {
                 if ($value === null) {
                     $arguments[$name] = null;
                     continue;
                 }
 
-                if (! is_array($value)) {
-                    throw ValidationException::withMessages([
-                        $fieldName => ["The {$fieldName} field must be an array."],
-                    ]);
-                }
-
-                $nestedData = $this->nestedBuilder($typeName)->castValidatedData($value);
-                $arguments[$name] = new $typeName(...$nestedData);
-            } elseif (is_subclass_of($typeName, TypedFormRequest::class)) {
-                if ($value === null) {
-                    $arguments[$name] = null;
-                    continue;
-                }
-
-                if (! is_array($value)) {
-                    throw ValidationException::withMessages([
-                        $fieldName => ["The {$fieldName} field must be an array."],
-                    ]);
-                }
-
-                $nestedData = $this->nestedBuilder($typeName)->castValidatedData($value);
-                $arguments[$name] = new $typeName(...$nestedData); // @phpstan-ignore new.noConstructor
+                $arguments[$name] = $this->instantiateFromValidatedArray($typeName, $this->ensureArrayValue($fieldName, $value));
             } elseif (is_subclass_of($typeName, BackedEnum::class)) {
                 $arguments[$name] = $value !== null ? $typeName::from($value) : null;
             } else {
@@ -250,6 +248,31 @@ class TypedFormRequestFactory
         }
 
         return $arguments;
+    }
+
+    /**
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function ensureArrayValue(string $fieldName, mixed $value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+
+        throw ValidationException::withMessages([
+            $fieldName => ["The {$fieldName} field must be an array."],
+        ]);
+    }
+
+    protected function instantiateFromValidatedArray(string $class, array $value): object
+    {
+        $nestedData = $this->nestedBuilder($class)->castValidatedData($value);
+
+        if (is_subclass_of($class, TypedFormRequest::class)) {
+            return new $class(...$nestedData); // @phpstan-ignore new.noConstructor
+        }
+
+        return new $class(...$nestedData);
     }
 
     protected function castBuiltinObjectValue(mixed $value): mixed
@@ -670,12 +693,7 @@ class TypedFormRequestFactory
                 $nested = $this->nestedBuilder($type->getName());
                 $excludeRule = null;
             } elseif ($type instanceof ReflectionUnionType) {
-                $nestedRequestClass = (new Collection($type->getTypes()))
-                    ->filter(fn (ReflectionNamedType $t) => $t->getName() !== 'null')
-                    ->filter(fn (ReflectionNamedType $t) => ! $t->isBuiltin())
-                    ->map(fn (ReflectionNamedType $t) => $t->getName())
-                    ->first(fn (string $class) => (is_subclass_of($class, TypedFormRequest::class) || $this->shouldHydrateParameter($param, $class))
-                        && ! in_array($class, $this->ancestors));
+                $nestedRequestClass = $this->nestedHydrationClassFromUnion($type, $param);
 
                 if ($nestedRequestClass === null) {
                     continue;
