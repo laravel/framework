@@ -128,8 +128,6 @@ class TypedFormRequestFactory
     /**
      * Get the first union branch that should be hydrated from an array payload.
      *
-     * @param  ReflectionUnionType  $type  The union type to inspect.
-     * @param  ReflectionParameter  $param  The constructor parameter being hydrated.
      * @return class-string|null
      */
     protected function nestedHydrationClassFromUnion(ReflectionUnionType $type, ReflectionParameter $param): ?string
