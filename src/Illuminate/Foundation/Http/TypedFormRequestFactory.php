@@ -349,13 +349,7 @@ class TypedFormRequestFactory
      */
     protected function instantiateFromValidatedArray(string $class, array $value): object
     {
-        $nestedData = $this->nestedFactory($class)->castValidatedData($value);
-
-        if (is_subclass_of($class, TypedFormRequest::class)) {
-            return new $class(...$nestedData);
-        }
-
-        return new $class(...$nestedData);
+        return new $class(...$this->nestedFactory($class)->castValidatedData($value));
     }
 
     /**
@@ -473,7 +467,9 @@ class TypedFormRequestFactory
      */
     protected function validationRules(): array
     {
-        $rules = $this->rulesFromTypes();
+        // Combine the inferred rules from the constructor arguments
+        // with the validation rules for nested objects.
+        $rules = array_merge($this->inferredRulesFromTypes(), $this->nestedMetadata()['rules']);
 
         if (method_exists($this->requestClass, 'rules')) {
             $userRules = Container::getInstance()->call(
@@ -496,15 +492,13 @@ class TypedFormRequestFactory
      *
      * @throws \ReflectionException
      */
-    protected function rulesFromTypes(): array
+    protected function inferredRulesFromTypes(): array
     {
         if ($this->reflectRequest()->getAttributes(WithoutInferringRules::class) !== []) {
             return [];
         }
 
-        $constructor = $this->reflectRequest()->getConstructor();
-
-        if ($constructor === null) {
+        if (($constructor = $this->reflectRequest()->getConstructor()) === null) {
             return [];
         }
 
@@ -518,7 +512,7 @@ class TypedFormRequestFactory
             }
         }
 
-        return array_merge($rules, $this->nestedMetadata()['rules']);
+        return $rules;
     }
 
     /**
