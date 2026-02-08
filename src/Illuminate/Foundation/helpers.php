@@ -840,8 +840,6 @@ if (! function_exists('resolve_if')) {
         if ($boolean) {
             return resolve($name, $parameters);
         }
-
-        return null;
     }
 }
 
@@ -860,8 +858,6 @@ if (! function_exists('resolve_unless')) {
         if (! $boolean) {
             return resolve($name, $parameters);
         }
-
-        return null;
     }
 }
 
