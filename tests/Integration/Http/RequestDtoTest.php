@@ -522,6 +522,19 @@ class RequestDtoTest extends TestCase
 
         $this->app->make(OptOutInferenceRequest::class);
     }
+
+
+    public function testOptOutInferenceClassAttributeDisablesInferredRules()
+    {
+        $request = Request::create('', parameters: [
+            'name' => 20, // numeric, should be allowed by manual rule only
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(OptOutInferenceOnClassRequest::class);
+
+        $this->assertSame('20', $actual->name); // coerced by PHP scalar typing
+    }
 }
 
 class MyTypedForm extends TypedFormRequest
@@ -560,31 +573,6 @@ class MyUnauthorizedTypedForm extends TypedFormRequest
     public static function authorize(): bool
     {
         return false;
-    }
-
-    public function testOptOutInferenceDoesNotAddStringRule()
-    {
-        $request = Request::create('', parameters: [
-            'name' => 2, // numeric, should be allowed by manual rule only
-        ]);
-        $this->app->instance('request', $request);
-
-        $actual = $this->app->make(OptOutInferenceRequest::class);
-
-        $this->assertInstanceOf(OptOutInferenceRequest::class, $actual);
-        $this->assertSame('2', $actual->name); // coerced by PHP scalar typing
-    }
-
-    public function testOptOutInferenceStillUsesManualRules()
-    {
-        $this->expectException(ValidationException::class);
-
-        $request = Request::create('', parameters: [
-            'name' => 1, // min:2 should fail
-        ]);
-        $this->app->instance('request', $request);
-
-        $this->app->make(OptOutInferenceRequest::class);
     }
 }
 
@@ -768,3 +756,20 @@ class OptOutInferenceRequest extends TypedFormRequest
         ];
     }
 }
+
+#[WithoutInferringRules]
+class OptOutInferenceOnClassRequest extends TypedFormRequest
+{
+    public function __construct(
+        public string $name,
+    ) {
+    }
+
+    public static function rules(): array
+    {
+        return [
+            'name' => ['min:2'],
+        ];
+    }
+}
+
