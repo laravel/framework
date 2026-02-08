@@ -18,12 +18,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Validator;
 use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionProperty;
+use ReflectionType;
+use ReflectionUnionType;
 
 use function Illuminate\Support\enum_value;
 
@@ -145,6 +148,25 @@ class TypedFormRequestBuilder
             }
 
             $type = $param->getType();
+
+            if ($type instanceof ReflectionUnionType) {
+                if ($validated[$name] === null) {
+                    continue;
+                }
+
+                $dtoType = collect($type->getTypes())
+                    ->filter(fn (ReflectionNamedType $t) => $t->getName() !== 'null')
+                    ->filter(fn (ReflectionNamedType $t) => ! $t->isBuiltin())
+                    ->map(fn (ReflectionNamedType $t) => $t->getName())
+                    ->first(fn (string $class) => is_subclass_of($class, TypedFormRequest::class));
+
+                if ($dtoType !== null && is_array($validated[$name])) {
+                    $nestedData = $this->nestedBuilder($dtoType)->castValidatedData($validated[$name]);
+                    $validated[$name] = new $dtoType(...$nestedData); // @phpstan-ignore new.noConstructor
+                }
+
+                continue;
+            }
 
             if (! $type instanceof ReflectionNamedType) {
                 continue;
@@ -325,7 +347,7 @@ class TypedFormRequestBuilder
 
         $type = $param->getType();
 
-        if (! $type instanceof ReflectionNamedType) {
+        if (! $type instanceof ReflectionType) {
             return [];
         }
 
@@ -343,21 +365,68 @@ class TypedFormRequestBuilder
         }
 
         // Type rule
-        $typeRule = match ($type->getName()) {
-            'int' => 'integer',
-            'float' => 'numeric',
-            'string' => 'string',
-            'bool' => 'boolean',
-            'array' => 'array',
-            'object' => 'array',
-            default => $this->ruleForNonBuiltinType($type),
-        };
+        $typeRule = $type instanceof ReflectionUnionType
+            ? $this->ruleForUnionType($type)
+            : ($type instanceof ReflectionNamedType ? $this->ruleForNamedType($type) : null);
 
         if ($typeRule !== null) {
             $rules[] = $typeRule;
         }
 
         return $rules;
+    }
+
+    /**
+     * @return string|\Illuminate\Contracts\Validation\ValidatorAwareRule|\Illuminate\Contracts\Validation\Rule|null
+     */
+    protected function ruleForNamedType(ReflectionNamedType $type): mixed
+    {
+        $name = $type->getName();
+
+        if ($name === 'null') {
+            return null;
+        }
+
+        if ($type->isBuiltin()) {
+            return match ($name) {
+                'int' => 'integer',
+                'float' => 'numeric',
+                'string' => 'string',
+                'bool' => 'boolean',
+                'array', 'object' => 'array',
+                default => null,
+            };
+        }
+
+        return $this->ruleForNonBuiltinType($type);
+    }
+
+    /**
+     * @return \Illuminate\Contracts\Validation\ValidatorAwareRule|\Illuminate\Contracts\Validation\Rule|null
+     */
+    protected function ruleForUnionType(ReflectionUnionType $type): mixed
+    {
+        $branches = [];
+
+        foreach ($type->getTypes() as $named) {
+            if ($named->getName() === 'null') {
+                continue;
+            }
+
+            $branchRule = $this->ruleForNamedType($named);
+
+            if ($branchRule === null) {
+                return null;
+            }
+
+            $branches[] = [$branchRule];
+        }
+
+        if ($branches === []) {
+            return null;
+        }
+
+        return Rule::anyOf($branches);
     }
 
     /**
@@ -520,19 +589,45 @@ class TypedFormRequestBuilder
         foreach ($constructor->getParameters() as $param) {
             $type = $param->getType();
 
-            if (! $type instanceof ReflectionNamedType
-                || $type->isBuiltin()
-                || ! is_subclass_of($type->getName(), TypedFormRequest::class)
-                || in_array($type->getName(), $this->ancestors)
-                || ($param->getAttributes(WithoutInferringRules::class) !== [])) {
+            if ($param->getAttributes(WithoutInferringRules::class) !== []) {
                 continue;
             }
 
             $name = $this->fieldNameFor($param);
-            $parentIsOptional = $param->isDefaultValueAvailable() || $type->allowsNull();
-            $nested = $this->nestedBuilder($type->getName());
+            $parentIsOptional = $param->isDefaultValueAvailable() || ($type?->allowsNull() ?? false);
+
+            if ($type instanceof ReflectionNamedType) {
+                if ($type->isBuiltin()
+                    || ! is_subclass_of($type->getName(), TypedFormRequest::class)
+                    || in_array($type->getName(), $this->ancestors)) {
+                    continue;
+                }
+
+                $nested = $this->nestedBuilder($type->getName());
+                $excludeRule = null;
+            } elseif ($type instanceof ReflectionUnionType) {
+                $dtoType = collect($type->getTypes())
+                    ->filter(fn (ReflectionNamedType $t) => $t->getName() !== 'null')
+                    ->filter(fn (ReflectionNamedType $t) => ! $t->isBuiltin())
+                    ->map(fn (ReflectionNamedType $t) => $t->getName())
+                    ->first(fn (string $class) => is_subclass_of($class, TypedFormRequest::class)
+                        && ! in_array($class, $this->ancestors));
+
+                if ($dtoType === null) {
+                    continue;
+                }
+
+                $nested = $this->nestedBuilder($dtoType);
+                $excludeRule = Rule::excludeIf(fn () => ! is_array(data_get($this->validationData(), $name)));
+            } else {
+                continue;
+            }
 
             foreach ($nested->validationRules() as $field => $fieldRules) {
+                if (isset($excludeRule)) {
+                    array_unshift($fieldRules, $excludeRule);
+                }
+
                 if ($parentIsOptional) {
                     $fieldRules = array_map(
                         static fn ($rule) => $rule === 'required' ? "required_with:$name" : $rule,

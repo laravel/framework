@@ -518,14 +518,17 @@ class RequestDtoTest extends TestCase
 
     public function testOptOutInferenceStillUsesManualRules()
     {
-        $this->expectException(ValidationException::class);
-
         $request = Request::create('', parameters: [
             'name' => 1, // min:2 should fail
         ]);
         $this->app->instance('request', $request);
 
-        $this->app->make(OptOutInferenceRequest::class);
+        try {
+            $this->app->make(OptOutInferenceRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('name', $e->errors());
+        }
     }
 
 
@@ -544,8 +547,6 @@ class RequestDtoTest extends TestCase
 
     public function testUnionBuiltinAcceptsInt()
     {
-        $this->markTestSkipped('add as follow up');
-
         $request = Request::create('', parameters: [
             'value' => 123,
         ]);
@@ -559,8 +560,6 @@ class RequestDtoTest extends TestCase
 
     public function testUnionBuiltinAcceptsString()
     {
-        $this->markTestSkipped('add as follow up');
-
         $request = Request::create('', parameters: [
             'value' => 'abc',
         ]);
@@ -574,34 +573,34 @@ class RequestDtoTest extends TestCase
 
     public function testUnionBuiltinRejectsArray()
     {
-        $this->markTestSkipped('add as follow up');
-
-        $this->expectException(ValidationException::class);
-
         $request = Request::create('', parameters: [
             'value' => ['invalid'],
         ]);
         $this->app->instance('request', $request);
 
-        $this->app->make(UnionBuiltinRequest::class);
+        try {
+            $this->app->make(UnionBuiltinRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('value', $e->errors());
+        }
     }
 
     public function testUnionBuiltinMissingRequiredFieldFails()
     {
-        $this->markTestSkipped('add as follow up');
-
-        $this->expectException(ValidationException::class);
-
         $request = Request::create('');
         $this->app->instance('request', $request);
 
-        $this->app->make(UnionBuiltinRequest::class);
+        try {
+            $this->app->make(UnionBuiltinRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('value', $e->errors());
+        }
     }
 
     public function testUnionNullableAllowsNull()
     {
-        $this->markTestSkipped('add as follow up');
-
         $request = Request::create('', parameters: [
             'value' => null,
         ]);
@@ -615,22 +614,21 @@ class RequestDtoTest extends TestCase
 
     public function testUnionNullableRejectsArray()
     {
-        $this->markTestSkipped('add as follow up');
-
-        $this->expectException(ValidationException::class);
-
         $request = Request::create('', parameters: [
             'value' => ['nope'],
         ]);
         $this->app->instance('request', $request);
 
-        $this->app->make(UnionNullableRequest::class);
+        try {
+            $this->app->make(UnionNullableRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('value', $e->errors());
+        }
     }
 
     public function testUnionNestedAcceptsArrayAndBuildsDto()
     {
-        $this->markTestSkipped('add as follow up');
-
         $request = Request::create('', parameters: [
             'address' => [
                 'street' => '123 Main St',
@@ -648,8 +646,6 @@ class RequestDtoTest extends TestCase
 
     public function testUnionNestedAcceptsString()
     {
-        $this->markTestSkipped('add as follow up');
-
         $request = Request::create('', parameters: [
             'address' => 'raw string',
         ]);
@@ -663,34 +659,34 @@ class RequestDtoTest extends TestCase
 
     public function testUnionNestedRejectsInt()
     {
-        $this->markTestSkipped('add as follow up');
-
-        $this->expectException(ValidationException::class);
-
         $request = Request::create('', parameters: [
             'address' => 123,
         ]);
         $this->app->instance('request', $request);
 
-        $this->app->make(UnionNestedRequest::class);
+        try {
+            $this->app->make(UnionNestedRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('address', $e->errors());
+        }
     }
 
     public function testUnionNestedMissingFieldFailsValidation()
     {
-        $this->markTestSkipped('add as follow up');
-
-        $this->expectException(ValidationException::class);
-
         $request = Request::create('');
         $this->app->instance('request', $request);
 
-        $this->app->make(UnionNestedRequest::class);
+        try {
+            $this->app->make(UnionNestedRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('address', $e->errors());
+        }
     }
 
     public function testUnionNestedArrayBranchValidatesNestedFields()
     {
-        $this->markTestSkipped('add as follow up');
-
         $request = Request::create('', parameters: [
             'address' => [
                 'city' => 'Springfield',
@@ -709,8 +705,6 @@ class RequestDtoTest extends TestCase
 
     public function testUnionNestedMapFromArrayBranchUsesMappedValidationErrorKey()
     {
-        $this->markTestSkipped('add as follow up');
-
         $request = Request::create('', parameters: [
             'shipping_address' => [
                 'city' => 'Springfield',
@@ -730,9 +724,6 @@ class RequestDtoTest extends TestCase
 
     public function testUnionNestedMapFromStringBranchPasses()
     {
-        $this->markTestSkipped('add as follow up');
-
-        $this->markTestSkipped('add as follow up');
         $request = Request::create('', parameters: [
             'shipping_address' => 'raw string',
         ]);
