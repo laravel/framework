@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Http;
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Http\Attributes\MapFrom;
+use Illuminate\Foundation\Http\Attributes\WithoutInferringRules;
 use Illuminate\Foundation\Http\TypedFormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -496,6 +497,31 @@ class RequestDtoTest extends TestCase
         $this->assertSame('Taylor', $actual->firstName);
         $this->assertSame('Otwell', $actual->lastName);
     }
+
+    public function testOptOutInferenceDoesNotAddStringRule()
+    {
+        $request = Request::create('', parameters: [
+            'name' => 20, // numeric, should be allowed by manual rule only
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(OptOutInferenceRequest::class);
+
+        $this->assertInstanceOf(OptOutInferenceRequest::class, $actual);
+        $this->assertSame('20', $actual->name); // coerced by PHP scalar typing
+    }
+
+    public function testOptOutInferenceStillUsesManualRules()
+    {
+        $this->expectException(ValidationException::class);
+
+        $request = Request::create('', parameters: [
+            'name' => 1, // min:2 should fail
+        ]);
+        $this->app->instance('request', $request);
+
+        $this->app->make(OptOutInferenceRequest::class);
+    }
 }
 
 class MyTypedForm extends TypedFormRequest
@@ -534,6 +560,31 @@ class MyUnauthorizedTypedForm extends TypedFormRequest
     public static function authorize(): bool
     {
         return false;
+    }
+
+    public function testOptOutInferenceDoesNotAddStringRule()
+    {
+        $request = Request::create('', parameters: [
+            'name' => 2, // numeric, should be allowed by manual rule only
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(OptOutInferenceRequest::class);
+
+        $this->assertInstanceOf(OptOutInferenceRequest::class, $actual);
+        $this->assertSame('2', $actual->name); // coerced by PHP scalar typing
+    }
+
+    public function testOptOutInferenceStillUsesManualRules()
+    {
+        $this->expectException(ValidationException::class);
+
+        $request = Request::create('', parameters: [
+            'name' => 1, // min:2 should fail
+        ]);
+        $this->app->instance('request', $request);
+
+        $this->app->make(OptOutInferenceRequest::class);
     }
 }
 
@@ -660,7 +711,8 @@ class AddressWithAddressChild extends TypedFormRequest
         public string $city,
         public ?string $zip = null,
         public ?AddressWithAddressChild $formerAddress = null
-    ) {}
+    ) {
+    }
 }
 
 class MappedFieldRequest extends TypedFormRequest
@@ -697,6 +749,22 @@ class MappedFieldWithRulesRequest extends TypedFormRequest
         return [
             'first_name' => ['min:2', 'max:50'],
             'lastName' => ['min:2'],
+        ];
+    }
+}
+
+class OptOutInferenceRequest extends TypedFormRequest
+{
+    public function __construct(
+        #[WithoutInferringRules]
+        public string $name,
+    ) {
+    }
+
+    public static function rules(): array
+    {
+        return [
+            'name' => ['min:2'],
         ];
     }
 }

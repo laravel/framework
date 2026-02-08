@@ -8,6 +8,7 @@ use Illuminate\Auth\Access\Response;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Foundation\Http\Attributes\MapFrom;
+use Illuminate\Foundation\Http\Attributes\WithoutInferringRules;
 use Illuminate\Foundation\Precognition;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -262,6 +263,10 @@ class TypedFormRequestBuilder
      */
     protected function rulesFromTypes(): array
     {
+        if ($this->reflectRequest()->getAttributes(WithoutInferringRules::class) !== []) {
+            return [];
+        }
+
         $constructor = $this->reflectRequest()->getConstructor();
 
         if ($constructor === null) {
@@ -286,6 +291,10 @@ class TypedFormRequestBuilder
      */
     protected function rulesForParameter(ReflectionParameter $param): array
     {
+        if ($param->getAttributes(WithoutInferringRules::class) !== []) {
+            return [];
+        }
+
         $type = $param->getType();
 
         if (! $type instanceof ReflectionNamedType) {
@@ -450,7 +459,7 @@ class TypedFormRequestBuilder
         $constructor = $this->reflectRequest()->getConstructor();
 
         if ($constructor === null) {
-            return $this->nestedMetadata = compact('rules', 'messages', 'attributes');
+            return $this->nestedMetadata = ['rules' => $rules, 'messages' => $messages, 'attributes' => $attributes];
         }
 
         foreach ($constructor->getParameters() as $param) {
@@ -459,7 +468,8 @@ class TypedFormRequestBuilder
             if (! $type instanceof ReflectionNamedType
                 || $type->isBuiltin()
                 || ! is_subclass_of($type->getName(), TypedFormRequest::class)
-                || in_array($type->getName(), $this->ancestors)) {
+                || in_array($type->getName(), $this->ancestors)
+                || ($param->getAttributes(WithoutInferringRules::class) !== [])) {
                 continue;
             }
 
