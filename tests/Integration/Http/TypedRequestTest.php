@@ -1140,6 +1140,62 @@ class TypedRequestTest extends TestCase
         }
     }
 
+    public function testTrueTypeAcceptsTruthyValue()
+    {
+        $request = Request::create('', parameters: [
+            'enabled' => true,
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(TrueTypedRequest::class);
+
+        $this->assertInstanceOf(TrueTypedRequest::class, $actual);
+        $this->assertTrue($actual->enabled);
+    }
+
+    public function testTrueTypeRejectsFalse()
+    {
+        $request = Request::create('', parameters: [
+            'enabled' => false,
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(TrueTypedRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('enabled', $e->errors());
+        }
+    }
+
+    public function testFalseTypeAcceptsFalsyValue()
+    {
+        $request = Request::create('', parameters: [
+            'disabled' => false,
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(FalseTypedRequest::class);
+
+        $this->assertInstanceOf(FalseTypedRequest::class, $actual);
+        $this->assertFalse($actual->disabled);
+    }
+
+    public function testFalseTypeRejectsTrue()
+    {
+        $request = Request::create('', parameters: [
+            'disabled' => true,
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(FalseTypedRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('disabled', $e->errors());
+        }
+    }
+
     public function testObjectTypeAcceptsArrayAndBuildsStdClass()
     {
         $request = Request::create('', parameters: [
@@ -1663,6 +1719,22 @@ class OptionalCollectionWithoutInferredRulesRequest extends TypedFormRequest
         return [
             'items' => ['nullable'],
         ];
+    }
+}
+
+class TrueTypedRequest extends TypedFormRequest
+{
+    public function __construct(
+        public true $enabled,
+    ) {
+    }
+}
+
+class FalseTypedRequest extends TypedFormRequest
+{
+    public function __construct(
+        public false $disabled,
+    ) {
     }
 }
 

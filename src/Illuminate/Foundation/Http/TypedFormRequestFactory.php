@@ -29,8 +29,8 @@ use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionType;
 use ReflectionUnionType;
-
 use stdClass;
+
 use function Illuminate\Support\enum_value;
 
 /**
@@ -326,6 +326,7 @@ class TypedFormRequestFactory
      * @param  string  $fieldName
      * @param  array<array-key, mixed>|mixed  $value
      * @return array<array-key, mixed>
+     *
      * @phpstan-return ($value is array<array-key, mixed> ? array<array-key, mixed> : never)
      *
      * @throws \Illuminate\Validation\ValidationException
@@ -566,16 +567,18 @@ class TypedFormRequestFactory
             return null;
         }
 
-        if ($type->isBuiltin()) {
-            return match ($name) {
-                'int' => 'integer',
-                'float' => 'numeric',
-                'string' => 'string',
-                'bool' => 'boolean',
-                'array', 'object' => 'array',
-                default => null,
-            };
-        }
+            if ($type->isBuiltin()) {
+                return match ($name) {
+                    'int' => 'integer',
+                    'float' => 'numeric',
+                    'string' => 'string',
+                    'bool' => 'boolean',
+                    'true' => 'accepted',
+                    'false' => 'declined',
+                    'array', 'object' => 'array',
+                    default => null,
+                };
+            }
 
         return $this->ruleForNonBuiltinType($type);
     }
@@ -733,8 +736,10 @@ class TypedFormRequestFactory
     /**
      * Convert a reflected default value to a native value.
      *
-     * @param  mixed  $value  The default value.
+     * @template TValue
+     * @param  TValue  $value
      * @return mixed
+     * @phpstan-return ($value is empty ? null : ($value is \BackedEnum ? value-of<TValue> : ($value is \UnitEnum ? string : TValue)))
      */
     protected function mapToNativeFromDefaultValue(mixed $value): mixed
     {
