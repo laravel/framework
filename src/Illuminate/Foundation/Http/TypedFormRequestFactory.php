@@ -94,6 +94,34 @@ class TypedFormRequestFactory
     }
 
     /**
+     * Build and validate the TypedFormRequest instance.
+     *
+     * @return T
+     */
+    public function build(): TypedFormRequest
+    {
+        $this->prepareForValidation();
+
+        if (! $this->passesAuthorization()) {
+            $this->failedAuthorization();
+        }
+
+        $this->validator = $this->getValidatorInstance();
+
+        if ($this->request->isPrecognitive()) {
+            $this->validator->after(Precognition::afterValidationHook($this->request));
+        }
+
+        if ($this->validator->fails()) {
+            $this->failedValidation();
+        }
+
+        $this->passedValidation();
+
+        return $this->buildTypedFormRequest($this->validator->validated());
+    }
+
+    /**
      * Get the reflected TypedFormRequest class.
      *
      * @return \ReflectionClass<T>
@@ -192,34 +220,6 @@ class TypedFormRequestFactory
         $attr = $param->getAttributes(MapFrom::class)[0] ?? null;
 
         return $attr ? $attr->newInstance()->name : $param->getName();
-    }
-
-    /**
-     * Build and validate the TypedFormRequest instance.
-     *
-     * @return T
-     */
-    public function build(): TypedFormRequest
-    {
-        $this->prepareForValidation();
-
-        if (! $this->passesAuthorization()) {
-            $this->failedAuthorization();
-        }
-
-        $this->validator = $this->getValidatorInstance();
-
-        if ($this->request->isPrecognitive()) {
-            $this->validator->after(Precognition::afterValidationHook($this->request));
-        }
-
-        if ($this->validator->fails()) {
-            $this->failedValidation();
-        }
-
-        $this->passedValidation();
-
-        return $this->buildTypedFormRequest($this->validator->validated());
     }
 
     /**
