@@ -323,11 +323,13 @@ class TypedFormRequestFactory
     /**
      * Ensure the given value is an array payload or throw a validation exception.
      *
+     * @template TValue of array<array-key, mixed>
+     *
      * @param  string  $fieldName
-     * @param  array<array-key, mixed>|mixed  $value
+     * @param  TValue|mixed  $value
      * @return array<array-key, mixed>
      *
-     * @phpstan-return ($value is array<array-key, mixed> ? array<array-key, mixed> : never)
+     * @phpstan-return ($value is array<array-key, mixed> ? TValue : never)
      *
      * @throws \Illuminate\Validation\ValidationException
      */
