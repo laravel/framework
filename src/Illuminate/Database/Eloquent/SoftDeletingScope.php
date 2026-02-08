@@ -71,8 +71,8 @@ class SoftDeletingScope implements Scope
     {
         $builder->macro('restore', function (Builder $builder) {
             $builder->withTrashed();
-
-            return $builder->update([$builder->getModel()->getDeletedAtColumn() => $builder->getModel()->getUndeletedValue()]);
+            $model = $builder->getModel();
+            return $builder->update([$model->getDeletedAtColumn() => $model->getUndeletedValue()]);
         });
     }
 
