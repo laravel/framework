@@ -11,6 +11,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
+use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Foundation\Http\Attributes\HydrateFromRequest;
 use Illuminate\Foundation\Http\Attributes\MapFrom;
 use Illuminate\Foundation\Http\Attributes\WithoutInferringRules;
@@ -38,22 +39,46 @@ use function Illuminate\Support\enum_value;
  */
 class TypedFormRequestFactory
 {
+    /**
+     * The validator instance for this request.
+     */
     protected Validator $validator;
 
-    /** @var ReflectionClass<T>|null */
+    /**
+     * The reflected request class.
+     *
+     * @var ReflectionClass<T>|null
+     */
     protected ?ReflectionClass $reflection = null;
 
-    /** @var list<class-string> */
+    /**
+     * The ancestor request classes being hydrated.
+     *
+     * Used to prevent recursive hydration loops.
+     *
+     * @var list<class-string>
+     */
     protected array $ancestors = [];
 
-    /** @var array{rules: array, messages: array, attributes: array}|null */
+    /**
+     * The cached nested validation metadata.
+     *
+     * @var array{rules: array<array-key, mixed>, messages: array<array-key, mixed>, attributes: array<array-key, mixed>}|null
+     */
     protected ?array $nestedMetadata = null;
 
-    /** @var array<class-string, bool> */
+    /**
+     * The cached HydrateFromRequest attribute checks.
+     *
+     * @var array<class-string, bool>
+     */
     protected array $hydrateFromRequestCache = [];
 
     /**
-     * @param  class-string<T>  $requestClass
+     * Create a new TypedFormRequest factory instance.
+     *
+     * @param  class-string<T>  $requestClass  The request class being built.
+     * @param  Request  $request  The underlying HTTP request instance.
      */
     public function __construct(
         protected string $requestClass,
@@ -62,6 +87,8 @@ class TypedFormRequestFactory
     }
 
     /**
+     * Get the reflected TypedFormRequest class.
+     *
      * @return \ReflectionClass<T>
      *
      * @throws \ReflectionException
@@ -72,7 +99,9 @@ class TypedFormRequestFactory
     }
 
     /**
-     * @param  class-string  $class
+     * Determine if the given class should be hydrated from request data.
+     *
+     * @param  class-string  $class  The class name to check.
      */
     protected function shouldHydrateFromRequest(string $class): bool
     {
@@ -85,12 +114,22 @@ class TypedFormRequestFactory
         return $this->hydrateFromRequestCache[$class] = $reflection->getAttributes(HydrateFromRequest::class, ReflectionAttribute::IS_INSTANCEOF) !== [];
     }
 
+    /**
+     * Determine if the given constructor parameter should be hydrated from request data.
+     *
+     * @param  ReflectionParameter  $param  The reflected parameter.
+     * @param  class-string  $class  The class name to check.
+     */
     protected function shouldHydrateParameter(ReflectionParameter $param, string $class): bool
     {
         return $param->getAttributes(HydrateFromRequest::class) !== [] || $this->shouldHydrateFromRequest($class);
     }
 
     /**
+     * Get the first union branch that should be hydrated from an array payload.
+     *
+     * @param  ReflectionUnionType  $type  The union type to inspect.
+     * @param  ReflectionParameter  $param  The constructor parameter being hydrated.
      * @return class-string|null
      */
     protected function nestedHydrationClassFromUnion(ReflectionUnionType $type, ReflectionParameter $param): ?string
@@ -132,6 +171,11 @@ class TypedFormRequestFactory
         return $builder;
     }
 
+    /**
+     * Resolve the validation field name for the given parameter.
+     *
+     * @param  ReflectionParameter  $param  The reflected parameter.
+     */
     protected function fieldNameFor(ReflectionParameter $param): string
     {
         $attr = $param->getAttributes(MapFrom::class)[0] ?? null;
@@ -140,6 +184,8 @@ class TypedFormRequestFactory
     }
 
     /**
+     * Build and validate the TypedFormRequest instance.
+     *
      * @return T
      */
     public function build(): TypedFormRequest
@@ -166,6 +212,9 @@ class TypedFormRequestFactory
     }
 
     /**
+     * Instantiate the TypedFormRequest with cast/normalized validated data.
+     *
+     * @param  array<string, mixed>  $validated  The validated request data.
      * @return T
      */
     protected function buildTypedFormRequest(array $validated): TypedFormRequest
@@ -175,6 +224,14 @@ class TypedFormRequestFactory
         return new $requestClass(...$this->castValidatedData($validated)); // @phpstan-ignore new.noConstructor (this is a requirement for now)
     }
 
+    /**
+     * Cast validated data into constructor arguments for the request class.
+     *
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     *
+     * @throws \ReflectionException
+     */
     protected function castValidatedData(array $validated): array
     {
         $constructor = $this->reflectRequest()->getConstructor();
@@ -200,6 +257,7 @@ class TypedFormRequestFactory
             if ($type instanceof ReflectionUnionType) {
                 if ($value === null) {
                     $arguments[$name] = null;
+
                     continue;
                 }
 
@@ -216,6 +274,7 @@ class TypedFormRequestFactory
 
             if (! $type instanceof ReflectionNamedType) {
                 $arguments[$name] = $value;
+
                 continue;
             }
 
@@ -236,6 +295,7 @@ class TypedFormRequestFactory
             } elseif ($this->shouldHydrateParameter($param, $typeName) || is_subclass_of($typeName, TypedFormRequest::class)) {
                 if ($value === null) {
                     $arguments[$name] = null;
+
                     continue;
                 }
 
@@ -251,6 +311,12 @@ class TypedFormRequestFactory
     }
 
     /**
+     * Ensure the given value is an array payload or throw a validation exception.
+     *
+     * @param  string  $fieldName
+     * @param  mixed  $value
+     * @return array<array-key, mixed>
+     *
      * @throws \Illuminate\Validation\ValidationException
      */
     protected function ensureArrayValue(string $fieldName, mixed $value): array
@@ -264,6 +330,12 @@ class TypedFormRequestFactory
         ]);
     }
 
+    /**
+     * Instantiate a nested object from a validated array payload.
+     *
+     * @param  class-string  $class
+     * @param  array<array-key, mixed>  $value
+     */
     protected function instantiateFromValidatedArray(string $class, array $value): object
     {
         $nestedData = $this->nestedBuilder($class)->castValidatedData($value);
@@ -275,7 +347,10 @@ class TypedFormRequestFactory
         return new $class(...$nestedData);
     }
 
-    protected function castBuiltinObjectValue(mixed $value): mixed
+    /**
+     * Cast an "object" builtin value into a stdClass instance when appropriate.
+     */
+    protected function castBuiltinObjectValue(mixed $value): ?object
     {
         if ($value === null || is_object($value)) {
             return $value;
@@ -288,6 +363,9 @@ class TypedFormRequestFactory
         return $value;
     }
 
+    /**
+     * Call the request's prepareForValidation hook if it exists.
+     */
     protected function prepareForValidation(): void
     {
         if (method_exists($this->requestClass, 'prepareForValidation')) {
@@ -298,7 +376,10 @@ class TypedFormRequestFactory
         }
     }
 
-    protected function passesAuthorization(): bool
+    /**
+     * Determine if the request passes authorization.
+     */
+    protected function passesAuthorization()
     {
         if (method_exists($this->requestClass, 'authorize')) {
             $result = Container::getInstance()->call(
@@ -312,21 +393,27 @@ class TypedFormRequestFactory
         return true;
     }
 
-    protected function failedAuthorization(): void
+    /**
+     * Handle a failed authorization attempt.
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    protected function failedAuthorization(): never
     {
         if (method_exists($this->requestClass, 'failedAuthorization')) {
             Container::getInstance()->call(
                 [$this->requestClass, 'failedAuthorization'],
                 ['request' => $this->request]
             );
-
-            return;
         }
 
         throw new AuthorizationException;
     }
 
-    protected function getValidatorInstance(): Validator
+    /**
+     * Get the validator instance for the request.
+     */
+    protected function getValidatorInstance(): ValidatorContract
     {
         $factory = Container::getInstance()->make(ValidationFactory::class);
 
@@ -347,7 +434,10 @@ class TypedFormRequestFactory
         return $validator;
     }
 
-    protected function createDefaultValidator(ValidationFactory $factory): Validator
+    /**
+     * Create the default validator for the request.
+     */
+    protected function createDefaultValidator(ValidationFactory $factory): ValidatorContract
     {
         $validator = $factory->make(
             $this->validationData(),
@@ -365,11 +455,15 @@ class TypedFormRequestFactory
         return $validator;
     }
 
+    /**
+     * Get the fully merged validation rules for the request.
+     *
+     * @return array<string, mixed>
+     */
     protected function validationRules(): array
     {
         $rules = $this->rulesFromTypes();
 
-        // @todo add in attribute check (read from #[Rules] attribute on the requestClass)
         if (method_exists($this->requestClass, 'rules')) {
             $userRules = Container::getInstance()->call(
                 [$this->requestClass, 'rules'],
@@ -385,6 +479,8 @@ class TypedFormRequestFactory
     }
 
     /**
+     * Infer validation rules from constructor parameter types.
+     *
      * @return array<string, mixed>
      *
      * @throws \ReflectionException
@@ -415,6 +511,8 @@ class TypedFormRequestFactory
     }
 
     /**
+     * Infer validation rules for the given constructor parameter.
+     *
      * @return list<string|\Illuminate\Contracts\Validation\Rule|\Illuminate\Contracts\Validation\ValidatorAwareRule>
      */
     protected function rulesForParameter(ReflectionParameter $param): array
@@ -431,18 +529,16 @@ class TypedFormRequestFactory
 
         $rules = [];
 
-        // Presence: required vs sometimes vs nullable
         if ($param->isDefaultValueAvailable()) {
             $rules[] = 'sometimes';
+        } else {
+            $rules[] = 'required';
         }
 
         if ($type->allowsNull()) {
             $rules[] = 'nullable';
-        } elseif (! $param->isDefaultValueAvailable()) {
-            $rules[] = 'required';
         }
 
-        // Type rule
         if ($param->getAttributes(HydrateFromRequest::class) !== []) {
             $typeRule = 'array';
         } else {
@@ -459,6 +555,8 @@ class TypedFormRequestFactory
     }
 
     /**
+     * Infer a validation rule for a named type.
+     *
      * @return string|\Illuminate\Contracts\Validation\ValidatorAwareRule|\Illuminate\Contracts\Validation\Rule|null
      */
     protected function ruleForNamedType(ReflectionNamedType $type): mixed
@@ -484,6 +582,8 @@ class TypedFormRequestFactory
     }
 
     /**
+     * Infer a validation rule for a union type.
+     *
      * @return \Illuminate\Contracts\Validation\ValidatorAwareRule|\Illuminate\Contracts\Validation\Rule|null
      */
     protected function ruleForUnionType(ReflectionUnionType $type): mixed
@@ -512,6 +612,8 @@ class TypedFormRequestFactory
     }
 
     /**
+     * Infer a validation rule for a non-builtin named type.
+     *
      * @return string|\Illuminate\Contracts\Validation\ValidatorAwareRule|\Illuminate\Contracts\Validation\Rule
      */
     protected function ruleForNonBuiltinType(ReflectionNamedType $type): mixed
@@ -537,12 +639,23 @@ class TypedFormRequestFactory
         return null;
     }
 
+    /**
+     * Determine if the given class name is a date object type.
+     *
+     * @param  class-string  $name
+     */
     protected function isDateObjectType(string $name): bool
     {
         return is_a($name, DateTimeInterface::class, true);
     }
 
-    protected function castDateValue(string $typeName, mixed $value): mixed
+    /**
+     * Cast the given value to the requested date object type.
+     *
+     * @param  class-string  $typeName  The date object class name.
+     * @param  mixed  $value  The validated value.
+     */
+    protected function castDateValue(string $typeName, mixed $value): ?DateTimeInterface
     {
         if ($value === null || ($value instanceof DateTimeInterface && $value instanceof $typeName)) {
             return $value;
@@ -560,6 +673,8 @@ class TypedFormRequestFactory
     }
 
     /**
+     * Get the validation data for the request.
+     *
      * @return array<string, mixed>
      */
     protected function validationData(): array
@@ -575,6 +690,12 @@ class TypedFormRequestFactory
         return $this->mergeRequestData($this->request->all());
     }
 
+    /**
+     * Merge request data with defaults for missing fields.
+     *
+     * @param  array<string, mixed>  $data  The input data.
+     * @return array<string, mixed>
+     */
     protected function mergeRequestData(array $data): array
     {
         $constructor = $this->reflectRequest()->getConstructor();
@@ -622,9 +743,8 @@ class TypedFormRequestFactory
     }
 
     /**
-     * Reflection property is assumed to have a default value.
+     * Convert a reflected default value to a native value.
      *
-     * @param  ReflectionProperty  $prop
      * @return mixed
      */
     protected function mapToNativeFromDefault(ReflectionProperty $prop): mixed
@@ -632,6 +752,11 @@ class TypedFormRequestFactory
         return enum_value($prop->getDefaultValue());
     }
 
+    /**
+     * Get the validation messages for the request.
+     *
+     * @return array<string, mixed>
+     */
     protected function messages(): array
     {
         $messages = [];
@@ -643,6 +768,11 @@ class TypedFormRequestFactory
         return array_merge($messages, $this->nestedMetadata()['messages']);
     }
 
+    /**
+     * Get the validation attributes for the request.
+     *
+     * @return array<string, mixed>
+     */
     protected function attributes(): array
     {
         $attributes = [];
@@ -655,6 +785,8 @@ class TypedFormRequestFactory
     }
 
     /**
+     * Get validation metadata for nested hydrated objects.
+     *
      * @return array{rules: array<array-key, mixed>, messages: array<array-key, mixed>, attributes: array<array-key, mixed>}
      */
     protected function nestedMetadata(): array
@@ -736,25 +868,29 @@ class TypedFormRequestFactory
         ];
     }
 
+    /**
+     * Determine if the request should stop on first validation failure.
+     */
     protected function shouldStopOnFirstFailure(): bool
     {
         // @todo use Taylor's attribute to check
         if (method_exists($this->requestClass, 'shouldStopOnFirstFailure')) {
-            return Container::getInstance()->call([$this->requestClass, 'shouldStopOnFirstFailure']);
+            return (bool) Container::getInstance()->call([$this->requestClass, 'shouldStopOnFirstFailure']);
         }
 
         return false;
     }
 
-    protected function failedValidation(): void
+    /**
+     * Handle a failed validation attempt.
+     */
+    protected function failedValidation(): never
     {
         if (method_exists($this->requestClass, 'failedValidation')) {
             Container::getInstance()->call(
                 [$this->requestClass, 'failedValidation'],
                 ['validator' => $this->validator]
             );
-
-            return;
         }
 
         $exception = $this->validator->getException();
@@ -762,6 +898,9 @@ class TypedFormRequestFactory
         throw new $exception($this->validator);
     }
 
+    /**
+     * Call the request's passedValidation hook if it exists.
+     */
     protected function passedValidation(): void
     {
         if (method_exists($this->requestClass, 'passedValidation')) {

@@ -17,7 +17,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Orchestra\Testbench\TestCase;
 
-class RequestDtoTest extends TestCase
+class TypedRequestTest extends TestCase
 {
     public function testSimplifiedRequestDtoValidatesAndBuilds()
     {
