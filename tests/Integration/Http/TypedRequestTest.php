@@ -1109,6 +1109,22 @@ class TypedRequestTest extends TestCase
         }
     }
 
+    public function testCollectionTypeThrowsValidationExceptionWhenInferenceDisabled()
+    {
+        $request = Request::create('', parameters: [
+            'items' => 'not-an-array',
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(OptionalCollectionWithoutInferredRulesRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('items', $e->errors());
+            $this->assertSame('The items field must be an array.', $e->errors()['items'][0]);
+        }
+    }
+
     public function testObjectTypeAcceptsArrayAndBuildsStdClass()
     {
         $request = Request::create('', parameters: [
@@ -1619,6 +1635,22 @@ class CollectionMappedTypedRequest extends TypedFormRequest
         #[MapFrom('item_list')]
         public Collection $items,
     ) {
+    }
+}
+
+class OptionalCollectionWithoutInferredRulesRequest extends TypedFormRequest
+{
+    public function __construct(
+        #[WithoutInferringRules]
+        public ?Collection $items = null,
+    ) {
+    }
+
+    public static function rules(): array
+    {
+        return [
+            'items' => ['nullable'],
+        ];
     }
 }
 
