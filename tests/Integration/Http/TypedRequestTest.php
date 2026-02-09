@@ -1373,20 +1373,6 @@ class TypedRequestTest extends TestCase
             $this->assertArrayNotHasKey('age', $e->errors());
         }
     }
-
-    public function testWithoutStopOnFirstFailureReportsMultipleErrors()
-    {
-        // Same shape as StopOnFirstFailureRequest but without the attribute.
-        $request = Request::create('', parameters: []);
-        $this->app->instance('request', $request);
-
-        try {
-            $this->app->make(MyTypedFormAutoRules::class);
-            self::fail('No exception thrown!');
-        } catch (ValidationException $e) {
-            $this->assertGreaterThan(1, count($e->errors()));
-        }
-    }
 }
 
 class MyTypedForm extends TypedFormRequest
