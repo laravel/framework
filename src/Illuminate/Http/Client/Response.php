@@ -396,7 +396,7 @@ class Response implements ArrayAccess, Stringable
             throw new RequestException($this);
         }
 
-        return $this->status() === $statusCode ?  throw new RequestException($this) : $this;
+        return $this->status() === $statusCode ? throw new RequestException($this) : $this;
     }
 
     /**
