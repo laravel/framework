@@ -3487,6 +3487,74 @@ class HttpClientTest extends TestCase
         $this->assertNull($exception);
     }
 
+    public function testThrowIfStatusWorksWithNonErrorStatusCodes()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('', 201),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api')->throwIfStatus(201);
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api')->throwIfStatus(fn ($status) => $status === 201);
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+    }
+
+    public function testThrowUnlessStatusWorksWithNonErrorStatusCodes()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('', 201),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api')->throwUnlessStatus(200);
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api')->throwUnlessStatus(201);
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNull($exception);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api')->throwUnlessStatus(fn ($status) => $status === 200);
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+    }
+
     public function testRequestExceptionIsThrownIfIsServerError()
     {
         $this->factory->fake([
