@@ -162,7 +162,7 @@ class ValidationRuleParser
         $data = ValidationData::initializeAndGatherData($attribute, $this->data);
 
         foreach ($data as $key => $value) {
-            if (Str::startsWith($key, $attribute) || (bool) preg_match('/^'.$pattern.'\z/', $key)) {
+            if (Str::startsWith($key, $attribute) || preg_match('/^'.$pattern.'\z/', $key)) {
                 foreach ((array) $rules as $rule) {
                     if ($rule instanceof CompilableRules) {
                         $context = Arr::get($this->data, Str::beforeLast($key, '.'));

@@ -57,7 +57,7 @@ class ValidationData
         $pattern = str_replace('\*', '[^\.]+', preg_quote($attribute, '/'));
 
         foreach ($data as $key => $value) {
-            if ((bool) preg_match('/^'.$pattern.'/', $key, $matches)) {
+            if (preg_match('/^'.$pattern.'/', $key, $matches)) {
                 $keys[] = $matches[0];
             }
         }
