@@ -4,6 +4,7 @@ namespace Illuminate\Database\Query;
 
 use BackedEnum;
 use Closure;
+use DatePeriod;
 use DateTimeInterface;
 use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 use Illuminate\Contracts\Database\Query\ConditionExpression;
@@ -1523,7 +1524,7 @@ class Builder implements BuilderContract
                 ->whereBetween(new Expression('('.$sub.')'), $values, $boolean, $not);
         }
 
-        if ($values instanceof \DatePeriod) {
+        if ($values instanceof DatePeriod) {
             $values = $this->resolveDatePeriodBounds($values);
         }
 
@@ -1532,29 +1533,6 @@ class Builder implements BuilderContract
         $this->addBinding(array_slice($this->cleanBindings(Arr::flatten($values)), 0, 2), 'where');
 
         return $this;
-    }
-
-    /**
-     * Resolve the start and end dates from a DatePeriod.
-     *
-     * @param  \DatePeriod  $period
-     * @return array{\DateTimeInterface, \DateTimeInterface}
-     */
-    protected function resolveDatePeriodBounds(\DatePeriod $period)
-    {
-        $start = $period->getStartDate();
-        $end = $period->getEndDate();
-
-        if ($end === null) {
-            $end = clone $start;
-
-            $recurrences = $period->getRecurrences();
-            for ($i = 0; $i < $recurrences; $i++) {
-                $end = $end->add($period->getDateInterval());
-            }
-        }
-
-        return [$start, $end];
     }
 
     /**
@@ -2791,7 +2769,7 @@ class Builder implements BuilderContract
     {
         $type = 'between';
 
-        if ($values instanceof \DatePeriod) {
+        if ($values instanceof DatePeriod) {
             $values = $this->resolveDatePeriodBounds($values);
         }
 
@@ -2837,6 +2815,29 @@ class Builder implements BuilderContract
     public function orHavingNotBetween($column, iterable $values)
     {
         return $this->havingBetween($column, $values, 'or', true);
+    }
+
+    /**
+     * Resolve the start and end dates from a DatePeriod.
+     *
+     * @param  \DatePeriod  $period
+     * @return array{\DateTimeInterface, \DateTimeInterface}
+     */
+    protected function resolveDatePeriodBounds(DatePeriod $period)
+    {
+        [$start, $end] = [$period->getStartDate(), $period->getEndDate()];
+
+        if ($end === null) {
+            $end = clone $start;
+
+            $recurrences = $period->getRecurrences();
+
+            for ($i = 0; $i < $recurrences; $i++) {
+                $end = $end->add($period->getDateInterval());
+            }
+        }
+
+        return [$start, $end];
     }
 
     /**
