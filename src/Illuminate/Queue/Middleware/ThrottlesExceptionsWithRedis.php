@@ -16,7 +16,7 @@ class ThrottlesExceptionsWithRedis extends ThrottlesExceptions
     /**
      * The Redis connection instance.
      *
-     * @var Connection
+     * @var \Illuminate\Contracts\Redis\Connection
      */
     protected $redis;
 
@@ -43,7 +43,9 @@ class ThrottlesExceptionsWithRedis extends ThrottlesExceptions
      */
     public function handle($job, $next)
     {
-        $this->redis = Container::getInstance()->make(Redis::class)->connection($this->connectionName);
+        $this->redis = Container::getInstance()
+            ->make(Redis::class)
+            ->connection($this->connectionName);
 
         $this->limiter = new DurationLimiter(
             $this->redis, $this->getKey($job), $this->maxAttempts, $this->decaySeconds
@@ -81,6 +83,8 @@ class ThrottlesExceptionsWithRedis extends ThrottlesExceptions
     }
 
     /**
+     * Specify the Redis connection that should be used.
+     *
      * @param  string  $name
      * @return $this
      */

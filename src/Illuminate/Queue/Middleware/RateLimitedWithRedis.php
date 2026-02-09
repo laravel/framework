@@ -15,12 +15,12 @@ class RateLimitedWithRedis extends RateLimited
     /**
      * The Redis connection instance.
      *
-     * @var Connection
+     * @var \Illuminate\Contracts\Redis\Connection
      */
     protected $redis;
 
     /**
-     * The Redis connection that should be used.
+     * The name of the Redis connection that should be used.
      *
      * @var string|null
      */
@@ -38,12 +38,15 @@ class RateLimitedWithRedis extends RateLimited
      *
      * @param  string  $limiterName
      */
-    public function __construct($limiterName, ?string $connectionName = null)
+    public function __construct($limiterName, ?string $connection = null)
     {
         parent::__construct($limiterName);
 
-        $this->connectionName = $connectionName;
-        $this->redis = Container::getInstance()->make(Redis::class)->connection($this->connectionName);
+        $this->connectionName = $connection;
+
+        $this->redis = Container::getInstance()
+            ->make(Redis::class)
+            ->connection($this->connectionName);
     }
 
     /**
@@ -98,17 +101,27 @@ class RateLimitedWithRedis extends RateLimited
     }
 
     /**
+     * Specify the Redis connection that should be used.
+     *
      * @param  string  $name
      * @return $this
      */
     public function connection(string $name)
     {
         $this->connectionName = $name;
-        $this->redis = Container::getInstance()->make(Redis::class)->connection($this->connectionName);
+
+        $this->redis = Container::getInstance()
+            ->make(Redis::class)
+            ->connection($this->connectionName);
 
         return $this;
     }
 
+    /**
+     * Prepare the object for serialization.
+     *
+     * @return array
+     */
     public function __sleep()
     {
         return array_merge(parent::__sleep(), ['connectionName']);
