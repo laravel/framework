@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Validator;
 use Orchestra\Testbench\TestCase;
 
 class TypedRequestTest extends TestCase
@@ -1290,6 +1291,49 @@ class TypedRequestTest extends TestCase
             $this->assertArrayNotHasKey('someObject', $e->errors());
         }
     }
+
+    public function testWithValidatorHookIsCalledWhenDefined()
+    {
+        WithValidatorRequest::$withValidatorCalled = false;
+
+        $request = Request::create('', parameters: ['name' => 'Taylor']);
+        $this->app->instance('request', $request);
+
+        $this->app->make(WithValidatorRequest::class);
+
+        $this->assertTrue(WithValidatorRequest::$withValidatorCalled);
+    }
+
+    public function testWithValidatorHookCanAddConditionalRules()
+    {
+        $request = Request::create('', parameters: [
+            'name' => 'Taylor',
+            'requiresEmail' => true,
+            // email is missing — withValidator adds 'required' for email when requiresEmail is true
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(WithValidatorConditionalRulesRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('email', $e->errors());
+        }
+    }
+
+    public function testWithValidatorHookConditionalRulesNotAppliedWhenConditionFalse()
+    {
+        $request = Request::create('', parameters: [
+            'name' => 'Taylor',
+            'requiresEmail' => false,
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(WithValidatorConditionalRulesRequest::class);
+
+        $this->assertInstanceOf(WithValidatorConditionalRulesRequest::class, $actual);
+        $this->assertSame('Taylor', $actual->name);
+    }
 }
 
 class MyTypedForm extends TypedFormRequest
@@ -1788,5 +1832,38 @@ class ObjectMappedTypedRequest extends TypedFormRequest
         #[MapFrom('metadata')]
         public \stdClass $someObject,
     ) {
+    }
+}
+
+class WithValidatorRequest extends TypedFormRequest
+{
+    public static bool $withValidatorCalled = false;
+
+    public function __construct(
+        public string $name,
+    ) {
+    }
+
+    public static function withValidator(Validator $validator): void
+    {
+        static::$withValidatorCalled = true;
+    }
+}
+
+class WithValidatorConditionalRulesRequest extends TypedFormRequest
+{
+    public function __construct(
+        public string $name,
+        public bool $requiresEmail = false,
+        #[WithoutInferringRules]
+        public ?string $email = null,
+    ) {
+    }
+
+    public static function withValidator(Validator $validator): void
+    {
+        $validator->sometimes('email', 'required|email', function ($input) {
+            return $input->requiresEmail;
+        });
     }
 }

@@ -313,7 +313,7 @@ class TypedFormRequestFactory
             } elseif (is_subclass_of($typeName, BackedEnum::class)) {
                 $arguments[$name] = $typeName::from($value);
             } elseif (is_a($typeName, Collection::class, true)) {
-                if ($value instanceof Collection) {
+                if ($value instanceof $typeName) {
                     $arguments[$name] = $value;
                 } else {
                     $arguments[$name] = new $typeName($this->ensureArrayValue($fieldName, $value));
@@ -429,6 +429,10 @@ class TypedFormRequestFactory
                 ['factory' => $factory]
             )
             : $this->createDefaultValidator($factory);
+
+        if (method_exists($this->requestClass, 'withValidator')) {
+            $this->requestClass::withValidator($validator);
+        }
 
         if (method_exists($this->requestClass, 'after')) {
             $validator->after(Container::getInstance()->call(
@@ -570,10 +574,6 @@ class TypedFormRequestFactory
     protected function ruleForNamedType(ReflectionNamedType $type): mixed
     {
         $name = $type->getName();
-
-        if ($name === 'null') {
-            return null;
-        }
 
         if ($type->isBuiltin()) {
             return match ($name) {
@@ -745,8 +745,10 @@ class TypedFormRequestFactory
      * Convert a reflected default value to a native value.
      *
      * @template TValue
+     *
      * @param  TValue  $value
      * @return mixed
+     *
      * @phpstan-return ($value is empty ? null : ($value is \BackedEnum ? value-of<TValue> : ($value is \UnitEnum ? string : TValue)))
      */
     protected function mapToNativeFromDefaultValue(mixed $value): mixed
