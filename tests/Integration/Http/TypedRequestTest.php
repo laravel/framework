@@ -1337,20 +1337,16 @@ class TypedRequestTest extends TestCase
 
     public function testPassedValidationHookIsCalledOnSuccess()
     {
-        PassedValidationRequest::$passedValidationCalled = false;
-
         $request = Request::create('', parameters: ['name' => 'Taylor']);
         $this->app->instance('request', $request);
 
         $this->app->make(PassedValidationRequest::class);
 
-        $this->assertTrue(PassedValidationRequest::$passedValidationCalled);
+        $this->assertTrue($request->attributes->get('passed_validation'));
     }
 
     public function testPassedValidationHookIsNotCalledOnFailure()
     {
-        PassedValidationRequest::$passedValidationCalled = false;
-
         $request = Request::create('', parameters: []);
         $this->app->instance('request', $request);
 
@@ -1358,7 +1354,7 @@ class TypedRequestTest extends TestCase
             $this->app->make(PassedValidationRequest::class);
             self::fail('No exception thrown!');
         } catch (ValidationException $e) {
-            $this->assertFalse(PassedValidationRequest::$passedValidationCalled);
+            $this->assertNull($request->attributes->get('passed_validation'));
         }
     }
 }
@@ -1897,15 +1893,13 @@ class WithValidatorConditionalRulesRequest extends TypedFormRequest
 
 class PassedValidationRequest extends TypedFormRequest
 {
-    public static bool $passedValidationCalled = false;
-
     public function __construct(
         public string $name,
     ) {
     }
 
-    public static function passedValidation(): void
+    public static function passedValidation(Request $request): void
     {
-        static::$passedValidationCalled = true;
+        $request->attributes->add(['passed_validation' => true]);
     }
 }
