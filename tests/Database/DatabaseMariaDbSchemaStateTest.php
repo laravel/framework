@@ -43,6 +43,8 @@ class DatabaseMariaDbSchemaStateTest extends TestCase
                 'LARAVEL_LOAD_PASSWORD' => '',
                 'LARAVEL_LOAD_DATABASE' => 'forge',
                 'LARAVEL_LOAD_SSL_CA' => '',
+                'LARAVEL_LOAD_SSL_CERT' => '',
+                'LARAVEL_LOAD_SSL_KEY' => '',
             ], [
                 'username' => 'root',
                 'host' => '127.0.0.1',
@@ -59,11 +61,35 @@ class DatabaseMariaDbSchemaStateTest extends TestCase
                 'LARAVEL_LOAD_PASSWORD' => '',
                 'LARAVEL_LOAD_DATABASE' => 'forge',
                 'LARAVEL_LOAD_SSL_CA' => 'ssl.ca',
+                'LARAVEL_LOAD_SSL_CERT' => '',
+                'LARAVEL_LOAD_SSL_KEY' => '',
             ], [
                 'username' => 'root',
                 'database' => 'forge',
                 'options' => [
                     PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : \PDO::MYSQL_ATTR_SSL_CA => 'ssl.ca',
+                ],
+            ],
+        ];
+
+        yield 'ssl_cert_and_key' => [
+            ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}" --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --ssl-ca="${:LARAVEL_LOAD_SSL_CA}" --ssl-cert="${:LARAVEL_LOAD_SSL_CERT}" --ssl-key="${:LARAVEL_LOAD_SSL_KEY}"', [
+                'LARAVEL_LOAD_SOCKET' => '',
+                'LARAVEL_LOAD_HOST' => '',
+                'LARAVEL_LOAD_PORT' => '',
+                'LARAVEL_LOAD_USER' => 'root',
+                'LARAVEL_LOAD_PASSWORD' => '',
+                'LARAVEL_LOAD_DATABASE' => 'forge',
+                'LARAVEL_LOAD_SSL_CA' => 'ssl.ca',
+                'LARAVEL_LOAD_SSL_CERT' => '/path/to/client-cert.pem',
+                'LARAVEL_LOAD_SSL_KEY' => '/path/to/client-key.pem',
+            ], [
+                'username' => 'root',
+                'database' => 'forge',
+                'options' => [
+                    PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : \PDO::MYSQL_ATTR_SSL_CA => 'ssl.ca',
+                    PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CERT : \PDO::MYSQL_ATTR_SSL_CERT => '/path/to/client-cert.pem',
+                    PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_KEY : \PDO::MYSQL_ATTR_SSL_KEY => '/path/to/client-key.pem',
                 ],
             ],
         ];
@@ -77,6 +103,8 @@ class DatabaseMariaDbSchemaStateTest extends TestCase
                 'LARAVEL_LOAD_PASSWORD' => '',
                 'LARAVEL_LOAD_DATABASE' => 'forge',
                 'LARAVEL_LOAD_SSL_CA' => '',
+                'LARAVEL_LOAD_SSL_CERT' => '',
+                'LARAVEL_LOAD_SSL_KEY' => '',
             ], [
                 'username' => 'root',
                 'database' => 'forge',
