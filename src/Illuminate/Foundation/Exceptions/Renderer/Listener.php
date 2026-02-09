@@ -6,6 +6,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Support\Str;
 use Laravel\Octane\Events\RequestReceived;
 use Laravel\Octane\Events\RequestTerminated;
 use Laravel\Octane\Events\TaskReceived;
@@ -66,8 +67,10 @@ class Listener
         $this->queries[] = [
             'connectionName' => $event->connectionName,
             'time' => $event->time,
-            'sql' => $event->sql,
-            'bindings' => $event->connection->prepareBindings($event->bindings),
+            'sql' => Str::limit($event->sql, 2000),
+            'bindings' => $event->connection->prepareBindings(
+                array_slice($event->bindings, 0, 300)
+            ),
         ];
     }
 }
