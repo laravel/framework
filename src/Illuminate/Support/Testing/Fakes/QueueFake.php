@@ -654,22 +654,6 @@ class QueueFake extends QueueManager implements Fake, Queue
     }
 
     /**
-     * Release the locks for all unique jobs that were pushed.
-     *
-     * @return void
-     */
-    public function cancelUniqueJobLocks()
-    {
-        $lock = new UniqueLock($this->app->make(Cache::class));
-
-        foreach ($this->uniqueJobs as $job) {
-            $lock->release($job);
-        }
-
-        $this->uniqueJobs = [];
-    }
-
-    /**
      * Serialize and unserialize the job to simulate the queueing process.
      *
      * @param  mixed  $job
@@ -678,6 +662,22 @@ class QueueFake extends QueueManager implements Fake, Queue
     protected function serializeAndRestoreJob($job)
     {
         return unserialize(serialize($job));
+    }
+
+    /**
+     * Release the locks for all unique jobs that were pushed.
+     *
+     * @return void
+     */
+    public function releaseUniqueJobLocks()
+    {
+        $lock = new UniqueLock($this->app->make(Cache::class));
+
+        foreach ($this->uniqueJobs as $job) {
+            $lock->release($job);
+        }
+
+        $this->uniqueJobs = [];
     }
 
     /**
