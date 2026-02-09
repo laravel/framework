@@ -906,7 +906,7 @@ class TypedFormRequestFactory
     protected function passedValidation(): void
     {
         if (method_exists($this->requestClass, 'passedValidation')) {
-            Container::getInstance()->call([$this->requestClass, 'passedValidation']);
+            $this->requestClass::passedValidation($this->request);
         }
     }
 }

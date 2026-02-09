@@ -1334,6 +1334,33 @@ class TypedRequestTest extends TestCase
         $this->assertInstanceOf(WithValidatorConditionalRulesRequest::class, $actual);
         $this->assertSame('Taylor', $actual->name);
     }
+
+    public function testPassedValidationHookIsCalledOnSuccess()
+    {
+        PassedValidationRequest::$passedValidationCalled = false;
+
+        $request = Request::create('', parameters: ['name' => 'Taylor']);
+        $this->app->instance('request', $request);
+
+        $this->app->make(PassedValidationRequest::class);
+
+        $this->assertTrue(PassedValidationRequest::$passedValidationCalled);
+    }
+
+    public function testPassedValidationHookIsNotCalledOnFailure()
+    {
+        PassedValidationRequest::$passedValidationCalled = false;
+
+        $request = Request::create('', parameters: []);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(PassedValidationRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertFalse(PassedValidationRequest::$passedValidationCalled);
+        }
+    }
 }
 
 class MyTypedForm extends TypedFormRequest
@@ -1865,5 +1892,20 @@ class WithValidatorConditionalRulesRequest extends TypedFormRequest
         $validator->sometimes('email', 'required|email', function ($input) {
             return $input->requiresEmail;
         });
+    }
+}
+
+class PassedValidationRequest extends TypedFormRequest
+{
+    public static bool $passedValidationCalled = false;
+
+    public function __construct(
+        public string $name,
+    ) {
+    }
+
+    public static function passedValidation(): void
+    {
+        static::$passedValidationCalled = true;
     }
 }
