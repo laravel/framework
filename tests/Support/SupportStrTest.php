@@ -684,7 +684,17 @@ class SupportStrTest extends TestCase
     {
         $this->assertTrue(Str::isUrl('https://laravel.com'));
         $this->assertTrue(Str::isUrl('http://localhost'));
+        $this->assertTrue(Str::isUrl('http://l'));
+        $this->assertTrue(Str::isUrl('http://l:8000'));
+        $this->assertTrue(Str::isUrl('http://l:8000/path'));
+        $this->assertTrue(Str::isUrl('http://a.b'));
+        $this->assertTrue(Str::isUrl('http://sub.domain.com'));
+        $this->assertTrue(Str::isUrl('http://my-site.com'));
+        $this->assertTrue(Str::isUrl('https://example.com:8080/path?q=1#frag'));
         $this->assertFalse(Str::isUrl('invalid url'));
+        $this->assertFalse(Str::isUrl('http://.'));
+        $this->assertFalse(Str::isUrl('http://...'));
+        $this->assertFalse(Str::isUrl('http:///path'));
     }
 
     #[DataProvider('validUuidList')]
