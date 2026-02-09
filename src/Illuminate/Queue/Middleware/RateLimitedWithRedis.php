@@ -3,7 +3,6 @@
 namespace Illuminate\Queue\Middleware;
 
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Redis\Connection;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Redis\Limiters\DurationLimiter;
 use Illuminate\Support\InteractsWithTime;
@@ -15,7 +14,7 @@ class RateLimitedWithRedis extends RateLimited
     /**
      * The Redis connection instance.
      *
-     * @var \Illuminate\Contracts\Redis\Connection
+     * @var \Illuminate\Contracts\Redis\Connection|null
      */
     protected $redis;
 
@@ -43,10 +42,6 @@ class RateLimitedWithRedis extends RateLimited
         parent::__construct($limiterName);
 
         $this->connectionName = $connection;
-
-        $this->redis = Container::getInstance()
-            ->make(Redis::class)
-            ->connection($this->connectionName);
     }
 
     /**
@@ -80,8 +75,12 @@ class RateLimitedWithRedis extends RateLimited
      */
     protected function tooManyAttempts($key, $maxAttempts, $decaySeconds)
     {
+        $redis = Container::getInstance()
+            ->make(Redis::class)
+            ->connection($this->connectionName);
+
         $limiter = new DurationLimiter(
-            $this->redis, $key, $maxAttempts, $decaySeconds
+            $redis, $key, $maxAttempts, $decaySeconds
         );
 
         return tap(! $limiter->acquire(), function () use ($key, $limiter) {
@@ -110,10 +109,6 @@ class RateLimitedWithRedis extends RateLimited
     {
         $this->connectionName = $name;
 
-        $this->redis = Container::getInstance()
-            ->make(Redis::class)
-            ->connection($this->connectionName);
-
         return $this;
     }
 
@@ -135,7 +130,5 @@ class RateLimitedWithRedis extends RateLimited
     public function __wakeup()
     {
         parent::__wakeup();
-
-        $this->redis = Container::getInstance()->make(Redis::class)->connection($this->connectionName);
     }
 }
