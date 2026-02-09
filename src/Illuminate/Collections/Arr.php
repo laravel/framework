@@ -1309,4 +1309,20 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Split an array into chunks.
+     *
+     * @template TKey of array-key
+     * @template TValue
+     *
+     * @param  array<TKey, TValue>  $array
+     * @param  int  $size
+     * @param  bool  $preserveKeys
+     * @return array<int, array<TKey, TValue>>
+     */
+    public static function chunk($array, $size, $preserveKeys = false)
+    {
+        return array_chunk($array, $size, $preserveKeys);
+    }
 }
