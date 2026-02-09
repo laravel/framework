@@ -70,6 +70,21 @@ class HandlePrecognitiveRequests
     }
 
     /**
+     * Append the appropriate "Vary" header to the given response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Response  $response
+     * @return \Illuminate\Http\Response
+     */
+    protected function appendVaryHeader($request, $response)
+    {
+        return tap($response, fn () => $response->headers->set('Vary', implode(', ', array_filter([
+            $response->headers->get('Vary'),
+            'Precognition',
+        ]))));
+    }
+
+    /**
      * Restore the original route dispatcher bindings.
      *
      * @param  array|null  $callableBinding
@@ -85,20 +100,5 @@ class HandlePrecognitiveRequests
         if ($controllerBinding) {
             $this->container->bind(ControllerDispatcherContract::class, $controllerBinding['concrete'], $controllerBinding['shared']);
         }
-    }
-
-    /**
-     * Append the appropriate "Vary" header to the given response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Http\Response  $response
-     * @return \Illuminate\Http\Response
-     */
-    protected function appendVaryHeader($request, $response)
-    {
-        return tap($response, fn () => $response->headers->set('Vary', implode(', ', array_filter([
-            $response->headers->get('Vary'),
-            'Precognition',
-        ]))));
     }
 }
