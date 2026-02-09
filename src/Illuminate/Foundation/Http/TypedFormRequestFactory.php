@@ -121,46 +121,6 @@ class TypedFormRequestFactory
     }
 
     /**
-     * Get the reflected TypedFormRequest class.
-     *
-     * @return \ReflectionClass<T>
-     *
-     * @throws \ReflectionException
-     */
-    protected function reflectRequest(): ReflectionClass
-    {
-        return $this->reflection ??= new ReflectionClass($this->requestClass);
-    }
-
-    /**
-     * Determine if a given class should be hydrated from request data because
-     * it has the HydrateFromRequest applied at the class-level.
-     *
-     * @param  class-string  $class
-     */
-    protected function shouldHydrateFromRequest(string $class): bool
-    {
-        if (isset($this->hydrateFromRequestCache[$class])) {
-            return $this->hydrateFromRequestCache[$class];
-        }
-
-        $reflection = new ReflectionClass($class);
-
-        return $this->hydrateFromRequestCache[$class] = $reflection->getAttributes(HydrateFromRequest::class) !== [];
-    }
-
-    /**
-     * Determine if the given constructor parameter should be hydrated from request data.
-     *
-     * @param  ReflectionParameter  $param
-     * @param  class-string  $class
-     */
-    protected function shouldHydrateParameter(ReflectionParameter $param, string $class): bool
-    {
-        return $param->getAttributes(HydrateFromRequest::class) !== [] || $this->shouldHydrateFromRequest($class);
-    }
-
-    /**
      * Get the first union branch that should be hydrated from an array payload.
      *
      * @return class-string|null
@@ -739,6 +699,47 @@ class TypedFormRequestFactory
         }
 
         return $data;
+    }
+
+
+    /**
+     * Get the reflected TypedFormRequest class.
+     *
+     * @return \ReflectionClass<T>
+     *
+     * @throws \ReflectionException
+     */
+    protected function reflectRequest(): ReflectionClass
+    {
+        return $this->reflection ??= new ReflectionClass($this->requestClass);
+    }
+
+    /**
+     * Determine if a given class should be hydrated from request data because
+     * it has the HydrateFromRequest applied at the class-level.
+     *
+     * @param  class-string  $class
+     */
+    protected function shouldHydrateFromRequest(string $class): bool
+    {
+        if (isset($this->hydrateFromRequestCache[$class])) {
+            return $this->hydrateFromRequestCache[$class];
+        }
+
+        $reflection = new ReflectionClass($class);
+
+        return $this->hydrateFromRequestCache[$class] = $reflection->getAttributes(HydrateFromRequest::class) !== [];
+    }
+
+    /**
+     * Determine if the given constructor parameter should be hydrated from request data.
+     *
+     * @param  ReflectionParameter  $param
+     * @param  class-string  $class
+     */
+    protected function shouldHydrateParameter(ReflectionParameter $param, string $class): bool
+    {
+        return $param->getAttributes(HydrateFromRequest::class) !== [] || $this->shouldHydrateFromRequest($class);
     }
 
     /**
