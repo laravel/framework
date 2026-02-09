@@ -1900,4 +1900,43 @@ class SupportArrTest extends TestCase
 
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
     }
+
+    public function testChunk()
+    {
+        // Basic chunking
+        $this->assertEquals(
+            [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+            Arr::chunk([1, 2, 3, 4, 5, 6, 7, 8, 9], 3)
+        );
+
+        // Uneven chunks
+        $this->assertEquals(
+            [[1, 2, 3], [4, 5]],
+            Arr::chunk([1, 2, 3, 4, 5], 3)
+        );
+
+        // Preserve keys
+        $this->assertEquals(
+            [['a' => 1, 'b' => 2], ['c' => 3, 'd' => 4]],
+            Arr::chunk(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4], 2, true)
+        );
+
+        // Without preserve keys on associative array
+        $this->assertEquals(
+            [[1, 2], [3, 4]],
+            Arr::chunk(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4], 2, false)
+        );
+
+        // Empty array
+        $this->assertEquals(
+            [],
+            Arr::chunk([], 3)
+        );
+
+        // Size larger than array
+        $this->assertEquals(
+            [[1, 2, 3]],
+            Arr::chunk([1, 2, 3], 10)
+        );
+    }
 }
