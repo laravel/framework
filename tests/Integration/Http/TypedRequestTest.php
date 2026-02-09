@@ -1196,6 +1196,34 @@ class TypedRequestTest extends TestCase
         }
     }
 
+    public function testIterableTypeAcceptsArray()
+    {
+        $request = Request::create('', parameters: [
+            'items' => ['a', 'b'],
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(IterableTypedRequest::class);
+
+        $this->assertInstanceOf(IterableTypedRequest::class, $actual);
+        $this->assertSame(['a', 'b'], $actual->items);
+    }
+
+    public function testIterableTypeRejectsScalar()
+    {
+        $request = Request::create('', parameters: [
+            'items' => 'not-an-array',
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(IterableTypedRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('items', $e->errors());
+        }
+    }
+
     public function testObjectTypeAcceptsArrayAndBuildsStdClass()
     {
         $request = Request::create('', parameters: [
@@ -1734,6 +1762,14 @@ class FalseTypedRequest extends TypedFormRequest
 {
     public function __construct(
         public false $disabled,
+    ) {
+    }
+}
+
+class IterableTypedRequest extends TypedFormRequest
+{
+    public function __construct(
+        public iterable $items,
     ) {
     }
 }

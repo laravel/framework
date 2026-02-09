@@ -291,14 +291,20 @@ class TypedFormRequestFactory
             }
 
             $typeName = $type->getName();
-            if ($type->isBuiltin() || is_a($typeName, stdClass::class, true)) {
-                $arguments[$name] = $this->castBuiltinObjectValue($value);
+            if ($type->isBuiltin()) {
+                if ($typeName === 'object') {
+                    $arguments[$name] = $this->castBuiltinObjectValue($value);
+                } else {
+                    $arguments[$name] = $value;
+                }
 
                 continue;
             }
 
             if ($this->isDateObjectType($typeName)) {
                 $arguments[$name] = $this->castDateValue($typeName, $value);
+            } elseif (is_a($typeName, stdClass::class, true)) {
+                $arguments[$name] = $this->castBuiltinObjectValue($value);
             } elseif ($this->shouldHydrateParameter($param, $typeName) || is_subclass_of($typeName, TypedFormRequest::class)) {
                 $arguments[$name] = $this->instantiateFromValidatedArray(
                     $typeName,
@@ -569,18 +575,18 @@ class TypedFormRequestFactory
             return null;
         }
 
-            if ($type->isBuiltin()) {
-                return match ($name) {
-                    'int' => 'integer',
-                    'float' => 'numeric',
-                    'string' => 'string',
-                    'bool' => 'boolean',
-                    'true' => 'accepted',
-                    'false' => 'declined',
-                    'array', 'object' => 'array',
-                    default => null,
-                };
-            }
+        if ($type->isBuiltin()) {
+            return match ($name) {
+                'int' => 'integer',
+                'float' => 'numeric',
+                'string' => 'string',
+                'bool' => 'boolean',
+                'true' => 'accepted',
+                'false' => 'declined',
+                'array', 'object', 'iterable' => 'array',
+                default => null,
+            };
+        }
 
         return $this->ruleForNonBuiltinType($type);
     }
