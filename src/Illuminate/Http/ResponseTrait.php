@@ -99,7 +99,7 @@ trait ResponseTrait
     }
 
     /**
-     * Remove a header or headers from the response.
+     * Remove a header(s) from the response.
      *
      * @param  array|string  $key
      * @return $this
