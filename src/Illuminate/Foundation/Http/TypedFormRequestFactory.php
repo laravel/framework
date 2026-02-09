@@ -14,6 +14,7 @@ use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Foundation\Http\Attributes\HydrateFromRequest;
 use Illuminate\Foundation\Http\Attributes\MapFrom;
+use Illuminate\Foundation\Http\Attributes\StopOnFirstFailure;
 use Illuminate\Foundation\Http\Attributes\WithoutInferringRules;
 use Illuminate\Foundation\Precognition;
 use Illuminate\Http\Request;
@@ -876,9 +877,12 @@ class TypedFormRequestFactory
      */
     protected function shouldStopOnFirstFailure(): bool
     {
-        // @todo use Taylor's attribute to check
         if (method_exists($this->requestClass, 'shouldStopOnFirstFailure')) {
             return (bool) Container::getInstance()->call([$this->requestClass, 'shouldStopOnFirstFailure']);
+        }
+
+        if ($this->reflectRequest()->getAttributes(StopOnFirstFailure::class) !== []) {
+            return true;
         }
 
         return false;

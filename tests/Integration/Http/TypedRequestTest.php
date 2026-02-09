@@ -10,6 +10,7 @@ use DateTimeInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Http\Attributes\HydrateFromRequest;
 use Illuminate\Foundation\Http\Attributes\MapFrom;
+use Illuminate\Foundation\Http\Attributes\StopOnFirstFailure;
 use Illuminate\Foundation\Http\Attributes\WithoutInferringRules;
 use Illuminate\Foundation\Http\TypedFormRequest;
 use Illuminate\Http\Request;
@@ -1357,6 +1358,35 @@ class TypedRequestTest extends TestCase
             $this->assertNull($request->attributes->get('passed_validation'));
         }
     }
+
+    public function testStopOnFirstFailureAttributeReportsOnlyOneError()
+    {
+        // Both name and age are required but neither is provided.
+        $request = Request::create('', parameters: []);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(StopOnFirstFailureRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertCount(1, $e->errors());
+            $this->assertArrayNotHasKey('age', $e->errors());
+        }
+    }
+
+    public function testWithoutStopOnFirstFailureReportsMultipleErrors()
+    {
+        // Same shape as StopOnFirstFailureRequest but without the attribute.
+        $request = Request::create('', parameters: []);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(MyTypedFormAutoRules::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertGreaterThan(1, count($e->errors()));
+        }
+    }
 }
 
 class MyTypedForm extends TypedFormRequest
@@ -1901,5 +1931,15 @@ class PassedValidationRequest extends TypedFormRequest
     public static function passedValidation(Request $request): void
     {
         $request->attributes->add(['passed_validation' => true]);
+    }
+}
+
+#[StopOnFirstFailure]
+class StopOnFirstFailureRequest extends TypedFormRequest
+{
+    public function __construct(
+        public string $name,
+        public int $age,
+    ) {
     }
 }
