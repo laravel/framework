@@ -245,7 +245,10 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
-        $replace = $this->buildFactoryReplacements();
+        $replace = array_merge(
+            $this->buildFactoryReplacements(),
+            $this->buildConnectionReplacements()
+        );
 
         return str_replace(
             array_keys($replace), array_values($replace), parent::buildClass($name)
@@ -302,6 +305,7 @@ class ModelMakeCommand extends GeneratorCommand
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
             ['api', null, InputOption::VALUE_NONE, 'Indicates if the generated controller should be an API resource controller'],
             ['requests', 'R', InputOption::VALUE_NONE, 'Create new form request classes and use them in the resource controller'],
+            ['connection', null, InputOption::VALUE_REQUIRED, 'Set the database connection for the generated model'],
         ];
     }
 
@@ -327,4 +331,30 @@ class ModelMakeCommand extends GeneratorCommand
             'resource' => 'Resource Controller',
         ])))->each(fn ($option) => $input->setOption($option, true));
     }
+
+    /**
+     * Build the replacements for the connection property in the model stub.
+     *
+     * @return array
+     */
+    protected function buildConnectionReplacements()
+    {
+        // If no connection option is set, the model will not have a connection property.
+        if (! $connection = $this->option('connection')) {
+            return [
+                '{{ connection }}' => '',
+            ];
+        }
+
+        // Otherwise, generate the code for the protected $connection property.
+        return [
+            '{{ connection }}' =>
+                "\n".
+                "    /**\n".
+                "     * The database connection for the model.\n".
+                "     */\n".
+                "    protected \$connection = '{$connection}';\n",
+        ];
+    }
+
 }
