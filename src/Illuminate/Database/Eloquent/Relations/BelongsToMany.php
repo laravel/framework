@@ -593,6 +593,17 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Add an "order by desc" clause for a pivot table column.
+     *
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @return $this
+     */
+    public function orderByPivotDesc($column)
+    {
+        return $this->orderBy($this->qualifyPivotColumn($column), 'desc');
+    }
+
+    /**
      * Find a related model by its primary key or return a new instance of the related model.
      *
      * @param  mixed  $id
