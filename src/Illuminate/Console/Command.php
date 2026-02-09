@@ -8,6 +8,7 @@ use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
@@ -172,7 +173,11 @@ class Command extends SymfonyCommand
             OutputStyle::class, ['input' => $input, 'output' => $output]
         );
 
-        $this->components = $this->laravel->make(Factory::class, ['output' => $this->output]);
+        $componentOutput = $output instanceof ConsoleOutputInterface
+            ? $this->laravel->make(OutputStyle::class, ['input' => $input, 'output' => $output->getErrorOutput()])
+            : $this->output;
+
+        $this->components = $this->laravel->make(Factory::class, ['output' => $componentOutput]);
 
         $this->configurePrompts($input);
 

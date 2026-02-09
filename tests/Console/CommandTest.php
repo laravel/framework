@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
@@ -183,6 +184,60 @@ class CommandTest extends TestCase
         };
 
         $this->assertSame(['bar:baz', 'baz:qux'], $command->getAliases());
+    }
+
+    public function testComponentsUseErrorOutputWhenAvailable()
+    {
+        $command = new class extends Command
+        {
+            public function handle()
+            {
+            }
+        };
+
+        $application = m::mock(Application::class);
+        $command->setLaravel($application);
+
+        $input = new ArrayInput([]);
+        $errorOutput = new NullOutput;
+        $output = m::mock(ConsoleOutput::class);
+        $output->shouldReceive('getErrorOutput')->andReturn($errorOutput);
+
+        $outputStyle = m::mock(OutputStyle::class);
+        $errorOutputStyle = m::mock(OutputStyle::class);
+
+        $application->shouldReceive('make')->with(OutputStyle::class, ['input' => $input, 'output' => $output])->andReturn($outputStyle);
+        $application->shouldReceive('make')->with(OutputStyle::class, ['input' => $input, 'output' => $errorOutput])->andReturn($errorOutputStyle);
+        $application->shouldReceive('make')->with(Factory::class, ['output' => $errorOutputStyle])->andReturn(m::mock(Factory::class));
+        $application->shouldReceive('call')->with([$command, 'handle'])->andReturn(0);
+        $application->shouldReceive('runningUnitTests')->andReturn(true);
+
+        $command->run($input, $output);
+    }
+
+    public function testComponentsUseMainOutputWhenErrorOutputNotAvailable()
+    {
+        $command = new class extends Command
+        {
+            public function handle()
+            {
+            }
+        };
+
+        $application = m::mock(Application::class);
+        $command->setLaravel($application);
+
+        $input = new ArrayInput([]);
+        $output = new NullOutput;
+
+        $outputStyle = m::mock(OutputStyle::class);
+
+        $application->shouldReceive('make')->with(OutputStyle::class, ['input' => $input, 'output' => $output])->andReturn($outputStyle);
+        $application->shouldReceive('make')->with(Factory::class, ['output' => $outputStyle])->andReturn(m::mock(Factory::class));
+        $application->shouldReceive('call')->with([$command, 'handle'])->andReturn(0);
+        $application->shouldReceive('runningUnitTests')->andReturn(true);
+
+        $command->run($input, $output);
     }
 
     public function testChoiceIsSingleSelectByDefault()
