@@ -98,12 +98,12 @@ class RateLimitedWithRedis extends RateLimited
     }
 
     /**
-     * @param  string  $connectionName
+     * @param  string  $name
      * @return $this
      */
-    public function connection(string $connectionName)
+    public function connection(string $name)
     {
-        $this->connectionName = $connectionName;
+        $this->connectionName = $name;
         $this->redis = Container::getInstance()->make(Redis::class)->connection($this->connectionName);
 
         return $this;
