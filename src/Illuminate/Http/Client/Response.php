@@ -396,11 +396,7 @@ class Response implements ArrayAccess, Stringable
             throw new RequestException($this);
         }
 
-        if ($this->status() === $statusCode) {
-            throw new RequestException($this);
-        }
-
-        return $this;
+        return $this->status() === $statusCode ?  throw new RequestException($this) : $this;
     }
 
     /**
@@ -413,16 +409,11 @@ class Response implements ArrayAccess, Stringable
      */
     public function throwUnlessStatus($statusCode)
     {
-        if (is_callable($statusCode) &&
-            ! $statusCode($this->status(), $this)) {
-            throw new RequestException($this);
+        if (is_callable($statusCode)) {
+            return $statusCode($this->status(), $this) ? $this : throw new RequestException($this);
         }
 
-        if (! is_callable($statusCode) && $this->status() !== $statusCode) {
-            throw new RequestException($this);
-        }
-
-        return $this;
+        return $this->status() === $statusCode ? $this : throw new RequestException($this);
     }
 
     /**
