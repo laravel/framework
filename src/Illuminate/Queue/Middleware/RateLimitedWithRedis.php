@@ -12,13 +12,6 @@ class RateLimitedWithRedis extends RateLimited
     use InteractsWithTime;
 
     /**
-     * The Redis connection instance.
-     *
-     * @var \Illuminate\Contracts\Redis\Connection|null
-     */
-    protected $redis;
-
-    /**
      * The name of the Redis connection that should be used.
      *
      * @var string|null
