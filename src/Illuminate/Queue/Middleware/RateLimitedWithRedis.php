@@ -97,6 +97,18 @@ class RateLimitedWithRedis extends RateLimited
         return ($this->decaysAt[$key] - $this->currentTime()) + 3;
     }
 
+    /**
+     * @param  string  $connectionName
+     * @return $this
+     */
+    public function connection(string $connectionName)
+    {
+        $this->connectionName = $connectionName;
+        $this->redis = Container::getInstance()->make(Redis::class)->connection($this->connectionName);
+
+        return $this;
+    }
+
     public function __sleep()
     {
         return array_merge(parent::__sleep(), ['connectionName']);
