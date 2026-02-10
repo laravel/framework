@@ -6,7 +6,6 @@ use ArrayIterator;
 use Illuminate\Contracts\Support\ValidatedData;
 use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Traits\InteractsWithData;
-use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
 
 class ValidatedInput implements ValidatedData
