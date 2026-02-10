@@ -34,7 +34,7 @@ abstract class TypedFormRequest implements SelfBuilding
         if (! $input instanceof Request) {
             $input = $input instanceof Arrayable ? $input->toArray() : $input;
 
-            $input = Request::create($input);
+            $input = Request::create('', parameters: $input);
         }
 
         return Container::getInstance()

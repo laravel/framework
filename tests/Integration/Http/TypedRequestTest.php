@@ -1359,6 +1359,69 @@ class TypedRequestTest extends TestCase
         }
     }
 
+    public function testFromBuildsFromArray()
+    {
+        $actual = MyTypedFormAutoRules::from(['name' => 'Taylor', 'age' => 30]);
+
+        $this->assertInstanceOf(MyTypedFormAutoRules::class, $actual);
+        $this->assertSame('Taylor', $actual->name);
+        $this->assertSame(30, $actual->age);
+    }
+
+    public function testFromFailsValidation()
+    {
+        $this->expectException(ValidationException::class);
+
+        MyTypedFormAutoRules::from(['name' => 'Taylor', 'age' => 'not-a-number']);
+    }
+
+    public function testFromSkipsAuthorization()
+    {
+        // MyUnauthorizedTypedForm::authorize() returns false,
+        // but from() should skip authorization entirely.
+        $actual = MyUnauthorizedTypedForm::from(['number' => 42, 'string' => 'hello']);
+
+        $this->assertInstanceOf(MyUnauthorizedTypedForm::class, $actual);
+        $this->assertSame(42, $actual->number);
+        $this->assertSame('hello', $actual->string);
+    }
+
+    public function testFromBuildsWithDefaults()
+    {
+        $actual = MyTypedFormAutoRules::from(['name' => 'Taylor', 'age' => 25]);
+
+        $this->assertNull($actual->bio);
+        $this->assertSame(SortDirection::Asc, $actual->sort);
+        $this->assertTrue($actual->active);
+    }
+
+    public function testFromBuildsNestedTypedFormRequest()
+    {
+        $actual = CreateOrderRequest::from([
+            'item' => 'Widget',
+            'address' => [
+                'street' => '123 Main St',
+                'city' => 'Springfield',
+            ],
+        ]);
+
+        $this->assertInstanceOf(CreateOrderRequest::class, $actual);
+        $this->assertSame('Widget', $actual->item);
+        $this->assertInstanceOf(Address::class, $actual->address);
+        $this->assertSame('123 Main St', $actual->address->street);
+    }
+
+    public function testFromAcceptsRequestInstance()
+    {
+        $request = Request::create('', parameters: ['name' => 'Taylor', 'age' => 30]);
+
+        $actual = MyTypedFormAutoRules::from($request);
+
+        $this->assertInstanceOf(MyTypedFormAutoRules::class, $actual);
+        $this->assertSame('Taylor', $actual->name);
+        $this->assertSame(30, $actual->age);
+    }
+
     public function testStopOnFirstFailureAttributeReportsOnlyOneError()
     {
         // Both name and age are required but neither is provided.
