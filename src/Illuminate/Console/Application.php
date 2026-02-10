@@ -256,7 +256,6 @@ class Application extends SymfonyApplication implements ApplicationContract
     protected function addToParent(SymfonyCommand $command)
     {
         if (method_exists(SymfonyApplication::class, 'addCommand')) {
-            /** @phpstan-ignore staticMethod.notFound */
             return parent::addCommand($command);
         }
 
