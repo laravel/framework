@@ -4094,7 +4094,6 @@ class Builder implements BuilderContract
                         return false;
                     }
                 }
-
                 return true;
             });
         }
