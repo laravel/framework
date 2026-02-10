@@ -1,0 +1,24 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Database\Eloquent\Builder;
+
+class {{ class }}
+{
+    /**
+     * Create a new filter instance.
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Apply the filter to the given Eloquent query.
+     */
+    public function __invoke(Builder $query): void
+    {
+        //
+    }
+}
