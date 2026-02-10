@@ -58,7 +58,7 @@ class ScheduleWorkCommand extends Command
 
             if (Carbon::now()->second === 0 &&
                 ! Carbon::now()->startOfMinute()->equalTo($lastExecutionStartedAt)) {
-                $executions[] = $execution = Process::fromShellCommandline($command);
+                $executions[] = $execution = $this->createScheduleRunProcess($command);
 
                 $execution->start();
 
@@ -76,5 +76,16 @@ class ScheduleWorkCommand extends Command
                 }
             }
         }
+    }
+
+    /**
+     * Create a new schedule:run process.
+     *
+     * @param  string  $command
+     * @return \Symfony\Component\Process\Process
+     */
+    protected function createScheduleRunProcess($command)
+    {
+        return Process::fromShellCommandline($command, base_path());
     }
 }
