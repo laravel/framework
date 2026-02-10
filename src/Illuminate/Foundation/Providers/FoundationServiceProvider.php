@@ -219,7 +219,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
                 return;
             }
 
-            app(DeferredCallbackCollection::class)->invokeWhen(fn ($callback) => $event->successful() || $callback->always);
+            app(DeferredCallbackCollection::class)->invokeWhen(fn ($callback) => ($event->successful() || $callback->always));
         });
     }
 
