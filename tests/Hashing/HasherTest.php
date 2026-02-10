@@ -145,4 +145,37 @@ class HasherTest extends TestCase
 
         (new Argon2IdHasher(['time' => 0]))->make('password');
     }
+
+    public function testCheckAndRehashReturnsNullWhenCheckFails()
+    {
+        $hasher = new BcryptHasher;
+        $hashed = $hasher->make('password');
+
+        $this->assertNull($this->hashManager->checkAndRehash('wrong-password', $hashed));
+    }
+
+    public function testCheckAndRehashReturnsOriginalHashWhenNoRehashNeeded()
+    {
+        $hasher = new BcryptHasher;
+        $hashed = $hasher->make('password');
+
+        $result = $this->hashManager->checkAndRehash('password', $hashed);
+
+        $this->assertSame($hashed, $result);
+    }
+
+    public function testCheckAndRehashReturnsNewHashWhenRehashIsNeeded()
+    {
+        $hasher = new BcryptHasher(['rounds' => 4]);
+        $hashed = $hasher->make('password');
+
+        $this->assertTrue((new BcryptHasher(['rounds' => 12]))->needsRehash($hashed));
+
+        $result = $this->hashManager->checkAndRehash('password', $hashed, ['rounds' => 12]);
+
+        $this->assertNotNull($result);
+        $this->assertNotSame($hashed, $result);
+        $this->assertTrue((new BcryptHasher(['rounds' => 12]))->check('password', $result));
+        $this->assertFalse((new BcryptHasher(['rounds' => 12]))->needsRehash($result));
+    }
 }

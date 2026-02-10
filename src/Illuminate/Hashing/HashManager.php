@@ -125,4 +125,28 @@ class HashManager extends Manager implements Hasher
 
         return true;
     }
+
+    /**
+     * Check the given plain value against a hash and return a new hash when the
+     * hash should be rehashed.
+     *
+     * Returns null when the value does not match the given hash.
+     *
+     * @param  string  $value
+     * @param  string  $hashedValue
+     * @param  array  $options
+     * @return string|null
+     */
+    public function checkAndRehash(#[\SensitiveParameter] $value, $hashedValue, array $options = [])
+    {
+        if (! $this->check($value, $hashedValue, $options)) {
+            return null;
+        }
+
+        if (! $this->needsRehash($hashedValue, $options)) {
+            return $hashedValue;
+        }
+
+        return $this->make($value, $options);
+    }
 }
