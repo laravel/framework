@@ -4058,6 +4058,57 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Insert new records into the database in chunks.
+     *
+     * @param  array|\Illuminate\Support\Collection  $values
+     * @param  int  $chunkSize
+     * @param  bool  $useTransaction
+     * @return bool
+     */
+    public function insertChunk($values, $chunkSize = 500, $useTransaction = false)
+    {
+        if ($values instanceof \Illuminate\Support\Collection) {
+            $values = $values->all();
+        }
+
+        if (empty($values)) {
+            return true;
+        }
+
+        if (! is_array(array_first($values))) {
+            $values = [$values];
+        }
+
+        foreach ($values as $key => $value) {
+            ksort($value);
+            $values[$key] = $value;
+        }
+
+        $chunks = array_chunk($values, $chunkSize);
+
+        // Use transaction if requested
+        if ($useTransaction) {
+            return $this->connection->transaction(function () use ($chunks) {
+                foreach ($chunks as $chunk) {
+                    if (! $this->insert($chunk)) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }
+
+        // Without transaction
+        foreach ($chunks as $chunk) {
+            if (! $this->insert($chunk)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Insert new records into the database while ignoring errors.
      *
      * @return int<0, max>
