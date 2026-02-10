@@ -223,7 +223,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
     public function testForceDeleteDoesntUpdateExistsPropertyIfFailed()
     {
-        $user = new class() extends SoftDeletesTestUser
+        $user = new class extends SoftDeletesTestUser
         {
             public $exists = true;
 

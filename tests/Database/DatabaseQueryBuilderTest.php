@@ -2386,7 +2386,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->having(
-            new class() implements ConditionExpression
+            new class implements ConditionExpression
             {
                 public function getValue(\Illuminate\Database\Grammar $grammar)
                 {
@@ -6525,7 +6525,7 @@ SQL;
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('orders')->where(
-            new class() implements ConditionExpression
+            new class implements ConditionExpression
             {
                 public function getValue(\Illuminate\Database\Grammar $grammar)
                 {

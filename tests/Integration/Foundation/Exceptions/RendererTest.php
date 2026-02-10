@@ -47,7 +47,7 @@ class RendererTest extends TestCase
     public function testItCanRenderExceptionPageWithRendererWhenDebugEnabled()
     {
         $this->app->singleton(ExceptionRenderer::class, function () {
-            return new class() implements ExceptionRenderer
+            return new class implements ExceptionRenderer
             {
                 public function render($throwable)
                 {
@@ -67,7 +67,7 @@ class RendererTest extends TestCase
     public function testItDoesNotRenderExceptionPageWithRendererWhenDebugDisabled()
     {
         $this->app->singleton(ExceptionRenderer::class, function () {
-            return new class() implements ExceptionRenderer
+            return new class implements ExceptionRenderer
             {
                 public function render($throwable)
                 {
@@ -103,7 +103,7 @@ class RendererTest extends TestCase
     public function testItDoesNotRegisterListenersWhenRendererBound()
     {
         $this->app->singleton(ExceptionRenderer::class, function () {
-            return new class() implements ExceptionRenderer
+            return new class implements ExceptionRenderer
             {
                 public function render($throwable)
                 {

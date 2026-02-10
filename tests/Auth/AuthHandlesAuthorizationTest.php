@@ -32,7 +32,7 @@ class AuthHandlesAuthorizationTest extends TestCase
 
     public function testDenyHasNullStatus()
     {
-        $class = new class()
+        $class = new class
         {
             use HandlesAuthorization;
 
@@ -53,7 +53,7 @@ class AuthHandlesAuthorizationTest extends TestCase
 
     public function testItCanDenyWithStatus()
     {
-        $class = new class()
+        $class = new class
         {
             use HandlesAuthorization;
 
@@ -73,7 +73,7 @@ class AuthHandlesAuthorizationTest extends TestCase
             $this->assertSame(0, $e->getCode());
         }
 
-        $class = new class()
+        $class = new class
         {
             use HandlesAuthorization;
 
@@ -96,7 +96,7 @@ class AuthHandlesAuthorizationTest extends TestCase
 
     public function testItCanDenyAsNotFound()
     {
-        $class = new class()
+        $class = new class
         {
             use HandlesAuthorization;
 
@@ -116,7 +116,7 @@ class AuthHandlesAuthorizationTest extends TestCase
             $this->assertSame(0, $e->getCode());
         }
 
-        $class = new class()
+        $class = new class
         {
             use HandlesAuthorization;
 

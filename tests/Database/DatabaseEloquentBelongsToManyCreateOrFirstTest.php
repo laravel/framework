@@ -287,7 +287,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
 
     public function testFirstOrCreateMethodFallsBackToCreateOrFirst(): void
     {
-        $source = new class() extends BelongsToManyCreateOrFirstTestSourceModel
+        $source = new class extends BelongsToManyCreateOrFirstTestSourceModel
         {
             protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
             {
@@ -358,7 +358,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
 
     public function testUpdateOrCreateMethodCreatesNewRelated(): void
     {
-        $source = new class() extends BelongsToManyCreateOrFirstTestSourceModel
+        $source = new class extends BelongsToManyCreateOrFirstTestSourceModel
         {
             protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
             {
@@ -400,7 +400,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
 
     public function testUpdateOrCreateMethodUpdatesExistingRelated(): void
     {
-        $source = new class() extends BelongsToManyCreateOrFirstTestSourceModel
+        $source = new class extends BelongsToManyCreateOrFirstTestSourceModel
         {
             protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
             {
