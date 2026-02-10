@@ -44,6 +44,18 @@ class LocalFilesystemAdapter extends FilesystemAdapter
     }
 
     /**
+     * Determine if temporary upload URLs can be generated.
+     *
+     * @return bool
+     */
+    public function providesTemporaryUploadUrls()
+    {
+        return $this->temporaryUploadUrlCallback || (
+            $this->shouldServeSignedUrls && $this->urlGeneratorResolver instanceof Closure
+        );
+    }
+
+    /**
      * Get a temporary URL for the file at the given path.
      *
      * @param  string  $path
@@ -71,6 +83,39 @@ class LocalFilesystemAdapter extends FilesystemAdapter
             ['path' => $path],
             absolute: false
         ));
+    }
+
+    /**
+     * Get a temporary upload URL for the file at the given path.
+     *
+     * @param  string  $path
+     * @param  \DateTimeInterface  $expiration
+     * @param  array  $options
+     * @return array
+     */
+    public function temporaryUploadUrl($path, $expiration, array $options = [])
+    {
+        if ($this->temporaryUploadUrlCallback) {
+            return $this->temporaryUploadUrlCallback->bindTo($this, static::class)(
+                $path, $expiration, $options
+            );
+        }
+
+        if (! $this->providesTemporaryUploadUrls()) {
+            throw new RuntimeException('This driver does not support creating temporary upload URLs.');
+        }
+
+        $url = call_user_func($this->urlGeneratorResolver);
+
+        return [
+            'url' => $url->to($url->temporarySignedRoute(
+                'storage.'.$this->disk.'.upload',
+                $expiration,
+                ['path' => $path, 'upload' => true],
+                absolute: false
+            )),
+            'headers' => [],
+        ];
     }
 
     /**
