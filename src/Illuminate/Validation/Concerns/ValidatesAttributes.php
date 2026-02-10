@@ -1783,6 +1783,18 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is an unsigned integer.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateUnsignedInt($attribute, $value)
+    {
+        return $this->validateInteger($attribute, $value) && $this->validateMin($attribute, $value, [0]);
+    }
+
+    /**
      * Validate that an attribute has a minimum number of digits.
      *
      * @param  string  $attribute
