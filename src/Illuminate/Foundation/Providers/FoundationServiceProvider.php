@@ -215,7 +215,11 @@ class FoundationServiceProvider extends AggregateServiceProvider
         });
 
         $this->app['events']->listen(function (JobAttempted $event) {
-            app(DeferredCallbackCollection::class)->invokeWhen(static fn ($callback) => ! in_array($event->connectionName, ['sync', 'deferred']) && ($event->successful() || $callback->always));
+            if (in_array($event->connectionName, ['sync', 'deferred'])) {
+                return;
+            }
+
+            app(DeferredCallbackCollection::class)->invokeWhen(fn ($callback) => ($event->successful() || $callback->always));
         });
     }
 
