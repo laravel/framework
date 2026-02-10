@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Events\MaintenanceModeDisabled;
+use Illuminate\Foundation\FileBasedMaintenanceMode;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'up')]
@@ -40,7 +41,7 @@ class UpCommand extends Command
 
             $this->laravel->maintenanceMode()->deactivate();
 
-            if (is_file(storage_path('framework/maintenance.php'))) {
+            if ($this->laravel->maintenanceMode() instanceof FileBasedMaintenanceMode && is_file(storage_path('framework/maintenance.php'))) {
                 unlink(storage_path('framework/maintenance.php'));
             }
 
