@@ -82,6 +82,13 @@ class TypedFormRequestFactory
     protected array $nestedFactories = [];
 
     /**
+     * Whether authorization checks should run.
+     *
+     * @var bool
+     */
+    protected bool $withAuthorization = true;
+
+    /**
      * Create a new TypedFormRequest factory instance.
      *
      * @param  class-string<T>  $requestClass  The request class being built.
@@ -94,6 +101,16 @@ class TypedFormRequestFactory
     }
 
     /**
+     * @return $this
+     */
+    public function withAuthorization(bool $withAuthorization): static
+    {
+        $this->withAuthorization = $withAuthorization;
+
+        return $this;
+    }
+
+    /**
      * Build and validate the TypedFormRequest instance.
      *
      * @return T
@@ -102,7 +119,7 @@ class TypedFormRequestFactory
     {
         $this->prepareForValidation();
 
-        if (! $this->passesAuthorization()) {
+        if ($this->withAuthorization && ! $this->passesAuthorization()) {
             $this->failedAuthorization();
         }
 
