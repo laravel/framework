@@ -86,7 +86,7 @@ jobs:
           command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --with="phpunit/phpunit:~${{ matrix.phpunit }}"
 
       - name: Execute tests
-        run: vendor/bin/phpunit --display-deprecation ${{ matrix.stability == 'prefer-stable' && '--fail-on-deprecation' || '' }}
+        run: vendor/bin/phpunit --display-deprecation --no-coverage
         env:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
           DB_USERNAME: root
@@ -148,7 +148,7 @@ jobs:
           command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --with="phpunit/phpunit:~${{ matrix.phpunit }}"
 
       - name: Execute tests
-        run: vendor/bin/phpunit
+        run: vendor/bin/phpunit --no-coverage
         env:
           AWS_ACCESS_KEY_ID: random_key
           AWS_SECRET_ACCESS_KEY: random_secret

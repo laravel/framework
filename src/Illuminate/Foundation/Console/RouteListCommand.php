@@ -402,7 +402,7 @@ class RouteListCommand extends Command
                 $spaces,
                 preg_replace('#({[^}]+})#', '<fg=yellow>$1</>', $uri),
                 $dots,
-                str_replace('   ', ' › ', $action ?? ''),
+                str_replace('   ', ' › ', $action ?? ''), // @phpstan-ignore nullCoalesce.variable
             ), $this->output->isVerbose() && ! empty($middleware) ? "<fg=#6C7280>$middleware</>" : null];
         })
             ->flatten()
