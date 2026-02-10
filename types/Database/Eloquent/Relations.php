@@ -78,6 +78,8 @@ function test(User $user, Post $post, Comment $comment, ChildUser $child): void
     assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}>', $user->roles()->lazy());
     assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}>', $user->roles()->lazyById());
     assertType('Illuminate\Support\LazyCollection<int, Illuminate\Types\Relations\Role&object{pivot: Illuminate\Database\Eloquent\Relations\Pivot}>', $user->roles()->cursor());
+    assertType("Illuminate\Database\Eloquent\Relations\BelongsToMany<Illuminate\Types\Relations\Role, Illuminate\Types\Relations\User, Illuminate\Database\Eloquent\Relations\Pivot, 'pivot'>", $user->roles()->orderByPivot('foo', 'asc'));
+    assertType("Illuminate\Database\Eloquent\Relations\BelongsToMany<Illuminate\Types\Relations\Role, Illuminate\Types\Relations\User, Illuminate\Database\Eloquent\Relations\Pivot, 'pivot'>", $user->roles()->orderByPivotDesc('foo'));
 
     assertType('Illuminate\Database\Eloquent\Relations\HasOneThrough<Illuminate\Types\Relations\Car, Illuminate\Types\Relations\Mechanic, Illuminate\Types\Relations\User>', $user->car());
     assertType('Illuminate\Types\Relations\Car|null', $user->car()->getResults());

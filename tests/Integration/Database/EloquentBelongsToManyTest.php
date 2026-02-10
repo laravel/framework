@@ -1363,6 +1363,9 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $relationTag2 = $post->tagsWithCustomExtraPivot()->orderByPivot('flag', 'desc')->first();
         $this->assertEquals($relationTag2->getAttributes(), $tag3->getAttributes());
+
+        $relationTag3 = $post->tagsWithCustomExtraPivot()->orderByPivotDesc('flag')->first();
+        $this->assertEquals($relationTag3->getAttributes(), $tag3->getAttributes());
     }
 
     public function testFirstOrMethod()

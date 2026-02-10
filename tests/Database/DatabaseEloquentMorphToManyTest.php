@@ -92,6 +92,9 @@ class DatabaseEloquentMorphToManyTest extends TestCase
 
         $builder->shouldReceive('orderBy')->with($column, 'asc')->once()->andReturnSelf();
         $relation->orderByPivot($column);
+
+        $builder->shouldReceive('orderBy')->with($column, 'desc')->once()->andReturnSelf();
+        $relation->orderByPivotDesc($column);
     }
 
     public function getRelation(): MorphToMany
