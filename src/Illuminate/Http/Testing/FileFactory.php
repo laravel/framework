@@ -21,7 +21,7 @@ class FileFactory
         }
 
         return tap(new File($name, tmpfile()), function ($file) use ($kilobytes, $mimeType) {
-            $file->sizeToReport = $kilobytes * 1024;
+            $file->sizeToReport = $kilobytes * 1_000;
             $file->mimeTypeToReport = $mimeType;
         });
     }

@@ -231,17 +231,17 @@ class ValidationFileRuleTest extends TestCase
     public function testSize()
     {
         $this->fails(
-            File::default()->size(1024),
+            File::default()->size(1_500),
             [
-                UploadedFile::fake()->create('foo.txt', 1025),
-                UploadedFile::fake()->create('foo.txt', 1023),
+                UploadedFile::fake()->create('foo.txt', 1_501),
+                UploadedFile::fake()->create('foo.txt', 1_499),
             ],
             ['validation.size.file']
         );
 
         $this->passes(
-            File::default()->size(1024),
-            UploadedFile::fake()->create('foo.txt', 1024),
+            File::default()->size(1_000),
+            UploadedFile::fake()->create('foo.txt', 1_000),
         );
     }
 
