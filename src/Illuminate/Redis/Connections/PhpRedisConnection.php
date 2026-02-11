@@ -53,7 +53,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     {
         $result = $this->command('get', [$key]);
 
-        if ($result === false && !$this->command('exists', [$key])) {
+        if ($result === false && ! $this->command('exists', [$key])) {
             return null;
         }
 
@@ -71,7 +71,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         $values = $this->command('mget', [$keys]);
 
         return array_map(function ($value, $index) use ($keys) {
-            if ($value === false && !$this->command('exists', [$keys[$index]])) {
+            if ($value === false && ! $this->command('exists', [$keys[$index]])) {
                 return null;
             }
 

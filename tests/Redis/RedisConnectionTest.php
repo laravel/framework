@@ -794,6 +794,18 @@ class RedisConnectionTest extends TestCase
         }
     }
 
+    public function testItReturnsFalseValues()
+    {
+        foreach ($this->connections() as $redis) {
+            $redis->set('foo', false);
+
+            $this->assertSame(false, $redis->get('foo'));
+            $this->assertNull($redis->get('bar'));
+
+            $redis->flushall();
+        }
+    }
+
     public function connections()
     {
         $connections = [
