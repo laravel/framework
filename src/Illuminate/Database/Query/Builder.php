@@ -328,14 +328,14 @@ class Builder implements BuilderContract
     /**
      * Add a select expression to the query.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression  $expression
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $expression
      * @param  string  $as
      * @return $this
      */
     public function selectExpression($expression, $as)
     {
         return $this->selectRaw(
-            '('.$expression->getValue($this->grammar).') as '.$this->grammar->wrap($as)
+            '('.$this->grammar->getValue($expression).') as '.$this->grammar->wrap($as)
         );
     }
 
