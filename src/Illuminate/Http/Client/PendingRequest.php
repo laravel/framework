@@ -1096,7 +1096,7 @@ class PendingRequest
 
             $shouldRetry = null;
 
-            return $result; 
+            return $result;
         });
     }
 
