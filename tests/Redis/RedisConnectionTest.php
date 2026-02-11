@@ -555,6 +555,10 @@ class RedisConnectionTest extends TestCase
     public function testItDispatchesQueryEvent()
     {
         foreach ($this->connections() as $redis) {
+            // Set a value first so get() returns a value (not false)
+            // This avoids triggering exists() check in phpredis
+            $redis->set('foobar', 'test-value');
+
             $redis->setEventDispatcher($events = m::mock(Dispatcher::class));
 
             $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) {
@@ -569,6 +573,7 @@ class RedisConnectionTest extends TestCase
             $redis->get('foobar');
 
             $redis->unsetEventDispatcher();
+            $redis->del('foobar');
         }
     }
 
