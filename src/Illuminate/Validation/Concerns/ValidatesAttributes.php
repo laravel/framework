@@ -2771,7 +2771,7 @@ trait ValidatesAttributes
         } elseif (is_array($value)) {
             return count($value);
         } elseif ($value instanceof File) {
-            return (string) ($value->getSize() / 1024);
+            return (string) ($value->getSize() / 1_000);
         }
 
         return mb_strlen($value ?? '');
