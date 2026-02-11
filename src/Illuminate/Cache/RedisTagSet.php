@@ -4,10 +4,13 @@ namespace Illuminate\Cache;
 
 use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\LazyCollection;
 
 class RedisTagSet extends TagSet
 {
+    use InteractsWithTime;
+
     /**
      * Add a reference entry to the tag set's underlying sorted set.
      *
@@ -87,7 +90,7 @@ class RedisTagSet extends TagSet
     {
         $flushStaleEntries = function ($pipe) {
             foreach ($this->tagIds() as $tagKey) {
-                $pipe->zremrangebyscore($this->store->getPrefix().$tagKey, 0, Carbon::now()->getTimestamp());
+                $pipe->zremrangebyscore($this->store->getPrefix().$tagKey, 0, $this->currentTime());
             }
         };
 

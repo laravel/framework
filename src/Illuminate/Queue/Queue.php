@@ -174,7 +174,7 @@ abstract class Queue
                 'command' => $job,
                 'batchId' => $job->batchId ?? null,
             ],
-            'createdAt' => Carbon::now()->getTimestamp(),
+            'createdAt' => $this->currentTime(),
         ]);
 
         try {
@@ -304,7 +304,7 @@ abstract class Queue
             'backoff' => null,
             'timeout' => null,
             'data' => $data,
-            'createdAt' => Carbon::now()->getTimestamp(),
+            'createdAt' => $this->currentTime(),
         ]);
     }
 

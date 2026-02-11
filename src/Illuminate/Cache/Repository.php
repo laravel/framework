@@ -629,11 +629,11 @@ class Repository implements ArrayAccess, CacheContract
         if (in_array(null, [$value, $created], true)) {
             return tap(value($callback), fn ($value) => $this->putMany([
                 $key => $value,
-                "illuminate:cache:flexible:created:{$key}" => Carbon::now()->getTimestamp(),
+                "illuminate:cache:flexible:created:{$key}" => $this->currentTime(),
             ], $ttl[1]));
         }
 
-        if (($created + $this->getSeconds($ttl[0])) > Carbon::now()->getTimestamp()) {
+        if (($created + $this->getSeconds($ttl[0])) > $this->currentTime()) {
             return $value;
         }
 
@@ -649,7 +649,7 @@ class Repository implements ArrayAccess, CacheContract
 
                 $this->putMany([
                     $key => value($callback),
-                    "illuminate:cache:flexible:created:{$key}" => Carbon::now()->getTimestamp(),
+                    "illuminate:cache:flexible:created:{$key}" => $this->currentTime(),
                 ], $ttl[1]);
             });
         };

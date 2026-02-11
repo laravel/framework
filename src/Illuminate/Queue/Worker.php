@@ -19,11 +19,12 @@ use Illuminate\Queue\Events\Looping;
 use Illuminate\Queue\Events\WorkerStarting;
 use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\InteractsWithTime;
 use Throwable;
 
 class Worker
 {
-    use DetectsLostConnections;
+    use DetectsLostConnections, InteractsWithTime;
 
     const EXIT_SUCCESS = 0;
     const EXIT_ERROR = 1;
@@ -562,7 +563,7 @@ class Worker
 
         $retryUntil = $job->retryUntil();
 
-        if ($retryUntil && Carbon::now()->getTimestamp() <= $retryUntil) {
+        if ($retryUntil && $this->currentTime() <= $retryUntil) {
             return;
         }
 
@@ -588,7 +589,7 @@ class Worker
     {
         $maxTries = ! is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
 
-        if ($job->retryUntil() && $job->retryUntil() <= Carbon::now()->getTimestamp()) {
+        if ($job->retryUntil() && $job->retryUntil() <= $this->currentTime()) {
             $this->failJob($job, $e);
         }
 
