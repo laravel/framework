@@ -218,7 +218,7 @@ class Batch implements Arrayable, JsonSerializable
      */
     public function progress()
     {
-        return $this->totalJobs > 0 ? round(($this->processedJobs() / $this->totalJobs) * 100) : 0;
+        return $this->totalJobs > 0 ? (int) round(($this->processedJobs() / $this->totalJobs) * 100) : 0;
     }
 
     /**
