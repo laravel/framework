@@ -1900,4 +1900,98 @@ class SupportArrTest extends TestCase
 
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
     }
+
+    public function testFilterRecursiveAllScenarios()
+    {
+        $array = [
+            'a' => null,
+            'b' => false,
+            'c' => 0,
+            'd' => '',
+            'e' => [],
+            'f' => 'hello',
+            'nested' => [
+                'x' => null,
+                'y' => 1,
+                'z' => [],
+            ],
+        ];
+
+        // 1. Default behavior: remove null only
+        $this->assertEquals([
+            'b' => false,
+            'c' => 0,
+            'd' => '',
+            'e' => [],
+            'f' => 'hello',
+            'nested' => [
+                'y' => 1,
+                'z' => [],
+            ],
+        ], Arr::filterRecursive($array));
+
+        // 2. Remove all falsy values (true)
+        $this->assertEquals([
+            'f' => 'hello',
+            'nested' => [
+                'y' => 1,
+            ],
+        ], Arr::filterRecursive($array, true));
+
+        // 3. Custom callback
+        $this->assertEquals([
+            'a' => null,
+            'b' => false,
+            'nested' => [],
+        ], Arr::filterRecursive($array, fn($v, $k) => in_array($k, ['a', 'b', 'nested'])));
+
+        // 4. Nested arrays with empty arrays preserved
+        $nestedEmpty = [
+            'level1' => [
+                'empty' => [],
+                'value' => 0,
+                'null' => null,
+            ],
+            'topnull' => null,
+        ];
+
+        $this->assertEquals([
+            'level1' => [
+                'empty' => [],
+                'value' => 0,
+            ],
+        ], Arr::filterRecursive($nestedEmpty));
+
+        // 5. Empty array input
+        $this->assertEquals([], Arr::filterRecursive([]));
+        $this->assertEquals([], Arr::filterRecursive([], true));
+        $this->assertEquals([], Arr::filterRecursive([], fn($v) => true));
+
+        // 6. Array with only falsy values
+        $falsyOnly = [
+            'zero' => 0,
+            'false' => false,
+            'empty' => '',
+            'null' => null,
+            'emptyArr' => [],
+        ];
+
+        // Default: remove only null
+        $this->assertEquals([
+            'zero' => 0,
+            'false' => false,
+            'empty' => '',
+            'emptyArr' => [],
+        ], Arr::filterRecursive($falsyOnly));
+
+        // Remove all falsy
+        $this->assertEquals([], Arr::filterRecursive($falsyOnly, true));
+
+        // Custom callback: keep only keys starting with 'e'
+        $this->assertEquals([
+            'empty' => '',
+            'emptyArr' => [],
+        ], Arr::filterRecursive($falsyOnly, fn($v, $k) => str_starts_with($k, 'e')));
+    }
+
 }

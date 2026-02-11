@@ -1309,4 +1309,43 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Recursively filter the given array.
+     *
+     * @template TKey of array-key
+     * @template TValue
+     *
+     * @param  bool|callable(TValue, TKey): bool  $filterAllOrCallback
+     *         - true: remove all falsy values (null, false, 0, '', [])
+     *         - false/null: remove only null
+     *         - callable: custom filter function
+     * @return array<TKey, TValue>
+     */
+    public static function filterRecursive(array $array, $filterAllOrCallback = null): array
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $array[$key] = static::filterRecursive($value, $filterAllOrCallback);
+            }
+        }
+
+        // Determine the filter callback
+        if (is_callable($filterAllOrCallback)) {
+            $callback = $filterAllOrCallback;
+        } elseif ($filterAllOrCallback === true) {
+            $callback = function ($value) {
+                if (is_array($value)) {
+                    return count($value) > 0;
+                }
+                return (bool) $value;
+            };
+        } else {
+            // Default behavior: remove only null
+            $callback = fn($value) => $value !== null;
+        }
+
+        return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
+    }
+
 }
