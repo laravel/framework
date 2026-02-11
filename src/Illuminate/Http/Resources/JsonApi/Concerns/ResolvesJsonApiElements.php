@@ -167,7 +167,7 @@ trait ResolvesJsonApiElements
     protected function resolveResourceRelationshipIdentifiers(JsonApiRequest $request): array
     {
         if (! $this->resource instanceof Model) {
-            return [];
+             return [];
         }
 
         $this->compileResourceRelationships($request);
