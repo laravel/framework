@@ -1943,7 +1943,7 @@ class SupportArrTest extends TestCase
             'a' => null,
             'b' => false,
             'nested' => [],
-        ], Arr::filterRecursive($array, fn($v, $k) => in_array($k, ['a', 'b', 'nested'])));
+        ], Arr::filterRecursive($array, fn ($v, $k) => in_array($k, ['a', 'b', 'nested'])));
 
         // 4. Nested arrays with empty arrays preserved
         $nestedEmpty = [
@@ -1965,7 +1965,7 @@ class SupportArrTest extends TestCase
         // 5. Empty array input
         $this->assertEquals([], Arr::filterRecursive([]));
         $this->assertEquals([], Arr::filterRecursive([], true));
-        $this->assertEquals([], Arr::filterRecursive([], fn($v) => true));
+        $this->assertEquals([], Arr::filterRecursive([], fn ($v) => true));
 
         // 6. Array with only falsy values
         $falsyOnly = [
@@ -1991,7 +1991,6 @@ class SupportArrTest extends TestCase
         $this->assertEquals([
             'empty' => '',
             'emptyArr' => [],
-        ], Arr::filterRecursive($falsyOnly, fn($v, $k) => str_starts_with($k, 'e')));
+        ], Arr::filterRecursive($falsyOnly, fn ($v, $k) => str_starts_with($k, 'e')));
     }
-
 }
