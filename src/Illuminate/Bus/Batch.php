@@ -214,7 +214,7 @@ class Batch implements Arrayable, JsonSerializable
     /**
      * Get the percentage of jobs that have been processed (between 0-100).
      *
-     * @return int
+     * @return int<0, 100>
      */
     public function progress()
     {
