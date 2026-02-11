@@ -901,7 +901,7 @@ class Validator implements ValidatorContract
      */
     protected function hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute)
     {
-        return ! in_array($rule, ['Unique', 'Exists']) || ! $this->messages->has($attribute);
+        return !in_array($rule, ['Unique', 'Exists']) || ! $this->messages->has($attribute);
     }
 
     /**
