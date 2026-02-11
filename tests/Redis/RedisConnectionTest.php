@@ -794,16 +794,62 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function testItReturnsFalseValues()
+    public function testGetReturnsFalseValueWithSerializer()
     {
-        foreach ($this->connections() as $redis) {
-            $redis->set('foo', false);
+        $host = env('REDIS_HOST', '127.0.0.1');
+        $port = env('REDIS_PORT', 6379);
 
-            $this->assertSame(false, $redis->get('foo'));
-            $this->assertNull($redis->get('bar'));
+        $manager = new RedisManager(new Application, 'phpredis', [
+            'cluster' => false,
+            'default' => [
+                'host' => $host,
+                'port' => $port,
+                'database' => 0,
+                'options' => ['serializer' => Redis::SERIALIZER_PHP],
+                'timeout' => 0.5,
+            ],
+        ]);
 
-            $redis->flushall();
-        }
+        $redis = $manager->connection();
+
+        $redis->set('foo', false);
+        $this->assertSame(false, $redis->get('foo'));
+
+        $this->assertNull($redis->get('bar'));
+
+        $redis->del('foo');
+    }
+
+    public function testMgetReturnsFalseValuesWithSerializer()
+    {
+        $host = env('REDIS_HOST', '127.0.0.1');
+        $port = env('REDIS_PORT', 6379);
+
+        $manager = new RedisManager(new Application, 'phpredis', [
+            'cluster' => false,
+            'default' => [
+                'host' => $host,
+                'port' => $port,
+                'database' => 0,
+                'options' => ['serializer' => Redis::SERIALIZER_PHP],
+                'timeout' => 0.5,
+            ],
+        ]);
+
+        $redis = $manager->connection();
+
+        $redis->set('foo', false);
+        $redis->set('bar', true);
+        $redis->set('baz', 'qux');
+
+        $results = $redis->mget(['foo', 'bar', 'baz', 'missing']);
+
+        $this->assertSame(false, $results[0]);
+        $this->assertSame(true, $results[1]);
+        $this->assertSame('qux', $results[2]);
+        $this->assertNull($results[3]);
+
+        $redis->del('foo', 'bar', 'baz');
     }
 
     public function connections()
