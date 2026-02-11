@@ -231,9 +231,7 @@ class DatabaseStore implements LockProvider, Store
      */
     public function increment($key, $value = 1)
     {
-        return $this->incrementOrDecrement($key, $value, function ($current, $value) {
-            return $current + $value;
-        });
+        return $this->incrementOrDecrement($key, $value, fn($current, $value) => $current + $value);
     }
 
     /**
@@ -245,9 +243,7 @@ class DatabaseStore implements LockProvider, Store
      */
     public function decrement($key, $value = 1)
     {
-        return $this->incrementOrDecrement($key, $value, function ($current, $value) {
-            return $current - $value;
-        });
+        return $this->incrementOrDecrement($key, $value, fn($current, $value) => $current - $value);
     }
 
     /**
