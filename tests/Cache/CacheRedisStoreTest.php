@@ -143,6 +143,24 @@ class CacheRedisStoreTest extends TestCase
         $this->assertEmpty($redis->getPrefix());
     }
 
+    public function testFalseValueIsReturnedCorrectly()
+    {
+        $redis = $this->getRedis();
+        $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
+        $redis->getRedis()->shouldReceive('get')->once()->with('prefix:foo')->andReturn(false);
+        $redis->getRedis()->shouldReceive('exists')->once()->with('prefix:foo')->andReturn(1);
+        $this->assertFalse($redis->get('foo'));
+    }
+
+    public function testNullIsReturnedWhenKeyDoesNotExist()
+    {
+        $redis = $this->getRedis();
+        $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
+        $redis->getRedis()->shouldReceive('get')->once()->with('prefix:foo')->andReturn(false);
+        $redis->getRedis()->shouldReceive('exists')->once()->with('prefix:foo')->andReturn(0);
+        $this->assertNull($redis->get('foo'));
+    }
+
     protected function getRedis()
     {
         return new RedisStore(m::mock(Factory::class), 'prefix:');
