@@ -7,6 +7,7 @@ use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
+use Illuminate\Routing\CallableDispatcher as ConcreteCallableDispatcher;
 use Illuminate\Routing\Contracts\CallableDispatcher;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -240,7 +241,11 @@ class Route
             $callable = unserialize($this->action['uses'])->getClosure();
         }
 
-        return $this->container[CallableDispatcher::class]->dispatch($this, $callable);
+        $dispatcher = $this->container->bound(CallableDispatcher::class)
+            ? $this->container[CallableDispatcher::class]
+            : new ConcreteCallableDispatcher($this->container);
+
+        return $dispatcher->dispatch($this, $callable);
     }
 
     /**

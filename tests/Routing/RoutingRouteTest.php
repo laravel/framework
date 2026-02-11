@@ -180,6 +180,21 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('closure', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
     }
 
+    public function testClosureRouteDispatchesWithoutCallableDispatcherBinding()
+    {
+        $container = new Container;
+        $router = new Router(new Dispatcher, $container);
+        $router->get('foo', function () {
+            return 'hello';
+        });
+
+        $this->assertFalse($container->bound(CallableDispatcherContract::class));
+
+        $response = $router->dispatch(Request::create('/foo', 'GET'));
+
+        $this->assertSame('hello', $response->getContent());
+    }
+
     public function testNotModifiedResponseIsProperlyReturned()
     {
         $router = $this->getRouter();
