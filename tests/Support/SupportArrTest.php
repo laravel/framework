@@ -1901,7 +1901,7 @@ class SupportArrTest extends TestCase
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
     }
 
-    public function testFilterRecursiveAllScenarios()
+    public function testFilterRecursive()
     {
         $array = [
             'a' => null,
