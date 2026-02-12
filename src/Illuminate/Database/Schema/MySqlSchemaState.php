@@ -65,29 +65,6 @@ class MySqlSchemaState extends SchemaState
     }
 
     /**
-     * @return array{version: string, isMariaDb: bool}
-     */
-    protected function detectClientVersion(): array
-    {
-        $version = '8.0.0';
-        $isMariaDb = false;
-
-        try {
-            $versionOutput = $this->makeProcess('mysql --version')->mustRun()->getOutput();
-            if (preg_match('/(\d+\.\d+\.\d+)/', $versionOutput, $matches)) {
-                $version = $matches[1];
-            }
-            $isMariaDb = stripos($versionOutput, 'mariadb') !== false;
-        } catch (ProcessFailedException) {
-        }
-
-        return [
-            'version' => $version,
-            'isMariaDb' => $isMariaDb,
-        ];
-    }
-
-    /**
      * Load the given schema file into the database.
      *
      * @param  string  $path
@@ -226,5 +203,31 @@ class MySqlSchemaState extends SchemaState
         }
 
         return $process;
+    }
+
+    /**
+     * Detect the MySQL client version.
+     *
+     * @return array{version: string, isMariaDb: bool}
+     */
+    protected function detectClientVersion(): array
+    {
+        [$version, $isMariaDb] = ['8.0.0', false];
+
+        try {
+            $versionOutput = $this->makeProcess('mysql --version')->mustRun()->getOutput();
+
+            if (preg_match('/(\d+\.\d+\.\d+)/', $versionOutput, $matches)) {
+                $version = $matches[1];
+            }
+
+            $isMariaDb = stripos($versionOutput, 'mariadb') !== false;
+        } catch (ProcessFailedException) {
+        }
+
+        return [
+            'version' => $version,
+            'isMariaDb' => $isMariaDb,
+        ];
     }
 }
