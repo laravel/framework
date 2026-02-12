@@ -5,17 +5,13 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Attributes\Appends;
 use Illuminate\Database\Eloquent\Attributes\Connection;
-use Illuminate\Database\Eloquent\Attributes\DateFormat;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
-use Illuminate\Database\Eloquent\Attributes\PrimaryKey;
 use Illuminate\Database\Eloquent\Attributes\Table;
-use Illuminate\Database\Eloquent\Attributes\Timestamps;
 use Illuminate\Database\Eloquent\Attributes\Touches;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Attributes\Visible;
-use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Database\Eloquent\Model;
 use PHPUnit\Framework\TestCase;
 
@@ -264,31 +260,31 @@ class ModelWithTableAttributeAndProperty extends Model
     protected $table = 'property_table';
 }
 
-#[PrimaryKey('custom_id')]
+#[Table(key: 'custom_id')]
 class ModelWithPrimaryKeyAttribute extends Model
 {
     //
 }
 
-#[PrimaryKey('attribute_id')]
+#[Table(key: 'attribute_id')]
 class ModelWithPrimaryKeyAttributeAndProperty extends Model
 {
     protected $primaryKey = 'property_id';
 }
 
-#[PrimaryKey('uuid', type: 'string')]
+#[Table(key: 'uuid', keyType: 'string')]
 class ModelWithPrimaryKeyTypeAttribute extends Model
 {
     //
 }
 
-#[PrimaryKey('uuid', incrementing: false)]
+#[Table(key: 'uuid', incrementing: false)]
 class ModelWithPrimaryKeyIncrementingAttribute extends Model
 {
     //
 }
 
-#[PrimaryKey('uuid', type: 'string', incrementing: false)]
+#[Table(key: 'uuid', keyType: 'string', incrementing: false)]
 class ModelWithFullPrimaryKeyAttribute extends Model
 {
     //
@@ -300,25 +296,25 @@ class ModelWithConnectionAttribute extends Model
     //
 }
 
-#[Timestamps(false)]
+#[Table(timestamps: false)]
 class ModelWithTimestampsFalseAttribute extends Model
 {
     //
 }
 
-#[WithoutTimestamps]
+#[Table(timestamps: false)]
 class ModelWithoutTimestampsAttribute extends Model
 {
     //
 }
 
-#[Timestamps(false)]
+#[Table(timestamps: false)]
 class ModelWithTimestampsAttributeAndProperty extends Model
 {
     public $timestamps = false;
 }
 
-#[DateFormat('U')]
+#[Table(dateFormat: 'U')]
 class ModelWithDateFormatAttribute extends Model
 {
     //

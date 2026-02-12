@@ -16,12 +16,9 @@ use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Attributes\Boot;
 use Illuminate\Database\Eloquent\Attributes\Connection;
 use Illuminate\Database\Eloquent\Attributes\Initialize;
-use Illuminate\Database\Eloquent\Attributes\PrimaryKey;
 use Illuminate\Database\Eloquent\Attributes\Scope as LocalScope;
 use Illuminate\Database\Eloquent\Attributes\Table;
-use Illuminate\Database\Eloquent\Attributes\Timestamps;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
-use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
@@ -433,21 +430,21 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function initializeModelAttributes()
     {
-        $this->table ??= static::resolveClassAttribute(Table::class, 'name');
+        $table = static::resolveClassAttribute(Table::class);
+
+        $this->table ??= $table->name ?? null;
         $this->connection ??= static::resolveClassAttribute(Connection::class, 'name');
 
-        if ($this->primaryKey === 'id') {
-            if ($primaryKey = static::resolveClassAttribute(PrimaryKey::class)) {
-                $this->primaryKey = $primaryKey->name;
+        if ($this->primaryKey === 'id' && $table && $table->key !== null) {
+            $this->primaryKey = $table->key;
+        }
 
-                if ($this->keyType === 'int' && $primaryKey->type !== null) {
-                    $this->keyType = $primaryKey->type;
-                }
+        if ($this->keyType === 'int' && $table && $table->keyType !== null) {
+            $this->keyType = $table->keyType;
+        }
 
-                if ($this->incrementing === true && $primaryKey->incrementing !== null) {
-                    $this->incrementing = $primaryKey->incrementing;
-                }
-            }
+        if ($this->incrementing === true && $table && $table->incrementing !== null) {
+            $this->incrementing = $table->incrementing;
         }
     }
 
@@ -530,11 +527,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return true;
         }
 
-        if (static::resolveClassAttribute(WithoutTimestamps::class, null, $class) !== null) {
-            return true;
-        }
-
-        $timestamps = static::resolveClassAttribute(Timestamps::class, 'enabled', $class)
+        $timestamps = static::resolveClassAttribute(Table::class, 'timestamps', $class)
             ?? get_class_vars($class)['timestamps'];
 
         if (! $timestamps) {
