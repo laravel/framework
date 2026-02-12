@@ -94,7 +94,7 @@ trait Queueable
     /**
      * Set the desired connection for the job.
      *
-     * @param  \UnitEnum|string|null  $connection
+     * @param  \BackedEnum|\UnitEnum|string|null  $connection
      * @return $this
      */
     public function onConnection($connection)
@@ -107,7 +107,7 @@ trait Queueable
     /**
      * Set the desired queue for the job.
      *
-     * @param  \UnitEnum|string|null  $queue
+     * @param  \BackedEnum|\UnitEnum|string|null  $queue
      * @return $this
      */
     public function onQueue($queue)
@@ -122,7 +122,7 @@ trait Queueable
      *
      * This feature is only supported by some queues, such as Amazon SQS.
      *
-     * @param  \UnitEnum|string  $group
+     * @param  \BackedEnum|\UnitEnum|string  $group
      * @return $this
      */
     public function onGroup($group)
@@ -152,7 +152,7 @@ trait Queueable
     /**
      * Set the desired connection for the chain.
      *
-     * @param  \UnitEnum|string|null  $connection
+     * @param  \BackedEnum|\UnitEnum|string|null  $connection
      * @return $this
      */
     public function allOnConnection($connection)
