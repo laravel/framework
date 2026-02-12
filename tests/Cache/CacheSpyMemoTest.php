@@ -8,15 +8,12 @@ use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Facade;
-use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use Mockery\LegacyMockInterface;
 use PHPUnit\Framework\TestCase;
 
 class CacheSpyMemoTest extends TestCase
 {
-    use MockeryPHPUnitIntegration;
-
     protected function setUp(): void
     {
         parent::setUp();

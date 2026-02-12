@@ -517,6 +517,46 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Execute the callback if the data passes the validation rules.
+     *
+     * @template TWhenReturnType
+     *
+     * @param  (callable($this): TWhenReturnType)  $callback
+     * @param  (callable($this): TWhenReturnType)|null  $default
+     * @return $this|TWhenReturnType
+     */
+    public function whenPasses(callable $callback, ?callable $default = null)
+    {
+        if ($this->passes()) {
+            return $callback($this) ?? $this;
+        } elseif ($default) {
+            return $default($this) ?? $this;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Execute the callback if the data fails the validation rules.
+     *
+     * @template TWhenReturnType
+     *
+     * @param  (callable($this): TWhenReturnType)  $callback
+     * @param  (callable($this): TWhenReturnType)|null  $default
+     * @return $this|TWhenReturnType
+     */
+    public function whenFails(callable $callback, ?callable $default = null)
+    {
+        if ($this->fails()) {
+            return $callback($this) ?? $this;
+        } elseif ($default) {
+            return $default($this) ?? $this;
+        }
+
+        return $this;
+    }
+
+    /**
      * Determine if the attribute should be excluded.
      *
      * @param  string  $attribute
@@ -748,7 +788,7 @@ class Validator implements ValidatorContract
     protected function replaceDotInParameters(array $parameters)
     {
         return array_map(function ($field) {
-            return static::encodeAttributeWithPlaceholder($field);
+            return static::encodeAttributeWithPlaceholder((string) ($field ?? ''));
         }, $parameters);
     }
 

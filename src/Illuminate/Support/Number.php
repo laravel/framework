@@ -222,7 +222,7 @@ class Number
      * @param  int|float  $number
      * @param  int  $precision
      * @param  int|null  $maxPrecision
-     * @return bool|string
+     * @return string|false
      */
     public static function abbreviate(int|float $number, int $precision = 0, ?int $maxPrecision = null)
     {
@@ -312,7 +312,7 @@ class Number
      * @param  int|float  $by
      * @param  int|float  $start
      * @param  int|float  $offset
-     * @return array
+     * @return list<array{int|float, int|float}>
      */
     public static function pairs(int|float $to, int|float $by, int|float $start = 0, int|float $offset = 1)
     {

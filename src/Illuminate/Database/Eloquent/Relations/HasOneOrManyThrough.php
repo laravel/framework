@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Support\Arr;
 
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
@@ -177,17 +178,23 @@ abstract class HasOneOrManyThrough extends Relation
      * Build model dictionary keyed by the relation's foreign key.
      *
      * @param  \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>  $results
-     * @return array<array<TRelatedModel>>
+     * @return array<array<array-key, TRelatedModel>>
      */
     protected function buildDictionary(EloquentCollection $results)
     {
         $dictionary = [];
 
+        $isAssociative = Arr::isAssoc($results->all());
+
         // First we will create a dictionary of models keyed by the foreign key of the
         // relationship as this will allow us to quickly access all of the related
         // models without having to do nested looping which will be quite slow.
-        foreach ($results as $result) {
-            $dictionary[$result->laravel_through_key][] = $result;
+        foreach ($results as $key => $result) {
+            if ($isAssociative) {
+                $dictionary[$result->laravel_through_key][$key] = $result;
+            } else {
+                $dictionary[$result->laravel_through_key][] = $result;
+            }
         }
 
         return $dictionary;
@@ -213,29 +220,29 @@ abstract class HasOneOrManyThrough extends Relation
      * Get the first record matching the attributes. If the record is not found, create it.
      *
      * @param  array  $attributes
-     * @param  array  $values
+     * @param  (\Closure(): array)|array  $values
      * @return TRelatedModel
      */
-    public function firstOrCreate(array $attributes = [], array $values = [])
+    public function firstOrCreate(array $attributes = [], Closure|array $values = [])
     {
         if (! is_null($instance = (clone $this)->where($attributes)->first())) {
             return $instance;
         }
 
-        return $this->createOrFirst(array_merge($attributes, $values));
+        return $this->createOrFirst(array_merge($attributes, value($values)));
     }
 
     /**
      * Attempt to create the record. If a unique constraint violation occurs, attempt to find the matching record.
      *
      * @param  array  $attributes
-     * @param  array  $values
+     * @param  (\Closure(): array)|array  $values
      * @return TRelatedModel
      */
-    public function createOrFirst(array $attributes = [], array $values = [])
+    public function createOrFirst(array $attributes = [], Closure|array $values = [])
     {
         try {
-            return $this->getQuery()->withSavepointIfNeeded(fn () => $this->create(array_merge($attributes, $values)));
+            return $this->getQuery()->withSavepointIfNeeded(fn () => $this->create(array_merge($attributes, value($values))));
         } catch (UniqueConstraintViolationException $exception) {
             return $this->where($attributes)->first() ?? throw $exception;
         }

@@ -7,9 +7,12 @@ use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Conditionable;
+use Stringable;
 use TypeError;
 
-class Enum implements Rule, ValidatorAwareRule
+use function Illuminate\Support\enum_value;
+
+class Enum implements Rule, ValidatorAwareRule, Stringable
 {
     use Conditionable;
 
@@ -143,5 +146,25 @@ class Enum implements Rule, ValidatorAwareRule
         $this->validator = $validator;
 
         return $this;
+    }
+
+    /**
+     * Convert the rule to a validation string.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        $cases = ! empty($this->only)
+            ? $this->only
+            : array_filter($this->type::cases(), fn ($case) => ! in_array($case, $this->except, true));
+
+        $values = array_map(function ($case) {
+            $value = enum_value($case);
+
+            return '"'.str_replace('"', '""', (string) $value).'"';
+        }, $cases);
+
+        return 'in:'.implode(',', $values);
     }
 }

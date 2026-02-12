@@ -8,10 +8,13 @@ use Illuminate\Bus\Batchable;
 use Illuminate\Bus\BatchFactory;
 use Illuminate\Bus\DatabaseBatchRepository;
 use Illuminate\Bus\Dispatcher;
+use Illuminate\Bus\Events\BatchCanceled;
+use Illuminate\Bus\Events\BatchFinished;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Contracts\Queue\Factory;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Capsule\Manager as DB;
@@ -104,14 +107,14 @@ class BusBatchTest extends TestCase
 
     /**
      * Tear down the database schema.
-     *
-     * @return void
      */
     protected function tearDown(): void
     {
         if (Facade::getFacadeApplication()) {
             Facade::setFacadeApplication(null);
         }
+
+        Container::setInstance(null);
 
         unset($_SERVER['__finally.batch'], $_SERVER['__progress.batch'], $_SERVER['__then.batch'], $_SERVER['__catch.batch'], $_SERVER['__catch.exception']);
 
@@ -251,6 +254,33 @@ class BusBatchTest extends TestCase
         $this->assertEquals(1, $_SERVER['__finally.count']);
         $this->assertEquals(2, $_SERVER['__progress.count']);
         $this->assertEquals(1, $_SERVER['__then.count']);
+    }
+
+    public function test_batch_finished_event_is_dispatched()
+    {
+        Container::getInstance()->instance(EventDispatcher::class, $events = m::mock(EventDispatcher::class));
+
+        $queue = m::mock(Factory::class);
+        $batch = $this->createTestBatch($queue);
+
+        $job = new class
+        {
+            use Batchable;
+        };
+
+        $queue->shouldReceive('connection')->once()
+            ->with('test-connection')
+            ->andReturn($connection = m::mock(stdClass::class));
+
+        $connection->shouldReceive('bulk')->once();
+
+        $batch = $batch->add([$job]);
+
+        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) use ($batch) {
+            return $event instanceof BatchFinished && $event->batch === $batch;
+        }));
+
+        $batch->recordSuccessfulJob('test-id');
     }
 
     public function test_failed_jobs_can_be_recorded_while_not_allowing_failures()
@@ -425,6 +455,20 @@ class BusBatchTest extends TestCase
         $batch = $batch->fresh();
 
         $this->assertTrue($batch->cancelled());
+    }
+
+    public function test_batch_cancelled_event_is_dispatched()
+    {
+        Container::getInstance()->instance(EventDispatcher::class, $events = m::mock(EventDispatcher::class));
+
+        $queue = m::mock(Factory::class);
+        $batch = $this->createTestBatch($queue);
+
+        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) use ($batch) {
+            return $event instanceof BatchCanceled && $event->batch->id === $batch->id;
+        }));
+
+        $batch->cancel();
     }
 
     public function test_batch_can_be_deleted()
@@ -659,15 +703,15 @@ class BusBatchTest extends TestCase
 
 class ChainHeadJob implements ShouldQueue
 {
-    use Dispatchable, Queueable, Batchable;
+    use Batchable, Dispatchable, Queueable;
 }
 
 class SecondTestJob implements ShouldQueue
 {
-    use Dispatchable, Queueable, Batchable;
+    use Batchable, Dispatchable, Queueable;
 }
 
 class ThirdTestJob implements ShouldQueue
 {
-    use Dispatchable, Queueable, Batchable;
+    use Batchable, Dispatchable, Queueable;
 }

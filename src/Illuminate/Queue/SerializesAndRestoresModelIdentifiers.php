@@ -106,7 +106,7 @@ trait SerializesAndRestoresModelIdentifiers
     public function restoreModel($value)
     {
         return $this->getQueryForModelRestoration(
-            (new $value->class)->setConnection($value->connection), $value->id
+            (new ($value->getClass()))->setConnection($value->connection), $value->id
         )->useWritePdo()->firstOrFail()->loadMissing($value->relations ?? []);
     }
 

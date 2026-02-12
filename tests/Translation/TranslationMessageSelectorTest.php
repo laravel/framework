@@ -33,6 +33,7 @@ class TranslationMessageSelectorTest extends TestCase
             ['first', '{9}first|{10}second', 1],
             ['', '{0}|{1}second', 0],
             ['', '{0}first|{1}', 1],
+            ['second', '{1.3}first|{2.3}second', .3],
             ['first', '{1.3}first|{2.3}second', 1.3],
             ['second', '{1.3}first|{2.3}second', 2.3],
             ['first
@@ -57,12 +58,30 @@ class TranslationMessageSelectorTest extends TestCase
             ['second', '{0}first|[1,3]second|[4,*]third', 1],
             ['third', '{0}first|[1,3]second|[4,*]third', 9],
 
+            ['first', '[*,-1]first|{0}second|[1,*]third', -4],
+            ['first', '[*,-1] first|{0} second|[1,*] third', -4],
+            ['second', '[*,-1]first|{0}second|[1,*]third', 0],
+            ['second', '[*,-1] first|{0} second|[1,*] third', 0],
+            ['third', '[*,-1]first|{0}second|[1,*]third', 9],
+            ['first', '[-5,-1]first|{0}second|[1,*]third', -4],
+
             ['first', 'first|second|third', 1],
             ['second', 'first|second|third', 9],
             ['second', 'first|second|third', 0],
 
             ['first', '{0}  first | { 1 } second', 0],
             ['first', '[4,*]first | [1,3]second', 100],
+
+            ['[first](//example.com)', '[first](//example.com)|[second](//test.com)', 1],
+            ['[second](//test.com)', '[first](//example.com)|[second](//test.com)', 2],
+            ['[first](//example.com)', '{0}[first](//example.com)|{1}[second](//test.com)', 0],
+            ['[second](//test.com)', '{0}[first](//example.com)|{1}[second](//test.com)', 1],
+            ['[first](//example.com)', '{0}[first](//example.com)|[2,*][second](//test.com)', 0],
+            ['[first](//example.com)', '{0}[first](//example.com)|[2,*][second](//test.com)', 1],
+            ['[second](//test.com)', '{0}[first](//example.com)|[2,*][second](//test.com)', 10],
+            ['[first](//example.com)', '{0}[first](//example.com)|{2.3}[second](//test.com)', 0],
+            ['[first](//example.com)', '{0}[first](//example.com)|{2.3}[second](//test.com)', 1],
+            ['[second](//test.com)', '{0}[first](//example.com)|{2.3}[second](//test.com)', 2.3],
         ];
     }
 }
