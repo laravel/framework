@@ -10,9 +10,9 @@ class Backoff
     /**
      * Create a new attribute instance.
      *
-     * @param  array<int>  $backoff
+     * @param  array<int>|int  $backoff
      */
-    public function __construct(public array $backoff)
+    public function __construct(public array|int $backoff)
     {
         //
     }
