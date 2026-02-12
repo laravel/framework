@@ -2,7 +2,7 @@
 
 namespace Illuminate\Cache\Limiters;
 
-use Illuminate\Contracts\Cache\LimiterTimeoutException;
+use Illuminate\Cache\Limiters\LimiterTimeoutException;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Throwable;
@@ -61,7 +61,7 @@ class ConcurrencyLimiter
      * @param  int  $sleep
      * @return mixed
      *
-     * @throws \Illuminate\Contracts\Cache\LimiterTimeoutException
+     * @throws \Illuminate\Cache\Limiters\LimiterTimeoutException
      * @throws \Throwable
      */
     public function block($timeout, $callback = null, $sleep = 250)

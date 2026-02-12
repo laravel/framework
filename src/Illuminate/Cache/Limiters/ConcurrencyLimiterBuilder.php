@@ -2,7 +2,7 @@
 
 namespace Illuminate\Cache\Limiters;
 
-use Illuminate\Contracts\Cache\LimiterTimeoutException;
+use Illuminate\Cache\Limiters\LimiterTimeoutException;
 use Illuminate\Support\InteractsWithTime;
 
 class ConcurrencyLimiterBuilder
@@ -122,7 +122,7 @@ class ConcurrencyLimiterBuilder
      * @param  callable|null  $failure
      * @return mixed
      *
-     * @throws \Illuminate\Contracts\Cache\LimiterTimeoutException
+     * @throws \Illuminate\Cache\Limiters\LimiterTimeoutException
      */
     public function then(callable $callback, ?callable $failure = null)
     {

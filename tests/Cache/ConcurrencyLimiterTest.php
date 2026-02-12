@@ -6,7 +6,7 @@ use Error;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Limiters\ConcurrencyLimiter;
 use Illuminate\Cache\Repository;
-use Illuminate\Contracts\Cache\LimiterTimeoutException;
+use Illuminate\Cache\Limiters\LimiterTimeoutException;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 

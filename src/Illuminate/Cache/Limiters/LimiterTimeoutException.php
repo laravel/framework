@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Contracts\Cache;
+namespace Illuminate\Cache\Limiters;
 
 use Exception;
 
