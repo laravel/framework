@@ -1343,17 +1343,17 @@ class Arr
 
                 return (bool) $value;
             };
-        } elseif($filterAllOrCallback === false) {
+        } elseif ($filterAllOrCallback === false) {
             // Remove empty string, empty array and null
             $callback = fn ($value) => filled($value);
-        }else {
+        } else {
             // Default behavior: remove only null
             $callback = fn ($value) => $value !== null;
         }
 
         // Only filter out empty arrays for sub-arrays
         return array_filter($array, function ($value, $key) use ($callback) {
-            if(is_array($value) && count($value) > 0) {
+            if (is_array($value) && count($value) > 0) {
                 return true;
             }
 
