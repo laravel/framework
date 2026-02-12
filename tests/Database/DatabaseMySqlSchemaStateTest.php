@@ -21,9 +21,11 @@ class DatabaseMySqlSchemaStateTest extends TestCase
 
         $schemaState = new MySqlSchemaState($connection);
 
+        $versionInfo = ['version' => '8.0.0', 'isMariaDb' => false];
+
         // test connectionString
         $method = new ReflectionMethod(get_class($schemaState), 'connectionString');
-        $connString = $method->invoke($schemaState);
+        $connString = $method->invoke($schemaState, $versionInfo);
 
         self::assertEquals($expectedConnectionString, $connString);
 
@@ -96,25 +98,25 @@ class DatabaseMySqlSchemaStateTest extends TestCase
             ],
         ];
 
-        // yield 'no_ssl' => [
-        //     ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}" --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --ssl=off', [
-        //         'LARAVEL_LOAD_SOCKET' => '',
-        //         'LARAVEL_LOAD_HOST' => '',
-        //         'LARAVEL_LOAD_PORT' => '',
-        //         'LARAVEL_LOAD_USER' => 'root',
-        //         'LARAVEL_LOAD_PASSWORD' => '',
-        //         'LARAVEL_LOAD_DATABASE' => 'forge',
-        //         'LARAVEL_LOAD_SSL_CA' => '',
-        //         'LARAVEL_LOAD_SSL_CERT' => '',
-        //         'LARAVEL_LOAD_SSL_KEY' => '',
-        //     ], [
-        //         'username' => 'root',
-        //         'database' => 'forge',
-        //         'options' => [
-        //             \PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
-        //         ],
-        //     ],
-        // ];
+        yield 'no_ssl' => [
+            ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}" --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}" --ssl-mode=DISABLED', [
+                'LARAVEL_LOAD_SOCKET' => '',
+                'LARAVEL_LOAD_HOST' => '',
+                'LARAVEL_LOAD_PORT' => '',
+                'LARAVEL_LOAD_USER' => 'root',
+                'LARAVEL_LOAD_PASSWORD' => '',
+                'LARAVEL_LOAD_DATABASE' => 'forge',
+                'LARAVEL_LOAD_SSL_CA' => '',
+                'LARAVEL_LOAD_SSL_CERT' => '',
+                'LARAVEL_LOAD_SSL_KEY' => '',
+            ], [
+                'username' => 'root',
+                'database' => 'forge',
+                'options' => [
+                    PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT : \PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
+                ],
+            ],
+        ];
 
         yield 'unix socket' => [
             ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}" --socket="${:LARAVEL_LOAD_SOCKET}"', [
