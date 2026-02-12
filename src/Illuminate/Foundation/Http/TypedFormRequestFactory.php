@@ -31,7 +31,6 @@ use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionType;
 use ReflectionUnionType;
-use SplFileInfo;
 use stdClass;
 
 use function Illuminate\Support\enum_value;
@@ -648,7 +647,7 @@ class TypedFormRequestFactory
      */
     protected function isFile(string $name): bool
     {
-        return is_a($name, SplFileInfo::class, true);
+        return is_a($name, UploadedFile::class, true);
     }
 
     /**

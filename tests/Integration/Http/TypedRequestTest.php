@@ -14,6 +14,7 @@ use Illuminate\Foundation\Http\Attributes\StopOnFirstFailure;
 use Illuminate\Foundation\Http\Attributes\WithoutInferringRules;
 use Illuminate\Foundation\Http\TypedFormRequest;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -1436,6 +1437,103 @@ class TypedRequestTest extends TestCase
             $this->assertArrayNotHasKey('age', $e->errors());
         }
     }
+
+    public function testUploadedFileTypeAcceptsValidFile()
+    {
+        $file = UploadedFile::fake()->create('document.pdf', 100);
+
+        $request = Request::create('', 'POST', ['title' => 'My Doc'], files: ['attachment' => $file]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(FileUploadRequest::class);
+
+        $this->assertSame('My Doc', $actual->title);
+        $this->assertInstanceOf(UploadedFile::class, $actual->attachment);
+        $this->assertSame('document.pdf', $actual->attachment->getClientOriginalName());
+    }
+
+    public function testUploadedFileTypeRejectsNonFileInput()
+    {
+        $request = Request::create('', 'POST', [
+            'title' => 'My Doc',
+            'attachment' => 'not-a-file',
+        ]);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(FileUploadRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('attachment', $e->errors());
+        }
+    }
+
+    public function testUploadedFileTypeMissingRequiredFileFails()
+    {
+        $request = Request::create('', 'POST', ['title' => 'My Doc']);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(FileUploadRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('attachment', $e->errors());
+        }
+    }
+
+    public function testNullableUploadedFileAcceptsNull()
+    {
+        $request = Request::create('', 'POST', [
+            'title' => 'My Doc',
+            'attachment' => null,
+        ]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(NullableFileUploadRequest::class);
+
+        $this->assertInstanceOf(NullableFileUploadRequest::class, $actual);
+        $this->assertSame('My Doc', $actual->title);
+        $this->assertNull($actual->attachment);
+    }
+
+    public function testOptionalUploadedFileUsesDefaultWhenOmitted()
+    {
+        $request = Request::create('', 'POST', ['title' => 'My Doc']);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(NullableFileUploadRequest::class);
+
+        $this->assertInstanceOf(NullableFileUploadRequest::class, $actual);
+        $this->assertNull($actual->attachment);
+    }
+
+    public function testUploadedFileMapFromUseMappedFieldName()
+    {
+        $file = UploadedFile::fake()->create('photo.jpg', 200);
+
+        $request = Request::create('', 'POST', ['title' => 'My Photo'], files: ['user_avatar' => $file]);
+        $this->app->instance('request', $request);
+
+        $actual = $this->app->make(MappedFileUploadRequest::class);
+
+        $this->assertInstanceOf(MappedFileUploadRequest::class, $actual);
+        $this->assertInstanceOf(UploadedFile::class, $actual->avatar);
+        $this->assertSame('photo.jpg', $actual->avatar->getClientOriginalName());
+    }
+
+    public function testUploadedFileMapFromMissingFileUsesMappedValidationKey()
+    {
+        $request = Request::create('', 'POST', ['title' => 'My Photo']);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(MappedFileUploadRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('user_avatar', $e->errors());
+            $this->assertArrayNotHasKey('avatar', $e->errors());
+        }
+    }
 }
 
 class MyTypedForm extends TypedFormRequest
@@ -1989,6 +2087,34 @@ class StopOnFirstFailureRequest extends TypedFormRequest
     public function __construct(
         public string $name,
         public int $age,
+    ) {
+    }
+}
+
+class FileUploadRequest extends TypedFormRequest
+{
+    public function __construct(
+        public string $title,
+        public UploadedFile $attachment,
+    ) {
+    }
+}
+
+class NullableFileUploadRequest extends TypedFormRequest
+{
+    public function __construct(
+        public string $title,
+        public ?UploadedFile $attachment = null,
+    ) {
+    }
+}
+
+class MappedFileUploadRequest extends TypedFormRequest
+{
+    public function __construct(
+        public string $title,
+        #[MapFrom('user_avatar')]
+        public UploadedFile $avatar,
     ) {
     }
 }
