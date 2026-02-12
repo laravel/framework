@@ -1992,5 +1992,42 @@ class SupportArrTest extends TestCase
             'empty' => '',
             'emptyArr' => [],
         ], Arr::filterRecursive($falsyOnly, fn ($v, $k) => str_starts_with($k, 'e')));
+
+        // 7. Remove only blank values (false mode - filled)
+        $this->assertEquals([
+            'b' => false,
+            'c' => 0,
+            'f' => 'hello',
+            'nested' => [
+                'y' => 1,
+            ],
+        ], Arr::filterRecursive($array, false));
+
+        // 8. Deeply nested arrays should be fully removed when they become empty (true mode)
+        $deep = [
+            'level1' => [
+                'level2' => [
+                    'null' => null,
+                ],
+            ],
+        ];
+        $this->assertEquals([], Arr::filterRecursive($deep, true));
+
+        // 9. Numeric keys should be preserved (no reindexing) when filtering
+        $numeric = [
+            0 => null,
+            1 => 'a',
+            2 => '',
+            3 => 'b',
+        ];
+        $this->assertEquals([
+            1 => 'a',
+            3 => 'b',
+        ], Arr::filterRecursive($numeric, true));
+
+        // 10. Custom callback with single parameter (value only)
+        $this->assertEquals([
+            'c' => 0,
+        ], Arr::filterRecursive($array, fn ($v) => $v === 0));
     }
 }

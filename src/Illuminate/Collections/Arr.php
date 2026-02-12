@@ -1316,10 +1316,12 @@ class Arr
      * @template TKey of array-key
      * @template TValue
      *
-     * @param  bool|null|callable(TValue, TKey): bool  $filterAllOrCallback
-     *                                                                  - true: remove all falsy values (null, false, 0, '', [])
-     *                                                                  - false/null: remove only null
-     *                                                                  - callable: custom filter function
+     * @param  array<TKey, TValue>  $array
+     * @param  bool|callable(TValue, TKey): bool|null  $filterAllOrCallback
+     *                                                                       - null  : remove only null values (default behavior)
+     *                                                                       - true  : remove all falsy values (null, false, 0, '0', '', [])
+     *                                                                       - false : remove only "blank" values (null, '', [], etc.) using Laravel's filled() (keeps false and 0)
+     *                                                                       - callable(TValue, TKey): bool : custom filter callback
      * @return array<TKey, TValue>
      */
     public static function filterRecursive(array $array, $filterAllOrCallback = null): array
@@ -1341,11 +1343,21 @@ class Arr
 
                 return (bool) $value;
             };
-        } else {
+        } elseif($filterAllOrCallback === false) {
+            // Remove empty string, empty array and null
+            $callback = fn ($value) => filled($value);
+        }else {
             // Default behavior: remove only null
             $callback = fn ($value) => $value !== null;
         }
 
-        return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
+        // Only filter out empty arrays for sub-arrays
+        return array_filter($array, function ($value, $key) use ($callback) {
+            if(is_array($value) && count($value) > 0) {
+                return true;
+            }
+
+            return $callback($value, $key);
+        }, ARRAY_FILTER_USE_BOTH);
     }
 }
