@@ -3,7 +3,6 @@
 namespace Illuminate\Container\Attributes;
 
 use Attribute;
-use BackedEnum;
 use InvalidArgumentException;
 use UnitEnum;
 
