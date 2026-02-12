@@ -1316,7 +1316,7 @@ class Arr
      * @template TKey of array-key
      * @template TValue
      *
-     * @param  bool|callable(TValue, TKey): bool  $filterAllOrCallback
+     * @param  bool|null|callable(TValue, TKey): bool  $filterAllOrCallback
      *                                                                  - true: remove all falsy values (null, false, 0, '', [])
      *                                                                  - false/null: remove only null
      *                                                                  - callable: custom filter function
