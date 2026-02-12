@@ -1739,6 +1739,86 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add index `custom_idx` using btree(`name`), lock=none', $statements[0]);
     }
 
+    public function testAddingFullTextIndexWithUseAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->fullText(['title', 'description'])->useAlgorithm('copy');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add fulltext `users_title_description_fulltext`(`title`, `description`), algorithm=copy', $statements[0]);
+    }
+
+    public function testAddingFullTextIndexWithUseAlgorithmAndLock()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->fullText('body')->useAlgorithm('copy')->lock('none');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add fulltext `users_body_fulltext`(`body`), algorithm=copy, lock=none', $statements[0]);
+    }
+
+    public function testAddingIndexWithUseAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->index('name')->useAlgorithm('inplace');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add index `users_name_index`(`name`), algorithm=inplace', $statements[0]);
+    }
+
+    public function testAddingIndexWithAlgorithmAndUseAlgorithmAndLock()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->index('email', 'idx', 'hash')->useAlgorithm('inplace')->lock('none');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add index `idx` using hash(`email`), algorithm=inplace, lock=none', $statements[0]);
+    }
+
+    public function testAddingUniqueIndexWithUseAlgorithmAndLock()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('email')->useAlgorithm('inplace')->lock('shared');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add unique `users_email_unique`(`email`), algorithm=inplace, lock=shared', $statements[0]);
+    }
+
+    public function testAddingPrimaryKeyWithUseAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->primary('id')->useAlgorithm('inplace');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add primary key (`id`), algorithm=inplace', $statements[0]);
+    }
+
+    public function testAddingPrimaryKeyWithAlgorithmAndUseAlgorithmAndLock()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->primary('id', 'pk', 'hash')->useAlgorithm('copy')->lock('exclusive');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add primary key using hash(`id`), algorithm=copy, lock=exclusive', $statements[0]);
+    }
+
+    public function testAddingSpatialIndexWithUseAlgorithmAndLock()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->spatialIndex('location')->useAlgorithm('copy')->lock('shared');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add spatial index `users_location_spatialindex`(`location`), algorithm=copy, lock=shared', $statements[0]);
+    }
+
     public function getGrammar(?Connection $connection = null)
     {
         return new MySqlGrammar($connection ?? $this->getConnection());

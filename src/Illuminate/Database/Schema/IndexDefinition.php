@@ -12,6 +12,7 @@ use Illuminate\Support\Fluent;
  * @method $this lock(('none'|'shared'|'default'|'exclusive') $value) Specify the DDL lock mode for the index operation (MySQL)
  * @method $this nullsNotDistinct(bool $value = true) Specify that the null values should not be treated as distinct (PostgreSQL)
  * @method $this online(bool $value = true) Specify that index creation should not lock the table (PostgreSQL/SqlServer)
+ * @method $this useAlgorithm(('inplace'|'copy'|'instant'|'default') $value) Specify the DDL algorithm for the index operation (MySQL)
  */
 class IndexDefinition extends Fluent
 {
