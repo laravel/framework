@@ -2,7 +2,6 @@
 
 namespace Illuminate\Cache\Limiters;
 
-use Illuminate\Cache\Limiters\LimiterTimeoutException;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Throwable;

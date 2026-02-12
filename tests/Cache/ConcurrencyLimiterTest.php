@@ -5,8 +5,8 @@ namespace Illuminate\Tests\Cache;
 use Error;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Limiters\ConcurrencyLimiter;
-use Illuminate\Cache\Repository;
 use Illuminate\Cache\Limiters\LimiterTimeoutException;
+use Illuminate\Cache\Repository;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
