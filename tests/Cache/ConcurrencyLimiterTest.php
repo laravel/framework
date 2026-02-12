@@ -195,7 +195,6 @@ class ConcurrencyLimiterTest extends TestCase
 
         $this->assertEquals([1, 2, 'failed'], $store);
     }
-
 }
 
 class ConcurrencyLimiterMockThatDoesntRelease extends ConcurrencyLimiter
