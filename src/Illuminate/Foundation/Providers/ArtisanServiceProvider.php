@@ -61,6 +61,7 @@ use Illuminate\Foundation\Console\JobMiddlewareMakeCommand;
 use Illuminate\Foundation\Console\KeyGenerateCommand;
 use Illuminate\Foundation\Console\LangPublishCommand;
 use Illuminate\Foundation\Console\ListenerMakeCommand;
+use Illuminate\Foundation\Console\LogRotateCommand;
 use Illuminate\Foundation\Console\MailMakeCommand;
 use Illuminate\Foundation\Console\ModelMakeCommand;
 use Illuminate\Foundation\Console\NotificationMakeCommand;
@@ -143,6 +144,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'EventList' => EventListCommand::class,
         'InvokeSerializedClosure' => InvokeSerializedClosureCommand::class,
         'KeyGenerate' => KeyGenerateCommand::class,
+        'LogRotate' => LogRotateCommand::class,
         'Optimize' => OptimizeCommand::class,
         'OptimizeClear' => OptimizeClearCommand::class,
         'PackageDiscover' => PackageDiscoverCommand::class,
@@ -548,6 +550,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton(ListenerMakeCommand::class, function ($app) {
             return new ListenerMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerLogRotateCommand()
+    {
+        $this->app->singleton(LogRotateCommand::class, function ($app) {
+            return new LogRotateCommand($app['files']);
         });
     }
 
