@@ -194,7 +194,7 @@ class Envelope
     }
 
     /**
-     * Set the subject of the message.
+     * Set the "subject" of the message.
      *
      * @param  string  $subject
      * @return $this
@@ -233,7 +233,7 @@ class Envelope
     }
 
     /**
-     * Add metadata to the message.
+     * Add "metadata" to the message.
      *
      * @param  string  $key
      * @param  string|int  $value
@@ -260,7 +260,7 @@ class Envelope
     }
 
     /**
-     * Determine if the message is from the given address.
+     * Determine if the message "is from" the given address.
      *
      * @param  string  $address
      * @param  string|null  $name
