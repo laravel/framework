@@ -11,7 +11,7 @@ class ConcurrencyLimiterBuilder
     /**
      * The cache repository or Redis connection.
      *
-     * @var mixed
+     * @var \Illuminate\Cache\Repository
      */
     public $connection;
 

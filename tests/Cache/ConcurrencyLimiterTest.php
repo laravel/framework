@@ -157,15 +157,79 @@ class ConcurrencyLimiterTest extends TestCase
     {
         $store = [];
 
-        $this->repository->funnel('test-funnel')
+        $result = $this->repository->funnel('test-funnel')
             ->limit(2)
             ->releaseAfter(5)
             ->block(2)
             ->then(function () use (&$store) {
                 $store[] = 1;
+
+                return 'ok';
             });
 
         $this->assertEquals([1], $store);
+        $this->assertSame('ok', $result);
+    }
+
+    public function testFunnelMethodAcceptsBackedEnum()
+    {
+        $store = [];
+
+        $result = $this->repository->funnel(ConcurrencyLimiterBackedEnum::TestFunnel)
+            ->limit(2)
+            ->releaseAfter(5)
+            ->block(2)
+            ->then(function () use (&$store) {
+                $store[] = 1;
+
+                return 'ok';
+            });
+
+        $this->assertEquals([1], $store);
+        $this->assertSame('ok', $result);
+    }
+
+    public function testFunnelMethodAcceptsUnitEnum()
+    {
+        $store = [];
+
+        $result = $this->repository->funnel(ConcurrencyLimiterUnitEnum::TestFunnel)
+            ->limit(2)
+            ->releaseAfter(5)
+            ->block(2)
+            ->then(function () use (&$store) {
+                $store[] = 1;
+
+                return 'ok';
+            });
+
+        $this->assertEquals([1], $store);
+        $this->assertSame('ok', $result);
+    }
+
+    public function testFunnelBackedEnumSharesKeyWithStringEquivalent()
+    {
+        // Fill all slots using the backed enum's string value
+        foreach (range(1, 2) as $i) {
+            (new ConcurrencyLimiterMockThatDoesntRelease($this->repository->getStore(), 'test-funnel', 2, 5))->block(2, function () {
+            });
+        }
+
+        // Try to acquire via the BackedEnum — should conflict with the string key
+        $result = $this->repository->funnel(ConcurrencyLimiterBackedEnum::TestFunnel)
+            ->limit(2)
+            ->releaseAfter(5)
+            ->block(0)
+            ->then(
+                function () {
+                    return 'success';
+                },
+                function () {
+                    return 'failed';
+                }
+            );
+
+        $this->assertSame('failed', $result);
     }
 
     public function testFunnelWithFailureCallback()
@@ -180,7 +244,7 @@ class ConcurrencyLimiterTest extends TestCase
         }
 
         // Try to acquire when all slots are full
-        $this->repository->funnel('funnel-key')
+        $result = $this->repository->funnel('funnel-key')
             ->limit(2)
             ->releaseAfter(5)
             ->block(0)
@@ -188,12 +252,16 @@ class ConcurrencyLimiterTest extends TestCase
                 function () use (&$store) {
                     $store[] = 'success';
                 },
-                function () use (&$store) {
+                function ($e) use (&$store) {
+                    $this->assertInstanceOf(LimiterTimeoutException::class, $e);
                     $store[] = 'failed';
+
+                    return 'failure-result';
                 }
             );
 
         $this->assertEquals([1, 2, 'failed'], $store);
+        $this->assertSame('failure-result', $result);
     }
 }
 
@@ -203,4 +271,14 @@ class ConcurrencyLimiterMockThatDoesntRelease extends ConcurrencyLimiter
     {
         //
     }
+}
+
+enum ConcurrencyLimiterBackedEnum: string
+{
+    case TestFunnel = 'test-funnel';
+}
+
+enum ConcurrencyLimiterUnitEnum
+{
+    case TestFunnel;
 }
