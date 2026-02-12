@@ -18,6 +18,7 @@ use Illuminate\Foundation\Http\Attributes\StopOnFirstFailure;
 use Illuminate\Foundation\Http\Attributes\WithoutInferringRules;
 use Illuminate\Foundation\Precognition;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
@@ -30,6 +31,7 @@ use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionType;
 use ReflectionUnionType;
+use SplFileInfo;
 use stdClass;
 
 use function Illuminate\Support\enum_value;
@@ -624,6 +626,10 @@ class TypedFormRequestFactory
             return 'array';
         }
 
+        if ($this->isFile($name)) {
+            return 'file';
+        }
+
         return null;
     }
 
@@ -635,6 +641,14 @@ class TypedFormRequestFactory
     protected function isDateObjectType(string $name): bool
     {
         return is_a($name, DateTimeInterface::class, true);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isFile(string $name): bool
+    {
+        return is_a($name, SplFileInfo::class, true);
     }
 
     /**
