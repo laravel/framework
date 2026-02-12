@@ -252,7 +252,7 @@ trait InteractsWithIO
      * @template TValue
      *
      * @param  iterable<TKey, TValue>|int  $totalSteps
-     * @param  \Closure(\Symfony\Component\Console\Helper\ProgressBar|TValue, \Symfony\Component\Console\Helper\ProgressBar|null, TKey|null): (mixed|void)  $callback
+     * @param  \Closure(\Symfony\Component\Console\Helper\ProgressBar): (mixed|void)|\Closure(TValue, \Symfony\Component\Console\Helper\ProgressBar, TKey): (mixed|void)  $callback
      * @return mixed|void
      */
     public function withProgressBar($totalSteps, Closure $callback)
