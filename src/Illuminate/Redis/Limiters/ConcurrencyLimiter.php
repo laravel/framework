@@ -4,9 +4,6 @@ namespace Illuminate\Redis\Limiters;
 
 use Illuminate\Cache\Limiters\ConcurrencyLimiter as BaseConcurrencyLimiter;
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
-use Illuminate\Support\Sleep;
-use Illuminate\Support\Str;
-use Throwable;
 
 class ConcurrencyLimiter extends BaseConcurrencyLimiter
 {
@@ -34,43 +31,13 @@ class ConcurrencyLimiter extends BaseConcurrencyLimiter
     }
 
     /**
-     * Attempt to acquire the lock for the given number of seconds.
+     * Create a new limiter timeout exception.
      *
-     * @param  int  $timeout
-     * @param  callable|null  $callback
-     * @param  int  $sleep
-     * @return mixed
-     *
-     * @throws \Illuminate\Contracts\Redis\LimiterTimeoutException
-     * @throws \Throwable
+     * @return \Illuminate\Contracts\Redis\LimiterTimeoutException
      */
-    public function block($timeout, $callback = null, $sleep = 250)
+    protected function newTimeoutException()
     {
-        $starting = time();
-
-        $id = Str::random(20);
-
-        while (! $slot = $this->acquire($id)) {
-            if (time() - $timeout >= $starting) {
-                throw new LimiterTimeoutException;
-            }
-
-            Sleep::usleep($sleep * 1000);
-        }
-
-        if (is_callable($callback)) {
-            try {
-                return tap($callback(), function () use ($slot, $id) {
-                    $this->release($slot, $id);
-                });
-            } catch (Throwable $exception) {
-                $this->release($slot, $id);
-
-                throw $exception;
-            }
-        }
-
-        return true;
+        return new LimiterTimeoutException;
     }
 
     /**

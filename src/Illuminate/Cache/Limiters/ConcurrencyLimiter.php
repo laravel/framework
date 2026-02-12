@@ -72,7 +72,7 @@ class ConcurrencyLimiter
 
         while (! $slot = $this->acquire($id)) {
             if (time() - $timeout >= $starting) {
-                throw new LimiterTimeoutException;
+                throw $this->newTimeoutException();
             }
 
             Sleep::usleep($sleep * 1000);
@@ -122,5 +122,15 @@ class ConcurrencyLimiter
     protected function release($lock, $id)
     {
         $lock->release();
+    }
+
+    /**
+     * Create a new limiter timeout exception.
+     *
+     * @return \Illuminate\Cache\Limiters\LimiterTimeoutException
+     */
+    protected function newTimeoutException()
+    {
+        return new LimiterTimeoutException;
     }
 }
