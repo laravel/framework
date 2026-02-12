@@ -1982,4 +1982,28 @@ class SupportStrTest extends TestCase
 
         $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', $countable));
     }
+
+    public function testIsEmailValidates()
+    {
+        // Valid emails
+        $this->assertTrue(Str::isEmail('taylorotwell@example.com'));
+        $this->assertTrue(Str::isEmail('ali7.khosrojerdi@gmail.com'));
+        $this->assertTrue(Str::isEmail('user+tag@example.co.uk'));
+        $this->assertTrue(Str::isEmail('user_name@example-domain.com'));
+        $this->assertTrue(Str::isEmail('123@example.com'));
+        $this->assertTrue(Str::isEmail('user@subdomain.example.com'));
+
+        // Invalid emails
+        $this->assertFalse(Str::isEmail('invalid.email'));
+        $this->assertFalse(Str::isEmail('@example.com'));
+        $this->assertFalse(Str::isEmail('user@'));
+        $this->assertFalse(Str::isEmail('user @example.com'));
+        $this->assertFalse(Str::isEmail('user@example'));
+        $this->assertFalse(Str::isEmail(''));
+        $this->assertFalse(Str::isEmail(null));
+        $this->assertFalse(Str::isEmail('user@@example.com'));
+        $this->assertFalse(Str::isEmail('user@.com'));
+        $this->assertFalse(Str::isEmail(123));
+        $this->assertFalse(Str::isEmail([]));
+    }
 }
