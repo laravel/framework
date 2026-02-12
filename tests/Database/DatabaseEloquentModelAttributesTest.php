@@ -150,12 +150,26 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertSame(['id', 'secret'], $model->getGuarded());
     }
 
+    public function test_guarded_property_takes_precedence(): void
+    {
+        $model = new ModelWithGuardedAttributeAndProperty;
+
+        $this->assertSame(['token'], $model->getGuarded());
+    }
+
     public function test_unguarded_attribute(): void
     {
         $model = new ModelWithUnguardedAttribute;
 
         $this->assertSame([], $model->getGuarded());
         $this->assertFalse($model->isGuarded('anything'));
+    }
+
+    public function test_guarded_attribute_is_inherited(): void
+    {
+        $model = new ModelExtendingGuardedParent;
+
+        $this->assertSame(['id', 'secret'], $model->getGuarded());
     }
 
     public function test_hidden_attribute(): void
@@ -324,6 +338,23 @@ class ModelWithFillableAttributeAndProperty extends Model
 
 #[Guarded(['id', 'secret'])]
 class ModelWithGuardedAttribute extends Model
+{
+    //
+}
+
+#[Guarded(['id', 'secret'])]
+class ModelWithGuardedAttributeAndProperty extends Model
+{
+    protected $guarded = ['token'];
+}
+
+#[Guarded(['id', 'secret'])]
+class GuardedBaseModel extends Model
+{
+    //
+}
+
+class ModelExtendingGuardedParent extends GuardedBaseModel
 {
     //
 }
