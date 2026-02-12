@@ -16,6 +16,8 @@ class RedisCacheFunnelTest extends CacheFunnelTestCase
 
         $this->setUpRedis();
 
+        Cache::purge('redis');
+
         $this->releaseFunnelLocks();
     }
 
