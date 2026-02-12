@@ -627,7 +627,7 @@ class Vite implements Htmlable
             (new Collection($attributes))->forget('href')->all()
         );
 
-        return '<link '.implode(' ', $this->parseAttributes($attributes)).' />';
+        return '<link '.implode(' ', $this->parseAttributes($attributes)).'>';
     }
 
     /**
@@ -790,7 +790,7 @@ class Vite implements Htmlable
             'nonce' => $this->nonce ?? false,
         ], $attributes));
 
-        return '<link '.implode(' ', $attributes).' />';
+        return '<link '.implode(' ', $attributes).'>';
     }
 
     /**
