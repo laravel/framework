@@ -31,8 +31,8 @@
                 {{-- Exception content --}}
                 <div
                     x-data="{ expanded: false }"
-                    class="group/exception flex-1 min-w-0 rounded-lg"
-                    :class="{ 'bg-white/50 dark:bg-white/2 dark:border dark:border-white/5': expanded }"
+                    class="group/exception flex-1 min-w-0 rounded-lg hover:border hover:border-neutral-200"
+                    :class="{ 'border border-neutral-200 bg-white/50 dark:bg-white/2 dark:border-white/5': expanded }"
                 >
                     {{-- Header + Message --}}
                     <div
