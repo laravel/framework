@@ -17,15 +17,15 @@
             >
                 {{-- Line from top of item to above dot (connects from previous item) --}}
                 @if ($index > 0)
-                    <div class="absolute -left-[15px] top-0 h-[14px] w-px border-l border-dashed border-neutral-300 dark:border-neutral-600"></div>
+                    <div class="absolute -left-[15px] top-0 h-[14px] w-px border-l border-dashed border-emerald-900"></div>
                 @endif
 
                 {{-- Dot --}}
-                <div class="absolute -left-[19px] top-[14px] size-[9px] rounded-full bg-blue-500 dark:bg-emerald-500"></div>
+                <div class="absolute -left-[19px] top-[14px] size-[9px] rounded-full bg-emerald-800"></div>
 
                 {{-- Line from below dot to bottom of item (connects to next item) --}}
                 @if ($index < $exception->previousExceptions()->count() - 1)
-                    <div class="absolute -left-[15px] top-[23px] bottom-0 w-px border-l border-dashed border-neutral-300 dark:border-neutral-600"></div>
+                    <div class="absolute -left-[15px] top-[23px] bottom-0 w-px border-l border-dashed border-emerald-900"></div>
                 @endif
 
                 {{-- Header + Message --}}
