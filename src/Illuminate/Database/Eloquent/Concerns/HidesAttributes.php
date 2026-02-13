@@ -2,6 +2,10 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\Initialize;
+use Illuminate\Database\Eloquent\Attributes\Visible;
+
 trait HidesAttributes
 {
     /**
@@ -17,6 +21,23 @@ trait HidesAttributes
      * @var array<string>
      */
     protected $visible = [];
+
+    /**
+     * Initialize the HidesAttributes trait.
+     *
+     * @return void
+     */
+    #[Initialize]
+    public function initializeHidesAttributes()
+    {
+        if (empty($this->hidden)) {
+            $this->hidden = static::resolveClassAttribute(Hidden::class, 'columns') ?? [];
+        }
+
+        if (empty($this->visible)) {
+            $this->visible = static::resolveClassAttribute(Visible::class, 'columns') ?? [];
+        }
+    }
 
     /**
      * Get the hidden attributes for the model.

@@ -18,6 +18,9 @@ use Illuminate\Contracts\Broadcasting\ShouldRescue;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcherContract;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Foundation\CachesRoutes;
+use Illuminate\Queue\Attributes\Connection as ConnectionAttribute;
+use Illuminate\Queue\Attributes\Queue as QueueAttribute;
+use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -30,7 +33,7 @@ use Throwable;
  */
 class BroadcastManager implements FactoryContract
 {
-    use ResolvesQueueRoutes;
+    use ReadsQueueAttributes, ResolvesQueueRoutes;
 
     /**
      * The application instance.
@@ -203,7 +206,9 @@ class BroadcastManager implements FactoryContract
         }
 
         if (is_null($queue)) {
-            $queue = $this->resolveQueueFromQueueRoute($event) ?? null;
+            $queue = $this->getAttributeValue($event, QueueAttribute::class, 'queue')
+                ?? $this->resolveQueueFromQueueRoute($event)
+                ?? null;
         }
 
         $broadcastEvent = new BroadcastEvent(clone $event);
@@ -219,6 +224,7 @@ class BroadcastManager implements FactoryContract
         $push = fn () => $this->app->make('queue')
             ->connection(
                 $event->connection
+                    ?? $this->getAttributeValue($event, ConnectionAttribute::class, 'connection')
                     ?? $this->resolveConnectionFromQueueRoute($event)
                     ?? null
             )

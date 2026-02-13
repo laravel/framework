@@ -8,9 +8,13 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\Attributes\RedirectTo;
+use Illuminate\Foundation\Http\Attributes\RedirectToRoute;
+use Illuminate\Foundation\Http\Attributes\StopOnFirstFailure;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
+use ReflectionClass;
 
 class FormRequest extends Request implements ValidatesWhenResolved
 {
@@ -83,6 +87,8 @@ class FormRequest extends Request implements ValidatesWhenResolved
             return $this->validator;
         }
 
+        $this->configureFromAttributes();
+
         $factory = $this->container->make(ValidationFactory::class);
 
         if (method_exists($this, 'validator')) {
@@ -105,6 +111,32 @@ class FormRequest extends Request implements ValidatesWhenResolved
         $this->setValidator($validator);
 
         return $this->validator;
+    }
+
+    /**
+     * Configure the form request from class attributes.
+     *
+     * @return void
+     */
+    protected function configureFromAttributes()
+    {
+        $reflection = new ReflectionClass($this);
+
+        if (count($reflection->getAttributes(StopOnFirstFailure::class)) > 0) {
+            $this->stopOnFirstFailure = true;
+        }
+
+        $redirectTo = $reflection->getAttributes(RedirectTo::class);
+
+        if (count($redirectTo) > 0) {
+            $this->redirect = $redirectTo[0]->newInstance()->url;
+        }
+
+        $redirectToRoute = $reflection->getAttributes(RedirectToRoute::class);
+
+        if (count($redirectToRoute) > 0) {
+            $this->redirectRoute = $redirectToRoute[0]->newInstance()->route;
+        }
     }
 
     /**

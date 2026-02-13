@@ -9,6 +9,9 @@ use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Queue\Attributes\Connection;
+use Illuminate\Queue\Attributes\Queue as QueueAttribute;
+use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Support\Collection;
@@ -17,7 +20,7 @@ use RuntimeException;
 
 class Dispatcher implements QueueingDispatcher
 {
-    use ResolvesQueueRoutes;
+    use ReadsQueueAttributes, ResolvesQueueRoutes;
 
     /**
      * The container implementation.
@@ -218,7 +221,7 @@ class Dispatcher implements QueueingDispatcher
      */
     public function dispatchToQueue($command)
     {
-        $connection = $command->connection
+        $connection = $this->getAttributeValue($command, Connection::class, 'connection')
             ?? $this->resolveConnectionFromQueueRoute($command)
             ?? null;
 
@@ -244,7 +247,9 @@ class Dispatcher implements QueueingDispatcher
      */
     protected function pushCommandToQueue($queue, $command)
     {
-        $queueName = $command->queue ?? $this->resolveQueueFromQueueRoute($command) ?? null;
+        $queueName = $this->getAttributeValue($command, QueueAttribute::class, 'queue')
+            ?? $this->resolveQueueFromQueueRoute($command)
+            ?? null;
 
         if (isset($command->delay)) {
             return $queue->later($command->delay, $command, queue: $queueName);
