@@ -15,9 +15,9 @@
                 @if ($exception->previousExceptions()->count() > 1)
                     <div class="flex flex-col items-center w-6 flex-shrink-0 self-stretch">
                         @if ($index > 0)
-                            <div class="h-[17.5px] w-px border-l border-dashed border-emerald-900"></div>
+                            <div class="h-[23.5px] w-px border-l border-dashed border-emerald-900"></div>
                         @else
-                            <div class="h-[17.5px]"></div>
+                            <div class="h-[23.5px]"></div>
                         @endif
 
                         <div class="size-[9px] flex-shrink-0 rounded-full bg-emerald-800"></div>
@@ -33,7 +33,7 @@
                 {{-- Exception content --}}
                 <div
                     x-data="{ expanded: false }"
-                    class="group/exception flex-1 min-w-0 rounded-lg"
+                    class="group/exception flex-1 min-w-0 rounded-lg my-1.5"
                     :class="{
                         'border border-neutral-200 bg-white/50 dark:bg-white/2 dark:border-white/5': expanded,
                         @if ($exception->previousExceptions()->count() === 1)
