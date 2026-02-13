@@ -11,18 +11,20 @@ Laravel {{ app()->version() }}
 @foreach($exception->frames() as $index => $frame)
 {{ $index }} - {{ $frame->file() }}:{{ $frame->line() }}
 @endforeach
-@foreach ($exception->previousExceptions() as $previous)
+@if ($exception->previousExceptions()->isNotEmpty())
 
-## Caused by: {{ $previous->class() }}
+## Previous Exceptions
+
+@foreach ($exception->previousExceptions() as $previous)
+### {{ $loop->iteration }}. {{ $previous->class() }}
 
 {!! $previous->message() !!}
-
-### Stack Trace
 
 @foreach($previous->frames() as $index => $frame)
 {{ $index }} - {{ $frame->file() }}:{{ $frame->line() }}
 @endforeach
 @endforeach
+@endif
 
 ## Request
 
