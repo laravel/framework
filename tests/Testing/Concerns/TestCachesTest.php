@@ -110,6 +110,7 @@ class TestCachesTest extends TestCase
 
         $this->assertCount(1, $setUpCallbacks);
     }
+
     public function testBootTestCacheSkipsIsolationIfOptedOut()
     {
         Container::getInstance()->make(ParallelTesting::class)->resolveTokenUsing(fn () => '7');
