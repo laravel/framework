@@ -1089,10 +1089,10 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * Report the exception.
      *
-     * @param  Throwable  $exception
+     * @param  \Throwable  $exception
      * @return void
      *
-     * @throws Throwable
+     * @throws \Throwable
      */
     protected function report($exception)
     {
