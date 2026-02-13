@@ -61,7 +61,7 @@
                         </div>
                         <button
                             type="button"
-                            class="flex h-6 w-6 flex-shrink-0 cursor-pointer items-center justify-center rounded-md dark:border dark:border-white/8 group-hover/exception:text-blue-500 group-hover/exception:dark:text-emerald-500"
+                            class="flex h-6 w-6 flex-shrink-0 cursor-pointer items-center justify-center rounded-md border border-neutral-200 dark:border-white/8 group-hover/exception:text-blue-500 group-hover/exception:dark:text-emerald-500"
                             :class="{
                                 'text-blue-500 dark:text-emerald-500 dark:bg-white/5': expanded,
                                 'text-neutral-500 dark:text-neutral-500 dark:bg-white/3': !expanded,
