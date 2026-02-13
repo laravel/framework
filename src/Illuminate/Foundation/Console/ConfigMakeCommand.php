@@ -44,16 +44,18 @@ class ConfigMakeCommand extends GeneratorCommand
      * Get the destination file path.
      *
      * @param  string  $name
+     * @return string
      */
-    protected function getPath($name): string
+    protected function getPath($name)
     {
         return config_path(Str::finish($this->argument('name'), '.php'));
     }
 
     /**
      * Get the stub file for the generator.
+     * @return string
      */
-    protected function getStub(): string
+    protected function getStub()
     {
         $relativePath = join_paths('stubs', 'config.stub');
 
@@ -64,8 +66,9 @@ class ConfigMakeCommand extends GeneratorCommand
 
     /**
      * Get the console command arguments.
+     * @return array
      */
-    protected function getOptions(): array
+    protected function getOptions()
     {
         return [
             ['force', 'f', InputOption::VALUE_NONE, 'Create the configuration file even if it already exists'],
