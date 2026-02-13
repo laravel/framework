@@ -103,7 +103,7 @@ class EncryptCookies
      * Validate and remove the cookie value prefix from the value.
      *
      * @param  string  $key
-     * @param  string  $value
+     * @param  string|array  $value
      * @return string|array|null
      */
     protected function validateValue(string $key, $value)
