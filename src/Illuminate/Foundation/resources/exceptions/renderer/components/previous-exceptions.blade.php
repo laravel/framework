@@ -47,10 +47,10 @@
                             class="flex-1 min-w-0"
                             :class="expanded ? 'flex flex-col' : 'flex items-baseline gap-2'"
                         >
-                            <h4 class="font-mono text-sm font-medium text-neutral-900 dark:text-white flex-shrink-0">{{ $previous->class() }}</h4>
+                            <h4 class="font-mono text-sm font-medium text-neutral-900 dark:text-white flex-shrink-0 max-w-full truncate">{{ $previous->class() }}</h4>
                             <p
                                 class="text-sm text-neutral-500 dark:text-neutral-400"
-                                :class="expanded ? 'mt-1' : 'truncate'"
+                                :class="expanded ? 'mt-1 break-words' : 'truncate'"
                             >{{ $previous->message() }}</p>
                         </div>
                         <button
