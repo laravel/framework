@@ -453,7 +453,7 @@ abstract class Factory
      * @param  iterable<int, array<string, mixed>>|int|null  $records
      * @return \Illuminate\Database\Eloquent\Collection<int, TModel>
      */
-    public function makeMany(int|iterable|null $records = null)
+    public function makeMany(iterable|int|null $records = null)
     {
         $records ??= ($this->count ?? 1);
 
