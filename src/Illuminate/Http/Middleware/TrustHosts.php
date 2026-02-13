@@ -4,6 +4,7 @@ namespace Illuminate\Http\Middleware;
 
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
+use Uri\Rfc3986\Uri;
 
 class TrustHosts
 {
@@ -109,7 +110,7 @@ class TrustHosts
      */
     protected function allSubdomainsOfApplicationUrl()
     {
-        if ($host = parse_url($this->app['config']->get('app.url'), PHP_URL_HOST)) {
+        if ($host = Uri::parse($this->app['config']->get('app.url'))?->getHost()) {
             return '^(.+\.)?'.preg_quote($host).'$';
         }
     }

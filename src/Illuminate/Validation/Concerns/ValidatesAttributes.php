@@ -28,6 +28,7 @@ use Illuminate\Validation\ValidationData;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Uri\Rfc3986\Uri;
 use ValueError;
 
 trait ValidatesAttributes
@@ -123,7 +124,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        if ($url = parse_url($value, PHP_URL_HOST)) {
+        if ($url = Uri::parse($value)?->getHost()) {
             try {
                 $records = $this->getDnsRecords($url.'.', DNS_A | DNS_AAAA);
 
