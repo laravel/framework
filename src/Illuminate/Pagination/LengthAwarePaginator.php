@@ -47,9 +47,15 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      * @param  int  $perPage
      * @param  int|null  $currentPage
      * @param  array  $options  (path, query, fragment, pageName)
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct($items, $total, $perPage, $currentPage = null, array $options = [])
     {
+        if ($perPage < 1) {
+            throw new \InvalidArgumentException('perPage value must be at least 1.');
+        }
+
         $this->options = $options;
 
         foreach ($options as $key => $value) {
