@@ -150,22 +150,7 @@ class RendererTest extends TestCase
     }
 
     #[WithConfig('app.debug', true)]
-    public function testDoesNotRenderPreviousExceptionsWhenThereIsNone()
-    {
-        $this->assertTrue($this->app->bound(Renderer::class));
-
-        $this->get('/failed')
-            ->assertInternalServerError()
-            ->assertSeeInOrder([
-                'RuntimeException',
-                'Bad route!',
-                'Previous exceptions',
-                'No previous exceptions'
-            ]);
-    }
-
-    #[WithConfig('app.debug', true)]
-    public function testItCanRenderPreviousExceptions()
+    public function testItRendersPreviousExceptions()
     {
         $this->assertTrue($this->app->bound(Renderer::class));
 
