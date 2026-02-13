@@ -21,7 +21,7 @@ trait TestCaches
     protected function bootTestCache()
     {
         ParallelTesting::setUpTestCase(function () {
-            if (ParallelTesting::option('without_cache_prefix')) {
+            if (ParallelTesting::option('without_cache')) {
                 return;
             }
 
