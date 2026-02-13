@@ -107,25 +107,15 @@ class Exception
     }
 
     /**
-     * Get all the previous exceptions.
+     * Get the previous exceptions in the chain.
      *
      * @return \Illuminate\Support\Collection<int, static>
      */
-    public function previous()
+    public function previousExceptions()
     {
-        return Collection::make($this->exception->getAllPrevious())->map(function ($exception) {
-            return new static($exception, $this->request, $this->listener, $this->basePath);
-        });
-    }
-
-    /**
-     * Determine if the current exceptions has previous exceptions.
-     *
-     * @return bool
-     */
-    public function hasPrevious()
-    {
-        return ! is_null($this->exception->getPrevious());
+        return once(fn () => (new Collection($this->exception->getAllPrevious()))->map(
+            fn ($previous) => new static($previous, $this->request, $this->listener, $this->basePath),
+        ));
     }
 
     /**
