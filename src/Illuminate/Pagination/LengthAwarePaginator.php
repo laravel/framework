@@ -52,7 +52,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      */
     public function __construct($items, $total, $perPage, $currentPage = null, array $options = [])
     {
-        if ($perPage < 1) {
+        if ($perPage  < 1) {
             throw new \InvalidArgumentException('perPage value must be at least 1.');
         }
 
