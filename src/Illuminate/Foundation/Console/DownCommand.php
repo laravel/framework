@@ -2,12 +2,12 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use DateTimeInterface;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Events\MaintenanceModeEnabled;
 use Illuminate\Foundation\Exceptions\RegisterErrorViewPaths;
+use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
