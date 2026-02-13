@@ -31,8 +31,11 @@
                 {{-- Exception content --}}
                 <div
                     x-data="{ expanded: false }"
-                    class="group/exception flex-1 min-w-0 rounded-lg hover:border hover:border-neutral-200"
-                    :class="{ 'border border-neutral-200 bg-white/50 dark:bg-white/2 dark:border-white/5': expanded }"
+                    class="group/exception flex-1 min-w-0 rounded-lg"
+                    :class="{
+                        'border border-neutral-200 bg-white/50 dark:bg-white/2 dark:border-white/5': expanded,
+                        'hover:border hover:border-neutral-200 dark:hover:border-none': !expanded,
+                    }"
                 >
                     {{-- Header + Message --}}
                     <div
