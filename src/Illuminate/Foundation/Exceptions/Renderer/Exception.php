@@ -175,6 +175,19 @@ class Exception
     }
 
     /**
+     * Get the previous exceptions in the chain.
+     *
+     * @return \Illuminate\Support\Collection<int, static>
+     */
+    public function previousExceptions()
+    {
+        return new Collection(array_map(
+            fn (FlattenException $previous) => new static($previous, $this->request, $this->listener, $this->basePath),
+            $this->exception->getAllPrevious(),
+        ));
+    }
+
+    /**
      * Get the exception's request instance.
      *
      * @return \Illuminate\Http\Request

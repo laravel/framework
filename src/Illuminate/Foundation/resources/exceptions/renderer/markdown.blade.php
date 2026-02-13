@@ -11,6 +11,18 @@ Laravel {{ app()->version() }}
 @foreach($exception->frames() as $index => $frame)
 {{ $index }} - {{ $frame->file() }}:{{ $frame->line() }}
 @endforeach
+@foreach ($exception->previousExceptions() as $previous)
+
+## Caused by: {{ $previous->class() }}
+
+{!! $previous->message() !!}
+
+### Stack Trace
+
+@foreach($previous->frames() as $index => $frame)
+{{ $index }} - {{ $frame->file() }}:{{ $frame->line() }}
+@endforeach
+@endforeach
 
 ## Request
 
