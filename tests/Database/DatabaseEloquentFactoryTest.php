@@ -200,6 +200,31 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(0, FactoryTestUser::all());
     }
 
+    public function test_make_many_creates_unpersisted_model_instances()
+    {
+        $users = FactoryTestUserFactory::new()->makeMany([
+            ['name' => 'Taylor Otwell'],
+            ['name' => 'Jeffrey Way'],
+        ]);
+
+        $this->assertInstanceOf(Collection::class, $users);
+        $this->assertCount(2, $users);
+        $this->assertSame('Taylor Otwell', $users[0]->name);
+        $this->assertSame('Jeffrey Way', $users[1]->name);
+        $this->assertCount(0, FactoryTestUser::all());
+
+        $users = FactoryTestUserFactory::new()->makeMany(3);
+        $this->assertInstanceOf(Collection::class, $users);
+        $this->assertCount(3, $users);
+        $this->assertInstanceOf(FactoryTestUser::class, $users->first());
+        $this->assertCount(0, FactoryTestUser::all());
+
+        $users = FactoryTestUserFactory::new()->makeMany();
+        $this->assertInstanceOf(Collection::class, $users);
+        $this->assertCount(1, $users);
+        $this->assertCount(0, FactoryTestUser::all());
+    }
+
     public function test_basic_model_attributes_can_be_created()
     {
         $user = FactoryTestUserFactory::new()->raw();
@@ -258,6 +283,54 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame($user, $_SERVER['__test.user.creating']);
 
         unset($_SERVER['__test.user.making'], $_SERVER['__test.user.creating']);
+    }
+
+    public function test_without_after_making_removes_callbacks()
+    {
+        $user = FactoryTestUserFactory::new()
+            ->afterMaking(function ($user) {
+                $_SERVER['__test.user.making'] = $user;
+            })
+            ->withoutAfterMaking()
+            ->create();
+
+        $this->assertArrayNotHasKey('__test.user.making', $_SERVER);
+    }
+
+    public function test_without_after_creating_removes_callbacks()
+    {
+        $user = FactoryTestUserFactory::new()
+            ->afterCreating(function ($user) {
+                $_SERVER['__test.user.creating'] = $user;
+            })
+            ->withoutAfterCreating()
+            ->create();
+
+        $this->assertArrayNotHasKey('__test.user.creating', $_SERVER);
+    }
+
+    public function test_without_after_making_removes_configure_callbacks()
+    {
+        $user = FactoryTestUserWithCallbacksFactory::new()
+            ->withoutAfterMaking()
+            ->create();
+
+        $this->assertArrayNotHasKey('__test.user.making', $_SERVER);
+        $this->assertSame($user, $_SERVER['__test.user.creating']);
+
+        unset($_SERVER['__test.user.creating']);
+    }
+
+    public function test_without_after_creating_removes_configure_callbacks()
+    {
+        $user = FactoryTestUserWithCallbacksFactory::new()
+            ->withoutAfterCreating()
+            ->create();
+
+        $this->assertSame($user, $_SERVER['__test.user.making']);
+        $this->assertArrayNotHasKey('__test.user.creating', $_SERVER);
+
+        unset($_SERVER['__test.user.making']);
     }
 
     public function test_has_many_relationship()
@@ -1266,6 +1339,28 @@ class FactoryTestUserWithArrayFactory extends Factory
             'name' => 'killer mike',
             'options' => ['rtj'],
         ];
+    }
+}
+
+class FactoryTestUserWithCallbacksFactory extends Factory
+{
+    protected $model = FactoryTestUser::class;
+
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->name(),
+            'options' => null,
+        ];
+    }
+
+    public function configure()
+    {
+        return $this->afterMaking(function ($user) {
+            $_SERVER['__test.user.making'] = $user;
+        })->afterCreating(function ($user) {
+            $_SERVER['__test.user.creating'] = $user;
+        });
     }
 }
 

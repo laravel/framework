@@ -164,4 +164,14 @@ class RendererTest extends TestCase
                 'Third exception',
             ]);
     }
+
+    #[WithConfig('app.debug', true)]
+    public function testItExcludesDecorativeAsciiArtInNonBrowserContexts()
+    {
+        $this->get('/failed')
+            ->assertInternalServerError()
+            ->assertSee('RuntimeException')
+            ->assertSee('Bad route!')
+            ->assertDontSee('viewBox="0 0 1268 308"', false);
+    }
 }

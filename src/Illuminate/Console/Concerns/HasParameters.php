@@ -42,7 +42,7 @@ trait HasParameters
      *
      * @return (InputArgument|array{
      *    0: non-empty-string,
-     *    1?: InputArgument::REQUIRED|InputArgument::OPTIONAL,
+     *    1?: InputArgument::REQUIRED|InputArgument::OPTIONAL|InputArgument::IS_ARRAY,
      *    2?: string,
      *    3?: mixed,
      *    4?: list<string|Suggestion>|\Closure(CompletionInput, CompletionSuggestions): list<string|Suggestion>

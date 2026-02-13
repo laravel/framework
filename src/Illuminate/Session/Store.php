@@ -584,7 +584,7 @@ class Store implements Session
      */
     public function forget($keys)
     {
-        Arr::forget($this->attributes, collect((array) $keys)->map(fn ($key) => enum_value($key))->all());
+        Arr::forget($this->attributes, (new Collection((array) $keys))->map(fn ($key) => enum_value($key))->all());
     }
 
     /**

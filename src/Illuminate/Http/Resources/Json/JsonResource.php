@@ -36,7 +36,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public $with = [];
 
     /**
-     * The additional meta data that should be added to the resource response.
+     * The additional metadata that should be added to the resource response.
      *
      * Added during response construction by the developer.
      *
@@ -221,7 +221,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     }
 
     /**
-     * Add additional meta data to the resource response.
+     * Add additional metadata to the resource response.
      *
      * @param  array  $data
      * @return $this

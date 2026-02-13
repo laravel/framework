@@ -1058,6 +1058,20 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where "created_at" between ? and ?', $builder->toSql());
         $this->assertEquals([now()->startOfDay(), now()->addMonth()->startOfDay()], $builder->getBindings());
 
+        // DatePeriod with end date
+        $builder = $this->getBuilder();
+        $period = new \DatePeriod(now()->startOfDay(), new \DateInterval('P1D'), now()->addDays(5)->startOfDay());
+        $builder->select('*')->from('users')->whereBetween('created_at', $period);
+        $this->assertSame('select * from "users" where "created_at" between ? and ?', $builder->toSql());
+        $this->assertEquals([now()->startOfDay(), now()->addDays(5)->startOfDay()], $builder->getBindings());
+
+        // DatePeriod with recurrence count (no end date)
+        $builder = $this->getBuilder();
+        $period = new \DatePeriod(now()->startOfDay(), new \DateInterval('P1D'), 5);
+        $builder->select('*')->from('users')->whereBetween('created_at', $period);
+        $this->assertSame('select * from "users" where "created_at" between ? and ?', $builder->toSql());
+        $this->assertEquals([now()->startOfDay(), now()->addDays(5)->startOfDay()], $builder->getBindings());
+
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereBetween('id', collect([1, 2]));
         $this->assertSame('select * from "users" where "id" between ? and ?', $builder->toSql());
@@ -4391,9 +4405,15 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testUpdateMethodWorksWithQueryAsValue()
     {
         $builder = $this->getBuilder();
+        $subQueryBuilder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "credits" = (select sum(credits) from "transactions" where "transactions"."user_id" = "users"."id" and "type" = ?) where "id" = ?', ['foo', 1])->andReturn(1);
-        $result = $builder->from('users')->where('id', '=', 1)->update(['credits' => $this->getBuilder()->from('transactions')->selectRaw('sum(credits)')->whereColumn('transactions.user_id', 'users.id')->where('type', 'foo')]);
+        $result = $builder->from('users')->where('id', '=', 1)->update(['credits' => $subQueryBuilder->from('transactions')->selectRaw('sum(credits)')->whereColumn('transactions.user_id', 'users.id')->where('type', 'foo')]);
+        $this->assertEquals(1, $result);
 
+        $builder = $this->getBuilder();
+        $subQueryBuilder = new EloquentBuilder($this->getBuilder());
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "credits" = (select sum(credits) from "transactions" where "transactions"."user_id" = "users"."id" and "type" = ?) where "id" = ?', ['foo', 1])->andReturn(1);
+        $result = $builder->from('users')->where('id', '=', 1)->update(['credits' => $subQueryBuilder->from('transactions')->selectRaw('sum(credits)')->whereColumn('transactions.user_id', 'users.id')->where('type', 'foo')]);
         $this->assertEquals(1, $result);
     }
 
@@ -5460,9 +5480,11 @@ SQL;
     public function testSelectExpression()
     {
         $builder = $this->getBuilder();
-        $builder->from('one')->selectExpression(new Raw('1 + 1'), 'expr');
+        $builder->from('one')
+            ->selectExpression(new Raw('1 + 1'), 'expr')
+            ->selectExpression('2 + 2', 'expr2');
 
-        $this->assertSame('select (1 + 1) as "expr" from "one"', $builder->toSql());
+        $this->assertSame('select (1 + 1) as "expr", (2 + 2) as "expr2" from "one"', $builder->toSql());
     }
 
     public function testSelect()

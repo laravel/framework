@@ -4,7 +4,10 @@ namespace Illuminate\Support\Testing\Fakes;
 
 use BadMethodCallException;
 use Closure;
+use Illuminate\Bus\UniqueLock;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Events\CallQueuedListener;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\QueueManager;
@@ -54,6 +57,13 @@ class QueueFake extends QueueManager implements Fake, Queue
      * @var list<RawPushType>
      */
     protected $rawPushes = [];
+
+    /**
+     * All of the unique jobs that were pushed.
+     *
+     * @var array
+     */
+    private $uniqueJobs = [];
 
     /**
      * Indicates if items should be serialized and restored when pushed to the queue.
@@ -477,6 +487,10 @@ class QueueFake extends QueueManager implements Fake, Queue
                 'queue' => $queue,
                 'data' => $data,
             ];
+
+            if ($job instanceof ShouldBeUnique) {
+                $this->uniqueJobs[] = $job;
+            }
         } else {
             is_object($job) && isset($job->connection)
                 ? $this->queue->connection($job->connection)->push($job, $data, $queue)
@@ -648,6 +662,22 @@ class QueueFake extends QueueManager implements Fake, Queue
     protected function serializeAndRestoreJob($job)
     {
         return unserialize(serialize($job));
+    }
+
+    /**
+     * Release the locks for all unique jobs that were pushed.
+     *
+     * @return void
+     */
+    public function releaseUniqueJobLocks()
+    {
+        $lock = new UniqueLock($this->app->make(Cache::class));
+
+        foreach ($this->uniqueJobs as $job) {
+            $lock->release($job);
+        }
+
+        $this->uniqueJobs = [];
     }
 
     /**
