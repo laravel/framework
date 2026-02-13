@@ -181,9 +181,8 @@ class Exception
      */
     public function previousExceptions()
     {
-        return new Collection(array_map(
+        return once(fn () => (new Collection($this->exception->getAllPrevious()))->map(
             fn (FlattenException $previous) => new static($previous, $this->request, $this->listener, $this->basePath),
-            $this->exception->getAllPrevious(),
         ));
     }
 
