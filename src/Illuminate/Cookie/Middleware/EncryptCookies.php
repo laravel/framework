@@ -105,6 +105,7 @@ class EncryptCookies
      * @param  string  $key
      * @param  string|array  $value
      * @return string|array|null
+     * @phpstan-return ($value is array ? array<string|null> : string|null)
      */
     protected function validateValue(string $key, $value)
     {
