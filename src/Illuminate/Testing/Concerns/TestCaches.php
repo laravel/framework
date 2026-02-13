@@ -20,8 +20,8 @@ trait TestCaches
      */
     protected function bootTestCache()
     {
-        ParallelTesting::setUpTestCase(function ($testCase) {
-            if (property_exists($testCase, 'useParallelSafeCachePrefix') && $testCase->useParallelSafeCachePrefix === false) {
+        ParallelTesting::setUpTestCase(function () {
+            if (ParallelTesting::option('without_cache_prefix')) {
                 return;
             }
 

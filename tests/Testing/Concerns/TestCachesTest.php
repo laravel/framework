@@ -111,22 +111,6 @@ class TestCachesTest extends TestCase
         $this->assertCount(1, $setUpCallbacks);
     }
 
-    public function testBootTestCacheSkipsIsolationIfOptedOut()
-    {
-        Container::getInstance()->make(ParallelTesting::class)->resolveTokenUsing(fn () => '7');
-
-        $instance = $this->makeTestCachesInstance();
-
-        (new ReflectionProperty($instance::class, 'originalCachePrefix'))->setValue(null, null);
-        (new ReflectionMethod($instance, 'bootTestCache'))->invoke($instance);
-
-        $testCase = new class { public $useParallelSafeCachePrefix = false; };
-
-        Container::getInstance()->make(ParallelTesting::class)->callSetUpTestCaseCallbacks($testCase);
-
-        $this->assertSame('myapp_cache_', Container::getInstance()['config']->get('cache.prefix'));
-    }
-
     protected function getParallelSafeCachePrefix()
     {
         $instance = $this->makeTestCachesInstance();
