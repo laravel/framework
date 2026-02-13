@@ -448,6 +448,29 @@ abstract class Factory
     }
 
     /**
+     * Create a collection of models.
+     *
+     * @param  iterable<int, array<string, mixed>>|int|null  $records
+     * @return \Illuminate\Database\Eloquent\Collection<int, TModel>
+     */
+    public function makeMany(iterable|int|null $records = null)
+    {
+        $records ??= ($this->count ?? 1);
+
+        $this->count = null;
+
+        if (is_numeric($records)) {
+            $records = array_fill(0, $records, []);
+        }
+
+        return new EloquentCollection(
+            (new Collection($records))->map(function ($record) {
+                return $this->state($record)->make();
+            })
+        );
+    }
+
+    /**
      * Insert the model records in bulk. No model events are emitted.
      *
      * @param  array<string, mixed>  $attributes

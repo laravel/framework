@@ -200,6 +200,31 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(0, FactoryTestUser::all());
     }
 
+    public function test_make_many_creates_unpersisted_model_instances()
+    {
+        $users = FactoryTestUserFactory::new()->makeMany([
+            ['name' => 'Taylor Otwell'],
+            ['name' => 'Jeffrey Way'],
+        ]);
+
+        $this->assertInstanceOf(Collection::class, $users);
+        $this->assertCount(2, $users);
+        $this->assertSame('Taylor Otwell', $users[0]->name);
+        $this->assertSame('Jeffrey Way', $users[1]->name);
+        $this->assertCount(0, FactoryTestUser::all());
+
+        $users = FactoryTestUserFactory::new()->makeMany(3);
+        $this->assertInstanceOf(Collection::class, $users);
+        $this->assertCount(3, $users);
+        $this->assertInstanceOf(FactoryTestUser::class, $users->first());
+        $this->assertCount(0, FactoryTestUser::all());
+
+        $users = FactoryTestUserFactory::new()->makeMany();
+        $this->assertInstanceOf(Collection::class, $users);
+        $this->assertCount(1, $users);
+        $this->assertCount(0, FactoryTestUser::all());
+    }
+
     public function test_basic_model_attributes_can_be_created()
     {
         $user = FactoryTestUserFactory::new()->raw();
