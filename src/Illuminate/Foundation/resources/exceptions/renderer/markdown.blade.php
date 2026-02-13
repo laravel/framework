@@ -12,21 +12,19 @@ Laravel {{ app()->version() }}
 {{ $index }} - {{ $frame->file() }}:{{ $frame->line() }}
 @endforeach
 
-## Previous Exceptions
+@if ($exception->previousExceptions()->isNotEmpty())
+## Previous {{ Str::plural('exception', $exception->previousExceptions()->count()) }}
+@foreach ($exception->previousExceptions() as $index => $previous)
 
-@forelse($exception->previous() as $index => $previous)
-{{ $index + 1 }}. **{{ $previous->class() }}**@if($previous->code()) (Code: {{ $previous->code() }})@endif
+### {{ $index + 1 }}. {{ $previous->class() }}
+
+{!! $previous->message() !!}
 
 @foreach($previous->frames() as $index => $frame)
-{{ $frame->file() }}:{{ $frame->line() }}@break
+{{ $index }} - {{ $frame->file() }}:{{ $frame->line() }}
 @endforeach
-
-@if($previous->message())
-{{ $previous->message() }}
+@endforeach
 @endif
-@empty
-No previous exceptions.
-@endforelse
 
 ## Request
 
