@@ -53,6 +53,7 @@ class ConfigMakeCommand extends GeneratorCommand
 
     /**
      * Get the stub file for the generator.
+     *
      * @return string
      */
     protected function getStub()
@@ -66,6 +67,7 @@ class ConfigMakeCommand extends GeneratorCommand
 
     /**
      * Get the console command arguments.
+     *
      * @return array
      */
     protected function getOptions()
