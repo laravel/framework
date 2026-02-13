@@ -8,66 +8,73 @@
         <h3 class="text-base font-semibold text-neutral-900 dark:text-white">Previous exceptions</h3>
     </div>
 
-    <div class="pl-7">
+    <div class="flex flex-col">
         @foreach ($exception->previousExceptions() as $index => $previous)
-            <div
-                x-data="{ expanded: false }"
-                class="group/exception relative rounded-lg"
-                :class="{ 'bg-white/50 dark:bg-white/2 dark:border dark:border-white/5': expanded }"
-            >
-                {{-- Line from top of item to above dot (connects from previous item) --}}
-                @if ($index > 0)
-                    <div class="absolute -left-[8px] top-0 h-[14px] w-px border-l border-dashed border-emerald-900"></div>
-                @endif
+            <div class="flex gap-2.5 px-2">
+                {{-- Timeline column --}}
+                <div class="flex flex-col items-center w-6 flex-shrink-0 self-stretch">
+                    @if ($index > 0)
+                        <div class="h-[17.5px] w-px border-l border-dashed border-emerald-900"></div>
+                    @else
+                        <div class="h-[17.5px]"></div>
+                    @endif
 
-                {{-- Dot --}}
-                <div class="absolute -left-[12.5px] top-[14px] size-[9px] rounded-full bg-emerald-800"></div>
+                    <div class="size-[9px] flex-shrink-0 rounded-full bg-emerald-800"></div>
 
-                {{-- Line from below dot to bottom of item (connects to next item) --}}
-                @if ($index < $exception->previousExceptions()->count() - 1)
-                    <div class="absolute -left-[8px] top-[23px] bottom-0 w-px border-l border-dashed border-emerald-900"></div>
-                @endif
-
-                {{-- Header + Message --}}
-                <div
-                    class="flex gap-2.5 p-3 cursor-pointer rounded-lg"
-                    :class="{ 'hover:bg-white/50 dark:hover:bg-white/2': !expanded }"
-                    @click="expanded = !expanded"
-                >
-                    <div
-                        class="flex-1 min-w-0"
-                        :class="expanded ? 'flex flex-col' : 'flex items-baseline gap-2'"
-                    >
-                        <h4 class="font-mono text-sm font-medium text-neutral-900 dark:text-white flex-shrink-0">{{ $previous->class() }}</h4>
-                        <p
-                            class="text-sm text-neutral-500 dark:text-neutral-400"
-                            :class="expanded ? 'mt-1' : 'truncate'"
-                        >{{ $previous->message() }}</p>
-                    </div>
-                    <button
-                        type="button"
-                        class="flex h-6 w-6 flex-shrink-0 cursor-pointer items-center justify-center rounded-md dark:border dark:border-white/8 group-hover/exception:text-blue-500 group-hover/exception:dark:text-emerald-500"
-                        :class="{
-                            'text-blue-500 dark:text-emerald-500 dark:bg-white/5': expanded,
-                            'text-neutral-500 dark:text-neutral-500 dark:bg-white/3': !expanded,
-                        }"
-                    >
-                        <x-laravel-exceptions-renderer::icons.chevrons-down-up x-show="expanded" />
-                        <x-laravel-exceptions-renderer::icons.chevrons-up-down x-show="!expanded" x-cloak />
-                    </button>
+                    @if ($index < $exception->previousExceptions()->count() - 1)
+                        <div class="flex-1 w-px border-l border-dashed border-emerald-900"></div>
+                    @else
+                        <div class="flex-1"></div>
+                    @endif
                 </div>
 
-                {{-- Collapsible trace --}}
-                <div x-show="expanded" x-cloak class="flex flex-col gap-1.5 p-3">
-                    @foreach ($previous->frameGroups() as $group)
-                        @if ($group['is_vendor'])
-                            <x-laravel-exceptions-renderer::vendor-frames :frames="$group['frames']" />
-                        @else
-                            @foreach ($group['frames'] as $frame)
-                                <x-laravel-exceptions-renderer::frame :$frame />
-                            @endforeach
-                        @endif
-                    @endforeach
+                {{-- Exception content --}}
+                <div
+                    x-data="{ expanded: false }"
+                    class="group/exception flex-1 min-w-0 rounded-lg"
+                    :class="{ 'bg-white/50 dark:bg-white/2 dark:border dark:border-white/5': expanded }"
+                >
+                    {{-- Header + Message --}}
+                    <div
+                        class="flex gap-2.5 p-3 cursor-pointer rounded-lg"
+                        :class="{ 'hover:bg-white/50 dark:hover:bg-white/2': !expanded }"
+                        @click="expanded = !expanded"
+                    >
+                        <div
+                            class="flex-1 min-w-0"
+                            :class="expanded ? 'flex flex-col' : 'flex items-baseline gap-2'"
+                        >
+                            <h4 class="font-mono text-sm font-medium text-neutral-900 dark:text-white flex-shrink-0">{{ $previous->class() }}</h4>
+                            <p
+                                class="text-sm text-neutral-500 dark:text-neutral-400"
+                                :class="expanded ? 'mt-1' : 'truncate'"
+                            >{{ $previous->message() }}</p>
+                        </div>
+                        <button
+                            type="button"
+                            class="flex h-6 w-6 flex-shrink-0 cursor-pointer items-center justify-center rounded-md dark:border dark:border-white/8 group-hover/exception:text-blue-500 group-hover/exception:dark:text-emerald-500"
+                            :class="{
+                                'text-blue-500 dark:text-emerald-500 dark:bg-white/5': expanded,
+                                'text-neutral-500 dark:text-neutral-500 dark:bg-white/3': !expanded,
+                            }"
+                        >
+                            <x-laravel-exceptions-renderer::icons.chevrons-down-up x-show="expanded" />
+                            <x-laravel-exceptions-renderer::icons.chevrons-up-down x-show="!expanded" x-cloak />
+                        </button>
+                    </div>
+
+                    {{-- Collapsible trace --}}
+                    <div x-show="expanded" x-cloak class="flex flex-col gap-1.5 p-3">
+                        @foreach ($previous->frameGroups() as $group)
+                            @if ($group['is_vendor'])
+                                <x-laravel-exceptions-renderer::vendor-frames :frames="$group['frames']" />
+                            @else
+                                @foreach ($group['frames'] as $frame)
+                                    <x-laravel-exceptions-renderer::frame :$frame />
+                                @endforeach
+                            @endif
+                        @endforeach
+                    </div>
                 </div>
             </div>
         @endforeach
