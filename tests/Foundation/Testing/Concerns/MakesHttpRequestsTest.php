@@ -174,6 +174,43 @@ class MakesHttpRequestsTest extends TestCase
         $this->assertSame('new-value', $this->unencryptedCookies['new-cookie']);
     }
 
+    public function testWithoutCookieRemovesCookie()
+    {
+        $this->withCookie('foo', 'bar');
+
+        $this->assertArrayHasKey('foo', $this->defaultCookies);
+
+        $this->withoutCookie('foo');
+
+        $this->assertArrayNotHasKey('foo', $this->defaultCookies);
+    }
+
+    public function testWithoutCookieRemovesUnencryptedCookie()
+    {
+        $this->withUnencryptedCookie('foo', 'bar');
+
+        $this->assertArrayHasKey('foo', $this->unencryptedCookies);
+
+        $this->withoutCookie('foo');
+
+        $this->assertArrayNotHasKey('foo', $this->unencryptedCookies);
+    }
+
+    public function testWithoutCookiesRemovesCookies()
+    {
+        $this->withCookies([
+            'foo' => 'bar',
+            'new-cookie' => 'new-value',
+        ]);
+
+        $this->assertCount(2, $this->defaultCookies);
+
+        $this->withoutCookies(['foo', 'new-cookie']);
+
+        $this->assertArrayNotHasKey('foo', $this->defaultCookies);
+        $this->assertArrayNotHasKey('new-cookie', $this->defaultCookies);
+    }
+
     public function testWithoutAndWithCredentials()
     {
         $this->encryptCookies = false;

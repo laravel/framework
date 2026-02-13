@@ -283,6 +283,34 @@ trait MakesHttpRequests
     }
 
     /**
+     * Remove cookies from the request.
+     *
+     * @param  array  $cookies
+     * @return $this
+     */
+    public function withoutCookies(array $cookies)
+    {
+        foreach ($cookies as $name) {
+            $this->withoutCookie($name);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove a cookie from the request.
+     *
+     * @param  string  $name
+     * @return $this
+     */
+    public function withoutCookie(string $name)
+    {
+        unset($this->defaultCookies[$name], $this->unencryptedCookies[$name]);
+
+        return $this;
+    }
+
+    /**
      * Automatically follow any redirects returned from the response.
      *
      * @return $this
