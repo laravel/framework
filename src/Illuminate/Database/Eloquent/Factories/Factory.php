@@ -800,6 +800,26 @@ abstract class Factory
     }
 
     /**
+     * Remove the "after making" callbacks from the factory.
+     *
+     * @return static
+     */
+    public function withoutAfterMaking()
+    {
+        return $this->newInstance(['afterMaking' => new Collection]);
+    }
+
+    /**
+     * Remove the "after creating" callbacks from the factory.
+     *
+     * @return static
+     */
+    public function withoutAfterCreating()
+    {
+        return $this->newInstance(['afterCreating' => new Collection]);
+    }
+
+    /**
      * Call the "after making" callbacks for the given model instances.
      *
      * @param  \Illuminate\Support\Collection  $instances
