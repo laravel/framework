@@ -199,12 +199,16 @@ abstract class Component
             $directory = Container::getInstance()['config']->get('view.compiled')
         );
 
-        if (! is_file($viewFile = $directory.'/'.hash('xxh128', $contents).'.blade.php')) {
+        $viewFile = $directory.'/'.hash('xxh128', $contents).'.blade.php';
+
+        if (! is_file($viewFile) || filesize($viewFile) === 0) {
+            $files = Container::getInstance()['files'];
+
             if (! is_dir($directory)) {
-                mkdir($directory, 0755, true);
+                $files->makeDirectory($directory, 0755, true, true);
             }
 
-            file_put_contents($viewFile, $contents);
+            $files->replace($viewFile, $contents);
         }
 
         return '__components::'.basename($viewFile, '.blade.php');
