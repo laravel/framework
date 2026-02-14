@@ -88,7 +88,7 @@ class CaptureEventsTest extends TestCase
     public function testCaptureEmptyEvents()
     {
         $captured = Event::capture(function () {
-            // no events dispatched
+            // No events dispatched
         });
 
         $this->assertInstanceOf(EventCollection::class, $captured);
