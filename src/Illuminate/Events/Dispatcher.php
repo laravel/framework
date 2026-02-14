@@ -863,6 +863,34 @@ class Dispatcher implements DispatcherContract
     }
 
     /**
+     * Execute the given callback while capturing events.
+     *
+     * @param  callable  $callback
+     * @param  string[]|null  $events
+     * @return array
+     */
+    public function capture(callable $callback, ?array $events = null)
+    {
+        $wasDeferring = $this->deferringEvents;
+        $previousDeferredEvents = $this->deferredEvents;
+        $previousEventsToDefer = $this->eventsToDefer;
+
+        $this->deferringEvents = true;
+        $this->deferredEvents = [];
+        $this->eventsToDefer = $events;
+
+        try {
+            $callback();
+
+            return $this->deferredEvents;
+        } finally {
+            $this->deferringEvents = $wasDeferring;
+            $this->deferredEvents = $previousDeferredEvents;
+            $this->eventsToDefer = $previousEventsToDefer;
+        }
+    }
+
+    /**
      * Determine if the given event should be deferred.
      *
      * @param  string  $event
