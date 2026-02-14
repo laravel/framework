@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View as ViewContract;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use ReflectionClass;
 use ReflectionMethod;
@@ -202,13 +203,11 @@ abstract class Component
         $viewFile = $directory.'/'.hash('xxh128', $contents).'.blade.php';
 
         if (! is_file($viewFile) || filesize($viewFile) === 0) {
-            $files = Container::getInstance()['files'];
-
             if (! is_dir($directory)) {
-                $files->makeDirectory($directory, 0755, true, true);
+                mkdir($directory, 0755, true);
             }
 
-            $files->replace($viewFile, $contents);
+            (new Filesystem)->replace($viewFile, $contents);
         }
 
         return '__components::'.basename($viewFile, '.blade.php');

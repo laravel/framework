@@ -8,7 +8,6 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\Factory as FactoryContract;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\Component;
@@ -37,7 +36,6 @@ class ComponentTest extends TestCase
         $container->instance('view', $this->viewFactory);
         $container->alias('view', FactoryContract::class);
         $container->instance('config', $this->config);
-        $container->instance('files', new Filesystem);
 
         Container::setInstance($container);
         Facade::setFacadeApplication($container);
