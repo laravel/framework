@@ -106,6 +106,9 @@ class TypedFormRequestFactory
     }
 
     /**
+     * Set authorization checks to run against the request. Useful for performing
+     * validation checks outside of the request life-cycle.
+     *
      * @return $this
      */
     public function withAuthorization(bool $withAuthorization): static
@@ -482,11 +485,7 @@ class TypedFormRequestFactory
      */
     protected function inferredRulesFromTypes(): array
     {
-        if ($this->reflectRequest()->getAttributes(WithoutInferringRules::class) !== []) {
-            return [];
-        }
-
-        if (($constructor = $this->reflectRequest()->getConstructor()) === null) {
+        if (($constructor = $this->reflectRequest()->getConstructor()) === null || $this->reflectRequest()->getAttributes(WithoutInferringRules::class) !== []) {
             return [];
         }
 
