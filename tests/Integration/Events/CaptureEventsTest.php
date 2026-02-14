@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Events;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Events\EventCollection;
 use Illuminate\Support\Facades\Event;
 use Orchestra\Testbench\TestCase;
 
@@ -90,7 +91,7 @@ class CaptureEventsTest extends TestCase
             // no events dispatched
         });
 
-        $this->assertIsArray($captured);
+        $this->assertInstanceOf(EventCollection::class, $captured);
         $this->assertEmpty($captured);
     }
 }

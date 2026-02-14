@@ -6,6 +6,7 @@ use Error;
 use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Events\EventCollection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -185,7 +186,7 @@ class EventsDispatcherTest extends TestCase
         });
 
         $this->assertArrayNotHasKey('__event.test', $_SERVER);
-        $this->assertIsArray($captured);
+        $this->assertInstanceOf(EventCollection::class, $captured);
         $this->assertCount(1, $captured);
 
         foreach ($captured as $args) {
@@ -329,8 +330,49 @@ class EventsDispatcherTest extends TestCase
             // No events dispatched
         });
 
-        $this->assertIsArray($captured);
+        $this->assertInstanceOf(EventCollection::class, $captured);
         $this->assertEmpty($captured);
+    }
+
+    public function testCapturedEventsDispatch()
+    {
+        $_SERVER['__event.test'] = [];
+        $d = new Dispatcher;
+        $d->listen('foo', function ($foo) {
+            $_SERVER['__event.test'][] = $foo;
+        });
+
+        $captured = $d->capture(function () use ($d) {
+            $d->dispatch('foo', ['bar']);
+            $d->dispatch('foo', ['baz']);
+        });
+
+        $this->assertSame([], $_SERVER['__event.test']);
+
+        $captured->dispatch();
+
+        $this->assertSame(['bar', 'baz'], $_SERVER['__event.test']);
+    }
+
+    public function testCapturedEventsFilterAndDispatch()
+    {
+        $_SERVER['__event.test'] = [];
+        $d = new Dispatcher;
+        $d->listen('foo', function ($value) {
+            $_SERVER['__event.test'][] = $value;
+        });
+        $d->listen('bar', function ($value) {
+            $_SERVER['__event.test'][] = $value;
+        });
+
+        $captured = $d->capture(function () use ($d) {
+            $d->dispatch('foo', ['foo_value']);
+            $d->dispatch('bar', ['bar_value']);
+        });
+
+        $captured->filter(fn ($args) => $args[0] === 'foo')->setDispatcher($d)->dispatch();
+
+        $this->assertSame(['foo_value'], $_SERVER['__event.test']);
     }
 
     public function testDeferInsideCapture()

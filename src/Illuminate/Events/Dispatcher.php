@@ -867,7 +867,7 @@ class Dispatcher implements DispatcherContract
      *
      * @param  callable  $callback
      * @param  string[]|null  $events
-     * @return array
+     * @return \Illuminate\Events\EventCollection
      */
     public function capture(callable $callback, ?array $events = null)
     {
@@ -882,7 +882,7 @@ class Dispatcher implements DispatcherContract
         try {
             $callback();
 
-            return $this->deferredEvents;
+            return (new EventCollection($this->deferredEvents))->setDispatcher($this);
         } finally {
             $this->deferringEvents = $wasDeferring;
             $this->deferredEvents = $previousDeferredEvents;
