@@ -580,7 +580,7 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
-     * Get the fully qualified parent key name.
+     * Get the fully-qualified parent key name.
      *
      * @return string
      */
