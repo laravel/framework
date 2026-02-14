@@ -267,7 +267,7 @@ class Logger implements LoggerInterface
      * @param  \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|string  $message
      * @return string
      */
-    protected function formatMessage($message): string
+    protected function formatMessage($message)
     {
         return match (true) {
             is_array($message) => var_export($message, true),
