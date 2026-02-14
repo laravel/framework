@@ -54,7 +54,7 @@ class JsonResponse extends BaseJsonResponse
     }
 
     /**
-     * Get the json_decoded data from the response.
+     * Get the decoded JSON data from the response.
      *
      * @param  bool  $assoc
      * @param  int  $depth
