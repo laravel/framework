@@ -98,6 +98,13 @@ class FilesystemAdapter implements CloudFilesystemContract
     protected $temporaryUploadUrlCallback;
 
     /**
+     * The name of the disk.
+     *
+     * @var string|null
+     */
+    protected $diskName;
+
+    /**
      * Create a new filesystem adapter instance.
      *
      * @param  \League\Flysystem\FilesystemOperator  $driver
@@ -282,6 +289,30 @@ class FilesystemAdapter implements CloudFilesystemContract
     public function path($path)
     {
         return $this->prefixer->prefixPath($path);
+    }
+
+    /**
+     * Specify the name of the disk.
+     *
+     * @param  string  $name
+     * @return $this
+     */
+    public function diskName(string $name): static
+    {
+        $this->diskName = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get a StorageUri instance for the given path.
+     *
+     * @param  string  $path
+     * @return \Illuminate\Support\StorageUri
+     */
+    public function uri(string $path): StorageUri
+    {
+        return new StorageUri($this->diskName, $path);
     }
 
     /**

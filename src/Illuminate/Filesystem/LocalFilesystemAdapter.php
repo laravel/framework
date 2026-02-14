@@ -124,11 +124,22 @@ class LocalFilesystemAdapter extends FilesystemAdapter
      * @param  string  $disk
      * @return $this
      */
-    public function diskName(string $disk)
+    public function diskName(string $disk): static
     {
         $this->disk = $disk;
 
         return $this;
+    }
+
+    /**
+     * Get a StorageUri instance for the given path.
+     *
+     * @param  string  $path
+     * @return \Illuminate\Support\StorageUri
+     */
+    public function uri(string $path): StorageUri
+    {
+        return new StorageUri($this->disk, $path);
     }
 
     /**
