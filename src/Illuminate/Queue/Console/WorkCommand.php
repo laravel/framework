@@ -209,7 +209,7 @@ class WorkCommand extends Command
      *
      * @param  Job  $job
      * @param  string  $status
-     * @param  Throwable|null  $exception
+     * @param  \Throwable|null  $exception
      * @return void
      */
     protected function writeOutput(Job $job, $status, ?Throwable $exception = null)
@@ -276,7 +276,7 @@ class WorkCommand extends Command
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  string  $status
-     * @param  Throwable|null  $exception
+     * @param  \Throwable|null  $exception
      * @return void
      */
     protected function writeOutputAsJson(Job $job, $status, ?Throwable $exception = null)

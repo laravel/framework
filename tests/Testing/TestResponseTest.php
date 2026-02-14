@@ -239,6 +239,18 @@ class TestResponseTest extends TestCase
         $response->assertViewMissing('foo.baz');
     }
 
+    public function testViewData(): void
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => ['foo' => 'bar', 'baz' => 'qux'],
+        ]);
+
+        $this->assertEquals('bar', $response->viewData('foo'));
+
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $response->viewData());
+    }
+
     public function testAssertContent(): void
     {
         $response = $this->makeMockResponse([

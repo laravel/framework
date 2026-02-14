@@ -4,13 +4,13 @@ namespace Illuminate\Support;
 
 use ArrayIterator;
 use Illuminate\Contracts\Support\ValidatedData;
+use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Traits\InteractsWithData;
-use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
 
 class ValidatedInput implements ValidatedData
 {
-    use InteractsWithData;
+    use Dumpable, InteractsWithData;
 
     /**
      * The underlying input.
@@ -98,29 +98,14 @@ class ValidatedInput implements ValidatedData
     }
 
     /**
-     * Dump the validated inputs items and end the script.
-     *
-     * @param  mixed  ...$keys
-     * @return never
-     */
-    public function dd(...$keys)
-    {
-        $this->dump(...$keys);
-
-        exit(1);
-    }
-
-    /**
      * Dump the items.
      *
-     * @param  mixed  $keys
+     * @param  mixed  ...$keys
      * @return $this
      */
-    public function dump($keys = [])
+    public function dump(...$keys)
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
-
-        VarDumper::dump(count($keys) > 0 ? $this->only($keys) : $this->all());
+        dump(count($keys) > 0 ? $this->only($keys) : $this->all());
 
         return $this;
     }

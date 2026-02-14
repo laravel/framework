@@ -250,8 +250,12 @@ class Mailable implements MailableContract, Renderable
 
         $queueName = property_exists($this, 'queue') ? $this->queue : null;
 
+        $job = $this->newQueuedJob();
+
+        $job->delay($delay);
+
         return $queue->connection($connection)->laterOn(
-            $queueName ?: null, $delay, $this->newQueuedJob()
+            $queueName ?: null, $delay, $job
         );
     }
 

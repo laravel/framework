@@ -512,4 +512,23 @@ class SupportLazyCollectionTest extends TestCase
 
         Carbon::setTestNow();
     }
+
+    public function testRandomPreservesKeys()
+    {
+        $collection = new LazyCollection([
+            'first' => 1,
+            'second' => 2,
+            'third' => 3,
+        ]);
+
+        $keysWithoutPreserve = array_keys($collection->random(2)->all());
+
+        $this->assertEquals([0, 1], $keysWithoutPreserve);
+
+        $keysWithPreserve = array_keys($collection->random(2, true)->all());
+
+        foreach ($keysWithPreserve as $key) {
+            $this->assertContains($key, ['first', 'second', 'third']);
+        }
+    }
 }
