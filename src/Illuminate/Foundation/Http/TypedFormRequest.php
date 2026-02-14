@@ -38,7 +38,7 @@ abstract class TypedFormRequest implements SelfBuilding
         }
 
         return Container::getInstance()
-            ->make(TypedFormRequestFactory::class, ['requestClass' => static::class, 'request' => $input])
+            ->makeWith(TypedFormRequestFactory::class, ['requestClass' => static::class, 'request' => $input])
             ->withAuthorization(false)
             ->build();
     }
