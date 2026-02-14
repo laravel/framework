@@ -863,7 +863,7 @@ class Dispatcher implements DispatcherContract
     }
 
     /**
-     * Execute the given callback while capturing events.
+     * Execute the given callback while capturing events, and then return the events.
      *
      * @param  callable  $callback
      * @param  string[]|null  $events
