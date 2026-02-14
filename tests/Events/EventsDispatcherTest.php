@@ -212,6 +212,7 @@ class EventsDispatcherTest extends TestCase
         });
 
         $this->assertSame([], $_SERVER['__event.test']);
+        $this->assertInstanceOf(EventCollection::class, $captured);
         $this->assertCount(2, $captured);
 
         $captured->dispatch();
@@ -243,6 +244,8 @@ class EventsDispatcherTest extends TestCase
         });
 
         $this->assertSame([], $_SERVER['__event.test']);
+        $this->assertInstanceOf(EventCollection::class, $outerCaptured);
+        $this->assertInstanceOf(EventCollection::class, $innerCaptured);
         $this->assertCount(2, $outerCaptured);
         $this->assertCount(1, $innerCaptured);
 
@@ -276,6 +279,7 @@ class EventsDispatcherTest extends TestCase
         }, ['foo']);
 
         $this->assertSame(['immediate'], $_SERVER['__event.test']);
+        $this->assertInstanceOf(EventCollection::class, $captured);
         $this->assertCount(1, $captured);
 
         $captured->dispatch();
@@ -304,6 +308,7 @@ class EventsDispatcherTest extends TestCase
         }, [DeferTestEvent::class]);
 
         $this->assertSame(['ImmediateTestEvent'], $_SERVER['__event.test']);
+        $this->assertInstanceOf(EventCollection::class, $captured);
 
         $captured->dispatch();
 
@@ -336,6 +341,7 @@ class EventsDispatcherTest extends TestCase
         });
 
         $this->assertSame([], $_SERVER['__event.test']);
+        $this->assertInstanceOf(EventCollection::class, $captured);
 
         $captured->dispatch();
 
@@ -357,6 +363,8 @@ class EventsDispatcherTest extends TestCase
             $d->dispatch('foo', ['foo_value']);
             $d->dispatch('bar', ['bar_value']);
         });
+
+        $this->assertInstanceOf(EventCollection::class, $captured);
 
         $captured->filter(fn ($args) => $args[0] === 'foo')->setDispatcher($d)->dispatch();
 
@@ -385,6 +393,7 @@ class EventsDispatcherTest extends TestCase
         });
 
         $this->assertSame(['deferred'], $_SERVER['__event.test']);
+        $this->assertInstanceOf(EventCollection::class, $captured);
         $this->assertCount(2, $captured);
 
         $captured->dispatch();
@@ -416,6 +425,7 @@ class EventsDispatcherTest extends TestCase
         });
 
         $this->assertSame(['deferred1', 'deferred2'], $_SERVER['__event.test']);
+        $this->assertInstanceOf(EventCollection::class, $innerCaptured);
         $this->assertCount(1, $innerCaptured);
 
         $innerCaptured->dispatch();

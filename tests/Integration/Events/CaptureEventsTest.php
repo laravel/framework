@@ -24,6 +24,7 @@ class CaptureEventsTest extends TestCase
         });
 
         $this->assertArrayNotHasKey('__event.test', $_SERVER);
+        $this->assertInstanceOf(EventCollection::class, $captured);
 
         $captured->dispatch();
 
@@ -46,6 +47,7 @@ class CaptureEventsTest extends TestCase
         });
 
         $this->assertSame([], $_SERVER['__model_event.test']);
+        $this->assertInstanceOf(EventCollection::class, $captured);
 
         $captured->dispatch();
 
@@ -73,6 +75,7 @@ class CaptureEventsTest extends TestCase
         }, ['eloquent.saved: '.CaptureTestModel::class]);
 
         $this->assertSame(['creating'], $_SERVER['__model_events']);
+        $this->assertInstanceOf(EventCollection::class, $captured);
 
         $captured->dispatch();
 
