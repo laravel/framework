@@ -34,6 +34,13 @@ class ThrottleRequests
     protected static $shouldHashKeys = true;
 
     /**
+     * The number of remaining whole tokens per token-bucket key.
+     *
+     * @var array<string, int>
+     */
+    protected $remainingTokens = [];
+
+    /**
      * Create a new request throttler.
      *
      * @param  \Illuminate\Cache\RateLimiter  $limiter
@@ -136,6 +143,10 @@ class ThrottleRequests
                     'decaySeconds' => $limit->decaySeconds,
                     'afterCallback' => $limit->afterCallback,
                     'responseCallback' => $limit->responseCallback,
+                    'usesTokenBucket' => (bool) ($limit->usesTokenBucket ?? false),
+                    'capacity' => $limit->capacity ?? null,
+                    'refillPerSecond' => $limit->refillPerSecond ?? null,
+                    'cost' => $limit->cost ?? 1,
                 ];
             })->all()
         );
@@ -154,6 +165,24 @@ class ThrottleRequests
     protected function handleRequest($request, Closure $next, array $limits)
     {
         foreach ($limits as $limit) {
+            if ($limit->usesTokenBucket ?? false) {
+                $tokenBucket = $this->limiter->tokenBucket(
+                    $limit->key,
+                    $limit->capacity,
+                    $limit->refillPerSecond,
+                    $this->resolveTokenBucketCost($limit->cost, $request),
+                    consume: ! $limit->afterCallback,
+                );
+
+                $this->remainingTokens[$limit->key] = (int) floor($tokenBucket['remaining']);
+
+                if (! $tokenBucket['allowed']) {
+                    throw $this->buildException($request, $limit->key, (int) ceil($limit->capacity), $limit->responseCallback);
+                }
+
+                continue;
+            }
+
             if ($this->limiter->tooManyAttempts($limit->key, $limit->maxAttempts)) {
                 throw $this->buildException($request, $limit->key, $limit->maxAttempts, $limit->responseCallback);
             }
@@ -166,6 +195,27 @@ class ThrottleRequests
         $response = $next($request);
 
         foreach ($limits as $limit) {
+            if ($limit->usesTokenBucket ?? false) {
+                if ($limit->afterCallback && ($limit->afterCallback)($response)) {
+                    $tokenBucket = $this->limiter->tokenBucket(
+                        $limit->key,
+                        $limit->capacity,
+                        $limit->refillPerSecond,
+                        $this->resolveTokenBucketCost($limit->cost, $request)
+                    );
+
+                    $this->remainingTokens[$limit->key] = (int) floor($tokenBucket['remaining']);
+                }
+
+                $response = $this->addHeaders(
+                    $response,
+                    (int) ceil($limit->capacity),
+                    $this->calculateTokenBucketRemainingAttempts($limit->key, $limit->capacity)
+                );
+
+                continue;
+            }
+
             if ($limit->afterCallback && ($limit->afterCallback)($response)) {
                 $this->limiter->hit($limit->key, $limit->decaySeconds);
             }
@@ -178,6 +228,24 @@ class ThrottleRequests
         }
 
         return $response;
+    }
+
+    /**
+     * Resolve the token bucket cost for the given request.
+     *
+     * @param  callable|int|float  $cost
+     * @param  \Illuminate\Http\Request  $request
+     * @return int|float
+     */
+    protected function resolveTokenBucketCost($cost, $request)
+    {
+        $resolved = is_callable($cost) ? $cost($request) : $cost;
+
+        if (! is_numeric($resolved) || (float) $resolved <= 0) {
+            throw new RuntimeException('Token bucket cost must be a positive numeric value.');
+        }
+
+        return (float) $resolved;
     }
 
     /**
@@ -327,6 +395,18 @@ class ThrottleRequests
     protected function calculateRemainingAttempts($key, $maxAttempts, $retryAfter = null)
     {
         return is_null($retryAfter) ? $this->limiter->retriesLeft($key, $maxAttempts) : 0;
+    }
+
+    /**
+     * Calculate remaining attempts for token bucket rate limits.
+     *
+     * @param  string  $key
+     * @param  int|float  $capacity
+     * @return int
+     */
+    protected function calculateTokenBucketRemainingAttempts($key, $capacity)
+    {
+        return max(0, $this->remainingTokens[$key] ?? (int) floor($capacity));
     }
 
     /**

@@ -40,6 +40,13 @@ class Limit
     public $responseCallback;
 
     /**
+     * Indicates if the limit uses token bucket semantics.
+     *
+     * @var bool
+     */
+    public $usesTokenBucket = false;
+
+    /**
      * Create a new limit instance.
      *
      * @param  mixed  $key
@@ -121,6 +128,18 @@ class Limit
     public static function none()
     {
         return new Unlimited;
+    }
+
+    /**
+     * Create a new token bucket rate limit.
+     *
+     * @param  int|float  $capacity
+     * @param  int|float  $refillPerSecond
+     * @return \Illuminate\Cache\RateLimiting\TokenBucketLimit
+     */
+    public static function tokenBucket(int|float $capacity, int|float $refillPerSecond = 1)
+    {
+        return new TokenBucketLimit('', $capacity, $refillPerSecond);
     }
 
     /**
