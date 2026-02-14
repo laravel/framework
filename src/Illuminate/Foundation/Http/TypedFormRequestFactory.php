@@ -14,6 +14,8 @@ use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Foundation\Http\Attributes\HydrateFromRequest;
 use Illuminate\Foundation\Http\Attributes\MapFrom;
+use Illuminate\Foundation\Http\Attributes\RedirectTo;
+use Illuminate\Foundation\Http\Attributes\RedirectToRoute;
 use Illuminate\Foundation\Http\Attributes\StopOnFirstFailure;
 use Illuminate\Foundation\Http\Attributes\WithoutInferringRules;
 use Illuminate\Foundation\Precognition;
@@ -930,9 +932,25 @@ class TypedFormRequestFactory
             );
         }
 
-        $exception = $this->validator->getException();
+        $exceptionClass = $this->validator->getException();
 
-        throw new $exception($this->validator);
+        throw $this->decorateException(new $exceptionClass($this->validator));
+    }
+
+    /**
+     * Decorate the validation exception with redirect information from class attributes.
+     */
+    protected function decorateException(ValidationException $exception): ValidationException
+    {
+        $reflection = $this->reflectRequest();
+
+        if ($redirect = $reflection->getAttributes(RedirectTo::class)[0] ?? null) {
+            $exception->redirectTo($redirect->newInstance()->url);
+        } elseif ($route = $reflection->getAttributes(RedirectToRoute::class)[0] ?? null) {
+            $exception->redirectTo(url()->route($route->newInstance()->route));
+        }
+
+        return $exception;
     }
 
     /**

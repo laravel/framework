@@ -10,6 +10,8 @@ use DateTimeInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Http\Attributes\HydrateFromRequest;
 use Illuminate\Foundation\Http\Attributes\MapFrom;
+use Illuminate\Foundation\Http\Attributes\RedirectTo;
+use Illuminate\Foundation\Http\Attributes\RedirectToRoute;
 use Illuminate\Foundation\Http\Attributes\StopOnFirstFailure;
 use Illuminate\Foundation\Http\Attributes\WithoutInferringRules;
 use Illuminate\Foundation\Http\TypedFormRequest;
@@ -1534,6 +1536,47 @@ class TypedRequestTest extends TestCase
             $this->assertArrayNotHasKey('avatar', $e->errors());
         }
     }
+
+    public function testRedirectToAttributeSetsRedirectUrlOnValidationException()
+    {
+        $request = Request::create('');
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(RedirectToRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertSame('/custom/error-page', $e->redirectTo);
+        }
+    }
+
+    public function testRedirectToRouteAttributeSetsRedirectUrlOnValidationException()
+    {
+        $this->app['router']->get('/dashboard', fn () => 'ok')->name('dashboard');
+
+        $request = Request::create('', parameters: []);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(RedirectToRouteRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertSame('http://localhost/dashboard', $e->redirectTo);
+        }
+    }
+
+    public function testNoRedirectAttributeMeansNullRedirectOnValidationException()
+    {
+        $request = Request::create('', parameters: []);
+        $this->app->instance('request', $request);
+
+        try {
+            $this->app->make(StopOnFirstFailureRequest::class);
+            self::fail('No exception thrown!');
+        } catch (ValidationException $e) {
+            $this->assertNull($e->redirectTo);
+        }
+    }
 }
 
 class MyTypedForm extends TypedFormRequest
@@ -2115,6 +2158,24 @@ class MappedFileUploadRequest extends TypedFormRequest
         public string $title,
         #[MapFrom('user_avatar')]
         public UploadedFile $avatar,
+    ) {
+    }
+}
+
+#[RedirectTo('/custom/error-page')]
+class RedirectToRequest extends TypedFormRequest
+{
+    public function __construct(
+        public string $name,
+    ) {
+    }
+}
+
+#[RedirectToRoute('dashboard')]
+class RedirectToRouteRequest extends TypedFormRequest
+{
+    public function __construct(
+        public string $name,
     ) {
     }
 }
