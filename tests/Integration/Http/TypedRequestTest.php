@@ -22,6 +22,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use Orchestra\Testbench\TestCase;
+use stdClass;
 
 class TypedRequestTest extends TestCase
 {
@@ -1242,7 +1243,7 @@ class TypedRequestTest extends TestCase
         $actual = $this->app->make(ObjectTypedRequest::class);
 
         $this->assertInstanceOf(ObjectTypedRequest::class, $actual);
-        $this->assertInstanceOf(\stdClass::class, $actual->someObject);
+        $this->assertInstanceOf(stdClass::class, $actual->someObject);
         $this->assertSame('Taylor', $actual->someObject->name);
         $this->assertSame(3, $actual->someObject->days);
     }
@@ -1275,7 +1276,7 @@ class TypedRequestTest extends TestCase
         $actual = $this->app->make(ObjectMappedTypedRequest::class);
 
         $this->assertInstanceOf(ObjectMappedTypedRequest::class, $actual);
-        $this->assertInstanceOf(\stdClass::class, $actual->someObject);
+        $this->assertInstanceOf(stdClass::class, $actual->someObject);
         $this->assertSame('Taylor', $actual->someObject->name);
         $this->assertSame(3, $actual->someObject->days);
     }
@@ -2073,7 +2074,7 @@ class ObjectMappedTypedRequest extends TypedFormRequest
 {
     public function __construct(
         #[MapFrom('metadata')]
-        public \stdClass $someObject,
+        public stdClass $someObject,
     ) {
     }
 }

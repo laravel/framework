@@ -18,6 +18,8 @@ use Illuminate\Foundation\Http\Attributes\RedirectTo;
 use Illuminate\Foundation\Http\Attributes\RedirectToRoute;
 use Illuminate\Foundation\Http\Attributes\StopOnFirstFailure;
 use Illuminate\Foundation\Http\Attributes\WithoutInferringRules;
+use Illuminate\Foundation\Http\Concerns\CastsValidatedData;
+use Illuminate\Foundation\Http\Concerns\InfersValidationRules;
 use Illuminate\Foundation\Precognition;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -42,6 +44,9 @@ use function Illuminate\Support\enum_value;
  */
 class TypedFormRequestFactory
 {
+    use CastsValidatedData;
+    use InfersValidationRules;
+
     /**
      * The validator instance for this request.
      */
@@ -222,97 +227,6 @@ class TypedFormRequestFactory
     }
 
     /**
-     * Cast validated data into constructor arguments for the request class.
-     *
-     * @param  array<string, mixed>  $validated
-     * @return array<string, mixed>
-     *
-     * @throws \ReflectionException
-     */
-    protected function castValidatedData(array $validated): array
-    {
-        if (($constructor = $this->reflectRequest()->getConstructor()) === null) {
-            return $validated;
-        }
-
-        $arguments = [];
-
-        foreach ($constructor->getParameters() as $param) {
-            $fieldName = $this->fieldNameFor($param);
-            $name = $param->getName();
-
-            if (! Arr::has($validated, $fieldName)) {
-                continue;
-            }
-
-            $value = Arr::get($validated, $fieldName);
-
-            if ($value === null) {
-                $arguments[$name] = null;
-
-                continue;
-            }
-
-            $type = $param->getType();
-
-            if ($type instanceof ReflectionUnionType) {
-                $nestedRequestClass = $this->nestedHydrationClassFromUnion($type, $param);
-
-                if ($nestedRequestClass !== null && is_array($value)) {
-                    $arguments[$name] = $this->instantiateFromValidatedArray(
-                        $nestedRequestClass,
-                        $this->ensureArrayValue($fieldName, $value)
-                    );
-                } else {
-                    $arguments[$name] = $value;
-                }
-
-                continue;
-            }
-
-            if (! $type instanceof ReflectionNamedType) {
-                $arguments[$name] = $value;
-
-                continue;
-            }
-
-            $typeName = $type->getName();
-            if ($type->isBuiltin()) {
-                if ($typeName === 'object') {
-                    $arguments[$name] = $this->castBuiltinObjectValue($value);
-                } else {
-                    $arguments[$name] = $value;
-                }
-
-                continue;
-            }
-
-            if ($this->isDateObjectType($typeName)) {
-                $arguments[$name] = $this->castDateValue($typeName, $value);
-            } elseif (is_a($typeName, stdClass::class, true)) {
-                $arguments[$name] = $this->castBuiltinObjectValue($value);
-            } elseif ($this->shouldHydrateParameter($param, $typeName) || is_subclass_of($typeName, TypedFormRequest::class)) {
-                $arguments[$name] = $this->instantiateFromValidatedArray(
-                    $typeName,
-                    $this->ensureArrayValue($fieldName, $value)
-                );
-            } elseif (is_subclass_of($typeName, BackedEnum::class)) {
-                $arguments[$name] = $typeName::from($value);
-            } elseif (is_a($typeName, Collection::class, true)) {
-                if ($value instanceof $typeName) {
-                    $arguments[$name] = $value;
-                } else {
-                    $arguments[$name] = new $typeName($this->ensureArrayValue($fieldName, $value));
-                }
-            } else {
-                $arguments[$name] = $value;
-            }
-        }
-
-        return $arguments;
-    }
-
-    /**
      * Ensure the given value is an array payload or throw a validation exception.
      *
      * @template TValue of array<array-key, mixed>
@@ -345,14 +259,6 @@ class TypedFormRequestFactory
     protected function instantiateFromValidatedArray(string $class, array $value): object
     {
         return new $class(...$this->nestedFactory($class)->castValidatedData($value));
-    }
-
-    /**
-     * Cast an "object" builtin value into a stdClass instance when appropriate.
-     */
-    protected function castBuiltinObjectValue(mixed $value): mixed
-    {
-        return is_array($value) ? (object) $value : $value;
     }
 
     /**
@@ -476,164 +382,7 @@ class TypedFormRequestFactory
         return $rules;
     }
 
-    /**
-     * Infer validation rules from constructor parameter types.
-     *
-     * @return array<string, mixed>
-     *
-     * @throws \ReflectionException
-     */
-    protected function inferredRulesFromTypes(): array
-    {
-        if (($constructor = $this->reflectRequest()->getConstructor()) === null || $this->reflectRequest()->getAttributes(WithoutInferringRules::class) !== []) {
-            return [];
-        }
 
-        $rules = [];
-
-        foreach ($constructor->getParameters() as $param) {
-            $paramRules = $this->rulesForParameter($param);
-
-            if ($paramRules !== []) {
-                $rules[$this->fieldNameFor($param)] = $paramRules;
-            }
-        }
-
-        return $rules;
-    }
-
-    /**
-     * Infer validation rules for the given constructor parameter.
-     *
-     * @return list<string|\Illuminate\Contracts\Validation\Rule|\Illuminate\Contracts\Validation\ValidatorAwareRule>
-     */
-    protected function rulesForParameter(ReflectionParameter $param): array
-    {
-        if ($param->getAttributes(WithoutInferringRules::class) !== []) {
-            return [];
-        }
-
-        $type = $param->getType();
-
-        if (! $type instanceof ReflectionType) {
-            return [];
-        }
-
-        $rules = [];
-
-        if ($param->isDefaultValueAvailable()) {
-            $rules[] = 'sometimes';
-        } elseif ($type->allowsNull()) {
-            $rules[] = 'present';
-        } else {
-            $rules[] = 'required';
-        }
-
-        if ($type->allowsNull()) {
-            $rules[] = 'nullable';
-        }
-
-        if ($param->getAttributes(HydrateFromRequest::class) !== []) {
-            $typeRule = 'array';
-        } else {
-            $typeRule = $type instanceof ReflectionUnionType
-                ? $this->ruleForUnionType($type)
-                : ($type instanceof ReflectionNamedType ? $this->ruleForNamedType($type) : null);
-        }
-
-        if ($typeRule !== null) {
-            $rules[] = $typeRule;
-        }
-
-        return $rules;
-    }
-
-    /**
-     * Infer a validation rule for a named type.
-     *
-     * @return string|\Illuminate\Contracts\Validation\ValidatorAwareRule|\Illuminate\Contracts\Validation\Rule|null
-     */
-    protected function ruleForNamedType(ReflectionNamedType $type): mixed
-    {
-        $name = $type->getName();
-
-        if ($type->isBuiltin()) {
-            return match ($name) {
-                'int' => 'integer',
-                'float' => 'numeric',
-                'string' => 'string',
-                'bool' => 'boolean',
-                'true' => 'accepted',
-                'false' => 'declined',
-                'array', 'object', 'iterable' => 'array',
-                default => null,
-            };
-        }
-
-        return $this->ruleForNonBuiltinType($type);
-    }
-
-    /**
-     * Infer a validation rule for a union type.
-     *
-     * @return \Illuminate\Contracts\Validation\ValidatorAwareRule|\Illuminate\Contracts\Validation\Rule|null
-     */
-    protected function ruleForUnionType(ReflectionUnionType $type): mixed
-    {
-        $branches = [];
-
-        foreach ($type->getTypes() as $named) {
-            if ($named->getName() === 'null') {
-                continue;
-            }
-
-            $branchRule = $this->ruleForNamedType($named);
-
-            if ($branchRule === null) {
-                return null;
-            }
-
-            $branches[] = [$branchRule];
-        }
-
-        if ($branches === []) {
-            return null;
-        }
-
-        return Rule::anyOf($branches);
-    }
-
-    /**
-     * Infer a validation rule for a non-builtin named type.
-     *
-     * @return string|\Illuminate\Contracts\Validation\ValidatorAwareRule|\Illuminate\Contracts\Validation\Rule
-     */
-    protected function ruleForNonBuiltinType(ReflectionNamedType $type): mixed
-    {
-        $name = $type->getName();
-
-        if ($this->shouldHydrateFromRequest($name)) {
-            return 'array';
-        }
-
-        if (is_subclass_of($name, BackedEnum::class)) {
-            return new Enum($name);
-        }
-
-        if ($this->isDateObjectType($name)) {
-            return 'date';
-        }
-
-        if (is_subclass_of($name, TypedFormRequest::class) || is_a($name, Collection::class, true) || is_a($name, stdClass::class, true)) {
-            return 'array';
-        }
-
-        if ($this->isFile($name)) {
-            return 'file';
-        }
-
-        return null;
-    }
 
     /**
      * Determine if the given class name is a date object type.
@@ -643,37 +392,6 @@ class TypedFormRequestFactory
     protected function isDateObjectType(string $name): bool
     {
         return is_a($name, DateTimeInterface::class, true);
-    }
-
-    /**
-     * @return bool
-     */
-    protected function isFile(string $name): bool
-    {
-        return is_a($name, UploadedFile::class, true);
-    }
-
-    /**
-     * Cast the given value to the requested date object type.
-     *
-     * @param  class-string  $typeName  The date object class name.
-     * @param  mixed  $value  The validated value.
-     */
-    protected function castDateValue(string $typeName, mixed $value): ?DateTimeInterface
-    {
-        if ($value === null || ($value instanceof DateTimeInterface && $value instanceof $typeName)) {
-            return $value;
-        }
-
-        $parsed = Date::parse($value);
-
-        return match (true) {
-            $typeName === DateTimeInterface::class => $parsed,
-            $typeName === DateTime::class => $parsed->toDateTime(),
-            $typeName === DateTimeImmutable::class => $parsed->toDateTimeImmutable(),
-            is_a($typeName, CarbonImmutable::class, true) => CarbonImmutable::instance($parsed),
-            default => $parsed,
-        };
     }
 
     /**
