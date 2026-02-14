@@ -25,9 +25,7 @@ class CaptureEventsTest extends TestCase
 
         $this->assertArrayNotHasKey('__event.test', $_SERVER);
 
-        foreach ($captured as $args) {
-            Event::dispatch(...$args);
-        }
+        $captured->dispatch();
 
         $this->assertSame('bar', $_SERVER['__event.test']);
     }
@@ -49,9 +47,7 @@ class CaptureEventsTest extends TestCase
 
         $this->assertSame([], $_SERVER['__model_event.test']);
 
-        foreach ($captured as $args) {
-            Event::dispatch(...$args);
-        }
+        $captured->dispatch();
 
         $this->assertContains('saved', $_SERVER['__model_event.test']);
     }
@@ -78,9 +74,7 @@ class CaptureEventsTest extends TestCase
 
         $this->assertSame(['creating'], $_SERVER['__model_events']);
 
-        foreach ($captured as $args) {
-            Event::dispatch(...$args);
-        }
+        $captured->dispatch();
 
         $this->assertSame(['creating', 'saved'], $_SERVER['__model_events']);
     }

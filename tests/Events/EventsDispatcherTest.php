@@ -189,9 +189,7 @@ class EventsDispatcherTest extends TestCase
         $this->assertInstanceOf(EventCollection::class, $captured);
         $this->assertCount(1, $captured);
 
-        foreach ($captured as $args) {
-            $d->dispatch(...$args);
-        }
+        $captured->dispatch();
 
         $this->assertSame('bar', $_SERVER['__event.test']);
     }
@@ -216,9 +214,7 @@ class EventsDispatcherTest extends TestCase
         $this->assertSame([], $_SERVER['__event.test']);
         $this->assertCount(2, $captured);
 
-        foreach ($captured as $args) {
-            $d->dispatch(...$args);
-        }
+        $captured->dispatch();
 
         $this->assertSame(['foo', 'bar'], $_SERVER['__event.test']);
     }
@@ -250,15 +246,11 @@ class EventsDispatcherTest extends TestCase
         $this->assertCount(2, $outerCaptured);
         $this->assertCount(1, $innerCaptured);
 
-        foreach ($innerCaptured as $args) {
-            $d->dispatch(...$args);
-        }
+        $innerCaptured->dispatch();
 
         $this->assertSame(['inner'], $_SERVER['__event.test']);
 
-        foreach ($outerCaptured as $args) {
-            $d->dispatch(...$args);
-        }
+        $outerCaptured->dispatch();
 
         $this->assertSame(['inner', 'outer1', 'outer2'], $_SERVER['__event.test']);
     }
@@ -286,9 +278,7 @@ class EventsDispatcherTest extends TestCase
         $this->assertSame(['immediate'], $_SERVER['__event.test']);
         $this->assertCount(1, $captured);
 
-        foreach ($captured as $args) {
-            $d->dispatch(...$args);
-        }
+        $captured->dispatch();
 
         $this->assertSame(['immediate', 'captured'], $_SERVER['__event.test']);
     }
@@ -315,9 +305,7 @@ class EventsDispatcherTest extends TestCase
 
         $this->assertSame(['ImmediateTestEvent'], $_SERVER['__event.test']);
 
-        foreach ($captured as $args) {
-            $d->dispatch(...$args);
-        }
+        $captured->dispatch();
 
         $this->assertSame(['ImmediateTestEvent', 'DeferTestEvent'], $_SERVER['__event.test']);
     }
@@ -399,9 +387,7 @@ class EventsDispatcherTest extends TestCase
         $this->assertSame(['deferred'], $_SERVER['__event.test']);
         $this->assertCount(2, $captured);
 
-        foreach ($captured as $args) {
-            $d->dispatch(...$args);
-        }
+        $captured->dispatch();
 
         $this->assertSame(['deferred', 'captured1', 'captured2'], $_SERVER['__event.test']);
     }
@@ -432,9 +418,7 @@ class EventsDispatcherTest extends TestCase
         $this->assertSame(['deferred1', 'deferred2'], $_SERVER['__event.test']);
         $this->assertCount(1, $innerCaptured);
 
-        foreach ($innerCaptured as $args) {
-            $d->dispatch(...$args);
-        }
+        $innerCaptured->dispatch();
 
         $this->assertSame(['deferred1', 'deferred2', 'captured'], $_SERVER['__event.test']);
     }
