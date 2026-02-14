@@ -281,7 +281,7 @@ trait SoftDeletes
     }
 
     /**
-     * Get the fully qualified "deleted at" column.
+     * Get the fully-qualified "deleted at" column.
      *
      * @return string
      */

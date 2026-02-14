@@ -176,7 +176,7 @@ class ViewMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the class fully qualified name for the test.
+     * Get the class fully-qualified name for the test.
      *
      * @return string
      */
