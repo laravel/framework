@@ -116,11 +116,12 @@ class DatabaseUserProvider implements UserProvider
 
         foreach ($credentials as $key => $value) {
             match (true) {
-                (is_array($value) || $value instanceof Arrayable) => $query->whereIn($key, $value),
-                ($value instanceof Closure) => $value($query),
+                is_array($value) || $value instanceof Arrayable => $query->whereIn($key, $value),
+                $value instanceof Closure => $value($query) ?? $query,
                 default => $query->where($key, $value),
             };
         }
+
 
         // Now we are ready to execute the query to see if we have a user matching
         // the given credentials. If not, we will just return null and indicate
