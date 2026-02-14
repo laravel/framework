@@ -16,6 +16,7 @@ use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionUnionType;
 use stdClass;
+use function Illuminate\Support\enum_value;
 
 trait CastsValidatedData
 {
@@ -202,4 +203,18 @@ trait CastsValidatedData
         ]);
     }
 
+    /**
+     * Convert a reflected default value to a native value.
+     *
+     * @template TValue
+     *
+     * @param  TValue  $value
+     * @return mixed
+     *
+     * @phpstan-return ($value is empty ? null : ($value is \BackedEnum ? value-of<TValue> : ($value is \UnitEnum ? string : TValue)))
+     */
+    protected function mapToNativeFromDefaultValue(mixed $value): mixed
+    {
+        return enum_value($value);
+    }
 }

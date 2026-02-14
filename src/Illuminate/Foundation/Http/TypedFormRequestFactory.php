@@ -397,21 +397,6 @@ class TypedFormRequestFactory
     }
 
     /**
-     * Convert a reflected default value to a native value.
-     *
-     * @template TValue
-     *
-     * @param  TValue  $value
-     * @return mixed
-     *
-     * @phpstan-return ($value is empty ? null : ($value is \BackedEnum ? value-of<TValue> : ($value is \UnitEnum ? string : TValue)))
-     */
-    protected function mapToNativeFromDefaultValue(mixed $value): mixed
-    {
-        return enum_value($value);
-    }
-
-    /**
      * Get the validation messages for the request.
      *
      * @return array<string, mixed>
