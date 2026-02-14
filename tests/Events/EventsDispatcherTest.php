@@ -333,6 +333,70 @@ class EventsDispatcherTest extends TestCase
         $this->assertEmpty($captured);
     }
 
+    public function testDeferInsideCapture()
+    {
+        $_SERVER['__event.test'] = [];
+        $d = new Dispatcher;
+        $d->listen('foo', function ($foo) {
+            $_SERVER['__event.test'][] = $foo;
+        });
+
+        $captured = $d->capture(function () use ($d) {
+            $d->dispatch('foo', ['captured1']);
+
+            $d->defer(function () use ($d) {
+                $d->dispatch('foo', ['deferred']);
+                $this->assertSame([], $_SERVER['__event.test']);
+            });
+
+            $this->assertSame(['deferred'], $_SERVER['__event.test']);
+
+            $d->dispatch('foo', ['captured2']);
+        });
+
+        $this->assertSame(['deferred'], $_SERVER['__event.test']);
+        $this->assertCount(2, $captured);
+
+        foreach ($captured as $args) {
+            $d->dispatch(...$args);
+        }
+
+        $this->assertSame(['deferred', 'captured1', 'captured2'], $_SERVER['__event.test']);
+    }
+
+    public function testCaptureInsideDefer()
+    {
+        $_SERVER['__event.test'] = [];
+        $d = new Dispatcher;
+        $d->listen('foo', function ($foo) {
+            $_SERVER['__event.test'][] = $foo;
+        });
+
+        $innerCaptured = null;
+
+        $d->defer(function () use ($d, &$innerCaptured) {
+            $d->dispatch('foo', ['deferred1']);
+
+            $innerCaptured = $d->capture(function () use ($d) {
+                $d->dispatch('foo', ['captured']);
+                $this->assertSame([], $_SERVER['__event.test']);
+            });
+
+            $this->assertSame([], $_SERVER['__event.test']);
+
+            $d->dispatch('foo', ['deferred2']);
+        });
+
+        $this->assertSame(['deferred1', 'deferred2'], $_SERVER['__event.test']);
+        $this->assertCount(1, $innerCaptured);
+
+        foreach ($innerCaptured as $args) {
+            $d->dispatch(...$args);
+        }
+
+        $this->assertSame(['deferred1', 'deferred2', 'captured'], $_SERVER['__event.test']);
+    }
+
     public function testHaltingEventExecution()
     {
         unset($_SERVER['__event.test']);
