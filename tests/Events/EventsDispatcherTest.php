@@ -326,7 +326,7 @@ class EventsDispatcherTest extends TestCase
         $d = new Dispatcher;
 
         $captured = $d->capture(function () {
-            // no events dispatched
+            // No events dispatched
         });
 
         $this->assertIsArray($captured);
