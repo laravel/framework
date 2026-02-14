@@ -346,7 +346,7 @@ abstract class Relation implements BuilderContract
     }
 
     /**
-     * Get the fully qualified parent key name.
+     * Get the fully-qualified parent key name.
      *
      * @return string
      */
