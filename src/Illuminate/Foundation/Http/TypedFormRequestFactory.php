@@ -9,7 +9,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
-use Illuminate\Container\Container;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Foundation\Http\Attributes\HydrateFromRequest;
@@ -96,10 +96,12 @@ class TypedFormRequestFactory
      *
      * @param  class-string<T>  $requestClass  The request class being built.
      * @param  Request  $request  The underlying HTTP request instance.
+     * @param  Container  $container  The container instance.
      */
     public function __construct(
         protected string $requestClass,
         protected Request $request,
+        protected Container $container,
     ) {
     }
 
@@ -179,10 +181,10 @@ class TypedFormRequestFactory
             return $this->nestedFactories[$class];
         }
 
-        $builder = Container::getInstance()
+        $builder = $this->container
             ->make(
                 TypedFormRequestFactory::class,
-                ['requestClass' => $class, 'request' => $this->request]
+                ['requestClass' => $class, 'request' => $this->request, 'container' => $this->container]
             );
         $builder->ancestors = [...$this->ancestors, $this->requestClass];
 
@@ -356,7 +358,7 @@ class TypedFormRequestFactory
     protected function prepareForValidation(): void
     {
         if (method_exists($this->requestClass, 'prepareForValidation')) {
-            Container::getInstance()->call(
+            $this->container->call(
                 [$this->requestClass, 'prepareForValidation'],
                 ['request' => $this->request]
             );
@@ -369,7 +371,7 @@ class TypedFormRequestFactory
     protected function passesAuthorization()
     {
         if (method_exists($this->requestClass, 'authorize')) {
-            $result = Container::getInstance()->call(
+            $result = $this->container->call(
                 [$this->requestClass, 'authorize'],
                 ['request' => $this->request]
             );
@@ -388,7 +390,7 @@ class TypedFormRequestFactory
     protected function failedAuthorization(): never
     {
         if (method_exists($this->requestClass, 'failedAuthorization')) {
-            Container::getInstance()->call(
+            $this->container->call(
                 [$this->requestClass, 'failedAuthorization'],
                 ['request' => $this->request]
             );
@@ -402,10 +404,10 @@ class TypedFormRequestFactory
      */
     protected function getValidatorInstance(): ValidatorContract
     {
-        $factory = Container::getInstance()->make(ValidationFactory::class);
+        $factory = $this->container->make(ValidationFactory::class);
 
         $validator = method_exists($this->requestClass, 'validator')
-            ? Container::getInstance()->call(
+            ? $this->container->call(
                 [$this->requestClass, 'validator'],
                 ['factory' => $factory]
             )
@@ -416,7 +418,7 @@ class TypedFormRequestFactory
         }
 
         if (method_exists($this->requestClass, 'after')) {
-            $validator->after(Container::getInstance()->call(
+            $validator->after($this->container->call(
                 [$this->requestClass, 'after'],
                 ['validator' => $validator]
             ));
@@ -458,7 +460,7 @@ class TypedFormRequestFactory
         $rules = array_merge($this->inferredRulesFromTypes(), $this->nestedMetadata()['rules']);
 
         if (method_exists($this->requestClass, 'rules')) {
-            $userRules = Container::getInstance()->call(
+            $userRules = $this->container->call(
                 [$this->requestClass, 'rules'],
                 ['request' => $this->request]
             );
@@ -682,9 +684,8 @@ class TypedFormRequestFactory
      */
     protected function validationData(): array
     {
-        // @todo add in an attribute that will read the docblocks for things like `int<1, 100>` and convert them into the rules
         if (method_exists($this->requestClass, 'validationData')) {
-            return Container::getInstance()->call(
+            return $this->container->call(
                 [$this->requestClass, 'validationData'],
                 ['request' => $this->request]
             );
@@ -800,7 +801,7 @@ class TypedFormRequestFactory
         $messages = [];
 
         if (method_exists($this->requestClass, 'messages')) {
-            $messages = Container::getInstance()->call([$this->requestClass, 'messages']);
+            $messages = $this->container->call([$this->requestClass, 'messages']);
         }
 
         return array_merge($messages, $this->nestedMetadata()['messages']);
@@ -816,7 +817,7 @@ class TypedFormRequestFactory
         $attributes = [];
 
         if (method_exists($this->requestClass, 'attributes')) {
-            $attributes = Container::getInstance()->call([$this->requestClass, 'attributes']);
+            $attributes = $this->container->call([$this->requestClass, 'attributes']);
         }
 
         return array_merge($attributes, $this->nestedMetadata()['attributes']);
@@ -910,7 +911,7 @@ class TypedFormRequestFactory
     protected function shouldStopOnFirstFailure(): bool
     {
         if (method_exists($this->requestClass, 'shouldStopOnFirstFailure')) {
-            return (bool) Container::getInstance()->call([$this->requestClass, 'shouldStopOnFirstFailure']);
+            return (bool) $this->container->call([$this->requestClass, 'shouldStopOnFirstFailure']);
         }
 
         if ($this->reflectRequest()->getAttributes(StopOnFirstFailure::class) !== []) {
@@ -926,7 +927,7 @@ class TypedFormRequestFactory
     protected function failedValidation(): never
     {
         if (method_exists($this->requestClass, 'failedValidation')) {
-            Container::getInstance()->call(
+            $this->container->call(
                 [$this->requestClass, 'failedValidation'],
                 ['validator' => $this->validator]
             );
