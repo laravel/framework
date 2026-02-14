@@ -11,6 +11,7 @@ use Illuminate\Foundation\Http\TypedFormRequest;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Validation\ValidationException;
 use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionUnionType;
@@ -176,4 +177,29 @@ trait CastsValidatedData
 
         return null;
     }
+
+    /**
+     * Ensure the given value is an array payload or throw a validation exception.
+     *
+     * @template TValue of array<array-key, mixed>
+     *
+     * @param  string  $fieldName
+     * @param  TValue|mixed  $value
+     * @return array<array-key, mixed>
+     *
+     * @phpstan-return ($value is array<array-key, mixed> ? TValue : never)
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function ensureArrayValue(string $fieldName, mixed $value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+
+        throw ValidationException::withMessages([
+            $fieldName => ["The {$fieldName} field must be an array."],
+        ]);
+    }
+
 }

@@ -183,30 +183,6 @@ class TypedFormRequestFactory
     }
 
     /**
-     * Ensure the given value is an array payload or throw a validation exception.
-     *
-     * @template TValue of array<array-key, mixed>
-     *
-     * @param  string  $fieldName
-     * @param  TValue|mixed  $value
-     * @return array<array-key, mixed>
-     *
-     * @phpstan-return ($value is array<array-key, mixed> ? TValue : never)
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    protected function ensureArrayValue(string $fieldName, mixed $value): array
-    {
-        if (is_array($value)) {
-            return $value;
-        }
-
-        throw ValidationException::withMessages([
-            $fieldName => ["The {$fieldName} field must be an array."],
-        ]);
-    }
-
-    /**
      * Instantiate a nested object from a validated array payload.
      *
      * @param  class-string  $class
