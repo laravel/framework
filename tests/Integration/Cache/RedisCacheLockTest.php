@@ -134,4 +134,55 @@ class RedisCacheLockTest extends TestCase
         $this->assertTrue($secondLock->isOwnedBy($firstLock->owner()));
         $this->assertFalse($secondLock->isOwnedByCurrentProcess());
     }
+
+    public function testRedisLockCanBeRefreshed()
+    {
+        Cache::store('redis')->lock('foo')->forceRelease();
+
+        $lock = Cache::store('redis')->lock('foo', 10);
+        $this->assertTrue($lock->get());
+
+        // Refresh the lock for another 20 seconds
+        $this->assertTrue($lock->refresh(20));
+
+        // Lock should still be held
+        $this->assertFalse(Cache::store('redis')->lock('foo', 10)->get());
+
+        $lock->release();
+    }
+
+    public function testRedisLockCannotBeRefreshedByAnotherOwner()
+    {
+        Cache::store('redis')->lock('foo')->forceRelease();
+
+        $firstLock = Cache::store('redis')->lock('foo', 10);
+        $this->assertTrue($firstLock->get());
+
+        // Create a new lock with a different owner
+        $secondLock = Cache::store('redis')->restoreLock('foo', 'other_owner');
+
+        // Second lock should not be able to refresh
+        $this->assertFalse($secondLock->refresh(20));
+
+        // Original lock should still be able to refresh
+        $this->assertTrue($firstLock->refresh(20));
+
+        $firstLock->release();
+    }
+
+    public function testRedisLockRefreshWithDefaultSeconds()
+    {
+        Cache::store('redis')->lock('foo')->forceRelease();
+
+        $lock = Cache::store('redis')->lock('foo', 10);
+        $this->assertTrue($lock->get());
+
+        // Refresh without specifying seconds should use the original duration
+        $this->assertTrue($lock->refresh());
+
+        // Lock should still be held
+        $this->assertFalse(Cache::store('redis')->lock('foo', 10)->get());
+
+        $lock->release();
+    }
 }
