@@ -12,6 +12,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use ReflectionNamedType;
+use ReflectionParameter;
 use ReflectionUnionType;
 use stdClass;
 
@@ -147,5 +148,32 @@ trait CastsValidatedData
     protected function isDateObjectType(string $name): bool
     {
         return is_a($name, DateTimeInterface::class, true);
+    }
+
+
+    /**
+     * Get the first union branch that should be hydrated from an array payload.
+     *
+     * @return class-string|null
+     */
+    protected function nestedHydrationClassFromUnion(ReflectionUnionType $type, ReflectionParameter $param): ?string
+    {
+        foreach ($type->getTypes() as $named) {
+            if ($named->getName() === 'null' || $named->isBuiltin()) {
+                continue;
+            }
+
+            $class = $named->getName();
+
+            if (in_array($class, $this->ancestors)) {
+                continue;
+            }
+
+            if (is_subclass_of($class, TypedFormRequest::class) || $this->shouldHydrateParameter($param, $class)) {
+                return $class;
+            }
+        }
+
+        return null;
     }
 }

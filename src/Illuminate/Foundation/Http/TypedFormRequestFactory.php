@@ -134,32 +134,6 @@ class TypedFormRequestFactory
     }
 
     /**
-     * Get the first union branch that should be hydrated from an array payload.
-     *
-     * @return class-string|null
-     */
-    protected function nestedHydrationClassFromUnion(ReflectionUnionType $type, ReflectionParameter $param): ?string
-    {
-        foreach ($type->getTypes() as $named) {
-            if ($named->getName() === 'null' || $named->isBuiltin()) {
-                continue;
-            }
-
-            $class = $named->getName();
-
-            if (in_array($class, $this->ancestors)) {
-                continue;
-            }
-
-            if (is_subclass_of($class, TypedFormRequest::class) || $this->shouldHydrateParameter($param, $class)) {
-                return $class;
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * @template TTypedFormRequest of TypedFormRequest
      *
      * @param  class-string<TTypedFormRequest>  $class
