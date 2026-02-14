@@ -17,14 +17,14 @@ abstract class TypedFormRequest implements SelfBuilding
     public static function newInstance(): static
     {
         return Container::getInstance()
-            ->make(TypedFormRequestFactory::class, ['requestClass' => static::class])
+            ->makeWith(TypedFormRequestFactory::class, ['requestClass' => static::class])
             ->build();
     }
 
     /**
      * Create a TypedFormRequest without authorization.
      *
-     * @param  array|\Illuminate\Http\Request  $input
+     * @param  array|\Illuminate\Http\Request|\Illuminate\Contracts\Support\Arrayable  $input
      * @return static
      *
      * @throws \Illuminate\Validation\ValidationException
