@@ -2,11 +2,6 @@
 
 namespace Illuminate\Foundation\Http;
 
-use BackedEnum;
-use Carbon\CarbonImmutable;
-use DateTime;
-use DateTimeImmutable;
-use DateTimeInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Contracts\Container\Container;
@@ -22,20 +17,14 @@ use Illuminate\Foundation\Http\Concerns\CastsValidatedData;
 use Illuminate\Foundation\Http\Concerns\InfersValidationRules;
 use Illuminate\Foundation\Precognition;
 use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionParameter;
-use ReflectionType;
 use ReflectionUnionType;
-use stdClass;
 
 use function Illuminate\Support\enum_value;
 
@@ -74,13 +63,6 @@ class TypedFormRequestFactory
      * @var array{rules: array<array-key, mixed>, messages: array<array-key, mixed>, attributes: array<array-key, mixed>}
      */
     protected array $nestedMetadata;
-
-    /**
-     * The cached HydrateFromRequest attribute checks.
-     *
-     * @var array<class-string, bool>
-     */
-    protected array $hydrateFromRequestCache = [];
 
     /**
      * The cached nested factories.
@@ -382,18 +364,6 @@ class TypedFormRequestFactory
         return $rules;
     }
 
-
-
-    /**
-     * Determine if the given class name is a date object type.
-     *
-     * @param  class-string  $name
-     */
-    protected function isDateObjectType(string $name): bool
-    {
-        return is_a($name, DateTimeInterface::class, true);
-    }
-
     /**
      * Get the validation data for the request.
      *
@@ -463,23 +433,6 @@ class TypedFormRequestFactory
     protected function reflectRequest(): ReflectionClass
     {
         return $this->reflection ??= new ReflectionClass($this->requestClass);
-    }
-
-    /**
-     * Determine if a given class should be hydrated from request data because
-     * it has the HydrateFromRequest applied at the class-level.
-     *
-     * @param  class-string  $class
-     */
-    protected function shouldHydrateFromRequest(string $class): bool
-    {
-        if (isset($this->hydrateFromRequestCache[$class])) {
-            return $this->hydrateFromRequestCache[$class];
-        }
-
-        $reflection = new ReflectionClass($class);
-
-        return $this->hydrateFromRequestCache[$class] = $reflection->getAttributes(HydrateFromRequest::class) !== [];
     }
 
     /**

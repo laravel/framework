@@ -10,13 +10,22 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
+use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionType;
 use ReflectionUnionType;
+use stdClass;
 
 trait InfersValidationRules
 {
+    /**
+     * The cached HydrateFromRequest attribute checks.
+     *
+     * @var array<class-string, bool>
+     */
+    protected array $hydrateFromRequestCache = [];
+
     /**
      * Infer validation rules from constructor parameter types.
      *
@@ -184,5 +193,22 @@ trait InfersValidationRules
     protected function isFile(string $name): bool
     {
         return is_a($name, UploadedFile::class, true);
+    }
+
+    /**
+     * Determine if a given class should be hydrated from request data because
+     * it has the HydrateFromRequest applied at the class-level.
+     *
+     * @param  class-string  $class
+     */
+    protected function shouldHydrateFromRequest(string $class): bool
+    {
+        if (isset($this->hydrateFromRequestCache[$class])) {
+            return $this->hydrateFromRequestCache[$class];
+        }
+
+        $reflection = new ReflectionClass($class);
+
+        return $this->hydrateFromRequestCache[$class] = $reflection->getAttributes(HydrateFromRequest::class) !== [];
     }
 }

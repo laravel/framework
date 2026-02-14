@@ -138,4 +138,14 @@ trait CastsValidatedData
             default => $parsed,
         };
     }
+
+    /**
+     * Determine if the given class name is a date object type.
+     *
+     * @param  class-string  $name
+     */
+    protected function isDateObjectType(string $name): bool
+    {
+        return is_a($name, DateTimeInterface::class, true);
+    }
 }
