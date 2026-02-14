@@ -57,6 +57,16 @@ class DatabaseMySqlQueryGrammarTest extends TestCase
         );
     }
 
+    public function testTimeoutWithExists()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('email', 'like', '%test%')->timeout(60);
+        $this->assertSame(
+            'select /*+ MAX_EXECUTION_TIME(60000) */ exists(select * from `users` where `email` like ?) as `exists`',
+            $builder->getGrammar()->compileExists($builder)
+        );
+    }
+
     public function testTimeoutNullRemovesTimeout()
     {
         $builder = $this->getBuilder();

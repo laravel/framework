@@ -25,22 +25,48 @@ class MySqlGrammar extends Grammar
      */
     public function compileSelect(Builder $query)
     {
-        $sql = parent::compileSelect($query);
+        return $this->applyTimeout($query, parent::compileSelect($query));
+    }
 
+    /**
+     * Compile an exists statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    public function compileExists(Builder $query)
+    {
+        $timeout = $query->timeout;
+        $query->timeout = null;
+
+        $select = $this->compileSelect($query);
+
+        $query->timeout = $timeout;
+
+        return $this->applyTimeout($query, "select exists({$select}) as {$this->wrap('exists')}");
+    }
+
+    /**
+     * Apply the query timeout to the given SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $sql
+     * @return string
+     */
+    protected function applyTimeout(Builder $query, string $sql)
+    {
         if ($query->timeout === null) {
             return $sql;
         }
 
         $milliseconds = $query->timeout * 1000;
 
-        $sql = preg_replace(
+        return preg_replace(
             '/^select\b/i',
             'select /*+ MAX_EXECUTION_TIME('.$milliseconds.') */',
             $sql,
             1
         );
-
-        return $sql;
     }
 
     /**

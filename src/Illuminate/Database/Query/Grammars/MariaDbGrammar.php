@@ -9,6 +9,22 @@ use RuntimeException;
 class MariaDbGrammar extends MySqlGrammar
 {
     /**
+     * Apply the query timeout to the given SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $sql
+     * @return string
+     */
+    protected function applyTimeout(Builder $query, string $sql)
+    {
+        if ($query->timeout === null) {
+            return $sql;
+        }
+
+        return 'SET STATEMENT max_statement_time='.$query->timeout.' FOR '.$sql;
+    }
+
+    /**
      * Compile a "lateral join" clause.
      *
      * @param  \Illuminate\Database\Query\JoinLateralClause  $join
