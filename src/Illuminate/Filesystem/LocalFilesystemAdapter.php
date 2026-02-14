@@ -3,6 +3,7 @@
 namespace Illuminate\Filesystem;
 
 use Closure;
+use Illuminate\Support\StorageUri;
 use Illuminate\Support\Traits\Conditionable;
 use RuntimeException;
 
