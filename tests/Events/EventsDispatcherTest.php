@@ -6,6 +6,7 @@ use Error;
 use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Events\EventCollection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -169,6 +170,267 @@ class EventsDispatcherTest extends TestCase
         }, [DeferTestEvent::class]);
 
         $this->assertSame(['ImmediateTestEvent', 'DeferTestEvent'], $_SERVER['__event.test']);
+    }
+
+    public function testCaptureEventExecution()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+        $d->listen('foo', function ($foo) {
+            $_SERVER['__event.test'] = $foo;
+        });
+
+        $captured = $d->capture(function () use ($d) {
+            $d->dispatch('foo', ['bar']);
+            $this->assertArrayNotHasKey('__event.test', $_SERVER);
+        });
+
+        $this->assertArrayNotHasKey('__event.test', $_SERVER);
+        $this->assertInstanceOf(EventCollection::class, $captured);
+        $this->assertCount(1, $captured);
+
+        $captured->dispatch();
+
+        $this->assertSame('bar', $_SERVER['__event.test']);
+    }
+
+    public function testCaptureMultipleEvents()
+    {
+        $_SERVER['__event.test'] = [];
+        $d = new Dispatcher;
+        $d->listen('foo', function ($value) {
+            $_SERVER['__event.test'][] = $value;
+        });
+        $d->listen('bar', function ($value) {
+            $_SERVER['__event.test'][] = $value;
+        });
+
+        $captured = $d->capture(function () use ($d) {
+            $d->dispatch('foo', ['foo']);
+            $d->dispatch('bar', ['bar']);
+            $this->assertSame([], $_SERVER['__event.test']);
+        });
+
+        $this->assertSame([], $_SERVER['__event.test']);
+        $this->assertInstanceOf(EventCollection::class, $captured);
+        $this->assertCount(2, $captured);
+
+        $captured->dispatch();
+
+        $this->assertSame(['foo', 'bar'], $_SERVER['__event.test']);
+    }
+
+    public function testCaptureNestedEvents()
+    {
+        $_SERVER['__event.test'] = [];
+        $d = new Dispatcher;
+        $d->listen('foo', function ($foo) {
+            $_SERVER['__event.test'][] = $foo;
+        });
+
+        $innerCaptured = null;
+
+        $outerCaptured = $d->capture(function () use ($d, &$innerCaptured) {
+            $d->dispatch('foo', ['outer1']);
+
+            $innerCaptured = $d->capture(function () use ($d) {
+                $d->dispatch('foo', ['inner']);
+                $this->assertSame([], $_SERVER['__event.test']);
+            });
+
+            $this->assertSame([], $_SERVER['__event.test']);
+
+            $d->dispatch('foo', ['outer2']);
+        });
+
+        $this->assertSame([], $_SERVER['__event.test']);
+        $this->assertInstanceOf(EventCollection::class, $outerCaptured);
+        $this->assertInstanceOf(EventCollection::class, $innerCaptured);
+        $this->assertCount(2, $outerCaptured);
+        $this->assertCount(1, $innerCaptured);
+
+        $innerCaptured->dispatch();
+
+        $this->assertSame(['inner'], $_SERVER['__event.test']);
+
+        $outerCaptured->dispatch();
+
+        $this->assertSame(['inner', 'outer1', 'outer2'], $_SERVER['__event.test']);
+    }
+
+    public function testCaptureSpecificEvents()
+    {
+        $_SERVER['__event.test'] = [];
+        $d = new Dispatcher;
+
+        $d->listen('foo', function ($foo) {
+            $_SERVER['__event.test'][] = $foo;
+        });
+
+        $d->listen('bar', function ($bar) {
+            $_SERVER['__event.test'][] = $bar;
+        });
+
+        $captured = $d->capture(function () use ($d) {
+            $d->dispatch('foo', ['captured']);
+            $d->dispatch('bar', ['immediate']);
+
+            $this->assertSame(['immediate'], $_SERVER['__event.test']);
+        }, ['foo']);
+
+        $this->assertSame(['immediate'], $_SERVER['__event.test']);
+        $this->assertInstanceOf(EventCollection::class, $captured);
+        $this->assertCount(1, $captured);
+
+        $captured->dispatch();
+
+        $this->assertSame(['immediate', 'captured'], $_SERVER['__event.test']);
+    }
+
+    public function testCaptureSpecificObjectEvents()
+    {
+        $_SERVER['__event.test'] = [];
+        $d = new Dispatcher;
+
+        $d->listen(DeferTestEvent::class, function () {
+            $_SERVER['__event.test'][] = 'DeferTestEvent';
+        });
+
+        $d->listen(ImmediateTestEvent::class, function () {
+            $_SERVER['__event.test'][] = 'ImmediateTestEvent';
+        });
+
+        $captured = $d->capture(function () use ($d) {
+            $d->dispatch(new DeferTestEvent());
+            $d->dispatch(new ImmediateTestEvent());
+
+            $this->assertSame(['ImmediateTestEvent'], $_SERVER['__event.test']);
+        }, [DeferTestEvent::class]);
+
+        $this->assertSame(['ImmediateTestEvent'], $_SERVER['__event.test']);
+        $this->assertInstanceOf(EventCollection::class, $captured);
+
+        $captured->dispatch();
+
+        $this->assertSame(['ImmediateTestEvent', 'DeferTestEvent'], $_SERVER['__event.test']);
+    }
+
+    public function testCaptureEmptyEvents()
+    {
+        $d = new Dispatcher;
+
+        $captured = $d->capture(function () {
+            // No events dispatched
+        });
+
+        $this->assertInstanceOf(EventCollection::class, $captured);
+        $this->assertEmpty($captured);
+    }
+
+    public function testCapturedEventsDispatch()
+    {
+        $_SERVER['__event.test'] = [];
+        $d = new Dispatcher;
+        $d->listen('foo', function ($foo) {
+            $_SERVER['__event.test'][] = $foo;
+        });
+
+        $captured = $d->capture(function () use ($d) {
+            $d->dispatch('foo', ['bar']);
+            $d->dispatch('foo', ['baz']);
+        });
+
+        $this->assertSame([], $_SERVER['__event.test']);
+        $this->assertInstanceOf(EventCollection::class, $captured);
+
+        $captured->dispatch();
+
+        $this->assertSame(['bar', 'baz'], $_SERVER['__event.test']);
+    }
+
+    public function testCapturedEventsFilterAndDispatch()
+    {
+        $_SERVER['__event.test'] = [];
+        $d = new Dispatcher;
+        $d->listen('foo', function ($value) {
+            $_SERVER['__event.test'][] = $value;
+        });
+        $d->listen('bar', function ($value) {
+            $_SERVER['__event.test'][] = $value;
+        });
+
+        $captured = $d->capture(function () use ($d) {
+            $d->dispatch('foo', ['foo_value']);
+            $d->dispatch('bar', ['bar_value']);
+        });
+
+        $this->assertInstanceOf(EventCollection::class, $captured);
+
+        $captured->filter(fn ($args) => $args[0] === 'foo')->setDispatcher($d)->dispatch();
+
+        $this->assertSame(['foo_value'], $_SERVER['__event.test']);
+    }
+
+    public function testDeferInsideCapture()
+    {
+        $_SERVER['__event.test'] = [];
+        $d = new Dispatcher;
+        $d->listen('foo', function ($foo) {
+            $_SERVER['__event.test'][] = $foo;
+        });
+
+        $captured = $d->capture(function () use ($d) {
+            $d->dispatch('foo', ['captured1']);
+
+            $d->defer(function () use ($d) {
+                $d->dispatch('foo', ['deferred']);
+                $this->assertSame([], $_SERVER['__event.test']);
+            });
+
+            $this->assertSame(['deferred'], $_SERVER['__event.test']);
+
+            $d->dispatch('foo', ['captured2']);
+        });
+
+        $this->assertSame(['deferred'], $_SERVER['__event.test']);
+        $this->assertInstanceOf(EventCollection::class, $captured);
+        $this->assertCount(2, $captured);
+
+        $captured->dispatch();
+
+        $this->assertSame(['deferred', 'captured1', 'captured2'], $_SERVER['__event.test']);
+    }
+
+    public function testCaptureInsideDefer()
+    {
+        $_SERVER['__event.test'] = [];
+        $d = new Dispatcher;
+        $d->listen('foo', function ($foo) {
+            $_SERVER['__event.test'][] = $foo;
+        });
+
+        $innerCaptured = null;
+
+        $d->defer(function () use ($d, &$innerCaptured) {
+            $d->dispatch('foo', ['deferred1']);
+
+            $innerCaptured = $d->capture(function () use ($d) {
+                $d->dispatch('foo', ['captured']);
+                $this->assertSame([], $_SERVER['__event.test']);
+            });
+
+            $this->assertSame([], $_SERVER['__event.test']);
+
+            $d->dispatch('foo', ['deferred2']);
+        });
+
+        $this->assertSame(['deferred1', 'deferred2'], $_SERVER['__event.test']);
+        $this->assertInstanceOf(EventCollection::class, $innerCaptured);
+        $this->assertCount(1, $innerCaptured);
+
+        $innerCaptured->dispatch();
+
+        $this->assertSame(['deferred1', 'deferred2', 'captured'], $_SERVER['__event.test']);
     }
 
     public function testHaltingEventExecution()
