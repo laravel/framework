@@ -94,6 +94,28 @@ class FoundationFormRequestTest extends TestCase
         $request->validateResolved();
     }
 
+    public function testValidationErrorStatusCanBeCustomized()
+    {
+        $request = $this->createRequest(['no' => 'name'], FoundationTestFormRequestCustomStatus::class);
+
+        $this->mocks['redirect']->shouldReceive('withInput->withErrors');
+
+        $exception = $this->catchException(ValidationException::class, fn () => $request->validateResolved());
+
+        $this->assertSame(400, $exception->status);
+    }
+
+    public function testValidationErrorStatusCanBeCustomizedWithProperty()
+    {
+        $request = $this->createRequest(['no' => 'name'], FoundationTestFormRequestCustomStatusProperty::class);
+
+        $this->mocks['redirect']->shouldReceive('withInput->withErrors');
+
+        $exception = $this->catchException(ValidationException::class, fn () => $request->validateResolved());
+
+        $this->assertSame(409, $exception->status);
+    }
+
     public function testValidateMethodThrowsWhenAuthorizationFails()
     {
         $this->expectException(AuthorizationException::class);
@@ -514,5 +536,38 @@ class FoundationTestFormRequestWithGetRules extends FormRequest
                 'a' => ['required', 'int', 'min:2'],
             ];
         }
+    }
+}
+
+class FoundationTestFormRequestCustomStatus extends FormRequest
+{
+    public function rules()
+    {
+        return ['name' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+
+    protected function validationErrorStatus()
+    {
+        return 400;
+    }
+}
+
+class FoundationTestFormRequestCustomStatusProperty extends FormRequest
+{
+    protected $validationErrorStatus = 409;
+
+    public function rules()
+    {
+        return ['name' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
     }
 }

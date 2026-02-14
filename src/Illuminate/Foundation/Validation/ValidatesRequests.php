@@ -14,11 +14,12 @@ trait ValidatesRequests
      *
      * @param  \Illuminate\Contracts\Validation\Validator|array  $validator
      * @param  \Illuminate\Http\Request|null  $request
+     * @param  int|null  $status
      * @return array
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function validateWith($validator, ?Request $request = null)
+    public function validateWith($validator, ?Request $request = null, ?int $status = null)
     {
         $request = $request ?: request();
 
@@ -33,7 +34,15 @@ trait ValidatesRequests
                 );
         }
 
-        return $validator->validate();
+        try {
+            return $validator->validate();
+        } catch (ValidationException $e) {
+            if (! is_null($status)) {
+                $e->status($status);
+            }
+
+            throw $e;
+        }
     }
 
     /**
@@ -43,12 +52,13 @@ trait ValidatesRequests
      * @param  array  $rules
      * @param  array  $messages
      * @param  array  $attributes
+     * @param  int|null  $status
      * @return array
      *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function validate(Request $request, array $rules,
-                             array $messages = [], array $attributes = [])
+                             array $messages = [], array $attributes = [], ?int $status = null)
     {
         $validator = $this->getValidationFactory()->make(
             $request->all(), $rules, $messages, $attributes
@@ -61,7 +71,15 @@ trait ValidatesRequests
                 );
         }
 
-        return $validator->validate();
+        try {
+            return $validator->validate();
+        } catch (ValidationException $e) {
+            if (! is_null($status)) {
+                $e->status($status);
+            }
+
+            throw $e;
+        }
     }
 
     /**
@@ -72,15 +90,16 @@ trait ValidatesRequests
      * @param  array  $rules
      * @param  array  $messages
      * @param  array  $attributes
+     * @param  int|null  $status
      * @return array
      *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function validateWithBag($errorBag, Request $request, array $rules,
-                                    array $messages = [], array $attributes = [])
+                                    array $messages = [], array $attributes = [], ?int $status = null)
     {
         try {
-            return $this->validate($request, $rules, $messages, $attributes);
+            return $this->validate($request, $rules, $messages, $attributes, $status);
         } catch (ValidationException $e) {
             $e->errorBag = $errorBag;
 

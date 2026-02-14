@@ -59,6 +59,13 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected $errorBag = 'default';
 
     /**
+     * The HTTP status code to use for a failed validation response.
+     *
+     * @var int
+     */
+    protected $validationErrorStatus = 422;
+
+    /**
      * Indicates whether validation should stop after the first rule failure.
      *
      * @var bool
@@ -167,7 +174,18 @@ class FormRequest extends Request implements ValidatesWhenResolved
 
         throw (new $exception($validator))
             ->errorBag($this->errorBag)
-            ->redirectTo($this->getRedirectUrl());
+            ->redirectTo($this->getRedirectUrl())
+            ->status($this->validationErrorStatus());
+    }
+
+    /**
+     * Get the HTTP status code to use for a failed validation response.
+     *
+     * @return int
+     */
+    protected function validationErrorStatus()
+    {
+        return $this->validationErrorStatus;
     }
 
     /**
