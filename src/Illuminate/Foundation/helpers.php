@@ -3,6 +3,7 @@
 use Carbon\CarbonInterface;
 use Illuminate\Broadcasting\FakePendingBroadcast;
 use Illuminate\Broadcasting\PendingBroadcast;
+use Illuminate\Cache\RateLimiter;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
@@ -22,6 +23,7 @@ use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Cookie\CookieJar;
 use Illuminate\Foundation\Bus\PendingClosureDispatch;
 use Illuminate\Foundation\Bus\PendingDispatch;
+use Illuminate\Foundation\Exceptions\PendingReport;
 use Illuminate\Foundation\Mix;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\RedirectResponse;
@@ -727,6 +729,25 @@ if (! function_exists('report')) {
         }
 
         app(ExceptionHandler::class)->report($exception);
+    }
+}
+
+if (! function_exists('report_attempt')) {
+    /**
+     * Report an exception a number of occurrences inside a window of time.
+     *
+     * @param  \Throwable|string  $exception
+     * @return \Illuminate\Foundation\Exceptions\PendingReport
+     */
+    function report_attempt($exception): PendingReport
+    {
+        if (is_string($exception)) {
+            $exception = new Exception($exception);
+        }
+
+        return app(PendingReport::class, [
+            'exception' => $exception,
+        ]);
     }
 }
 
