@@ -162,7 +162,7 @@ abstract class Queue
         $payload = $this->withCreatePayloadHooks($queue, [
             'uuid' => (string) Str::uuid(),
             'displayName' => $this->getDisplayName($job),
-            'job' => 'Illuminate\Queue\CallQueuedHandler@call',
+            'job' => 'default',
             'maxTries' => $this->getJobTries($job),
             'maxExceptions' => $job->maxExceptions ?? null,
             'failOnTimeout' => $job->failOnTimeout ?? false,

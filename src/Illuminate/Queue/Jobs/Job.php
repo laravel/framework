@@ -189,6 +189,10 @@ abstract class Job
 
         $commandName = $this->payload()['data']['commandName'] ?? false;
 
+        if ($commandName) {
+            $commandName = $this->container->getAlias($commandName);
+        }
+
         // If the exception is due to a job timing out, we need to rollback the current
         // database transaction so that the failed job count can be incremented with
         // the proper value. Otherwise, the current transaction will never commit.

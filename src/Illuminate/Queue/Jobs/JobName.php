@@ -14,6 +14,8 @@ class JobName
      */
     public static function parse($job)
     {
+        $job = config('queue.job_handler')[$job] ?? $job;
+
         return Str::parseCallback($job, 'fire');
     }
 
