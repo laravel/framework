@@ -1997,4 +1997,44 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         unset($this->items[$key]);
     }
+
+    /**
+     * @param  int  $limit
+     * @param  (callable(TValue, TKey): mixed)|string|null  $callback
+     * @return static<mixed, int>
+     */
+    public function mostCommon($limit = 1, $callback = null)
+    {
+        if ($this->isEmpty()) {
+            return new static;
+        }
+
+        $values = is_null($callback)
+            ? $this
+            : $this->map($this->valueRetriever($callback));
+
+        $counted = $values->countBy()->sortDesc();
+
+        return $counted->take($limit);
+    }
+
+    /**
+     * @param  int  $limit
+     * @param  (callable(TValue, TKey): mixed)|string|null  $callback
+     * @return static<mixed, int>
+     */
+    public function leastCommon($limit = 1, $callback = null)
+    {
+        if ($this->isEmpty()) {
+            return new static;
+        }
+
+        $values = is_null($callback)
+            ? $this
+            : $this->map($this->valueRetriever($callback));
+
+        $counted = $values->countBy()->sort();
+
+        return $counted->take($limit);
+    }
 }

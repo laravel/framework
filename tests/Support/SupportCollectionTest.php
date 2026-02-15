@@ -6031,6 +6031,78 @@ class SupportCollectionTest extends TestCase
         $this->assertNull($collection->percentage(fn ($value) => $value === 1));
     }
 
+    #[DataProvider('collectionClassProvider')]
+    public function testMostCommonWithoutCallback()
+    {
+        $collection = collect(['a', 'b', 'a', 'c', 'a', 'b']);
+
+        $result = $collection->mostCommon(2);
+
+        $this->assertEquals(['a' => 3, 'b' => 2], $result->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testMostCommonWithCallback()
+    {
+        $collection = collect([
+            ['product' => 'Laptop'],
+            ['product' => 'Mouse'],
+            ['product' => 'Laptop'],
+            ['product' => 'Keyboard'],
+            ['product' => 'Laptop'],
+        ]);
+
+        $result = $collection->mostCommon(2, 'product');
+
+        $this->assertEquals(['Laptop' => 3, 'Mouse' => 1], $result->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testMostCommonWithLimit()
+    {
+        $collection = collect(['x', 'y', 'x', 'z', 'x', 'y', 'z', 'z']);
+
+        $result = $collection->mostCommon();
+
+        $this->assertEquals(['x' => 3], $result->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testLeastCommonWithoutCallback()
+    {
+        $collection = collect(['a', 'b', 'a', 'c', 'a', 'b']);
+
+        $result = $collection->leastCommon(2);
+
+        $this->assertEquals(['c' => 1, 'b' => 2], $result->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testLeastCommonWithCallback()
+    {
+        $collection = collect([
+            ['country' => 'Iran'],
+            ['country' => 'USA'],
+            ['country' => 'Iran'],
+            ['country' => 'UK'],
+            ['country' => 'Iran'],
+        ]);
+
+        $result = $collection->leastCommon(2, 'country');
+
+        $this->assertEquals(['USA' => 1, 'UK' => 1], $result->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testLeastCommonWithLimit()
+    {
+        $collection = collect(['x', 'y', 'x', 'z', 'x', 'y']);
+
+        $result = $collection->leastCommon();
+
+        $this->assertEquals(['z' => 1], $result->all());
+    }
+
     /**
      * Provides each collection class, respectively.
      *
