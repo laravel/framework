@@ -60,19 +60,22 @@ class FakeProcessResult implements ProcessResultContract
      */
     protected function normalizeOutput(array|string $output)
     {
-        if (empty($output)) {
-            return '';
-        } elseif (is_string($output)) {
-            return rtrim($output, "\n")."\n";
-        } elseif (is_array($output)) {
-            return rtrim(
+        return match (true) {
+            empty($output) => '',
+
+            is_string($output) =>
+                rtrim($output, "\n") . "\n",
+
+            is_array($output) =>
+            rtrim(
                 (new Collection($output))
-                    ->map(fn ($line) => rtrim($line, "\n")."\n")
+                    ->map(fn ($line) => rtrim($line, "\n") . "\n")
                     ->implode(''),
                 "\n"
-            );
-        }
+            ),
+        };
     }
+
 
     /**
      * Get the original command executed by the process.
