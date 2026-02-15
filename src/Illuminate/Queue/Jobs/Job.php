@@ -187,7 +187,7 @@ abstract class Job
             return;
         }
 
-        $commandName = $this->payload()['data']['commandName'] ?? false;
+        $commandName = $this->resolveQueuedJobClass();
 
         // If the exception is due to a job timing out, we need to rollback the current
         // database transaction so that the failed job count can be incremented with

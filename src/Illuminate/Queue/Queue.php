@@ -168,7 +168,7 @@ abstract class Queue
         $payload = $this->withCreatePayloadHooks($queue, [
             'uuid' => (string) Str::uuid(),
             'displayName' => $this->getDisplayName($job),
-            'job' => 'Illuminate\Queue\CallQueuedHandler@call',
+            'job' => 'default',
             'maxTries' => $this->getJobTries($job),
             'maxExceptions' => $this->getAttributeValue($job, MaxExceptions::class, 'maxExceptions'),
             'failOnTimeout' => $this->getAttributeValue($job, FailOnTimeout::class, 'failOnTimeout') ?? false,

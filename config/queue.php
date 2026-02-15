@@ -122,4 +122,7 @@ return [
         'table' => 'failed_jobs',
     ],
 
+    'job_handler' => [
+        'default' => 'Illuminate\Queue\CallQueuedHandler@call',
+    ]
 ];

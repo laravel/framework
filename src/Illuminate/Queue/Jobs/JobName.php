@@ -14,6 +14,8 @@ class JobName
      */
     public static function parse($job)
     {
+        $job = config('queue.job_handler')[$job] ?? $job;
+
         return Str::parseCallback($job, 'fire');
     }
 
@@ -43,7 +45,7 @@ class JobName
     public static function resolveClassName($name, $payload)
     {
         if (is_string($payload['data']['commandName'] ?? null)) {
-            return $payload['data']['commandName'];
+            return app()->getAlias($payload['data']['commandName']);
         }
 
         return $name;
