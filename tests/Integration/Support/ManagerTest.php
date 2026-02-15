@@ -61,6 +61,8 @@ class ManagerTest extends TestCase
         $manager->forgetDrivers();
         $concrete = $manager->driver('myDriver');
         $this->assertEquals('@my-driver-overrode', $concrete->name);
+        $cachedConcrete = $manager->driver('myDriver');
+        $this->assertEquals(spl_object_hash($concrete), spl_object_hash($cachedConcrete));
     }
 
     public function testExtendUsingEnum()

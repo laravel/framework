@@ -57,14 +57,14 @@ abstract class MultipleInstanceManager
     /**
      * Get the default instance name.
      *
-     * @return string
+     * @return \BackedEnum|\UnitEnum|string
      */
     abstract public function getDefaultInstance();
 
     /**
      * Set the default instance name.
      *
-     * @param  string  $name
+     * @param  \BackedEnum|\UnitEnum|string  $name
      * @return void
      */
     abstract public function setDefaultInstance($name);
@@ -72,7 +72,7 @@ abstract class MultipleInstanceManager
     /**
      * Get the instance specific configuration.
      *
-     * @param  string  $name
+     * @param  \BackedEnum|\UnitEnum|string  $name
      * @return array
      */
     abstract public function getInstanceConfig($name);
@@ -80,31 +80,31 @@ abstract class MultipleInstanceManager
     /**
      * Get an instance by name.
      *
-     * @param  string|null  $name
+     * @param  \BackedEnum|\UnitEnum|string|null  $name
      * @return mixed
      */
     public function instance($name = null)
     {
         $name = $name ?: $this->getDefaultInstance();
 
-        return $this->instances[$name] = $this->get($name);
+        return $this->instances[enum_value($name)] = $this->get($name);
     }
 
     /**
      * Attempt to get an instance from the local cache.
      *
-     * @param  string  $name
+     * @param  \BackedEnum|\UnitEnum|string  $name
      * @return mixed
      */
     protected function get($name)
     {
-        return $this->instances[$name] ?? $this->resolve($name);
+        return $this->instances[enum_value($name)] ?? $this->resolve($name);
     }
 
     /**
      * Resolve the given instance.
      *
-     * @param  string  $name
+     * @param  \BackedEnum|\UnitEnum|string  $name
      * @return mixed
      *
      * @throws \InvalidArgumentException
@@ -119,10 +119,14 @@ abstract class MultipleInstanceManager
         }
 
         if (! array_key_exists($this->driverKey, $config)) {
-            throw new RuntimeException("Instance [{$name}] does not specify a {$this->driverKey}.");
+            throw new RuntimeException(sprintf(
+                "Instance [%s] does not specify a %s.",
+                enum_value($name),
+                $this->driverKey
+            ));
         }
 
-        $driverName = $config[$this->driverKey];
+        $driverName = enum_value($config[$this->driverKey]);
 
         if (isset($this->customCreators[$driverName])) {
             return $this->callCustomCreator($config);
@@ -139,7 +143,7 @@ abstract class MultipleInstanceManager
                 return $this->{$createMethod}($config);
             }
 
-            throw new InvalidArgumentException("Instance {$this->driverKey} [{$config[$this->driverKey]}] is not supported.");
+            throw new InvalidArgumentException("Instance {$this->driverKey} [{$driverName}] is not supported.");
         }
     }
 
@@ -151,13 +155,13 @@ abstract class MultipleInstanceManager
      */
     protected function callCustomCreator(array $config)
     {
-        return $this->customCreators[$config[$this->driverKey]]($this->app, $config);
+        return $this->customCreators[enum_value($config[$this->driverKey])]($this->app, $config);
     }
 
     /**
      * Unset the given instances.
      *
-     * @param  array|string|null  $name
+     * @param  array<array-key,\BackedEnum|\UnitEnum|string>|\BackedEnum|\UnitEnum|string|null  $name
      * @return $this
      */
     public function forgetInstance($name = null)
@@ -165,8 +169,8 @@ abstract class MultipleInstanceManager
         $name ??= $this->getDefaultInstance();
 
         foreach ((array) $name as $instanceName) {
-            if (isset($this->instances[$instanceName])) {
-                unset($this->instances[$instanceName]);
+            if (isset($this->instances[enum_value($instanceName)])) {
+                unset($this->instances[enum_value($instanceName)]);
             }
         }
 
@@ -176,20 +180,20 @@ abstract class MultipleInstanceManager
     /**
      * Disconnect the given instance and remove from local cache.
      *
-     * @param  string|null  $name
+     * @param  \BackedEnum|\UnitEnum|string|null  $name
      * @return void
      */
     public function purge($name = null)
     {
         $name ??= $this->getDefaultInstance();
 
-        unset($this->instances[$name]);
+        unset($this->instances[enum_value($name)]);
     }
 
     /**
      * Register a custom instance creator Closure.
      *
-     * @param  string  $name
+     * @param  \BackedEnum|\UnitEnum|string  $name
      * @param  \Closure  $callback
      *
      * @param-closure-this  $this  $callback
@@ -198,7 +202,7 @@ abstract class MultipleInstanceManager
      */
     public function extend($name, Closure $callback)
     {
-        $this->customCreators[$name] = $callback->bindTo($this, $this);
+        $this->customCreators[enum_value($name)] = $callback->bindTo($this, $this);
 
         return $this;
     }
