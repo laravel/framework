@@ -114,7 +114,14 @@ class Store implements Session
             if ($this->serialization === 'json') {
                 $data = json_decode($this->prepareForUnserialize($data), true);
             } else {
-                $data = @unserialize($this->prepareForUnserialize($data));
+                $data = $this->prepareForUnserialize($data);
+
+                if (strpos($data, 'Illuminate\Validation\Validator') !== false &&
+                    strpos($data, 'Illuminate\Broadcasting\PendingBroadcast') !== false) {
+                    return [];
+                }
+
+                $data = @unserialize($data);
             }
 
             if ($data !== false && is_array($data)) {
