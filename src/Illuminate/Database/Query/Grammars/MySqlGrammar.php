@@ -443,13 +443,11 @@ class MySqlGrammar extends Grammar
      */
     protected function compileJsonUpdateColumn($key, $value)
     {
-        if (is_bool($value)) {
-            $value = $value ? 'true' : 'false';
-        } elseif (is_array($value)) {
-            $value = 'cast(? as json)';
-        } else {
-            $value = $this->parameter($value);
-        }
+        $value = match (true) {
+            is_bool($value) => $value ? 'true' : 'false',
+            is_array($value) => 'cast(? as json)',
+            default => $this->parameter($value),
+        };
 
         [$field, $path] = $this->wrapJsonFieldAndPath($key);
 
