@@ -133,12 +133,12 @@ class PendingProcess
     /**
      * Specify the maximum number of seconds the process may run.
      *
-     * @param  int|CarbonInterval  $timeout
+     * @param  CarbonInterval|int  $timeout
      * @return $this
      */
     public function timeout(int|CarbonInterval $timeout)
     {
-        $this->timeout = $this->normalizeTimeout($timeout);
+        $this->timeout = $timeout instanceof CarbonInterval ? (int) $timeout->totalSeconds : $timeout;
 
         return $this;
     }
@@ -146,12 +146,12 @@ class PendingProcess
     /**
      * Specify the maximum number of seconds a process may go without returning output.
      *
-     * @param  int|CarbonInterval  $timeout
+     * @param  CarbonInterval|int  $timeout
      * @return $this
      */
     public function idleTimeout(int|CarbonInterval $timeout)
     {
-        $this->idleTimeout = $this->normalizeTimeout($timeout);
+        $this->idleTimeout = $timeout instanceof CarbonInterval ? (int) $timeout->totalSeconds : $timeout;
 
         return $this;
     }
@@ -362,17 +362,6 @@ class PendingProcess
     {
         return (new Collection($this->fakeHandlers))
             ->first(fn ($handler, $pattern) => $pattern === '*' || Str::is($pattern, $command));
-    }
-
-    /**
-     * Normalize a timeout value to a number of seconds.
-     *
-     * @param  int|CarbonInterval  $timeout
-     * @return $this
-     */
-    protected function normalizeTimeout(int|CarbonInterval $timeout): int
-    {
-        return $timeout instanceof CarbonInterval ? (int) $timeout->totalSeconds : $timeout;
     }
 
     /**
