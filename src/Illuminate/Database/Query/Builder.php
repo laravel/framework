@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query;
 
 use BackedEnum;
+use Carbon\CarbonPeriod;
 use Closure;
 use DatePeriod;
 use DateTimeInterface;
@@ -220,13 +221,6 @@ class Builder implements BuilderContract
     public $lock;
 
     /**
-     * The query execution timeout in seconds.
-     *
-     * @var int|null
-     */
-    public $timeout;
-
-    /**
      * The callbacks that should be invoked before the query is executed.
      *
      * @var array
@@ -329,20 +323,6 @@ class Builder implements BuilderContract
 
         return $this->selectRaw(
             '('.$query.') as '.$this->grammar->wrap($as), $bindings
-        );
-    }
-
-    /**
-     * Add a select expression to the query.
-     *
-     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $expression
-     * @param  string  $as
-     * @return $this
-     */
-    public function selectExpression($expression, $as)
-    {
-        return $this->selectRaw(
-            '('.$this->grammar->getValue($expression).') as '.$this->grammar->wrap($as)
         );
     }
 
@@ -500,7 +480,7 @@ class Builder implements BuilderContract
         $this->ensureConnectionSupportsVectors();
 
         if (is_string($vector)) {
-            $vector = Str::of($vector)->toEmbeddings(cache: true);
+            Str::of($vector)->toEmbeddings();
         }
 
         $this->addBinding(
@@ -1215,7 +1195,7 @@ class Builder implements BuilderContract
     public function whereVectorSimilarTo($column, $vector, $minSimilarity = 0.6, $order = true)
     {
         if (is_string($vector)) {
-            $vector = Str::of($vector)->toEmbeddings(cache: true);
+            $vector = Str::of($vector)->toEmbeddings();
         }
 
         $this->whereVectorDistanceLessThan($column, $vector, 1 - $minSimilarity);
@@ -1241,7 +1221,7 @@ class Builder implements BuilderContract
         $this->ensureConnectionSupportsVectors();
 
         if (is_string($vector)) {
-            $vector = Str::of($vector)->toEmbeddings(cache: true);
+            Str::of($vector)->toEmbeddings();
         }
 
         return $this->whereRaw(
@@ -1575,7 +1555,7 @@ class Builder implements BuilderContract
         }
 
         if ($values instanceof DatePeriod) {
-            $values = $this->resolveDatePeriodBounds($values);
+            return $this->whereBetweenDatePeriod($column, $values, $boolean, $not);
         }
 
         $this->wheres[] = compact('type', 'column', 'values', 'boolean', 'not');
@@ -1583,6 +1563,50 @@ class Builder implements BuilderContract
         $this->addBinding(array_slice($this->cleanBindings(Arr::flatten($values)), 0, 2), 'where');
 
         return $this;
+    }
+
+    /**
+     * Add a "where between" statement for a DatePeriod to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \DatePeriod  $period
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    protected function whereBetweenDatePeriod($column, DatePeriod $period, $boolean = 'and', $not = false)
+    {
+        $startDate = $period->start ?? $period->getStartDate();
+        $endDate = $period->end ?? $period->getEndDate();
+
+        // Calculate end date if it's null (when using recurrences)
+        if ($endDate === null) {
+            $recurrences = $period->recurrences ?? 0;
+            $endDate = clone $startDate;
+
+            for ($i = 0; $i < $recurrences; $i++) {
+                $endDate = $endDate->add($period->getDateInterval());
+            }
+        }
+
+        // Determine operators based on inclusion/exclusion flags
+        $includeStart = $period->include_start_date !== false;
+        $includeEnd = $period->include_end_date === true;
+
+        $lowerOp = $includeStart ? '>=' : '>';
+        $upperOp = $includeEnd ? '<=' : '<';
+
+        if ($not) {
+            // For NOT BETWEEN: value < start OR value > end
+            return $this->where(function ($query) use ($column, $startDate, $endDate, $lowerOp, $upperOp) {
+                $query->where($column, $lowerOp === '>=' ? '<' : '<=', $startDate)
+                      ->orWhere($column, $upperOp === '<=' ? '>' : '>=', $endDate);
+            }, null, null, $boolean);
+        }
+
+        // For BETWEEN: start <=/< value AND value <=/> end
+        return $this->where($column, $lowerOp, $startDate, $boolean)
+                    ->where($column, $upperOp, $endDate, $boolean);
     }
 
     /**
@@ -1596,13 +1620,6 @@ class Builder implements BuilderContract
     public function whereBetweenColumns($column, array $values, $boolean = 'and', $not = false)
     {
         $type = 'betweenColumns';
-
-        if ($this->isQueryable($column)) {
-            [$sub, $bindings] = $this->createSub($column);
-
-            return $this->addBinding($bindings, 'where')
-                ->whereBetweenColumns(new Expression('('.$sub.')'), $values, $boolean, $not);
-        }
 
         $this->wheres[] = compact('type', 'column', 'values', 'boolean', 'not');
 
@@ -2820,7 +2837,7 @@ class Builder implements BuilderContract
         $type = 'between';
 
         if ($values instanceof DatePeriod) {
-            $values = $this->resolveDatePeriodBounds($values);
+            return $this->havingBetweenDatePeriod($column, $values, $boolean, $not);
         }
 
         $this->havings[] = compact('type', 'column', 'values', 'boolean', 'not');
@@ -2828,6 +2845,51 @@ class Builder implements BuilderContract
         $this->addBinding(array_slice($this->cleanBindings(Arr::flatten($values)), 0, 2), 'having');
 
         return $this;
+    }
+
+    /**
+     * Add a "having between" clause for a DatePeriod to the query.
+     *
+     * @param  string  $column
+     * @param  \DatePeriod  $period
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    protected function havingBetweenDatePeriod($column, DatePeriod $period, $boolean = 'and', $not = false)
+    {
+        $startDate = $period->start ?? $period->getStartDate();
+        $endDate = $period->end ?? $period->getEndDate();
+
+        // Calculate end date if it's null (when using recurrences)
+        if ($endDate === null) {
+            $recurrences = $period->recurrences ?? 0;
+            $endDate = clone $startDate;
+
+            for ($i = 0; $i < $recurrences; $i++) {
+                $endDate = $endDate->add($period->getDateInterval());
+            }
+        }
+
+        // Determine operators based on inclusion/exclusion flags
+        $includeStart = $period->include_start_date !== false;
+        $includeEnd = $period->include_end_date === true;
+
+        $lowerOp = $includeStart ? '>=' : '>';
+        $upperOp = $includeEnd ? '<=' : '<';
+
+        if ($not) {
+            // For NOT BETWEEN: value < start OR value > end
+            return $this->havingRaw(
+                "({$this->grammar->wrap($column)} {$lowerOp} ? OR {$this->grammar->wrap($column)} {$upperOp} ?)",
+                [$lowerOp === '>=' ? $startDate : $startDate, $upperOp === '<=' ? $endDate : $endDate],
+                $boolean
+            );
+        }
+
+        // For BETWEEN: start <=/< value AND value <=/> end
+        return $this->having($column, $lowerOp, $startDate, $boolean)
+                    ->having($column, $upperOp, $endDate, $boolean);
     }
 
     /**
@@ -2865,29 +2927,6 @@ class Builder implements BuilderContract
     public function orHavingNotBetween($column, iterable $values)
     {
         return $this->havingBetween($column, $values, 'or', true);
-    }
-
-    /**
-     * Resolve the start and end dates from a DatePeriod.
-     *
-     * @param  \DatePeriod  $period
-     * @return array{\DateTimeInterface, \DateTimeInterface}
-     */
-    protected function resolveDatePeriodBounds(DatePeriod $period)
-    {
-        [$start, $end] = [$period->getStartDate(), $period->getEndDate()];
-
-        if ($end === null) {
-            $end = clone $start;
-
-            $recurrences = $period->getRecurrences();
-
-            for ($i = 0; $i < $recurrences; $i++) {
-                $end = $end->add($period->getDateInterval());
-            }
-        }
-
-        return [$start, $end];
     }
 
     /**
@@ -2997,7 +3036,7 @@ class Builder implements BuilderContract
         $this->ensureConnectionSupportsVectors();
 
         if (is_string($vector)) {
-            $vector = Str::of($vector)->toEmbeddings(cache: true);
+            Str::of($vector)->toEmbeddings();
         }
 
         $this->addBinding(
@@ -3285,25 +3324,6 @@ class Builder implements BuilderContract
     public function sharedLock()
     {
         return $this->lock(false);
-    }
-
-    /**
-     * Set a query execution timeout in seconds.
-     *
-     * @param  int|null  $seconds
-     * @return $this
-     *
-     * @throws InvalidArgumentException
-     */
-    public function timeout(?int $seconds): static
-    {
-        if ($seconds !== null && $seconds <= 0) {
-            throw new InvalidArgumentException('Timeout must be greater than zero.');
-        }
-
-        $this->timeout = $seconds;
-
-        return $this;
     }
 
     /**
@@ -4178,7 +4198,7 @@ class Builder implements BuilderContract
         $this->applyBeforeQueryCallbacks();
 
         $values = (new Collection($values))->map(function ($value) {
-            if (! $value instanceof self && ! $value instanceof EloquentBuilder && ! $value instanceof Relation) {
+            if (! $value instanceof Builder) {
                 return ['value' => $value, 'bindings' => match (true) {
                     $value instanceof Collection => $value->all(),
                     $value instanceof UnitEnum => enum_value($value),
