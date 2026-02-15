@@ -195,7 +195,7 @@ class CacheManager implements FactoryContract
             $this->getPrefix($config),
             $config['lock_table'] ?? 'cache_locks',
             $config['lock_lottery'] ?? [2, 100],
-            $config['lock_timeout'] ?? 86400,
+            $config['lock_timeout'] ?? 86_400,
         );
 
         return $this->repository(

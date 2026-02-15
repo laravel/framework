@@ -84,7 +84,7 @@ class DatabaseStore implements LockProvider, Store
         $prefix = '',
         $lockTable = 'cache_locks',
         $lockLottery = [2, 100],
-        $defaultLockTimeoutInSeconds = 86400,
+        $defaultLockTimeoutInSeconds = 86_400,
     ) {
         $this->table = $table;
         $this->prefix = $prefix;
@@ -316,7 +316,7 @@ class DatabaseStore implements LockProvider, Store
      */
     public function forever($key, $value)
     {
-        return $this->put($key, $value, 315360000);
+        return $this->put($key, $value, 315_360_000);
     }
 
     /**

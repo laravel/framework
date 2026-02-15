@@ -37,7 +37,7 @@ class DynamoDbLock extends Lock
             return $this->dynamo->add($this->name, $this->owner, $this->seconds);
         }
 
-        return $this->dynamo->add($this->name, $this->owner, 86400);
+        return $this->dynamo->add($this->name, $this->owner, 86_400);
     }
 
     /**
