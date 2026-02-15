@@ -197,4 +197,6 @@ return [
 
     'attributes' => [],
 
+    'and_more' => '(and :count more error)|(and :count more errors)',
+
 ];

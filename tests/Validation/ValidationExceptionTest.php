@@ -46,10 +46,9 @@ class ValidationExceptionTest extends TestCase
     {
         $translator = $this->getTranslator('uk', [
             '*' => [
-                '*' => [
+                'validation' => [
                     'uk' => [
-                        '(and :count more error)' => '(та ще :count помилка)',
-                        '(and :count more errors)' => '(та ще :count помилка)|(та ще :count помилки)|(та ще :count помилок)',
+                        'and_more' => '(та ще :count помилка)|(та ще :count помилки)|(та ще :count помилок)',
                     ],
                 ],
             ],
@@ -67,10 +66,9 @@ class ValidationExceptionTest extends TestCase
     {
         $translator = $this->getTranslator('uk', [
             '*' => [
-                '*' => [
+                'validation' => [
                     'uk' => [
-                        '(and :count more error)' => '(та ще :count помилка)',
-                        '(and :count more errors)' => '(та ще :count помилка)|(та ще :count помилки)|(та ще :count помилок)',
+                        'and_more' => '(та ще :count помилка)|(та ще :count помилки)|(та ще :count помилок)',
                     ],
                 ],
             ],
@@ -89,10 +87,9 @@ class ValidationExceptionTest extends TestCase
     {
         $translator = $this->getTranslator('uk', [
             '*' => [
-                '*' => [
+                'validation' => [
                     'uk' => [
-                        '(and :count more error)' => '(та ще :count помилка)',
-                        '(and :count more errors)' => '(та ще :count помилка)|(та ще :count помилки)|(та ще :count помилок)',
+                        'and_more' => '(та ще :count помилка)|(та ще :count помилки)|(та ще :count помилок)',
                     ],
                 ],
             ],
@@ -180,7 +177,19 @@ class ValidationExceptionTest extends TestCase
 
     protected function getTranslator($locale = 'en', $loaded = [])
     {
-        $translator ??= new Translator(new ArrayLoader, $locale);
+        $translator = new Translator(new ArrayLoader, $locale);
+
+        if ($loaded === []) {
+            $loaded = [
+                '*' => [
+                    'validation' => [
+                        'en' => [
+                            'and_more' => '(and :count more error)|(and :count more errors)',
+                        ],
+                    ],
+                ],
+            ];
+        }
 
         $translator->setLoaded($loaded);
 
