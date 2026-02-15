@@ -270,6 +270,8 @@ class Application extends SymfonyApplication implements ApplicationContract
      *
      * @param  \Illuminate\Console\Command|string  $command
      * @return \Symfony\Component\Console\Command\Command|null
+     *
+     * @throws \ReflectionException
      */
     public function resolve($command)
     {

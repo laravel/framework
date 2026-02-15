@@ -110,6 +110,8 @@ class BroadcastEvent implements ShouldQueue
      *
      * @param  mixed  $event
      * @return array
+     *
+     * @throws \ReflectionException
      */
     protected function getPayloadFromEvent($event)
     {
