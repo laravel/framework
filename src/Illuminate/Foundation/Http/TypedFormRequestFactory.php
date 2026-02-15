@@ -12,21 +12,17 @@ use Illuminate\Foundation\Http\Attributes\MapFrom;
 use Illuminate\Foundation\Http\Attributes\RedirectTo;
 use Illuminate\Foundation\Http\Attributes\RedirectToRoute;
 use Illuminate\Foundation\Http\Attributes\StopOnFirstFailure;
-use Illuminate\Foundation\Http\Attributes\WithoutInferringRules;
 use Illuminate\Foundation\Http\Concerns\CastsValidatedData;
 use Illuminate\Foundation\Http\Concerns\InfersValidationRules;
+use Illuminate\Foundation\Http\Concerns\ResolvesNestedMetadata;
 use Illuminate\Foundation\Precognition;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionParameter;
-use ReflectionUnionType;
-
-use function Illuminate\Support\enum_value;
 
 /**
  * @template T of TypedFormRequest
@@ -35,6 +31,7 @@ class TypedFormRequestFactory
 {
     use CastsValidatedData;
     use InfersValidationRules;
+    use ResolvesNestedMetadata;
 
     /**
      * The validator instance for this request.
@@ -56,20 +53,6 @@ class TypedFormRequestFactory
      * @var list<class-string>
      */
     protected array $ancestors = [];
-
-    /**
-     * The cached nested validation metadata.
-     *
-     * @var array{rules: array<array-key, mixed>, messages: array<array-key, mixed>, attributes: array<array-key, mixed>}
-     */
-    protected array $nestedMetadata;
-
-    /**
-     * The cached nested factories.
-     *
-     * @var array<class-string, static>
-     */
-    protected array $nestedFactories = [];
 
     /**
      * Whether authorization checks should run.
@@ -131,30 +114,6 @@ class TypedFormRequestFactory
         $this->passedValidation();
 
         return $this->buildTypedFormRequest($this->validator->validated());
-    }
-
-    /**
-     * @template TTypedFormRequest of TypedFormRequest
-     *
-     * @param  class-string<TTypedFormRequest>  $class
-     * @return static<TTypedFormRequest>
-     */
-    protected function nestedFactory(string $class): static
-    {
-        if (isset($this->nestedFactories[$class])) {
-            return $this->nestedFactories[$class];
-        }
-
-        $builder = $this->container
-            ->make(
-                TypedFormRequestFactory::class,
-                ['requestClass' => $class, 'request' => $this->request, 'container' => $this->container]
-            );
-        $builder->ancestors = [...$this->ancestors, $this->requestClass];
-
-        $this->nestedFactories[$class] = $builder;
-
-        return $builder;
     }
 
     /**
@@ -394,120 +353,6 @@ class TypedFormRequestFactory
     protected function shouldHydrateParameter(ReflectionParameter $param, string $class): bool
     {
         return $param->getAttributes(HydrateFromRequest::class) !== [] || $this->shouldHydrateFromRequest($class);
-    }
-
-    /**
-     * Get the validation messages for the request.
-     *
-     * @return array<string, mixed>
-     */
-    protected function messages(): array
-    {
-        $messages = [];
-
-        if (method_exists($this->requestClass, 'messages')) {
-            $messages = $this->container->call([$this->requestClass, 'messages']);
-        }
-
-        return array_merge($messages, $this->nestedMetadata()['messages']);
-    }
-
-    /**
-     * Get the validation attributes for the request.
-     *
-     * @return array<string, mixed>
-     */
-    protected function attributes(): array
-    {
-        $attributes = [];
-
-        if (method_exists($this->requestClass, 'attributes')) {
-            $attributes = $this->container->call([$this->requestClass, 'attributes']);
-        }
-
-        return array_merge($attributes, $this->nestedMetadata()['attributes']);
-    }
-
-    /**
-     * Get validation metadata for nested hydrated objects.
-     *
-     * @return array{rules: array<array-key, mixed>, messages: array<array-key, mixed>, attributes: array<array-key, mixed>}
-     */
-    protected function nestedMetadata(): array
-    {
-        if (isset($this->nestedMetadata)) {
-            return $this->nestedMetadata;
-        }
-
-        if (($constructor = $this->reflectRequest()->getConstructor()) === null) {
-            return $this->nestedMetadata = ['rules' => [], 'messages' => [], 'attributes' => []];
-        }
-
-        $rules = [];
-        $messages = [];
-        $attributes = [];
-
-        foreach ($constructor->getParameters() as $param) {
-            $type = $param->getType();
-
-            if ($param->getAttributes(WithoutInferringRules::class) !== []) {
-                continue;
-            }
-
-            $name = $this->fieldNameFor($param);
-            $parentIsOptional = $param->isDefaultValueAvailable() || ($type?->allowsNull() ?? false);
-
-            if ($type instanceof ReflectionNamedType) {
-                if ($type->isBuiltin()
-                    || in_array($type->getName(), $this->ancestors)
-                    || (! is_subclass_of($type->getName(), TypedFormRequest::class) && ! $this->shouldHydrateParameter($param, $type->getName()))) {
-                    continue;
-                }
-
-                $nested = $this->nestedFactory($type->getName());
-                $excludeRule = null;
-            } elseif ($type instanceof ReflectionUnionType) {
-                $nestedRequestClass = $this->nestedHydrationClassFromUnion($type, $param);
-
-                if ($nestedRequestClass === null) {
-                    continue;
-                }
-
-                $nested = $this->nestedFactory($nestedRequestClass);
-                $excludeRule = Rule::excludeIf(fn () => ! is_array(Arr::get($this->validationData(), $name)));
-            } else {
-                continue;
-            }
-
-            foreach ($nested->validationRules() as $field => $fieldRules) {
-                if (isset($excludeRule)) {
-                    array_unshift($fieldRules, $excludeRule);
-                }
-
-                if ($parentIsOptional) {
-                    $fieldRules = array_map(
-                        static fn ($rule) => $rule === 'required' ? "required_with:$name" : $rule,
-                        $fieldRules,
-                    );
-                }
-
-                $rules["$name.$field"] = $fieldRules;
-            }
-
-            foreach ($nested->messages() as $key => $message) {
-                $messages["$name.$key"] = $message;
-            }
-
-            foreach ($nested->attributes() as $key => $attribute) {
-                $attributes["$name.$key"] = $attribute;
-            }
-        }
-
-        return $this->nestedMetadata = [
-            'rules' => $rules,
-            'messages' => $messages,
-            'attributes' => $attributes,
-        ];
     }
 
     /**

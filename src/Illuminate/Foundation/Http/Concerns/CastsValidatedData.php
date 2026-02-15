@@ -16,6 +16,7 @@ use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionUnionType;
 use stdClass;
+
 use function Illuminate\Support\enum_value;
 
 trait CastsValidatedData
