@@ -645,6 +645,22 @@ class JsonApiResourceTest extends TestCase
             ->assertJsonCount(1, 'included');
     }
 
+    public function testTopLevelArrayBackedCustomResourceCanGenerateJsonApiResponse()
+    {
+        $this->getJson('/things/99')
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertExactJson([
+                'data' => [
+                    'id' => '99',
+                    'type' => 'things',
+                    'attributes' => [
+                        'name' => 'test',
+                    ],
+                ],
+            ])
+            ->assertJsonMissing(['jsonapi', 'included']);
+    }
+
     public function testSameModelWithTheSameResourceTypeIsDeduplicated()
     {
         $user = User::factory()->create();

@@ -93,6 +93,8 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      *
      * @param  static|callable|null  $callback
      * @return static|void
+     *
+     * @throws \InvalidArgumentException
      */
     public static function defaults($callback = null)
     {
@@ -228,7 +230,9 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      * Convert a potentially human-friendly file size to kilobytes.
      *
      * @param  string|int  $size
-     * @return mixed
+     * @return ($size is int ? int : int|float)
+     *
+     * @throws \InvalidArgumentException
      */
     protected function toKilobytes($size)
     {

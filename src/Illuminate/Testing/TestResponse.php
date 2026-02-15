@@ -1341,14 +1341,20 @@ class TestResponse implements ArrayAccess
     /**
      * Get a piece of data from the original view.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @return mixed
      */
-    public function viewData($key)
+    public function viewData($key = null)
     {
         $this->ensureResponseHasView();
 
-        return $this->original->gatherData()[$key];
+        $data = $this->original->gatherData();
+
+        if (is_null($key)) {
+            return $data;
+        }
+
+        return $data[$key];
     }
 
     /**

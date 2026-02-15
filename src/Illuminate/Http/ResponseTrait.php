@@ -99,6 +99,21 @@ trait ResponseTrait
     }
 
     /**
+     * Remove a header(s) from the response.
+     *
+     * @param  array|string  $key
+     * @return $this
+     */
+    public function withoutHeader($key)
+    {
+        foreach ((array) $key as $header) {
+            $this->headers->remove($header);
+        }
+
+        return $this;
+    }
+
+    /**
      * Add a cookie to the response.
      *
      * @param  \Symfony\Component\HttpFoundation\Cookie|mixed  $cookie

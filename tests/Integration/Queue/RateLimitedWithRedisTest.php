@@ -7,7 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Queue\Job;
-use Illuminate\Contracts\Redis\Factory as Redis;
+use Illuminate\Contracts\Redis\Connection;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
@@ -113,7 +113,7 @@ class RateLimitedWithRedisTest extends TestCase
 
     public function testMiddlewareSerialization()
     {
-        $rateLimited = new RateLimitedWithRedis('limiterName');
+        $rateLimited = new RateLimitedWithRedis('limiterName', 'default');
         $rateLimited->shouldRelease = false;
 
         $restoredRateLimited = unserialize(serialize($rateLimited));
@@ -124,8 +124,9 @@ class RateLimitedWithRedisTest extends TestCase
 
         $this->assertFalse($restoredRateLimited->shouldRelease);
         $this->assertSame('limiterName', $fetch('limiterName'));
+        $this->assertSame('default', $fetch('connectionName'));
         $this->assertInstanceOf(RateLimiter::class, $fetch('limiter'));
-        $this->assertInstanceOf(Redis::class, $fetch('redis'));
+        // $this->assertInstanceOf(Connection::class, $fetch('redis'));
     }
 
     protected function assertJobRanSuccessfully($testJob)

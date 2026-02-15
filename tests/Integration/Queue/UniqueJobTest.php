@@ -16,6 +16,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
 
@@ -164,6 +165,29 @@ class UniqueJobTest extends QueueTestCase
             $this->assertModelMissing($user);
             $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
         }
+    }
+
+    public function testQueueFakeReleasesUniqueJobLocksBetweenFakes()
+    {
+        Queue::fake();
+
+        UniqueTestJob::dispatch();
+        Queue::assertPushed(UniqueTestJob::class);
+
+        Queue::fake();
+
+        UniqueTestJob::dispatch();
+        Queue::assertPushed(UniqueTestJob::class);
+    }
+
+    public function testQueueFakePreservesUniqueJobLockWithinTest()
+    {
+        Queue::fake();
+
+        UniqueTestJob::dispatch();
+        UniqueTestJob::dispatch();
+
+        Queue::assertPushedTimes(UniqueTestJob::class, 1);
     }
 
     protected function getLockKey($job)

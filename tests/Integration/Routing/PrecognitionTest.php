@@ -1220,6 +1220,30 @@ class PrecognitionTest extends TestCase
         $response->assertHeader('Precognition', 'true');
         $response->assertHeaderMissing('Precognition-Success', 'true');
     }
+
+    public function testItRestoresOriginalDispatcherBindingsAfterPrecognitiveRequest()
+    {
+        Route::get('test-route', fn () => 'ok')
+            ->middleware(HandlePrecognitiveRequests::class);
+
+        $callableBinding = $this->app->getBindings()[CallableDispatcherContract::class] ?? null;
+        $controllerBinding = $this->app->getBindings()[ControllerDispatcherContract::class] ?? null;
+
+        $response = $this->get('test-route', ['Precognition' => 'true']);
+        $response->assertNoContent();
+
+        $this->assertInstanceOf(CallableDispatcher::class, $this->app->make(CallableDispatcherContract::class));
+        $this->assertInstanceOf(ControllerDispatcher::class, $this->app->make(ControllerDispatcherContract::class));
+
+        $this->assertSame(
+            $callableBinding['shared'] ?? null,
+            $this->app->getBindings()[CallableDispatcherContract::class]['shared'] ?? null
+        );
+        $this->assertSame(
+            $controllerBinding['shared'] ?? null,
+            $this->app->getBindings()[ControllerDispatcherContract::class]['shared'] ?? null
+        );
+    }
 }
 
 class PrecognitionTestController

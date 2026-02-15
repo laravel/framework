@@ -124,6 +124,8 @@ class CacheManager implements FactoryContract
      *
      * @param  array  $config
      * @return \Illuminate\Cache\Repository
+     *
+     * @throws \InvalidArgumentException
      */
     public function build(array $config)
     {

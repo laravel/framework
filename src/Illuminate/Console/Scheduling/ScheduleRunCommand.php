@@ -263,7 +263,7 @@ class ScheduleRunCommand extends Command
                 $this->eventsRan = true;
             }
 
-            Sleep::usleep(100000);
+            Sleep::usleep(100_000);
         }
     }
 
