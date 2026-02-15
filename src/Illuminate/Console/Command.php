@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console;
 
+use Illuminate\Console\Attributes\Aliases;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\View\Components\Factory;
@@ -148,6 +149,12 @@ class Command extends SymfonyCommand
 
         if (count($description) > 0) {
             $this->description = $description[0]->newInstance()->description;
+        }
+
+        $aliases = $reflection->getAttributes(Aliases::class);
+
+        if (count($aliases) > 0) {
+            $this->aliases = $aliases[0]->newInstance()->aliases;
         }
     }
 
