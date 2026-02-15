@@ -145,7 +145,7 @@ class Command extends SymfonyCommand
 
             $this->signature = $signatureInstance->signature;
 
-            if (! empty($signatureInstance->aliases)) {
+            if ($signatureInstance->aliases !== null) {
                 $this->aliases = $signatureInstance->aliases;
             }
         }
