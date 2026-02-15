@@ -1259,7 +1259,7 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * Get the JSON decoded body of the response as a collection.
+     * Get the decoded JSON body of the response as a collection.
      *
      * @param  string|null  $key
      * @return \Illuminate\Support\Collection
