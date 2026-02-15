@@ -136,7 +136,7 @@ class PendingProcess
      * @param  CarbonInterval|int  $timeout
      * @return $this
      */
-    public function timeout(int|CarbonInterval $timeout)
+    public function timeout(CarbonInterval|int $timeout)
     {
         $this->timeout = $timeout instanceof CarbonInterval ? (int) $timeout->totalSeconds : $timeout;
 
@@ -149,7 +149,7 @@ class PendingProcess
      * @param  CarbonInterval|int  $timeout
      * @return $this
      */
-    public function idleTimeout(int|CarbonInterval $timeout)
+    public function idleTimeout(CarbonInterval|int $timeout)
     {
         $this->idleTimeout = $timeout instanceof CarbonInterval ? (int) $timeout->totalSeconds : $timeout;
 
