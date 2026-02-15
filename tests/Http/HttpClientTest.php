@@ -4413,6 +4413,30 @@ class HttpClientTest extends TestCase
         $response->json();
         $this->assertSame(3, $response->bodyCallCount);
     }
+
+    #[DataProvider('falseyJsonResponses')]
+    public function testJsonDecodingIsCachedWhenDecodedValueIsFalsey(string $json, mixed $expected): void
+    {
+        $response = new BodyTrackingResponse(Factory::psr7Response($json));
+
+        $this->assertSame($expected, $response->json());
+        $this->assertSame(1, $response->bodyCallCount);
+
+        $this->assertSame($expected, $response->json());
+        $this->assertSame(1, $response->bodyCallCount);
+    }
+
+    public static function falseyJsonResponses(): array
+    {
+        return [
+            'empty array' => ['[]', []],
+            'empty object' => ['{}', []],
+            'zero' => ['0', 0],
+            'false' => ['false', false],
+            'null' => ['null', null],
+            'empty string' => ['""', ''],
+        ];
+    }
 }
 
 class CustomFactory extends Factory
