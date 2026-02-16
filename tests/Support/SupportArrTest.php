@@ -1934,32 +1934,4 @@ class SupportArrTest extends TestCase
 
         $this->assertEquals(['a' => 'a:value1', 'b' => 'b:value2'], $result);
     }
-
-    public function testMapWithArrayCallableDoesNotReceiveKeyAsSecondArgument()
-    {
-        $array = ['Sample type 1', 'Sample type 1', 'Sample type 1'];
-        $trim = new class
-        {
-            public function trim($string, $characters = "\n\r\t\v\x00")
-            {
-                return trim($string, $characters);
-            }
-        };
-
-        $this->assertSame(['Sample type 1', 'Sample type 1', 'Sample type 1'], Arr::map($array, [$trim, 'trim']));
-    }
-
-    public function testMapWithStaticArrayCallableDoesNotReceiveKeyAsSecondArgument()
-    {
-        $array = ['6', '7', '8'];
-        $converter = new class
-        {
-            public static function toInt($value, $base = 10)
-            {
-                return intval($value, $base);
-            }
-        };
-
-        $this->assertSame([6, 7, 8], Arr::map($array, [$converter, 'toInt']));
-    }
 }

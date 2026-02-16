@@ -835,11 +835,15 @@ class Arr
     {
         $keys = array_keys($array);
 
-        if (is_string($callback) || (is_array($callback) && count($callback) === 2)) {
-            $items = array_map($callback, $array);
-        } else {
+        if (is_string($callback)) {
+        $items = array_map($callback, $array);
+    } else {
+        try {
             $items = array_map($callback, $array, $keys);
+        } catch (ArgumentCountError) {
+            $items = array_map($callback, $array);
         }
+    }
 
         return array_combine($keys, $items);
     }

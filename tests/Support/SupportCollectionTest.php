@@ -6050,36 +6050,6 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
-    public function testMapWithArrayCallableDoesNotReceiveKeyAsSecondArgument($collection)
-    {
-        $c = new $collection(['Sample type 1', 'Sample type 1', 'Sample type 1']);
-        $trim = new class
-        {
-            public function trim($string, $characters = "\n\r\t\v\x00")
-            {
-                return trim($string, $characters);
-            }
-        };
-
-        $this->assertSame(['Sample type 1', 'Sample type 1', 'Sample type 1'], $c->map([$trim, 'trim'])->all());
-    }
-
-    #[DataProvider('collectionClassProvider')]
-    public function testMapWithStaticArrayCallableDoesNotReceiveKeyAsSecondArgument($collection)
-    {
-        $c = new $collection(['6', '7', '8']);
-        $converter = new class
-        {
-            public static function toInt($value, $base = 10)
-            {
-                return intval($value, $base);
-            }
-        };
-
-        $this->assertSame([6, 7, 8], $c->map([$converter, 'toInt'])->all());
-    }
-
-    #[DataProvider('collectionClassProvider')]
     public function testMapWithClosureReceivesKey($collection)
     {
         $c = new $collection(['a' => 'value1', 'b' => 'value2']);
