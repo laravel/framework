@@ -666,7 +666,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $blueprint->dateTime('created_at');
         $statements = $blueprint->toSql();
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add "created_at" datetime2(0) not null', $statements[0]);
+        $this->assertSame('alter table "users" add "created_at" datetime not null', $statements[0]);
     }
 
     public function testAddingDateTimeWithPrecision()
@@ -684,7 +684,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $blueprint->dateTimeTz('foo');
         $statements = $blueprint->toSql();
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add "foo" datetimeoffset(0) not null', $statements[0]);
+        $this->assertSame('alter table "users" add "foo" datetimeoffset not null', $statements[0]);
     }
 
     public function testAddingDateTimeTzWithPrecision()
@@ -702,7 +702,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $blueprint->time('created_at');
         $statements = $blueprint->toSql();
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add "created_at" time(0) not null', $statements[0]);
+        $this->assertSame('alter table "users" add "created_at" time not null', $statements[0]);
     }
 
     public function testAddingTimeWithPrecision()
@@ -720,7 +720,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $blueprint->timeTz('created_at');
         $statements = $blueprint->toSql();
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add "created_at" time(0) not null', $statements[0]);
+        $this->assertSame('alter table "users" add "created_at" time not null', $statements[0]);
     }
 
     public function testAddingTimeTzWithPrecision()
@@ -738,7 +738,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $blueprint->timestamp('created_at');
         $statements = $blueprint->toSql();
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add "created_at" datetime2(0) not null', $statements[0]);
+        $this->assertSame('alter table "users" add "created_at" datetime not null', $statements[0]);
     }
 
     public function testAddingTimestampWithPrecision()
@@ -756,7 +756,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $blueprint->timestampTz('created_at');
         $statements = $blueprint->toSql();
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add "created_at" datetimeoffset(0) not null', $statements[0]);
+        $this->assertSame('alter table "users" add "created_at" datetimeoffset not null', $statements[0]);
     }
 
     public function testAddingTimestampTzWithPrecision()
