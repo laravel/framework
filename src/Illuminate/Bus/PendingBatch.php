@@ -22,7 +22,7 @@ class PendingBatch
     /**
      * The IoC container instance.
      *
-     * @var Container
+     * @var \Illuminate\Contracts\Container\Container
      */
     protected $container;
 
@@ -36,7 +36,7 @@ class PendingBatch
     /**
      * The jobs that belong to the batch.
      *
-     * @var Collection
+     * @var \Illuminate\Support\Collection
      */
     public $jobs;
 
