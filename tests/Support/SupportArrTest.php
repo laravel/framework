@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use ArgumentCountError;
 use ArrayObject;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -1912,7 +1913,7 @@ class SupportArrTest extends TestCase
     public function testMapWithStringCallableArrayCombineThrowsArgumentCountError()
     {
         $array = [['a', 'b', 'c'], ['d', 'e', 'f']];
-        $this->expectException(\ArgumentCountError::class);
+        $this->expectException(ArgumentCountError::class);
         Arr::map($array, 'array_combine');
     }
 
@@ -1937,9 +1938,9 @@ class SupportArrTest extends TestCase
     public function testMapWithArrayCallableDoesNotReceiveKeyAsSecondArgument()
     {
         $array = ['Sample type 1', 'Sample type 1', 'Sample type 1'];
-        $trim = new class 
+        $trim = new class
         {
-            public function trim($string, $characters = "\n\r\t\v\x00") 
+            public function trim($string, $characters = "\n\r\t\v\x00")
             {
                 return trim($string, $characters);
             }
@@ -1951,9 +1952,9 @@ class SupportArrTest extends TestCase
     public function testMapWithStaticArrayCallableDoesNotReceiveKeyAsSecondArgument()
     {
         $array = ['6', '7', '8'];
-        $converter = new class  
+        $converter = new class
         {
-            public static function toInt($value, $base = 10) 
+            public static function toInt($value, $base = 10)
             {
                 return intval($value, $base);
             }

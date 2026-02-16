@@ -6053,9 +6053,9 @@ class SupportCollectionTest extends TestCase
     public function testMapWithArrayCallableDoesNotReceiveKeyAsSecondArgument($collection)
     {
         $c = new $collection(['Sample type 1', 'Sample type 1', 'Sample type 1']);
-        $trim = new class 
+        $trim = new class
         {
-            public function trim($string, $characters = "\n\r\t\v\x00") 
+            public function trim($string, $characters = "\n\r\t\v\x00")
             {
                 return trim($string, $characters);
             }
@@ -6068,9 +6068,9 @@ class SupportCollectionTest extends TestCase
     public function testMapWithStaticArrayCallableDoesNotReceiveKeyAsSecondArgument($collection)
     {
         $c = new $collection(['6', '7', '8']);
-        $converter = new class 
+        $converter = new class
         {
-            public static function toInt($value, $base = 10) 
+            public static function toInt($value, $base = 10)
             {
                 return intval($value, $base);
             }
