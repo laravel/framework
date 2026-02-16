@@ -6053,8 +6053,10 @@ class SupportCollectionTest extends TestCase
     public function testMapWithArrayCallableDoesNotReceiveKeyAsSecondArgument($collection)
     {
         $c = new $collection(['Sample type 1', 'Sample type 1', 'Sample type 1']);
-        $trim = new class {
-            public function trim($string, $characters = "\n\r\t\v\x00") {
+        $trim = new class 
+        {
+            public function trim($string, $characters = "\n\r\t\v\x00") 
+            {
                 return trim($string, $characters);
             }
         };
@@ -6066,8 +6068,10 @@ class SupportCollectionTest extends TestCase
     public function testMapWithStaticArrayCallableDoesNotReceiveKeyAsSecondArgument($collection)
     {
         $c = new $collection(['6', '7', '8']);
-        $converter = new class {
-            public static function toInt($value, $base = 10) {
+        $converter = new class 
+        {
+            public static function toInt($value, $base = 10) 
+            {
                 return intval($value, $base);
             }
         };
@@ -6080,7 +6084,7 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection(['a' => 'value1', 'b' => 'value2']);
         $result = $c->map(function ($value, $key) {
-            return $key . ':' . $value;
+            return $key.':'.$value;
         });
 
         $this->assertEquals(['a' => 'a:value1', 'b' => 'b:value2'], $result->all());
