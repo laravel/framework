@@ -15,6 +15,7 @@ assertType("'foo'", when(true, 'foo', 42));
 assertType('null', when(false, 'foo'));
 assertType('42', when(false, 'foo', 42));
 assertType("'foo'", when(true, fn () => 'foo'));
+assertType("'foo'", when(fn() => 'foo', fn ($value) => $value));
 assertType("'foo'", when(true, fn () => 'foo', fn () => 42));
 assertType('null', when(false, fn () => 'foo'));
 assertType('42', when(false, fn () => 'foo', fn () => 42));
