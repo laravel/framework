@@ -141,7 +141,13 @@ class Command extends SymfonyCommand
         $signature = $reflection->getAttributes(Signature::class);
 
         if (count($signature) > 0) {
-            $this->signature = $signature[0]->newInstance()->signature;
+            $signatureInstance = $signature[0]->newInstance();
+
+            $this->signature = $signatureInstance->signature;
+
+            if ($signatureInstance->aliases !== null) {
+                $this->aliases = $signatureInstance->aliases;
+            }
         }
 
         $description = $reflection->getAttributes(Description::class);
