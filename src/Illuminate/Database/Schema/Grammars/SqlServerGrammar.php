@@ -745,10 +745,14 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeJson(Fluent $column)
     {
-        $version = $this->connection->getServerVersion();
+        try {
+            $version = $this->connection->getServerVersion();
 
-        if (version_compare($version, '16.0', '>=')) {
-            return 'json';
+            if (version_compare($version, '16.0', '>=')) {
+                return 'json';
+            }
+        } catch (\Exception) {
+            // Fall back to nvarchar(max) if version cannot be determined
         }
 
         return 'nvarchar(max)';
