@@ -129,7 +129,7 @@ class TestCachesTest extends TestCase
         unset($_SERVER['LARAVEL_PARALLEL_TESTING_WITHOUT_CACHE']);
     }
 
-    public function testSwitchToCachePrefixDoesNotForgetResolvedDrivers()
+    public function testSwitchToCachePrefixDoesNotRemoveResolvedDrivers()
     {
         $container = Container::getInstance();
 
