@@ -837,7 +837,6 @@ class Arr
         $keys = array_keys($array);
 
         if (is_string($callback)) {
-
             return array_combine($keys, array_map($callback, $array));
         }
 
