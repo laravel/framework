@@ -686,8 +686,6 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeFloat(Fluent $column)
     {
-        // SQL Server float precision must be between 1-53, or omitted entirely.
-        // Precision of 0 is invalid and should be treated as no precision specified.
         return ! is_null($column->precision) && $column->precision > 0
             ? "float($column->precision)"
             : 'float';
@@ -808,8 +806,6 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeTime(Fluent $column)
     {
-        // Use time without precision when precision is 0 or null for backward compatibility.
-        // SQL Server time precision must be between 0-7 when specified.
         return ! is_null($column->precision) && $column->precision > 0
             ? "time($column->precision)"
             : 'time';
@@ -838,8 +834,6 @@ class SqlServerGrammar extends Grammar
             $column->default(new Expression('CURRENT_TIMESTAMP'));
         }
 
-        // Use datetime2 only when precision is explicitly greater than 0.
-        // Precision of 0 or null uses the standard datetime type for backward compatibility.
         return ! is_null($column->precision) && $column->precision > 0
             ? "datetime2($column->precision)"
             : 'datetime';
@@ -859,8 +853,6 @@ class SqlServerGrammar extends Grammar
             $column->default(new Expression('CURRENT_TIMESTAMP'));
         }
 
-        // Use datetimeoffset with precision only when explicitly greater than 0.
-        // Precision of 0 or null uses datetimeoffset without precision for backward compatibility.
         return ! is_null($column->precision) && $column->precision > 0
             ? "datetimeoffset($column->precision)"
             : 'datetimeoffset';
