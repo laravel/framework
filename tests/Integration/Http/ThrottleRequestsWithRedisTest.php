@@ -49,4 +49,29 @@ class ThrottleRequestsWithRedisTest extends TestCase
             }
         });
     }
+
+    public function testKeysAreNamespacedWithPrefix()
+    {
+        $this->ifRedisAvailable(function () {
+            Route::get('/', function () {
+                return 'yes';
+            })->middleware(ThrottleRequestsWithRedis::class.':2,1');
+
+            $redis = $this->app->make('redis')->connection();
+
+            // Clear any existing keys
+            $redis->flushdb();
+
+            // Make a request
+            $this->withoutExceptionHandling()->get('/');
+
+            // Check that keys are prefixed with 'throttle:'
+            $keys = $redis->keys('*');
+            $this->assertNotEmpty($keys);
+
+            foreach ($keys as $key) {
+                $this->assertStringStartsWith('throttle:', $key);
+            }
+        });
+    }
 }
