@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Database\Schema\Blueprint;
@@ -1426,6 +1427,31 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             'user_uuid',
             $instance->toArray(),
         );
+    }
+
+    public function testWhenMethodReturnsRelationInstance()
+    {
+        Carbon::setTestNow('2024-05-05 10:00:00');
+
+        $post = Post::create(['title' => Str::random()]);
+        $tag1 = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'active', 'created_at' => '2024-01-01 00:00:00', 'updated_at' => '2024-01-01 00:00:00'],
+            ['post_id' => $post->id, 'tag_id' => $tag2->id, 'flag' => 'inactive', 'created_at' => '2024-06-01 00:00:00', 'updated_at' => '2024-06-01 00:00:00'],
+        ]);
+
+        $tags = $post->tagsWithExtraPivot()
+            ->when(true, function ($relation) {
+                $this->assertInstanceOf(BelongsToMany::class, $relation);
+
+                return $relation->wherePivotBetween('updated_at', ['2000-01-01', '2024-05-05']);
+            })
+            ->get();
+
+        $this->assertCount(1, $tags);
+        $this->assertEquals($tag1->id, $tags->first()->id);
     }
 }
 
