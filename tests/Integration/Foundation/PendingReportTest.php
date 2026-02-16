@@ -31,6 +31,7 @@ class PendingReportTest extends TestCase
 
     protected function tearDown(): void
     {
+        Container::setInstance();
         m::close();
     }
 
