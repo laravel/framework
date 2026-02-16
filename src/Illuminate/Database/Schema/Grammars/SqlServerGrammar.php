@@ -745,6 +745,12 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeJson(Fluent $column)
     {
+        $version = $this->connection->getServerVersion();
+
+        if (version_compare($version, '16.0', '>=')) {
+            return 'json';
+        }
+
         return 'nvarchar(max)';
     }
 
@@ -756,7 +762,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeJsonb(Fluent $column)
     {
-        return 'nvarchar(max)';
+        return $this->typeJson($column);
     }
 
     /**
