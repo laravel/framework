@@ -21,6 +21,10 @@ trait TestCaches
     protected function bootTestCache()
     {
         ParallelTesting::setUpTestCase(function () {
+            if (ParallelTesting::option('without_cache')) {
+                return;
+            }
+
             $this->switchToCachePrefix($this->parallelSafeCachePrefix());
         });
     }

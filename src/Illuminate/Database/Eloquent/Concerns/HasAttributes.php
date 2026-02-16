@@ -1304,7 +1304,7 @@ trait HasAttributes
      *
      * @param  string  $enumClass
      * @param  string|int  $value
-     * @return \UnitEnum|\BackedEnum
+     * @return \UnitEnum
      */
     protected function getEnumCaseFromValue($enumClass, $value)
     {
@@ -1317,7 +1317,7 @@ trait HasAttributes
      * Get the storable value from the given enum.
      *
      * @param  string  $expectedEnum
-     * @param  \UnitEnum|\BackedEnum  $value
+     * @param  \UnitEnum  $value
      * @return string|int
      */
     protected function getStorableEnumValue($expectedEnum, $value)
