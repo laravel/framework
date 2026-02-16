@@ -64,7 +64,7 @@ class Arr
      * @param  mixed  $value
      * @return array
      */
-    public static function add($array, $key, $value)
+    public static function add(array $array, string|int|float $key, mixed $value): array
     {
         if (is_null(static::get($array, $key))) {
             static::set($array, $key, $value);
