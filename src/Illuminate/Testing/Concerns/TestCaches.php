@@ -50,9 +50,5 @@ trait TestCaches
     protected function switchToCachePrefix($prefix)
     {
         $this->app['config']->set('cache.prefix', $prefix);
-
-        if ($this->app->resolved('cache')) {
-            $this->app['cache']->forgetDriver();
-        }
     }
 }
