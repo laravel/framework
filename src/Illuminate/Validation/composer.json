@@ -25,6 +25,7 @@
         "illuminate/macroable": "^13.0",
         "illuminate/support": "^13.0",
         "illuminate/translation": "^13.0",
+        "league/uri-polyfill": "^7.7.0",
         "symfony/http-foundation": "^7.4.0|^8.0.0",
         "symfony/mime": "^7.4.0|^8.0.0"
     },

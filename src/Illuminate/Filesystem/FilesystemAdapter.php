@@ -38,6 +38,7 @@ use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
+use Uri\Rfc3986\Uri;
 
 /**
  * @mixin \League\Flysystem\FilesystemOperator
@@ -881,12 +882,12 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     protected function replaceBaseUrl($uri, $url)
     {
-        $parsed = parse_url($url);
+        $parsed = new Uri($url);
 
         return $uri
-            ->withScheme($parsed['scheme'])
-            ->withHost($parsed['host'])
-            ->withPort($parsed['port'] ?? null);
+            ->withScheme($parsed->getScheme())
+            ->withHost($parsed->getHost())
+            ->withPort($parsed->getPort());
     }
 
     /**
