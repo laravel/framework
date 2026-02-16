@@ -50,5 +50,14 @@ trait TestCaches
     protected function switchToCachePrefix($prefix)
     {
         $this->app['config']->set('cache.prefix', $prefix);
+
+        if ($this->app->resolved('cache')) {
+            $store = $this->app['cache']->driver()->getStore();
+
+            if (method_exists($store, 'setPrefix')) {
+                $store->setPrefix($prefix);
+            }
+        }
+
     }
 }
