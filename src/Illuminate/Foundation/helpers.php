@@ -720,34 +720,18 @@ if (! function_exists('report')) {
     /**
      * Report an exception.
      *
-     * @param  \Throwable|string  $exception
+     * @param  \Throwable|string|null  $exception
+     * @return ($exception is null ? \Illuminate\Foundation\Exceptions\PendingReport : void)
      */
-    function report($exception): void
+    function report($exception = null)
     {
-        if (is_string($exception)) {
-            $exception = new Exception($exception);
+        $report = app(PendingReport::class);
+
+        if (is_null($exception)) {
+            return $report;
         }
 
-        app(ExceptionHandler::class)->report($exception);
-    }
-}
-
-if (! function_exists('report_attempt')) {
-    /**
-     * Report an exception a number of occurrences inside a window of time.
-     *
-     * @param  \Throwable|string  $exception
-     * @return \Illuminate\Foundation\Exceptions\PendingReport
-     */
-    function report_attempt($exception): PendingReport
-    {
-        if (is_string($exception)) {
-            $exception = new Exception($exception);
-        }
-
-        return app(PendingReport::class, [
-            'exception' => $exception,
-        ]);
+        $report->exception($exception)->now();
     }
 }
 
@@ -760,9 +744,7 @@ if (! function_exists('report_if')) {
      */
     function report_if($boolean, $exception): void
     {
-        if ($boolean) {
-            report($exception);
-        }
+        report()->exception($exception)->when($boolean)->now();
     }
 }
 
@@ -775,9 +757,7 @@ if (! function_exists('report_unless')) {
      */
     function report_unless($boolean, $exception): void
     {
-        if (! $boolean) {
-            report($exception);
-        }
+        report()->exception($exception)->unless($boolean)->now();
     }
 }
 

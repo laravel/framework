@@ -309,4 +309,5 @@ EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
         $this->assertCount(1, $recordedLogs);
         $this->assertStringContainsString('a really (truncated...)', $recordedLogs[0]['message']);
     }
+
 }
