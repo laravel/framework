@@ -1076,6 +1076,55 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestUser::findOrFail(new Collection([1, 1, 2, 3]));
     }
 
+    public function testFindOrFailWithEnumThrowsModelNotFoundExceptionWithEnumValue()
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 999');
+
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::findOrFail(EloquentTestUserIdEnum::NotFound);
+    }
+
+    public function testFindOrFailWithMultipleEnumsThrowsModelNotFoundExceptionWithEnumValues()
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 998, 999');
+
+        EloquentTestUser::findOrFail([EloquentTestUserIdEnum::AlsoNotFound, EloquentTestUserIdEnum::NotFound]);
+    }
+
+    public function testFindOrFailWithPartialEnumMatchThrowsModelNotFoundExceptionForMissingIds()
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 998, 999');
+
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::findOrFail([EloquentTestUserIdEnum::One, EloquentTestUserIdEnum::AlsoNotFound, EloquentTestUserIdEnum::NotFound]);
+    }
+
+    public function testCollectionFindOrFailWithEnumThrowsModelNotFoundExceptionWithEnumValue()
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 999');
+
+        $collection = new Collection([
+            EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']),
+        ]);
+
+        $collection->findOrFail(EloquentTestUserIdEnum::NotFound);
+    }
+
+    public function testModelNotFoundExceptionWithUnitEnum()
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] Active');
+
+        $exception = new ModelNotFoundException();
+        $exception->setModel(EloquentTestUser::class, EloquentTestUserStatus::Active);
+
+        throw $exception;
+    }
+
     public function testOneToOneRelationship()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
@@ -3088,4 +3137,17 @@ enum StringBackedRole: string
 {
     case User = 'user';
     case Admin = 'admin';
+}
+
+enum EloquentTestUserIdEnum: int
+{
+    case One = 1;
+    case AlsoNotFound = 998;
+    case NotFound = 999;
+}
+
+enum EloquentTestUserStatus
+{
+    case Active;
+    case Inactive;
 }

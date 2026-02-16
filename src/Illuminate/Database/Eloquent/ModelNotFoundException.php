@@ -5,6 +5,8 @@ namespace Illuminate\Database\Eloquent;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Support\Arr;
 
+use function Illuminate\Support\enum_value;
+
 /**
  * @template TModel of \Illuminate\Database\Eloquent\Model
  */
@@ -28,13 +30,13 @@ class ModelNotFoundException extends RecordsNotFoundException
      * Set the affected Eloquent model and instance ids.
      *
      * @param  class-string<TModel>  $model
-     * @param  array<int, int|string>|int|string  $ids
+     * @param  array<int, int|string|\BackedEnum|\UnitEnum>|int|string|\BackedEnum|\UnitEnum  $ids
      * @return $this
      */
     public function setModel($model, $ids = [])
     {
         $this->model = $model;
-        $this->ids = Arr::wrap($ids);
+        $this->ids = array_map(fn ($id) => enum_value($id), Arr::wrap($ids));
 
         $this->message = "No query results for model [{$model}]";
 
