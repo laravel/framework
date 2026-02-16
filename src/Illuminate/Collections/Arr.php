@@ -405,7 +405,7 @@ class Arr
      * @param  array|string|int|float  $keys
      * @return void
      */
-    public static function forget(&$array, $keys)
+    public static function forget(array &$array, array|string|int|float $keys): void
     {
         $original = &$array;
 
@@ -512,7 +512,7 @@ class Arr
      * @param  string|array  $keys
      * @return bool
      */
-    public static function has($array, $keys)
+    public static function has(\ArrayAccess|array $array, string|array $keys): bool
     {
         $keys = (array) $keys;
 
