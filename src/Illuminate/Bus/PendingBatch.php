@@ -22,7 +22,7 @@ class PendingBatch
     /**
      * The IoC container instance.
      *
-     * @var \Illuminate\Contracts\Container\Container
+     * @var Container
      */
     protected $container;
 
@@ -36,7 +36,7 @@ class PendingBatch
     /**
      * The jobs that belong to the batch.
      *
-     * @var \Illuminate\Support\Collection
+     * @var Collection
      */
     public $jobs;
 
@@ -57,10 +57,10 @@ class PendingBatch
     /**
      * Create a new pending batch instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @param  \Illuminate\Support\Collection  $jobs
+     * @param Container $container
+     * @param Collection|array $jobs
      */
-    public function __construct(Container $container, Collection $jobs)
+    public function __construct(Container $container, Collection|array $jobs)
     {
         $this->container = $container;
 
