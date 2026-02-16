@@ -441,6 +441,18 @@ class Response implements ArrayAccess, Stringable
     }
 
     /**
+     * Throw an exception if the response status code is a 3xx level code.
+     *
+     * @return $this
+     *
+     * @throws \Illuminate\Http\Client\RequestException
+     */
+    public function throwIfRedirect()
+    {
+        return $this->redirect() ? throw new RequestException($this, $this->truncateExceptionsAt) : $this;
+    }
+
+    /**
      * Indicate that request exceptions should be truncated to the given length.
      *
      * @param  int<1, max>  $length

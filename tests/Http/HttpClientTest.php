@@ -3607,6 +3607,69 @@ class HttpClientTest extends TestCase
         $this->assertInstanceOf(RequestException::class, $exception);
     }
 
+    public function testRequestExceptionIsThrownIfIsRedirect()
+    {
+        $this->factory->fake([
+            'http://foo.com/api/200' => $this->factory::response('', 200),
+            'http://foo.com/api/301' => $this->factory::response('', 301),
+            'http://foo.com/api/302' => $this->factory::response('', 302),
+            'http://foo.com/api/400' => $this->factory::response('', 400),
+            'http://foo.com/api/500' => $this->factory::response('', 500),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api/301')->throwIfRedirect();
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api/302')->throwIfRedirect();
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api/200')->throwIfRedirect();
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNull($exception);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api/400')->throwIfRedirect();
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNull($exception);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api/500')->throwIfRedirect();
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNull($exception);
+    }
+
     public function testItCanEnforceFaking()
     {
         $this->factory->preventStrayRequests();
