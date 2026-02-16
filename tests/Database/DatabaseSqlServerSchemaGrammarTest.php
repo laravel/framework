@@ -604,7 +604,10 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
     public function testAddingJson()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getServerVersion')->andReturn('15.0');
+
+        $blueprint = new Blueprint($conn, 'users');
         $blueprint->json('foo');
         $statements = $blueprint->toSql();
 
@@ -612,14 +615,43 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add "foo" nvarchar(max) not null', $statements[0]);
     }
 
+    public function testAddingJsonOnSqlServer2025()
+    {
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getServerVersion')->andReturn('16.0');
+
+        $blueprint = new Blueprint($conn, 'users');
+        $blueprint->json('foo');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add "foo" json not null', $statements[0]);
+    }
+
     public function testAddingJsonb()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getServerVersion')->andReturn('15.0');
+
+        $blueprint = new Blueprint($conn, 'users');
         $blueprint->jsonb('foo');
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add "foo" nvarchar(max) not null', $statements[0]);
+    }
+
+    public function testAddingJsonbOnSqlServer2025()
+    {
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getServerVersion')->andReturn('16.0');
+
+        $blueprint = new Blueprint($conn, 'users');
+        $blueprint->jsonb('foo');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add "foo" json not null', $statements[0]);
     }
 
     public function testAddingDate()
