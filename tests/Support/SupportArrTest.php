@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use ArgumentCountError;
 use ArrayObject;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -1899,5 +1900,62 @@ class SupportArrTest extends TestCase
         $result = Arr::partition($array, fn (string $value) => str_contains($value, 'J'));
 
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
+    }
+
+    public function testMapWithStringCallableTrimDoesNotReceiveKeyAsSecondArgument()
+    {
+        $array = ['Sample type 1', 'Sample type 1', 'Sample type 1'];
+        $result = Arr::map($array, 'trim');
+
+        $this->assertEquals(['Sample type 1', 'Sample type 1', 'Sample type 1'], $result);
+    }
+
+    public function testMapWithStringCallableArrayCombineThrowsArgumentCountError()
+    {
+        $array = [['a', 'b', 'c'], ['d', 'e', 'f']];
+        $this->expectException(ArgumentCountError::class);
+        Arr::map($array, 'array_combine');
+    }
+
+    public function testMapWithStringCallableIntvalDoesNotReceiveKeyAsSecondArgument()
+    {
+        $array = ['6', '7', '8'];
+        $result = Arr::map($array, 'intval');
+
+        $this->assertEquals([6, 7, 8], $result);
+    }
+
+    public function testMapWithClosureReceivesKey()
+    {
+        $array = ['a' => 'value1', 'b' => 'value2'];
+        $result = Arr::map($array, function ($value, $key) {
+            return $key . ':' . $value;
+        });
+
+        $this->assertEquals(['a' => 'a:value1', 'b' => 'b:value2'], $result);
+    }
+
+    public function testMapWithArrayCallableDoesNotReceiveKeyAsSecondArgument()
+    {
+        $array = ['Sample type 1', 'Sample type 1', 'Sample type 1'];
+        $trim = new class {
+            public function trim($string, $characters = "\n\r\t\v\x00") {
+                return trim($string, $characters);
+            }
+        };
+
+        $this->assertSame(['Sample type 1', 'Sample type 1', 'Sample type 1'], Arr::map($array, [$trim, 'trim']));
+    }
+
+    public function testMapWithStaticArrayCallableDoesNotReceiveKeyAsSecondArgument()
+    {
+        $array = ['6', '7', '8'];
+        $converter = new class {
+            public static function toInt($value, $base = 10) {
+                return intval($value, $base);
+            }
+        };
+
+        $this->assertSame([6, 7, 8], Arr::map($array, [$converter, 'toInt']));
     }
 }

@@ -802,9 +802,12 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      */
     public function map(callable $callback)
     {
-        return new static(function () use ($callback) {
+        $passKey = ! is_string($callback)
+            && ! (is_array($callback) && count($callback) === 2);
+
+        return new static(function () use ($callback, $passKey) {
             foreach ($this as $key => $value) {
-                yield $key => $callback($value, $key);
+                yield $key => $passKey ? $callback($value, $key) : $callback($value);
             }
         });
     }

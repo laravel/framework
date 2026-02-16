@@ -836,10 +836,10 @@ class Arr
     {
         $keys = array_keys($array);
 
-        try {
-            $items = array_map($callback, $array, $keys);
-        } catch (ArgumentCountError) {
+        if (is_string($callback) || (is_array($callback) && count($callback) === 2)) {
             $items = array_map($callback, $array);
+        } else {
+            $items = array_map($callback, $array, $keys);
         }
 
         return array_combine($keys, $items);
