@@ -57,8 +57,8 @@ class PendingBatch
     /**
      * Create a new pending batch instance.
      *
-     * @param Container $container
-     * @param Collection|array $jobs
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  \Illuminate\Support\Collection|array  $jobs
      */
     public function __construct(Container $container, Collection|array $jobs)
     {
