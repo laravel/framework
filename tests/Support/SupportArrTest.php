@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Support;
 
-use ArgumentCountError;
 use ArrayObject;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
