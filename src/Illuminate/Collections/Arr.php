@@ -64,7 +64,7 @@ class Arr
      * @param  mixed  $value
      * @return array
      */
-    public static function add($array, $key, $value)
+    public static function add(array $array, string|int|float $key, mixed $value): array
     {
         if (is_null(static::get($array, $key))) {
             static::set($array, $key, $value);
@@ -405,7 +405,7 @@ class Arr
      * @param  array|string|int|float  $keys
      * @return void
      */
-    public static function forget(&$array, $keys)
+    public static function forget(array &$array, array|string|int|float $keys): void
     {
         $original = &$array;
 
@@ -512,7 +512,7 @@ class Arr
      * @param  string|array  $keys
      * @return bool
      */
-    public static function has($array, $keys)
+    public static function has(\ArrayAccess|array $array, string|array $keys): bool
     {
         $keys = (array) $keys;
 
