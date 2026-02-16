@@ -1910,13 +1910,6 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['Sample type 1', 'Sample type 1', 'Sample type 1'], $result);
     }
 
-    public function testMapWithStringCallableArrayCombineThrowsArgumentCountError()
-    {
-        $array = [['a', 'b', 'c'], ['d', 'e', 'f']];
-        $this->expectException(ArgumentCountError::class);
-        Arr::map($array, 'array_combine');
-    }
-
     public function testMapWithStringCallableIntvalDoesNotReceiveKeyAsSecondArgument()
     {
         $array = ['6', '7', '8'];

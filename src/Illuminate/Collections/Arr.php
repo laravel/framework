@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use ArgumentCountError;
 use ArrayAccess;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
