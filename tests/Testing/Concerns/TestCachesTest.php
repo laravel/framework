@@ -111,6 +111,40 @@ class TestCachesTest extends TestCase
         $this->assertCount(1, $setUpCallbacks);
     }
 
+    public function testBootTestCacheSkipsIsolationIfOptedOut()
+    {
+        Container::getInstance()->make(ParallelTesting::class)->resolveTokenUsing(fn () => '7');
+
+        $instance = $this->makeTestCachesInstance();
+
+        (new ReflectionProperty($instance::class, 'originalCachePrefix'))->setValue(null, null);
+        (new ReflectionMethod($instance, 'bootTestCache'))->invoke($instance);
+
+        $_SERVER['LARAVEL_PARALLEL_TESTING_WITHOUT_CACHE'] = 1;
+
+        Container::getInstance()->make(ParallelTesting::class)->callSetUpTestCaseCallbacks(new class { });
+
+        $this->assertSame('myapp_cache_', Container::getInstance()['config']->get('cache.prefix'));
+
+        unset($_SERVER['LARAVEL_PARALLEL_TESTING_WITHOUT_CACHE']);
+    }
+
+    public function testSwitchToCachePrefixDoesNotRemoveResolvedDrivers()
+    {
+        $container = Container::getInstance();
+
+        $container->singleton('cache', fn ($app) => new \Illuminate\Cache\CacheManager($app));
+
+        $container['config']->set('cache.default', 'array');
+        $container['config']->set('cache.stores.array', ['driver' => 'array']);
+
+        $driver = $container['cache']->driver();
+
+        $this->switchToCachePrefix('new_prefix_');
+
+        $this->assertSame($driver, $container['cache']->driver());
+    }
+
     protected function getParallelSafeCachePrefix()
     {
         $instance = $this->makeTestCachesInstance();

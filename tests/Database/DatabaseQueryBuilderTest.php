@@ -5433,9 +5433,11 @@ SQL;
     public function testSelectExpression()
     {
         $builder = $this->getBuilder();
-        $builder->from('one')->selectExpression(new Raw('1 + 1'), 'expr');
+        $builder->from('one')
+            ->selectExpression(new Raw('1 + 1'), 'expr')
+            ->selectExpression('2 + 2', 'expr2');
 
-        $this->assertSame('select (1 + 1) as "expr" from "one"', $builder->toSql());
+        $this->assertSame('select (1 + 1) as "expr", (2 + 2) as "expr2" from "one"', $builder->toSql());
     }
 
     public function testSelect()

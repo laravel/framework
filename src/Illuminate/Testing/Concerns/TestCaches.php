@@ -21,6 +21,10 @@ trait TestCaches
     protected function bootTestCache()
     {
         ParallelTesting::setUpTestCase(function () {
+            if (ParallelTesting::option('without_cache')) {
+                return;
+            }
+
             $this->switchToCachePrefix($this->parallelSafeCachePrefix());
         });
     }
@@ -46,9 +50,5 @@ trait TestCaches
     protected function switchToCachePrefix($prefix)
     {
         $this->app['config']->set('cache.prefix', $prefix);
-
-        if ($this->app->resolved('cache')) {
-            $this->app['cache']->forgetDriver();
-        }
     }
 }
