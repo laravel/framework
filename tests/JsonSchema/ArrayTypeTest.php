@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class ArrayTypeTest extends TestCase
 {
-    public function test_it_may_set_min_items(): void
+    public function testItMaySetMinItems(): void
     {
         $type = JsonSchema::array()->title('Tags')->min(1);
 
@@ -18,7 +18,7 @@ class ArrayTypeTest extends TestCase
         ], $type->toArray());
     }
 
-    public function test_it_may_set_max_items(): void
+    public function testItMaySetMaxItems(): void
     {
         $type = JsonSchema::array()->description('A list of tags')->max(10);
 
@@ -29,7 +29,7 @@ class ArrayTypeTest extends TestCase
         ], $type->toArray());
     }
 
-    public function test_it_may_set_items_type(): void
+    public function testItMaySetItemsType(): void
     {
         $type = JsonSchema::array()->items(
             JsonSchema::string()->max(20)
@@ -44,7 +44,7 @@ class ArrayTypeTest extends TestCase
         ], $type->toArray());
     }
 
-    public function test_it_may_set_default_value(): void
+    public function testItMaySetDefaultValue(): void
     {
         $type = JsonSchema::array()->default(['a', 'b']);
 
@@ -54,7 +54,7 @@ class ArrayTypeTest extends TestCase
         ], $type->toArray());
     }
 
-    public function test_it_may_set_enum(): void
+    public function testItMaySetEnum(): void
     {
         $type = JsonSchema::array()->enum([
             ['a'],

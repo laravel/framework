@@ -8,7 +8,7 @@ use RuntimeException;
 
 class MultipleInstanceManagerTest extends TestCase
 {
-    public function test_configurable_instances_can_be_resolved()
+    public function testConfigurableInstancesCanBeResolved()
     {
         $manager = new MultipleInstanceManager($this->app);
 
@@ -29,7 +29,7 @@ class MultipleInstanceManagerTest extends TestCase
         $this->assertEquals(spl_object_hash($mysqlInstance), spl_object_hash($duplicateMysqlInstance));
     }
 
-    public function test_unresolvable_instances_throw_errors()
+    public function testUnresolvableInstancesThrowErrors()
     {
         $this->expectException(RuntimeException::class);
 

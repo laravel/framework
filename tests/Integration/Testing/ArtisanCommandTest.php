@@ -67,12 +67,12 @@ class ArtisanCommandTest extends TestCase
         });
     }
 
-    public function test_console_command_that_passes()
+    public function testConsoleCommandThatPasses()
     {
         $this->artisan('exit', ['code' => 0])->assertOk();
     }
 
-    public function test_console_command_that_fails()
+    public function testConsoleCommandThatFails()
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Expected status code 0 but received 1.');
@@ -80,7 +80,7 @@ class ArtisanCommandTest extends TestCase
         $this->artisan('exit', ['code' => 1])->assertOk();
     }
 
-    public function test_console_command_that_passes_with_output()
+    public function testConsoleCommandThatPassesWithOutput()
     {
         $this->artisan('survey')
             ->expectsQuestion('What is your name?', 'Taylor Otwell')
@@ -90,7 +90,7 @@ class ArtisanCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
-    public function test_console_command_that_passes_with_repeating_output()
+    public function testConsoleCommandThatPassesWithRepeatingOutput()
     {
         $this->artisan('slim')
             ->expectsQuestion('Who?', 'Taylor')
@@ -103,7 +103,7 @@ class ArtisanCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
-    public function test_console_command_that_fails_from_unexpected_output()
+    public function testConsoleCommandThatFailsFromUnexpectedOutput()
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Output "Your name is Taylor Otwell and you prefer PHP." was printed.');
@@ -115,7 +115,7 @@ class ArtisanCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
-    public function test_console_command_that_fails_from_unexpected_output_substring()
+    public function testConsoleCommandThatFailsFromUnexpectedOutputSubstring()
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Output "Taylor Otwell" was printed.');
@@ -125,7 +125,7 @@ class ArtisanCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
-    public function test_console_command_that_fails_from_missing_output()
+    public function testConsoleCommandThatFailsFromMissingOutput()
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Output "Your name is Taylor Otwell and you prefer PHP." was not printed.');
@@ -139,7 +139,7 @@ class ArtisanCommandTest extends TestCase
         });
     }
 
-    public function test_console_command_that_fails_from_exit_code_mismatch()
+    public function testConsoleCommandThatFailsFromExitCodeMismatch()
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Expected status code 1 but received 0.');
@@ -150,7 +150,7 @@ class ArtisanCommandTest extends TestCase
             ->assertExitCode(1);
     }
 
-    public function test_console_command_that_fails_from_unordered_output()
+    public function testConsoleCommandThatFailsFromUnorderedOutput()
     {
         $this->expectException(InvalidOrderException::class);
 
@@ -166,21 +166,21 @@ class ArtisanCommandTest extends TestCase
         });
     }
 
-    public function test_console_command_that_passes_if_the_output_contains()
+    public function testConsoleCommandThatPassesIfTheOutputContains()
     {
         $this->artisan('contains')
             ->expectsOutputToContain('Taylor Otwell')
             ->assertExitCode(0);
     }
 
-    public function test_console_command_that_passes_if_outputs_something()
+    public function testConsoleCommandThatPassesIfOutputsSomething()
     {
         $this->artisan('contains')
             ->expectsOutput()
             ->assertExitCode(0);
     }
 
-    public function test_console_command_that_passes_if_outputs_is_something_and_is_the_expected_output()
+    public function testConsoleCommandThatPassesIfOutputsIsSomethingAndIsTheExpectedOutput()
     {
         $this->artisan('contains')
             ->expectsOutput()
@@ -188,7 +188,7 @@ class ArtisanCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
-    public function test_console_command_that_fail_if_doesnt_output_something()
+    public function testConsoleCommandThatFailIfDoesntOutputSomething()
     {
         $this->expectException(InvalidCountException::class);
 
@@ -199,7 +199,7 @@ class ArtisanCommandTest extends TestCase
         m::close();
     }
 
-    public function test_console_command_that_fail_if_doesnt_output_something_and_is_not_the_expected_output()
+    public function testConsoleCommandThatFailIfDoesntOutputSomethingAndIsNotTheExpectedOutput()
     {
         $this->expectException(AssertionFailedError::class);
 
@@ -211,14 +211,14 @@ class ArtisanCommandTest extends TestCase
         });
     }
 
-    public function test_console_command_that_passes_if_does_not_output_anything()
+    public function testConsoleCommandThatPassesIfDoesNotOutputAnything()
     {
         $this->artisan('exit', ['code' => 0])
             ->doesntExpectOutput()
             ->assertExitCode(0);
     }
 
-    public function test_console_command_that_passes_if_does_not_output_anything_and_is_not_the_expected_output()
+    public function testConsoleCommandThatPassesIfDoesNotOutputAnythingAndIsNotTheExpectedOutput()
     {
         $this->artisan('exit', ['code' => 0])
             ->doesntExpectOutput()
@@ -226,7 +226,7 @@ class ArtisanCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
-    public function test_console_command_that_passes_if_expects_output_and_there_is_interactions()
+    public function testConsoleCommandThatPassesIfExpectsOutputAndThereIsInteractions()
     {
         $this->artisan('interactions', ['--no-interaction' => true])
             ->expectsOutput()
@@ -236,7 +236,7 @@ class ArtisanCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
-    public function test_console_command_that_fails_if_doesnt_expect_output_but__there_is_interactions()
+    public function testConsoleCommandThatFailsIfDoesntExpectOutputBut_ThereIsInteractions()
     {
         $this->expectException(InvalidCountException::class);
 
@@ -250,7 +250,7 @@ class ArtisanCommandTest extends TestCase
         m::close();
     }
 
-    public function test_console_command_that_fails_if_doesnt_expect_output_but_outputs_something()
+    public function testConsoleCommandThatFailsIfDoesntExpectOutputButOutputsSomething()
     {
         $this->expectException(InvalidCountException::class);
 
@@ -261,7 +261,7 @@ class ArtisanCommandTest extends TestCase
         m::close();
     }
 
-    public function test_console_command_that_fails_if_doesnt_expect_output_and_does_expect_output()
+    public function testConsoleCommandThatFailsIfDoesntExpectOutputAndDoesExpectOutput()
     {
         $this->expectException(InvalidCountException::class);
 
@@ -273,7 +273,7 @@ class ArtisanCommandTest extends TestCase
         m::close();
     }
 
-    public function test_console_command_that_fails_if_the_output_does_not_contain()
+    public function testConsoleCommandThatFailsIfTheOutputDoesNotContain()
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Output does not contain "Otwell Taylor".');
@@ -285,7 +285,7 @@ class ArtisanCommandTest extends TestCase
         });
     }
 
-    public function test_pending_command_can_be_tapped()
+    public function testPendingCommandCanBeTapped()
     {
         $newEngland = [
             'Connecticut',

@@ -10,7 +10,7 @@ class DateFormatValidationTest extends TestCase
 {
     #[TestWith(['UTC'])]
     #[TestWith(['Europe/Amsterdam'])]
-    public function test_it_can_validate_regardless_of_timezone(string $timezone): void
+    public function testItCanValidateRegardlessOfTimezone(string $timezone): void
     {
         date_default_timezone_set($timezone);
 

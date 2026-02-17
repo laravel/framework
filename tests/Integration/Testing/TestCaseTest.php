@@ -7,7 +7,7 @@ use Orchestra\Testbench\TestCase;
 
 class TestCaseTest extends TestCase
 {
-    public function test_without_vite_clear_facade_resolved_instance()
+    public function testWithoutViteClearFacadeResolvedInstance()
     {
         Vite::useScriptTagAttributes([
             'crossorigin' => 'anonymous',

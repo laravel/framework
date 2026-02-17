@@ -25,12 +25,12 @@ class BladeTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_rendering_blade_string()
+    public function testRenderingBladeString()
     {
         $this->assertSame('Hello Taylor', Blade::render('Hello {{ $name }}', ['name' => 'Taylor']));
     }
 
-    public function test_rendering_blade_long_maxpathlen_string()
+    public function testRenderingBladeLongMaxpathlenString()
     {
         $longString = str_repeat('a', PHP_MAXPATHLEN);
 
@@ -40,7 +40,7 @@ class BladeTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function test_rendering_blade_long_maxpathlen_string_with_exact_length()
+    public function testRenderingBladeLongMaxpathlenStringWithExactLength()
     {
         // The PHP_MAXPATHLEN restriction is only active, if
         // open_basedir is set and active. Otherwise, the check
@@ -64,21 +64,21 @@ class BladeTest extends TestCase
         }
     }
 
-    public function test_rendering_blade_component_instance()
+    public function testRenderingBladeComponentInstance()
     {
         $component = new HelloComponent('Taylor');
 
         $this->assertSame('Hello Taylor', Blade::renderComponent($component));
     }
 
-    public function test_basic_blade_rendering()
+    public function testBasicBladeRendering()
     {
         $view = View::make('hello', ['name' => 'Taylor'])->render();
 
         $this->assertSame('Hello Taylor', trim($view));
     }
 
-    public function test_rendering_a_component()
+    public function testRenderingAComponent()
     {
         $view = View::make('uses-panel', ['name' => 'Taylor'])->render();
 
@@ -87,7 +87,7 @@ class BladeTest extends TestCase
 </div>', trim($view));
     }
 
-    public function test_rendering_a_dynamic_component()
+    public function testRenderingADynamicComponent()
     {
         $view = View::make('uses-panel-dynamically', ['name' => 'Taylor'])->render();
 
@@ -96,7 +96,7 @@ class BladeTest extends TestCase
 </div>', trim($view));
     }
 
-    public function test_rendering_the_same_dynamic_component_with_different_attributes()
+    public function testRenderingTheSameDynamicComponentWithDifferentAttributes()
     {
         $view = View::make('varied-dynamic-calls')->render();
 
@@ -108,14 +108,14 @@ class BladeTest extends TestCase
 </span>', trim($view));
     }
 
-    public function test_inline_link_type_attributes_dont_add_extra_spacing_at_end()
+    public function testInlineLinkTypeAttributesDontAddExtraSpacingAtEnd()
     {
         $view = View::make('uses-link')->render();
 
         $this->assertSame('This is a sentence with a <a href="https://laravel.com">link</a>.', trim($view));
     }
 
-    public function test_appendable_attributes()
+    public function testAppendableAttributes()
     {
         $view = View::make('uses-appendable-panel', ['name' => 'Taylor', 'withInjectedValue' => true])->render();
 
@@ -137,7 +137,7 @@ class BladeTest extends TestCase
         $this->assertSame('<input class="disabled-class" foo="bar" type="text" disabled />', trim($view));
     }
 
-    public function test_consume_defaults()
+    public function testConsumeDefaults()
     {
         $view = View::make('consume')->render();
 
@@ -150,7 +150,7 @@ class BladeTest extends TestCase
 <div>Slot: F, Color: yellow, Default: foo</div>', trim($view));
     }
 
-    public function test_consume_with_props()
+    public function testConsumeWithProps()
     {
         $view = View::make('consume', ['color' => 'rebeccapurple'])->render();
 
@@ -163,7 +163,7 @@ class BladeTest extends TestCase
 <div>Slot: F, Color: yellow, Default: foo</div>', trim($view));
     }
 
-    public function test_name_attribute_can_be_used_if_using_short_slot_names()
+    public function testNameAttributeCanBeUsedIfUsingShortSlotNames()
     {
         $content = Blade::render('<x-input-with-slot>
     <x-slot:input name="my_form_field" class="text-input-lg" data-test="data">Test</x-slot:input>
@@ -174,7 +174,7 @@ class BladeTest extends TestCase
 </div>', trim($content));
     }
 
-    public function test_name_attribute_cant_be_used_if_not_using_short_slot_names()
+    public function testNameAttributeCantBeUsedIfNotUsingShortSlotNames()
     {
         $content = Blade::render('<x-input-with-slot>
     <x-slot name="input" class="text-input-lg" data-test="data">Test</x-slot>
@@ -185,7 +185,7 @@ class BladeTest extends TestCase
 </div>', trim($content));
     }
 
-    public function test_bound_name_attribute_can_be_used_if_using_short_slot_names()
+    public function testBoundNameAttributeCanBeUsedIfUsingShortSlotNames()
     {
         $content = Blade::render('<x-input-with-slot>
     <x-slot:input :name="\'my_form_field\'" class="text-input-lg" data-test="data">Test</x-slot:input>
@@ -196,7 +196,7 @@ class BladeTest extends TestCase
 </div>', trim($content));
     }
 
-    public function test_bound_name_attribute_can_be_used_if_using_short_slot_names_and_not_first_attribute()
+    public function testBoundNameAttributeCanBeUsedIfUsingShortSlotNamesAndNotFirstAttribute()
     {
         $content = Blade::render('<x-input-with-slot>
     <x-slot:input class="text-input-lg" :name="\'my_form_field\'" data-test="data">Test</x-slot:input>
@@ -207,7 +207,7 @@ class BladeTest extends TestCase
 </div>', trim($content));
     }
 
-    public function test_no_name_passed_to_slot_uses_default_name()
+    public function testNoNamePassedToSlotUsesDefaultName()
     {
         $content = Blade::render('<x-link href="#"><x-slot>default slot</x-slot></x-link>');
 
@@ -225,7 +225,7 @@ class BladeTest extends TestCase
         $this->assertTrue($found);
     }
 
-    public function test_include_scoped_does_not_inherit_parent_scope()
+    public function testIncludeScopedDoesNotInheritParentScope()
     {
         // Regular @include passes parent scope variables
         $regularInclude = View::make('uses-include-regular', [

@@ -9,7 +9,7 @@ use Orchestra\Testbench\TestCase;
 
 class BladeAnonymousComponentTest extends TestCase
 {
-    public function test_anonymous_components_with_custom_paths_can_be_rendered()
+    public function testAnonymousComponentsWithCustomPathsCanBeRendered()
     {
         Blade::anonymousComponentPath(__DIR__.'/anonymous-components-1', 'layouts');
         Blade::anonymousComponentPath(__DIR__.'/anonymous-components-2');
@@ -21,7 +21,7 @@ class BladeAnonymousComponentTest extends TestCase
         $this->assertTrue(str_contains($view, 'class="danger-button"'));
     }
 
-    public function test_anonymous_components_with_custom_paths_cant_be_rendered_as_normal_views()
+    public function testAnonymousComponentsWithCustomPathsCantBeRenderedAsNormalViews()
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -31,7 +31,7 @@ class BladeAnonymousComponentTest extends TestCase
         $view = View::make('layouts::app')->render();
     }
 
-    public function test_anonymous_components_with_custom_paths_cant_be_rendered_as_normal_views_even_with_no_prefix()
+    public function testAnonymousComponentsWithCustomPathsCantBeRenderedAsNormalViewsEvenWithNoPrefix()
     {
         $this->expectException(InvalidArgumentException::class);
 

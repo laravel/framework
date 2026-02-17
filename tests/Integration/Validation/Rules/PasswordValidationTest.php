@@ -13,7 +13,7 @@ class PasswordValidationTest extends TestCase
     #[TestWith(['.'])]
     #[TestWith(['*'])]
     #[TestWith(['__asterisk__'])]
-    public function test_it_can_validate_attribute_as_array(string $attribute): void
+    public function testItCanValidateAttributeAsArray(string $attribute): void
     {
         $validator = Validator::make([
             'passwords' => [
@@ -30,7 +30,7 @@ class PasswordValidationTest extends TestCase
     #[TestWith(['.'])]
     #[TestWith(['*'])]
     #[TestWith(['__asterisk__'])]
-    public function test_it_can_validate_attribute_as_array_when_validation_should_fails(string $attribute): void
+    public function testItCanValidateAttributeAsArrayWhenValidationShouldFails(string $attribute): void
     {
         $validator = Validator::make([
             'passwords' => [
