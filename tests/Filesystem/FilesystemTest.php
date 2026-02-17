@@ -744,6 +744,7 @@ class FilesystemTest extends TestCase
             $contents = array_diff(scandir($tempDir), ['.', '..']);
             $this->assertCount(1, $contents, 'Temp file should be cleaned up: '.implode(', ', $contents));
             $this->assertContains('target', $contents);
+
             return;
         }
 

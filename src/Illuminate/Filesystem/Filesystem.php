@@ -222,7 +222,7 @@ class Filesystem
         $tempPath = tempnam(dirname($path), basename($path));
 
         if ($tempPath === false) {
-            throw new RuntimeException("Unable to create temporary file in ".dirname($path));
+            throw new RuntimeException('Unable to create temporary file in '.dirname($path));
         }
 
         try {
