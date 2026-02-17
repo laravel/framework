@@ -630,6 +630,38 @@ class TestResponseTest extends TestCase
         $response->assertSeeTextInOrder(['foobar', 'qux', 'baz']);
     }
 
+    public function testAssertDontSeeTextInOrder(): void
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'foo<strong>bar</strong> baz <strong>foo</strong>',
+        ]);
+
+        // These strings exist but not in this order, so assertion passes
+        $response->assertDontSeeTextInOrder(['baz', 'foobar']);
+    }
+
+    public function testAssertDontSeeTextInOrderEscaped(): void
+    {
+        $response = $this->makeMockResponse([
+            'render' => '<strong>laravel &amp; php</strong> <i>phpstorm &gt; sublime</i>',
+        ]);
+
+        // These strings exist but not in this order, so assertion passes
+        $response->assertDontSeeTextInOrder(['phpstorm > sublime', 'laravel & php']);
+    }
+
+    public function testAssertDontSeeTextInOrderCanFail(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => 'foo<strong>bar</strong> baz <strong>foo</strong>',
+        ]);
+
+        // These strings are in order, so the assertion should fail
+        $response->assertDontSeeTextInOrder(['foobar', 'baz']);
+    }
+
     public function testAssertDontSee(): void
     {
         $response = $this->makeMockResponse([

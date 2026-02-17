@@ -23,6 +23,7 @@ use Illuminate\Testing\Constraints\SeeInOrder;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Testing\TestResponseAssert as PHPUnit;
 use LogicException;
+use PHPUnit\Framework\Constraint\LogicalNot;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\StreamedJsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -837,6 +838,25 @@ class TestResponse implements ArrayAccess
         foreach ($values as $value) {
             PHPUnit::withResponse($this)->assertStringNotContainsString((string) $value, $content);
         }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given strings are not contained in order within the response text.
+     *
+     * @param  array  $values
+     * @param  bool  $escape
+     * @return $this
+     */
+    public function assertDontSeeTextInOrder(array $values, $escape = true)
+    {
+        $values = $escape ? array_map(e(...), $values) : $values;
+
+        PHPUnit::withResponse($this)->assertThat(
+            $values,
+            new LogicalNot(new SeeInOrder(strip_tags($this->getContent())))
+        );
 
         return $this;
     }
