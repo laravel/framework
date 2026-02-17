@@ -43,7 +43,7 @@ class DeleteModelWhenMissingTest extends QueueTestCase
         parent::tearDown();
     }
 
-    public function test_deleteModelWhenMissing_and_display_name(): void
+    public function testDeleteModelWhenMissingAndDisplayName(): void
     {
         $model = MyTestModel::query()->create(['name' => 'test']);
 

@@ -9,7 +9,7 @@ use Orchestra\Testbench\TestCase;
 
 class HasMiddlewareTest extends TestCase
 {
-    public function test_has_middleware_is_respected()
+    public function testHasMiddlewareIsRespected()
     {
         $route = Route::get('/', [HasMiddlewareTestController::class, 'index']);
         $this->assertEquals($route->controllerMiddleware(), ['all', 'only-index']);

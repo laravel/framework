@@ -19,7 +19,7 @@ class MakeHttpRequestsTest extends TestCase
         ]);
     }
 
-    public function test_it_can_use_uri_to_make_request()
+    public function testItCanUseUriToMakeRequest()
     {
         $this->getJson(Uri::of('decode')->withQuery(['editing' => true, 'editMode' => 'create', 'search' => 'Laravel']))
             ->assertSuccessful()

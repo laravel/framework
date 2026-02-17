@@ -27,7 +27,7 @@ class CustomPayloadTest extends TestCase
     }
 
     #[DataProvider('websites')]
-    public function test_custom_payload_gets_cleared_for_each_data_provider(string $websites)
+    public function testCustomPayloadGetsClearedForEachDataProvider(string $websites)
     {
         $dispatcher = $this->app->make(QueueingDispatcher::class);
 

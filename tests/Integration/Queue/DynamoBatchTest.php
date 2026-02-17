@@ -44,7 +44,7 @@ class DynamoBatchTest extends TestCase
         ]);
     }
 
-    public function test_running_a_batch()
+    public function testRunningABatch()
     {
         Bus::batch([
             new BatchJob('1'),
@@ -54,7 +54,7 @@ class DynamoBatchTest extends TestCase
         $this->assertEquals(['1', '2'], BatchRunRecorder::$results);
     }
 
-    public function test_retrieve_batch_by_id()
+    public function testRetrieveBatchById()
     {
         $batch = Bus::batch([
             new BatchJob('1'),
@@ -69,7 +69,7 @@ class DynamoBatchTest extends TestCase
         $this->assertTrue($retrieved->finishedAt->between(now()->subSecond(30), now()));
     }
 
-    public function test_retrieve_non_existent_batch()
+    public function testRetrieveNonExistentBatch()
     {
         /** @var DynamoBatchRepository */
         $repo = app(DynamoBatchRepository::class);
@@ -77,7 +77,7 @@ class DynamoBatchTest extends TestCase
         $this->assertNull($retrieved);
     }
 
-    public function test_delete_batch_by_id()
+    public function testDeleteBatchById()
     {
         $batch = Bus::batch([
             new BatchJob('1'),
@@ -92,7 +92,7 @@ class DynamoBatchTest extends TestCase
         $this->assertNull($retrieved);
     }
 
-    public function test_delete_non_existent_batch()
+    public function testDeleteNonExistentBatch()
     {
         /** @var DynamoBatchRepository */
         $repo = app(DynamoBatchRepository::class);
@@ -101,7 +101,7 @@ class DynamoBatchTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function test_batch_with_failing_job()
+    public function testBatchWithFailingJob()
     {
         $batch = Bus::batch([
             new BatchJob('1'),
@@ -117,7 +117,7 @@ class DynamoBatchTest extends TestCase
         $this->assertTrue($retrieved->cancelledAt->between(now()->subSecond(30), now()));
     }
 
-    public function test_get_batches()
+    public function testGetBatches()
     {
         $batches = [
             Bus::batch([new BatchJob('1')])->dispatch(),

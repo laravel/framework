@@ -17,13 +17,13 @@ class ContextIntegrationTest extends TestCase
 {
     use LazilyRefreshDatabase;
 
-    public function test_it_can_hydrate_null()
+    public function testItCanHydrateNull()
     {
         Context::hydrate(null);
         $this->assertEquals([], Context::all());
     }
 
-    public function test_it_handles_eloquent()
+    public function testItHandlesEloquent()
     {
         $user = UserFactory::new()->create(['name' => 'Tim']);
 
@@ -49,7 +49,7 @@ class ContextIntegrationTest extends TestCase
         $this->assertSame(55, Context::get('number'));
     }
 
-    public function test_it_ignores_deleted_models_when_hydrating()
+    public function testItIgnoresDeletedModelsWhenHydrating()
     {
         $user = UserFactory::new()->create(['name' => 'Tim']);
 
@@ -68,7 +68,7 @@ class ContextIntegrationTest extends TestCase
         $this->assertSame(55, Context::get('number'));
     }
 
-    public function test_it_ignores_deleted_models_within_collections_when_hydrating()
+    public function testItIgnoresDeletedModelsWithinCollectionsWhenHydrating()
     {
         $user = UserFactory::new()->create(['name' => 'Tim']);
 
@@ -88,7 +88,7 @@ class ContextIntegrationTest extends TestCase
         $this->assertSame(55, Context::get('number'));
     }
 
-    public function test_it_throws_on_incomplete_classes()
+    public function testItThrowsOnIncompleteClasses()
     {
         $dehydrated = [
             'data' => [
@@ -103,7 +103,7 @@ class ContextIntegrationTest extends TestCase
         Context::hydrate($dehydrated);
     }
 
-    public function test_it_throws_generic_unserialize_exceptions()
+    public function testItThrowsGenericUnserializeExceptions()
     {
         $dehydrated = [
             'data' => [
@@ -118,7 +118,7 @@ class ContextIntegrationTest extends TestCase
         Context::hydrate($dehydrated);
     }
 
-    public function test_it_can_handle_unserialize_exceptions_manually()
+    public function testItCanHandleUnserializeExceptionsManually()
     {
         $dehydrated = [
             'data' => [

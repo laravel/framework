@@ -10,7 +10,7 @@ use Orchestra\Testbench\Attributes\WithMigration;
 #[WithMigration('session')]
 class DatabaseSessionHandlerTest extends DatabaseTestCase
 {
-    public function test_basic_read_write_functionality()
+    public function testBasicReadWriteFunctionality()
     {
         $connection = $this->app['db']->connection();
         $handler = new DatabaseSessionHandler($connection, 'sessions', 1);
@@ -54,7 +54,7 @@ class DatabaseSessionHandlerTest extends DatabaseTestCase
         $this->assertEquals(['come' => 'alive'], json_decode($handler->read('valid_session_id_2425'), true));
     }
 
-    public function test_garbage_collector()
+    public function testGarbageCollector()
     {
         $connection = $this->app['db']->connection();
 
@@ -76,7 +76,7 @@ class DatabaseSessionHandlerTest extends DatabaseTestCase
         $this->assertEquals(0, $connection->table('sessions')->count());
     }
 
-    public function test_destroy()
+    public function testDestroy()
     {
         $connection = $this->app['db']->connection();
         $handler1 = new DatabaseSessionHandler($connection, 'sessions', 1, $this->app);
@@ -96,7 +96,7 @@ class DatabaseSessionHandlerTest extends DatabaseTestCase
         $this->assertEquals(1, $connection->table('sessions')->where('id', 'id_2')->count());
     }
 
-    public function test_it_can_work_without_container()
+    public function testItCanWorkWithoutContainer()
     {
         $connection = $this->app['db']->connection();
         $handler = new DatabaseSessionHandler($connection, 'sessions', 1);
