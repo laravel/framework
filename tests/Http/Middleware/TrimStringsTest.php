@@ -11,7 +11,7 @@ class TrimStringsTest extends TestCase
     /**
      * Test no zero-width space character returns the same string.
      */
-    public function test_no_zero_width_space_character_returns_the_same_string()
+    public function testNoZeroWidthSpaceCharacterReturnsTheSameString()
     {
         $request = new Request;
 
@@ -29,7 +29,7 @@ class TrimStringsTest extends TestCase
     /**
      * Test leading zero-width space character is trimmed [ZWSP].
      */
-    public function test_leading_zero_width_space_character_is_trimmed()
+    public function testLeadingZeroWidthSpaceCharacterIsTrimmed()
     {
         $request = new Request;
 
@@ -44,7 +44,7 @@ class TrimStringsTest extends TestCase
         });
     }
 
-    public function test_trim_strings_can_globally_ignore_certain_inputs()
+    public function testTrimStringsCanGloballyIgnoreCertainInputs()
     {
         $request = new Request;
 
@@ -64,7 +64,7 @@ class TrimStringsTest extends TestCase
     /**
      * Test trailing zero-width space character is trimmed [ZWSP].
      */
-    public function test_trailing_zero_width_space_character_is_trimmed()
+    public function testTrailingZeroWidthSpaceCharacterIsTrimmed()
     {
         $request = new Request;
 
@@ -82,7 +82,7 @@ class TrimStringsTest extends TestCase
     /**
      * Test leading zero-width non-breakable space character is trimmed [ZWNBSP].
      */
-    public function test_leading_zero_width_non_breakable_space_character_is_trimmed()
+    public function testLeadingZeroWidthNonBreakableSpaceCharacterIsTrimmed()
     {
         $request = new Request;
 
@@ -100,7 +100,7 @@ class TrimStringsTest extends TestCase
     /**
      * Test leading multiple zero-width non-breakable space characters are trimmed [ZWNBSP].
      */
-    public function test_leading_multiple_zero_width_non_breakable_space_characters_are_trimmed()
+    public function testLeadingMultipleZeroWidthNonBreakableSpaceCharactersAreTrimmed()
     {
         $request = new Request;
 
@@ -118,7 +118,7 @@ class TrimStringsTest extends TestCase
     /**
      * Test a combination of leading and trailing zero-width non-breakable space and zero-width space characters are trimmed [ZWNBSP], [ZWSP].
      */
-    public function test_combination_of_leading_and_trailing_zero_width_non_breakable_space_and_zero_width_space_characters_are_trimmed()
+    public function testCombinationOfLeadingAndTrailingZeroWidthNonBreakableSpaceAndZeroWidthSpaceCharactersAreTrimmed()
     {
         $request = new Request;
 
@@ -136,7 +136,7 @@ class TrimStringsTest extends TestCase
     /**
      * Test leading invisible character are trimmed [U+200E].
      */
-    public function test_leading_invisible_characters_are_trimmed()
+    public function testLeadingInvisibleCharactersAreTrimmed()
     {
         $request = new Request;
 
@@ -154,7 +154,7 @@ class TrimStringsTest extends TestCase
     /**
      * Test trailing invisible character are trimmed [U+200E].
      */
-    public function test_trailing_invisible_characters_are_trimmed()
+    public function testTrailingInvisibleCharactersAreTrimmed()
     {
         $request = new Request;
 
@@ -172,7 +172,7 @@ class TrimStringsTest extends TestCase
     /**
      * Test leading multiple invisible character are trimmed [U+200E].
      */
-    public function test_leading_multiple_invisible_characters_are_trimmed()
+    public function testLeadingMultipleInvisibleCharactersAreTrimmed()
     {
         $request = new Request;
 
@@ -190,7 +190,7 @@ class TrimStringsTest extends TestCase
     /**
      * Test trailing multiple invisible character are trimmed [U+200E].
      */
-    public function test_trailing_multiple_invisible_characters_are_trimmed()
+    public function testTrailingMultipleInvisibleCharactersAreTrimmed()
     {
         $request = new Request;
 
@@ -208,7 +208,7 @@ class TrimStringsTest extends TestCase
     /**
      * Test combination of leading and trailing multiple invisible characters are trimmed [U+200E].
      */
-    public function test_combination_of_leading_and_trailing_multiple_invisible_characters_are_trimmed()
+    public function testCombinationOfLeadingAndTrailingMultipleInvisibleCharactersAreTrimmed()
     {
         $request = new Request;
 
@@ -223,7 +223,7 @@ class TrimStringsTest extends TestCase
         });
     }
 
-    public function test_trim_strings_can_ignore_nested_attributes_using_wildcards()
+    public function testTrimStringsCanIgnoreNestedAttributesUsingWildcards()
     {
         $request = new Request;
 

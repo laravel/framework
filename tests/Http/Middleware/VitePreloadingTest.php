@@ -145,7 +145,7 @@ class VitePreloadingTest extends TestCase
         );
     }
 
-    public function test_it_can_configure_the_middleware()
+    public function testItCanConfigureTheMiddleware()
     {
         $definition = AddLinkHeadersForPreloadedAssets::using(limit: 5);
 

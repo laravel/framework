@@ -609,14 +609,14 @@ class FoundationApplicationTest extends TestCase
         }
     }
 
-    public function test_routes_are_cached()
+    public function testRoutesAreCached()
     {
         $app = new Application();
         $app->instance('routes.cached', true);
         $this->assertTrue($app->routesAreCached());
     }
 
-    public function test_routes_are_not_cached_by_instance_falls_back_to_file()
+    public function testRoutesAreNotCachedByInstanceFallsBackToFile()
     {
         $app = new Application();
         $files = new FileExistsFake;
@@ -626,7 +626,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertStringContainsString('routes-v7.php', $files->pathRequested);
     }
 
-    public function test_events_are_cached_uses_container_instance()
+    public function testEventsAreCachedUsesContainerInstance()
     {
         $app = new Application();
         $app->instance('events.cached', true);
@@ -637,7 +637,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertFalse(isset($files->pathRequested));
     }
 
-    public function test_events_are_cached_checks_filesystem_if_not_set()
+    public function testEventsAreCachedChecksFilesystemIfNotSet()
     {
         $app = new Application();
         $files = new FileExistsFake;

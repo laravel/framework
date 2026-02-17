@@ -10,7 +10,7 @@ use Orchestra\Testbench\TestCase;
 
 class BuildableIntegrationTest extends TestCase
 {
-    public function test_build_method_can_resolve_itself_via_container(): void
+    public function testBuildMethodCanResolveItselfViaContainer(): void
     {
         config([
             'aim' => [

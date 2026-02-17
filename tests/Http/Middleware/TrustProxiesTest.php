@@ -22,7 +22,7 @@ class TrustProxiesTest extends TestCase
      * This re-tests Symfony's Request class, but hopefully provides
      * some clarify to developers looking at the tests.
      */
-    public function test_request_does_not_trust()
+    public function testRequestDoesNotTrust()
     {
         $req = $this->createProxiedRequest();
 
@@ -39,7 +39,7 @@ class TrustProxiesTest extends TestCase
      *
      * Again, this re-tests Symfony's Request class.
      */
-    public function test_does_trust_trusted_proxy()
+    public function testDoesTrustTrustedProxy()
     {
         $req = $this->createProxiedRequest();
         $req->setTrustedProxies(['192.168.10.10'], $this->headerAll);
@@ -55,7 +55,7 @@ class TrustProxiesTest extends TestCase
      * Test the next most typical usage of TrustedProxies:
      * Trusted X-Forwarded-For header, wildcard for TrustedProxies.
      */
-    public function test_trusted_proxy_sets_trusted_proxies_with_wildcard()
+    public function testTrustedProxySetsTrustedProxiesWithWildcard()
     {
         $trustedProxy = $this->createTrustedProxy($this->headerAll, '*');
         $request = $this->createProxiedRequest();
@@ -69,7 +69,7 @@ class TrustProxiesTest extends TestCase
      * Test the next most typical usage of TrustedProxies:
      * Trusted X-Forwarded-For header, wildcard for TrustedProxies.
      */
-    public function test_trusted_proxy_sets_trusted_proxies_with_double_wildcard_for_backwards_compat()
+    public function testTrustedProxySetsTrustedProxiesWithDoubleWildcardForBackwardsCompat()
     {
         $trustedProxy = $this->createTrustedProxy($this->headerAll, '**');
         $request = $this->createProxiedRequest();
@@ -83,7 +83,7 @@ class TrustProxiesTest extends TestCase
      * Test the next most typical usage of TrustedProxies:
      * Trusted X-Forwarded-For header, REMOTE_ADDR for TrustedProxies.
      */
-    public function test_trusted_proxy_sets_trusted_proxies_with_REMOTE_ADDR()
+    public function testTrustedProxySetsTrustedProxiesWithRemoteAddr()
     {
         $trustedProxy = $this->createTrustedProxy($this->headerAll, 'REMOTE_ADDR');
         $request = $this->createProxiedRequest();
@@ -97,7 +97,7 @@ class TrustProxiesTest extends TestCase
      * Test the most typical usage of TrustProxies:
      * Trusted X-Forwarded-For header.
      */
-    public function test_trusted_proxy_sets_trusted_proxies()
+    public function testTrustedProxySetsTrustedProxies()
     {
         $trustedProxy = $this->createTrustedProxy($this->headerAll, ['192.168.10.10']);
         $request = $this->createProxiedRequest();
@@ -110,7 +110,7 @@ class TrustProxiesTest extends TestCase
     /**
      * Test X-Forwarded-For header with multiple IP addresses.
      */
-    public function test_get_client_ips()
+    public function testGetClientIps()
     {
         $trustedProxy = $this->createTrustedProxy($this->headerAll, ['192.168.10.10']);
 
@@ -134,7 +134,7 @@ class TrustProxiesTest extends TestCase
     /**
      * Test X-Forwarded-For header with multiple IP addresses, with some of those being trusted.
      */
-    public function test_get_client_ip_with_multiple_ip_addresses_some_of_which_are_trusted()
+    public function testGetClientIpWithMultipleIpAddressesSomeOfWhichAreTrusted()
     {
         $trustedProxy = $this->createTrustedProxy($this->headerAll, ['192.168.10.10', '192.0.2.199']);
 
@@ -157,7 +157,7 @@ class TrustProxiesTest extends TestCase
     /**
      * Test X-Forwarded-For header with multiple IP addresses, with * wildcard trusting of all proxies.
      */
-    public function test_get_client_ip_with_multiple_ip_addresses_all_proxies_are_trusted()
+    public function testGetClientIpWithMultipleIpAddressesAllProxiesAreTrusted()
     {
         $trustedProxy = $this->createTrustedProxy($this->headerAll, '*');
 
@@ -180,7 +180,7 @@ class TrustProxiesTest extends TestCase
     /**
      * Test distrusting a header.
      */
-    public function test_can_distrust_headers()
+    public function testCanDistrustHeaders()
     {
         $trustedProxy = $this->createTrustedProxy(Request::HEADER_FORWARDED, ['192.168.10.10']);
 
@@ -206,7 +206,7 @@ class TrustProxiesTest extends TestCase
     /**
      * Test that only the X-Forwarded-For header is trusted.
      */
-    public function test_x_forwarded_for_header_only_trusted()
+    public function testXForwardedForHeaderOnlyTrusted()
     {
         $trustedProxy = $this->createTrustedProxy(Request::HEADER_X_FORWARDED_FOR, '*');
 
@@ -227,7 +227,7 @@ class TrustProxiesTest extends TestCase
     /**
      * Test that only the X-Forwarded-Host header is trusted.
      */
-    public function test_x_forwarded_host_header_only_trusted()
+    public function testXForwardedHostHeaderOnlyTrusted()
     {
         $trustedProxy = $this->createTrustedProxy(Request::HEADER_X_FORWARDED_HOST, '*');
 
@@ -248,7 +248,7 @@ class TrustProxiesTest extends TestCase
     /**
      * Test that only the X-Forwarded-Port header is trusted.
      */
-    public function test_x_forwarded_port_header_only_trusted()
+    public function testXForwardedPortHeaderOnlyTrusted()
     {
         $trustedProxy = $this->createTrustedProxy(Request::HEADER_X_FORWARDED_PORT, '*');
 
@@ -269,7 +269,7 @@ class TrustProxiesTest extends TestCase
     /**
      * Test that only the X-Forwarded-Prefix header is trusted.
      */
-    public function test_x_forwarded_prefix_header_only_trusted()
+    public function testXForwardedPrefixHeaderOnlyTrusted()
     {
         $trustedProxy = $this->createTrustedProxy(Request::HEADER_X_FORWARDED_PREFIX, '*');
 
@@ -290,7 +290,7 @@ class TrustProxiesTest extends TestCase
     /**
      * Test that only the X-Forwarded-Proto header is trusted.
      */
-    public function test_x_forwarded_proto_header_only_trusted()
+    public function testXForwardedProtoHeaderOnlyTrusted()
     {
         $trustedProxy = $this->createTrustedProxy(Request::HEADER_X_FORWARDED_PROTO, '*');
 
@@ -311,7 +311,7 @@ class TrustProxiesTest extends TestCase
     /**
      * Test a combination of individual X-Forwarded-* headers are trusted.
      */
-    public function test_x_forwarded_multiple_individual_headers_trusted()
+    public function testXForwardedMultipleIndividualHeadersTrusted()
     {
         $trustedProxy = $this->createTrustedProxy(
             Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST |
@@ -336,7 +336,7 @@ class TrustProxiesTest extends TestCase
     /**
      * Test to ensure it's reading text-based configurations and converting it correctly.
      */
-    public function test_is_reading_text_based_configurations()
+    public function testIsReadingTextBasedConfigurations()
     {
         $request = $this->createProxiedRequest();
 

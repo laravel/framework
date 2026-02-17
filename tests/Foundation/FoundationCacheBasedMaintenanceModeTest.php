@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class FoundationCacheBasedMaintenanceModeTest extends TestCase
 {
-    public function test_it_determines_whether_maintenance_mode_is_active()
+    public function testItDeterminesWhetherMaintenanceModeIsActive()
     {
         $cache = m::mock(Factory::class, Repository::class);
         $cache->shouldReceive('store')->with('store-key')->andReturnSelf();
@@ -24,7 +24,7 @@ class FoundationCacheBasedMaintenanceModeTest extends TestCase
         $this->assertTrue($manager->active());
     }
 
-    public function test_it_retrieves_payload_from_cache()
+    public function testItRetrievesPayloadFromCache()
     {
         $cache = m::mock(Factory::class, Repository::class);
         $cache->shouldReceive('store')->with('store-key')->andReturnSelf();
@@ -35,7 +35,7 @@ class FoundationCacheBasedMaintenanceModeTest extends TestCase
         $this->assertSame(['payload'], $manager->data());
     }
 
-    public function test_it_stores_payload_in_cache()
+    public function testItStoresPayloadInCache()
     {
         $cache = m::spy(Factory::class, Repository::class);
         $cache->shouldReceive('store')->with('store-key')->andReturnSelf();
@@ -46,7 +46,7 @@ class FoundationCacheBasedMaintenanceModeTest extends TestCase
         $cache->shouldHaveReceived('put')->once()->with('key', ['payload']);
     }
 
-    public function test_it_removes_payload_from_cache()
+    public function testItRemovesPayloadFromCache()
     {
         $cache = m::spy(Factory::class, Repository::class);
         $cache->shouldReceive('store')->with('store-key')->andReturnSelf();

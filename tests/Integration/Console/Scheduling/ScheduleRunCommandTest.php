@@ -29,7 +29,7 @@ class ScheduleRunCommandTest extends TestCase
     /**
      * @throws BindingResolutionException
      */
-    public function test_failing_command_in_foreground_triggers_event()
+    public function testFailingCommandInForegroundTriggersEvent()
     {
         Event::fake([
             ScheduledTaskStarting::class,
@@ -62,7 +62,7 @@ class ScheduleRunCommandTest extends TestCase
     /**
      * @throws BindingResolutionException
      */
-    public function test_failing_command_in_background_does_not_trigger_event()
+    public function testFailingCommandInBackgroundDoesNotTriggerEvent()
     {
         Event::fake([
             ScheduledTaskStarting::class,
@@ -93,7 +93,7 @@ class ScheduleRunCommandTest extends TestCase
     /**
      * @throws BindingResolutionException
      */
-    public function test_successful_command_does_not_trigger_event()
+    public function testSuccessfulCommandDoesNotTriggerEvent()
     {
         Event::fake([
             ScheduledTaskStarting::class,
@@ -123,7 +123,7 @@ class ScheduleRunCommandTest extends TestCase
     /**
      * @throws BindingResolutionException
      */
-    public function test_command_with_no_explicit_return_does_not_trigger_event()
+    public function testCommandWithNoExplicitReturnDoesNotTriggerEvent()
     {
         Event::fake([
             ScheduledTaskStarting::class,
@@ -154,7 +154,7 @@ class ScheduleRunCommandTest extends TestCase
     /**
      * @throws BindingResolutionException
      */
-    public function test_successful_command_in_background_does_not_trigger_event()
+    public function testSuccessfulCommandInBackgroundDoesNotTriggerEvent()
     {
         Event::fake([
             ScheduledTaskStarting::class,
@@ -185,7 +185,7 @@ class ScheduleRunCommandTest extends TestCase
     /**
      * @throws BindingResolutionException
      */
-    public function test_command_with_no_explicit_return_in_background_does_not_trigger_event()
+    public function testCommandWithNoExplicitReturnInBackgroundDoesNotTriggerEvent()
     {
         Event::fake([
             ScheduledTaskStarting::class,

@@ -20,7 +20,7 @@ class SubMinuteSchedulingTest extends TestCase
         $this->schedule = $this->app->make(Schedule::class);
     }
 
-    public function test_it_doesnt_wait_for_sub_minute_events_when_nothing_is_scheduled()
+    public function testItDoesntWaitForSubMinuteEventsWhenNothingIsScheduled()
     {
         Carbon::setTestNow(now()->startOfMinute());
         Sleep::fake();
@@ -31,7 +31,7 @@ class SubMinuteSchedulingTest extends TestCase
         Sleep::assertNeverSlept();
     }
 
-    public function test_it_doesnt_wait_for_sub_minute_events_when_none_are_scheduled()
+    public function testItDoesntWaitForSubMinuteEventsWhenNoneAreScheduled()
     {
         $this->schedule
             ->call(fn () => true)
@@ -47,7 +47,7 @@ class SubMinuteSchedulingTest extends TestCase
     }
 
     #[DataProvider('frequencyProvider')]
-    public function test_it_runs_sub_minute_callbacks($frequency, $expectedRuns)
+    public function testItRunsSubMinuteCallbacks($frequency, $expectedRuns)
     {
         $runs = 0;
         $this->schedule->call(function () use (&$runs) {
@@ -65,7 +65,7 @@ class SubMinuteSchedulingTest extends TestCase
         $this->assertEquals($expectedRuns, $runs);
     }
 
-    public function test_it_runs_multiple_sub_minute_callbacks()
+    public function testItRunsMultipleSubMinuteCallbacks()
     {
         $everySecondRuns = 0;
         $this->schedule->call(function () use (&$everySecondRuns) {
@@ -89,7 +89,7 @@ class SubMinuteSchedulingTest extends TestCase
         $this->assertEquals(2, $everyThirtySecondsRuns);
     }
 
-    public function test_sub_minute_scheduling_can_be_interrupted()
+    public function testSubMinuteSchedulingCanBeInterrupted()
     {
         $runs = 0;
         $this->schedule->call(function () use (&$runs) {
@@ -116,7 +116,7 @@ class SubMinuteSchedulingTest extends TestCase
         $this->assertEquals(30, $startedAt->diffInSeconds(now()));
     }
 
-    public function test_sub_minute_events_stop_for_the_rest_of_the_minute_once_maintenance_mode_is_enabled()
+    public function testSubMinuteEventsStopForTheRestOfTheMinuteOnceMaintenanceModeIsEnabled()
     {
         $runs = 0;
         $this->schedule->call(function () use (&$runs) {
@@ -147,7 +147,7 @@ class SubMinuteSchedulingTest extends TestCase
         $this->assertEquals(30, $runs);
     }
 
-    public function test_sub_minute_events_can_be_run_in_maintenance_mode()
+    public function testSubMinuteEventsCanBeRunInMaintenanceMode()
     {
         $runs = 0;
         $this->schedule->call(function () use (&$runs) {
@@ -174,7 +174,7 @@ class SubMinuteSchedulingTest extends TestCase
         $this->assertEquals(60, $runs);
     }
 
-    public function test_sub_minute_scheduling_respects_filters()
+    public function testSubMinuteSchedulingRespectsFilters()
     {
         $runs = 0;
         $this->schedule->call(function () use (&$runs) {
@@ -192,7 +192,7 @@ class SubMinuteSchedulingTest extends TestCase
         $this->assertEquals(30, $runs);
     }
 
-    public function test_sub_minute_scheduling_can_run_on_one_server()
+    public function testSubMinuteSchedulingCanRunOnOneServer()
     {
         $runs = 0;
         $this->schedule->call(function () use (&$runs) {
