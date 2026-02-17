@@ -38,7 +38,7 @@ class RouteServiceProviderTest extends TestCase
             })->create();
     }
 
-    public function test_it_can_register_multiple_route_service_providers()
+    public function testItCanRegisterMultipleRouteServiceProviders()
     {
         Assert::assertArraySubset([
             RouteServiceProvider::class => true,
@@ -46,14 +46,14 @@ class RouteServiceProviderTest extends TestCase
         ], $this->app->getLoadedProviders());
     }
 
-    public function test_it_can_uses_routes_registered_using_bootstrap_file()
+    public function testItCanUsesRoutesRegisteredUsingBootstrapFile()
     {
         $this->get(route('login'))
             ->assertOk()
             ->assertSee('Login');
     }
 
-    public function test_it_can_uses_routes_registered_using_configuration_file()
+    public function testItCanUsesRoutesRegisteredUsingConfigurationFile()
     {
         $this->get(route('dashboard'))
             ->assertOk()

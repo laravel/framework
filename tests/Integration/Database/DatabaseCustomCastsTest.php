@@ -37,7 +37,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         });
     }
 
-    public function test_custom_casting()
+    public function testCustomCasting()
     {
         $model = new TestEloquentModelWithCustomCasts;
 
@@ -86,7 +86,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         );
     }
 
-    public function test_custom_casting_using_create()
+    public function testCustomCastingUsingCreate()
     {
         $model = TestEloquentModelWithCustomCasts::create([
             'array_object' => ['name' => 'Taylor'],
@@ -107,7 +107,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $this->assertTrue(Hash::check('secret', $model->password));
     }
 
-    public function test_custom_casting_nullable_values()
+    public function testCustomCastingNullableValues()
     {
         $model = new TestEloquentModelWithCustomCastsNullable();
 
@@ -154,7 +154,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         );
     }
 
-    public function test_as_collection_with_map_into()
+    public function testAsCollectionWithMapInto()
     {
         $model = new TestEloquentModelWithCustomCasts();
         $model->mergeCasts([
@@ -169,7 +169,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $this->assertSame('bar', $model->collection->first()->foo);
     }
 
-    public function test_as_custom_collection_with_map_into()
+    public function testAsCustomCollectionWithMapInto()
     {
         $model = new TestEloquentModelWithCustomCasts();
         $model->mergeCasts([
@@ -185,7 +185,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $this->assertSame('bar', $model->collection->first()->foo);
     }
 
-    public function test_as_collection_with_map_callback(): void
+    public function testAsCollectionWithMapCallback(): void
     {
         $model = new TestEloquentModelWithCustomCasts();
         $model->mergeCasts([
@@ -200,7 +200,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $this->assertSame('bar', $model->collection->first()->foo);
     }
 
-    public function test_as_custom_collection_with_map_callback(): void
+    public function testAsCustomCollectionWithMapCallback(): void
     {
         $model = new TestEloquentModelWithCustomCasts();
         $model->mergeCasts([

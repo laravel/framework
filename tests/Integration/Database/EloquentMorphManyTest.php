@@ -38,7 +38,7 @@ class EloquentMorphManyTest extends DatabaseTestCase
         $this->assertSame('new name', $post->title);
     }
 
-    public function test_self_referencing_existence_query()
+    public function testSelfReferencingExistenceQuery()
     {
         $post = Post::create(['title' => 'foo']);
 

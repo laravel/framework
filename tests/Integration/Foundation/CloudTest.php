@@ -9,7 +9,7 @@ use Orchestra\Testbench\TestCase;
 class CloudTest extends TestCase
 {
     #[WithConfig('database.connections.pgsql', ['host' => 'test-pooler.pg.laravel.cloud', 'username' => 'test-username', 'password' => 'test-password'])]
-    public function test_it_can_resolve_core_container_aliases()
+    public function testItCanResolveCoreContainerAliases()
     {
         Cloud::configureUnpooledPostgresConnection($this->app);
 
@@ -20,7 +20,7 @@ class CloudTest extends TestCase
         ], $this->app['config']->get('database.connections.pgsql-unpooled'));
     }
 
-    public function test_it_can_configure_disks()
+    public function testItCanConfigureDisks()
     {
         $_SERVER['LARAVEL_CLOUD_DISK_CONFIG'] = json_encode(
             [
@@ -53,7 +53,7 @@ class CloudTest extends TestCase
         unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG']);
     }
 
-    public function test_it_respects_log_levels()
+    public function testItRespectsLogLevels()
     {
         if (isset($_SERVER['LOG_LEVEL'])) {
             $logLevelBackup = $_SERVER['LOG_LEVEL'];

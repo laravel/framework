@@ -34,7 +34,7 @@ class ModelInspectorTest extends DatabaseTestCase
         });
     }
 
-    public function test_extracts_model_data()
+    public function testExtractsModelData()
     {
         $extractor = new ModelInspector($this->app);
         $modelInfo = $extractor->inspect(ModelInspectorTestModel::class);
@@ -44,7 +44,7 @@ class ModelInspectorTest extends DatabaseTestCase
         $this->assertSame(ModelInspectorTestModelResource::class, $modelInfo['resource']);
     }
 
-    public function test_command_returns_json()
+    public function testCommandReturnsJson()
     {
         $this->withoutMockingConsoleOutput()->artisan('model:show', ['model' => ModelInspectorTestModel::class, '--json' => true]);
         $o = Artisan::output();

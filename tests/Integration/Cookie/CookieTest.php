@@ -14,7 +14,7 @@ use Orchestra\Testbench\TestCase;
 
 class CookieTest extends TestCase
 {
-    public function test_cookie_is_sent_back_with_proper_expire_time_when_should_expire_on_close()
+    public function testCookieIsSentBackWithProperExpireTimeWhenShouldExpireOnClose()
     {
         $this->app['config']->set('session.expire_on_close', true);
 
@@ -27,7 +27,7 @@ class CookieTest extends TestCase
         $this->assertEquals(0, $response->headers->getCookies()[1]->getExpiresTime());
     }
 
-    public function test_cookie_is_sent_back_with_proper_expire_time_with_respect_to_lifetime()
+    public function testCookieIsSentBackWithProperExpireTimeWithRespectToLifetime()
     {
         $this->app['config']->set('session.expire_on_close', false);
         $this->app['config']->set('session.lifetime', 1);

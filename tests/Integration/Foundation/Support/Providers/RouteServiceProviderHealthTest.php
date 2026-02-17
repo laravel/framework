@@ -29,7 +29,7 @@ class RouteServiceProviderHealthTest extends TestCase
         $app['config']->set('app.key', Str::random(32));
     }
 
-    public function test_it_can_load_health_page()
+    public function testItCanLoadHealthPage()
     {
         $this->get('/up')->assertOk();
     }

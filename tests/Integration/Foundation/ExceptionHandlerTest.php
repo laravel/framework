@@ -204,7 +204,7 @@ EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
         yield 'Do not throw exception' => [[Fixtures\Providers\ThrowExceptionServiceProvider::class], true];
     }
 
-    public function test_it_handles_malformed_error_views_in_production()
+    public function testItHandlesMalformedErrorViewsInProduction()
     {
         Config::set('view.paths', [__DIR__.'/Fixtures/MalformedErrorViews']);
         Config::set('app.debug', false);
@@ -225,7 +225,7 @@ EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
         $response->assertStatus(404);
     }
 
-    public function test_it_handles_malformed_error_views_in_development()
+    public function testItHandlesMalformedErrorViewsInDevelopment()
     {
         Config::set('view.paths', [__DIR__.'/Fixtures/MalformedErrorViews']);
         Config::set('app.debug', true);
@@ -246,7 +246,7 @@ EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
         $response->assertStatus(500);
     }
 
-    public function test_it_use_custom_json_response_factory_in_exception_handler()
+    public function testItUseCustomJsonResponseFactoryInExceptionHandler()
     {
         $this->app->singleton(ResponseFactoryContract::class, function ($app) {
             return new class($app['view'], $app['redirect']) extends ResponseFactory
@@ -286,7 +286,7 @@ EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
         ]);
     }
 
-    public function test_it_reports_request_exceptions()
+    public function testItReportsRequestExceptions()
     {
         config(['logging.default' => 'test_log']);
         config(['logging.channels.test_log' => [

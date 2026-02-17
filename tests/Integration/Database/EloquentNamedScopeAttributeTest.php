@@ -22,7 +22,7 @@ class EloquentNamedScopeAttributeTest extends TestCase
     }
 
     #[DataProvider('scopeDataProvider')]
-    public function test_it_can_query_named_scoped_from_the_query_builder(string $methodName)
+    public function testItCanQueryNamedScopedFromTheQueryBuilder(string $methodName)
     {
         $query = Fixtures\NamedScopeUser::query()->{$methodName}(true);
 
@@ -30,7 +30,7 @@ class EloquentNamedScopeAttributeTest extends TestCase
     }
 
     #[DataProvider('scopeDataProvider')]
-    public function test_it_can_query_named_scoped_from_static_query(string $methodName)
+    public function testItCanQueryNamedScopedFromStaticQuery(string $methodName)
     {
         $query = Fixtures\NamedScopeUser::{$methodName}(true);
 
