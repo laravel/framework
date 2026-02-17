@@ -727,4 +727,26 @@ class FilesystemTest extends TestCase
         $this->assertCount(1, $allFiles);
         $this->assertEquals('test.txt', $allFiles[0]->getFilename());
     }
+
+    public function testReplaceCleansUpTempFileOnFailure()
+    {
+        $tempDir = self::$tempDir.'/cleanup_test';
+        @mkdir($tempDir);
+        $target = $tempDir.'/target';
+        @mkdir($target);
+
+        $files = new Filesystem;
+
+        try {
+            $files->replace($target, 'content');
+        } catch (\Throwable $e) {
+            // Check that only 'target' exists in $tempDir
+            $contents = array_diff(scandir($tempDir), ['.', '..']);
+            $this->assertCount(1, $contents, 'Temp file should be cleaned up: '.implode(', ', $contents));
+            $this->assertContains('target', $contents);
+            return;
+        }
+
+        $this->fail('Expected exception (due to renaming file to directory) was not thrown.');
+    }
 }

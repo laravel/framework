@@ -221,16 +221,33 @@ class Filesystem
 
         $tempPath = tempnam(dirname($path), basename($path));
 
-        // Fix permissions of tempPath because `tempnam()` creates it with permissions set to 0600...
-        if (! is_null($mode)) {
-            chmod($tempPath, $mode);
-        } else {
-            chmod($tempPath, 0777 - umask());
+        if ($tempPath === false) {
+             throw new \Symfony\Component\HttpFoundation\File\Exception\FileException("Unable to create temporary file in " . dirname($path));
         }
 
-        file_put_contents($tempPath, $content);
+        try {
+            // Fix permissions of tempPath because `tempnam()` creates it with permissions set to 0600...
+            if (! is_null($mode)) {
+                chmod($tempPath, $mode);
+            } else {
+                chmod($tempPath, 0777 - umask());
+            }
 
-        rename($tempPath, $path);
+            if (file_put_contents($tempPath, $content) === false) {
+                throw new \RuntimeException("Unable to write to temporary file {$tempPath}");
+            }
+
+            if (@rename($tempPath, $path) === false) {
+                // If rename fails, we should throw an exception to trigger the cleanup
+                throw new \RuntimeException("Unable to move temporary file to {$path}");
+            }
+        } catch (\Throwable $e) {
+            if (file_exists($tempPath)) {
+                @unlink($tempPath);
+            }
+            
+            throw $e;
+        }
     }
 
     /**
