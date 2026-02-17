@@ -260,6 +260,24 @@ class Migrator
     }
 
     /**
+     * Determine if a migration should be skipped.
+     *
+     * @param  string  $migration
+     * @return bool
+     */
+    public function migrationShouldBeSkipped($migration)
+    {
+        $migration = $this->resolvePath($migration);
+
+        // Check if it's a Migration instance and shouldRun() returns false
+        if ($migration instanceof Migration) {
+            return ! $migration->shouldRun();
+        }
+
+        return false;
+    }
+
+    /**
      * Rollback the last migration operation.
      *
      * @param  string[]|string  $paths

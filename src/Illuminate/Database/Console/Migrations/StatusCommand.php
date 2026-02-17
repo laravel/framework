@@ -65,6 +65,9 @@ class StatusCommand extends BaseCommand
             $migrations = $this->getStatusFor($ran, $batches)
                 ->when($this->option('pending') !== false, fn ($collection) => $collection->filter(function ($migration) {
                     return (new Stringable($migration[1]))->contains('Pending');
+                }))
+                ->when($this->option('skipped') !== false, fn ($collection) => $collection->filter(function ($migration) {
+                    return (new Stringable($migration[1]))->contains('Skipped');
                 }));
 
             if (count($migrations) > 0) {
@@ -80,12 +83,18 @@ class StatusCommand extends BaseCommand
                 $this->newLine();
             } elseif ($this->option('pending') !== false) {
                 $this->components->info('No pending migrations');
+            } elseif ($this->option('skipped') !== false) {
+                $this->components->info('No skipped migrations');
             } else {
                 $this->components->info('No migrations found');
             }
 
             if ($this->option('pending') && $migrations->some(fn ($m) => (new Stringable($m[1]))->contains('Pending'))) {
                 return $this->option('pending');
+            }
+
+            if ($this->option('skipped') && $migrations->some(fn ($m) => (new Stringable($m[1]))->contains('Skipped'))) {
+                return $this->option('skipped');
             }
         });
     }
@@ -103,9 +112,11 @@ class StatusCommand extends BaseCommand
             ->map(function ($migration) use ($ran, $batches) {
                 $migrationName = $this->migrator->getMigrationName($migration);
 
-                $status = in_array($migrationName, $ran)
-                    ? '<fg=green;options=bold>Ran</>'
-                    : '<fg=yellow;options=bold>Pending</>';
+                $status = match (true) {
+                    in_array($migrationName, $ran) => '<fg=green;options=bold>Ran</>',
+                    $this->migrator->migrationShouldBeSkipped($migration) => '<fg=gray;options=bold>Skipped</>',
+                    default => '<fg=yellow;options=bold>Pending</>'
+                };
 
                 if (in_array($migrationName, $ran)) {
                     $status = '['.$batches[$migrationName].'] '.$status;
@@ -135,6 +146,7 @@ class StatusCommand extends BaseCommand
         return [
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use'],
             ['pending', null, InputOption::VALUE_OPTIONAL, 'Only list pending migrations', false],
+            ['skipped', null, InputOption::VALUE_OPTIONAL, 'Only list skipped migrations', false],
             ['path', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The path(s) to the migrations files to use'],
             ['realpath', null, InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths'],
         ];
