@@ -346,7 +346,7 @@ abstract class Relation implements BuilderContract
     }
 
     /**
-     * Get the fully qualified parent key name.
+     * Get the fully-qualified parent key name.
      *
      * @return string
      */
@@ -452,7 +452,7 @@ abstract class Relation implements BuilderContract
     /**
      * Define the morph map for polymorphic relations and require all morphed models to be explicitly mapped.
      *
-     * @param  array<string, class-string<\Illuminate\Database\Eloquent\Model>>  $map
+     * @param  array<array-key, class-string<\Illuminate\Database\Eloquent\Model>>  $map
      * @param  bool  $merge
      * @return array
      */
@@ -466,7 +466,7 @@ abstract class Relation implements BuilderContract
     /**
      * Set or get the morph map for polymorphic relations.
      *
-     * @param  array<string, class-string<\Illuminate\Database\Eloquent\Model>>|null  $map
+     * @param  array<array-key, class-string<\Illuminate\Database\Eloquent\Model>>|null  $map
      * @param  bool  $merge
      * @return array<string, class-string<\Illuminate\Database\Eloquent\Model>>
      */

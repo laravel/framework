@@ -64,6 +64,10 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      *
      * @param  static|callable|null  $callback
      * @return static|void
+     *
+     * @phpstan-return ($callback is null ? static : ($callback is callable ? void : ($callback is static ? void : never)))
+     *
+     * @throws \InvalidArgumentException
      */
     public static function defaults($callback = null)
     {

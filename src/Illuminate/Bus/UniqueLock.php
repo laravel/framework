@@ -36,7 +36,7 @@ class UniqueLock
             : ($job->uniqueFor ?? 0);
 
         $cache = method_exists($job, 'uniqueVia')
-            ? $job->uniqueVia()
+            ? ($job->uniqueVia() ?? $this->cache)
             : $this->cache;
 
         return (bool) $cache->lock($this->getKey($job), $uniqueFor)->get();
@@ -51,7 +51,7 @@ class UniqueLock
     public function release($job)
     {
         $cache = method_exists($job, 'uniqueVia')
-            ? $job->uniqueVia()
+            ? ($job->uniqueVia() ?? $this->cache)
             : $this->cache;
 
         $cache->lock($this->getKey($job))->forceRelease();

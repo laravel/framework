@@ -5,6 +5,7 @@ namespace Illuminate\Database\Schema;
 use Exception;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Str;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
 class MySqlSchemaState extends SchemaState
@@ -71,7 +72,9 @@ class MySqlSchemaState extends SchemaState
      */
     public function load($path)
     {
-        $command = 'mysql '.$this->connectionString().' --database="${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"';
+        $versionInfo = $this->detectClientVersion();
+
+        $command = 'mysql '.$this->connectionString($versionInfo).' --database="${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"';
 
         $process = $this->makeProcess($command)->setTimeout(null);
 
@@ -87,7 +90,9 @@ class MySqlSchemaState extends SchemaState
      */
     protected function baseDumpCommand()
     {
-        $command = 'mysqldump '.$this->connectionString().' --no-tablespaces --skip-add-locks --skip-comments --skip-set-charset --tz-utc --column-statistics=0';
+        $versionInfo = $this->detectClientVersion();
+
+        $command = 'mysqldump '.$this->connectionString($versionInfo).' --no-tablespaces --skip-add-locks --skip-comments --skip-set-charset --tz-utc --column-statistics=0';
 
         if (! $this->connection->isMaria()) {
             $command .= ' --set-gtid-purged=OFF';
@@ -99,9 +104,10 @@ class MySqlSchemaState extends SchemaState
     /**
      * Generate a basic connection string (--socket, --host, --port, --user, --password) for the database.
      *
+     * @param  array{version: string, isMariaDb: bool}  $versionInfo
      * @return string
      */
-    protected function connectionString()
+    protected function connectionString(array $versionInfo)
     {
         $value = ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}"';
 
@@ -116,10 +122,26 @@ class MySqlSchemaState extends SchemaState
             $value .= ' --ssl-ca="${:LARAVEL_LOAD_SSL_CA}"';
         }
 
-        // if (isset($config['options'][\PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT]) &&
-        //     $config['options'][\PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] === false) {
-        //     $value .= ' --ssl=off';
-        // }
+        /** @phpstan-ignore class.notFound */
+        if (isset($config['options'][PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CERT : \PDO::MYSQL_ATTR_SSL_CERT])) {
+            $value .= ' --ssl-cert="${:LARAVEL_LOAD_SSL_CERT}"';
+        }
+
+        /** @phpstan-ignore class.notFound */
+        if (isset($config['options'][PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_KEY : \PDO::MYSQL_ATTR_SSL_KEY])) {
+            $value .= ' --ssl-key="${:LARAVEL_LOAD_SSL_KEY}"';
+        }
+
+        /** @phpstan-ignore class.notFound */
+        $verifyCertOption = PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT : \PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT;
+
+        if (isset($config['options'][$verifyCertOption]) && $config['options'][$verifyCertOption] === false) {
+            if (version_compare($versionInfo['version'], '5.7.11', '>=') && ! $versionInfo['isMariaDb']) {
+                $value .= ' --ssl-mode=DISABLED';
+            } else {
+                $value .= ' --ssl=off';
+            }
+        }
 
         return $value;
     }
@@ -142,6 +164,8 @@ class MySqlSchemaState extends SchemaState
             'LARAVEL_LOAD_PASSWORD' => $config['password'] ?? '',
             'LARAVEL_LOAD_DATABASE' => $config['database'],
             'LARAVEL_LOAD_SSL_CA' => $config['options'][PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : \PDO::MYSQL_ATTR_SSL_CA] ?? '', // @phpstan-ignore class.notFound
+            'LARAVEL_LOAD_SSL_CERT' => $config['options'][PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CERT : \PDO::MYSQL_ATTR_SSL_CERT] ?? '', // @phpstan-ignore class.notFound
+            'LARAVEL_LOAD_SSL_KEY' => $config['options'][PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_KEY : \PDO::MYSQL_ATTR_SSL_KEY] ?? '', // @phpstan-ignore class.notFound
         ];
     }
 
@@ -179,5 +203,31 @@ class MySqlSchemaState extends SchemaState
         }
 
         return $process;
+    }
+
+    /**
+     * Detect the MySQL client version.
+     *
+     * @return array{version: string, isMariaDb: bool}
+     */
+    protected function detectClientVersion(): array
+    {
+        [$version, $isMariaDb] = ['8.0.0', false];
+
+        try {
+            $versionOutput = $this->makeProcess('mysql --version')->mustRun()->getOutput();
+
+            if (preg_match('/(\d+\.\d+\.\d+)/', $versionOutput, $matches)) {
+                $version = $matches[1];
+            }
+
+            $isMariaDb = stripos($versionOutput, 'mariadb') !== false;
+        } catch (ProcessFailedException) {
+        }
+
+        return [
+            'version' => $version,
+            'isMariaDb' => $isMariaDb,
+        ];
     }
 }

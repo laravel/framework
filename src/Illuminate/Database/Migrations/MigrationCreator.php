@@ -26,7 +26,7 @@ class MigrationCreator
     /**
      * The registered post create hooks.
      *
-     * @var array
+     * @var (\Closure(string, string): void)[]
      */
     protected $postCreate = [];
 
@@ -154,7 +154,7 @@ class MigrationCreator
      * Get the class name of a migration name.
      *
      * @param  string  $name
-     * @return string
+     * @return class-string<\Illuminate\Database\Migrations\Migration>
      */
     protected function getClassName($name)
     {
@@ -190,7 +190,7 @@ class MigrationCreator
     /**
      * Register a post migration create hook.
      *
-     * @param  \Closure  $callback
+     * @param  (\Closure(string, string): void)  $callback
      * @return void
      */
     public function afterCreate(Closure $callback)

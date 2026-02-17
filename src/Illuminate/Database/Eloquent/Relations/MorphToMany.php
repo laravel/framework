@@ -202,7 +202,7 @@ class MorphToMany extends BelongsToMany
     }
 
     /**
-     * Get the fully qualified morph type for the relation.
+     * Get the fully-qualified morph type for the relation.
      *
      * @return string
      */

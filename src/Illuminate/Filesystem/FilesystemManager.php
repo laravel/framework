@@ -287,6 +287,8 @@ class FilesystemManager implements FactoryContract
      *
      * @param  array  $config
      * @return \Illuminate\Contracts\Filesystem\Filesystem
+     *
+     * @throws \InvalidArgumentException
      */
     public function createScopedDriver(array $config)
     {

@@ -615,6 +615,8 @@ trait QueriesRelationships
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
      * @param  \Illuminate\Database\Eloquent\Model|iterable<int, \Illuminate\Database\Eloquent\Model>|string|null  $model
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function whereMorphedTo($relation, $model, $boolean = 'and')
     {
@@ -658,6 +660,8 @@ trait QueriesRelationships
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
      * @param  \Illuminate\Database\Eloquent\Model|iterable<int, \Illuminate\Database\Eloquent\Model>|string  $model
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function whereNotMorphedTo($relation, $model, $boolean = 'and')
     {

@@ -31,7 +31,9 @@
 
     <x-laravel-exceptions-renderer::separator />
 
-    <x-laravel-exceptions-renderer::section-container class="pb-0 sm:pb-0">
-        <x-laravel-exceptions-renderer::laravel-ascii-spotlight />
-    </x-laravel-exceptions-renderer::section-container>
+    @if (! app()->runningUnitTests() && ! app()->runningInConsole())
+        <x-laravel-exceptions-renderer::section-container class="pb-0 sm:pb-0">
+            <x-laravel-exceptions-renderer::laravel-ascii-spotlight />
+        </x-laravel-exceptions-renderer::section-container>
+    @endif
 </x-laravel-exceptions-renderer::layout>

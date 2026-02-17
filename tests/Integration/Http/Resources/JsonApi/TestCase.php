@@ -51,6 +51,10 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             return Post::find($postId)->toResource();
         });
 
+        $router->get('things/{id}', function ($id) {
+            return new ArrayBackedJsonApiResource(['id' => (int) $id, 'name' => 'test']);
+        });
+
         $router->get('users/{userId}/with-array-relationship', function ($userId) {
             $resource = new UserWithArrayRelationshipResource(User::find($userId));
             $resource->loadedRelationshipsMap = [

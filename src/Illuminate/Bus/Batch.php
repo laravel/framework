@@ -4,6 +4,7 @@ namespace Illuminate\Bus;
 
 use Carbon\CarbonImmutable;
 use Closure;
+use Illuminate\Bus\Events\BatchCanceled;
 use Illuminate\Bus\Events\BatchFinished;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -103,19 +104,6 @@ class Batch implements Arrayable, JsonSerializable
 
     /**
      * Create a new batch instance.
-     *
-     * @param  \Illuminate\Contracts\Queue\Factory  $queue
-     * @param  \Illuminate\Bus\BatchRepository  $repository
-     * @param  string  $id
-     * @param  string  $name
-     * @param  int  $totalJobs
-     * @param  int  $pendingJobs
-     * @param  int  $failedJobs
-     * @param  array  $failedJobIds
-     * @param  array  $options
-     * @param  \Carbon\CarbonImmutable  $createdAt
-     * @param  \Carbon\CarbonImmutable|null  $cancelledAt
-     * @param  \Carbon\CarbonImmutable|null  $finishedAt
      */
     public function __construct(
         QueueFactory $queue,
@@ -202,7 +190,6 @@ class Batch implements Arrayable, JsonSerializable
     /**
      * Prepare a chain that exists within the jobs being added.
      *
-     * @param  array  $chain
      * @return \Illuminate\Support\Collection
      */
     protected function prepareBatchedChain(array $chain)
@@ -227,17 +214,16 @@ class Batch implements Arrayable, JsonSerializable
     /**
      * Get the percentage of jobs that have been processed (between 0-100).
      *
-     * @return int
+     * @return int<0, 100>
      */
     public function progress()
     {
-        return $this->totalJobs > 0 ? round(($this->processedJobs() / $this->totalJobs) * 100) : 0;
+        return $this->totalJobs > 0 ? (int) round(($this->processedJobs() / $this->totalJobs) * 100) : 0;
     }
 
     /**
      * Record that a job within the batch finished successfully, executing any callbacks if necessary.
      *
-     * @param  string  $jobId
      * @return void
      */
     public function recordSuccessfulJob(string $jobId)
@@ -270,7 +256,6 @@ class Batch implements Arrayable, JsonSerializable
     /**
      * Decrement the pending jobs for the batch.
      *
-     * @param  string  $jobId
      * @return \Illuminate\Bus\UpdatedBatchJobCounts
      */
     public function decrementPendingJobs(string $jobId)
@@ -343,7 +328,6 @@ class Batch implements Arrayable, JsonSerializable
     /**
      * Record that a job within the batch failed to finish successfully, executing any callbacks if necessary.
      *
-     * @param  string  $jobId
      * @param  \Throwable  $e
      * @return void
      */
@@ -377,7 +361,6 @@ class Batch implements Arrayable, JsonSerializable
     /**
      * Increment the failed jobs for the batch.
      *
-     * @param  string  $jobId
      * @return \Illuminate\Bus\UpdatedBatchJobCounts
      */
     public function incrementFailedJobs(string $jobId)
@@ -421,6 +404,12 @@ class Batch implements Arrayable, JsonSerializable
     public function cancel()
     {
         $this->repository->cancel($this->id);
+
+        $container = Container::getInstance();
+
+        if ($container->bound(Dispatcher::class)) {
+            $container->make(Dispatcher::class)->dispatch(new BatchCanceled($this));
+        }
     }
 
     /**
@@ -457,8 +446,6 @@ class Batch implements Arrayable, JsonSerializable
      * Invoke a batch callback handler.
      *
      * @param  callable  $handler
-     * @param  \Illuminate\Bus\Batch  $batch
-     * @param  \Throwable|null  $e
      * @return void
      */
     protected function invokeHandlerCallback($handler, Batch $batch, ?Throwable $e = null)
@@ -496,8 +483,6 @@ class Batch implements Arrayable, JsonSerializable
 
     /**
      * Get the JSON serializable representation of the object.
-     *
-     * @return array
      */
     public function jsonSerialize(): array
     {

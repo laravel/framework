@@ -8,6 +8,7 @@ use Illuminate\Bus\Batchable;
 use Illuminate\Bus\BatchFactory;
 use Illuminate\Bus\DatabaseBatchRepository;
 use Illuminate\Bus\Dispatcher;
+use Illuminate\Bus\Events\BatchCanceled;
 use Illuminate\Bus\Events\BatchFinished;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Bus\Queueable;
@@ -106,14 +107,14 @@ class BusBatchTest extends TestCase
 
     /**
      * Tear down the database schema.
-     *
-     * @return void
      */
     protected function tearDown(): void
     {
         if (Facade::getFacadeApplication()) {
             Facade::setFacadeApplication(null);
         }
+
+        Container::setInstance(null);
 
         unset($_SERVER['__finally.batch'], $_SERVER['__progress.batch'], $_SERVER['__then.batch'], $_SERVER['__catch.batch'], $_SERVER['__catch.exception']);
 
@@ -456,7 +457,21 @@ class BusBatchTest extends TestCase
         $this->assertTrue($batch->cancelled());
     }
 
-    public function testBatchCanBeDeleted()
+    public function test_batch_cancelled_event_is_dispatched()
+    {
+        Container::getInstance()->instance(EventDispatcher::class, $events = m::mock(EventDispatcher::class));
+
+        $queue = m::mock(Factory::class);
+        $batch = $this->createTestBatch($queue);
+
+        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) use ($batch) {
+            return $event instanceof BatchCanceled && $event->batch->id === $batch->id;
+        }));
+
+        $batch->cancel();
+    }
+
+    public function test_batch_can_be_deleted()
     {
         $queue = m::mock(Factory::class);
 
@@ -688,15 +703,15 @@ class BusBatchTest extends TestCase
 
 class ChainHeadJob implements ShouldQueue
 {
-    use Dispatchable, Queueable, Batchable;
+    use Batchable, Dispatchable, Queueable;
 }
 
 class SecondTestJob implements ShouldQueue
 {
-    use Dispatchable, Queueable, Batchable;
+    use Batchable, Dispatchable, Queueable;
 }
 
 class ThirdTestJob implements ShouldQueue
 {
-    use Dispatchable, Queueable, Batchable;
+    use Batchable, Dispatchable, Queueable;
 }
