@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class ListenerTest extends TestCase
 {
-    public function test_queries_returns_expected_shape_after_query_executed()
+    public function testQueriesReturnsExpectedShapeAfterQueryExecuted()
     {
         $connection = m::mock();
 

@@ -640,7 +640,7 @@ class EventsDispatcherTest extends TestCase
         unset($_SERVER['__event.test']);
     }
 
-    public function test_Listener_object_creation_is_lazy()
+    public function testListenerObjectCreationIsLazy()
     {
         $d = new Dispatcher;
         $d->listen(TestEvent::class, TestListener1::class);

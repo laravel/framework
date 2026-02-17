@@ -13,7 +13,7 @@ class FrameTest extends TestCase
 {
     #[RequiresOperatingSystem('Linux|DAR')]
     #[DataProvider('unixFileDataProvider')]
-    public function test_it_normalizes_file_path_on_unix($frameData, $basePath, $expected)
+    public function testItNormalizesFilePathOnUnix($frameData, $basePath, $expected)
     {
         $exception = m::mock(FlattenException::class);
         $classMap = [];
@@ -48,7 +48,7 @@ class FrameTest extends TestCase
 
     #[RequiresOperatingSystem('Windows')]
     #[DataProvider('windowsFileDataProvider')]
-    public function test_it_normalizes_file_path_on_windows($frameData, $basePath, $expected)
+    public function testItNormalizesFilePathOnWindows($frameData, $basePath, $expected)
     {
         $exception = m::mock(FlattenException::class);
         $classMap = [];
@@ -83,7 +83,7 @@ class FrameTest extends TestCase
 
     #[RequiresOperatingSystem('Linux|DAR')]
     #[DataProvider('unixIsFromVendorDataProvider')]
-    public function test_it_determines_if_frame_is_from_vendor_on_unix($frameData, $basePath, $expected)
+    public function testItDeterminesIfFrameIsFromVendorOnUnix($frameData, $basePath, $expected)
     {
         $exception = m::mock(FlattenException::class);
         $classMap = [];
@@ -118,7 +118,7 @@ class FrameTest extends TestCase
 
     #[RequiresOperatingSystem('Windows')]
     #[DataProvider('windowsIsFromVendorDataProvider')]
-    public function test_it_determines_if_frame_is_from_vendor_on_windows($frameData, $basePath, $expected)
+    public function testItDeterminesIfFrameIsFromVendorOnWindows($frameData, $basePath, $expected)
     {
         $exception = m::mock(FlattenException::class);
         $classMap = [];

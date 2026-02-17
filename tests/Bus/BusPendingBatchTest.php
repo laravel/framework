@@ -16,7 +16,7 @@ use stdClass;
 
 class BusPendingBatchTest extends TestCase
 {
-    public function test_pending_batch_may_be_configured_and_dispatched()
+    public function testPendingBatchMayBeConfiguredAndDispatched()
     {
         $container = new Container;
 
@@ -60,7 +60,7 @@ class BusPendingBatchTest extends TestCase
         $pendingBatch->dispatch();
     }
 
-    public function test_batch_is_deleted_from_storage_if_exception_thrown_during_batching()
+    public function testBatchIsDeletedFromStorageIfExceptionThrownDuringBatching()
     {
         $this->expectException(RuntimeException::class);
 
@@ -88,7 +88,7 @@ class BusPendingBatchTest extends TestCase
         $pendingBatch->dispatch();
     }
 
-    public function test_batch_is_dispatched_when_dispatchif_is_true()
+    public function testBatchIsDispatchedWhenDispatchifIsTrue()
     {
         $container = new Container;
 
@@ -114,7 +114,7 @@ class BusPendingBatchTest extends TestCase
         $this->assertInstanceOf(Batch::class, $result);
     }
 
-    public function test_batch_is_not_dispatched_when_dispatchif_is_false()
+    public function testBatchIsNotDispatchedWhenDispatchifIsFalse()
     {
         $container = new Container;
 
@@ -137,7 +137,7 @@ class BusPendingBatchTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function test_batch_is_dispatched_when_dispatchunless_is_false()
+    public function testBatchIsDispatchedWhenDispatchunlessIsFalse()
     {
         $container = new Container;
 
@@ -163,7 +163,7 @@ class BusPendingBatchTest extends TestCase
         $this->assertInstanceOf(Batch::class, $result);
     }
 
-    public function test_batch_is_not_dispatched_when_dispatchunless_is_true()
+    public function testBatchIsNotDispatchedWhenDispatchunlessIsTrue()
     {
         $container = new Container;
 
@@ -186,7 +186,7 @@ class BusPendingBatchTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function test_batch_before_event_is_called()
+    public function testBatchBeforeEventIsCalled()
     {
         $container = new Container;
 
@@ -219,7 +219,7 @@ class BusPendingBatchTest extends TestCase
         $this->assertTrue($beforeCalled);
     }
 
-    public function test_it_throws_exception_if_batched_job_is_not_batchable(): void
+    public function testItThrowsExceptionIfBatchedJobIsNotBatchable(): void
     {
         $nonBatchableJob = new class {
         };
@@ -229,7 +229,7 @@ class BusPendingBatchTest extends TestCase
         new PendingBatch(new Container, new Collection([$nonBatchableJob]));
     }
 
-    public function test_it_throws_an_exception_if_batched_job_contains_batch_with_nonbatchable_job(): void
+    public function testItThrowsAnExceptionIfBatchedJobContainsBatchWithNonbatchableJob(): void
     {
         $this->expectException(RuntimeException::class);
 
@@ -243,7 +243,7 @@ class BusPendingBatchTest extends TestCase
         );
     }
 
-    public function test_it_can_batch_a_closure(): void
+    public function testItCanBatchAClosure(): void
     {
         new PendingBatch(
             new Container,
@@ -255,7 +255,7 @@ class BusPendingBatchTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    public function test_allow_failures_with_boolean_true_enables_failure_tolerance(): void
+    public function testAllowFailuresWithBooleanTrueEnablesFailureTolerance(): void
     {
         $batch = new PendingBatch(new Container, new Collection([new BatchableJob]));
 
@@ -266,7 +266,7 @@ class BusPendingBatchTest extends TestCase
         $this->assertEmpty($batch->failureCallbacks());
     }
 
-    public function test_allow_failures_with_boolean_false_disables_failure_tolerance(): void
+    public function testAllowFailuresWithBooleanFalseDisablesFailureTolerance(): void
     {
         $batch = new PendingBatch(new Container, new Collection([new BatchableJob]));
 
@@ -277,7 +277,7 @@ class BusPendingBatchTest extends TestCase
         $this->assertEmpty($batch->failureCallbacks());
     }
 
-    public function test_allow_failures_with_single_closure_registers_callback(): void
+    public function testAllowFailuresWithSingleClosureRegistersCallback(): void
     {
         $batch = new PendingBatch(new Container, new Collection([new BatchableJob]));
 
@@ -288,7 +288,7 @@ class BusPendingBatchTest extends TestCase
         $this->assertCount(1, $batch->failureCallbacks());
     }
 
-    public function test_allow_failures_with_single_callable_registers_callback(): void
+    public function testAllowFailuresWithSingleCallableRegistersCallback(): void
     {
         $batch = new PendingBatch(new Container, new Collection([new BatchableJob]));
 
@@ -299,7 +299,7 @@ class BusPendingBatchTest extends TestCase
         $this->assertCount(1, $batch->failureCallbacks());
     }
 
-    public function test_allow_failures_with_array_of_callables_registers_multiple_callbacks(): void
+    public function testAllowFailuresWithArrayOfCallablesRegistersMultipleCallbacks(): void
     {
         $batch = new PendingBatch(new Container, new Collection([new BatchableJob]));
 
@@ -315,7 +315,7 @@ class BusPendingBatchTest extends TestCase
         $this->assertCount(4, $batch->failureCallbacks());
     }
 
-    public function test_allow_failures_registers_only_valid_callbacks(): void
+    public function testAllowFailuresRegistersOnlyValidCallbacks(): void
     {
         $batch = new PendingBatch(new Container, new Collection([new BatchableJob]));
 
@@ -337,7 +337,7 @@ class BusPendingBatchTest extends TestCase
         $this->assertCount(3, $batch->failureCallbacks());
     }
 
-    public function test_allow_failures_with_empty_array_enables_tolerance_without_callbacks(): void
+    public function testAllowFailuresWithEmptyArrayEnablesToleranceWithoutCallbacks(): void
     {
         $batch = new PendingBatch(new Container, new Collection([new BatchableJob]));
 
@@ -348,7 +348,7 @@ class BusPendingBatchTest extends TestCase
         $this->assertEmpty($batch->failureCallbacks());
     }
 
-    public function test_allow_failures_is_chainable(): void
+    public function testAllowFailuresIsChainable(): void
     {
         $batch = new PendingBatch(new Container, new Collection([new BatchableJob]));
 
@@ -360,7 +360,7 @@ class BusPendingBatchTest extends TestCase
         $this->assertSame($batch, $batch->allowFailures([]));
     }
 
-    public function test_failure_callbacks_accessor_returns_registered_callbacks(): void
+    public function testFailureCallbacksAccessorReturnsRegisteredCallbacks(): void
     {
         $batch = new PendingBatch(new Container, new Collection([new BatchableJob]));
 

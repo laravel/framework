@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class BusBatchableTest extends TestCase
 {
-    public function test_batch_may_be_retrieved()
+    public function testBatchMayBeRetrieved()
     {
         $class = new class
         {
@@ -32,7 +32,7 @@ class BusBatchableTest extends TestCase
         Container::setInstance(null);
     }
 
-    public function test_with_fake_batch_sets_and_returns_fake()
+    public function testWithFakeBatchSetsAndReturnsFake()
     {
         $job = new class
         {
@@ -49,7 +49,7 @@ class BusBatchableTest extends TestCase
         $this->assertSame(3, $job->batch()->totalJobs);
     }
 
-    public function test_batching_reflects_cancelled_state()
+    public function testBatchingReflectsCancelledState()
     {
         $job = new class
         {
