@@ -222,7 +222,7 @@ class Filesystem
         $tempPath = tempnam(dirname($path), basename($path));
 
         if ($tempPath === false) {
-             throw new \Symfony\Component\HttpFoundation\File\Exception\FileException("Unable to create temporary file in " . dirname($path));
+            throw new RuntimeException("Unable to create temporary file in ".dirname($path));
         }
 
         try {
@@ -234,18 +234,18 @@ class Filesystem
             }
 
             if (file_put_contents($tempPath, $content) === false) {
-                throw new \RuntimeException("Unable to write to temporary file {$tempPath}");
+                throw new RuntimeException("Unable to write to temporary file {$tempPath}");
             }
 
             if (@rename($tempPath, $path) === false) {
                 // If rename fails, we should throw an exception to trigger the cleanup
-                throw new \RuntimeException("Unable to move temporary file to {$path}");
+                throw new RuntimeException("Unable to move temporary file to {$path}");
             }
         } catch (\Throwable $e) {
             if (file_exists($tempPath)) {
                 @unlink($tempPath);
             }
-            
+
             throw $e;
         }
     }
