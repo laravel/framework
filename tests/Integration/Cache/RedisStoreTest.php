@@ -297,4 +297,35 @@ class RedisStoreTest extends TestCase
         $keyCount = Cache::store('redis')->connection()->keys('*');
         $this->assertCount(0, $keyCount);
     }
+
+    public function testLocksCanBeFlushed()
+    {
+        /** @var \Illuminate\Cache\RedisStore $store */
+        $store = Cache::store('redis');
+        $store->flush();
+
+        $store->lock('lock-1', 60)->acquire();
+        $store->lock('lock-2', 60)->acquire();
+        $store->lock('lock-3', 60)->acquire();
+
+        $this->assertTrue($store->flushLocks());
+
+        $this->assertTrue($store->lock('lock-1', 60)->acquire());
+        $this->assertTrue($store->lock('lock-2', 60)->acquire());
+        $this->assertTrue($store->lock('lock-3', 60)->acquire());
+    }
+
+    public function testFlushLocksDoesNotAffectNonLockKeys()
+    {
+        /** @var \Illuminate\Cache\RedisStore $store */
+        $store = Cache::store('redis');
+        $store->flush();
+
+        $store->put('foo', 'bar', 60);
+        $store->lock('lock-1', 60)->acquire();
+
+        $store->flushLocks();
+
+        $this->assertSame('bar', $store->get('foo'));
+    }
 }
