@@ -35,6 +35,21 @@ class NumberType extends Type
     }
 
     /**
+     * The value must be a multiple of this number.
+     */
+    protected int|float|null $multipleOf = null;
+
+    /**
+     * Set the multipleOf constraint.
+     */
+    public function multipleOf(int|float $value): static
+    {
+        $this->multipleOf = $value;
+
+        return $this;
+    }
+
+    /**
      * Set the type's default value.
      */
     public function default(int|float $value): static
