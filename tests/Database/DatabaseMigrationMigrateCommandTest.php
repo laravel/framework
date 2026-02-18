@@ -22,6 +22,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
+        $migrator->shouldReceive('getConnection')->andReturn(null);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
         $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
@@ -41,6 +42,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
+        $migrator->shouldReceive('getConnection')->andReturn(null);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(false);
         $migrator->shouldReceive('resolveConnection')->andReturn($connection = m::mock(stdClass::class));
@@ -68,6 +70,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
+        $migrator->shouldReceive('getConnection')->andReturn(null);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
         $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
@@ -87,6 +90,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
+        $migrator->shouldReceive('getConnection')->andReturn(null);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
         $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
@@ -105,6 +109,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
+        $migrator->shouldReceive('getConnection')->andReturn(null);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
         $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
@@ -123,6 +128,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
+        $migrator->shouldReceive('getConnection')->andReturn(null);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
         $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {

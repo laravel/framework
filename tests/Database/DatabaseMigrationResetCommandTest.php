@@ -26,6 +26,7 @@ class DatabaseMigrationResetCommandTest extends TestCase
         $app = new ApplicationDatabaseResetStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
+        $migrator->shouldReceive('getConnection')->andReturn(null);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('usingConnection')->once()->with(null, m::type(Closure::class))->andReturnUsing(function ($connection, $callback) {
             $callback();
@@ -43,6 +44,7 @@ class DatabaseMigrationResetCommandTest extends TestCase
         $app = new ApplicationDatabaseResetStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
+        $migrator->shouldReceive('getConnection')->andReturn(null);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('usingConnection')->once()->with('foo', m::type(Closure::class))->andReturnUsing(function ($connection, $callback) {
             $callback();

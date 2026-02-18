@@ -18,6 +18,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
+        $migrator->shouldReceive('getConnection')->andReturn(null);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
             return $callback();
@@ -34,6 +35,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
+        $migrator->shouldReceive('getConnection')->andReturn(null);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
             return $callback();
@@ -50,6 +52,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
+        $migrator->shouldReceive('getConnection')->andReturn(null);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
             return $callback();
@@ -66,6 +69,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
+        $migrator->shouldReceive('getConnection')->andReturn(null);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
             return $callback();

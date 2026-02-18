@@ -25,9 +25,39 @@ class BaseCommand extends Command
             })->all();
         }
 
+        // If the active connection has a 'migrations' path configured, use it instead
+        // of the default migrations directory. This allows per-connection migration
+        // directories to be defined in config/database.php without passing --path.
+        if ($connectionPath = $this->connectionMigrationPath()) {
+            return [$this->laravel->basePath().'/'.$connectionPath];
+        }
+
         return array_merge(
             $this->migrator->paths(), [$this->getMigrationPath()]
         );
+    }
+
+    /**
+     * Get the migration path configured for the active database connection, if any.
+     *
+     * @return string|null
+     */
+    protected function connectionMigrationPath()
+    {
+        if (! $this->laravel->bound('config')) {
+            return null;
+        }
+
+        $connection = $this->migrator->getConnection()
+            ?? $this->laravel['config']->get('database.default');
+
+        if (! $connection) {
+            return null;
+        }
+
+        $path = $this->laravel['config']->get("database.connections.{$connection}.migrations");
+
+        return is_string($path) ? $path : null;
     }
 
     /**

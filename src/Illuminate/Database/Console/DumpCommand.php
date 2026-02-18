@@ -59,13 +59,17 @@ class DumpCommand extends Command
         $info = 'Database schema dumped';
 
         if ($this->option('prune')) {
-            (new Filesystem)->deleteDirectory(
-                $path = database_path('migrations'), preserve: false
-            );
+            $migrationPath = $connection->getConfig('migrations');
+
+            $pruneDirectory = is_string($migrationPath)
+                ? base_path($migrationPath)
+                : database_path('migrations');
+
+            (new Filesystem)->deleteDirectory($pruneDirectory, preserve: false);
 
             $info .= ' and pruned';
 
-            $dispatcher->dispatch(new MigrationsPruned($connection, $path));
+            $dispatcher->dispatch(new MigrationsPruned($connection, $pruneDirectory));
         }
 
         $this->components->info($info.' successfully.');
