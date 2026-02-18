@@ -2,6 +2,7 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Contracts\Cache\FlushableLock;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
@@ -11,7 +12,7 @@ use Illuminate\Redis\Connections\PredisConnection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 
-class RedisStore extends TaggableStore implements LockProvider
+class RedisStore extends TaggableStore implements FlushableLock, LockProvider
 {
     use RetrievesMultipleKeys {
         many as private manyAlias;
@@ -285,6 +286,18 @@ class RedisStore extends TaggableStore implements LockProvider
     public function flush()
     {
         $this->connection()->flushdb();
+
+        return true;
+    }
+
+    /**
+     * Remove all locks from the store.
+     *
+     * @return bool
+     */
+    public function flushLocks(): bool
+    {
+        $this->lockConnection()->flushdb();
 
         return true;
     }
