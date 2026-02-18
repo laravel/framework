@@ -110,7 +110,7 @@ class RequestException extends HttpClientException
 
         $summary = is_int($truncateExceptionsAt)
             ? Message::bodySummary($response->toPsrResponse(), $truncateExceptionsAt)
-            : Message::toString($response->toPsrResponse());
+            : null;
 
         return is_null($summary) ? $message : $message.":\n{$summary}\n";
     }

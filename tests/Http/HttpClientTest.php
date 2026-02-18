@@ -1515,6 +1515,23 @@ class HttpClientTest extends TestCase
         $this->assertEquals(1, substr_count($exception->getMessage(), '{"error":{"code":403,"message":"The Request can not be completed"}}'));
     }
 
+    public function testRequestExceptionWithStreamingResponseAndTruncateOff()
+    {
+        RequestException::dontTruncate();
+
+        $stream = new \GuzzleHttp\Psr7\NoSeekStream(Utils::streamFor(json_encode(['hello' => 'world'])));
+        $response = new Psr7Response(400, ['content-type' => 'application/json'], $stream);
+
+        $exception = new RequestException(new Response($response));
+
+        // The exception message should not consume the stream
+        $this->assertStringContainsString('HTTP request returned status code 400', $exception->getMessage());
+
+        // The response body should still be readable
+        $this->assertNotNull($exception->response->json());
+        $this->assertEquals(['hello' => 'world'], $exception->response->json());
+    }
+
     public function testOnErrorDoesntCallClosureOnInformational()
     {
         $status = 0;
