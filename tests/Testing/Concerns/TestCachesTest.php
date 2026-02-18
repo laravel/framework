@@ -129,6 +129,22 @@ class TestCachesTest extends TestCase
         unset($_SERVER['LARAVEL_PARALLEL_TESTING_WITHOUT_CACHE']);
     }
 
+    public function testSwitchToCachePrefixDoesNotRemoveResolvedDrivers()
+    {
+        $container = Container::getInstance();
+
+        $container->singleton('cache', fn ($app) => new \Illuminate\Cache\CacheManager($app));
+
+        $container['config']->set('cache.default', 'array');
+        $container['config']->set('cache.stores.array', ['driver' => 'array']);
+
+        $driver = $container['cache']->driver();
+
+        $this->switchToCachePrefix('new_prefix_');
+
+        $this->assertSame($driver, $container['cache']->driver());
+    }
+
     protected function getParallelSafeCachePrefix()
     {
         $instance = $this->makeTestCachesInstance();

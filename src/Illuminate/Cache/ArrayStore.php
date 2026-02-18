@@ -33,13 +33,22 @@ class ArrayStore extends TaggableStore implements LockProvider
     protected $serializesValues;
 
     /**
+     * The classes that should be allowed during unserialization.
+     *
+     * @var array|bool|null
+     */
+    protected $serializableClasses;
+
+    /**
      * Create a new Array store.
      *
      * @param  bool  $serializesValues
+     * @param  array|bool|null  $serializableClasses
      */
-    public function __construct($serializesValues = false)
+    public function __construct($serializesValues = false, $serializableClasses = null)
     {
         $this->serializesValues = $serializesValues;
+        $this->serializableClasses = $serializableClasses;
     }
 
     /**
@@ -58,7 +67,7 @@ class ArrayStore extends TaggableStore implements LockProvider
 
         foreach ($this->storage as $key => $data) {
             $storage[$key] = [
-                'value' => unserialize($data['value']),
+                'value' => $this->unserialize($data['value']),
                 'expiresAt' => $data['expiresAt'],
             ];
         }
@@ -88,7 +97,7 @@ class ArrayStore extends TaggableStore implements LockProvider
             return;
         }
 
-        return $this->serializesValues ? unserialize($item['value']) : $item['value'];
+        return $this->serializesValues ? $this->unserialize($item['value']) : $item['value'];
     }
 
     /**
@@ -261,5 +270,20 @@ class ArrayStore extends TaggableStore implements LockProvider
     public function restoreLock($name, $owner)
     {
         return $this->lock($name, 0, $owner);
+    }
+
+    /**
+     * Unserialize the given value.
+     *
+     * @param  string  $value
+     * @return mixed
+     */
+    protected function unserialize($value)
+    {
+        if ($this->serializableClasses !== null) {
+            return unserialize($value, ['allowed_classes' => $this->serializableClasses]);
+        }
+
+        return unserialize($value);
     }
 }
