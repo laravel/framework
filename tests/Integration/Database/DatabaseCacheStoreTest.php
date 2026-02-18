@@ -306,7 +306,7 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
 
     protected function getLocksTableName()
     {
-        return config('cache.stores.database.lock_table', 'cache_locks');
+        return config('cache.stores.database.lock_table') ?: 'cache_locks';
     }
 
     protected function withCachePrefix(string $key)
