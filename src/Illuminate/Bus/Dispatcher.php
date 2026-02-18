@@ -155,6 +155,17 @@ class Dispatcher implements QueueingDispatcher
     }
 
     /**
+     * Create a new deferred batch of queueable jobs.
+     *
+     * @param  callable  $builder
+     * @return \Illuminate\Bus\DeferredBatch
+     */
+    public function deferredBatch(callable $builder)
+    {
+        return new DeferredBatch($builder);
+    }
+
+    /**
      * Create a new chain of queueable jobs.
      *
      * @param  \Illuminate\Support\Collection|array|null  $jobs
