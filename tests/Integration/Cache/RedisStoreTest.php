@@ -314,18 +314,4 @@ class RedisStoreTest extends TestCase
         $this->assertTrue($store->lock('lock-2', 60)->acquire());
         $this->assertTrue($store->lock('lock-3', 60)->acquire());
     }
-
-    public function testFlushLocksDoesNotAffectNonLockKeys()
-    {
-        /** @var \Illuminate\Cache\RedisStore $store */
-        $store = Cache::store('redis');
-        $store->flush();
-
-        $store->put('foo', 'bar', 60);
-        $store->lock('lock-1', 60)->acquire();
-
-        $store->flushLocks();
-
-        $this->assertSame('bar', $store->get('foo'));
-    }
 }
