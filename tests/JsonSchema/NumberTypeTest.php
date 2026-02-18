@@ -61,6 +61,61 @@ class NumberTypeTest extends TestCase
         ], $type->toArray());
     }
 
+    public function test_it_may_set_exclusive_min_value_as_float(): void
+    {
+        $type = JsonSchema::number()->title('Price')->exclusiveMin(5.5);
+
+        $this->assertEquals([
+            'type' => 'number',
+            'title' => 'Price',
+            'exclusiveMinimum' => 5.5,
+        ], $type->toArray());
+    }
+
+    public function test_it_may_set_exclusive_min_value_as_int(): void
+    {
+        $type = JsonSchema::number()->title('Price')->exclusiveMin(5);
+
+        $this->assertEquals([
+            'type' => 'number',
+            'title' => 'Price',
+            'exclusiveMinimum' => 5,
+        ], $type->toArray());
+    }
+
+    public function test_it_may_set_exclusive_max_value_as_float(): void
+    {
+        $type = JsonSchema::number()->description('Max price')->exclusiveMax(10.75);
+
+        $this->assertEquals([
+            'type' => 'number',
+            'description' => 'Max price',
+            'exclusiveMaximum' => 10.75,
+        ], $type->toArray());
+    }
+
+    public function test_it_may_set_exclusive_max_value_as_int(): void
+    {
+        $type = JsonSchema::number()->description('Max price')->exclusiveMax(10);
+
+        $this->assertEquals([
+            'type' => 'number',
+            'description' => 'Max price',
+            'exclusiveMaximum' => 10,
+        ], $type->toArray());
+    }
+
+    public function test_it_may_set_both_exclusive_bounds(): void
+    {
+        $type = JsonSchema::number()->exclusiveMin(0.0)->exclusiveMax(100.5);
+
+        $this->assertEquals([
+            'type' => 'number',
+            'exclusiveMinimum' => 0.0,
+            'exclusiveMaximum' => 100.5,
+        ], $type->toArray());
+    }
+
     public function test_it_may_set_enum(): void
     {
         $type = JsonSchema::number()->enum([1, 2.5, 3]);

@@ -160,6 +160,9 @@ class TypeTest extends TestCase
             [JsonSchema::integer()->max(120), 120],
             [JsonSchema::integer()->default(18), 18],
             [JsonSchema::integer()->enum([1, 2, 3]), 2],
+            [JsonSchema::integer()->exclusiveMin(5), 6],
+            [JsonSchema::integer()->exclusiveMax(10), 9],
+            [JsonSchema::integer()->exclusiveMin(0)->exclusiveMax(10), 5],
             // additional IntegerType cases
             [JsonSchema::integer()->min(-5), -5], // negative boundary
             [JsonSchema::integer()->max(10), 9], // below max
@@ -176,6 +179,9 @@ class TypeTest extends TestCase
             [JsonSchema::number()->max(100.0), 99.9],
             [JsonSchema::number()->default(9.99), 9.99],
             [JsonSchema::number()->enum([1, 2.5, 3]), 2.5],
+            [JsonSchema::number()->exclusiveMin(5.0), 5.1],
+            [JsonSchema::number()->exclusiveMax(10.5), 10.4],
+            [JsonSchema::number()->exclusiveMin(0.0)->exclusiveMax(1.0), 0.5],
             // additional NumberType cases
             [JsonSchema::number()->min(-10.5), -10.5], // negative boundary
             [JsonSchema::number()->min(0)->max(1), 1.0], // boundary at max
@@ -309,6 +315,9 @@ class TypeTest extends TestCase
             [JsonSchema::integer()->max(5), 6], // above max
             [JsonSchema::integer()->default(1), '1'], // wrong type
             [JsonSchema::integer()->enum([1, 2, 3]), 4], // not in enum
+            [JsonSchema::integer()->exclusiveMin(5), 5], // boundary not allowed
+            [JsonSchema::integer()->exclusiveMax(10), 10], // boundary not allowed
+            [JsonSchema::integer()->exclusiveMin(0), 0], // zero boundary not allowed
             // additional IntegerType cases
             [JsonSchema::integer()->min(0), -1], // below min boundary
             [JsonSchema::integer()->max(0), 1], // above max boundary
@@ -324,6 +333,9 @@ class TypeTest extends TestCase
             [JsonSchema::number()->max(1.5), 1.6], // above max
             [JsonSchema::number()->default(1.1), '1.1'], // wrong type
             [JsonSchema::number()->enum([1, 2.5, 3]), 4], // not in enum
+            [JsonSchema::number()->exclusiveMin(5.0), 5.0], // boundary not allowed
+            [JsonSchema::number()->exclusiveMax(10.5), 10.5], // boundary not allowed
+            [JsonSchema::number()->exclusiveMin(0.0), 0.0], // zero boundary not allowed
             // additional NumberType cases
             [JsonSchema::number()->min(0), -0.0001], // below min
             [JsonSchema::number()->max(10), 10.0001], // above max
