@@ -3,6 +3,7 @@
 namespace Illuminate\Cache;
 
 use Closure;
+use Illuminate\Contracts\Cache\FlushableLock;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\ConnectionInterface;
@@ -15,7 +16,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 
-class DatabaseStore implements LockProvider, Store
+class DatabaseStore implements FlushableLock, LockProvider, Store
 {
     use InteractsWithTime;
 
@@ -441,6 +442,18 @@ class DatabaseStore implements LockProvider, Store
     }
 
     /**
+     * Remove all locks from the store.
+     *
+     * @return bool
+     */
+    public function flushLocks(): bool
+    {
+        $this->lockTable()->delete();
+
+        return true;
+    }
+
+    /**
      * Get a query builder for the cache table.
      *
      * @return \Illuminate\Database\Query\Builder
@@ -448,6 +461,16 @@ class DatabaseStore implements LockProvider, Store
     protected function table()
     {
         return $this->connection->table($this->table);
+    }
+
+    /**
+     * Get a query builder for the cache locks table.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    protected function lockTable()
+    {
+        return $this->lockConnection->table($this->lockTable);
     }
 
     /**
