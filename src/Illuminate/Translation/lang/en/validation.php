@@ -178,6 +178,11 @@ return [
     |
     */
 
+    'summary' => [
+        'one_error' => '(and :count more error)',
+        'multiple_errors' => '(and :count more errors)',
+    ],
+
     'custom' => [
         'attribute-name' => [
             'rule-name' => 'custom-message',

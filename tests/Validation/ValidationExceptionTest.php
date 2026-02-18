@@ -44,16 +44,15 @@ class ValidationExceptionTest extends TestCase
 
     public function testExceptionTranslatedSummarizesTwoErrors()
     {
-        $translator = $this->getTranslator('uk', [
-            '*' => [
-                '*' => [
-                    'uk' => [
-                        '(and :count more error)' => '(та ще :count помилка)',
-                        '(and :count more errors)' => '(та ще :count помилка)|(та ще :count помилки)|(та ще :count помилок)',
-                    ],
-                ],
+        $loader = new ArrayLoader;
+        $loader->addMessages('uk', 'validation', [
+            'summary' => [
+                'one_error' => '(та ще :count помилка)',
+                'multiple_errors' => '(та ще :count помилка)|(та ще :count помилки)|(та ще :count помилок)',
             ],
         ]);
+
+        $translator = new Translator($loader, 'uk');
 
         $exception = $this->getException([], [
             'foo' => 'required',
@@ -65,16 +64,15 @@ class ValidationExceptionTest extends TestCase
 
     public function testExceptionTranslatedSummarizesThreeOrMoreErrors()
     {
-        $translator = $this->getTranslator('uk', [
-            '*' => [
-                '*' => [
-                    'uk' => [
-                        '(and :count more error)' => '(та ще :count помилка)',
-                        '(and :count more errors)' => '(та ще :count помилка)|(та ще :count помилки)|(та ще :count помилок)',
-                    ],
-                ],
+        $loader = new ArrayLoader;
+        $loader->addMessages('uk', 'validation', [
+            'summary' => [
+                'one_error' => '(та ще :count помилка)',
+                'multiple_errors' => '(та ще :count помилка)|(та ще :count помилки)|(та ще :count помилок)',
             ],
         ]);
+
+        $translator = new Translator($loader, 'uk');
 
         $exception = $this->getException([], [
             'foo' => 'required',
@@ -87,16 +85,15 @@ class ValidationExceptionTest extends TestCase
 
     public function testExceptionTranslatedSummarizesFiveOrMoreErrors()
     {
-        $translator = $this->getTranslator('uk', [
-            '*' => [
-                '*' => [
-                    'uk' => [
-                        '(and :count more error)' => '(та ще :count помилка)',
-                        '(and :count more errors)' => '(та ще :count помилка)|(та ще :count помилки)|(та ще :count помилок)',
-                    ],
-                ],
+        $loader = new ArrayLoader;
+        $loader->addMessages('uk', 'validation', [
+            'summary' => [
+                'one_error' => '(та ще :count помилка)',
+                'multiple_errors' => '(та ще :count помилка)|(та ще :count помилки)|(та ще :count помилок)',
             ],
         ]);
+
+        $translator = new Translator($loader, 'uk');
 
         $exception = $this->getException([], [
             'foo' => 'required',
@@ -180,7 +177,16 @@ class ValidationExceptionTest extends TestCase
 
     protected function getTranslator($locale = 'en', $loaded = [])
     {
-        $translator ??= new Translator(new ArrayLoader, $locale);
+        $loader = new ArrayLoader;
+
+        $loader->addMessages('en', 'validation', [
+            'summary' => [
+                'one_error' => '(and :count more error)',
+                'multiple_errors' => '(and :count more errors)',
+            ],
+        ]);
+
+        $translator = new Translator($loader, $locale);
 
         $translator->setLoaded($loaded);
 
