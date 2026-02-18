@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use Illuminate\Queue\Attributes\MaxExceptions;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Queue\Attributes\Timeout;
@@ -71,6 +72,11 @@ class SendQueuedNotifications implements ShouldQueue
     public $shouldBeEncrypted = false;
 
     /**
+     * Indicates if the job should be deleted when models are missing.
+     */
+    public bool $deleteWhenMissingModels = false;
+
+    /**
      * Create a new job instance.
      *
      * @param  \Illuminate\Notifications\Notifiable|\Illuminate\Support\Collection  $notifiables
@@ -85,6 +91,7 @@ class SendQueuedNotifications implements ShouldQueue
         $this->tries = $this->getAttributeValue($notification, Tries::class, 'tries');
         $this->timeout = $this->getAttributeValue($notification, Timeout::class, 'timeout');
         $this->maxExceptions = $this->getAttributeValue($notification, MaxExceptions::class, 'maxExceptions');
+        $this->deleteWhenMissingModels = $this->getAttributeValue($notification, DeleteWhenMissingModels::class, 'deleteWhenMissingModels') ?? false;
 
         if ($notification instanceof ShouldQueueAfterCommit) {
             $this->afterCommit = true;
