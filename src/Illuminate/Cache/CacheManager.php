@@ -447,7 +447,7 @@ class CacheManager implements FactoryContract
      */
     protected function getSerializableClasses(array $config)
     {
-        return $config['serializable_classes'] ?? null;
+        return $this->app['config']['cache.serializable_classes'] ?? null;
     }
 
     /**
