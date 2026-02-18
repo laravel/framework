@@ -567,7 +567,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add "foo" double precision not null', $statements[0]);
+        $this->assertSame('alter table "users" add "foo" float(53) not null', $statements[0]);
     }
 
     public function testAddingDecimal()

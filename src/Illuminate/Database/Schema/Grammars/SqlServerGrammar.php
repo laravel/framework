@@ -697,7 +697,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeDouble(Fluent $column)
     {
-        return 'double precision';
+        return 'float(53)';
     }
 
     /**
