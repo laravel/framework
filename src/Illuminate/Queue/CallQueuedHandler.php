@@ -253,6 +253,11 @@ class CallQueuedHandler
 
             $shouldDelete = $reflectionClass->getDefaultProperties()['deleteWhenMissingModels']
                 ?? count($reflectionClass->getAttributes(DeleteWhenMissingModels::class)) !== 0;
+
+            if (! $shouldDelete) {
+                $command = $job->payload()['data']['command'] ?? null;
+                $shouldDelete = str_contains((string) $command, '"deleteWhenMissingModels";b:1;');
+            }
         } catch (Exception) {
             $shouldDelete = false;
         }

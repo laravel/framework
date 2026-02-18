@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\ChannelManager;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\SendQueuedNotifications;
 use Illuminate\Support\Collection;
 use Mockery as m;
@@ -16,11 +17,12 @@ class NotificationSendQueuedNotificationTest extends TestCase
 {
     public function testNotificationsCanBeSent()
     {
-        $job = new SendQueuedNotifications('notifiables', 'notification');
+        $notification = new TestNotification;
+        $job = new SendQueuedNotifications('notifiables', $notification);
         $manager = m::mock(ChannelManager::class);
         $manager->shouldReceive('sendNow')->once()->withArgs(function ($notifiables, $notification, $channels) {
             return $notifiables instanceof Collection && $notifiables->toArray() === ['notifiables']
-                && $notification === 'notification'
+                && $notification instanceof TestNotification
                 && $channels === null;
         });
         $job->handle($manager);
@@ -31,7 +33,7 @@ class NotificationSendQueuedNotificationTest extends TestCase
         $identifier = new ModelIdentifier(NotifiableUser::class, [null], [], null);
         $serializedIdentifier = serialize($identifier);
 
-        $job = new SendQueuedNotifications(new NotifiableUser, 'notification');
+        $job = new SendQueuedNotifications(new NotifiableUser, new TestNotification);
         $serialized = serialize($job);
 
         $this->assertStringContainsString($serializedIdentifier, $serialized);
@@ -42,7 +44,7 @@ class NotificationSendQueuedNotificationTest extends TestCase
         $notifiable = new AnonymousNotifiable;
         $serializedNotifiable = serialize($notifiable);
 
-        $job = new SendQueuedNotifications($notifiable, 'notification');
+        $job = new SendQueuedNotifications($notifiable, new TestNotification);
         $serialized = serialize($job);
 
         $this->assertStringContainsString($serializedNotifiable, $serialized);
@@ -68,4 +70,8 @@ class NotifiableUser extends Model
 
     public $table = 'users';
     public $timestamps = false;
+}
+
+class TestNotification extends Notification
+{
 }

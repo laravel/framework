@@ -8,9 +8,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
+use ReflectionClass;
 
 class SendQueuedNotifications implements ShouldQueue
 {
@@ -66,6 +68,11 @@ class SendQueuedNotifications implements ShouldQueue
     public $shouldBeEncrypted = false;
 
     /**
+     * Indicates if the job should be deleted when models are missing.
+     */
+    public bool $deleteWhenMissingModels = false;
+
+    /**
      * Create a new job instance.
      *
      * @param  \Illuminate\Notifications\Notifiable|\Illuminate\Support\Collection  $notifiables
@@ -88,6 +95,10 @@ class SendQueuedNotifications implements ShouldQueue
         }
 
         $this->shouldBeEncrypted = $notification instanceof ShouldBeEncrypted;
+
+        $this->deleteWhenMissingModels = property_exists($notification, 'deleteWhenMissingModels')
+            ? $notification->deleteWhenMissingModels
+            : (new ReflectionClass($notification))->getAttributes(DeleteWhenMissingModels::class) !== [];
     }
 
     /**
