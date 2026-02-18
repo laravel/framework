@@ -3,6 +3,7 @@
 namespace Illuminate\Cache;
 
 use Exception;
+use Illuminate\Contracts\Cache\FlushableLock;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Filesystem\LockTimeoutException;
@@ -10,7 +11,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\LockableFile;
 use Illuminate\Support\InteractsWithTime;
 
-class FileStore implements Store, LockProvider
+class FileStore implements FlushableLock, LockProvider, Store
 {
     use InteractsWithTime, RetrievesMultipleKeys;
 
@@ -290,6 +291,28 @@ class FileStore implements Store, LockProvider
             $deleted = $this->files->deleteDirectory($directory);
 
             if (! $deleted || $this->files->exists($directory)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Remove all locks from the store.
+     *
+     * @return bool
+     */
+    public function flushLocks(): bool
+    {
+        if (! $this->files->isDirectory($this->lockDirectory)) {
+            return false;
+        }
+
+        foreach ($this->files->directories($this->lockDirectory) as $lockDirectory) {
+            $deleted = $this->files->deleteDirectory($lockDirectory);
+
+            if (! $deleted || $this->files->exists($lockDirectory)) {
                 return false;
             }
         }
