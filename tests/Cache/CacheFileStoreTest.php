@@ -362,7 +362,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertFalse($result, 'Flush should not clean directory');
     }
 
-    public function testFlushingLocksCleansSeparateDirectory()
+    public function testFlushingLocksCleansDirectory()
     {
         $lockDir = __DIR__ . '/locks';
         $files = $this->mockFilesystem();
@@ -376,7 +376,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertTrue($result, 'Flushing locks failed');
     }
 
-    public function testFlushingLocksFailsSeparateDirectoryClean()
+    public function testFlushingLocksFailsDirectoryClean()
     {
         $lockDir = __DIR__ . '/locks';
         $files = $this->mockFilesystem();
@@ -390,7 +390,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertFalse($result, 'Flushing locks should not have cleared directories');
     }
 
-    public function testFlushingLocksIgnoreNonExistingSeparateDirectory()
+    public function testFlushingLocksIgnoreNonExistingDirectory()
     {
         $lockDir = __DIR__ . '/locks';
         $files = $this->mockFilesystem();
