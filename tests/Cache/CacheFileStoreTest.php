@@ -364,7 +364,7 @@ class CacheFileStoreTest extends TestCase
 
     public function testFlushingLocksCleansDirectory()
     {
-        $lockDir = __DIR__ . '/locks';
+        $lockDir = __DIR__.'/locks';
         $files = $this->mockFilesystem();
         $files->expects($this->once())->method('isDirectory')->with($this->equalTo($lockDir))->willReturn(true);
         $files->expects($this->once())->method('directories')->with($this->equalTo($lockDir))->willReturn(['foo']);
@@ -378,7 +378,7 @@ class CacheFileStoreTest extends TestCase
 
     public function testFlushingLocksFailsDirectoryClean()
     {
-        $lockDir = __DIR__ . '/locks';
+        $lockDir = __DIR__.'/locks';
         $files = $this->mockFilesystem();
         $files->expects($this->once())->method('isDirectory')->with($this->equalTo($lockDir))->willReturn(true);
         $files->expects($this->once())->method('directories')->with($this->equalTo($lockDir))->willReturn(['foo']);
@@ -392,7 +392,7 @@ class CacheFileStoreTest extends TestCase
 
     public function testFlushingLocksIgnoreNonExistingDirectory()
     {
-        $lockDir = __DIR__ . '/locks';
+        $lockDir = __DIR__.'/locks';
         $files = $this->mockFilesystem();
         $files->expects($this->once())->method('isDirectory')->with($this->equalTo($lockDir))->willReturn(false);
 
