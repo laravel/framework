@@ -161,6 +161,34 @@ class RouteListCommandTest extends TestCase
             ->expectsOutput('                                                  Showing [3] routes')
             ->expectsOutput('');
     }
+
+    public function testDisplayRoutesWithBindingFields()
+    {
+        $this->router->get('users/{user:name}', [FooController::class, 'show']);
+        $this->router->get('users/{user:name}/posts/{post:slug}', function () {
+            //
+        });
+
+        $this->artisan(RouteListCommand::class, ['-v' => true])
+            ->assertSuccessful()
+            ->expectsOutput('')
+            ->expectsOutput('  GET|HEAD       users/{user:name} Illuminate\Tests\Testing\Console\FooController@show')
+            ->expectsOutput('  GET|HEAD       users/{user:name}/posts/{post:slug} ............... ')
+            ->expectsOutput('')
+            ->expectsOutput('                                                  Showing [2] routes')
+            ->expectsOutput('');
+    }
+
+    public function testDisplayRoutesWithBindingFieldsAsJson()
+    {
+        $this->router->get('users/{user:name}/posts/{post:slug}', function () {
+            //
+        });
+
+        $this->artisan(RouteListCommand::class, ['--json' => true])
+            ->assertSuccessful()
+            ->expectsOutputToContain('users\/{user:name}\/posts\/{post:slug}');
+    }
 }
 
 class FooController extends Controller
