@@ -362,6 +362,46 @@ class CacheFileStoreTest extends TestCase
         $this->assertFalse($result, 'Flush should not clean directory');
     }
 
+    public function testFlushingLocksCleansSeparateDirectory()
+    {
+        $lockDir = __DIR__ . '/locks';
+        $files = $this->mockFilesystem();
+        $files->expects($this->once())->method('isDirectory')->with($this->equalTo($lockDir))->willReturn(true);
+        $files->expects($this->once())->method('directories')->with($this->equalTo($lockDir))->willReturn(['foo']);
+        $files->expects($this->once())->method('deleteDirectory')->with($this->equalTo('foo'))->willReturn(true);
+
+        $store = new FileStore($files, __DIR__);
+        $store->setLockDirectory($lockDir);
+        $result = $store->flushLocks();
+        $this->assertTrue($result, 'Flushing locks failed');
+    }
+
+    public function testFlushingLocksFailsSeparateDirectoryClean()
+    {
+        $lockDir = __DIR__ . '/locks';
+        $files = $this->mockFilesystem();
+        $files->expects($this->once())->method('isDirectory')->with($this->equalTo($lockDir))->willReturn(true);
+        $files->expects($this->once())->method('directories')->with($this->equalTo($lockDir))->willReturn(['foo']);
+        $files->expects($this->once())->method('deleteDirectory')->with($this->equalTo('foo'))->willReturn(false);
+
+        $store = new FileStore($files, __DIR__);
+        $store->setLockDirectory($lockDir);
+        $result = $store->flushLocks();
+        $this->assertFalse($result, 'Flushing locks should not have cleared directories');
+    }
+
+    public function testFlushingLocksIgnoreNonExistingSeparateDirectory()
+    {
+        $lockDir = __DIR__ . '/locks';
+        $files = $this->mockFilesystem();
+        $files->expects($this->once())->method('isDirectory')->with($this->equalTo($lockDir))->willReturn(false);
+
+        $store = new FileStore($files, __DIR__);
+        $store->setLockDirectory($lockDir);
+        $result = $store->flushLocks();
+        $this->assertFalse($result, 'Flushing locks should not clean locks directory');
+    }
+
     public function testItHandlesForgettingNonFlexibleKeys()
     {
         $store = new FileStore(new Filesystem, __DIR__);
