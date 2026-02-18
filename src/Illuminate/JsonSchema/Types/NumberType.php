@@ -15,6 +15,11 @@ class NumberType extends Type
     protected int|float|null $maximum = null;
 
     /**
+     * The number the value must be a multiple of.
+     */
+    protected int|float|null $multipleOf = null;
+
+    /**
      * Set the minimum value (inclusive).
      */
     public function min(int|float $value): static
@@ -35,12 +40,7 @@ class NumberType extends Type
     }
 
     /**
-     * The value must be a multiple of this number.
-     */
-    protected int|float|null $multipleOf = null;
-
-    /**
-     * Set the multipleOf constraint.
+     * Set the number the value must be a multiple of.
      */
     public function multipleOf(int|float $value): static
     {
