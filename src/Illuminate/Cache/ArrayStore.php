@@ -2,12 +2,13 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Contracts\Cache\FlushableLock;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 
-class ArrayStore extends TaggableStore implements LockProvider
+class ArrayStore extends TaggableStore implements FlushableLock, LockProvider
 {
     use InteractsWithTime, RetrievesMultipleKeys;
 
@@ -202,6 +203,18 @@ class ArrayStore extends TaggableStore implements LockProvider
     public function flush()
     {
         $this->storage = [];
+
+        return true;
+    }
+
+    /**
+     * Remove all locks from the store.
+     *
+     * @return bool
+     */
+    public function flushLocks(): bool
+    {
+        $this->locks = [];
 
         return true;
     }
