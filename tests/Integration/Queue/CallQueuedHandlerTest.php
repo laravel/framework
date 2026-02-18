@@ -93,11 +93,11 @@ class CallQueuedHandlerTest extends TestCase
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
         $job = m::mock(Job::class);
-        $job->shouldReceive('resolveQueuedJobClass')->andReturn(__CLASS__);
+        $job->shouldReceive('payload')->andReturn(['deleteWhenMissingModels' => false]);
         $job->shouldReceive('fail')->once();
 
         $instance->call($job, [
-            'command' => serialize(new CallQueuedHandlerExceptionThrower),
+            'command' => serialize(new CallQueuedHandlerExceptionThrowerWithoutDelete),
         ]);
     }
 
@@ -108,6 +108,7 @@ class CallQueuedHandlerTest extends TestCase
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
         $job = m::mock(Job::class);
+        $job->shouldReceive('payload')->andReturn(['deleteWhenMissingModels' => true]);
         $job->shouldReceive('getConnectionName')->andReturn('connection');
         $job->shouldReceive('resolveQueuedJobClass')->andReturn(CallQueuedHandlerExceptionThrower::class);
         $job->shouldReceive('markAsFailed')->never();
@@ -129,6 +130,7 @@ class CallQueuedHandlerTest extends TestCase
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
         $job = m::mock(Job::class);
+        $job->shouldReceive('payload')->andReturn(['deleteWhenMissingModels' => true]);
         $job->shouldReceive('getConnectionName')->andReturn('connection');
         $job->shouldReceive('resolveQueuedJobClass')->andReturn(CallQueuedHandlerAttributeExceptionThrower::class);
         $job->shouldReceive('markAsFailed')->never();
@@ -166,6 +168,7 @@ class CallQueuedHandlerTest extends TestCase
         $job->shouldReceive('failed')->never();
         $job->shouldReceive('uuid')->andReturn('job-uuid');
         $job->shouldReceive('payload')->andReturn([
+            'deleteWhenMissingModels' => true,
             'data' => [
                 'batchId' => 'test-batch-id',
                 'command' => $serialized,
@@ -229,6 +232,19 @@ class CallQueuedHandlerExceptionThrower
 {
     public $deleteWhenMissingModels = true;
 
+    public function handle()
+    {
+        //
+    }
+
+    public function __wakeup()
+    {
+        throw new ModelNotFoundException('Foo');
+    }
+}
+
+class CallQueuedHandlerExceptionThrowerWithoutDelete
+{
     public function handle()
     {
         //
