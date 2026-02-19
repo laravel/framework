@@ -59,7 +59,7 @@ class DownCommand extends Command
             $this->laravel->get('events')->dispatch(new MaintenanceModeEnabled());
 
             $this->components->info($wasAlreadyDown
-                ? 'Maintenance mode refreshed.'
+                ? 'Maintenance mode options updated.'
                 : 'Application is now in maintenance mode.'
             );
 
