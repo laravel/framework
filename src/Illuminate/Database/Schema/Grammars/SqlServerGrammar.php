@@ -309,7 +309,7 @@ class SqlServerGrammar extends Grammar
         $table = $blueprint->getTable();
         $columns = $this->columnize($command->columns);
         $catalog = $this->wrap($command->catalog ?: 'ft_'.$table);
-        $keyIndex = $this->wrap($command->index ?: 'PK_'.$table.'_id');
+        $keyIndex = $this->wrap($command->pkindex ?: 'PK_'.$table.'_id');
 
         if (str_contains($table, '.')) {
             $table = current(array_reverse(explode('.', $table)));

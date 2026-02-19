@@ -18,7 +18,7 @@ class FulltextTest extends SqlServerTestCase
             $table->id('id')->primary('id', 'pk_articles_id');
             $table->string('title', 200);
             $table->text('body');
-            $table->fulltext(['title', 'body'], ['index' => 'pk_articles_id']
+            $table->fulltext(['title', 'body'], ['pkindex' => 'pk_articles_id']
             );
         });
     }
