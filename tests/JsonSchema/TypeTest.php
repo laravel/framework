@@ -279,6 +279,9 @@ class TypeTest extends TestCase
             [JsonSchema::array()->items(JsonSchema::string()->max(3)), ['one', 'two']],
             [JsonSchema::array()->default(['x']), ['x']],
             [JsonSchema::array()->enum([['a'], ['b', 'c']]), ['b', 'c']],
+            [JsonSchema::array()->unique(), [1, 2, 3]],
+            [JsonSchema::array()->items(JsonSchema::string())->unique(), ['a', 'b', 'c']],
+            [JsonSchema::array()->unique(), []],
             // additional ArrayType cases
             [JsonSchema::array()->min(0), []], // explicit min zero
             [JsonSchema::array()->max(0), []], // exactly zero length
@@ -372,6 +375,8 @@ class TypeTest extends TestCase
             [JsonSchema::array()->max(1), ['a', 'b']], // too many items
             [JsonSchema::array()->items(JsonSchema::string()->max(3)), ['four']], // item too long
             [JsonSchema::array()->enum([['a'], ['b', 'c']]), ['c', 'd']], // not in enum
+            [JsonSchema::array()->unique(), [1, 1, 2]],
+            [JsonSchema::array()->items(JsonSchema::string())->unique(), ['a', 'b', 'a']],
             // additional ArrayType cases
             [JsonSchema::array()->items(JsonSchema::integer()), ['a']], // wrong item type
             [JsonSchema::array()->min(1), []], // too few
