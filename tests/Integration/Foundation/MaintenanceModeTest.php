@@ -257,6 +257,21 @@ class MaintenanceModeTest extends TestCase
         $this->assertSame($expectedDate, $data['retry']);
     }
 
+    public function testMaintenanceModeCanBeRefreshedWithNewOptions()
+    {
+        $this->artisan(DownCommand::class, ['--retry' => 60])
+            ->expectsOutputToContain('Application is now in maintenance mode.');
+
+        $data = json_decode(file_get_contents(storage_path('framework/down')), true);
+        $this->assertSame(60, $data['retry']);
+
+        $this->artisan(DownCommand::class, ['--retry' => 120])
+            ->expectsOutputToContain('Maintenance mode options updated.');
+
+        $data = json_decode(file_get_contents(storage_path('framework/down')), true);
+        $this->assertSame(120, $data['retry']);
+    }
+
     public function testMaintenanceModeRespectsBootstrapConfiguredExcludedPaths()
     {
         PreventRequestsDuringMaintenance::except([

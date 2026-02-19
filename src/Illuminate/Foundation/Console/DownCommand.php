@@ -45,11 +45,7 @@ class DownCommand extends Command
     public function handle()
     {
         try {
-            if ($this->laravel->maintenanceMode()->active() && ! $this->getSecret()) {
-                $this->components->info('Application is already down.');
-
-                return 0;
-            }
+            $wasAlreadyDown = $this->laravel->maintenanceMode()->active();
 
             $downFilePayload = $this->getDownFilePayload();
 
@@ -62,7 +58,10 @@ class DownCommand extends Command
 
             $this->laravel->get('events')->dispatch(new MaintenanceModeEnabled());
 
-            $this->components->info('Application is now in maintenance mode.');
+            $this->components->info($wasAlreadyDown
+                ? 'Maintenance mode options updated.'
+                : 'Application is now in maintenance mode.'
+            );
 
             if ($downFilePayload['secret'] !== null) {
                 $this->components->info('You may bypass maintenance mode via ['.config('app.url')."/{$downFilePayload['secret']}].");
