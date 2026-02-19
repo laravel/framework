@@ -464,6 +464,16 @@ class CacheRepositoryTest extends TestCase
         $this->assertFalse($nonFlushableRepo->supportsFlushingLocks());
     }
 
+    public function testItThrowsExceptionWhenStoreDoesNotSupportFlushingLocks()
+    {
+        $this->expectException(BadMethodCallException::class);
+
+        $nonFlushable = m::mock(MemcachedStore::class);
+        $nonFlushableRepo = new Repository($nonFlushable);
+
+        $nonFlushableRepo->flushLocks();
+    }
+
     public function testTouchWithNullTTLRemembersItemForever(): void
     {
         $key = 'key';

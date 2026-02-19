@@ -2,11 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Cache\DatabaseStore;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Orchestra\Testbench\Attributes\WithMigration;
+use RuntimeException;
 
 #[WithMigration('cache')]
 class DatabaseCacheStoreTest extends DatabaseTestCase
@@ -289,6 +291,41 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
 
         $this->assertTrue($store->lock('active-lock', 60)->acquire());
         $this->assertDatabaseMissing($this->getLocksTableName(), ['key' => $this->withCachePrefix('stale-lock')]);
+    }
+
+    public function testHasSeparateLockStoreReturnsTrueWhenTablesAreDifferent()
+    {
+        $store = new DatabaseStore(
+            connection: DB::connection(),
+            table: $this->getCacheTableName(),
+            lockTable: $this->getLocksTableName(),
+        );
+
+        $this->assertTrue($store->hasSeparateLockStore());
+    }
+
+    public function testHasSeparateLockStoreReturnsFalseWhenTablesAreTheSame()
+    {
+        $store = new DatabaseStore(
+            connection: DB::connection(),
+            table: $this->getCacheTableName(),
+            lockTable: $this->getCacheTableName(),
+        );
+
+        $this->assertFalse($store->hasSeparateLockStore());
+    }
+
+    public function testFlushLocksThrowsExceptionWhenTablesAreTheSame()
+    {
+        $store = new DatabaseStore(
+            connection: DB::connection(),
+            table: $this->getCacheTableName(),
+            lockTable: $this->getCacheTableName(),
+        );
+
+        $this->expectException(RuntimeException::class);
+
+        $store->flushLocks();
     }
 
     /**
