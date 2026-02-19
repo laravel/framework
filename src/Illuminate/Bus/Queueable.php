@@ -3,12 +3,15 @@
 namespace Illuminate\Bus;
 
 use Closure;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Laravel\SerializableClosure\SerializableClosure;
 use PHPUnit\Framework\Assert as PHPUnit;
 use RuntimeException;
+use Throwable;
 
 use function Illuminate\Support\enum_value;
 
@@ -334,6 +337,46 @@ trait Queueable
                 $next->chainCatchCallbacks = $this->chainCatchCallbacks;
             }));
         }
+    }
+
+    /**
+     * Dispatch a batch as part of the current job chain.
+     *
+     * @param  \Illuminate\Bus\PendingBatch  $batch
+     * @return \Illuminate\Bus\Batch
+     */
+    public function dispatchBatchInChain(PendingBatch $batch)
+    {
+        foreach ($this->chainCatchCallbacks ?? [] as $callback) {
+            $batch->catch(function (Batch $batch, ?Throwable $exception) use ($callback) {
+                if (! $batch->allowsFailures()) {
+                    $callback($exception);
+                }
+            });
+        }
+
+        if (is_array($this->chained) && ! empty($this->chained)) {
+            $next = unserialize(array_shift($this->chained));
+
+            $next->chained = $this->chained;
+
+            $next->onConnection($next->connection ?: $this->chainConnection);
+            $next->onQueue($next->queue ?: $this->chainQueue);
+
+            $next->chainConnection = $this->chainConnection;
+            $next->chainQueue = $this->chainQueue;
+            $next->chainCatchCallbacks = $this->chainCatchCallbacks;
+
+            $batch->finally(function (Batch $batch) use ($next) {
+                if (! $batch->cancelled()) {
+                    Container::getInstance()->make(Dispatcher::class)->dispatch($next);
+                }
+            });
+
+            $this->chained = [];
+        }
+
+        return $batch->dispatch();
     }
 
     /**

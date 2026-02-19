@@ -8,7 +8,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Collection;
-use Throwable;
 
 class ChainedBatch implements ShouldQueue
 {
@@ -74,9 +73,7 @@ class ChainedBatch implements ShouldQueue
      */
     public function handle()
     {
-        $this->attachRemainderOfChainToEndOfBatch(
-            $this->toPendingBatch()
-        )->dispatch();
+        $this->dispatchBatchInChain($this->toPendingBatch());
     }
 
     /**
@@ -99,46 +96,7 @@ class ChainedBatch implements ShouldQueue
             $batch->onConnection($this->connection);
         }
 
-        foreach ($this->chainCatchCallbacks ?? [] as $callback) {
-            $batch->catch(function (Batch $batch, ?Throwable $exception) use ($callback) {
-                if (! $batch->allowsFailures()) {
-                    $callback($exception);
-                }
-            });
-        }
-
         return $batch;
     }
 
-    /**
-     * Move the remainder of the chain to a "finally" batch callback.
-     *
-     * @param  \Illuminate\Bus\PendingBatch  $batch
-     * @return \Illuminate\Bus\PendingBatch
-     */
-    protected function attachRemainderOfChainToEndOfBatch(PendingBatch $batch)
-    {
-        if (is_array($this->chained) && ! empty($this->chained)) {
-            $next = unserialize(array_shift($this->chained));
-
-            $next->chained = $this->chained;
-
-            $next->onConnection($next->connection ?: $this->chainConnection);
-            $next->onQueue($next->queue ?: $this->chainQueue);
-
-            $next->chainConnection = $this->chainConnection;
-            $next->chainQueue = $this->chainQueue;
-            $next->chainCatchCallbacks = $this->chainCatchCallbacks;
-
-            $batch->finally(function (Batch $batch) use ($next) {
-                if (! $batch->cancelled()) {
-                    Container::getInstance()->make(Dispatcher::class)->dispatch($next);
-                }
-            });
-
-            $this->chained = [];
-        }
-
-        return $batch;
-    }
 }
