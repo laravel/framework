@@ -628,7 +628,7 @@ class BusFake implements Fake, QueueingDispatcher
      */
     public function hasDispatched($command)
     {
-        return isset($this->commands[$command]) && ! empty($this->commands[$command]);
+        return ! empty($this->commands[$command]);
     }
 
     /**
@@ -639,7 +639,7 @@ class BusFake implements Fake, QueueingDispatcher
      */
     public function hasDispatchedSync($command)
     {
-        return isset($this->commandsSync[$command]) && ! empty($this->commandsSync[$command]);
+        return ! empty($this->commandsSync[$command]);
     }
 
     /**
@@ -650,7 +650,7 @@ class BusFake implements Fake, QueueingDispatcher
      */
     public function hasDispatchedAfterResponse($command)
     {
-        return isset($this->commandsAfterResponse[$command]) && ! empty($this->commandsAfterResponse[$command]);
+        return ! empty($this->commandsAfterResponse[$command]);
     }
 
     /**
