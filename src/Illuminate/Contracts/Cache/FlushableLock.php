@@ -10,4 +10,11 @@ interface FlushableLock
      * @return bool
      */
     public function flushLocks(): bool;
+
+    /**
+     * Determine if the lock store is separate from the cache store.
+     *
+     * @return bool
+     */
+    public function hasSeparateLockStore(): bool;
 }
