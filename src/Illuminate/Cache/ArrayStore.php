@@ -7,6 +7,7 @@ use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
+use RuntimeException;
 
 class ArrayStore extends TaggableStore implements FlushableLock, LockProvider
 {
@@ -211,9 +212,15 @@ class ArrayStore extends TaggableStore implements FlushableLock, LockProvider
      * Remove all locks from the store.
      *
      * @return bool
+     *
+     * @throws \RuntimeException
      */
     public function flushLocks(): bool
     {
+        if (! $this->hasSeparateLockStore()) {
+            throw new RuntimeException('Flushing locks is only supported when the lock store is separate from the cache store.');
+        }
+
         $this->locks = [];
 
         return true;
@@ -274,5 +281,15 @@ class ArrayStore extends TaggableStore implements FlushableLock, LockProvider
     public function restoreLock($name, $owner)
     {
         return $this->lock($name, 0, $owner);
+    }
+
+    /**
+     * Determine if the lock store is separate from the cache store.
+     *
+     * @return bool
+     */
+    public function hasSeparateLockStore(): bool
+    {
+        return true;
     }
 }
