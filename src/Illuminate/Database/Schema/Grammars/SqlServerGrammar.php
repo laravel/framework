@@ -316,13 +316,13 @@ class SqlServerGrammar extends Grammar
         }
 
         return [
-            sprintf("create fulltext catalog %s", $catalog),
-            sprintf("create fulltext index on %s (%s) key index %s on %s with (change_tracking = auto)",
+            sprintf('create fulltext catalog %s', $catalog),
+            sprintf('create fulltext index on %s (%s) key index %s on %s with (change_tracking = auto)',
                 $this->wrapTable($blueprint),
                 $columns,
                 $keyIndex,
                 $catalog
-            )
+            ),
         ];
     }
 
@@ -493,7 +493,7 @@ class SqlServerGrammar extends Grammar
 
         return [
             sprintf('drop fulltext index on %s', $this->wrapTable($blueprint)),
-            sprintf('drop fulltext catalog %s', $catalog)
+            sprintf('drop fulltext catalog %s', $catalog),
         ];
     }
 
