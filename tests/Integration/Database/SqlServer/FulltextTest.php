@@ -32,7 +32,7 @@ class FulltextTest extends SqlServerTestCase
 
     protected function setUp(): void
     {
-        $this->markTestSkipped( 'Available SQL Server images do not support full-text search.' );
+        $this->markTestSkipped('Available SQL Server images do not support full-text search.');
 
         parent::setUp();
 
