@@ -306,8 +306,6 @@ class RedisStoreTest extends TestCase
         if (! $store->hasSeparateLockStore()) {
             $this->markTestSkipped('A separate Redis lock connection is required to test flushing locks.');
         }
-        $store->setConnection('default');
-        $store->setLockConnection('locks');
         $store->flush();
 
         $store->lock('lock-1', 60)->acquire();
@@ -328,8 +326,6 @@ class RedisStoreTest extends TestCase
         if (! $store->hasSeparateLockStore()) {
             $this->markTestSkipped('A separate Redis lock connection is required to test flushing locks.');
         }
-        $store->setConnection('default');
-        $store->setLockConnection('locks');
         $store->flush();
 
         $store->put('foo', 'bar', 60);
@@ -347,8 +343,6 @@ class RedisStoreTest extends TestCase
         if (! $store->hasSeparateLockStore()) {
             $this->markTestSkipped('A separate Redis lock connection is required to test flushing locks.');
         }
-        $store->setConnection('default');
-        $store->setLockConnection('locks');
 
         $this->assertTrue($store->hasSeparateLockStore());
     }
