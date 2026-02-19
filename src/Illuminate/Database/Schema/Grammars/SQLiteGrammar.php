@@ -427,6 +427,53 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile a fulltext index command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileFulltext(Blueprint $blueprint, Fluent $command)
+    {
+        $new = join(', ', array_map(fn ($col) => 'new.'.$this->wrap($col), $command->columns));
+        $cols = join(', ', array_map(fn ($col) => $this->wrap($col), $command->columns));
+
+        $ftsTable = $this->wrapTable($blueprint->getTable().'_fts');
+        $table = $this->wrapTable($blueprint->getTable());
+        $prefix = $blueprint->getTable().'_fts';
+
+        return [
+            // Create FTS virtual table
+            sprintf('create virtual table %s using fts5(%s, prefix=3)', $ftsTable, $cols),
+
+            // Insert trigger
+            sprintf(
+                'CREATE TRIGGER %s AFTER INSERT ON %s BEGIN
+                    INSERT INTO %s(rowid, %s) VALUES(%s, %s);
+                END',
+                $this->wrap($prefix.'_insert'), $table, $ftsTable, $cols, 'new.rowid', $new
+            ),
+
+            // Delete trigger
+            sprintf(
+                'CREATE TRIGGER %s AFTER DELETE ON %s BEGIN
+                    INSERT INTO %s(%s, rowid) VALUES(\'delete\', old.rowid);
+                END',
+                $this->wrap($prefix.'_delete'), $table, $ftsTable, $ftsTable
+            ),
+
+            // Update trigger
+            sprintf(
+                'CREATE TRIGGER %s AFTER UPDATE ON %s BEGIN
+                    INSERT INTO %s(%s, rowid) VALUES(\'delete\', old.rowid);
+                    INSERT INTO %s(rowid, %s) VALUES(new.rowid, %s);
+                END',
+                $this->wrap($prefix.'_update'), $table, $ftsTable, $ftsTable, $ftsTable, $cols, $new
+            ),
+        ];
+    }
+
+    /**
      * Compile a spatial index key command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -576,6 +623,26 @@ class SQLiteGrammar extends Grammar
             $schema ? $this->wrapValue($schema).'.' : '',
             $this->wrap($command->index)
         );
+    }
+
+    /**
+     * Compile a drop fulltext index command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileDropFullText(Blueprint $blueprint, Fluent $command)
+    {
+        $tableName = $this->wrapTable($blueprint->getTable().'_fts');
+        $prefix = $blueprint->getTable().'_fts';
+
+        return [
+            sprintf('DROP TRIGGER %s', $this->wrap($prefix.'_insert')),
+            sprintf('DROP TRIGGER %s', $this->wrap($prefix.'_delete')),
+            sprintf('DROP TRIGGER %s', $this->wrap($prefix.'_update')),
+            sprintf('DROP TABLE %s', $tableName),
+        ];
     }
 
     /**

@@ -108,7 +108,11 @@ class Grammar extends BaseGrammar
     {
         $sql = [];
 
-        foreach ($this->selectComponents as $component) {
+        // Reverse so that each component can add parts to earlier
+        // components if necessary. For example, a "where" component can
+        // add a "join" component if it needs to create a where clause
+        // on a joined table.
+        foreach (array_reverse($this->selectComponents) as $component) {
             if (isset($query->$component)) {
                 $method = 'compile'.ucfirst($component);
 
@@ -116,7 +120,8 @@ class Grammar extends BaseGrammar
             }
         }
 
-        return $sql;
+        // Finally, we will reverse the components back to the original order
+        return array_reverse($sql);
     }
 
     /**

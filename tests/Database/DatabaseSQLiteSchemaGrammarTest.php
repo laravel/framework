@@ -247,6 +247,16 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertSame(['create index "foo"."baz" on "users" ("foo", "bar")'], $blueprint->toSql());
     }
 
+    public function testAddingFulltextIndex()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->fulltext('body');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(4, $statements);
+        $this->assertSame('create virtual table "users_fts" using fts5("body", prefix=3)', $statements[0]);
+    }
+
     public function testAddingSpatialIndex()
     {
         $this->expectException(RuntimeException::class);

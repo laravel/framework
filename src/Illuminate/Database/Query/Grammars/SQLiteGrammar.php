@@ -81,6 +81,32 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile a "where fulltext" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    public function whereFullText(Builder $query, $where)
+    {
+        $table = $query->from;
+        $ftsName = $query->from.'_fts';
+        $ftsTable = $this->wrapTable($ftsName);
+        $value = $this->parameter($where['value']);
+
+        $subQuery = $query->getConnection()
+            ->table($ftsName)
+            ->selectRaw('rowid')
+            ->whereRaw("{$ftsTable} MATCH {$value}");
+
+        $query->joinSub($subQuery, $ftsName, function ($join) use ($table, $ftsName) {
+            $join->on("{$table}.rowid", '=', "{$ftsName}.rowid");
+        });
+
+        return '1';
+    }
+
+    /**
      * Convert a LIKE pattern to a GLOB pattern using simple string replacement.
      *
      * @param  string  $value
