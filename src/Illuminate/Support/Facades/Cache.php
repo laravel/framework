@@ -65,6 +65,8 @@ use Mockery;
  * @method static string getPrefix()
  * @method static \Illuminate\Contracts\Cache\Lock lock(string $name, int $seconds = 0, string|null $owner = null)
  * @method static \Illuminate\Contracts\Cache\Lock restoreLock(string $name, string $owner)
+ * @method static bool supportsFlushingLocks()
+ * @method static bool flushLocks()
  *
  * @see \Illuminate\Cache\CacheManager
  * @see \Illuminate\Cache\Repository

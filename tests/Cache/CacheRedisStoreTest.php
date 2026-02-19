@@ -146,6 +146,16 @@ class CacheRedisStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testFlushesCachedLocks()
+    {
+        $redis = $this->getRedis();
+        $redis->getRedis()->shouldReceive('connection')->once()->with('locks')->andReturn($redis->getRedis());
+        $redis->getRedis()->shouldReceive('flushdb')->once()->andReturn('ok');
+        $redis->setLockConnection('locks');
+        $result = $redis->flushLocks();
+        $this->assertTrue($result);
+    }
+
     public function testGetAndSetPrefix()
     {
         $redis = $this->getRedis();

@@ -2,11 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Cache\DatabaseStore;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Orchestra\Testbench\Attributes\WithMigration;
+use RuntimeException;
 
 #[WithMigration('cache')]
 class DatabaseCacheStoreTest extends DatabaseTestCase
@@ -250,6 +252,82 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
         app('config')->set('database', $originalConfiguration);
     }
 
+    public function testLocksCanBeFlushed()
+    {
+        $store = $this->getStore();
+
+        $store->lock('lock-1', 60)->acquire();
+        $store->lock('lock-2', 60)->acquire();
+        $store->lock('lock-3', 60)->acquire();
+
+        $this->assertTrue($store->flushLocks());
+
+        $this->assertTrue($store->lock('lock-1', 60)->acquire());
+        $this->assertTrue($store->lock('lock-2', 60)->acquire());
+        $this->assertTrue($store->lock('lock-3', 60)->acquire());
+    }
+
+    public function testFlushLocksDoesNotAffectCacheEntries()
+    {
+        $store = $this->getStore();
+
+        $store->put('foo', 'bar', 60);
+        $store->lock('lock-1', 60)->acquire();
+
+        $store->flushLocks();
+
+        $this->assertSame('bar', $store->get('foo'));
+        $this->assertDatabaseHas($this->getCacheTableName(), ['key' => $this->withCachePrefix('foo')]);
+    }
+
+    public function testFlushLocksRemovesExpiredLocksToo()
+    {
+        $store = $this->getStore();
+
+        $this->insertToLocksTable('stale-lock', 'owner', 0);
+        $store->lock('active-lock', 60)->acquire();
+
+        $store->flushLocks();
+
+        $this->assertTrue($store->lock('active-lock', 60)->acquire());
+        $this->assertDatabaseMissing($this->getLocksTableName(), ['key' => $this->withCachePrefix('stale-lock')]);
+    }
+
+    public function testHasSeparateLockStoreReturnsTrueWhenTablesAreDifferent()
+    {
+        $store = new DatabaseStore(
+            connection: DB::connection(),
+            table: $this->getCacheTableName(),
+            lockTable: $this->getLocksTableName(),
+        );
+
+        $this->assertTrue($store->hasSeparateLockStore());
+    }
+
+    public function testHasSeparateLockStoreReturnsFalseWhenTablesAreTheSame()
+    {
+        $store = new DatabaseStore(
+            connection: DB::connection(),
+            table: $this->getCacheTableName(),
+            lockTable: $this->getCacheTableName(),
+        );
+
+        $this->assertFalse($store->hasSeparateLockStore());
+    }
+
+    public function testFlushLocksThrowsExceptionWhenTablesAreTheSame()
+    {
+        $store = new DatabaseStore(
+            connection: DB::connection(),
+            table: $this->getCacheTableName(),
+            lockTable: $this->getCacheTableName(),
+        );
+
+        $this->expectException(RuntimeException::class);
+
+        $store->flushLocks();
+    }
+
     /**
      * @return \Illuminate\Cache\DatabaseStore
      */
@@ -261,6 +339,11 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
     protected function getCacheTableName()
     {
         return config('cache.stores.database.table');
+    }
+
+    protected function getLocksTableName()
+    {
+        return config('cache.stores.database.lock_table') ?: 'cache_locks';
     }
 
     protected function withCachePrefix(string $key)
@@ -275,6 +358,18 @@ class DatabaseCacheStoreTest extends DatabaseTestCase
                 [
                     'key' => $this->withCachePrefix($key),
                     'value' => serialize($value),
+                    'expiration' => Carbon::now()->addSeconds($ttl)->getTimestamp(),
+                ]
+            );
+    }
+
+    protected function insertToLocksTable(string $key, string $owner, $ttl = 60)
+    {
+        DB::table($this->getLocksTableName())
+            ->insert(
+                [
+                    'key' => $this->withCachePrefix($key),
+                    'owner' => $owner,
                     'expiration' => Carbon::now()->addSeconds($ttl)->getTimestamp(),
                 ]
             );

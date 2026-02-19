@@ -192,6 +192,18 @@ class CacheArrayStoreTest extends TestCase
         $this->assertNull($store->get('baz'));
     }
 
+    public function testLocksCanBeFlushed()
+    {
+        $store = new ArrayStore;
+        $store->lock('foo', 10);
+        $store->lock('bar', 10);
+        $result = $store->flushLocks();
+        $this->assertTrue($result);
+        $this->assertNull($store->get('foo'));
+        $this->assertNull($store->get('bar'));
+        $this->assertEmpty($store->locks);
+    }
+
     public function testCacheKey()
     {
         $store = new ArrayStore;
