@@ -57,9 +57,9 @@ class ArrayType extends Type
     /**
      * Indicate that array items must be unique.
      */
-    public function uniqueItems(bool $uniqueItems = true): static
+    public function unique(bool $unique = true): static
     {
-        if ($uniqueItems) {
+        if ($unique) {
             $this->uniqueItems = true;
         }
 
