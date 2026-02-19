@@ -10,6 +10,7 @@ use Illuminate\Contracts\Filesystem\LockTimeoutException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\LockableFile;
 use Illuminate\Support\InteractsWithTime;
+use RuntimeException;
 
 class FileStore implements FlushableLock, LockProvider, Store
 {
@@ -302,9 +303,15 @@ class FileStore implements FlushableLock, LockProvider, Store
      * Remove all locks from the store.
      *
      * @return bool
+     *
+     * @throws \RuntimeException
      */
     public function flushLocks(): bool
     {
+        if (! $this->hasSeparateLockStore()) {
+            throw new RuntimeException('Flushing locks is only supported when the lock store is separate from the cache store.');
+        }
+
         if (! $this->files->isDirectory($this->lockDirectory)) {
             return false;
         }
@@ -458,5 +465,15 @@ class FileStore implements FlushableLock, LockProvider, Store
     public function getPrefix()
     {
         return '';
+    }
+
+    /**
+     * Determine if the lock store is separate from the cache store.
+     *
+     * @return bool
+     */
+    public function hasSeparateLockStore(): bool
+    {
+        return $this->lockDirectory !== null && $this->lockDirectory !== $this->directory;
     }
 }
