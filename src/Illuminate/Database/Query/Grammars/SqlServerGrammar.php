@@ -192,7 +192,7 @@ class SqlServerGrammar extends Grammar
         }
 
         return $sql;
-   }
+    }
 
     /**
      * Compile a "JSON contains" statement into SQL.
