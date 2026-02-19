@@ -307,20 +307,19 @@ class SqlServerGrammar extends Grammar
     public function compileFulltext(Blueprint $blueprint, Fluent $command)
     {
         $table = $blueprint->getTable();
-        $columns = $this->columnize($command->columns);
-        $catalog = $this->wrap($command->catalog ?: 'ft_'.$table);
-        $keyIndex = $this->wrap($command->pkindex ?: 'PK_'.$table.'_id');
 
         if (str_contains($table, '.')) {
             $table = current(array_reverse(explode('.', $table)));
         }
 
+        $catalog = $this->wrap('ft_'.$table);
+
         return [
             sprintf('create fulltext catalog %s', $catalog),
             sprintf('create fulltext index on %s (%s) key index %s on %s with (change_tracking = auto)',
                 $this->wrapTable($blueprint),
-                $columns,
-                $keyIndex,
+                $this->columnize($command->columns),
+                $this->wrap($table.'_id_primary'),
                 $catalog
             ),
         ];
