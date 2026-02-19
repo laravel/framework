@@ -98,5 +98,4 @@ class ChainedBatch implements ShouldQueue
 
         return $batch;
     }
-
 }
