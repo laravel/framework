@@ -55,7 +55,7 @@ class ArrayType extends Type
     }
 
     /**
-     * Indicate that array items must be unique.
+     * Indicate that the array items must be unique.
      */
     public function unique(bool $unique = true): static
     {
