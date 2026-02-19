@@ -15,10 +15,11 @@ class FulltextTest extends SqlServerTestCase
     protected function afterRefreshingDatabase()
     {
         Schema::create('articles', function (Blueprint $table) {
-            $table->id('id');
+            $table->id('id')->primary('id', 'pk_articles_id');
             $table->string('title', 200);
             $table->text('body');
-            $table->fulltext(['title', 'body']);
+            $table->fulltext(['title', 'body'], ['index' => 'pk_articles_id']
+            );
         });
     }
 
