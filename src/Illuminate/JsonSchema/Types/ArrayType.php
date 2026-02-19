@@ -20,6 +20,11 @@ class ArrayType extends Type
     protected ?Type $items = null;
 
     /**
+     * Whether the array items must be unique.
+     */
+    protected ?bool $uniqueItems = null;
+
+    /**
      * Set the minimum number of items (inclusive).
      */
     public function min(int $value): static
@@ -45,6 +50,18 @@ class ArrayType extends Type
     public function items(Type $type): static
     {
         $this->items = $type;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that array items must be unique.
+     */
+    public function uniqueItems(bool $uniqueItems = true): static
+    {
+        if ($uniqueItems) {
+            $this->uniqueItems = true;
+        }
 
         return $this;
     }
