@@ -316,7 +316,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
         $this->assertCount(2, $statements);
         $this->assertSame('create fulltext catalog "ft_users"', $statements[0]);
-        $this->assertSame('create fulltext index on "users" ("body") key index "PK_users" on "ft_users" with (change_tracking = auto)', $statements[1]);
+        $this->assertSame('create fulltext index on "users" ("body") key index "users_id_primary" on "ft_users" with (change_tracking = auto)', $statements[1]);
     }
 
     public function testAddingSpatialIndex()
