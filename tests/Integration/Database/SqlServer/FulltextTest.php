@@ -14,6 +14,7 @@ class FulltextTest extends SqlServerTestCase
 {
     protected function afterRefreshingDatabase()
     {
+        /* Available SQL Server images do not support full-text search
         Schema::create('articles', function (Blueprint $table) {
             $table->id('id');
             $table->string('title', 200);
@@ -21,15 +22,18 @@ class FulltextTest extends SqlServerTestCase
             $table->primary('id', 'pk_articles_id');
             $table->fulltext(['title', 'body'])->pkindex('pk_articles_id');
         });
+        */
     }
 
     protected function destroyDatabaseMigrations()
     {
-        Schema::drop('articles');
+        // Schema::drop('articles');
     }
 
     protected function setUp(): void
     {
+        $this->markTestSkipped( 'Available SQL Server images do not support full-text search.' );
+
         parent::setUp();
 
         DB::table('articles')->insert([

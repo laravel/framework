@@ -306,8 +306,6 @@ jobs:
           SA_PASSWORD: Forge123
         ports:
           - 1433:1433
-        options: >-
-          --name sql1
 
     strategy:
       fail-fast: true
@@ -315,17 +313,6 @@ jobs:
     name: SQL Server 2019
 
     steps:
-      - name: Install Full-Text Search
-        run: |
-          docker exec sql1 bash -c "
-            apt-get update &&
-            apt-get install -y mssql-server-fts &&
-            /opt/mssql/bin/mssql-conf set sqlagent.enabled true
-          "
-
-      - name: Restart SQL Server
-        run: docker restart sql1
-
       - name: Checkout code
         uses: actions/checkout@v6
 
@@ -370,8 +357,6 @@ jobs:
           SA_PASSWORD: Forge123
         ports:
           - 1433:1433
-        options: >-
-          --name sql1
 
     strategy:
       fail-fast: true
@@ -379,17 +364,6 @@ jobs:
     name: SQL Server 2017
 
     steps:
-      - name: Install Full-Text Search
-        run: |
-          docker exec sql1 bash -c "
-            apt-get update &&
-            apt-get install -y mssql-server-fts &&
-            /opt/mssql/bin/mssql-conf set sqlagent.enabled true
-          "
-
-      - name: Restart SQL Server
-        run: docker restart sql1
-
       - name: Checkout code
         uses: actions/checkout@v6
 
