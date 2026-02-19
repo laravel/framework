@@ -308,6 +308,17 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame('create index "baz" on "users" ("foo", "bar") with (online = on)', $statements[0]);
     }
 
+    public function testAddingFulltextIndex()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->fulltext('body');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('create fulltext catalog "ft_users"', $statements[0]);
+        $this->assertSame('create fulltext index on "users" ("body") key index "PK_users" on "ft_users" with (change_tracking = auto)', $statements[1]);
+    }
+
     public function testAddingSpatialIndex()
     {
         $blueprint = new Blueprint($this->getConnection(), 'geo');

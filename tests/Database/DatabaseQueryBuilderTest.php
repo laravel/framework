@@ -1587,6 +1587,19 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['Air | Plan:* -Car'], $builder->getBindings());
     }
 
+    public function testWhereFulltextSqlserver()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereFullText('body', 'Hello World');
+        $this->assertSame('select * from [users] where contains (([body]), ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereFullText('body', 'Hello World', ['expanded' => true]);
+        $this->assertSame('select * from [users] where freetext (([body]), ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+    }
+
     public function testWhereAll()
     {
         $builder = $this->getBuilder();

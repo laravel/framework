@@ -174,6 +174,27 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a "where fulltext" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    public function whereFullText(Builder $query, $where)
+    {
+        $columns = $this->columnize($where['columns']);
+        $value = $this->parameter($where['value']);
+
+        if ($where['options']['expanded'] ?? false) {
+            $sql = "freetext (($columns), {$value})";
+        } else {
+            $sql = "contains (($columns), {$value})";
+        }
+
+        return $sql;
+   }
+
+    /**
      * Compile a "JSON contains" statement into SQL.
      *
      * @param  string  $column

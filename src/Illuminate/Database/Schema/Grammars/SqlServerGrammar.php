@@ -298,6 +298,35 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a fulltext index command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string[]
+     */
+    public function compileFulltext(Blueprint $blueprint, Fluent $command)
+    {
+        $table = $blueprint->getTable();
+        $columns = $this->columnize($command->columns);
+        $catalog = $this->wrap($command->catalog ?: 'ft_'.$table);
+        $keyIndex = $this->wrap($command->index ?: 'PK_'.$table.'_id');
+
+        if (str_contains($table, '.')) {
+            $table = current(array_reverse(explode('.', $table)));
+        }
+
+        return [
+            sprintf("create fulltext catalog %s", $catalog),
+            sprintf("create fulltext index on %s (%s) key index %s on %s with (change_tracking = auto)",
+                $this->wrapTable($blueprint),
+                $columns,
+                $keyIndex,
+                $catalog
+            )
+        ];
+    }
+
+    /**
      * Compile a spatial index key command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -449,6 +478,23 @@ class SqlServerGrammar extends Grammar
         $index = $this->wrap($command->index);
 
         return "drop index {$index} on {$this->wrapTable($blueprint)}";
+    }
+
+    /**
+     * Compile a drop fulltext index command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string[]
+     */
+    public function compileDropFullText(Blueprint $blueprint, Fluent $command)
+    {
+        $catalog = $this->wrap($command->catalog ?: 'ft_'.$blueprint->getTable());
+
+        return [
+            sprintf('drop fulltext index on %s', $this->wrapTable($blueprint)),
+            sprintf('drop fulltext catalog %s', $catalog)
+        ];
     }
 
     /**
