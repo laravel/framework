@@ -266,7 +266,7 @@ class MaintenanceModeTest extends TestCase
         $this->assertSame(60, $data['retry']);
 
         $this->artisan(DownCommand::class, ['--retry' => 120])
-            ->expectsOutputToContain('Maintenance mode refreshed.');
+            ->expectsOutputToContain('Maintenance mode options updated.');
 
         $data = json_decode(file_get_contents(storage_path('framework/down')), true);
         $this->assertSame(120, $data['retry']);
