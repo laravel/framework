@@ -313,13 +313,14 @@ class SqlServerGrammar extends Grammar
         }
 
         $catalog = $this->wrap('ft_'.$table);
+        $pkindex = $this->wrap($command->pkindex ?: $table.'_id_primary');
 
         return [
             sprintf('create fulltext catalog %s', $catalog),
             sprintf('create fulltext index on %s (%s) key index %s on %s with (change_tracking = auto)',
                 $this->wrapTable($blueprint),
                 $this->columnize($command->columns),
-                $this->wrap($table.'_id_primary'),
+                $pkindex,
                 $catalog
             ),
         ];
