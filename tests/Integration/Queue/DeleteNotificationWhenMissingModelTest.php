@@ -25,7 +25,7 @@ class DeleteNotificationWhenMissingModelTest extends QueueTestCase
         $this->driver = 'database';
     }
 
-    protected function defineDatabaseMigrations()
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
         Schema::create('delete_notification_test_models', function (Blueprint $table) {
             $table->id();
