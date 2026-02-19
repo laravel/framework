@@ -303,6 +303,8 @@ class RedisStoreTest extends TestCase
     {
         /** @var \Illuminate\Cache\RedisStore $store */
         $store = Cache::store('redis');
+        $store->setConnection('default');
+        $store->setLockConnection('locks');
         $store->flush();
 
         $store->lock('lock-1', 60)->acquire();
