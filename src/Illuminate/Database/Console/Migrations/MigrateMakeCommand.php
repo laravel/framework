@@ -21,7 +21,8 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         {--table= : The table to migrate}
         {--path= : The location where the migration file should be created}
         {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
-        {--fullpath : Output the full path of the migration (Deprecated)}';
+        {--fullpath : Output the full path of the migration (Deprecated)}
+        {--database= : The database connection to use}';
 
     /**
      * The console command description.
@@ -95,7 +96,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         // Now we are ready to write the migration out to disk. Once we've written
         // the migration out, we will dump-autoload for the entire framework to
         // make sure that the migrations are registered by the class loaders.
-        $this->writeMigration($name, $table, $create);
+        $this->writeMigration($name, $table, $create, $this->getConnectionForMigration());
     }
 
     /**
@@ -106,10 +107,10 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
      * @param  bool  $create
      * @return void
      */
-    protected function writeMigration($name, $table, $create)
+    protected function writeMigration($name, $table, $create, $connection = null)
     {
         $file = $this->creator->create(
-            $name, $this->getMigrationPath(), $table, $create
+            $name, $this->getMigrationPath(), $table, $create, $connection
         );
 
         if (windows_os()) {
@@ -117,6 +118,27 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         }
 
         $this->components->info(sprintf('Migration [%s] created successfully.', $file));
+    }
+
+    /**
+     * Get the database connection name to inject into the migration, if applicable.
+     *
+     * Returns the connection name only when it differs from the default connection,
+     * so the $connection property is only added to migrations that need it.
+     *
+     * @return string|null
+     */
+    protected function getConnectionForMigration()
+    {
+        $database = $this->input->getOption('database');
+
+        if (! $database || ! $this->laravel->bound('config')) {
+            return null;
+        }
+
+        $default = $this->laravel['config']->get('database.default');
+
+        return $database !== $default ? $database : null;
     }
 
     /**
@@ -130,6 +152,18 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
             return ! $this->usingRealPath()
                 ? $this->laravel->basePath().'/'.$targetPath
                 : $targetPath;
+        }
+
+        $database = $this->input->getOption('database');
+
+        if ($database && $this->laravel->bound('config')) {
+            $connectionPath = $this->laravel['config']->get(
+                "database.connections.{$database}.migrations"
+            );
+
+            if (is_string($connectionPath)) {
+                return $this->laravel->basePath().'/'.$connectionPath;
+            }
         }
 
         return parent::getMigrationPath();

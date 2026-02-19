@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+{{ connection }}
     /**
      * Run the migrations.
      */

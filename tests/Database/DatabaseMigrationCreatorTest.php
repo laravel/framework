@@ -93,6 +93,40 @@ class DatabaseMigrationCreatorTest extends TestCase
         $creator->create('migration_creator_fake_migration', 'foo');
     }
 
+    public function testConnectionPropertyIsInjectedIntoStub()
+    {
+        $creator = $this->getCreator();
+        $creator->expects($this->any())->method('getDatePrefix')->willReturn('foo');
+        $creator->getFilesystem()->shouldReceive('exists')->once()->with('stubs/migration.stub')->andReturn(false);
+        $creator->getFilesystem()->shouldReceive('get')->once()->with($creator->stubPath().'/migration.stub')->andReturn('return new class extends Migration
+{
+{{ connection }}
+    public function up(): void {}
+};');
+        $creator->getFilesystem()->shouldReceive('ensureDirectoryExists')->once()->with('foo');
+        $creator->getFilesystem()->shouldReceive('put')->once()->with('foo/foo_create_bar.php', "return new class extends Migration\n{\n    protected \$connection = 'crm';\n\n    public function up(): void {}\n};");
+        $creator->getFilesystem()->shouldReceive('glob')->once()->with('foo/*.php')->andReturn([]);
+
+        $creator->create('create_bar', 'foo', null, false, 'crm');
+    }
+
+    public function testNoConnectionPropertyWhenConnectionIsNull()
+    {
+        $creator = $this->getCreator();
+        $creator->expects($this->any())->method('getDatePrefix')->willReturn('foo');
+        $creator->getFilesystem()->shouldReceive('exists')->once()->with('stubs/migration.stub')->andReturn(false);
+        $creator->getFilesystem()->shouldReceive('get')->once()->with($creator->stubPath().'/migration.stub')->andReturn('return new class extends Migration
+{
+{{ connection }}
+    public function up(): void {}
+};');
+        $creator->getFilesystem()->shouldReceive('ensureDirectoryExists')->once()->with('foo');
+        $creator->getFilesystem()->shouldReceive('put')->once()->with('foo/foo_create_bar.php', "return new class extends Migration\n{\n\n    public function up(): void {}\n};");
+        $creator->getFilesystem()->shouldReceive('glob')->once()->with('foo/*.php')->andReturn([]);
+
+        $creator->create('create_bar', 'foo', null, false, null);
+    }
+
     protected function getCreator()
     {
         $files = m::mock(Filesystem::class);
