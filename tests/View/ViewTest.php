@@ -99,6 +99,32 @@ class ViewTest extends TestCase
         $this->assertSame('contents', (string) $view);
     }
 
+    public function testToTextTrimsTrailingNewlines()
+    {
+        $view = $this->getView(['foo' => 'bar']);
+        $view->getFactory()->shouldReceive('incrementRender')->once()->ordered();
+        $view->getFactory()->shouldReceive('callComposer')->once()->ordered()->with($view);
+        $view->getFactory()->shouldReceive('getShared')->once()->andReturn(['shared' => 'foo']);
+        $view->getEngine()->shouldReceive('get')->once()->with('path', ['foo' => 'bar', 'shared' => 'foo'])->andReturn("contents\n");
+        $view->getFactory()->shouldReceive('decrementRender')->once()->ordered();
+        $view->getFactory()->shouldReceive('flushStateIfDoneRendering')->once();
+
+        $this->assertSame('contents', $view->toText());
+    }
+
+    public function testToTextPreservesInternalNewlines()
+    {
+        $view = $this->getView();
+        $view->getFactory()->shouldReceive('incrementRender')->once()->ordered();
+        $view->getFactory()->shouldReceive('callComposer')->once()->ordered()->with($view);
+        $view->getFactory()->shouldReceive('getShared')->once()->andReturn(['shared' => 'foo']);
+        $view->getEngine()->shouldReceive('get')->once()->andReturn("line1\nline2\n\n\n");
+        $view->getFactory()->shouldReceive('decrementRender')->once()->ordered();
+        $view->getFactory()->shouldReceive('flushStateIfDoneRendering')->once();
+
+        $this->assertSame("line1\nline2", $view->toText());
+    }
+
     public function testViewNestBindsASubView()
     {
         $view = $this->getView();

@@ -494,6 +494,16 @@ class View implements ArrayAccess, Htmlable, Stringable, ViewContract
     }
 
     /**
+     * Get the string contents of the view with trailing newlines trimmed.
+     *
+     * @return string
+     */
+    public function toText()
+    {
+        return rtrim($this->render(), PHP_EOL);
+    }
+
+    /**
      * Get the string contents of the view.
      *
      * @return string
