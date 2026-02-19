@@ -15,6 +15,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class DatabaseStore implements FlushableLock, LockProvider, Store
 {
@@ -445,9 +446,15 @@ class DatabaseStore implements FlushableLock, LockProvider, Store
      * Remove all locks from the store.
      *
      * @return bool
+     *
+     * @throws \RuntimeException
      */
     public function flushLocks(): bool
     {
+        if (! $this->hasSeparateLockStore()) {
+            throw new RuntimeException('Flushing locks is only supported when the lock store is separate from the cache store.');
+        }
+
         $this->lockTable()->delete();
 
         return true;
@@ -574,5 +581,15 @@ class DatabaseStore implements FlushableLock, LockProvider, Store
         }
 
         return unserialize($value);
+    }
+
+    /**
+     * Determine if the lock store is separate from the cache store.
+     *
+     * @return bool
+     */
+    public function hasSeparateLockStore(): bool
+    {
+        return $this->lockTable !== $this->table;
     }
 }
