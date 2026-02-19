@@ -334,11 +334,14 @@ jobs:
           max_attempts: 5
           command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
+      - name: Create test database
+        run: /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Forge123 -Q "CREATE DATABASE testdb;"
+
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Database
         env:
           DB_CONNECTION: sqlsrv
-          DB_DATABASE: master
+          DB_DATABASE: testdb
           DB_USERNAME: SA
           DB_PASSWORD: Forge123
 
@@ -382,11 +385,14 @@ jobs:
           max_attempts: 5
           command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
+      - name: Create test database
+        run: /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Forge123 -Q "CREATE DATABASE testdb;"
+
       - name: Execute tests
         run: vendor/bin/phpunit tests/Integration/Database
         env:
           DB_CONNECTION: sqlsrv
-          DB_DATABASE: master
+          DB_DATABASE: testdb
           DB_USERNAME: SA
           DB_PASSWORD: Forge123
 
