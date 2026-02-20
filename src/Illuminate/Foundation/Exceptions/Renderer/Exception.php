@@ -118,8 +118,17 @@ class Exception
                 return (string) realpath($path);
             }, array_values(ClassLoader::getRegisteredLoaders())[0]->getClassMap());
 
+            $trace = $this->exception->getTrace();
+
+            if (count($trace) > 1 && empty($trace[0]['class']) && empty($trace[0]['function'])) {
+                $trace[0]['class'] = $trace[1]['class'] ?? '';
+                $trace[0]['type'] = $trace[1]['type'] ?? '';
+                $trace[0]['function'] = $trace[1]['function'] ?? '';
+                $trace[0]['args'] = $trace[1]['args'] ?? [];
+            }
+
             $trace = array_values(array_filter(
-                $this->exception->getTrace(), fn ($trace) => isset($trace['file']),
+                $trace, fn ($trace) => isset($trace['file']),
             ));
 
             if (($trace[1]['class'] ?? '') === HandleExceptions::class) {

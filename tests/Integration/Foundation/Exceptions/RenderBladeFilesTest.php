@@ -27,9 +27,14 @@ class RenderBladeFilesTest extends TestCase
                 return null;
             }
 
-            public function previous()
+            public function operator()
             {
-                return null;
+                return '';
+            }
+
+            public function callable()
+            {
+                return 'throw';
             }
 
             public function source()

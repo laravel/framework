@@ -317,16 +317,37 @@ class DatabaseConnectionTest extends TestCase
         $this->assertEquals($mock, $result);
     }
 
+    public function testTransactionRetriesOnCommitDeadlockWhenPDOHasActiveTransaction()
+    {
+        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['inTransaction', 'beginTransaction', 'commit', 'rollBack'])->getMock();
+        $mock = $this->getMockConnection([], $pdo);
+
+        $pdo->expects($this->exactly(2))->method('beginTransaction');
+        $pdo->expects($this->exactly(2))->method('commit')->willReturnOnConsecutiveCalls(
+            $this->throwException(new DatabaseConnectionTestMockPDOException('Serialization failure', '40001')),
+            true,
+        );
+        $pdo->method('inTransaction')->willReturn(true);
+        $pdo->expects($this->once())->method('rollBack');
+
+        $result = $mock->transaction(function () {
+            return 'success';
+        }, 2);
+
+        $this->assertSame('success', $result);
+    }
+
     public function testTransactionRetriesOnSerializationFailure()
     {
         $this->expectException(PDOException::class);
         $this->expectExceptionMessage('Serialization failure');
 
-        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['beginTransaction', 'commit', 'rollBack'])->getMock();
+        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['inTransaction', 'beginTransaction', 'commit', 'rollBack'])->getMock();
         $mock = $this->getMockConnection([], $pdo);
         $pdo->expects($this->exactly(3))->method('commit')->will($this->throwException(new DatabaseConnectionTestMockPDOException('Serialization failure', '40001')));
         $pdo->expects($this->exactly(3))->method('beginTransaction');
-        $pdo->expects($this->never())->method('rollBack');
+        $pdo->method('inTransaction')->willReturn(true);
+        $pdo->expects($this->exactly(2))->method('rollBack');
         $mock->transaction(function () {
         }, 3);
     }

@@ -717,6 +717,36 @@ class EventsDispatcherTest extends TestCase
 
         unset($_SERVER['__event.test']);
     }
+
+    public function testEventDispatchesUsingNamedArguments()
+    {
+        $container = new Container;
+        $events = m::mock(Dispatcher::class);
+        $container->instance('events', $events);
+
+        $originalContainer = Container::getInstance();
+        Container::setInstance($container);
+
+        try {
+            $events->shouldReceive('dispatch')
+                ->once()
+                ->with(m::on(function ($event) {
+                    $this->assertInstanceOf(DispatchableNamedArgumentsEvent::class, $event);
+                    $this->assertSame('first-value', $event->first);
+                    $this->assertSame('second-value', $event->second);
+
+                    return true;
+                }))
+                ->andReturn(['dispatched']);
+
+            $this->assertSame(
+                ['dispatched'],
+                DispatchableNamedArgumentsEvent::dispatch(second: 'second-value', first: 'first-value')
+            );
+        } finally {
+            Container::setInstance($originalContainer);
+        }
+    }
 }
 
 class TestListenerLean
@@ -867,4 +897,15 @@ class DeferTestEvent
 
 class ImmediateTestEvent
 {
+}
+
+class DispatchableNamedArgumentsEvent
+{
+    use \Illuminate\Foundation\Events\Dispatchable;
+
+    public function __construct(
+        public string $first,
+        public string $second,
+    ) {
+    }
 }

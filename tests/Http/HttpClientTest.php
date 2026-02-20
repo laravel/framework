@@ -7,8 +7,10 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException as GuzzleRequestException;
 use GuzzleHttp\Exception\TooManyRedirectsException;
 use GuzzleHttp\Middleware;
+use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Promise\RejectedPromise;
+use GuzzleHttp\Psr7\NoSeekStream;
 use GuzzleHttp\Psr7\Request as GuzzleRequest;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use GuzzleHttp\Psr7\Utils;
@@ -42,6 +44,7 @@ use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -1513,6 +1516,43 @@ class HttpClientTest extends TestCase
         $exception->report();
 
         $this->assertEquals(1, substr_count($exception->getMessage(), '{"error":{"code":403,"message":"The Request can not be completed"}}'));
+    }
+
+    #[TestWith([false])]
+    #[TestWith([120])]
+    public function testStreamingResponseExceptionMessageIsNotSummarizedWhenBodyIsNotSeekable(int|false $truncateAt)
+    {
+        RequestException::$truncateAt = $truncateAt;
+
+        $this->factory->fake([
+            '*' => Create::promiseFor(
+                new Psr7Response(
+                    400,
+                    ['Content-Type' => 'application/json'],
+                    new NoSeekStream(Utils::streamFor(json_encode(['hello' => 'world'])))
+                )
+            ),
+        ]);
+
+        $throwCallbackCalled = false;
+
+        try {
+            $this->factory
+                ->withOptions(['stream' => true])
+                ->throw(function (Response $response, RequestException $exception) use (&$throwCallbackCalled) {
+                    $throwCallbackCalled = true;
+
+                    $this->assertNotNull($response->json());
+                    $this->assertSame('HTTP request returned status code 400', $exception->getMessage());
+                })
+                ->get('http://example.com');
+
+            $this->fail('RequestException was not thrown.');
+        } catch (RequestException $exception) {
+            $this->assertSame('HTTP request returned status code 400', $exception->getMessage());
+        }
+
+        $this->assertTrue($throwCallbackCalled);
     }
 
     public function testOnErrorDoesntCallClosureOnInformational()
@@ -3751,7 +3791,7 @@ class HttpClientTest extends TestCase
                     $onStatsFunctionCalled = true;
                 },
             ])
-            ->get('https://example.com')
+            ->get('http://example.com')
             ->handlerStats();
 
         $this->assertIsArray($stats);

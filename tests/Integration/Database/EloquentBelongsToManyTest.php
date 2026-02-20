@@ -243,8 +243,13 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         foreach ($post->tagsWithCustomExtraPivot as $tag) {
             $this->assertSame('exclude', $tag->pivot->flag);
 
-            $this->assertSame('2017-10-10 10:10:10', $tag->pivot->getAttributes()['created_at']);
-            $this->assertSame('2017-10-10 10:10:20', $tag->pivot->getAttributes()['updated_at']); // +10 seconds
+            if ($this->driver === 'sqlsrv') {
+                $this->assertSame('2017-10-10 10:10:10.000', $tag->pivot->getAttributes()['created_at']);
+                $this->assertSame('2017-10-10 10:10:20.000', $tag->pivot->getAttributes()['updated_at']); // +10 seconds
+            } else {
+                $this->assertSame('2017-10-10 10:10:10', $tag->pivot->getAttributes()['created_at']);
+                $this->assertSame('2017-10-10 10:10:20', $tag->pivot->getAttributes()['updated_at']); // +10 seconds
+            }
         }
     }
 

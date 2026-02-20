@@ -26,7 +26,7 @@ class NotIn implements Stringable
     /**
      * Create a new "not in" rule instance.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string  $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|\UnitEnum|array|string  $values
      */
     public function __construct($values)
     {
