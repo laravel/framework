@@ -245,6 +245,65 @@ class ThrottleRequestsTest extends TestCase
         $response->assertOk();
     }
 
+    public function testItCanThrottleUsingTokenBucket()
+    {
+        $rateLimiter = Container::getInstance()->make(RateLimiter::class);
+        $rateLimiter->for('token-bucket', fn () => Limit::tokenBucket(3, 1));
+        Route::get('/token-bucket', fn () => 'ok')->middleware(ThrottleRequests::using('token-bucket'));
+
+        Carbon::setTestNow('2000-01-01 00:00:00.000');
+
+        for ($i = 0; $i < 3; $i++) {
+            $response = $this->get('/token-bucket');
+            $response->assertOk();
+            $response->assertHeader('X-RateLimit-Limit', 3);
+            $response->assertHeader('X-RateLimit-Remaining', 2 - $i);
+        }
+
+        $response = $this->get('/token-bucket');
+        $response->assertStatus(429);
+        $response->assertHeader('Retry-After', 1);
+        $response->assertHeader('X-RateLimit-Reset', now()->addSecond()->timestamp);
+        $response->assertHeader('X-RateLimit-Limit', 3);
+        $response->assertHeader('X-RateLimit-Remaining', 0);
+
+        Carbon::setTestNow(now()->addSecond());
+
+        $response = $this->get('/token-bucket');
+        $response->assertOk();
+        $response->assertHeader('X-RateLimit-Limit', 3);
+        $response->assertHeader('X-RateLimit-Remaining', 0);
+    }
+
+    public function testItCanThrottleUsingTokenBucketWithDynamicCost()
+    {
+        $rateLimiter = Container::getInstance()->make(RateLimiter::class);
+        $rateLimiter->for('token-bucket-cost', fn (Request $request) => Limit::tokenBucket(4, 1)
+            ->by('shared')
+            ->cost(fn (Request $request) => $request->is('expensive') ? 3 : 1));
+
+        Route::get('/cheap', fn () => 'ok')->middleware(ThrottleRequests::using('token-bucket-cost'));
+        Route::get('/expensive', fn () => 'ok')->middleware(ThrottleRequests::using('token-bucket-cost'));
+
+        Carbon::setTestNow('2000-01-01 00:00:00.000');
+
+        $response = $this->get('/cheap');
+        $response->assertOk();
+        $response->assertHeader('X-RateLimit-Limit', 4);
+        $response->assertHeader('X-RateLimit-Remaining', 3);
+
+        $response = $this->get('/expensive');
+        $response->assertOk();
+        $response->assertHeader('X-RateLimit-Limit', 4);
+        $response->assertHeader('X-RateLimit-Remaining', 0);
+
+        $response = $this->get('/cheap');
+        $response->assertStatus(429);
+        $response->assertHeader('Retry-After', 1);
+        $response->assertHeader('X-RateLimit-Limit', 4);
+        $response->assertHeader('X-RateLimit-Remaining', 0);
+    }
+
     public function testItCanCombineRateLimitsWithoutSpecifyingUniqueKeys()
     {
         $rateLimiter = Container::getInstance()->make(RateLimiter::class);

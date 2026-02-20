@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\RateLimiting\GlobalLimit;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Cache\RateLimiting\TokenBucketLimit;
 use PHPUnit\Framework\TestCase;
 
 class LimitTest extends TestCase
@@ -53,5 +54,16 @@ class LimitTest extends TestCase
         $limit = new GlobalLimit(3);
         $this->assertSame(60, $limit->decaySeconds);
         $this->assertSame(3, $limit->maxAttempts);
+
+        $limit = Limit::tokenBucket(10, 2);
+        $this->assertInstanceOf(TokenBucketLimit::class, $limit);
+        $this->assertTrue($limit->usesTokenBucket);
+        $this->assertSame(10, $limit->capacity);
+        $this->assertSame(2, $limit->refillPerSecond);
+        $this->assertSame(10, $limit->maxAttempts);
+        $this->assertSame(1, $limit->decaySeconds);
+
+        $limit->cost(2);
+        $this->assertSame(2, $limit->cost);
     }
 }
