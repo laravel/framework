@@ -449,6 +449,35 @@ class ModelSerializationTest extends TestCase
 
         $this->assertTrue($unserialized->user->is($user));
     }
+
+    #[WithConfig('database.default', 'testing')]
+    public function test_it_users_morphmap_for_serialization_of_collection()
+    {
+        Relation::morphMap([
+            'user' => User::class,
+        ]);
+
+        ModelIdentifier::useMorphMap();
+
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $serialized = serialize(new CollectionSerializationTestClass(
+            new Collection([$user]),
+        ));
+
+        $this->assertSame(
+            'O:67:"Illuminate\Tests\Integration\Queue\CollectionSerializationTestClass":1:{s:5:"users";O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:4:"user";s:2:"id";a:1:{i:0;i:1;}s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}}',
+            $serialized
+        );
+
+        /** @var CollectionSerializationTestClass $unserialized */
+        $unserialized = unserialize($serialized);
+
+        $this->assertInstanceOf(Collection::class, $unserialized->users);
+        $this->assertTrue($unserialized->users->sole()->is($user));
+    }
 }
 
 trait TraitBootsAndInitializersTest
