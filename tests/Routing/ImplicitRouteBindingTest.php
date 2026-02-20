@@ -2,8 +2,11 @@
 
 namespace Illuminate\Tests\Routing;
 
+use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
 use Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException;
 use Illuminate\Routing\ImplicitRouteBinding;
 use Illuminate\Routing\Route;
@@ -126,9 +129,29 @@ class ImplicitRouteBindingTest extends TestCase
 
         ImplicitRouteBinding::resolveForRoute($container, $route);
     }
+
+    public function testItThrowsModelNotFoundExceptionOnQueryException(): void
+    {
+        $action = ['uses' => fn (ImplicitRouteBindingUserWithQueryException $user) => $user];
+
+        $route = new Route('GET', '/test', $action);
+        $route->parameters = ['user' => 'invalid-value'];
+        $route->prepareForSerialization();
+        $this->expectException(ModelNotFoundException::class);
+
+        ImplicitRouteBinding::resolveForRoute(Container::getInstance(), $route);
+    }
 }
 
 class ImplicitRouteBindingUser extends Model
 {
     //
+}
+
+class ImplicitRouteBindingUserWithQueryException extends Model
+{
+    public function resolveRouteBinding($value, $field = null): void
+    {
+        throw new QueryException('mysql', 'select * from users where id = ?', [$value], new Exception('Out of range value'));
+    }
 }
