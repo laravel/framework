@@ -2449,12 +2449,10 @@ trait ValidatesAttributes
      */
     protected function convertValuesToBoolean($values)
     {
-        return array_map(function ($value) {
-            return match ($value) {
-                'true' => true,
-                'false' => false,
-                default => $value,
-            };
+        return array_map(fn ($value) => match ($value) {
+            'true' => true,
+            'false' => false,
+            default => $value,
         }, $values);
     }
 
