@@ -80,7 +80,10 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
         $this->app->singleton('migrator', function ($app) {
             $repository = $app['migration.repository'];
 
-            return new Migrator($repository, $app['db'], $app['files'], $app['events']);
+            $migrations = $app['config']['database.migrations'];
+            $defaultMigrationConnection = is_array($migrations) ? ($migrations['connection'] ?? null) : null;
+
+            return new Migrator($repository, $app['db'], $app['files'], $app['events'], $defaultMigrationConnection);
         });
 
         $this->app->bind(Migrator::class, fn ($app) => $app['migrator']);

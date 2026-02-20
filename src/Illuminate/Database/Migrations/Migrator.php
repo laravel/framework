@@ -67,6 +67,13 @@ class Migrator
     protected $connection;
 
     /**
+     * The name of the default migration connection from database config (database.migrations.connection).
+     *
+     * @var string|null
+     */
+    protected $defaultMigrationConnection;
+
+    /**
      * The paths to all of the migration files.
      *
      * @var string[]
@@ -101,17 +108,20 @@ class Migrator
      * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
+     * @param  string|null  $defaultMigrationConnection
      */
     public function __construct(
         MigrationRepositoryInterface $repository,
         Resolver $resolver,
         Filesystem $files,
         ?Dispatcher $dispatcher = null,
+        ?string $defaultMigrationConnection = null,
     ) {
         $this->files = $files;
         $this->events = $dispatcher;
         $this->resolver = $resolver;
         $this->repository = $repository;
+        $this->defaultMigrationConnection = $defaultMigrationConnection;
     }
 
     /**
@@ -703,10 +713,10 @@ class Migrator
             return call_user_func(
                 static::$connectionResolverCallback,
                 $this->resolver,
-                $connection ?: $this->connection
+                $connection ?: $this->connection ?: $this->defaultMigrationConnection
             );
         } else {
-            return $this->resolver->connection($connection ?: $this->connection);
+            return $this->resolver->connection($connection ?: $this->connection ?: $this->defaultMigrationConnection);
         }
     }
 

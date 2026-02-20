@@ -131,6 +131,7 @@ return [
     'migrations' => [
         'table' => 'migrations',
         'update_date_on_publish' => true,
+        // 'connection' => 'mysql', // Optional: Default database connection for migrations
     ],
 
     /*
