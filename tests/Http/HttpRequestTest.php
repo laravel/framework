@@ -637,17 +637,43 @@ class HttpRequestTest extends TestCase
             'empty_str' => '',
             'null' => null,
         ]);
-        $this->assertTrue($request->string('int') instanceof Stringable);
-        $this->assertTrue($request->string('unknown_key') instanceof Stringable);
-        $this->assertSame('123', $request->string('int')->value());
-        $this->assertSame('456', $request->string('int_str')->value());
-        $this->assertSame('123.456', $request->string('float')->value());
-        $this->assertSame('123.456', $request->string('float_str')->value());
-        $this->assertSame('0', $request->string('float_zero')->value());
-        $this->assertSame('0.000', $request->string('float_str_zero')->value());
-        $this->assertSame('', $request->string('empty_str')->value());
-        $this->assertSame('', $request->string('null')->value());
-        $this->assertSame('', $request->string('unknown_key')->value());
+        $this->assertIsString($request->string('int'));
+        $this->assertIsString($request->string('unknown_key'));
+        $this->assertSame('123', $request->string('int'));
+        $this->assertSame('456', $request->string('int_str'));
+        $this->assertSame('123.456', $request->string('float'));
+        $this->assertSame('123.456', $request->string('float_str'));
+        $this->assertSame('0', $request->string('float_zero'));
+        $this->assertSame('0.000', $request->string('float_str_zero'));
+        $this->assertSame('', $request->string('empty_str'));
+        $this->assertSame('', $request->string('null'));
+        $this->assertSame('', $request->string('unknown_key'));
+    }
+
+    public function testStrMethod()
+    {
+        $request = Request::create('/', 'GET', [
+            'int' => 123,
+            'int_str' => '456',
+            'float' => 123.456,
+            'float_str' => '123.456',
+            'float_zero' => 0.000,
+            'float_str_zero' => '0.000',
+            'str' => 'abc',
+            'empty_str' => '',
+            'null' => null,
+        ]);
+        $this->assertTrue($request->str('int') instanceof Stringable);
+        $this->assertTrue($request->str('unknown_key') instanceof Stringable);
+        $this->assertSame('123', $request->str('int')->value());
+        $this->assertSame('456', $request->str('int_str')->value());
+        $this->assertSame('123.456', $request->str('float')->value());
+        $this->assertSame('123.456', $request->str('float_str')->value());
+        $this->assertSame('0', $request->str('float_zero')->value());
+        $this->assertSame('0.000', $request->str('float_str_zero')->value());
+        $this->assertSame('', $request->str('empty_str')->value());
+        $this->assertSame('', $request->str('null')->value());
+        $this->assertSame('', $request->str('unknown_key')->value());
     }
 
     public function testBooleanMethod()

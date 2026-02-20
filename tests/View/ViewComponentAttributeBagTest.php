@@ -346,11 +346,11 @@ class ViewComponentAttributeBagTest extends TestCase
             'number' => 123,
         ]);
 
-        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $bag->string('name'));
-        $this->assertEquals('test', (string) $bag->string('name'));
-        $this->assertEquals('', (string) $bag->string('empty'));
-        $this->assertEquals('123', (string) $bag->string('number'));
-        $this->assertEquals('default', (string) $bag->string('missing', 'default'));
+        $this->assertIsString($bag->string('name'));
+        $this->assertEquals('test', $bag->string('name'));
+        $this->assertEquals('', $bag->string('empty'));
+        $this->assertEquals('123', $bag->string('number'));
+        $this->assertEquals('default', $bag->string('missing', 'default'));
     }
 
     public function testBoolean()

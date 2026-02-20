@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use stdClass;
 
 use function Illuminate\Support\enum_value;
@@ -232,19 +233,27 @@ trait InteractsWithData
      */
     public function str($key, $default = null)
     {
-        return $this->string($key, $default);
+        return Str::of($this->data($key, $default));
     }
 
     /**
-     * Retrieve data from the instance as a Stringable instance.
+     * Retrieve data from the instance as a string.
      *
      * @param  string  $key
      * @param  mixed  $default
-     * @return \Illuminate\Support\Stringable
+     * @return string
      */
-    public function string($key, $default = null)
+    public function string($key, $default = null): string
     {
-        return Str::of($this->data($key, $default));
+        $value = $this->data($key, $default);
+
+        if (! is_scalar($value) && ! is_null($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Value for key [%s] must be a string, %s given.', $key, gettype($value))
+            );
+        }
+
+        return (string) $value;
     }
 
     /**
