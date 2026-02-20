@@ -71,7 +71,7 @@ class ConcurrencyLimiter
 
         while (! $slot = $this->acquire($id)) {
             if (time() - $timeout >= $starting) {
-                throw $this->newTimeoutException();
+                throw new LimiterTimeoutException;
             }
 
             Sleep::usleep($sleep * 1000);
@@ -79,11 +79,11 @@ class ConcurrencyLimiter
 
         if (is_callable($callback)) {
             try {
-                return tap($callback(), function () use ($slot, $id) {
-                    $this->release($slot, $id);
+                return tap($callback(), function () use ($slot) {
+                    $this->release($slot);
                 });
             } catch (Throwable $exception) {
-                $this->release($slot, $id);
+                $this->release($slot);
 
                 throw $exception;
             }
@@ -115,21 +115,10 @@ class ConcurrencyLimiter
      * Release the lock.
      *
      * @param  \Illuminate\Contracts\Cache\Lock  $lock
-     * @param  string  $id
      * @return void
      */
-    protected function release($lock, $id)
+    protected function release($lock)
     {
         $lock->release();
-    }
-
-    /**
-     * Create a new limiter timeout exception.
-     *
-     * @return \Illuminate\Cache\Limiters\LimiterTimeoutException
-     */
-    protected function newTimeoutException()
-    {
-        return new LimiterTimeoutException;
     }
 }

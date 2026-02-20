@@ -2,11 +2,14 @@
 
 namespace Illuminate\Tests\Cache;
 
+use BadMethodCallException;
 use Error;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Limiters\ConcurrencyLimiter;
 use Illuminate\Cache\Limiters\LimiterTimeoutException;
 use Illuminate\Cache\Repository;
+use Illuminate\Contracts\Cache\LockProvider;
+use Illuminate\Contracts\Cache\Store;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
@@ -232,6 +235,19 @@ class ConcurrencyLimiterTest extends TestCase
         $this->assertSame('failed', $result);
     }
 
+    public function testFunnelThrowsExceptionWhenStoreDoesNotSupportLocks()
+    {
+        $store = $this->createMock(Store::class);
+        $repository = new Repository($store);
+
+        $this->assertNotInstanceOf(LockProvider::class, $store);
+
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('This cache store does not support locks.');
+
+        $repository->funnel('test');
+    }
+
     public function testFunnelWithFailureCallback()
     {
         $store = [];
@@ -267,7 +283,7 @@ class ConcurrencyLimiterTest extends TestCase
 
 class ConcurrencyLimiterMockThatDoesntRelease extends ConcurrencyLimiter
 {
-    protected function release($lock, $id)
+    protected function release($lock)
     {
         //
     }

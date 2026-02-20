@@ -21,6 +21,7 @@ use Illuminate\Cache\Events\RetrievingManyKeys;
 use Illuminate\Cache\Events\WritingKey;
 use Illuminate\Cache\Events\WritingManyKeys;
 use Illuminate\Cache\Limiters\ConcurrencyLimiterBuilder;
+use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -687,6 +688,10 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function funnel($name)
     {
+        if (! $this->store instanceof LockProvider) {
+            throw new BadMethodCallException('This cache store does not support locks.');
+        }
+
         return new ConcurrencyLimiterBuilder($this, enum_value($name));
     }
 
