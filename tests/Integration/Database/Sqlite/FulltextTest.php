@@ -28,7 +28,7 @@ class FulltextTest extends DatabaseTestCase
             $table->id('id');
             $table->string('title', 200);
             $table->text('body');
-            $table->fulltext(['title', 'body']);
+            $table->fulltext(['title', 'body'])->prefixlength('2 3');
         });
     }
 

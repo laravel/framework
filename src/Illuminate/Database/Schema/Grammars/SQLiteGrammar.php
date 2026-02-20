@@ -436,7 +436,8 @@ class SQLiteGrammar extends Grammar
     public function compileFulltext(Blueprint $blueprint, Fluent $command)
     {
         $new = join(', ', array_map(fn ($col) => 'new.'.$this->wrap($col), $command->columns));
-        $cols = join(', ', array_map(fn ($col) => $this->wrap($col), $command->columns));
+        $cols = $this->columnize($command->columns);
+        $len = $command->prefixlength ?: '3 4';
 
         $ftsTable = $this->wrapTable($blueprint->getTable().'_fts');
         $table = $this->wrapTable($blueprint->getTable());
@@ -444,7 +445,7 @@ class SQLiteGrammar extends Grammar
 
         return [
             // Create FTS virtual table
-            sprintf('create virtual table %s using fts5(%s, prefix=3)', $ftsTable, $cols),
+            sprintf('create virtual table %s using fts5(%s, prefix=\'%s\')', $ftsTable, $cols, $len),
 
             // Insert trigger
             sprintf(
