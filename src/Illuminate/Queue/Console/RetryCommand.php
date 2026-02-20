@@ -141,7 +141,7 @@ class RetryCommand extends Command
     protected function retryJob($job)
     {
         $queue = $this->laravel['queue']->connection($job->connection);
-        
+
         $this->laravel['queue']->connection($job->connection)->pushRaw(
             $this->refreshRetryUntil($this->resetAttempts($job->payload)),
             $job->queue,
@@ -206,7 +206,7 @@ class RetryCommand extends Command
      */
     protected function getQueueableOptions($queue, $job)
     {
-        if (!method_exists($queue, 'getQueueableOptions')) {
+        if (! method_exists($queue, 'getQueueableOptions')) {
             return [];
         }
 
@@ -236,7 +236,7 @@ class RetryCommand extends Command
         if ($this->laravel->bound(Encrypter::class)) {
             return unserialize($this->laravel->make(Encrypter::class)->decrypt($payload['data']['command']));
         }
-        
+
         throw new RuntimeException('Unable to extract job payload.');
     }
 }
