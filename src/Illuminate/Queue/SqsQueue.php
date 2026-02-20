@@ -178,9 +178,32 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
+        $queue ??= $this->default;
+
+        if (str_ends_with((string) $queue, '.fifo') && ! isset($options['MessageGroupId'])) {
+            $options = array_merge($this->getFifoOptions($queue, $payload), $options);
+        }
+
         return $this->sqs->sendMessage([
             'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload, ...$options,
         ])->get('MessageId');
+    }
+
+    /**
+     * Get the default FIFO queue options from the payload.
+     *
+     * @param  string  $queue
+     * @param  string  $payload
+     * @return array{MessageGroupId: string, MessageDeduplicationId: string}
+     */
+    protected function getFifoOptions($queue, $payload)
+    {
+        $decoded = json_decode($payload, true);
+
+        return array_filter([
+            'MessageGroupId' => $decoded['messageGroupId'] ?? (string) $queue,
+            'MessageDeduplicationId' => (string) Str::orderedUuid(),
+        ]);
     }
 
     /**

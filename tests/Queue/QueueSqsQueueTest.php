@@ -649,6 +649,79 @@ class QueueSqsQueueTest extends TestCase
         Str::createUuidsNormally();
     }
 
+    public function testPushRawProperlyPushesOntoSqsFifoQueueWithoutOptions()
+    {
+        Str::createUuidsUsing(fn () => $this->mockedDeduplicationId);
+
+        $queue = new SqsQueue($this->sqs, $this->fifoQueueName, $this->prefix);
+        $queue->setContainer(m::mock(Container::class));
+
+        $this->sqs->shouldReceive('sendMessage')->once()->with([
+            'QueueUrl' => $this->fifoQueueUrl,
+            'MessageBody' => $this->mockedPayload,
+            'MessageGroupId' => $this->fifoQueueName,
+            'MessageDeduplicationId' => $this->mockedDeduplicationId,
+        ])->andReturn($this->mockedSendMessageResponseModel);
+
+        $id = $queue->pushRaw($this->mockedPayload, $this->fifoQueueName);
+        $this->assertEquals($this->mockedMessageId, $id);
+
+        Str::createUuidsNormally();
+    }
+
+    public function testPushRawProperlyPushesOntoSqsFifoQueueWithExistingOptions()
+    {
+        $queue = new SqsQueue($this->sqs, $this->fifoQueueName, $this->prefix);
+        $queue->setContainer(m::mock(Container::class));
+
+        $this->sqs->shouldReceive('sendMessage')->once()->with([
+            'QueueUrl' => $this->fifoQueueUrl,
+            'MessageBody' => $this->mockedPayload,
+            'MessageGroupId' => $this->mockedMessageGroupId,
+            'MessageDeduplicationId' => $this->mockedDeduplicationId,
+        ])->andReturn($this->mockedSendMessageResponseModel);
+
+        $id = $queue->pushRaw($this->mockedPayload, $this->fifoQueueName, [
+            'MessageGroupId' => $this->mockedMessageGroupId,
+            'MessageDeduplicationId' => $this->mockedDeduplicationId,
+        ]);
+        $this->assertEquals($this->mockedMessageId, $id);
+    }
+
+    public function testPushRawOntoSqsFifoQueueUsesDefaultQueueWhenQueueIsNull()
+    {
+        Str::createUuidsUsing(fn () => $this->mockedDeduplicationId);
+
+        $queue = new SqsQueue($this->sqs, $this->fifoQueueName, $this->prefix);
+        $queue->setContainer(m::mock(Container::class));
+
+        $this->sqs->shouldReceive('sendMessage')->once()->with([
+            'QueueUrl' => $this->fifoQueueUrl,
+            'MessageBody' => $this->mockedPayload,
+            'MessageGroupId' => $this->fifoQueueName,
+            'MessageDeduplicationId' => $this->mockedDeduplicationId,
+        ])->andReturn($this->mockedSendMessageResponseModel);
+
+        $id = $queue->pushRaw($this->mockedPayload);
+        $this->assertEquals($this->mockedMessageId, $id);
+
+        Str::createUuidsNormally();
+    }
+
+    public function testPushRawOntoStandardQueueDoesNotAddFifoOptions()
+    {
+        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix);
+        $queue->setContainer(m::mock(Container::class));
+
+        $this->sqs->shouldReceive('sendMessage')->once()->with([
+            'QueueUrl' => $this->queueUrl,
+            'MessageBody' => $this->mockedPayload,
+        ])->andReturn($this->mockedSendMessageResponseModel);
+
+        $id = $queue->pushRaw($this->mockedPayload, $this->queueName);
+        $this->assertEquals($this->mockedMessageId, $id);
+    }
+
     public function testDelayedPendingDispatchProperlyPushesJobObjectOntoSqsFifoQueueWithoutDelay()
     {
         Str::createUuidsUsing(fn () => $this->mockedDeduplicationId);
