@@ -58,6 +58,20 @@ class UniqueLock
     }
 
     /**
+     * Refresh the lock for the given job.
+     */
+    public function refresh(mixed $job, ?int $seconds = null): bool
+    {
+        $cache = method_exists($job, 'uniqueVia')
+            ? $job->uniqueVia()
+            : $this->cache;
+
+        $lock = $cache->lock($this->getKey($job));
+
+        return method_exists($lock, 'refresh') && $lock->refresh($seconds);
+    }
+
+    /**
      * Generate the lock key for the given job.
      *
      * @param  mixed  $job
