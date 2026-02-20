@@ -103,9 +103,14 @@ class AliasLoader
             return $path;
         }
 
-        file_put_contents($path, $this->formatFacadeStub(
+        $stub = $this->formatFacadeStub(
             $alias, file_get_contents(__DIR__.'/stubs/facade.stub')
-        ));
+        );
+
+        // "Atomic" write (tmp + rename) to prevent other processes from reading a partially written facade file
+        $tmpPath = tempnam(dirname($path), 'facade-');
+        file_put_contents($tmpPath, $stub);
+        rename($tmpPath, $path);
 
         return $path;
     }
