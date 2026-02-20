@@ -45,11 +45,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * @var string
      */
-<<<<<<< HEAD
     const VERSION = '13.x-dev';
-=======
-    const VERSION = '12.52.0';
->>>>>>> v12.52.0
 
     /**
      * The base path for the Laravel installation.
