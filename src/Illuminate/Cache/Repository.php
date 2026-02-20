@@ -567,6 +567,26 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Get an item from the cache, unless the condition is true.
+     *
+     * @template TCacheValue
+     *
+     * @param  bool|\Closure(): bool  $condition
+     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  \Closure(): TCacheValue  $callback
+     * @return TCacheValue
+     */
+    public function rememberUnless($condition, $key, $ttl, Closure $callback)
+    {
+        if (value($condition)) {
+            return $callback();
+        }
+
+        return $this->remember($key, $ttl, $callback);
+    }
+
+    /**
      * Get an item from the cache, or execute the given Closure and store the result forever.
      *
      * @template TCacheValue
@@ -603,6 +623,25 @@ class Repository implements ArrayAccess, CacheContract
         $this->forever($key, $value = $callback());
 
         return $value;
+    }
+
+    /**
+     * Get an item from the cache forever, unless the condition is true.
+     *
+     * @template TCacheValue
+     *
+     * @param  bool|\Closure(): bool  $condition
+     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  \Closure(): TCacheValue  $callback
+     * @return TCacheValue
+     */
+    public function rememberForeverUnless($condition, $key, Closure $callback)
+    {
+        if (value($condition)) {
+            return $callback();
+        }
+
+        return $this->rememberForever($key, $callback);
     }
 
     /**

@@ -144,6 +144,32 @@ class CacheRepositoryTest extends TestCase
         $this->assertSame('bar', $result);
     }
 
+    public function testRememberUnlessBypassesCacheWhenConditionIsTrue()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->never();
+        $repo->getStore()->shouldReceive('put')->never();
+
+        $result = $repo->rememberUnless(true, 'foo', 10, function () {
+            return 'bar';
+        });
+
+        $this->assertSame('bar', $result);
+    }
+
+    public function testRememberUnlessUsesCacheWhenConditionIsFalse()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
+        $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 10);
+
+        $result = $repo->rememberUnless(false, 'foo', 10, function () {
+            return 'bar';
+        });
+
+        $this->assertSame('bar', $result);
+    }
+
     public function testRememberForeverMethodCallsForeverAndReturnsDefault()
     {
         $repo = $this->getRepository();
@@ -152,6 +178,32 @@ class CacheRepositoryTest extends TestCase
         $result = $repo->rememberForever('foo', function () {
             return 'bar';
         });
+        $this->assertSame('bar', $result);
+    }
+
+    public function testRememberForeverUnlessBypassesCacheWhenConditionIsTrue()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->never();
+        $repo->getStore()->shouldReceive('forever')->never();
+
+        $result = $repo->rememberForeverUnless(true, 'foo', function () {
+            return 'bar';
+        });
+
+        $this->assertSame('bar', $result);
+    }
+
+    public function testRememberForeverUnlessUsesCacheWhenConditionIsFalse()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
+        $repo->getStore()->shouldReceive('forever')->once()->with('foo', 'bar');
+
+        $result = $repo->rememberForeverUnless(false, 'foo', function () {
+            return 'bar';
+        });
+
         $this->assertSame('bar', $result);
     }
 
@@ -556,6 +608,30 @@ class CacheRepositoryTest extends TestCase
         $cache->put(TestCacheKey::FOO, 5);
         $this->assertSame(6, $cache->increment(TestCacheKey::FOO));
         $this->assertSame(5, $cache->decrement(TestCacheKey::FOO));
+    }
+
+    public function testTaggedCacheRememberUnlessBypassesCacheWhenConditionIsTrue()
+    {
+        $cache = (new Repository(new ArrayStore()))->tags('test-tag');
+
+        $value = $cache->rememberUnless(true, 'foo', 10, function () {
+            return 'bar';
+        });
+
+        $this->assertSame('bar', $value);
+        $this->assertNull($cache->get('foo'));
+    }
+
+    public function testTaggedCacheRememberForeverUnlessUsesCacheWhenConditionIsFalse()
+    {
+        $cache = (new Repository(new ArrayStore()))->tags('test-tag');
+
+        $value = $cache->rememberForeverUnless(false, 'foo', function () {
+            return 'bar';
+        });
+
+        $this->assertSame('bar', $value);
+        $this->assertSame('bar', $cache->get('foo'));
     }
 
     protected function getRepository()
