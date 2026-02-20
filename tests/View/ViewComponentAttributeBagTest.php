@@ -51,10 +51,15 @@ class ViewComponentAttributeBagTest extends TestCase
             'test-0' => 0,
             'test-0-string' => '0',
             'test-empty-string' => '',
+            'test-whitespace-string' => ' ',
+            'data-test-empty-string' => '',
+            'data-test-whitespace-string' => ' ',
+            'value' => ' ',
+            'alt' => '',
         ]);
 
-        $this->assertSame('test-string="ok" test-true="test-true" test-0="0" test-0-string="0" test-empty-string=""', (string) $bag);
-        $this->assertSame('test-string="ok" test-true="test-true" test-0="0" test-0-string="0" test-empty-string=""', (string) $bag->merge());
+        $this->assertSame('test-string="ok" test-true="test-true" test-0="0" test-0-string="0" data-test-empty-string="" data-test-whitespace-string=" " value=" " alt=""', (string) $bag);
+        $this->assertSame('test-string="ok" test-true="test-true" test-0="0" test-0-string="0" data-test-empty-string="" data-test-whitespace-string=" " value=" " alt=""', (string) $bag->merge());
 
         $bag = (new ComponentAttributeBag)
             ->merge([
@@ -72,9 +77,14 @@ class ViewComponentAttributeBagTest extends TestCase
                 'test-0' => 0,
                 'test-0-string' => '0',
                 'test-empty-string' => '',
+                'test-whitespace-string' => ' ',
+                'data-test-empty-string' => '',
+                'data-test-whitespace-string' => ' ',
+                'value' => ' ',
+                'alt' => '',
             ]);
 
-        $this->assertSame('test-string="ok" test-true="test-true" test-0="0" test-0-string="0" test-empty-string=""', (string) $bag);
+        $this->assertSame('test-string="ok" test-true="test-true" test-0="0" test-0-string="0" data-test-empty-string="" data-test-whitespace-string=" " value=" " alt=""', (string) $bag);
 
         $bag = (new ComponentAttributeBag)
             ->merge([
