@@ -254,7 +254,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(4, $statements);
-        $this->assertSame('create virtual table "users_fts" using fts5("body", prefix=3)', $statements[0]);
+        $this->assertSame('create virtual table "users_fts" using fts5("body", prefix=\'3 4\')', $statements[0]);
     }
 
     public function testAddingSpatialIndex()
