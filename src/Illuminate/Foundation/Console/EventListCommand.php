@@ -230,6 +230,8 @@ class EventListCommand extends Command
      * Gets the raw version of event listeners from the event dispatcher.
      *
      * @return array
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function getRawListeners()
     {
@@ -240,6 +242,8 @@ class EventListCommand extends Command
      * Get the event dispatcher.
      *
      * @return \Illuminate\Events\Dispatcher
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function getEventsDispatcher()
     {
