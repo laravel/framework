@@ -3,7 +3,9 @@
 namespace Illuminate\Tests\Queue;
 
 use Exception;
+use Illuminate\Cache\Repository;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Job as QueueJobContract;
@@ -403,6 +405,29 @@ class QueueWorkerTest extends TestCase
         Worker::popUsing('myworker', null);
     }
 
+    public function testWorkerHandlesCacheFailed()
+    {
+        $workerOptions = new WorkerOptions();
+        $workerOptions->stopWhenEmpty = true;
+
+        $mockStore = m::mock(Store::class);
+
+        $mockStore->expects('get')
+            ->with('illuminate:queue:restart')
+            ->andThrow(new Exception('Cache read failed'));
+
+        $worker = $this->getWorker('default', ['queue' => [
+            $firstJob = new WorkerFakeJob,
+        ]]);
+
+        $worker->setCache(new Repository($mockStore));
+
+        $worker->daemon('default', 'queue', $workerOptions);
+
+        $this->assertFalse($firstJob->fired);
+        $this->assertTrue($worker->cacheFailed);
+    }
+
     public function testWorkerStartingIsDispatched()
     {
         $workerOptions = new WorkerOptions();
@@ -513,11 +538,6 @@ class InsomniacWorker extends Worker
     public function stop($status = 0, $options = null, $reason = null)
     {
         return parent::stop($status, $options, $reason);
-    }
-
-    public function daemonShouldRun(WorkerOptions $options, $connectionName, $queue)
-    {
-        return ! ($this->isDownForMaintenance)();
     }
 
     public function memoryExceeded($memoryLimit)
