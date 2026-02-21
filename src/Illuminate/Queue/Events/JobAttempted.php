@@ -5,7 +5,7 @@ namespace Illuminate\Queue\Events;
 class JobAttempted
 {
     /**
-     * Create a new event instance.
+     * Create a new event instance. a
      *
      * @param  string  $connectionName  The connection name.
      * @param  \Illuminate\Contracts\Queue\Job  $job  The job instance.
