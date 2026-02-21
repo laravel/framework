@@ -187,10 +187,10 @@ class SyncQueue extends Queue implements QueueContract
      * @param  \Throwable|null  $exception
      * @return void
      */
-    protected function raiseJobAttemptedEvent(Job $job, ?Throwable $exception = null)
+    protected function raiseJobAttemptedEvent(Job $job, ?Throwable $exceptionOccurred = null)
     {
         if ($this->container->bound('events')) {
-            $this->container['events']->dispatch(new JobAttempted($this->connectionName, $job, $exception));
+            $this->container['events']->dispatch(new JobAttempted($this->connectionName, $job, $exceptionOccurred));
         }
     }
 
