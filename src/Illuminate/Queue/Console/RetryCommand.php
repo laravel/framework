@@ -220,7 +220,7 @@ class RetryCommand extends Command
     }
 
     /**
-     * Get job instance from the payload.
+     * Get the job instance from the given payload.
      *
      * @param  array  $payload
      * @return mixed
