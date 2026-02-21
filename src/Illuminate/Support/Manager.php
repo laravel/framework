@@ -50,14 +50,14 @@ abstract class Manager
     /**
      * Get the default driver name.
      *
-     * @return \BackedEnum|\UnitEnum|string|null
+     * @return \UnitEnum|string|null
      */
     abstract public function getDefaultDriver();
 
     /**
      * Get a driver instance.
      *
-     * @param  \BackedEnum|\UnitEnum|string|null  $driver
+     * @param  \UnitEnum|string|null  $driver
      * @return mixed
      *
      * @throws \InvalidArgumentException
@@ -81,7 +81,7 @@ abstract class Manager
     /**
      * Create a new driver instance.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $driver
+     * @param  \UnitEnum|string  $driver
      * @return mixed
      *
      * @throws \InvalidArgumentException
@@ -109,7 +109,7 @@ abstract class Manager
     /**
      * Call a custom driver creator.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $driver
+     * @param  \UnitEnum|string  $driver
      * @return mixed
      */
     protected function callCustomCreator($driver)
@@ -120,7 +120,7 @@ abstract class Manager
     /**
      * Register a custom driver creator Closure.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $driver
+     * @param  \UnitEnum|string  $driver
      * @param  \Closure  $callback
      * @return $this
      */

@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Integration\Support\Fixtures;
 
 use Illuminate\Support\MultipleInstanceManager as BaseMultipleInstanceManager;
+use Illuminate\Tests\Integration\Support\Fixtures\Enums\Bar;
+use Illuminate\Tests\Integration\Support\Fixtures\Enums\Foo;
 
 class MultipleInstanceManager extends BaseMultipleInstanceManager
 {
@@ -10,38 +12,22 @@ class MultipleInstanceManager extends BaseMultipleInstanceManager
 
     protected function createFooDriver(array $config)
     {
-        return new class($config)
-        {
-            public $config;
-
-            public function __construct($config)
-            {
-                $this->config = $config;
-            }
-        };
+        return DummyInstanceFactory::withConfig($config);
     }
 
     protected function createBarDriver(array $config)
     {
-        return new class($config)
-        {
-            public $config;
-
-            public function __construct($config)
-            {
-                $this->config = $config;
-            }
-        };
+        return DummyInstanceFactory::withConfig($config);
     }
 
     protected function createMysqlDatabaseConnectionDriver(array $config)
     {
-        return new class($config)
-        {
-            public function __construct(public $config)
-            {
-            }
-        };
+        return DummyInstanceFactory::withConfig($config);
+    }
+
+    protected function createMysqlDriver(array $config)
+    {
+        return DummyInstanceFactory::withConfig($config);
     }
 
     /**
@@ -73,24 +59,25 @@ class MultipleInstanceManager extends BaseMultipleInstanceManager
      */
     public function getInstanceConfig($name)
     {
-        switch ($name) {
-            case 'foo':
-                return [
-                    'driver' => 'foo',
-                    'foo-option' => 'option-value',
-                ];
-            case 'bar':
-                return [
-                    'driver' => 'bar',
-                    'bar-option' => 'option-value',
-                ];
-            case 'mysql_database-connection':
-                return [
-                    'driver' => 'mysql_database-connection',
-                    'mysql_database-connection-option' => 'option-value',
-                ];
-            default:
-                return [];
-        }
+        return match ($name) {
+            'foo' => [
+                'driver' => 'foo',
+                'foo-option' => 'option-value',
+            ],
+            'bar' => [
+                'driver' => 'bar',
+                'bar-option' => 'option-value',
+            ],
+            'mysql_database-connection' => [
+                'driver' => 'mysql_database-connection',
+                'mysql_database-connection-option' => 'option-value',
+            ],
+            Bar::MonitoringDb => [
+                'driver' => Foo::MySql,
+                'database_name' => 'monitoring',
+            ],
+
+            default => [],
+        };
     }
 }
