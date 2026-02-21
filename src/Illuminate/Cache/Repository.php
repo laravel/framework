@@ -20,6 +20,8 @@ use Illuminate\Cache\Events\RetrievingKey;
 use Illuminate\Cache\Events\RetrievingManyKeys;
 use Illuminate\Cache\Events\WritingKey;
 use Illuminate\Cache\Events\WritingManyKeys;
+use Illuminate\Cache\Limiters\ConcurrencyLimiterBuilder;
+use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -676,6 +678,21 @@ class Repository implements ArrayAccess, CacheContract
     public function withoutOverlapping($key, callable $callback, $lockFor = 0, $waitFor = 10, $owner = null)
     {
         return $this->store->lock(enum_value($key), $lockFor, $owner)->block($waitFor, $callback);
+    }
+
+    /**
+     * Funnel a callback for a maximum number of simultaneous executions.
+     *
+     * @param  \UnitEnum|string  $name
+     * @return \Illuminate\Cache\Limiters\ConcurrencyLimiterBuilder
+     */
+    public function funnel($name)
+    {
+        if (! $this->store instanceof LockProvider) {
+            throw new BadMethodCallException('This cache store does not support locks.');
+        }
+
+        return new ConcurrencyLimiterBuilder($this, enum_value($name));
     }
 
     /**
