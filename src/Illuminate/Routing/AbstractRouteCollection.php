@@ -79,15 +79,28 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
     protected function matchAgainstRoutes(array $routes, $request, $includingMethod = true)
     {
         $fallbackRoute = null;
+        $dynamicRoutes = [];
 
         foreach ($routes as $route) {
+            if ($route->isFallback) {
+                $fallbackRoute ??= $route;
+
+                continue;
+            }
+
+            if (! empty($route->parameterNames())) {
+                $dynamicRoutes[] = $route;
+
+                continue;
+            }
+
             if ($route->matches($request, $includingMethod)) {
-                if ($route->isFallback) {
-                    $fallbackRoute ??= $route;
+                return $route;
+            }
+        }
 
-                    continue;
-                }
-
+        foreach ($dynamicRoutes as $route) {
+            if ($route->matches($request, $includingMethod)) {
                 return $route;
             }
         }
