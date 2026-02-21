@@ -43,9 +43,10 @@ class FilesystemAdapterTest extends TestCase
             $this->adapter = new LocalFilesystemAdapter(dirname($this->tempDir))
         );
         $filesystem->deleteDirectory(basename($this->tempDir));
-        m::close();
 
         unset($this->tempDir, $this->filesystem, $this->adapter);
+
+        parent::tearDown();
     }
 
     public function testResponse()
@@ -766,5 +767,64 @@ class FilesystemAdapterTest extends TestCase
 
         $path = $filesystemAdapter->path('different');
         $this->assertEquals('my-root/someprefix/different', $path);
+    }
+
+    public function testTemporaryUploadUrlWithCustomCallback()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $filesystemAdapter->buildTemporaryUploadUrlsUsing(function ($path, Carbon $expiration, $options) {
+            return [
+                'url' => $path.$expiration->toString().implode('', $options),
+                'headers' => ['X-Custom' => 'header'],
+            ];
+        });
+
+        $path = 'foo';
+        $expiration = Carbon::create(2021, 18, 12, 13);
+        $options = ['bar' => 'baz'];
+
+        $result = $filesystemAdapter->temporaryUploadUrl($path, $expiration, $options);
+
+        $this->assertSame($path.$expiration->toString().implode('', $options), $result['url']);
+        $this->assertSame(['X-Custom' => 'header'], $result['headers']);
+    }
+
+    public function testProvidesTemporaryUploadUrls()
+    {
+        $localAdapter = new class($this->tempDir) extends LocalFilesystemAdapter
+        {
+            public function temporaryUploadUrl($path, $expiration, $options): array
+            {
+                return [
+                    'url' => $path,
+                    'headers' => [],
+                ];
+            }
+        };
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $localAdapter);
+
+        $this->assertTrue($filesystemAdapter->providesTemporaryUploadUrls());
+    }
+
+    public function testProvidesTemporaryUploadUrlsWithCustomCallback()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $filesystemAdapter->buildTemporaryUploadUrlsUsing(function ($path, Carbon $expiration, $options) {
+            return [
+                'url' => $path.$expiration->toString().implode('', $options),
+                'headers' => [],
+            ];
+        });
+
+        $this->assertTrue($filesystemAdapter->providesTemporaryUploadUrls());
+    }
+
+    public function testProvidesTemporaryUploadUrlsForAdapterWithoutTemporaryUploadUrlSupport()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $this->assertFalse($filesystemAdapter->providesTemporaryUploadUrls());
     }
 }

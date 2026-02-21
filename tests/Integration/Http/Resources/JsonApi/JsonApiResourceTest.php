@@ -604,4 +604,135 @@ class JsonApiResourceTest extends TestCase
             ->assertJsonCount(1, 'included')
             ->assertJsonMissing(['jsonapi']);
     }
+
+    public function testItHandlesBidirectionalRelationshipsWithChaperoneWithoutInfiniteLoop()
+    {
+        $user = User::factory()->create();
+
+        $post = Post::factory()->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        // The /with-chaperone-posts route loads chaperonePosts which uses chaperone()
+        // to automatically set the inverse 'author' relationship on each Post,
+        // creating circular object references (User -> Post -> User same instance).
+        // Without the fix, this would hang forever due to infinite loop.
+        // The same User model appears twice in included: once as "posts" (the Post)
+        // and once as "authors" (Post's author via chaperone) - this is correct
+        // because different resource types should not be deduplicated.
+        $this->getJson("/users/{$user->getKey()}/with-chaperone-posts?".http_build_query(['include' => 'chaperonePosts']))
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertJsonPath('data.id', (string) $user->getKey())
+            ->assertJsonPath('data.type', 'users')
+            ->assertJsonPath('data.relationships.chaperonePosts.data.0.type', 'posts')
+            ->assertJsonPath('data.relationships.chaperonePosts.data.0.id', (string) $post->getKey())
+            ->assertJsonPath('included.0.type', 'posts')
+            ->assertJsonPath('included.1.type', 'authors')
+            ->assertJsonCount(2, 'included');
+    }
+
+    public function testIncludedResourcesCanBeArrayBackedCustomResources()
+    {
+        $user = User::factory()->create();
+
+        $this->getJson("/users/{$user->getKey()}/with-array-relationship")
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertJsonPath('data.id', (string) $user->getKey())
+            ->assertJsonPath('data.type', 'users')
+            ->assertJsonPath('included.0.id', '99')
+            ->assertJsonPath('included.0.type', 'things')
+            ->assertJsonPath('included.0.attributes.name', 'test')
+            ->assertJsonCount(1, 'included');
+    }
+
+    public function testTopLevelArrayBackedCustomResourceCanGenerateJsonApiResponse()
+    {
+        $this->getJson('/things/99')
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertExactJson([
+                'data' => [
+                    'id' => '99',
+                    'type' => 'things',
+                    'attributes' => [
+                        'name' => 'test',
+                    ],
+                ],
+            ])
+            ->assertJsonMissing(['jsonapi', 'included']);
+    }
+
+    public function testSameModelWithTheSameResourceTypeIsDeduplicated()
+    {
+        $user = User::factory()->create();
+
+        $post1 = Post::factory()->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        $post2 = Post::factory()->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        Comment::factory()->create([
+            'post_id' => $post1->getKey(),
+            'user_id' => $user->getKey(),
+        ]);
+
+        Comment::factory()->create([
+            'post_id' => $post2->getKey(),
+            'user_id' => $user->getKey(),
+        ]);
+
+        // Both comments have the same commenter (User). Per the JSON:API spec, the same
+        // type+id pair should only appear once in included, even when referenced by
+        // multiple relationships. We expect 3 items: 2 comments + 1 user (deduped).
+        $response = $this->getJson('/posts?'.http_build_query(['include' => 'comments.commenter']))
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertJsonCount(3, 'included');
+
+        $included = $response->json('included');
+        $types = array_column($included, 'type');
+
+        $this->assertCount(2, array_filter($types, fn (string $t) => $t === 'comments'));
+        $this->assertCount(1, array_filter($types, fn (string $t) => $t === 'users'));
+    }
+
+    public function testDifferentModelInstancesWithSameTypeAndIdAreDeduplicated()
+    {
+        $user = User::factory()->create();
+
+        // This route manually creates two different User model instances with the same ID and
+        // adds them both to the loadedRelationshipsMap. Per the JSON:API spec, they should
+        // be deduplicated since they have the same type+id, even though they're different object instances.
+        $response = $this->getJson("/users/{$user->getKey()}/with-duplicate-instances")
+            ->assertHeader('Content-type', 'application/vnd.api+json');
+
+        $included = $response->json('included');
+
+        $this->assertCount(1, $included);
+        $this->assertSame('users', $included[0]['type']);
+        $this->assertSame((string) $user->getKey(), $included[0]['id']);
+    }
+
+    public function testSameModelOnDifferentResourcesIsNotDeduplicated()
+    {
+        $user = User::factory()->create();
+
+        $post = Post::factory()->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        // Post's author uses AuthorResource ("authors"), root uses UserResource ("users").
+        // We don't want to deduplicate them, as even though the underlying model is the
+        // same, they are different resource types, so they have different identity.
+        $this->getJson("/users/{$user->getKey()}/with-chaperone-posts?".http_build_query(['include' => 'chaperonePosts.author']))
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertJsonPath('data.id', (string) $user->getKey())
+            ->assertJsonPath('data.type', 'users')
+            ->assertJsonPath('included.0.type', 'posts')
+            ->assertJsonPath('included.0.id', (string) $post->getKey())
+            ->assertJsonPath('included.1.type', 'authors')
+            ->assertJsonPath('included.1.id', (string) $user->getKey())
+            ->assertJsonCount(2, 'included');
+    }
 }

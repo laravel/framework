@@ -17,11 +17,6 @@ class SupportFacadeTest extends TestCase
         FacadeStub::setFacadeApplication(null);
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testFacadeCallsUnderlyingApplication()
     {
         $app = new ApplicationStub;

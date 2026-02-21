@@ -50,6 +50,13 @@ class Connection implements ConnectionInterface
     protected $readPdo;
 
     /**
+     * The database connection configuration options for reading.
+     *
+     * @var array
+     */
+    protected $readPdoConfig = [];
+
+    /**
      * The name of the connected database.
      *
      * @var string
@@ -202,6 +209,13 @@ class Connection implements ConnectionInterface
      * @var \Closure[]
      */
     protected static $resolvers = [];
+
+    /**
+     * The last retrieved PDO read / write type.
+     *
+     * @var null|'read'|'write'
+     */
+    protected $latestPdoTypeRetrieved = null;
 
     /**
      * Create a new database connection instance.
@@ -826,7 +840,8 @@ class Connection implements ConnectionInterface
                 $query,
                 $this->prepareBindings($bindings),
                 $e,
-                $this->getConnectionDetails()
+                $this->getConnectionDetails(),
+                $this->latestReadWriteTypeUsed(),
             );
         }
     }
@@ -854,14 +869,16 @@ class Connection implements ConnectionInterface
     {
         $this->totalQueryDuration += $time ?? 0.0;
 
-        $this->event(new QueryExecuted($query, $bindings, $time, $this));
+        $readWriteType = $this->latestReadWriteTypeUsed();
+
+        $this->event(new QueryExecuted($query, $bindings, $time, $this, $readWriteType));
 
         $query = $this->pretending === true
             ? $this->queryGrammar?->substituteBindingsIntoRawSql($query, $bindings) ?? $query
             : $query;
 
         if ($this->loggingQueries) {
-            $this->queryLog[] = compact('query', 'bindings', 'time');
+            $this->queryLog[] = compact('query', 'bindings', 'time', 'readWriteType');
         }
     }
 
@@ -1234,6 +1251,8 @@ class Connection implements ConnectionInterface
      */
     public function getPdo()
     {
+        $this->latestPdoTypeRetrieved = 'write';
+
         if ($this->pdo instanceof Closure) {
             return $this->pdo = call_user_func($this->pdo);
         }
@@ -1266,6 +1285,8 @@ class Connection implements ConnectionInterface
             ($this->recordsModified && $this->getConfig('sticky'))) {
             return $this->getPdo();
         }
+
+        $this->latestPdoTypeRetrieved = 'read';
 
         if ($this->readPdo instanceof Closure) {
             return $this->readPdo = call_user_func($this->readPdo);
@@ -1308,6 +1329,19 @@ class Connection implements ConnectionInterface
     public function setReadPdo($pdo)
     {
         $this->readPdo = $pdo;
+
+        return $this;
+    }
+
+    /**
+     * Set the read PDO connection configuration.
+     *
+     * @param  array  $config
+     * @return $this
+     */
+    public function setReadPdoConfig(array $config)
+    {
+        $this->readPdoConfig = $config;
 
         return $this;
     }
@@ -1365,13 +1399,17 @@ class Connection implements ConnectionInterface
      */
     protected function getConnectionDetails()
     {
+        $config = $this->latestReadWriteTypeUsed() === 'read'
+            ? $this->readPdoConfig
+            : $this->config;
+
         return [
             'driver' => $this->getDriverName(),
             'name' => $this->getNameWithReadWriteType(),
-            'host' => $this->getConfig('host'),
-            'port' => $this->getConfig('port'),
-            'database' => $this->getConfig('database'),
-            'unix_socket' => $this->getConfig('unix_socket'),
+            'host' => $config['host'] ?? null,
+            'port' => $config['port'] ?? null,
+            'database' => $config['database'] ?? null,
+            'unix_socket' => $config['unix_socket'] ?? null,
         ];
     }
 
@@ -1643,6 +1681,16 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Retrieve the latest read / write type used.
+     *
+     * @return 'read'|'write'|null
+     */
+    protected function latestReadWriteTypeUsed()
+    {
+        return $this->readWriteType ?? $this->latestPdoTypeRetrieved;
+    }
+
+    /**
      * Get the table prefix for the connection.
      *
      * @return string
@@ -1715,5 +1763,20 @@ class Connection implements ConnectionInterface
     public static function getResolver($driver)
     {
         return static::$resolvers[$driver] ?? null;
+    }
+
+    /**
+     * Prepare the instance for cloning.
+     *
+     * @return void
+     */
+    public function __clone()
+    {
+        // When cloning, re-initialize grammars to reference cloned connection...
+        $this->useDefaultQueryGrammar();
+
+        if (! is_null($this->schemaGrammar)) {
+            $this->useDefaultSchemaGrammar();
+        }
     }
 }

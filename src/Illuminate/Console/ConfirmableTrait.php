@@ -11,9 +11,11 @@ trait ConfirmableTrait
      *
      * This method only asks for confirmation in production.
      *
+     * @template TReturn of bool = bool
+     *
      * @param  string  $warning
-     * @param  \Closure|bool|null  $callback
-     * @return bool
+     * @param  (\Closure(): TReturn)|TReturn|null  $callback
+     * @return (TReturn is false ? true : bool)
      */
     public function confirmToProceed($warning = 'Application In Production', $callback = null)
     {
@@ -43,7 +45,7 @@ trait ConfirmableTrait
     /**
      * Get the default confirmation callback.
      *
-     * @return \Closure
+     * @return \Closure(): bool
      */
     protected function getDefaultConfirmCallback()
     {

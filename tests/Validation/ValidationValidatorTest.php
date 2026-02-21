@@ -44,10 +44,9 @@ class ValidationValidatorTest extends TestCase
 {
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Carbon::setTestNow(null);
-        m::close();
+
+        parent::tearDown();
     }
 
     public function testNestedErrorMessagesAreRetrievedFromLocalArray()
@@ -7397,6 +7396,22 @@ class ValidationValidatorTest extends TestCase
         // Interpreted dot followed by escaped dot fails on empty value
         $v = new Validator($trans, ['foo' => [['bar.baz' => ''], ['bar.baz' => '']]], ['foo.*.bar\.baz' => 'required']);
         $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo.bar' => 'valid'], ['foo\.bar' => 'required']);
+        $this->assertFalse($v->fails());
+
+        $v = new Validator($trans, ['foo.bar' => 'valid'], []);
+        $v->appendRules(['foo\.bar' => 'required']);
+        $this->assertFalse($v->fails());
+
+        $v = new Validator($trans, ['foo.bar' => 'valid'], []);
+        $v->sometimes('foo\.bar', 'required', fn () => true);
+        $this->assertFalse($v->fails());
+
+        $v = new Validator($trans, ['name' => 'ab'], ['name' => 'required']);
+        $v->appendRules(['name' => 'string']);
+        $v->appendRules(['name' => 'min:5|max:255']);
+        $this->assertTrue($v->fails());
     }
 
     public function testParsingArrayKeysWithDotWhenTestingExistence()
@@ -9978,6 +9993,103 @@ class ValidationValidatorTest extends TestCase
         $withinRange = false;
 
         $this->assertFalse($validator->passes());
+    }
+
+    public function testMessagesDefaultWhenUsingSizeSpecificCustomMessages()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $data = [
+            'array_data' => [0, 0, 0],
+            'some_more_array_data' => [0, 0, 0, 0],
+            'numeric_data' => 5,
+        ];
+
+        $rules = [
+            'array_data' => 'array|max:1',
+            'some_more_array_data' => 'array|max:3',
+            'numeric_data' => 'integer|max:2',
+        ];
+
+        $messages = [
+            'max' => [
+                'array' => ':attribute must be up to :max',
+            ],
+        ];
+
+        $validator = new Validator($trans, $data, $rules, $messages, []);
+
+        $this->assertSame([
+            'array_data' => [
+                'array data must be up to 1',
+            ],
+            'some_more_array_data' => [
+                'some more array data must be up to 3',
+            ],
+            'numeric_data' => [
+                'validation.max.numeric',
+            ],
+        ], $validator->messages()->messages());
+    }
+
+    public function testWhenFails()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['text' => 'abcdef'], ['text' => 'string|max:5']);
+
+        $result = $v->whenFails(function () {
+            return 'whenFails';
+        });
+
+        $this->assertSame('whenFails', $result);
+
+        $v = new Validator($trans, ['text' => 'abc'], ['text' => 'string|max:5']);
+
+        $result = $v->whenFails(function () {
+            return 'whenFails';
+        });
+
+        $this->assertSame($v, $result);
+
+        $v = new Validator($trans, ['text' => 'abc'], ['text' => 'string|max:5']);
+
+        $result = $v->whenFails(function () {
+            return 'whenFails';
+        }, function () {
+            return 'whenNotFails';
+        });
+
+        $this->assertSame('whenNotFails', $result);
+    }
+
+    public function testWhenPasses()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['text' => 'abc'], ['text' => 'string|max:5']);
+
+        $result = $v->whenPasses(function () {
+            return 'whenPasses';
+        });
+
+        $this->assertSame('whenPasses', $result);
+
+        $v = new Validator($trans, ['text' => 'abcdef'], ['text' => 'string|max:5']);
+
+        $result = $v->whenPasses(function () {
+            return 'whenPasses';
+        });
+
+        $this->assertSame($v, $result);
+
+        $v = new Validator($trans, ['text' => 'abcdef'], ['text' => 'string|max:5']);
+
+        $result = $v->whenPasses(function () {
+            return 'whenPasses';
+        }, function () {
+            return 'whenNotPasses';
+        });
+
+        $this->assertSame('whenNotPasses', $result);
     }
 
     protected function getTranslator()

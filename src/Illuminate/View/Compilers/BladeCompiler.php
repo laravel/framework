@@ -196,7 +196,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
             );
 
             if (! $this->files->exists($compiledPath)) {
-                $this->files->put($compiledPath, $contents);
+                $this->files->replace($compiledPath, $contents);
 
                 return;
             }
@@ -204,7 +204,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $compiledHash = $this->files->hash($compiledPath, 'xxh128');
 
             if ($compiledHash !== hash('xxh128', $contents)) {
-                $this->files->put($compiledPath, $contents);
+                $this->files->replace($compiledPath, $contents);
             }
         }
     }

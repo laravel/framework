@@ -14,11 +14,6 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseMySqlSchemaGrammarTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testBasicCreateTable()
     {
         $conn = $this->getConnection();
@@ -1632,6 +1627,116 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `users` drop `name`, algorithm=instant', $statements[0]);
+    }
+
+    public function testAddingColumnWithLock()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->string('name')->lock('none');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `name` varchar(255) not null, lock=none', $statements[0]);
+    }
+
+    public function testChangingColumnWithLock()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->string('name', 100)->change()->lock('none');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` modify `name` varchar(100) not null, lock=none', $statements[0]);
+    }
+
+    public function testDroppingColumnWithLock()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->dropColumn('name')->lock('none');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` drop `name`, lock=none', $statements[0]);
+    }
+
+    public function testColumnWithBothAlgorithmAndLock()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->string('name')->instant()->lock('none');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `name` varchar(255) not null, algorithm=instant, lock=none', $statements[0]);
+    }
+
+    public function testAddingIndexWithLock()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->index('name')->lock('none');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add index `users_name_index`(`name`), lock=none', $statements[0]);
+    }
+
+    public function testAddingUniqueIndexWithLock()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('email')->lock('shared');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add unique `users_email_unique`(`email`), lock=shared', $statements[0]);
+    }
+
+    public function testAddingPrimaryKeyWithLock()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->primary('id')->lock('exclusive');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add primary key (`id`), lock=exclusive', $statements[0]);
+    }
+
+    public function testAddingForeignKeyWithLock()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->foreign('user_id')->references('id')->on('accounts')->lock('none');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add constraint `users_user_id_foreign` foreign key (`user_id`) references `accounts` (`id`), lock=none', $statements[0]);
+    }
+
+    public function testAddingFullTextIndexWithLock()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->fullText('content')->lock('shared');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add fulltext `users_content_fulltext`(`content`), lock=shared', $statements[0]);
+    }
+
+    public function testAddingSpatialIndexWithLock()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->spatialIndex('location')->lock('default');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add spatial index `users_location_spatialindex`(`location`), lock=default', $statements[0]);
+    }
+
+    public function testIndexWithAlgorithmAndLock()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->index('name', 'custom_idx')->algorithm('btree')->lock('none');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add index `custom_idx` using btree(`name`), lock=none', $statements[0]);
     }
 
     public function getGrammar(?Connection $connection = null)

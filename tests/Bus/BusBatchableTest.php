@@ -11,11 +11,6 @@ use PHPUnit\Framework\TestCase;
 
 class BusBatchableTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function test_batch_may_be_retrieved()
     {
         $class = new class

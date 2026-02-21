@@ -28,11 +28,6 @@ use stdClass;
 
 class DatabaseConnectionTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testSettingDefaultCallsGetDefaultGrammar()
     {
         $connection = $this->getMockConnection();
@@ -322,16 +317,37 @@ class DatabaseConnectionTest extends TestCase
         $this->assertEquals($mock, $result);
     }
 
+    public function testTransactionRetriesOnCommitDeadlockWhenPDOHasActiveTransaction()
+    {
+        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['inTransaction', 'beginTransaction', 'commit', 'rollBack'])->getMock();
+        $mock = $this->getMockConnection([], $pdo);
+
+        $pdo->expects($this->exactly(2))->method('beginTransaction');
+        $pdo->expects($this->exactly(2))->method('commit')->willReturnOnConsecutiveCalls(
+            $this->throwException(new DatabaseConnectionTestMockPDOException('Serialization failure', '40001')),
+            true,
+        );
+        $pdo->method('inTransaction')->willReturn(true);
+        $pdo->expects($this->once())->method('rollBack');
+
+        $result = $mock->transaction(function () {
+            return 'success';
+        }, 2);
+
+        $this->assertSame('success', $result);
+    }
+
     public function testTransactionRetriesOnSerializationFailure()
     {
         $this->expectException(PDOException::class);
         $this->expectExceptionMessage('Serialization failure');
 
-        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['beginTransaction', 'commit', 'rollBack'])->getMock();
+        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['inTransaction', 'beginTransaction', 'commit', 'rollBack'])->getMock();
         $mock = $this->getMockConnection([], $pdo);
         $pdo->expects($this->exactly(3))->method('commit')->will($this->throwException(new DatabaseConnectionTestMockPDOException('Serialization failure', '40001')));
         $pdo->expects($this->exactly(3))->method('beginTransaction');
-        $pdo->expects($this->never())->method('rollBack');
+        $pdo->method('inTransaction')->willReturn(true);
+        $pdo->expects($this->exactly(2))->method('rollBack');
         $mock->transaction(function () {
         }, 3);
     }
@@ -538,6 +554,206 @@ class DatabaseConnectionTest extends TestCase
 
         $this->assertEquals("select * from tbl where col = 'foo'", $log[0]['raw_query']);
         $this->assertEquals(1.23, $log[0]['time']);
+    }
+
+    public function testQueryExceptionContainsReadConnectionDetailsWhenUsingReadPdo()
+    {
+        // Create write PDO mock that will NOT be used for this query
+        $writePdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)
+            ->onlyMethods(['prepare'])
+            ->getMock();
+        $writePdo->expects($this->never())->method('prepare');
+
+        // Create read PDO mock that throws an exception
+        $readPdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)
+            ->onlyMethods(['prepare'])
+            ->getMock();
+        $readPdo->expects($this->once())
+            ->method('prepare')
+            ->willThrowException(new PDOException('Connection refused'));
+
+        // Write configuration (passed to constructor)
+        $writeConfig = [
+            'driver' => 'mysql',
+            'name' => 'mysql',
+            'host' => '192.168.1.10',
+            'port' => '3306',
+            'database' => 'write_db',
+        ];
+
+        // Create connection with write config
+        $connection = new Connection($writePdo, 'write_db', '', $writeConfig);
+        $connection->useDefaultQueryGrammar();
+        $connection->useDefaultPostProcessor();
+
+        // Read configuration (different from write)
+        $readConfig = [
+            'host' => '192.168.1.20',
+            'port' => '3307',
+            'database' => 'read_db',
+        ];
+
+        // Set read PDO and its config
+        $connection->setReadPdo($readPdo);
+        $connection->setReadPdoConfig($readConfig);
+
+        try {
+            $connection->select('SELECT * FROM users', useReadPdo: true);
+            $this->fail('Expected QueryException was not thrown');
+        } catch (QueryException $e) {
+            // Verify the readWriteType is correctly set to 'read'
+            $this->assertSame('read', $e->readWriteType);
+
+            // Verify connection details show READ config, not write config
+            $connectionDetails = $e->getConnectionDetails();
+            $this->assertSame('192.168.1.20', $connectionDetails['host']);
+            $this->assertSame('3307', $connectionDetails['port']);
+            $this->assertSame('read_db', $connectionDetails['database']);
+        }
+    }
+
+    public function testQueryExceptionContainsReadConnectionDetailsWhenReadPdoConnectionFails()
+    {
+        // Write PDO (won't be used)
+        $writePdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)
+            ->onlyMethods(['prepare'])
+            ->getMock();
+        $writePdo->expects($this->never())->method('prepare');
+
+        // Write configuration
+        $writeConfig = [
+            'driver' => 'mysql',
+            'name' => 'mysql',
+            'host' => '192.168.1.10',
+            'port' => '3306',
+            'database' => 'write_db',
+        ];
+
+        $connection = new Connection($writePdo, 'write_db', '', $writeConfig);
+        $connection->useDefaultQueryGrammar();
+        $connection->useDefaultPostProcessor();
+
+        // Read config (different host)
+        $readConfig = [
+            'host' => '192.168.1.20',
+            'port' => '3307',
+            'database' => 'read_db',
+        ];
+
+        // Simulate lazy PDO that fails during connection (e.g., SET NAMES fails)
+        $connection->setReadPdo(function () {
+            throw new PDOException('SQLSTATE[HY000] SET NAMES failed');
+        });
+        $connection->setReadPdoConfig($readConfig);
+
+        try {
+            $connection->select('SELECT * FROM users', useReadPdo: true);
+            $this->fail('Expected QueryException was not thrown');
+        } catch (QueryException $e) {
+            $this->assertSame('read', $e->readWriteType);
+
+            // Verify connection details show READ config even for connection-time failures
+            $connectionDetails = $e->getConnectionDetails();
+            $this->assertSame('192.168.1.20', $connectionDetails['host']);
+            $this->assertSame('3307', $connectionDetails['port']);
+            $this->assertSame('read_db', $connectionDetails['database']);
+        }
+    }
+
+    public function testQueryExceptionContainsWriteConnectionDetailsWhenUsingWritePdo()
+    {
+        // Create write PDO mock that throws an exception
+        $writePdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)
+            ->onlyMethods(['prepare'])
+            ->getMock();
+        $writePdo->expects($this->once())
+            ->method('prepare')
+            ->willThrowException(new PDOException('Connection refused'));
+
+        // Create read PDO mock that will NOT be used
+        $readPdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)
+            ->onlyMethods(['prepare'])
+            ->getMock();
+        $readPdo->expects($this->never())->method('prepare');
+
+        // Write configuration (passed to constructor)
+        $writeConfig = [
+            'driver' => 'mysql',
+            'name' => 'mysql',
+            'host' => '192.168.1.10',
+            'port' => '3306',
+            'database' => 'write_db',
+        ];
+
+        $connection = new Connection($writePdo, 'write_db', '', $writeConfig);
+        $connection->useDefaultQueryGrammar();
+        $connection->useDefaultPostProcessor();
+
+        // Read configuration (different from write)
+        $readConfig = [
+            'host' => '192.168.1.20',
+            'port' => '3307',
+            'database' => 'read_db',
+        ];
+
+        $connection->setReadPdo($readPdo);
+        $connection->setReadPdoConfig($readConfig);
+
+        try {
+            $connection->select('SELECT * FROM users', useReadPdo: false);
+            $this->fail('Expected QueryException was not thrown');
+        } catch (QueryException $e) {
+            // Verify the readWriteType is correctly set to 'write'
+            $this->assertSame('write', $e->readWriteType);
+
+            // Verify connection details show WRITE config, not read config
+            $connectionDetails = $e->getConnectionDetails();
+            $this->assertSame('192.168.1.10', $connectionDetails['host']);
+            $this->assertSame('3306', $connectionDetails['port']);
+            $this->assertSame('write_db', $connectionDetails['database']);
+        }
+    }
+
+    public function testQueryExceptionContainsWriteConnectionDetailsWhenWritePdoConnectionFails()
+    {
+        // Write configuration
+        $writeConfig = [
+            'driver' => 'mysql',
+            'name' => 'mysql',
+            'host' => '192.168.1.10',
+            'port' => '3306',
+            'database' => 'write_db',
+        ];
+
+        // Simulate lazy write PDO that fails during connection (e.g., SET NAMES fails)
+        $connection = new Connection(function () {
+            throw new PDOException('SQLSTATE[HY000] SET NAMES failed');
+        }, 'write_db', '', $writeConfig);
+        $connection->useDefaultQueryGrammar();
+        $connection->useDefaultPostProcessor();
+
+        // Read config (different host)
+        $readConfig = [
+            'host' => '192.168.1.20',
+            'port' => '3307',
+            'database' => 'read_db',
+        ];
+
+        $connection->setReadPdo(new DatabaseConnectionTestMockPDO);
+        $connection->setReadPdoConfig($readConfig);
+
+        try {
+            $connection->select('SELECT * FROM users', useReadPdo: false);
+            $this->fail('Expected QueryException was not thrown');
+        } catch (QueryException $e) {
+            $this->assertSame('write', $e->readWriteType);
+
+            // Verify connection details show WRITE config even for connection-time failures
+            $connectionDetails = $e->getConnectionDetails();
+            $this->assertSame('192.168.1.10', $connectionDetails['host']);
+            $this->assertSame('3306', $connectionDetails['port']);
+            $this->assertSame('write_db', $connectionDetails['database']);
+        }
     }
 
     protected function getMockConnection($methods = [], $pdo = null)

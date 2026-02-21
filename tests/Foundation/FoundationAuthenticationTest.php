@@ -49,11 +49,6 @@ class FoundationAuthenticationTest extends TestCase
         return $guard;
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testAssertAuthenticated()
     {
         $this->mockGuard()

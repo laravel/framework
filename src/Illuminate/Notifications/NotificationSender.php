@@ -82,8 +82,6 @@ class NotificationSender
      */
     public function send($notifiables, $notification)
     {
-        $notifiables = $this->formatNotifiables($notifiables);
-
         if ($notification instanceof ShouldQueue) {
             return $this->queueNotification($notifiables, $notification);
         }
@@ -106,11 +104,11 @@ class NotificationSender
         $original = clone $notification;
 
         foreach ($notifiables as $notifiable) {
-            if (empty($viaChannels = $channels ?: $notification->via($notifiable))) {
+            if (empty($viaChannels = $channels ?: $original->via($notifiable))) {
                 continue;
             }
 
-            $this->withLocale($this->preferredLocale($notifiable, $notification), function () use ($viaChannels, $notifiable, $original) {
+            $this->withLocale($this->preferredLocale($notifiable, $original), function () use ($viaChannels, $notifiable, $original) {
                 $notificationId = (string) Str::uuid();
 
                 foreach ((array) $viaChannels as $channel) {
@@ -175,6 +173,10 @@ class NotificationSender
             $this->failedEventWasDispatched = false;
 
             throw $exception;
+        }
+
+        if (method_exists($notification, 'afterSending')) {
+            $notification->afterSending($notifiable, $channel, $response);
         }
 
         $this->events->dispatch(

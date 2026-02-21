@@ -28,7 +28,6 @@ use Illuminate\Testing\Assert;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use InvalidArgumentException;
-use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use OutOfRangeException;
 use PHPUnit\Framework\AssertionFailedError;
@@ -44,7 +43,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class FoundationExceptionsHandlerTest extends TestCase
 {
-    use MockeryPHPUnitIntegration;
     use InteractsWithExceptionHandling;
 
     protected $config;
@@ -82,6 +80,8 @@ class FoundationExceptionsHandlerTest extends TestCase
     protected function tearDown(): void
     {
         Container::setInstance(null);
+
+        parent::tearDown();
     }
 
     public function testHandlerReportsExceptionAsContext()
