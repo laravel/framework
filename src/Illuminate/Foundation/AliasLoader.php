@@ -107,10 +107,12 @@ class AliasLoader
             $alias, file_get_contents(__DIR__.'/stubs/facade.stub')
         );
 
-        // "Atomic" write (tmp + rename) to prevent other processes from reading a partially written facade file
-        $tmpPath = tempnam(dirname($path), 'facade-');
-        file_put_contents($tmpPath, $stub);
-        rename($tmpPath, $path);
+        // Atomic write to prevent race conditions...
+        $tempPath = tempnam(dirname($path), 'facade-');
+
+        file_put_contents($tempPath, $stub);
+
+        rename($tempPath, $path);
 
         return $path;
     }
