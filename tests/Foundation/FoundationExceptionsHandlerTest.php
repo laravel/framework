@@ -264,6 +264,24 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertSame('{"response":"My renderable exception response"}', $response);
     }
 
+    public function testRespondMethodIsCalledOnException()
+    {
+        $this->config->shouldReceive('get')->with('app.debug', null)->andReturn(false);
+        $this->request->shouldReceive('expectsJson')->once()->andReturn(true);
+
+        $response = $this->handler->render($this->request, new RespondableException);
+
+        $this->assertSame('responded', $response->headers->get('X-Test-Header'));
+    }
+
+    public function testRespondMethodIsCalledOnRenderableException()
+    {
+        $response = $this->handler->render(Request::create('/'), new RenderableAndRespondableException);
+
+        $this->assertSame('{"response":"My renderable exception response"}', $response->getContent());
+        $this->assertSame('responded', $response->headers->get('X-Test-Header'));
+    }
+
     public function testReturnsCustomResponseWhenExceptionImplementsResponsable()
     {
         $response = $this->handler->render($this->request, new ResponsableException)->getContent();
@@ -965,6 +983,31 @@ class RenderableException extends Exception
     public function render($request)
     {
         return response()->json(['response' => 'My renderable exception response']);
+    }
+}
+
+class RespondableException extends Exception
+{
+    public function respond($response, $request)
+    {
+        $response->headers->set('X-Test-Header', 'responded');
+
+        return $response;
+    }
+}
+
+class RenderableAndRespondableException extends Exception
+{
+    public function render($request)
+    {
+        return response()->json(['response' => 'My renderable exception response']);
+    }
+
+    public function respond($response, $request)
+    {
+        $response->headers->set('X-Test-Header', 'responded');
+
+        return $response;
     }
 }
 
