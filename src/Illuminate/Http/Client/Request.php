@@ -193,7 +193,7 @@ class Request implements ArrayAccess
     }
 
     /**
-     * Get the JSON decoded body of the request.
+     * Get the decoded JSON body of the request.
      *
      * @return array
      */

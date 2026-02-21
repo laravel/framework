@@ -593,6 +593,17 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Add an "order by desc" clause for a pivot table column.
+     *
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @return $this
+     */
+    public function orderByPivotDesc($column)
+    {
+        return $this->orderBy($this->qualifyPivotColumn($column), 'desc');
+    }
+
+    /**
      * Find a related model by its primary key or return a new instance of the related model.
      *
      * @param  mixed  $id
@@ -632,12 +643,12 @@ class BelongsToMany extends Relation
      * Get the first record matching the attributes. If the record is not found, create it.
      *
      * @param  array  $attributes
-     * @param  array  $values
+     * @param  (\Closure(): array)|array  $values
      * @param  array  $joining
      * @param  bool  $touch
      * @return TRelatedModel&object{pivot: TPivotModel}
      */
-    public function firstOrCreate(array $attributes = [], array $values = [], array $joining = [], $touch = true)
+    public function firstOrCreate(array $attributes = [], Closure|array $values = [], array $joining = [], $touch = true)
     {
         if (is_null($instance = (clone $this)->where($attributes)->first())) {
             if (is_null($instance = $this->related->where($attributes)->first())) {
@@ -658,15 +669,15 @@ class BelongsToMany extends Relation
      * Attempt to create the record. If a unique constraint violation occurs, attempt to find the matching record.
      *
      * @param  array  $attributes
-     * @param  array  $values
+     * @param  (\Closure(): array)|array  $values
      * @param  array  $joining
      * @param  bool  $touch
      * @return TRelatedModel&object{pivot: TPivotModel}
      */
-    public function createOrFirst(array $attributes = [], array $values = [], array $joining = [], $touch = true)
+    public function createOrFirst(array $attributes = [], Closure|array $values = [], array $joining = [], $touch = true)
     {
         try {
-            return $this->getQuery()->withSavepointIfNeeded(fn () => $this->create(array_merge($attributes, $values), $joining, $touch));
+            return $this->getQuery()->withSavepointIfNeeded(fn () => $this->create(array_merge($attributes, value($values)), $joining, $touch));
         } catch (UniqueConstraintViolationException $e) {
             // ...
         }
@@ -1567,7 +1578,7 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Get the fully qualified foreign key for the relation.
+     * Get the fully-qualified foreign key for the relation.
      *
      * @return string
      */
@@ -1587,7 +1598,7 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Get the fully qualified "related key" for the relation.
+     * Get the fully-qualified "related key" for the relation.
      *
      * @return string
      */
@@ -1607,7 +1618,7 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Get the fully qualified parent key name for the relation.
+     * Get the fully-qualified parent key name for the relation.
      *
      * @return string
      */
@@ -1627,7 +1638,7 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Get the fully qualified related key name for the relation.
+     * Get the fully-qualified related key name for the relation.
      *
      * @return string
      */

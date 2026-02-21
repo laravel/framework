@@ -71,6 +71,13 @@ class DatabaseStore implements FlushableLock, LockProvider, Store
     protected $defaultLockTimeoutInSeconds;
 
     /**
+     * The classes that should be allowed during unserialization.
+     *
+     * @var array|bool|null
+     */
+    protected $serializableClasses;
+
+    /**
      * Create a new database store.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
@@ -79,6 +86,7 @@ class DatabaseStore implements FlushableLock, LockProvider, Store
      * @param  string  $lockTable
      * @param  array  $lockLottery
      * @param  int  $defaultLockTimeoutInSeconds
+     * @param  array|bool|null  $serializableClasses
      */
     public function __construct(
         ConnectionInterface $connection,
@@ -87,6 +95,7 @@ class DatabaseStore implements FlushableLock, LockProvider, Store
         $lockTable = 'cache_locks',
         $lockLottery = [2, 100],
         $defaultLockTimeoutInSeconds = 86400,
+        $serializableClasses = null,
     ) {
         $this->table = $table;
         $this->prefix = $prefix;
@@ -94,6 +103,7 @@ class DatabaseStore implements FlushableLock, LockProvider, Store
         $this->lockTable = $lockTable;
         $this->lockLottery = $lockLottery;
         $this->defaultLockTimeoutInSeconds = $defaultLockTimeoutInSeconds;
+        $this->serializableClasses = $serializableClasses;
     }
 
     /**
@@ -578,6 +588,10 @@ class DatabaseStore implements FlushableLock, LockProvider, Store
              $this->connection instanceof SQLiteConnection) &&
             ! Str::contains($value, [':', ';'])) {
             $value = base64_decode($value);
+        }
+
+        if ($this->serializableClasses !== null) {
+            return unserialize($value, ['allowed_classes' => $this->serializableClasses]);
         }
 
         return unserialize($value);

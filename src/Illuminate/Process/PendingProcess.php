@@ -2,6 +2,7 @@
 
 namespace Illuminate\Process;
 
+use Carbon\CarbonInterval;
 use Closure;
 use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Support\Collection;
@@ -132,12 +133,12 @@ class PendingProcess
     /**
      * Specify the maximum number of seconds the process may run.
      *
-     * @param  int  $timeout
+     * @param  CarbonInterval|int  $timeout
      * @return $this
      */
-    public function timeout(int $timeout)
+    public function timeout(CarbonInterval|int $timeout)
     {
-        $this->timeout = $timeout;
+        $this->timeout = $timeout instanceof CarbonInterval ? (int) $timeout->totalSeconds : $timeout;
 
         return $this;
     }
@@ -145,12 +146,12 @@ class PendingProcess
     /**
      * Specify the maximum number of seconds a process may go without returning output.
      *
-     * @param  int  $timeout
+     * @param  CarbonInterval|int  $timeout
      * @return $this
      */
-    public function idleTimeout(int $timeout)
+    public function idleTimeout(CarbonInterval|int $timeout)
     {
-        $this->idleTimeout = $timeout;
+        $this->idleTimeout = $timeout instanceof CarbonInterval ? (int) $timeout->totalSeconds : $timeout;
 
         return $this;
     }

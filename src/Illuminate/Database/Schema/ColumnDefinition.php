@@ -20,7 +20,7 @@ use Illuminate\Support\Fluent;
  * @method $this instant() Specify that algorithm=instant should be used for the column operation (MySQL)
  * @method $this index(bool|string $indexName = null) Add an index
  * @method $this invisible() Specify that the column should be invisible to "SELECT *" (MySQL)
- * @method $this lock('none'|'shared'|'default'|'exclusive' $value) Specify the DDL lock mode for the column operation (MySQL)
+ * @method $this lock(('none'|'shared'|'default'|'exclusive') $value) Specify the DDL lock mode for the column operation (MySQL)
  * @method $this nullable(bool $value = true) Allow NULL values to be inserted into the column
  * @method $this persisted() Mark the computed generated column as persistent (SQL Server)
  * @method $this primary(bool $value = true) Add a primary index

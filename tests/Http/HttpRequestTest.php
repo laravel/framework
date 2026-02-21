@@ -152,6 +152,30 @@ class HttpRequestTest extends TestCase
         $this->assertSame('https://foo.com/?key=value%20with%20spaces', $request->fullUrlWithQuery(['key' => 'value with spaces']));
     }
 
+    public function testFullUrlWithoutQueryMethod()
+    {
+        $request = Request::create('http://foo.com/foo/bar?name=taylor&age=30');
+        $this->assertSame('http://foo.com/foo/bar?age=30', $request->fullUrlWithoutQuery('name'));
+
+        $request = Request::create('http://foo.com/foo/bar?name=taylor&age=30');
+        $this->assertSame('http://foo.com/foo/bar?age=30', $request->fullUrlWithoutQuery(['name']));
+
+        $request = Request::create('http://foo.com/foo/bar?name=taylor&age=30&city=nyc');
+        $this->assertSame('http://foo.com/foo/bar?city=nyc', $request->fullUrlWithoutQuery(['name', 'age']));
+
+        $request = Request::create('http://foo.com/foo/bar?name=taylor');
+        $this->assertSame('http://foo.com/foo/bar', $request->fullUrlWithoutQuery('name'));
+
+        $request = Request::create('http://foo.com/foo/bar');
+        $this->assertSame('http://foo.com/foo/bar', $request->fullUrlWithoutQuery('name'));
+
+        $request = Request::create('https://foo.com?a=b&c=d');
+        $this->assertSame('https://foo.com/?c=d', $request->fullUrlWithoutQuery('a'));
+
+        $request = Request::create('https://foo.com/?name=taylor&age=30');
+        $this->assertSame('https://foo.com/?age=30', $request->fullUrlWithoutQuery('name'));
+    }
+
     public function testIsMethod()
     {
         $request = Request::create('/foo/bar');
@@ -1800,5 +1824,16 @@ class HttpRequestTest extends TestCase
         Request::create('', 'GET')->json();
 
         $this->assertTrue(json_last_error() === JSON_ERROR_NONE);
+    }
+
+    public function testItClampsValues()
+    {
+        $request = Request::create('/', 'GET', ['per_page' => 100, 'float' => 9.24]);
+        $this->assertSame(100, $request->clamp('per_page', 100, 101));
+        $this->assertSame(10, $request->clamp('per_page', -10, 10));
+        $this->assertSame(25, $request->clamp('per_page_2', 25, 100, 1));
+        $this->assertSame(100, $request->clamp('per_page', 1, 250, 99));
+        $this->assertSame(22.4, $request->clamp('per_page', 1.11, 22.4, 2));
+        $this->assertSame(9.24, $request->clamp('float', 1, 10));
     }
 }

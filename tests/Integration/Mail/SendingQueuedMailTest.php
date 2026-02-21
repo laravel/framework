@@ -39,6 +39,19 @@ class SendingQueuedMailTest extends TestCase
 
         Queue::connection('mail-connection')->assertPushedOn('mail-queue', SendQueuedMailable::class);
     }
+
+    public function testMailIsSentWithDelay()
+    {
+        Queue::fake();
+
+        $delay = now()->addMinutes(10);
+
+        Mail::to('test@mail.com')->later($delay, new SendingQueuedMailTestMail);
+
+        Queue::assertPushed(SendQueuedMailable::class, function ($job) use ($delay) {
+            return $job->delay === $delay;
+        });
+    }
 }
 
 class SendingQueuedMailTestMail extends Mailable

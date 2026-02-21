@@ -75,7 +75,7 @@ trait PromptsForMissingInput
     /**
      * Prompt for missing input arguments using the returned questions.
      *
-     * @return array<string, string|array{string, string}|(\Closure(): array<int|string>|string|int|bool)>
+     * @return array<string, string|array{string, string}|\Closure(): (array<int|string>|string|int|bool)>
      */
     protected function promptForMissingArgumentsUsing()
     {

@@ -15,6 +15,8 @@ use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
+use Illuminate\Foundation\Testing\Attributes\SetUp;
+use Illuminate\Foundation\Testing\Attributes\TearDown;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
@@ -42,6 +44,7 @@ use Illuminate\View\Component;
 use Mockery;
 use Mockery\Exception\InvalidCountException;
 use PHPUnit\Metadata\Annotation\Parser\Registry as PHPUnitRegistry;
+use ReflectionClass;
 use Throwable;
 
 trait InteractsWithTestCaseLifecycle
@@ -245,6 +248,16 @@ trait InteractsWithTestCaseLifecycle
 
             if (method_exists($this, $method = 'tearDown'.class_basename($trait))) {
                 $this->beforeApplicationDestroyed(fn () => $this->{$method}());
+            }
+
+            foreach ((new ReflectionClass($trait))->getMethods() as $method) {
+                if ($method->getAttributes(SetUp::class) !== []) {
+                    $this->{$method->getName()}();
+                }
+
+                if ($method->getAttributes(TearDown::class) !== []) {
+                    $this->beforeApplicationDestroyed(fn () => $this->{$method->getName()}());
+                }
             }
         }
 

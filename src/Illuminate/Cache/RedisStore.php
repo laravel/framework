@@ -49,17 +49,26 @@ class RedisStore extends TaggableStore implements FlushableLock, LockProvider
     protected $lockConnection;
 
     /**
+     * The classes that should be allowed during unserialization.
+     *
+     * @var array|bool|null
+     */
+    protected $serializableClasses;
+
+    /**
      * Create a new Redis store.
      *
      * @param  \Illuminate\Contracts\Redis\Factory  $redis
      * @param  string  $prefix
      * @param  string  $connection
+     * @param  array|bool|null  $serializableClasses
      */
-    public function __construct(Redis $redis, $prefix = '', $connection = 'default')
+    public function __construct(Redis $redis, $prefix = '', $connection = 'default', $serializableClasses = null)
     {
         $this->redis = $redis;
         $this->setPrefix($prefix);
         $this->setConnection($connection);
+        $this->serializableClasses = $serializableClasses;
     }
 
     /**
@@ -517,7 +526,15 @@ class RedisStore extends TaggableStore implements FlushableLock, LockProvider
      */
     protected function unserialize($value)
     {
-        return is_numeric($value) ? $value : unserialize($value);
+        if (is_numeric($value)) {
+            return $value;
+        }
+
+        if ($this->serializableClasses !== null) {
+            return unserialize($value, ['allowed_classes' => $this->serializableClasses]);
+        }
+
+        return unserialize($value);
     }
 
     /**

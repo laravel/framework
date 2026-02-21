@@ -4,6 +4,8 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
 use Illuminate\Database\ClassMorphViolationException;
+use Illuminate\Database\Eloquent\Attributes\Initialize;
+use Illuminate\Database\Eloquent\Attributes\Touches;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
@@ -68,6 +70,19 @@ trait HasRelationships
      * @var array
      */
     protected static $relationResolvers = [];
+
+    /**
+     * Initialize the HasRelationships trait.
+     *
+     * @return void
+     */
+    #[Initialize]
+    public function initializeHasRelationships()
+    {
+        if (empty($this->touches)) {
+            $this->touches = static::resolveClassAttribute(Touches::class, 'relations') ?? [];
+        }
+    }
 
     /**
      * Get the dynamic relation resolver if defined or inherited, or return null.
@@ -912,7 +927,7 @@ trait HasRelationships
             );
         });
 
-        return ! is_null($caller) ? $caller['function'] : null;
+        return $caller['function'] ?? null;
     }
 
     /**
@@ -1034,7 +1049,7 @@ trait HasRelationships
     {
         return tap(new $class, function ($instance) {
             if (! $instance->getConnectionName()) {
-                $instance->setConnection($this->connection);
+                $instance->setConnection($this->getConnectionName());
             }
         });
     }

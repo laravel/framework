@@ -22,7 +22,7 @@ class DeleteModelWhenMissingTest extends QueueTestCase
         $this->driver = 'database';
     }
 
-    protected function defineDatabaseMigrations()
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
         Schema::create('delete_model_test_models', function (Blueprint $table) {
             $table->id();

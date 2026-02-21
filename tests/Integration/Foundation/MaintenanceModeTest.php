@@ -198,18 +198,22 @@ class MaintenanceModeTest extends TestCase
     #[DataProvider('retryAfterDatetimeProvider')]
     public function testMaintenanceModeRetryCanAcceptDatetime(string $datetime): void
     {
+        Carbon::setTestNow('2023-01-01 00:00:00');
+
         $this->artisan(DownCommand::class, ['--retry' => $datetime]);
 
         $data = json_decode(file_get_contents(storage_path('framework/down')), true);
 
         $expectedDate = Carbon::parse($datetime)->format(DateTimeInterface::RFC7231);
         $this->assertSame($expectedDate, $data['retry']);
+
+        Carbon::setTestNow();
     }
 
     public static function retryAfterDatetimeProvider(): array
     {
         return [
-            'ISO 8601 format' => [date('Y-m-d H:i:s', strtotime('+1 week'))],
+            'ISO 8601 format' => ['2023-01-08 00:00:00'],
             'natural language' => ['tomorrow 14:00'],
             'relative time' => ['+2 hours'],
         ];

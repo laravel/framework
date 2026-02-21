@@ -90,7 +90,7 @@ class Response implements ArrayAccess, Stringable
     }
 
     /**
-     * Get the JSON decoded body of the response as an array or scalar value.
+     * Get the decoded JSON body of the response as an array or scalar value.
      *
      * @param  string|null  $key
      * @param  mixed  $default
@@ -117,7 +117,7 @@ class Response implements ArrayAccess, Stringable
     }
 
     /**
-     * Get the JSON decoded body of the response as an object.
+     * Get the decoded JSON body of the response as an object.
      *
      * @param  int-mask<JSON_BIGINT_AS_STRING, JSON_INVALID_UTF8_IGNORE, JSON_INVALID_UTF8_SUBSTITUTE, JSON_OBJECT_AS_ARRAY, JSON_THROW_ON_ERROR>|null  $flags
      * @return object|null
@@ -128,7 +128,7 @@ class Response implements ArrayAccess, Stringable
     }
 
     /**
-     * Get the JSON decoded body of the response as a collection.
+     * Get the decoded JSON body of the response as a collection.
      *
      * @param  string|null  $key
      * @param  int-mask<JSON_BIGINT_AS_STRING, JSON_INVALID_UTF8_IGNORE, JSON_INVALID_UTF8_SUBSTITUTE, JSON_OBJECT_AS_ARRAY, JSON_THROW_ON_ERROR>|null  $flags
@@ -140,7 +140,7 @@ class Response implements ArrayAccess, Stringable
     }
 
     /**
-     * Get the JSON decoded body of the response as a fluent object.
+     * Get the decoded JSON body of the response as a fluent object.
      *
      * @param  string|null  $key
      * @param  int-mask<JSON_BIGINT_AS_STRING, JSON_INVALID_UTF8_IGNORE, JSON_INVALID_UTF8_SUBSTITUTE, JSON_OBJECT_AS_ARRAY, JSON_THROW_ON_ERROR>|null  $flags
@@ -393,10 +393,10 @@ class Response implements ArrayAccess, Stringable
     {
         if (is_callable($statusCode) &&
             $statusCode($this->status(), $this)) {
-            return $this->throw();
+            throw new RequestException($this, $this->truncateExceptionsAt);
         }
 
-        return $this->status() === $statusCode ? $this->throw() : $this;
+        return $this->status() === $statusCode ? throw new RequestException($this, $this->truncateExceptionsAt) : $this;
     }
 
     /**
@@ -410,10 +410,10 @@ class Response implements ArrayAccess, Stringable
     public function throwUnlessStatus($statusCode)
     {
         if (is_callable($statusCode)) {
-            return $statusCode($this->status(), $this) ? $this : $this->throw();
+            return $statusCode($this->status(), $this) ? $this : throw new RequestException($this, $this->truncateExceptionsAt);
         }
 
-        return $this->status() === $statusCode ? $this : $this->throw();
+        return $this->status() === $statusCode ? $this : throw new RequestException($this, $this->truncateExceptionsAt);
     }
 
     /**

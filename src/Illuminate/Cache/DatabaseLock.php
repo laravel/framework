@@ -114,7 +114,7 @@ class DatabaseLock extends Lock
      *
      * @return bool
      *
-     * @throws Throwable
+     * @throws \Throwable
      */
     public function release()
     {

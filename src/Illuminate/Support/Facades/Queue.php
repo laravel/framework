@@ -31,6 +31,10 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static string|null resolveConnectionFromQueueRoute(object $queueable)
  * @method static string|null resolveQueueFromQueueRoute(object $queueable)
  * @method static int size(string|null $queue = null)
+ * @method static int pendingSize(string|null $queue = null)
+ * @method static int delayedSize(string|null $queue = null)
+ * @method static int reservedSize(string|null $queue = null)
+ * @method static int|null creationTimeOfOldestPendingJob(string|null $queue = null)
  * @method static mixed push(string|object $job, mixed $data = '', string|null $queue = null)
  * @method static mixed pushOn(string $queue, string|object $job, mixed $data = '')
  * @method static mixed pushRaw(string $payload, string|null $queue = null, array $options = [])
@@ -40,10 +44,6 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static \Illuminate\Contracts\Queue\Job|null pop(string|null $queue = null)
  * @method static string getConnectionName()
  * @method static \Illuminate\Contracts\Queue\Queue setConnectionName(string $name)
- * @method static int pendingSize(string|null $queue = null)
- * @method static int delayedSize(string|null $queue = null)
- * @method static int reservedSize(string|null $queue = null)
- * @method static int|null creationTimeOfOldestPendingJob(string|null $queue = null)
  * @method static mixed getJobTries(mixed $job)
  * @method static mixed getJobBackoff(mixed $job)
  * @method static mixed getJobExpiration(mixed $job)
@@ -71,6 +71,7 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static array pushedJobs()
  * @method static array rawPushes()
  * @method static \Illuminate\Support\Testing\Fakes\QueueFake serializeAndRestore(bool $serializeAndRestore = true)
+ * @method static void releaseUniqueJobLocks()
  *
  * @see \Illuminate\Queue\QueueManager
  * @see \Illuminate\Queue\Queue
@@ -99,7 +100,7 @@ class Queue extends Facade
     public static function fake($jobsToFake = [])
     {
         $actualQueueManager = static::isFake()
-            ? static::getFacadeRoot()->queue
+            ? tap(static::getFacadeRoot(), fn ($fake) => $fake->releaseUniqueJobLocks())->queue
             : static::getFacadeRoot();
 
         return tap(new QueueFake(static::getFacadeApplication(), $jobsToFake, $actualQueueManager), function ($fake) {

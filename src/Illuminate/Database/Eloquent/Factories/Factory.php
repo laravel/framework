@@ -7,6 +7,7 @@ use Faker\Generator;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Factories\Attributes\UseModel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -15,6 +16,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
+use ReflectionClass;
 use Throwable;
 use UnitEnum;
 
@@ -149,6 +151,13 @@ abstract class Factory
      * @var bool
      */
     protected static $expandRelationshipsByDefault = true;
+
+    /**
+     * The cached model class names resolved from attributes.
+     *
+     * @var array<class-string, class-string<TModel>|false>
+     */
+    protected static $cachedModelAttributes = [];
 
     /**
      * Create a new factory instance.
@@ -445,6 +454,29 @@ abstract class Factory
         } finally {
             Model::automaticallyEagerLoadRelationships($autoEagerLoadingEnabled);
         }
+    }
+
+    /**
+     * Create a collection of models.
+     *
+     * @param  iterable<int, array<string, mixed>>|int|null  $records
+     * @return \Illuminate\Database\Eloquent\Collection<int, TModel>
+     */
+    public function makeMany(iterable|int|null $records = null)
+    {
+        $records ??= ($this->count ?? 1);
+
+        $this->count = null;
+
+        if (is_numeric($records)) {
+            $records = array_fill(0, $records, []);
+        }
+
+        return new EloquentCollection(
+            (new Collection($records))->map(function ($record) {
+                return $this->state($record)->make();
+            })
+        );
     }
 
     /**
@@ -777,6 +809,26 @@ abstract class Factory
     }
 
     /**
+     * Remove the "after making" callbacks from the factory.
+     *
+     * @return static
+     */
+    public function withoutAfterMaking()
+    {
+        return $this->newInstance(['afterMaking' => new Collection]);
+    }
+
+    /**
+     * Remove the "after creating" callbacks from the factory.
+     *
+     * @return static
+     */
+    public function withoutAfterCreating()
+    {
+        return $this->newInstance(['afterCreating' => new Collection]);
+    }
+
+    /**
      * Call the "after making" callbacks for the given model instances.
      *
      * @param  \Illuminate\Support\Collection  $instances
@@ -892,6 +944,18 @@ abstract class Factory
      */
     public function modelName()
     {
+        if (! array_key_exists(static::class, static::$cachedModelAttributes)) {
+            $attribute = (new ReflectionClass($this))->getAttributes(UseModel::class);
+
+            static::$cachedModelAttributes[static::class] = count($attribute) > 0
+                ? $attribute[0]->newInstance()->class
+                : false;
+        }
+
+        if (static::$cachedModelAttributes[static::class]) {
+            return static::$cachedModelAttributes[static::class];
+        }
+
         if ($this->model !== null) {
             return $this->model;
         }
