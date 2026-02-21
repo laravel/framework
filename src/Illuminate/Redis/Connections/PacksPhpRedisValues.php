@@ -30,6 +30,13 @@ trait PacksPhpRedisValues
     protected $supportsZstd;
 
     /**
+     * Indicates if Redis supports LZ4 compression.
+     *
+     * @var bool|null
+     */
+    protected $supportsLz4;
+
+    /**
      * Prepares the given values to be used with the `eval` command, including serialization and compression.
      *
      * @param  array<int|string,string>  $values
@@ -68,6 +75,19 @@ trait PacksPhpRedisValues
                     return \zstd_compress(
                         $this->client->_serialize($value),
                         $compressionLevel === 0 ? Redis::COMPRESSION_ZSTD_DEFAULT : $compressionLevel
+                    );
+                };
+            } elseif ($this->supportsLz4() && $this->lz4Compressed()) {
+                if (! function_exists('lz4_compress')) {
+                    throw new RuntimeException("'lz4' extension required to call 'lz4_compress'.");
+                }
+
+                $compressionLevel = $this->client->getOption(Redis::OPT_COMPRESSION_LEVEL);
+
+                $processor = function ($value) use ($compressionLevel) {
+                    return \lz4_compress(
+                        $this->client->_serialize($value),
+                        $compressionLevel === 0 ? 0 : $compressionLevel
                     );
                 };
             } else {
@@ -217,6 +237,20 @@ trait PacksPhpRedisValues
         }
 
         return $this->supportsZstd;
+    }
+
+    /**
+     * Determine if the current PhpRedis extension version supports LZ4 compression.
+     *
+     * @return bool
+     */
+    protected function supportsLz4(): bool
+    {
+        if ($this->supportsLz4 === null) {
+            $this->supportsLz4 = $this->phpRedisVersionAtLeast('5.3.0');
+        }
+
+        return $this->supportsLz4;
     }
 
     /**
