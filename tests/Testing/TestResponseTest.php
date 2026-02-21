@@ -2852,6 +2852,78 @@ class TestResponseTest extends TestCase
         $response->assertSessionHas(['foo', 'bar']);
     }
 
+    public function testAssertSessionHasAllWithValues(): void
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('foo', 'apple');
+        $store->put('bar', 'banana');
+
+        $response = TestResponse::fromBaseResponse(new Response());
+
+        $response->assertSessionHasAll([
+            'foo' => 'apple',
+            'bar' => 'banana',
+        ]);
+    }
+
+    public function testAssertSessionHasAllShowsAllMismatches(): void
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('foo', 'wrong1');
+        $store->put('bar', 'wrong2');
+
+        $response = TestResponse::fromBaseResponse(new Response());
+
+        try {
+            $response->assertSessionHasAll([
+                'foo' => 'apple',
+                'bar' => 'banana',
+            ]);
+
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $diff = $e->getComparisonFailure()->getDiff();
+            $this->assertStringContainsString('wrong1', $diff);
+            $this->assertStringContainsString('wrong2', $diff);
+            $this->assertStringContainsString('apple', $diff);
+            $this->assertStringContainsString('banana', $diff);
+        }
+    }
+
+    public function testAssertSessionHasAllWithMixedKeys(): void
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('foo', 'apple');
+        $store->put('bar', 'banana');
+        $store->put('baz', 'cherry');
+
+        $response = TestResponse::fromBaseResponse(new Response());
+
+        $response->assertSessionHasAll([
+            'baz',
+            'foo' => 'apple',
+            'bar' => 'banana',
+        ]);
+    }
+
+    public function testAssertSessionHasAllWithClosures(): void
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('foo', 'apple');
+        $store->put('bar', 'banana');
+
+        $response = TestResponse::fromBaseResponse(new Response());
+
+        $response->assertSessionHasAll([
+            'foo' => fn ($value) => $value === 'apple',
+            'bar' => 'banana',
+        ]);
+    }
+
     public function testAssertSessionMissing(): void
     {
         $this->expectException(AssertionFailedError::class);
