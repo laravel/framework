@@ -1216,19 +1216,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function before($value, $strict = false)
     {
-        $key = $this->search($value, $strict);
-
-        if ($key === false) {
-            return null;
-        }
-
-        $position = ($keys = $this->keys())->search($key);
-
-        if ($position === 0) {
-            return null;
-        }
-
-        return $this->get($keys->get($position - 1));
+        return $this->adjacentItem($value, $strict, -1);
     }
 
     /**
@@ -1240,19 +1228,34 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function after($value, $strict = false)
     {
+        return $this->adjacentItem($value, $strict, 1);
+    }
+
+    /**
+     * Get an adjacent item relative to the given item.
+     *
+     * @param  TValue|(callable(TValue,TKey): bool)  $value
+     * @param  bool  $strict
+     * @param  int  $offset
+     * @return TValue|null
+     */
+    protected function adjacentItem($value, $strict, $offset)
+    {
         $key = $this->search($value, $strict);
 
         if ($key === false) {
             return null;
         }
 
-        $position = ($keys = $this->keys())->search($key);
+        $keys = $this->keys();
+        $position = $keys->search($key);
+        $targetPosition = $position + $offset;
 
-        if ($position === $keys->count() - 1) {
+        if ($targetPosition < 0 || $targetPosition >= $keys->count()) {
             return null;
         }
 
-        return $this->get($keys->get($position + 1));
+        return $this->get($keys->get($targetPosition));
     }
 
     /**
