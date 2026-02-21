@@ -683,7 +683,7 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Funnel a callback for a maximum number of simultaneous executions.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $name
+     * @param  \UnitEnum|string  $name
      * @return \Illuminate\Cache\Limiters\ConcurrencyLimiterBuilder
      */
     public function funnel($name)

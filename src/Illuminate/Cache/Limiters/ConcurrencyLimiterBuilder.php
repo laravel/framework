@@ -37,7 +37,7 @@ class ConcurrencyLimiterBuilder
     public $releaseAfter = 60;
 
     /**
-     * The amount of time to block until a lock is available.
+     * The number of seconds to block until a lock is available.
      *
      * @var int
      */
@@ -89,7 +89,7 @@ class ConcurrencyLimiterBuilder
     }
 
     /**
-     * Set the amount of time to block until a lock is available.
+     * Set the number of seconds to block until a lock is available.
      *
      * @param  int  $timeout
      * @return $this
