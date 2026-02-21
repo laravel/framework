@@ -301,7 +301,7 @@ class ArrayStore extends TaggableStore implements FlushableLock, LockProvider
     {
         return true;
     }
-    
+
     /**
      * Unserialize the given value.
      *
