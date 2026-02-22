@@ -12,7 +12,7 @@ class FilesystemServiceProviderTest extends TestCase
     public function test_it_throws_when_served_disks_have_conflicting_uris()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The [other] disk conflicts with another served disk at [/storage]. Each served disk must have a unique [url].');
+        $this->expectExceptionMessage('The [other] disk conflicts with the [local] disk at [/storage]. Each served disk must have a unique [url].');
 
         config(['filesystems.disks' => [
             'local' => [

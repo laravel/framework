@@ -95,13 +95,13 @@ class FilesystemServiceProvider extends ServiceProvider
                 ? rtrim(parse_url($config['url'])['path'], '/')
                 : '/storage';
 
-            if (in_array($uri, $served)) {
+            if (isset($served[$uri])) {
                 throw new InvalidArgumentException(
-                    "The [{$disk}] disk conflicts with another served disk at [{$uri}]. Each served disk must have a unique [url]."
+                    "The [{$disk}] disk conflicts with the [{$served[$uri]}] disk at [{$uri}]. Each served disk must have a unique [url]."
                 );
             }
 
-            $served[] = $uri;
+            $served[$uri] = $disk;
 
             $this->app->booted(function ($app) use ($disk, $config, $uri) {
                 $isProduction = $app->isProduction();
