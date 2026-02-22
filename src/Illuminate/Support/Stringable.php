@@ -382,6 +382,36 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Determine if a given string contains only alphabetic characters.
+     *
+     * @return bool
+     */
+    public function isAlpha()
+    {
+        return Str::isAlpha($this->value);
+    }
+
+    /**
+     * Determine if a given string contains only alpha-numeric characters.
+     *
+     * @return bool
+     */
+    public function isAlphanumeric()
+    {
+        return Str::isAlphanumeric($this->value);
+    }
+
+    /**
+     * Determine if a given string is a valid hexadecimal string.
+     *
+     * @return bool
+     */
+    public function isHex()
+    {
+        return Str::isHex($this->value);
+    }
+
+    /**
      * Determine if a given string is valid JSON.
      *
      * @return bool
@@ -570,13 +600,33 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
-     * Remove all non-numeric characters from a string.
+     * Remove all non-numeric characters from the string.
      *
      * @return static
      */
     public function numbers()
     {
         return new static(Str::numbers($this->value));
+    }
+
+    /**
+     * Remove all non-alphabetic characters from the string.
+     *
+     * @return static
+     */
+    public function letters()
+    {
+        return new static(Str::letters($this->value));
+    }
+
+    /**
+     * Remove all non-alphanumeric characters from the string.
+     *
+     * @return static
+     */
+    public function alphanumeric()
+    {
+        return new static(Str::alphanumeric($this->value));
     }
 
     /**

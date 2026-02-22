@@ -37,8 +37,26 @@ class SupportStringableTest extends TestCase
 
     public function testIsAscii()
     {
-        $this->assertTrue($this->stringable('A')->isAscii());
-        $this->assertFalse($this->stringable('ù')->isAscii());
+        $this->assertTrue($this->stringable('hannah')->isAscii());
+        $this->assertFalse($this->stringable('有机')->isAscii());
+    }
+
+    public function testIsAlpha()
+    {
+        $this->assertTrue($this->stringable('laravel')->isAlpha());
+        $this->assertFalse($this->stringable('laravel 12')->isAlpha());
+    }
+
+    public function testIsAlphanumeric()
+    {
+        $this->assertTrue($this->stringable('laravel12')->isAlphanumeric());
+        $this->assertFalse($this->stringable('laravel-12')->isAlphanumeric());
+    }
+
+    public function testIsHex()
+    {
+        $this->assertTrue($this->stringable('af0123')->isHex());
+        $this->assertFalse($this->stringable('gh0123')->isHex());
     }
 
     public function testIsUrl()
@@ -1210,6 +1228,24 @@ class SupportStringableTest extends TestCase
         $this->assertEquals(null, $this->stringable('Привет, мир!')->charAt('Привет, мир!', 100));
     }
 
+    public function testNumbers()
+    {
+        $this->assertSame('5551234567', (string) $this->stringable('(555) 123-4567')->numbers());
+        $this->assertSame('443', (string) $this->stringable('L4r4v3l!')->numbers());
+        $this->assertSame('', (string) $this->stringable('Laravel!')->numbers());
+    }
+
+    public function testLetters()
+    {
+        $this->assertSame('Lrvl', (string) $this->stringable('L4r4v3l!')->letters());
+        $this->assertSame('Laravel', (string) $this->stringable('Laravel 12!')->letters());
+    }
+
+    public function testAlphanumeric()
+    {
+        $this->assertSame('L4r4v3l', (string) $this->stringable('L4r4v3l!')->alphanumeric());
+        $this->assertSame('Laravel12', (string) $this->stringable('Laravel 12!')->alphanumeric());
+    }
     public function testSubstr()
     {
         $this->assertSame('Ё', (string) $this->stringable('БГДЖИЛЁ')->substr(-1));
@@ -1515,11 +1551,6 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('off')->toBoolean());
         $this->assertTrue($this->stringable('yes')->toBoolean());
         $this->assertFalse($this->stringable('no')->toBoolean());
-    }
-
-    public function testNumbers()
-    {
-        $this->assertSame('5551234567', (string) $this->stringable('(555) 123-4567')->numbers());
     }
 
     public function testToDate()

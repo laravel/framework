@@ -697,6 +697,43 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::isUrl('http:///path'));
     }
 
+    public function testIsAlpha()
+    {
+        $this->assertTrue(Str::isAlpha('laravel'));
+        $this->assertTrue(Str::isAlpha('Laravel'));
+        $this->assertTrue(Str::isAlpha('LARA'));
+        $this->assertTrue(Str::isAlpha('Jönköping'));
+        $this->assertFalse(Str::isAlpha('laravel 12'));
+        $this->assertFalse(Str::isAlpha('laravel-12'));
+        $this->assertFalse(Str::isAlpha(' '));
+        $this->assertFalse(Str::isAlpha(''));
+        $this->assertFalse(Str::isAlpha(123));
+    }
+
+    public function testIsAlphanumeric()
+    {
+        $this->assertTrue(Str::isAlphanumeric('laravel12'));
+        $this->assertTrue(Str::isAlphanumeric('Laravel12'));
+        $this->assertTrue(Str::isAlphanumeric('123'));
+        $this->assertTrue(Str::isAlphanumeric('Jönköping12'));
+        $this->assertFalse(Str::isAlphanumeric('laravel-12'));
+        $this->assertFalse(Str::isAlphanumeric('laravel 12'));
+        $this->assertFalse(Str::isAlphanumeric(' '));
+        $this->assertFalse(Str::isAlphanumeric(''));
+        $this->assertFalse(Str::isAlphanumeric(null));
+    }
+
+    public function testIsHex()
+    {
+        $this->assertTrue(Str::isHex('af0123'));
+        $this->assertTrue(Str::isHex('AF0123'));
+        $this->assertTrue(Str::isHex('0123456789abcdef'));
+        $this->assertFalse(Str::isHex('gh0123'));
+        $this->assertFalse(Str::isHex('af0123 '));
+        $this->assertFalse(Str::isHex(''));
+        $this->assertFalse(Str::isHex(null));
+    }
+
     #[DataProvider('validUuidList')]
     public function testIsUuidWithValidUuid($uuid)
     {
@@ -808,6 +845,30 @@ class SupportStrTest extends TestCase
         $arrayValue = ['(555) 123-4567', 'L4r4v3l', 'Laravel!'];
         $arrayExpected = ['5551234567', '443', ''];
         $this->assertSame($arrayExpected, Str::numbers($arrayValue));
+    }
+
+    public function testLetters()
+    {
+        $this->assertSame('Lrvl', Str::letters('L4r4v3l!'));
+        $this->assertSame('Laravel', Str::letters('Laravel 12!'));
+        $this->assertSame('Jönköping', Str::letters('Jönköping 12!'));
+        $this->assertSame('', Str::letters('123!'));
+
+        $arrayValue = ['L4r4v3l!', 'Laravel 12!', '123!'];
+        $arrayExpected = ['Lrvl', 'Laravel', ''];
+        $this->assertSame($arrayExpected, Str::letters($arrayValue));
+    }
+
+    public function testAlphanumeric()
+    {
+        $this->assertSame('L4r4v3l', Str::alphanumeric('L4r4v3l!'));
+        $this->assertSame('Laravel12', Str::alphanumeric('Laravel 12!'));
+        $this->assertSame('Jönköping12', Str::alphanumeric('Jönköping 12!'));
+        $this->assertSame('123', Str::alphanumeric('123!'));
+
+        $arrayValue = ['L4r4v3l!', 'Laravel 12!', '123!'];
+        $arrayExpected = ['L4r4v3l', 'Laravel12', '123'];
+        $this->assertSame($arrayExpected, Str::alphanumeric($arrayValue));
     }
 
     public function testRandom()

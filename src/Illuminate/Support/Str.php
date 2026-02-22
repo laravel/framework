@@ -554,7 +554,7 @@ class Str
     }
 
     /**
-     * Determine if a given string is 7 bit ASCII.
+     * Determine if a given value is 7 bit ASCII.
      *
      * @param  string  $value
      * @return bool
@@ -562,6 +562,57 @@ class Str
     public static function isAscii($value)
     {
         return ASCII::is_ascii((string) $value);
+    }
+
+    /**
+     * Determine if a given value contains only alphabetic characters.
+     *
+     * @param  mixed  $value
+     * @return bool
+     *
+     * @phpstan-assert-if-true =non-empty-string $value
+     */
+    public static function isAlpha($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        return preg_match('/^\pL++$/u', $value) > 0;
+    }
+
+    /**
+     * Determine if a given value contains only alpha-numeric characters.
+     *
+     * @param  mixed  $value
+     * @return bool
+     *
+     * @phpstan-assert-if-true =non-empty-string $value
+     */
+    public static function isAlphanumeric($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        return preg_match('/^[\pL\pN]++$/u', $value) > 0;
+    }
+
+    /**
+     * Determine if a given value is a valid hexadecimal string.
+     *
+     * @param  mixed  $value
+     * @return bool
+     *
+     * @phpstan-assert-if-true =non-empty-string $value
+     */
+    public static function isHex($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        return preg_match('/^[a-fA-F0-9]++$/', $value) > 0;
     }
 
     /**
@@ -922,12 +973,34 @@ class Str
     /**
      * Remove all non-numeric characters from a string.
      *
-     * @param  string  $value
-     * @return string
+     * @param  string|array  $value
+     * @return string|array
      */
     public static function numbers($value)
     {
         return preg_replace('/[^0-9]/', '', $value);
+    }
+
+    /**
+     * Remove all non-alphabetic characters from a string.
+     *
+     * @param  string|array  $value
+     * @return string|array
+     */
+    public static function letters($value)
+    {
+        return preg_replace('/[^\pL]/u', '', $value);
+    }
+
+    /**
+     * Remove all non-alphanumeric characters from a string.
+     *
+     * @param  string|array  $value
+     * @return string|array
+     */
+    public static function alphanumeric($value)
+    {
+        return preg_replace('/[^\pL\pN]/u', '', $value);
     }
 
     /**
