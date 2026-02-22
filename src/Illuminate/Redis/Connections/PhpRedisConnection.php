@@ -317,11 +317,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             $options['count'] ?? 10
         );
 
-        if ($result === false) {
-            $result = [];
-        }
-
-        return $cursor === 0 && empty($result) ? false : [$cursor, $result];
+        return $this->normalizeScanResult($cursor, $result);
     }
 
     /**
@@ -339,11 +335,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             $options['count'] ?? 10
         );
 
-        if ($result === false) {
-            $result = [];
-        }
-
-        return $cursor === 0 && empty($result) ? false : [$cursor, $result];
+        return $this->normalizeScanResult($cursor, $result);
     }
 
     /**
@@ -361,11 +353,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             $options['count'] ?? 10
         );
 
-        if ($result === false) {
-            $result = [];
-        }
-
-        return $cursor === 0 && empty($result) ? false : [$cursor, $result];
+        return $this->normalizeScanResult($cursor, $result);
     }
 
     /**
@@ -383,6 +371,18 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             $options['count'] ?? 10
         );
 
+        return $this->normalizeScanResult($cursor, $result);
+    }
+
+    /**
+     * Normalize the result from a scan operation.
+     *
+     * @param  mixed  $cursor
+     * @param  mixed  $result
+     * @return array|false
+     */
+    protected function normalizeScanResult($cursor, $result)
+    {
         if ($result === false) {
             $result = [];
         }
