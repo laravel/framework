@@ -1246,6 +1246,7 @@ class SupportStringableTest extends TestCase
         $this->assertSame('L4r4v3l', (string) $this->stringable('L4r4v3l!')->alphanumeric());
         $this->assertSame('Laravel12', (string) $this->stringable('Laravel 12!')->alphanumeric());
     }
+
     public function testSubstr()
     {
         $this->assertSame('Ё', (string) $this->stringable('БГДЖИЛЁ')->substr(-1));
