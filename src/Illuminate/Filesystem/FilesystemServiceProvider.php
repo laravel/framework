@@ -91,19 +91,19 @@ class FilesystemServiceProvider extends ServiceProvider
                 continue;
             }
 
-            $uri = isset($config['url'])
-                ? rtrim(parse_url($config['url'])['path'], '/')
-                : '/storage';
+            $this->app->booted(function ($app) use ($disk, $config, &$served) {
+                $uri = isset($config['url'])
+                    ? rtrim(parse_url($config['url'])['path'], '/')
+                    : '/storage';
 
-            if (isset($served[$uri])) {
-                throw new InvalidArgumentException(
-                    "The [{$disk}] disk conflicts with the [{$served[$uri]}] disk at [{$uri}]. Each served disk must have a unique [url]."
-                );
-            }
+                if (isset($served[$uri])) {
+                    throw new InvalidArgumentException(
+                        "The [{$disk}] disk conflicts with the [{$served[$uri]}] disk at [{$uri}]. Each served disk must have a unique [url]."
+                    );
+                }
 
-            $served[$uri] = $disk;
+                $served[$uri] = $disk;
 
-            $this->app->booted(function ($app) use ($disk, $config, $uri) {
                 $isProduction = $app->isProduction();
 
                 Route::get($uri.'/{path}', function (Request $request, string $path) use ($disk, $config, $isProduction) {
