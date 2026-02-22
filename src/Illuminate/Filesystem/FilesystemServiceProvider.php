@@ -6,6 +6,7 @@ use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use InvalidArgumentException;
 
 class FilesystemServiceProvider extends ServiceProvider
 {
@@ -83,16 +84,26 @@ class FilesystemServiceProvider extends ServiceProvider
             return;
         }
 
+        $served = [];
+
         foreach ($this->app['config']['filesystems.disks'] ?? [] as $disk => $config) {
             if (! $this->shouldServeFiles($config)) {
                 continue;
             }
 
-            $this->app->booted(function ($app) use ($disk, $config) {
-                $uri = isset($config['url'])
-                    ? rtrim(parse_url($config['url'])['path'], '/')
-                    : '/storage';
+            $uri = isset($config['url'])
+                ? rtrim(parse_url($config['url'])['path'], '/')
+                : '/storage';
 
+            if (in_array($uri, $served)) {
+                throw new InvalidArgumentException(
+                    "The [{$disk}] disk conflicts with another served disk at [{$uri}]. Each served disk must have a unique [url]."
+                );
+            }
+
+            $served[] = $uri;
+
+            $this->app->booted(function ($app) use ($disk, $config, $uri) {
                 $isProduction = $app->isProduction();
 
                 Route::get($uri.'/{path}', function (Request $request, string $path) use ($disk, $config, $isProduction) {
