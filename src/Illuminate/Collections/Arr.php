@@ -1180,6 +1180,46 @@ class Arr
     }
 
     /**
+     * Get a collection item from an array using "dot" notation.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int|null  $key
+     * @param  mixed  $default
+     * @return \Illuminate\Support\Collection
+     */
+    public static function collect($array, $key = null, $default = null)
+    {
+        return new Collection(static::get($array, $key, $default));
+    }
+
+    /**
+     * Get an enum item from an array using "dot" notation.
+     *
+     * @template TEnum of \BackedEnum
+     * @template TDefault
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int|null  $key
+     * @param  class-string<TEnum>  $enumClass
+     * @param  TDefault|(\Closure(): TDefault)  $default
+     * @return TEnum|TDefault
+     */
+    public static function enum($array, $key, $enumClass, $default = null)
+    {
+        $value = static::get($array, $key);
+
+        if ($value instanceof $enumClass) {
+            return $value;
+        }
+
+        if (is_null($value) || ! is_a($enumClass, \BackedEnum::class, true)) {
+            return value($default);
+        }
+
+        return $enumClass::tryFrom($value) ?: value($default);
+    }
+
+    /**
      * Conditionally compile classes from an array into a CSS class list.
      *
      * @param  array<string, bool>|array<int, string|int>|string  $array

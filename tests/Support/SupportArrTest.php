@@ -628,6 +628,49 @@ class SupportArrTest extends TestCase
         Arr::string($test_array, 'integer');
     }
 
+    public function testItGetsACollection()
+    {
+        $test_array = ['items' => ['foo', 'bar']];
+
+        // Test collection values are returned as collections
+        $collection = Arr::collect($test_array, 'items');
+        $this->assertInstanceOf(Collection::class, $collection);
+        $this->assertEquals(['foo', 'bar'], $collection->all());
+
+        // Test that default values are wrapped in collections
+        $collection = Arr::collect($test_array, 'missing_key', ['default']);
+        $this->assertInstanceOf(Collection::class, $collection);
+        $this->assertEquals(['default'], $collection->all());
+
+        // Test null key returns the whole array as a collection
+        $collection = Arr::collect($test_array);
+        $this->assertInstanceOf(Collection::class, $collection);
+        $this->assertEquals($test_array, $collection->all());
+    }
+
+    public function testItGetsAnEnum()
+    {
+        $test_array = ['status' => 'A', 'invalid' => 'C'];
+
+        // Test string backed enums are returned
+        $enum = Arr::enum($test_array, 'status', TestStringBackedEnum::class);
+        $this->assertInstanceOf(TestStringBackedEnum::class, $enum);
+        $this->assertSame(TestStringBackedEnum::A, $enum);
+
+        // Test that default values are returned for invalid values
+        $enum = Arr::enum($test_array, 'invalid', TestStringBackedEnum::class, TestStringBackedEnum::B);
+        $this->assertSame(TestStringBackedEnum::B, $enum);
+
+        // Test that default values are returned for missing keys
+        $enum = Arr::enum($test_array, 'missing_key', TestStringBackedEnum::class, TestStringBackedEnum::B);
+        $this->assertSame(TestStringBackedEnum::B, $enum);
+
+        // Test with already instantiated enum
+        $test_array = ['status' => TestStringBackedEnum::A];
+        $enum = Arr::enum($test_array, 'status', TestStringBackedEnum::class);
+        $this->assertSame(TestStringBackedEnum::A, $enum);
+    }
+
     public function testItGetsAnInteger()
     {
         $test_array = ['string' => 'foo bar', 'integer' => 1234];
@@ -1676,7 +1719,9 @@ class SupportArrTest extends TestCase
         $this->assertSame($subject, Arr::from($items));
 
         $items = new WeakMap;
-        $items[$temp = new class {}] = 'bar';
+        $items[$temp = new class
+        {
+        }] = 'bar';
         $this->assertSame(['bar'], Arr::from($items));
 
         $this->expectException(InvalidArgumentException::class);
