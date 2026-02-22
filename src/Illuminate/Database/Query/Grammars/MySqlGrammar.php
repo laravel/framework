@@ -6,6 +6,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 class MySqlGrammar extends Grammar
 {
@@ -15,6 +16,30 @@ class MySqlGrammar extends Grammar
      * @var string[]
      */
     protected $operators = ['sounds like'];
+
+    /**
+     * Compile a select query into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    public function compileSelect(Builder $query)
+    {
+        $sql = parent::compileSelect($query);
+
+        if ($query->timeout === null) {
+            return $sql;
+        }
+
+        $milliseconds = $query->timeout * 1000;
+
+        return preg_replace(
+            '/^select\b/i',
+            'select /*+ MAX_EXECUTION_TIME('.$milliseconds.') */',
+            $sql,
+            1
+        );
+    }
 
     /**
      * Compile a "where like" clause.
@@ -102,13 +127,25 @@ class MySqlGrammar extends Grammar
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  \Illuminate\Database\Query\IndexHint  $indexHint
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function compileIndexHint(Builder $query, $indexHint)
     {
+        $index = $indexHint->index;
+
+        $indexes = array_map('trim', explode(',', $index));
+
+        foreach ($indexes as $i) {
+            if (! preg_match('/^[a-zA-Z0-9_$]+$/', $i)) {
+                throw new InvalidArgumentException('Index name contains invalid characters.');
+            }
+        }
+
         return match ($indexHint->type) {
-            'hint' => "use index ({$indexHint->index})",
-            'force' => "force index ({$indexHint->index})",
-            default => "ignore index ({$indexHint->index})",
+            'hint' => "use index ({$index})",
+            'force' => "force index ({$index})",
+            default => "ignore index ({$index})",
         };
     }
 
@@ -285,10 +322,20 @@ class MySqlGrammar extends Grammar
      *
      * @param  string|int  $seed
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     public function compileRandom($seed)
     {
-        return 'RAND('.$seed.')';
+        if ($seed === '' || $seed === null) {
+            return 'RAND()';
+        }
+
+        if (! is_numeric($seed)) {
+            throw new InvalidArgumentException('The seed value must be numeric.');
+        }
+
+        return 'RAND('.(int) $seed.')';
     }
 
     /**
@@ -388,6 +435,14 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function supportsStraightJoins()
+    {
+        return true;
+    }
+
+    /**
      * Prepare a JSON column being updated using the JSON_SET function.
      *
      * @param  string  $key
@@ -454,7 +509,7 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Compile a delete query that does not use joins.
+     * Compile a delete statement without joins into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $table
@@ -465,9 +520,33 @@ class MySqlGrammar extends Grammar
     {
         $sql = parent::compileDeleteWithoutJoins($query, $table, $where);
 
-        // When using MySQL, delete statements may contain order by statements and limits
-        // so we will compile both of those here. Once we have finished compiling this
-        // we will return the completed SQL statement so it will be executed for us.
+        if (! empty($query->orders)) {
+            $sql .= ' '.$this->compileOrders($query, $query->orders);
+        }
+
+        if (isset($query->limit)) {
+            $sql .= ' '.$this->compileLimit($query, $query->limit);
+        }
+
+        return $sql;
+    }
+
+    /**
+     * Compile a delete statement with joins into SQL.
+     *
+     * Adds ORDER BY and LIMIT if present, for platforms that allow them (e.g., PlanetScale).
+     *
+     * Standard MySQL does not support ORDER BY or LIMIT with joined deletes and will throw a syntax error.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $table
+     * @param  string  $where
+     * @return string
+     */
+    protected function compileDeleteWithJoins(Builder $query, $table, $where)
+    {
+        $sql = parent::compileDeleteWithJoins($query, $table, $where);
+
         if (! empty($query->orders)) {
             $sql .= ' '.$this->compileOrders($query, $query->orders);
         }

@@ -441,6 +441,9 @@ class SupportStrTest extends TestCase
         $this->assertSame('te', Str::afterLast('yv0et0te', 0));
         $this->assertSame('te', Str::afterLast('yv2et2te', 2));
         $this->assertSame('foo', Str::afterLast('----foo', '---'));
+        // Test with multibyte characters in search string
+        $this->assertSame('', Str::afterLast('café au café', 'café'));
+        $this->assertSame('', Str::afterLast('こんにちは世界こんにちは', 'こんにちは'));
     }
 
     #[DataProvider('strContainsProvider')]
@@ -681,7 +684,17 @@ class SupportStrTest extends TestCase
     {
         $this->assertTrue(Str::isUrl('https://laravel.com'));
         $this->assertTrue(Str::isUrl('http://localhost'));
+        $this->assertTrue(Str::isUrl('http://l'));
+        $this->assertTrue(Str::isUrl('http://l:8000'));
+        $this->assertTrue(Str::isUrl('http://l:8000/path'));
+        $this->assertTrue(Str::isUrl('http://a.b'));
+        $this->assertTrue(Str::isUrl('http://sub.domain.com'));
+        $this->assertTrue(Str::isUrl('http://my-site.com'));
+        $this->assertTrue(Str::isUrl('https://example.com:8080/path?q=1#frag'));
         $this->assertFalse(Str::isUrl('invalid url'));
+        $this->assertFalse(Str::isUrl('http://.'));
+        $this->assertFalse(Str::isUrl('http://...'));
+        $this->assertFalse(Str::isUrl('http:///path'));
     }
 
     #[DataProvider('validUuidList')]
@@ -1274,6 +1287,10 @@ class SupportStrTest extends TestCase
         $this->assertSame('12:00', Str::substrReplace('1200', ':', 2, 0));
         $this->assertSame('The Laravel Framework', Str::substrReplace('The Framework', 'Laravel ', 4, 0));
         $this->assertSame('Laravel – The PHP Framework for Web Artisans', Str::substrReplace('Laravel Framework', '– The PHP Framework for Web Artisans', 8));
+        // test edge cases with negative offset or length
+        $this->assertSame('1567', Str::substrReplace('1234', '567', -3, 3));
+        $this->assertSame('125674', Str::substrReplace('1234', '567', 2, -1));
+        $this->assertSame('125674', Str::substrReplace('1234', '567', -2, -1));
     }
 
     public function testSubstrReplaceWithMultibyte()
@@ -1826,18 +1843,34 @@ class SupportStrTest extends TestCase
     public function testChopStart()
     {
         foreach ([
-            ['http://laravel.com', 'http://', 'laravel.com'],
-            ['http://-http://', 'http://', '-http://'],
-            ['http://laravel.com', 'htp:/', 'http://laravel.com'],
-            ['http://laravel.com', 'http://www.', 'http://laravel.com'],
-            ['http://laravel.com', '-http://', 'http://laravel.com'],
-            ['http://laravel.com', ['https://', 'http://'], 'laravel.com'],
-            ['http://www.laravel.com', ['http://', 'www.'], 'www.laravel.com'],
-            ['http://http-is-fun.test', 'http://', 'http-is-fun.test'],
-            ['🌊✋', '🌊', '✋'],
-            ['🌊✋', '✋', '🌊✋'],
-        ] as $value) {
-            [$subject, $needle, $expected] = $value;
+            '' => ['', ''],
+            'Laravel' => ['', 'Laravel'],
+            'Ship it' => [['', 'Ship '], 'it'],
+            'http://laravel.com' => ['http://', 'laravel.com'],
+            'http://-http://' => ['http://', '-http://'],
+            'http://laravel.com' => ['htp:/', 'http://laravel.com'],
+            'http://laravel.com' => ['http://www.', 'http://laravel.com'],
+            'http://laravel.com' => ['-http://', 'http://laravel.com'],
+            'http://laravel.com' => [['https://', 'http://'], 'laravel.com'],
+            'http://www.laravel.com' => [['http://', 'www.'], 'www.laravel.com'],
+            'http://http-is-fun.test' => ['http://', 'http-is-fun.test'],
+            // Multibyte emoji tests
+            '🌊✋' => ['🌊', '✋'],
+            '🌊✋' => ['✋', '🌊✋'],
+            '🚀🌟💫' => ['🚀', '🌟💫'],
+            '🚀🌟💫' => ['🚀🌟', '💫'],
+            // Multibyte character tests (Japanese, Chinese, Arabic, etc.)
+            'こんにちは世界' => ['こんにちは', '世界'],
+            '你好世界' => ['你好', '世界'],
+            'مرحبا بك' => ['مرحبا ', 'بك'],
+            // Mixed multibyte and ASCII
+            '🎉Laravel' => ['🎉', 'Laravel'],
+            'Hello🌍World' => ['Hello🌍', 'World'],
+            // Multiple needle array with multibyte
+            '🌊✋🎉' => [['🚀', '🌊'], '✋🎉'],
+            'こんにちは世界' => [['Hello', 'こんにちは'], '世界'],
+        ] as $subject => $value) {
+            [$needle, $expected] = $value;
 
             $this->assertSame($expected, Str::chopStart($subject, $needle));
         }
@@ -1846,18 +1879,34 @@ class SupportStrTest extends TestCase
     public function testChopEnd()
     {
         foreach ([
-            ['path/to/file.php', '.php', 'path/to/file'],
-            ['.php-.php', '.php', '.php-'],
-            ['path/to/file.php', '.ph', 'path/to/file.php'],
-            ['path/to/file.php', 'foo.php', 'path/to/file.php'],
-            ['path/to/file.php', '.php-', 'path/to/file.php'],
-            ['path/to/file.php', ['.html', '.php'], 'path/to/file'],
-            ['path/to/file.php', ['.php', 'file'], 'path/to/file'],
-            ['path/to/php.php', '.php', 'path/to/php'],
-            ['✋🌊', '🌊', '✋'],
-            ['✋🌊', '✋', '✋🌊'],
-        ] as $value) {
-            [$subject, $needle, $expected] = $value;
+            '' => ['', ''],
+            'Laravel' => ['', 'Laravel'],
+            'Ship it' => [['', ' it'], 'Ship'],
+            'path/to/file.php' => ['.php', 'path/to/file'],
+            '.php-.php' => ['.php', '.php-'],
+            'path/to/file.php' => ['.ph', 'path/to/file.php'],
+            'path/to/file.php' => ['foo.php', 'path/to/file.php'],
+            'path/to/file.php' => ['.php-', 'path/to/file.php'],
+            'path/to/file.php' => [['.html', '.php'], 'path/to/file'],
+            'path/to/file.php' => [['.php', 'file'], 'path/to/file'],
+            'path/to/php.php' => ['.php', 'path/to/php'],
+            // Multibyte emoji tests
+            '✋🌊' => ['🌊', '✋'],
+            '✋🌊' => ['✋', '✋🌊'],
+            '🌟💫🚀' => ['🚀', '🌟💫'],
+            '🌟💫🚀' => ['💫🚀', '🌟'],
+            // Multibyte character tests (Japanese, Chinese, Arabic, etc.)
+            '世界こんにちは' => ['こんにちは', '世界'],
+            '世界你好' => ['你好', '世界'],
+            'بك مرحبا' => [' مرحبا', 'بك'],
+            // Mixed multibyte and ASCII
+            'Laravel🎉' => ['🎉', 'Laravel'],
+            'Hello🌍World' => ['World', 'Hello🌍'],
+            // Multiple needle array with multibyte
+            '🎉✋🌊' => [['🚀', '🌊'], '🎉✋'],
+            '世界こんにちは' => [['Hello', 'こんにちは'], '世界'],
+        ] as $subject => $value) {
+            [$needle, $expected] = $value;
 
             $this->assertSame($expected, Str::chopEnd($subject, $needle));
         }

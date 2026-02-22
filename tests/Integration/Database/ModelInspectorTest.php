@@ -4,13 +4,16 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\UseResource;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelInfo;
 use Illuminate\Database\Eloquent\ModelInspector;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
 
@@ -39,6 +42,7 @@ class ModelInspectorTest extends DatabaseTestCase
         $this->assertModelInfo($modelInfo);
         $this->assertSame(ModelInspectorTestModelEloquentCollection::class, $modelInfo['collection']);
         $this->assertSame(ModelInspectorTestModelBuilder::class, $modelInfo['builder']);
+        $this->assertSame(ModelInspectorTestModelResource::class, $modelInfo['resource']);
     }
 
     public function test_command_returns_json()
@@ -50,7 +54,7 @@ class ModelInspectorTest extends DatabaseTestCase
         $this->assertModelInfo($modelInfo);
     }
 
-    private function assertModelInfo(array $modelInfo)
+    private function assertModelInfo(ModelInfo|array $modelInfo)
     {
         $this->assertEquals(ModelInspectorTestModel::class, $modelInfo['class']);
         $this->assertEquals(Schema::getConnection()->getConfig()['name'], $modelInfo['database']);
@@ -166,6 +170,8 @@ class ModelInspectorTest extends DatabaseTestCase
         $this->assertEquals('created', $modelInfo['observers'][0]['event']);
         $this->assertCount(1, $modelInfo['observers'][0]['observer']);
         $this->assertEquals("Illuminate\Tests\Integration\Database\ModelInspectorTestModelObserver@created", $modelInfo['observers'][0]['observer'][0]);
+        $this->assertEquals(ModelInspectorTestModelEloquentCollection::class, $modelInfo['collection']);
+        $this->assertEquals(ModelInspectorTestModelBuilder::class, $modelInfo['builder']);
     }
 
     private function assertAttributes($expectedAttributes, $actualAttributes)
@@ -181,6 +187,7 @@ class ModelInspectorTest extends DatabaseTestCase
 
 #[ObservedBy(ModelInspectorTestModelObserver::class)]
 #[CollectedBy(ModelInspectorTestModelEloquentCollection::class)]
+#[UseResource(ModelInspectorTestModelResource::class)]
 class ModelInspectorTestModel extends Model
 {
     use HasUuids;
@@ -214,5 +221,9 @@ class ModelInspectorTestModelEloquentCollection extends Collection
 }
 
 class ModelInspectorTestModelBuilder extends Builder
+{
+}
+
+class ModelInspectorTestModelResource extends JsonResource
 {
 }

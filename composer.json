@@ -15,7 +15,7 @@
         }
     ],
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "ext-ctype": "*",
         "ext-filter": "*",
         "ext-hash": "*",
@@ -44,20 +44,19 @@
         "psr/log": "^1.0|^2.0|^3.0",
         "psr/simple-cache": "^1.0|^2.0|^3.0",
         "ramsey/uuid": "^4.7",
-        "symfony/console": "^7.2.0",
-        "symfony/error-handler": "^7.2.0",
-        "symfony/finder": "^7.2.0",
-        "symfony/http-foundation": "^7.2.0",
-        "symfony/http-kernel": "^7.2.0",
-        "symfony/mailer": "^7.2.0",
-        "symfony/mime": "^7.2.0",
-        "symfony/polyfill-php83": "^1.33",
+        "symfony/console": "^7.4.0|^8.0.0",
+        "symfony/error-handler": "^7.4.0|^8.0.0",
+        "symfony/finder": "^7.4.0|^8.0.0",
+        "symfony/http-foundation": "^7.4.0|^8.0.0",
+        "symfony/http-kernel": "^7.4.0|^8.0.0",
+        "symfony/mailer": "^7.4.0|^8.0.0",
+        "symfony/mime": "^7.4.0|^8.0.0",
         "symfony/polyfill-php84": "^1.33",
         "symfony/polyfill-php85": "^1.33",
-        "symfony/process": "^7.2.0",
-        "symfony/routing": "^7.2.0",
-        "symfony/uid": "^7.2.0",
-        "symfony/var-dumper": "^7.2.0",
+        "symfony/process": "^7.4.5|^8.0.5",
+        "symfony/routing": "^7.4.0|^8.0.0",
+        "symfony/uid": "^7.4.0|^8.0.0",
+        "symfony/var-dumper": "^7.4.0|^8.0.0",
         "tijsverkoyen/css-to-inline-styles": "^2.2.5",
         "vlucas/phpdotenv": "^5.6.1",
         "voku/portable-ascii": "^2.0.2"
@@ -116,17 +115,17 @@
         "league/flysystem-sftp-v3": "^3.25.1",
         "mockery/mockery": "^1.6.10",
         "opis/json-schema": "^2.4.1",
-        "orchestra/testbench-core": "^10.8.1",
+        "orchestra/testbench-core": "^11.0.0",
         "pda/pheanstalk": "^5.0.6|^7.0.0",
         "php-http/discovery": "^1.15",
         "phpstan/phpstan": "^2.0",
-        "phpunit/phpunit": "^10.5.35|^11.5.3|^12.0.1",
+        "phpunit/phpunit": "^11.5.50|^12.5.8|^13.0.3",
         "predis/predis": "^2.3|^3.0",
         "resend/resend-php": "^0.10.0|^1.0",
-        "symfony/cache": "^7.2.0",
-        "symfony/http-client": "^7.2.0",
-        "symfony/psr-http-message-bridge": "^7.2.0",
-        "symfony/translation": "^7.2.0"
+        "symfony/cache": "^7.4.0|^8.0.0",
+        "symfony/http-client": "^7.4.0|^8.0.0",
+        "symfony/psr-http-message-bridge": "^7.4.0|^8.0.0",
+        "symfony/translation": "^7.4.0"
     },
     "conflict": {
         "tightenco/collect": "<5.5.33"
@@ -168,7 +167,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "12.x-dev"
+            "dev-master": "13.0.x-dev"
         }
     },
     "suggest": {
@@ -195,20 +194,25 @@
         "mockery/mockery": "Required to use mocking (^1.6).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (^5.0).",
         "php-http/discovery": "Required to use PSR-7 bridging features (^1.15).",
-        "phpunit/phpunit": "Required to use assertions and run tests (^10.5.35|^11.5.3|^12.0.1).",
+        "phpunit/phpunit": "Required to use assertions and run tests (^11.5.50|^12.5.8|^13.0.3).",
         "predis/predis": "Required to use the predis connector (^2.3|^3.0).",
         "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^6.0|^7.0).",
         "resend/resend-php": "Required to enable support for the Resend mail transport (^0.10.0|^1.0).",
-        "symfony/cache": "Required to PSR-6 cache bridge (^7.2).",
-        "symfony/filesystem": "Required to enable support for relative symbolic links (^7.2).",
-        "symfony/http-client": "Required to enable support for the Symfony API mail transports (^7.2).",
-        "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail transport (^7.2).",
-        "symfony/postmark-mailer": "Required to enable support for the Postmark mail transport (^7.2).",
-        "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^7.2)."
+        "symfony/cache": "Required to PSR-6 cache bridge (^7.4|^8.0).",
+        "symfony/filesystem": "Required to enable support for relative symbolic links (^7.4|^8.0).",
+        "symfony/http-client": "Required to enable support for the Symfony API mail transports (^7.4|^8.0).",
+        "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail transport (^7.4|^8.0).",
+        "symfony/postmark-mailer": "Required to enable support for the Postmark mail transport (^7.4|^8.0).",
+        "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^7.4|^8.0)."
     },
     "config": {
         "sort-packages": true,
+        "audit": {
+            "ignore": {
+                "GHSA-vvj3-c3rp-c85p": "Ensure testing features are compatible with affected PHPUnit versions"
+            }
+        },
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
             "php-http/discovery": false

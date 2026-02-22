@@ -17,11 +17,6 @@ use PHPUnit\Framework\TestCase;
 
 class DatabasePostgresSchemaGrammarTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testBasicCreateTable()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
@@ -70,7 +65,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(2, $statements);
         $this->assertSame('create table "users" ("id" serial not null primary key, "email" varchar(255) not null, "name" varchar(255) collate "nb_NO.utf8" not null)', $statements[0]);
-        $this->assertSame('alter sequence users_id_seq restart with 1000', $statements[1]);
+        $this->assertSame("select setval(pg_get_serial_sequence('\"users\"', 'id'), 1000, false)", $statements[1]);
     }
 
     public function testAddColumnsWithMultipleAutoIncrementStartingValue()
@@ -88,8 +83,8 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
             'alter table "users" add column "id" bigserial not null primary key',
             'alter table "users" add column "code" serial not null primary key',
             'alter table "users" add column "name" varchar(255) not null',
-            'alter sequence users_id_seq restart with 100',
-            'alter sequence users_code_seq restart with 200',
+            "select setval(pg_get_serial_sequence('\"users\"', 'id'), 100, false)",
+            "select setval(pg_get_serial_sequence('\"users\"', 'code'), 200, false)",
         ], $statements);
     }
 
@@ -456,6 +451,56 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('create index concurrently "my_index" on "geo" using gist ("coordinates" point_ops)', $statements[0]);
+    }
+
+    public function testAddingVectorIndex()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'posts');
+        $blueprint->vectorIndex('embeddings');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "posts_embeddings_vectorindex" on "posts" using hnsw ("embeddings" vector_cosine_ops)', $statements[0]);
+    }
+
+    public function testAddingVectorIndexOnline()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'posts');
+        $blueprint->vectorIndex('embeddings')->online();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index concurrently "posts_embeddings_vectorindex" on "posts" using hnsw ("embeddings" vector_cosine_ops)', $statements[0]);
+    }
+
+    public function testAddingVectorIndexWithName()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'posts');
+        $blueprint->vectorIndex('embeddings', 'my_vector_index');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "my_vector_index" on "posts" using hnsw ("embeddings" vector_cosine_ops)', $statements[0]);
+    }
+
+    public function testAddingFluentVectorIndex()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'posts');
+        $blueprint->vector('embeddings', 1536)->vectorIndex();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('create index "posts_embeddings_vectorindex" on "posts" using hnsw ("embeddings" vector_cosine_ops)', $statements[1]);
+    }
+
+    public function testAddingFluentIndexOnVectorColumn()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'posts');
+        $blueprint->vector('embeddings', 1536)->index();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('create index "posts_embeddings_vectorindex" on "posts" using hnsw ("embeddings" vector_cosine_ops)', $statements[1]);
     }
 
     public function testAddingRawIndex()

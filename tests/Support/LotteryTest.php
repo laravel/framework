@@ -10,9 +10,9 @@ class LotteryTest extends TestCase
 {
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Lottery::determineResultNormally();
+
+        parent::tearDown();
     }
 
     public function testItCanWin()

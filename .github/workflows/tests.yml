@@ -24,7 +24,7 @@ jobs:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: forge
         ports:
-          - 33306:3306
+          - 3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
       redis:
         image: redis:7.0
@@ -39,30 +39,12 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.2, 8.3, 8.4]
-        phpunit: ['10.5.35', '11.5.3', '12.0.0', '12.5.0']
+        php: [8.3, 8.4, 8.5]
+        phpunit: ['11.5.50', '12.5.8', '13.0.3']
         stability: [prefer-lowest, prefer-stable]
         exclude:
-          - php: 8.2
-            phpunit: '12.0.0'
-          - php: 8.2
-            phpunit: '12.5.0'
-        include:
-          - php: 8.5
-            phpunit: '12.1.0'
-            stability: prefer-stable
-          - php: 8.5
-            phpunit: '12.2.0'
-            stability: prefer-stable
-          - php: 8.5
-            phpunit: '12.3.0'
-            stability: prefer-stable
-          - php: 8.5
-            phpunit: '12.4.0'
-            stability: prefer-stable
-          - php: 8.5
-            phpunit: '12.5.0'
-            stability: prefer-stable
+          - php: 8.3
+            phpunit: '13.0.3'
 
     name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }}
 
@@ -83,7 +65,7 @@ jobs:
           REDIS_LIBS: liblz4-dev, liblzf-dev, libzstd-dev
 
       - name: Set Framework version
-        run: composer config version "12.x-dev"
+        run: composer config version "13.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
@@ -93,7 +75,7 @@ jobs:
           command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --with="phpunit/phpunit:~${{ matrix.phpunit }}"
 
       - name: Execute tests
-        run: vendor/bin/phpunit --display-deprecation ${{ matrix.stability == 'prefer-stable' && '--fail-on-deprecation' || '' }}
+        run: vendor/bin/phpunit --display-deprecation ${{ matrix.stability == 'prefer-stable' && '--fail-on-deprecation' || '' }} --no-coverage
         env:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
           DB_USERNAME: root
@@ -103,7 +85,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: randomSecret
 
       - name: Store artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linux-logs-${{ matrix.php }}-${{ matrix.phpunit }}-${{ matrix.stability }}
           path: |
@@ -116,30 +98,12 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.2, 8.3, 8.4]
-        phpunit: ['10.5.35', '11.5.3', '12.0.0', '12.5.0']
+        php: [8.3, 8.4, 8.5]
+        phpunit: ['11.5.50', '12.5.8', '13.0.3']
         stability: [prefer-lowest, prefer-stable]
         exclude:
-          - php: 8.2
-            phpunit: '12.0.0'
-          - php: 8.2
-            phpunit: '12.5.0'
-        include:
-          - php: 8.5
-            phpunit: '12.1.0'
-            stability: prefer-stable
-          - php: 8.5
-            phpunit: '12.2.0'
-            stability: prefer-stable
-          - php: 8.5
-            phpunit: '12.3.0'
-            stability: prefer-stable
-          - php: 8.5
-            phpunit: '12.4.0'
-            stability: prefer-stable
-          - php: 8.5
-            phpunit: '12.5.0'
-            stability: prefer-stable
+          - php: 8.3
+            phpunit: '13.0.3'
 
     name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }} - Windows
 
@@ -161,7 +125,7 @@ jobs:
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "12.x-dev"
+        run: composer config version "13.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
@@ -171,13 +135,13 @@ jobs:
           command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --with="phpunit/phpunit:~${{ matrix.phpunit }}"
 
       - name: Execute tests
-        run: vendor/bin/phpunit
+        run: vendor/bin/phpunit --no-coverage
         env:
           AWS_ACCESS_KEY_ID: random_key
           AWS_SECRET_ACCESS_KEY: random_secret
 
       - name: Store artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: windows-logs-${{ matrix.php }}-${{ matrix.phpunit }}-${{ matrix.stability }}
           path: |

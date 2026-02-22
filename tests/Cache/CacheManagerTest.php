@@ -15,25 +15,19 @@ use PHPUnit\Framework\TestCase;
 
 class CacheManagerTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testCustomDriverClosureBoundObjectIsCacheManager()
     {
-        $cacheManager = new CacheManager([
-            'config' => [
-                'cache.stores.'.__CLASS__ => [
-                    'driver' => __CLASS__,
+        $manager = new CacheManager($this->getApp([
+            'cache' => [
+                'stores' => [
+                    __CLASS__ => [
+                        'driver' => __CLASS__,
+                    ],
                 ],
             ],
-        ]);
-        $driver = function () {
-            return $this;
-        };
-        $cacheManager->extend(__CLASS__, $driver);
-        $this->assertEquals($cacheManager, $cacheManager->store(__CLASS__));
+        ]));
+        $manager->extend(__CLASS__, fn () => $this);
+        $this->assertSame($manager, $manager->store(__CLASS__));
     }
 
     public function testCustomDriverOverridesInternalDrivers()

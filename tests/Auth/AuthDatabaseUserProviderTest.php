@@ -14,11 +14,6 @@ use stdClass;
 
 class AuthDatabaseUserProviderTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testRetrieveByIDReturnsUserWhenUserIsFound()
     {
         $conn = m::mock(Connection::class);

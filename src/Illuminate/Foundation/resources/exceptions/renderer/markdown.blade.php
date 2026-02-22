@@ -12,6 +12,20 @@ Laravel {{ app()->version() }}
 {{ $index }} - {{ $frame->file() }}:{{ $frame->line() }}
 @endforeach
 
+@if ($exception->previousExceptions()->isNotEmpty())
+## Previous {{ Str::plural('exception', $exception->previousExceptions()->count()) }}
+@foreach ($exception->previousExceptions() as $index => $previous)
+
+### {{ $index + 1 }}. {{ $previous->class() }}
+
+{!! $previous->message() !!}
+
+@foreach($previous->frames() as $index => $frame)
+{{ $index }} - {{ $frame->file() }}:{{ $frame->line() }}
+@endforeach
+@endforeach
+@endif
+
 ## Request
 
 {{ $exception->request()->method() }} {{ \Illuminate\Support\Str::start($exception->request()->path(), '/') }}

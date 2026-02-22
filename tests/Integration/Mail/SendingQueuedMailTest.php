@@ -28,6 +28,30 @@ class SendingQueuedMailTest extends TestCase
             return $job->middleware[0] instanceof RateLimited;
         });
     }
+
+    public function testMailIsSentWhenRoutingQueue()
+    {
+        Queue::fake();
+
+        Queue::route(Mailable::class, 'mail-queue', 'mail-connection');
+
+        Mail::to('test@mail.com')->queue(new SendingQueuedMailTestMail);
+
+        Queue::connection('mail-connection')->assertPushedOn('mail-queue', SendQueuedMailable::class);
+    }
+
+    public function testMailIsSentWithDelay()
+    {
+        Queue::fake();
+
+        $delay = now()->addMinutes(10);
+
+        Mail::to('test@mail.com')->later($delay, new SendingQueuedMailTestMail);
+
+        Queue::assertPushed(SendQueuedMailable::class, function ($job) use ($delay) {
+            return $job->delay === $delay;
+        });
+    }
 }
 
 class SendingQueuedMailTestMail extends Mailable

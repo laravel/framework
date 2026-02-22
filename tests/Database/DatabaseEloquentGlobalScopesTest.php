@@ -23,9 +23,9 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Model::unsetConnectionResolver();
+
+        parent::tearDown();
     }
 
     public function testGlobalScopeIsApplied()
@@ -167,6 +167,38 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $this->assertEquals($mainQuery, $query->toSql());
         $this->assertEquals(['bar', 1, 'baz', 1], $query->getBindings());
     }
+
+    public function testRegularScopesThatRemoveGlobalScopes()
+    {
+        $query = EloquentClosureGlobalScopesTestModel::where('foo', 'foo')->approved()->notApproved();
+
+        $this->assertSame('select * from "table" where "foo" = ? and ("approved" = ? or "should_approve" = ?) and ("approved" = ? or "should_approve" = ?) order by "name" asc', $query->toSql());
+        $this->assertEquals(['foo', 1, 0, 0, 1], $query->getBindings());
+    }
+
+    public function testRegularScopesThatRemoveGlobalScopesCalledInNestedWhereCondition()
+    {
+        $query = EloquentClosureGlobalScopesTestModel::where('foo', 'foo')->where(function ($query) {
+            $query->approved();
+            $query->orWhere(function ($query) {
+                $query->notApproved();
+            });
+        });
+
+        $this->assertSame('select * from "table" where "foo" = ? and (("approved" = ? or "should_approve" = ?) or (("approved" = ? or "should_approve" = ?))) order by "name" asc', $query->toSql());
+        $this->assertEquals(['foo', 1, 0, 0, 1], $query->getBindings());
+    }
+
+    public function testRemovingGlobalScopeInNestedWhereCondition()
+    {
+        $query = EloquentClosureGlobalScopesTestModel::where('foo', 'foo')->where(function ($query) {
+            $query->approved();
+            $query->withoutGlobalScope('active_scope');
+        });
+
+        $this->assertSame('select * from "table" where "foo" = ? and (("approved" = ? or "should_approve" = ?)) order by "name" asc', $query->toSql());
+        $this->assertEquals(['foo', 1, 0], $query->getBindings());
+    }
 }
 
 class EloquentClosureGlobalScopesTestModel extends Model
@@ -189,6 +221,11 @@ class EloquentClosureGlobalScopesTestModel extends Model
     public function scopeApproved($query)
     {
         return $query->where('approved', 1)->orWhere('should_approve', 0);
+    }
+
+    public function scopeNotApproved($query)
+    {
+        return $query->where('approved', 0)->orWhere('should_approve', 1)->withoutGlobalScope('active_scope');
     }
 
     public function scopeOrApproved($query)

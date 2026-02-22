@@ -10,8 +10,10 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Sleep;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 
+#[RequiresPhpExtension('redis')]
 class RedisStoreTest extends TestCase
 {
     use InteractsWithRedis;

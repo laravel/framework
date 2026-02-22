@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Console;
 
 use Illuminate\Console\Application;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components\Factory;
@@ -17,11 +18,6 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class CommandTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testCallingClassCommandResolveCommandViaApplicationResolution()
     {
         $command = new class extends Command
@@ -214,5 +210,21 @@ class CommandTest extends TestCase
         $command->setOutput($output);
 
         $command->choice('Select all that apply.', ['option-1', 'option-2', 'option-3'], null, null, true);
+    }
+
+    public function testSignatureAttributeCanSetAliases()
+    {
+        $command = new SignatureWithAliasesCommand;
+
+        $this->assertSame('foo:bar', $command->getName());
+        $this->assertSame(['bar:baz', 'baz:qux'], $command->getAliases());
+    }
+}
+
+#[Signature('foo:bar', aliases: ['bar:baz', 'baz:qux'])]
+class SignatureWithAliasesCommand extends Command
+{
+    public function handle()
+    {
     }
 }

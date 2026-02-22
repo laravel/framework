@@ -96,8 +96,13 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
      * @param  \Illuminate\Http\Request  $request
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
+    #[\Override]
     public function toArray(Request $request)
     {
+        if ($this->collection->first() instanceof JsonResource) {
+            return $this->collection->map->resolve($request)->all();
+        }
+
         return $this->collection->map->toArray($request)->all();
     }
 

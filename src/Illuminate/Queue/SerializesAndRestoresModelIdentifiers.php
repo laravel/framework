@@ -90,11 +90,11 @@ trait SerializesAndRestoresModelIdentifiers
 
         $collectionClass = get_class($collection);
 
-        return new $collectionClass(
+        return (new $collectionClass(
             (new Collection($value->id))
                 ->map(fn ($id) => $collection[$id] ?? null)
                 ->filter()
-        );
+        ))->loadMissing($value->relations ?? []);
     }
 
     /**
@@ -106,7 +106,7 @@ trait SerializesAndRestoresModelIdentifiers
     public function restoreModel($value)
     {
         return $this->getQueryForModelRestoration(
-            (new $value->class)->setConnection($value->connection), $value->id
+            (new ($value->getClass()))->setConnection($value->connection), $value->id
         )->useWritePdo()->firstOrFail()->loadMissing($value->relations ?? []);
     }
 

@@ -142,7 +142,7 @@ class RouteListCommand extends Command
         return $this->filterRoute([
             'domain' => $route->domain(),
             'method' => implode('|', $route->methods()),
-            'uri' => $route->uri(),
+            'uri' => $this->resolveUri($route),
             'name' => $route->getName(),
             'action' => ltrim($route->getActionName(), '\\'),
             'middleware' => $this->getMiddleware($route),
@@ -198,6 +198,23 @@ class RouteListCommand extends Command
         $this->output->writeln(
             $this->option('json') ? $this->asJson($routes) : $this->forCli($routes)
         );
+    }
+
+    /**
+     * Get the URI for the given route, including any binding fields.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return string
+     */
+    protected function resolveUri(Route $route)
+    {
+        $uri = $route->uri();
+
+        foreach ($route->bindingFields() as $parameter => $field) {
+            $uri = str_replace("{{$parameter}}", "{{$parameter}:{$field}}", $uri);
+        }
+
+        return $uri;
     }
 
     /**
@@ -417,7 +434,7 @@ class RouteListCommand extends Command
      * Get the formatted action for display on the CLI.
      *
      * @param  array  $route
-     * @return string
+     * @return string|null
      */
     protected function formatActionForCli($route)
     {

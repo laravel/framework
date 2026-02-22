@@ -1160,16 +1160,12 @@ class Container implements ArrayAccess, ContainerContract
         // new instance of this class, injecting the created dependencies in.
         try {
             $instances = $this->resolveDependencies($dependencies);
-        } catch (BindingResolutionException $e) {
+        } finally {
             array_pop($this->buildStack);
-
-            throw $e;
         }
 
-        array_pop($this->buildStack);
-
         $this->fireAfterResolvingAttributeCallbacks(
-            $reflector->getAttributes(), $instance = $reflector->newInstanceArgs($instances)
+            $reflector->getAttributes(), $instance = new $concrete(...$instances)
         );
 
         return $instance;
@@ -1178,7 +1174,9 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Instantiate a concrete instance of the given self building type.
      *
-     * @param  \Closure(static, array): TClass|class-string<TClass>  $concrete
+     * @template TClass of object
+     *
+     * @param  object{'newInstance': \Closure(static, array): TClass|class-string<TClass>}  $concrete
      * @param  \ReflectionClass  $reflector
      * @return TClass
      *
@@ -1716,7 +1714,13 @@ class Container implements ArrayAccess, ContainerContract
     public function forgetScopedInstances()
     {
         foreach ($this->scopedInstances as $scoped) {
-            unset($this->instances[$scoped]);
+            if ($scoped instanceof Closure) {
+                foreach ($this->closureReturnTypes($scoped) as $type) {
+                    unset($this->instances[$type]);
+                }
+            } else {
+                unset($this->instances[$scoped]);
+            }
         }
     }
 

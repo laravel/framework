@@ -74,6 +74,8 @@ class DatabaseEloquentBelongsToManyEachByIdTest extends TestCase
         $this->schema()->drop('users');
         $this->schema()->drop('articles');
         $this->schema()->drop('article_user');
+
+        parent::tearDown();
     }
 
     /**

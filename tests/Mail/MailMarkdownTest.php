@@ -11,12 +11,6 @@ use PHPUnit\Framework\TestCase;
 
 class MailMarkdownTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-        Markdown::flushState();
-    }
-
     public function testRenderFunctionReturnsHtml(): void
     {
         $viewFactory = m::mock(Factory::class);

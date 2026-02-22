@@ -499,11 +499,13 @@ class BusFake implements Fake, QueueingDispatcher
     /**
      * Assert if a batch was dispatched based on a truth-test callback.
      *
-     * @param  callable(\Illuminate\Bus\PendingBatch): bool  $callback
+     * @param  array|callable(\Illuminate\Bus\PendingBatch): bool  $callback
      * @return void
      */
-    public function assertBatched(callable $callback)
+    public function assertBatched(callable|array $callback)
     {
+        $callback = is_array($callback) ? fn (PendingBatchFake $batch) => $batch->hasJobs($callback) : $callback;
+
         PHPUnit::assertTrue(
             $this->batched($callback)->count() > 0,
             'The expected batch was not dispatched.'
@@ -716,17 +718,18 @@ class BusFake implements Fake, QueueingDispatcher
     }
 
     /**
-     * Dispatch a command to its appropriate handler.
+     * Dispatch a command to its appropriate handler after the current process.
      *
      * @param  mixed  $command
-     * @return mixed
+     * @param  mixed  $handler
+     * @return void
      */
-    public function dispatchAfterResponse($command)
+    public function dispatchAfterResponse($command, $handler = null)
     {
         if ($this->shouldFakeJob($command)) {
             $this->commandsAfterResponse[get_class($command)][] = $this->getCommandRepresentation($command);
         } else {
-            return $this->dispatcher->dispatch($command);
+            $this->dispatcher->dispatchAfterResponse($command, $handler);
         }
     }
 

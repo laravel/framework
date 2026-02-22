@@ -13,9 +13,9 @@ class CacheSessionStoreTest extends TestCase
 {
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Carbon::setTestNow(null);
+
+        parent::tearDown();
     }
 
     public function testItemsCanBeSetAndRetrieved()
@@ -69,6 +69,26 @@ class CacheSessionStoreTest extends TestCase
         $result = $store->get('foo');
 
         $this->assertNull($result);
+    }
+
+    public function testTouchExtendsTtl()
+    {
+        Carbon::setTestNow(Carbon::now());
+
+        $store = new SessionStore(self::getSession());
+        $store->put('foo', 'bar', 10);
+
+        // Move time forward and touch to extend TTL
+        Carbon::setTestNow(Carbon::now()->addSeconds(5));
+        $this->assertTrue($store->touch('foo', 60));
+
+        // Value should still exist past the original expiry
+        Carbon::setTestNow(Carbon::now()->addSeconds(10));
+        $this->assertSame('bar', $store->get('foo'));
+
+        // Value should expire after the new TTL
+        Carbon::setTestNow(Carbon::now()->addSeconds(50));
+        $this->assertNull($store->get('foo'));
     }
 
     public function testStoreItemForeverProperlyStoresInArray()

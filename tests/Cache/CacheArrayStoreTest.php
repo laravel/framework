@@ -11,9 +11,9 @@ class CacheArrayStoreTest extends TestCase
 {
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Carbon::setTestNow(null);
+
+        parent::tearDown();
     }
 
     public function testItemsCanBeSetAndRetrieved()
@@ -67,6 +67,23 @@ class CacheArrayStoreTest extends TestCase
         $result = $store->get('foo');
 
         $this->assertNull($result);
+    }
+
+    public function testTouchExtendsTtl(): void
+    {
+        $key = 'key';
+        $value = 'value';
+
+        $store = new ArrayStore;
+
+        Carbon::setTestNow($now = Carbon::now());
+
+        $store->put($key, $value, 30);
+        $store->touch($key, 60);
+
+        Carbon::setTestNow($now->addSeconds(45));
+
+        $this->assertSame($value, $store->get($key));
     }
 
     public function testStoreItemForeverProperlyStoresInArray()

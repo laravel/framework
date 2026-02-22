@@ -147,6 +147,62 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testHasSole($collection)
+    {
+        $collection = new $collection([
+            ['age' => 2],
+            ['age' => 3],
+        ]);
+
+        $this->assertFalse($collection->hasSole());
+        $this->assertFalse($collection->where('age', 1)->hasSole());
+        $this->assertTrue($collection->where('age', 2)->hasSole());
+
+        $this->assertFalse($collection->hasSole(fn () => true));
+        $this->assertFalse($collection->hasSole(fn () => false));
+        $this->assertTrue($collection->hasSole(fn ($item) => $item['age'] === 2));
+
+        $this->assertFalse($collection->hasSole('age', '>', 1));
+        $this->assertFalse($collection->hasSole('age', '<', 1));
+        $this->assertTrue($collection->hasSole('age', 2));
+
+        $data = new $collection([
+            (object) ['active' => true, 'verified' => true],
+            (object) ['active' => false, 'verified' => true],
+        ]);
+
+        $this->assertFalse($data->hasSole->verified);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testHasMany($collection)
+    {
+        $collection = new $collection([
+            ['age' => 2],
+            ['age' => 3],
+        ]);
+
+        $this->assertTrue($collection->hasMany());
+        $this->assertFalse($collection->where('age', 1)->hasMany());
+        $this->assertFalse($collection->where('age', 2)->hasMany());
+
+        $this->assertTrue($collection->hasMany(fn () => true));
+        $this->assertFalse($collection->hasMany(fn () => false));
+        $this->assertFalse($collection->hasMany(fn ($item) => $item['age'] === 2));
+
+        $this->assertTrue($collection->hasMany('age', '>', 1));
+        $this->assertFalse($collection->hasMany('age', '<', 1));
+        $this->assertFalse($collection->hasMany('age', 2));
+
+        $data = new $collection([
+            (object) ['active' => true, 'verified' => true],
+            (object) ['active' => false, 'verified' => true],
+        ]);
+
+        $this->assertTrue($data->hasMany->verified);
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testFirstOrFailReturnsFirstItemInCollection($collection)
     {
         $collection = new $collection([
@@ -898,6 +954,20 @@ class SupportCollectionTest extends TestCase
         $this->assertFalse(collect([1, 2, 2])->containsOneItem(fn ($number) => $number === 2));
         $this->assertTrue(collect(['ant', 'bear', 'cat'])->containsOneItem(fn ($word) => strlen($word) === 4));
         $this->assertFalse(collect(['ant', 'bear', 'cat'])->containsOneItem(fn ($word) => strlen($word) > 4));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testContainsManyItems($collection)
+    {
+        $this->assertFalse((new $collection([]))->containsManyItems());
+        $this->assertFalse((new $collection([1]))->containsManyItems());
+        $this->assertTrue((new $collection([1, 2]))->containsManyItems());
+        $this->assertTrue((new $collection([1, 2, 3]))->containsManyItems());
+
+        $this->assertTrue(collect([1, 2, 2])->containsManyItems(fn ($number) => $number === 2));
+        $this->assertFalse(collect(['ant', 'bear', 'cat'])->containsManyItems(fn ($word) => strlen($word) === 4));
+        $this->assertFalse(collect(['ant', 'bear', 'cat'])->containsManyItems(fn ($word) => strlen($word) > 4));
+        $this->assertTrue(collect(['ant', 'bear', 'cat'])->containsManyItems(fn ($word) => strlen($word) === 3));
     }
 
     public function testIterable()
@@ -3351,6 +3421,60 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['c', 'e'], $data->nth(2, -4)->all());
         $this->assertEquals(['e'], $data->nth(4, -2)->all());
         $this->assertEquals(['e'], $data->nth(2, -2)->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testNthThrowsExceptionForInvalidStep($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Step value must be at least 1.');
+
+        (new $collection([1, 2, 3]))->nth(0)->all();
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testNthThrowsExceptionForNegativeStep($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Step value must be at least 1.');
+
+        (new $collection([1, 2, 3]))->nth(-1)->all();
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testSplitThrowsExceptionForInvalidNumberOfGroups($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Number of groups must be at least 1.');
+
+        (new $collection([1, 2, 3]))->split(0);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testSplitThrowsExceptionForNegativeNumberOfGroups($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Number of groups must be at least 1.');
+
+        (new $collection([1, 2, 3]))->split(-1);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testSplitInThrowsExceptionForInvalidNumberOfGroups($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Number of groups must be at least 1.');
+
+        (new $collection([1, 2, 3]))->splitIn(0);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testSplitInThrowsExceptionForNegativeNumberOfGroups($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Number of groups must be at least 1.');
+
+        (new $collection([1, 2, 3]))->splitIn(-1);
     }
 
     #[DataProvider('collectionClassProvider')]

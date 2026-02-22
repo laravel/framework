@@ -17,9 +17,9 @@ class PluralizerPortugueseTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Pluralizer::useLanguage('english');
+
+        parent::tearDown();
     }
 
     public function testBasicSingular()

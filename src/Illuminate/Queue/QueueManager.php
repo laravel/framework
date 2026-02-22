@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Closure;
 use Illuminate\Contracts\Queue\Factory as FactoryContract;
 use Illuminate\Contracts\Queue\Monitor as MonitorContract;
+use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use InvalidArgumentException;
 
 /**
@@ -12,6 +13,8 @@ use InvalidArgumentException;
  */
 class QueueManager implements FactoryContract, MonitorContract
 {
+    use ResolvesQueueRoutes;
+
     /**
      * The application instance.
      *
@@ -121,6 +124,19 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Set the queue route for the given class.
+     *
+     * @param  array|class-string  $class
+     * @param  string|null  $queue
+     * @param  string|null  $connection
+     * @return void
+     */
+    public function route(array|string $class, $queue = null, $connection = null)
+    {
+        $this->queueRoutes()->set($class, $queue, $connection);
+    }
+
+    /**
      * Determine if the driver is connected.
      *
      * @param  string|null  $name
@@ -209,6 +225,10 @@ class QueueManager implements FactoryContract, MonitorContract
         $this->app['cache']
             ->store()
             ->forever("illuminate:queue:paused:{$connection}:{$queue}", true);
+
+        $this->app['events']->dispatch(
+            new Events\QueuePaused($connection, $queue)
+        );
     }
 
     /**
@@ -224,6 +244,10 @@ class QueueManager implements FactoryContract, MonitorContract
         $this->app['cache']
             ->store()
             ->put("illuminate:queue:paused:{$connection}:{$queue}", true, $ttl);
+
+        $this->app['events']->dispatch(
+            new Events\QueuePaused($connection, $queue, $ttl)
+        );
     }
 
     /**
@@ -238,6 +262,10 @@ class QueueManager implements FactoryContract, MonitorContract
         $this->app['cache']
             ->store()
             ->forget("illuminate:queue:paused:{$connection}:{$queue}");
+
+        $this->app['events']->dispatch(
+            new Events\QueueResumed($connection, $queue)
+        );
     }
 
     /**

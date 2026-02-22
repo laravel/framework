@@ -6,7 +6,7 @@ use Illuminate\Encryption\Encrypter;
 use Illuminate\Http\Request;
 use Orchestra\Testbench\TestCase;
 
-class VerifyCsrfTokenExceptTest extends TestCase
+class PreventRequestForgeryExceptTest extends TestCase
 {
     private $stub;
     private $request;
@@ -15,8 +15,8 @@ class VerifyCsrfTokenExceptTest extends TestCase
     {
         parent::setUp();
 
-        VerifyCsrfTokenExceptStub::except(['/globally/ignored']);
-        $this->stub = new VerifyCsrfTokenExceptStub(app(), new Encrypter(Encrypter::generateKey('AES-128-CBC')));
+        PreventRequestForgeryExceptStub::except(['/globally/ignored']);
+        $this->stub = new PreventRequestForgeryExceptStub(app(), new Encrypter(Encrypter::generateKey('AES-128-CBC')));
         $this->request = Request::create('http://example.com/foo/bar', 'POST');
     }
 

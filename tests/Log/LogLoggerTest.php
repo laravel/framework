@@ -3,24 +3,23 @@
 namespace Illuminate\Tests\Log;
 
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Log\Logger;
 use Mockery as m;
+use Monolog\Handler\TestHandler;
+use Monolog\Level;
 use Monolog\Logger as Monolog;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class LogLoggerTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testMethodsPassErrorAdditionsToMonolog()
     {
         $writer = new Logger($monolog = m::mock(Monolog::class));
+        $monolog->shouldReceive('isHandling')->with('error')->andReturn(true);
         $monolog->shouldReceive('error')->once()->with('foo', []);
 
         $writer->error('foo');
@@ -31,6 +30,7 @@ class LogLoggerTest extends TestCase
         $writer = new Logger($monolog = m::mock(Monolog::class));
         $writer->withContext(['bar' => 'baz']);
 
+        $monolog->shouldReceive('isHandling')->with('error')->andReturn(true);
         $monolog->shouldReceive('error')->once()->with('foo', ['bar' => 'baz']);
 
         $writer->error('foo');
@@ -42,6 +42,7 @@ class LogLoggerTest extends TestCase
         $writer->withContext(['bar' => 'baz']);
         $writer->withoutContext();
 
+        $monolog->shouldReceive('isHandling')->with('error')->andReturn(true);
         $monolog->expects('error')->with('foo', []);
 
         $writer->error('foo');
@@ -53,6 +54,7 @@ class LogLoggerTest extends TestCase
         $writer->withContext(['bar' => 'baz', 'forget' => 'me']);
         $writer->withoutContext(['forget']);
 
+        $monolog->shouldReceive('isHandling')->with('error')->andReturn(true);
         $monolog->shouldReceive('error')->once()->with('foo', ['bar' => 'baz']);
 
         $writer->error('foo');
@@ -61,6 +63,7 @@ class LogLoggerTest extends TestCase
     public function testLoggerFiresEventsDispatcher()
     {
         $writer = new Logger($monolog = m::mock(Monolog::class), $events = new Dispatcher);
+        $monolog->shouldReceive('isHandling')->with('error')->andReturn(true);
         $monolog->shouldReceive('error')->once()->with('foo', []);
 
         $events->listen(MessageLogged::class, function ($event) {
@@ -112,6 +115,7 @@ class LogLoggerTest extends TestCase
         $writer->withContext(['ip' => '127.0.0.1', 'timestamp' => '1986-10-29']);
         $writer->withoutContext(['timestamp']);
 
+        $monolog->shouldReceive('isHandling')->with('info')->andReturn(true);
         $monolog->shouldReceive('info')->once()->with('User action', [
             'user_id' => 123,
             'action' => 'login',
@@ -119,5 +123,55 @@ class LogLoggerTest extends TestCase
         ]);
 
         $writer->info('User action');
+    }
+
+    public function testSkipsSerializationWhenLogLevelNotHandled()
+    {
+        $monolog = new Monolog('test');
+        $monolog->pushHandler(new TestHandler(Level::Error));
+
+        $writer = new Logger($monolog);
+
+        $arrayable = new class implements Arrayable
+        {
+            public bool $wasCalled = false;
+
+            public function toArray(): array
+            {
+                $this->wasCalled = true;
+
+                return ['serialized' => 'data'];
+            }
+        };
+
+        $writer->debug($arrayable);
+
+        $this->assertFalse($arrayable->wasCalled);
+    }
+
+    public function testSerializesWhenLogLevelIsHandled()
+    {
+        $monolog = new Monolog('test');
+        $handler = new TestHandler(Level::Debug);
+        $monolog->pushHandler($handler);
+
+        $writer = new Logger($monolog);
+
+        $arrayable = new class implements Arrayable
+        {
+            public bool $wasCalled = false;
+
+            public function toArray(): array
+            {
+                $this->wasCalled = true;
+
+                return ['serialized' => 'data'];
+            }
+        };
+
+        $writer->debug($arrayable);
+
+        $this->assertTrue($arrayable->wasCalled);
+        $this->assertTrue($handler->hasDebugRecords());
     }
 }

@@ -12,13 +12,6 @@ use PHPUnit\Framework\TestCase;
 #[RequiresPhpExtension('memcached')]
 class CacheMemcachedStoreTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-
-        parent::tearDown();
-    }
-
     public function testGetReturnsNullWhenNotFound()
     {
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['get', 'getResultCode'])->getMock();
@@ -65,6 +58,20 @@ class CacheMemcachedStoreTest extends TestCase
         $result = $store->put('foo', 'bar', 60);
         $this->assertTrue($result);
         Carbon::setTestNow(null);
+    }
+
+    public function testTouchMethodProperlyCallsMemcache(): void
+    {
+        $key = 'key';
+        $ttl = 60;
+
+        $now = Carbon::now();
+
+        $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['touch'])->getMock();
+
+        $memcache->expects($this->once())->method('touch')->with($this->equalTo($key), $this->equalTo($now->addSeconds($ttl)->getTimestamp()))->willReturn(true);
+
+        $this->assertTrue((new MemcachedStore($memcache))->touch($key, $ttl));
     }
 
     public function testIncrementMethodProperlyCallsMemcache()

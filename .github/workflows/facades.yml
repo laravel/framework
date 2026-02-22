@@ -26,13 +26,13 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: 8.3
           extensions: :php-psr
           tools: composer:v2
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "12.x-dev"
+        run: composer config version "13.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
@@ -58,8 +58,8 @@ jobs:
             Illuminate\\Support\\Facades\\Context \
             Illuminate\\Support\\Facades\\Cookie \
             Illuminate\\Support\\Facades\\Crypt \
-            Illuminate\\Support\\Facades\\DB \
             Illuminate\\Support\\Facades\\Date \
+            Illuminate\\Support\\Facades\\DB \
             Illuminate\\Support\\Facades\\Event \
             Illuminate\\Support\\Facades\\Exceptions \
             Illuminate\\Support\\Facades\\File \
@@ -69,6 +69,7 @@ jobs:
             Illuminate\\Support\\Facades\\Lang \
             Illuminate\\Support\\Facades\\Log \
             Illuminate\\Support\\Facades\\Mail \
+            Illuminate\\Support\\Facades\\MaintenanceMode \
             Illuminate\\Support\\Facades\\Notification \
             Illuminate\\Support\\Facades\\ParallelTesting \
             Illuminate\\Support\\Facades\\Password \

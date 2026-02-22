@@ -23,7 +23,7 @@ use Orchestra\Testbench\TestCase;
 use Throwable;
 
 #[WithConfig('cache.default', 'redis')]
-#[WithConfig('cache.prefix', 'laravel_cache_')]
+#[WithConfig('cache.prefix', 'laravel-cache-')]
 class MemoizedStoreTest extends TestCase
 {
     use InteractsWithRedis;
@@ -296,7 +296,7 @@ class MemoizedStoreTest extends TestCase
 
     public function test_memoized_driver_uses_underlying_drivers_prefix()
     {
-        $this->assertSame('laravel_cache_', Cache::memo()->getPrefix());
+        $this->assertSame('laravel-cache-', Cache::memo()->getPrefix());
 
         Cache::driver('redis')->setPrefix('foo');
 
@@ -480,6 +480,11 @@ class MemoizedStoreTest extends TestCase
                 return Cache::forget(...func_get_args());
             }
 
+            public function touch($key, $seconds)
+            {
+                return Cache::touch(...func_get_args());
+            }
+
             public function flush()
             {
                 return Cache::flush(...func_get_args());
@@ -513,5 +518,14 @@ class MemoizedStoreTest extends TestCase
         $value = Cache::get('key');
 
         $this->assertSame('value-2', $value);
+    }
+
+    public function test_it_supports_restore_lock()
+    {
+        $owner = Cache::lock('foo', 10)->owner();
+
+        $restoredLock = Cache::memo()->restoreLock('foo', $owner);
+
+        $this->assertSame($owner, $restoredLock->owner());
     }
 }

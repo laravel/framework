@@ -43,7 +43,7 @@ class SupportFacadesEventTest extends TestCase
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
 
-        m::close();
+        parent::tearDown();
     }
 
     public function testFakeFor()

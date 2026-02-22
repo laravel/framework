@@ -9,11 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 class CacheRedisStoreTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testGetReturnsNullWhenNotFound()
     {
         $redis = $this->getRedis();
@@ -119,6 +114,19 @@ class CacheRedisStoreTest extends TestCase
         $redis->getRedis()->shouldReceive('set')->once()->with('prefix:foo', serialize('foo'))->andReturn('OK');
         $result = $redis->forever('foo', 'foo', 60);
         $this->assertTrue($result);
+    }
+
+    public function testTouchMethodProperlyCallsRedis(): void
+    {
+        $key = 'key';
+        $ttl = 60;
+
+        $redis = $this->getRedis();
+
+        $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
+        $redis->getRedis()->shouldReceive('expire')->once()->with("prefix:$key", $ttl)->andReturn(true);
+
+        $this->assertTrue($redis->touch($key, $ttl));
     }
 
     public function testForgetMethodProperlyCallsRedis()

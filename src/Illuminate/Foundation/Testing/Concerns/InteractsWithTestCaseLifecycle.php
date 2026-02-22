@@ -12,17 +12,23 @@ use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Bootstrap\RegisterProviders;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
-use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
+use Illuminate\Foundation\Testing\Attributes\SetUp;
+use Illuminate\Foundation\Testing\Attributes\TearDown;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
+use Illuminate\Http\Client\Response;
+use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Http\Middleware\TrustProxies;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 use Illuminate\Mail\Markdown;
 use Illuminate\Queue\Console\WorkCommand;
 use Illuminate\Queue\Queue;
@@ -38,6 +44,7 @@ use Illuminate\View\Component;
 use Mockery;
 use Mockery\Exception\InvalidCountException;
 use PHPUnit\Metadata\Annotation\Parser\Registry as PHPUnitRegistry;
+use ReflectionClass;
 use Throwable;
 
 trait InteractsWithTestCaseLifecycle
@@ -176,18 +183,23 @@ trait InteractsWithTestCaseLifecycle
         Factory::flushState();
         EncodedHtmlString::flushState();
         EncryptCookies::flushState();
+        HandleCors::flushState();
         HandleExceptions::flushState($this);
+        JsonApiResource::flushState();
+        JsonResource::flushState();
         Markdown::flushState();
         Migrator::withoutMigrations([]);
         Once::flush();
         PreventRequestsDuringMaintenance::flushState();
         Queue::createPayloadUsing(null);
         RegisterProviders::flushState();
+        Response::flushState();
         Sleep::fake(false);
+        Str::resetFactoryState();
         TrimStrings::flushState();
         TrustProxies::flushState();
         TrustHosts::flushState();
-        ValidateCsrfToken::flushState();
+        PreventRequestForgery::flushState();
         Validator::flushState();
         WorkCommand::flushState();
 
@@ -236,6 +248,16 @@ trait InteractsWithTestCaseLifecycle
 
             if (method_exists($this, $method = 'tearDown'.class_basename($trait))) {
                 $this->beforeApplicationDestroyed(fn () => $this->{$method}());
+            }
+
+            foreach ((new ReflectionClass($trait))->getMethods() as $method) {
+                if ($method->getAttributes(SetUp::class) !== []) {
+                    $this->{$method->getName()}();
+                }
+
+                if ($method->getAttributes(TearDown::class) !== []) {
+                    $this->beforeApplicationDestroyed(fn () => $this->{$method->getName()}());
+                }
             }
         }
 

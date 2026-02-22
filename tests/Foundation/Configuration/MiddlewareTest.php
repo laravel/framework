@@ -9,12 +9,13 @@ use Illuminate\Contracts\Foundation\MaintenanceMode;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
-use Mockery;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
@@ -23,16 +24,15 @@ class MiddlewareTest extends TestCase
 {
     protected function tearDown(): void
     {
-        parent::tearDown();
-
-        Mockery::close();
-
         Container::setInstance(null);
         ConvertEmptyStringsToNull::flushState();
         EncryptCookies::flushState();
+        PreventRequestForgery::flushState();
         PreventRequestsDuringMaintenance::flushState();
         TrimStrings::flushState();
         TrustProxies::flushState();
+
+        parent::tearDown();
     }
 
     public function testConvertEmptyStringsToNull()
@@ -198,7 +198,7 @@ class MiddlewareTest extends TestCase
 
     public function testTrustHosts()
     {
-        $app = Mockery::mock(Application::class);
+        $app = m::mock(Application::class);
         $configuration = new Middleware();
         $middleware = new class($app) extends TrustHosts
         {
@@ -241,7 +241,7 @@ class MiddlewareTest extends TestCase
     public function testEncryptCookies()
     {
         $configuration = new Middleware();
-        $encrypter = Mockery::mock(Encrypter::class);
+        $encrypter = m::mock(Encrypter::class);
         $middleware = new EncryptCookies($encrypter);
 
         $this->assertFalse($middleware->isDisabled('aaa'));
@@ -260,10 +260,10 @@ class MiddlewareTest extends TestCase
     {
         $configuration = new Middleware();
 
-        $mode = Mockery::mock(MaintenanceMode::class);
+        $mode = m::mock(MaintenanceMode::class);
         $mode->shouldReceive('active')->andReturn(true);
         $mode->shouldReceive('date')->andReturn([]);
-        $app = Mockery::mock(Application::class);
+        $app = m::mock(Application::class);
         $app->shouldReceive('maintenanceMode')->andReturn($mode);
         $middleware = new PreventRequestsDuringMaintenance($app);
 
@@ -279,5 +279,28 @@ class MiddlewareTest extends TestCase
 
         $configuration->preventRequestsDuringMaintenance(['metrics/*']);
         $this->assertTrue($method->invoke($middleware, $request));
+    }
+
+    public function testPreventRequestForgery()
+    {
+        $configuration = new Middleware();
+        $middleware = new PreventRequestForgery(
+            m::mock(Application::class),
+            m::mock(Encrypter::class)
+        );
+
+        $this->assertSame([], $middleware->getExcludedPaths());
+
+        $configuration->preventRequestForgery(
+            except: ['/webhook', '/api/*'],
+            originOnly: true,
+            allowSameSite: true
+        );
+
+        $this->assertSame(['/webhook', '/api/*'], $middleware->getExcludedPaths());
+
+        $reflection = new ReflectionClass(PreventRequestForgery::class);
+        $this->assertTrue($reflection->getStaticPropertyValue('originOnly'));
+        $this->assertTrue($reflection->getStaticPropertyValue('allowSameSite'));
     }
 }

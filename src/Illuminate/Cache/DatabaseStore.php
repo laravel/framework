@@ -69,6 +69,13 @@ class DatabaseStore implements LockProvider, Store
     protected $defaultLockTimeoutInSeconds;
 
     /**
+     * The classes that should be allowed during unserialization.
+     *
+     * @var array|bool|null
+     */
+    protected $serializableClasses;
+
+    /**
      * Create a new database store.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
@@ -77,6 +84,7 @@ class DatabaseStore implements LockProvider, Store
      * @param  string  $lockTable
      * @param  array  $lockLottery
      * @param  int  $defaultLockTimeoutInSeconds
+     * @param  array|bool|null  $serializableClasses
      */
     public function __construct(
         ConnectionInterface $connection,
@@ -85,6 +93,7 @@ class DatabaseStore implements LockProvider, Store
         $lockTable = 'cache_locks',
         $lockLottery = [2, 100],
         $defaultLockTimeoutInSeconds = 86400,
+        $serializableClasses = null,
     ) {
         $this->table = $table;
         $this->prefix = $prefix;
@@ -92,6 +101,7 @@ class DatabaseStore implements LockProvider, Store
         $this->lockTable = $lockTable;
         $this->lockLottery = $lockLottery;
         $this->defaultLockTimeoutInSeconds = $defaultLockTimeoutInSeconds;
+        $this->serializableClasses = $serializableClasses;
     }
 
     /**
@@ -353,6 +363,21 @@ class DatabaseStore implements LockProvider, Store
     }
 
     /**
+     * Adjust the expiration time of a cached item.
+     *
+     * @param  string  $key
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function touch($key, $seconds)
+    {
+        return (bool) $this->table()
+            ->where('key', '=', $this->getPrefix().$key)
+            ->where('expiration', '>', $now = $this->getTime())
+            ->update(['expiration' => $now + $seconds]);
+    }
+
+    /**
      * Remove an item from the cache.
      *
      * @param  string  $key
@@ -533,6 +558,10 @@ class DatabaseStore implements LockProvider, Store
              $this->connection instanceof SQLiteConnection) &&
             ! Str::contains($value, [':', ';'])) {
             $value = base64_decode($value);
+        }
+
+        if ($this->serializableClasses !== null) {
+            return unserialize($value, ['allowed_classes' => $this->serializableClasses]);
         }
 
         return unserialize($value);
