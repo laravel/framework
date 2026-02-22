@@ -299,4 +299,82 @@ class EncrypterTest extends TestCase
         $this->assertFalse(Encrypter::appearsEncrypted(['foo' => 'bar']));
         $this->assertFalse(Encrypter::appearsEncrypted(null));
     }
+
+    public function testGenerateKeyCreatesCorrectLengthKey()
+    {
+        $key128cbc = Encrypter::generateKey('aes-128-cbc');
+        $this->assertSame(16, mb_strlen($key128cbc, '8bit'));
+
+        $key256cbc = Encrypter::generateKey('aes-256-cbc');
+        $this->assertSame(32, mb_strlen($key256cbc, '8bit'));
+
+        $key128gcm = Encrypter::generateKey('AES-128-GCM');
+        $this->assertSame(16, mb_strlen($key128gcm, '8bit'));
+
+        $key256gcm = Encrypter::generateKey('AES-256-GCM');
+        $this->assertSame(32, mb_strlen($key256gcm, '8bit'));
+    }
+
+    public function testGenerateKeyCreatesUsableKey()
+    {
+        $key = Encrypter::generateKey('aes-256-gcm');
+        $e = new Encrypter($key, 'aes-256-gcm');
+
+        $encrypted = $e->encrypt('test value');
+        $this->assertSame('test value', $e->decrypt($encrypted));
+    }
+
+
+    public function testGetKeyReturnsCurrentKey()
+    {
+        $key = str_repeat('a', 16);
+        $e = new Encrypter($key);
+
+        $this->assertSame($key, $e->getKey());
+    }
+
+    public function testGetAllKeysReturnsCurrentAndPreviousKeys()
+    {
+        $currentKey = str_repeat('a', 16);
+        $previousKey1 = str_repeat('b', 16);
+        $previousKey2 = str_repeat('c', 16);
+
+        $e = new Encrypter($currentKey);
+        $e->previousKeys([$previousKey1, $previousKey2]);
+
+        $allKeys = $e->getAllKeys();
+        $this->assertCount(3, $allKeys);
+        $this->assertSame($currentKey, $allKeys[0]);
+        $this->assertSame($previousKey1, $allKeys[1]);
+        $this->assertSame($previousKey2, $allKeys[2]);
+    }
+
+    public function testGetPreviousKeysReturnsOnlyPreviousKeys()
+    {
+        $currentKey = str_repeat('a', 16);
+        $previousKey = str_repeat('b', 16);
+
+        $e = new Encrypter($currentKey);
+        $this->assertEmpty($e->getPreviousKeys());
+
+        $e->previousKeys([$previousKey]);
+        $this->assertSame([$previousKey], $e->getPreviousKeys());
+    }
+
+    public function testPreviousKeysThrowsExceptionForInvalidKey()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.');
+
+        $e = new Encrypter(str_repeat('a', 16));
+        $e->previousKeys([str_repeat('b', 5)]); // Invalid key length
+    }
+
+    public function testPreviousKeysMethodReturnsSelf()
+    {
+        $e = new Encrypter(str_repeat('a', 16));
+        $result = $e->previousKeys([str_repeat('b', 16)]);
+
+        $this->assertSame($e, $result);
+    }
 }
