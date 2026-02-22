@@ -958,6 +958,10 @@ class Builder implements BuilderContract
             $type = 'Bitwise';
         }
 
+        if ($operator === '<=>') {
+            $type = 'NullSafeEquals';
+        }
+
         // Now that we are working with just a simple query we can put the elements
         // in our array and add the query binding to our array of bindings that
         // will be bound to each SQL statements when it is finally executed.
@@ -1314,6 +1318,39 @@ class Builder implements BuilderContract
     public function orWhereNotLike($column, $value, $caseSensitive = false)
     {
         return $this->whereNotLike($column, $value, $caseSensitive, 'or');
+    }
+
+    /**
+     * Add a "where null safe equals" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNullSafeEquals($column, $value, $boolean = 'and')
+    {
+        $type = 'NullSafeEquals';
+
+        $this->wheres[] = compact('type', 'column', 'value', 'boolean');
+
+        if (! $value instanceof ExpressionContract) {
+            $this->addBinding($this->flattenValue($value), 'where');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where null safe equals" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereNullSafeEquals($column, $value)
+    {
+        return $this->whereNullSafeEquals($column, $value, 'or');
     }
 
     /**
