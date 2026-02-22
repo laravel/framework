@@ -2163,7 +2163,6 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->whereNotMorphedTo('morph', $relatedModel);
 
-        $this->assertStringNotContainsString('<=>', $builder->toSql());
         $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where not (("eloquent_builder_test_model_parent_stubs"."morph_type" is ? and "eloquent_builder_test_model_parent_stubs"."morph_id" in (?)))', $builder->toSql());
         $this->assertEquals([$relatedModel->getMorphClass(), $relatedModel->getKey()], $builder->getBindings());
     }
@@ -2175,7 +2174,6 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->whereNotMorphedTo('morph', EloquentBuilderTestModelCloseRelatedStub::class);
 
-        $this->assertStringNotContainsString('<=>', $builder->toSql());
         $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where not ("eloquent_builder_test_model_parent_stubs"."morph_type" is ?)', $builder->toSql());
         $this->assertEquals([EloquentBuilderTestModelCloseRelatedStub::class], $builder->getBindings());
     }
@@ -2215,7 +2213,6 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->whereNotMorphedTo('morph', $relatedModel);
 
-        $this->assertStringNotContainsString('<=>', $builder->toSql());
         $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where not (("eloquent_builder_test_model_parent_stubs"."morph_type" is not distinct from ? and "eloquent_builder_test_model_parent_stubs"."morph_id" in (?)))', $builder->toSql());
         $this->assertEquals([$relatedModel->getMorphClass(), $relatedModel->getKey()], $builder->getBindings());
     }
@@ -2227,7 +2224,6 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->whereNotMorphedTo('morph', EloquentBuilderTestModelCloseRelatedStub::class);
 
-        $this->assertStringNotContainsString('<=>', $builder->toSql());
         $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where not ("eloquent_builder_test_model_parent_stubs"."morph_type" is not distinct from ?)', $builder->toSql());
         $this->assertEquals([EloquentBuilderTestModelCloseRelatedStub::class], $builder->getBindings());
     }
@@ -2242,7 +2238,6 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->whereNotMorphedTo('morph', $relatedModel);
 
-        $this->assertStringNotContainsString('<=>', $builder->toSql());
         $this->assertSame('select * from [eloquent_builder_test_model_parent_stubs] where not ((exists (select [eloquent_builder_test_model_parent_stubs].[morph_type] intersect select ?) and [eloquent_builder_test_model_parent_stubs].[morph_id] in (?)))', $builder->toSql());
         $this->assertEquals([$relatedModel->getMorphClass(), $relatedModel->getKey()], $builder->getBindings());
     }
@@ -2254,7 +2249,6 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder = $model->whereNotMorphedTo('morph', EloquentBuilderTestModelCloseRelatedStub::class);
 
-        $this->assertStringNotContainsString('<=>', $builder->toSql());
         $this->assertSame('select * from [eloquent_builder_test_model_parent_stubs] where not (exists (select [eloquent_builder_test_model_parent_stubs].[morph_type] intersect select ?))', $builder->toSql());
         $this->assertEquals([EloquentBuilderTestModelCloseRelatedStub::class], $builder->getBindings());
     }
