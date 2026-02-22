@@ -323,8 +323,7 @@ class EncrypterTest extends TestCase
         $encrypted = $e->encrypt('test value');
         $this->assertSame('test value', $e->decrypt($encrypted));
     }
-
-
+    
     public function testGetKeyReturnsCurrentKey()
     {
         $key = str_repeat('a', 16);
