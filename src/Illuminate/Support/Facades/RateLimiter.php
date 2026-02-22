@@ -17,6 +17,7 @@ namespace Illuminate\Support\Facades;
  * @method static void clear(string $key)
  * @method static int availableIn(string $key)
  * @method static string cleanRateLimiterKey(string $key)
+ * @method static mixed|false unique(string $key, \DateTimeInterface|\DateInterval|int $decaySeconds, \Closure $callback)
  *
  * @see \Illuminate\Cache\RateLimiter
  */

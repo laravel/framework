@@ -8,6 +8,7 @@ use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 
+use Throwable;
 use function Illuminate\Support\enum_value;
 
 class RateLimiter
@@ -284,6 +285,27 @@ class RateLimiter
     public function cleanRateLimiterKey($key)
     {
         return preg_replace('/&([a-z])[a-z]+;/i', '$1', htmlentities($key));
+    }
+
+    public function unique($key, $decaySeconds, $callback)
+    {
+        $key = $this->cleanRateLimiterKey($key);
+
+        if ($this->cache->add($key.':timer', $this->availableAt($decaySeconds), $decaySeconds)) {
+            try {
+                $result = $callback();
+
+                $this->hit($key, $decaySeconds);
+
+                return $result;
+            } catch (Throwable $e) {
+                $this->clear($key);
+
+                throw $e;
+            }
+        }
+
+        return false;
     }
 
     /**

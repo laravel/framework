@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Cache;
 
+use Exception;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Cache\Repository as Cache;
@@ -213,5 +214,45 @@ class CacheRateLimiterTest extends TestCase
         $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
 
         $this->assertTrue($rateLimiter->tooManyAttempts($key, 1));
+    }
+
+    public function testUniqueCallback()
+    {
+        $key = 'unique';
+
+        $cache = m::mock(Cache::class);
+        $cache->shouldReceive('add')->once()->with("$key:timer", m::type('int'), 30)->andReturnTrue();
+        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
+
+        $rateLimiter = new RateLimiter($cache);
+
+        $cache->shouldReceive('add')->once()->with("$key:timer", m::type('int'), 30)->andReturnTrue();
+        $cache->shouldReceive('add')->once()->with($key, 0, 30)->andReturnTrue();
+        $cache->shouldReceive('increment')->once()->with($key, 1)->andReturnTrue();
+
+        $this->assertSame('foo', $rateLimiter->unique($key, 30, fn() => 'foo'));
+
+        $cache->shouldReceive('add')->once()->with("$key:timer", m::type('int'), 30)->andReturnFalse();
+
+        $this->assertFalse($rateLimiter->unique($key, 30, fn() => 'foo'));
+    }
+
+    public function testUniqueExceptionsClearsAttempts()
+    {
+        $key = 'unique';
+
+        $cache = m::mock(Cache::class);
+        $cache->shouldReceive('add')->once()->with("$key:timer", m::type('int'), 30)->andReturnTrue();
+        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
+
+        $rateLimiter = new RateLimiter($cache);
+
+        $cache->shouldReceive('forget')->once()->with($key)->andReturnTrue();
+        $cache->shouldReceive('forget')->once()->with("$key:timer")->andReturnTrue();
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Thrown by debounce');
+
+        $this->assertSame('foo', $rateLimiter->unique($key, 30, fn() => throw new Exception('Thrown by debounce')));
     }
 }
