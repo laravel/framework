@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Integration\Filesystem;
 
 use Illuminate\Filesystem\FilesystemServiceProvider;
-use Illuminate\Support\Facades\Route;
 use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
 
