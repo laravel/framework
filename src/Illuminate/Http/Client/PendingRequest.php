@@ -1497,6 +1497,8 @@ class PendingRequest
      * Build the stub handler.
      *
      * @return \Closure
+     *
+     * @throws \Illuminate\Http\Client\Exceptions\StrayRequestException
      */
     public function buildStubHandler()
     {
@@ -1795,6 +1797,8 @@ class PendingRequest
      *
      * @param  \GuzzleHttp\Exception\ConnectException  $e
      * @return void
+     *
+     * @throws \Illuminate\Http\Client\ConnectionException
      */
     protected function marshalConnectionException(ConnectException $e)
     {
@@ -1816,6 +1820,8 @@ class PendingRequest
      *
      * @param  \GuzzleHttp\Exception\RequestException  $e
      * @return void
+     *
+     * @throws \Illuminate\Http\Client\ConnectionException
      */
     protected function marshalRequestExceptionWithoutResponse(RequestException $e)
     {
@@ -1837,6 +1843,9 @@ class PendingRequest
      *
      * @param  \GuzzleHttp\Exception\RequestException  $e
      * @return void
+     *
+     * @throws \Illuminate\Http\Client\RequestException
+     * @throws \Illuminate\Http\Client\ConnectionException
      */
     protected function marshalRequestExceptionWithResponse(RequestException $e)
     {
