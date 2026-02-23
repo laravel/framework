@@ -4552,6 +4552,100 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testBatchExistsValidationHappyPath()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['ids' => [1, 2, 3]], [
+            'ids.*' => 'exists:users,id',
+        ]);
+        $mock = m::mock(DatabasePresenceVerifierInterface::class);
+        $mock->shouldReceive('setConnection')->once()->with(null);
+        $mock->shouldReceive('getMultiCount')->once()->with('users', 'id', [1, 2, 3], [])->andReturn(3);
+        $mock->shouldReceive('getCount')->never();
+        $v->setPresenceVerifier($mock);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testBatchExistsValidationSadPath()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['ids' => [1, 2, 3]], [
+            'ids.*' => 'exists:users,id',
+        ]);
+        $mock = m::mock(DatabasePresenceVerifierInterface::class);
+        $mock->shouldReceive('setConnection')->with(null);
+        $mock->shouldReceive('getMultiCount')->once()->with('users', 'id', [1, 2, 3], [])->andReturn(2);
+        $mock->shouldReceive('getCount')->with('users', 'id', 1, null, null, [])->andReturn(1);
+        $mock->shouldReceive('getCount')->with('users', 'id', 2, null, null, [])->andReturn(0);
+        $mock->shouldReceive('getCount')->with('users', 'id', 3, null, null, [])->andReturn(1);
+        $v->setPresenceVerifier($mock);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->errors()->has('ids.1'));
+        $this->assertFalse($v->errors()->has('ids.0'));
+        $this->assertFalse($v->errors()->has('ids.2'));
+    }
+
+    public function testBatchExistsValidationSkipsQueryCallbacks()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $closure = function () {
+            //
+        };
+        $v = new Validator($trans, ['ids' => [1, 2, 3]], [
+            'ids.*' => (new Exists('users', 'id'))->where($closure),
+        ]);
+        $mock = m::mock(DatabasePresenceVerifierInterface::class);
+        $mock->shouldReceive('setConnection')->with(null);
+        $mock->shouldReceive('getMultiCount')->never();
+        $mock->shouldReceive('getCount')->with('users', 'id', 1, null, null, [$closure])->andReturn(1);
+        $mock->shouldReceive('getCount')->with('users', 'id', 2, null, null, [$closure])->andReturn(1);
+        $mock->shouldReceive('getCount')->with('users', 'id', 3, null, null, [$closure])->andReturn(1);
+        $v->setPresenceVerifier($mock);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testBatchExistsValidationSkipsSingleElement()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['ids' => [1]], [
+            'ids.*' => 'exists:users,id',
+        ]);
+        $mock = m::mock(DatabasePresenceVerifierInterface::class);
+        $mock->shouldReceive('setConnection')->once()->with(null);
+        $mock->shouldReceive('getMultiCount')->never();
+        $mock->shouldReceive('getCount')->once()->with('users', 'id', 1, null, null, [])->andReturn(1);
+        $v->setPresenceVerifier($mock);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testBatchExistsValidationWithExtraConditions()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['ids' => [1, 2, 3]], [
+            'ids.*' => 'exists:users,id,active,1',
+        ]);
+        $mock = m::mock(DatabasePresenceVerifierInterface::class);
+        $mock->shouldReceive('setConnection')->once()->with(null);
+        $mock->shouldReceive('getMultiCount')->once()->with('users', 'id', [1, 2, 3], ['active' => 1])->andReturn(3);
+        $mock->shouldReceive('getCount')->never();
+        $v->setPresenceVerifier($mock);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testBatchExistsValidationWithDuplicateValues()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['ids' => [1, 1, 2]], [
+            'ids.*' => 'exists:users,id',
+        ]);
+        $mock = m::mock(DatabasePresenceVerifierInterface::class);
+        $mock->shouldReceive('setConnection')->once()->with(null);
+        $mock->shouldReceive('getMultiCount')->once()->with('users', 'id', [1, 2], [])->andReturn(2);
+        $mock->shouldReceive('getCount')->never();
+        $v->setPresenceVerifier($mock);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateGtMessagesAreCorrect()
     {
         $trans = $this->getIlluminateArrayTranslator();

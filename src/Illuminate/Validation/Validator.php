@@ -118,6 +118,20 @@ class Validator implements ValidatorContract
     protected $distinctValues = [];
 
     /**
+     * The cached results of batch "exists" validation for wildcard attributes.
+     *
+     * @var array
+     */
+    protected $batchedExistsResults = [];
+
+    /**
+     * The attributes for which batch "exists" validation has been attempted.
+     *
+     * @var array
+     */
+    protected $existsBatchAttempted = [];
+
+    /**
      * All of the registered "after" callbacks.
      *
      * @var array
@@ -461,7 +475,7 @@ class Validator implements ValidatorContract
     {
         $this->messages = new MessageBag;
 
-        [$this->distinctValues, $this->failedRules] = [[], []];
+        [$this->distinctValues, $this->failedRules, $this->batchedExistsResults, $this->existsBatchAttempted] = [[], [], [], []];
 
         // We'll spin through each rule, validating the attributes attached to that
         // rule. Any error messages will be added to the containers with each of
