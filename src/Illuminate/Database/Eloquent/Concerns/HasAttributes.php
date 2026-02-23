@@ -8,12 +8,14 @@ use Brick\Math\Exception\MathException as BrickMathException;
 use Brick\Math\RoundingMode;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
+use Closure;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Attributes\Appends;
+use Illuminate\Database\Eloquent\Attributes\Casts;
 use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
@@ -206,7 +208,7 @@ trait HasAttributes
     protected function initializeHasAttributes()
     {
         $this->casts = $this->ensureCastsAreStringValues(
-            array_merge($this->casts, $this->casts()),
+            array_merge($this->resolveCastAttributes(), $this->casts, $this->casts()),
         );
 
         $this->dateFormat ??= static::resolveClassAttribute(Table::class)->dateFormat ?? null;
@@ -1714,6 +1716,26 @@ trait HasAttributes
     protected function casts()
     {
         return [];
+    }
+
+    /**
+     * Resolve the casts from the Casts attributes on the class, its parents, and traits.
+     *
+     * @return array<string, mixed>
+     */
+    protected function resolveCastAttributes(): array
+    {
+        return collect(class_parents($this))
+            ->prepend(static::class)
+            ->map(fn ($c) => new ReflectionClass($c))
+            ->flatMap(fn ($class) => [
+                ...$class->getAttributes(Casts::class),
+                ...collect($class->getTraits())->flatMap(fn ($t) => $t->getAttributes(Casts::class)),
+            ])
+            ->reverse() // child classes override parent classes
+            ->map(fn ($a) => $a->newInstance())
+            ->flatMap(fn ($i) => $i->casts instanceof Closure ? ($i->casts)() : $i->casts)
+            ->all();
     }
 
     /**

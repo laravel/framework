@@ -14,6 +14,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\Eloquent\Attributes\Casts;
 use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
@@ -3588,6 +3589,97 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertNotInstanceOf(CustomBuilder::class, $eloquentBuilder);
     }
+
+    public function testCastAttributeOnClass()
+    {
+        $model = new EloquentModelWithCastAttribute;
+        $model->intAttribute = '3';
+        $model->floatAttribute = '4.5';
+
+        $this->assertIsInt($model->intAttribute);
+        $this->assertSame(3, $model->intAttribute);
+        $this->assertIsFloat($model->floatAttribute);
+        $this->assertSame(4.5, $model->floatAttribute);
+    }
+
+    public function testCastAttributeFromTrait()
+    {
+        $model = new EloquentModelWithCastAttributeTrait;
+        $model->intAttribute = '5';
+        $model->traitAttribute = '10';
+
+        $this->assertIsInt($model->intAttribute);
+        $this->assertSame(5, $model->intAttribute);
+        $this->assertIsInt($model->traitAttribute);
+        $this->assertSame(10, $model->traitAttribute);
+    }
+
+    public function testCastAttributeFromParentClass()
+    {
+        $model = new EloquentModelWithCastAttributeChild;
+        $model->intAttribute = '3';
+        $model->floatAttribute = '4.5';
+        $model->childAttribute = '100';
+
+        $this->assertIsInt($model->intAttribute);
+        $this->assertSame(3, $model->intAttribute);
+        $this->assertIsFloat($model->floatAttribute);
+        $this->assertSame(4.5, $model->floatAttribute);
+        $this->assertIsInt($model->childAttribute);
+        $this->assertSame(100, $model->childAttribute);
+    }
+
+    public function testCastAttributeChildOverridesParent()
+    {
+        $model = new EloquentModelWithCastAttributeChildOverride;
+        $model->intAttribute = '3.7';
+
+        $this->assertIsFloat($model->intAttribute);
+        $this->assertSame(3.7, $model->intAttribute);
+    }
+
+    public function testCastAttributeCanBeOverriddenByProperty()
+    {
+        $model = new EloquentModelWithCastAttributeOverride;
+        $model->intAttribute = '3.7';
+
+        $this->assertIsFloat($model->intAttribute);
+        $this->assertSame(3.7, $model->intAttribute);
+    }
+
+    public function testCastAttributeCanBeOverriddenByMethod()
+    {
+        $model = new EloquentModelWithCastAttributeMethodOverride;
+        $model->intAttribute = '3';
+
+        $this->assertIsString($model->intAttribute);
+        $this->assertSame('3', $model->intAttribute);
+    }
+
+    public function testCastAttributeWithCustomCaster()
+    {
+        $model = new EloquentModelWithCastAttributeCustomCaster;
+        $model->price = new CastAttributePrice(100.5, 'USD');
+
+        $this->assertInstanceOf(CastAttributePrice::class, $model->price);
+        $this->assertSame(100.5, $model->price->amount);
+        $this->assertSame('USD', $model->price->currency);
+    }
+
+    public function testCastAttributeFromTraitInParent()
+    {
+        $model = new EloquentModelWithCastAttributeTraitChild;
+        $model->intAttribute = '5';
+        $model->traitAttribute = '10';
+        $model->childAttribute = '20';
+
+        $this->assertIsInt($model->intAttribute);
+        $this->assertSame(5, $model->intAttribute);
+        $this->assertIsInt($model->traitAttribute);
+        $this->assertSame(10, $model->traitAttribute);
+        $this->assertIsInt($model->childAttribute);
+        $this->assertSame(20, $model->childAttribute);
+    }
 }
 
 class CustomBuilder extends Builder
@@ -4503,4 +4595,100 @@ enum ConnectionNameBacked: string
 {
     case Foo = 'Foo';
     case Bar = 'Bar';
+}
+
+#[Casts(['intAttribute' => 'int', 'floatAttribute' => 'float'])]
+class EloquentModelWithCastAttribute extends Model
+{
+}
+
+#[Casts(['traitAttribute' => 'int'])]
+trait EloquentCastAttributeTrait
+{
+    public function getTraitName(): string
+    {
+        return 'EloquentCastAttributeTrait';
+    }
+}
+
+#[Casts(['intAttribute' => 'int'])]
+class EloquentModelWithCastAttributeTrait extends Model
+{
+    use EloquentCastAttributeTrait;
+}
+
+#[Casts(['childAttribute' => 'int'])]
+class EloquentModelWithCastAttributeChild extends EloquentModelWithCastAttribute
+{
+}
+
+#[Casts(['intAttribute' => 'float'])]
+class EloquentModelWithCastAttributeChildOverride extends EloquentModelWithCastAttribute
+{
+}
+
+#[Casts(['intAttribute' => 'int'])]
+class EloquentModelWithCastAttributeOverride extends Model
+{
+    protected $casts = [
+        'intAttribute' => 'float',
+    ];
+}
+
+#[Casts(['intAttribute' => 'int'])]
+class EloquentModelWithCastAttributeMethodOverride extends Model
+{
+    protected function casts(): array
+    {
+        return [
+            'intAttribute' => 'string',
+        ];
+    }
+}
+
+#[Casts(['price' => CastAttributePrice::class])]
+class EloquentModelWithCastAttributeCustomCaster extends Model
+{
+}
+
+class CastAttributePrice implements Castable
+{
+    public function __construct(public float $amount, public string $currency)
+    {
+    }
+
+    public static function castUsing(array $arguments): CastsAttributes
+    {
+        return new class implements CastsAttributes
+        {
+            public function get(Model $model, string $key, mixed $value, array $attributes): CastAttributePrice
+            {
+                return new CastAttributePrice($attributes['amount'], $attributes['currency']);
+            }
+
+            public function set(Model $model, string $key, mixed $value, array $attributes): array
+            {
+                return [
+                    'amount' => $value->amount,
+                    'currency' => $value->currency,
+                ];
+            }
+        };
+    }
+}
+
+#[Casts(['traitAttribute' => 'int'])]
+trait EloquentCastAttributeTraitForParent
+{
+}
+
+#[Casts(['intAttribute' => 'int'])]
+class EloquentModelWithCastAttributeTraitParent extends Model
+{
+    use EloquentCastAttributeTraitForParent;
+}
+
+#[Casts(['childAttribute' => 'int'])]
+class EloquentModelWithCastAttributeTraitChild extends EloquentModelWithCastAttributeTraitParent
+{
 }
