@@ -287,8 +287,6 @@ class Mailable implements MailableContract, Renderable
     protected function newQueuedJob()
     {
         $messageGroup = $this->messageGroup ?? (method_exists($this, 'messageGroup') ? $this->messageGroup() : null);
-
-        /** @phpstan-ignore callable.nonNativeMethod (false positive since method_exists guard is used) */
         $deduplicator = $this->deduplicator ?? (method_exists($this, 'deduplicationId') ? $this->deduplicationId(...) : null);
 
         return Container::getInstance()->make(SendQueuedMailable::class, ['mailable' => $this])
