@@ -950,6 +950,17 @@ trait ValidatesAttributes
         // that the columns being "verified" shares the given attribute's name.
         $column = $this->getQueryColumn($parameters, $attribute);
 
+        $cacheKey = $attribute.'|'.$table.'|'.$column;
+
+        if (isset($this->batchedExistsResults[$cacheKey])) {
+            return $this->batchedExistsResults[$cacheKey];
+        }
+
+        if ($this->attemptBatchExistsValidation($attribute, $value, $parameters, $connection, $table, $column)
+            && isset($this->batchedExistsResults[$cacheKey])) {
+            return $this->batchedExistsResults[$cacheKey];
+        }
+
         $expected = is_array($value) ? count(array_unique($value)) : 1;
 
         if ($expected === 0) {
@@ -959,6 +970,75 @@ trait ValidatesAttributes
         return $this->getExistCount(
             $connection, $table, $column, $value, $parameters
         ) >= $expected;
+    }
+
+    /**
+     * Attempt to batch validate "exists" for all wildcard-expanded sibling attributes.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array  $parameters
+     * @param  mixed  $connection
+     * @param  string  $table
+     * @param  string  $column
+     * @return bool
+     */
+    protected function attemptBatchExistsValidation($attribute, $value, $parameters, $connection, $table, $column)
+    {
+        $primaryAttribute = $this->getPrimaryAttribute($attribute);
+
+        if ($primaryAttribute === $attribute) {
+            return false;
+        }
+
+        $batchKey = $primaryAttribute.'|'.$table.'|'.$column;
+
+        if (isset($this->existsBatchAttempted[$batchKey])) {
+            return false;
+        }
+
+        $this->existsBatchAttempted[$batchKey] = true;
+
+        if ($this->currentRule instanceof Exists && ! empty($this->currentRule->queryCallbacks())) {
+            return false;
+        }
+
+        $siblings = $this->implicitAttributes[$primaryAttribute] ?? [];
+
+        if (count($siblings) < 2) {
+            return false;
+        }
+
+        $values = [];
+
+        foreach ($siblings as $sibling) {
+            $siblingValue = $this->getValue($sibling);
+
+            if (is_array($siblingValue) || is_object($siblingValue) || is_null($siblingValue)) {
+                return false;
+            }
+
+            $values[$sibling] = $siblingValue;
+        }
+
+        $extra = $this->getExtraConditions(
+            array_values(array_slice($parameters, 2))
+        );
+
+        $verifier = $this->getPresenceVerifier($connection);
+
+        $uniqueValues = array_values(array_unique($values));
+
+        $count = $verifier->getMultiCount($table, $column, $uniqueValues, $extra);
+
+        if ($count >= count($uniqueValues)) {
+            foreach ($siblings as $sibling) {
+                $siblingCacheKey = $sibling.'|'.$table.'|'.$column;
+                $this->batchedExistsResults[$siblingCacheKey] = true;
+            }
+        }
+
+        return true;
     }
 
     /**
