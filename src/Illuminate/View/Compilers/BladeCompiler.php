@@ -974,13 +974,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register a handler for custom directives.
      *
      * @param  string  $name
-     * @param  callable  $handler
+     * @param  \Closure  $handler
      * @param  bool  $bind
      * @return void
      *
      * @throws \InvalidArgumentException
      */
-    public function directive($name, callable $handler, bool $bind = false)
+    public function directive($name, \Closure $handler, bool $bind = false)
     {
         if (! preg_match('/^\w+(?:::\w+)?$/x', $name)) {
             throw new InvalidArgumentException("The directive name [{$name}] is not valid. Directive names must only contain alphanumeric characters and underscores.");
