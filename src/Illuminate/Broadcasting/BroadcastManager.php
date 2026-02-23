@@ -328,7 +328,7 @@ class BroadcastManager implements FactoryContract
      */
     protected function createPusherDriver(array $config)
     {
-        return new PusherBroadcaster($this->pusher($config));
+        return new PusherBroadcaster($this->pusher($config), $config['jsonp'] ?? false);
     }
 
     /**
