@@ -278,6 +278,43 @@ class OnceTest extends TestCase
         $this->assertNotSame($result[0], $result[1]);
     }
 
+    public function testKeyedMemoizationOnSameLine()
+    {
+        $result = [once_keyed('first', fn () => rand(1, PHP_INT_MAX)), once_keyed('second', fn () => rand(1, PHP_INT_MAX))];
+
+        $this->assertNotSame($result[0], $result[1]);
+
+        $result = [once_keyed('shared', fn () => rand(1, PHP_INT_MAX)), once_keyed('shared', fn () => rand(1, PHP_INT_MAX))];
+
+        $this->assertSame($result[0], $result[1]);
+    }
+
+    public function testKeyedMemoizationIsScopedPerObject()
+    {
+        $instanceA = new class
+        {
+            public function rand()
+            {
+                return once_keyed('shared', fn () => rand(1, PHP_INT_MAX));
+            }
+        };
+
+        $instanceB = new class
+        {
+            public function rand()
+            {
+                return once_keyed('shared', fn () => rand(1, PHP_INT_MAX));
+            }
+        };
+
+        $firstA = $instanceA->rand();
+        $secondA = $instanceA->rand();
+        $firstB = $instanceB->rand();
+
+        $this->assertSame($firstA, $secondA);
+        $this->assertNotSame($firstA, $firstB);
+    }
+
     public function testResultIsDifferentWhenCalledFromDifferentClosures()
     {
         $resolver = fn () => once(fn () => rand(1, PHP_INT_MAX));

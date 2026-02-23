@@ -256,6 +256,26 @@ if (! function_exists('once')) {
     }
 }
 
+if (! function_exists('once_keyed')) {
+    /**
+     * Ensures a callable is only called once for the given key at the current call site.
+     *
+     * @template  TReturnType
+     *
+     * @param  string  $key
+     * @param  callable(): TReturnType  $callback
+     * @return TReturnType
+     */
+    function once_keyed(string $key, callable $callback)
+    {
+        return Once::instance()->value(Onceable::fromKey(
+            debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2),
+            $key,
+            $callback,
+        ));
+    }
+}
+
 if (! function_exists('optional')) {
     /**
      * Provide access to optional objects.

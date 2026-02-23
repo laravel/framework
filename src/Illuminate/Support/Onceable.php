@@ -39,6 +39,22 @@ class Onceable
     }
 
     /**
+     * Create a new onceable instance using an explicit key.
+     *
+     * @param  array<int, array<string, mixed>>  $trace
+     * @param  string  $key
+     * @return static
+     */
+    public static function fromKey(array $trace, string $key, callable $callable)
+    {
+        return new static(
+            static::hashFromKey($trace, $key, $callable),
+            static::objectFromTrace($trace),
+            $callable,
+        );
+    }
+
+    /**
      * Computes the object of the onceable from the given trace, if any.
      *
      * @param  array<int, array<string, mixed>>  $trace
@@ -87,6 +103,29 @@ class Onceable
             $trace[1]['function'],
             $trace[0]['line'],
             serialize($uses),
+        ));
+    }
+
+    /**
+     * Computes the hash of the onceable from an explicit key and the given trace.
+     *
+     * @param  array<int, array<string, mixed>>  $trace
+     * @param  string  $key
+     * @return string
+     */
+    protected static function hashFromKey(array $trace, string $key, callable $callable): string
+    {
+        $class = $callable instanceof Closure ? (new ReflectionClosure($callable))->getClosureCalledClass()?->getName() : null;
+
+        $class ??= $trace[1]['class'] ?? null;
+
+        return hash('xxh128', sprintf(
+            '%s@%s%s:%s (%s)',
+            $trace[0]['file'] ?? '[internal]',
+            $class ? $class.'@' : '',
+            $trace[1]['function'] ?? '{main}',
+            $trace[0]['line'] ?? 0,
+            $key,
         ));
     }
 }

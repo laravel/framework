@@ -22,6 +22,7 @@ assertType('mixed', object_get(new User(), 'name'));
 assertType('1', once(fn () => 1));
 assertType('null', once(function () { /** @phpstan-ignore function.void (testing void) */
 }));
+assertType('1', once_keyed('foo', fn () => 1));
 
 assertType('Illuminate\Support\Optional', optional());
 assertType('null', optional(null, fn () => 1));
