@@ -21,7 +21,7 @@ class PusherBroadcaster extends Broadcaster
     protected $pusher;
 
     /**
-     * Indicates if JSONP callbacks are allowed on authorizatoin.
+     * Indicates if JSONP callbacks are allowed on authorization.
      *
      * @var bool
      */
