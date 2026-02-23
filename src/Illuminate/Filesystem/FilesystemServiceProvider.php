@@ -98,7 +98,7 @@ class FilesystemServiceProvider extends ServiceProvider
 
                 if (isset($served[$uri])) {
                     throw new InvalidArgumentException(
-                        "The [{$disk}] disk conflicts with the [{$served[$uri]}] disk at [{$uri}]. Each served disk must have a unique [url]."
+                        "The [{$disk}] disk conflicts with the [{$served[$uri]}] disk at [{$uri}]. Each served disk must have a unique URL."
                     );
                 }
 
