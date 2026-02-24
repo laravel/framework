@@ -1,6 +1,42 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.52.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.53.0...12.x)
+
+## [v12.53.0](https://github.com/laravel/framework/compare/v12.52.0...v12.53.0) - 2026-02-24
+
+* [12.x] Add multipleOf support to JsonSchema numeric types by [@Amirhf1](https://github.com/Amirhf1) in https://github.com/laravel/framework/pull/58903
+* [12.x] chore: don't format notifiables in NotificationSender::send by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/58900
+* [12.x] Add vector option to whereFullText for pre-computed tsvector columns by [@milroyfraser](https://github.com/milroyfraser) in https://github.com/laravel/framework/pull/58893
+* [12.x] Add array key support for `buildMorphMapFromModels()` function by [@josephkerkhof](https://github.com/josephkerkhof) in https://github.com/laravel/framework/pull/58891
+* [12.x] Fix RequestException summarizing for Guzzle streamed responses by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/58909
+* [12.x] Tests for streamed RequestException by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/58910
+* Support a serializable classes value on caches by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/58911
+* [12.x] Simplify TokenGuard methods by [@Amirhf1](https://github.com/Amirhf1) in https://github.com/laravel/framework/pull/58923
+* [12.x] Add uniqueItems support to JsonSchema ArrayType by [@Amirhf1](https://github.com/Amirhf1) in https://github.com/laravel/framework/pull/58922
+* [12.x] Add tests for `PhpRedisClusterConnection` flushdb method by [@miladev95](https://github.com/miladev95) in https://github.com/laravel/framework/pull/58917
+* [12.x] Add support for named arguments in event dispatching and broadcasting by [@ph7jack](https://github.com/ph7jack) in https://github.com/laravel/framework/pull/58913
+* [12.x] Allow `down` command to refresh maintenance mode options by [@alies-dev](https://github.com/alies-dev) in https://github.com/laravel/framework/pull/58918
+* [12.x] Rollback lingering PDO transaction before retrying on commit deadlock by [@dxnter](https://github.com/dxnter) in https://github.com/laravel/framework/pull/58906
+* [12.x] Simplify queue resolution using `match` expression by [@josephkerkhof](https://github.com/josephkerkhof) in https://github.com/laravel/framework/pull/58928
+* Bump tar from 7.5.7 to 7.5.9 in /src/Illuminate/Foundation/resources/exceptions/renderer by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/framework/pull/58931
+* [12.x] Fix model serialization in queue jobs by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/58939
+* [12.x] Change Mail text alignment from left to start by [@zvizvi](https://github.com/zvizvi) in https://github.com/laravel/framework/pull/58935
+* [12.x] Refactor `convertValuesToBoolean` to use `match` for cleaner logic by [@josephkerkhof](https://github.com/josephkerkhof) in https://github.com/laravel/framework/pull/58927
+* [12.x] Allow Scheduled Command `Event` macros to be applied to schedule groups by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/58926
+* [12.x] Fix race condition on creating the real-time facade cache file (#58945) by [@sosias](https://github.com/sosias) in https://github.com/laravel/framework/pull/58947
+* [12.x] Show all mismatched values in `assertSessionHasAll` failure output by [@dxnter](https://github.com/dxnter) in https://github.com/laravel/framework/pull/58946
+* Fix RetryCommand not working for SQS FIFO queue by [@cwang22](https://github.com/cwang22) in https://github.com/laravel/framework/pull/58936
+* [12.x] Improve return types for Wormhole and InteractsWithTime by [@KentarouTakeda](https://github.com/KentarouTakeda) in https://github.com/laravel/framework/pull/58951
+* [12.x] Add `Cache::funnel()` for concurrency limiting with any cache driver by [@mathiasgrimm](https://github.com/mathiasgrimm) in https://github.com/laravel/framework/pull/58439
+* [12.x]  Ensure `oldest_pending` is displayed in `queue:monitor` by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58952
+* [12.x] Fix/cross database null safe equals by [@patrickomeara](https://github.com/patrickomeara) in https://github.com/laravel/framework/pull/58962
+* [12.x] Add MySQL inRandomOrder regression tests by [@laraib15](https://github.com/laraib15) in https://github.com/laravel/framework/pull/58966
+* [12.x] Add missing [@throws](https://github.com/throws) docblocks to Illuminate/Http by [@Amirhf1](https://github.com/Amirhf1) in https://github.com/laravel/framework/pull/58965
+* Fix Invalid Types by [@RyanSchaefer](https://github.com/RyanSchaefer) in https://github.com/laravel/framework/pull/58963
+* JSONP Check by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/58971
+* [12.x] Resolve Stan Mailable CI error by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58972
+* [12.x] Remove unnecessary dirname calls. by [@jelleroorda](https://github.com/jelleroorda) in https://github.com/laravel/framework/pull/58984
+* [12.x] Add missing [@throws](https://github.com/throws) docblocks to `Serializer` and `Type` classes in `Illuminate/JsonSchema` by [@mrvipchien](https://github.com/mrvipchien) in https://github.com/laravel/framework/pull/58981
 
 ## [v12.52.0](https://github.com/laravel/framework/compare/v12.51.0...v12.52.0) - 2026-02-17
 
