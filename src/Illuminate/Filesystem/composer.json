@@ -15,10 +15,10 @@
     ],
     "require": {
         "php": "^8.3",
-        "illuminate/collections": "^13.0",
-        "illuminate/contracts": "^13.0",
-        "illuminate/macroable": "^13.0",
-        "illuminate/support": "^13.0",
+        "illuminate/collections": "^14.0",
+        "illuminate/contracts": "^14.0",
+        "illuminate/macroable": "^14.0",
+        "illuminate/support": "^14.0",
         "symfony/finder": "^7.4.0|^8.0.0"
     },
     "autoload": {
@@ -31,14 +31,14 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "13.0.x-dev"
+            "dev-master": "14.0.x-dev"
         }
     },
     "suggest": {
         "ext-fileinfo": "Required to use the Filesystem class.",
         "ext-ftp": "Required to use the Flysystem FTP driver.",
         "ext-hash": "Required to use the Filesystem class.",
-        "illuminate/http": "Required for handling uploaded files (^13.0).",
+        "illuminate/http": "Required for handling uploaded files (^14.0).",
         "league/flysystem": "Required to use the Flysystem local driver (^3.25.1).",
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (^3.25.1).",
         "league/flysystem-ftp": "Required to use the Flysystem FTP driver (^3.25.1).",

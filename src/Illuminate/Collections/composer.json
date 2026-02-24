@@ -15,9 +15,9 @@
     ],
     "require": {
         "php": "^8.3",
-        "illuminate/conditionable": "^13.0",
-        "illuminate/contracts": "^13.0",
-        "illuminate/macroable": "^13.0",
+        "illuminate/conditionable": "^14.0",
+        "illuminate/contracts": "^14.0",
+        "illuminate/macroable": "^14.0",
         "symfony/polyfill-php84": "^1.33",
         "symfony/polyfill-php85": "^1.33"
     },
@@ -32,11 +32,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "13.0.x-dev"
+            "dev-master": "14.0.x-dev"
         }
     },
     "suggest": {
-        "illuminate/http": "Required to convert collections to API resources (^12.0).",
+        "illuminate/http": "Required to convert collections to API resources (^14.0).",
         "symfony/var-dumper": "Required to use the dump method (^7.4|^8.0)."
     },
     "config": {

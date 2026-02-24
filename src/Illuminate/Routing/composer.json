@@ -17,14 +17,14 @@
         "php": "^8.3",
         "ext-filter": "*",
         "ext-hash": "*",
-        "illuminate/collections": "^13.0",
-        "illuminate/container": "^13.0",
-        "illuminate/contracts": "^13.0",
-        "illuminate/http": "^13.0",
-        "illuminate/macroable": "^13.0",
-        "illuminate/pipeline": "^13.0",
-        "illuminate/session": "^13.0",
-        "illuminate/support": "^13.0",
+        "illuminate/collections": "^14.0",
+        "illuminate/container": "^14.0",
+        "illuminate/contracts": "^14.0",
+        "illuminate/http": "^14.0",
+        "illuminate/macroable": "^14.0",
+        "illuminate/pipeline": "^14.0",
+        "illuminate/session": "^14.0",
+        "illuminate/support": "^14.0",
         "symfony/http-foundation": "^7.4.0|^8.0.0",
         "symfony/http-kernel": "^7.4.0|^8.0.0",
         "symfony/polyfill-php84": "^1.33",
@@ -38,11 +38,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "13.0.x-dev"
+            "dev-master": "14.0.x-dev"
         }
     },
     "suggest": {
-        "illuminate/console": "Required to use the make commands (^13.0).",
+        "illuminate/console": "Required to use the make commands (^14.0).",
         "php-http/discovery": "Required to use PSR-7 bridging features (^1.15).",
         "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^7.4|^8.0)."
     },

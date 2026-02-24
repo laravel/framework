@@ -19,12 +19,12 @@
         "ext-mbstring": "*",
         "brick/math": "^0.11|^0.12|^0.13|^0.14",
         "egulias/email-validator": "^3.2.5|^4.0",
-        "illuminate/collections": "^13.0",
-        "illuminate/container": "^13.0",
-        "illuminate/contracts": "^13.0",
-        "illuminate/macroable": "^13.0",
-        "illuminate/support": "^13.0",
-        "illuminate/translation": "^13.0",
+        "illuminate/collections": "^14.0",
+        "illuminate/container": "^14.0",
+        "illuminate/contracts": "^14.0",
+        "illuminate/macroable": "^14.0",
+        "illuminate/support": "^14.0",
+        "illuminate/translation": "^14.0",
         "symfony/http-foundation": "^7.4.0|^8.0.0",
         "symfony/mime": "^7.4.0|^8.0.0"
     },
@@ -35,11 +35,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "13.0.x-dev"
+            "dev-master": "14.0.x-dev"
         }
     },
     "suggest": {
-        "illuminate/database": "Required to use the database presence verifier (^13.0).",
+        "illuminate/database": "Required to use the database presence verifier (^14.0).",
         "ramsey/uuid": "Required to use Validator::validateUuid() (^4.7)."
     },
     "config": {

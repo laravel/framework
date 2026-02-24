@@ -16,11 +16,11 @@
     "require": {
         "php": "^8.3",
         "ext-mbstring": "*",
-        "illuminate/collections": "^13.0",
-        "illuminate/contracts": "^13.0",
-        "illuminate/macroable": "^13.0",
-        "illuminate/support": "^13.0",
-        "illuminate/view": "^13.0",
+        "illuminate/collections": "^14.0",
+        "illuminate/contracts": "^14.0",
+        "illuminate/macroable": "^14.0",
+        "illuminate/support": "^14.0",
+        "illuminate/view": "^14.0",
         "laravel/prompts": "^0.3.0",
         "nunomaduro/termwind": "^2.0",
         "symfony/console": "^7.4.0|^8.0.0",
@@ -33,17 +33,17 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "13.0.x-dev"
+            "dev-master": "14.0.x-dev"
         }
     },
     "suggest": {
         "ext-pcntl": "Required to use signal trapping.",
         "dragonmantank/cron-expression": "Required to use scheduler (^3.3.2).",
         "guzzlehttp/guzzle": "Required to use the ping methods on schedules (^7.8).",
-        "illuminate/bus": "Required to use the scheduled job dispatcher (^13.0).",
-        "illuminate/container": "Required to use the scheduler (^13.0).",
-        "illuminate/filesystem": "Required to use the generator command (^13.0).",
-        "illuminate/queue": "Required to use closures for scheduled jobs (^13.0)."
+        "illuminate/bus": "Required to use the scheduled job dispatcher (^14.0).",
+        "illuminate/container": "Required to use the scheduler (^14.0).",
+        "illuminate/filesystem": "Required to use the generator command (^14.0).",
+        "illuminate/queue": "Required to use closures for scheduled jobs (^14.0)."
     },
     "config": {
         "sort-packages": true
