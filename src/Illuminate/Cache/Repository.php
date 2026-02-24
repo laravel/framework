@@ -680,7 +680,6 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
-     * Remove an item from the cache.
      * Execute a callback while holding an atomic lock on a cache mutex to prevent overlapping calls.
      *
      * @template TReturn
