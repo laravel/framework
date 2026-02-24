@@ -51,6 +51,37 @@ class NumberTypeTest extends TestCase
         ], $type->toArray());
     }
 
+    public function test_it_may_set_exclusive_minimum(): void
+    {
+        $type = JsonSchema::number()->min(5.5, exclusive: true);
+
+        $this->assertEquals([
+            'type' => 'number',
+            'exclusiveMinimum' => 5.5,
+        ], $type->toArray());
+    }
+
+    public function test_it_may_set_exclusive_maximum(): void
+    {
+        $type = JsonSchema::number()->max(10.75, exclusive: true);
+
+        $this->assertEquals([
+            'type' => 'number',
+            'exclusiveMaximum' => 10.75,
+        ], $type->toArray());
+    }
+
+    public function test_exclusive_min_and_max_are_mutually_exclusive_with_inclusive(): void
+    {
+        $type = JsonSchema::number()->min(0.0)->max(100.0)->min(5.5, exclusive: true);
+
+        $this->assertEquals([
+            'type' => 'number',
+            'exclusiveMinimum' => 5.5,
+            'maximum' => 100.0,
+        ], $type->toArray());
+    }
+
     public function test_it_may_set_default_value(): void
     {
         $type = JsonSchema::number()->default(9.99);

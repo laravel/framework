@@ -29,6 +29,37 @@ class IntegerTypeTest extends TestCase
         ], $type->toArray());
     }
 
+    public function test_it_may_set_exclusive_minimum(): void
+    {
+        $type = JsonSchema::integer()->min(5, exclusive: true);
+
+        $this->assertEquals([
+            'type' => 'integer',
+            'exclusiveMinimum' => 5,
+        ], $type->toArray());
+    }
+
+    public function test_it_may_set_exclusive_maximum(): void
+    {
+        $type = JsonSchema::integer()->max(10, exclusive: true);
+
+        $this->assertEquals([
+            'type' => 'integer',
+            'exclusiveMaximum' => 10,
+        ], $type->toArray());
+    }
+
+    public function test_exclusive_min_and_max_are_mutually_exclusive_with_inclusive(): void
+    {
+        $type = JsonSchema::integer()->min(1)->max(100)->min(5, exclusive: true);
+
+        $this->assertEquals([
+            'type' => 'integer',
+            'exclusiveMinimum' => 5,
+            'maximum' => 100,
+        ], $type->toArray());
+    }
+
     public function test_it_may_set_default_value(): void
     {
         $type = JsonSchema::integer()->default(18);

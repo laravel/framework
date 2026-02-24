@@ -10,9 +10,20 @@ class NumberType extends Type
     protected int|float|null $minimum = null;
 
     /**
+     * The exclusive minimum value.
+     */
+    protected int|float|null $exclusiveMinimum = null;
+
+    /**
      * The maximum value (inclusive).
      */
     protected int|float|null $maximum = null;
+
+    /**
+     * The exclusive maximum value.
+     */
+    protected int|float|null $exclusiveMaximum = null;
+
 
     /**
      * The number the value must be a multiple of.
@@ -20,21 +31,23 @@ class NumberType extends Type
     protected int|float|null $multipleOf = null;
 
     /**
-     * Set the minimum value (inclusive).
+     * Set the minimum value.
      */
-    public function min(int|float $value): static
+    public function min(int|float $value, bool $exclusive = false): static
     {
-        $this->minimum = $value;
+        $this->minimum = $exclusive ? null : $value;
+        $this->exclusiveMinimum = $exclusive ? $value : null;
 
         return $this;
     }
 
     /**
-     * Set the maximum value (inclusive).
+     * Set the maximum value.
      */
-    public function max(int|float $value): static
+    public function max(int|float $value, bool $exclusive = false): static
     {
-        $this->maximum = $value;
+        $this->maximum = $exclusive ? null : $value;
+        $this->exclusiveMaximum = $exclusive ? $value : null;
 
         return $this;
     }

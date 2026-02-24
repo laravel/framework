@@ -172,6 +172,9 @@ class TypeTest extends TestCase
             [JsonSchema::integer()->default(0), 0], // default value
             [JsonSchema::integer()->nullable(), null],
             [JsonSchema::integer()->nullable(false), 0],
+            [JsonSchema::integer()->min(5, exclusive: true), 6],
+            [JsonSchema::integer()->max(10, exclusive: true), 9],
+            [JsonSchema::integer()->min(0, exclusive: true)->max(100, exclusive: true), 50],
 
             // NumberType
             [JsonSchema::number(), 3.14],
@@ -190,6 +193,9 @@ class TypeTest extends TestCase
             [JsonSchema::number()->default(0.0), 0.0],
             [JsonSchema::number()->nullable(), null],
             [JsonSchema::number()->nullable(false), 0.0],
+            [JsonSchema::number()->min(5.0, exclusive: true), 5.01],
+            [JsonSchema::number()->max(10.0, exclusive: true), 9.99],
+            [JsonSchema::number()->min(0.0, exclusive: true)->max(1.0, exclusive: true), 0.5],
 
             // BooleanType
             [JsonSchema::boolean(), true],
@@ -328,6 +334,10 @@ class TypeTest extends TestCase
             [JsonSchema::integer()->enum(IntBackedEnum::class), 3], // integer backed enum cases mismatch
             [JsonSchema::integer()->default(1), null], // wrong type
             [JsonSchema::integer()->nullable(false), null], // not nullable
+            [JsonSchema::integer()->min(5, exclusive: true), 5], // equal bound
+            [JsonSchema::integer()->min(5, exclusive: true), 4], // below bound
+            [JsonSchema::integer()->max(10, exclusive: true), 10], // equal bound
+            [JsonSchema::integer()->max(10, exclusive: true), 11], // above bound
 
             // NumberType
             [JsonSchema::number(), '3.14'], // type mismatch
@@ -344,6 +354,10 @@ class TypeTest extends TestCase
             [JsonSchema::number()->enum([1.1, 2.2]), 1.1000001], // not exactly in enum
             [JsonSchema::number()->default(0.0), []], // wrong type
             [JsonSchema::number()->nullable(false), null], // not nullable
+            [JsonSchema::number()->min(5.0, exclusive: true), 5.0], // equal bound
+            [JsonSchema::number()->min(5.0, exclusive: true), 4.99], // below bound
+            [JsonSchema::number()->max(10.0, exclusive: true), 10.0], // equal bound
+            [JsonSchema::number()->max(10.0, exclusive: true), 10.01], // above bound
 
             // BooleanType
             [JsonSchema::boolean(), 'true'], // type mismatch

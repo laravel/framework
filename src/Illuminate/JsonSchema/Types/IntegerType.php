@@ -10,9 +10,19 @@ class IntegerType extends Type
     protected ?int $minimum = null;
 
     /**
+     * The exclusive minimum value.
+     */
+    protected ?int $exclusiveMinimum = null;
+
+    /**
      * The maximum value (inclusive).
      */
     protected ?int $maximum = null;
+
+    /**
+     * The exclusive maximum value.
+     */
+    protected ?int $exclusiveMaximum = null;
 
     /**
      * The number the value must be a multiple of.
@@ -20,21 +30,23 @@ class IntegerType extends Type
     protected ?int $multipleOf = null;
 
     /**
-     * Set the minimum value (inclusive).
+     * Set the minimum value.
      */
-    public function min(int $value): static
+    public function min(int $value, bool $exclusive = false): static
     {
-        $this->minimum = $value;
+        $this->minimum = $exclusive ? null : $value;
+        $this->exclusiveMinimum = $exclusive ? $value : null;
 
         return $this;
     }
 
     /**
-     * Set the maximum value (inclusive).
+     * Set the maximum value.
      */
-    public function max(int $value): static
+    public function max(int $value, bool $exclusive = false): static
     {
-        $this->maximum = $value;
+        $this->maximum = $exclusive ? null : $value;
+        $this->exclusiveMaximum = $exclusive ? $value : null;
 
         return $this;
     }
