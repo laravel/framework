@@ -9,6 +9,11 @@ abstract class Controller
     /**
      * The middleware registered on the controller.
      *
+     * Note: Controllers extending this class and using the middleware() method will be instantiated
+     * early during routing to gather the middleware. If you need to access session or auth data
+     * in your constructor, do not extend this class. Instead, implement the
+     * \Illuminate\Routing\Controllers\HasMiddleware interface to define your middleware statically.
+     *
      * @var array
      */
     protected $middleware = [];
@@ -66,7 +71,9 @@ abstract class Controller
     public function __call($method, $parameters)
     {
         throw new BadMethodCallException(sprintf(
-            'Method %s::%s does not exist.', static::class, $method
+            'Method %s::%s does not exist.',
+            static::class,
+            $method
         ));
     }
 }
