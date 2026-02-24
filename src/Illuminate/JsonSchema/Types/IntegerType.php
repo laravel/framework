@@ -35,6 +35,7 @@ class IntegerType extends Type
     public function min(int $value, bool $exclusive = false): static
     {
         $this->minimum = $exclusive ? null : $value;
+
         $this->exclusiveMinimum = $exclusive ? $value : null;
 
         return $this;
@@ -46,6 +47,7 @@ class IntegerType extends Type
     public function max(int $value, bool $exclusive = false): static
     {
         $this->maximum = $exclusive ? null : $value;
+
         $this->exclusiveMaximum = $exclusive ? $value : null;
 
         return $this;
