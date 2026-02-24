@@ -16,10 +16,10 @@
     "require": {
         "php": "^8.3",
         "ext-hash": "*",
-        "illuminate/collections": "^13.0",
-        "illuminate/contracts": "^13.0",
-        "illuminate/macroable": "^13.0",
-        "illuminate/support": "^13.0",
+        "illuminate/collections": "^14.0",
+        "illuminate/contracts": "^14.0",
+        "illuminate/macroable": "^14.0",
+        "illuminate/support": "^14.0",
         "symfony/http-foundation": "^7.4.0|^8.0.0",
         "symfony/http-kernel": "^7.4.0|^8.0.0"
     },
