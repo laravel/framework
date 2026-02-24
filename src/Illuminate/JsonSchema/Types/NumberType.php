@@ -24,7 +24,6 @@ class NumberType extends Type
      */
     protected int|float|null $exclusiveMaximum = null;
 
-
     /**
      * The number the value must be a multiple of.
      */
