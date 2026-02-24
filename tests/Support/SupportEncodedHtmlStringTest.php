@@ -3,10 +3,8 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Contracts\Support\DeferringDisplayableValue;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\EncodedHtmlString;
 use Illuminate\Support\HtmlString;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class SupportEncodedHtmlStringTest extends TestCase
@@ -248,4 +246,3 @@ enum SupportEncodedHtmlStringTestIntEnum: int
 {
     case One = 1;
 }
-
