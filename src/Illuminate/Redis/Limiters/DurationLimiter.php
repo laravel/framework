@@ -12,28 +12,28 @@ class DurationLimiter
      *
      * @var \Illuminate\Redis\Connections\Connection
      */
-    private $redis;
+    protected $redis;
 
     /**
      * The unique name of the lock.
      *
      * @var string
      */
-    private $name;
+    protected $name;
 
     /**
      * The allowed number of concurrent tasks.
      *
      * @var int
      */
-    private $maxLocks;
+    protected $maxLocks;
 
     /**
      * The number of seconds a slot should be maintained.
      *
      * @var int
      */
-    private $decay;
+    protected $decay;
 
     /**
      * The timestamp of the end of the current duration.
