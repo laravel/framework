@@ -684,7 +684,7 @@ class SupportTestingBusFakeTest extends TestCase
             $this->fake->assertNothingBatched();
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString("The following batched jobs were dispatched unexpectedly:\n\n- ". $job::class, $e->getMessage());
+            $this->assertStringContainsString("The following batched jobs were dispatched unexpectedly:\n\n- ".$job::class, $e->getMessage());
         }
     }
 

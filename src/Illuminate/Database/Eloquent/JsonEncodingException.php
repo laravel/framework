@@ -15,7 +15,7 @@ class JsonEncodingException extends RuntimeException
      */
     public static function forModel($model, $message)
     {
-        return new static('Error encoding model ['. $model::class .'] with ID ['.$model->getKey().'] to JSON: '.$message);
+        return new static('Error encoding model ['.$model::class.'] with ID ['.$model->getKey().'] to JSON: '.$message);
     }
 
     /**
@@ -29,7 +29,7 @@ class JsonEncodingException extends RuntimeException
     {
         $model = $resource->resource;
 
-        return new static('Error encoding resource ['. $resource::class .'] with model ['. $model::class .'] with ID ['.$model->getKey().'] to JSON: '.$message);
+        return new static('Error encoding resource ['.$resource::class.'] with model ['.$model::class.'] with ID ['.$model->getKey().'] to JSON: '.$message);
     }
 
     /**

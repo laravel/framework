@@ -108,7 +108,7 @@ trait HasGlobalScopes
         }
 
         return Arr::get(
-            static::$globalScopes, static::class.'.'. $scope::class
+            static::$globalScopes, static::class.'.'.$scope::class
         );
     }
 

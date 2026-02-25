@@ -30,7 +30,7 @@ class Serializer
             Types\NumberType::class => 'number',
             Types\ObjectType::class => 'object',
             Types\StringType::class => 'string',
-            default => throw new RuntimeException('Unsupported ['. $type::class .'] type.'),
+            default => throw new RuntimeException('Unsupported ['.$type::class.'] type.'),
         };
 
         $nullable = static::isNullable($type);
