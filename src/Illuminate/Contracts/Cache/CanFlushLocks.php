@@ -2,7 +2,7 @@
 
 namespace Illuminate\Contracts\Cache;
 
-interface FlushableLock
+interface CanFlushLocks
 {
     /**
      * Flush all locks managed by the store.

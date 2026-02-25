@@ -3,7 +3,7 @@
 namespace Illuminate\Cache;
 
 use Exception;
-use Illuminate\Contracts\Cache\FlushableLock;
+use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Filesystem\LockTimeoutException;
@@ -12,7 +12,7 @@ use Illuminate\Filesystem\LockableFile;
 use Illuminate\Support\InteractsWithTime;
 use RuntimeException;
 
-class FileStore implements FlushableLock, LockProvider, Store
+class FileStore implements CanFlushLocks, LockProvider, Store
 {
     use InteractsWithTime, RetrievesMultipleKeys;
 

@@ -2,7 +2,7 @@
 
 namespace Illuminate\Cache;
 
-use Illuminate\Contracts\Cache\FlushableLock;
+use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
@@ -13,7 +13,7 @@ use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use RuntimeException;
 
-class RedisStore extends TaggableStore implements FlushableLock, LockProvider
+class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
 {
     use RetrievesMultipleKeys {
         many as private manyAlias;

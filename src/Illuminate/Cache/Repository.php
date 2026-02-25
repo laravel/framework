@@ -20,7 +20,7 @@ use Illuminate\Cache\Events\RetrievingKey;
 use Illuminate\Cache\Events\RetrievingManyKeys;
 use Illuminate\Cache\Events\WritingKey;
 use Illuminate\Cache\Events\WritingManyKeys;
-use Illuminate\Contracts\Cache\FlushableLock;
+use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -870,7 +870,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function supportsFlushingLocks(): bool
     {
-        return $this->store instanceof FlushableLock;
+        return $this->store instanceof CanFlushLocks;
     }
 
     /**

@@ -3,7 +3,7 @@
 namespace Illuminate\Cache;
 
 use Closure;
-use Illuminate\Contracts\Cache\FlushableLock;
+use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\ConnectionInterface;
@@ -17,7 +17,7 @@ use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 use RuntimeException;
 
-class DatabaseStore implements FlushableLock, LockProvider, Store
+class DatabaseStore implements CanFlushLocks, LockProvider, Store
 {
     use InteractsWithTime;
 
