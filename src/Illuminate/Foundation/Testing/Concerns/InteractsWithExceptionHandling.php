@@ -229,7 +229,7 @@ trait InteractsWithExceptionHandling
         } catch (Throwable $exception) {
             $thrown = true;
 
-            $exceptionClass = get_class($exception);
+            $exceptionClass = $exception::class;
             $exceptionMessage = $exception->getMessage();
         }
 

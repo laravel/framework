@@ -180,7 +180,7 @@ class Application extends SymfonyApplication implements ApplicationContract
             $callingClass = true;
 
             if (is_object($command)) {
-                $command = get_class($command);
+                $command = $command::class;
             }
 
             $command = $this->laravel->make($command)->getName();

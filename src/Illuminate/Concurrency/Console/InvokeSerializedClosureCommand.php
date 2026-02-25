@@ -70,7 +70,7 @@ class InvokeSerializedClosureCommand extends Command
 
             $this->output->write(json_encode([
                 'successful' => false,
-                'exception' => get_class($e),
+                'exception' => $e::class,
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),

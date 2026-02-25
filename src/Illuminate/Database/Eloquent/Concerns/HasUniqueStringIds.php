@@ -103,6 +103,6 @@ trait HasUniqueStringIds
      */
     protected function handleInvalidUniqueId($value, $field)
     {
-        throw (new ModelNotFoundException)->setModel(get_class($this), $value);
+        throw (new ModelNotFoundException)->setModel($this::class, $value);
     }
 }

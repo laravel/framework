@@ -66,7 +66,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
             return $this->notifiable->receivesBroadcastNotificationsOn($this->notification);
         }
 
-        $class = str_replace('\\', '.', get_class($this->notifiable));
+        $class = str_replace('\\', '.', $this->notifiable::class);
 
         return $class.'.'.$this->notifiable->getKey();
     }
@@ -97,7 +97,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     {
         return method_exists($this->notification, 'broadcastType')
             ? $this->notification->broadcastType()
-            : get_class($this->notification);
+            : $this->notification::class;
     }
 
     /**

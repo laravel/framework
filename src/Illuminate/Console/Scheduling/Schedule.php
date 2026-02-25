@@ -157,7 +157,7 @@ class Schedule
     public function command($command, array $parameters = [])
     {
         if ($command instanceof SymfonyCommand) {
-            $command = get_class($command);
+            $command = $command::class;
 
             $command = Container::getInstance()->make($command);
 

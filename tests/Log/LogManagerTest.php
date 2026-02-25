@@ -143,7 +143,7 @@ class LogManagerTest extends TestCase
         $this->assertEquals(Level::Notice, $handlers[0]->getLevel());
         $this->assertFalse($handlers[0]->getBubble());
 
-        $url = new ReflectionProperty(get_class($handlers[0]), 'url');
+        $url = new ReflectionProperty($handlers[0]::class, 'url');
         $this->assertSame('php://stderr', $url->getValue($handlers[0]));
 
         $config->set('logging.channels.logentries', [
@@ -158,7 +158,7 @@ class LogManagerTest extends TestCase
         $logger = $manager->channel('logentries');
         $handlers = $logger->getLogger()->getHandlers();
 
-        $logToken = new ReflectionProperty(get_class($handlers[0]), 'logToken');
+        $logToken = new ReflectionProperty($handlers[0]::class, 'logToken');
 
         $this->assertInstanceOf(LogEntriesHandler::class, $handlers[0]);
         $this->assertSame('123456789', $logToken->getValue($handlers[0]));
@@ -200,7 +200,7 @@ class LogManagerTest extends TestCase
         $this->assertInstanceOf(NewRelicHandler::class, $handler);
         $this->assertInstanceOf(HtmlFormatter::class, $formatter);
 
-        $dateFormat = new ReflectionProperty(get_class($formatter), 'dateFormat');
+        $dateFormat = new ReflectionProperty($formatter::class, 'dateFormat');
 
         $this->assertSame('Y/m/d--test', $dateFormat->getValue($formatter));
     }
@@ -260,7 +260,7 @@ class LogManagerTest extends TestCase
         $this->assertInstanceOf(MemoryUsageProcessor::class, $processors[1]);
         $this->assertInstanceOf(PsrLogMessageProcessor::class, $processors[2]);
 
-        $removeUsedContextFields = new ReflectionProperty(get_class($processors[2]), 'removeUsedContextFields');
+        $removeUsedContextFields = new ReflectionProperty($processors[2]::class, 'removeUsedContextFields');
 
         $this->assertTrue($removeUsedContextFields->getValue($processors[2]));
     }
@@ -340,7 +340,7 @@ class LogManagerTest extends TestCase
         $this->assertInstanceOf(HtmlFormatter::class, $formatter);
         $this->assertCount(1, $logger->getLogger()->getProcessors());
 
-        $dateFormat = new ReflectionProperty(get_class($formatter), 'dateFormat');
+        $dateFormat = new ReflectionProperty($formatter::class, 'dateFormat');
 
         $this->assertSame('Y/m/d--test', $dateFormat->getValue($formatter));
     }
@@ -385,7 +385,7 @@ class LogManagerTest extends TestCase
         $this->assertInstanceOf(HtmlFormatter::class, $formatter);
         $this->assertCount(1, $logger->getLogger()->getProcessors());
 
-        $dateFormat = new ReflectionProperty(get_class($formatter), 'dateFormat');
+        $dateFormat = new ReflectionProperty($formatter::class, 'dateFormat');
 
         $this->assertSame('Y/m/d--test', $dateFormat->getValue($formatter));
     }
@@ -428,7 +428,7 @@ class LogManagerTest extends TestCase
         $this->assertInstanceOf(HtmlFormatter::class, $formatter);
         $this->assertCount(1, $logger->getLogger()->getProcessors());
 
-        $dateFormat = new ReflectionProperty(get_class($formatter), 'dateFormat');
+        $dateFormat = new ReflectionProperty($formatter::class, 'dateFormat');
 
         $this->assertSame('Y/m/d--test', $dateFormat->getValue($formatter));
     }
@@ -460,7 +460,7 @@ class LogManagerTest extends TestCase
 
         $this->assertInstanceOf(StreamHandler::class, $handler);
 
-        $url = new ReflectionProperty(get_class($handler), 'url');
+        $url = new ReflectionProperty($handler::class, 'url');
 
         $this->assertSame(storage_path('logs/on-demand.log'), $url->getValue($handler));
     }
@@ -485,7 +485,7 @@ class LogManagerTest extends TestCase
         };
         $channel = $manager->build([
             'driver' => 'custom',
-            'via' => get_class($factory),
+            'via' => $factory::class,
         ]);
         $logger = $manager->stack(['test', $channel]);
 
@@ -495,7 +495,7 @@ class LogManagerTest extends TestCase
         $this->assertInstanceOf(StreamHandler::class, $handler);
         $this->assertInstanceOf(UidProcessor::class, $processor);
 
-        $url = new ReflectionProperty(get_class($handler), 'url');
+        $url = new ReflectionProperty($handler::class, 'url');
 
         $this->assertSame(storage_path('logs/custom.log'), $url->getValue($handler));
     }
@@ -527,10 +527,10 @@ class LogManagerTest extends TestCase
         $expectedFingersCrossedHandler = $handlers[0];
         $this->assertInstanceOf(FingersCrossedHandler::class, $expectedFingersCrossedHandler);
 
-        $activationStrategyProp = new ReflectionProperty(get_class($expectedFingersCrossedHandler), 'activationStrategy');
+        $activationStrategyProp = new ReflectionProperty($expectedFingersCrossedHandler::class, 'activationStrategy');
         $activationStrategyValue = $activationStrategyProp->getValue($expectedFingersCrossedHandler);
 
-        $actionLevelProp = new ReflectionProperty(get_class($activationStrategyValue), 'actionLevel');
+        $actionLevelProp = new ReflectionProperty($activationStrategyValue::class, 'actionLevel');
         $actionLevelValue = $actionLevelProp->getValue($activationStrategyValue);
 
         $this->assertEquals(Level::Critical, $actionLevelValue);
@@ -538,7 +538,7 @@ class LogManagerTest extends TestCase
         if (method_exists($expectedFingersCrossedHandler, 'getHandler')) {
             $expectedStreamHandler = $expectedFingersCrossedHandler->getHandler();
         } else {
-            $handlerProp = new ReflectionProperty(get_class($expectedFingersCrossedHandler), 'handler');
+            $handlerProp = new ReflectionProperty($expectedFingersCrossedHandler::class, 'handler');
             $expectedStreamHandler = $handlerProp->getValue($expectedFingersCrossedHandler);
         }
         $this->assertInstanceOf(StreamHandler::class, $expectedStreamHandler);
@@ -568,7 +568,7 @@ class LogManagerTest extends TestCase
 
         $expectedFingersCrossedHandler = $handlers[0];
 
-        $stopBufferingProp = new ReflectionProperty(get_class($expectedFingersCrossedHandler), 'stopBuffering');
+        $stopBufferingProp = new ReflectionProperty($expectedFingersCrossedHandler::class, 'stopBuffering');
         $stopBufferingValue = $stopBufferingProp->getValue($expectedFingersCrossedHandler);
 
         $this->assertTrue($stopBufferingValue);
@@ -598,7 +598,7 @@ class LogManagerTest extends TestCase
 
         $expectedFingersCrossedHandler = $handlers[0];
 
-        $stopBufferingProp = new ReflectionProperty(get_class($expectedFingersCrossedHandler), 'stopBuffering');
+        $stopBufferingProp = new ReflectionProperty($expectedFingersCrossedHandler::class, 'stopBuffering');
         $stopBufferingValue = $stopBufferingProp->getValue($expectedFingersCrossedHandler);
 
         $this->assertFalse($stopBufferingValue);
@@ -724,7 +724,7 @@ class LogManagerTest extends TestCase
 
         $this->assertInstanceOf(LineFormatter::class, $formatter);
 
-        $format = new ReflectionProperty(get_class($formatter), 'format');
+        $format = new ReflectionProperty($formatter::class, 'format');
 
         $this->assertEquals(
             '[%datetime%] %channel%.%level_name%: %message% %context% %extra%',

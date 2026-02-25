@@ -36,7 +36,7 @@ class FoundationApplicationTest extends TestCase
     public function testServiceProvidersAreCorrectlyRegistered()
     {
         $provider = m::mock(ApplicationBasicServiceProviderStub::class);
-        $class = get_class($provider);
+        $class = $provider::class;
         $provider->shouldReceive('register')->once();
         $app = new Application;
         $app->register($provider);
@@ -54,7 +54,7 @@ class FoundationApplicationTest extends TestCase
             ];
         });
 
-        $this->assertArrayHasKey(get_class($provider), $app->getLoadedProviders());
+        $this->assertArrayHasKey($provider::class, $app->getLoadedProviders());
 
         $instance = $app->make(AbstractClass::class);
 
@@ -73,7 +73,7 @@ class FoundationApplicationTest extends TestCase
             ];
         });
 
-        $this->assertArrayHasKey(get_class($provider), $app->getLoadedProviders());
+        $this->assertArrayHasKey($provider::class, $app->getLoadedProviders());
 
         $instance = $app->make(AbstractClass::class);
 
@@ -89,7 +89,7 @@ class FoundationApplicationTest extends TestCase
     public function testServiceProvidersAreCorrectlyRegisteredWhenRegisterMethodIsNotFilled()
     {
         $provider = m::mock(ServiceProvider::class);
-        $class = get_class($provider);
+        $class = $provider::class;
         $provider->shouldReceive('register')->once();
         $app = new Application;
         $app->register($provider);
@@ -100,7 +100,7 @@ class FoundationApplicationTest extends TestCase
     public function testServiceProvidersCouldBeLoaded()
     {
         $provider = m::mock(ServiceProvider::class);
-        $class = get_class($provider);
+        $class = $provider::class;
         $provider->shouldReceive('register')->once();
         $app = new Application;
         $app->register($provider);

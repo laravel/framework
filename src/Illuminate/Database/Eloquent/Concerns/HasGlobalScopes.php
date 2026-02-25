@@ -59,7 +59,7 @@ trait HasGlobalScopes
         } elseif ($scope instanceof Closure) {
             return static::$globalScopes[static::class][spl_object_hash($scope)] = $scope;
         } elseif ($scope instanceof Scope) {
-            return static::$globalScopes[static::class][get_class($scope)] = $scope;
+            return static::$globalScopes[static::class][$scope::class] = $scope;
         } elseif (is_string($scope) && class_exists($scope) && is_subclass_of($scope, Scope::class)) {
             return static::$globalScopes[static::class][$scope] = new $scope;
         }
@@ -108,7 +108,7 @@ trait HasGlobalScopes
         }
 
         return Arr::get(
-            static::$globalScopes, static::class.'.'.get_class($scope)
+            static::$globalScopes, static::class.'.'. $scope::class
         );
     }
 

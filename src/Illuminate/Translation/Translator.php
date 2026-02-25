@@ -288,8 +288,8 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
             }
 
             if (is_object($value)) {
-                $value = isset($this->stringableHandlers[get_class($value)])
-                    ? call_user_func($this->stringableHandlers[get_class($value)], $value)
+                $value = isset($this->stringableHandlers[$value::class])
+                    ? call_user_func($this->stringableHandlers[$value::class], $value)
                     : enum_value($value);
             }
 

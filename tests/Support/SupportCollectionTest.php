@@ -5966,7 +5966,7 @@ class SupportCollectionTest extends TestCase
         $wrongType = new $collection;
         $data = $collection::make([new \Error, new \Error, $wrongType]);
         $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage(sprintf("Collection should only include [%s] items, but '%s' found at position %d.", \Throwable::class, get_class($wrongType), 2));
+        $this->expectExceptionMessage(sprintf("Collection should only include [%s] items, but '%s' found at position %d.", \Throwable::class, $wrongType::class, 2));
         $data->ensure(\Throwable::class);
     }
 
@@ -5979,7 +5979,7 @@ class SupportCollectionTest extends TestCase
         $wrongType = new $collection;
         $data = $collection::make([new \Error, new \Error, $wrongType]);
         $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage(sprintf('Collection should only include [%s] items, but \'%s\' found at position %d.', implode(', ', [\Throwable::class, 'int']), get_class($wrongType), 2));
+        $this->expectExceptionMessage(sprintf('Collection should only include [%s] items, but \'%s\' found at position %d.', implode(', ', [\Throwable::class, 'int']), $wrongType::class, 2));
         $data->ensure([\Throwable::class, 'int']);
     }
 

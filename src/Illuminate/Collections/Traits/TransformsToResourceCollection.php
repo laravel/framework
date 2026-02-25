@@ -46,7 +46,7 @@ trait TransformsToResourceCollection
         throw_unless(is_object($model), LogicException::class, 'Resource collection guesser expects the collection to contain objects.');
 
         /** @var class-string<Model> $className */
-        $className = get_class($model);
+        $className = $model::class;
 
         throw_unless(method_exists($className, 'guessResourceName'), LogicException::class, sprintf('Expected class %s to implement guessResourceName method. Make sure the model uses the TransformsToResource trait.', $className));
 

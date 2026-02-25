@@ -181,7 +181,7 @@ trait HasRelationships
      */
     protected function invokeRelationAutoloadCallbackFor($key, $tuples)
     {
-        $tuples = array_merge([[$key, get_class($this)]], $tuples);
+        $tuples = array_merge([[$key, $this::class]], $tuples);
 
         call_user_func($this->relationAutoloadCallback, $tuples);
     }

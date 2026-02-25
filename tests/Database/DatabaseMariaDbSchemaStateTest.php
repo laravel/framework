@@ -22,13 +22,13 @@ class DatabaseMariaDbSchemaStateTest extends TestCase
         $versionInfo = ['version' => '11.8.3', 'isMariaDb' => true];
 
         // test connectionString
-        $method = new ReflectionMethod(get_class($schemaState), 'connectionString');
+        $method = new ReflectionMethod($schemaState::class, 'connectionString');
         $connString = $method->invoke($schemaState, $versionInfo);
 
         self::assertEquals($expectedConnectionString, $connString);
 
         // test baseVariables
-        $method = new ReflectionMethod(get_class($schemaState), 'baseVariables');
+        $method = new ReflectionMethod($schemaState::class, 'baseVariables');
         $variables = $method->invoke($schemaState, $dbConfig);
 
         self::assertEquals($expectedVariables, $variables);

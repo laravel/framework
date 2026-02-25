@@ -159,7 +159,7 @@ trait InteractsWithQueue
             PHPUnit::assertInstanceOf(
                 $exception,
                 $this->job->failedWith,
-                'Expected job to be manually failed with ['.$exception.'] but job failed with ['.get_class($this->job->failedWith).'].'
+                'Expected job to be manually failed with ['.$exception.'] but job failed with ['. $this->job->failedWith::class .'].'
             );
 
             return $this;
@@ -171,9 +171,9 @@ trait InteractsWithQueue
 
         if ($exception instanceof Throwable) {
             PHPUnit::assertInstanceOf(
-                get_class($exception),
+                $exception::class,
                 $this->job->failedWith,
-                'Expected job to be manually failed with ['.get_class($exception).'] but job failed with ['.get_class($this->job->failedWith).'].'
+                'Expected job to be manually failed with ['. $exception::class .'] but job failed with ['. $this->job->failedWith::class .'].'
             );
 
             PHPUnit::assertEquals(

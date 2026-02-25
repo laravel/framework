@@ -460,7 +460,7 @@ class Migrator
      */
     protected function pretendToRun($migration, $method)
     {
-        $name = get_class($migration);
+        $name = $migration::class;
 
         $reflectionClass = new ReflectionClass($migration);
 

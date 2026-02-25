@@ -44,7 +44,7 @@ trait TransformsToResource
             }
         }
 
-        throw new LogicException(sprintf('Failed to find resource class for model [%s].', get_class($this)));
+        throw new LogicException(sprintf('Failed to find resource class for model [%s].', $this::class));
     }
 
     /**

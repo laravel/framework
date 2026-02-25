@@ -109,7 +109,7 @@ class ResourceResponse implements Responsable
      */
     protected function wrapper()
     {
-        return get_class($this->resource)::$wrap;
+        return $this->resource::class::$wrap;
     }
 
     /**

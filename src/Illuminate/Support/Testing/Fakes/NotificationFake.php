@@ -195,7 +195,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
         }
 
         PHPUnit::assertEmpty(
-            $this->notifications[get_class($notifiable)][$notifiable->getKey() ?? ''] ?? [],
+            $this->notifications[$notifiable::class][$notifiable->getKey() ?? ''] ?? [],
             'Notifications were sent unexpectedly.',
         );
     }
@@ -283,7 +283,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      */
     protected function notificationsFor($notifiable, $notification)
     {
-        return $this->notifications[get_class($notifiable)][(string) $notifiable->getKey()][$notification] ?? [];
+        return $this->notifications[$notifiable::class][(string) $notifiable->getKey()][$notification] ?? [];
     }
 
     /**
@@ -330,7 +330,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
                 continue;
             }
 
-            $this->notifications[get_class($notifiable)][(string) $notifiable->getKey()][get_class($notification)][] = [
+            $this->notifications[$notifiable::class][(string) $notifiable->getKey()][$notification::class][] = [
                 'notification' => $this->serializeAndRestore && $notification instanceof ShouldQueue
                     ? $this->serializeAndRestoreNotification($notification)
                     : $notification,

@@ -404,7 +404,7 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         $connection->shouldReceive('getDatabaseName')->andReturn('database');
         $resolver = m::mock(ConnectionResolverInterface::class, ['connection' => $connection]);
 
-        $class = get_class($model);
+        $class = $model::class;
         $class::setConnectionResolver($resolver);
 
         $connection->shouldReceive('getPdo')->andReturn($pdo = m::mock(PDO::class));

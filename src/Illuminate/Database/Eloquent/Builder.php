@@ -213,7 +213,7 @@ class Builder implements BuilderContract
     public function withoutGlobalScope($scope)
     {
         if (! is_string($scope)) {
-            $scope = get_class($scope);
+            $scope = $scope::class;
         }
 
         unset($this->scopes[$scope]);
@@ -622,7 +622,7 @@ class Builder implements BuilderContract
         if (is_array($id)) {
             if (count($result) !== count(array_unique($id))) {
                 throw (new ModelNotFoundException)->setModel(
-                    get_class($this->model), array_diff($id, $result->modelKeys())
+                    $this->model::class, array_diff($id, $result->modelKeys())
                 );
             }
 
@@ -631,7 +631,7 @@ class Builder implements BuilderContract
 
         if (is_null($result)) {
             throw (new ModelNotFoundException)->setModel(
-                get_class($this->model), $id
+                $this->model::class, $id
             );
         }
 
@@ -780,7 +780,7 @@ class Builder implements BuilderContract
             return $model;
         }
 
-        throw (new ModelNotFoundException)->setModel(get_class($this->model));
+        throw (new ModelNotFoundException)->setModel($this->model::class);
     }
 
     /**
@@ -821,7 +821,7 @@ class Builder implements BuilderContract
         try {
             return $this->baseSole($columns);
         } catch (RecordsNotFoundException) {
-            throw (new ModelNotFoundException)->setModel(get_class($this->model));
+            throw (new ModelNotFoundException)->setModel($this->model::class);
         }
     }
 

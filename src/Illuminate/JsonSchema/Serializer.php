@@ -23,14 +23,14 @@ class Serializer
         /** @var array<string, mixed> $attributes */
         $attributes = (fn () => get_object_vars($type))->call($type);
 
-        $attributes['type'] = match (get_class($type)) {
+        $attributes['type'] = match ($type::class) {
             Types\ArrayType::class => 'array',
             Types\BooleanType::class => 'boolean',
             Types\IntegerType::class => 'integer',
             Types\NumberType::class => 'number',
             Types\ObjectType::class => 'object',
             Types\StringType::class => 'string',
-            default => throw new RuntimeException('Unsupported ['.get_class($type).'] type.'),
+            default => throw new RuntimeException('Unsupported ['. $type::class .'] type.'),
         };
 
         $nullable = static::isNullable($type);

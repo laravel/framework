@@ -84,7 +84,7 @@ if (! function_exists('class_basename')) {
      */
     function class_basename($class): string
     {
-        $class = is_object($class) ? get_class($class) : $class;
+        $class = is_object($class) ? $class::class : $class;
 
         return basename(str_replace('\\', '/', $class));
     }
@@ -100,7 +100,7 @@ if (! function_exists('class_uses_recursive')) {
     function class_uses_recursive($class): array
     {
         if (is_object($class)) {
-            $class = get_class($class);
+            $class = $class::class;
         }
 
         $results = [];

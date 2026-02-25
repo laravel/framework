@@ -24,13 +24,13 @@ class DatabaseMySqlSchemaStateTest extends TestCase
         $versionInfo = ['version' => '8.0.0', 'isMariaDb' => false];
 
         // test connectionString
-        $method = new ReflectionMethod(get_class($schemaState), 'connectionString');
+        $method = new ReflectionMethod($schemaState::class, 'connectionString');
         $connString = $method->invoke($schemaState, $versionInfo);
 
         self::assertEquals($expectedConnectionString, $connString);
 
         // test baseVariables
-        $method = new ReflectionMethod(get_class($schemaState), 'baseVariables');
+        $method = new ReflectionMethod($schemaState::class, 'baseVariables');
         $variables = $method->invoke($schemaState, $dbConfig);
 
         self::assertEquals($expectedVariables, $variables);
@@ -159,7 +159,7 @@ class DatabaseMySqlSchemaStateTest extends TestCase
         $this->expectExceptionMessage('Dump execution exceeded maximum depth of 30.');
 
         // test executeDumpProcess
-        $method = new ReflectionMethod(get_class($schemaState), 'executeDumpProcess');
+        $method = new ReflectionMethod($schemaState::class, 'executeDumpProcess');
         $method->invoke($schemaState, $mockProcess, $mockOutput, $mockVariables, 31);
     }
 }

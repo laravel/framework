@@ -81,7 +81,7 @@ trait SupportsInverseRelations
             Str::camel(Str::beforeLast($this->getParent()->getForeignKey(), $this->getParent()->getKeyName())),
             Str::camel(class_basename($this->getParent())),
             'owner',
-            get_class($this->getParent()) === get_class($this->getModel()) ? 'parent' : null,
+            $this->getParent()::class === $this->getModel()::class ? 'parent' : null,
         ]));
     }
 

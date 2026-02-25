@@ -75,7 +75,7 @@ class UniqueLock
 
         $jobName = method_exists($job, 'displayName')
             ? $job->displayName()
-            : get_class($job);
+            : $job::class;
 
         return 'laravel_unique_job:'.$jobName.':'.$uniqueId;
     }

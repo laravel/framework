@@ -207,7 +207,7 @@ class ThrottleRequests
         if (! is_numeric($maxAttempts)) {
             is_null($request->user())
                 ? throw MissingRateLimiterException::forLimiter($maxAttempts)
-                : throw MissingRateLimiterException::forLimiterAndUser($maxAttempts, get_class($request->user()));
+                : throw MissingRateLimiterException::forLimiterAndUser($maxAttempts, $request->user()::class);
         }
 
         return (int) $maxAttempts;

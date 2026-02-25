@@ -13,7 +13,7 @@ class MailMailableDataTest extends TestCase
 
         $testData = [
             'first_name' => 'James',
-            '__laravel_mailable' => get_class($mailable),
+            '__laravel_mailable' => $mailable::class,
         ];
 
         $mailable->build(function ($m) use ($testData) {

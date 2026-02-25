@@ -76,7 +76,7 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $ids = is_array($key) ? array_diff($key, $result->modelKeys()) : $key;
 
-        $exception->setModel(get_class($model), $ids);
+        $exception->setModel($model::class, $ids);
 
         throw $exception;
     }
@@ -320,7 +320,7 @@ class Collection extends BaseCollection implements QueueableCollection
     {
         $this->pluck($relation)
             ->filter()
-            ->groupBy(fn ($model) => get_class($model))
+            ->groupBy(fn ($model) => $model::class)
             ->each(fn ($models, $className) => static::make($models)->load($relations[$className] ?? []));
 
         return $this;
@@ -337,7 +337,7 @@ class Collection extends BaseCollection implements QueueableCollection
     {
         $this->pluck($relation)
             ->filter()
-            ->groupBy(fn ($model) => get_class($model))
+            ->groupBy(fn ($model) => $model::class)
             ->each(fn ($models, $className) => static::make($models)->loadCount($relations[$className] ?? []));
 
         return $this;
@@ -843,7 +843,7 @@ class Collection extends BaseCollection implements QueueableCollection
     {
         return method_exists($model, 'getQueueableClassName')
             ? $model->getQueueableClassName()
-            : get_class($model);
+            : $model::class;
     }
 
     /**
@@ -923,7 +923,7 @@ class Collection extends BaseCollection implements QueueableCollection
             throw new LogicException('Unable to create query for empty collection.');
         }
 
-        $class = get_class($model);
+        $class = $model::class;
 
         if ($this->reject(fn ($model) => $model instanceof $class)->isNotEmpty()) {
             throw new LogicException('Unable to create query for collection with mixed types.');

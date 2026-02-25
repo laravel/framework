@@ -932,7 +932,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function getProvider($provider)
     {
-        $name = is_string($provider) ? $provider : get_class($provider);
+        $name = is_string($provider) ? $provider : $provider::class;
 
         return $this->serviceProviders[$name] ?? null;
     }
@@ -945,7 +945,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function getProviders($provider)
     {
-        $name = is_string($provider) ? $provider : get_class($provider);
+        $name = is_string($provider) ? $provider : $provider::class;
 
         return Arr::where($this->serviceProviders, fn ($value) => $value instanceof $name);
     }
@@ -969,7 +969,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     protected function markAsRegistered($provider)
     {
-        $class = get_class($provider);
+        $class = $provider::class;
 
         $this->serviceProviders[$class] = $provider;
 

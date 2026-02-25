@@ -197,7 +197,7 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->fail();
         } catch (ExpectationFailedException $e) {
             $this->assertStringContainsString('The following jobs were pushed unexpectedly', $e->getMessage());
-            $this->assertStringContainsString(get_class($this->job), $e->getMessage());
+            $this->assertStringContainsString($this->job::class, $e->getMessage());
             $this->assertStringContainsString(CallQueuedClosure::class, $e->getMessage());
         }
     }
@@ -335,7 +335,7 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->fake->undefinedMethod();
         } catch (BadMethodCallException $e) {
             $this->assertSame(sprintf(
-                'Call to undefined method %s::%s()', get_class($this->fake), 'undefinedMethod'
+                'Call to undefined method %s::%s()', $this->fake::class, 'undefinedMethod'
             ), $e->getMessage());
         }
     }

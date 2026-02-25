@@ -481,7 +481,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
 
         foreach ($models as $model) {
             /** @var Model $model */
-            $class = get_class($model);
+            $class = $model::class;
             $class::setConnectionResolver($resolver);
         }
 

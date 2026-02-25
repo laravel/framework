@@ -797,7 +797,7 @@ class BelongsToMany extends Relation
             return $result;
         }
 
-        throw (new ModelNotFoundException)->setModel(get_class($this->related), $id);
+        throw (new ModelNotFoundException)->setModel($this->related::class, $id);
     }
 
     /**
@@ -878,7 +878,7 @@ class BelongsToMany extends Relation
             return $model;
         }
 
-        throw (new ModelNotFoundException)->setModel(get_class($this->related));
+        throw (new ModelNotFoundException)->setModel($this->related::class);
     }
 
     /**

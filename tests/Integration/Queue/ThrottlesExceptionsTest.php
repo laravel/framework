@@ -363,7 +363,7 @@ class ThrottlesExceptionsTest extends TestCase
             }
         };
 
-        $expectedKey = 'laravel_throttles_exceptions:'.hash('xxh128', get_class($job));
+        $expectedKey = 'laravel_throttles_exceptions:'.hash('xxh128', $job::class);
 
         $rateLimiter->shouldReceive('tooManyAttempts')
             ->once()

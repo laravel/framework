@@ -182,7 +182,7 @@ class Dispatcher implements QueueingDispatcher
      */
     public function hasCommandHandler($command)
     {
-        return array_key_exists(get_class($command), $this->handlers);
+        return array_key_exists($command::class, $this->handlers);
     }
 
     /**
@@ -194,7 +194,7 @@ class Dispatcher implements QueueingDispatcher
     public function getCommandHandler($command)
     {
         if ($this->hasCommandHandler($command)) {
-            return $this->container->make($this->handlers[get_class($command)]);
+            return $this->container->make($this->handlers[$command::class]);
         }
 
         return false;

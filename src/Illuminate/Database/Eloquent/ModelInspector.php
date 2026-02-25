@@ -193,8 +193,8 @@ class ModelInspector
 
                 return [
                     'name' => $method->getName(),
-                    'type' => Str::afterLast(get_class($relation), '\\'),
-                    'related' => get_class($relation->getRelated()),
+                    'type' => Str::afterLast($relation::class, '\\'),
+                    'related' => $relation->getRelated()::class,
                 ];
             })
             ->filter()

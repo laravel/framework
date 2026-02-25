@@ -258,7 +258,7 @@ class ThrottlesExceptions
 
         $jobName = method_exists($job, 'displayName')
             ? $job->displayName()
-            : get_class($job);
+            : $job::class;
 
         return $this->prefix.hash('xxh128', $jobName);
     }

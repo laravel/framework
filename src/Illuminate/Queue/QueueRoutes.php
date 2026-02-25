@@ -62,7 +62,7 @@ class QueueRoutes
         }
 
         $classes = array_merge(
-            [get_class($queueable)],
+            [$queueable::class],
             class_parents($queueable) ?: [],
             class_implements($queueable) ?: [],
             class_uses_recursive($queueable)

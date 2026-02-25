@@ -403,8 +403,8 @@ class BusBatchTest extends TestCase
                     $_SERVER['__failure3.batch'] = $batch;
                     $_SERVER['__failure3.exception'] = $e;
                     $_SERVER['__failure3.batch_id'] = $batch->id;
-                    $_SERVER['__failure3.batch_class'] = get_class($batch);
-                    $_SERVER['__failure3.exception_class'] = get_class($e);
+                    $_SERVER['__failure3.batch_class'] = $batch::class;
+                    $_SERVER['__failure3.exception_class'] = $e::class;
                     $_SERVER['__failure3.exception_message'] = $e->getMessage();
                     $_SERVER['__failure3.param_count'] = func_num_args();
                 },

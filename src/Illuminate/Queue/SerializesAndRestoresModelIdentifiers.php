@@ -28,7 +28,7 @@ trait SerializesAndRestoresModelIdentifiers
                 $withRelations ? $value->getQueueableRelations() : [],
                 $value->getQueueableConnection()
             ))->useCollectionClass(
-                ($collectionClass = get_class($value)) !== EloquentCollection::class
+                ($collectionClass = $value::class) !== EloquentCollection::class
                     ? $collectionClass
                     : null
             );
@@ -36,7 +36,7 @@ trait SerializesAndRestoresModelIdentifiers
 
         if ($value instanceof QueueableEntity) {
             return new ModelIdentifier(
-                get_class($value),
+                $value::class,
                 $value->getQueueableId(),
                 $withRelations ? $value->getQueueableRelations() : [],
                 $value->getQueueableConnection()
@@ -88,7 +88,7 @@ trait SerializesAndRestoresModelIdentifiers
 
         $collection = $collection->keyBy->getKey();
 
-        $collectionClass = get_class($collection);
+        $collectionClass = $collection::class;
 
         return (new $collectionClass(
             (new Collection($value->id))

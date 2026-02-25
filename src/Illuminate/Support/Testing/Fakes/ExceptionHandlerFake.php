@@ -81,7 +81,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
 
         Assert::assertTrue(
             (new Collection($this->reported))->contains(
-                fn (Throwable $e) => $this->firstClosureParameterType($exception) === get_class($e)
+                fn (Throwable $e) => $this->firstClosureParameterType($exception) === $e::class
                     && $exception($e) === true,
             ), $message,
         );
@@ -172,7 +172,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
      */
     protected function isFakedException(Throwable $e)
     {
-        return count($this->exceptions) === 0 || in_array(get_class($e), $this->exceptions, true);
+        return count($this->exceptions) === 0 || in_array($e::class, $this->exceptions, true);
     }
 
     /**

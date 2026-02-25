@@ -365,7 +365,7 @@ trait Queueable
         if ((new Collection($expectedChain))->contains(fn ($job) => is_object($job))) {
             $expectedChain = (new Collection($expectedChain))->map(fn ($job) => serialize($job))->all();
         } else {
-            $chain = (new Collection($this->chained))->map(fn ($job) => get_class(unserialize($job)))->all();
+            $chain = (new Collection($this->chained))->map(fn ($job) => unserialize($job)::class)->all();
         }
 
         PHPUnit::assertTrue(

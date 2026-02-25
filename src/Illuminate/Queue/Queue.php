@@ -191,7 +191,7 @@ abstract class Queue
                 : serialize(clone $job);
         } catch (Throwable $e) {
             throw new RuntimeException(
-                sprintf('Failed to serialize job of type [%s]: %s', get_class($job), $e->getMessage()),
+                sprintf('Failed to serialize job of type [%s]: %s', $job::class, $e->getMessage()),
                 0,
                 $e
             );
@@ -199,7 +199,7 @@ abstract class Queue
 
         return array_merge($payload, [
             'data' => array_merge($payload['data'], [
-                'commandName' => get_class($job),
+                'commandName' => $job::class,
                 'command' => $command,
             ]),
         ]);
@@ -215,7 +215,7 @@ abstract class Queue
     {
         return method_exists($job, 'displayName')
             ? $job->displayName()
-            : get_class($job);
+            : $job::class;
     }
 
     /**
