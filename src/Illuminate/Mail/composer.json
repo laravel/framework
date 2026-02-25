@@ -2,17 +2,17 @@
     "name": "illuminate/mail",
     "description": "The Illuminate Mail package.",
     "license": "MIT",
-    "homepage": "https://laravel.com",
-    "support": {
-        "issues": "https://github.com/laravel/framework/issues",
-        "source": "https://github.com/laravel/framework"
-    },
     "authors": [
         {
             "name": "Taylor Otwell",
             "email": "taylor@laravel.com"
         }
     ],
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "require": {
         "php": "^8.3",
         "illuminate/collections": "^13.0",
@@ -21,30 +21,30 @@
         "illuminate/macroable": "^13.0",
         "illuminate/support": "^13.0",
         "league/commonmark": "^2.7",
-        "psr/log": "^1.0|^2.0|^3.0",
-        "symfony/mailer": "^7.4.0|^8.0.0",
+        "psr/log": "^1.0 || ^2.0 || ^3.0",
+        "symfony/mailer": "^7.4.0 || ^8.0.0",
         "tijsverkoyen/css-to-inline-styles": "^2.2.5"
     },
+    "suggest": {
+        "aws/aws-sdk-php": "Required to use the SES mail driver (^3.322.9).",
+        "illuminate/http": "Required to create an attachment from an UploadedFile instance (^13.0).",
+        "resend/resend-php": "Required to enable support for the Resend mail transport (^0.10.0 || ^1.0).",
+        "symfony/http-client": "Required to use the Symfony API mail transports (^7.4 || ^8.0).",
+        "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail transport (^7.4 || ^8.0).",
+        "symfony/postmark-mailer": "Required to enable support for the Postmark mail transport (^7.4 || ^8.0)."
+    },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Illuminate\\Mail\\": ""
         }
     },
+    "config": {
+        "sort-packages": true
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "13.0.x-dev"
         }
-    },
-    "suggest": {
-        "aws/aws-sdk-php": "Required to use the SES mail driver (^3.322.9).",
-        "illuminate/http": "Required to create an attachment from an UploadedFile instance (^13.0).",
-        "resend/resend-php": "Required to enable support for the Resend mail transport (^0.10.0|^1.0).",
-        "symfony/http-client": "Required to use the Symfony API mail transports (^7.4|^8.0).",
-        "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail transport (^7.4|^8.0).",
-        "symfony/postmark-mailer": "Required to enable support for the Postmark mail transport (^7.4|^8.0)."
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "minimum-stability": "dev"
+    }
 }

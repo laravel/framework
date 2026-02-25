@@ -2,17 +2,17 @@
     "name": "illuminate/cache",
     "description": "The Illuminate Cache package.",
     "license": "MIT",
-    "homepage": "https://laravel.com",
-    "support": {
-        "issues": "https://github.com/laravel/framework/issues",
-        "source": "https://github.com/laravel/framework"
-    },
     "authors": [
         {
             "name": "Taylor Otwell",
             "email": "taylor@laravel.com"
         }
     ],
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "require": {
         "php": "^8.3",
         "illuminate/collections": "^13.0",
@@ -21,17 +21,7 @@
         "illuminate/support": "^13.0"
     },
     "provide": {
-        "psr/simple-cache-implementation": "1.0|2.0|3.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "Illuminate\\Cache\\": ""
-        }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "13.0.x-dev"
-        }
+        "psr/simple-cache-implementation": "1.0 || 2.0 || 3.0"
     },
     "suggest": {
         "ext-apcu": "Required to use the APC cache driver.",
@@ -40,10 +30,20 @@
         "illuminate/database": "Required to use the database cache driver (^13.0).",
         "illuminate/filesystem": "Required to use the file cache driver (^13.0).",
         "illuminate/redis": "Required to use the redis cache driver (^13.0).",
-        "symfony/cache": "Required to use PSR-6 cache bridge (^7.4|^8.0)."
+        "symfony/cache": "Required to use PSR-6 cache bridge (^7.4 || ^8.0)."
+    },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Illuminate\\Cache\\": ""
+        }
     },
     "config": {
         "sort-packages": true
     },
-    "minimum-stability": "dev"
+    "extra": {
+        "branch-alias": {
+            "dev-master": "13.0.x-dev"
+        }
+    }
 }
