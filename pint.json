@@ -42,6 +42,7 @@
         "encoding": true,
         "full_opening_tag": true,
         "function_declaration": true,
+        "get_class_to_class_keyword": true,
         "heredoc_to_nowdoc": true,
         "include": true,
         "increment_style": {
