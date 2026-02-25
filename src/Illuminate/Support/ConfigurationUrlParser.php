@@ -33,7 +33,7 @@ class ConfigurationUrlParser
             $config = ['url' => $config];
         }
 
-        $url = Arr::pull($config, 'url');
+        $url = trim((string) Arr::pull($config, 'url'));
 
         if (! $url) {
             return $config;
