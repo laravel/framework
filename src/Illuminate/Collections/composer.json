@@ -36,7 +36,7 @@
         }
     },
     "suggest": {
-        "illuminate/http": "Required to convert collections to API resources (^12.0).",
+        "illuminate/http": "Required to convert collections to API resources (^13.0).",
         "symfony/var-dumper": "Required to use the dump method (^7.4|^8.0)."
     },
     "config": {

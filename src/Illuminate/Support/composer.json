@@ -25,7 +25,6 @@
         "illuminate/macroable": "^13.0",
         "illuminate/reflection": "^13.0",
         "nesbot/carbon": "^3.8.4",
-        "symfony/polyfill-php83": "^1.33",
         "symfony/polyfill-php85": "^1.33",
         "voku/portable-ascii": "^2.0.2"
     },
