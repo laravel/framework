@@ -48,6 +48,10 @@ if (! function_exists('blank')) {
      */
     function blank($value): bool
     {
+        if(! isset($value)) {
+            return false;
+        }
+        
         if (is_null($value)) {
             return true;
         }
