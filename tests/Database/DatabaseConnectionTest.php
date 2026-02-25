@@ -735,6 +735,26 @@ class DatabaseConnectionTest extends TestCase
         }
     }
 
+    public function testPingReturnsTrueWhenConnectionIsAlive()
+    {
+        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['query'])->getMock();
+        $pdo->expects($this->once())->method('query')->with('SELECT 1')->willReturn($this->createMock(PDOStatement::class));
+
+        $connection = $this->getMockConnection([], $pdo);
+
+        $this->assertTrue($connection->ping());
+    }
+
+    public function testPingReturnsFalseWhenQueryFails()
+    {
+        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['query'])->getMock();
+        $pdo->expects($this->once())->method('query')->with('SELECT 1')->will($this->throwException(new PDOException));
+
+        $connection = $this->getMockConnection([], $pdo);
+
+        $this->assertFalse($connection->ping());
+    }
+
     protected function getMockConnection($methods = [], $pdo = null)
     {
         $pdo = $pdo ?: new DatabaseConnectionTestMockPDO;

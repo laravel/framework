@@ -1034,6 +1034,22 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Check if the database connection is still alive.
+     *
+     * @return bool
+     */
+    public function ping(): bool
+    {
+        try {
+            $this->getPdo()->query('SELECT 1');
+
+            return true;
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    /**
      * Disconnect from the underlying PDO connection.
      *
      * @return void

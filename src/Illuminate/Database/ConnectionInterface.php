@@ -181,4 +181,11 @@ interface ConnectionInterface
      * @return string
      */
     public function getDatabaseName();
+
+    /**
+     * Check if the database connection is still alive.
+     *
+     * @return bool
+     */
+    public function ping(): bool;
 }
