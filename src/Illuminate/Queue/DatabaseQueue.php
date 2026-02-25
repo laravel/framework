@@ -295,9 +295,12 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
                 }
             });
         } catch (Throwable $e) {
+            // Potentially invalid job that we need to fail (#58978)...
             if ($jobRecord) {
                 try {
-                    $this->marshalFailedJob($queue, $jobRecord)->fail($e);
+                    (new DatabaseJob(
+                        $this->container, $this, $jobRecord, $this->connectionName, $queue
+                    ))->fail($e);
                 } catch (Throwable) {
                     // Ignore and throw the original exception...
                 }
@@ -305,24 +308,6 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
 
             throw $e;
         }
-    }
-
-    /**
-     * Marshal the failed job into a DatabaseJob instance.
-     *
-     * @param  string  $queue
-     * @param  \Illuminate\Queue\Jobs\DatabaseJobRecord  $job
-     * @return \Illuminate\Queue\Jobs\DatabaseJob
-     */
-    protected function marshalFailedJob($queue, $job)
-    {
-        return new DatabaseJob(
-            $this->container,
-            $this,
-            $job,
-            $this->connectionName,
-            $queue,
-        );
     }
 
     /**
