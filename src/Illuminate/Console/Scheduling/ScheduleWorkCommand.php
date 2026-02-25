@@ -20,7 +20,8 @@ class ScheduleWorkCommand extends Command
      */
     protected $signature = 'schedule:work
         {--run-output-file= : The file to direct <info>schedule:run</info> output to}
-        {--whisper : Do not output message indicating that no jobs were ready to run}';
+        {--whisper : Do not output message indicating that no jobs were ready to run}
+        {--interval=60 : The interval in seconds to run the scheduler}';
 
     /**
      * The console command description.
@@ -36,6 +37,18 @@ class ScheduleWorkCommand extends Command
      */
     public function handle()
     {
+        $interval = (int) $this->option('interval');
+
+        if ($interval <= 0) {
+            $this->components->error('The interval must be greater than zero.');
+            return;
+        }
+
+        if (60 % $interval !== 0) {
+            $this->components->error('The interval is not evenly divisible by 60.');
+            return;
+        }
+
         $this->components->info(
             'Running scheduled tasks.',
             $this->getLaravel()->environment('local') ? OutputInterface::VERBOSITY_NORMAL : OutputInterface::VERBOSITY_VERBOSE
@@ -56,13 +69,13 @@ class ScheduleWorkCommand extends Command
         while (true) {
             usleep(100 * 1000);
 
-            if (Carbon::now()->second === 0 &&
-                ! Carbon::now()->startOfMinute()->equalTo($lastExecutionStartedAt)) {
+            if (Carbon::now()->second % $interval === 0 &&
+                ! Carbon::now()->startOfSecond()->equalTo($lastExecutionStartedAt)) {
                 $executions[] = $execution = Process::fromShellCommandline($command, base_path());
 
                 $execution->start();
 
-                $lastExecutionStartedAt = Carbon::now()->startOfMinute();
+                $lastExecutionStartedAt = Carbon::now()->startOfSecond();
             }
 
             foreach ($executions as $key => $execution) {
