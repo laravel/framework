@@ -17,6 +17,7 @@ use Illuminate\Testing\Assert;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\NullOutput;
 
 class SeedCommandTest extends TestCase
@@ -131,6 +132,114 @@ class SeedCommandTest extends TestCase
         SeedCommand::prohibit();
 
         Assert::assertSame(Command::FAILURE, $command->handle());
+    }
+
+    public function testListWithNoSeeders()
+    {
+        $input = new ArrayInput(['--list' => true]);
+        $output = new BufferedOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $resolver = m::mock(ConnectionResolverInterface::class);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('call');
+        $container->shouldReceive('runningUnitTests')->andReturn('true');
+        $container->shouldReceive('databasePath')->with('seeders')->andReturn('/nonexistent/path');
+        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn($outputStyle);
+        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(
+            new Factory($outputStyle)
+        );
+
+        $command = new SeedCommand($resolver);
+        $command->setLaravel($container);
+
+        $command->run($input, $output);
+        $result = $command->handle();
+
+        Assert::assertSame(Command::SUCCESS, $result);
+        Assert::assertStringContainsString('No seeders found', $output->fetch());
+    }
+
+    public function testListBypassesProhibition()
+    {
+        $input = new ArrayInput(['--list' => true]);
+        $output = new BufferedOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $resolver = m::mock(ConnectionResolverInterface::class);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('call');
+        $container->shouldReceive('runningUnitTests')->andReturn('true');
+        $container->shouldReceive('databasePath')->with('seeders')->andReturn('/nonexistent/path');
+        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn($outputStyle);
+        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(
+            new Factory($outputStyle)
+        );
+
+        $command = new SeedCommand($resolver);
+        $command->setLaravel($container);
+
+        $command->run($input, $output);
+
+        SeedCommand::prohibit();
+
+        Assert::assertSame(Command::SUCCESS, $command->handle());
+    }
+
+    public function testSelectRespectsProhibition()
+    {
+        $input = new ArrayInput(['--select' => true]);
+        $output = new NullOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $resolver = m::mock(ConnectionResolverInterface::class);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('call');
+        $container->shouldReceive('runningUnitTests')->andReturn('true');
+        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn($outputStyle);
+        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(
+            new Factory($outputStyle)
+        );
+
+        $command = new SeedCommand($resolver);
+        $command->setLaravel($container);
+
+        $command->run($input, $output);
+
+        SeedCommand::prohibit();
+
+        Assert::assertSame(Command::FAILURE, $command->handle());
+    }
+
+    public function testSelectWithNoSeeders()
+    {
+        $input = new ArrayInput(['--select' => true, '--force' => true]);
+        $output = new BufferedOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $resolver = m::mock(ConnectionResolverInterface::class);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('call');
+        $container->shouldReceive('environment')->once()->andReturn('testing');
+        $container->shouldReceive('runningUnitTests')->andReturn('true');
+        $container->shouldReceive('databasePath')->with('seeders')->andReturn('/nonexistent/path');
+        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn($outputStyle);
+        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(
+            new Factory($outputStyle)
+        );
+
+        $command = new SeedCommand($resolver);
+        $command->setLaravel($container);
+
+        $command->run($input, $output);
+        $result = $command->handle();
+
+        Assert::assertSame(Command::SUCCESS, $result);
+        Assert::assertStringContainsString('No seeders found', $output->fetch());
     }
 
     protected function tearDown(): void
