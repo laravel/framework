@@ -2,44 +2,44 @@
     "name": "illuminate/broadcasting",
     "description": "The Illuminate Broadcasting package.",
     "license": "MIT",
-    "homepage": "https://laravel.com",
-    "support": {
-        "issues": "https://github.com/laravel/framework/issues",
-        "source": "https://github.com/laravel/framework"
-    },
     "authors": [
         {
             "name": "Taylor Otwell",
             "email": "taylor@laravel.com"
         }
     ],
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "require": {
         "php": "^8.3",
-        "psr/log": "^1.0|^2.0|^3.0",
         "illuminate/bus": "^13.0",
         "illuminate/collections": "^13.0",
         "illuminate/container": "^13.0",
         "illuminate/contracts": "^13.0",
         "illuminate/queue": "^13.0",
-        "illuminate/support": "^13.0"
+        "illuminate/support": "^13.0",
+        "psr/log": "^1.0 || ^2.0 || ^3.0"
     },
+    "suggest": {
+        "ext-hash": "Required to use the Ably and Pusher broadcast drivers.",
+        "ably/ably-php": "Required to use the Ably broadcast driver (^1.0).",
+        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^6.0 || ^7.0)."
+    },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Illuminate\\Broadcasting\\": ""
         }
     },
+    "config": {
+        "sort-packages": true
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "13.0.x-dev"
         }
-    },
-    "suggest": {
-        "ext-hash": "Required to use the Ably and Pusher broadcast drivers.",
-        "ably/ably-php": "Required to use the Ably broadcast driver (^1.0).",
-        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^6.0|^7.0)."
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "minimum-stability": "dev"
+    }
 }

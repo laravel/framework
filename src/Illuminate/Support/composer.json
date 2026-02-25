@@ -2,17 +2,17 @@
     "name": "illuminate/support",
     "description": "The Illuminate Support package.",
     "license": "MIT",
-    "homepage": "https://laravel.com",
-    "support": {
-        "issues": "https://github.com/laravel/framework/issues",
-        "source": "https://github.com/laravel/framework"
-    },
     "authors": [
         {
             "name": "Taylor Otwell",
             "email": "taylor@laravel.com"
         }
     ],
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "require": {
         "php": "^8.3",
         "ext-ctype": "*",
@@ -28,12 +28,24 @@
         "symfony/polyfill-php85": "^1.33",
         "voku/portable-ascii": "^2.0.2"
     },
-    "conflict": {
-        "tightenco/collect": "<5.5.33"
-    },
     "replace": {
         "spatie/once": "*"
     },
+    "conflict": {
+        "tightenco/collect": "<5.5.33"
+    },
+    "suggest": {
+        "illuminate/filesystem": "Required to use the Composer class (^13.0).",
+        "laravel/serializable-closure": "Required to use the once function (^1.3 || ^2.0).",
+        "league/commonmark": "Required to use Str::markdown() and Stringable::markdown() (^2.7).",
+        "league/uri": "Required to use the Uri class (^7.5.1).",
+        "ramsey/uuid": "Required to use Str::uuid() (^4.7).",
+        "symfony/process": "Required to use the Composer class (^7.4 || ^8.0).",
+        "symfony/uid": "Required to use Str::ulid() (^7.4 || ^8.0).",
+        "symfony/var-dumper": "Required to use the dd function (^7.4 || ^8.0).",
+        "vlucas/phpdotenv": "Required to use the Env class and env helper (^5.6.1)."
+    },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Illuminate\\Support\\": ""
@@ -43,24 +55,12 @@
             "helpers.php"
         ]
     },
+    "config": {
+        "sort-packages": true
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "13.0.x-dev"
         }
-    },
-    "suggest": {
-        "illuminate/filesystem": "Required to use the Composer class (^13.0).",
-        "laravel/serializable-closure": "Required to use the once function (^1.3|^2.0).",
-        "league/commonmark": "Required to use Str::markdown() and Stringable::markdown() (^2.7).",
-        "league/uri": "Required to use the Uri class (^7.5.1).",
-        "ramsey/uuid": "Required to use Str::uuid() (^4.7).",
-        "symfony/process": "Required to use the Composer class (^7.4|^8.0).",
-        "symfony/uid": "Required to use Str::ulid() (^7.4|^8.0).",
-        "symfony/var-dumper": "Required to use the dd function (^7.4|^8.0).",
-        "vlucas/phpdotenv": "Required to use the Env class and env helper (^5.6.1)."
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "minimum-stability": "dev"
+    }
 }

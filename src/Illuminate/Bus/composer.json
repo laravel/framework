@@ -2,17 +2,17 @@
     "name": "illuminate/bus",
     "description": "The Illuminate Bus package.",
     "license": "MIT",
-    "homepage": "https://laravel.com",
-    "support": {
-        "issues": "https://github.com/laravel/framework/issues",
-        "source": "https://github.com/laravel/framework"
-    },
     "authors": [
         {
             "name": "Taylor Otwell",
             "email": "taylor@laravel.com"
         }
     ],
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "require": {
         "php": "^8.3",
         "illuminate/collections": "^13.0",
@@ -20,21 +20,21 @@
         "illuminate/pipeline": "^13.0",
         "illuminate/support": "^13.0"
     },
+    "suggest": {
+        "illuminate/queue": "Required to use closures when chaining jobs (^13.0)."
+    },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Illuminate\\Bus\\": ""
         }
     },
+    "config": {
+        "sort-packages": true
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "13.0.x-dev"
         }
-    },
-    "suggest": {
-        "illuminate/queue": "Required to use closures when chaining jobs (^13.0)."
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "minimum-stability": "dev"
+    }
 }

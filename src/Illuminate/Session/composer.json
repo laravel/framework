@@ -2,17 +2,17 @@
     "name": "illuminate/session",
     "description": "The Illuminate Session package.",
     "license": "MIT",
-    "homepage": "https://laravel.com",
-    "support": {
-        "issues": "https://github.com/laravel/framework/issues",
-        "source": "https://github.com/laravel/framework"
-    },
     "authors": [
         {
             "name": "Taylor Otwell",
             "email": "taylor@laravel.com"
         }
     ],
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "require": {
         "php": "^8.3",
         "ext-ctype": "*",
@@ -21,24 +21,24 @@
         "illuminate/contracts": "^13.0",
         "illuminate/filesystem": "^13.0",
         "illuminate/support": "^13.0",
-        "symfony/finder": "^7.4.0|^8.0.0",
-        "symfony/http-foundation": "^7.4.0|^8.0.0"
+        "symfony/finder": "^7.4.0 || ^8.0.0",
+        "symfony/http-foundation": "^7.4.0 || ^8.0.0"
     },
+    "suggest": {
+        "illuminate/console": "Required to use the session:table command (^13.0)."
+    },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Illuminate\\Session\\": ""
         }
     },
+    "config": {
+        "sort-packages": true
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "13.0.x-dev"
         }
-    },
-    "suggest": {
-        "illuminate/console": "Required to use the session:table command (^13.0)."
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "minimum-stability": "dev"
+    }
 }

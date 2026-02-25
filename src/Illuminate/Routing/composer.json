@@ -2,17 +2,17 @@
     "name": "illuminate/routing",
     "description": "The Illuminate Routing package.",
     "license": "MIT",
-    "homepage": "https://laravel.com",
-    "support": {
-        "issues": "https://github.com/laravel/framework/issues",
-        "source": "https://github.com/laravel/framework"
-    },
     "authors": [
         {
             "name": "Taylor Otwell",
             "email": "taylor@laravel.com"
         }
     ],
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "require": {
         "php": "^8.3",
         "ext-filter": "*",
@@ -25,32 +25,32 @@
         "illuminate/pipeline": "^13.0",
         "illuminate/session": "^13.0",
         "illuminate/support": "^13.0",
-        "symfony/http-foundation": "^7.4.0|^8.0.0",
-        "symfony/http-kernel": "^7.4.0|^8.0.0",
+        "symfony/http-foundation": "^7.4.0 || ^8.0.0",
+        "symfony/http-kernel": "^7.4.0 || ^8.0.0",
         "symfony/polyfill-php84": "^1.33",
         "symfony/polyfill-php85": "^1.33",
-        "symfony/routing": "^7.4.0|^8.0.0"
+        "symfony/routing": "^7.4.0 || ^8.0.0"
     },
+    "suggest": {
+        "illuminate/console": "Required to use the make commands (^13.0).",
+        "php-http/discovery": "Required to use PSR-7 bridging features (^1.15).",
+        "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^7.4 || ^8.0)."
+    },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Illuminate\\Routing\\": ""
         }
     },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": false
+        },
+        "sort-packages": true
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "13.0.x-dev"
         }
-    },
-    "suggest": {
-        "illuminate/console": "Required to use the make commands (^13.0).",
-        "php-http/discovery": "Required to use PSR-7 bridging features (^1.15).",
-        "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^7.4|^8.0)."
-    },
-    "config": {
-        "sort-packages": true,
-        "allow-plugins": {
-            "php-http/discovery": false
-        }
-    },
-    "minimum-stability": "dev"
+    }
 }
