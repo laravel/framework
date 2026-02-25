@@ -2,12 +2,14 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
+use RuntimeException;
 
-class ArrayStore extends TaggableStore implements LockProvider
+class ArrayStore extends TaggableStore implements CanFlushLocks, LockProvider
 {
     use InteractsWithTime, RetrievesMultipleKeys;
 
@@ -216,6 +218,24 @@ class ArrayStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Remove all locks from the store.
+     *
+     * @return bool
+     *
+     * @throws \RuntimeException
+     */
+    public function flushLocks(): bool
+    {
+        if (! $this->hasSeparateLockStore()) {
+            throw new RuntimeException('Flushing locks is only supported when the lock store is separate from the cache store.');
+        }
+
+        $this->locks = [];
+
+        return true;
+    }
+
+    /**
      * Get the cache key prefix.
      *
      * @return string
@@ -270,6 +290,16 @@ class ArrayStore extends TaggableStore implements LockProvider
     public function restoreLock($name, $owner)
     {
         return $this->lock($name, 0, $owner);
+    }
+
+    /**
+     * Determine if the lock store is separate from the cache store.
+     *
+     * @return bool
+     */
+    public function hasSeparateLockStore(): bool
+    {
+        return true;
     }
 
     /**

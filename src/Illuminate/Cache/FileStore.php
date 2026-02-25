@@ -3,14 +3,16 @@
 namespace Illuminate\Cache;
 
 use Exception;
+use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Filesystem\LockTimeoutException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\LockableFile;
 use Illuminate\Support\InteractsWithTime;
+use RuntimeException;
 
-class FileStore implements Store, LockProvider
+class FileStore implements CanFlushLocks, LockProvider, Store
 {
     use InteractsWithTime, RetrievesMultipleKeys;
 
@@ -307,6 +309,34 @@ class FileStore implements Store, LockProvider
     }
 
     /**
+     * Remove all locks from the store.
+     *
+     * @return bool
+     *
+     * @throws \RuntimeException
+     */
+    public function flushLocks(): bool
+    {
+        if (! $this->hasSeparateLockStore()) {
+            throw new RuntimeException('Flushing locks is only supported when the lock store is separate from the cache store.');
+        }
+
+        if (! $this->files->isDirectory($this->lockDirectory)) {
+            return false;
+        }
+
+        foreach ($this->files->directories($this->lockDirectory) as $lockDirectory) {
+            $deleted = $this->files->deleteDirectory($lockDirectory);
+
+            if (! $deleted || $this->files->exists($lockDirectory)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Retrieve an item and expiry time from the cache by key.
      *
      * @param  string  $key
@@ -459,5 +489,15 @@ class FileStore implements Store, LockProvider
     public function getPrefix()
     {
         return '';
+    }
+
+    /**
+     * Determine if the lock store is separate from the cache store.
+     *
+     * @return bool
+     */
+    public function hasSeparateLockStore(): bool
+    {
+        return $this->lockDirectory !== null && $this->lockDirectory !== $this->directory;
     }
 }

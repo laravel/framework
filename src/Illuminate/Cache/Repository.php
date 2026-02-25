@@ -20,6 +20,7 @@ use Illuminate\Cache\Events\RetrievingKey;
 use Illuminate\Cache\Events\RetrievingManyKeys;
 use Illuminate\Cache\Events\WritingKey;
 use Illuminate\Cache\Events\WritingManyKeys;
+use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -769,6 +770,24 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Flush all locks from the cache store.
+     *
+     * @return bool
+     *
+     * @throws \BadMethodCallException
+     */
+    public function flushLocks(): bool
+    {
+        $store = $this->getStore();
+
+        if (! $this->supportsFlushingLocks()) {
+            throw new BadMethodCallException('This cache store does not support flushing locks.');
+        }
+
+        return $store->flushLocks();
+    }
+
+    /**
      * Begin executing a new tags operation if the store supports it.
      *
      * @param  mixed  $names
@@ -841,6 +860,16 @@ class Repository implements ArrayAccess, CacheContract
     public function supportsTags()
     {
         return method_exists($this->store, 'tags');
+    }
+
+    /**
+     * Determine if the current store supports flushing locks.
+     *
+     * @return bool
+     */
+    public function supportsFlushingLocks(): bool
+    {
+        return $this->store instanceof CanFlushLocks;
     }
 
     /**

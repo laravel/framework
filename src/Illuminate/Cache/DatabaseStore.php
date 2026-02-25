@@ -3,6 +3,7 @@
 namespace Illuminate\Cache;
 
 use Closure;
+use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\ConnectionInterface;
@@ -14,8 +15,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
+use RuntimeException;
 
-class DatabaseStore implements LockProvider, Store
+class DatabaseStore implements CanFlushLocks, LockProvider, Store
 {
     use InteractsWithTime;
 
@@ -451,6 +453,24 @@ class DatabaseStore implements LockProvider, Store
     }
 
     /**
+     * Remove all locks from the store.
+     *
+     * @return bool
+     *
+     * @throws \RuntimeException
+     */
+    public function flushLocks(): bool
+    {
+        if (! $this->hasSeparateLockStore()) {
+            throw new RuntimeException('Flushing locks is only supported when the lock store is separate from the cache store.');
+        }
+
+        $this->lockTable()->delete();
+
+        return true;
+    }
+
+    /**
      * Get a query builder for the cache table.
      *
      * @return \Illuminate\Database\Query\Builder
@@ -458,6 +478,16 @@ class DatabaseStore implements LockProvider, Store
     protected function table()
     {
         return $this->connection->table($this->table);
+    }
+
+    /**
+     * Get a query builder for the cache locks table.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    protected function lockTable()
+    {
+        return $this->lockConnection->table($this->lockTable);
     }
 
     /**
@@ -565,5 +595,15 @@ class DatabaseStore implements LockProvider, Store
         }
 
         return unserialize($value);
+    }
+
+    /**
+     * Determine if the lock store is separate from the cache store.
+     *
+     * @return bool
+     */
+    public function hasSeparateLockStore(): bool
+    {
+        return $this->lockTable !== $this->table;
     }
 }

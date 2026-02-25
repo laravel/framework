@@ -12,6 +12,7 @@ use Mockery as m;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
+use RuntimeException;
 
 #[RequiresPhpExtension('redis')]
 class RedisStoreTest extends TestCase
@@ -296,5 +297,75 @@ class RedisStoreTest extends TestCase
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
         $this->assertCount(0, $keyCount);
+    }
+
+    public function testLocksCanBeFlushed()
+    {
+        /** @var \Illuminate\Cache\RedisStore $store */
+        $store = Cache::store('redis');
+        if (! $store->hasSeparateLockStore()) {
+            $this->markTestSkipped('A separate Redis lock connection is required to test flushing locks.');
+        }
+        $store->flush();
+
+        $store->lock('lock-1', 60)->acquire();
+        $store->lock('lock-2', 60)->acquire();
+        $store->lock('lock-3', 60)->acquire();
+
+        $this->assertTrue($store->flushLocks());
+
+        $this->assertTrue($store->lock('lock-1', 60)->acquire());
+        $this->assertTrue($store->lock('lock-2', 60)->acquire());
+        $this->assertTrue($store->lock('lock-3', 60)->acquire());
+    }
+
+    public function testFlushLocksDoesNotAffectNonLockKeys()
+    {
+        /** @var \Illuminate\Cache\RedisStore $store */
+        $store = Cache::store('redis');
+        if (! $store->hasSeparateLockStore()) {
+            $this->markTestSkipped('A separate Redis lock connection is required to test flushing locks.');
+        }
+        $store->flush();
+
+        $store->put('foo', 'bar', 60);
+        $store->lock('lock-1', 60)->acquire();
+
+        $store->flushLocks();
+
+        $this->assertSame('bar', $store->get('foo'));
+    }
+
+    public function testHasSeparateLockStoreReturnsTrueWhenLockConnectionDiffers()
+    {
+        /** @var \Illuminate\Cache\RedisStore $store */
+        $store = Cache::store('redis');
+        if (! $store->hasSeparateLockStore()) {
+            $this->markTestSkipped('A separate Redis lock connection is required to test flushing locks.');
+        }
+
+        $this->assertTrue($store->hasSeparateLockStore());
+    }
+
+    public function testHasSeparateLockStoreReturnsFalseWhenLockConnectionIsSame()
+    {
+        /** @var \Illuminate\Cache\RedisStore $store */
+        $store = Cache::store('redis');
+        $store->setConnection('default');
+        $store->setLockConnection('default');
+
+        $this->assertFalse($store->hasSeparateLockStore());
+    }
+
+    public function testFlushLocksThrowsExceptionWhenLockConnectionIsSame()
+    {
+        /** @var \Illuminate\Cache\RedisStore $store */
+        $store = Cache::store('redis');
+        $store->setConnection('default');
+        $store->setLockConnection('default');
+
+        $this->expectException(RuntimeException::class);
+
+        $store->flushLocks();
     }
 }

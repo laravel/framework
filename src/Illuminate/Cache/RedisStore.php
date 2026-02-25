@@ -2,6 +2,7 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
@@ -10,8 +11,9 @@ use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Redis\Connections\PredisConnection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
+use RuntimeException;
 
-class RedisStore extends TaggableStore implements LockProvider
+class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
 {
     use RetrievesMultipleKeys {
         many as private manyAlias;
@@ -299,6 +301,24 @@ class RedisStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Remove all locks from the store.
+     *
+     * @return bool
+     *
+     * @throws \RuntimeException
+     */
+    public function flushLocks(): bool
+    {
+        if (! $this->hasSeparateLockStore()) {
+            throw new RuntimeException('Flushing locks is only supported when the lock store is separate from the cache store.');
+        }
+
+        $this->lockConnection()->flushdb();
+
+        return true;
+    }
+
+    /**
      * Remove all expired tag set entries.
      *
      * @return void
@@ -547,5 +567,15 @@ class RedisStore extends TaggableStore implements LockProvider
         }
 
         return $this->unserialize($value);
+    }
+
+    /**
+     * Determine if the lock store is separate from the cache store.
+     *
+     * @return bool
+     */
+    public function hasSeparateLockStore(): bool
+    {
+        return $this->lockConnection !== $this->connection;
     }
 }
