@@ -163,8 +163,44 @@ class DurationLimiterTest extends TestCase
         $this->assertSame(0, $limiter->remaining);
     }
 
+    public function testItCanBeExtendedWithCustomLuaScript()
+    {
+        $limiter = new DurationLimiterWithCustomDecay($this->redis(), 'custom-lua-key', 1, 1);
+
+        $this->assertTrue($limiter->acquire());
+        $this->assertSame(0, $limiter->remaining);
+        $this->assertFalse($limiter->acquire());
+    }
+
+    public function testSubclassCanAccessProtectedProperties()
+    {
+        $limiter = new DurationLimiterWithCustomDecay($this->redis(), 'protected-props-key', 5, 10);
+
+        $this->assertSame('protected-props-key', $limiter->getLimiterName());
+        $this->assertSame(5, $limiter->getLimiterMaxLocks());
+        $this->assertSame(10, $limiter->getLimiterDecay());
+    }
+
     private function redis()
     {
         return $this->redis['phpredis']->connection();
+    }
+}
+
+class DurationLimiterWithCustomDecay extends DurationLimiter
+{
+    public function getLimiterName(): string
+    {
+        return $this->name;
+    }
+
+    public function getLimiterMaxLocks(): int
+    {
+        return $this->maxLocks;
+    }
+
+    public function getLimiterDecay(): int
+    {
+        return $this->decay;
     }
 }
