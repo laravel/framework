@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Cache;
 
+use BadMethodCallException;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Console\ClearCommand;
 use Illuminate\Contracts\Cache\Repository;
@@ -133,6 +134,55 @@ class ClearCommandTest extends TestCase
         $this->files->shouldNotReceive('delete');
 
         $this->runCommand($this->command);
+    }
+
+    public function testClearLocksWithNoStoreArgument()
+    {
+        $this->cacheManager->shouldReceive('store')->once()->with(null)->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('flushLocks')->once()->andReturn(true);
+        $this->cacheRepository->shouldNotReceive('flush');
+
+        $this->files->shouldNotReceive('exists');
+        $this->files->shouldNotReceive('files');
+        $this->files->shouldNotReceive('delete');
+
+        $this->assertSame(0, $this->runCommand($this->command, ['--locks' => true]));
+    }
+
+    public function testClearLocksWithStoreArgument()
+    {
+        $this->cacheManager->shouldReceive('store')->once()->with('redis')->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('flushLocks')->once()->andReturn(true);
+        $this->cacheRepository->shouldNotReceive('flush');
+
+        $this->assertSame(0, $this->runCommand($this->command, ['store' => 'redis', '--locks' => true]));
+    }
+
+    public function testClearLocksCannotBeUsedWithTags()
+    {
+        $this->cacheManager->shouldNotReceive('store');
+        $this->cacheRepository->shouldNotReceive('flush');
+        $this->cacheRepository->shouldNotReceive('flushLocks');
+
+        $this->assertSame(1, $this->runCommand($this->command, ['--locks' => true, '--tags' => 'foo']));
+    }
+
+    public function testClearLocksWillFailWhenNotSupportedByStore()
+    {
+        $this->cacheManager->shouldReceive('store')->once()->with(null)->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('flushLocks')->once()->andThrow(new BadMethodCallException);
+        $this->cacheRepository->shouldNotReceive('flush');
+
+        $this->assertSame(1, $this->runCommand($this->command, ['--locks' => true]));
+    }
+
+    public function testClearLocksWillFailWhenFlushLocksFails()
+    {
+        $this->cacheManager->shouldReceive('store')->once()->with(null)->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('flushLocks')->once()->andReturn(false);
+        $this->cacheRepository->shouldNotReceive('flush');
+
+        $this->assertSame(1, $this->runCommand($this->command, ['--locks' => true]));
     }
 
     protected function runCommand($command, $input = [])
