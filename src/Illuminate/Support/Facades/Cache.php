@@ -47,9 +47,11 @@ use Mockery;
  * @method static bool delete(\UnitEnum|array|string $key)
  * @method static bool deleteMultiple(iterable $keys)
  * @method static bool clear()
+ * @method static bool flushLocks()
  * @method static \Illuminate\Cache\TaggedCache tags(mixed $names)
  * @method static string|null getName()
  * @method static bool supportsTags()
+ * @method static bool supportsFlushingLocks()
  * @method static int|null getDefaultCacheTime()
  * @method static \Illuminate\Cache\Repository setDefaultCacheTime(int|null $seconds)
  * @method static \Illuminate\Contracts\Cache\Store getStore()
@@ -65,8 +67,6 @@ use Mockery;
  * @method static string getPrefix()
  * @method static \Illuminate\Contracts\Cache\Lock lock(string $name, int $seconds = 0, string|null $owner = null)
  * @method static \Illuminate\Contracts\Cache\Lock restoreLock(string $name, string $owner)
- * @method static bool supportsFlushingLocks()
- * @method static bool flushLocks()
  *
  * @see \Illuminate\Cache\CacheManager
  * @see \Illuminate\Cache\Repository
