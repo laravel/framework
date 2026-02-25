@@ -30,7 +30,7 @@ use Illuminate\Support\Testing\Fakes\EventFake;
  * @method static \Illuminate\Support\Testing\Fakes\EventFake except(array|string $eventsToDispatch)
  * @method static void assertListening(string $expectedEvent, string|array $expectedListener)
  * @method static void assertDispatched(string|\Closure $event, callable|int|null $callback = null)
- * @method static void assertDispatchedOnce(string $event, int $times = null)
+ * @method static void assertDispatchedOnce(string $event)
  * @method static void assertDispatchedTimes(string $event, int $times = 1)
  * @method static void assertNotDispatched(string|\Closure $event, callable|null $callback = null)
  * @method static void assertNothingDispatched()
