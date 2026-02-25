@@ -61,10 +61,9 @@ class PredisConnection extends Connection implements ConnectionContract
     protected function parseParametersForEvent(array $parameters)
     {
         return (new Collection($parameters))
-            ->transform(function ($parameter) {
-                return $parameter instanceof ArrayableArgument
-                    ? $parameter->toArray()
-                    : $parameter;
-            })->all();
+            ->transform(fn ($parameter) => $parameter instanceof ArrayableArgument
+                ? $parameter->toArray()
+                : $parameter
+            )->all();
     }
 }

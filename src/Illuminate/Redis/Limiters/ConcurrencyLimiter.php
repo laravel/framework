@@ -101,9 +101,7 @@ class ConcurrencyLimiter
      */
     protected function acquire($id)
     {
-        $slots = array_map(function ($i) {
-            return $this->name.$i;
-        }, range(1, $this->maxLocks));
+        $slots = array_map(fn ($i) => $this->name.$i, range(1, $this->maxLocks));
 
         return $this->redis->eval(...array_merge(
             [$this->lockScript(), count($slots)],
