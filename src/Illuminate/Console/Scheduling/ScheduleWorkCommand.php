@@ -41,11 +41,13 @@ class ScheduleWorkCommand extends Command
 
         if ($interval <= 0) {
             $this->components->error('The interval must be greater than zero.');
+
             return;
         }
 
         if (60 % $interval !== 0) {
             $this->components->error('The interval is not evenly divisible by 60.');
+
             return;
         }
 
