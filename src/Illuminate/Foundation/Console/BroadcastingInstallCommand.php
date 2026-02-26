@@ -33,6 +33,7 @@ class BroadcastingInstallCommand extends Command
                     {--reverb : Install Laravel Reverb as the default broadcaster}
                     {--pusher : Install Pusher as the default broadcaster}
                     {--ably : Install Ably as the default broadcaster}
+                    {--poll : Install Poll as the default broadcaster}
                     {--without-node : Do not prompt to install Node dependencies}';
 
     /**
@@ -466,10 +467,15 @@ class BroadcastingInstallCommand extends Command
             return 'ably';
         }
 
+        if ($this->option('poll')) {
+            return 'poll';
+        }
+
         return select('Which broadcasting driver would you like to use?', [
             'reverb' => 'Laravel Reverb',
             'pusher' => 'Pusher',
             'ably' => 'Ably',
+            'poll' => 'Poll',
         ]);
     }
 

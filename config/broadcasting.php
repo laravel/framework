@@ -11,7 +11,7 @@ return [
     | framework when an event needs to be broadcast. You may set this to
     | any of the connections defined in the "connections" array below.
     |
-    | Supported: "reverb", "pusher", "ably", "redis", "log", "null"
+    | Supported: "reverb", "pusher", "ably", "redis", "poll", "log", "null"
     |
     */
 
@@ -67,6 +67,15 @@ return [
         'ably' => [
             'driver' => 'ably',
             'key' => env('ABLY_KEY'),
+        ],
+
+        'poll' => [
+            'driver' => 'poll',
+            'store' => env('BROADCAST_POLL_CACHE_STORE'),
+            'ttl' => env('BROADCAST_POLL_TTL', 60),
+            'prefix' => env('BROADCAST_POLL_PREFIX', 'poll_broadcast:'),
+            'presence_timeout' => env('BROADCAST_POLL_PRESENCE_TIMEOUT', 30),
+            'lottery' => [2, 100],
         ],
 
         'log' => [

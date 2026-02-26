@@ -8,6 +8,7 @@ use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactoryContract;
  * @method static void routes(array|null $attributes = null)
  * @method static void userRoutes(array|null $attributes = null)
  * @method static void channelRoutes(array|null $attributes = null)
+ * @method static void pollRoutes(array|null $attributes = null)
  * @method static string|null socket(\Illuminate\Http\Request|null $request = null)
  * @method static \Illuminate\Broadcasting\AnonymousEvent on(\Illuminate\Broadcasting\Channel|array|string $channels)
  * @method static \Illuminate\Broadcasting\AnonymousEvent private(string $channel)

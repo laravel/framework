@@ -8,6 +8,7 @@ use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Broadcasting\Broadcasters\AblyBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\NullBroadcaster;
+use Illuminate\Broadcasting\Broadcasters\PollBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
 use Illuminate\Bus\UniqueLock;
@@ -115,6 +116,25 @@ class BroadcastManager implements FactoryContract
     public function channelRoutes(?array $attributes = null)
     {
         $this->routes($attributes);
+    }
+
+    /**
+     * Register the routes for handling broadcast polling.
+     *
+     * @param  array|null  $attributes
+     * @return void
+     */
+    public function pollRoutes(?array $attributes = null)
+    {
+        if ($this->app instanceof CachesRoutes && $this->app->routesAreCached()) {
+            return;
+        }
+
+        $attributes = $attributes ?: ['middleware' => ['web']];
+
+        $this->app['router']->group($attributes, function ($router) {
+            $router->get('/broadcasting/poll', '\\'.PollController::class.'@poll');
+        });
     }
 
     /**
@@ -423,6 +443,23 @@ class BroadcastManager implements FactoryContract
     protected function createNullDriver(array $config)
     {
         return new NullBroadcaster;
+    }
+
+    /**
+     * Create an instance of the driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Contracts\Broadcasting\Broadcaster
+     */
+    protected function createPollDriver(array $config)
+    {
+        return new PollBroadcaster(
+            $this->app->make('cache')->store($config['store'] ?? null),
+            $config['ttl'] ?? 60,
+            $config['prefix'] ?? 'poll_broadcast:',
+            $config['presence_timeout'] ?? 30,
+            $config['lottery'] ?? [2, 100]
+        );
     }
 
     /**
