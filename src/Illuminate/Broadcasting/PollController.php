@@ -19,7 +19,7 @@ class PollController extends Controller
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function poll(Request $request)
+    public function __invoke(Request $request)
     {
         $request->validate([
             'channels' => ['required', 'array'],
