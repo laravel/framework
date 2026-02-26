@@ -14,7 +14,7 @@ class CacheLocksFlushed
     /**
      * Create a new event instance.
      *
-     * @param string|null $storeName
+     * @param  string|null  $storeName
      */
     public function __construct(?string $storeName)
     {
