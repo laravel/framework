@@ -871,6 +871,10 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  string|class-string<TClass>  $id
      * @return ($id is class-string<TClass> ? TClass : mixed)
+     *
+     * @throws \Illuminate\Contracts\Container\CircularDependencyException
+     * @throws \Illuminate\Container\EntryNotFoundException
+     *
      */
     public function get(string $id)
     {
@@ -1372,6 +1376,8 @@ class Container implements ArrayAccess, ContainerContract
      * Resolve a dependency based on an attribute.
      *
      * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function resolveFromAttribute(ReflectionAttribute $attribute)
     {

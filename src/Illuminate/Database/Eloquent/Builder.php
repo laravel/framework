@@ -718,6 +718,8 @@ class Builder implements BuilderContract
      * @param  array  $attributes
      * @param  (\Closure(): array)|array  $values
      * @return TModel
+     *
+     * @throws \Illuminate\Database\UniqueConstraintViolationException
      */
     public function createOrFirst(array $attributes = [], Closure|array $values = [])
     {

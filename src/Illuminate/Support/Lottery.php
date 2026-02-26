@@ -46,6 +46,8 @@ class Lottery
      *
      * @param  int|float  $chances
      * @param  int<1, max>|null  $outOf
+     *
+     * @throws \RuntimeException
      */
     public function __construct($chances, $outOf = null)
     {

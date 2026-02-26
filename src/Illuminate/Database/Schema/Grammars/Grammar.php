@@ -67,6 +67,8 @@ abstract class Grammar extends BaseGrammar
      * Compile the query to determine the schemas.
      *
      * @return string
+     *
+     * @throws \RuntimeException
      */
     public function compileSchemas()
     {
@@ -284,6 +286,8 @@ abstract class Grammar extends BaseGrammar
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
      * @return string
+     *
+     * @throws \RuntimeException
      */
     public function compileDropForeign(Blueprint $blueprint, Fluent $command)
     {

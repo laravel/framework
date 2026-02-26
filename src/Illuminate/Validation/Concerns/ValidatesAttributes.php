@@ -969,6 +969,8 @@ trait ValidatesAttributes
      * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
+     *
+     * @throws \InvalidArgumentException
      */
     public function validateEncoding($attribute, $value, $parameters)
     {
@@ -1902,6 +1904,8 @@ trait ValidatesAttributes
      * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
+     *
+     * @throws \Illuminate\Support\Exceptions\MathException
      */
     public function validateMultipleOf($attribute, $value, $parameters)
     {

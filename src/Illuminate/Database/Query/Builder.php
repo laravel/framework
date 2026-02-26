@@ -1361,6 +1361,8 @@ class Builder implements BuilderContract
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function whereIn($column, $values, $boolean = 'and', $not = false)
     {
@@ -4210,6 +4212,8 @@ class Builder implements BuilderContract
      * Update records in a PostgreSQL database using the update from syntax.
      *
      * @return int
+     *
+     * @throws \LogicException
      */
     public function updateFrom(array $values)
     {
@@ -4646,6 +4650,8 @@ class Builder implements BuilderContract
      * Ensure the database connection supports vector queries.
      *
      * @return void
+     *
+     * @throws \RuntimeException
      */
     protected function ensureConnectionSupportsVectors()
     {

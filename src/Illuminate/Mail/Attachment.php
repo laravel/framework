@@ -186,6 +186,8 @@ class Attachment
      * @param  \Illuminate\Mail\Mailable|\Illuminate\Mail\Message|\Illuminate\Notifications\Messages\MailMessage  $mail
      * @param  array  $options
      * @return mixed
+     *
+     * @throws \RuntimeException
      */
     public function attachTo($mail, $options = [])
     {

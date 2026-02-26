@@ -115,6 +115,8 @@ trait InteractsWithTestCaseLifecycle
      * @internal
      *
      * @return void
+     *
+     * @throws \Throwable
      */
     protected function tearDownTheTestEnvironment(): void
     {

@@ -685,6 +685,8 @@ class Repository implements ArrayAccess, CacheContract
      *
      * @param  \UnitEnum|string  $name
      * @return \Illuminate\Cache\Limiters\ConcurrencyLimiterBuilder
+     *
+     * @throws \BadMethodCallException
      */
     public function funnel($name)
     {

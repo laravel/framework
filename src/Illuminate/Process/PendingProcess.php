@@ -369,6 +369,9 @@ class PendingProcess
      * @param  string  $command
      * @param  \Closure  $fake
      * @return mixed
+     *
+     * @throws \LogicException
+     * @throws \Throwable
      */
     protected function resolveSynchronousFake(string $command, Closure $fake)
     {

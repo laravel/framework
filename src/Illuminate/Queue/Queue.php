@@ -8,6 +8,7 @@ use DateTimeInterface;
 use Illuminate\Bus\UniqueLock;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -156,6 +157,8 @@ abstract class Queue
      * @param  object  $job
      * @param  string  $queue
      * @return array
+     *
+     * @throws \RuntimeException
      */
     protected function createObjectPayload($job, $queue)
     {
