@@ -10,6 +10,9 @@ use Illuminate\Cache\Events\CacheFlushed;
 use Illuminate\Cache\Events\CacheFlushFailed;
 use Illuminate\Cache\Events\CacheFlushing;
 use Illuminate\Cache\Events\CacheHit;
+use Illuminate\Cache\Events\CacheLocksFlushed;
+use Illuminate\Cache\Events\CacheLocksFlushFailed;
+use Illuminate\Cache\Events\CacheLocksFlushing;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\ForgettingKey;
 use Illuminate\Cache\Events\KeyForgetFailed;
@@ -784,7 +787,17 @@ class Repository implements ArrayAccess, CacheContract
             throw new BadMethodCallException('This cache store does not support flushing locks.');
         }
 
-        return $store->flushLocks();
+        $this->event(new CacheLocksFlushing($this->getName()));
+
+        $result = $store->flushLocks();
+
+        if ($result) {
+            $this->event(new CacheLocksFlushed($this->getName()));
+        } else {
+            $this->event(new CacheLocksFlushFailed($this->getName()));
+        }
+
+        return $result;
     }
 
     /**
