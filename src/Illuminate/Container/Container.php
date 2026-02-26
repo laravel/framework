@@ -874,7 +874,6 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @throws \Illuminate\Contracts\Container\CircularDependencyException
      * @throws \Illuminate\Container\EntryNotFoundException
-     *
      */
     public function get(string $id)
     {
