@@ -23,6 +23,7 @@ use Illuminate\Testing\Constraints\SeeInOrder;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Testing\TestResponseAssert as PHPUnit;
 use LogicException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\StreamedJsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -1895,7 +1896,7 @@ class TestResponse implements ArrayAccess
         }
 
         if (! $this->baseResponse instanceof StreamedResponse
-            && ! $this->baseResponse instanceof StreamedJsonResponse) {
+            && ! $this->baseResponse instanceof BinaryFileResponse) {
             PHPUnit::withResponse($this)->fail('The response is not a streamed response.');
         }
 

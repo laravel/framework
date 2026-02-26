@@ -371,6 +371,43 @@ class TestResponseTest extends TestCase
         }
     }
 
+    public function testAssertStreamedBinaryFile(): void
+    {
+        $response = TestResponse::fromBaseResponse(
+            new BinaryFileResponse(__DIR__.'/Fixtures/file.json')
+        );
+
+        $response->assertStreamedContent('{"foo":"bar"}');
+
+        try {
+            $response->assertStreamedContent('not expected response string');
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
+        }
+    }
+
+    public function testAssertStreamedJsonFile(): void
+    {
+        $response = TestResponse::fromBaseResponse(
+            new BinaryFileResponse(__DIR__.'/Fixtures/file.json')
+        );
+
+        $response->assertStreamedJsonContent(['foo' => 'bar']);
+
+        try {
+            $response->assertStreamedJsonContent([
+                'data' => [
+                    ['id' => 1],
+                    ['id' => 2],
+                ],
+            ]);
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
+        }
+    }
+
     public function testJsonAssertionsOnStreamedJsonContent(): void
     {
         $response = TestResponse::fromBaseResponse(
