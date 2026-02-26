@@ -607,6 +607,8 @@ trait HasAttributes
      *
      * @param  string  $key
      * @return mixed
+     *
+     * @throws \Illuminate\Database\LazyLoadingViolationException
      */
     protected function handleLazyLoadingViolation($key)
     {
@@ -803,6 +805,8 @@ trait HasAttributes
      *
      * @param  array  $casts
      * @return array
+     *
+     * @throws \InvalidArgumentException
      */
     protected function ensureCastsAreStringValues($casts)
     {
@@ -1319,6 +1323,8 @@ trait HasAttributes
      * @param  string  $expectedEnum
      * @param  \UnitEnum  $value
      * @return string|int
+     *
+     * @throws \ValueError
      */
     protected function getStorableEnumValue($expectedEnum, $value)
     {
@@ -1369,6 +1375,8 @@ trait HasAttributes
      * @param  string  $key
      * @param  mixed  $value
      * @return string
+     *
+     * @throws \Illuminate\Database\Eloquent\JsonEncodingException
      */
     protected function castAttributeAsJson($key, $value)
     {
@@ -1478,6 +1486,8 @@ trait HasAttributes
      * @param  string  $key
      * @param  mixed  $value
      * @return string
+     *
+     * @throws \RuntimeException
      */
     protected function castAttributeAsHashedString($key, #[\SensitiveParameter] $value)
     {
@@ -1519,6 +1529,8 @@ trait HasAttributes
      * @param  float|string  $value
      * @param  int  $decimals
      * @return string
+     *
+     * @throws \Illuminate\Support\Exceptions\MathException
      */
     protected function asDecimal($value, $decimals)
     {

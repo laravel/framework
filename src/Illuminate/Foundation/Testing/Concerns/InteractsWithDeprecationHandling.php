@@ -31,6 +31,8 @@ trait InteractsWithDeprecationHandling
      * Disable deprecation handling for the test.
      *
      * @return $this
+     *
+     * @throws \ErrorException
      */
     protected function withoutDeprecationHandling()
     {

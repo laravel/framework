@@ -77,6 +77,8 @@ class FilesystemServiceProvider extends ServiceProvider
      * Register protected file serving.
      *
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     protected function serveFiles()
     {

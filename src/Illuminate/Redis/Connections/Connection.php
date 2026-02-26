@@ -110,6 +110,8 @@ abstract class Connection
      * @param  string  $method
      * @param  array  $parameters
      * @return mixed
+     *
+     * @throws \Throwable
      */
     public function command($method, array $parameters = [])
     {
