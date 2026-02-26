@@ -253,12 +253,12 @@ class BroadcastManager implements FactoryContract
     /**
      * Get a driver instance.
      *
-     * @param  string|null  $driver
+     * @param  string|null  $name
      * @return mixed
      */
-    public function connection($driver = null)
+    public function connection($name = null)
     {
-        return $this->driver($driver);
+        return $this->driver($name);
     }
 
     /**
