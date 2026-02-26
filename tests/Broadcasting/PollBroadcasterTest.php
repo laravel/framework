@@ -360,24 +360,14 @@ class PollBroadcasterTest extends TestCase
     {
         $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
 
-        $result = $broadcaster->updatePresence('presence-chat', 1, ['name' => 'Alice']);
+        $members = $broadcaster->updatePresence('presence-chat', 1, ['name' => 'Alice']);
 
-        $this->assertCount(1, $result['members']);
-        $this->assertEquals(1, $result['members'][0]['user_id']);
-        $this->assertEquals(['name' => 'Alice'], $result['members'][0]['user_info']);
+        $this->assertCount(1, $members);
+        $this->assertEquals(1, $members[0]['user_id']);
+        $this->assertEquals(['name' => 'Alice'], $members[0]['user_info']);
     }
 
-    public function testUpdatePresenceDetectsJoining()
-    {
-        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
-
-        $result = $broadcaster->updatePresence('presence-chat', 1, ['name' => 'Alice']);
-
-        $this->assertCount(1, $result['joined']);
-        $this->assertEquals(1, $result['joined'][0]['user_id']);
-    }
-
-    public function testUpdatePresenceDetectsLeaving()
+    public function testUpdatePresencePrunesStaleMembers()
     {
         $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 1, [0, 100]);
 
@@ -385,12 +375,10 @@ class PollBroadcasterTest extends TestCase
 
         sleep(2);
 
-        $result = $broadcaster->updatePresence('presence-chat', 2, ['name' => 'Bob']);
+        $members = $broadcaster->updatePresence('presence-chat', 2, ['name' => 'Bob']);
 
-        $this->assertCount(1, $result['members']);
-        $this->assertEquals(2, $result['members'][0]['user_id']);
-        $this->assertCount(1, $result['left']);
-        $this->assertEquals(1, $result['left'][0]['user_id']);
+        $this->assertCount(1, $members);
+        $this->assertEquals(2, $members[0]['user_id']);
     }
 
     public function testUpdatePresenceSameUserAppearsOnce()
@@ -398,11 +386,11 @@ class PollBroadcasterTest extends TestCase
         $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
 
         $broadcaster->updatePresence('presence-chat', 1, ['name' => 'Alice']);
-        $result = $broadcaster->updatePresence('presence-chat', 1, ['name' => 'Alice Updated']);
+        $members = $broadcaster->updatePresence('presence-chat', 1, ['name' => 'Alice Updated']);
 
-        $this->assertCount(1, $result['members']);
-        $this->assertEquals(1, $result['members'][0]['user_id']);
-        $this->assertEquals(['name' => 'Alice Updated'], $result['members'][0]['user_info']);
+        $this->assertCount(1, $members);
+        $this->assertEquals(1, $members[0]['user_id']);
+        $this->assertEquals(['name' => 'Alice Updated'], $members[0]['user_info']);
     }
 
     public function testUpdatePresenceMultipleUsersTracked()
@@ -410,9 +398,9 @@ class PollBroadcasterTest extends TestCase
         $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
 
         $broadcaster->updatePresence('presence-chat', 1, ['name' => 'Alice']);
-        $result = $broadcaster->updatePresence('presence-chat', 2, ['name' => 'Bob']);
+        $members = $broadcaster->updatePresence('presence-chat', 2, ['name' => 'Bob']);
 
-        $this->assertCount(2, $result['members']);
+        $this->assertCount(2, $members);
     }
 
     public function testChannelKeyGeneration()

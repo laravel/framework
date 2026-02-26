@@ -74,7 +74,7 @@ return [
             'store' => env('BROADCAST_POLL_CACHE_STORE'),
             'ttl' => env('BROADCAST_POLL_TTL', 60),
             'prefix' => env('BROADCAST_POLL_PREFIX', 'poll_broadcast:'),
-            'presence_timeout' => env('BROADCAST_POLL_PRESENCE_TIMEOUT', 30),
+            'presence_timeout' => env('BROADCAST_POLL_PRESENCE_TIMEOUT', 2),
             'lottery' => [2, 100],
         ],
 

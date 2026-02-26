@@ -215,7 +215,6 @@ class PollBroadcaster extends Broadcaster
     {
         return $this->cache->withoutOverlapping($this->presenceKey($channel).':lock', function () use ($channel, $userId, $userInfo) {
             $members = $this->cache->get($this->presenceKey($channel), []);
-            $previousMembers = $members;
 
             $members[$userId] = [
                 'user_id' => $userId,
@@ -229,23 +228,10 @@ class PollBroadcaster extends Broadcaster
 
             $this->cache->put($this->presenceKey($channel), $members, $this->ttl);
 
-            $currentIds = array_keys($members);
-            $previousIds = array_keys($previousMembers);
-
-            $joined = array_diff($currentIds, $previousIds);
-            $left = array_diff($previousIds, $currentIds);
-
-            return [
-                'members' => array_values(array_map(fn ($member) => [
-                    'user_id' => $member['user_id'],
-                    'user_info' => $member['user_info'],
-                ], $members)),
-                'joined' => array_values(array_intersect_key($members, array_flip($joined))),
-                'left' => array_values(array_map(fn ($id) => [
-                    'user_id' => $previousMembers[$id]['user_id'],
-                    'user_info' => $previousMembers[$id]['user_info'],
-                ], $left)),
-            ];
+            return array_values(array_map(fn ($member) => [
+                'user_id' => $member['user_id'],
+                'user_info' => $member['user_info'],
+            ], $members));
         }, 10, 5);
     }
 

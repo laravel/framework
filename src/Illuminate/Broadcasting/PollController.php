@@ -69,9 +69,11 @@ class PollController extends Controller
                         ? $user->getAuthIdentifierForBroadcasting()
                         : $user->getAuthIdentifier();
 
-                    $presence[$channel] = $broadcaster->updatePresence(
-                        $channel, $broadcastIdentifier, []
-                    );
+                    $presence[$channel] = [
+                        'members' => $broadcaster->updatePresence(
+                            $channel, $broadcastIdentifier, []
+                        ),
+                    ];
                 }
             }
         }
