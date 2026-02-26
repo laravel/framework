@@ -133,7 +133,8 @@ class BroadcastManager implements FactoryContract
         $attributes = $attributes ?: ['middleware' => ['web']];
 
         $this->app['router']->group($attributes, function ($router) {
-            $router->get('/broadcasting/poll', '\\'.PollController::class.'@poll');
+            $router->post('/broadcasting/poll', '\\'.PollController::class.'@poll')
+                ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
         });
     }
 
