@@ -56,6 +56,12 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
     protected function handleRequest($request, Closure $next, array $limits)
     {
         foreach ($limits as $limit) {
+            if (($limit->usesTokenBucket ?? false) || $limit->afterCallback) {
+                return parent::handleRequest($request, $next, $limits);
+            }
+        }
+
+        foreach ($limits as $limit) {
             if ($this->tooManyAttempts($limit->key, $limit->maxAttempts, $limit->decaySeconds)) {
                 throw $this->buildException($request, $limit->key, $limit->maxAttempts, $limit->responseCallback);
             }
