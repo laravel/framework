@@ -13,13 +13,13 @@ trait InteractsWithDictionary
      * Get a dictionary key attribute - casting it to a string if necessary.
      *
      * @param  mixed  $attribute
-     * @return int|string|null
+     * @return string|int|null
      *
      * @throws \InvalidArgumentException
      */
     protected function getDictionaryKey($attribute)
     {
-        if ($attribute === null || is_int($attribute) || is_string($attribute)) {
+        if (is_null($attribute) || is_string($attribute) || is_int($attribute)) {
             return $attribute;
         }
 
