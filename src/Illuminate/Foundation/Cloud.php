@@ -26,6 +26,7 @@ class Cloud
     {
         (match ($bootstrapper) {
             LoadConfiguration::class => function () use ($app) {
+                static::configureCloudLogging($app);
                 static::configureDisks($app);
                 static::configureUnpooledPostgresConnection($app);
                 static::ensureMigrationsUseUnpooledConnection($app);
