@@ -285,7 +285,7 @@ class BelongsToMany extends Relation
         foreach ($models as $model) {
             $key = $this->getDictionaryKey($model->{$this->parentKey});
 
-            if (isset($dictionary[$key])) {
+            if ($key !== null && isset($dictionary[$key])) {
                 $model->setRelation(
                     $relation, $this->related->newCollection($dictionary[$key])
                 );
@@ -312,6 +312,10 @@ class BelongsToMany extends Relation
 
         foreach ($results as $key => $result) {
             $value = $this->getDictionaryKey($result->{$this->accessor}->{$this->foreignPivotKey});
+
+            if ($value === null) {
+                continue;
+            }
 
             if ($isAssociative) {
                 $dictionary[$value][$key] = $result;
