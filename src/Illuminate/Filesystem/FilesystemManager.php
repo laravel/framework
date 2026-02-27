@@ -200,9 +200,10 @@ class FilesystemManager implements FactoryContract
      * Create an instance of the ftp driver.
      *
      * @param  array  $config
+     * @param  string  $name
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
-    public function createFtpDriver(array $config)
+    public function createFtpDriver(array $config, string $name = 'ftp')
     {
         if (! isset($config['root'])) {
             $config['root'] = '';
@@ -210,16 +211,17 @@ class FilesystemManager implements FactoryContract
 
         $adapter = new FtpAdapter(FtpConnectionOptions::fromArray($config));
 
-        return new FilesystemAdapter($this->createFlysystem($adapter, $config), $adapter, $config);
+        return (new FilesystemAdapter($this->createFlysystem($adapter, $config), $adapter, $config))->diskName($name);
     }
 
     /**
      * Create an instance of the sftp driver.
      *
      * @param  array  $config
+     * @param  string  $name
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
-    public function createSftpDriver(array $config)
+    public function createSftpDriver(array $config, string $name = 'sftp')
     {
         $provider = SftpConnectionProvider::fromArray($config);
 
@@ -231,16 +233,17 @@ class FilesystemManager implements FactoryContract
 
         $adapter = new SftpAdapter($provider, $root, $visibility);
 
-        return new FilesystemAdapter($this->createFlysystem($adapter, $config), $adapter, $config);
+        return (new FilesystemAdapter($this->createFlysystem($adapter, $config), $adapter, $config))->diskName($name);
     }
 
     /**
      * Create an instance of the Amazon S3 driver.
      *
      * @param  array  $config
+     * @param  string  $name
      * @return \Illuminate\Contracts\Filesystem\Cloud
      */
-    public function createS3Driver(array $config)
+    public function createS3Driver(array $config, string $name = 's3')
     {
         $s3Config = $this->formatS3Config($config);
 
@@ -256,9 +259,9 @@ class FilesystemManager implements FactoryContract
 
         $adapter = new S3Adapter($client, $s3Config['bucket'], $root, $visibility, null, $config['options'] ?? [], $streamReads);
 
-        return new AwsS3V3Adapter(
+        return (new AwsS3V3Adapter(
             $this->createFlysystem($adapter, $config), $adapter, $s3Config, $client
-        );
+        ))->diskName($name);
     }
 
     /**

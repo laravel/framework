@@ -132,6 +132,17 @@ class Attachment
     }
 
     /**
+     * Create a mail attachment from a StorageUri instance.
+     *
+     * @param  \Illuminate\Support\StorageUri  $uri
+     * @return static
+     */
+    public static function fromStorageUri(StorageUri $uri)
+    {
+        return static::fromStorageDisk($uri->disk(), $uri->path());
+    }
+
+    /**
      * Create a mail attachment from a file on the cloud storage disk.
      *
      * @param  string  $path

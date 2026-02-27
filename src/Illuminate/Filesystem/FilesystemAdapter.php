@@ -11,6 +11,7 @@ use Illuminate\Http\File;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\StorageUri;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
@@ -96,6 +97,13 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @var \Closure|null
      */
     protected $temporaryUploadUrlCallback;
+
+    /**
+     * The name of the disk.
+     *
+     * @var string|null
+     */
+    protected $diskName;
 
     /**
      * Create a new filesystem adapter instance.
@@ -282,6 +290,30 @@ class FilesystemAdapter implements CloudFilesystemContract
     public function path($path)
     {
         return $this->prefixer->prefixPath($path);
+    }
+
+    /**
+     * Specify the name of the disk.
+     *
+     * @param  string  $name
+     * @return $this
+     */
+    public function diskName(string $name): static
+    {
+        $this->diskName = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get a StorageUri instance for the given path.
+     *
+     * @param  string  $path
+     * @return \Illuminate\Support\StorageUri
+     */
+    public function uri(string $path): StorageUri
+    {
+        return new StorageUri($this->diskName, $path);
     }
 
     /**
