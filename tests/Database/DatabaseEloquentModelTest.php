@@ -1118,7 +1118,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query = m::mock(Builder::class);
         $baseQuery = m::mock(BaseBuilder::class);
         $query->shouldReceive('toBase')->once()->andReturn($baseQuery);
-        $baseQuery->shouldReceive('insertOrIgnoreReturning')->once()->with(['name' => 'taylor'], ['name'], ['*'])->andReturn(new BaseCollection([(object) ['id' => 1, 'name' => 'taylor']]));
+        $baseQuery->shouldReceive('insertOrIgnoreReturning')->once()->with(['name' => 'taylor'], ['name'])->andReturn(new BaseCollection([(object) ['id' => 1, 'name' => 'taylor']]));
         $query->shouldReceive('getConnection')->once();
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->expects($this->once())->method('updateTimestamps');
@@ -1143,7 +1143,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query = m::mock(Builder::class);
         $baseQuery = m::mock(BaseBuilder::class);
         $query->shouldReceive('toBase')->once()->andReturn($baseQuery);
-        $baseQuery->shouldReceive('insertOrIgnoreReturning')->once()->with(['name' => 'taylor'], ['name'], ['*'])->andReturn(new BaseCollection);
+        $baseQuery->shouldReceive('insertOrIgnoreReturning')->once()->with(['name' => 'taylor'], ['name'])->andReturn(new BaseCollection);
         $query->shouldReceive('getConnection')->once();
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->expects($this->once())->method('updateTimestamps');
@@ -1165,7 +1165,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query = m::mock(Builder::class);
         $baseQuery = m::mock(BaseBuilder::class);
         $query->shouldReceive('toBase')->once()->andReturn($baseQuery);
-        $baseQuery->shouldReceive('insertOrIgnoreReturning')->once()->with(['name' => 'taylor'], ['name'], ['*'])->andReturn(new BaseCollection([(object) ['name' => 'taylor']]));
+        $baseQuery->shouldReceive('insertOrIgnoreReturning')->once()->with(['name' => 'taylor'], ['name'])->andReturn(new BaseCollection([(object) ['name' => 'taylor']]));
         $query->shouldReceive('getConnection')->once();
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->expects($this->once())->method('updateTimestamps');
