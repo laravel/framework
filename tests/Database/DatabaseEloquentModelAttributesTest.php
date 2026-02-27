@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\Touches;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Attributes\Visible;
+use Illuminate\Database\Eloquent\Attributes\With;
+use Illuminate\Database\Eloquent\Attributes\WithCount;
 use Illuminate\Database\Eloquent\Model;
 use PHPUnit\Framework\TestCase;
 
@@ -240,6 +242,34 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertSame(['only_this'], $model->getHidden());
     }
 
+    public function test_with_attribute(): void
+    {
+        $model = new ModelWithWithAttribute;
+
+        $this->assertSame(['posts', 'comments'], $model->getWith());
+    }
+
+    public function test_with_property_takes_precedence(): void
+    {
+        $model = new ModelWithWithAttributeAndProperty;
+
+        $this->assertSame(['tags'], $model->getWith());
+    }
+
+    public function test_with_count_attribute(): void
+    {
+        $model = new ModelWithWithCountAttribute;
+
+        $this->assertSame(['posts', 'comments'], $model->getWithCount());
+    }
+
+    public function test_with_count_property_takes_precedence(): void
+    {
+        $model = new ModelWithWithCountAttributeAndProperty;
+
+        $this->assertSame(['tags'], $model->getWithCount());
+    }
+
     public function test_is_ignoring_touch_with_timestamps_attribute(): void
     {
         $this->assertTrue(ModelWithoutTimestampsAttribute::isIgnoringTouch());
@@ -383,4 +413,28 @@ class ModelWithAppendsAttribute extends Model
 class ModelWithTouchesAttribute extends Model
 {
     //
+}
+
+#[With(['posts', 'comments'])]
+class ModelWithWithAttribute extends Model
+{
+    //
+}
+
+#[With(['posts', 'comments'])]
+class ModelWithWithAttributeAndProperty extends Model
+{
+    protected $with = ['tags'];
+}
+
+#[WithCount(['posts', 'comments'])]
+class ModelWithWithCountAttribute extends Model
+{
+    //
+}
+
+#[WithCount(['posts', 'comments'])]
+class ModelWithWithCountAttributeAndProperty extends Model
+{
+    protected $withCount = ['tags'];
 }

@@ -6,6 +6,8 @@ use Closure;
 use Illuminate\Database\ClassMorphViolationException;
 use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Attributes\Touches;
+use Illuminate\Database\Eloquent\Attributes\With;
+use Illuminate\Database\Eloquent\Attributes\WithCount;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
@@ -79,6 +81,14 @@ trait HasRelationships
     #[Initialize]
     public function initializeHasRelationships()
     {
+        if (empty($this->with)) {
+            $this->with = static::resolveClassAttribute(With::class, 'relations') ?? [];
+        }
+
+        if (empty($this->withCount)) {
+            $this->withCount = static::resolveClassAttribute(WithCount::class, 'relations') ?? [];
+        }
+
         if (empty($this->touches)) {
             $this->touches = static::resolveClassAttribute(Touches::class, 'relations') ?? [];
         }
@@ -1175,6 +1185,26 @@ trait HasRelationships
         $this->relations = [];
 
         return $this;
+    }
+
+    /**
+     * Get the relationships that should be eager loaded on every query.
+     *
+     * @return array
+     */
+    public function getWith()
+    {
+        return $this->with;
+    }
+
+    /**
+     * Get the relationship counts that should be eager loaded on every query.
+     *
+     * @return array
+     */
+    public function getWithCount()
+    {
+        return $this->withCount;
     }
 
     /**
