@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Attributes\RouteKey;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Routing\Attributes\BindRoute;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\Attributes\WithConfig;
@@ -81,6 +83,29 @@ PHP);
         ]);
     }
 
+    public function testBindRouteAttributeCanBeUsedWithRouteCachingEnabled()
+    {
+        $this->defineCacheRoutes(<<<PHP
+<?php
+
+use Illuminate\Routing\Attributes\BindRoute;
+use Illuminate\Tests\Integration\Routing\ImplicitBindingUser;
+
+Route::get('/cached-bound-user/{user}', function (#[BindRoute(null, 'name')] ImplicitBindingUser \$user) {
+    return \$user;
+})->middleware('web');
+PHP);
+
+        $user = ImplicitBindingUser::create(['name' => 'Dries']);
+
+        $response = $this->getJson("/cached-bound-user/{$user->name}");
+
+        $response->assertJson([
+            'id' => $user->id,
+            'name' => $user->name,
+        ]);
+    }
+
     public function testWithoutRouteCachingEnabled()
     {
         $user = ImplicitBindingUser::create(['name' => 'Dries']);
@@ -92,6 +117,46 @@ PHP);
         })->middleware(['web']);
 
         $response = $this->postJson("/user/{$user->id}");
+
+        $response->assertJson([
+            'id' => $user->id,
+            'name' => $user->name,
+        ]);
+
+        $this->assertTrue($user->is($response->baseRequest->route('user')));
+    }
+
+    public function testRouteKeyAttributeCanBeUsedForImplicitModelRouteBinding()
+    {
+        $user = ImplicitBindingUserByName::create(['name' => 'Dries']);
+
+        config(['app.key' => str_repeat('a', 32)]);
+
+        Route::get('/user-by-name/{user}', function (ImplicitBindingUserByName $user) {
+            return $user;
+        })->middleware(['web']);
+
+        $response = $this->getJson("/user-by-name/{$user->name}");
+
+        $response->assertJson([
+            'id' => $user->id,
+            'name' => $user->name,
+        ]);
+
+        $this->assertTrue($user->is($response->baseRequest->route('user')));
+    }
+
+    public function testBindRouteAttributeCanBeUsedToOverrideTheBindingField()
+    {
+        $user = ImplicitBindingUser::create(['name' => 'Dries']);
+
+        config(['app.key' => str_repeat('a', 32)]);
+
+        Route::get('/bound-user/{user}', function (#[BindRoute(null, 'name')] ImplicitBindingUser $user) {
+            return $user;
+        })->middleware(['web']);
+
+        $response = $this->getJson("/bound-user/{$user->name}");
 
         $response->assertJson([
             'id' => $user->id,
@@ -319,6 +384,12 @@ class ImplicitBindingUser extends Model
     {
         return $this->hasMany(ImplicitBindingComment::class, 'user_id');
     }
+}
+
+#[RouteKey('name')]
+class ImplicitBindingUserByName extends ImplicitBindingUser
+{
+    //
 }
 
 class ImplicitBindingPost extends Model

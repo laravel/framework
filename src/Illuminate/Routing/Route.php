@@ -9,6 +9,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Contracts\CallableDispatcher;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
+use Illuminate\Routing\Attributes\BindRoute;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Matching\HostValidator;
@@ -1385,6 +1386,10 @@ class Route
      */
     public function prepareForSerialization()
     {
+        if ($attributes = $this->bindingAttributes()) {
+            $this->action['bindingAttributes'] = $attributes;
+        }
+
         if ($this->action['uses'] instanceof Closure) {
             $this->action['uses'] = serialize(
                 SerializableClosure::unsigned($this->action['uses'])
@@ -1400,6 +1405,34 @@ class Route
         $this->compileRoute();
 
         unset($this->router, $this->container);
+    }
+
+    /**
+     * Get the route binding attributes declared on the route signature.
+     *
+     * @return array<string, array{parameter: string|null, field: string|null, withTrashed: bool|null}>
+     */
+    protected function bindingAttributes(): array
+    {
+        $attributes = [];
+
+        foreach ($this->signatureParameters() as $parameter) {
+            $attribute = $parameter->getAttributes(BindRoute::class)[0] ?? null;
+
+            if (is_null($attribute)) {
+                continue;
+            }
+
+            $instance = $attribute->newInstance();
+
+            $attributes[$parameter->getName()] = [
+                'parameter' => $instance->parameter,
+                'field' => $instance->field,
+                'withTrashed' => $instance->withTrashed,
+            ];
+        }
+
+        return $attributes;
     }
 
     /**

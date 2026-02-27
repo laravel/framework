@@ -16,6 +16,7 @@ use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Attributes\Boot;
 use Illuminate\Database\Eloquent\Attributes\Connection;
 use Illuminate\Database\Eloquent\Attributes\Initialize;
+use Illuminate\Database\Eloquent\Attributes\RouteKey;
 use Illuminate\Database\Eloquent\Attributes\Scope as LocalScope;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
@@ -293,6 +294,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static array $classAttributes = [];
 
     /**
+     * Cache of route key names.
+     *
+     * @var array<class-string<self>, string>
+     */
+    protected static array $routeKeyNames = [];
+
+    /**
      * The name of the "created at" column.
      *
      * @var string|null
@@ -482,6 +490,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         static::$bootedCallbacks = [];
         static::$classAttributes = [];
         static::$globalScopes = [];
+        static::$routeKeyNames = [];
     }
 
     /**
@@ -2249,7 +2258,20 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getRouteKeyName()
     {
-        return $this->getKeyName();
+        return static::$routeKeyNames[static::class] ??= $this->resolveRouteKeyName();
+    }
+
+    /**
+     * Get the route key name for the model.
+     */
+    protected function resolveRouteKeyName(): string
+    {
+        $attributes = (new ReflectionClass($this))
+            ->getAttributes(RouteKey::class);
+
+        return $attributes !== []
+            ? $attributes[0]->newInstance()->field
+            : $this->getKeyName();
     }
 
     /**
