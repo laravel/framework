@@ -66,6 +66,13 @@ class SendQueuedNotifications implements ShouldQueue
     public $shouldBeEncrypted = false;
 
     /**
+     * Indicates if the job should be deleted when models are missing.
+     *
+     * @var bool
+     */
+    public $deleteWhenMissingModels = false;
+
+    /**
      * Create a new job instance.
      *
      * @param  \Illuminate\Notifications\Notifiable|\Illuminate\Support\Collection  $notifiables
@@ -80,6 +87,10 @@ class SendQueuedNotifications implements ShouldQueue
         $this->tries = property_exists($notification, 'tries') ? $notification->tries : null;
         $this->timeout = property_exists($notification, 'timeout') ? $notification->timeout : null;
         $this->maxExceptions = property_exists($notification, 'maxExceptions') ? $notification->maxExceptions : null;
+
+        $this->deleteWhenMissingModels = property_exists($notification, 'deleteWhenMissingModels')
+            ? $notification->deleteWhenMissingModels
+            : false;
 
         if ($notification instanceof ShouldQueueAfterCommit) {
             $this->afterCommit = true;

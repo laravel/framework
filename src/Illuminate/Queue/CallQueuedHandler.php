@@ -17,6 +17,7 @@ use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Events\CallQueuedListener;
 use Illuminate\Log\Context\Repository as ContextRepository;
+use Illuminate\Notifications\SendQueuedNotifications;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use ReflectionClass;
@@ -249,10 +250,16 @@ class CallQueuedHandler
         $class = $job->resolveQueuedJobClass();
 
         try {
-            $reflectionClass = new ReflectionClass($class);
+            $shouldDelete = $this->shouldDeleteWhenMissingModels($class);
 
-            $shouldDelete = $reflectionClass->getDefaultProperties()['deleteWhenMissingModels']
-                ?? count($reflectionClass->getAttributes(DeleteWhenMissingModels::class)) !== 0;
+            if (! $shouldDelete && $class === SendQueuedNotifications::class) {
+                $payload = $job->payload();
+                $notificationClass = $payload['displayName'] ?? null;
+
+                if ($notificationClass && class_exists($notificationClass)) {
+                    $shouldDelete = $this->shouldDeleteWhenMissingModels($notificationClass);
+                }
+            }
         } catch (Exception) {
             $shouldDelete = false;
         }
@@ -266,6 +273,20 @@ class CallQueuedHandler
         }
 
         return $job->fail($e);
+    }
+
+    /**
+     * Determine if the job should be deleted when models are missing.
+     *
+     * @param  string  $class
+     * @return bool
+     */
+    protected function shouldDeleteWhenMissingModels(string $class)
+    {
+        $reflectionClass = new ReflectionClass($class);
+
+        return $reflectionClass->getDefaultProperties()['deleteWhenMissingModels']
+            ?? count($reflectionClass->getAttributes(DeleteWhenMissingModels::class)) !== 0;
     }
 
     /**

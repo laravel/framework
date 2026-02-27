@@ -60,6 +60,19 @@ class NotificationSendQueuedNotificationTest extends TestCase
 
         $this->assertEquals(23, $job->maxExceptions);
     }
+
+    public function testNotificationCanSetDeleteWhenMissingModels()
+    {
+        $notifiable = new NotifiableUser;
+        $notification = new class
+        {
+            public $deleteWhenMissingModels = true;
+        };
+
+        $job = new SendQueuedNotifications($notifiable, $notification);
+
+        $this->assertTrue($job->deleteWhenMissingModels);
+    }
 }
 
 class NotifiableUser extends Model
