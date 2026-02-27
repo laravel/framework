@@ -356,6 +356,23 @@ class PollBroadcasterTest extends TestCase
         $this->assertEquals('my-channel', $result['events'][0]['channel']);
     }
 
+    public function testGetEventsBroadcastToMultipleChannelsReturnsEventPerChannel()
+    {
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
+
+        $connectResult = $broadcaster->getEvents(['channel-a', 'channel-b']);
+        $lastEventId = $connectResult['lastEventId'];
+
+        $broadcaster->broadcast(['channel-a', 'channel-b'], 'SharedEvent', ['msg' => 'hi']);
+
+        $result = $broadcaster->getEvents(['channel-a', 'channel-b'], $lastEventId);
+
+        $this->assertCount(2, $result['events']);
+        $this->assertEquals('channel-a', $result['events'][0]['channel']);
+        $this->assertEquals('channel-b', $result['events'][1]['channel']);
+        $this->assertEquals($result['events'][0]['id'], $result['events'][1]['id']);
+    }
+
     public function testUpdatePresenceRecordsUser()
     {
         $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
