@@ -26,6 +26,7 @@ class Cloud
     {
         (match ($bootstrapper) {
             LoadConfiguration::class => function () use ($app) {
+                static::configureCloudLogging($app);
                 static::configureDisks($app);
                 static::configureUnpooledPostgresConnection($app);
                 static::ensureMigrationsUseUnpooledConnection($app);
@@ -134,6 +135,9 @@ class Cloud
                                       $_SERVER['LARAVEL_CLOUD_LOG_SOCKET'] ??
                                       'unix:///tmp/cloud-init.sock',
                 'persistent' => true,
+                'timeout' => $_ENV['LARAVEL_CLOUD_LOG_TIMEOUT'] ??
+                        $_SERVER['LARAVEL_CLOUD_LOG_TIMEOUT'] ??
+                        3,
             ],
         ]);
     }
