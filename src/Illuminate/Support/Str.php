@@ -1448,15 +1448,17 @@ class Str
      */
     public static function headline($value)
     {
-        $parts = mb_split('\s+', $value);
+        if ($value === '') {
+            return '';
+        }
 
-        $parts = count($parts) > 1
-            ? array_map(static::title(...), $parts)
-            : array_map(static::title(...), static::ucsplit(implode('_', $parts)));
+        if (str_contains($value, ' ')) {
+            preg_match_all('/[^ _-]+/', $value, $m);
+        } else {
+            preg_match_all('/\p{Lu}?\p{Ll}+|\p{Lu}|\d+/u', $value, $m);
+        }
 
-        $collapsed = static::replace(['-', '_', ' '], '_', implode('_', $parts));
-
-        return implode(' ', array_filter(explode('_', $collapsed)));
+        return mb_convert_case(implode(' ', $m[0]), MB_CASE_TITLE, 'UTF-8');
     }
 
     /**
