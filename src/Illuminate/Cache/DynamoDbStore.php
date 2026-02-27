@@ -230,6 +230,8 @@ class DynamoDbStore implements LockProvider, Store
      * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
+     *
+     * @throws \Aws\DynamoDb\Exception\DynamoDbException
      */
     public function add($key, $value, $seconds)
     {

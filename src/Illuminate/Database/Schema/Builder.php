@@ -363,6 +363,8 @@ class Builder
      * @param  string  $column
      * @param  bool  $fullDefinition
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     public function getColumnType($table, $column, $fullDefinition = false)
     {
@@ -660,6 +662,8 @@ class Builder
      * @param  string  $name
      * @param  string|null  $schema
      * @return void
+     *
+     * @throws \RuntimeException
      */
     public function ensureExtensionExists($name, $schema = null)
     {
@@ -730,6 +734,8 @@ class Builder
      * @param  string  $reference
      * @param  string|bool|null  $withDefaultSchema
      * @return array{string|null, string}
+     *
+     * @throws \InvalidArgumentException
      */
     public function parseSchemaAndTable($reference, $withDefaultSchema = null)
     {

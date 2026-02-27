@@ -40,6 +40,8 @@ class ThrottlesExceptionsWithRedis extends ThrottlesExceptions
      * @param  mixed  $job
      * @param  callable  $next
      * @return mixed
+     *
+     * @throws \Throwable
      */
     public function handle($job, $next)
     {

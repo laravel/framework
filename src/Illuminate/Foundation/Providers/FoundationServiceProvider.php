@@ -142,6 +142,8 @@ class FoundationServiceProvider extends AggregateServiceProvider
      * Register the "validate" macro on the request.
      *
      * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function registerRequestValidation()
     {

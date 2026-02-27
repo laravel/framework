@@ -1017,6 +1017,8 @@ trait HasRelationships
      * Get the class name for polymorphic relations.
      *
      * @return string
+     *
+     * @throws \Illuminate\Database\ClassMorphViolationException
      */
     public function getMorphClass()
     {
