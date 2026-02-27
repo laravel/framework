@@ -71,4 +71,53 @@ class CloudTest extends TestCase
             $_SERVER['LOG_LEVEL'] = $logLevelBackup;
         }
     }
+
+    public function test_it_uses_default_log_timeout()
+    {
+        Cloud::configureCloudLogging($this->app);
+
+        $this->assertEquals(3, $this->app['config']->get('logging.channels.laravel-cloud-socket.with.timeout'));
+    }
+
+    public function test_it_respects_log_timeout_from_server()
+    {
+        $backup = $_SERVER['LARAVEL_CLOUD_LOG_TIMEOUT'] ?? null;
+
+        $_SERVER['LARAVEL_CLOUD_LOG_TIMEOUT'] = 10;
+
+        Cloud::configureCloudLogging($this->app);
+
+        $this->assertEquals(10, $this->app['config']->get('logging.channels.laravel-cloud-socket.with.timeout'));
+
+        if ($backup === null) {
+            unset($_SERVER['LARAVEL_CLOUD_LOG_TIMEOUT']);
+        } else {
+            $_SERVER['LARAVEL_CLOUD_LOG_TIMEOUT'] = $backup;
+        }
+    }
+
+    public function test_it_respects_log_timeout_from_env()
+    {
+        $serverBackup = $_SERVER['LARAVEL_CLOUD_LOG_TIMEOUT'] ?? null;
+        $envBackup = $_ENV['LARAVEL_CLOUD_LOG_TIMEOUT'] ?? null;
+
+        unset($_SERVER['LARAVEL_CLOUD_LOG_TIMEOUT']);
+        $_ENV['LARAVEL_CLOUD_LOG_TIMEOUT'] = 5;
+
+        Cloud::configureCloudLogging($this->app);
+
+        $this->assertEquals(5, $this->app['config']->get('logging.channels.laravel-cloud-socket.with.timeout'));
+
+        if ($envBackup === null) {
+            unset($_ENV['LARAVEL_CLOUD_LOG_TIMEOUT']);
+        } else {
+            $_ENV['LARAVEL_CLOUD_LOG_TIMEOUT'] = $envBackup;
+        }
+
+        if ($serverBackup === null) {
+            unset($_SERVER['LARAVEL_CLOUD_LOG_TIMEOUT']);
+        } else {
+            $_SERVER['LARAVEL_CLOUD_LOG_TIMEOUT'] = $serverBackup;
+        }
+    }
 }

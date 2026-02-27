@@ -134,6 +134,9 @@ class Cloud
                                       $_SERVER['LARAVEL_CLOUD_LOG_SOCKET'] ??
                                       'unix:///tmp/cloud-init.sock',
                 'persistent' => true,
+                'timeout' => $_ENV['LARAVEL_CLOUD_LOG_TIMEOUT'] ??
+                        $_SERVER['LARAVEL_CLOUD_LOG_TIMEOUT'] ??
+                        3,
             ],
         ]);
     }
