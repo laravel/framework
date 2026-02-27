@@ -4118,6 +4118,38 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Insert new records into the database while ignoring specific conflicts and returning specified columns.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function insertOrIgnoreReturning(array $values, array|string $uniqueBy, array $returning = ['*'])
+    {
+        if (empty($values)) {
+            return new Collection;
+        }
+
+        if (! is_array(array_first($values))) {
+            $values = [$values];
+        } else {
+            foreach ($values as $key => $value) {
+                ksort($value);
+
+                $values[$key] = $value;
+            }
+        }
+
+        $this->applyBeforeQueryCallbacks();
+
+        $sql = $this->grammar->compileInsertOrIgnoreReturning($this, $values, (array) $uniqueBy, $returning);
+
+        $this->connection->recordsHaveBeenModified();
+
+        return new Collection(
+            $this->connection->selectFromWriteConnection($sql, $this->cleanBindings(Arr::flatten($values, 1)))
+        );
+    }
+
+    /**
      * Insert a new record and get the value of the primary key.
      *
      * @param  string|null  $sequence
