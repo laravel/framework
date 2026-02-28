@@ -5,7 +5,10 @@ namespace Illuminate\Tests\Queue;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\Attributes\AfterCommit;
+use Illuminate\Queue\Attributes\BeforeCommit;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Queue;
 use PHPUnit\Framework\TestCase;
 
 class BeforeCommitContractTest extends TestCase
@@ -94,12 +97,67 @@ class BeforeCommitContractTest extends TestCase
         $this->assertTrue($this->shouldDispatchAfterCommit($job));
     }
 
+    public function testJobWithoutContractRespectsAfterCommitAttribute()
+    {
+        $job = new JobWithAfterCommitAttribute;
+
+        $this->assertTrue($this->shouldDispatchAfterCommit($job));
+    }
+
+    public function testJobWithoutContractRespectsBeforeCommitAttribute()
+    {
+        $job = new JobWithBeforeCommitAttribute;
+
+        $this->assertFalse($this->shouldDispatchAfterCommit($job));
+    }
+
+    public function testRuntimeBeforeCommitOverridesAfterCommitAttribute()
+    {
+        $job = (new JobWithAfterCommitAttribute)->beforeCommit();
+
+        $this->assertFalse($this->shouldDispatchAfterCommit($job));
+    }
+
+    public function testRuntimeAfterCommitOverridesBeforeCommitAttribute()
+    {
+        $job = (new JobWithBeforeCommitAttribute)->afterCommit();
+
+        $this->assertTrue($this->shouldDispatchAfterCommit($job));
+    }
+
+    public function testBeforeCommitAttributeOverridesAfterCommitContract()
+    {
+        $job = new JobWithBeforeCommitAttributeAndAfterCommitContract;
+
+        $this->assertFalse($this->shouldDispatchAfterCommit($job));
+    }
+
     protected function shouldDispatchAfterCommit($job)
     {
-        if ($job instanceof ShouldQueueAfterCommit) {
-            return ! (isset($job->afterCommit) && $job->afterCommit === false);
-        }
-
-        return isset($job->afterCommit) ? $job->afterCommit : false;
+        return (new class extends Queue
+        {
+            public function shouldDispatchAfterCommit($job)
+            {
+                return parent::shouldDispatchAfterCommit($job);
+            }
+        })->shouldDispatchAfterCommit($job);
     }
+}
+
+#[AfterCommit]
+class JobWithAfterCommitAttribute
+{
+    use Dispatchable, InteractsWithQueue, Queueable;
+}
+
+#[BeforeCommit]
+class JobWithBeforeCommitAttribute
+{
+    use Dispatchable, InteractsWithQueue, Queueable;
+}
+
+#[BeforeCommit]
+class JobWithBeforeCommitAttributeAndAfterCommitContract implements ShouldQueueAfterCommit
+{
+    use Dispatchable, InteractsWithQueue, Queueable;
 }
