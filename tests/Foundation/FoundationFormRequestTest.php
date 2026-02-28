@@ -9,6 +9,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\Attributes\ErrorBag;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
@@ -92,6 +93,17 @@ class FoundationFormRequestTest extends TestCase
         $this->mocks['redirect']->shouldReceive('withInput->withErrors');
 
         $request->validateResolved();
+    }
+
+    public function testValidateThrowsWhenValidationFailsWithConfiguredErrorBagAttribute()
+    {
+        $request = $this->createRequest(['no' => 'name'], FoundationTestFormRequestWithErrorBagAttribute::class);
+
+        $exception = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertSame('login', $exception->errorBag);
     }
 
     public function testValidateMethodThrowsWhenAuthorizationFails()
@@ -455,6 +467,20 @@ class FoundationTestFormRequestPassesWithResponseStub extends FormRequest
     public function authorize()
     {
         return Response::allow('baz');
+    }
+}
+
+#[ErrorBag('login')]
+class FoundationTestFormRequestWithErrorBagAttribute extends FormRequest
+{
+    public function rules()
+    {
+        return ['name' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
     }
 }
 
