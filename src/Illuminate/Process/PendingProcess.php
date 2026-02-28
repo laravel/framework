@@ -13,6 +13,11 @@ use RuntimeException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException as SymfonyTimeoutException;
 use Symfony\Component\Process\Process;
 
+/**
+ * @phpstan-type ProcessEnvironment array<string, bool|float|int|string|null>
+ * @phpstan-type ProcessOptions array<string, mixed>
+ * @phpstan-type ProcessFakeHandler \Closure(\Illuminate\Process\PendingProcess): mixed
+ */
 class PendingProcess
 {
     use Conditionable;
@@ -55,7 +60,7 @@ class PendingProcess
     /**
      * The additional environment variables for the process.
      *
-     * @var array
+     * @var ProcessEnvironment
      */
     public $environment = [];
 
@@ -83,14 +88,14 @@ class PendingProcess
     /**
      * The options that will be passed to "proc_open".
      *
-     * @var array
+     * @var ProcessOptions
      */
     public $options = [];
 
     /**
      * The registered fake handler callbacks.
      *
-     * @var array
+     * @var array<string, ProcessFakeHandler>
      */
     protected $fakeHandlers = [];
 
@@ -171,7 +176,7 @@ class PendingProcess
     /**
      * Set the additional environment variables for the process.
      *
-     * @param  array  $environment
+     * @param  ProcessEnvironment  $environment
      * @return $this
      */
     public function env(array $environment)
@@ -222,7 +227,7 @@ class PendingProcess
     /**
      * Set the "proc_open" options that should be used when invoking the process.
      *
-     * @param  array  $options
+     * @param  ProcessOptions  $options
      * @return $this
      */
     public function options(array $options)
@@ -342,7 +347,7 @@ class PendingProcess
     /**
      * Specify the fake process result handlers for the pending process.
      *
-     * @param  array  $fakeHandlers
+     * @param  array<string, ProcessFakeHandler>  $fakeHandlers
      * @return $this
      */
     public function withFakeHandlers(array $fakeHandlers)
@@ -356,7 +361,7 @@ class PendingProcess
      * Get the fake handler for the given command, if applicable.
      *
      * @param  string  $command
-     * @return \Closure|null
+     * @return ProcessFakeHandler|null
      */
     protected function fakeFor(string $command)
     {
@@ -368,7 +373,7 @@ class PendingProcess
      * Resolve the given fake handler for a synchronous process.
      *
      * @param  string  $command
-     * @param  \Closure  $fake
+     * @param  ProcessFakeHandler  $fake
      * @return mixed
      *
      * @throws \LogicException
@@ -401,7 +406,7 @@ class PendingProcess
      *
      * @param  string  $command
      * @param  callable|null  $output
-     * @param  \Closure  $fake
+     * @param  ProcessFakeHandler  $fake
      * @return \Illuminate\Process\FakeInvokedProcess
      *
      * @throws \LogicException

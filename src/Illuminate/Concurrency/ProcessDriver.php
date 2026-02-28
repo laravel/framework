@@ -14,6 +14,21 @@ use Laravel\SerializableClosure\SerializableClosure;
 
 use function Illuminate\Support\defer;
 
+/**
+ * @phpstan-type InvokeSerializedClosureSuccessPayload array{
+ *     successful: true,
+ *     result: string
+ * }
+ * @phpstan-type InvokeSerializedClosureFailurePayload array{
+ *     successful: false,
+ *     exception: class-string<\Throwable>,
+ *     message: string,
+ *     file: string,
+ *     line: int,
+ *     parameters: array<string, mixed>
+ * }
+ * @phpstan-type InvokeSerializedClosurePayload InvokeSerializedClosureSuccessPayload|InvokeSerializedClosureFailurePayload
+ */
 class ProcessDriver implements Driver
 {
     /**
@@ -26,13 +41,19 @@ class ProcessDriver implements Driver
 
     /**
      * Run the given tasks concurrently and return an array containing the results.
+     *
+     * @param  \Closure(): mixed|array<array-key, \Closure(): mixed>  $tasks
+     * @return array<array-key, mixed>
      */
     public function run(Closure|array $tasks): array
     {
         $command = Application::formatCommandString('invoke-serialized-closure');
 
+        /** @var array<array-key, \Closure(): mixed> $tasks */
+        $tasks = Arr::wrap($tasks);
+
         $results = $this->processFactory->pool(function (Pool $pool) use ($tasks, $command) {
-            foreach (Arr::wrap($tasks) as $key => $task) {
+            foreach ($tasks as $key => $task) {
                 $pool->as($key)->path(base_path())->env([
                     'LARAVEL_INVOKABLE_CLOSURE' => base64_encode(
                         serialize(new SerializableClosure($task))
@@ -41,34 +62,40 @@ class ProcessDriver implements Driver
             }
         })->start()->wait();
 
-        return $results->collect()->mapWithKeys(function ($result, $key) {
-            if ($result->failed()) {
-                throw new Exception('Concurrent process failed with exit code ['.$result->exitCode().']. Message: '.$result->errorOutput());
+        return $results->collect()->mapWithKeys(function ($processResult, $key) {
+            if ($processResult->failed()) {
+                throw new Exception('Concurrent process failed with exit code ['.$processResult->exitCode().']. Message: '.$processResult->errorOutput());
             }
 
-            $result = json_decode($result->output(), true);
+            /** @var InvokeSerializedClosurePayload $payload */
+            $payload = json_decode($processResult->output(), true);
 
-            if (! $result['successful']) {
-                throw new $result['exception'](
-                    ...(! empty(array_filter($result['parameters']))
-                        ? $result['parameters']
-                        : [$result['message']])
+            if (! $payload['successful']) {
+                throw new $payload['exception'](
+                    ...(! empty(array_filter($payload['parameters']))
+                        ? $payload['parameters']
+                        : [$payload['message']])
                 );
             }
 
-            return [$key => unserialize($result['result'])];
+            return [$key => unserialize($payload['result'])];
         })->all();
     }
 
     /**
      * Start the given tasks in the background after the current task has finished.
+     *
+     * @param  \Closure(): mixed|array<array-key, \Closure(): mixed>  $tasks
      */
     public function defer(Closure|array $tasks): DeferredCallback
     {
         $command = Application::formatCommandString('invoke-serialized-closure');
 
         return defer(function () use ($tasks, $command) {
-            foreach (Arr::wrap($tasks) as $task) {
+            /** @var array<array-key, \Closure(): mixed> $tasks */
+            $tasks = Arr::wrap($tasks);
+
+            foreach ($tasks as $task) {
                 $this->processFactory->path(base_path())->env([
                     'LARAVEL_INVOKABLE_CLOSURE' => base64_encode(
                         serialize(new SerializableClosure($task))
