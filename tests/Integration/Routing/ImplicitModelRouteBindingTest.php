@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Attributes\RouteKey;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
@@ -92,6 +93,26 @@ PHP);
         })->middleware(['web']);
 
         $response = $this->postJson("/user/{$user->id}");
+
+        $response->assertJson([
+            'id' => $user->id,
+            'name' => $user->name,
+        ]);
+
+        $this->assertTrue($user->is($response->baseRequest->route('user')));
+    }
+
+    public function testRouteKeyAttributeCanBeUsedForImplicitModelRouteBinding()
+    {
+        $user = ImplicitBindingUserByName::create(['name' => 'Dries']);
+
+        config(['app.key' => str_repeat('a', 32)]);
+
+        Route::get('/user-by-name/{user}', function (ImplicitBindingUserByName $user) {
+            return $user;
+        })->middleware(['web']);
+
+        $response = $this->getJson("/user-by-name/{$user->name}");
 
         $response->assertJson([
             'id' => $user->id,
@@ -319,6 +340,12 @@ class ImplicitBindingUser extends Model
     {
         return $this->hasMany(ImplicitBindingComment::class, 'user_id');
     }
+}
+
+#[RouteKey('name')]
+class ImplicitBindingUserByName extends ImplicitBindingUser
+{
+    //
 }
 
 class ImplicitBindingPost extends Model
