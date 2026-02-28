@@ -4122,6 +4122,30 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->insertOrIgnoreReturning(['email' => 'foo'], 'email');
     }
 
+    public function testInsertOrIgnoreReturningWithEmptyUniqueByArray()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The unique columns must not be empty.');
+        $builder = $this->getPostgresBuilder();
+        $builder->from('users')->insertOrIgnoreReturning(['email' => 'foo'], []);
+    }
+
+    public function testInsertOrIgnoreReturningWithEmptyUniqueByString()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The unique columns must not be empty.');
+        $builder = $this->getPostgresBuilder();
+        $builder->from('users')->insertOrIgnoreReturning(['email' => 'foo'], '');
+    }
+
+    public function testInsertOrIgnoreReturningWithEmptyReturning()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The returning columns must not be empty.');
+        $builder = $this->getPostgresBuilder();
+        $builder->from('users')->insertOrIgnoreReturning(['email' => 'foo'], 'email', []);
+    }
+
     public function testInsertOrIgnoreUsingMethod()
     {
         $this->expectException(RuntimeException::class);

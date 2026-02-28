@@ -4120,12 +4120,22 @@ class Builder implements BuilderContract
     /**
      * Insert new records into the database while ignoring specific conflicts and returning specified columns.
      *
+     * @param  non-empty-string|non-empty-array<non-empty-string>  $uniqueBy
+     * @param  non-empty-array<non-empty-string>  $returning
      * @return \Illuminate\Support\Collection
      */
     public function insertOrIgnoreReturning(array $values, array|string $uniqueBy, array $returning = ['*'])
     {
         if (empty($values)) {
             return new Collection;
+        }
+
+        if ($uniqueBy === [] || $uniqueBy === '') {
+            throw new InvalidArgumentException('The unique columns must not be empty.');
+        }
+
+        if ($returning === []) {
+            throw new InvalidArgumentException('The returning columns must not be empty.');
         }
 
         if (! is_array(array_first($values))) {
