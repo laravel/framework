@@ -9,6 +9,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Contracts\CallableDispatcher;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
+use Illuminate\Routing\Controllers\Attributes\Middleware as MiddlewareAttribute;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Matching\HostValidator;
@@ -23,6 +24,8 @@ use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use Laravel\SerializableClosure\SerializableClosure;
 use LogicException;
+use ReflectionAttribute;
+use ReflectionClass;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
 use function Illuminate\Support\enum_value;
@@ -1134,7 +1137,34 @@ class Route
             );
         }
 
-        return [];
+        return $this->attributeProvidedControllerMiddleware(
+            $controllerClass, $controllerMethod
+        );
+    }
+
+    /**
+     * Get the attribute provided controller middleware for the given class and method.
+     *
+     * @return array
+     */
+    protected function attributeProvidedControllerMiddleware(string $class, string $method)
+    {
+        $reflectionClass = new ReflectionClass($class);
+        $reflectionMethod = $reflectionClass->getMethod($method);
+
+        return (new Collection(array_merge(
+            $reflectionClass->getAttributes(MiddlewareAttribute::class, ReflectionAttribute::IS_INSTANCEOF),
+            $reflectionMethod->getAttributes(MiddlewareAttribute::class, ReflectionAttribute::IS_INSTANCEOF),
+        )))->map(function (ReflectionAttribute $attribute) use ($method) {
+            $instance = $attribute->newInstance();
+
+            return static::methodExcludedByOptions(
+                $method, ['only' => $instance->only, 'except' => $instance->except],
+            ) ? null : $instance->value;
+        })
+            ->filter()
+            ->values()
+            ->all();
     }
 
     /**
