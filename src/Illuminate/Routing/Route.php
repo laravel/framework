@@ -26,6 +26,7 @@ use Laravel\SerializableClosure\SerializableClosure;
 use LogicException;
 use ReflectionAttribute;
 use ReflectionClass;
+use ReflectionException;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
 use function Illuminate\Support\enum_value;
@@ -1149,8 +1150,12 @@ class Route
      */
     protected function attributeProvidedControllerMiddleware(string $class, string $method)
     {
-        $reflectionClass = new ReflectionClass($class);
-        $reflectionMethod = $reflectionClass->getMethod($method);
+        try {
+            $reflectionClass = new ReflectionClass($class);
+            $reflectionMethod = $reflectionClass->getMethod($method);
+        } catch (ReflectionException) {
+            return [];
+        }
 
         return (new Collection(array_merge(
             $reflectionClass->getAttributes(MiddlewareAttribute::class, ReflectionAttribute::IS_INSTANCEOF),

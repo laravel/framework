@@ -15,5 +15,6 @@ class Middleware
         public string $value,
         public ?array $only = null,
         public ?array $except = null,
-    ) {}
+    ) {
+    }
 }
