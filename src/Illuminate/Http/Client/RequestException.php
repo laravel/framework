@@ -32,7 +32,7 @@ class RequestException extends HttpClientException
      *
      * @var bool
      */
-    public bool $hasBeenSummarized = false;
+    public $hasBeenSummarized = false;
 
     /**
      * Create a new exception instance.
