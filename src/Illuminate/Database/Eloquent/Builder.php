@@ -9,6 +9,7 @@ use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
+use Illuminate\Database\Eloquent\Concerns\CanonicalizesModelKeys;
 use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -17,6 +18,7 @@ use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\BinaryCodec;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -35,7 +37,7 @@ use ReflectionMethod;
 class Builder implements BuilderContract
 {
     /** @use \Illuminate\Database\Concerns\BuildsQueries<TModel> */
-    use BuildsQueries, ForwardsCalls, QueriesRelationships {
+    use BuildsQueries, ForwardsCalls, CanonicalizesModelKeys, QueriesRelationships {
         BuildsQueries::sole as baseSole;
     }
 
@@ -275,11 +277,9 @@ class Builder implements BuilderContract
      */
     public function whereKey($id)
     {
-        if ($id instanceof Model) {
-            $id = $id->getKey();
-        }
+        $id = $this->prepareModelKey($id, $this->model);
 
-        if (is_array($id) || $id instanceof Arrayable) {
+        if (is_array($id)) {
             if (in_array($this->model->getKeyType(), ['int', 'integer'])) {
                 $this->query->whereIntegerInRaw($this->model->getQualifiedKeyName(), $id);
             } else {
@@ -287,10 +287,6 @@ class Builder implements BuilderContract
             }
 
             return $this;
-        }
-
-        if ($id !== null && $this->model->getKeyType() === 'string') {
-            $id = (string) $id;
         }
 
         return $this->where($this->model->getQualifiedKeyName(), '=', $id);
@@ -304,11 +300,9 @@ class Builder implements BuilderContract
      */
     public function whereKeyNot($id)
     {
-        if ($id instanceof Model) {
-            $id = $id->getKey();
-        }
+        $id = $this->prepareModelKey($id, $this->model);
 
-        if (is_array($id) || $id instanceof Arrayable) {
+        if (is_array($id)) {
             if (in_array($this->model->getKeyType(), ['int', 'integer'])) {
                 $this->query->whereIntegerNotInRaw($this->model->getQualifiedKeyName(), $id);
             } else {
@@ -316,10 +310,6 @@ class Builder implements BuilderContract
             }
 
             return $this;
-        }
-
-        if ($id !== null && $this->model->getKeyType() === 'string') {
-            $id = (string) $id;
         }
 
         return $this->where($this->model->getQualifiedKeyName(), '!=', $id);

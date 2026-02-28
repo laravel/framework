@@ -28,4 +28,14 @@ trait HasUuids
     {
         return Str::isUuid($value);
     }
+
+    /**
+     * Get the key format as binary representation.
+     *
+     * @return string
+     */
+    public  function getBinaryIdFormat(): string
+    {
+        return 'uuid';
+    }
 }

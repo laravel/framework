@@ -28,4 +28,14 @@ trait HasUlids
     {
         return Str::isUlid($value);
     }
+
+    /**
+     * Get the key format as binary representation.
+     *
+     * @return string
+     */
+    public function getBinaryIdFormat(): string
+    {
+        return 'ulid';
+    }
 }

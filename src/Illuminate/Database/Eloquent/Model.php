@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Arr;
+use Illuminate\Support\BinaryCodec;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable as SupportStringable;
@@ -2292,7 +2293,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function resolveRouteBindingQuery($query, $value, $field = null)
     {
-        return $query->where($field ?? $this->getRouteKeyName(), $value);
+        return $query->where(
+            column: $field ?? $this->getRouteKeyName(),
+            value: match ($this->getKeyType()) {
+                'binary' => BinaryCodec::encode($value, $this->getBinaryIdFormat()),
+                default => $value,
+            }
+        );
     }
 
     /**

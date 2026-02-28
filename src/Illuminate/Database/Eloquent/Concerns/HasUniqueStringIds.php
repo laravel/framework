@@ -72,7 +72,9 @@ trait HasUniqueStringIds
     public function getKeyType()
     {
         if (in_array($this->getKeyName(), $this->uniqueIds())) {
-            return 'string';
+            return property_exists($this, 'usesBinaryIds') && $this->usesBinaryIds
+                ? 'binary'
+                : 'string';
         }
 
         return parent::getKeyType();
