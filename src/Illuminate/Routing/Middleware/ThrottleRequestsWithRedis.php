@@ -59,11 +59,19 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
             if ($this->tooManyAttempts($limit->key, $limit->maxAttempts, $limit->decaySeconds)) {
                 throw $this->buildException($request, $limit->key, $limit->maxAttempts, $limit->responseCallback);
             }
+
+            if (! $limit->afterCallback) {
+                $this->hit($limit->key, $limit->maxAttempts, $limit->decaySeconds);
+            }
         }
 
         $response = $next($request);
 
         foreach ($limits as $limit) {
+            if ($limit->afterCallback && ($limit->afterCallback)($response)) {
+                $this->hit($limit->key, $limit->maxAttempts, $limit->decaySeconds);
+            }
+
             $response = $this->addHeaders(
                 $response,
                 $limit->maxAttempts,
@@ -80,7 +88,7 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
      * @param  string  $key
      * @param  int  $maxAttempts
      * @param  int  $decaySeconds
-     * @return mixed
+     * @return bool
      */
     protected function tooManyAttempts($key, $maxAttempts, $decaySeconds)
     {
@@ -88,11 +96,32 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
             $this->getRedisConnection(), $key, $maxAttempts, $decaySeconds
         );
 
-        return tap(! $limiter->acquire(), function () use ($key, $limiter) {
+        return tap($limiter->tooManyAttempts(), function () use ($key, $limiter) {
             [$this->decaysAt[$key], $this->remaining[$key]] = [
                 $limiter->decaysAt, $limiter->remaining,
             ];
         });
+    }
+
+    /**
+     * Increment the counter for the given key.
+     *
+     * @param  string  $key
+     * @param  int  $maxAttempts
+     * @param  int  $decaySeconds
+     * @return void
+     */
+    protected function hit($key, $maxAttempts, $decaySeconds)
+    {
+        $limiter = new DurationLimiter(
+            $this->getRedisConnection(), $key, $maxAttempts, $decaySeconds
+        );
+
+        $limiter->acquire();
+
+        [$this->decaysAt[$key], $this->remaining[$key]] = [
+            $limiter->decaysAt, $limiter->remaining,
+        ];
     }
 
     /**

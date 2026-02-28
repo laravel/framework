@@ -596,6 +596,51 @@ class SessionStoreTest extends TestCase
         $this->assertFalse($session->has(SessionTestKey::Preference));
     }
 
+    public function testBackedEnumKeyHasAny()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 'Taylor');
+        $session->put(SessionTestKey::Settings, 'dark-mode');
+
+        $this->assertTrue($session->hasAny(SessionTestKey::User));
+        $this->assertTrue($session->hasAny('user'));
+        $this->assertTrue($session->hasAny(SessionTestKey::User, SessionTestKey::Preference, 'foo'));
+        $this->assertTrue($session->hasAny([SessionTestKey::User, SessionTestKey::Preference, 'foo']));
+
+        $this->assertFalse($session->hasAny(SessionTestKey::Preference));
+        $this->assertFalse($session->hasAny('preference'));
+        $this->assertFalse($session->hasAny(SessionTestKey::Preference, 'foo'));
+        $this->assertFalse($session->hasAny([SessionTestKey::Preference, 'foo']));
+    }
+
+    public function testBackedEnumKeyExists()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 'Taylor');
+        $session->put(SessionTestKey::Settings, null);
+
+        $this->assertTrue($session->exists(SessionTestKey::User));
+        $this->assertTrue($session->exists(SessionTestKey::Settings));
+        $this->assertFalse($session->exists(SessionTestKey::Preference));
+
+        $this->assertTrue($session->exists('user'));
+        $this->assertFalse($session->exists('preference'));
+    }
+
+    public function testBackedEnumKeyMissing()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 'Taylor');
+        $session->put(SessionTestKey::Settings, null);
+
+        $this->assertFalse($session->missing(SessionTestKey::User));
+        $this->assertFalse($session->missing(SessionTestKey::Settings));
+        $this->assertTrue($session->missing(SessionTestKey::Preference));
+
+        $this->assertFalse($session->missing('user'));
+        $this->assertTrue($session->missing('preference'));
+    }
+
     public function testBackedEnumKeyForget()
     {
         $session = $this->getSession();
@@ -670,6 +715,20 @@ class SessionStoreTest extends TestCase
 
         $this->assertSame('Taylor', $session->remove(SessionTestKey::User));
         $this->assertFalse($session->has('user'));
+    }
+
+    public function testBackedEnumKeyFlash()
+    {
+        $session = $this->getSession();
+        $session->flash(SessionTestKey::User, 'Taylor');
+        $this->assertTrue($session->has(SessionTestKey::User));
+    }
+
+    public function testBackedEnumKeyNow()
+    {
+        $session = $this->getSession();
+        $session->now(SessionTestKey::User, 'Taylor');
+        $this->assertTrue($session->has(SessionTestKey::User));
     }
 
     public function testRememberMethodCallsPutAndReturnsDefault()

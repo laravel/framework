@@ -101,6 +101,19 @@ class DatabaseConnectionFactoryTest extends TestCase
         $this->assertNotInstanceOf(PDO::class, $readPdo->getValue($connection));
     }
 
+    public function testReadWriteConnectionSetsReadPdoConfig()
+    {
+        $connection = $this->db->getConnection('read_write');
+
+        $readPdoConfig = new ReflectionProperty(get_class($connection), 'readPdoConfig');
+
+        $config = $readPdoConfig->getValue($connection);
+
+        $this->assertNotEmpty($config);
+        $this->assertArrayHasKey('database', $config);
+        $this->assertSame(':memory:', $config['database']);
+    }
+
     public function testIfDriverIsntSetExceptionIsThrown()
     {
         $this->expectException(InvalidArgumentException::class);

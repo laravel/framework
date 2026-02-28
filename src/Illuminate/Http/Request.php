@@ -432,6 +432,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @param  string  $key
      * @param  mixed  $default
      * @return mixed
+     *
+     * @deprecated use ->input() instead
      */
     #[\Override]
     public function get(string $key, mixed $default = null): mixed
@@ -586,6 +588,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \Symfony\Component\HttpFoundation\Exception\SessionNotFoundException
      */
     #[\Override]
     public function getSession(): SessionInterface

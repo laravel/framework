@@ -5,8 +5,8 @@ namespace Illuminate\Http\Resources\JsonApi\Concerns;
 use Generator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\AsPivot;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -20,6 +20,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use JsonSerializable;
+use WeakMap;
 
 trait ResolvesJsonApiElements
 {
@@ -159,7 +160,7 @@ trait ResolvesJsonApiElements
     /**
      * Resolves `relationships` for the resource's data object.
      *
-     * @return string|int
+     * @return array
      *
      * @throws \RuntimeException
      */
@@ -323,17 +324,38 @@ trait ResolvesJsonApiElements
     public function resolveIncludedResourceObjects(JsonApiRequest $request): Collection
     {
         if (! $this->resource instanceof Model) {
-            return [];
+            return new Collection;
         }
 
         $this->compileResourceRelationships($request);
 
         $relations = new Collection;
-
         $index = 0;
+
+        // Track visited objects by instance + type to prevent infinite loops from circular
+        // references created by "chaperone()". We use object instances rather than type
+        // and ID for any possible cases like BelongsToMany with different pivot data.
+        // We'll track types to allow the same models with different resource types.
+        $visitedObjects = new WeakMap;
+
+        $visitedObjects[$this->resource] = [
+            $this->resolveResourceType($request) => true,
+        ];
 
         while ($index < count($this->loadedRelationshipsMap)) {
             [$resourceInstance, $type, $id, $isUnique] = $this->loadedRelationshipsMap[$index];
+
+            $underlyingResource = $resourceInstance->resource;
+
+            if (is_object($underlyingResource)) {
+                if (isset($visitedObjects[$underlyingResource][$type])) {
+                    $index++;
+                    continue;
+                }
+
+                $visitedObjects[$underlyingResource] ??= [];
+                $visitedObjects[$underlyingResource][$type] = true;
+            }
 
             if (! $resourceInstance instanceof JsonApiResource &&
                 $resourceInstance instanceof JsonResource) {
@@ -344,7 +366,7 @@ trait ResolvesJsonApiElements
                 ->includePreviouslyLoadedRelationships()
                 ->resolve($request);
 
-            array_push($this->loadedRelationshipsMap, ...$resourceInstance->loadedRelationshipsMap);
+            array_push($this->loadedRelationshipsMap, ...($resourceInstance->loadedRelationshipsMap ?? []));
 
             $relations->push(array_filter([
                 'id' => $id,
@@ -401,7 +423,7 @@ trait ResolvesJsonApiElements
      */
     public function ignoreFieldsAndIncludesInQueryString()
     {
-        return $this->respectFieldsAndIncludesFromQueryString(false);
+        return $this->respectFieldsAndIncludesInQueryString(false);
     }
 
     /**

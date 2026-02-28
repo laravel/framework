@@ -97,7 +97,7 @@ class TaggedCache extends Repository
     }
 
     /**
-     * Get a fully qualified key for a tagged item.
+     * Get a fully-qualified key for a tagged item.
      *
      * @param  string  $key
      * @return string

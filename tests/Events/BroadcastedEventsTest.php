@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Events;
 
+use Illuminate\Broadcasting\PendingBroadcast;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -143,6 +144,38 @@ class BroadcastedEventsTest extends TestCase
 
         $d->dispatch($event);
     }
+
+    public function testEventBroadcastsUsingNamedArguments()
+    {
+        $container = new Container;
+        $broadcast = m::mock(BroadcastFactory::class);
+        $container->instance(BroadcastFactory::class, $broadcast);
+
+        $originalContainer = Container::getInstance();
+        Container::setInstance($container);
+
+        try {
+            $pendingBroadcast = m::mock(PendingBroadcast::class);
+
+            $broadcast->shouldReceive('event')
+                ->once()
+                ->with(m::on(function ($event) {
+                    $this->assertInstanceOf(BroadcastableNamedArgumentsEvent::class, $event);
+                    $this->assertSame('first-value', $event->first);
+                    $this->assertSame('second-value', $event->second);
+
+                    return true;
+                }))
+                ->andReturn($pendingBroadcast);
+
+            $this->assertSame(
+                $pendingBroadcast,
+                BroadcastableNamedArgumentsEvent::broadcast(second: 'second-value', first: 'first-value')
+            );
+        } finally {
+            Container::setInstance($originalContainer);
+        }
+    }
 }
 
 class BroadcastEvent implements ShouldBroadcast
@@ -171,5 +204,16 @@ class BroadcastFalseCondition extends BroadcastEvent
     public function broadcastWhen()
     {
         return false;
+    }
+}
+
+class BroadcastableNamedArgumentsEvent
+{
+    use \Illuminate\Foundation\Events\Dispatchable;
+
+    public function __construct(
+        public string $first,
+        public string $second,
+    ) {
     }
 }

@@ -108,7 +108,7 @@ class MonitorCommand extends Command
                 'reserved' => method_exists($this->manager->connection($connection), 'reservedSize')
                     ? $this->manager->connection($connection)->reservedSize($queue)
                     : null,
-                'oldest_pending' => method_exists($this->manager->connection($connection), 'oldestPending')
+                'oldest_pending' => method_exists($this->manager->connection($connection), 'creationTimeOfOldestPendingJob')
                     ? $this->manager->connection($connection)->creationTimeOfOldestPendingJob($queue)
                     : null,
                 'status' => $size >= $this->option('max') ? '<fg=yellow;options=bold>ALERT</>' : '<fg=green;options=bold>OK</>',

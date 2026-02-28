@@ -159,7 +159,9 @@ class BelongsTo extends Relation
         foreach ($results as $result) {
             $attribute = $this->getDictionaryKey($this->getRelatedKeyFrom($result));
 
-            $dictionary[$attribute] = $result;
+            if ($attribute !== null) {
+                $dictionary[$attribute] = $result;
+            }
         }
 
         // Once we have the dictionary constructed, we can loop through all the parents
@@ -168,8 +170,8 @@ class BelongsTo extends Relation
         foreach ($models as $model) {
             $attribute = $this->getDictionaryKey($this->getForeignKeyFrom($model));
 
-            if (isset($dictionary[$attribute ?? ''])) {
-                $model->setRelation($relation, $dictionary[$attribute ?? '']);
+            if ($attribute !== null && isset($dictionary[$attribute])) {
+                $model->setRelation($relation, $dictionary[$attribute]);
             }
         }
 
@@ -307,7 +309,7 @@ class BelongsTo extends Relation
     }
 
     /**
-     * Get the fully qualified foreign key of the relationship.
+     * Get the fully-qualified foreign key of the relationship.
      *
      * @return string
      */
@@ -337,7 +339,7 @@ class BelongsTo extends Relation
     }
 
     /**
-     * Get the fully qualified associated key of the relationship.
+     * Get the fully-qualified associated key of the relationship.
      *
      * @return string
      */

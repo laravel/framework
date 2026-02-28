@@ -76,6 +76,7 @@ use Illuminate\Database\Console\WipeCommand;
  * @method static \PDO|\Closure|null getRawReadPdo()
  * @method static \Illuminate\Database\Connection setPdo(\PDO|\Closure|null $pdo)
  * @method static \Illuminate\Database\Connection setReadPdo(\PDO|\Closure|null $pdo)
+ * @method static \Illuminate\Database\Connection setReadPdoConfig(array $config)
  * @method static string|null getName()
  * @method static string|null getNameWithReadWriteType()
  * @method static mixed getConfig(string|null $option = null)

@@ -6,6 +6,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 class SQLiteGrammar extends Grammar
 {
@@ -44,25 +45,6 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
-     * Compile a basic where clause.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $where
-     * @return string
-     */
-    protected function whereBasic(Builder $query, $where)
-    {
-        if ($where['operator'] === '<=>') {
-            $column = $this->wrap($where['column']);
-            $value = $this->parameter($where['value']);
-
-            return "{$column} IS {$value}";
-        }
-
-        return parent::whereBasic($query, $where);
-    }
-
-    /**
      * Compile a "where like" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -93,6 +75,18 @@ class SQLiteGrammar extends Grammar
             ['[*]', '[?]', '*', '?'],
             $value
         );
+    }
+
+    /**
+     * Compile a "where null safe equals" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereNullSafeEquals(Builder $query, $where)
+    {
+        return $this->wrap($where['column']).' is '.$this->parameter($where['value']);
     }
 
     /**
@@ -176,12 +170,22 @@ class SQLiteGrammar extends Grammar
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  \Illuminate\Database\Query\IndexHint  $indexHint
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function compileIndexHint(Builder $query, $indexHint)
     {
-        return $indexHint->type === 'force'
-            ? "indexed by {$indexHint->index}"
-            : '';
+        if ($indexHint->type !== 'force') {
+            return '';
+        }
+
+        $index = $indexHint->index;
+
+        if (! preg_match('/^[a-zA-Z0-9_$]+$/', $index)) {
+            throw new InvalidArgumentException('Index name contains invalid characters.');
+        }
+
+        return "indexed by {$index}";
     }
 
     /**

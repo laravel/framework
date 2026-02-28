@@ -225,6 +225,25 @@ class BladeTest extends TestCase
         $this->assertTrue($found);
     }
 
+    public function test_include_scoped_does_not_inherit_parent_scope()
+    {
+        // Regular @include passes parent scope variables
+        $regularInclude = View::make('uses-include-regular', [
+            'parentVar' => 'parent-value',
+            'explicitVar' => 'explicit-value',
+        ])->render();
+
+        $this->assertSame('Parent: parent-value, Explicit: explicit-value', trim($regularInclude));
+
+        // @includeIsolated does NOT pass parent scope variables
+        $scopedInclude = View::make('uses-include-scoped', [
+            'parentVar' => 'parent-value',
+            'explicitVar' => 'explicit-value',
+        ])->render();
+
+        $this->assertSame('Parent: undefined, Explicit: explicit-value', trim($scopedInclude));
+    }
+
     /** {@inheritdoc} */
     #[\Override]
     protected function defineEnvironment($app)
