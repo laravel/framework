@@ -18,7 +18,6 @@ use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
-use Illuminate\Support\BinaryCodec;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -277,10 +276,10 @@ class Builder implements BuilderContract
      */
     public function whereKey($id)
     {
-        $id = $this->prepareModelKey($id, $this->model);
+        $id = $this->prepareModelKey($this->model, $id);
 
         if (is_array($id)) {
-            if (in_array($this->model->getKeyType(), ['int', 'integer'])) {
+            if ($this->model->getModelKeyType()->isInt()) {
                 $this->query->whereIntegerInRaw($this->model->getQualifiedKeyName(), $id);
             } else {
                 $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
@@ -300,10 +299,10 @@ class Builder implements BuilderContract
      */
     public function whereKeyNot($id)
     {
-        $id = $this->prepareModelKey($id, $this->model);
+        $id = $this->prepareModelKey($this->model, $id);
 
         if (is_array($id)) {
-            if (in_array($this->model->getKeyType(), ['int', 'integer'])) {
+            if ($this->model->getModelKeyType()->isInt()) {
                 $this->query->whereIntegerNotInRaw($this->model->getQualifiedKeyName(), $id);
             } else {
                 $this->query->whereNotIn($this->model->getQualifiedKeyName(), $id);

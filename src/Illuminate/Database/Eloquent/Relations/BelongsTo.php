@@ -95,9 +95,10 @@ class BelongsTo extends Relation
             // For belongs to relationships, which are essentially the inverse of has one
             // or has many relationships, we need to actually query on the primary key
             // of the related models matching on the foreign key that's on a parent.
-            $key = $this->getQualifiedOwnerKeyName();
+            $keyName = $this->getQualifiedOwnerKeyName();
+            $foreignKey = $this->getForeignKeyFrom($this->child);
 
-            $this->query->where($key, '=', $this->getForeignKeyFrom($this->child));
+            $this->query->where($keyName, '=', $this->prepareModelKey($this->related, $foreignKey));
         }
     }
 
@@ -110,8 +111,9 @@ class BelongsTo extends Relation
         $key = $this->getQualifiedOwnerKeyName();
 
         $whereIn = $this->whereInMethod($this->related, $this->ownerKey);
+        $keys = $this->prepareModelKey($this->related, $this->getEagerModelKeys($models));
 
-        $this->whereInEager($whereIn, $key, $this->getEagerModelKeys($models));
+        $this->whereInEager($whereIn, $key, $keys);
     }
 
     /**
@@ -273,8 +275,7 @@ class BelongsTo extends Relation
      */
     protected function relationHasIncrementingId()
     {
-        return $this->related->getIncrementing() &&
-            in_array($this->related->getKeyType(), ['int', 'integer']);
+        return $this->related->getModelKeyType()->isInt() && $this->related->getIncrementing();
     }
 
     /**
@@ -367,9 +368,7 @@ class BelongsTo extends Relation
      */
     protected function getForeignKeyFrom(Model $model)
     {
-        $foreignKey = $model->{$this->foreignKey};
-
-        return enum_value($foreignKey);
+        return enum_value($model->{$this->foreignKey});
     }
 
     /**

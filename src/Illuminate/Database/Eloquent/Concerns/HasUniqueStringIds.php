@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Database\Eloquent\ModelKeyType;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 trait HasUniqueStringIds
@@ -71,13 +72,15 @@ trait HasUniqueStringIds
      */
     public function getKeyType()
     {
+        $keyType = parent::getKeyType();
+
         if (in_array($this->getKeyName(), $this->uniqueIds())) {
-            return property_exists($this, 'usesBinaryIds') && $this->usesBinaryIds
-                ? 'binary'
-                : 'string';
+            $keyType = property_exists($this, 'usesBinaryIds') && $this->usesBinaryIds
+                ? ModelKeyType::BINARY
+                : ModelKeyType::STRING;
         }
 
-        return parent::getKeyType();
+        return $this->setKeyType($keyType)->getKeyType();
     }
 
     /**

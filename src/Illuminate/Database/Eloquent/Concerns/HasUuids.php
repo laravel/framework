@@ -34,7 +34,7 @@ trait HasUuids
      *
      * @return string
      */
-    public  function getBinaryIdFormat(): string
+    public function getBinaryIdFormat(): string
     {
         return 'uuid';
     }

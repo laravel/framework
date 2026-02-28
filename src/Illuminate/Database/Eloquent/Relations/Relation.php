@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Concerns\CanonicalizesModelKeys;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\MultipleRecordsFoundException;
@@ -23,7 +24,7 @@ use Illuminate\Support\Traits\Macroable;
  */
 abstract class Relation implements BuilderContract
 {
-    use ForwardsCalls, Macroable {
+    use ForwardsCalls, Macroable, CanonicalizesModelKeys {
         Macroable::__call as macroCall;
     }
 
@@ -422,8 +423,7 @@ abstract class Relation implements BuilderContract
      */
     protected function whereInMethod(Model $model, $key)
     {
-        return $model->getKeyName() === last(explode('.', $key))
-            && in_array($model->getKeyType(), ['int', 'integer'])
+        return $model->getKeyName() === last(explode('.', $key)) && $model->getModelKeyType()->isInt()
                 ? 'whereIntegerInRaw'
                 : 'whereIn';
     }

@@ -246,7 +246,7 @@ class BelongsToMany extends Relation
     protected function addWhereConstraints()
     {
         $this->query->where(
-            $this->getQualifiedForeignPivotKeyName(), '=', $this->parent->{$this->parentKey}
+            $this->getQualifiedForeignPivotKeyName(), '=', $this->prepareModelKey($this->parent, $this->parent->{$this->parentKey})
         );
 
         return $this;
@@ -260,7 +260,7 @@ class BelongsToMany extends Relation
         $this->whereInEager(
             $whereIn,
             $this->getQualifiedForeignPivotKeyName(),
-            $this->getKeys($models, $this->parentKey)
+            $this->prepareModelKey($this->parent, $this->getKeys($models, $this->parentKey))
         );
     }
 

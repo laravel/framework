@@ -22,7 +22,6 @@ use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Arr;
-use Illuminate\Support\BinaryCodec;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable as SupportStringable;
@@ -49,6 +48,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         Concerns\PreventsCircularRecursion,
         Concerns\TransformsToResource,
         ForwardsCalls;
+
     /** @use HasCollection<\Illuminate\Database\Eloquent\Collection<array-key, static & self>> */
     use HasCollection;
 
@@ -76,9 +76,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * The "type" of the primary key ID.
      *
-     * @var string
+     * @var ModelKeyType|string
      */
-    protected $keyType = 'int';
+    protected $keyType = ModelKeyType::INT;
 
     /**
      * Indicates if the IDs are auto-incrementing.
@@ -374,7 +374,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             if (! in_array($method->getName(), $booted) &&
                 $method->isStatic() &&
                 (in_array($method->getName(), $conventionalBootMethods) ||
-                $method->getAttributes(Boot::class) !== [])) {
+                    $method->getAttributes(Boot::class) !== [])) {
                 $method->invoke(null);
 
                 $booted[] = $method->getName();
@@ -624,7 +624,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                 } else {
                     throw new MassAssignmentException(sprintf(
                         'Add [%s] to fillable property to allow mass assignment on [%s].',
-                        $key, get_class($this)
+                        $key, get_class($this),
                     ));
                 }
             }
@@ -640,7 +640,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                 throw new MassAssignmentException(sprintf(
                     'Add fillable property [%s] to allow mass assignment on [%s].',
                     implode(', ', $keys),
-                    get_class($this)
+                    get_class($this),
                 ));
             }
         }
@@ -704,7 +704,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $model->exists = $exists;
 
         $model->setConnection(
-            $this->getConnectionName()
+            $this->getConnectionName(),
         );
 
         $model->setTable($this->getTable());
@@ -769,7 +769,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function all($columns = ['*'])
     {
         return static::query()->get(
-            is_array($columns) ? $columns : func_get_args()
+            is_array($columns) ? $columns : func_get_args(),
         );
     }
 
@@ -782,7 +782,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function with($relations)
     {
         return static::query()->with(
-            is_string($relations) ? func_get_args() : $relations
+            is_string($relations) ? func_get_args() : $relations,
         );
     }
 
@@ -795,7 +795,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public function load($relations)
     {
         $query = $this->newQueryWithoutRelationships()->with(
-            is_string($relations) ? func_get_args() : $relations
+            is_string($relations) ? func_get_args() : $relations,
         );
 
         $query->eagerLoadRelations([$this]);
@@ -1136,7 +1136,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected function incrementQuietly($column, $amount = 1, array $extra = [])
     {
         return static::withoutEvents(
-            fn () => $this->incrementOrDecrement($column, $amount, $extra, 'increment')
+            fn () => $this->incrementOrDecrement($column, $amount, $extra, 'increment'),
         );
     }
 
@@ -1151,7 +1151,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected function decrementQuietly($column, $amount = 1, array $extra = [])
     {
         return static::withoutEvents(
-            fn () => $this->incrementOrDecrement($column, $amount, $extra, 'decrement')
+            fn () => $this->incrementOrDecrement($column, $amount, $extra, 'decrement'),
         );
     }
 
@@ -1546,7 +1546,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
     /**
      * Force a hard delete on a soft deleted model.
-     *
      * This method protects developers from running forceDelete when the trait is missing.
      *
      * @return bool|null
@@ -1558,7 +1557,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
     /**
      * Force a hard destroy on a soft deleted model.
-     *
      * This method protects developers from running forceDestroy when the trait is missing.
      *
      * @param  \Illuminate\Support\Collection|array|int|string  $ids
@@ -1609,7 +1607,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public function newModelQuery()
     {
         return $this->newEloquentBuilder(
-            $this->newBaseQueryBuilder()
+            $this->newBaseQueryBuilder(),
         )->setModel($this);
     }
 
@@ -1859,12 +1857,12 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
                 ->useWritePdo()
                 ->firstOrFail()
-                ->attributes
+                ->attributes,
         );
 
         $this->load((new BaseCollection($this->relations))->reject(
             fn ($relation) => $relation instanceof Pivot
-                || (is_object($relation) && in_array(AsPivot::class, class_uses_recursive($relation), true))
+                || (is_object($relation) && in_array(AsPivot::class, class_uses_recursive($relation), true)),
         )->keys()->all());
 
         $this->syncOriginal();
@@ -1889,7 +1887,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         ]));
 
         $attributes = Arr::except(
-            $this->getAttributes(), $except ? array_unique(array_merge($except, $defaults)) : $defaults
+            $this->getAttributes(), $except ? array_unique(array_merge($except, $defaults)) : $defaults,
         );
 
         return tap(new static, function ($instance) use ($attributes) {
@@ -1948,16 +1946,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * Get the current connection name for the model.
-     *
-     * @return string|null
-     */
-    public function getConnectionName()
-    {
-        return enum_value($this->connection);
-    }
-
-    /**
      * Set the connection associated with the model.
      *
      * @param  \UnitEnum|string|null  $name
@@ -1968,6 +1956,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->connection = $name;
 
         return $this;
+    }
+
+    /**
+     * Get the current connection name for the model.
+     *
+     * @return string|null
+     */
+    public function getConnectionName()
+    {
+        return enum_value($this->connection);
     }
 
     /**
@@ -2075,20 +2073,30 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getKeyType()
     {
-        return $this->keyType;
+        return enum_value($this->keyType);
     }
 
     /**
      * Set the data type for the primary key.
      *
-     * @param  string  $type
+     * @param  string|ModelKeyType  $type
      * @return $this
      */
     public function setKeyType($type)
     {
-        $this->keyType = $type;
+        $this->keyType = ModelKeyType::from(enum_value($type));
 
         return $this;
+    }
+
+    /**
+     * Get the model key type.
+     *
+     * @return ModelKeyType
+     */
+    public function getModelKeyType(): ModelKeyType
+    {
+        return ModelKeyType::create($this->getKeyType());
     }
 
     /**
@@ -2295,10 +2303,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         return $query->where(
             column: $field ?? $this->getRouteKeyName(),
-            value: match ($this->getKeyType()) {
-                'binary' => BinaryCodec::encode($value, $this->getBinaryIdFormat()),
-                default => $value,
-            }
+            value: ModelKey::cast($this, $value),
         );
     }
 
@@ -2496,7 +2501,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $this->attributes[$offset],
             $this->relations[$offset],
             $this->attributeCastCache[$offset],
-            $this->classCastCache[$offset]
+            $this->classCastCache[$offset],
         );
     }
 
