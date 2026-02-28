@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Routing\Controllers\Attributes;
+namespace Illuminate\Routing\Attributes\Controllers;
 
 use Attribute;
 
