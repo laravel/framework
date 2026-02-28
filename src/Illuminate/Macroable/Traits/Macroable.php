@@ -4,6 +4,8 @@ namespace Illuminate\Support\Traits;
 
 use BadMethodCallException;
 use Closure;
+use Illuminate\Macroable\Exceptions\MacroAlreadyDefinedException;
+use Illuminate\Support\MacroOverrides;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -17,6 +19,13 @@ trait Macroable
     protected static $macros = [];
 
     /**
+     * Indicates if a macros should not be overridden when it already exists.
+     *
+     * @var bool
+     */
+    protected static $preventMacroOverrides = false;
+
+    /**
      * Register a custom macro.
      *
      * @param  string  $name
@@ -28,7 +37,34 @@ trait Macroable
      */
     public static function macro($name, $macro)
     {
+        if (static::shouldPreventMacroOverrides() && static::hasMacro($name)) {
+            throw new MacroAlreadyDefinedException(sprintf(
+                'Macro %s::%s already exists.', static::class, $name
+            ));
+        }
+
         static::$macros[$name] = $macro;
+    }
+
+    /**
+     * Prevents macro overrides.
+     *
+     * @param  bool  $prevent
+     * @return void
+     */
+    public static function preventMacroOverrides($prevent = true): void
+    {
+        static::$preventMacroOverrides = $prevent;
+    }
+
+    /**
+     * Determines if macro overrides should be prevented.
+     *
+     * @return bool
+     */
+    public static function shouldPreventMacroOverrides(): bool
+    {
+        return static::$preventMacroOverrides === null ? MacroOverrides::shouldPrevent() : static::$preventMacroOverrides;
     }
 
     /**
