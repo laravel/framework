@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
 use Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException;
 use Illuminate\Support\Reflector;
 use Illuminate\Support\Str;
@@ -45,19 +46,24 @@ class ImplicitRouteBinding
                 ? 'resolveSoftDeletableRouteBinding'
                 : 'resolveRouteBinding';
 
-            if ($parent instanceof UrlRoutable &&
-                ! $route->preventsScopedBindings() &&
-                ($route->enforcesScopedBindings() || array_key_exists($parameterName, $route->bindingFields()))) {
-                $childRouteBindingMethod = $route->allowsTrashedBindings() && $instance::isSoftDeletable()
-                    ? 'resolveSoftDeletableChildRouteBinding'
-                    : 'resolveChildRouteBinding';
+            try {
+                if ($parent instanceof UrlRoutable &&
+                    ! $route->preventsScopedBindings() &&
+                    ($route->enforcesScopedBindings() || array_key_exists($parameterName, $route->bindingFields()))) {
+                    $childRouteBindingMethod = $route->allowsTrashedBindings() && $instance::isSoftDeletable()
+                        ? 'resolveSoftDeletableChildRouteBinding'
+                        : 'resolveChildRouteBinding';
 
-                if (! $model = $parent->{$childRouteBindingMethod}(
-                    $parameterName, $parameterValue, $route->bindingFieldFor($parameterName)
-                )) {
+                    if (! $model = $parent->{$childRouteBindingMethod}(
+                        $parameterName, $parameterValue, $route->bindingFieldFor($parameterName)
+                    )) {
+                        throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
+                    }
+                } elseif (! $model = $instance->{$routeBindingMethod}($parameterValue, $route->bindingFieldFor($parameterName))) {
                     throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
                 }
-            } elseif (! $model = $instance->{$routeBindingMethod}($parameterValue, $route->bindingFieldFor($parameterName))) {
+            } catch (QueryException $e) {
+                report_if($instance::reportsRouteModelBindingExceptions(), $e);
                 throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
             }
 
