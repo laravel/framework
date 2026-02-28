@@ -11,21 +11,21 @@ class RequestException extends HttpClientException
      *
      * @var \Illuminate\Http\Client\Response
      */
-    public Response $response;
+    public $response;
 
     /**
      * The current truncation length for the exception message.
      *
      * @var int|false|null
      */
-    public int|false|null $truncateExceptionsAt;
+    public $truncateExceptionsAt;
 
     /**
      * The global truncation length for the exception message.
      *
      * @var int|false
      */
-    public static int|false $truncateAt = 120;
+    public static $truncateAt = 120;
 
     /**
      * Whether the response has been summarized in the message.
@@ -54,7 +54,7 @@ class RequestException extends HttpClientException
      *
      * @return void
      */
-    public static function truncate(): void
+    public static function truncate()
     {
         static::$truncateAt = 120;
     }
@@ -65,7 +65,7 @@ class RequestException extends HttpClientException
      * @param  int  $length
      * @return void
      */
-    public static function truncateAt(int $length): void
+    public static function truncateAt(int $length)
     {
         static::$truncateAt = $length;
     }
@@ -75,7 +75,7 @@ class RequestException extends HttpClientException
      *
      * @return void
      */
-    public static function dontTruncate(): void
+    public static function dontTruncate()
     {
         static::$truncateAt = false;
     }
@@ -85,7 +85,7 @@ class RequestException extends HttpClientException
      *
      * @return bool
      */
-    public function report(): bool
+    public function report()
     {
         if (! $this->hasBeenSummarized) {
             $this->message = $this->prepareMessage($this->response);
@@ -102,7 +102,7 @@ class RequestException extends HttpClientException
      * @param  \Illuminate\Http\Client\Response  $response
      * @return string
      */
-    protected function prepareMessage(Response $response): string
+    protected function prepareMessage(Response $response)
     {
         $message = "HTTP request returned status code {$response->status()}";
 
