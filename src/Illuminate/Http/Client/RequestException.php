@@ -112,12 +112,8 @@ class RequestException extends HttpClientException
         $psrResponse = $response->toPsrResponse();
 
         $summary = match (true) {
-            is_int($truncateExceptionsAt) 
-                => Message::bodySummary($psrResponse, $truncateExceptionsAt),
-
-            ($body = $psrResponse->getBody()) && $body->isSeekable() && $body->isReadable() 
-                => Message::toString($psrResponse),
-
+            is_int($truncateExceptionsAt) => Message::bodySummary($psrResponse, $truncateExceptionsAt),
+            ($body = $psrResponse->getBody()) && $body->isSeekable() && $body->isReadable() => Message::toString($psrResponse),
             default => null,
         };
 
