@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent\Relations\Concerns;
 use BackedEnum;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelKey;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Collection as BaseCollection;
 
@@ -660,15 +661,12 @@ trait InteractsWithPivotTable
     /**
      * Cast the given key to convert to primary key type.
      *
-     * @param  mixed  $key
-     * @return mixed
+     * @param  string|int|null  $key
+     * @return string|int|null
      */
-    protected function castKey($key)
+    protected function castKey(string|int|null $key): string|int|null
     {
-        return $this->getTypeSwapValue(
-            $this->related->getKeyType(),
-            $key
-        );
+        return ModelKey::cast($this->related, $key);
     }
 
     /**

@@ -9,6 +9,7 @@ use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
+use Illuminate\Database\Eloquent\Concerns\CanonicalizesModelKeys;
 use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -35,7 +36,7 @@ use ReflectionMethod;
 class Builder implements BuilderContract
 {
     /** @use \Illuminate\Database\Concerns\BuildsQueries<TModel> */
-    use BuildsQueries, ForwardsCalls, QueriesRelationships {
+    use BuildsQueries, ForwardsCalls, CanonicalizesModelKeys, QueriesRelationships {
         BuildsQueries::sole as baseSole;
     }
 
@@ -275,22 +276,16 @@ class Builder implements BuilderContract
      */
     public function whereKey($id)
     {
-        if ($id instanceof Model) {
-            $id = $id->getKey();
-        }
+        $id = $this->prepareModelKey($this->model, $id);
 
-        if (is_array($id) || $id instanceof Arrayable) {
-            if (in_array($this->model->getKeyType(), ['int', 'integer'])) {
+        if (is_array($id)) {
+            if ($this->model->getModelKeyType()->isInt()) {
                 $this->query->whereIntegerInRaw($this->model->getQualifiedKeyName(), $id);
             } else {
                 $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
             }
 
             return $this;
-        }
-
-        if ($id !== null && $this->model->getKeyType() === 'string') {
-            $id = (string) $id;
         }
 
         return $this->where($this->model->getQualifiedKeyName(), '=', $id);
@@ -304,22 +299,16 @@ class Builder implements BuilderContract
      */
     public function whereKeyNot($id)
     {
-        if ($id instanceof Model) {
-            $id = $id->getKey();
-        }
+        $id = $this->prepareModelKey($this->model, $id);
 
-        if (is_array($id) || $id instanceof Arrayable) {
-            if (in_array($this->model->getKeyType(), ['int', 'integer'])) {
+        if (is_array($id)) {
+            if ($this->model->getModelKeyType()->isInt()) {
                 $this->query->whereIntegerNotInRaw($this->model->getQualifiedKeyName(), $id);
             } else {
                 $this->query->whereNotIn($this->model->getQualifiedKeyName(), $id);
             }
 
             return $this;
-        }
-
-        if ($id !== null && $this->model->getKeyType() === 'string') {
-            $id = (string) $id;
         }
 
         return $this->where($this->model->getQualifiedKeyName(), '!=', $id);
