@@ -456,9 +456,9 @@ class BroadcastManager implements FactoryContract
     {
         return new PollBroadcaster(
             $this->app->make('cache')->store($config['store'] ?? null),
-            $config['ttl'] ?? 60,
-            $config['prefix'] ?? 'poll_broadcast:',
-            $config['presence_timeout'] ?? 30,
+            $config['ttl'],
+            $config['prefix'],
+            $config['presence_timeout'],
         );
     }
 

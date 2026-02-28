@@ -35,7 +35,7 @@ class PollBroadcaster extends Broadcaster
     /**
      * Create a new broadcaster instance.
      */
-    public function __construct(Cache $cache, int $ttl = 60, string $prefix = 'poll_broadcast:', int $presenceTimeout = 30)
+    public function __construct(Cache $cache, int $ttl, string $prefix, int $presenceTimeout)
     {
         $this->cache = $cache;
         $this->ttl = $ttl;
