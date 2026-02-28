@@ -4128,6 +4128,14 @@ class Builder implements BuilderContract
             return new Collection;
         }
 
+        if ($uniqueBy === [] || $uniqueBy === '') {
+            throw new InvalidArgumentException('The unique columns must not be empty.');
+        }
+
+        if ($returning === []) {
+            throw new InvalidArgumentException('The returning columns must not be empty.');
+        }
+
         if (! is_array(array_first($values))) {
             $values = [$values];
         } else {
