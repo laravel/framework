@@ -8,7 +8,7 @@ class MacroOverrides
 {
     protected static $preventMacroOverrides = false;
 
-    public static function preventGlobally($prevent = true)
+    public static function prevent($prevent = true)
     {
         static::$preventMacroOverrides = $prevent;
     }
