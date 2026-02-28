@@ -4,6 +4,7 @@ namespace Illuminate\Broadcasting\Broadcasters;
 
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -13,64 +14,37 @@ class PollBroadcaster extends Broadcaster
 
     /**
      * The cache repository instance.
-     *
-     * @var \Illuminate\Contracts\Cache\Repository
      */
-    protected $cache;
+    protected Cache $cache;
 
     /**
      * The time-to-live for broadcast events in seconds.
-     *
-     * @var int
      */
-    protected $ttl;
+    protected int $ttl;
 
     /**
      * The cache key prefix.
-     *
-     * @var string
      */
-    protected $prefix;
+    protected string $prefix;
 
     /**
      * The presence timeout in seconds.
-     *
-     * @var int
      */
-    protected $presenceTimeout;
-
-    /**
-     * The lottery odds for pruning expired event IDs.
-     *
-     * @var array
-     */
-    protected $lottery;
+    protected int $presenceTimeout;
 
     /**
      * Create a new broadcaster instance.
-     *
-     * @param  \Illuminate\Contracts\Cache\Repository  $cache
-     * @param  int  $ttl
-     * @param  string  $prefix
-     * @param  int  $presenceTimeout
-     * @param  array  $lottery
      */
-    public function __construct(Cache $cache, $ttl = 60, $prefix = 'poll_broadcast:', $presenceTimeout = 30, $lottery = [2, 100])
+    public function __construct(Cache $cache, int $ttl = 60, string $prefix = 'poll_broadcast:', int $presenceTimeout = 30)
     {
         $this->cache = $cache;
         $this->ttl = $ttl;
         $this->prefix = $prefix;
         $this->presenceTimeout = $presenceTimeout;
-        $this->lottery = $lottery;
     }
 
     /**
-     * Authenticate the incoming request for a given channel.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+     * {@inheritdoc}
      */
     public function auth($request)
     {
@@ -88,11 +62,7 @@ class PollBroadcaster extends Broadcaster
     }
 
     /**
-     * Return the valid authentication response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  mixed  $result
-     * @return mixed
+     * {@inheritdoc}
      */
     public function validAuthenticationResponse($request, $result)
     {
@@ -115,12 +85,7 @@ class PollBroadcaster extends Broadcaster
     }
 
     /**
-     * Broadcast the given event.
-     *
-     * @param  array  $channels
-     * @param  string  $event
-     * @param  array  $payload
-     * @return void
+     * {@inheritdoc}
      */
     public function broadcast(array $channels, $event, array $payload = [])
     {
@@ -128,7 +93,7 @@ class PollBroadcaster extends Broadcaster
             return;
         }
 
-        $eventId = (string) Str::ulid();
+        $eventId = (string) Str::uuid7();
         $socket = Arr::pull($payload, 'socket');
 
         $this->cache->put($this->eventKey($eventId), [
@@ -140,144 +105,130 @@ class PollBroadcaster extends Broadcaster
         ], $this->ttl);
 
         foreach ($this->formatChannels($channels) as $channel) {
-            $this->cache->withoutOverlapping($this->channelKey($channel).':lock', function () use ($channel, $eventId) {
+            $this->atomic($this->channelKey($channel), function () use ($channel, $eventId) {
                 $ids = $this->cache->get($this->channelKey($channel), []);
 
                 $ids[] = $eventId;
 
-                if (random_int(1, $this->lottery[1]) <= $this->lottery[0]) {
-                    $ids = $this->pruneExpiredIds($ids);
-                }
-
                 $this->cache->put($this->channelKey($channel), $ids, $this->ttl);
-            }, 10, 5);
+            });
         }
     }
 
     /**
      * Get events for the given channels since the last event ID.
-     *
-     * @param  array  $channels
-     * @param  string|null  $lastEventId
-     * @return array
      */
-    public function getEvents(array $channels, $lastEventId = null)
+    public function getEvents(array $channels, ?string $lastEventId = null): array
     {
         if (is_null($lastEventId)) {
             return [
                 'events' => [],
-                'lastEventId' => (string) Str::ulid(),
+                'lastEventId' => (string) Str::uuid7(),
             ];
         }
 
-        $events = [];
+        $cutoffId = (string) Str::uuid7(now()->subSeconds($this->ttl));
+        $lastEventId = max($lastEventId, $cutoffId);
 
-        foreach ($channels as $channel) {
-            $ids = $this->cache->get($this->channelKey($channel), []);
-
-            foreach ($ids as $id) {
-                if (strcmp($id, $lastEventId) <= 0) {
-                    continue;
-                }
-
-                $event = $this->cache->get($this->eventKey($id));
-
-                if (is_null($event)) {
-                    continue;
-                }
-
-                $event['channel'] = $channel;
-                $events[] = $event;
-            }
-        }
-
-        usort($events, fn ($a, $b) => strcmp($a['id'], $b['id']));
-
-        $newLastEventId = ! empty($events)
-            ? end($events)['id']
-            : $lastEventId;
+        $events = (new Collection($channels))
+            ->flatMap(fn ($channel) => $this->getChannelEvents($channel, $lastEventId, $cutoffId))
+            ->sortBy('id')
+            ->values()
+            ->all();
 
         return [
             'events' => $events,
-            'lastEventId' => $newLastEventId,
+            'lastEventId' => ! empty($events) ? end($events)['id'] : $lastEventId,
         ];
     }
 
     /**
-     * Update presence information for a user on a channel.
-     *
-     * @param  string  $channel
-     * @param  mixed  $userId
-     * @param  mixed  $userInfo
-     * @return array
+     * Get new events for a single channel since the given last event ID.
      */
-    public function updatePresence($channel, $userId, $userInfo)
+    protected function getChannelEvents(string $channel, string $lastEventId, string $cutoffId): array
     {
-        return $this->cache->withoutOverlapping($this->presenceKey($channel).':lock', function () use ($channel, $userId, $userInfo) {
-            $members = $this->cache->get($this->presenceKey($channel), []);
+        $ids = $this->pruneExpiredChannelIds($channel, $cutoffId);
 
-            $members[$userId] = [
-                'user_id' => $userId,
-                'user_info' => $userInfo,
-                'last_seen' => time(),
-            ];
-
-            $cutoff = time() - $this->presenceTimeout;
-
-            $members = array_filter($members, fn ($member) => $member['last_seen'] >= $cutoff);
-
-            $this->cache->put($this->presenceKey($channel), $members, $this->ttl);
-
-            return array_values(array_map(fn ($member) => [
-                'user_id' => $member['user_id'],
-                'user_info' => $member['user_info'],
-            ], $members));
-        }, 10, 5);
+        return (new Collection($ids))
+            ->filter(fn ($id) => strcmp($id, $lastEventId) > 0)
+            ->map(fn ($id) => $this->cache->get($this->eventKey($id)))
+            ->filter()
+            ->map(fn ($event) => $event + ['channel' => $channel])
+            ->values()
+            ->all();
     }
 
     /**
-     * Prune expired event IDs from the given array using ULID timestamp comparison.
-     *
-     * @param  array  $ids
-     * @return array
+     * Prune expired event IDs for a channel.
      */
-    protected function pruneExpiredIds(array $ids)
+    protected function pruneExpiredChannelIds(string $channel, string $cutoffId): array
     {
-        $cutoffTime = now()->subSeconds($this->ttl);
-        $cutoffUlid = (string) Str::ulid($cutoffTime);
+        return $this->atomic($this->channelKey($channel), function () use ($channel, $cutoffId) {
+            $ids = new Collection($this->cache->get($this->channelKey($channel), []));
 
-        return array_values(array_filter($ids, fn ($id) => strcmp($id, $cutoffUlid) > 0));
+            $surviving = $ids->filter(fn ($id) => strcmp($id, $cutoffId) > 0)->values();
+
+            if ($surviving->count() < $ids->count()) {
+                $this->cache->put($this->channelKey($channel), $surviving->all(), $this->ttl);
+            }
+
+            return $surviving->all();
+        });
+    }
+
+    /**
+     * Update presence information for a user on a channel.
+     */
+    public function updatePresence(string $channel, mixed $userId, mixed $userInfo): array
+    {
+        return $this->atomic($this->presenceKey($channel), function () use ($channel, $userId, $userInfo) {
+            $cutoff = time() - $this->presenceTimeout;
+
+            $members = (new Collection($this->cache->get($this->presenceKey($channel), [])))
+                ->put($userId, [
+                    'user_id' => $userId,
+                    'user_info' => $userInfo,
+                    'last_seen' => time(),
+                ])
+                ->filter(fn ($member) => $member['last_seen'] >= $cutoff);
+
+            $this->cache->put($this->presenceKey($channel), $members->all(), $this->ttl);
+
+            return $members->map(fn ($member) => [
+                'user_id' => $member['user_id'],
+                'user_info' => $member['user_info'],
+            ])->values()->all();
+        });
+    }
+
+    /**
+     * Execute a callback within a cache-based atomic lock.
+     */
+    protected function atomic(string $key, callable $callback, int $lockTimeout = 10, int $waitTimeout = 5): mixed
+    {
+        return $this->cache->withoutOverlapping($key.':lock', $callback, $lockTimeout, $waitTimeout);
     }
 
     /**
      * Get the cache key for a channel's event index.
-     *
-     * @param  string  $channel
-     * @return string
      */
-    public function channelKey($channel)
+    public function channelKey(string $channel): string
     {
         return $this->prefix.$channel;
     }
 
     /**
      * Get the cache key for an event payload.
-     *
-     * @param  string  $eventId
-     * @return string
      */
-    public function eventKey($eventId)
+    public function eventKey(string $eventId): string
     {
         return $this->prefix.'event:'.$eventId;
     }
 
     /**
      * Get the cache key for a channel's presence members.
-     *
-     * @param  string  $channel
-     * @return string
      */
-    public function presenceKey($channel)
+    public function presenceKey(string $channel): string
     {
         return $this->prefix.'presence:'.$channel;
     }

@@ -29,7 +29,7 @@ class PollBroadcasterTest extends TestCase
         parent::setUp();
 
         $this->cache = new CacheRepository(new ArrayStore);
-        $this->broadcaster = m::mock(PollBroadcaster::class, [$this->cache, 60, 'poll_broadcast:', 30, [2, 100]])->makePartial();
+        $this->broadcaster = m::mock(PollBroadcaster::class, [$this->cache, 60, 'poll_broadcast:', 30])->makePartial();
 
         Container::setInstance(new Container);
     }
@@ -154,7 +154,7 @@ class PollBroadcasterTest extends TestCase
 
     public function testBroadcastStoresEventInCache()
     {
-        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30);
 
         $broadcaster->broadcast(['test-channel'], 'TestEvent', ['message' => 'hello']);
 
@@ -174,7 +174,7 @@ class PollBroadcasterTest extends TestCase
 
     public function testBroadcastStoresSocketIdFromPayload()
     {
-        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30);
 
         $broadcaster->broadcast(['test-channel'], 'TestEvent', [
             'message' => 'hello',
@@ -190,7 +190,7 @@ class PollBroadcasterTest extends TestCase
 
     public function testBroadcastToMultipleChannels()
     {
-        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30);
 
         $broadcaster->broadcast(['channel-a', 'channel-b'], 'TestEvent', ['data' => 1]);
 
@@ -204,7 +204,7 @@ class PollBroadcasterTest extends TestCase
 
     public function testBroadcastWithEmptyChannelsDoesNothing()
     {
-        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30);
 
         $broadcaster->broadcast([], 'TestEvent', ['data' => 1]);
 
@@ -213,18 +213,18 @@ class PollBroadcasterTest extends TestCase
 
     public function testGetEventsConnectHandshakeReturnsEmptyEventsAndCursor()
     {
-        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30);
 
         $result = $broadcaster->getEvents(['test-channel']);
 
         $this->assertEmpty($result['events']);
         $this->assertNotEmpty($result['lastEventId']);
-        $this->assertTrue(Str::isUlid($result['lastEventId']));
+        $this->assertTrue(Str::isUuid($result['lastEventId']));
     }
 
     public function testGetEventsReturnsEventsAfterLastEventId()
     {
-        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30);
 
         $connectResult = $broadcaster->getEvents(['test-channel']);
         $lastEventId = $connectResult['lastEventId'];
@@ -241,7 +241,7 @@ class PollBroadcasterTest extends TestCase
 
     public function testGetEventsOnlyReturnsEventsAfterCursor()
     {
-        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30);
 
         $broadcaster->broadcast(['test-channel'], 'Event1', ['msg' => '1']);
 
@@ -258,7 +258,7 @@ class PollBroadcasterTest extends TestCase
 
     public function testGetEventsFromMultipleChannels()
     {
-        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30);
 
         $connectResult = $broadcaster->getEvents(['channel-a', 'channel-b']);
         $lastEventId = $connectResult['lastEventId'];
@@ -277,7 +277,7 @@ class PollBroadcasterTest extends TestCase
 
     public function testGetEventsReturnsSortedByUlid()
     {
-        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30);
 
         $connectResult = $broadcaster->getEvents(['test-channel']);
         $lastEventId = $connectResult['lastEventId'];
@@ -295,7 +295,7 @@ class PollBroadcasterTest extends TestCase
 
     public function testGetEventsUpdatesLastEventId()
     {
-        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30);
 
         $connectResult = $broadcaster->getEvents(['test-channel']);
         $lastEventId = $connectResult['lastEventId'];
@@ -311,7 +311,7 @@ class PollBroadcasterTest extends TestCase
 
     public function testGetEventsKeepsLastEventIdWhenNoNewEvents()
     {
-        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30);
 
         $connectResult = $broadcaster->getEvents(['test-channel']);
         $lastEventId = $connectResult['lastEventId'];
@@ -324,7 +324,7 @@ class PollBroadcasterTest extends TestCase
 
     public function testGetEventsSkipsExpiredEventPayloads()
     {
-        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30);
 
         $connectResult = $broadcaster->getEvents(['test-channel']);
         $lastEventId = $connectResult['lastEventId'];
@@ -344,7 +344,7 @@ class PollBroadcasterTest extends TestCase
 
     public function testGetEventsIncludesChannelInEvent()
     {
-        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30);
 
         $connectResult = $broadcaster->getEvents(['my-channel']);
         $lastEventId = $connectResult['lastEventId'];
@@ -358,7 +358,7 @@ class PollBroadcasterTest extends TestCase
 
     public function testGetEventsBroadcastToMultipleChannelsReturnsEventPerChannel()
     {
-        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30);
 
         $connectResult = $broadcaster->getEvents(['channel-a', 'channel-b']);
         $lastEventId = $connectResult['lastEventId'];
@@ -373,9 +373,42 @@ class PollBroadcasterTest extends TestCase
         $this->assertEquals($result['events'][0]['id'], $result['events'][1]['id']);
     }
 
+    public function testGetEventsBumpsLastEventIdToCutoffWhenExpired()
+    {
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30);
+
+        // A lastEventId from 120s ago — older than the 60s TTL.
+        $lastEventId = (string) Str::uuid7(now()->subSeconds(120));
+
+        // An expired event ID from 90s ago — newer than lastEventId but still older than cutoff.
+        $expiredEventId = (string) Str::uuid7(now()->subSeconds(90));
+        $this->cache->put('poll_broadcast:event:'.$expiredEventId, [
+            'id' => $expiredEventId,
+            'event' => 'ExpiredEvent',
+            'data' => [],
+            'socket' => null,
+            'timestamp' => time() - 90,
+        ], 60);
+
+        // Broadcast a fresh event.
+        $broadcaster->broadcast(['test-channel'], 'FreshEvent', ['msg' => 'hello']);
+
+        // Prepend the expired event ID to the channel index.
+        $ids = $this->cache->get('poll_broadcast:test-channel', []);
+        array_unshift($ids, $expiredEventId);
+        $this->cache->put('poll_broadcast:test-channel', $ids, 60);
+
+        $result = $broadcaster->getEvents(['test-channel'], $lastEventId);
+
+        // Only the fresh event is returned — the expired one is skipped
+        // because lastEventId gets bumped to cutoffId.
+        $this->assertCount(1, $result['events']);
+        $this->assertEquals('FreshEvent', $result['events'][0]['event']);
+    }
+
     public function testUpdatePresenceRecordsUser()
     {
-        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30);
 
         $members = $broadcaster->updatePresence('presence-chat', 1, ['name' => 'Alice']);
 
@@ -386,7 +419,7 @@ class PollBroadcasterTest extends TestCase
 
     public function testUpdatePresencePrunesStaleMembers()
     {
-        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 1, [0, 100]);
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 1);
 
         $broadcaster->updatePresence('presence-chat', 1, ['name' => 'Alice']);
 
@@ -400,7 +433,7 @@ class PollBroadcasterTest extends TestCase
 
     public function testUpdatePresenceSameUserAppearsOnce()
     {
-        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30);
 
         $broadcaster->updatePresence('presence-chat', 1, ['name' => 'Alice']);
         $members = $broadcaster->updatePresence('presence-chat', 1, ['name' => 'Alice Updated']);
@@ -412,7 +445,7 @@ class PollBroadcasterTest extends TestCase
 
     public function testUpdatePresenceMultipleUsersTracked()
     {
-        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30);
 
         $broadcaster->updatePresence('presence-chat', 1, ['name' => 'Alice']);
         $members = $broadcaster->updatePresence('presence-chat', 2, ['name' => 'Bob']);
@@ -422,21 +455,21 @@ class PollBroadcasterTest extends TestCase
 
     public function testChannelKeyGeneration()
     {
-        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30);
 
         $this->assertEquals('poll_broadcast:test-channel', $broadcaster->channelKey('test-channel'));
     }
 
     public function testEventKeyGeneration()
     {
-        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30);
 
         $this->assertEquals('poll_broadcast:event:01ABC', $broadcaster->eventKey('01ABC'));
     }
 
     public function testPresenceKeyGeneration()
     {
-        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30, [0, 100]);
+        $broadcaster = new PollBroadcaster($this->cache, 60, 'poll_broadcast:', 30);
 
         $this->assertEquals('poll_broadcast:presence:presence-chat', $broadcaster->presenceKey('presence-chat'));
     }

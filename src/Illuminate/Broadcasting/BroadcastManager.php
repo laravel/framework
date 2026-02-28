@@ -459,7 +459,6 @@ class BroadcastManager implements FactoryContract
             $config['ttl'] ?? 60,
             $config['prefix'] ?? 'poll_broadcast:',
             $config['presence_timeout'] ?? 30,
-            $config['lottery'] ?? [2, 100]
         );
     }
 
