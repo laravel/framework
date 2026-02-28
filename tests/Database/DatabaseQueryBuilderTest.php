@@ -4405,6 +4405,22 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(2, $result);
     }
 
+    public function testUpsertMethodWithEmptyUniqueByArray()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The unique columns must not be empty.');
+        $builder = $this->getPostgresBuilder();
+        $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar']], []);
+    }
+
+    public function testUpsertMethodWithEmptyUniqueByString()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The unique columns must not be empty.');
+        $builder = $this->getPostgresBuilder();
+        $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar']], '');
+    }
+
     public function testUpdateMethodWithJoins()
     {
         $builder = $this->getBuilder();
