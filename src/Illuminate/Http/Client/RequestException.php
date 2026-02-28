@@ -39,9 +39,8 @@ class RequestException extends HttpClientException
      *
      * @param  \Illuminate\Http\Client\Response  $response
      * @param  int|false|null  $truncateExceptionsAt
-     * @return void
      */
-    public function __construct(Response $response, $truncateExceptionsAt = null): void
+    public function __construct(Response $response, $truncateExceptionsAt = null)
     {
         parent::__construct($this->prepareMessage($response), $response->status());
 
