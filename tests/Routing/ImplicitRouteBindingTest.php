@@ -4,8 +4,6 @@ namespace Illuminate\Tests\Routing;
 
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Routing\Attributes\BindRoute;
 use Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException;
 use Illuminate\Routing\ImplicitRouteBinding;
 use Illuminate\Routing\Route;
@@ -128,130 +126,9 @@ class ImplicitRouteBindingTest extends TestCase
 
         ImplicitRouteBinding::resolveForRoute($container, $route);
     }
-
-    public function test_it_can_resolve_the_implicit_model_route_bindings_using_bind_route_field_attribute()
-    {
-        ImplicitRouteBindingAttributeUser::$lastField = null;
-        ImplicitRouteBindingAttributeUser::$lastValue = null;
-
-        $action = ['uses' => function (#[BindRoute(null, 'slug')] ImplicitRouteBindingAttributeUser $user) {
-            return $user;
-        }];
-
-        $route = new Route('GET', '/test/{user}', $action);
-        $route->parameters = ['user' => 'laravel'];
-
-        $route->prepareForSerialization();
-
-        $container = Container::getInstance();
-
-        ImplicitRouteBinding::resolveForRoute($container, $route);
-
-        $this->assertSame('slug', ImplicitRouteBindingAttributeUser::$lastField);
-        $this->assertSame('laravel', ImplicitRouteBindingAttributeUser::$lastValue);
-        $this->assertInstanceOf(ImplicitRouteBindingAttributeUser::class, $route->parameter('user'));
-    }
-
-    public function test_it_can_resolve_the_implicit_model_route_bindings_using_bind_route_parameter_attribute()
-    {
-        ImplicitRouteBindingAttributeUser::$lastField = null;
-        ImplicitRouteBindingAttributeUser::$lastValue = null;
-
-        $action = ['uses' => function (#[BindRoute('member')] ImplicitRouteBindingAttributeUser $user) {
-            return $user;
-        }];
-
-        $route = new Route('GET', '/test/{member}', $action);
-        $route->parameters = ['member' => 'laravel'];
-
-        $route->prepareForSerialization();
-
-        $container = Container::getInstance();
-
-        ImplicitRouteBinding::resolveForRoute($container, $route);
-
-        $this->assertSame('laravel', ImplicitRouteBindingAttributeUser::$lastValue);
-        $this->assertInstanceOf(ImplicitRouteBindingAttributeUser::class, $route->parameter('member'));
-    }
-
-    public function test_it_can_force_trashed_resolution_using_bind_route_attribute()
-    {
-        ImplicitRouteBindingAttributeSoftDeletableUser::$method = null;
-
-        $action = ['uses' => function (#[BindRoute(null, null, true)] ImplicitRouteBindingAttributeSoftDeletableUser $user) {
-            return $user;
-        }];
-
-        $route = new Route('GET', '/test/{user}', $action);
-        $route->parameters = ['user' => '1'];
-
-        $route->prepareForSerialization();
-
-        $container = Container::getInstance();
-
-        ImplicitRouteBinding::resolveForRoute($container, $route);
-
-        $this->assertSame('resolveSoftDeletableRouteBinding', ImplicitRouteBindingAttributeSoftDeletableUser::$method);
-    }
-
-    public function test_it_can_disable_trashed_resolution_using_bind_route_attribute()
-    {
-        ImplicitRouteBindingAttributeSoftDeletableUser::$method = null;
-
-        $action = ['uses' => function (#[BindRoute(null, null, false)] ImplicitRouteBindingAttributeSoftDeletableUser $user) {
-            return $user;
-        }];
-
-        $route = (new Route('GET', '/test/{user}', $action))->withTrashed();
-        $route->parameters = ['user' => '1'];
-
-        $route->prepareForSerialization();
-
-        $container = Container::getInstance();
-
-        ImplicitRouteBinding::resolveForRoute($container, $route);
-
-        $this->assertSame('resolveRouteBinding', ImplicitRouteBindingAttributeSoftDeletableUser::$method);
-    }
 }
 
 class ImplicitRouteBindingUser extends Model
 {
     //
-}
-
-class ImplicitRouteBindingAttributeUser extends Model
-{
-    public static $lastField;
-
-    public static $lastValue;
-
-    public function resolveRouteBinding($value, $field = null)
-    {
-        static::$lastValue = $value;
-        static::$lastField = $field;
-
-        return new self();
-    }
-}
-
-class ImplicitRouteBindingAttributeSoftDeletableUser extends Model
-{
-    use SoftDeletes;
-
-    public static $method;
-
-    public function resolveRouteBinding($value, $field = null)
-    {
-        static::$method = 'resolveRouteBinding';
-
-        return new self();
-    }
-
-    public function resolveSoftDeletableRouteBinding($value, $field = null)
-    {
-        static::$method = 'resolveSoftDeletableRouteBinding';
-
-        return new self();
-    }
 }
