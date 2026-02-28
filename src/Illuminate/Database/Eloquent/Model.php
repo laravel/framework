@@ -2302,8 +2302,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public function resolveRouteBindingQuery($query, $value, $field = null)
     {
         return $query->where(
-            column: $field ?? $this->getRouteKeyName(),
-            value: ModelKey::cast($this, $value),
+            $field ?? $this->getRouteKeyName(),
+            ModelKey::cast($this, $value),
         );
     }
 
