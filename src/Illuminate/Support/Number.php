@@ -38,7 +38,7 @@ class Number
         static::ensureIntlExtensionIsInstalled();
 
         if (is_string($number)) {
-            $number = self::parse($number, NumberFormatter::TYPE_DOUBLE, $locale);
+            $number = static::parse($number, NumberFormatter::TYPE_DOUBLE, $locale);
         }
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::DECIMAL);
@@ -78,7 +78,7 @@ class Number
      */
     public static function parseInt(string $string, ?string $locale = null): int|false
     {
-        return self::parse($string, NumberFormatter::TYPE_INT32, $locale);
+        return static::parse($string, NumberFormatter::TYPE_INT32, $locale);
     }
 
     /**
@@ -90,7 +90,7 @@ class Number
      */
     public static function parseFloat(string $string, ?string $locale = null): float|false
     {
-        return self::parse($string, NumberFormatter::TYPE_DOUBLE, $locale);
+        return static::parse($string, NumberFormatter::TYPE_DOUBLE, $locale);
     }
 
     /**
@@ -107,7 +107,7 @@ class Number
         static::ensureIntlExtensionIsInstalled();
 
         if (is_string($number)) {
-            $number = self::parse($number, NumberFormatter::TYPE_DOUBLE, $locale);
+            $number = static::parse($number, NumberFormatter::TYPE_DOUBLE, $locale);
         }
 
         if (! is_null($after) && $number <= $after) {
@@ -135,7 +135,7 @@ class Number
         static::ensureIntlExtensionIsInstalled();
 
         if (is_string($number)) {
-            $number = self::parse($number, NumberFormatter::TYPE_DOUBLE, $locale);
+            $number = static::parse($number, NumberFormatter::TYPE_DOUBLE, $locale);
         }
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::ORDINAL);
@@ -155,7 +155,7 @@ class Number
         static::ensureIntlExtensionIsInstalled();
 
         if (is_string($number)) {
-            $number = self::parse($number, NumberFormatter::TYPE_DOUBLE, $locale);
+            $number = static::parse($number, NumberFormatter::TYPE_DOUBLE, $locale);
         }
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SPELLOUT);
@@ -179,7 +179,7 @@ class Number
         static::ensureIntlExtensionIsInstalled();
 
         if (is_string($number)) {
-            $number = self::parse($number, NumberFormatter::TYPE_DOUBLE, $locale);
+            $number = static::parse($number, NumberFormatter::TYPE_DOUBLE, $locale);
         }
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::PERCENT);
@@ -207,7 +207,7 @@ class Number
         static::ensureIntlExtensionIsInstalled();
 
         if (is_string($number)) {
-            $number = self::parse($number, NumberFormatter::TYPE_DOUBLE, $locale);
+            $number = static::parse($number, NumberFormatter::TYPE_DOUBLE, $locale);
         }
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::CURRENCY);
@@ -230,7 +230,7 @@ class Number
     public static function fileSize(int|float|string $bytes, int $precision = 0, ?int $maxPrecision = null)
     {
         if (is_string($bytes)) {
-            $bytes = self::parse($bytes, NumberFormatter::TYPE_DOUBLE);
+            $bytes = static::parse($bytes, NumberFormatter::TYPE_DOUBLE);
         }
 
         $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
@@ -269,7 +269,7 @@ class Number
     public static function forHumans(int|float|string $number, int $precision = 0, ?int $maxPrecision = null, bool $abbreviate = false)
     {
         if (is_string($number)) {
-            $number = self::parse($number, NumberFormatter::TYPE_DOUBLE);
+            $number = static::parse($number, NumberFormatter::TYPE_DOUBLE);
         }
 
         return static::summarize($number, $precision, $maxPrecision, $abbreviate ? [
@@ -335,7 +335,7 @@ class Number
     public static function clamp(int|float|string $number, int|float $min, int|float $max)
     {
         if (is_string($number)) {
-            $number = self::parse($number, NumberFormatter::TYPE_DOUBLE);
+            $number = static::parse($number, NumberFormatter::TYPE_DOUBLE);
         }
 
         return min(max($number, $min), $max);
@@ -353,7 +353,7 @@ class Number
     public static function pairs(int|float|string $to, int|float $by, int|float $start = 0, int|float $offset = 1)
     {
         if (is_string($to)) {
-            $to = self::parse($to, NumberFormatter::TYPE_DOUBLE);
+            $to = static::parse($to, NumberFormatter::TYPE_DOUBLE);
         }
 
         $output = [];
@@ -380,7 +380,7 @@ class Number
     public static function trim(int|float|string $number)
     {
         if (is_string($number)) {
-            $number = self::parse($number, NumberFormatter::TYPE_DOUBLE);
+            $number = static::parse($number, NumberFormatter::TYPE_DOUBLE);
         }
 
         return json_decode(json_encode($number));
