@@ -27,15 +27,19 @@ class Number
     /**
      * Format the given number according to the current locale.
      *
-     * @param  int|float  $number
+     * @param  int|float|string  $number
      * @param  int|null  $precision
      * @param  int|null  $maxPrecision
      * @param  string|null  $locale
      * @return string|false
      */
-    public static function format(int|float $number, ?int $precision = null, ?int $maxPrecision = null, ?string $locale = null)
+    public static function format(int|float|string $number, ?int $precision = null, ?int $maxPrecision = null, ?string $locale = null)
     {
         static::ensureIntlExtensionIsInstalled();
+
+        if (is_string($number)) {
+            $number = self::parse($number, NumberFormatter::TYPE_DOUBLE, $locale);
+        }
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::DECIMAL);
 
@@ -92,15 +96,19 @@ class Number
     /**
      * Spell out the given number in the given locale.
      *
-     * @param  int|float  $number
+     * @param  int|float|string  $number
      * @param  string|null  $locale
      * @param  int|null  $after
      * @param  int|null  $until
      * @return string
      */
-    public static function spell(int|float $number, ?string $locale = null, ?int $after = null, ?int $until = null)
+    public static function spell(int|float|string $number, ?string $locale = null, ?int $after = null, ?int $until = null)
     {
         static::ensureIntlExtensionIsInstalled();
+
+        if (is_string($number)) {
+            $number = self::parse($number, NumberFormatter::TYPE_DOUBLE, $locale);
+        }
 
         if (! is_null($after) && $number <= $after) {
             return static::format($number, locale: $locale);
@@ -118,13 +126,17 @@ class Number
     /**
      * Convert the given number to ordinal form.
      *
-     * @param  int|float  $number
+     * @param  int|float|string  $number
      * @param  string|null  $locale
      * @return string
      */
-    public static function ordinal(int|float $number, ?string $locale = null)
+    public static function ordinal(int|float|string $number, ?string $locale = null)
     {
         static::ensureIntlExtensionIsInstalled();
+
+        if (is_string($number)) {
+            $number = self::parse($number, NumberFormatter::TYPE_DOUBLE, $locale);
+        }
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::ORDINAL);
 
@@ -134,13 +146,17 @@ class Number
     /**
      * Spell out the given number in the given locale in ordinal form.
      *
-     * @param  int|float  $number
+     * @param  int|float|string  $number
      * @param  string|null  $locale
      * @return string
      */
-    public static function spellOrdinal(int|float $number, ?string $locale = null)
+    public static function spellOrdinal(int|float|string $number, ?string $locale = null)
     {
         static::ensureIntlExtensionIsInstalled();
+
+        if (is_string($number)) {
+            $number = self::parse($number, NumberFormatter::TYPE_DOUBLE, $locale);
+        }
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SPELLOUT);
 
@@ -152,15 +168,19 @@ class Number
     /**
      * Convert the given number to its percentage equivalent.
      *
-     * @param  int|float  $number
+     * @param  int|float|string  $number
      * @param  int  $precision
      * @param  int|null  $maxPrecision
      * @param  string|null  $locale
      * @return string|false
      */
-    public static function percentage(int|float $number, int $precision = 0, ?int $maxPrecision = null, ?string $locale = null)
+    public static function percentage(int|float|string $number, int $precision = 0, ?int $maxPrecision = null, ?string $locale = null)
     {
         static::ensureIntlExtensionIsInstalled();
+
+        if (is_string($number)) {
+            $number = self::parse($number, NumberFormatter::TYPE_DOUBLE, $locale);
+        }
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::PERCENT);
 
@@ -176,15 +196,19 @@ class Number
     /**
      * Convert the given number to its currency equivalent.
      *
-     * @param  int|float  $number
+     * @param  int|float|string  $number
      * @param  string  $in
      * @param  string|null  $locale
      * @param  int|null  $precision
      * @return string|false
      */
-    public static function currency(int|float $number, string $in = '', ?string $locale = null, ?int $precision = null)
+    public static function currency(int|float|string $number, string $in = '', ?string $locale = null, ?int $precision = null)
     {
         static::ensureIntlExtensionIsInstalled();
+
+        if (is_string($number)) {
+            $number = self::parse($number, NumberFormatter::TYPE_DOUBLE, $locale);
+        }
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::CURRENCY);
 
@@ -198,13 +222,17 @@ class Number
     /**
      * Convert the given number to its file size equivalent.
      *
-     * @param  int|float  $bytes
+     * @param  int|float|string  $bytes
      * @param  int  $precision
      * @param  int|null  $maxPrecision
      * @return string
      */
-    public static function fileSize(int|float $bytes, int $precision = 0, ?int $maxPrecision = null)
+    public static function fileSize(int|float|string $bytes, int $precision = 0, ?int $maxPrecision = null)
     {
+        if (is_string($bytes)) {
+            $bytes = self::parse($bytes, NumberFormatter::TYPE_DOUBLE);
+        }
+
         $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
         $unitCount = count($units);
@@ -219,12 +247,12 @@ class Number
     /**
      * Convert the number to its human-readable equivalent.
      *
-     * @param  int|float  $number
+     * @param  int|float|string  $number
      * @param  int  $precision
      * @param  int|null  $maxPrecision
      * @return string|false
      */
-    public static function abbreviate(int|float $number, int $precision = 0, ?int $maxPrecision = null)
+    public static function abbreviate(int|float|string $number, int $precision = 0, ?int $maxPrecision = null)
     {
         return static::forHumans($number, $precision, $maxPrecision, abbreviate: true);
     }
@@ -232,14 +260,18 @@ class Number
     /**
      * Convert the number to its human-readable equivalent.
      *
-     * @param  int|float  $number
+     * @param  int|float|string  $number
      * @param  int  $precision
      * @param  int|null  $maxPrecision
      * @param  bool  $abbreviate
      * @return string|false
      */
-    public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null, bool $abbreviate = false)
+    public static function forHumans(int|float|string $number, int $precision = 0, ?int $maxPrecision = null, bool $abbreviate = false)
     {
+        if (is_string($number)) {
+            $number = self::parse($number, NumberFormatter::TYPE_DOUBLE);
+        }
+
         return static::summarize($number, $precision, $maxPrecision, $abbreviate ? [
             3 => 'K',
             6 => 'M',
@@ -295,27 +327,35 @@ class Number
     /**
      * Clamp the given number between the given minimum and maximum.
      *
-     * @param  int|float  $number
+     * @param  int|float|string  $number
      * @param  int|float  $min
      * @param  int|float  $max
      * @return int|float
      */
-    public static function clamp(int|float $number, int|float $min, int|float $max)
+    public static function clamp(int|float|string $number, int|float $min, int|float $max)
     {
+        if (is_string($number)) {
+            $number = self::parse($number, NumberFormatter::TYPE_DOUBLE);
+        }
+
         return min(max($number, $min), $max);
     }
 
     /**
      * Split the given number into pairs of min/max values.
      *
-     * @param  int|float  $to
+     * @param  int|float|string  $to
      * @param  int|float  $by
      * @param  int|float  $start
      * @param  int|float  $offset
      * @return list<array{int|float, int|float}>
      */
-    public static function pairs(int|float $to, int|float $by, int|float $start = 0, int|float $offset = 1)
+    public static function pairs(int|float|string $to, int|float $by, int|float $start = 0, int|float $offset = 1)
     {
+        if (is_string($to)) {
+            $to = self::parse($to, NumberFormatter::TYPE_DOUBLE);
+        }
+
         $output = [];
 
         for ($lower = $start; $lower < $to; $lower += $by) {
@@ -334,11 +374,15 @@ class Number
     /**
      * Remove any trailing zero digits after the decimal point of the given number.
      *
-     * @param  int|float  $number
+     * @param  int|float|string  $number
      * @return int|float
      */
-    public static function trim(int|float $number)
+    public static function trim(int|float|string $number)
     {
+        if (is_string($number)) {
+            $number = self::parse($number, NumberFormatter::TYPE_DOUBLE);
+        }
+
         return json_decode(json_encode($number));
     }
 

@@ -79,6 +79,13 @@ class SupportNumberTest extends TestCase
     }
 
     #[RequiresPhpExtension('intl')]
+    public function testSpelloutWithString()
+    {
+        $this->assertSame('ten', Number::spell('10'));
+        $this->assertSame('one thousand two hundred thirty-four', Number::spell('1,234'));
+    }
+
+    #[RequiresPhpExtension('intl')]
     public function testSpelloutWithLocale()
     {
         $this->assertSame('trois', Number::spell(3, 'fr'));
@@ -107,11 +114,27 @@ class SupportNumberTest extends TestCase
     }
 
     #[RequiresPhpExtension('intl')]
+    public function testOrdinalWithString()
+    {
+        $this->assertSame('1st', Number::ordinal('1'));
+        $this->assertSame('2nd', Number::ordinal('2'));
+        $this->assertSame('1,234th', Number::ordinal('1,234'));
+    }
+
+    #[RequiresPhpExtension('intl')]
     public function testSpellOrdinal()
     {
         $this->assertSame('first', Number::spellOrdinal(1));
         $this->assertSame('second', Number::spellOrdinal(2));
         $this->assertSame('third', Number::spellOrdinal(3));
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testSpellOrdinalWithString()
+    {
+        $this->assertSame('first', Number::spellOrdinal('1'));
+        $this->assertSame('second', Number::spellOrdinal('2'));
+        $this->assertSame('one thousand two hundred thirty-fourth', Number::spellOrdinal('1,234'));
     }
 
     #[RequiresPhpExtension('intl')]
@@ -135,6 +158,14 @@ class SupportNumberTest extends TestCase
         $this->assertSame('0.00%', Number::percentage(0, precision: 2));
         $this->assertSame('0.12%', Number::percentage(0.12345, precision: 2));
         $this->assertSame('0.1235%', Number::percentage(0.12345, precision: 4));
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testToPercentWithString()
+    {
+        $this->assertSame('10%', Number::percentage('10'));
+        $this->assertSame('1,000%', Number::percentage('1,000'));
+        $this->assertSame('1,234.56%', Number::percentage('1,234.56', precision: 2));
     }
 
     #[RequiresPhpExtension('intl')]
@@ -168,7 +199,14 @@ class SupportNumberTest extends TestCase
         $this->assertSame('123.456.789,12 €', Number::currency(123456789.12345, 'EUR', 'de'));
         $this->assertSame('1 234,56 $US', Number::currency(1234.56, 'USD', 'fr'));
     }
-
+    #[RequiresPhpExtension('intl')]
+    public function testToCurrencyWithString()
+    {
+        $this->assertSame('$1.00', Number::currency('1'));
+        $this->assertSame('$1,234.00', Number::currency('1,234'));
+        $this->assertSame('$1,234.56', Number::currency('1,234.56'));
+        $this->assertSame('€1,234.56', Number::currency('1,234.56', 'EUR'));
+    }
     public function testBytesToHuman()
     {
         $this->assertSame('0 B', Number::fileSize(0));
@@ -188,6 +226,14 @@ class SupportNumberTest extends TestCase
         $this->assertSame('1,024 YB', Number::fileSize(1024 ** 9));
     }
 
+    #[RequiresPhpExtension('intl')]
+    public function testBytesToHumanWithString()
+    {
+        $this->assertSame('1 KB', Number::fileSize('1,024'));
+        $this->assertSame('2 KB', Number::fileSize('2,048'));
+        $this->assertSame('1.23 KB', Number::fileSize('1,264', precision: 2));
+    }
+
     public function testClamp()
     {
         $this->assertSame(2, Number::clamp(1, 2, 3));
@@ -195,6 +241,14 @@ class SupportNumberTest extends TestCase
         $this->assertSame(5, Number::clamp(5, 1, 10));
         $this->assertSame(4.5, Number::clamp(4.5, 1, 10));
         $this->assertSame(1, Number::clamp(-10, 1, 5));
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testClampWithString()
+    {
+        $this->assertSame(5.0, Number::clamp('5', 1, 10));
+        $this->assertSame(2, Number::clamp('1', 2, 3));
+        $this->assertSame(1000.0, Number::clamp('1,000', 1, 2000));
     }
 
     public function testToHuman()
@@ -253,6 +307,14 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1 thousand quadrillion', Number::forHumans(-1000000000000000000));
     }
 
+    #[RequiresPhpExtension('intl')]
+    public function testToHumanWithString()
+    {
+        $this->assertSame('1 thousand', Number::forHumans('1,000'));
+        $this->assertSame('1.23 thousand', Number::forHumans('1,234', precision: 2));
+        $this->assertSame('1 million', Number::forHumans('1,000,000'));
+    }
+
     public function testSummarize()
     {
         $this->assertSame('1', Number::abbreviate(1));
@@ -309,6 +371,14 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1KQ', Number::abbreviate(-1000000000000000000));
     }
 
+    #[RequiresPhpExtension('intl')]
+    public function testSummarizeWithString()
+    {
+        $this->assertSame('1K', Number::abbreviate('1,000'));
+        $this->assertSame('1.23K', Number::abbreviate('1,234', precision: 2));
+        $this->assertSame('1M', Number::abbreviate('1,000,000'));
+    }
+
     public function testPairs()
     {
         $this->assertSame([[0, 10], [10, 20], [20, 25]], Number::pairs(25, 10, 0, 0));
@@ -325,6 +395,13 @@ class SupportNumberTest extends TestCase
         $this->assertSame([[0.5, 2.5], [3.0, 5.0], [5.5, 7.5], [8.0, 10.0]], Number::pairs(10, 2.5, 0.5, 0.5));
     }
 
+    #[RequiresPhpExtension('intl')]
+    public function testPairsWithString()
+    {
+        $this->assertSame([[0, 9], [10, 19], [20, 25.0]], Number::pairs('25', 10, 0, 1));
+        $this->assertSame([[0, 999], [1000, 1999], [2000, 2500.0]], Number::pairs('2,500', 1000, 0, 1));
+    }
+
     public function testTrim()
     {
         $this->assertSame(12, Number::trim(12));
@@ -334,6 +411,14 @@ class SupportNumberTest extends TestCase
         $this->assertSame(12.3, Number::trim(12.30));
         $this->assertSame(12.3456789, Number::trim(12.3456789));
         $this->assertSame(12.3456789, Number::trim(12.34567890000));
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testTrimWithString()
+    {
+        $this->assertSame(12, Number::trim('12'));
+        $this->assertSame(1234, Number::trim('1,234'));
+        $this->assertSame(1234.56, Number::trim('1,234.56'));
     }
 
     #[RequiresPhpExtension('intl')]
