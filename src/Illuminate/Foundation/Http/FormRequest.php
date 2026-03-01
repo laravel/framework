@@ -8,6 +8,7 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\Attributes\ErrorBag;
 use Illuminate\Foundation\Http\Attributes\RedirectTo;
 use Illuminate\Foundation\Http\Attributes\RedirectToRoute;
 use Illuminate\Foundation\Http\Attributes\StopOnFirstFailure;
@@ -136,6 +137,12 @@ class FormRequest extends Request implements ValidatesWhenResolved
 
         if (count($redirectToRoute) > 0) {
             $this->redirectRoute = $redirectToRoute[0]->newInstance()->route;
+        }
+
+        $errorBag = $reflection->getAttributes(ErrorBag::class);
+
+        if (count($errorBag) > 0) {
+            $this->errorBag = $errorBag[0]->newInstance()->name;
         }
     }
 
