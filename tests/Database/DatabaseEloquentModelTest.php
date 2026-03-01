@@ -3435,6 +3435,35 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($user->name);
     }
 
+
+    public function testGetChangesWithKey()
+    {
+        $model = new EloquentModelStub;
+        $model->setRawAttributes(['name' => 'John', 'email' => 'john@example.com']);
+        $model->syncOriginal();
+
+        $model->name = 'Jack';
+        $model->email = 'jack@example.com';
+        $model->syncChanges();
+
+        $this->assertSame('Jack', $model->getChanges('name'));
+        $this->assertNull($model->getChanges('missing_key'));
+    }
+
+    public function testGetPreviousWithKey()
+    {
+        $model = new EloquentModelStub;
+        $model->setRawAttributes(['name' => 'John', 'email' => 'john@example.com']);
+        $model->syncOriginal();
+
+        $model->name = 'Jack';
+        $model->email = 'jack@example.com';
+        $model->syncChanges();
+
+        $this->assertSame('John', $model->getPrevious('name'));
+        $this->assertNull($model->getPrevious('missing_key'));
+    }
+
     public function testDiscardChanges()
     {
         $user = new EloquentModelStub([

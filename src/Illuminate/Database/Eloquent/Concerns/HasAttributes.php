@@ -2300,21 +2300,32 @@ trait HasAttributes
     /**
      * Get the attributes that were changed when the model was last saved.
      *
-     * @return array<string, mixed>
+     * @param  string|null  $key
+     * @return array<string, mixed>|mixed
      */
-    public function getChanges()
+    public function getChanges($key = null)
     {
-        return $this->changes;
+        if (is_null($key)) {
+            return $this->changes;
+        }
+
+        return $this->changes[$key] ?? null;
     }
+
 
     /**
      * Get the attributes that were previously original before the model was last saved.
      *
-     * @return array<string, mixed>
+     * @param  string|null  $key
+     * @return array<string, mixed>|mixed
      */
-    public function getPrevious()
+    public function getPrevious($key = null)
     {
-        return $this->previous;
+        if (is_null($key)) {
+            return $this->previous;
+        }
+
+        return $this->previous[$key] ?? null;
     }
 
     /**
