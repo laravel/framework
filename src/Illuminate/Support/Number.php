@@ -276,13 +276,12 @@ class Number
             ];
         }
 
-        switch (true) {
-            case (float) $number === 0.0:
-                return $precision > 0 ? static::format(0, $precision, $maxPrecision) : '0';
-            case $number < 0:
-                return sprintf('-%s', static::summarize(abs($number), $precision, $maxPrecision, $units));
-            case $number >= 1e15:
-                return sprintf('%s'.end($units), static::summarize($number / 1e15, $precision, $maxPrecision, $units));
+        if ((float) $number === 0.0) {
+            return $precision > 0 ? static::format(0, $precision, $maxPrecision) : '0';
+        } elseif ($number < 0) {
+            return sprintf('-%s', static::summarize(abs($number), $precision, $maxPrecision, $units));
+        } elseif ($number >= 1e15) {
+            return sprintf('%s'.end($units), static::summarize($number / 1e15, $precision, $maxPrecision, $units));
         }
 
         $numberExponent = floor(log10($number));
