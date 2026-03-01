@@ -196,8 +196,8 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
         if ($events->count()) {
             foreach ($events as $event) {
                 $this->components->twoColumnDetail(
-                    sprintf('%s', $event['event']),
-                    sprintf('%s', $event['class']),
+                    $event['event'],
+                    $event['class'],
                 );
             }
         }
@@ -209,7 +209,7 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
         if ($observers->count()) {
             foreach ($observers as $observer) {
                 $this->components->twoColumnDetail(
-                    sprintf('%s', $observer['event']),
+                    $observer['event'],
                     implode(', ', $observer['observer'])
                 );
             }
