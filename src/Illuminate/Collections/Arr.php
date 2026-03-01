@@ -76,6 +76,11 @@ class Arr
     /**
      * Get an array item from an array using "dot" notation.
      *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int|null  $key
+     * @param  array|null  $default
+     * @return array
+     *
      * @throws \InvalidArgumentException
      */
     public static function array(ArrayAccess|array $array, string|int|null $key, ?array $default = null): array
@@ -93,6 +98,11 @@ class Arr
 
     /**
      * Get a boolean item from an array using "dot" notation.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int|null  $key
+     * @param  bool|null  $default
+     * @return bool
      *
      * @throws \InvalidArgumentException
      */
@@ -383,6 +393,11 @@ class Arr
     /**
      * Get a float item from an array using "dot" notation.
      *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int|null  $key
+     * @param  float|null  $default
+     * @return float
+     *
      * @throws \InvalidArgumentException
      */
     public static function float(ArrayAccess|array $array, string|int|null $key, ?float $default = null): float
@@ -621,6 +636,11 @@ class Arr
 
     /**
      * Get an integer item from an array using "dot" notation.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int|null  $key
+     * @param  int|null  $default
+     * @return int
      *
      * @throws \InvalidArgumentException
      */
@@ -1162,6 +1182,11 @@ class Arr
 
     /**
      * Get a string item from an array using "dot" notation.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int|null  $key
+     * @param  string|null  $default
+     * @return string
      *
      * @throws \InvalidArgumentException
      */
