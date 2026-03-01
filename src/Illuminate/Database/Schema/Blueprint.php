@@ -1850,13 +1850,9 @@ class Blueprint
      */
     public function removeColumn($name)
     {
-        $this->columns = array_values(array_filter($this->columns, function ($c) use ($name) {
-            return $c['name'] != $name;
-        }));
+        $this->columns = array_values(array_filter($this->columns, fn ($c) => $c['name'] !== $name));
 
-        $this->commands = array_values(array_filter($this->commands, function ($c) use ($name) {
-            return ! $c instanceof ColumnDefinition || $c['name'] != $name;
-        }));
+        $this->commands = array_values(array_filter($this->commands, fn ($c) => ! $c instanceof ColumnDefinition || $c['name'] !== $name));
 
         return $this;
     }
@@ -1956,9 +1952,7 @@ class Blueprint
      */
     public function getAddedColumns()
     {
-        return array_filter($this->columns, function ($column) {
-            return ! $column->change;
-        });
+        return array_filter($this->columns, fn ($column) => ! $column->change);
     }
 
     /**
@@ -1970,9 +1964,7 @@ class Blueprint
      */
     public function getChangedColumns()
     {
-        return array_filter($this->columns, function ($column) {
-            return (bool) $column->change;
-        });
+        return array_filter($this->columns, fn ($column) => (bool) $column->change);
     }
 
     /**
