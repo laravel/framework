@@ -2,17 +2,17 @@
     "name": "illuminate/testing",
     "description": "The Illuminate Testing package.",
     "license": "MIT",
-    "homepage": "https://laravel.com",
-    "support": {
-        "issues": "https://github.com/laravel/framework/issues",
-        "source": "https://github.com/laravel/framework"
-    },
     "authors": [
         {
             "name": "Taylor Otwell",
             "email": "taylor@laravel.com"
         }
     ],
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "require": {
         "php": "^8.3",
         "ext-mbstring": "*",
@@ -21,26 +21,26 @@
         "illuminate/macroable": "^13.0",
         "illuminate/support": "^13.0"
     },
+    "suggest": {
+        "brianium/paratest": "Required to run tests in parallel (^7.0 || ^8.0).",
+        "illuminate/console": "Required to assert console commands (^13.0).",
+        "illuminate/database": "Required to assert databases (^13.0).",
+        "illuminate/http": "Required to assert responses (^13.0).",
+        "mockery/mockery": "Required to use mocking (^1.6).",
+        "phpunit/phpunit": "Required to use assertions and run tests (^11.5.50 || ^12.5.8)."
+    },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Illuminate\\Testing\\": ""
         }
     },
+    "config": {
+        "sort-packages": true
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "13.0.x-dev"
         }
-    },
-    "suggest": {
-        "brianium/paratest": "Required to run tests in parallel (^7.0|^8.0).",
-        "illuminate/console": "Required to assert console commands (^13.0).",
-        "illuminate/database": "Required to assert databases (^13.0).",
-        "illuminate/http": "Required to assert responses (^13.0).",
-        "mockery/mockery": "Required to use mocking (^1.6).",
-        "phpunit/phpunit": "Required to use assertions and run tests (^11.5.50|^12.5.8)."
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "minimum-stability": "dev"
+    }
 }

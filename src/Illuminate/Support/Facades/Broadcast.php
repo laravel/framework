@@ -14,7 +14,7 @@ use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactoryContract;
  * @method static \Illuminate\Broadcasting\AnonymousEvent presence(string $channel)
  * @method static \Illuminate\Broadcasting\PendingBroadcast event(mixed $event = null)
  * @method static void queue(mixed $event)
- * @method static mixed connection(string|null $driver = null)
+ * @method static mixed connection(string|null $name = null)
  * @method static mixed driver(string|null $name = null)
  * @method static \Pusher\Pusher pusher(array $config)
  * @method static \Ably\AblyRest ably(array $config)

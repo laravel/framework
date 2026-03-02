@@ -167,6 +167,8 @@ class MemoizedStore implements LockProvider, Store
      * @param  int  $seconds
      * @param  string|null  $owner
      * @return \Illuminate\Contracts\Cache\Lock
+     *
+     * @throws \BadMethodCallException
      */
     public function lock($name, $seconds = 0, $owner = null)
     {
@@ -183,6 +185,8 @@ class MemoizedStore implements LockProvider, Store
      * @param  string  $name
      * @param  string  $owner
      * @return \Illuminate\Contracts\Cache\Lock
+     *
+     * @throws \BadMethodCallException
      */
     public function restoreLock($name, $owner)
     {

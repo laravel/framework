@@ -167,8 +167,12 @@ class PostgresGrammar extends Grammar
             $language = 'english';
         }
 
+        $isVector = $where['options']['vector'] ?? false;
+
         $columns = (new Collection($where['columns']))
-            ->map(fn ($column) => "to_tsvector('{$language}', {$this->wrap($column)})")
+            ->map(fn ($column) => $isVector
+                ? $this->wrap($column)
+                : "to_tsvector('{$language}', {$this->wrap($column)})")
             ->implode(' || ');
 
         $mode = 'plainto_tsquery';
@@ -367,6 +371,22 @@ class PostgresGrammar extends Grammar
     public function compileInsertOrIgnore(Builder $query, array $values)
     {
         return $this->compileInsert($query, $values).' on conflict do nothing';
+    }
+
+    /**
+     * Compile an insert or ignore statement with a returning clause into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @param  array  $uniqueBy
+     * @param  array  $returning
+     * @return string
+     */
+    public function compileInsertOrIgnoreReturning(Builder $query, array $values, array $uniqueBy, array $returning)
+    {
+        return $this->compileInsert($query, $values)
+            .' on conflict ('.$this->columnize($uniqueBy).') do nothing'
+            .' returning '.$this->columnize($returning);
     }
 
     /**

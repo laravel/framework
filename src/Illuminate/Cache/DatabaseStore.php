@@ -3,6 +3,7 @@
 namespace Illuminate\Cache;
 
 use Closure;
+use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\ConnectionInterface;
@@ -14,8 +15,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
+use RuntimeException;
 
-class DatabaseStore implements LockProvider, Store
+class DatabaseStore implements CanFlushLocks, LockProvider, Store
 {
     use InteractsWithTime;
 
@@ -69,6 +71,13 @@ class DatabaseStore implements LockProvider, Store
     protected $defaultLockTimeoutInSeconds;
 
     /**
+     * The classes that should be allowed during unserialization.
+     *
+     * @var array|bool|null
+     */
+    protected $serializableClasses;
+
+    /**
      * Create a new database store.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
@@ -77,6 +86,7 @@ class DatabaseStore implements LockProvider, Store
      * @param  string  $lockTable
      * @param  array  $lockLottery
      * @param  int  $defaultLockTimeoutInSeconds
+     * @param  array|bool|null  $serializableClasses
      */
     public function __construct(
         ConnectionInterface $connection,
@@ -85,6 +95,7 @@ class DatabaseStore implements LockProvider, Store
         $lockTable = 'cache_locks',
         $lockLottery = [2, 100],
         $defaultLockTimeoutInSeconds = 86400,
+        $serializableClasses = null,
     ) {
         $this->table = $table;
         $this->prefix = $prefix;
@@ -92,6 +103,7 @@ class DatabaseStore implements LockProvider, Store
         $this->lockTable = $lockTable;
         $this->lockLottery = $lockLottery;
         $this->defaultLockTimeoutInSeconds = $defaultLockTimeoutInSeconds;
+        $this->serializableClasses = $serializableClasses;
     }
 
     /**
@@ -441,6 +453,24 @@ class DatabaseStore implements LockProvider, Store
     }
 
     /**
+     * Remove all locks from the store.
+     *
+     * @return bool
+     *
+     * @throws \RuntimeException
+     */
+    public function flushLocks(): bool
+    {
+        if (! $this->hasSeparateLockStore()) {
+            throw new RuntimeException('Flushing locks is only supported when the lock store is separate from the cache store.');
+        }
+
+        $this->lockTable()->delete();
+
+        return true;
+    }
+
+    /**
      * Get a query builder for the cache table.
      *
      * @return \Illuminate\Database\Query\Builder
@@ -448,6 +478,16 @@ class DatabaseStore implements LockProvider, Store
     protected function table()
     {
         return $this->connection->table($this->table);
+    }
+
+    /**
+     * Get a query builder for the cache locks table.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    protected function lockTable()
+    {
+        return $this->lockConnection->table($this->lockTable);
     }
 
     /**
@@ -550,6 +590,20 @@ class DatabaseStore implements LockProvider, Store
             $value = base64_decode($value);
         }
 
+        if ($this->serializableClasses !== null) {
+            return unserialize($value, ['allowed_classes' => $this->serializableClasses]);
+        }
+
         return unserialize($value);
+    }
+
+    /**
+     * Determine if the lock store is separate from the cache store.
+     *
+     * @return bool
+     */
+    public function hasSeparateLockStore(): bool
+    {
+        return $this->lockTable !== $this->table;
     }
 }

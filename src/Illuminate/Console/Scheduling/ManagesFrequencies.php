@@ -147,6 +147,8 @@ trait ManagesFrequencies
      *
      * @param  int<0, 59>  $seconds
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     protected function repeatEvery($seconds)
     {

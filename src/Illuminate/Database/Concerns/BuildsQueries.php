@@ -315,6 +315,7 @@ trait BuildsQueries
      * @return \Illuminate\Support\LazyCollection
      *
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     protected function orderedLazyById($chunkSize = 1000, $column = null, $alias = null, $descending = false)
     {

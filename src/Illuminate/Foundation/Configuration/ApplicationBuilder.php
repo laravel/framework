@@ -194,6 +194,8 @@ class ApplicationBuilder
      * @param  string  $apiPrefix
      * @param  callable|null  $then
      * @return \Closure
+     *
+     * @throws \Throwable
      */
     protected function buildRoutingCallback(array|string|null $web,
         array|string|null $api,

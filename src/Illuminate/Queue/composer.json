@@ -2,17 +2,17 @@
     "name": "illuminate/queue",
     "description": "The Illuminate Queue package.",
     "license": "MIT",
-    "homepage": "https://laravel.com",
-    "support": {
-        "issues": "https://github.com/laravel/framework/issues",
-        "source": "https://github.com/laravel/framework"
-    },
     "authors": [
         {
             "name": "Taylor Otwell",
             "email": "taylor@laravel.com"
         }
     ],
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "require": {
         "php": "^8.3",
         "illuminate/collections": "^13.0",
@@ -23,32 +23,32 @@
         "illuminate/filesystem": "^13.0",
         "illuminate/pipeline": "^13.0",
         "illuminate/support": "^13.0",
-        "laravel/serializable-closure": "^1.3|^2.0",
+        "laravel/serializable-closure": "^1.3 || ^2.0",
         "ramsey/uuid": "^4.7",
-        "symfony/process": "^7.4.5|^8.0.5"
+        "symfony/process": "^7.4.5 || ^8.0.5"
     },
+    "suggest": {
+        "ext-filter": "Required to use the SQS queue worker.",
+        "ext-mbstring": "Required to use the database failed job providers.",
+        "ext-pcntl": "Required to use all features of the queue worker.",
+        "ext-pdo": "Required to use the database queue worker.",
+        "ext-posix": "Required to use all features of the queue worker.",
+        "aws/aws-sdk-php": "Required to use the SQS queue driver and DynamoDb failed job storage (^3.322.9).",
+        "illuminate/redis": "Required to use the Redis queue driver (^13.0).",
+        "pda/pheanstalk": "Required to use the Beanstalk queue driver (^5.0.6 || ^7.0.0)."
+    },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Illuminate\\Queue\\": ""
         }
     },
+    "config": {
+        "sort-packages": true
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "13.0.x-dev"
         }
-    },
-    "suggest": {
-        "ext-pdo": "Required to use the database queue worker.",
-        "ext-filter": "Required to use the SQS queue worker.",
-        "ext-mbstring": "Required to use the database failed job providers.",
-        "ext-pcntl": "Required to use all features of the queue worker.",
-        "ext-posix": "Required to use all features of the queue worker.",
-        "aws/aws-sdk-php": "Required to use the SQS queue driver and DynamoDb failed job storage (^3.322.9).",
-        "illuminate/redis": "Required to use the Redis queue driver (^13.0).",
-        "pda/pheanstalk": "Required to use the Beanstalk queue driver (^5.0.6|^7.0.0)."
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "minimum-stability": "dev"
+    }
 }

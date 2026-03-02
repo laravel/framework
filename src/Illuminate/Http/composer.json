@@ -2,17 +2,17 @@
     "name": "illuminate/http",
     "description": "The Illuminate Http package.",
     "license": "MIT",
-    "homepage": "https://laravel.com",
-    "support": {
-        "issues": "https://github.com/laravel/framework/issues",
-        "source": "https://github.com/laravel/framework"
-    },
     "authors": [
         {
             "name": "Taylor Otwell",
             "email": "taylor@laravel.com"
         }
     ],
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "require": {
         "php": "^8.3",
         "ext-filter": "*",
@@ -23,26 +23,26 @@
         "illuminate/macroable": "^13.0",
         "illuminate/session": "^13.0",
         "illuminate/support": "^13.0",
-        "symfony/http-foundation": "^7.4.0|^8.0.0",
-        "symfony/http-kernel": "^7.4.0|^8.0.0",
-        "symfony/polyfill-php85": "^1.33",
-        "symfony/mime": "^7.4.0|^8.0.0"
+        "symfony/http-foundation": "^7.4.0 || ^8.0.0",
+        "symfony/http-kernel": "^7.4.0 || ^8.0.0",
+        "symfony/mime": "^7.4.0 || ^8.0.0",
+        "symfony/polyfill-php85": "^1.33"
     },
+    "suggest": {
+        "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image()."
+    },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Illuminate\\Http\\": ""
         }
     },
-    "suggest": {
-        "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image()."
+    "config": {
+        "sort-packages": true
     },
     "extra": {
         "branch-alias": {
             "dev-master": "13.0.x-dev"
         }
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "minimum-stability": "dev"
+    }
 }

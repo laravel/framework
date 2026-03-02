@@ -141,6 +141,19 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testLocksMayBeFlushedFromCache()
+    {
+        $store = $this->getStore();
+        $connection = m::mock(\Illuminate\Database\ConnectionInterface::class);
+        $store->setLockConnection($connection);
+        $table = m::mock(stdClass::class);
+        $store->getLockConnection()->shouldReceive('table')->once()->with('cache_locks')->andReturn($table);
+        $table->shouldReceive('delete')->once()->andReturn(2);
+
+        $result = $store->flushLocks();
+        $this->assertTrue($result);
+    }
+
     public function testIncrementReturnsCorrectValues()
     {
         $store = $this->getStore();

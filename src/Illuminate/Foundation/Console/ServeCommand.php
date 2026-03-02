@@ -408,6 +408,8 @@ class ServeCommand extends Command
      *
      * @param  string  $line
      * @return int
+     *
+     * @throws \InvalidArgumentException
      */
     public static function getRequestPortFromLine($line)
     {

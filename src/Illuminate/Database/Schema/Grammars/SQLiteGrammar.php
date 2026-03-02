@@ -598,6 +598,8 @@ class SQLiteGrammar extends Grammar
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
      * @return array
+     *
+     * @throws \RuntimeException
      */
     public function compileDropForeign(Blueprint $blueprint, Fluent $command)
     {

@@ -29,6 +29,8 @@ trait TransformsToResource
      * Guess the resource class for the model.
      *
      * @return \Illuminate\Http\Resources\Json\JsonResource
+     *
+     * @throws \LogicException
      */
     protected function guessResource(): JsonResource
     {

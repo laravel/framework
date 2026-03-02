@@ -439,6 +439,8 @@ class BusFake implements Fake, QueueingDispatcher
      * @param  array  $expectedChain
      * @param  callable|null  $callback
      * @return void
+     *
+     * @throws \RuntimeException
      */
     protected function assertDispatchedWithChainOfObjects($command, $expectedChain, $callback)
     {

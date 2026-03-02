@@ -62,20 +62,20 @@ class FileViewFinder implements ViewFinderInterface
     /**
      * Get the fully-qualified location of the view.
      *
-     * @param  string  $name
+     * @param  string  $view
      * @return string
      */
-    public function find($name)
+    public function find($view)
     {
-        if (isset($this->views[$name])) {
-            return $this->views[$name];
+        if (isset($this->views[$view])) {
+            return $this->views[$view];
         }
 
-        if ($this->hasHintInformation($name = trim($name))) {
-            return $this->views[$name] = $this->findNamespacedView($name);
+        if ($this->hasHintInformation($view = trim($view))) {
+            return $this->views[$view] = $this->findNamespacedView($view);
         }
 
-        return $this->views[$name] = $this->findInPaths($name, $this->paths);
+        return $this->views[$view] = $this->findInPaths($view, $this->paths);
     }
 
     /**

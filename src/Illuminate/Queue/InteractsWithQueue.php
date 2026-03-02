@@ -49,6 +49,8 @@ trait InteractsWithQueue
      *
      * @param  \Throwable|string|null  $exception
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     public function fail($exception = null)
     {
@@ -259,6 +261,8 @@ trait InteractsWithQueue
      * Ensure that queue interactions have been faked.
      *
      * @return void
+     *
+     * @throws \RuntimeException
      */
     private function ensureQueueInteractionsHaveBeenFaked()
     {

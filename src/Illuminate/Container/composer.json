@@ -2,24 +2,27 @@
     "name": "illuminate/container",
     "description": "The Illuminate Container package.",
     "license": "MIT",
-    "homepage": "https://laravel.com",
-    "support": {
-        "issues": "https://github.com/laravel/framework/issues",
-        "source": "https://github.com/laravel/framework"
-    },
     "authors": [
         {
             "name": "Taylor Otwell",
             "email": "taylor@laravel.com"
         }
     ],
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "require": {
         "php": "^8.3",
         "illuminate/contracts": "^13.0",
         "illuminate/reflection": "^13.0",
-        "psr/container": "^1.1.1|^2.0.1",
+        "psr/container": "^1.1.1 || ^2.0.1",
         "symfony/polyfill-php84": "^1.33",
         "symfony/polyfill-php85": "^1.33"
+    },
+    "provide": {
+        "psr/container-implementation": "1.1 || 2.0"
     },
     "suggest": {
         "illuminate/auth": "Required to use the Auth attribute",
@@ -29,21 +32,18 @@
         "illuminate/filesystem": "Required to use the Storage attribute",
         "illuminate/log": "Required to use the Log or Context attributes"
     },
-    "provide": {
-        "psr/container-implementation": "1.1|2.0"
-    },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Illuminate\\Container\\": ""
         }
     },
+    "config": {
+        "sort-packages": true
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "13.0.x-dev"
         }
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "minimum-stability": "dev"
+    }
 }

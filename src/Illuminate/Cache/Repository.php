@@ -10,6 +10,9 @@ use Illuminate\Cache\Events\CacheFlushed;
 use Illuminate\Cache\Events\CacheFlushFailed;
 use Illuminate\Cache\Events\CacheFlushing;
 use Illuminate\Cache\Events\CacheHit;
+use Illuminate\Cache\Events\CacheLocksFlushed;
+use Illuminate\Cache\Events\CacheLocksFlushFailed;
+use Illuminate\Cache\Events\CacheLocksFlushing;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\ForgettingKey;
 use Illuminate\Cache\Events\KeyForgetFailed;
@@ -20,6 +23,7 @@ use Illuminate\Cache\Events\RetrievingKey;
 use Illuminate\Cache\Events\RetrievingManyKeys;
 use Illuminate\Cache\Events\WritingKey;
 use Illuminate\Cache\Events\WritingManyKeys;
+use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -680,7 +684,6 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
-     * Remove an item from the cache.
      * Execute a callback while holding an atomic lock on a cache mutex to prevent overlapping calls.
      *
      * @template TReturn
@@ -770,6 +773,34 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Flush all locks from the cache store.
+     *
+     * @return bool
+     *
+     * @throws \BadMethodCallException
+     */
+    public function flushLocks(): bool
+    {
+        $store = $this->getStore();
+
+        if (! $this->supportsFlushingLocks()) {
+            throw new BadMethodCallException('This cache store does not support flushing locks.');
+        }
+
+        $this->event(new CacheLocksFlushing($this->getName()));
+
+        $result = $store->flushLocks();
+
+        if ($result) {
+            $this->event(new CacheLocksFlushed($this->getName()));
+        } else {
+            $this->event(new CacheLocksFlushFailed($this->getName()));
+        }
+
+        return $result;
+    }
+
+    /**
      * Begin executing a new tags operation if the store supports it.
      *
      * @param  mixed  $names
@@ -842,6 +873,16 @@ class Repository implements ArrayAccess, CacheContract
     public function supportsTags()
     {
         return method_exists($this->store, 'tags');
+    }
+
+    /**
+     * Determine if the current store supports flushing locks.
+     *
+     * @return bool
+     */
+    public function supportsFlushingLocks(): bool
+    {
+        return $this->store instanceof CanFlushLocks;
     }
 
     /**
@@ -925,46 +966,46 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Determine if a cached value exists.
      *
-     * @param  \UnitEnum|string  $key
+     * @param  \UnitEnum|string  $offset
      * @return bool
      */
-    public function offsetExists($key): bool
+    public function offsetExists($offset): bool
     {
-        return $this->has($key);
+        return $this->has($offset);
     }
 
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  \UnitEnum|string  $key
+     * @param  \UnitEnum|string  $offset
      * @return mixed
      */
-    public function offsetGet($key): mixed
+    public function offsetGet($offset): mixed
     {
-        return $this->get($key);
+        return $this->get($offset);
     }
 
     /**
      * Store an item in the cache for the default time.
      *
-     * @param  \UnitEnum|string  $key
+     * @param  \UnitEnum|string  $offset
      * @param  mixed  $value
      * @return void
      */
-    public function offsetSet($key, $value): void
+    public function offsetSet($offset, $value): void
     {
-        $this->put($key, $value, $this->default);
+        $this->put($offset, $value, $this->default);
     }
 
     /**
      * Remove an item from the cache.
      *
-     * @param  \UnitEnum|string  $key
+     * @param  \UnitEnum|string  $offset
      * @return void
      */
-    public function offsetUnset($key): void
+    public function offsetUnset($offset): void
     {
-        $this->forget($key);
+        $this->forget($offset);
     }
 
     /**

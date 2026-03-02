@@ -1374,6 +1374,8 @@ class Builder implements BuilderContract
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function whereIn($column, $values, $boolean = 'and', $not = false)
     {
@@ -4116,6 +4118,48 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Insert new records into the database while ignoring specific conflicts and returning specified columns.
+     *
+     * @param  non-empty-string|non-empty-array<non-empty-string>  $uniqueBy
+     * @param  non-empty-array<non-empty-string>  $returning
+     * @return \Illuminate\Support\Collection
+     */
+    public function insertOrIgnoreReturning(array $values, array|string $uniqueBy, array $returning = ['*'])
+    {
+        if (empty($values)) {
+            return new Collection;
+        }
+
+        if ($uniqueBy === [] || $uniqueBy === '') {
+            throw new InvalidArgumentException('The unique columns must not be empty.');
+        }
+
+        if ($returning === []) {
+            throw new InvalidArgumentException('The returning columns must not be empty.');
+        }
+
+        if (! is_array(array_first($values))) {
+            $values = [$values];
+        } else {
+            foreach ($values as $key => $value) {
+                ksort($value);
+
+                $values[$key] = $value;
+            }
+        }
+
+        $this->applyBeforeQueryCallbacks();
+
+        $sql = $this->grammar->compileInsertOrIgnoreReturning($this, $values, (array) $uniqueBy, $returning);
+
+        $this->connection->recordsHaveBeenModified();
+
+        return new Collection(
+            $this->connection->selectFromWriteConnection($sql, $this->cleanBindings(Arr::flatten($values, 1)))
+        );
+    }
+
+    /**
      * Insert a new record and get the value of the primary key.
      *
      * @param  string|null  $sequence
@@ -4202,6 +4246,8 @@ class Builder implements BuilderContract
      * Update records in a PostgreSQL database using the update from syntax.
      *
      * @return int
+     *
+     * @throws \LogicException
      */
     public function updateFrom(array $values)
     {
@@ -4245,10 +4291,15 @@ class Builder implements BuilderContract
     /**
      * Insert new records or update the existing ones.
      *
+     * @param  non-empty-string|non-empty-array<int, non-empty-string>  $uniqueBy
      * @return int
      */
     public function upsert(array $values, array|string $uniqueBy, ?array $update = null)
     {
+        if ($uniqueBy === [] || $uniqueBy === '') {
+            throw new InvalidArgumentException('The unique columns must not be empty.');
+        }
+
         if (empty($values)) {
             return 0;
         } elseif ($update === []) {
@@ -4638,6 +4689,8 @@ class Builder implements BuilderContract
      * Ensure the database connection supports vector queries.
      *
      * @return void
+     *
+     * @throws \RuntimeException
      */
     protected function ensureConnectionSupportsVectors()
     {
