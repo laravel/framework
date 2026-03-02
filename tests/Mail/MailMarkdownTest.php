@@ -7,7 +7,7 @@ use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Factory;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Orchestra\Testbench\TestCase;
 
 class MailMarkdownTest extends TestCase
 {
@@ -107,5 +107,42 @@ class MailMarkdownTest extends TestCase
         $result = $markdown->parse('# Something')->toHtml();
 
         $this->assertSame("<h1>Something</h1>\n", $result);
+    }
+
+    public function testParseWithCustomExtensionsViaConfig(): void
+    {
+        $this->app['config']->set('mail.markdown.extensions', [
+            \League\CommonMark\Extension\Strikethrough\StrikethroughExtension::class,
+        ]);
+
+        $result = Markdown::parse('~~strikethrough text~~')->toHtml();
+
+        $this->assertStringContainsString('<del>', $result);
+        $this->assertStringContainsString('strikethrough text', $result);
+        $this->assertStringContainsString('</del>', $result);
+    }
+
+    public function testParseWithoutCustomExtensionsDoesNotApplyThem(): void
+    {
+        $this->app['config']->set('mail.markdown.extensions', []);
+
+        $result = Markdown::parse('~~strikethrough text~~')->toHtml();
+
+        $this->assertStringNotContainsString('<del>', $result);
+        $this->assertStringContainsString('~~strikethrough text~~', $result);
+    }
+
+    public function testParseWithMultipleCustomExtensions(): void
+    {
+        $this->app['config']->set('mail.markdown.extensions', [
+            \League\CommonMark\Extension\Strikethrough\StrikethroughExtension::class,
+            \League\CommonMark\Extension\TaskList\TaskListExtension::class,
+        ]);
+
+        $strikethroughResult = Markdown::parse('~~strikethrough~~')->toHtml();
+        $this->assertStringContainsString('<del>', $strikethroughResult);
+
+        $taskListResult = Markdown::parse('- [ ] Task item')->toHtml();
+        $this->assertStringContainsString('type="checkbox"', $taskListResult);
     }
 }

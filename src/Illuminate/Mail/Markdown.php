@@ -188,6 +188,10 @@ class Markdown
         $environment->addExtension(new CommonMarkCoreExtension);
         $environment->addExtension(new TableExtension);
 
+        foreach (config('mail.markdown.extensions', []) as $extensionClass) {
+            $environment->addExtension(new $extensionClass);
+        }
+
         return new MarkdownConverter($environment);
     }
 
