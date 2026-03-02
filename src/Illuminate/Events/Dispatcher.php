@@ -536,6 +536,7 @@ class Dispatcher implements DispatcherContract
         $listener = $this->container->make($class);
 
         return $this->handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
+                && ! $this->methodShouldBeHandledImmediately($method)
             ? $this->createCallbackForListenerRunningAfterCommits($listener, $method)
             : [$listener, $method];
     }
@@ -601,6 +602,20 @@ class Dispatcher implements DispatcherContract
         return (($listener->afterCommit ?? null) ||
                 $listener instanceof ShouldHandleEventsAfterCommit) &&
                 $this->resolveTransactionManager();
+    }
+
+    /**
+     * Determine if the given method should be handled immediately regardless of after commit configuration.
+     *
+     * @param  string  $method
+     * @return bool
+     */
+    protected function methodShouldBeHandledImmediately($method)
+    {
+        return in_array($method, [
+            'creating', 'updating', 'saving',
+            'deleting', 'restoring', 'forceDeleting',
+        ]);
     }
 
     /**
