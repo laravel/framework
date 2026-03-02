@@ -89,7 +89,7 @@
         "symfony/cache": "^7.4.0 || ^8.0.0",
         "symfony/http-client": "^7.4.0 || ^8.0.0",
         "symfony/psr-http-message-bridge": "^7.4.0 || ^8.0.0",
-        "symfony/translation": "^7.4.0"
+        "symfony/translation": "^7.4.0 || ^8.0.0"
     },
     "replace": {
         "illuminate/auth": "self.version",
