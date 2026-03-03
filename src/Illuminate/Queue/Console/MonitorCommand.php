@@ -136,6 +136,7 @@ class MonitorCommand extends Command
             $this->components->twoColumnDetail('Pending jobs', $queue['pending'] ?? 'N/A');
             $this->components->twoColumnDetail('Delayed jobs', $queue['delayed'] ?? 'N/A');
             $this->components->twoColumnDetail('Reserved jobs', $queue['reserved'] ?? 'N/A');
+            $this->components->twoColumnDetail('Oldest pending job', $queue['oldest_pending'] ?? 'N/A');
             $this->line('');
         });
 
