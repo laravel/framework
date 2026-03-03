@@ -846,7 +846,7 @@ class PendingRequest
      */
     public function get(string $url, $query = null)
     {
-        return $this->send('GET', $url, func_num_args() === 1 ? [] : [
+        return $this->send('GET', $url, is_null($query) ? [] : [
             'query' => $query,
         ]);
     }
@@ -864,7 +864,7 @@ class PendingRequest
      */
     public function head(string $url, $query = null)
     {
-        return $this->send('HEAD', $url, func_num_args() === 1 ? [] : [
+        return $this->send('HEAD', $url, is_null($query) ? [] : [
             'query' => $query,
         ]);
     }
