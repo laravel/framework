@@ -47,6 +47,7 @@ function test(
     assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Types\Builder\User>', $query->findOr([1], callback: fn () => 42));
     assertType('Illuminate\Types\Builder\User', $query->findOrFail(1));
     assertType('Illuminate\Types\Builder\User|null', $query->find(1));
+    assertType('Illuminate\Types\Builder\User|null', $query->firstWhereKey(1));
     assertType('42|Illuminate\Types\Builder\User', $query->findOr(1, fn () => 42));
     assertType('42|Illuminate\Types\Builder\User', $query->findOr(1, callback: fn () => 42));
     assertType('Illuminate\Types\Builder\User|null', $query->first());

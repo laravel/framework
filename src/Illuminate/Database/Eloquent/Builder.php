@@ -379,6 +379,18 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Find the first model matching the given primary key.
+     *
+     * @param  mixed  $id
+     * @param  array|string  $columns
+     * @return TModel|null
+     */
+    public function firstWhereKey($id, $columns = ['*'])
+    {
+        return $this->whereKey($id)->first($columns);
+    }
+
+    /**
      * Add an "or where" clause to the query.
      *
      * @param  (\Closure(static): mixed)|array|string|\Illuminate\Contracts\Database\Query\Expression  $column
