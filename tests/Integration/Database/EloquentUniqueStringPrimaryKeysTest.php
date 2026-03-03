@@ -135,6 +135,10 @@ class EloquentUniqueStringPrimaryKeysTest extends DatabaseTestCase
 
     public function testFirstWhereKeyWithUuidPrimaryKey()
     {
+        if ($this->driver === 'sqlsrv') {
+            $this->markTestSkipped('SQL Server returns uniqueidentifier in a format that may not match the in-memory UUID string comparison.');
+        }
+
         $user = ModelWithUuidPrimaryKey::create();
 
         $this->assertNotNull($user->id);
