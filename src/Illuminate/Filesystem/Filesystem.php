@@ -453,7 +453,7 @@ class Filesystem
      * Get the file type of a given file.
      *
      * @param  string  $path
-     * @return string
+     * @return string|false
      */
     public function type($path)
     {
