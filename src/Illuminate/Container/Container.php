@@ -237,8 +237,8 @@ class Container implements ArrayAccess, ContainerContract
     public function bound($abstract)
     {
         return isset($this->bindings[$abstract]) ||
-               isset($this->instances[$abstract]) ||
-               $this->isAlias($abstract);
+            isset($this->instances[$abstract]) ||
+            $this->isAlias($abstract);
     }
 
     /**
@@ -262,7 +262,7 @@ class Container implements ArrayAccess, ContainerContract
         }
 
         return isset($this->resolved[$abstract]) ||
-               isset($this->instances[$abstract]);
+            isset($this->instances[$abstract]);
     }
 
     /**
@@ -359,7 +359,9 @@ class Container implements ArrayAccess, ContainerContract
     {
         if ($abstract instanceof Closure) {
             return $this->bindBasedOnClosureReturnTypes(
-                $abstract, $concrete, $shared
+                $abstract,
+                $concrete,
+                $shared
             );
         }
 
@@ -377,7 +379,7 @@ class Container implements ArrayAccess, ContainerContract
         // up inside its own Closure to give us more convenience when extending.
         if (! $concrete instanceof Closure) {
             if (! is_string($concrete)) {
-                throw new TypeError(self::class.'::bind(): Argument #2 ($concrete) must be of type Closure|string|null');
+                throw new TypeError(self::class . '::bind(): Argument #2 ($concrete) must be of type Closure|string|null');
             }
 
             $concrete = $this->getClosure($abstract, $concrete);
@@ -408,7 +410,9 @@ class Container implements ArrayAccess, ContainerContract
             }
 
             return $container->resolve(
-                $concrete, $parameters, raiseEvents: false
+                $concrete,
+                $parameters,
+                raiseEvents: false
             );
         };
     }
@@ -445,7 +449,7 @@ class Container implements ArrayAccess, ContainerContract
     protected function parseBindMethod($method)
     {
         if (is_array($method)) {
-            return $method[0].'@'.$method[1];
+            return $method[0] . '@' . $method[1];
         }
 
         return $method;
@@ -769,7 +773,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function wrap(Closure $callback, array $parameters = [])
     {
-        return fn () => $this->call($callback, $parameters);
+        return fn() => $this->call($callback, $parameters);
     }
 
     /**
@@ -802,6 +806,8 @@ class Container implements ArrayAccess, ContainerContract
             array_pop($this->buildStack);
         }
 
+        $result ??= null;
+
         return $result;
     }
 
@@ -813,8 +819,10 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getClassForCallable($callback)
     {
-        if (is_callable($callback) &&
-            ! ($reflector = new ReflectionFunction($callback(...)))->isAnonymous()) {
+        if (
+            is_callable($callback) &&
+            ! ($reflector = new ReflectionFunction($callback(...)))->isAnonymous()
+        ) {
             return $reflector->getClosureScopeClass()->name ?? false;
         }
 
@@ -831,7 +839,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function factory($abstract)
     {
-        return fn () => $this->make($abstract);
+        return fn() => $this->make($abstract);
     }
 
     /**
@@ -978,8 +986,10 @@ class Container implements ArrayAccess, ContainerContract
             return $this->bindings[$abstract]['concrete'];
         }
 
-        if ($this->environmentResolver === null ||
-            ($this->checkedForAttributeBindings[$abstract] ?? false) || ! is_string($abstract)) {
+        if (
+            $this->environmentResolver === null ||
+            ($this->checkedForAttributeBindings[$abstract] ?? false) || ! is_string($abstract)
+        ) {
             return $abstract;
         }
 
@@ -1131,8 +1141,10 @@ class Container implements ArrayAccess, ContainerContract
             return $this->notInstantiable($concrete);
         }
 
-        if (is_a($concrete, SelfBuilding::class, true) &&
-            ! in_array($concrete, $this->buildStack, true)) {
+        if (
+            is_a($concrete, SelfBuilding::class, true) &&
+            ! in_array($concrete, $this->buildStack, true)
+        ) {
             return $this->buildSelfBuildingInstance($concrete, $reflector);
         }
 
@@ -1147,7 +1159,8 @@ class Container implements ArrayAccess, ContainerContract
             array_pop($this->buildStack);
 
             $this->fireAfterResolvingAttributeCallbacks(
-                $reflector->getAttributes(), $instance = new $concrete
+                $reflector->getAttributes(),
+                $instance = new $concrete
             );
 
             return $instance;
@@ -1165,7 +1178,8 @@ class Container implements ArrayAccess, ContainerContract
         }
 
         $this->fireAfterResolvingAttributeCallbacks(
-            $reflector->getAttributes(), $instance = new $concrete(...$instances)
+            $reflector->getAttributes(),
+            $instance = new $concrete(...$instances)
         );
 
         return $instance;
@@ -1195,7 +1209,8 @@ class Container implements ArrayAccess, ContainerContract
         array_pop($this->buildStack);
 
         $this->fireAfterResolvingAttributeCallbacks(
-            $reflector->getAttributes(), $instance
+            $reflector->getAttributes(),
+            $instance
         );
 
         return $instance;
@@ -1257,7 +1272,8 @@ class Container implements ArrayAccess, ContainerContract
     protected function hasParameterOverride($dependency)
     {
         return array_key_exists(
-            $dependency->name, $this->getLastParameterOverride()
+            $dependency->name,
+            $this->getLastParameterOverride()
         );
     }
 
@@ -1291,7 +1307,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function resolvePrimitive(ReflectionParameter $parameter)
     {
-        if (! is_null($concrete = $this->getContextualConcrete('$'.$parameter->getName()))) {
+        if (! is_null($concrete = $this->getContextualConcrete('$' . $parameter->getName()))) {
             return Util::unwrapIfClosure($concrete, $this);
         }
 
@@ -1324,9 +1340,11 @@ class Container implements ArrayAccess, ContainerContract
         // First we will check if a default value has been defined for the parameter.
         // If it has, and no explicit binding exists, we should return it to avoid
         // overriding any of the developer specified defaults for the parameters.
-        if ($parameter->isDefaultValueAvailable() &&
+        if (
+            $parameter->isDefaultValueAvailable() &&
             ! $this->bound($className) &&
-            $this->findInContextualBindings($className) === null) {
+            $this->findInContextualBindings($className) === null
+        ) {
             return $parameter->getDefaultValue();
         }
 
@@ -1365,7 +1383,7 @@ class Container implements ArrayAccess, ContainerContract
             return $this->make($className);
         }
 
-        return array_map(fn ($abstract) => $this->resolve($abstract), $concrete);
+        return array_map(fn($abstract) => $this->resolve($abstract), $concrete);
     }
 
     /**
@@ -1536,7 +1554,8 @@ class Container implements ArrayAccess, ContainerContract
         $this->fireCallbackArray($object, $this->globalResolvingCallbacks);
 
         $this->fireCallbackArray(
-            $object, $this->getCallbacksForType($abstract, $object, $this->resolvingCallbacks)
+            $object,
+            $this->getCallbacksForType($abstract, $object, $this->resolvingCallbacks)
         );
 
         $this->fireAfterResolvingCallbacks($abstract, $object);
@@ -1554,7 +1573,8 @@ class Container implements ArrayAccess, ContainerContract
         $this->fireCallbackArray($object, $this->globalAfterResolvingCallbacks);
 
         $this->fireCallbackArray(
-            $object, $this->getCallbacksForType($abstract, $object, $this->afterResolvingCallbacks)
+            $object,
+            $this->getCallbacksForType($abstract, $object, $this->afterResolvingCallbacks)
         );
     }
 
@@ -1577,7 +1597,9 @@ class Container implements ArrayAccess, ContainerContract
             }
 
             $callbacks = $this->getCallbacksForType(
-                $attribute->getName(), $object, $this->afterResolvingAttributeCallbacks
+                $attribute->getName(),
+                $object,
+                $this->afterResolvingAttributeCallbacks
             );
 
             foreach ($callbacks as $callback) {
@@ -1813,7 +1835,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function offsetSet($key, $value): void
     {
-        $this->bind($key, $value instanceof Closure ? $value : fn () => $value);
+        $this->bind($key, $value instanceof Closure ? $value : fn() => $value);
     }
 
     /**

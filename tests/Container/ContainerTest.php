@@ -145,7 +145,7 @@ class ContainerTest extends TestCase
     public function testScopedBindingsWithClosureReturnType()
     {
         $container = new Container;
-        $container->scoped(fn (): stdClass => new stdClass);
+        $container->scoped(fn(): stdClass => new stdClass);
         $container->forgetScopedInstances();
     }
 
@@ -329,7 +329,7 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(ContainerConcreteStub::class, $instance->noDefault);
         $this->assertSame(null, $instance->default);
 
-        $container->bind(ContainerConcreteStub::class, fn () => new ContainerConcreteStub);
+        $container->bind(ContainerConcreteStub::class, fn() => new ContainerConcreteStub);
         $instance = $container->make(ContainerClassWithDefaultValueStub::class);
         $this->assertInstanceOf(ContainerConcreteStub::class, $instance->default);
     }
@@ -340,7 +340,7 @@ class ContainerTest extends TestCase
 
         $container->when(ContainerClassWithDefaultValueStub::class)
             ->needs(ContainerConcreteStub::class)
-            ->give(fn () => new ContainerConcreteStub);
+            ->give(fn() => new ContainerConcreteStub);
         $instance = $container->make(ContainerClassWithDefaultValueStub::class);
         $this->assertInstanceOf(ContainerConcreteStub::class, $instance->default);
     }
@@ -547,7 +547,7 @@ class ContainerTest extends TestCase
 
         $container->when(ContainerCurrentResolvingConcrete::class)
             ->needs('$currentlyResolving')
-            ->give(fn ($container) => $container->currentlyResolving());
+            ->give(fn($container) => $container->currentlyResolving());
 
         $resolved = $container->make(ContainerCurrentResolvingConcrete::class);
 
@@ -780,7 +780,7 @@ class ContainerTest extends TestCase
     public function testBindInterfaceToSingleton()
     {
         $container = new Container;
-        $container->resolveEnvironmentUsing(fn ($arr) => true);
+        $container->resolveEnvironmentUsing(fn($arr) => true);
         $firstInstantiation = $container->get(ContainerBindSingletonTestInterface::class);
         $secondInstantiation = $container->get(ContainerBindSingletonTestInterface::class);
 
@@ -790,14 +790,14 @@ class ContainerTest extends TestCase
     public function testBindInterfaceToScoped()
     {
         $container = new Container;
-        $container->resolveEnvironmentUsing(fn ($arr) => $arr === ['test']);
+        $container->resolveEnvironmentUsing(fn($arr) => $arr === ['test']);
         $firstInstantiation = $container->get(ContainerBindScopedTestInterface::class);
         $secondInstantiation = $container->get(ContainerBindScopedTestInterface::class);
 
         $this->assertSame($firstInstantiation, $secondInstantiation);
 
         // With a different environment
-        $container->resolveEnvironmentUsing(fn ($arr) => $arr === ['test2']);
+        $container->resolveEnvironmentUsing(fn($arr) => $arr === ['test2']);
         $thirdInstantiation = $container->get(ContainerBindScopedTestInterface::class);
         $this->assertSame($firstInstantiation, $thirdInstantiation);
 
@@ -820,13 +820,13 @@ class ContainerTest extends TestCase
     public function testChecksForMoreSpecificEnvironmentBeforeFallingBackToDefault(): void
     {
         $container = new Container;
-        $container->resolveEnvironmentUsing(fn ($env) => in_array('prod', $env));
+        $container->resolveEnvironmentUsing(fn($env) => in_array('prod', $env));
 
         $instance = $container->make(WildcardAndProdInterface::class);
 
         $this->assertInstanceOf(ProdConcrete::class, $instance);
         $container->flush();
-        $container->resolveEnvironmentUsing(fn ($env) => in_array('some_string', $env));
+        $container->resolveEnvironmentUsing(fn($env) => in_array('some_string', $env));
         $instance = $container->make(WildcardAndProdInterface::class);
         $this->assertInstanceOf(FallbackConcrete::class, $instance);
     }
@@ -834,7 +834,7 @@ class ContainerTest extends TestCase
     public function testCanPassAStringForEnvironmentEnvironment(): void
     {
         $container = new Container;
-        $container->resolveEnvironmentUsing(fn ($env) => in_array('cli', $env));
+        $container->resolveEnvironmentUsing(fn($env) => in_array('cli', $env));
 
         $instance = $container->make(CliOnlyInterface::class);
 
@@ -846,7 +846,7 @@ class ContainerTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         $container = new Container;
-        $container->resolveEnvironmentUsing(fn () => true);
+        $container->resolveEnvironmentUsing(fn() => true);
         $container->make(EmptyEnvInterface::class);
     }
 
@@ -863,13 +863,13 @@ class ContainerTest extends TestCase
     public function testFlushResetsEnvironmentResolverAndCheckedBindings(): void
     {
         $container = new Container;
-        $container->resolveEnvironmentUsing(fn ($environments) => in_array('prod', $environments));
+        $container->resolveEnvironmentUsing(fn($environments) => in_array('prod', $environments));
 
         $first = $container->make(MultiEnvInterface::class);
         $this->assertInstanceOf(ProdConcrete::class, $first);
 
         $container->flush();
-        $container->resolveEnvironmentUsing(fn (array $environments) => in_array('dev', $environments));
+        $container->resolveEnvironmentUsing(fn(array $environments) => in_array('dev', $environments));
 
         $second = $container->make(MultiEnvInterface::class);
         $this->assertInstanceOf(DevConcrete::class, $second);
@@ -880,7 +880,7 @@ class ContainerTest extends TestCase
         $this->expectException(BindingResolutionException::class);
 
         $container = new Container;
-        $container->resolveEnvironmentUsing(fn () => false);
+        $container->resolveEnvironmentUsing(fn() => false);
 
         $container->make(ProdEnvOnlyInterface::class);
     }
@@ -888,7 +888,7 @@ class ContainerTest extends TestCase
     public function testScopedSingletonWithBind()
     {
         $container = new Container;
-        $container->resolveEnvironmentUsing(fn ($environments) => true);
+        $container->resolveEnvironmentUsing(fn($environments) => true);
 
         $original = $container->make(IsScoped::class);
         $new = $container->make(IsScoped::class);
@@ -901,7 +901,7 @@ class ContainerTest extends TestCase
     public function testSingletonWithBind()
     {
         $container = new Container;
-        $container->resolveEnvironmentUsing(fn ($environments) => true);
+        $container->resolveEnvironmentUsing(fn($environments) => true);
 
         $original = $container->make(IsSingleton::class);
         $new = $container->make(IsSingleton::class);
@@ -921,6 +921,20 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(RequestDto::class, $r);
         $this->assertEquals(999, $r->userId);
         $this->assertEquals('taylor@laravel.com', $r->email);
+    }
+
+    public function call_handles_void_callbacks_without_undefined_variable_on_php_85()
+    {
+        $container = new Container();
+
+        try {
+            $container->call(function () {
+                // Void callback
+            });
+            $this->assertTrue(true);
+        } catch (\Throwable $e) {
+            $this->fail('Unexpected exception thrown: ' . $e->getMessage());
+        }
     }
 
     // public function testContainerCanCatchCircularDependency()
@@ -1013,8 +1027,7 @@ class ContainerClassWithDefaultValueStub
     public function __construct(
         public ?ContainerConcreteStub $noDefault,
         public ?ContainerConcreteStub $default = null,
-    ) {
-    }
+    ) {}
 }
 
 class ContainerMixedPrimitiveStub
@@ -1053,9 +1066,7 @@ class ContainerInjectVariableStubWithInterfaceImplementation implements IContain
 
 class ContainerContextualBindingCallTarget
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function work(IContainerContractStub $stub)
     {
@@ -1066,9 +1077,7 @@ class ContainerContextualBindingCallTarget
 #[Attribute(Attribute::TARGET_PARAMETER)]
 class ContainerCurrentResolvingAttribute implements ContextualAttribute
 {
-    public function resolve()
-    {
-    }
+    public function resolve() {}
 }
 
 class ContainerCurrentResolvingConcrete
@@ -1084,19 +1093,13 @@ class ContainerCurrentResolvingConcrete
 }
 
 #[Singleton]
-class ContainerSingletonAttribute
-{
-}
+class ContainerSingletonAttribute {}
 
 #[Scoped]
-class ContainerScopedAttribute
-{
-}
+class ContainerScopedAttribute {}
 
 #[Bind(ContainerSingletonAttribute::class, environments: ['foo', ContainerTestEnvironments::Bar])]
-interface ContainerBindSingletonTestInterface
-{
-}
+interface ContainerBindSingletonTestInterface {}
 
 enum ContainerTestEnvironments: string
 {
@@ -1105,104 +1108,65 @@ enum ContainerTestEnvironments: string
 
 #[Bind(ContainerScopedAttribute::class, environments: ['test'])]
 #[Bind(ContainerScopedAttribute::class, environments: ['test2'])]
-interface ContainerBindScopedTestInterface
-{
-}
+interface ContainerBindScopedTestInterface {}
 
 #[Bind(WildcardConcrete::class)]
-interface WildcardOnlyInterface
-{
-}
+interface WildcardOnlyInterface {}
 
-class WildcardConcrete implements WildcardOnlyInterface
-{
-}
+class WildcardConcrete implements WildcardOnlyInterface {}
 
 /*
  * The order of these attributes matters because we want to ensure we only fallback to '*' when there's no more specific environment.
  */
 #[Bind(FallbackConcrete::class)]
 #[Bind(ProdConcrete::class, environments: 'prod')]
-interface WildcardAndProdInterface
-{
-}
+interface WildcardAndProdInterface {}
 
-class FallbackConcrete implements WildcardAndProdInterface
-{
-}
-class ProdConcrete implements WildcardAndProdInterface
-{
-}
+class FallbackConcrete implements WildcardAndProdInterface {}
+class ProdConcrete implements WildcardAndProdInterface {}
 
 #[Bind(CliConcrete::class, environments: 'cli')]
-interface CliOnlyInterface
-{
-}
+interface CliOnlyInterface {}
 
-class CliConcrete implements CliOnlyInterface
-{
-}
+class CliConcrete implements CliOnlyInterface {}
 
 #[Bind(BadConcrete::class, environments: [])]
-interface EmptyEnvInterface
-{
-}
+interface EmptyEnvInterface {}
 
-class BadConcrete implements EmptyEnvInterface
-{
-}
+class BadConcrete implements EmptyEnvInterface {}
 
 #[Bind(ProdConcrete::class, environments: 'prod')]
-interface ProdEnvOnlyInterface
-{
-}
+interface ProdEnvOnlyInterface {}
 
 #[Bind(ProdConcrete::class, environments: 'prod')]
 #[Bind(DevConcrete::class, environments: 'dev')]
-interface MultiEnvInterface
-{
-}
+interface MultiEnvInterface {}
 
-class DevConcrete implements MultiEnvInterface
-{
-}
+class DevConcrete implements MultiEnvInterface {}
 
 #[Bind(OriginalConcrete::class)]
-interface OverrideInterface
-{
-}
+interface OverrideInterface {}
 
-class OriginalConcrete implements OverrideInterface
-{
-}
+class OriginalConcrete implements OverrideInterface {}
 
-class AltConcrete implements OverrideInterface
-{
-}
+class AltConcrete implements OverrideInterface {}
 
 #[Bind(IsScopedConcrete::class)]
 #[Scoped]
-interface IsScoped
-{
-}
+interface IsScoped {}
 
-class IsScopedConcrete implements IsScoped
-{
-}
+class IsScopedConcrete implements IsScoped {}
 
 #[Bind(IsScopedConcrete::class)]
 #[Singleton]
-interface IsSingleton
-{
-}
+interface IsSingleton {}
 
 class RequestDto implements SelfBuilding
 {
     public function __construct(
         public readonly int $userId,
         public readonly string $email,
-    ) {
-    }
+    ) {}
 
     public static function newInstance(RequestDtoDependencyContract $dependency): self
     {
@@ -1213,9 +1177,7 @@ class RequestDto implements SelfBuilding
     }
 }
 
-interface RequestDtoDependencyContract
-{
-}
+interface RequestDtoDependencyContract {}
 
 class RequestDtoDependency implements RequestDtoDependencyContract
 {
