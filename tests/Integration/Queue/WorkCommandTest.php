@@ -117,7 +117,7 @@ class WorkCommandTest extends QueueTestCase
         $this->artisan('queue:work', [
             '--daemon' => true,
             '--stop-when-empty' => true,
-            '--memory' => 0.1,
+            '--memory' => 1,
         ])->assertExitCode(12);
 
         // Memory limit isn't checked until after the first job is attempted.
