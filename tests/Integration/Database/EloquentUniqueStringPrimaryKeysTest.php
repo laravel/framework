@@ -132,6 +132,16 @@ class EloquentUniqueStringPrimaryKeysTest extends DatabaseTestCase
 
         $this->assertEquals(3, ModelUpsertWithUuidPrimaryKey::count());
     }
+
+    public function testFirstWhereKeyWithUuidPrimaryKey()
+    {
+        $user = ModelWithUuidPrimaryKey::create();
+
+        $this->assertNotNull($user->id);
+        $this->assertTrue($user->is(ModelWithUuidPrimaryKey::firstWhereKey($user->id)));
+        $this->assertTrue($user->is(ModelWithUuidPrimaryKey::firstWhereKey($user)));
+        $this->assertNull(ModelWithUuidPrimaryKey::firstWhereKey('00000000-0000-0000-0000-000000000000'));
+    }
 }
 
 class ModelWithUuidPrimaryKey extends Eloquent

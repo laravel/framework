@@ -249,6 +249,28 @@ class EloquentWhereTest extends DatabaseTestCase
         );
     }
 
+    public function testFirstWhereKey()
+    {
+        /** @var \Illuminate\Tests\Integration\Database\UserWhereTest $firstUser */
+        $firstUser = UserWhereTest::create([
+            'name' => 'test-name',
+            'email' => 'test-email',
+            'address' => 'test-address',
+        ]);
+
+        /** @var \Illuminate\Tests\Integration\Database\UserWhereTest $secondUser */
+        $secondUser = UserWhereTest::create([
+            'name' => 'test-name1',
+            'email' => 'test-email1',
+            'address' => 'test-address1',
+        ]);
+
+        $this->assertTrue($firstUser->is(UserWhereTest::firstWhereKey($firstUser->id)));
+        $this->assertTrue($secondUser->is(UserWhereTest::firstWhereKey($secondUser->id)));
+        $this->assertNull(UserWhereTest::firstWhereKey(99999));
+        $this->assertTrue($firstUser->is(UserWhereTest::firstWhereKey($firstUser)));
+    }
+
     public function testSole()
     {
         $expected = UserWhereTest::create([
