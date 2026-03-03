@@ -110,6 +110,9 @@ class AliasLoader
         // Atomic write to prevent race conditions...
         $tempPath = tempnam(dirname($path), 'facade-');
 
+        // Fix permissions of tempPath because `tempnam()` creates it with permissions set to 0600...
+        chmod($tempPath, 0777 - umask());
+
         file_put_contents($tempPath, $stub);
 
         rename($tempPath, $path);
