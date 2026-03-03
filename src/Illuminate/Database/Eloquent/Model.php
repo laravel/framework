@@ -1313,6 +1313,41 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Save the model to the database, ignoring specific unique constraint conflicts.
+     *
+     * @param  array|string  $uniqueBy
+     * @param  array  $options
+     * @return bool
+     */
+    public function saveOrIgnore(array|string $uniqueBy, array $options = [])
+    {
+        if ($this->exists) {
+            throw new LogicException('Cannot use saveOrIgnore on an existing model.');
+        }
+
+        $this->mergeAttributesFromCachedCasts();
+
+        $query = $this->newModelQuery();
+
+        if ($this->fireModelEvent('saving') === false) {
+            return false;
+        }
+
+        $saved = $this->performInsertOrIgnore($query, $uniqueBy);
+
+        if (! $this->getConnectionName() &&
+            $connection = $query->getConnection()) {
+            $this->setConnection($connection->getName());
+        }
+
+        if ($saved) {
+            $this->finishSave($options);
+        }
+
+        return $saved;
+    }
+
+    /**
      * Save the model to the database within a transaction.
      *
      * @param  array  $options
@@ -1472,6 +1507,55 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // We will go ahead and set the exists property to true, so that it is set when
         // the created event is fired, just in case the developer tries to update it
         // during the event. This will allow them to do so and run an update here.
+        $this->exists = true;
+
+        $this->wasRecentlyCreated = true;
+
+        $this->fireModelEvent('created', false);
+
+        return true;
+    }
+
+    /**
+     * Perform a model insert operation, ignoring specific unique constraint conflicts.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<static>  $query
+     * @param  array|string  $uniqueBy
+     * @return bool
+     */
+    protected function performInsertOrIgnore(Builder $query, array|string $uniqueBy)
+    {
+        if ($this->usesUniqueIds()) {
+            $this->setUniqueIds();
+        }
+
+        if ($this->fireModelEvent('creating') === false) {
+            return false;
+        }
+
+        if ($this->usesTimestamps()) {
+            $this->updateTimestamps();
+        }
+
+        $attributes = $this->getAttributesForInsert();
+
+        if (empty($attributes)) {
+            return true;
+        }
+
+        $result = $query->toBase()->insertOrIgnoreReturning($attributes, $uniqueBy);
+
+        if ($result->isEmpty()) {
+            return false;
+        }
+
+        if ($this->getIncrementing()) {
+            $this->setAttribute(
+                $keyName = $this->getKeyName(),
+                $result->first()->{$keyName}
+            );
+        }
+
         $this->exists = true;
 
         $this->wasRecentlyCreated = true;
