@@ -90,9 +90,9 @@ jobs:
       matrix:
         include:
           - php: 8.3
-            pheanstalk: 5
-          - php: 8.4
             pheanstalk: 7
+          - php: 8.4
+            pheanstalk: 8
 
     name: Beanstalkd Driver (pda/pheanstalk:^${{ matrix.pheanstalk }})
 
