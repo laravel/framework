@@ -291,14 +291,14 @@ class CompiledRouteCollection extends AbstractRouteCollection
                 )
             ), '/');
         }
-
         return $this->router->newRoute($attributes['methods'], $baseUri === '' ? '/' : $baseUri, $attributes['action'])
             ->setFallback($attributes['fallback'])
             ->setDefaults($attributes['defaults'])
             ->setWheres($attributes['wheres'])
             ->setBindingFields($attributes['bindingFields'])
             ->block($attributes['lockSeconds'] ?? null, $attributes['waitSeconds'] ?? null)
-            ->withTrashed($attributes['withTrashed'] ?? false);
+            ->withTrashed($attributes['withTrashed'] ?? false)
+            ->setAliases($attributes['aliases']??[]);
     }
 
     /**

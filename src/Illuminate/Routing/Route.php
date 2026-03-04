@@ -158,6 +158,13 @@ class Route
     protected $bindingFields = [];
 
     /**
+     * TODO: AUR: desc.
+     *
+     * @var array
+     */
+    protected $aliases = [];
+
+    /**
      * The validators used by the routes.
      *
      * @var array
@@ -1400,6 +1407,37 @@ class Route
         $this->compileRoute();
 
         unset($this->router, $this->container);
+    }
+
+    /**
+     * TODO: AUR: desc.
+     *
+     * @return void
+     */
+    public function addAlias(string $alias)
+    {
+        $this->aliases[] = $alias;
+    }
+
+    /**
+     * TODO: AUR: desc.
+     *
+     * @param  array<string>  $aliases
+     * @return $this
+     */
+    public function setAliases(array $aliases)
+    {
+        $this->aliases = $aliases;
+
+        return $this;
+    }
+
+    /**
+     * TODO: AUR: desc.
+     */
+    public function getAliases(): array
+    {
+        return $this->aliases;
     }
 
     /**
