@@ -47,7 +47,7 @@ class RouteListCommand extends Command
      *
      * @var string[]
      */
-    protected $headers = ['Domain', 'Method', 'URI', 'Name', 'Action', 'Middleware'];
+    protected $headers = ['Domain', 'Method', 'URI', 'Name', 'Action', 'Aliases', 'Middleware'];
 
     /**
      * The terminal width resolver callback.
@@ -144,6 +144,7 @@ class RouteListCommand extends Command
             'method' => implode('|', $route->methods()),
             'uri' => $route->uri(),
             'name' => $route->getName(),
+            'aliases' =>  $route->getName() ? app('router')->getRouteAliasesFor($route->getName()) : [],
             'action' => ltrim($route->getActionName(), '\\'),
             'middleware' => $this->getMiddleware($route),
             'vendor' => $this->isVendorRoute($route),
@@ -421,13 +422,18 @@ class RouteListCommand extends Command
      */
     protected function formatActionForCli($route)
     {
-        ['action' => $action, 'name' => $name] = $route;
+
+        ['action' => $action, 'name' => $name, 'aliases' => $aliases ]= $route;
+
+        $computed_aliases = $this->option('with-aliases') && sizeof($aliases)>0
+            ?(' ['.implode(', ', $aliases).']')
+            :'';
 
         if ($action === 'Closure' || $action === ViewController::class) {
-            return $name;
+            return $name.$computed_aliases;
         }
 
-        $name = $name ? "$name   " : null;
+        $name = $name ? "$name $computed_aliases  " : null;
 
         $rootControllerNamespace = $this->laravel[UrlGenerator::class]->getRootControllerNamespace()
             ?? ($this->laravel->getNamespace().'Http\\Controllers');
@@ -505,6 +511,7 @@ class RouteListCommand extends Command
             ['path', null, InputOption::VALUE_OPTIONAL, 'Only show routes matching the given path pattern'],
             ['except-path', null, InputOption::VALUE_OPTIONAL, 'Do not display the routes matching the given path pattern'],
             ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes'],
+            ['with-aliases', 'a', InputOption::VALUE_NONE, 'Show routes with aliases'],
             ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (domain, method, uri, name, action, middleware, definition) to sort by', 'uri'],
             ['except-vendor', null, InputOption::VALUE_NONE, 'Do not display routes defined by vendor packages'],
             ['only-vendor', null, InputOption::VALUE_NONE, 'Only display routes defined by vendor packages'],
