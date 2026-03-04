@@ -234,6 +234,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $missingAttributeViolationCallback;
 
     /**
+     * Indicates whether magic mutators should be prevented.
+     *
+     * @var bool
+     */
+    protected static $modelsShouldPreventMagicMutators = false;
+
+    /**
      * Indicates if broadcasting is currently enabled.
      *
      * @var bool
@@ -576,6 +583,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function handleMissingAttributeViolationUsing(?callable $callback)
     {
         static::$missingAttributeViolationCallback = $callback;
+    }
+
+    /**
+     * Prevent models from using legacy magic mutators.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function preventMagicMutators($value = true)
+    {
+        static::$modelsShouldPreventMagicMutators = $value;
     }
 
     /**
@@ -2390,6 +2408,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function preventsAccessingMissingAttributes()
     {
         return static::$modelsShouldPreventAccessingMissingAttributes;
+    }
+
+    /**
+     * Determine if magic mutators are being prevented.
+     *
+     * @return bool
+     */
+    public static function preventsMagicMutators()
+    {
+        return static::$modelsShouldPreventMagicMutators;
     }
 
     /**
