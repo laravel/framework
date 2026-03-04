@@ -9,6 +9,8 @@ use LogicException;
 
 /**
  * @implements Arrayable<string, mixed>
+ *
+ * @internal
  */
 class ModelInfo implements Arrayable, ArrayAccess
 {
@@ -54,7 +56,7 @@ class ModelInfo implements Arrayable, ArrayAccess
      *     relations: \Illuminate\Support\Collection<int, array{name: string, type: string, related: class-string<\Illuminate\Database\Eloquent\Model>}>,
      *     events: \Illuminate\Support\Collection<int, array{event: string, class: string}>,
      *     observers: \Illuminate\Support\Collection<int, array{event: string, observer: array<int, string>}>, collection: class-string<\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>>,
-     *     builder: class-string<\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>>
+     *     builder: class-string<\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>>,
      *     resource: \Illuminate\Http\Resources\Json\JsonResource|null
      * }
      */
