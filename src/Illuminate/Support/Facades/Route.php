@@ -81,6 +81,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  * @method static mixed macroCall(string $method, array $parameters)
+ * @method static void alias(string $originalName, string|array $aliasNames)
  * @method static \Illuminate\Support\HigherOrderTapProxy|\Illuminate\Routing\Router tap(callable|null $callback = null)
  * @method static \Illuminate\Routing\RouteRegistrar attribute(string $key, mixed $value)
  * @method static \Illuminate\Routing\RouteRegistrar whereAlpha(array|string $parameters)

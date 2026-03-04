@@ -516,6 +516,10 @@ class UrlGenerator implements UrlGeneratorContract
             throw new InvalidArgumentException('Attribute [name] expects a string backed enum.');
         }
 
+        if ($resolved = app('router')->resolveAlias($name)) {
+            $name = $resolved;
+        }
+
         if (! is_null($route = $this->routes->getByName($name))) {
             return $this->toRoute($route, $parameters, $absolute);
         }
@@ -526,6 +530,19 @@ class UrlGenerator implements UrlGeneratorContract
         }
 
         throw new RouteNotFoundException("Route [{$name}] not defined.");
+    }
+
+    /**
+     * TODO: AUR: desc.
+     */
+    public function getAliasesFor(string $originalName): array
+    {
+        return array_keys(
+            array_filter(
+                app('router')->getRouteAliases(),
+                fn ($original) => $original === $originalName
+            )
+        );
     }
 
     /**

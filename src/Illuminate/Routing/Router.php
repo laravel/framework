@@ -122,6 +122,13 @@ class Router implements BindingRegistrar, RegistrarContract
     protected $groupStack = [];
 
     /**
+     * TODO: AUR: COMMENTS.
+     *
+     * @var array
+     */
+    protected $routeAliases = [];
+
+    /**
      * The registered custom implicit binding callback.
      *
      * @var array
@@ -1497,6 +1504,43 @@ class Router implements BindingRegistrar, RegistrarContract
         $this->container = $container;
 
         return $this;
+    }
+
+    /**
+     * TODO: AUR: desc.
+     *
+     * @param  string  $aliasName
+     * @param  string  $originalName
+     * @return void
+     */
+    public function alias(string $originalName, string|array $aliasNames): void
+    {
+        $aliasNames = is_array($aliasNames) ? $aliasNames : [$aliasNames];
+
+        foreach ($aliasNames as $aliasName) {
+            $this->routeAliases[$aliasName] = $originalName;
+        }
+    }
+
+    /**
+     * TODO: AUR: desc.
+     *
+     * @return array
+     */
+    public function getRouteAliases(): array
+    {
+        return $this->routeAliases;
+    }
+
+    /**
+     * TODO: AUR: desc.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    public function resolveAlias(string $name): string|null
+    {
+        return $this->routeAliases[$name] ?? null;
     }
 
     /**
