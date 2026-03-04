@@ -42,7 +42,7 @@ trait ResolvesJsonApiElements
     public $loadedRelationshipsMap;
 
     /**
-     * Cached loaded relationships identifers.
+     * Cached loaded relationships identifiers.
      */
     protected array $loadedRelationshipIdentifiers = [];
 
