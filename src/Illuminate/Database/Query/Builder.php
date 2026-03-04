@@ -4152,11 +4152,13 @@ class Builder implements BuilderContract
 
         $sql = $this->grammar->compileInsertOrIgnoreReturning($this, $values, (array) $uniqueBy, $returning);
 
-        $this->connection->recordsHaveBeenModified();
-
-        return new Collection(
+        $result = new Collection(
             $this->connection->selectFromWriteConnection($sql, $this->cleanBindings(Arr::flatten($values, 1)))
         );
+
+        $this->connection->recordsHaveBeenModified($result->isNotEmpty());
+
+        return $result;
     }
 
     /**
