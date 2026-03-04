@@ -77,7 +77,7 @@ class RouteListCommandTest extends TestCase
         $this->app->call('route:list', ['--json' => true, '--sort' => 'domain,uri']);
         $output = $this->app->output();
 
-        $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"example","name":null,"action":"Closure","middleware":["exampleMiddleware"]},{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","middleware":["web","auth"]},{"domain":"sub","method":"GET|HEAD","uri":"sub-example","name":null,"action":"Closure","middleware":["exampleMiddleware"]}]';
+        $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"example","name":null,"action":"Closure","aliases": [],"middleware":["exampleMiddleware"]},{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","aliases": [],"middleware":["web","auth"]},{"domain":"sub","method":"GET|HEAD","uri":"sub-example","name":null,"action":"Closure","aliases": [],"middleware":["exampleMiddleware"]}]';
 
         $this->assertJsonStringEqualsJsonString($expectedOrder, $output);
     }
@@ -87,7 +87,7 @@ class RouteListCommandTest extends TestCase
         $this->app->call('route:list', ['--json' => true, '--sort' => 'domain,uri', '--reverse' => true]);
         $output = $this->app->output();
 
-        $expectedOrder = '[{"domain":"sub","method":"GET|HEAD","uri":"sub-example","name":null,"action":"Closure","middleware":["exampleMiddleware"]},{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","middleware":["web","auth"]},{"domain":null,"method":"GET|HEAD","uri":"example","name":null,"action":"Closure","middleware":["exampleMiddleware"]}]';
+        $expectedOrder = '[{"domain":"sub","method":"GET|HEAD","uri":"sub-example","name":null,"action":"Closure","aliases": [],"middleware":["exampleMiddleware"]},{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","aliases": [],"middleware":["web","auth"]},{"domain":null,"method":"GET|HEAD","uri":"example","name":null,"action":"Closure","aliases": [],"middleware":["exampleMiddleware"]}]';
 
         $this->assertJsonStringEqualsJsonString($expectedOrder, $output);
     }
@@ -97,7 +97,7 @@ class RouteListCommandTest extends TestCase
         $this->app->call('route:list', ['--json' => true]);
         $output = $this->app->output();
 
-        $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"example","name":null,"action":"Closure","middleware":["exampleMiddleware"]},{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","middleware":["web","auth"]}, {"domain":"sub","method":"GET|HEAD","uri":"sub-example","name":null,"action":"Closure","middleware":["exampleMiddleware"]}]';
+        $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"example","name":null,"action":"Closure","aliases": [],"middleware":["exampleMiddleware"]},{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","aliases": [],"middleware":["web","auth"]}, {"domain":"sub","method":"GET|HEAD","uri":"sub-example","name":null,"action":"Closure","aliases": [],"middleware":["exampleMiddleware"]}]';
 
         $this->assertJsonStringEqualsJsonString($expectedOrder, $output);
     }
@@ -107,7 +107,7 @@ class RouteListCommandTest extends TestCase
         $this->app->call('route:list', ['--json' => true, '--sort' => 'definition']);
         $output = $this->app->output();
 
-        $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"example","name":null,"action":"Closure","middleware":["exampleMiddleware"]},{"domain":"sub","method":"GET|HEAD","uri":"sub-example","name":null,"action":"Closure","middleware":["exampleMiddleware"]}, {"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","middleware":["web","auth"]}]';
+        $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"example","name":null,"action":"Closure","aliases": [],"middleware":["exampleMiddleware"]},{"domain":"sub","method":"GET|HEAD","uri":"sub-example","name":null,"action":"Closure","aliases": [],"middleware":["exampleMiddleware"]}, {"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","aliases": [],"middleware":["web","auth"]}]';
 
         $this->assertJsonStringEqualsJsonString($expectedOrder, $output);
     }
@@ -181,7 +181,7 @@ class RouteListCommandTest extends TestCase
         $this->app->call('route:list', ['--json' => true, '-vv' => true]);
         $output = $this->app->output();
 
-        $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"example","name":null,"action":"Closure","middleware":["exampleMiddleware"]},{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","middleware":["Middleware 5","Middleware 1","Middleware 4","Middleware 2","Middleware 3"]},{"domain":"sub","method":"GET|HEAD","uri":"sub-example","name":null,"action":"Closure","middleware":["exampleMiddleware"]}]';
+        $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"example","name":null,"action":"Closure","aliases": [],"middleware":["exampleMiddleware"]},{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","aliases": [],"middleware":["Middleware 5","Middleware 1","Middleware 4","Middleware 2","Middleware 3"]},{"domain":"sub","method":"GET|HEAD","uri":"sub-example","name":null,"action":"Closure","aliases": [],"middleware":["exampleMiddleware"]}]';
 
         $this->assertJsonStringEqualsJsonString($expectedOrder, $output);
     }
@@ -191,7 +191,7 @@ class RouteListCommandTest extends TestCase
         $this->app->call('route:list', ['--json' => true, '-v' => true, '--middleware' => 'auth']);
         $output = $this->app->output();
 
-        $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","middleware":["web","auth"]}]';
+        $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","aliases": [],"middleware":["web","auth"]}]';
 
         $this->assertJsonStringEqualsJsonString($expectedOrder, $output);
     }
