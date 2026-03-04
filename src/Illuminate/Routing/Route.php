@@ -158,7 +158,7 @@ class Route
     protected $bindingFields = [];
 
     /**
-     * TODO: AUR: desc.
+     * List of route aliases.
      *
      * @var array
      */
@@ -1410,7 +1410,7 @@ class Route
     }
 
     /**
-     * TODO: AUR: desc.
+     * Add an alise for the route.
      *
      * @return void
      */
@@ -1420,7 +1420,7 @@ class Route
     }
 
     /**
-     * TODO: AUR: desc.
+     * Set the aliases for the route.
      *
      * @param  array<string>  $aliases
      * @return $this
@@ -1433,7 +1433,7 @@ class Route
     }
 
     /**
-     * TODO: AUR: desc.
+     * Get the aliases for the route.
      */
     public function getAliases(): array
     {

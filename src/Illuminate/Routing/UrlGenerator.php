@@ -533,19 +533,6 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
-     * TODO: AUR: desc.
-     */
-    public function getAliasesFor(string $originalName): array
-    {
-        return array_keys(
-            array_filter(
-                app('router')->getRouteAliases(),
-                fn ($original) => $original === $originalName
-            )
-        );
-    }
-
-    /**
      * Get the URL for a given route instance.
      *
      * @param  \Illuminate\Routing\Route  $route

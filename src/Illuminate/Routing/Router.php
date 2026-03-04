@@ -122,7 +122,7 @@ class Router implements BindingRegistrar, RegistrarContract
     protected $groupStack = [];
 
     /**
-     * TODO: AUR: COMMENTS.
+     * Store of all registered route aliases.
      *
      * @var array
      */
@@ -1516,10 +1516,10 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
-     * TODO: AUR: desc.
+     * Register route aliases.
      *
-     * @param  string  $aliasName
      * @param  string  $originalName
+     * @param  string|array  $aliasNames
      * @return void
      */
     public function alias(string $originalName, string|array $aliasNames): void
@@ -1532,7 +1532,7 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
-     * TODO: AUR: desc.
+     * Get all the registered route aliases.
      *
      * @return array
      */
@@ -1542,16 +1542,23 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
-     * TODO: AUR: desc.
+     * Resolve alias returning the original name.
      *
      * @param  string  $name
-     * @return string
+     * @return string|null
      */
     public function resolveAlias(string $name): string|null
     {
         return $this->routeAliases[$name] ?? null;
     }
 
+
+    /**
+     * Get all aliases for a given route name.
+     *
+     * @param string $originalName
+     * @return array
+     */
     public function getRouteAliasesFor(string $originalName): array
     {
         return array_keys(
