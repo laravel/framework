@@ -28,7 +28,7 @@ namespace Illuminate\Support\Facades;
  * @method static string dirname(string $path)
  * @method static string extension(string $path)
  * @method static string|null guessExtension(string $path)
- * @method static string type(string $path)
+ * @method static string|false type(string $path)
  * @method static string|false mimeType(string $path)
  * @method static int size(string $path)
  * @method static int lastModified(string $path)
