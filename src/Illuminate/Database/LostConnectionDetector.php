@@ -4,6 +4,7 @@ namespace Illuminate\Database;
 
 use Illuminate\Contracts\Database\LostConnectionDetector as LostConnectionDetectorContract;
 use Illuminate\Support\Str;
+use PDOException;
 use Throwable;
 
 class LostConnectionDetector implements LostConnectionDetectorContract
@@ -16,6 +17,13 @@ class LostConnectionDetector implements LostConnectionDetectorContract
      */
     public function causedByLostConnection(Throwable $e): bool
     {
+        if ($e instanceof PDOException
+            && isset($e->errorInfo[0], $e->errorInfo[1])
+            && $e->errorInfo[0] === 'HY000'
+            && (int) $e->errorInfo[1] === 2002) {
+            return true;
+        }
+
         $message = $e->getMessage();
 
         return Str::contains($message, [
