@@ -6,6 +6,7 @@ use Attribute;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Container\ContextualAttribute;
 use UnitEnum;
+
 use function Illuminate\Support\enum_value;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
@@ -13,6 +14,7 @@ class Log implements ContextualAttribute
 {
     /**
      * Create a new class instance.
+     *
      * @param  UnitEnum|string|null  $channel  The log configuration's channel name.
      * @param  UnitEnum|string|null  $name  The name to prefix all logs with. Only to be used with Monolog drivers.
      */
