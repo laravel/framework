@@ -9,6 +9,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 use UnexpectedValueException;
+use PDO;
 
 #[AsCommand(name: 'db')]
 class DbCommand extends Command
@@ -352,7 +353,7 @@ class DbCommand extends Command
 
         if (! empty($connection['options'])) {
             // For PostgreSQL SSL mode
-            if (isset($connection['options'][\PDO::MYSQL_ATTR_SSL_CA])) {
+            if (isset($connection['options'][PDO::MYSQL_ATTR_SSL_CA])) {
                 $params['ssl'] = 'true';
             }
         }
