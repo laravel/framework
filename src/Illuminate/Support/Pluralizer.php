@@ -91,6 +91,10 @@ class Pluralizer
 
         foreach ($functions as $function) {
             if ($function($comparison) === $comparison) {
+                if ($function === 'mb_strtoupper' && str_starts_with($value, $comparison)) {
+                    return $comparison.mb_substr($value, mb_strlen($comparison));
+                }
+
                 return $function($value);
             }
         }

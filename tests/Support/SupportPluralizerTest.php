@@ -35,6 +35,14 @@ class SupportPluralizerTest extends TestCase
         $this->assertSame('children', Str::plural('cHiLd'));
     }
 
+    public function testPluralAcronyms()
+    {
+        $this->assertSame('CDs', Str::plural('CD'));
+        $this->assertSame('DVDs', Str::plural('DVD'));
+        $this->assertSame('URLs', Str::plural('URL'));
+        $this->assertSame('APIs', Str::plural('API'));
+    }
+
     public function testIfEndOfWordPlural()
     {
         $this->assertSame('VortexFields', Str::plural('VortexField'));
