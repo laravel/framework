@@ -23,6 +23,15 @@ class AuthorizeMiddlewareAttributeTest extends TestCase
             'Illuminate\Auth\Middleware\Authorize:except-index,a,b',
         ], $route->controllerMiddleware());
     }
+
+    public function test_attribute_supports_enums_for_models(): void
+    {
+        $route = Route::get('/', [AuthorizeMiddlewareEnumModelsController::class, 'index']);
+        $this->assertEquals([
+            'Illuminate\Auth\Middleware\Authorize:view,user',
+            'Illuminate\Auth\Middleware\Authorize:update,post,Account,1',
+        ], $route->controllerMiddleware());
+    }
 }
 
 #[Authorize('all')]
@@ -40,4 +49,30 @@ class AuthorizeMiddlewareAttributeController
     {
         // ...
     }
+}
+
+#[Authorize('view', models: AuthorizeModelBackedEnum::User)]
+#[Authorize('update', models: [AuthorizeModelBackedEnum::Post, AuthorizeModelUnitEnum::Account, AuthorizeModelIntegerEnum::One])]
+class AuthorizeMiddlewareEnumModelsController
+{
+    public function index(): void
+    {
+        // ...
+    }
+}
+
+enum AuthorizeModelBackedEnum: string
+{
+    case User = 'user';
+    case Post = 'post';
+}
+
+enum AuthorizeModelUnitEnum
+{
+    case Account;
+}
+
+enum AuthorizeModelIntegerEnum: int
+{
+    case One = 1;
 }
