@@ -14,11 +14,11 @@
         "source": "https://github.com/laravel/framework"
     },
     "require": {
-        "php": "^8.3",
+        "php": "^8.4",
         "ext-filter": "*",
-        "illuminate/collections": "^13.0",
-        "illuminate/contracts": "^13.0",
-        "illuminate/support": "^13.0"
+        "illuminate/collections": "^14.0",
+        "illuminate/contracts": "^14.0",
+        "illuminate/support": "^14.0"
     },
     "minimum-stability": "dev",
     "autoload": {
@@ -31,7 +31,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "13.0.x-dev"
+            "dev-master": "14.0.x-dev"
         }
     }
 }
