@@ -1084,7 +1084,7 @@ class Route
         }
 
         foreach ($middleware as $index => $value) {
-            $middleware[$index] = (string) $value;
+            $middleware[$index] = (string) enum_value($value);
         }
 
         $this->action['middleware'] = array_merge(

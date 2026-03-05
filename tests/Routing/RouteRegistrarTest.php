@@ -104,6 +104,15 @@ class RouteRegistrarTest extends TestCase
         $this->assertSame(['one'], $this->getRoute()->middleware());
     }
 
+    public function testMiddlewareAsEnumsOnRouteInstance()
+    {
+        $this->router->get('users', function () {
+            return 'all-users';
+        })->middleware([CategoryEnum::People, CategoryBackedEnum::People, IntegerEnum::One]);
+
+        $this->assertSame(['People', 'people', '1'], $this->getRoute()->middleware());
+    }
+
     public function testMiddlewareAsArrayWithStringables()
     {
         $one = new class implements Stringable
@@ -344,6 +353,17 @@ class RouteRegistrarTest extends TestCase
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
         $this->seeMiddleware('one');
+    }
+
+    public function testCanRegisterGroupWithBackedEnumMiddleware()
+    {
+        $this->router->middleware(CategoryBackedEnum::People)->group(function ($router) {
+            $router->get('users', function () {
+                return 'all-users';
+            });
+        });
+
+        $this->seeMiddleware('people');
     }
 
     public function testCanRegisterGroupWithNamespace()

@@ -10,6 +10,8 @@ use Illuminate\Support\Reflector;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 
+use function Illuminate\Support\enum_value;
+
 /**
  * @method \Illuminate\Routing\Route any(string $uri, \Closure|array|string|null $action = null)
  * @method \Illuminate\Routing\Route delete(string $uri, \Closure|array|string|null $action = null)
@@ -124,7 +126,7 @@ class RouteRegistrar
             $value = array_filter(Arr::wrap($value));
 
             foreach ($value as $index => $middleware) {
-                $value[$index] = (string) $middleware;
+                $value[$index] = (string) enum_value($middleware);
             }
         }
 
