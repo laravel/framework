@@ -269,9 +269,7 @@ class DbCommand extends Command
      */
     protected function openDatabaseUrl(array $connection)
     {
-        $url = $this->buildDatabaseUrl($connection);
-
-        $this->open($url);
+        $this->open($this->buildDatabaseUrl($connection));
 
         return Command::SUCCESS;
     }
@@ -287,11 +285,7 @@ class DbCommand extends Command
         $driver = $this->getDriverScheme($connection['driver']);
 
         if ($connection['driver'] === 'sqlite') {
-            $path = $connection['database'];
-
-            return str_starts_with($path, '/')
-                ? "{$driver}://{$path}"
-                : "{$driver}:///{$path}";
+            return $connection['database'];
         }
 
         $url = "{$driver}://";

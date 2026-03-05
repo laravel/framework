@@ -63,7 +63,7 @@ class DbCommandTest extends TestCase
 
         $url = $command->buildDatabaseUrl($connection);
 
-        $this->assertSame('sqlite:///path/to/database.sqlite', $url);
+        $this->assertSame('/path/to/database.sqlite', $url);
     }
 
     public function testBuildDatabaseUrlForSqlServer()
