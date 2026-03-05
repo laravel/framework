@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\ConfigurationUrlParser;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 use UnexpectedValueException;
 
@@ -19,7 +20,8 @@ class DbCommand extends Command
      */
     protected $signature = 'db {connection? : The database connection that should be used}
                {--read : Connect to the read connection}
-               {--write : Connect to the write connection}';
+               {--write : Connect to the write connection}
+               {--open : Open the connection URL in a GUI client}';
 
     /**
      * The console command description.
@@ -43,6 +45,10 @@ class DbCommand extends Command
             $this->newLine();
 
             return Command::FAILURE;
+        }
+
+        if ($this->option('open')) {
+            return $this->openDatabaseUrl($connection);
         }
 
         try {
@@ -253,5 +259,149 @@ class DbCommand extends Command
         return array_values(array_filter($args, function ($key) use ($connection) {
             return ! empty($connection[$key]);
         }, ARRAY_FILTER_USE_KEY));
+    }
+
+    /**
+     * Open the database connection URL in a GUI client.
+     *
+     * @param  array  $connection
+     * @return int
+     */
+    protected function openDatabaseUrl(array $connection)
+    {
+        $url = $this->buildDatabaseUrl($connection);
+
+        $this->open($url);
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * Build the database connection URL.
+     *
+     * @param  array  $connection
+     * @return string
+     */
+    protected function buildDatabaseUrl(array $connection)
+    {
+        $driver = $this->getDriverScheme($connection['driver']);
+
+        if ($connection['driver'] === 'sqlite') {
+            $path = $connection['database'];
+
+            return str_starts_with($path, '/')
+                ? "{$driver}://{$path}"
+                : "{$driver}:///{$path}";
+        }
+
+        $url = "{$driver}://";
+
+        if (! empty($connection['username'])) {
+            $url .= urlencode($connection['username']);
+
+            if (! empty($connection['password'])) {
+                $url .= ':'.urlencode($connection['password']);
+            }
+
+            $url .= '@';
+        }
+
+        $url .= $connection['host'];
+
+        if (! empty($connection['port'])) {
+            $url .= ":{$connection['port']}";
+        }
+
+        if (! empty($connection['database'])) {
+            $url .= '/'.urlencode($connection['database']);
+        }
+
+        $queryParams = $this->getQueryParameters($connection);
+        if (! empty($queryParams)) {
+            $url .= '?'.http_build_query($queryParams);
+        }
+
+        return $url;
+    }
+
+    /**
+     * Get the URL scheme for the database driver.
+     *
+     * @param  string  $driver
+     * @return string
+     */
+    protected function getDriverScheme($driver)
+    {
+        return match ($driver) {
+            'mysql', 'mariadb' => 'mysql',
+            'pgsql' => 'postgresql',
+            'sqlite' => 'sqlite',
+            'sqlsrv' => 'sqlserver',
+            default => $driver,
+        };
+    }
+
+    /**
+     * Get additional query parameters for the URL.
+     *
+     * @param  array  $connection
+     * @return array
+     */
+    protected function getQueryParameters(array $connection)
+    {
+        $params = [];
+
+        // Add SSL/TLS parameters if configured
+        if (! empty($connection['sslmode'])) {
+            $params['sslmode'] = $connection['sslmode'];
+        }
+
+        if (! empty($connection['options'])) {
+            // For PostgreSQL SSL mode
+            if (isset($connection['options'][\PDO::MYSQL_ATTR_SSL_CA])) {
+                $params['ssl'] = 'true';
+            }
+        }
+
+        return $params;
+    }
+
+    /**
+     * Open the database URL.
+     *
+     * @param  string  $url
+     * @return void
+     */
+    protected function open($url)
+    {
+        if (PHP_OS_FAMILY === 'Windows') {
+            $process = Process::fromShellCommandline(escapeshellcmd("start {$url}"));
+            $process->run();
+
+            if (! $process->isSuccessful()) {
+                throw new ProcessFailedException($process);
+            }
+
+            return;
+        }
+
+        $binary = collect(match (PHP_OS_FAMILY) {
+            'Darwin' => ['open'],
+            'Linux' => ['xdg-open', 'wslview'],
+        })->first(fn ($binary) => (new ExecutableFinder)->find($binary) !== null);
+
+        if ($binary === null) {
+            $this->components->warn('Unable to open the URL on your system. You will need to open it yourself.');
+            $this->components->info("Database URL: {$url}");
+
+            return;
+        }
+
+        $process = Process::fromShellCommandline(escapeshellcmd("{$binary} {$url}"));
+        $process->run();
+
+        if (! $process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
     }
 }
