@@ -4149,11 +4149,11 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testInsertOrIgnoreReturningDoesNotMarkRecordsModifiedWhenNoRowsWereInserted()
     {
         $builder = $this->getPostgresBuilder();
-        $builder->getConnection()->shouldReceive('recordsHaveBeenModified')->once()->with(false);
         $builder->getConnection()->shouldReceive('selectFromWriteConnection')->once()->with(
             'insert into "users" ("email") values (?) on conflict ("email") do nothing returning *',
             ['foo']
         )->andReturn([]);
+        $builder->getConnection()->shouldReceive('recordsHaveBeenModified')->once()->with(false);
         $result = $builder->from('users')->insertOrIgnoreReturning(['email' => 'foo'], 'email');
         $this->assertInstanceOf(Collection::class, $result);
         $this->assertTrue($result->isEmpty());
