@@ -2864,11 +2864,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $keys = get_object_vars($this);
 
-        if (version_compare(PHP_VERSION, '8.4.0', '>=')) {
-            foreach ((new ReflectionClass($this))->getProperties() as $property) {
-                if ($property->hasHooks()) {
-                    unset($keys[$property->getName()]);
-                }
+        foreach ((new ReflectionClass($this))->getProperties() as $property) {
+            if ($property->hasHooks()) {
+                unset($keys[$property->getName()]);
             }
         }
 

@@ -1439,6 +1439,7 @@ class Route
 
         $this->compileRoute();
 
+        /** @phpstan-ignore unset.possiblyHookedProperty,unset.possiblyHookedProperty */
         unset($this->router, $this->container);
     }
 

@@ -14,7 +14,7 @@
         "source": "https://github.com/laravel/framework"
     },
     "require": {
-        "php": "^8.3"
+        "php": "^8.4"
     },
     "minimum-stability": "dev",
     "autoload": {
@@ -27,7 +27,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "13.0.x-dev"
+            "dev-master": "14.0.x-dev"
         }
     }
 }

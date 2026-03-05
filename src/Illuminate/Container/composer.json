@@ -14,12 +14,11 @@
         "source": "https://github.com/laravel/framework"
     },
     "require": {
-        "php": "^8.3",
-        "illuminate/contracts": "^13.0",
-        "illuminate/reflection": "^13.0",
+        "php": "^8.4",
+        "illuminate/contracts": "^14.0",
+        "illuminate/reflection": "^14.0",
         "psr/container": "^1.1.1 || ^2.0.1",
-        "symfony/polyfill-php84": "^1.36",
-        "symfony/polyfill-php85": "^1.36"
+        "symfony/polyfill-php85": "^1.33"
     },
     "provide": {
         "psr/container-implementation": "1.1 || 2.0"
@@ -43,7 +42,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "13.0.x-dev"
+            "dev-master": "14.0.x-dev"
         }
     }
 }
