@@ -9,6 +9,7 @@ use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
 use InvalidArgumentException;
+use JsonException;
 use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionParameter;
@@ -173,9 +174,42 @@ class SeedCommand extends Command
             'float' => $this->castFloatSeederParameter($seeder, $parameter, $value),
             'bool' => $this->castBooleanSeederParameter($seeder, $parameter, $value),
             'string' => $value,
-            'array' => [$value],
+            'array' => $this->castArraySeederParameter($seeder, $parameter, $value),
             default => $value,
         };
+    }
+
+    /**
+     * Cast a seeder parameter value to array.
+     *
+     * @param  \Illuminate\Database\Seeder  $seeder
+     * @param  \ReflectionParameter  $parameter
+     * @param  string  $value
+     * @return array
+     */
+    protected function castArraySeederParameter(Seeder $seeder, ReflectionParameter $parameter, string $value): array
+    {
+        $trimmed = trim($value);
+
+        if ($trimmed !== '' && str_starts_with($trimmed, '[')) {
+            try {
+                $parsed = json_decode($trimmed, true, 512, JSON_THROW_ON_ERROR);
+            } catch (JsonException) {
+                throw new InvalidArgumentException(
+                    "The [{$parameter->getName()}] parameter for [".get_class($seeder).'] must be a valid JSON array.'
+                );
+            }
+
+            if (! is_array($parsed)) {
+                throw new InvalidArgumentException(
+                    "The [{$parameter->getName()}] parameter for [".get_class($seeder).'] must be a valid JSON array.'
+                );
+            }
+
+            return $parsed;
+        }
+
+        return [$value];
     }
 
     /**
