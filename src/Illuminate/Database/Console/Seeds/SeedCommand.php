@@ -158,15 +158,14 @@ class SeedCommand extends Command
     protected function castSeederParameterValue(Seeder $seeder, ReflectionParameter $parameter, string $value)
     {
         $type = $parameter->getType();
+        $unsupportedTypeMessage = "Unable to pass [{$parameter->getName()}] to [".get_class($seeder).'] via --with because only int, float, bool, string, and array types are supported.';
 
         if ($type === null) {
             return $value;
         }
 
-        if (! $type instanceof ReflectionNamedType || ! $type->isBuiltin()) {
-            throw new InvalidArgumentException(
-                "Unable to pass [{$parameter->getName()}] to [".get_class($seeder).'] via --with because only single built-in scalar parameter types are supported.'
-            );
+        if (! $type instanceof ReflectionNamedType) {
+            throw new InvalidArgumentException($unsupportedTypeMessage);
         }
 
         return match ($type->getName()) {
@@ -175,7 +174,7 @@ class SeedCommand extends Command
             'bool' => $this->castBooleanSeederParameter($seeder, $parameter, $value),
             'string' => $value,
             'array' => $this->castArraySeederParameter($seeder, $parameter, $value),
-            default => $value,
+            default => throw new InvalidArgumentException($unsupportedTypeMessage),
         };
     }
 
