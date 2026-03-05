@@ -731,6 +731,12 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('/', $url->previousPath());
 
         $this->assertSame('/bar', $url->previousPath('/bar'));
+
+        $url->getRequest()->headers->set('referer', 'http://www.google.com/search?q=laravel');
+        $this->assertSame('/search', $url->previousPath());
+
+        $url->getRequest()->headers->set('referer', 'http://www.external.com/some/path');
+        $this->assertSame('/some/path', $url->previousPath());
     }
 
     public function testRouteNotDefinedException()

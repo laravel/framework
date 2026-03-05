@@ -182,9 +182,9 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function previousPath($fallback = false)
     {
-        $previousPath = str_replace($this->to('/'), '', rtrim(preg_replace('/\?.*/', '', $this->previous($fallback)), '/'));
+        $previousPath = parse_url($this->previous($fallback), PHP_URL_PATH);
 
-        return $previousPath === '' ? '/' : $previousPath;
+        return $previousPath && $previousPath !== '/' ? rtrim($previousPath, '/') : '/';
     }
 
     /**
