@@ -1472,7 +1472,7 @@ class Router implements BindingRegistrar, RegistrarContract
         foreach ($this->routes as $route) {
             $aliases = $route->getAliases();
             if ($name = $route->getName()) {
-                if ( sizeof($aliases) > 0) {
+                if (sizeof($aliases) > 0) {
                     $this->alias($name, $aliases);
                 }
             }
@@ -1547,22 +1547,21 @@ class Router implements BindingRegistrar, RegistrarContract
      * @param  string  $name
      * @return string|null
      */
-    public function resolveAlias(string $name): string|null
+    public function resolveAlias(string $name): ?string
     {
         return $this->routeAliases[$name] ?? null;
     }
 
-
     /**
      * Get all aliases for a given route name.
      *
-     * @param string $originalName
+     * @param  string  $originalName
      * @return array
      */
     public function getRouteAliasesFor(string $originalName): array
     {
         return array_keys(
-            array_filter($this->routeAliases, fn($original) => $original === $originalName)
+            array_filter($this->routeAliases, fn ($original) => $original === $originalName)
         );
     }
 

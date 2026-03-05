@@ -10,16 +10,12 @@ use Illuminate\Routing\CallableDispatcher;
 use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContract;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 use Illuminate\Routing\ControllerDispatcher;
-use Illuminate\Routing\Route;
-use Illuminate\Routing\RouteCollection;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
 use PHPUnit\Framework\TestCase;
 
 class RoutingAliasTest extends TestCase
 {
-
-
     public function testRegisterSingleAlias()
     {
         $router = $this->getRouter();
@@ -76,7 +72,6 @@ class RoutingAliasTest extends TestCase
 
     public function testPreventOverrideAliases()
     {
-
         [$container, $router] = $this->getRouterWithApp();
 
         $router->get('dashboard', function () {
@@ -107,8 +102,8 @@ class RoutingAliasTest extends TestCase
 
         $container->instance(Registrar::class, $router);
 
-        $container->bind(ControllerDispatcherContract::class, fn($app) => new ControllerDispatcher($app));
-        $container->bind(CallableDispatcherContract::class, fn($app) => new CallableDispatcher($app));
+        $container->bind(ControllerDispatcherContract::class, fn ($app) => new ControllerDispatcher($app));
+        $container->bind(CallableDispatcherContract::class, fn ($app) => new CallableDispatcher($app));
 
         return $router;
     }
@@ -116,7 +111,6 @@ class RoutingAliasTest extends TestCase
     protected function getRouterWithApp(): array
     {
         $container = new Container;
-
 
         Container::setInstance($container);
 

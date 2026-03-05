@@ -144,7 +144,7 @@ class RouteListCommand extends Command
             'method' => implode('|', $route->methods()),
             'uri' => $route->uri(),
             'name' => $route->getName(),
-            'aliases' =>  $route->getName() ? app('router')->getRouteAliasesFor($route->getName()) : [],
+            'aliases' => $route->getName() ? app('router')->getRouteAliasesFor($route->getName()) : [],
             'action' => ltrim($route->getActionName(), '\\'),
             'middleware' => $this->getMiddleware($route),
             'vendor' => $this->isVendorRoute($route),
@@ -422,12 +422,11 @@ class RouteListCommand extends Command
      */
     protected function formatActionForCli($route)
     {
+        ['action' => $action, 'name' => $name, 'aliases' => $aliases] = $route;
 
-        ['action' => $action, 'name' => $name, 'aliases' => $aliases ]= $route;
-
-        $computed_aliases = $this->option('with-aliases') && sizeof($aliases)>0
-            ?(' ['.implode(', ', $aliases).']')
-            :'';
+        $computed_aliases = $this->option('with-aliases') && sizeof($aliases) > 0
+            ? (' ['.implode(', ', $aliases).']')
+            : '';
 
         if ($action === 'Closure' || $action === ViewController::class) {
             return $name.$computed_aliases;

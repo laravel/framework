@@ -184,7 +184,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
                 'lockSeconds' => $route->locksFor(),
                 'waitSeconds' => $route->waitsFor(),
                 'withTrashed' => $route->allowsTrashedBindings(),
-                'aliases' => app('router')->getRouteAliasesFor($route->getName())?? [],
+                'aliases' => app('router')->getRouteAliasesFor($route->getName()) ?? [],
             ];
         }
 

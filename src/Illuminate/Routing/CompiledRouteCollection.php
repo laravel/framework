@@ -299,7 +299,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
             ->setBindingFields($attributes['bindingFields'])
             ->block($attributes['lockSeconds'] ?? null, $attributes['waitSeconds'] ?? null)
             ->withTrashed($attributes['withTrashed'] ?? false)
-            ->setAliases($attributes['aliases']??[]);
+            ->setAliases($attributes['aliases'] ?? []);
     }
 
     /**

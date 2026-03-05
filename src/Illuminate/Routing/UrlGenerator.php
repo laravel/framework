@@ -516,7 +516,7 @@ class UrlGenerator implements UrlGeneratorContract
             throw new InvalidArgumentException('Attribute [name] expects a string backed enum.');
         }
 
-        if (is_null($this->routes->getByName($name))){
+        if (is_null($this->routes->getByName($name))) {
             if ($resolved = app('router')->resolveAlias($name)) {
                 $name = $resolved;
             }
