@@ -140,6 +140,7 @@ class RefreshCommand extends Command
             '--database' => $database,
             '--class' => $this->option('seeder') ?: 'Database\\Seeders\\DatabaseSeeder',
             '--force' => true,
+            '--with' => $this->option('with'),
         ]));
     }
 
@@ -157,6 +158,7 @@ class RefreshCommand extends Command
             ['realpath', null, InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths'],
             ['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run'],
             ['seeder', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder'],
+            ['with', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Values passed into the seeder'],
             ['step', null, InputOption::VALUE_OPTIONAL, 'The number of migrations to be reverted & re-run'],
         ];
     }

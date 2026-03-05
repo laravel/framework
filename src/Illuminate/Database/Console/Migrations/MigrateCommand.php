@@ -35,6 +35,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
                 {--pretend : Dump the SQL queries that would be run}
                 {--seed : Indicates if the seed task should be re-run}
                 {--seeder= : The class name of the root seeder}
+                {--with=* : Values passed into the seeder}
                 {--step : Force the migrations to be run so they can be rolled back individually}
                 {--graceful : Return a successful exit code even if an error occurs}';
 
@@ -124,10 +125,11 @@ class MigrateCommand extends BaseCommand implements Isolatable
             // seed task to re-populate the database, which is convenient when adding
             // a migration and a seed at the same time, as it is only this command.
             if ($this->option('seed') && ! $this->option('pretend')) {
-                $this->call('db:seed', [
+                $this->call('db:seed', array_filter([
                     '--class' => $this->option('seeder') ?: 'Database\\Seeders\\DatabaseSeeder',
                     '--force' => true,
-                ]);
+                    '--with' => $this->option('with'),
+                ]));
             }
         });
     }

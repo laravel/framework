@@ -122,6 +122,7 @@ class FreshCommand extends Command
             '--database' => $database,
             '--class' => $this->option('seeder') ?: 'Database\\Seeders\\DatabaseSeeder',
             '--force' => true,
+            '--with' => $this->option('with'),
         ]));
     }
 
@@ -142,6 +143,7 @@ class FreshCommand extends Command
             ['schema-path', null, InputOption::VALUE_OPTIONAL, 'The path to a schema dump file'],
             ['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run'],
             ['seeder', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder'],
+            ['with', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Values passed into the seeder'],
             ['step', null, InputOption::VALUE_NONE, 'Force the migrations to be run so they can be rolled back individually'],
         ];
     }
