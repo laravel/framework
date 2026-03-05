@@ -62,7 +62,6 @@ class EloquentMagicMutatorTest extends TestCase
 
         $this->assertSame('TAYLOR', $model->name);
     }
-
 }
 
 class EloquentMagicMutatorTestModelWithLegacy extends Model
