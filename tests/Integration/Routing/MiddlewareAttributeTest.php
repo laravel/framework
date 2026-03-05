@@ -23,6 +23,25 @@ class MiddlewareAttributeTest extends TestCase
             'except-index',
         ], $route->controllerMiddleware());
     }
+
+    public function test_attribute_middleware_supports_arrays(): void
+    {
+        $route = Route::get('/', [MiddlewareArrayAttributeController::class, 'index']);
+        $this->assertEquals([
+            'all',
+            'all-array-one',
+            'all-array-two',
+            'also-index-array-one',
+            'also-index-array-two',
+        ], $route->controllerMiddleware());
+
+        $route = Route::get('/', [MiddlewareArrayAttributeController::class, 'show']);
+        $this->assertEquals([
+            'all',
+            'all-array-one',
+            'all-array-two',
+        ], $route->controllerMiddleware());
+    }
 }
 
 #[Middleware('all')]
@@ -31,6 +50,22 @@ class MiddlewareAttributeTest extends TestCase
 class MiddlewareAttributeController
 {
     #[Middleware('also-index')]
+    public function index(): void
+    {
+        // ...
+    }
+
+    public function show(): void
+    {
+        // ...
+    }
+}
+
+#[Middleware('all')]
+#[Middleware(['all-array-one', 'all-array-two'])]
+class MiddlewareArrayAttributeController
+{
+    #[Middleware(['also-index-array-one', 'also-index-array-two'], only: ['index'])]
     public function index(): void
     {
         // ...

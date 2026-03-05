@@ -1196,6 +1196,7 @@ class Route
             ) ? null : $instance->value;
         })
             ->filter()
+            ->flatten()
             ->values()
             ->all();
     }
