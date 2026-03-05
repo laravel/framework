@@ -183,7 +183,7 @@ class ArrayStore extends TaggableStore implements CanFlushLocks, LockProvider
 
         $item['expiresAt'] = $this->calculateExpiration($seconds);
 
-        $this->storage = array_merge($this->storage, [$key => $item]);
+        $this->storage[$key] = $item;
 
         return true;
     }

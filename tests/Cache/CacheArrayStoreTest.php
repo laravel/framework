@@ -86,6 +86,22 @@ class CacheArrayStoreTest extends TestCase
         $this->assertSame($value, $store->get($key));
     }
 
+    public function testTouchDoesNotDuplicateNumericKeys(): void
+    {
+        $store = new ArrayStore;
+
+        $store->put('0', 'value', 30);
+
+        $this->assertTrue($store->touch('0', 60));
+        $this->assertSame('value', $store->get('0'));
+
+        $all = $store->all();
+
+        $this->assertCount(1, $all);
+        $this->assertArrayHasKey(0, $all);
+        $this->assertArrayNotHasKey(1, $all);
+    }
+
     public function testStoreItemForeverProperlyStoresInArray()
     {
         $mock = $this->getMockBuilder(ArrayStore::class)->onlyMethods(['put'])->getMock();
