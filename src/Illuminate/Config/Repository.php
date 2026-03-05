@@ -77,13 +77,19 @@ class Repository implements ArrayAccess, ConfigContract
     }
 
     /**
-     * Get the specified string configuration value.
+     * Get the specified string configuration value with optional type validation.
      *
      * @param  (\Closure():(string|null))|string|null  $default
+     * @return (
+     *     $type is ConfigStringType::DEFAULT ? string :
+     *     ($type is ConfigStringType::NON_EMPTY ? non-empty-string :
+     *     ($type is ConfigStringType::NON_FALSY ? non-falsy-string :
+     *     ($type is ConfigStringType::LOWERCASE ? lowercase-string : uppercase-string)))
+     * )
      *
      * @throws \InvalidArgumentException
      */
-    public function string(string $key, $default = null): string
+    public function string(string $key, $default = null, ConfigStringType $type = ConfigStringType::DEFAULT): string
     {
         $value = $this->get($key, $default);
 
@@ -93,101 +99,64 @@ class Repository implements ArrayAccess, ConfigContract
             );
         }
 
-        return $value;
-    }
+        if ($type === ConfigStringType::NON_EMPTY) {
+            if (trim($value) === '') {
+                throw new InvalidArgumentException(
+                    sprintf('Configuration value for key [%s] must be a non-empty string, %s given.', $key, $value)
+                );
+            }
 
-    /**
-     * Get the specified string configuration value.
-     *
-     * @param  (\Closure():(string|null))|string|null  $default
-     * @return non-empty-string
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function nonEmptyString(string $key, $default = null): string
-    {
-        $value = $this->string($key, $default);
+            return $value;
+        }
 
-        if (trim($value) === '') {
-            throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a non-empty string, %s given.', $key, $value)
-            );
+        if ($type === ConfigStringType::NON_FALSY) {
+            if (! (bool) $value) {
+                throw new InvalidArgumentException(
+                    sprintf('Configuration value for key [%s] must be a non-falsy string, %s given.', $key, $value)
+                );
+            }
+
+            return $value;
+        }
+
+        if ($type === ConfigStringType::LOWERCASE) {
+            if (strtolower($value) !== $value) {
+                throw new InvalidArgumentException(
+                    sprintf('Configuration value for key [%s] must be a lowercase string, %s given.', $key, $value)
+                );
+            }
+
+            return $value;
+        }
+
+        if ($type === ConfigStringType::UPPERCASE) {
+            if (strtoupper($value) !== $value) {
+                throw new InvalidArgumentException(
+                    sprintf('Configuration value for key [%s] must be an uppercase string, %s given.', $key, $value)
+                );
+            }
+
+            return $value;
         }
 
         return $value;
     }
 
     /**
-     * Get the specified string configuration value.
-     *
-     * @param  (\Closure():(string|null))|string|null  $default
-     * @return non-falsy-string
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function nonFalsyString(string $key, $default = null): string
-    {
-        $value = $this->string($key, $default);
-
-        if (! (bool) $value) {
-            throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a non-falsy string, %s given.', $key, $value)
-            );
-        }
-
-        return $value;
-    }
-
-    /**
-     * Get the specified string configuration value.
-     *
-     * @param  (\Closure():(string|null))|string|null  $default
-     * @return lowercase-string
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function lowerCaseString(string $key, $default = null): string
-    {
-        $value = $this->string($key, $default);
-
-        if (strtolower($value) !== $value) {
-            throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a lowercase string, %s given.', $key, $value)
-            );
-        }
-
-        return $value;
-    }
-
-    /**
-     * Get the specified string configuration value.
-     *
-     * @param  (\Closure():(string|null))|string|null  $default
-     * @return uppercase-string
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function upperCaseString(string $key, $default = null): string
-    {
-        $value = $this->string($key, $default);
-
-        if (strtoupper($value) !== $value) {
-            throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be an uppercase string, %s given.', $key, $value)
-            );
-        }
-
-        return $value;
-    }
-
-    /**
-     * Get the specified integer configuration value.
+     * Get the specified integer configuration value with optional type validation.
      *
      * @param  (\Closure():(int|null))|int|null  $default
+     * @return (
+     *     $type is ConfigIntType::DEFAULT ? int :
+     *     ($type is ConfigIntType::POSITIVE ? positive-int :
+     *     ($type is ConfigIntType::NEGATIVE ? negative-int :
+     *     ($type is ConfigIntType::NON_POSITIVE ? non-positive-int :
+     *     ($type is ConfigIntType::NON_NEGATIVE ? non-negative-int : non-zero-int))))
+     * )
      *
      * @throws \InvalidArgumentException
      */
-    public function integer(string $key, $default = null): int
+    public function integer(string $key, $default = null, ConfigIntType $type = ConfigIntType::DEFAULT): int
     {
         $value = $this->get($key, $default);
 
@@ -197,109 +166,54 @@ class Repository implements ArrayAccess, ConfigContract
             );
         }
 
-        return $value;
-    }
+        if ($type === ConfigIntType::POSITIVE) {
+            if ($value <= 0) {
+                throw new InvalidArgumentException(
+                    sprintf('Configuration value for key [%s] must be a positive integer, %s given.', $key, $value)
+                );
+            }
 
-    /**
-     * Get the specified integer configuration value.
-     *
-     * @param  (\Closure():(int|null))|int|null  $default
-     * @return positive-int
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function positiveInteger(string $key, $default = null): int
-    {
-        $value = $this->integer($key, $default);
-
-        if ($value <= 0) {
-            throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a positive integer, %s given.', $key, $value)
-            );
+            return $value;
         }
 
-        return $value;
-    }
+        if ($type === ConfigIntType::NEGATIVE) {
+            if ($value >= 0) {
+                throw new InvalidArgumentException(
+                    sprintf('Configuration value for key [%s] must be a negative integer, %s given.', $key, $value)
+                );
+            }
 
-    /**
-     * Get the specified integer configuration value.
-     *
-     * @param  (\Closure():(int|null))|int|null  $default
-     * @return negative-int
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function negativeInteger(string $key, $default = null): int
-    {
-        $value = $this->integer($key, $default);
-
-        if ($value >= 0) {
-            throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a negative integer, %s given.', $key, $value)
-            );
+            return $value;
         }
 
-        return $value;
-    }
+        if ($type === ConfigIntType::NON_POSITIVE) {
+            if ($value > 0) {
+                throw new InvalidArgumentException(
+                    sprintf('Configuration value for key [%s] must be a non-positive integer, %s given.', $key, $value)
+                );
+            }
 
-    /**
-     * Get the specified integer configuration value.
-     *
-     * @param  (\Closure():(int|null))|int|null  $default
-     * @return non-positive-int
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function nonPositiveInteger(string $key, $default = null): int
-    {
-        $value = $this->integer($key, $default);
-
-        if ($value > 0) {
-            throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a non-positive integer, %s given.', $key, $value)
-            );
+            return $value;
         }
 
-        return $value;
-    }
+        if ($type === ConfigIntType::NON_NEGATIVE) {
+            if ($value < 0) {
+                throw new InvalidArgumentException(
+                    sprintf('Configuration value for key [%s] must be a non-negative integer, %s given.', $key, $value)
+                );
+            }
 
-    /**
-     * Get the specified integer configuration value.
-     *
-     * @param  (\Closure():(int|null))|int|null  $default
-     * @return non-negative-int
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function nonNegativeInteger(string $key, $default = null): int
-    {
-        $value = $this->integer($key, $default);
-
-        if ($value < 0) {
-            throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a non-negative integer, %s given.', $key, $value)
-            );
+            return $value;
         }
 
-        return $value;
-    }
+        if ($type === ConfigIntType::NON_ZERO) {
+            if ($value === 0) {
+                throw new InvalidArgumentException(
+                    sprintf('Configuration value for key [%s] must be a non-zero integer, %s given.', $key, $value)
+                );
+            }
 
-    /**
-     * Get the specified integer configuration value.
-     *
-     * @param  (\Closure():(int|null))|int|null  $default
-     * @return non-zero-int
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function nonZeroInteger(string $key, $default = null): int
-    {
-        $value = $this->integer($key, $default);
-
-        if ($value === 0) {
-            throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a non-zero integer, %s given.', $key, $value)
-            );
+            return $value;
         }
 
         return $value;
