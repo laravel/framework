@@ -22,6 +22,7 @@ class Command extends SymfonyCommand
         Concerns\InteractsWithIO,
         Concerns\InteractsWithSignals,
         Concerns\PromptsForMissingInput,
+        Concerns\ValidatesInput,
         Macroable;
 
     /**
@@ -236,6 +237,12 @@ class Command extends SymfonyCommand
             return (int) (is_numeric($this->option('isolated'))
                 ? $this->option('isolated')
                 : $this->isolatedExitCode);
+        }
+
+        if (! is_null($validator = $this->getFailedCommandInputValidator())) {
+            $this->displayValidationErrors($validator);
+
+            return static::FAILURE;
         }
 
         $method = method_exists($this, 'handle') ? 'handle' : '__invoke';
