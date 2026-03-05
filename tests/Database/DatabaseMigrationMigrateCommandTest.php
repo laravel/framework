@@ -135,6 +135,32 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $this->runCommand($command, ['--step' => true]);
     }
 
+    public function testWithOptionMayBeForwardedToSeeder()
+    {
+        $params = [$migrator = m::mock(Migrator::class), $dispatcher = m::mock(Dispatcher::class)];
+        $command = $this->getMockBuilder(MigrateCommand::class)->onlyMethods(['call'])->setConstructorArgs($params)->getMock();
+        $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $migrator->shouldReceive('paths')->once()->andReturn([]);
+        $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
+        $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(static function ($name, $callback) {
+            return $callback();
+        });
+        $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
+        $migrator->shouldReceive('run')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => false]);
+        $migrator->shouldReceive('getNotes')->andReturn([]);
+        $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
+
+        $command->expects($this->once())->method('call')->with($this->equalTo('db:seed'), $this->equalTo([
+            '--class' => 'Database\\Seeders\\DatabaseSeeder',
+            '--force' => true,
+            '--with' => ['count=10', 'active=true'],
+        ]));
+
+        $this->runCommand($command, ['--seed' => true, '--with' => ['count=10', 'active=true']]);
+    }
+
     protected function runCommand($command, $input = [])
     {
         return $command->run(new ArrayInput($input), new NullOutput);

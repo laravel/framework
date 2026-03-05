@@ -74,6 +74,44 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $this->runCommand($command, ['--step' => 2]);
     }
 
+    public function testRefreshCommandMayForwardWithOptionsToSeeder()
+    {
+        $command = new RefreshCommand;
+
+        $app = new ApplicationDatabaseRefreshStub(['path.database' => __DIR__]);
+        $dispatcher = $app->instance(Dispatcher::class, $events = m::mock());
+        $console = m::mock(ConsoleApplication::class)->makePartial();
+        $console->__construct();
+        $command->setLaravel($app);
+        $command->setApplication($console);
+
+        $resetCommand = m::mock(ResetCommand::class);
+        $migrateCommand = m::mock(MigrateCommand::class);
+        $seedCommand = m::mock(\Illuminate\Database\Console\Seeds\SeedCommand::class);
+
+        $console->shouldReceive('find')->with('migrate:reset')->andReturn($resetCommand);
+        $console->shouldReceive('find')->with('migrate')->andReturn($migrateCommand);
+        $console->shouldReceive('find')->with('db:seed')->andReturn($seedCommand);
+        $dispatcher->shouldReceive('dispatch')->once()->with(m::type(DatabaseRefreshed::class));
+
+        $quote = DIRECTORY_SEPARATOR === '\\' ? '"' : "'";
+        $resetCommand->shouldReceive('run')->with(new InputMatcher("--force=1 {$quote}migrate:reset{$quote}"), m::any());
+        $migrateCommand->shouldReceive('run')->with(new InputMatcher('--force=1 migrate'), m::any());
+        $seedCommand->shouldReceive('run')->withArgs(function ($input, $output) {
+            $serializedInput = (string) $input;
+
+            return str_contains($serializedInput, 'db:seed')
+                && str_contains($serializedInput, '--class=')
+                && str_contains($serializedInput, 'Database\\Seeders\\DatabaseSeeder')
+                && str_contains($serializedInput, '--force=1')
+                && str_contains($serializedInput, '--with=')
+                && str_contains($serializedInput, 'count=10')
+                && str_contains($serializedInput, 'active=true');
+        });
+
+        $this->runCommand($command, ['--seed' => true, '--with' => ['count=10', 'active=true']]);
+    }
+
     public function testRefreshCommandExitsWhenProhibited()
     {
         $command = new RefreshCommand;
