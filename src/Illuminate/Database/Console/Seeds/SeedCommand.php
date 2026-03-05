@@ -194,25 +194,23 @@ class SeedCommand extends Command
     {
         $trimmed = trim($value);
 
-        if ($trimmed !== '' && str_starts_with($trimmed, '[')) {
-            try {
-                $parsed = json_decode($trimmed, true, 512, JSON_THROW_ON_ERROR);
-            } catch (JsonException) {
-                throw new InvalidArgumentException(
-                    "The [{$parameter->getName()}] parameter for [".get_class($seeder).'] must be a valid JSON array.'
-                );
-            }
-
-            if (! is_array($parsed)) {
-                throw new InvalidArgumentException(
-                    "The [{$parameter->getName()}] parameter for [".get_class($seeder).'] must be a valid JSON array.'
-                );
-            }
-
-            return $parsed;
+        if ($trimmed === '' || ! str_starts_with($trimmed, '[')) {
+            return [$value];
         }
 
-        return [$value];
+        $invalidJsonArrayMessage = "The [{$parameter->getName()}] parameter for [".get_class($seeder).'] must be a valid JSON array.';
+
+        try {
+            $parsed = json_decode($trimmed, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            throw new InvalidArgumentException($invalidJsonArrayMessage);
+        }
+
+        if (! is_array($parsed)) {
+            throw new InvalidArgumentException($invalidJsonArrayMessage);
+        }
+
+        return $parsed;
     }
 
     /**
