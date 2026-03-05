@@ -4,12 +4,12 @@ namespace Illuminate\Database\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\ConfigurationUrlParser;
+use PDO;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 use UnexpectedValueException;
-use PDO;
 
 #[AsCommand(name: 'db')]
 class DbCommand extends Command
