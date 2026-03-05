@@ -575,7 +575,6 @@ class SeedCommandTest extends TestCase
 
         $reflection = new \ReflectionClass($command);
         $method = $reflection->getMethod('parseParameters');
-        $method->setAccessible(true);
 
         $result = $method->invoke($command);
 
@@ -606,7 +605,6 @@ class SeedCommandTest extends TestCase
 
         $reflection = new \ReflectionClass($command);
         $method = $reflection->getMethod('parseParameters');
-        $method->setAccessible(true);
         $method->invoke($command);
     }
 
@@ -634,7 +632,6 @@ class SeedCommandTest extends TestCase
 
         $reflection = new \ReflectionClass($command);
         $method = $reflection->getMethod('parseParameters');
-        $method->setAccessible(true);
         $method->invoke($command);
     }
 
