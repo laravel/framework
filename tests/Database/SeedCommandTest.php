@@ -87,6 +87,64 @@ class SeedCommandTest extends TestCase
         ], SeedCommandExecutedWithDependencySeeder::$calledWith);
     }
 
+    public function testHandleExecutesSeederRunWithJsonArrayWithParameters()
+    {
+        SeedCommandExecutedArraySeeder::$calledWith = null;
+
+        $input = new ArrayInput([
+            '--force' => true,
+            '--database' => 'sqlite',
+            '--class' => SeedCommandExecutedArraySeeder::class,
+            '--with' => ['tags=["admin","staff"]'],
+        ]);
+        $output = new NullOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $resolver = m::mock(ConnectionResolverInterface::class);
+        $resolver->shouldReceive('getDefaultConnection')->once()->andReturn(null);
+        $resolver->shouldReceive('setDefaultConnection')->once()->with('sqlite');
+
+        $container = new SeedCommandTestApplication;
+        $container->instance(OutputStyle::class, $outputStyle);
+        $container->instance(Factory::class, new Factory($outputStyle));
+
+        $command = new SeedCommand($resolver);
+        $command->setLaravel($container);
+
+        $command->run($input, $output);
+
+        $this->assertSame(['admin', 'staff'], SeedCommandExecutedArraySeeder::$calledWith);
+    }
+
+    public function testHandleExecutesSeederRunWithScalarArrayParameterFallback()
+    {
+        SeedCommandExecutedArraySeeder::$calledWith = null;
+
+        $input = new ArrayInput([
+            '--force' => true,
+            '--database' => 'sqlite',
+            '--class' => SeedCommandExecutedArraySeeder::class,
+            '--with' => ['tags=admin'],
+        ]);
+        $output = new NullOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $resolver = m::mock(ConnectionResolverInterface::class);
+        $resolver->shouldReceive('getDefaultConnection')->once()->andReturn(null);
+        $resolver->shouldReceive('setDefaultConnection')->once()->with('sqlite');
+
+        $container = new SeedCommandTestApplication;
+        $container->instance(OutputStyle::class, $outputStyle);
+        $container->instance(Factory::class, new Factory($outputStyle));
+
+        $command = new SeedCommand($resolver);
+        $command->setLaravel($container);
+
+        $command->run($input, $output);
+
+        $this->assertSame(['admin'], SeedCommandExecutedArraySeeder::$calledWith);
+    }
+
     public function testHandle()
     {
         $input = new ArrayInput(['--force' => true, '--database' => 'sqlite']);
@@ -335,6 +393,49 @@ class SeedCommandTest extends TestCase
         $command->handle();
     }
 
+    public function testHandleThrowsExceptionForInvalidJsonArrayParameter()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The [tags] parameter');
+        $this->expectExceptionMessage('must be a valid JSON array');
+
+        $input = new ArrayInput([
+            '--force' => true,
+            '--database' => 'sqlite',
+            '--class' => SeedCommandArrayParameterSeeder::class,
+            '--with' => ['tags=[invalid'],
+        ]);
+        $output = new NullOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $seeder = m::mock(new SeedCommandArrayParameterSeeder);
+        $seeder->shouldReceive('setContainer')->once()->andReturnSelf();
+        $seeder->shouldReceive('setCommand')->once()->andReturnSelf();
+        $seeder->shouldNotReceive('__invoke');
+
+        $resolver = m::mock(ConnectionResolverInterface::class);
+        $resolver->shouldReceive('getDefaultConnection')->once();
+        $resolver->shouldReceive('setDefaultConnection')->once()->with('sqlite');
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('call');
+        $container->shouldReceive('environment')->once()->andReturn('testing');
+        $container->shouldReceive('runningUnitTests')->andReturn('true');
+        $container->shouldReceive('make')->with(SeedCommandArrayParameterSeeder::class)->andReturn($seeder);
+        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
+            $outputStyle
+        );
+        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(
+            new Factory($outputStyle)
+        );
+
+        $command = new SeedCommand($resolver);
+        $command->setLaravel($container);
+
+        $command->run($input, $output);
+        $command->handle();
+    }
+
     public function testWithoutModelEvents()
     {
         $input = new ArrayInput([
@@ -549,6 +650,7 @@ class SeedCommandTest extends TestCase
     {
         SeedCommandExecutedSeeder::$calledWith = null;
         SeedCommandExecutedWithDependencySeeder::$calledWith = null;
+        SeedCommandExecutedArraySeeder::$calledWith = null;
 
         SeedCommand::prohibit(false);
 
@@ -584,6 +686,14 @@ class SeedCommandNonScalarParameterSeeder extends Seeder
     }
 }
 
+class SeedCommandArrayParameterSeeder extends Seeder
+{
+    public function run(array $tags = [])
+    {
+        //
+    }
+}
+
 class SeedCommandExecutedSeeder extends Seeder
 {
     public static ?array $calledWith = null;
@@ -608,6 +718,16 @@ class SeedCommandExecutedWithDependencySeeder extends Seeder
             'dependency' => get_class($dependency),
             'count' => $count,
         ];
+    }
+}
+
+class SeedCommandExecutedArraySeeder extends Seeder
+{
+    public static ?array $calledWith = null;
+
+    public function run(array $tags = [])
+    {
+        static::$calledWith = $tags;
     }
 }
 
