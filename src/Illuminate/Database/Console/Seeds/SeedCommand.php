@@ -129,6 +129,10 @@ class SeedCommand extends Command
             return [];
         }
 
+        if (! method_exists($seeder, 'run')) {
+            throw new InvalidArgumentException('Method [run] missing from '.get_class($seeder));
+        }
+
         $method = new ReflectionMethod($seeder, 'run');
         $signature = [];
 
