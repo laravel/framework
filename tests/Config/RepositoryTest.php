@@ -29,6 +29,13 @@ class RepositoryTest extends TestCase
             'boolean' => true,
             'integer' => 1,
             'float' => 1.1,
+            'empty_string' => '',
+            'falsy_string' => '0',
+            'lowercase_string' => 'bar',
+            'mixedcase_string' => 'Bar',
+            'uppercase_string' => 'BAR',
+            'zero_integer' => 0,
+            'negative_integer' => -1,
             'associate' => [
                 'x' => 'xxx',
                 'y' => 'yyy',
@@ -371,5 +378,124 @@ class RepositoryTest extends TestCase
         $this->expectExceptionMessageMatches('#^Configuration value for key \[a.b\] must be a float, (.*) given.#');
 
         $this->repository->float('a.b');
+    }
+
+    public function testItGetsAsNonEmptyString(): void
+    {
+        $this->assertSame('bar', $this->repository->nonEmptyString('foo'));
+    }
+
+    public function testItThrowsAnExceptionWhenTryingToGetEmptyStringAsNonEmptyString(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#^Configuration value for key \[empty_string\] must be a non-empty string, (.*) given.#');
+
+        $this->repository->nonEmptyString('empty_string');
+    }
+
+    public function testItGetsAsNonFalsyString(): void
+    {
+        $this->assertSame('bar', $this->repository->nonFalsyString('foo'));
+    }
+
+    public function testItThrowsAnExceptionWhenTryingToGetFalsyStringAsNonFalsyString(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#^Configuration value for key \[falsy_string\] must be a non-falsy string, (.*) given.#');
+
+        $this->repository->nonFalsyString('falsy_string');
+    }
+
+    public function testItGetsAsLowerCaseString(): void
+    {
+        $this->assertSame('bar', $this->repository->lowerCaseString('foo'));
+    }
+
+    public function testItThrowsAnExceptionWhenTryingToGetNonLowerCaseStringAsLowerCaseString(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#^Configuration value for key \[mixedcase_string\] must be a lowercase string, (.*) given.#');
+
+        $this->repository->lowerCaseString('mixedcase_string');
+    }
+
+    public function testItGetsAsUpperCaseString(): void
+    {
+        $this->assertSame('BAR', $this->repository->upperCaseString('uppercase_string'));
+    }
+
+    public function testItThrowsAnExceptionWhenTryingToGetNonUpperCaseStringAsUpperCaseString(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#^Configuration value for key \[foo\] must be an uppercase string, (.*) given.#');
+
+        $this->repository->upperCaseString('foo');
+    }
+
+    public function testItGetsAsPositiveInteger(): void
+    {
+        $this->assertSame(1, $this->repository->positiveInteger('integer'));
+    }
+
+    public function testItThrowsAnExceptionWhenTryingToGetNonPositiveIntegerAsPositiveInteger(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#^Configuration value for key \[zero_integer\] must be a positive integer, (.*) given.#');
+
+        $this->repository->positiveInteger('zero_integer');
+    }
+
+    public function testItGetsAsNegativeInteger(): void
+    {
+        $this->assertSame(-1, $this->repository->negativeInteger('negative_integer'));
+    }
+
+    public function testItThrowsAnExceptionWhenTryingToGetNonNegativeIntegerAsNegativeInteger(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#^Configuration value for key \[integer\] must be a negative integer, (.*) given.#');
+
+        $this->repository->negativeInteger('integer');
+    }
+
+    public function testItGetsAsNonPositiveInteger(): void
+    {
+        $this->assertSame(0, $this->repository->nonPositiveInteger('zero_integer'));
+        $this->assertSame(-1, $this->repository->nonPositiveInteger('negative_integer'));
+    }
+
+    public function testItThrowsAnExceptionWhenTryingToGetPositiveIntegerAsNonPositiveInteger(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#^Configuration value for key \[integer\] must be a non-positive integer, (.*) given.#');
+
+        $this->repository->nonPositiveInteger('integer');
+    }
+
+    public function testItGetsAsNonNegativeInteger(): void
+    {
+        $this->assertSame(1, $this->repository->nonNegativeInteger('integer'));
+        $this->assertSame(0, $this->repository->nonNegativeInteger('zero_integer'));
+    }
+
+    public function testItThrowsAnExceptionWhenTryingToGetNegativeIntegerAsNonNegativeInteger(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#^Configuration value for key \[negative_integer\] must be a non-negative integer, (.*) given.#');
+
+        $this->repository->nonNegativeInteger('negative_integer');
+    }
+
+    public function testItGetsAsNonZeroInteger(): void
+    {
+        $this->assertSame(1, $this->repository->nonZeroInteger('integer'));
+    }
+
+    public function testItThrowsAnExceptionWhenTryingToGetZeroAsNonZeroInteger(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#^Configuration value for key \[zero_integer\] must be a non-zero integer, (.*) given.#');
+
+        $this->repository->nonZeroInteger('zero_integer');
     }
 }

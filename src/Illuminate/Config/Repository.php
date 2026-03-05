@@ -110,7 +110,7 @@ class Repository implements ArrayAccess, ConfigContract
 
         if (trim($value) === '') {
             throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a non empty string, %s given.', $key, $value)
+                sprintf('Configuration value for key [%s] must be a non-empty string, %s given.', $key, $value)
             );
         }
 
@@ -131,7 +131,7 @@ class Repository implements ArrayAccess, ConfigContract
 
         if (! (bool) $value) {
             throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a non falsy string, %s given.', $key, $value)
+                sprintf('Configuration value for key [%s] must be a non-falsy string, %s given.', $key, $value)
             );
         }
 
@@ -152,7 +152,7 @@ class Repository implements ArrayAccess, ConfigContract
 
         if (strtolower($value) !== $value) {
             throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a lower case string, %s given.', $key, $value)
+                sprintf('Configuration value for key [%s] must be a lowercase string, %s given.', $key, $value)
             );
         }
 
@@ -173,7 +173,7 @@ class Repository implements ArrayAccess, ConfigContract
 
         if (strtoupper($value) !== $value) {
             throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a upper case string, %s given.', $key, $value)
+                sprintf('Configuration value for key [%s] must be an uppercase string, %s given.', $key, $value)
             );
         }
 
@@ -214,7 +214,7 @@ class Repository implements ArrayAccess, ConfigContract
 
         if ($value <= 0) {
             throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be an positive integer, %s given.', $key, $value)
+                sprintf('Configuration value for key [%s] must be a positive integer, %s given.', $key, $value)
             );
         }
 
@@ -235,7 +235,7 @@ class Repository implements ArrayAccess, ConfigContract
 
         if ($value >= 0) {
             throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be an negative integer, %s given.', $key, $value)
+                sprintf('Configuration value for key [%s] must be a negative integer, %s given.', $key, $value)
             );
         }
 
@@ -256,7 +256,7 @@ class Repository implements ArrayAccess, ConfigContract
 
         if ($value > 0) {
             throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be an non positive integer, %s given.', $key, $value)
+                sprintf('Configuration value for key [%s] must be a non-positive integer, %s given.', $key, $value)
             );
         }
 
@@ -277,7 +277,7 @@ class Repository implements ArrayAccess, ConfigContract
 
         if ($value < 0) {
             throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be an non negative integer, %s given.', $key, $value)
+                sprintf('Configuration value for key [%s] must be a non-negative integer, %s given.', $key, $value)
             );
         }
 
@@ -298,7 +298,7 @@ class Repository implements ArrayAccess, ConfigContract
 
         if ($value === 0) {
             throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be an non zero integer, %s given.', $key, $value)
+                sprintf('Configuration value for key [%s] must be a non-zero integer, %s given.', $key, $value)
             );
         }
 
