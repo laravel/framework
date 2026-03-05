@@ -351,6 +351,45 @@ class SeedCommandTest extends TestCase
         $command->handle();
     }
 
+    public function testHandleThrowsExceptionWhenRunMethodIsMissingAndWithParametersAreProvided()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Method [run] missing from '.SeedCommandMissingRunMethodSeeder::class);
+
+        $input = new ArrayInput([
+            '--force' => true,
+            '--database' => 'sqlite',
+            '--class' => SeedCommandMissingRunMethodSeeder::class,
+            '--with' => ['count=10'],
+        ]);
+        $output = new NullOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $resolver = m::mock(ConnectionResolverInterface::class);
+        $resolver->shouldReceive('getDefaultConnection')->once();
+        $resolver->shouldReceive('setDefaultConnection')->once()->with('sqlite');
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('call');
+        $container->shouldReceive('environment')->once()->andReturn('testing');
+        $container->shouldReceive('runningUnitTests')->andReturn('true');
+        $container->shouldReceive('make')->with(SeedCommandMissingRunMethodSeeder::class)->andReturn(
+            new SeedCommandMissingRunMethodSeeder
+        );
+        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
+            $outputStyle
+        );
+        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(
+            new Factory($outputStyle)
+        );
+
+        $command = new SeedCommand($resolver);
+        $command->setLaravel($container);
+
+        $command->run($input, $output);
+        $command->handle();
+    }
+
     public function testHandleThrowsExceptionForInvalidIntegerParameter()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -739,6 +778,11 @@ class SeedCommandUnsupportedBuiltInParameterSeeder extends Seeder
     {
         //
     }
+}
+
+class SeedCommandMissingRunMethodSeeder extends Seeder
+{
+    //
 }
 
 class SeedCommandExecutedSeeder extends Seeder
