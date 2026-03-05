@@ -32,6 +32,7 @@ class Log implements ContextualAttribute
     public static function resolve(self $attribute, Container $container)
     {
         $logger = $container->make('log')->channel(enum_value($attribute->channel));
+
         if ($attribute->name !== null) {
             $logger = $logger->withName(enum_value($attribute->name));
         }
