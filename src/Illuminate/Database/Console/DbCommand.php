@@ -4,6 +4,7 @@ namespace Illuminate\Database\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\ConfigurationUrlParser;
+use Illuminate\Support\Uri;
 use PDO;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -289,34 +290,17 @@ class DbCommand extends Command
             return $connection['database'];
         }
 
-        $url = "{$driver}://";
-
-        if (! empty($connection['username'])) {
-            $url .= urlencode($connection['username']);
-
-            if (! empty($connection['password'])) {
-                $url .= ':'.urlencode($connection['password']);
-            }
-
-            $url .= '@';
-        }
-
-        $url .= $connection['host'];
-
-        if (! empty($connection['port'])) {
-            $url .= ":{$connection['port']}";
-        }
-
-        if (! empty($connection['database'])) {
-            $url .= '/'.urlencode($connection['database']);
-        }
-
-        $queryParams = $this->getQueryParameters($connection);
-        if (! empty($queryParams)) {
-            $url .= '?'.http_build_query($queryParams);
-        }
-
-        return $url;
+        return (new Uri)
+            ->withScheme($driver)
+            ->withHost($connection['host'])
+            ->withUser(
+                $connection['username'] ?? null,
+                ! empty($connection['password']) ? $connection['password'] : null,
+            )
+            ->when(! empty($connection['port']), fn (Uri $uri) => $uri->withPort((int) $connection['port']))
+            ->when(! empty($connection['database']), fn (Uri $uri) => $uri->withPath($connection['database']))
+            ->when(! empty($this->getQueryParameters($connection)), fn (Uri $uri) => $uri->withQuery($this->getQueryParameters($connection)))
+            ->value();
     }
 
     /**

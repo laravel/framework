@@ -81,7 +81,7 @@ class DbCommandTest extends TestCase
 
         $url = $command->buildDatabaseUrl($connection);
 
-        $this->assertSame('sqlserver://sa:Password123%21@localhost:1433/master', $url);
+        $this->assertSame('sqlserver://sa:Password123!@localhost:1433/master', $url);
     }
 
     public function testBuildDatabaseUrlWithSpecialCharactersInPassword()
@@ -99,7 +99,7 @@ class DbCommandTest extends TestCase
 
         $url = $command->buildDatabaseUrl($connection);
 
-        $this->assertSame('mysql://root:p%40ss%3Aword%21%23%24@localhost:3306/forge', $url);
+        $this->assertSame('mysql://root:p%40ss:word!%23$@localhost:3306/forge', $url);
     }
 
     public function testBuildDatabaseUrlWithoutPassword()
