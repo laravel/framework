@@ -4,6 +4,7 @@ namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinLateralClause;
+use Illuminate\Support\Str;
 use RuntimeException;
 
 class MariaDbGrammar extends MySqlGrammar
@@ -20,6 +21,21 @@ class MariaDbGrammar extends MySqlGrammar
     public function compileJoinLateral(JoinLateralClause $join, string $expression): string
     {
         throw new RuntimeException('This database engine does not support lateral joins.');
+    }
+
+    /**
+     * Compile an insert ignore statement with returning into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @param  array  $uniqueBy
+     * @param  array  $returning
+     * @return string
+     */
+    public function compileInsertOrIgnoreReturning(Builder $query, array $values, array $uniqueBy, array $returning)
+    {
+        return Str::replaceFirst('insert', 'insert ignore', $this->compileInsert($query, $values))
+            .' returning '.$this->columnize($returning);
     }
 
     /**

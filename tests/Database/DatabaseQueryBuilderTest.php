@@ -4028,6 +4028,49 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->insertOrIgnoreReturning(['email' => 'foo'], 'email');
     }
 
+    public function testMariaDbInsertOrIgnoreReturningMethod()
+    {
+        $builder = $this->getMariaDbBuilder();
+        $builder->getConnection()->shouldReceive('recordsHaveBeenModified')->once();
+        $builder->getConnection()->shouldReceive('selectFromWriteConnection')->once()->with(
+            'insert ignore into `users` (`email`) values (?) returning `id`',
+            ['foo']
+        )->andReturn([['id' => 1]]);
+        $result = $builder->from('users')->insertOrIgnoreReturning(['email' => 'foo'], 'email', ['id']);
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertEquals([['id' => 1]], $result->all());
+    }
+
+    public function testMariaDbInsertOrIgnoreReturningMethodWithMultipleUniqueByColumns()
+    {
+        $builder = $this->getMariaDbBuilder();
+        $builder->getConnection()->shouldReceive('recordsHaveBeenModified')->once();
+        $builder->getConnection()->shouldReceive('selectFromWriteConnection')->once()->with(
+            'insert ignore into `users` (`email`, `name`) values (?, ?) returning *',
+            ['foo', 'bar']
+        )->andReturn([['id' => 1, 'email' => 'foo', 'name' => 'bar']]);
+        $result = $builder->from('users')->insertOrIgnoreReturning(['email' => 'foo', 'name' => 'bar'], ['email', 'name']);
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertEquals([['id' => 1, 'email' => 'foo', 'name' => 'bar']], $result->all());
+    }
+
+    public function testMariaDbInsertOrIgnoreReturningMethodWithMultipleRecords()
+    {
+        $builder = $this->getMariaDbBuilder();
+        $builder->getConnection()->shouldReceive('recordsHaveBeenModified')->once();
+        $builder->getConnection()->shouldReceive('selectFromWriteConnection')->once()->with(
+            'insert ignore into `users` (`email`) values (?), (?) returning `id`, `email`',
+            ['foo', 'bar']
+        )->andReturn([['id' => 1, 'email' => 'foo']]);
+        $result = $builder->from('users')->insertOrIgnoreReturning(
+            [['email' => 'foo'], ['email' => 'bar']],
+            'email',
+            ['id', 'email']
+        );
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertEquals([['id' => 1, 'email' => 'foo']], $result->all());
+    }
+
     public function testPostgresInsertOrIgnoreReturningMethod()
     {
         $builder = $this->getPostgresBuilder();
