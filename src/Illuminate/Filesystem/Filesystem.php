@@ -221,11 +221,12 @@ class Filesystem
 
         $tempPath = tempnam(dirname($path), basename($path));
 
-        // Fix permissions of tempPath because `tempnam()` creates it with permissions set to 0600...
+        // Fix permissions of tempPath because `tempnam()` creates it with permissions set to 0600.
+        // chmod is suppressed because it may fail on non-POSIX filesystems (e.g. Azure File SMB)...
         if (! is_null($mode)) {
-            chmod($tempPath, $mode);
+            @chmod($tempPath, $mode);
         } else {
-            chmod($tempPath, 0777 - umask());
+            @chmod($tempPath, 0777 - umask());
         }
 
         file_put_contents($tempPath, $content);
