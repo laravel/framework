@@ -239,15 +239,15 @@ class Command extends SymfonyCommand
                 : $this->isolatedExitCode);
         }
 
-        if (! is_null($validator = $this->getFailedCommandInputValidator())) {
-            $this->displayValidationErrors($validator);
-
-            return static::FAILURE;
-        }
-
-        $method = method_exists($this, 'handle') ? 'handle' : '__invoke';
-
         try {
+            if (! is_null($validator = $this->getFailedCommandInputValidator())) {
+                $this->displayValidationErrors($validator);
+
+                return static::FAILURE;
+            }
+
+            $method = method_exists($this, 'handle') ? 'handle' : '__invoke';
+
             return (int) $this->laravel->call([$this, $method]);
         } catch (ManuallyFailedException $e) {
             $this->components->error($e->getMessage());
