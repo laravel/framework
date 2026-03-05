@@ -13,12 +13,12 @@ class Log implements ContextualAttribute
 {
     /**
      * Create a new class instance.
-     * @param  string|UnitEnum|null  $channel  The log configuration's channel name.
-     * @param  string|UnitEnum|null  $name  The name to prefix all logs with. Only to be used with Monolog drivers.
+     * @param  UnitEnum|string|null  $channel  The log configuration's channel name.
+     * @param  UnitEnum|string|null  $name  The name to prefix all logs with. Only to be used with Monolog drivers.
      */
     public function __construct(
-        public string|UnitEnum|null $channel = null,
-        public string|UnitEnum|null $name = null,
+        public UnitEnum|string|null $channel = null,
+        public UnitEnum|string|null $name = null,
     ) {
     }
 
