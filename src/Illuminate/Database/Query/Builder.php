@@ -335,7 +335,7 @@ class Builder implements BuilderContract
     /**
      * Add a select expression to the query.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $expression
+     * @param  \Illuminate\Contracts\Database\Query\Expression|literal-string  $expression
      * @param  string  $as
      * @return $this
      */
@@ -349,7 +349,7 @@ class Builder implements BuilderContract
     /**
      * Add a new "raw" select expression to the query.
      *
-     * @param  string  $expression
+     * @param  literal-string  $expression
      * @return $this
      */
     public function selectRaw($expression, array $bindings = [])
@@ -382,7 +382,7 @@ class Builder implements BuilderContract
     /**
      * Add a raw "from" clause to the query.
      *
-     * @param  string  $expression
+     * @param  literal-string  $expression
      * @param  mixed  $bindings
      * @return $this
      */
@@ -1275,7 +1275,7 @@ class Builder implements BuilderContract
     /**
      * Add a raw "where" clause to the query.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $sql
+     * @param  \Illuminate\Contracts\Database\Query\Expression|literal-string  $sql
      * @param  mixed  $bindings
      * @param  string  $boolean
      * @return $this
@@ -1292,7 +1292,7 @@ class Builder implements BuilderContract
     /**
      * Add a raw "or where" clause to the query.
      *
-     * @param  string  $sql
+     * @param  literal-string  $sql
      * @param  mixed  $bindings
      * @return $this
      */
@@ -2642,7 +2642,7 @@ class Builder implements BuilderContract
     /**
      * Add a raw "groupBy" clause to the query.
      *
-     * @param  string  $sql
+     * @param  literal-string  $sql
      * @return $this
      */
     public function groupByRaw($sql, array $bindings = [])
@@ -2895,7 +2895,7 @@ class Builder implements BuilderContract
     /**
      * Add a raw "having" clause to the query.
      *
-     * @param  string  $sql
+     * @param  literal-string  $sql
      * @param  string  $boolean
      * @return $this
      */
@@ -2913,7 +2913,7 @@ class Builder implements BuilderContract
     /**
      * Add a raw "or having" clause to the query.
      *
-     * @param  string  $sql
+     * @param  literal-string  $sql
      * @return $this
      */
     public function orHavingRaw($sql, array $bindings = [])
@@ -3034,7 +3034,7 @@ class Builder implements BuilderContract
     /**
      * Add a raw "order by" clause to the query.
      *
-     * @param  string  $sql
+     * @param  literal-string  $sql
      * @param  array  $bindings
      * @return $this
      */
@@ -3438,6 +3438,7 @@ class Builder implements BuilderContract
     /**
      * Get a single expression value from the first result of a query.
      *
+     * @param  literal-string  $expression
      * @return mixed
      */
     public function rawValue(string $expression, array $bindings = [])
@@ -4494,7 +4495,7 @@ class Builder implements BuilderContract
     /**
      * Create a raw database expression.
      *
-     * @param  mixed  $value
+     * @param  literal-string|int|float  $value
      * @return \Illuminate\Contracts\Database\Query\Expression
      */
     public function raw($value)
