@@ -22,8 +22,6 @@ class Repository implements ArrayAccess, ConfigContract
 
     /**
      * Create a new configuration repository.
-     *
-     * @param  array  $items
      */
     public function __construct(array $items = [])
     {
@@ -81,9 +79,7 @@ class Repository implements ArrayAccess, ConfigContract
     /**
      * Get the specified string configuration value.
      *
-     * @param  string  $key
      * @param  (\Closure():(string|null))|string|null  $default
-     * @return string
      *
      * @throws \InvalidArgumentException
      */
@@ -101,11 +97,93 @@ class Repository implements ArrayAccess, ConfigContract
     }
 
     /**
+     * Get the specified string configuration value.
+     *
+     * @param  (\Closure():(string|null))|string|null  $default
+     * @return non-empty-string
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function nonEmptyString(string $key, $default = null): string
+    {
+        $value = $this->string($key, $default);
+
+        if (trim($value) === '') {
+            throw new InvalidArgumentException(
+                sprintf('Configuration value for key [%s] must be a non empty string, %s given.', $key, $value)
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the specified string configuration value.
+     *
+     * @param  (\Closure():(string|null))|string|null  $default
+     * @return non-falsy-string
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function nonFalsyString(string $key, $default = null): string
+    {
+        $value = $this->string($key, $default);
+
+        if (! (bool) $value) {
+            throw new InvalidArgumentException(
+                sprintf('Configuration value for key [%s] must be a non falsy string, %s given.', $key, $value)
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the specified string configuration value.
+     *
+     * @param  (\Closure():(string|null))|string|null  $default
+     * @return lowercase-string
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function lowerCaseString(string $key, $default = null): string
+    {
+        $value = $this->string($key, $default);
+
+        if (strtolower($value) !== $value) {
+            throw new InvalidArgumentException(
+                sprintf('Configuration value for key [%s] must be a lower case string, %s given.', $key, $value)
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the specified string configuration value.
+     *
+     * @param  (\Closure():(string|null))|string|null  $default
+     * @return uppercase-string
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function upperCaseString(string $key, $default = null): string
+    {
+        $value = $this->string($key, $default);
+
+        if (strtoupper($value) !== $value) {
+            throw new InvalidArgumentException(
+                sprintf('Configuration value for key [%s] must be a upper case string, %s given.', $key, $value)
+            );
+        }
+
+        return $value;
+    }
+
+    /**
      * Get the specified integer configuration value.
      *
-     * @param  string  $key
      * @param  (\Closure():(int|null))|int|null  $default
-     * @return int
      *
      * @throws \InvalidArgumentException
      */
@@ -123,11 +201,114 @@ class Repository implements ArrayAccess, ConfigContract
     }
 
     /**
+     * Get the specified integer configuration value.
+     *
+     * @param  (\Closure():(int|null))|int|null  $default
+     * @return positive-int
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function positiveInteger(string $key, $default = null): int
+    {
+        $value = $this->integer($key, $default);
+
+        if ($value <= 0) {
+            throw new InvalidArgumentException(
+                sprintf('Configuration value for key [%s] must be an positive integer, %s given.', $key, $value)
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the specified integer configuration value.
+     *
+     * @param  (\Closure():(int|null))|int|null  $default
+     * @return negative-int
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function negativeInteger(string $key, $default = null): int
+    {
+        $value = $this->integer($key, $default);
+
+        if ($value >= 0) {
+            throw new InvalidArgumentException(
+                sprintf('Configuration value for key [%s] must be an negative integer, %s given.', $key, $value)
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the specified integer configuration value.
+     *
+     * @param  (\Closure():(int|null))|int|null  $default
+     * @return non-positive-int
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function nonPositiveInteger(string $key, $default = null): int
+    {
+        $value = $this->integer($key, $default);
+
+        if ($value > 0) {
+            throw new InvalidArgumentException(
+                sprintf('Configuration value for key [%s] must be an non positive integer, %s given.', $key, $value)
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the specified integer configuration value.
+     *
+     * @param  (\Closure():(int|null))|int|null  $default
+     * @return non-negative-int
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function nonNegativeInteger(string $key, $default = null): int
+    {
+        $value = $this->integer($key, $default);
+
+        if ($value < 0) {
+            throw new InvalidArgumentException(
+                sprintf('Configuration value for key [%s] must be an non negative integer, %s given.', $key, $value)
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the specified integer configuration value.
+     *
+     * @param  (\Closure():(int|null))|int|null  $default
+     * @return non-zero-int
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function nonZeroInteger(string $key, $default = null): int
+    {
+        $value = $this->integer($key, $default);
+
+        if ($value === 0) {
+            throw new InvalidArgumentException(
+                sprintf('Configuration value for key [%s] must be an non zero integer, %s given.', $key, $value)
+            );
+        }
+
+        return $value;
+    }
+
+    /**
      * Get the specified float configuration value.
      *
-     * @param  string  $key
      * @param  (\Closure():(float|null))|float|null  $default
-     * @return float
      *
      * @throws \InvalidArgumentException
      */
@@ -147,9 +328,7 @@ class Repository implements ArrayAccess, ConfigContract
     /**
      * Get the specified boolean configuration value.
      *
-     * @param  string  $key
      * @param  (\Closure():(bool|null))|bool|null  $default
-     * @return bool
      *
      * @throws \InvalidArgumentException
      */
@@ -169,7 +348,6 @@ class Repository implements ArrayAccess, ConfigContract
     /**
      * Get the specified array configuration value.
      *
-     * @param  string  $key
      * @param  (\Closure():(array<array-key, mixed>|null))|array<array-key, mixed>|null  $default
      * @return array<array-key, mixed>
      *
@@ -191,7 +369,6 @@ class Repository implements ArrayAccess, ConfigContract
     /**
      * Get the specified array configuration value as a collection.
      *
-     * @param  string  $key
      * @param  (\Closure():(array<array-key, mixed>|null))|array<array-key, mixed>|null  $default
      * @return Collection<array-key, mixed>
      */
@@ -262,7 +439,6 @@ class Repository implements ArrayAccess, ConfigContract
      * Determine if the given configuration option exists.
      *
      * @param  string  $key
-     * @return bool
      */
     public function offsetExists($key): bool
     {
@@ -273,7 +449,6 @@ class Repository implements ArrayAccess, ConfigContract
      * Get a configuration option.
      *
      * @param  string  $key
-     * @return mixed
      */
     public function offsetGet($key): mixed
     {
@@ -285,7 +460,6 @@ class Repository implements ArrayAccess, ConfigContract
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return void
      */
     public function offsetSet($key, $value): void
     {
@@ -296,7 +470,6 @@ class Repository implements ArrayAccess, ConfigContract
      * Unset a configuration option.
      *
      * @param  string  $key
-     * @return void
      */
     public function offsetUnset($key): void
     {
