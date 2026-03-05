@@ -309,6 +309,48 @@ class SeedCommandTest extends TestCase
         $command->handle();
     }
 
+    public function testHandleThrowsExceptionForUnsupportedBuiltInSeederParameterType()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unable to pass [items]');
+
+        $input = new ArrayInput([
+            '--force' => true,
+            '--database' => 'sqlite',
+            '--class' => SeedCommandUnsupportedBuiltInParameterSeeder::class,
+            '--with' => ['items=value'],
+        ]);
+        $output = new NullOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $seeder = m::mock(new SeedCommandUnsupportedBuiltInParameterSeeder);
+        $seeder->shouldReceive('setContainer')->once()->andReturnSelf();
+        $seeder->shouldReceive('setCommand')->once()->andReturnSelf();
+        $seeder->shouldNotReceive('__invoke');
+
+        $resolver = m::mock(ConnectionResolverInterface::class);
+        $resolver->shouldReceive('getDefaultConnection')->once();
+        $resolver->shouldReceive('setDefaultConnection')->once()->with('sqlite');
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('call');
+        $container->shouldReceive('environment')->once()->andReturn('testing');
+        $container->shouldReceive('runningUnitTests')->andReturn('true');
+        $container->shouldReceive('make')->with(SeedCommandUnsupportedBuiltInParameterSeeder::class)->andReturn($seeder);
+        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
+            $outputStyle
+        );
+        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(
+            new Factory($outputStyle)
+        );
+
+        $command = new SeedCommand($resolver);
+        $command->setLaravel($container);
+
+        $command->run($input, $output);
+        $command->handle();
+    }
+
     public function testHandleThrowsExceptionForInvalidIntegerParameter()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -689,6 +731,14 @@ class SeedCommandNonScalarParameterSeeder extends Seeder
 class SeedCommandArrayParameterSeeder extends Seeder
 {
     public function run(array $tags = [])
+    {
+        //
+    }
+}
+
+class SeedCommandUnsupportedBuiltInParameterSeeder extends Seeder
+{
+    public function run(iterable $items)
     {
         //
     }
