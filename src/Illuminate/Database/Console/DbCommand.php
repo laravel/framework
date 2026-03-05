@@ -354,7 +354,7 @@ class DbCommand extends Command
     protected function open($url)
     {
         if (PHP_OS_FAMILY === 'Windows') {
-            $process = Process::fromShellCommandline(escapeshellcmd("start {$url}"));
+            $process = new Process(['start', '', $url]);
             $process->run();
 
             if (! $process->isSuccessful()) {
@@ -376,7 +376,7 @@ class DbCommand extends Command
             return;
         }
 
-        $process = Process::fromShellCommandline(escapeshellcmd("{$binary} {$url}"));
+        $process = new Process([$binary, $url]);
         $process->run();
 
         if (! $process->isSuccessful()) {
