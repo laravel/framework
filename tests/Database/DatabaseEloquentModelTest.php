@@ -16,6 +16,7 @@ use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\RouteKey;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
@@ -2178,6 +2179,13 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('id', $model->getRouteKeyName());
     }
 
+    public function testRouteNameCanBeConfiguredUsingRouteKeyAttribute()
+    {
+        $model = new EloquentModelWithRouteKeyAttributeStub;
+
+        $this->assertSame('slug', $model->getRouteKeyName());
+    }
+
     public function testCloneModelMakesAFreshCopyOfTheModel()
     {
         $class = new EloquentModelStub;
@@ -4161,6 +4169,12 @@ class EloquentModelNonIncrementingStub extends Model
     protected $table = 'stub';
     protected $guarded = [];
     public $incrementing = false;
+}
+
+#[RouteKey('slug')]
+class EloquentModelWithRouteKeyAttributeStub extends Model
+{
+    //
 }
 
 class EloquentNoConnectionModelStub extends EloquentModelStub
