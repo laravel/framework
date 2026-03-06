@@ -22,6 +22,7 @@ class Command extends SymfonyCommand
         Concerns\InteractsWithIO,
         Concerns\InteractsWithSignals,
         Concerns\PromptsForMissingInput,
+        Concerns\ValidatesInput,
         Macroable;
 
     /**
@@ -238,9 +239,15 @@ class Command extends SymfonyCommand
                 : $this->isolatedExitCode);
         }
 
-        $method = method_exists($this, 'handle') ? 'handle' : '__invoke';
-
         try {
+            if (! is_null($validator = $this->getFailedCommandInputValidator())) {
+                $this->displayValidationErrors($validator);
+
+                return static::FAILURE;
+            }
+
+            $method = method_exists($this, 'handle') ? 'handle' : '__invoke';
+
             return (int) $this->laravel->call([$this, $method]);
         } catch (ManuallyFailedException $e) {
             $this->components->error($e->getMessage());

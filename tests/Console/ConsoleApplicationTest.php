@@ -5,8 +5,12 @@ namespace Illuminate\Tests\Console;
 use Composer\Autoload\ClassLoader;
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
+use Illuminate\Console\OutputStyle;
+use Illuminate\Console\View\Components\Factory;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
+use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application as FoundationApplication;
@@ -21,6 +25,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 use Throwable;
 
 use function Illuminate\Filesystem\join_paths;
@@ -157,6 +163,41 @@ class ConsoleApplicationTest extends TestCase
 
         $this->assertSame($codeOfCallingArrayInput, $codeOfCallingStringInput);
         $this->assertSame($outputOfCallingArrayInput, $outputOfCallingStringInput);
+    }
+
+    public function testCommandInputValidationThrowsWhenValidatorBindingIsMissing()
+    {
+        $command = new class extends Command
+        {
+            protected $signature = 'validation:test {name?}';
+
+            protected function rules(): array
+            {
+                return ['name' => 'required'];
+            }
+
+            public function handle(): int
+            {
+                return self::SUCCESS;
+            }
+        };
+
+        $app = m::mock(ApplicationContract::class);
+        $command->setLaravel($app);
+
+        $input = new ArrayInput(['name' => 'Taylor']);
+        $output = new NullOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $app->shouldReceive('make')->with(OutputStyle::class, ['input' => $input, 'output' => $output])->andReturn($outputStyle);
+        $app->shouldReceive('make')->with(Factory::class, ['output' => $outputStyle])->andReturn(new Factory($outputStyle));
+        $app->shouldReceive('runningUnitTests')->andReturn(true);
+        $app->shouldReceive('make')->with(ValidationFactory::class)->andThrow(new BindingResolutionException('Target class [validator] does not exist.'));
+
+        $this->expectException(BindingResolutionException::class);
+        $this->expectExceptionMessage('Target class [validator] does not exist.');
+
+        $command->run($input, $output);
     }
 
     public function testCommandInputPromptsWhenRequiredArgumentIsMissing()
