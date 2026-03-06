@@ -182,6 +182,13 @@ trait HasAttributes
     protected static $setAttributeMutatorCache = [];
 
     /**
+     * The cache of the legacy magic get mutators for each class.
+     *
+     * @var array
+     */
+    protected static $legacyGetMutatorCache = [];
+
+    /**
      * The cache of the converted cast types.
      *
      * @var array
@@ -519,6 +526,21 @@ trait HasAttributes
     }
 
     /**
+     * Handle a magic mutator violation.
+     *
+     * @param  string  $key
+     * @return void
+     */
+    protected function handleMagicMutatorViolation($key)
+    {
+        throw new RuntimeException(sprintf(
+            'Model [%s] uses legacy magic mutator [get%sAttribute()]. Use the Attribute return type or call the model method explicitly.',
+            get_class($this),
+            Str::studly($key)
+        ));
+    }
+
+    /**
      * Get a plain attribute (not a relationship).
      *
      * @param  string  $key
@@ -647,7 +669,15 @@ trait HasAttributes
      */
     public function hasGetMutator($key)
     {
-        return method_exists($this, 'get'.Str::studly($key).'Attribute');
+        $class = get_class($this);
+
+        if (isset(static::$legacyGetMutatorCache[$class][$key])) {
+            return static::$legacyGetMutatorCache[$class][$key];
+        }
+
+        return static::$legacyGetMutatorCache[$class][$key] = method_exists(
+            $this, 'get'.Str::studly($key).'Attribute'
+        );
     }
 
     /**
@@ -712,6 +742,10 @@ trait HasAttributes
      */
     protected function mutateAttribute($key, $value)
     {
+        if (static::preventsMagicMutators()) {
+            $this->handleMagicMutatorViolation($key);
+        }
+
         $this->mergeAttributesFromCachedCasts();
 
         return $this->{'get'.Str::studly($key).'Attribute'}($value);
