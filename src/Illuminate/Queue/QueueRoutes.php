@@ -7,7 +7,7 @@ class QueueRoutes
     /**
      * The mapping of class names to their default routes.
      *
-     * @var array<class-string, string>
+     * @var array<class-string, array|string>
      */
     protected $routes = [];
 
@@ -50,10 +50,10 @@ class QueueRoutes
     }
 
     /**
-     * Get the queue that a given queueable instance should be routed to.
+     * Get the route for a given queueable instance.
      *
      * @param  object  $queueable
-     * @return string|null
+     * @return array|string|null
      */
     public function getRoute($queueable)
     {
