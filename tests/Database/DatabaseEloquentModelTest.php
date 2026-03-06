@@ -2636,6 +2636,46 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->isDirty('category'));
     }
 
+    public function testIncrementEachOnExistingModelScopesQueryToModelKey()
+    {
+        $model = m::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
+        $model->exists = true;
+        $model->id = 1;
+        $model->syncOriginalAttribute('id');
+        $model->foo = 2;
+        $model->bar = 5;
+
+        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('where')->once()->with('id', '=', 1)->andReturn($query);
+        $query->shouldReceive('incrementEach')->once()->with(['foo' => 1, 'bar' => 2], [])->andReturn(1);
+
+        $result = $model->publicIncrementEach(['foo' => 1, 'bar' => 2]);
+
+        $this->assertEquals(1, $result);
+        $this->assertEquals(3, $model->foo);
+        $this->assertEquals(7, $model->bar);
+    }
+
+    public function testDecrementEachOnExistingModelScopesQueryToModelKey()
+    {
+        $model = m::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
+        $model->exists = true;
+        $model->id = 1;
+        $model->syncOriginalAttribute('id');
+        $model->foo = 10;
+        $model->bar = 5;
+
+        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('where')->once()->with('id', '=', 1)->andReturn($query);
+        $query->shouldReceive('decrementEach')->once()->with(['foo' => 3, 'bar' => 2], [])->andReturn(1);
+
+        $result = $model->publicDecrementEach(['foo' => 3, 'bar' => 2]);
+
+        $this->assertEquals(1, $result);
+        $this->assertEquals(7, $model->foo);
+        $this->assertEquals(3, $model->bar);
+    }
+
     public function testRelationshipTouchOwnersIsPropagated()
     {
         $relation = $this->getMockBuilder(BelongsTo::class)->onlyMethods(['touch'])->disableOriginalConstructor()->getMock();
@@ -3668,6 +3708,16 @@ class EloquentModelStub extends Model
     public function publicDecrementQuietly($column, $amount = 1, $extra = [])
     {
         return $this->decrementQuietly($column, $amount, $extra);
+    }
+
+    public function publicIncrementEach(array $columns, array $extra = [])
+    {
+        return $this->incrementEach($columns, $extra);
+    }
+
+    public function publicDecrementEach(array $columns, array $extra = [])
+    {
+        return $this->decrementEach($columns, $extra);
     }
 
     public function belongsToStub()

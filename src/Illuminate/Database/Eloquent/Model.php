@@ -1155,6 +1155,64 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Increment each given column's value by the given amount.
+     *
+     * @param  array<string, float|int>  $columns
+     * @param  array<string, mixed>  $extra
+     * @return int
+     */
+    protected function incrementEach(array $columns, array $extra = [])
+    {
+        return $this->incrementOrDecrementEach($columns, $extra, 'incrementEach');
+    }
+
+    /**
+     * Decrement each given column's value by the given amount.
+     *
+     * @param  array<string, float|int>  $columns
+     * @param  array<string, mixed>  $extra
+     * @return int
+     */
+    protected function decrementEach(array $columns, array $extra = [])
+    {
+        return $this->incrementOrDecrementEach($columns, $extra, 'decrementEach');
+    }
+
+    /**
+     * Run the incrementEach or decrementEach method on the model.
+     *
+     * @param  array<string, float|int>  $columns
+     * @param  array<string, mixed>  $extra
+     * @param  string  $method
+     * @return int
+     */
+    protected function incrementOrDecrementEach(array $columns, array $extra, string $method)
+    {
+        if (! $this->exists) {
+            return $this->newQueryWithoutRelationships()->{$method}($columns, $extra);
+        }
+
+        if ($this->fireModelEvent('updating') === false) {
+            return false;
+        }
+
+        return tap($this->setKeysForSaveQuery($this->newQueryWithoutScopes())->{$method}($columns, $extra), function () use ($columns, $extra, $method) {
+            $this->forceFill(array_merge(
+                collect($columns)->mapWithKeys(function ($amount, $column) use ($method) {
+                    return [$column => $this->{$column} + ($method === 'incrementEach' ? $amount : $amount * -1)];
+                })->all(),
+                $extra
+            ));
+
+            $this->syncChanges();
+
+            $this->fireModelEvent('updated', false);
+
+            $this->syncOriginal();
+        });
+    }
+
+    /**
      * Save the model and all of its relationships.
      *
      * @return bool
@@ -2524,7 +2582,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function __call($method, $parameters)
     {
-        if (in_array($method, ['increment', 'decrement', 'incrementQuietly', 'decrementQuietly'])) {
+        if (in_array($method, ['increment', 'decrement', 'incrementQuietly', 'decrementQuietly', 'incrementEach', 'decrementEach'])) {
             return $this->$method(...$parameters);
         }
 
