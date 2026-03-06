@@ -37,6 +37,13 @@ class Logger implements LoggerInterface
     protected $context = [];
 
     /**
+     * The sample rate for the next log message.
+     *
+     * @var float|null
+     */
+    protected $sampleRate = null;
+
+    /**
      * Create a new log writer instance.
      *
      * @param  \Psr\Log\LoggerInterface  $logger
@@ -171,6 +178,23 @@ class Logger implements LoggerInterface
     }
 
     /**
+     * Set a sample rate for the next log message.
+     *
+     * @param  float  $rate  A value between 0.0 and 1.0
+     * @return $this
+     */
+    public function sample(float $rate)
+    {
+        if ($rate < 0.0 || $rate > 1.0) {
+            throw new \InvalidArgumentException('Sample rate must be between 0.0 and 1.0.');
+        }
+
+        $this->sampleRate = $rate;
+
+        return $this;
+    }
+
+    /**
      * Write a message to the log.
      *
      * @param  string  $level
@@ -180,6 +204,15 @@ class Logger implements LoggerInterface
      */
     protected function writeLog($level, $message, $context): void
     {
+        if (! is_null($this->sampleRate)) {
+            $rate = $this->sampleRate;
+            $this->sampleRate = null;
+
+            if ($rate === 0.0 || ($rate < 1.0 && (mt_rand() / mt_getrandmax()) > $rate)) {
+                return;
+            }
+        }
+
         if (method_exists($this->logger, 'isHandling') && ! $this->logger->isHandling($level)) {
             return;
         }
