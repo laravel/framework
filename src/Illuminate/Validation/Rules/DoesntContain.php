@@ -10,7 +10,7 @@ use function Illuminate\Support\enum_value;
 class DoesntContain implements Stringable
 {
     /**
-     * The values that should be contained in the attribute.
+     * The values that should not be contained in the attribute.
      *
      * @var array
      */
