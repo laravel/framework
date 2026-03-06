@@ -73,6 +73,23 @@ class HttpClientTest extends TestCase
         Response::flushState();
     }
 
+    public function testRetryWhenCallbackReceivesExceptionForRedirectResponse()
+    {
+        $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 302),
+        ]);
+
+        $callbackCalled = false;
+
+        $this->factory->retry(2, 0, function (Exception $e) use (&$callbackCalled) {
+            $callbackCalled = true;
+
+            return false;
+        })->get('http://laravel.com');
+
+        $this->assertTrue($callbackCalled);
+    }
+
     public function testStubbedResponsesAreReturnedAfterFaking()
     {
         $this->factory->fake();
