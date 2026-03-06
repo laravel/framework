@@ -2,6 +2,8 @@
 
 namespace Illuminate\Support\Traits;
 
+use Carbon\CarbonInterval;
+use Carbon\Unit;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
@@ -322,6 +324,30 @@ trait InteractsWithData
         }
 
         return Date::createFromFormat($format, $this->data($key), $tz);
+    }
+
+    /**
+     * Retrieve data from the instance as a CarbonInterval instance.
+     *
+     * @param  string  $key
+     * @param  \Carbon\Unit|string|null  $unit
+     * @return \Carbon\CarbonInterval|null
+     */
+    public function interval($key, $unit = null)
+    {
+        if ($this->isNotFilled($key)) {
+            return null;
+        }
+
+        $value = $this->data($key);
+
+        if (is_null($unit)) {
+            return CarbonInterval::make($value);
+        }
+
+        $unit = $unit instanceof Unit ? $unit : Unit::fromName($unit);
+
+        return $unit->interval((float) $value);
     }
 
     /**

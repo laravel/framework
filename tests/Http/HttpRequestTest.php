@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Http;
 
+use Carbon\CarbonInterval;
+use Carbon\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Route;
@@ -813,6 +815,47 @@ class HttpRequestTest extends TestCase
         ]);
 
         $request->date('date', 'invalid_format');
+    }
+
+    public function testIntervalMethod()
+    {
+        $request = Request::create('/', 'GET', [
+            'as_null' => null,
+            'as_empty' => '',
+            'as_iso' => 'P1Y2M3DT4H5M6S',
+            'as_human' => '2 hours 30 minutes',
+            'as_seconds' => '90',
+            'as_minutes' => '45',
+        ]);
+
+        $this->assertNull($request->interval('as_null'));
+        $this->assertNull($request->interval('as_empty'));
+        $this->assertNull($request->interval('doesnt_exist'));
+
+        $interval = $request->interval('as_iso');
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+        $this->assertSame(1, $interval->years);
+        $this->assertSame(2, $interval->months);
+        $this->assertSame(3, $interval->dayz);
+        $this->assertSame(4, $interval->hours);
+        $this->assertSame(5, $interval->minutes);
+        $this->assertSame(6, $interval->seconds);
+
+        $interval = $request->interval('as_human');
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+        $this->assertSame(2, $interval->hours);
+        $this->assertSame(30, $interval->minutes);
+
+        $interval = $request->interval('as_seconds', 'second');
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+        $this->assertSame(90, $interval->seconds);
+
+        $this->assertSame(90, $request->interval('as_seconds', 'minute')->minutes);
+        $this->assertSame(90, $request->interval('as_seconds', 'hour')->hours);
+        $this->assertSame(90, $request->interval('as_seconds', 'day')->dayz);
+
+        $this->assertSame(45, $request->interval('as_minutes', Unit::Minute)->minutes);
+        $this->assertSame(45, $request->interval('as_minutes', Unit::Second)->seconds);
     }
 
     public function testEnumMethod()
