@@ -143,6 +143,8 @@ class DatabaseManager implements ConnectionResolverInterface
      * @param  array  $config
      * @param  bool  $force
      * @return \Illuminate\Database\ConnectionInterface
+     *
+     * @throws \RuntimeException
      */
     public function connectUsing(string $name, array $config, bool $force = false)
     {

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Process;
 
+use Carbon\CarbonInterval;
 use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Process\Exceptions\ProcessFailedException;
 use Illuminate\Process\Exceptions\ProcessTimedOutException;
@@ -634,6 +635,21 @@ class ProcessTest extends TestCase
 
         $factory = new Factory;
         $result = $factory->timeout(1)->path(__DIR__)->run('sleep 2; exit 1;');
+
+        $result->throw();
+    }
+
+    #[RequiresOperatingSystem('Linux|DAR')]
+    public function testATimeoutCanBeSetWithACarbonInterval()
+    {
+        $this->expectException(ProcessTimedOutException::class);
+        $this->expectExceptionMessage(
+            'The process "sleep 2; exit 1;" exceeded the timeout of 1 seconds.'
+        );
+
+        $factory = new Factory;
+        $timeout = CarbonInterval::milliseconds(1_000);
+        $result = $factory->timeout($timeout)->path(__DIR__)->run('sleep 2; exit 1;');
 
         $result->throw();
     }

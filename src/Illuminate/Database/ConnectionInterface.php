@@ -18,7 +18,7 @@ interface ConnectionInterface
     /**
      * Get a new raw query expression.
      *
-     * @param  mixed  $value
+     * @param  literal-string|int|float  $value
      * @return \Illuminate\Contracts\Database\Query\Expression
      */
     public function raw($value);
@@ -51,9 +51,10 @@ interface ConnectionInterface
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
+     * @param  array  $fetchUsing
      * @return array
      */
-    public function select($query, $bindings = [], $useReadPdo = true);
+    public function select($query, $bindings = [], $useReadPdo = true, array $fetchUsing = []);
 
     /**
      * Run a select statement against the database and returns a generator.
@@ -61,9 +62,10 @@ interface ConnectionInterface
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
+     * @param  array  $fetchUsing
      * @return \Generator
      */
-    public function cursor($query, $bindings = [], $useReadPdo = true);
+    public function cursor($query, $bindings = [], $useReadPdo = true, array $fetchUsing = []);
 
     /**
      * Run an insert statement against the database.
@@ -113,7 +115,7 @@ interface ConnectionInterface
     /**
      * Run a raw, unprepared query against the PDO connection.
      *
-     * @param  string  $query
+     * @param  literal-string  $query
      * @return bool
      */
     public function unprepared($query);

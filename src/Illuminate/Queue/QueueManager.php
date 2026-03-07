@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Closure;
 use Illuminate\Contracts\Queue\Factory as FactoryContract;
 use Illuminate\Contracts\Queue\Monitor as MonitorContract;
+use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use InvalidArgumentException;
 
 /**
@@ -12,6 +13,8 @@ use InvalidArgumentException;
  */
 class QueueManager implements FactoryContract, MonitorContract
 {
+    use ResolvesQueueRoutes;
+
     /**
      * The application instance.
      *
@@ -118,6 +121,19 @@ class QueueManager implements FactoryContract, MonitorContract
     public function stopping($callback)
     {
         $this->app['events']->listen(Events\WorkerStopping::class, $callback);
+    }
+
+    /**
+     * Set the queue route for the given class.
+     *
+     * @param  array|class-string  $class
+     * @param  string|null  $queue
+     * @param  string|null  $connection
+     * @return void
+     */
+    public function route(array|string $class, $queue = null, $connection = null)
+    {
+        $this->queueRoutes()->set($class, $queue, $connection);
     }
 
     /**

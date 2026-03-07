@@ -849,6 +849,18 @@ class SupportTestingBusFakeTest extends TestCase
         });
     }
 
+    public function testDispatchAfterResponseWithHandler()
+    {
+        $job = new BusJobStub;
+        $handler = function () {
+            return 'handled';
+        };
+
+        $this->fake->dispatchAfterResponse($job, $handler);
+
+        $this->fake->assertDispatchedAfterResponse(BusJobStub::class);
+    }
+
     public function testCanAssertJobsOnPendingBatchFake()
     {
         $this->fake->batch([

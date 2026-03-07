@@ -69,6 +69,23 @@ class CacheArrayStoreTest extends TestCase
         $this->assertNull($result);
     }
 
+    public function testTouchExtendsTtl(): void
+    {
+        $key = 'key';
+        $value = 'value';
+
+        $store = new ArrayStore;
+
+        Carbon::setTestNow($now = Carbon::now());
+
+        $store->put($key, $value, 30);
+        $store->touch($key, 60);
+
+        Carbon::setTestNow($now->addSeconds(45));
+
+        $this->assertSame($value, $store->get($key));
+    }
+
     public function testStoreItemForeverProperlyStoresInArray()
     {
         $mock = $this->getMockBuilder(ArrayStore::class)->onlyMethods(['put'])->getMock();
@@ -173,6 +190,18 @@ class CacheArrayStoreTest extends TestCase
         $this->assertTrue($result);
         $this->assertNull($store->get('foo'));
         $this->assertNull($store->get('baz'));
+    }
+
+    public function testLocksCanBeFlushed()
+    {
+        $store = new ArrayStore;
+        $store->lock('foo', 10);
+        $store->lock('bar', 10);
+        $result = $store->flushLocks();
+        $this->assertTrue($result);
+        $this->assertNull($store->get('foo'));
+        $this->assertNull($store->get('bar'));
+        $this->assertEmpty($store->locks);
     }
 
     public function testCacheKey()

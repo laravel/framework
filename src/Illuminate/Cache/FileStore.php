@@ -3,14 +3,16 @@
 namespace Illuminate\Cache;
 
 use Exception;
+use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Filesystem\LockTimeoutException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\LockableFile;
 use Illuminate\Support\InteractsWithTime;
+use RuntimeException;
 
-class FileStore implements Store, LockProvider
+class FileStore implements CanFlushLocks, LockProvider, Store
 {
     use InteractsWithTime, RetrievesMultipleKeys;
 
@@ -248,6 +250,24 @@ class FileStore implements Store, LockProvider
     }
 
     /**
+     * Adjust the expiration time of a cached item.
+     *
+     * @param  string  $key
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function touch($key, $seconds)
+    {
+        $payload = $this->getPayload($this->getPrefix().$key);
+
+        if (is_null($payload['data'])) {
+            return false;
+        }
+
+        return $this->put($key, $payload['data'], $seconds);
+    }
+
+    /**
      * Remove an item from the cache.
      *
      * @param  string  $key
@@ -281,6 +301,34 @@ class FileStore implements Store, LockProvider
             $deleted = $this->files->deleteDirectory($directory);
 
             if (! $deleted || $this->files->exists($directory)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Remove all locks from the store.
+     *
+     * @return bool
+     *
+     * @throws \RuntimeException
+     */
+    public function flushLocks(): bool
+    {
+        if (! $this->hasSeparateLockStore()) {
+            throw new RuntimeException('Flushing locks is only supported when the lock store is separate from the cache store.');
+        }
+
+        if (! $this->files->isDirectory($this->lockDirectory)) {
+            return false;
+        }
+
+        foreach ($this->files->directories($this->lockDirectory) as $lockDirectory) {
+            $deleted = $this->files->deleteDirectory($lockDirectory);
+
+            if (! $deleted || $this->files->exists($lockDirectory)) {
                 return false;
             }
         }
@@ -441,5 +489,15 @@ class FileStore implements Store, LockProvider
     public function getPrefix()
     {
         return '';
+    }
+
+    /**
+     * Determine if the lock store is separate from the cache store.
+     *
+     * @return bool
+     */
+    public function hasSeparateLockStore(): bool
+    {
+        return $this->lockDirectory !== null && $this->lockDirectory !== $this->directory;
     }
 }

@@ -14,4 +14,11 @@ class ManagerTest extends TestCase
 
         (new NullableManager($this->app))->driver();
     }
+
+    public function testCustomDriverClosureBoundObjectIsManager()
+    {
+        $manager = new NullableManager($this->app);
+        $manager->extend(__CLASS__, fn () => $this);
+        $this->assertSame($manager, $manager->driver(__CLASS__));
+    }
 }

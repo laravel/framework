@@ -24,6 +24,8 @@ use Illuminate\Support\Testing\Fakes\NotificationFake;
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
+ * @method static string|null resolveConnectionFromQueueRoute(object $queueable)
+ * @method static string|null resolveQueueFromQueueRoute(object $queueable)
  * @method static void assertSentOnDemand(string|\Closure $notification, callable|null $callback = null)
  * @method static void assertSentTo(mixed $notifiable, string|\Closure $notification, callable|null $callback = null)
  * @method static void assertSentOnDemandTimes(string $notification, int $times = 1)

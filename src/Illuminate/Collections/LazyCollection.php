@@ -41,6 +41,8 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * Create a new lazy collection instance.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>|(Closure(): \Generator<TKey, TValue, mixed, void>)|self<TKey, TValue>|array<TKey, TValue>|null  $source
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct($source = null)
     {
@@ -314,11 +316,9 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
-     * Count the number of items in the collection by a field or using a callback.
-     *
-     * @param  (callable(TValue, TKey): (array-key|\UnitEnum))|string|null  $countBy
-     * @return static<array-key, int>
+     * {@inheritDoc}
      */
+    #[\Override]
     public function countBy($countBy = null)
     {
         $countBy = is_null($countBy)
@@ -537,16 +537,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
 
     /**
      * {@inheritDoc}
-     *
-     * @template TGroupKey of array-key|\UnitEnum|\Stringable
-     *
-     * @param  (callable(TValue, TKey): TGroupKey)|array|string  $groupBy
-     * @return static<
-     *  ($groupBy is (array|string)
-     *      ? array-key
-     *      : (TGroupKey is \UnitEnum ? array-key : (TGroupKey is \Stringable ? string : TGroupKey))),
-     *  static<($preserveKeys is true ? TKey : int), ($groupBy is array ? mixed : TValue)>
-     * >
      */
     #[\Override]
     public function groupBy($groupBy, $preserveKeys = false)
@@ -555,13 +545,9 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
-     * Key an associative array by a field or using a callback.
-     *
-     * @template TNewKey of array-key|\UnitEnum
-     *
-     * @param  (callable(TValue, TKey): TNewKey)|array|string  $keyBy
-     * @return static<($keyBy is (array|string) ? array-key : (TNewKey is \UnitEnum ? array-key : TNewKey)), TValue>
+     * {@inheritDoc}
      */
+    #[\Override]
     public function keyBy($keyBy)
     {
         return new static(function () use ($keyBy) {

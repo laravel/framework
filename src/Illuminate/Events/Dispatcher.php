@@ -18,8 +18,19 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
+use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\Connection;
+use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
+use Illuminate\Queue\Attributes\FailOnTimeout;
+use Illuminate\Queue\Attributes\MaxExceptions;
+use Illuminate\Queue\Attributes\Queue as QueueAttribute;
+use Illuminate\Queue\Attributes\ReadsQueueAttributes;
+use Illuminate\Queue\Attributes\Timeout;
+use Illuminate\Queue\Attributes\Tries;
+use Illuminate\Queue\Attributes\UniqueFor;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
@@ -29,7 +40,7 @@ use function Illuminate\Support\enum_value;
 
 class Dispatcher implements DispatcherContract
 {
-    use Macroable, ReflectsClosures;
+    use Macroable, ReadsQueueAttributes, ReflectsClosures, ResolvesQueueRoutes;
 
     /**
      * The IoC container instance.
@@ -96,8 +107,6 @@ class Dispatcher implements DispatcherContract
 
     /**
      * Create a new event dispatcher instance.
-     *
-     * @param  \Illuminate\Contracts\Container\Container|null  $container
      */
     public function __construct(?ContainerContract $container = null)
     {
@@ -357,7 +366,6 @@ class Dispatcher implements DispatcherContract
     /**
      * Determine if the payload has a broadcastable event.
      *
-     * @param  array  $payload
      * @return bool
      */
     protected function shouldBroadcast(array $payload)
@@ -434,7 +442,6 @@ class Dispatcher implements DispatcherContract
      * Add the listeners for the event's interfaces to the given array.
      *
      * @param  string  $eventName
-     * @param  array  $listeners
      * @return array
      */
     protected function addInterfaceListeners($eventName, array $listeners = [])
@@ -453,7 +460,6 @@ class Dispatcher implements DispatcherContract
     /**
      * Prepare the listeners for a given event.
      *
-     * @param  string  $eventName
      * @return \Closure[]
      */
     protected function prepareListeners(string $eventName)
@@ -659,17 +665,25 @@ class Dispatcher implements DispatcherContract
             return;
         }
 
-        $connection = $this->resolveQueue()->connection(method_exists($listener, 'viaConnection')
+        $connectionName = method_exists($listener, 'viaConnection')
             ? (isset($arguments[0]) ? $listener->viaConnection($arguments[0]) : $listener->viaConnection())
-            : $listener->connection ?? null);
+            : $this->getAttributeValue($listener, Connection::class, 'connection');
+
+        $connection = $this->resolveQueue()->connection(
+            $connectionName ?? $this->resolveConnectionFromQueueRoute($listener) ?? null
+        );
 
         $queue = method_exists($listener, 'viaQueue')
             ? (isset($arguments[0]) ? $listener->viaQueue($arguments[0]) : $listener->viaQueue())
-            : $listener->queue ?? null;
+            : $this->getAttributeValue($listener, QueueAttribute::class, 'queue');
 
         $delay = method_exists($listener, 'withDelay')
             ? (isset($arguments[0]) ? $listener->withDelay($arguments[0]) : $listener->withDelay())
             : $listener->delay ?? null;
+
+        if (is_null($queue)) {
+            $queue = $this->resolveQueueFromQueueRoute($listener) ?? null;
+        }
 
         is_null($delay)
             ? $connection->pushOn(enum_value($queue), $job)
@@ -713,13 +727,14 @@ class Dispatcher implements DispatcherContract
                 $job->afterCommit = property_exists($listener, 'afterCommit') ? $listener->afterCommit : null;
             }
 
-            $job->backoff = method_exists($listener, 'backoff') ? $listener->backoff(...$data) : ($listener->backoff ?? null);
-            $job->maxExceptions = $listener->maxExceptions ?? null;
+            $job->backoff = method_exists($listener, 'backoff') ? $listener->backoff(...$data) : $this->getAttributeValue($listener, Backoff::class, 'backoff');
+            $job->maxExceptions = $this->getAttributeValue($listener, MaxExceptions::class, 'maxExceptions');
             $job->retryUntil = method_exists($listener, 'retryUntil') ? $listener->retryUntil(...$data) : null;
             $job->shouldBeEncrypted = $listener instanceof ShouldBeEncrypted;
-            $job->timeout = $listener->timeout ?? null;
-            $job->failOnTimeout = $listener->failOnTimeout ?? false;
-            $job->tries = method_exists($listener, 'tries') ? $listener->tries(...$data) : ($listener->tries ?? null);
+            $job->timeout = $this->getAttributeValue($listener, Timeout::class, 'timeout');
+            $job->failOnTimeout = $this->getAttributeValue($listener, FailOnTimeout::class, 'failOnTimeout') ?? false;
+            $job->deleteWhenMissingModels = $this->getAttributeValue($listener, DeleteWhenMissingModels::class, 'deleteWhenMissingModels') ?? false;
+            $job->tries = method_exists($listener, 'tries') ? $listener->tries(...$data) : $this->getAttributeValue($listener, Tries::class, 'tries');
             $job->messageGroup = method_exists($listener, 'messageGroup') ? $listener->messageGroup(...$data) : ($listener->messageGroup ?? null);
             $job->withDeduplicator(method_exists($listener, 'deduplicator')
                 ? $listener->deduplicator(...$data)
@@ -741,7 +756,7 @@ class Dispatcher implements DispatcherContract
 
                 $job->uniqueFor = method_exists($listener, 'uniqueFor')
                     ? $listener->uniqueFor(...$data)
-                    : ($listener->uniqueFor ?? 0);
+                    : ($this->getAttributeValue($listener, UniqueFor::class, 'uniqueFor') ?? 0);
             }
         });
     }
@@ -866,7 +881,6 @@ class Dispatcher implements DispatcherContract
     /**
      * Determine if the given event should be deferred.
      *
-     * @param  string  $event
      * @return bool
      */
     protected function shouldDeferEvent(string $event)

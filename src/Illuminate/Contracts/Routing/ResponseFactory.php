@@ -2,6 +2,9 @@
 
 namespace Illuminate\Contracts\Routing;
 
+use Closure;
+use Illuminate\Http\StreamedEvent;
+
 interface ResponseFactory
 {
     /**
@@ -56,6 +59,16 @@ interface ResponseFactory
      * @return \Illuminate\Http\JsonResponse
      */
     public function jsonp($callback, $data = [], $status = 200, array $headers = [], $options = 0);
+
+    /**
+     * Create a new event stream response.
+     *
+     * @param  \Closure  $callback
+     * @param  array  $headers
+     * @param  \Illuminate\Http\StreamedEvent|string|null  $endStreamWith
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function eventStream(Closure $callback, array $headers = [], StreamedEvent|string|null $endStreamWith = '</stream>');
 
     /**
      * Create a new streamed response instance.

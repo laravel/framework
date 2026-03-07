@@ -8,9 +8,9 @@ use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
-use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Routing\Middleware\ValidateSignature;
@@ -487,7 +487,7 @@ class Middleware
                 \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
                 \Illuminate\Session\Middleware\StartSession::class,
                 \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-                \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+                \Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class,
                 \Illuminate\Routing\Middleware\SubstituteBindings::class,
                 $this->authenticatedSessions ? 'auth.session' : null,
             ])),
@@ -591,16 +591,36 @@ class Middleware
     }
 
     /**
+     * Configure the request forgery prevention middleware.
+     *
+     * @param  array  $except
+     * @param  bool  $originOnly
+     * @param  bool  $allowSameSite
+     * @return $this
+     */
+    public function preventRequestForgery(array $except = [], bool $originOnly = false, bool $allowSameSite = false)
+    {
+        if (! empty($except)) {
+            PreventRequestForgery::except($except);
+        }
+
+        PreventRequestForgery::useOriginOnly($originOnly);
+        PreventRequestForgery::allowSameSite($allowSameSite);
+
+        return $this;
+    }
+
+    /**
      * Configure the CSRF token validation middleware.
+     *
+     * @deprecated Use preventRequestForgery() instead.
      *
      * @param  array  $except
      * @return $this
      */
     public function validateCsrfTokens(array $except = [])
     {
-        ValidateCsrfToken::except($except);
-
-        return $this;
+        return $this->preventRequestForgery($except);
     }
 
     /**

@@ -29,6 +29,17 @@ class SendingQueuedMailTest extends TestCase
         });
     }
 
+    public function testMailIsSentWhenRoutingQueue()
+    {
+        Queue::fake();
+
+        Queue::route(Mailable::class, 'mail-queue', 'mail-connection');
+
+        Mail::to('test@mail.com')->queue(new SendingQueuedMailTestMail);
+
+        Queue::connection('mail-connection')->assertPushedOn('mail-queue', SendQueuedMailable::class);
+    }
+
     public function testMailIsSentWithDelay()
     {
         Queue::fake();

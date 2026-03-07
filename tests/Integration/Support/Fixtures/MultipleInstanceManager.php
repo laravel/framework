@@ -89,6 +89,10 @@ class MultipleInstanceManager extends BaseMultipleInstanceManager
                     'driver' => 'mysql_database-connection',
                     'mysql_database-connection-option' => 'option-value',
                 ];
+            case 'custom':
+                return [
+                    'driver' => 'custom',
+                ];
             default:
                 return [];
         }

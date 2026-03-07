@@ -414,6 +414,83 @@ class ThrottleRequestsTest extends TestCase
         }
     }
 
+    public function testMultipleDistinctKeysDoNotOverThrottle()
+    {
+        $rateLimiter = Container::getInstance()->make(RateLimiter::class);
+        $rateLimiter->for('test', fn () => [
+            Limit::perMinute(3)->by('minute-key'),
+            Limit::perSecond(1)->by('second-key'),
+            Limit::perDay(4)->by('day-key'),
+        ]);
+        Route::get('/', fn () => 'ok')->middleware(ThrottleRequests::using('test'));
+
+        // Running 2 requests in a single second is not allowed.
+        Carbon::setTestNow('2000-01-01 00:00:00.000');
+        $this->get('/')->assertOk();
+        $this->get('/')->assertStatus(429);
+
+        // After a second, the per-second limit should resets.
+        Carbon::setTestNow('2000-01-01 00:00:01.000');
+        $this->get('/')->assertOk();
+        $this->get('/')->assertStatus(429);
+
+        // A third request is allowed in the same minute.
+        Carbon::setTestNow('2000-01-01 00:00:02.000');
+        $this->get('/')->assertOk();
+
+        // A fourth request is not allowed in the same minute.
+        Carbon::setTestNow('2000-01-01 00:00:03.000');
+        $this->get('/')->assertStatus(429);
+
+        // A fourth request is allowed in the same day, but not a fifth.
+        Carbon::setTestNow('2000-01-01 01:00:00.000');
+        $this->get('/')->assertOk();
+        $this->get('/')->assertStatus(429);
+
+        // The next day, all limits should reset.
+        Carbon::setTestNow('2000-01-02 00:01:00.000');
+        $this->get('/')->assertOk();
+        Carbon::setTestNow('2000-01-02 00:01:01.000');
+        $this->get('/')->assertOk();
+        Carbon::setTestNow('2000-01-02 00:01:02.000');
+        $this->get('/')->assertOk();
+        Carbon::setTestNow('2000-01-02 00:01:03.000');
+        $this->get('/')->assertStatus(429);
+        Carbon::setTestNow('2000-01-02 01:00:00.000');
+        $this->get('/')->assertOk();
+        $this->get('/')->assertStatus(429);
+    }
+
+    public function testLimitOrderDoesNotAffectBehavior()
+    {
+        $rateLimiter = Container::getInstance()->make(RateLimiter::class);
+        $rateLimiter->for('test', fn () => [
+            Limit::perDay(4)->by('day-key'),
+            Limit::perMinute(3)->by('minute-key'),
+        ]);
+        Route::get('/', fn () => 'ok')->middleware(ThrottleRequests::using('test'));
+
+        Carbon::setTestNow('2000-01-01 00:00:00.000');
+
+        // Make 3 requests, each a second apart, that should all be successful.
+        for ($i = 0; $i < 3; $i++) {
+            $this->get('/')->assertOk();
+            Carbon::setTestNow(now()->addSecond());
+        }
+
+        $this->assertSame('2000-01-01 00:00:03.000', now()->toDateTimeString('m'));
+        $this->get('/')->assertStatus(429);
+
+        // A fourth request is allowed in the same day but not a fifth.
+        Carbon::setTestNow('2000-01-01 00:01:00.000');
+        $this->get('/')->assertOk();
+        $this->get('/')->assertStatus(429);
+
+        // After a day, both limits should reset.
+        Carbon::setTestNow('2000-01-02 00:00:00.000');
+        $this->get('/')->assertOk();
+    }
+
     public function testItCanThrottleBasedOnResponse()
     {
         RateLimiterFacade::for('throttle-not-found', function (Request $request) {

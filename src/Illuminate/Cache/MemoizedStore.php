@@ -167,6 +167,8 @@ class MemoizedStore implements LockProvider, Store
      * @param  int  $seconds
      * @param  string|null  $owner
      * @return \Illuminate\Contracts\Cache\Lock
+     *
+     * @throws \BadMethodCallException
      */
     public function lock($name, $seconds = 0, $owner = null)
     {
@@ -183,6 +185,8 @@ class MemoizedStore implements LockProvider, Store
      * @param  string  $name
      * @param  string  $owner
      * @return \Illuminate\Contracts\Cache\Lock
+     *
+     * @throws \BadMethodCallException
      */
     public function restoreLock($name, $owner)
     {
@@ -191,6 +195,20 @@ class MemoizedStore implements LockProvider, Store
         }
 
         return $this->repository->getStore()->restoreLock(...func_get_args());
+    }
+
+    /**
+     * Adjust the expiration time of a cached item.
+     *
+     * @param  string  $key
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function touch($key, $seconds)
+    {
+        unset($this->cache[$this->prefix($key)]);
+
+        return $this->repository->touch($key, $seconds);
     }
 
     /**

@@ -84,6 +84,13 @@ class CallQueuedListener implements ShouldQueue
     public $shouldBeEncrypted = false;
 
     /**
+     * Indicates if the job should be deleted when models are missing.
+     *
+     * @var bool
+     */
+    public $deleteWhenMissingModels;
+
+    /**
      * Indicates if the listener should be unique.
      */
     public bool $shouldBeUnique = false;

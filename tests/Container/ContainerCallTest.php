@@ -227,6 +227,29 @@ class ContainerCallTest extends TestCase
             return $foo;
         });
     }
+
+    public function testCallWithNullableClassParameterDefaultValue()
+    {
+        $container = new Container;
+
+        $result = $container->call(function (?ContainerCallConcreteStub $stub = null) {
+            return $stub;
+        });
+
+        $this->assertNull($result);
+    }
+
+    public function testCallWithNullableClassParameterDefaultValueWithBinding()
+    {
+        $container = new Container;
+        $container->bind(ContainerCallConcreteStub::class);
+
+        $result = $container->call(function (?ContainerCallConcreteStub $stub = null) {
+            return $stub;
+        });
+
+        $this->assertInstanceOf(ContainerCallConcreteStub::class, $result);
+    }
 }
 
 class ContainerTestCallStub

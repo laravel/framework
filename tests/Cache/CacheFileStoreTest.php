@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class CacheFileStoreTest extends TestCase
 {
@@ -109,6 +110,39 @@ class CacheFileStoreTest extends TestCase
         $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($contents))->willReturn(strlen($contents));
         $result = $store->put('foo', 'Hello World', 10);
         $this->assertTrue($result);
+    }
+
+    public function testTouchExtendsTtl(): void
+    {
+        $files = $this->mockFilesystem();
+        $store = $this->getMockBuilder(FileStore::class)->onlyMethods(['expiration', 'get', 'getPayload'])->setConstructorArgs([$files, __DIR__])->getMock();
+
+        $now = Carbon::now();
+
+        $key = 'foo';
+        $content = 'Hello World';
+        $ttl = 60;
+        $hash = sha1($key);
+        $path = __DIR__.'/'.substr($hash, 0, 2).'/'.substr($hash, 2, 2).'/'.$hash;
+
+        $store->expects($this->once())
+            ->method('expiration')
+            ->with($this->equalTo($ttl))
+            ->willReturn($now->clone()->addSeconds($ttl)->getTimestamp());
+        $store->expects($this->once())
+            ->method('getPayload')
+            ->with($key)
+            ->willReturn(['data' => $content, 'expiration' => $now->clone()->addSeconds($ttl)->getTimestamp()]);
+        $files->expects($this->once())
+            ->method('put')
+            ->with(
+                $this->equalTo($path),
+                $this->equalTo($now->clone()->addSeconds($ttl)->getTimestamp().serialize($content)),
+                $this->equalTo(true)
+            )
+            ->willReturn(1);
+
+        $this->assertTrue($store->touch($key, $ttl));
     }
 
     public function testStoreItemProperlySetsPermissions()
@@ -327,6 +361,80 @@ class CacheFileStoreTest extends TestCase
         $store = new FileStore($files, __DIR__.'--wrong');
         $result = $store->flush();
         $this->assertFalse($result, 'Flush should not clean directory');
+    }
+
+    public function testFlushingLocksCleansDirectory()
+    {
+        $lockDir = __DIR__.'/locks';
+        $files = $this->mockFilesystem();
+        $files->expects($this->once())->method('isDirectory')->with($this->equalTo($lockDir))->willReturn(true);
+        $files->expects($this->once())->method('directories')->with($this->equalTo($lockDir))->willReturn(['foo']);
+        $files->expects($this->once())->method('deleteDirectory')->with($this->equalTo('foo'))->willReturn(true);
+
+        $store = new FileStore($files, __DIR__);
+        $store->setLockDirectory($lockDir);
+        $result = $store->flushLocks();
+        $this->assertTrue($result, 'Flushing locks failed');
+    }
+
+    public function testFlushingLocksFailsDirectoryClean()
+    {
+        $lockDir = __DIR__.'/locks';
+        $files = $this->mockFilesystem();
+        $files->expects($this->once())->method('isDirectory')->with($this->equalTo($lockDir))->willReturn(true);
+        $files->expects($this->once())->method('directories')->with($this->equalTo($lockDir))->willReturn(['foo']);
+        $files->expects($this->once())->method('deleteDirectory')->with($this->equalTo('foo'))->willReturn(false);
+
+        $store = new FileStore($files, __DIR__);
+        $store->setLockDirectory($lockDir);
+        $result = $store->flushLocks();
+        $this->assertFalse($result, 'Flushing locks should not have cleared directories');
+    }
+
+    public function testFlushingLocksIgnoreNonExistingDirectory()
+    {
+        $lockDir = __DIR__.'/locks';
+        $files = $this->mockFilesystem();
+        $files->expects($this->once())->method('isDirectory')->with($this->equalTo($lockDir))->willReturn(false);
+
+        $store = new FileStore($files, __DIR__);
+        $store->setLockDirectory($lockDir);
+        $result = $store->flushLocks();
+        $this->assertFalse($result, 'Flushing locks should not clean locks directory');
+    }
+
+    public function testHasSeparateLockStoreReturnsTrueWhenLockDirectoryDiffers()
+    {
+        $store = new FileStore(new Filesystem, __DIR__);
+        $store->setLockDirectory('/locks');
+
+        $this->assertTrue($store->hasSeparateLockStore());
+    }
+
+    public function testHasSeparateLockStoreReturnsFalseWhenLockDirectoryIsSame()
+    {
+        $store = new FileStore(new Filesystem, __DIR__);
+        $store->setLockDirectory(__DIR__);
+
+        $this->assertFalse($store->hasSeparateLockStore());
+    }
+
+    public function testHasSeparateLockStoreReturnsFalseWhenLockDirectoryIsNull()
+    {
+        $store = new FileStore(new Filesystem, __DIR__);
+        $store->setLockDirectory(null);
+
+        $this->assertFalse($store->hasSeparateLockStore());
+    }
+
+    public function testFlushLocksThrowsExceptionWhenLockDirectoryIsSame()
+    {
+        $store = new FileStore(new Filesystem, __DIR__);
+        $store->setLockDirectory(__DIR__);
+
+        $this->expectException(RuntimeException::class);
+
+        $store->flushLocks();
     }
 
     public function testItHandlesForgettingNonFlexibleKeys()

@@ -8,8 +8,8 @@ use Illuminate\Process\Factory;
 /**
  * @method static \Illuminate\Process\PendingProcess command(array|string $command)
  * @method static \Illuminate\Process\PendingProcess path(string $path)
- * @method static \Illuminate\Process\PendingProcess timeout(int $timeout)
- * @method static \Illuminate\Process\PendingProcess idleTimeout(int $timeout)
+ * @method static \Illuminate\Process\PendingProcess timeout(\Carbon\CarbonInterval|int $timeout)
+ * @method static \Illuminate\Process\PendingProcess idleTimeout(\Carbon\CarbonInterval|int $timeout)
  * @method static \Illuminate\Process\PendingProcess forever()
  * @method static \Illuminate\Process\PendingProcess env(array $environment)
  * @method static \Illuminate\Process\PendingProcess input(\Traversable|resource|string|int|float|bool|null $input)

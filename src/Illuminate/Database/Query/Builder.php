@@ -271,6 +271,13 @@ class Builder implements BuilderContract
     public $useWritePdo = false;
 
     /**
+     * The custom arguments for the PDOStatement::fetchAll / fetch functions.
+     *
+     * @var array
+     */
+    public array $fetchUsing = [];
+
+    /**
      * Create a new query builder instance.
      */
     public function __construct(
@@ -328,7 +335,7 @@ class Builder implements BuilderContract
     /**
      * Add a select expression to the query.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $expression
+     * @param  \Illuminate\Contracts\Database\Query\Expression|literal-string  $expression
      * @param  string  $as
      * @return $this
      */
@@ -342,7 +349,7 @@ class Builder implements BuilderContract
     /**
      * Add a new "raw" select expression to the query.
      *
-     * @param  string  $expression
+     * @param  literal-string  $expression
      * @return $this
      */
     public function selectRaw($expression, array $bindings = [])
@@ -375,7 +382,7 @@ class Builder implements BuilderContract
     /**
      * Add a raw "from" clause to the query.
      *
-     * @param  string  $expression
+     * @param  literal-string  $expression
      * @param  mixed  $bindings
      * @return $this
      */
@@ -825,6 +832,49 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a straight join to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
+     * @param  \Closure|string  $first
+     * @param  string|null  $operator
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
+     * @return $this
+     */
+    public function straightJoin($table, $first, $operator = null, $second = null)
+    {
+        return $this->join($table, $first, $operator, $second, 'straight_join');
+    }
+
+    /**
+     * Add a "straight join where" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
+     * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $first
+     * @param  string  $operator
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $second
+     * @return $this
+     */
+    public function straightJoinWhere($table, $first, $operator, $second)
+    {
+        return $this->joinWhere($table, $first, $operator, $second, 'straight_join');
+    }
+
+    /**
+     * Add a subquery straight join to the query.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
+     * @param  string  $as
+     * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $first
+     * @param  string|null  $operator
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
+     * @return $this
+     */
+    public function straightJoinSub($query, $as, $first, $operator = null, $second = null)
+    {
+        return $this->joinSub($query, $as, $first, $operator, $second, 'straight_join');
+    }
+
+    /**
      * Get a new "join" clause.
      *
      * @param  string  $type
@@ -1229,7 +1279,7 @@ class Builder implements BuilderContract
     /**
      * Add a raw "where" clause to the query.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $sql
+     * @param  \Illuminate\Contracts\Database\Query\Expression|literal-string  $sql
      * @param  mixed  $bindings
      * @param  string  $boolean
      * @return $this
@@ -1246,7 +1296,7 @@ class Builder implements BuilderContract
     /**
      * Add a raw "or where" clause to the query.
      *
-     * @param  string  $sql
+     * @param  literal-string  $sql
      * @param  mixed  $bindings
      * @return $this
      */
@@ -1361,6 +1411,8 @@ class Builder implements BuilderContract
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function whereIn($column, $values, $boolean = 'and', $not = false)
     {
@@ -2627,7 +2679,7 @@ class Builder implements BuilderContract
     /**
      * Add a raw "groupBy" clause to the query.
      *
-     * @param  string  $sql
+     * @param  literal-string  $sql
      * @return $this
      */
     public function groupByRaw($sql, array $bindings = [])
@@ -2880,7 +2932,7 @@ class Builder implements BuilderContract
     /**
      * Add a raw "having" clause to the query.
      *
-     * @param  string  $sql
+     * @param  literal-string  $sql
      * @param  string  $boolean
      * @return $this
      */
@@ -2898,7 +2950,7 @@ class Builder implements BuilderContract
     /**
      * Add a raw "or having" clause to the query.
      *
-     * @param  string  $sql
+     * @param  literal-string  $sql
      * @return $this
      */
     public function orHavingRaw($sql, array $bindings = [])
@@ -3019,7 +3071,7 @@ class Builder implements BuilderContract
     /**
      * Add a raw "order by" clause to the query.
      *
-     * @param  string  $sql
+     * @param  literal-string  $sql
      * @param  array  $bindings
      * @return $this
      */
@@ -3423,6 +3475,7 @@ class Builder implements BuilderContract
     /**
      * Get a single expression value from the first result of a query.
      *
+     * @param  literal-string  $expression
      * @return mixed
      */
     public function rawValue(string $expression, array $bindings = [])
@@ -3456,9 +3509,13 @@ class Builder implements BuilderContract
      */
     public function get($columns = ['*'])
     {
-        $items = new Collection($this->onceWithColumns(Arr::wrap($columns), function () {
-            return $this->processor->processSelect($this, $this->runSelect());
-        }));
+        $original = $this->columns;
+
+        $this->columns ??= Arr::wrap($columns);
+
+        $items = new Collection($this->processor->processSelect($this, $this->runSelect()));
+
+        $this->columns = $original;
 
         return $this->applyAfterQueryCallbacks(
             isset($this->groupLimit) ? $this->withoutGroupLimitKeys($items) : $items
@@ -3473,7 +3530,7 @@ class Builder implements BuilderContract
     protected function runSelect()
     {
         return $this->connection->select(
-            $this->toSql(), $this->getBindings(), ! $this->useWritePdo
+            $this->toSql(), $this->getBindings(), ! $this->useWritePdo, $this->fetchUsing
         );
     }
 
@@ -3693,7 +3750,7 @@ class Builder implements BuilderContract
 
         return (new LazyCollection(function () {
             yield from $this->connection->cursor(
-                $this->toSql(), $this->getBindings(), ! $this->useWritePdo
+                $this->toSql(), $this->getBindings(), ! $this->useWritePdo, $this->fetchUsing
             );
         }))->map(function ($item) {
             return $this->applyAfterQueryCallbacks(new Collection([$item]))->first();
@@ -3723,17 +3780,18 @@ class Builder implements BuilderContract
      */
     public function pluck($column, $key = null)
     {
+        $original = $this->columns;
+
         // First, we will need to select the results of the query accounting for the
         // given columns / key. Once we have the results, we will be able to take
         // the results and get the exact data that was requested for the query.
-        $queryResult = $this->onceWithColumns(
-            is_null($key) || $key === $column ? [$column] : [$column, $key],
-            function () {
-                return $this->processor->processSelect(
-                    $this, $this->runSelect()
-                );
-            }
-        );
+        $this->columns ??= is_null($key) || $key === $column
+            ? [$column]
+            : [$column, $key];
+
+        $queryResult = $this->processor->processSelect($this, $this->runSelect());
+
+        $this->columns = $original;
 
         if (empty($queryResult)) {
             return new Collection;
@@ -4029,32 +4087,6 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Execute the given callback while selecting the given columns.
-     *
-     * After running the callback, the columns are reset to the original value.
-     *
-     * @template TResult
-     *
-     * @param  array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
-     * @param  callable(): TResult  $callback
-     * @return TResult
-     */
-    protected function onceWithColumns($columns, $callback)
-    {
-        $original = $this->columns;
-
-        if (is_null($original)) {
-            $this->columns = $columns;
-        }
-
-        $result = $callback();
-
-        $this->columns = $original;
-
-        return $result;
-    }
-
-    /**
      * Insert new records into the database.
      *
      * @return bool
@@ -4121,6 +4153,50 @@ class Builder implements BuilderContract
             $this->grammar->compileInsertOrIgnore($this, $values),
             $this->cleanBindings(Arr::flatten($values, 1))
         );
+    }
+
+    /**
+     * Insert new records into the database while ignoring specific conflicts and returning specified columns.
+     *
+     * @param  non-empty-string|non-empty-array<non-empty-string>  $uniqueBy
+     * @param  non-empty-array<non-empty-string>  $returning
+     * @return \Illuminate\Support\Collection
+     */
+    public function insertOrIgnoreReturning(array $values, array|string $uniqueBy, array $returning = ['*'])
+    {
+        if (empty($values)) {
+            return new Collection;
+        }
+
+        if ($uniqueBy === [] || $uniqueBy === '') {
+            throw new InvalidArgumentException('The unique columns must not be empty.');
+        }
+
+        if ($returning === []) {
+            throw new InvalidArgumentException('The returning columns must not be empty.');
+        }
+
+        if (! is_array(array_first($values))) {
+            $values = [$values];
+        } else {
+            foreach ($values as $key => $value) {
+                ksort($value);
+
+                $values[$key] = $value;
+            }
+        }
+
+        $this->applyBeforeQueryCallbacks();
+
+        $sql = $this->grammar->compileInsertOrIgnoreReturning($this, $values, (array) $uniqueBy, $returning);
+
+        $result = new Collection(
+            $this->connection->selectFromWriteConnection($sql, $this->cleanBindings(Arr::flatten($values, 1)))
+        );
+
+        $this->connection->recordsHaveBeenModified($result->isNotEmpty());
+
+        return $result;
     }
 
     /**
@@ -4210,6 +4286,8 @@ class Builder implements BuilderContract
      * Update records in a PostgreSQL database using the update from syntax.
      *
      * @return int
+     *
+     * @throws \LogicException
      */
     public function updateFrom(array $values)
     {
@@ -4253,10 +4331,15 @@ class Builder implements BuilderContract
     /**
      * Insert new records or update the existing ones.
      *
+     * @param  non-empty-string|non-empty-array<int, non-empty-string>  $uniqueBy
      * @return int
      */
     public function upsert(array $values, array|string $uniqueBy, ?array $update = null)
     {
+        if ($uniqueBy === [] || $uniqueBy === '') {
+            throw new InvalidArgumentException('The unique columns must not be empty.');
+        }
+
         if (empty($values)) {
             return 0;
         } elseif ($update === []) {
@@ -4449,7 +4532,7 @@ class Builder implements BuilderContract
     /**
      * Create a raw database expression.
      *
-     * @param  mixed  $value
+     * @param  literal-string|int|float  $value
      * @return \Illuminate\Contracts\Database\Query\Expression
      */
     public function raw($value)
@@ -4646,6 +4729,8 @@ class Builder implements BuilderContract
      * Ensure the database connection supports vector queries.
      *
      * @return void
+     *
+     * @throws \RuntimeException
      */
     protected function ensureConnectionSupportsVectors()
     {
@@ -4682,6 +4767,19 @@ class Builder implements BuilderContract
     public function useWritePdo()
     {
         $this->useWritePdo = true;
+
+        return $this;
+    }
+
+    /**
+     * Specify arguments for the PDOStatement::fetchAll / fetch functions.
+     *
+     * @param  mixed  ...$fetchUsing
+     * @return $this
+     */
+    public function fetchUsing(...$fetchUsing)
+    {
+        $this->fetchUsing = $fetchUsing;
 
         return $this;
     }

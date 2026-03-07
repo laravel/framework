@@ -43,6 +43,18 @@ class BroadcastManagerTest extends TestCase
         Queue::assertPushed(BroadcastEvent::class);
     }
 
+    public function testEventsCanBeBroadcastUsingQueueRoutes()
+    {
+        Bus::fake();
+        Queue::fake();
+
+        Queue::route(TestEvent::class, 'broadcast-queue', 'broadcast-connection');
+
+        Broadcast::queue(new TestEvent);
+        Bus::assertNotDispatched(BroadcastEvent::class);
+        Queue::connection('broadcast-connection')->assertPushedOn('broadcast-queue', BroadcastEvent::class);
+    }
+
     public function testEventsCanBeRescued()
     {
         Bus::fake();
@@ -127,6 +139,21 @@ class BroadcastManagerTest extends TestCase
         $broadcastManager = new BroadcastManager($app);
 
         $broadcastManager->connection('alien_connection');
+    }
+
+    public function testCustomDriverClosureBoundObjectIsBroadcastManager()
+    {
+        $manager = new BroadcastManager($this->getApp([
+            'broadcasting' => [
+                'connections' => [
+                    __CLASS__ => [
+                        'driver' => __CLASS__,
+                    ],
+                ],
+            ],
+        ]));
+        $manager->extend(__CLASS__, fn () => $this);
+        $this->assertSame($manager, $manager->connection(__CLASS__));
     }
 
     public function testThrowExceptionWhenDriverCreationFails()

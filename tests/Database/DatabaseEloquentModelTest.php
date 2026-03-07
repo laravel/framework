@@ -1112,6 +1112,88 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->exists);
     }
 
+    public function testInsertOrIgnoreProcessWithIncrementing()
+    {
+        $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'refresh'])->getMock();
+        $query = m::mock(Builder::class);
+        $baseQuery = m::mock(BaseBuilder::class);
+        $query->shouldReceive('toBase')->once()->andReturn($baseQuery);
+        $baseQuery->shouldReceive('insertOrIgnoreReturning')->once()->with(['name' => 'taylor'], ['name'])->andReturn(new BaseCollection([(object) ['id' => 1, 'name' => 'taylor']]));
+        $query->shouldReceive('getConnection')->once();
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+        $model->expects($this->once())->method('updateTimestamps');
+
+        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.created: '.get_class($model), $model);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.saved: '.get_class($model), $model);
+
+        $model->name = 'taylor';
+        $model->exists = false;
+        $this->assertTrue($model->saveOrIgnore(['name']));
+        $this->assertEquals(1, $model->id);
+        $this->assertTrue($model->exists);
+        $this->assertTrue($model->wasRecentlyCreated);
+    }
+
+    public function testInsertOrIgnoreProcessWithConflict()
+    {
+        $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'refresh'])->getMock();
+        $query = m::mock(Builder::class);
+        $baseQuery = m::mock(BaseBuilder::class);
+        $query->shouldReceive('toBase')->once()->andReturn($baseQuery);
+        $baseQuery->shouldReceive('insertOrIgnoreReturning')->once()->with(['name' => 'taylor'], ['name'])->andReturn(new BaseCollection);
+        $query->shouldReceive('getConnection')->once();
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+        $model->expects($this->once())->method('updateTimestamps');
+
+        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
+
+        $model->name = 'taylor';
+        $model->exists = false;
+        $this->assertFalse($model->saveOrIgnore(['name']));
+        $this->assertFalse($model->exists);
+        $this->assertFalse($model->wasRecentlyCreated);
+    }
+
+    public function testInsertOrIgnoreProcessWithNonIncrementing()
+    {
+        $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'refresh'])->getMock();
+        $query = m::mock(Builder::class);
+        $baseQuery = m::mock(BaseBuilder::class);
+        $query->shouldReceive('toBase')->once()->andReturn($baseQuery);
+        $baseQuery->shouldReceive('insertOrIgnoreReturning')->once()->with(['name' => 'taylor'], ['name'])->andReturn(new BaseCollection([(object) ['name' => 'taylor']]));
+        $query->shouldReceive('getConnection')->once();
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+        $model->expects($this->once())->method('updateTimestamps');
+        $model->setIncrementing(false);
+
+        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.created: '.get_class($model), $model);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.saved: '.get_class($model), $model);
+
+        $model->name = 'taylor';
+        $model->exists = false;
+        $this->assertTrue($model->saveOrIgnore(['name']));
+        $this->assertNull($model->id);
+        $this->assertTrue($model->exists);
+        $this->assertTrue($model->wasRecentlyCreated);
+    }
+
+    public function testInsertOrIgnoreThrowsOnExistingModel()
+    {
+        $this->expectException(\LogicException::class);
+
+        $model = new EloquentModelStub;
+        $model->exists = true;
+        $model->saveOrIgnore(['name']);
+    }
+
     public function testDeleteProperlyDeletesModel()
     {
         $model = $this->getMockBuilder(Model::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'touchOwners'])->getMock();
@@ -3552,6 +3634,21 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInstanceOf(EloquentModelWithUseFactoryAttributeFactory::class, $model::newFactory());
         $this->assertEquals(EloquentModelWithUseFactoryAttribute::class, $factory->modelName());
         $this->assertEquals('test name', $instance->name); // Small smoke test to ensure the factory is working
+    }
+
+    public function testNestedModelBootingIsDisallowed()
+    {
+        $this->expectExceptionMessageMatches('/The \[(.+)] method may not be called on model \[(.+)\] while it is being booted\./');
+
+        $model = new class extends Model
+        {
+            protected static function boot()
+            {
+                parent::boot();
+
+                $tableName = (new static())->getTable();
+            }
+        };
     }
 
     public function testUseCustomBuilderWithUseEloquentBuilderAttribute()

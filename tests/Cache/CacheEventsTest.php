@@ -7,6 +7,9 @@ use Illuminate\Cache\Events\CacheFlushed;
 use Illuminate\Cache\Events\CacheFlushFailed;
 use Illuminate\Cache\Events\CacheFlushing;
 use Illuminate\Cache\Events\CacheHit;
+use Illuminate\Cache\Events\CacheLocksFlushed;
+use Illuminate\Cache\Events\CacheLocksFlushFailed;
+use Illuminate\Cache\Events\CacheLocksFlushing;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\ForgettingKey;
 use Illuminate\Cache\Events\KeyForgetFailed;
@@ -238,6 +241,25 @@ class CacheEventsTest extends TestCase
         $this->assertTrue($repository->clear());
     }
 
+    public function testFlushLocksTriggersEvents()
+    {
+        $dispatcher = $this->getDispatcher();
+        $repository = $this->getRepository($dispatcher);
+
+        $dispatcher->shouldReceive('dispatch')->once()->with(
+            $this->assertEventMatches(CacheLocksFlushing::class, [
+                'storeName' => 'array',
+            ])
+        );
+
+        $dispatcher->shouldReceive('dispatch')->once()->with(
+            $this->assertEventMatches(CacheLocksFlushed::class, [
+                'storeName' => 'array',
+            ])
+        );
+        $this->assertTrue($repository->flushLocks());
+    }
+
     public function testFlushFailureDoesDispatchEvent()
     {
         $dispatcher = $this->getDispatcher();
@@ -261,6 +283,31 @@ class CacheEventsTest extends TestCase
             ])
         );
         $this->assertFalse($repository->clear());
+    }
+
+    public function testFlushLocksFailureDoesDispatchEvent()
+    {
+        $dispatcher = $this->getDispatcher();
+
+        // Create a store that fails to flush locks
+        $failingStore = m::mock(ArrayStore::class);
+        $failingStore->shouldReceive('flushLocks')->andReturn(false);
+
+        $repository = new Repository($failingStore, ['store' => 'array']);
+        $repository->setEventDispatcher($dispatcher);
+
+        $dispatcher->shouldReceive('dispatch')->once()->with(
+            $this->assertEventMatches(CacheLocksFlushing::class, [
+                'storeName' => 'array',
+            ])
+        );
+
+        $dispatcher->shouldReceive('dispatch')->once()->with(
+            $this->assertEventMatches(CacheLocksFlushFailed::class, [
+                'storeName' => 'array',
+            ])
+        );
+        $this->assertFalse($repository->flushLocks());
     }
 
     protected function assertEventMatches($eventClass, $properties = [])

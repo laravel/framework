@@ -83,6 +83,8 @@ class ComponentSlot implements Htmlable, Stringable
      *
      * @param  callable|string|null  $callable
      * @return bool
+     *
+     * @throws \InvalidArgumentException
      */
     public function hasActualContent(callable|string|null $callable = null)
     {

@@ -10,6 +10,7 @@ use DateTimeImmutable;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\FileStore;
 use Illuminate\Cache\Lock;
+use Illuminate\Cache\MemcachedStore;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Cache\TaggableStore;
@@ -421,6 +422,16 @@ class CacheRepositoryTest extends TestCase
         $this->assertSame($store->getDefaultCacheTime(), $repo->getDefaultCacheTime());
     }
 
+    public function testFlushLocksDelegatesToStore()
+    {
+        $flushable = m::mock(RedisStore::class);
+        $flushable->shouldReceive('flushLocks')->once()->andReturn(true);
+
+        $repo = new Repository($flushable);
+
+        $this->assertTrue($repo->flushLocks());
+    }
+
     public function testTaggableRepositoriesSupportTags()
     {
         $taggable = m::mock(TaggableStore::class);
@@ -435,6 +446,78 @@ class CacheRepositoryTest extends TestCase
         $nonTaggableRepo = new Repository($nonTaggable);
 
         $this->assertFalse($nonTaggableRepo->supportsTags());
+    }
+
+    public function testFlushableLockRepositorySupportsFlushingLocks()
+    {
+        $flushable = m::mock(RedisStore::class);
+        $flushableRepo = new Repository($flushable);
+
+        $this->assertTrue($flushableRepo->supportsFlushingLocks());
+    }
+
+    public function testNonFlushableLockRepositoryDoesNotSupportFlushingLocks()
+    {
+        $nonFlushable = m::mock(MemcachedStore::class);
+        $nonFlushableRepo = new Repository($nonFlushable);
+
+        $this->assertFalse($nonFlushableRepo->supportsFlushingLocks());
+    }
+
+    public function testItThrowsExceptionWhenStoreDoesNotSupportFlushingLocks()
+    {
+        $this->expectException(BadMethodCallException::class);
+
+        $nonFlushable = m::mock(MemcachedStore::class);
+        $nonFlushableRepo = new Repository($nonFlushable);
+
+        $nonFlushableRepo->flushLocks();
+    }
+
+    public function testTouchWithNullTTLRemembersItemForever(): void
+    {
+        $key = 'key';
+        $ttl = null;
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->with($key)->andReturn('bar');
+        $repo->getStore()->shouldReceive('forever')->once()->with($key, 'bar')->andReturn(true);
+        $this->assertTrue($repo->touch($key, $ttl));
+    }
+
+    public function testTouchWithSecondsTtlCorrectlyProxiesToStore(): void
+    {
+        $key = 'key';
+        $ttl = 60;
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->with($key)->andReturn('bar');
+        $repo->getStore()->shouldReceive('touch')->once()->with($key, $ttl)->andReturn(true);
+        $this->assertTrue($repo->touch($key, $ttl));
+    }
+
+    public function testTouchWithDatetimeTtlCorrectlyProxiesToStore(): void
+    {
+        $key = 'key';
+        $ttl = 60;
+
+        Carbon::setTestNow($now = Carbon::now());
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->with($key)->andReturn('bar');
+        $repo->getStore()->shouldReceive('touch')->once()->with($key, $ttl)->andReturn(true);
+        $this->assertTrue($repo->touch($key, $now->addSeconds($ttl)));
+    }
+
+    public function testTouchWithDateIntervalTtlCorrectlyProxiesToStore(): void
+    {
+        $key = 'key';
+        $ttl = 60;
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->with($key)->andReturn('bar');
+        $repo->getStore()->shouldReceive('touch')->once()->with($key, $ttl)->andReturn(true);
+        $this->assertTrue($repo->touch($key, DateInterval::createFromDateString("$ttl seconds")));
     }
 
     public function testAtomicExecutesCallbackAndReturnsResult()
@@ -501,6 +584,15 @@ class CacheRepositoryTest extends TestCase
         } catch (LockTimeoutException) {
             $this->assertFalse($called);
         }
+    }
+
+    public function testTaggedCacheWorksWithEnumKey()
+    {
+        $cache = (new Repository(new ArrayStore()))->tags('test-tag');
+
+        $cache->put(TestCacheKey::FOO, 5);
+        $this->assertSame(6, $cache->increment(TestCacheKey::FOO));
+        $this->assertSame(5, $cache->decrement(TestCacheKey::FOO));
     }
 
     protected function getRepository()
@@ -661,4 +753,9 @@ class CacheRepositoryTest extends TestCase
         $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('bar');
         $repo->array('foo');
     }
+}
+
+enum TestCacheKey: string
+{
+    case FOO = 'foo';
 }

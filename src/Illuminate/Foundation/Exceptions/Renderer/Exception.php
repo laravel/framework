@@ -107,6 +107,18 @@ class Exception
     }
 
     /**
+     * Get the previous exceptions in the chain.
+     *
+     * @return \Illuminate\Support\Collection<int, static>
+     */
+    public function previousExceptions()
+    {
+        return once(fn () => (new Collection($this->exception->getAllPrevious()))->map(
+            fn ($previous) => new static($previous, $this->request, $this->listener, $this->basePath),
+        ));
+    }
+
+    /**
      * Get the exception's frames.
      *
      * @return \Illuminate\Support\Collection<int, Frame>

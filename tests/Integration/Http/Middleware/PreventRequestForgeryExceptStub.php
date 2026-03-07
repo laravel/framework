@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Http\Middleware;
 
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 
-class VerifyCsrfTokenExceptStub extends VerifyCsrfToken
+class PreventRequestForgeryExceptStub extends PreventRequestForgery
 {
     public function checkInExceptArray($request)
     {

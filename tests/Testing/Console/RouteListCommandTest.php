@@ -62,8 +62,8 @@ class RouteListCommandTest extends TestCase
         $this->artisan(RouteListCommand::class)
             ->assertSuccessful()
             ->expectsOutput('')
-            ->expectsOutput('  GET|HEAD   / ..................................................... ')
             ->expectsOutput('  GET|HEAD   {account}.example.com/ ................................ ')
+            ->expectsOutput('  GET|HEAD   / ..................................................... ')
             ->expectsOutput('  GET|HEAD   closure ............................................... ')
             ->expectsOutput('  POST       controller-invokable Illuminate\Tests\Testing\Console\…')
             ->expectsOutput('  GET|HEAD   controller-method/{user} Illuminate\Tests\Testing\Cons…')
@@ -160,6 +160,34 @@ class RouteListCommandTest extends TestCase
             ->expectsOutput('')
             ->expectsOutput('                                                  Showing [3] routes')
             ->expectsOutput('');
+    }
+
+    public function testDisplayRoutesWithBindingFields()
+    {
+        $this->router->get('users/{user:name}', [FooController::class, 'show']);
+        $this->router->get('users/{user:name}/posts/{post:slug}', function () {
+            //
+        });
+
+        $this->artisan(RouteListCommand::class, ['-v' => true])
+            ->assertSuccessful()
+            ->expectsOutput('')
+            ->expectsOutput('  GET|HEAD       users/{user:name} Illuminate\Tests\Testing\Console\FooController@show')
+            ->expectsOutput('  GET|HEAD       users/{user:name}/posts/{post:slug} ............... ')
+            ->expectsOutput('')
+            ->expectsOutput('                                                  Showing [2] routes')
+            ->expectsOutput('');
+    }
+
+    public function testDisplayRoutesWithBindingFieldsAsJson()
+    {
+        $this->router->get('users/{user:name}/posts/{post:slug}', function () {
+            //
+        });
+
+        $this->artisan(RouteListCommand::class, ['--json' => true])
+            ->assertSuccessful()
+            ->expectsOutputToContain('users\/{user:name}\/posts\/{post:slug}');
     }
 }
 

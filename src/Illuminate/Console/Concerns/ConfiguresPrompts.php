@@ -121,6 +121,8 @@ trait ConfiguresPrompts
      * @param  bool|string  $required
      * @param  (\Closure(PResult): mixed)|null  $validate
      * @return PResult
+     *
+     * @throws \Illuminate\Console\PromptValidationException
      */
     protected function promptUntilValid($prompt, $required, $validate)
     {

@@ -16,6 +16,7 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\QueueManager;
+use Illuminate\Queue\QueueRoutes;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use Laravel\SerializableClosure\SerializableClosure;
 use Mockery as m;
@@ -146,6 +147,31 @@ class QueuedEventsTest extends TestCase
             ['shouldUseRedisConnection' => true],
             'bar',
         ]);
+    }
+
+    public function testQueueIsSetUsingQueueRoutes()
+    {
+        $container = new Container;
+        $d = new Dispatcher($container);
+
+        $queueRoutes = new QueueRoutes;
+        $queueRoutes->set(TestDispatcherQueueRoutes::class, 'event-queue', 'event-connection');
+        $container->instance('queue.routes', $queueRoutes);
+
+        $fakeQueue = new QueueFake($container);
+
+        Container::setInstance($container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherQueueRoutes::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->connection('event-connection')->assertPushedOn('event-queue', CallQueuedListener::class);
+
+        Container::setInstance(null);
     }
 
     public function testDelayIsSetByWithDelayDynamically()
@@ -807,6 +833,14 @@ class TestDispatcherViaQueueSupportsEnum implements ShouldQueue
     public function viaQueue()
     {
         return TestQueueType::EnumeratedQueue;
+    }
+}
+
+class TestDispatcherQueueRoutes implements ShouldQueue
+{
+    public function handle()
+    {
+        //
     }
 }
 
