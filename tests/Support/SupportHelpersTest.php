@@ -1284,6 +1284,106 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('x"null"x', env('foo'));
     }
 
+    public function testEnvStrictNumericToInteger(): void
+    {
+        $_SERVER['foo'] = '42';
+        $this->assertSame(42, Env::get('foo', null, true));
+        $this->assertSame(42, env('foo', null, strict: true));
+
+        $_SERVER['foo'] = '0';
+        $this->assertSame(0, Env::get('foo', null, true));
+
+        $_SERVER['foo'] = '-100';
+        $this->assertSame(-100, Env::get('foo', null, true));
+
+        $this->assertNull(Env::get('env_strict_missing_int', null, true));
+        $this->assertSame(99, Env::get('env_strict_missing_int', 99, true));
+        $this->assertSame('default', Env::get('env_strict_missing_int', 'default', true));
+    }
+
+    public function testEnvStrictNumericToFloat(): void
+    {
+        $_SERVER['foo'] = '3.14';
+        $this->assertSame(3.14, Env::get('foo', null, true));
+
+        $_SERVER['foo'] = '0.0';
+        $this->assertSame(0.0, Env::get('foo', null, true));
+
+        $_SERVER['foo'] = '-2.5';
+        $this->assertSame(-2.5, Env::get('foo', null, true));
+
+        $_SERVER['foo'] = '1e2';
+        $this->assertSame(100.0, Env::get('foo', null, true));
+
+        $_SERVER['foo'] = '2.5e-1';
+        $this->assertSame(0.25, Env::get('foo', null, true));
+
+        $this->assertNull(Env::get('env_strict_missing_float', null, true));
+        $this->assertSame(1.5, Env::get('env_strict_missing_float', 1.5, true));
+    }
+
+    public function testEnvStrictBooleanLikeToBoolean(): void
+    {
+        $_SERVER['foo'] = 'true';
+        $this->assertTrue(Env::get('foo', null, true));
+
+        $_SERVER['foo'] = 'on';
+        $this->assertTrue(Env::get('foo', null, true));
+
+        $_SERVER['foo'] = 'yes';
+        $this->assertTrue(Env::get('foo', null, true));
+
+        $_SERVER['foo'] = 'false';
+        $this->assertFalse(Env::get('foo', null, true));
+
+        $_SERVER['foo'] = 'off';
+        $this->assertFalse(Env::get('foo', null, true));
+
+        $_SERVER['foo'] = 'no';
+        $this->assertFalse(Env::get('foo', null, true));
+
+        $_SERVER['foo'] = '';
+        $this->assertSame('', Env::get('foo', null, true));
+
+        $this->assertNull(Env::get('env_strict_missing_bool', null, true));
+        $this->assertTrue(Env::get('env_strict_missing_bool', true, true));
+        $this->assertFalse(Env::get('env_strict_missing_bool', false, true));
+    }
+
+    public function testEnvStrictPlainStringStaysString(): void
+    {
+        $_SERVER['foo'] = 'hello';
+        $this->assertSame('hello', Env::get('foo', null, true));
+
+        $_SERVER['foo'] = 'some-value';
+        $this->assertSame('some-value', Env::get('foo', null, true));
+
+        $this->assertNull(Env::get('env_strict_missing_str', null, true));
+        $this->assertSame('fallback', Env::get('env_strict_missing_str', 'fallback', true));
+    }
+
+    public function testEnvWithoutStrictReturnsRawValue(): void
+    {
+        $_SERVER['foo'] = '42';
+        $this->assertSame('42', Env::get('foo'));
+        $this->assertSame('42', Env::get('foo', null, false));
+    }
+
+    public function testEnvHelperWithStrictParameter(): void
+    {
+        $_SERVER['foo'] = '123';
+        $this->assertSame(123, env('foo', null, strict: true));
+
+        $_SERVER['foo'] = 'true';
+        $this->assertTrue(env('foo', null, strict: true));
+
+        $_SERVER['foo'] = '42';
+        $this->assertSame(42, env('foo', null, strict: true));
+
+        $_SERVER['foo'] = 'hello';
+        $this->assertSame('hello', env('foo', null, strict: true));
+    }
+
     public function testWriteArrayOfEnvVariablesToFile()
     {
         $filesystem = new Filesystem;

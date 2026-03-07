@@ -142,13 +142,17 @@ if (! function_exists('env')) {
     /**
      * Gets the value of an environment variable.
      *
+     * When $strict is true, the value is cast when present: numeric with decimal/exponent → float,
+     * other numeric → int, boolean-like → bool.
+     *
      * @param  string  $key
      * @param  mixed  $default
+     * @param  bool  $strict
      * @return mixed
      */
-    function env($key, $default = null)
+    function env($key, $default = null, bool $strict = false)
     {
-        return Env::get($key, $default);
+        return Env::get($key, $default, $strict);
     }
 }
 
