@@ -184,6 +184,8 @@ class DatabaseEloquentBelongsToManyWithAttributesTest extends TestCase
         $this->schema()->drop('with_attributes_posts');
         $this->schema()->drop('with_attributes_tags');
         $this->schema()->drop('with_attributes_pivot');
+
+        parent::tearDown();
     }
 
     /**

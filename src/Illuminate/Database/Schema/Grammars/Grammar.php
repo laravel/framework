@@ -153,6 +153,20 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a vector index key command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    public function compileVectorIndex(Blueprint $blueprint, Fluent $command)
+    {
+        throw new RuntimeException('The database driver in use does not support vector indexes.');
+    }
+
+    /**
      * Compile the query to determine the foreign keys.
      *
      * @param  string|null  $schema
@@ -345,6 +359,19 @@ abstract class Grammar extends BaseGrammar
     protected function typeVector(Fluent $column)
     {
         throw new RuntimeException('This database driver does not support the vector type.');
+    }
+
+    /**
+     * Create the column definition for a tsvector type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    protected function typeTsvector(Fluent $column)
+    {
+        throw new RuntimeException('This database driver does not support the tsvector type.');
     }
 
     /**

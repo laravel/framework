@@ -5,9 +5,11 @@ namespace Illuminate\Database\Schema;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
+use Illuminate\Database\PostgresConnection;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use LogicException;
+use RuntimeException;
 
 class Builder
 {
@@ -37,7 +39,7 @@ class Builder
     /**
      * The default string length for migrations.
      *
-     * @var int|null
+     * @var non-negative-int|null
      */
     public static $defaultStringLength = 255;
 
@@ -49,7 +51,7 @@ class Builder
     /**
      * The default relationship morph key type.
      *
-     * @var string
+     * @var 'int'|'uuid'|'ulid'
      */
     public static $defaultMorphKeyType = 'int';
 
@@ -67,7 +69,7 @@ class Builder
     /**
      * Set the default string length for migrations.
      *
-     * @param  int  $length
+     * @param  non-negative-int  $length
      * @return void
      */
     public static function defaultStringLength($length)
@@ -318,6 +320,38 @@ class Builder
     public function whenTableDoesntHaveColumn(string $table, string $column, Closure $callback)
     {
         if (! $this->hasColumn($table, $column)) {
+            $this->table($table, fn (Blueprint $table) => $callback($table));
+        }
+    }
+
+    /**
+     * Execute a table builder callback if the given table has a given index.
+     *
+     * @param  string  $table
+     * @param  string|array  $index
+     * @param  \Closure  $callback
+     * @param  string|null  $type
+     * @return void
+     */
+    public function whenTableHasIndex(string $table, string|array $index, Closure $callback, ?string $type = null)
+    {
+        if ($this->hasIndex($table, $index, $type)) {
+            $this->table($table, fn (Blueprint $table) => $callback($table));
+        }
+    }
+
+    /**
+     * Execute a table builder callback if the given table doesn't have a given index.
+     *
+     * @param  string  $table
+     * @param  string|array  $index
+     * @param  \Closure  $callback
+     * @param  string|null  $type
+     * @return void
+     */
+    public function whenTableDoesntHaveIndex(string $table, string|array $index, Closure $callback, ?string $type = null)
+    {
+        if (! $this->hasIndex($table, $index, $type)) {
             $this->table($table, fn (Blueprint $table) => $callback($table));
         }
     }
@@ -593,8 +627,10 @@ class Builder
     /**
      * Disable foreign key constraints during the execution of a callback.
      *
-     * @param  \Closure  $callback
-     * @return mixed
+     * @template TReturn
+     *
+     * @param  (\Closure(): TReturn)  $callback
+     * @return TReturn
      */
     public function withoutForeignKeyConstraints(Closure $callback)
     {
@@ -605,6 +641,38 @@ class Builder
         } finally {
             $this->enableForeignKeyConstraints();
         }
+    }
+
+    /**
+     * Create the vector extension on the schema if it does not exist.
+     *
+     * @param  string|null  $schema
+     * @return void
+     */
+    public function ensureVectorExtensionExists($schema = null)
+    {
+        $this->ensureExtensionExists('vector', $schema);
+    }
+
+    /**
+     * Create a new extension on the schema if it does not exist.
+     *
+     * @param  string  $name
+     * @param  string|null  $schema
+     * @return void
+     */
+    public function ensureExtensionExists($name, $schema = null)
+    {
+        if (! $this->getConnection() instanceof PostgresConnection) {
+            throw new RuntimeException('Extensions are only supported by Postgres.');
+        }
+
+        $name = $this->getConnection()->getSchemaGrammar()->wrap($name);
+
+        $this->getConnection()->statement(match (filled($schema)) {
+            true => "create extension if not exists {$name} schema {$this->getConnection()->getSchemaGrammar()->wrap($schema)}",
+            false => "create extension if not exists {$name}",
+        });
     }
 
     /**
@@ -661,7 +729,7 @@ class Builder
      *
      * @param  string  $reference
      * @param  string|bool|null  $withDefaultSchema
-     * @return array
+     * @return array{string|null, string}
      */
     public function parseSchemaAndTable($reference, $withDefaultSchema = null)
     {

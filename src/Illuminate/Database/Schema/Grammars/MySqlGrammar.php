@@ -310,9 +310,11 @@ class MySqlGrammar extends Grammar
      */
     public function compileAdd(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('alter table %s add %s',
+        return sprintf('alter table %s add %s%s%s',
             $this->wrapTable($blueprint),
-            $this->getColumn($blueprint, $command->column)
+            $this->getColumn($blueprint, $command->column),
+            $command->column->instant ? ', algorithm=instant' : '',
+            $command->column->lock ? ', lock='.$command->column->lock : ''
         );
     }
 
@@ -403,7 +405,17 @@ class MySqlGrammar extends Grammar
             $this->getType($column)
         );
 
-        return $this->addModifiers($sql, $blueprint, $column);
+        $sql = $this->addModifiers($sql, $blueprint, $column);
+
+        if ($column->instant) {
+            $sql .= ', algorithm=instant';
+        }
+
+        if ($column->lock) {
+            $sql .= ', lock='.$column->lock;
+        }
+
+        return $sql;
     }
 
     /**
@@ -415,10 +427,11 @@ class MySqlGrammar extends Grammar
      */
     public function compilePrimary(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('alter table %s add primary key %s(%s)',
+        return sprintf('alter table %s add primary key %s(%s)%s',
             $this->wrapTable($blueprint),
             $command->algorithm ? 'using '.$command->algorithm : '',
-            $this->columnize($command->columns)
+            $this->columnize($command->columns),
+            $command->lock ? ', lock='.$command->lock : ''
         );
     }
 
@@ -480,12 +493,13 @@ class MySqlGrammar extends Grammar
      */
     protected function compileKey(Blueprint $blueprint, Fluent $command, $type)
     {
-        return sprintf('alter table %s add %s %s%s(%s)',
+        return sprintf('alter table %s add %s %s%s(%s)%s',
             $this->wrapTable($blueprint),
             $type,
             $this->wrap($command->index),
             $command->algorithm ? ' using '.$command->algorithm : '',
-            $this->columnize($command->columns)
+            $this->columnize($command->columns),
+            $command->lock ? ', lock='.$command->lock : ''
         );
     }
 
@@ -524,7 +538,17 @@ class MySqlGrammar extends Grammar
     {
         $columns = $this->prefixArray('drop', $this->wrapArray($command->columns));
 
-        return 'alter table '.$this->wrapTable($blueprint).' '.implode(', ', $columns);
+        $sql = 'alter table '.$this->wrapTable($blueprint).' '.implode(', ', $columns);
+
+        if ($command->instant) {
+            $sql .= ', algorithm=instant';
+        }
+
+        if ($command->lock) {
+            $sql .= ', lock='.$command->lock;
+        }
+
+        return $sql;
     }
 
     /**
@@ -589,6 +613,24 @@ class MySqlGrammar extends Grammar
     public function compileDropSpatialIndex(Blueprint $blueprint, Fluent $command)
     {
         return $this->compileDropIndex($blueprint, $command);
+    }
+
+    /**
+     * Compile a foreign key command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileForeign(Blueprint $blueprint, Fluent $command)
+    {
+        $sql = parent::compileForeign($blueprint, $command);
+
+        if ($command->lock) {
+            $sql .= ', lock='.$command->lock;
+        }
+
+        return $sql;
     }
 
     /**

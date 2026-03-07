@@ -177,6 +177,8 @@ class DatabaseEloquentBelongsToManyWithAttributesPendingTest extends TestCase
         $this->schema()->drop('pending_attributes_posts');
         $this->schema()->drop('pending_attributes_tags');
         $this->schema()->drop('pending_attributes_pivot');
+
+        parent::tearDown();
     }
 
     /**

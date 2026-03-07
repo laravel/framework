@@ -64,6 +64,8 @@ class DatabaseEloquentTimestampsTest extends TestCase
         $this->schema()->drop('users_created_at');
         $this->schema()->drop('users_updated_at');
         Carbon::setTestNow(null);
+
+        parent::tearDown();
     }
 
     /**

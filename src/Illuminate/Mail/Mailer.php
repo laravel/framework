@@ -248,7 +248,7 @@ class Mailer implements MailerContract, MailQueueContract
         // First we need to parse the view, which could either be a string or an array
         // containing both an HTML and plain text versions of the view which should
         // be used when sending an e-mail. We will extract both of them out here.
-        [$view, $plain, $raw] = $this->parseView($view);
+        [$view, $plain] = $this->parseView($view);
 
         $data['message'] = $this->createMessage();
 
@@ -270,7 +270,7 @@ class Mailer implements MailerContract, MailQueueContract
         if (preg_match_all('/<img.+?src=[\'"]cid:([^\'"]+)[\'"].*?>/is', $renderedView, $matches)) {
             foreach (array_unique($matches[1]) as $image) {
                 foreach ($attachments as $attachment) {
-                    if ($attachment->getFilename() === $image) {
+                    if ($attachment->getContentId() === $image || $attachment->getFilename() === $image) {
                         $renderedView = str_replace(
                             'cid:'.$image,
                             'data:'.$attachment->getContentType().';base64,'.$attachment->bodyToString(),

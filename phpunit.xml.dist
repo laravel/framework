@@ -12,6 +12,9 @@
             <directory suffix="Test.php">./tests</directory>
         </testsuite>
     </testsuites>
+    <extensions>
+        <bootstrap class="Illuminate\Tests\AfterEachTestExtension" />
+    </extensions>
     <php>
         <ini name="date.timezone" value="UTC" />
         <ini name="intl.default_locale" value="C.UTF-8" />

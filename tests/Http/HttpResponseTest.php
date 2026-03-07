@@ -22,11 +22,6 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class HttpResponseTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testJsonResponsesAreConvertedAndHeadersAreSet()
     {
         $response = new Response(new ArrayableStub);
@@ -211,6 +206,26 @@ class HttpResponseTest extends TestCase
         $response->withHeaders($headerBag);
         $this->assertSame('BAAA', $response->headers->get('bar'));
         $this->assertSame('TATA', $response->headers->get('titi'));
+    }
+
+    public function testWithoutHeader()
+    {
+        $response = new Response(null, 200, ['foo' => 'bar', 'baz' => 'qux', 'zal' => 'ter']);
+        $this->assertSame('bar', $response->headers->get('foo'));
+        $this->assertSame('qux', $response->headers->get('baz'));
+        $this->assertSame('ter', $response->headers->get('zal'));
+
+        // Test removing single header
+        $result = $response->withoutHeader('foo');
+        $this->assertSame($response, $result);
+        $this->assertNull($response->headers->get('foo'));
+        $this->assertSame('qux', $response->headers->get('baz'));
+        $this->assertSame('ter', $response->headers->get('zal'));
+
+        // Test removing multiple headers at once
+        $response->withoutHeader(['baz', 'zal']);
+        $this->assertNull($response->headers->get('baz'));
+        $this->assertNull($response->headers->get('zal'));
     }
 
     public function testMagicCall()

@@ -330,7 +330,9 @@ class DatabaseManager implements ConnectionResolverInterface
             return $this->connection($name);
         }
 
-        return $this->refreshPdoConnections($name);
+        return tap($this->refreshPdoConnections($name), function ($connection) {
+            $this->dispatchConnectionEstablishedEvent($connection);
+        });
     }
 
     /**

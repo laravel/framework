@@ -95,7 +95,7 @@ class Authorize
     }
 
     /**
-     * Checks if the given string looks like a fully qualified class name.
+     * Checks if the given string looks like a fully-qualified class name.
      *
      * @param  string  $value
      * @return bool

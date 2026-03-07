@@ -10,11 +10,11 @@ class FoundationInteractsWithTimeTest extends TestCase
 {
     use InteractsWithTime;
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
-        parent::tearDown();
-
         Carbon::setTestNow();
+
+        parent::tearDown();
     }
 
     public function testFreezeTimeReturnsFrozenTime()

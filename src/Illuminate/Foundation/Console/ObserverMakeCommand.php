@@ -88,7 +88,7 @@ class ObserverMakeCommand extends GeneratorCommand
      */
     protected function parseModel($model)
     {
-        if (preg_match('([^A-Za-z0-9_/\\\\])', $model)) {
+        if (preg_match('/[^A-Za-z0-9_\/\\\\]/', $model)) {
             throw new InvalidArgumentException('Model name contains invalid characters.');
         }
 
@@ -158,8 +158,8 @@ class ObserverMakeCommand extends GeneratorCommand
         }
 
         $model = suggest(
-            'What model should this observer apply to? (Optional)',
-            $this->possibleModels(),
+            'What model should be observed? (Optional)',
+            $this->findAvailableModels(),
         );
 
         if ($model) {

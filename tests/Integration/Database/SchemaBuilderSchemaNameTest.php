@@ -566,7 +566,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         try {
             $db->statement("create login my_user with password = 'Passw0rd'");
             $db->statement('create user my_user for login my_user');
-        } catch(\Illuminate\Database\QueryException $e) {
+        } catch(\Illuminate\Database\QueryException) {
             //
         }
 

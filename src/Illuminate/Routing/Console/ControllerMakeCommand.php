@@ -207,7 +207,7 @@ class ControllerMakeCommand extends GeneratorCommand
      */
     protected function parseModel($model)
     {
-        if (preg_match('([^A-Za-z0-9_/\\\\])', $model)) {
+        if (preg_match('/[^A-Za-z0-9_\/\\\\]/', $model)) {
             throw new InvalidArgumentException('Model name contains invalid characters.');
         }
 
@@ -328,8 +328,8 @@ class ControllerMakeCommand extends GeneratorCommand
 
         if (in_array($type, ['api', 'resource', 'singleton'])) {
             $model = suggest(
-                "What model should this $type controller be for? (Optional)",
-                $this->possibleModels()
+                "What model is this $type controller for? (Optional)",
+                $this->findAvailableModels()
             );
 
             if ($model) {

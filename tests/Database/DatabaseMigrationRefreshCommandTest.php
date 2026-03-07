@@ -20,7 +20,8 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
     protected function tearDown(): void
     {
         RefreshCommand::prohibit(false);
-        m::close();
+
+        parent::tearDown();
     }
 
     public function testRefreshCommandCallsCommandsWithProperArguments()

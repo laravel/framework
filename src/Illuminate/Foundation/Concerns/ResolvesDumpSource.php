@@ -13,6 +13,7 @@ trait ResolvesDumpSource
      * @var array<string, string>
      */
     protected $editorHrefs = [
+        'antigravity' => 'antigravity://file/{file}:{line}',
         'atom' => 'atom://core/open/file?filename={file}&line={line}',
         'cursor' => 'cursor://file/{file}:{line}',
         'emacs' => 'emacs://open?url=file://{file}&line={line}',
@@ -169,7 +170,9 @@ trait ResolvesDumpSource
             ? $editor['href']
             : ($this->editorHrefs[$editor['name'] ?? $editor] ?? sprintf('%s://open?file={file}&line={line}', $editor['name'] ?? $editor));
 
-        if ($basePath = $editor['base_path'] ?? false) {
+        $basePath = $editor['base_path'] ?? false;
+
+        if ($basePath !== false) {
             $file = Str::replaceStart($this->basePath, $basePath, $file);
         }
 

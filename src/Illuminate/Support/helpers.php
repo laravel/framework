@@ -232,7 +232,7 @@ if (! function_exists('laravel_cloud')) {
     function laravel_cloud(): bool
     {
         return ($_ENV['LARAVEL_CLOUD'] ?? false) === '1' ||
-               ($_SERVER['LARAVEL_CLOUD'] ?? false) === '1';
+            ($_SERVER['LARAVEL_CLOUD'] ?? false) === '1';
     }
 }
 
@@ -288,9 +288,7 @@ if (! function_exists('preg_replace_array')) {
     function preg_replace_array($pattern, array $replacements, $subject): string
     {
         return preg_replace_callback($pattern, function () use (&$replacements) {
-            foreach ($replacements as $value) {
-                return array_shift($replacements);
-            }
+            return array_shift($replacements);
         }, $subject);
     }
 }

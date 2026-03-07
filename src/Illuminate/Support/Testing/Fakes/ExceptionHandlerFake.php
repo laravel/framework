@@ -113,7 +113,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     {
         try {
             $this->assertReported($exception);
-        } catch (ExpectationFailedException $e) {
+        } catch (ExpectationFailedException) {
             return;
         }
 

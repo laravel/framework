@@ -64,6 +64,13 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     protected $routeResolver;
 
     /**
+     * The cached "Accept" header value.
+     *
+     * @var string|null
+     */
+    protected $cachedAcceptHeader;
+
+    /**
      * Create a new Illuminate HTTP request from server variables.
      *
      * @return static
@@ -357,6 +364,23 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * {@inheritdoc}
+     */
+    #[\Override]
+    public function getAcceptableContentTypes(): array
+    {
+        $currentAcceptHeader = $this->headers->get('Accept');
+
+        if ($this->cachedAcceptHeader !== $currentAcceptHeader) {
+            // Flush acceptable content types so Symfony re-calculates them...
+            $this->acceptableContentTypes = null;
+            $this->cachedAcceptHeader = $currentAcceptHeader;
+        }
+
+        return parent::getAcceptableContentTypes();
+    }
+
+    /**
      * Merge new input into the current request's input array.
      *
      * @param  array  $input
@@ -408,6 +432,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @param  string  $key
      * @param  mixed  $default
      * @return mixed
+     *
+     * @deprecated use ->input() instead
      */
     #[\Override]
     public function get(string $key, mixed $default = null): mixed
@@ -562,6 +588,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \Symfony\Component\HttpFoundation\Exception\SessionNotFoundException
      */
     #[\Override]
     public function getSession(): SessionInterface

@@ -78,7 +78,7 @@ class TrimStrings extends TransformsRequest
      */
     protected function shouldSkip($key, $except)
     {
-        return in_array($key, $except, true);
+        return Str::is($except, $key);
     }
 
     /**

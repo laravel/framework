@@ -51,6 +51,13 @@ class BroadcastEvent implements ShouldQueue
     public $maxExceptions;
 
     /**
+     * Delete the job if its models no longer exist.
+     *
+     * @var bool
+     */
+    public $deleteWhenMissingModels = true;
+
+    /**
      * Create a new job handler instance.
      *
      * @param  mixed  $event

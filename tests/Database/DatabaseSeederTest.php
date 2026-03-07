@@ -28,11 +28,6 @@ class TestDepsSeeder extends Seeder
 
 class DatabaseSeederTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testCallResolveTheClassAndCallsRun()
     {
         $seeder = new TestSeeder;

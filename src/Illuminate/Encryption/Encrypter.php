@@ -327,6 +327,30 @@ class Encrypter implements EncrypterContract, StringEncrypter
     }
 
     /**
+     * Determine if the given value appears to be encrypted by this encrypter.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function appearsEncrypted($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        $decoded = base64_decode($value, true);
+
+        if ($decoded === false) {
+            return false;
+        }
+
+        $payload = json_decode($decoded, true);
+
+        return is_array($payload)
+            && isset($payload['iv'], $payload['value'], $payload['mac']);
+    }
+
+    /**
      * Get the encryption key that the encrypter is currently using.
      *
      * @return string

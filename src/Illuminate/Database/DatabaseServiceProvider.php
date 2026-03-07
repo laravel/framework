@@ -76,15 +76,15 @@ class DatabaseServiceProvider extends ServiceProvider
             return $app['db']->connection()->getSchemaBuilder();
         });
 
-        $this->app->singleton('db.transactions', function ($app) {
+        $this->app->singleton('db.transactions', function () {
             return new DatabaseTransactionsManager;
         });
 
-        $this->app->singleton(ConcurrencyErrorDetectorContract::class, function ($app) {
+        $this->app->singleton(ConcurrencyErrorDetectorContract::class, function () {
             return new ConcurrencyErrorDetector;
         });
 
-        $this->app->singleton(LostConnectionDetectorContract::class, function ($app) {
+        $this->app->singleton(LostConnectionDetectorContract::class, function () {
             return new LostConnectionDetector;
         });
     }

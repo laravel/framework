@@ -145,11 +145,17 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run multiple times per minute.
      *
-     * @param  int<0, 59>  $seconds
+     * @param  int<1, 59>  $seconds
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     protected function repeatEvery($seconds)
     {
+        if ($seconds <= 0) {
+            throw new InvalidArgumentException("The seconds [$seconds] must be greater than zero.");
+        }
+
         if (60 % $seconds !== 0) {
             throw new InvalidArgumentException("The seconds [$seconds] are not evenly divisible by 60.");
         }
@@ -566,6 +572,21 @@ trait ManagesFrequencies
         $this->dailyAt($time);
 
         return $this->spliceIntoPosition(3, Carbon::now()->endOfMonth()->day);
+    }
+
+    /**
+     * Schedule the event to run on specific days of the month.
+     *
+     * @param  array<int<1, 31>>|int<1, 31>  ...$days
+     * @return $this
+     */
+    public function daysOfMonth(...$days)
+    {
+        $days = count($days) === 1 && is_array($days[0]) ? $days[0] : $days;
+
+        $this->dailyAt('0:0');
+
+        return $this->spliceIntoPosition(3, implode(',', $days));
     }
 
     /**

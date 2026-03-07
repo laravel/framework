@@ -30,7 +30,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Log\Logger withContext(array $context = [])
  * @method static void listen(\Closure $callback)
  * @method static \Psr\Log\LoggerInterface getLogger()
- * @method static \Illuminate\Contracts\Events\Dispatcher getEventDispatcher()
+ * @method static \Illuminate\Contracts\Events\Dispatcher|null getEventDispatcher()
  * @method static void setEventDispatcher(\Illuminate\Contracts\Events\Dispatcher $dispatcher)
  * @method static \Illuminate\Log\Logger|mixed when(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)
  * @method static \Illuminate\Log\Logger|mixed unless(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)

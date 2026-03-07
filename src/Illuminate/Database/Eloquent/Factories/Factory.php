@@ -448,6 +448,60 @@ abstract class Factory
     }
 
     /**
+     * Create a collection of models.
+     *
+     * @param  iterable<int, array<string, mixed>>|int|null  $records
+     * @return \Illuminate\Database\Eloquent\Collection<int, TModel>
+     */
+    public function makeMany(iterable|int|null $records = null)
+    {
+        $records ??= ($this->count ?? 1);
+
+        $this->count = null;
+
+        if (is_numeric($records)) {
+            $records = array_fill(0, $records, []);
+        }
+
+        return new EloquentCollection(
+            (new Collection($records))->map(function ($record) {
+                return $this->state($record)->make();
+            })
+        );
+    }
+
+    /**
+     * Insert the model records in bulk. No model events are emitted.
+     *
+     * @param  array<string, mixed>  $attributes
+     * @param  Model|null  $parent
+     * @return void
+     */
+    public function insert(array $attributes = [], ?Model $parent = null): void
+    {
+        $made = $this->make($attributes, $parent);
+
+        $madeCollection = $made instanceof Collection
+            ? $made
+            : $this->newModel()->newCollection([$made]);
+
+        $model = $madeCollection->first();
+
+        if (isset($this->connection)) {
+            $model->setConnection($this->connection);
+        }
+
+        $query = $model->newQueryWithoutScopes();
+
+        $query->fillAndInsert(
+            $madeCollection->withoutAppends()
+                ->setHidden([])
+                ->map(static fn (Model $model) => $model->attributesToArray())
+                ->all()
+        );
+    }
+
+    /**
      * Make an instance of the model with the given attributes.
      *
      * @param  \Illuminate\Database\Eloquent\Model|null  $parent
@@ -746,6 +800,26 @@ abstract class Factory
     }
 
     /**
+     * Remove the "after making" callbacks from the factory.
+     *
+     * @return static
+     */
+    public function withoutAfterMaking()
+    {
+        return $this->newInstance(['afterMaking' => new Collection]);
+    }
+
+    /**
+     * Remove the "after creating" callbacks from the factory.
+     *
+     * @return static
+     */
+    public function withoutAfterCreating()
+    {
+        return $this->newInstance(['afterCreating' => new Collection]);
+    }
+
+    /**
      * Call the "after making" callbacks for the given model instances.
      *
      * @param  \Illuminate\Support\Collection  $instances
@@ -811,10 +885,10 @@ abstract class Factory
     /**
      * Specify the database connection that should be used to generate models.
      *
-     * @param  \UnitEnum|string  $connection
+     * @param  \UnitEnum|string|null  $connection
      * @return static
      */
-    public function connection(UnitEnum|string $connection)
+    public function connection(UnitEnum|string|null $connection)
     {
         return $this->newInstance(['connection' => $connection]);
     }

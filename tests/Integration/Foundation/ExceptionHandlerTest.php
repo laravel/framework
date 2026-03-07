@@ -9,10 +9,14 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Debug\ShouldntReport;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\ResponseFactory;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
+use Monolog\Handler\TestHandler;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\PhpProcess;
@@ -280,5 +284,29 @@ EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
             'msg' => 'Server Error',
             'success' => false,
         ]);
+    }
+
+    public function test_it_reports_request_exceptions()
+    {
+        config(['logging.default' => 'test_log']);
+        config(['logging.channels.test_log' => [
+            'driver' => 'monolog',
+            'handler' => TestHandler::class,
+        ]]);
+        Log::setDefaultDriver('test_log');
+        Http::fake([
+            '*' => Http::response('a really long message is being returned', status:500),
+        ]);
+
+        RequestException::truncateAt(8);
+        try {
+            Http::throw()->get('http://laravel.test');
+        } catch (RequestException $requestException) {
+            report($requestException);
+        }
+
+        $recordedLogs = Log::getLogger()->getHandlers()[0]->getRecords();
+        $this->assertCount(1, $recordedLogs);
+        $this->assertStringContainsString('a really (truncated...)', $recordedLogs[0]['message']);
     }
 }

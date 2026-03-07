@@ -11,13 +11,22 @@ use Throwable;
 class FailoverStore extends TaggableStore implements LockProvider
 {
     /**
+     * The caches which failed on the last action.
+     *
+     * @var list<string>
+     */
+    protected array $failingCaches = [];
+
+    /**
      * Create a new failover store.
+     *
+     * @param  array<int, string>  $stores
      */
     public function __construct(
         protected CacheManager $cache,
         protected Dispatcher $events,
-        protected array $stores)
-    {
+        protected array $stores
+    ) {
     }
 
     /**
@@ -163,6 +172,22 @@ class FailoverStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Remove all expired tag set entries.
+     *
+     * @return void
+     */
+    public function flushStaleTags()
+    {
+        foreach ($this->stores as $store) {
+            if ($this->store($store)->getStore() instanceof RedisStore) {
+                $this->store($store)->flushStaleTags();
+
+                break;
+            }
+        }
+    }
+
+    /**
      * Get the cache key prefix.
      *
      * @return string
@@ -174,19 +199,31 @@ class FailoverStore extends TaggableStore implements LockProvider
 
     /**
      * Attempt the given method on all stores.
+     *
+     * @return mixed
+     *
+     * @throws \Throwable
      */
     protected function attemptOnAllStores(string $method, array $arguments)
     {
-        $lastException = null;
+        [$lastException, $failedCaches] = [null, []];
 
-        foreach ($this->stores as $store) {
-            try {
-                return $this->store($store)->{$method}(...$arguments);
-            } catch (Throwable $e) {
-                $lastException = $e;
+        try {
+            foreach ($this->stores as $store) {
+                try {
+                    return $this->store($store)->{$method}(...$arguments);
+                } catch (Throwable $e) {
+                    $lastException = $e;
 
-                $this->events->dispatch(new CacheFailedOver($store, $e));
+                    $failedCaches[] = $store;
+
+                    if (! in_array($store, $this->failingCaches)) {
+                        $this->events->dispatch(new CacheFailedOver($store, $e));
+                    }
+                }
             }
+        } finally {
+            $this->failingCaches = $failedCaches;
         }
 
         throw $lastException ?? new RuntimeException('All failover cache stores failed.');
@@ -195,10 +232,10 @@ class FailoverStore extends TaggableStore implements LockProvider
     /**
      * Get the cache store for the given store name.
      *
-     * @return \Illuminate\Contracts\Cache\Store
+     * @return \Illuminate\Contracts\Cache\Repository
      */
     protected function store(string $store)
     {
-        return $this->cache->store($store)->getStore();
+        return $this->cache->store($store);
     }
 }

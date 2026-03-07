@@ -50,20 +50,20 @@ class AuthorizeMiddlewareTest extends TestCase
 
     protected function tearDown(): void
     {
-        m::close();
-
         Container::setInstance(null);
+
+        parent::tearDown();
     }
 
     public function testItCanGenerateDefinitionViaStaticMethod()
     {
-        $signature = (string) Authorize::using('ability');
+        $signature = Authorize::using('ability');
         $this->assertSame('Illuminate\Auth\Middleware\Authorize:ability', $signature);
 
-        $signature = (string) Authorize::using('ability', 'model');
+        $signature = Authorize::using('ability', 'model');
         $this->assertSame('Illuminate\Auth\Middleware\Authorize:ability,model', $signature);
 
-        $signature = (string) Authorize::using('ability', 'model', \App\Models\Comment::class);
+        $signature = Authorize::using('ability', 'model', \App\Models\Comment::class);
         $this->assertSame('Illuminate\Auth\Middleware\Authorize:ability,model,App\Models\Comment', $signature);
     }
 

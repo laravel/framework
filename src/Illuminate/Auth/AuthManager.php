@@ -127,6 +127,7 @@ class AuthManager implements FactoryContract
             $this->app['session.store'],
             rehashOnLogin: $this->app['config']->get('hashing.rehash_on_login', true),
             timeboxDuration: $this->app['config']->get('auth.timebox_duration', 200000),
+            hashKey: $this->app['config']->get('app.key'),
         );
 
         // When using the remember me functionality of the authentication services we

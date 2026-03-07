@@ -251,7 +251,7 @@ trait HasAttributes
     protected function addDateAttributesToArray(array $attributes)
     {
         foreach ($this->getDates() as $key) {
-            if (! isset($attributes[$key])) {
+            if (is_null($key) || ! isset($attributes[$key])) {
                 continue;
             }
 
@@ -537,7 +537,9 @@ trait HasAttributes
      */
     protected function getAttributeFromArray($key)
     {
-        return $this->getAttributes()[$key] ?? null;
+        $this->mergeAttributeFromCachedCasts($key);
+
+        return $this->attributes[$key] ?? null;
     }
 
     /**
@@ -710,6 +712,8 @@ trait HasAttributes
      */
     protected function mutateAttribute($key, $value)
     {
+        $this->mergeAttributesFromCachedCasts();
+
         return $this->{'get'.Str::studly($key).'Attribute'}($value);
     }
 
@@ -725,6 +729,8 @@ trait HasAttributes
         if (array_key_exists($key, $this->attributeCastCache)) {
             return $this->attributeCastCache[$key];
         }
+
+        $this->mergeAttributesFromCachedCasts();
 
         $attribute = $this->{Str::camel($key)}();
 
@@ -1157,6 +1163,8 @@ trait HasAttributes
      */
     protected function setMutatedAttributeValue($key, $value)
     {
+        $this->mergeAttributesFromCachedCasts();
+
         return $this->{'set'.Str::studly($key).'Attribute'}($value);
     }
 
@@ -1169,6 +1177,8 @@ trait HasAttributes
      */
     protected function setAttributeMarkedMutatedAttributeValue($key, $value)
     {
+        $this->mergeAttributesFromCachedCasts();
+
         $attribute = $this->{Str::camel($key)}();
 
         $callback = $attribute->set ?: function ($value) use ($key) {
@@ -1283,7 +1293,7 @@ trait HasAttributes
      *
      * @param  string  $enumClass
      * @param  string|int  $value
-     * @return \UnitEnum|\BackedEnum
+     * @return \UnitEnum
      */
     protected function getEnumCaseFromValue($enumClass, $value)
     {
@@ -1296,7 +1306,7 @@ trait HasAttributes
      * Get the storable value from the given enum.
      *
      * @param  string  $expectedEnum
-     * @param  \UnitEnum|\BackedEnum  $value
+     * @param  \UnitEnum  $value
      * @return string|int
      */
     protected function getStorableEnumValue($expectedEnum, $value)
@@ -1314,7 +1324,7 @@ trait HasAttributes
      * @param  string  $path
      * @param  string  $key
      * @param  mixed  $value
-     * @return $this
+     * @return array
      */
     protected function getArrayAttributeWithValue($path, $key, $value)
     {
@@ -1502,7 +1512,7 @@ trait HasAttributes
     protected function asDecimal($value, $decimals)
     {
         try {
-            return (string) BigDecimal::of($value)->toScale($decimals, RoundingMode::HALF_UP);
+            return (string) BigDecimal::of((string) $value)->toScale($decimals, RoundingMode::HALF_UP);
         } catch (BrickMathException $e) {
             throw new MathException('Unable to cast value to a decimal.', previous: $e);
         }
@@ -1622,7 +1632,7 @@ trait HasAttributes
     /**
      * Get the attributes that should be converted to dates.
      *
-     * @return array
+     * @return array<int, string|null>
      */
     public function getDates()
     {
@@ -1897,6 +1907,17 @@ trait HasAttributes
     }
 
     /**
+     * Merge the a cast class and attribute cast attribute back into the model.
+     *
+     * @return void
+     */
+    protected function mergeAttributeFromCachedCasts(string $key)
+    {
+        $this->mergeAttributeFromClassCasts($key);
+        $this->mergeAttributeFromAttributeCasts($key);
+    }
+
+    /**
      * Merge the cast class attributes back into the model.
      *
      * @return void
@@ -1904,15 +1925,31 @@ trait HasAttributes
     protected function mergeAttributesFromClassCasts()
     {
         foreach ($this->classCastCache as $key => $value) {
-            $caster = $this->resolveCasterClass($key);
-
-            $this->attributes = array_merge(
-                $this->attributes,
-                $caster instanceof CastsInboundAttributes
-                    ? [$key => $value]
-                    : $this->normalizeCastClassResponse($key, $caster->set($this, $key, $value, $this->attributes))
-            );
+            $this->mergeAttributeFromClassCasts($key);
         }
+    }
+
+    /**
+     * Merge the cast class attribute back into the model.
+     *
+     * @return void
+     */
+    protected function mergeAttributeFromClassCasts(string $key): void
+    {
+        if (! isset($this->classCastCache[$key])) {
+            return;
+        }
+
+        $value = $this->classCastCache[$key];
+
+        $caster = $this->resolveCasterClass($key);
+
+        $this->attributes = array_merge(
+            $this->attributes,
+            $caster instanceof CastsInboundAttributes
+                ? [$key => $value]
+                : $this->normalizeCastClassResponse($key, $caster->set($this, $key, $value, $this->attributes))
+        );
     }
 
     /**
@@ -1923,23 +1960,39 @@ trait HasAttributes
     protected function mergeAttributesFromAttributeCasts()
     {
         foreach ($this->attributeCastCache as $key => $value) {
-            $attribute = $this->{Str::camel($key)}();
-
-            if ($attribute->get && ! $attribute->set) {
-                continue;
-            }
-
-            $callback = $attribute->set ?: function ($value) use ($key) {
-                $this->attributes[$key] = $value;
-            };
-
-            $this->attributes = array_merge(
-                $this->attributes,
-                $this->normalizeCastClassResponse(
-                    $key, $callback($value, $this->attributes)
-                )
-            );
+            $this->mergeAttributeFromAttributeCasts($key);
         }
+    }
+
+    /**
+     * Merge the cast class attribute back into the model.
+     *
+     * @return void
+     */
+    protected function mergeAttributeFromAttributeCasts(string $key): void
+    {
+        if (! isset($this->attributeCastCache[$key])) {
+            return;
+        }
+
+        $value = $this->attributeCastCache[$key];
+
+        $attribute = $this->{Str::camel($key)}();
+
+        if ($attribute->get && ! $attribute->set) {
+            return;
+        }
+
+        $callback = $attribute->set ?: function ($value) use ($key) {
+            $this->attributes[$key] = $value;
+        };
+
+        $this->attributes = array_merge(
+            $this->attributes,
+            $this->normalizeCastClassResponse(
+                $key, $callback($value, $this->attributes)
+            )
+        );
     }
 
     /**
@@ -2421,6 +2474,16 @@ trait HasAttributes
     public function hasAppended($attribute)
     {
         return in_array($attribute, $this->appends);
+    }
+
+    /**
+     * Remove all appended properties from the model.
+     *
+     * @return $this
+     */
+    public function withoutAppends()
+    {
+        return $this->setAppends([]);
     }
 
     /**

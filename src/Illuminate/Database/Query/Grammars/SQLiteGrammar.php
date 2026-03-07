@@ -6,6 +6,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 class SQLiteGrammar extends Grammar
 {
@@ -74,6 +75,18 @@ class SQLiteGrammar extends Grammar
             ['[*]', '[?]', '*', '?'],
             $value
         );
+    }
+
+    /**
+     * Compile a "where null safe equals" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereNullSafeEquals(Builder $query, $where)
+    {
+        return $this->wrap($where['column']).' is '.$this->parameter($where['value']);
     }
 
     /**
@@ -157,12 +170,22 @@ class SQLiteGrammar extends Grammar
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  \Illuminate\Database\Query\IndexHint  $indexHint
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function compileIndexHint(Builder $query, $indexHint)
     {
-        return $indexHint->type === 'force'
-            ? "indexed by {$indexHint->index}"
-            : '';
+        if ($indexHint->type !== 'force') {
+            return '';
+        }
+
+        $index = $indexHint->index;
+
+        if (! preg_match('/^[a-zA-Z0-9_$]+$/', $index)) {
+            throw new InvalidArgumentException('Index name contains invalid characters.');
+        }
+
+        return "indexed by {$index}";
     }
 
     /**
@@ -228,7 +251,7 @@ class SQLiteGrammar extends Grammar
     {
         $version = $query->getConnection()->getServerVersion();
 
-        if (version_compare($version, '3.25.0') >= 0) {
+        if (version_compare($version, '3.25.0', '>=')) {
             return parent::compileGroupLimit($query);
         }
 

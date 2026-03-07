@@ -3,12 +3,17 @@
 namespace Illuminate\Tests\JsonSchema;
 
 use Illuminate\JsonSchema\JsonSchema;
+use Illuminate\Tests\JsonSchema\Fixtures\Enums\IntBackedEnum;
+use Illuminate\Tests\JsonSchema\Fixtures\Enums\StringBackedEnum;
+use Illuminate\Tests\JsonSchema\Fixtures\Enums\UnitEnum;
+use InvalidArgumentException;
 use Opis\JsonSchema\Resolvers\SchemaResolver;
 use Opis\JsonSchema\SchemaLoader;
 use Opis\JsonSchema\Validator;
 use Opis\Uri\Uri;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 use Stringable;
 
 class TypeTest extends TestCase
@@ -102,6 +107,33 @@ class TypeTest extends TestCase
         $this->assertInstanceOf(JsonSchema::class, $schema);
     }
 
+    public function test_throws_with_invalid_enum_string(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The provided class must be a BackedEnum.');
+        $this->expectExceptionCode(0);
+
+        JsonSchema::string()->enum('NonExistentEnumClass');
+    }
+
+    public function test_throws_with_not_an_enum_class(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The provided class must be a BackedEnum.');
+        $this->expectExceptionCode(0);
+
+        JsonSchema::string()->enum(stdClass::class);
+    }
+
+    public function test_throws_with_unit_enum_class(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The provided class must be a BackedEnum.');
+        $this->expectExceptionCode(0);
+
+        JsonSchema::string()->enum(UnitEnum::class);
+    }
+
     public static function validSchemasProvider(): array
     {
         return [
@@ -118,6 +150,7 @@ class TypeTest extends TestCase
             [JsonSchema::string()->min(1)->max(3), 'a'], // boundary at min
             [JsonSchema::string()->pattern('^[A-Z]{2}[0-9]{2}$'), 'AB12'], // complex pattern
             [JsonSchema::string()->enum(['', 'x', 'y']), ''], // enum including empty string
+            [JsonSchema::string()->enum(StringBackedEnum::class), 'one'], // string backed enum cases
             [JsonSchema::string()->nullable(), null],
             [JsonSchema::string()->nullable(false), ''],
 
@@ -127,11 +160,15 @@ class TypeTest extends TestCase
             [JsonSchema::integer()->max(120), 120],
             [JsonSchema::integer()->default(18), 18],
             [JsonSchema::integer()->enum([1, 2, 3]), 2],
+            [JsonSchema::integer()->multipleOf(5), 10],
+            [JsonSchema::integer()->multipleOf(3), 9],
+            [JsonSchema::integer()->multipleOf(7), 0],
             // additional IntegerType cases
             [JsonSchema::integer()->min(-5), -5], // negative boundary
             [JsonSchema::integer()->max(10), 9], // below max
             [JsonSchema::integer()->min(1)->max(3), 3], // boundary at max
             [JsonSchema::integer()->enum([0, -1, 5]), 0], // enum with zero
+            [JsonSchema::integer()->enum(IntBackedEnum::class), 1], // integer backed enum cases
             [JsonSchema::integer()->default(0), 0], // default value
             [JsonSchema::integer()->nullable(), null],
             [JsonSchema::integer()->nullable(false), 0],
@@ -142,6 +179,9 @@ class TypeTest extends TestCase
             [JsonSchema::number()->max(100.0), 99.9],
             [JsonSchema::number()->default(9.99), 9.99],
             [JsonSchema::number()->enum([1, 2.5, 3]), 2.5],
+            [JsonSchema::number()->multipleOf(0.5), 2.5],
+            [JsonSchema::number()->multipleOf(3), 9],
+            [JsonSchema::number()->multipleOf(0.1), 0.3],
             // additional NumberType cases
             [JsonSchema::number()->min(-10.5), -10.5], // negative boundary
             [JsonSchema::number()->min(0)->max(1), 1.0], // boundary at max
@@ -239,6 +279,9 @@ class TypeTest extends TestCase
             [JsonSchema::array()->items(JsonSchema::string()->max(3)), ['one', 'two']],
             [JsonSchema::array()->default(['x']), ['x']],
             [JsonSchema::array()->enum([['a'], ['b', 'c']]), ['b', 'c']],
+            [JsonSchema::array()->unique(), [1, 2, 3]],
+            [JsonSchema::array()->items(JsonSchema::string())->unique(), ['a', 'b', 'c']],
+            [JsonSchema::array()->unique(), []],
             // additional ArrayType cases
             [JsonSchema::array()->min(0), []], // explicit min zero
             [JsonSchema::array()->max(0), []], // exactly zero length
@@ -265,6 +308,7 @@ class TypeTest extends TestCase
             [JsonSchema::string()->max(0), 'a'], // too long for zero max
             [JsonSchema::string()->pattern('^[a]+$'), 'ab'], // pattern mismatch
             [JsonSchema::string()->enum(['a', 'b']), 'A'], // case sensitive mismatch
+            [JsonSchema::string()->enum(StringBackedEnum::class), 'three'], // string backed enum cases mismatch
             [JsonSchema::string(), null], // null not allowed
             [JsonSchema::string()->nullable(false), null], // not nullable
 
@@ -274,11 +318,14 @@ class TypeTest extends TestCase
             [JsonSchema::integer()->max(5), 6], // above max
             [JsonSchema::integer()->default(1), '1'], // wrong type
             [JsonSchema::integer()->enum([1, 2, 3]), 4], // not in enum
+            [JsonSchema::integer()->multipleOf(5), 7], // not a multiple
+            [JsonSchema::integer()->multipleOf(3), 10], // not a multiple
             // additional IntegerType cases
             [JsonSchema::integer()->min(0), -1], // below min boundary
             [JsonSchema::integer()->max(0), 1], // above max boundary
             [JsonSchema::integer(), 3.14], // not an integer
             [JsonSchema::integer()->enum([1, 2]), 2.5], // not in enum and not an integer
+            [JsonSchema::integer()->enum(IntBackedEnum::class), 3], // integer backed enum cases mismatch
             [JsonSchema::integer()->default(1), null], // wrong type
             [JsonSchema::integer()->nullable(false), null], // not nullable
 
@@ -288,6 +335,8 @@ class TypeTest extends TestCase
             [JsonSchema::number()->max(1.5), 1.6], // above max
             [JsonSchema::number()->default(1.1), '1.1'], // wrong type
             [JsonSchema::number()->enum([1, 2.5, 3]), 4], // not in enum
+            [JsonSchema::number()->multipleOf(0.5), 1.3], // not a multiple
+            [JsonSchema::number()->multipleOf(3), 10], // not a multiple
             // additional NumberType cases
             [JsonSchema::number()->min(0), -0.0001], // below min
             [JsonSchema::number()->max(10), 10.0001], // above max
@@ -326,6 +375,8 @@ class TypeTest extends TestCase
             [JsonSchema::array()->max(1), ['a', 'b']], // too many items
             [JsonSchema::array()->items(JsonSchema::string()->max(3)), ['four']], // item too long
             [JsonSchema::array()->enum([['a'], ['b', 'c']]), ['c', 'd']], // not in enum
+            [JsonSchema::array()->unique(), [1, 1, 2]],
+            [JsonSchema::array()->items(JsonSchema::string())->unique(), ['a', 'b', 'a']],
             // additional ArrayType cases
             [JsonSchema::array()->items(JsonSchema::integer()), ['a']], // wrong item type
             [JsonSchema::array()->min(1), []], // too few

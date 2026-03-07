@@ -13,6 +13,7 @@ use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\View\Component;
 use InvalidArgumentException;
+use ParseError;
 
 class BladeCompiler extends Compiler implements CompilerInterface
 {
@@ -195,7 +196,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
             );
 
             if (! $this->files->exists($compiledPath)) {
-                $this->files->put($compiledPath, $contents);
+                $this->files->replace($compiledPath, $contents);
 
                 return;
             }
@@ -203,7 +204,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $compiledHash = $this->files->hash($compiledPath, 'xxh128');
 
             if ($compiledHash !== hash('xxh128', $contents)) {
-                $this->files->put($compiledPath, $contents);
+                $this->files->replace($compiledPath, $contents);
             }
         }
     }
@@ -620,7 +621,11 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function hasEvenNumberOfParentheses(string $expression)
     {
-        $tokens = token_get_all('<?php '.$expression);
+        try {
+            $tokens = token_get_all('<?php '.$expression);
+        } catch (ParseError) {
+            return false;
+        }
 
         if (Arr::last($tokens) !== ')') {
             return false;
@@ -969,7 +974,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register a handler for custom directives.
      *
      * @param  string  $name
-     * @param  callable  $handler
+     * @param  ($bind is true ? \Closure : callable)  $handler
      * @param  bool  $bind
      * @return void
      *

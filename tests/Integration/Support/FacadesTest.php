@@ -14,9 +14,9 @@ class FacadesTest extends TestCase
 {
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         unset($_SERVER['__laravel.authResolved']);
+
+        parent::tearDown();
     }
 
     public function testFacadeResolvedCanResolveCallback()

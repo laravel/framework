@@ -15,11 +15,6 @@ use stdClass;
 
 class DatabaseEloquentHasManyTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testMakeMethodDoesNotSaveNewModel()
     {
         $relation = $this->getRelation();

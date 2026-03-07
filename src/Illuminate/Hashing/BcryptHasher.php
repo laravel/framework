@@ -50,6 +50,7 @@ class BcryptHasher extends AbstractHasher implements HasherContract
      * @return string
      *
      * @throws \RuntimeException
+     * @throws \InvalidArgumentException
      */
     public function make(#[\SensitiveParameter] $value, array $options = [])
     {

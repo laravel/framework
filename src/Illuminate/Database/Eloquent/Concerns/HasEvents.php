@@ -18,7 +18,7 @@ trait HasEvents
      *
      * Allows for object-based events for native Eloquent events.
      *
-     * @var array
+     * @var array<string, class-string>
      */
     protected $dispatchesEvents = [];
 
@@ -27,7 +27,7 @@ trait HasEvents
      *
      * These are extra user-defined events observers may subscribe to.
      *
-     * @var array
+     * @var string[]
      */
     protected $observables = [];
 
@@ -66,7 +66,7 @@ trait HasEvents
     /**
      * Register observers with the model.
      *
-     * @param  object|array|string  $classes
+     * @param  object|string[]|string  $classes
      * @return void
      *
      * @throws \RuntimeException
@@ -106,7 +106,7 @@ trait HasEvents
      * Resolve the observer's class name from an object or string.
      *
      * @param  object|string  $class
-     * @return string
+     * @return class-string
      *
      * @throws \InvalidArgumentException
      */
@@ -126,7 +126,7 @@ trait HasEvents
     /**
      * Get the observable event names.
      *
-     * @return array
+     * @return string[]
      */
     public function getObservableEvents()
     {
@@ -143,7 +143,7 @@ trait HasEvents
     /**
      * Set the observable event names.
      *
-     * @param  array  $observables
+     * @param  string[]  $observables
      * @return $this
      */
     public function setObservableEvents(array $observables)
@@ -156,7 +156,7 @@ trait HasEvents
     /**
      * Add an observable event name.
      *
-     * @param  mixed  $observables
+     * @param  string|string[]  $observables
      * @return void
      */
     public function addObservableEvents($observables)
@@ -169,7 +169,7 @@ trait HasEvents
     /**
      * Remove an observable event name.
      *
-     * @param  mixed  $observables
+     * @param  string|string[]  $observables
      * @return void
      */
     public function removeObservableEvents($observables)
@@ -230,8 +230,8 @@ trait HasEvents
      * Fire a custom model event for the given event.
      *
      * @param  string  $event
-     * @param  string  $method
-     * @return mixed
+     * @param  'until'|'dispatch'  $method
+     * @return array|null|void
      */
     protected function fireCustomModelEvent($event, $method)
     {

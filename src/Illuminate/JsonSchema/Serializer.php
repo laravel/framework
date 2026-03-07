@@ -17,6 +17,8 @@ class Serializer
      * Serialize the given property to an array.
      *
      * @return array<string, mixed>
+     *
+     * @throws \RuntimeException
      */
     public static function serialize(Types\Type $type): array
     {

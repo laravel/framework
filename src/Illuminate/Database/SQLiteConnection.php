@@ -27,7 +27,7 @@ class SQLiteConnection extends Connection
      */
     protected function executeBeginTransactionStatement()
     {
-        if (version_compare(PHP_VERSION, '8.4.0') >= 0) {
+        if (version_compare(PHP_VERSION, '8.4.0', '>=')) {
             $mode = $this->getConfig('transaction_mode') ?? 'DEFERRED';
 
             $this->getPdo()->exec("BEGIN {$mode} TRANSACTION");
@@ -59,7 +59,7 @@ class SQLiteConnection extends Connection
      */
     protected function isUniqueConstraintError(Exception $exception)
     {
-        return boolval(preg_match('#(column(s)? .* (is|are) not unique|UNIQUE constraint failed: .*)#i', $exception->getMessage()));
+        return (bool) preg_match('#(column(s)? .* (is|are) not unique|UNIQUE constraint failed: .*)#i', $exception->getMessage());
     }
 
     /**

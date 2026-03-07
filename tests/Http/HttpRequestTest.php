@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Http;
 
+use Carbon\CarbonInterval;
+use Carbon\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Route;
@@ -25,11 +27,6 @@ include_once 'Enums.php';
 
 class HttpRequestTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testInstanceMethod()
     {
         $request = Request::create('');
@@ -155,6 +152,30 @@ class HttpRequestTest extends TestCase
 
         $request = Request::create('https://foo.com');
         $this->assertSame('https://foo.com/?key=value%20with%20spaces', $request->fullUrlWithQuery(['key' => 'value with spaces']));
+    }
+
+    public function testFullUrlWithoutQueryMethod()
+    {
+        $request = Request::create('http://foo.com/foo/bar?name=taylor&age=30');
+        $this->assertSame('http://foo.com/foo/bar?age=30', $request->fullUrlWithoutQuery('name'));
+
+        $request = Request::create('http://foo.com/foo/bar?name=taylor&age=30');
+        $this->assertSame('http://foo.com/foo/bar?age=30', $request->fullUrlWithoutQuery(['name']));
+
+        $request = Request::create('http://foo.com/foo/bar?name=taylor&age=30&city=nyc');
+        $this->assertSame('http://foo.com/foo/bar?city=nyc', $request->fullUrlWithoutQuery(['name', 'age']));
+
+        $request = Request::create('http://foo.com/foo/bar?name=taylor');
+        $this->assertSame('http://foo.com/foo/bar', $request->fullUrlWithoutQuery('name'));
+
+        $request = Request::create('http://foo.com/foo/bar');
+        $this->assertSame('http://foo.com/foo/bar', $request->fullUrlWithoutQuery('name'));
+
+        $request = Request::create('https://foo.com?a=b&c=d');
+        $this->assertSame('https://foo.com/?c=d', $request->fullUrlWithoutQuery('a'));
+
+        $request = Request::create('https://foo.com/?name=taylor&age=30');
+        $this->assertSame('https://foo.com/?age=30', $request->fullUrlWithoutQuery('name'));
     }
 
     public function testIsMethod()
@@ -591,6 +612,20 @@ class HttpRequestTest extends TestCase
         $this->assertInstanceOf(SymfonyUploadedFile::class, $request['file']);
     }
 
+    public function testFluentMethod()
+    {
+        $request = Request::create('/', 'GET', [
+            'user' => [
+                'name' => 'Michael',
+                'role' => 'admin',
+            ],
+            'users' => null,
+        ]);
+        $this->assertSame(['name' => 'Michael', 'role' => 'admin'], $request->fluent('user')->toArray());
+        $this->assertSame([], $request->fluent('users')->toArray());
+        $this->assertSame([], $request->fluent('not_found')->toArray());
+    }
+
     public function testStringMethod()
     {
         $request = Request::create('/', 'GET', [
@@ -780,6 +815,47 @@ class HttpRequestTest extends TestCase
         ]);
 
         $request->date('date', 'invalid_format');
+    }
+
+    public function testIntervalMethod()
+    {
+        $request = Request::create('/', 'GET', [
+            'as_null' => null,
+            'as_empty' => '',
+            'as_iso' => 'P1Y2M3DT4H5M6S',
+            'as_human' => '2 hours 30 minutes',
+            'as_seconds' => '90',
+            'as_minutes' => '45',
+        ]);
+
+        $this->assertNull($request->interval('as_null'));
+        $this->assertNull($request->interval('as_empty'));
+        $this->assertNull($request->interval('doesnt_exist'));
+
+        $interval = $request->interval('as_iso');
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+        $this->assertSame(1, $interval->years);
+        $this->assertSame(2, $interval->months);
+        $this->assertSame(3, $interval->dayz);
+        $this->assertSame(4, $interval->hours);
+        $this->assertSame(5, $interval->minutes);
+        $this->assertSame(6, $interval->seconds);
+
+        $interval = $request->interval('as_human');
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+        $this->assertSame(2, $interval->hours);
+        $this->assertSame(30, $interval->minutes);
+
+        $interval = $request->interval('as_seconds', 'second');
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+        $this->assertSame(90, $interval->seconds);
+
+        $this->assertSame(90, $request->interval('as_seconds', 'minute')->minutes);
+        $this->assertSame(90, $request->interval('as_seconds', 'hour')->hours);
+        $this->assertSame(90, $request->interval('as_seconds', 'day')->dayz);
+
+        $this->assertSame(45, $request->interval('as_minutes', Unit::Minute)->minutes);
+        $this->assertSame(45, $request->interval('as_minutes', Unit::Second)->seconds);
     }
 
     public function testEnumMethod()
@@ -1411,6 +1487,79 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->accepts('application/baz+json'));
     }
 
+    public function testWantsJsonRespectsHeaderChanges()
+    {
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '*/*']);
+
+        $this->assertFalse($request->wantsJson());
+
+        $this->assertTrue($request->acceptsAnyContentType());
+
+        $request->headers->set('Accept', 'application/json');
+
+        $this->assertTrue($request->wantsJson(), 'wantsJson() should return true after Accept header is changed to application/json');
+    }
+
+    public function testAcceptsJsonRespectsHeaderChanges()
+    {
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '*/*']);
+
+        $this->assertTrue($request->acceptsAnyContentType());
+
+        $request->headers->set('Accept', 'application/json');
+
+        $this->assertTrue($request->acceptsJson(), 'acceptsJson() should return true after Accept header is changed to application/json');
+    }
+
+    public function testPrefersRespectsHeaderChanges()
+    {
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '*/*']);
+
+        $this->assertTrue($request->acceptsAnyContentType());
+
+        $request->headers->set('Accept', 'application/json');
+
+        $this->assertSame('json', $request->prefers(['html', 'json']), 'prefers() should return json after Accept header is changed to application/json');
+    }
+
+    public function testWantsJsonWorksWhenHeaderSetBeforeFirstCall()
+    {
+        $request = Request::create('/', 'GET', [], [], [], []);
+
+        $request->headers->set('Accept', 'application/json');
+
+        $this->assertTrue($request->wantsJson(), 'wantsJson() should return true when Accept header is set to application/json');
+    }
+
+    public function testCacheClearedWhenTransitioningFromUnsetToSetHeader()
+    {
+        $request = Request::create('/', 'GET', [], [], [], []);
+
+        $request->getAcceptableContentTypes();
+
+        $request->headers->set('Accept', 'application/json');
+
+        $this->assertTrue($request->wantsJson(), 'wantsJson() should return true after Accept header is set from null to application/json');
+
+        $this->assertTrue($request->acceptsJson(), 'acceptsJson() should return true after Accept header is set from null to application/json');
+    }
+
+    public function testAcceptsJsonWorksWhenHeaderChangedMultipleTimes()
+    {
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/html']);
+
+        $this->assertFalse($request->acceptsJson());
+
+        $request->headers->set('Accept', 'application/json');
+        $this->assertTrue($request->acceptsJson());
+
+        $request->headers->set('Accept', 'text/html');
+        $this->assertFalse($request->acceptsJson());
+
+        $request->headers->set('Accept', 'application/json');
+        $this->assertTrue($request->acceptsJson());
+    }
+
     public function testBadAcceptHeader()
     {
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'Mozilla/5.0 (Windows; U; Windows NT 5.1; pt-PT; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 (.NET CLR 3.5.30729)']);
@@ -1718,5 +1867,16 @@ class HttpRequestTest extends TestCase
         Request::create('', 'GET')->json();
 
         $this->assertTrue(json_last_error() === JSON_ERROR_NONE);
+    }
+
+    public function testItClampsValues()
+    {
+        $request = Request::create('/', 'GET', ['per_page' => 100, 'float' => 9.24]);
+        $this->assertSame(100, $request->clamp('per_page', 100, 101));
+        $this->assertSame(10, $request->clamp('per_page', -10, 10));
+        $this->assertSame(25, $request->clamp('per_page_2', 25, 100, 1));
+        $this->assertSame(100, $request->clamp('per_page', 1, 250, 99));
+        $this->assertSame(22.4, $request->clamp('per_page', 1.11, 22.4, 2));
+        $this->assertSame(9.24, $request->clamp('float', 1, 10));
     }
 }

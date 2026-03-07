@@ -14,11 +14,6 @@ class RouteListCommandTest extends TestCase
 {
     protected Application $app;
 
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -187,6 +182,16 @@ class RouteListCommandTest extends TestCase
         $output = $this->app->output();
 
         $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"example","name":null,"action":"Closure","middleware":["exampleMiddleware"]},{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","middleware":["Middleware 5","Middleware 1","Middleware 4","Middleware 2","Middleware 3"]},{"domain":"sub","method":"GET|HEAD","uri":"sub-example","name":null,"action":"Closure","middleware":["exampleMiddleware"]}]';
+
+        $this->assertJsonStringEqualsJsonString($expectedOrder, $output);
+    }
+
+    public function testFilterByMiddleware()
+    {
+        $this->app->call('route:list', ['--json' => true, '-v' => true, '--middleware' => 'auth']);
+        $output = $this->app->output();
+
+        $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","middleware":["web","auth"]}]';
 
         $this->assertJsonStringEqualsJsonString($expectedOrder, $output);
     }

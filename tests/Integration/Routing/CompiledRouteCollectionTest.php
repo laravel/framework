@@ -34,9 +34,9 @@ class CompiledRouteCollectionTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         unset($this->routeCollection, $this->router);
+
+        parent::tearDown();
     }
 
     /**

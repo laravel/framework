@@ -73,6 +73,13 @@ abstract class ServiceProvider
     public static array $optimizeClearCommands = [];
 
     /**
+     * Commands that should be run during the "reload" command.
+     *
+     * @var array<string, string>
+     */
+    public static array $reloadCommands = [];
+
+    /**
      * Create a new service provider instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -483,6 +490,39 @@ abstract class ServiceProvider
      */
     protected function optimizes(?string $optimize = null, ?string $clear = null, ?string $key = null)
     {
+        $key = $this->getProviderKey($key);
+
+        if ($optimize) {
+            static::$optimizeCommands[$key] = $optimize;
+        }
+
+        if ($clear) {
+            static::$optimizeClearCommands[$key] = $clear;
+        }
+    }
+
+    /**
+     * Register commands that should run on "reload".
+     *
+     * @param  string|null  $reload
+     * @param  string|null  $key
+     * @return void
+     */
+    protected function reloads(string $reload, ?string $key = null)
+    {
+        $key = $this->getProviderKey($key);
+
+        static::$reloadCommands[$key] = $reload;
+    }
+
+    /**
+     * Get a short descriptive key for the current service provider.
+     *
+     * @param  string|null  $key
+     * @return string
+     */
+    protected function getProviderKey(?string $key = null): string
+    {
         $key ??= (string) Str::of(get_class($this))
             ->classBasename()
             ->before('ServiceProvider')
@@ -494,13 +534,7 @@ abstract class ServiceProvider
             $key = class_basename(get_class($this));
         }
 
-        if ($optimize) {
-            static::$optimizeCommands[$key] = $optimize;
-        }
-
-        if ($clear) {
-            static::$optimizeClearCommands[$key] = $clear;
-        }
+        return $key;
     }
 
     /**

@@ -20,11 +20,6 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 
 class MailableQueuedTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testQueuedMailableSent(): void
     {
         $queueFake = new QueueFake(new Application);

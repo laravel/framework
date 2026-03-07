@@ -29,6 +29,7 @@ use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Finder\Finder;
 use Throwable;
+use WeakMap;
 
 class Kernel implements KernelContract
 {
@@ -366,16 +367,36 @@ class Kernel implements KernelContract
 
         $namespace = $this->app->getNamespace();
 
-        foreach (Finder::create()->in($paths)->files() as $file) {
-            $command = $this->commandClassFromFile($file, $namespace);
+        $possibleCommands = new WeakMap;
 
-            if (is_subclass_of($command, Command::class) &&
-                ! (new ReflectionClass($command))->isAbstract()) {
-                Artisan::starting(function ($artisan) use ($command) {
-                    $artisan->resolve($command);
-                });
-            }
+        $filterCommands = function (SplFileInfo $file) use ($namespace, &$possibleCommands) {
+            $commandClassName = $this->commandClassFromFile($file, $namespace);
+
+            $possibleCommands[$file] = $commandClassName;
+
+            $command = rescue(fn () => new ReflectionClass($commandClassName), null, false);
+
+            return $command instanceof ReflectionClass
+                && $command->isSubClassOf(Command::class)
+                && ! $command->isAbstract();
+        };
+
+        foreach ($this->findCommands($paths)->filter($filterCommands) as $file) {
+            Artisan::starting(function ($artisan) use ($file, $possibleCommands) {
+                $artisan->resolve($possibleCommands[$file]);
+            });
         }
+    }
+
+    /**
+     * Get the Finder instance for discovering command files.
+     *
+     * @param  array  $paths
+     * @return \Symfony\Component\Finder\Finder
+     */
+    protected function findCommands(array $paths)
+    {
+        return Finder::create()->in($paths)->name('*.php')->files();
     }
 
     /**

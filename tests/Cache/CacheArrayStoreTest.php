@@ -11,9 +11,9 @@ class CacheArrayStoreTest extends TestCase
 {
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Carbon::setTestNow(null);
+
+        parent::tearDown();
     }
 
     public function testItemsCanBeSetAndRetrieved()
@@ -117,6 +117,8 @@ class CacheArrayStoreTest extends TestCase
 
     public function testNonExistingKeysCanBeIncremented()
     {
+        Carbon::setTestNow(Carbon::now());
+
         $store = new ArrayStore;
         $result = $store->increment('foo');
         $this->assertEquals(1, $result);

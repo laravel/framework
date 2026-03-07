@@ -40,20 +40,29 @@ class QueryExecuted
     public $connectionName;
 
     /**
+     * The PDO read / write type for the executed query.
+     *
+     * @var null|'read'|'write'
+     */
+    public $readWriteType;
+
+    /**
      * Create a new event instance.
      *
      * @param  string  $sql
      * @param  array  $bindings
      * @param  float|null  $time
      * @param  \Illuminate\Database\Connection  $connection
+     * @param  null|'read'|'write'  $readWriteType
      */
-    public function __construct($sql, $bindings, $time, $connection)
+    public function __construct($sql, $bindings, $time, $connection, $readWriteType = null)
     {
         $this->sql = $sql;
         $this->time = $time;
         $this->bindings = $bindings;
         $this->connection = $connection;
         $this->connectionName = $connection->getName();
+        $this->readWriteType = $readWriteType;
     }
 
     /**

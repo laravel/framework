@@ -2,12 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
+use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Orchestra\Testbench\TestCase;
 
 abstract class QueueTestCase extends TestCase
 {
-    use DatabaseMigrations;
+    use DatabaseMigrations, InteractsWithRedis;
 
     /**
      * The current database driver.
@@ -25,6 +26,24 @@ abstract class QueueTestCase extends TestCase
     protected function defineEnvironment($app)
     {
         $this->driver = $app['config']->get('queue.default', 'sync');
+    }
+
+    #[\Override]
+    protected function setUp(): void
+    {
+        $this->afterApplicationCreated(function () {
+            if ($this->getQueueDriver() === 'redis') {
+                $this->setUpRedis();
+            }
+        });
+
+        $this->beforeApplicationDestroyed(function () {
+            if ($this->getQueueDriver() === 'redis') {
+                $this->tearDownRedis();
+            }
+        });
+
+        parent::setUp();
     }
 
     /**

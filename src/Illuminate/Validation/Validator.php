@@ -188,6 +188,7 @@ class Validator implements ValidatorContract
     protected $fileRules = [
         'Between',
         'Dimensions',
+        'Encoding',
         'Extensions',
         'File',
         'Image',
@@ -516,6 +517,46 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Execute the callback if the data passes the validation rules.
+     *
+     * @template TWhenReturnType
+     *
+     * @param  (callable($this): TWhenReturnType)  $callback
+     * @param  (callable($this): TWhenReturnType)|null  $default
+     * @return $this|TWhenReturnType
+     */
+    public function whenPasses(callable $callback, ?callable $default = null)
+    {
+        if ($this->passes()) {
+            return $callback($this) ?? $this;
+        } elseif ($default) {
+            return $default($this) ?? $this;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Execute the callback if the data fails the validation rules.
+     *
+     * @template TWhenReturnType
+     *
+     * @param  (callable($this): TWhenReturnType)  $callback
+     * @param  (callable($this): TWhenReturnType)|null  $default
+     * @return $this|TWhenReturnType
+     */
+    public function whenFails(callable $callback, ?callable $default = null)
+    {
+        if ($this->fails()) {
+            return $callback($this) ?? $this;
+        } elseif ($default) {
+            return $default($this) ?? $this;
+        }
+
+        return $this;
+    }
+
+    /**
      * Determine if the attribute should be excluded.
      *
      * @param  string  $attribute
@@ -747,7 +788,7 @@ class Validator implements ValidatorContract
     protected function replaceDotInParameters(array $parameters)
     {
         return array_map(function ($field) {
-            return str_replace('\.', '__dot__'.static::$placeholderHash, $field);
+            return static::encodeAttributeWithPlaceholder((string) ($field ?? ''));
         }, $parameters);
     }
 
@@ -1205,7 +1246,7 @@ class Validator implements ValidatorContract
     {
         return (new Collection($this->rules))
             ->mapWithKeys(fn ($value, $key) => [
-                str_replace('__dot__'.static::$placeholderHash, '\\.', $key) => $value,
+                static::decodeAttributeWithPlaceholder($key) => $value,
             ])
             ->all();
     }
@@ -1220,7 +1261,7 @@ class Validator implements ValidatorContract
     {
         $rules = (new Collection($rules))
             ->mapWithKeys(function ($value, $key) {
-                return [str_replace('\.', '__dot__'.static::$placeholderHash, $key) => $value];
+                return [static::encodeAttributeWithPlaceholder($key) => $value];
             })
             ->toArray();
 
@@ -1234,7 +1275,26 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Append new validation rules to the validator.
+     *
+     * @param  array  $rules
+     * @return $this
+     */
+    public function appendRules(array $rules)
+    {
+        $rules = (new Collection($rules))
+            ->map(function ($value) {
+                return is_string($value) ? explode('|', $value) : $value;
+            })
+            ->all();
+
+        return $this->setRules(array_merge_recursive($this->getRulesWithoutPlaceholders(), $rules));
+    }
+
+    /**
      * Parse the given rules and merge them into current rules.
+     *
+     * @internal
      *
      * @param  array  $rules
      * @return void
@@ -1275,7 +1335,7 @@ class Validator implements ValidatorContract
 
             foreach ($response->rules as $ruleKey => $ruleValue) {
                 if ($callback($payload, $this->dataForSometimesIteration($ruleKey, ! str_ends_with($key, '.*')))) {
-                    $this->addRules([$ruleKey => $ruleValue]);
+                    $this->addRules([static::encodeAttributeWithPlaceholder($ruleKey) => $ruleValue]);
                 }
             }
         }
@@ -1659,6 +1719,28 @@ class Validator implements ValidatorContract
         [$class, $method] = Str::parseCallback($callback, 'validate');
 
         return $this->container->make($class)->{$method}(...array_values($parameters));
+    }
+
+    /**
+     * Encode the attribute with the placeholder hash.
+     *
+     * @param  string  $attribute
+     * @return string
+     */
+    protected static function encodeAttributeWithPlaceholder(string $attribute)
+    {
+        return str_replace('\.', '__dot__'.static::$placeholderHash, $attribute);
+    }
+
+    /**
+     * Decode an attribute with a placeholder hash.
+     *
+     * @param  string  $attribute
+     * @return string
+     */
+    protected static function decodeAttributeWithPlaceholder(string $attribute)
+    {
+        return str_replace('__dot__'.static::$placeholderHash, '\\.', $attribute);
     }
 
     /**

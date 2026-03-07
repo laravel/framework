@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Dotenv\Parser\Lines;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Encryption\Encrypter;
@@ -76,7 +77,7 @@ class EnvironmentDecryptCommand extends Command
         $key = $this->parseKey($key);
 
         $encryptedFile = ($this->option('env')
-            ? Str::finish(dirname($this->laravel->environmentFilePath()), DIRECTORY_SEPARATOR).'.env.'.$this->option('env')
+            ? Str::finish($this->laravel->environmentPath(), DIRECTORY_SEPARATOR).'.env.'.$this->option('env')
             : $this->laravel->environmentFilePath()).'.encrypted';
 
         $outputFile = $this->outputFilePath();
@@ -96,10 +97,13 @@ class EnvironmentDecryptCommand extends Command
         try {
             $encrypter = new Encrypter($key, $cipher);
 
-            $this->files->put(
-                $outputFile,
-                $encrypter->decrypt($this->files->get($encryptedFile))
-            );
+            $encryptedContents = $this->files->get($encryptedFile);
+
+            $decrypted = $this->isReadableFormat($encryptedContents)
+                ? $this->decryptReadableFormat($encryptedContents, $encrypter)
+                : $encrypter->decrypt($encryptedContents);
+
+            $this->files->put($outputFile, $decrypted);
         } catch (Exception $e) {
             $this->fail($e->getMessage());
         }
@@ -109,6 +113,44 @@ class EnvironmentDecryptCommand extends Command
         $this->components->twoColumnDetail('Decrypted file', $outputFile);
 
         $this->newLine();
+    }
+
+    /**
+     * Determine if the content is in readable format where each variable still has its own plain-text key.
+     *
+     * @param  string  $contents
+     * @return bool
+     */
+    protected function isReadableFormat(string $contents): bool
+    {
+        return ! Encrypter::appearsEncrypted($contents);
+    }
+
+    /**
+     * Decrypt the environment file from readable format.
+     *
+     * @param  string  $contents
+     * @param  \Illuminate\Encryption\Encrypter  $encrypter
+     * @return string
+     */
+    protected function decryptReadableFormat(string $contents, Encrypter $encrypter): string
+    {
+        $result = '';
+
+        foreach (Lines::process(preg_split('/\r\n|\r|\n/', $contents)) as $entry) {
+            $pos = strpos($entry, '=');
+
+            if ($pos === false) {
+                continue;
+            }
+
+            $name = substr($entry, 0, $pos);
+            $encryptedValue = substr($entry, $pos + 1);
+
+            $result .= $name.'='.$encrypter->decryptString($encryptedValue)."\n";
+        }
+
+        return $result;
     }
 
     /**
@@ -133,7 +175,7 @@ class EnvironmentDecryptCommand extends Command
      */
     protected function outputFilePath()
     {
-        $path = Str::finish($this->option('path') ?: dirname($this->laravel->environmentFilePath()), DIRECTORY_SEPARATOR);
+        $path = Str::finish($this->option('path') ?: $this->laravel->environmentPath(), DIRECTORY_SEPARATOR);
 
         $outputFile = $this->option('filename') ?: ('.env'.($this->option('env') ? '.'.$this->option('env') : ''));
         $outputFile = ltrim($outputFile, DIRECTORY_SEPARATOR);

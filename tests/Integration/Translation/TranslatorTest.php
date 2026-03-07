@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Translation;
 
+use Illuminate\Http\UploadedFile;
+use Illuminate\Validation\Rules\File;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -95,6 +97,26 @@ class TranslatorTest extends TestCase
         $this->app['translator']->get('some missing key', [], 'ht');
 
         $this->assertSame('ht', $_SERVER['__missing_translation_key_locale']);
+
+        $this->app['translator']->handleMissingKeysUsing(null);
+    }
+
+    public function testFileValidationDoesNotAttemptToTranslateAlreadyTranslatedMessages()
+    {
+        $keysLookedUp = [];
+
+        $this->app['translator']->handleMissingKeysUsing(function ($key) use (&$keysLookedUp) {
+            $keysLookedUp[] = $key;
+        });
+
+        $validator = $this->app['validator']->make(
+            ['file' => UploadedFile::fake()->create('file.pdf')],
+            ['file' => [File::types(['txt'])]]
+        );
+
+        $validator->fails();
+
+        $this->assertNotContains('The file field must be a file of type: txt.', $keysLookedUp);
 
         $this->app['translator']->handleMissingKeysUsing(null);
     }

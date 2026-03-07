@@ -21,8 +21,9 @@ class ScheduleRunCommandTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
         Carbon::setTestNow();
+
+        parent::tearDown();
     }
 
     /**
@@ -132,7 +133,8 @@ class ScheduleRunCommandTest extends TestCase
 
         // Create a schedule and add the command that just performs an action without explicit exit
         $schedule = $this->app->make(Schedule::class);
-        $task = $schedule->exec('true')
+        $command = PHP_OS_FAMILY === 'Windows' ? 'cmd /c exit 0' : 'true';
+        $task = $schedule->exec($command)
             ->everyMinute();
 
         // Make sure it will run regardless of schedule
