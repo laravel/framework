@@ -22,6 +22,7 @@ use Illuminate\Http\Client\Promises\FluentPromise;
 use Illuminate\Http\Client\Promises\LazyPromise;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Conditionable;
@@ -797,6 +798,38 @@ class PendingRequest
     public function throwUnless($condition)
     {
         return $this->throwIf(! $condition);
+    }
+
+    /**
+     * Log the request and response.
+     *
+     * @param  string|null  $channel
+     * @return $this
+     */
+    public function debug(?string $channel = null)
+    {
+        $this->beforeSending(function (Request $request) use ($channel) {
+            $logger = $channel ? Log::channel($channel) : Log::getFacadeRoot();
+
+            $logger->debug('HTTP Request', [
+                'method' => $request->method(),
+                'url' => $request->url(),
+                'headers' => $request->headers(),
+                'body' => $request->body(),
+            ]);
+        });
+
+        return $this->afterResponse(function (Response $response) use ($channel) {
+            $logger = $channel ? Log::channel($channel) : Log::getFacadeRoot();
+
+            $logger->debug('HTTP Response', [
+                'status' => $response->status(),
+                'headers' => $response->headers(),
+                'body' => $response->body(),
+            ]);
+
+            return $response;
+        });
     }
 
     /**

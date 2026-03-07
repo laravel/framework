@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
 
@@ -109,6 +110,58 @@ class HttpClientTest extends TestCase
         $this->assertEquals('second response', $response2->body());
         $this->assertEquals('unnamed', $response3->body());
         $this->assertEquals('unnamed', $response4->body());
+    }
+
+    public function testDebugLogsRequestAndResponse(): void
+    {
+        Http::fake(['*' => Http::response(['name' => 'Taylor'], 200, ['X-Foo' => 'Bar'])]);
+        Log::shouldReceive('debug')
+            ->once()
+            ->withArgs(function ($message, $context) {
+                return $message === 'HTTP Request'
+                    && $context['method'] === 'POST'
+                    && str_contains($context['url'], 'example.com')
+                    && $context['body'] === '{"email":"taylor@laravel.com"}';
+            });
+
+        Log::shouldReceive('debug')
+            ->once()
+            ->withArgs(function ($message, $context) {
+                return $message === 'HTTP Response'
+                    && $context['status'] === 200
+                    && str_contains($context['body'], 'Taylor');
+            });
+
+        Http::debug()->post('http://example.com/login', ['email' => 'taylor@laravel.com']);
+    }
+
+    public function testDebugLogsToSpecificChannel(): void
+    {
+        Http::fake(['*' => Http::response('OK')]);
+
+        $channel = Log::partialMock();
+        Log::shouldReceive('channel')
+            ->with('stderr')
+            ->andReturn($channel);
+
+        $channel->shouldReceive('debug')
+            ->once()
+            ->withArgs(fn ($message) => $message === 'HTTP Request');
+        $channel->shouldReceive('debug')
+            ->once()
+            ->withArgs(fn ($message) => $message === 'HTTP Response');
+
+        Http::debug('stderr')->get('http://example.com');
+    }
+
+    public function testDebugIsChainable(): void
+    {
+        Http::fake(['*' => Http::response('OK')]);
+        Log::shouldReceive('debug')->twice();
+
+        $response = Http::debug()->withHeaders(['X-Foo' => 'Bar'])->get('http://example.com');
+
+        $this->assertEquals('OK', $response->body());
     }
 
     public function testAsyncCanHandleThrownException()
