@@ -22,6 +22,7 @@ use Illuminate\Http\Client\Promises\FluentPromise;
 use Illuminate\Http\Client\Promises\LazyPromise;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Conditionable;
@@ -797,6 +798,63 @@ class PendingRequest
     public function throwUnless($condition)
     {
         return $this->throwIf(! $condition);
+    }
+
+    /**
+     * Log the request and response.
+     *
+     * @param  string|null  $channel
+     * @return $this
+     */
+    public function debug(?string $channel = null)
+    {
+        $this->beforeSending(function (Request $request) use ($channel) {
+            $logger = $channel ? Log::channel($channel) : Log::getFacadeRoot();
+
+            $headers = collect($request->headers())
+                ->map(fn ($values, $name) => "$name: ".implode(', ', $values))
+                ->implode("\n  ");
+
+            $body = $request->body();
+            $json = json_decode($body, true);
+
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $body = json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            }
+
+            $logger->debug(sprintf(
+                "HTTP Request\n── %s %s ──\n  %s%s",
+                $request->method(),
+                $request->url(),
+                $headers,
+                $body !== '' ? "\n\n  Body:\n  ".$body : '',
+            ));
+        });
+
+        return $this->afterResponse(function (Response $response) use ($channel) {
+            $logger = $channel ? Log::channel($channel) : Log::getFacadeRoot();
+
+            $headers = collect($response->headers())
+                ->map(fn ($values, $name) => "$name: ".implode(', ', $values))
+                ->implode("\n  ");
+
+            $body = $response->body();
+            $json = json_decode($body, true);
+
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $body = json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            }
+
+            $logger->debug(sprintf(
+                "HTTP Response\n── %s %s ──\n  %s\n\n  Body:\n  %s",
+                $response->status(),
+                $response->reason(),
+                $headers,
+                $body,
+            ));
+
+            return $response;
+        });
     }
 
     /**
