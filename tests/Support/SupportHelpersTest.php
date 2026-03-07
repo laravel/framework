@@ -1296,12 +1296,30 @@ class SupportHelpersTest extends TestCase
         $_SERVER['foo'] = '-100';
         $this->assertSame(-100, Env::get('foo', null, true));
 
-        $_SERVER['foo'] = '3.14';
-        $this->assertSame(3, Env::get('foo', null, true));
-
         $this->assertNull(Env::get('env_strict_missing_int', null, true));
         $this->assertSame(99, Env::get('env_strict_missing_int', 99, true));
         $this->assertSame('default', Env::get('env_strict_missing_int', 'default', true));
+    }
+
+    public function testEnvStrictNumericToFloat(): void
+    {
+        $_SERVER['foo'] = '3.14';
+        $this->assertSame(3.14, Env::get('foo', null, true));
+
+        $_SERVER['foo'] = '0.0';
+        $this->assertSame(0.0, Env::get('foo', null, true));
+
+        $_SERVER['foo'] = '-2.5';
+        $this->assertSame(-2.5, Env::get('foo', null, true));
+
+        $_SERVER['foo'] = '1e2';
+        $this->assertSame(100.0, Env::get('foo', null, true));
+
+        $_SERVER['foo'] = '2.5e-1';
+        $this->assertSame(0.25, Env::get('foo', null, true));
+
+        $this->assertNull(Env::get('env_strict_missing_float', null, true));
+        $this->assertSame(1.5, Env::get('env_strict_missing_float', 1.5, true));
     }
 
     public function testEnvStrictBooleanLikeToBoolean(): void

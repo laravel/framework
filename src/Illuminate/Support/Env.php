@@ -95,7 +95,8 @@ class Env
     /**
      * Get the value of an environment variable.
      *
-     * When $strict is true, the value is cast when present: boolean-like → bool, numeric → int,
+     * When $strict is true, the value is cast when present: numeric with decimal/exponent → float,
+     * other numeric → int, boolean-like → bool.
      *
      * @param  string  $key
      * @param  mixed  $default
@@ -112,12 +113,17 @@ class Env
 
         $result = $option->get();
 
+
         if ($strict) {
             if (is_bool($result)) {
                 return $result;
             }
 
             if (is_numeric($result)) {
+                if (str_contains($result, '.') || str_contains($result, 'e')) {
+                    return (float) $result;
+                }
+
                 return (int) $result;
             }
 

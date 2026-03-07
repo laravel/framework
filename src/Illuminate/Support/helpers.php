@@ -142,7 +142,8 @@ if (! function_exists('env')) {
     /**
      * Gets the value of an environment variable.
      *
-     * When $strict is true, the value is cast when present: boolean-like → bool, numeric → int,
+     * When $strict is true, the value is cast when present: numeric with . or e → float,
+     * other numeric → int, boolean-like → bool.
      *
      * @param  string  $key
      * @param  mixed  $default
