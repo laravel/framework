@@ -793,10 +793,12 @@ class Handler implements ExceptionHandlerContract
      */
     protected function invalidJson($request, ValidationException $exception)
     {
-        return response()->json([
-            'message' => $exception->getMessage(),
-            'errors' => $exception->errors(),
-        ], $exception->status);
+        return response()->json(array_filter([
+            'message' => config('app.hide_validation_errors')
+                ? $exception->validator->getTranslator()->get('The given data was invalid.')
+                : $exception->getMessage(),
+            'errors' => config('app.hide_validation_errors') ? null : $exception->errors(),
+        ]), $exception->status);
     }
 
     /**
