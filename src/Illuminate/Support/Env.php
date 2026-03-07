@@ -113,7 +113,6 @@ class Env
 
         $result = $option->get();
 
-
         if ($strict) {
             if (is_bool($result)) {
                 return $result;
