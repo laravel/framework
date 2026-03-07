@@ -119,14 +119,14 @@ class Env
             }
 
             if (is_numeric($result)) {
-                if (str_contains($result, '.') || str_contains($result, 'e')) {
+                if (str_contains($result, '.') || str_contains(strtolower($result), 'e')) {
                     return (float) $result;
                 }
 
                 return (int) $result;
             }
 
-            if (in_array($result, ['true', 'false', '1', '0', 'on', 'off', 'yes', 'no'], true)) {
+            if (in_array(strtolower($result), ['true', 'false', '1', '0', 'on', 'off', 'yes', 'no'], true)) {
                 return filter_var($result, FILTER_VALIDATE_BOOLEAN);
             }
         }
