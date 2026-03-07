@@ -111,7 +111,7 @@ class AliasLoader
         $tempPath = tempnam(dirname($path), 'facade-');
 
         // Fix permissions of tempPath because `tempnam()` creates it with permissions set to 0600...
-        chmod($tempPath, 0777 - umask());
+        @chmod($tempPath, 0777 - umask());
 
         file_put_contents($tempPath, $stub);
 
