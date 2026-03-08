@@ -12,6 +12,7 @@ use Illuminate\Console\Events\ScheduledTaskStarting;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Sleep;
@@ -110,6 +111,8 @@ class ScheduleRunCommand extends Command
         $this->cache = $cache;
         $this->handler = $handler;
         $this->phpBinary = Application::phpBinary();
+
+        $this->registerFailureLogger();
 
         $events = $this->schedule->dueEvents($this->laravel);
 
@@ -285,5 +288,27 @@ class ScheduleRunCommand extends Command
     protected function clearInterruptSignal()
     {
         $this->cache->forget('illuminate:schedule:interrupt');
+    }
+
+    /**
+     * Register the schedule failure logger listeners.
+     *
+     * @return void
+     */
+    protected function registerFailureLogger()
+    {
+        $logger = new ScheduleFailureLogger(
+            $this->laravel->make(Filesystem::class)
+        );
+
+        $this->dispatcher->listen(
+            ScheduledTaskFailed::class,
+            [$logger, 'handleTaskFailed']
+        );
+
+        $this->dispatcher->listen(
+            ScheduledTaskSkipped::class,
+            [$logger, 'handleTaskSkipped']
+        );
     }
 }

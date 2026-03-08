@@ -294,7 +294,7 @@ class Event
      *
      * @return bool
      */
-    protected function expressionPasses()
+    public function expressionPasses()
     {
         $date = Date::now();
 
