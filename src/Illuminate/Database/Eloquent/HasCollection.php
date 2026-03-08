@@ -18,6 +18,16 @@ trait HasCollection
     protected static array $resolvedCollectionClasses = [];
 
     /**
+     * Wrap the model in its Eloquent Collection.
+     *
+     * @return TCollection
+     */
+    public function collect()
+    {
+        return $this->newCollection([$this]);
+    }
+
+    /**
      * Create a new Eloquent Collection instance.
      *
      * @param  array<array-key, \Illuminate\Database\Eloquent\Model>  $models

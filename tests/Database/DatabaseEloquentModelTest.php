@@ -3542,6 +3542,26 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInstanceOf(CustomEloquentCollection::class, $collection);
     }
 
+    public function testCollect()
+    {
+        $model = new EloquentModelStub;
+        $collection = $model->collect();
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $collection);
+        $this->assertCount(1, $collection);
+        $this->assertSame($model, $collection->first());
+    }
+
+    public function testCollectRespectsCustomCollection()
+    {
+        $model = new EloquentModelWithCollectedByAttribute;
+        $collection = $model->collect();
+
+        $this->assertInstanceOf(CustomEloquentCollection::class, $collection);
+        $this->assertCount(1, $collection);
+        $this->assertSame($model, $collection->first());
+    }
+
     public function testUseFactoryAttribute()
     {
         $model = new EloquentModelWithUseFactoryAttribute;
