@@ -151,6 +151,15 @@ class RepositoryTest extends TestCase
         $this->assertSame('default', $this->repository->get('not-exist', 'default'));
     }
 
+    public function testFirst()
+    {
+        $this->assertSame('bar', $this->repository->first(['foo', 'bar', 'baz']));
+        $this->assertSame('baz', $this->repository->first(['none', 'bar', 'foo']));
+        $this->assertSame('bat', $this->repository->first(['none1', 'none2', 'baz']));
+        $this->assertSame('default', $this->repository->first(['none1', 'none2'], 'default'));
+        $this->assertNull($this->repository->first(['unknown']));
+    }
+
     public function testSet()
     {
         $this->repository->set('key', 'value');

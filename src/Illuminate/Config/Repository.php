@@ -58,6 +58,24 @@ class Repository implements ArrayAccess, ConfigContract
     }
 
     /**
+     * Get the first configuration value from the given keys.
+     *
+     * @param  array<int, string>  $keys
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function first(array $keys, $default = null)
+    {
+        foreach ($keys as $key) {
+            if ($this->has($key)) {
+                return $this->get($key);
+            }
+        }
+
+        return $default;
+    }
+
+    /**
      * Get many configuration values.
      *
      * @param  array<string|int,mixed>  $keys
