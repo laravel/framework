@@ -382,6 +382,16 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Determine if the string is valid base64 encoded.
+     *
+     * @return bool
+     */
+    public function isBase64()
+    {
+        return Str::isBase64($this->value);
+    }
+
+    /**
      * Determine if a given string is valid JSON.
      *
      * @return bool

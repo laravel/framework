@@ -565,6 +565,27 @@ class Str
     }
 
     /**
+     * Determine if a given value is a valid base64 encoded string.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function isBase64($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        $decoded = base64_decode($value, true);
+
+        if ($decoded === false) {
+            return false;
+        }
+
+        return base64_encode($decoded) === $value;
+    }
+
+    /**
      * Determine if a given value is valid JSON.
      *
      * @param  mixed  $value

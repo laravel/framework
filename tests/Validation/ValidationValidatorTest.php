@@ -3258,6 +3258,37 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateBase64()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => base64_encode('Hello World')], ['foo' => 'base64']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => base64_encode('')], ['foo' => 'base64']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => base64_encode("\x00\x01\x02\xff")], ['foo' => 'base64']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'not-valid-base64!@#$'], ['foo' => 'base64']);
+        $this->assertFalse($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'SGVsbG8gV29ybGQ'], ['foo' => 'base64']);
+        $this->assertFalse($v->passes()); // missing padding
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => ['array']], ['foo' => 'base64']);
+        $this->assertFalse($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => null], ['foo' => 'base64']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateBoolean()
     {
         $trans = $this->getIlluminateArrayTranslator();

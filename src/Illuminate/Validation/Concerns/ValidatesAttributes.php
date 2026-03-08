@@ -175,6 +175,18 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is a valid base64 encoded string.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateBase64($attribute, $value)
+    {
+        return Str::isBase64($value);
+    }
+
+    /**
      * Validate the date is before a given date.
      *
      * @param  string  $attribute
