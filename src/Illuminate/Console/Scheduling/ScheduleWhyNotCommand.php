@@ -78,8 +78,21 @@ class ScheduleWhyNotCommand extends Command
      * Build a row of diagnostic data for the given event.
      *
      * @param  \Illuminate\Console\Scheduling\Event  $event
-     * @param  \Illuminate\Support\Collection  $failures
-     * @return array
+     * @param  \Illuminate\Support\Collection<int, array{
+     *     mutex?: string,
+     *     command?: string,
+     *     type?: string,
+     *     exception?: string,
+     *     reason?: string,
+     *     timestamp?: string,
+     * }>  $failures
+     * @return array{
+     *     command: string,
+     *     status: 'OK'|'FAILED'|'SKIPPED',
+     *     diagnostics: string,
+     *     last_failure: string,
+     *     last_failed_at: string,
+     * }
      */
     protected function buildRow(Event $event, Collection $failures)
     {
@@ -285,6 +298,6 @@ class ScheduleWhyNotCommand extends Command
             return $value;
         }
 
-        return mb_substr($value, 0, $length - 3).'...';
+        return mb_substr($value, 0, $length - 1).'…';
     }
 }

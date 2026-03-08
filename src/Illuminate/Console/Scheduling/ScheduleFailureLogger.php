@@ -13,7 +13,7 @@ class ScheduleFailureLogger
      * Create a new failure logger instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  int  $maxEntries
+     * @param  non-negative-int  $maxEntries
      */
     public function __construct(
         protected Filesystem $files,
@@ -60,7 +60,15 @@ class ScheduleFailureLogger
     /**
      * Write an entry to the failure log.
      *
-     * @param  array  $entry
+     * @param  array{
+     *     timestamp: string,
+     *     command: string,
+     *     description: string,
+     *     type: 'failed'|'skipped',
+     *     exit_code?: int|null,
+     *     exception?: string,
+     *     mutex: string,
+     * }  $entry
      * @return void
      */
     protected function writeEntry(array $entry)
