@@ -12,6 +12,7 @@ use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
+use function Illuminate\Filesystem\join_paths;
 use function Orchestra\Testbench\artisan;
 use function Orchestra\Testbench\phpunit_version_compare;
 
@@ -221,8 +222,8 @@ class BladeTest extends TestCase
 
     public function test_view_cache_command_deduplicates_paths_before_compiling()
     {
-        View::addNamespace('templates', __DIR__.'/templates');
-        View::addNamespace('components', __DIR__.'/templates/components');
+        View::addNamespace('templates', join_paths(__DIR__, 'templates'));
+        View::addNamespace('components', join_paths(__DIR__, 'templates', 'components'));
 
         $compiler = Mockery::mock(app('blade.compiler'))->makePartial();
         $compiler->shouldReceive('compile')->with(realpath(__DIR__.'/templates/components/panel.blade.php'))->once();
