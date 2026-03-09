@@ -62,6 +62,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->viewFactory = m::mock(ViewFactory::class);
 
         $this->request = m::mock(stdClass::class);
+        $this->request->shouldReceive('wantsJsonApi')->andReturn(false);
 
         $this->container = Container::setInstance(new Container);
 
