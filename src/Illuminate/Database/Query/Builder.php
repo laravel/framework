@@ -4228,9 +4228,9 @@ class Builder implements BuilderContract
     /**
      * Execute an insert-using statement via a PendingInsertUsing clause.
      *
-     * @param  \Closure  $callback
+     * @param  \Closure(\Illuminate\Database\Query\PendingInsertUsing): void  $callback
      * @param  string  $compileMethod
-     * @return int
+     * @return non-negative-int
      */
     protected function performInsertUsingWithClause(Closure $callback, string $compileMethod)
     {
