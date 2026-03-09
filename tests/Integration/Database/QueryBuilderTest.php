@@ -7,6 +7,7 @@ use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
+use Illuminate\Database\Query\PendingInsertUsing;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Testing\Assert as PHPUnit;
@@ -685,6 +686,56 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame('Bar Post', $result[1]->title);
         $this->assertSame('Foo Post', $result2[0]->title);
         $this->assertSame('Bar Post', $result2[1]->title);
+    }
+
+    public function testInsertUsingWithClause()
+    {
+        Schema::create('post_copies', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('title');
+            $table->string('status');
+            $table->timestamp('created_at');
+        });
+
+        DB::table('post_copies')->insertUsing(function (PendingInsertUsing $insert) {
+            $insert->from(DB::table('posts'))
+                ->column('title', 'title')
+                ->value('status', 'archived')
+                ->column('created_at', 'created_at');
+        });
+
+        $copies = DB::table('post_copies')->orderBy('id')->get();
+
+        $this->assertCount(2, $copies);
+        $this->assertSame('Foo Post', $copies[0]->title);
+        $this->assertSame('archived', $copies[0]->status);
+        $this->assertSame('Bar Post', $copies[1]->title);
+        $this->assertSame('archived', $copies[1]->status);
+    }
+
+    public function testInsertUsingClauseWithExpression()
+    {
+        Schema::create('post_copies', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('title');
+            $table->string('status');
+            $table->integer('priority');
+        });
+
+        DB::table('post_copies')->insertUsing(function (PendingInsertUsing $insert) {
+            $insert->from(DB::table('posts'))
+                ->column('title', 'title')
+                ->value('status', 'active')
+                ->value('priority', DB::raw('1 + 1'));
+        });
+
+        $copies = DB::table('post_copies')->orderBy('id')->get();
+
+        $this->assertCount(2, $copies);
+        $this->assertSame('active', $copies[0]->status);
+        $this->assertEquals(2, $copies[0]->priority);
+        $this->assertSame('active', $copies[1]->status);
+        $this->assertEquals(2, $copies[1]->priority);
     }
 
     protected function defineEnvironmentWouldThrowsPDOException($app)

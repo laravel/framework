@@ -4182,12 +4182,17 @@ class Builder implements BuilderContract
     /**
      * Insert new records into the table using a subquery.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
+     * @param  array|(callable(\Illuminate\Database\Query\PendingInsertUsing): void)  $columns
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string|null  $query
      * @return int
      */
-    public function insertUsing(array $columns, $query)
+    public function insertUsing($columns, $query = null)
     {
         $this->applyBeforeQueryCallbacks();
+
+        if ($columns instanceof Closure && is_null($query)) {
+            return $this->performInsertUsingWithClause($columns, 'compileInsertUsing');
+        }
 
         [$sql, $bindings] = $this->createSub($query);
 
@@ -4200,17 +4205,53 @@ class Builder implements BuilderContract
     /**
      * Insert new records into the table using a subquery while ignoring errors.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
+     * @param  array|(callable(\Illuminate\Database\Query\PendingInsertUsing): void)  $columns
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string|null  $query
      * @return int
      */
-    public function insertOrIgnoreUsing(array $columns, $query)
+    public function insertOrIgnoreUsing($columns, $query = null)
     {
         $this->applyBeforeQueryCallbacks();
+
+        if ($columns instanceof Closure && is_null($query)) {
+            return $this->performInsertUsingWithClause($columns, 'compileInsertOrIgnoreUsing');
+        }
 
         [$sql, $bindings] = $this->createSub($query);
 
         return $this->connection->affectingStatement(
             $this->grammar->compileInsertOrIgnoreUsing($this, $columns, $sql),
+            $this->cleanBindings($bindings)
+        );
+    }
+
+    /**
+     * Execute an insert-using statement via a PendingInsertUsing clause.
+     *
+     * @param  \Closure  $callback
+     * @param  string  $compileMethod
+     * @return int
+     */
+    protected function performInsertUsingWithClause(Closure $callback, string $compileMethod)
+    {
+        $pending = new PendingInsertUsing($this->grammar);
+
+        $callback($pending);
+
+        $query = $pending->getQuery();
+
+        if ($query instanceof Closure) {
+            $queryClosure = $query;
+
+            $queryClosure($query = $this->forSubQuery());
+        }
+
+        $pending->applyToQuery($query);
+
+        [$sql, $bindings] = $this->parseSub($query);
+
+        return $this->connection->affectingStatement(
+            $this->grammar->{$compileMethod}($this, $pending->getColumns(), $sql),
             $this->cleanBindings($bindings)
         );
     }

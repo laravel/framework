@@ -18,6 +18,7 @@ use Illuminate\Database\Query\Grammars\PostgresGrammar;
 use Illuminate\Database\Query\Grammars\SQLiteGrammar;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Database\Query\PendingInsertUsing;
 use Illuminate\Database\Query\Processors\MySqlProcessor;
 use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Database\Query\Processors\Processor;
@@ -3964,6 +3965,144 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('table1')->insertUsing(['foo'], ['bar']);
     }
 
+    public function testInsertUsingWithClause()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with(
+            'insert into "table1" ("foo", "status", "reason") select "bar", ?, ? from "table2" where "foreign_id" = ?',
+            ['active', 'created', 5]
+        )->andReturn(1);
+
+        $result = $builder->from('table1')->insertUsing(function (PendingInsertUsing $insert) {
+            $insert->from(function (Builder $query) {
+                $query->from('table2')->where('foreign_id', '=', 5);
+            })
+            ->column('foo', 'bar')
+            ->value('status', 'active')
+            ->value('reason', 'created');
+        });
+
+        $this->assertEquals(1, $result);
+    }
+
+    public function testInsertUsingClausePreservesColumnOrder()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with(
+            'insert into "table1" ("payment_id", "status", "changed_at") select "id", ?, "created_at" from "table2"',
+            ['active']
+        )->andReturn(1);
+
+        $result = $builder->from('table1')->insertUsing(function (PendingInsertUsing $insert) {
+            $insert->from(function (Builder $query) {
+                $query->from('table2');
+            })
+            ->column('payment_id', 'id')
+            ->value('status', 'active')
+            ->column('changed_at', 'created_at');
+        });
+
+        $this->assertEquals(1, $result);
+    }
+
+    public function testInsertUsingClauseWithExpression()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with(
+            'insert into "table1" ("foo", "created_at") select "bar", NOW() from "table2"',
+            []
+        )->andReturn(1);
+
+        $result = $builder->from('table1')->insertUsing(function (PendingInsertUsing $insert) {
+            $insert->from(function (Builder $query) {
+                $query->from('table2');
+            })
+            ->column('foo', 'bar')
+            ->value('created_at', new Raw('NOW()'));
+        });
+
+        $this->assertEquals(1, $result);
+    }
+
+    public function testInsertUsingClauseWithEnum()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with(
+            'insert into "table1" ("foo", "status") select "bar", ? from "table2"',
+            [5]
+        )->andReturn(1);
+
+        $result = $builder->from('table1')->insertUsing(function (PendingInsertUsing $insert) {
+            $insert->from(function (Builder $query) {
+                $query->from('table2');
+            })
+            ->column('foo', 'bar')
+            ->value('status', Bar::FOO);
+        });
+
+        $this->assertEquals(1, $result);
+    }
+
+    public function testInsertUsingClauseWithBuilderInstance()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with(
+            'insert into "table1" ("foo", "status") select "bar", ? from "table2" where "foreign_id" = ?',
+            ['active', 5]
+        )->andReturn(1);
+
+        $subquery = $this->getBuilder()->from('table2')->where('foreign_id', '=', 5);
+
+        $result = $builder->from('table1')->insertUsing(function (PendingInsertUsing $insert) use ($subquery) {
+            $insert->from($subquery)
+                ->column('foo', 'bar')
+                ->value('status', 'active');
+        });
+
+        $this->assertEquals(1, $result);
+    }
+
+    public function testInsertUsingClauseWithBatchValues()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with(
+            'insert into "table1" ("foo", "status", "reason") select "bar", ?, ? from "table2"',
+            ['active', 'created']
+        )->andReturn(1);
+
+        $result = $builder->from('table1')->insertUsing(function (PendingInsertUsing $insert) {
+            $insert->from(function (Builder $query) {
+                $query->from('table2');
+            })
+            ->column('foo', 'bar')
+            ->value([
+                'status' => 'active',
+                'reason' => 'created',
+            ]);
+        });
+
+        $this->assertEquals(1, $result);
+    }
+
+    public function testInsertUsingClauseWithQualifiedColumnNames()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with(
+            'insert into "table1" ("table1"."foo", "status") select "table2"."bar", ? from "table2"',
+            ['active']
+        )->andReturn(1);
+
+        $result = $builder->from('table1')->insertUsing(function (PendingInsertUsing $insert) {
+            $insert->from(function (Builder $query) {
+                $query->from('table2');
+            })
+            ->column('table1.foo', 'table2.bar')
+            ->value('status', 'active');
+        });
+
+        $this->assertEquals(1, $result);
+    }
+
     public function testInsertOrIgnoreMethod()
     {
         $this->expectException(RuntimeException::class);
@@ -4187,6 +4326,26 @@ class DatabaseQueryBuilderTest extends TestCase
                 $query->select(['bar'])->from('table2')->where('foreign_id', '=', 5);
             }
         );
+
+        $this->assertEquals(1, $result);
+    }
+
+    public function testMySqlInsertOrIgnoreUsingWithClause()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('getDatabaseName');
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with(
+            'insert ignore into `table1` (`foo`, `status`) select `bar`, ? from `table2` where `foreign_id` = ?',
+            ['active', 5]
+        )->andReturn(1);
+
+        $result = $builder->from('table1')->insertOrIgnoreUsing(function (PendingInsertUsing $insert) {
+            $insert->from(function (Builder $query) {
+                $query->from('table2')->where('foreign_id', '=', 5);
+            })
+            ->column('foo', 'bar')
+            ->value('status', 'active');
+        });
 
         $this->assertEquals(1, $result);
     }
