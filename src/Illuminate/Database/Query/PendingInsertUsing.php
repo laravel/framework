@@ -14,9 +14,9 @@ class PendingInsertUsing
     protected $query;
 
     /**
-     * The ordered list of column entries.
+     * The ordered list of column or value entries.
      *
-     * @var list<array{type: "column"|"value", target: string, source: string}>
+     * @var list<array{type: "column", target: string, source: string}|array{type: "value", target: string, value: mixed}>
      */
     protected $entries = [];
 
@@ -65,7 +65,7 @@ class PendingInsertUsing
     /**
      * Map target column(s) to literal value(s).
      *
-     * @param  string|array  $target
+     * @param  string|array<string, mixed>  $target
      * @param  mixed  $value
      * @return $this
      */
