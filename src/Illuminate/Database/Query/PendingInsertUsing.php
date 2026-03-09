@@ -16,12 +16,12 @@ class PendingInsertUsing
     /**
      * The ordered list of column entries.
      *
-     * @var array
+     * @var list<array{type: "column"|"value", target: string, source: string}>
      */
     protected $entries = [];
 
     /**
-     * Create a new pending insert-using instance.
+     * Create a new PendingInsertUsing instance.
      *
      * @param  \Illuminate\Database\Query\Grammars\Grammar  $grammar  The grammar instance.
      */
@@ -45,13 +45,19 @@ class PendingInsertUsing
     /**
      * Map a target column to a source column from the subquery.
      *
-     * @param  string  $target
-     * @param  string  $source
+     * @param  string|array<string, string>  $target
+     * @param  string|null  $source
      * @return $this
      */
-    public function column(string $target, string $source)
+    public function column(array|string $target, string|null $source = null)
     {
-        $this->entries[] = ['type' => 'column', 'target' => $target, 'source' => $source];
+        if (! is_array($target)) {
+            $target = [$target => $source];
+        }
+
+        foreach ($target as $targetColumn => $sourceColumn) {
+            $this->entries[] = ['type' => 'column', 'target' => $targetColumn, 'source' => $sourceColumn];
+        }
 
         return $this;
     }
@@ -65,15 +71,13 @@ class PendingInsertUsing
      */
     public function value(string|array $target, mixed $value = null)
     {
-        if (is_array($target)) {
-            foreach ($target as $column => $val) {
-                $this->entries[] = ['type' => 'value', 'target' => $column, 'value' => $val];
-            }
-
-            return $this;
+        if (! is_array($target)) {
+            $target = [$target => $value];
         }
 
-        $this->entries[] = ['type' => 'value', 'target' => $target, 'value' => $value];
+        foreach ($target as $column => $val) {
+            $this->entries[] = ['type' => 'value', 'target' => $column, 'value' => $val];
+        }
 
         return $this;
     }
@@ -95,7 +99,7 @@ class PendingInsertUsing
      */
     public function getColumns()
     {
-        return array_map(fn ($entry) => $entry['target'], $this->entries);
+        return array_map(static fn ($entry) => $entry['target'], $this->entries);
     }
 
     /**
