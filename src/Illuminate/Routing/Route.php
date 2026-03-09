@@ -1193,7 +1193,7 @@ class Route
 
             return static::methodExcludedByOptions(
                 $method, ['only' => $instance->only, 'except' => $instance->except],
-            ) ? null : $instance->value;
+            ) ? null : $instance->middleware;
         })
             ->filter()
             ->values()
