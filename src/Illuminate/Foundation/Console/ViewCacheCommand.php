@@ -106,10 +106,8 @@ class ViewCacheCommand extends Command
             (new Collection($finder->getHints()))->flatten()
         )->unique();
 
-        return $paths->reject(function ($path) use ($paths) {
-            return $paths->contains(function ($existing) use ($path) {
-                return $existing !== $path && Path::isBasePath($existing, $path);
-            });
-        })->values();
+        return $paths->reject(fn ($path) => $paths->contains(function ($existing) use ($path) {
+            return $existing !== $path && Path::isBasePath($existing, $path);
+        }))->values();
     }
 }
