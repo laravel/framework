@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -101,8 +102,14 @@ class ViewCacheCommand extends Command
     {
         $finder = $this->laravel['view']->getFinder();
 
-        return (new Collection($finder->getPaths()))->merge(
+        $paths = (new Collection($finder->getPaths()))->merge(
             (new Collection($finder->getHints()))->flatten()
-        );
+        )->unique();
+
+        return $paths->reject(function ($path) use ($paths) {
+            return $paths->contains(function ($existing) use ($path) {
+                return $existing !== $path && Path::isBasePath($existing, $path);
+            });
+        })->values();
     }
 }
