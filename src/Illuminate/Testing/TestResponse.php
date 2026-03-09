@@ -696,7 +696,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the given string or array of strings are contained within the response.
      *
-     * @param  string|array  $value
+     * @param  string|list<string>  $value
      * @param  bool  $escape
      * @return $this
      */
@@ -716,7 +716,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the given HTML string or array of HTML strings are contained within the response.
      *
-     * @param  array|string  $value
+     * @param  string|list<string>  $value
      * @return $this
      */
     public function assertSeeHtml($value)
@@ -727,7 +727,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the given strings are contained in order within the response.
      *
-     * @param  array  $values
+     * @param  list<string>  $values
      * @param  bool  $escape
      * @return $this
      */
@@ -743,7 +743,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the given HTML strings are contained in order within the response.
      *
-     * @param  array  $values
+     * @param  list<string>  $values
      * @return $this
      */
     public function assertSeeHtmlInOrder(array $values)
@@ -754,7 +754,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the given string or array of strings are contained within the response text.
      *
-     * @param  string|array  $value
+     * @param  string|list<string>  $value
      * @param  bool  $escape
      * @return $this
      */
@@ -776,7 +776,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the given strings are contained in order within the response text.
      *
-     * @param  array  $values
+     * @param  list<string>  $values
      * @param  bool  $escape
      * @return $this
      */
@@ -792,7 +792,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the given string or array of strings are not contained within the response.
      *
-     * @param  string|array  $value
+     * @param  string|list<string>  $value
      * @param  bool  $escape
      * @return $this
      */
@@ -812,7 +812,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the given HTML string or array of HTML strings are not contained within the response.
      *
-     * @param  array|string  $value
+     * @param  string|list<string>  $value
      * @return $this
      */
     public function assertDontSeeHtml($value)
@@ -823,7 +823,7 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the given string or array of strings are not contained within the response text.
      *
-     * @param  string|array  $value
+     * @param  string|list<string>  $value
      * @param  bool  $escape
      * @return $this
      */
