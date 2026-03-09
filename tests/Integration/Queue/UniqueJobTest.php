@@ -199,7 +199,7 @@ class UniqueJobTest extends QueueTestCase
     {
         Bus::fake();
 
-        $lockKey = 'laravel_unique_job:App\\Actions\\UniqueTestAction:';
+        $lockKey = 'laravel_unique_job:'.hash('xxh128', 'App\\Actions\\UniqueTestAction').':';
 
         dispatch(new UniqueTestJobWithDisplayName);
         $this->runQueueWorkerCommand(['--once' => true]);
@@ -238,7 +238,7 @@ class UniqueJobTest extends QueueTestCase
     public function testUniqueLockCreatesKeyWithDisplayNameWhenAvailable()
     {
         $this->assertEquals(
-            'laravel_unique_job:App\\Actions\\UniqueTestAction:unique-id-2',
+            'laravel_unique_job:'.hash('xxh128', 'App\\Actions\\UniqueTestAction').':unique-id-2',
             UniqueLock::getKey(new UniqueIdTestJobWithDisplayName)
         );
     }
@@ -246,7 +246,7 @@ class UniqueJobTest extends QueueTestCase
     public function testUniqueLockCreatesKeyWithIdAndDisplayNameWhenAvailable()
     {
         $this->assertEquals(
-            'laravel_unique_job:App\\Actions\\UniqueTestAction:unique-id-2',
+            'laravel_unique_job:'.hash('xxh128', 'App\\Actions\\UniqueTestAction').':unique-id-2',
             UniqueLock::getKey(new UniqueIdTestJobWithDisplayName)
         );
     }
