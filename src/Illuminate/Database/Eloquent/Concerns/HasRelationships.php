@@ -1156,7 +1156,7 @@ trait HasRelationships
      * @param  array|string  $relations
      * @return $this
      */
-    public function withoutRelation($relations)
+    public function withoutRelation(array|string $relations): static
     {
         $model = clone $this;
 
