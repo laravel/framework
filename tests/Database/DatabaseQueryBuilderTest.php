@@ -4103,6 +4103,47 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(1, $result);
     }
 
+    public function testInsertUsingClauseWithBatchColumns()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with(
+            'insert into "table1" ("foo", "baz", "status") select "bar", "qux", ? from "table2"',
+            ['active']
+        )->andReturn(1);
+
+        $result = $builder->from('table1')->insertUsing(function (PendingInsertUsing $insert) {
+            $insert->from(function (Builder $query) {
+                $query->from('table2');
+            })
+            ->column([
+                'foo' => 'bar',
+                'baz' => 'qux',
+            ])
+            ->value('status', 'active');
+        });
+
+        $this->assertEquals(1, $result);
+    }
+
+    public function testInsertUsingClauseWithLimitAndOffset()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with(
+            'insert into "table1" ("foo", "status") select "bar", ? from "table2" order by "id" asc limit 10 offset 5',
+            ['active']
+        )->andReturn(1);
+
+        $result = $builder->from('table1')->insertUsing(function (PendingInsertUsing $insert) {
+            $insert->from(function (Builder $query) {
+                $query->from('table2')->orderBy('id')->limit(10)->offset(5);
+            })
+            ->column('foo', 'bar')
+            ->value('status', 'active');
+        });
+
+        $this->assertEquals(1, $result);
+    }
+
     public function testInsertOrIgnoreMethod()
     {
         $this->expectException(RuntimeException::class);

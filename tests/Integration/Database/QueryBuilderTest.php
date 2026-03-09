@@ -738,6 +738,52 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertEquals(2, $copies[1]->priority);
     }
 
+    public function testInsertUsingClauseWithQualifiedSourceColumnNames()
+    {
+        Schema::create('post_copies', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('title');
+            $table->string('status');
+        });
+
+        DB::table('post_copies')->insertUsing(function (PendingInsertUsing $insert) {
+            $insert->from(DB::table('posts'))
+                ->column('title', 'posts.title')
+                ->value('status', 'archived');
+        });
+
+        $copies = DB::table('post_copies')->orderBy('id')->get();
+
+        $this->assertCount(2, $copies);
+        $this->assertSame('Foo Post', $copies[0]->title);
+        $this->assertSame('archived', $copies[0]->status);
+        $this->assertSame('Bar Post', $copies[1]->title);
+        $this->assertSame('archived', $copies[1]->status);
+    }
+
+    public function testInsertUsingClauseWithLimitAndOffset()
+    {
+        Schema::create('post_copies', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('title');
+            $table->string('status');
+        });
+
+        DB::table('post_copies')->insertUsing(function (PendingInsertUsing $insert) {
+            $insert->from(
+                DB::table('posts')->orderBy('created_at')->limit(1)->offset(1)
+            )
+            ->column('title', 'title')
+            ->value('status', 'archived');
+        });
+
+        $copies = DB::table('post_copies')->get();
+
+        $this->assertCount(1, $copies);
+        $this->assertSame('Bar Post', $copies[0]->title);
+        $this->assertSame('archived', $copies[0]->status);
+    }
+
     protected function defineEnvironmentWouldThrowsPDOException($app)
     {
         $this->afterApplicationCreated(function () {
