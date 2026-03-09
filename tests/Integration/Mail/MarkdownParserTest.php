@@ -89,7 +89,7 @@ class MarkdownParserTest extends TestCase
 
     public function testItCanParseMarkdownWithCustomExtensionsViaConfig(): void
     {
-        $this->app['config']->set('mail.markdown.extensions', [
+        $this->configureMarkdownExtensions([
             \League\CommonMark\Extension\Strikethrough\StrikethroughExtension::class,
         ]);
 
@@ -105,7 +105,7 @@ class MarkdownParserTest extends TestCase
 
     public function testItCanParseMarkdownWithoutCustomExtensionsDoesNotApplyThem(): void
     {
-        $this->app['config']->set('mail.markdown.extensions', []);
+        $this->configureMarkdownExtensions([]);
 
         tap(Markdown::parse('~~strikethrough text~~'), function ($html) {
             $this->assertInstanceOf(HtmlString::class, $html);
@@ -119,7 +119,7 @@ class MarkdownParserTest extends TestCase
 
     public function testItCanParseMarkdownWithMultipleCustomExtensions(): void
     {
-        $this->app['config']->set('mail.markdown.extensions', [
+        $this->configureMarkdownExtensions([
             \League\CommonMark\Extension\Strikethrough\StrikethroughExtension::class,
             \League\CommonMark\Extension\TaskList\TaskListExtension::class,
         ]);
@@ -145,7 +145,7 @@ class MarkdownParserTest extends TestCase
 
     public function testItCanParseMarkdownEncodedStringWithCustomExtensions(): void
     {
-        $this->app['config']->set('mail.markdown.extensions', [
+        $this->configureMarkdownExtensions([
             \League\CommonMark\Extension\Strikethrough\StrikethroughExtension::class,
         ]);
 
@@ -156,5 +156,16 @@ class MarkdownParserTest extends TestCase
 
             $this->assertStringEqualsStringIgnoringLineEndings($expected.PHP_EOL, (string) $html);
         });
+    }
+
+    /**
+     * @param  array<int, class-string<\League\CommonMark\Extension\ExtensionInterface>>  $extensions
+     */
+    protected function configureMarkdownExtensions(array $extensions): void
+    {
+        $this->app['config']->set('mail.markdown.extensions', $extensions);
+
+        $this->app->forgetInstance(Markdown::class);
+        $this->app->make(Markdown::class);
     }
 }
