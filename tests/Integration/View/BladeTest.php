@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\View;
 use Illuminate\View\Component;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\Finder\Finder;
@@ -216,6 +217,19 @@ class BladeTest extends TestCase
         $found = collect($compiledFiles)
             ->contains(fn (SplFileInfo $file) => str_contains($file->getContents(), 'echo "<?php echo e($scriptMessage); ?>" > output.log'));
         $this->assertTrue($found);
+    }
+
+    public function test_view_cache_command_deduplicates_paths_before_compiling()
+    {
+        View::addNamespace('templates', __DIR__.'/templates');
+        View::addNamespace('components', __DIR__.'/templates/components');
+
+        $compiler = Mockery::mock(app('blade.compiler'))->makePartial();
+        $compiler->shouldReceive('compile')->with(realpath(__DIR__.'/templates/components/panel.blade.php'))->once();
+
+        $this->instance('blade.compiler', $compiler);
+
+        $this->artisan('view:cache');
     }
 
     /** {@inheritdoc} */
