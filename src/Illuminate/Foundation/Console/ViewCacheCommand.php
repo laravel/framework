@@ -6,7 +6,6 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -107,7 +106,7 @@ class ViewCacheCommand extends Command
         )->unique();
 
         return $paths->reject(fn ($path) => $paths->contains(function ($existing) use ($path) {
-            return $existing !== $path && Path::isBasePath($existing, $path);
+            return $existing !== $path && str_starts_with(realpath($path) ?: $path, realpath($existing) ?: $existing);
         }))->values();
     }
 }
