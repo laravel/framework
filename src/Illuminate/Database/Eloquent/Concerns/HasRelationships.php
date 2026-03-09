@@ -1153,7 +1153,7 @@ trait HasRelationships
     /**
      * Duplicate the instance and unset the given loaded relations.
      *
-     * @param  string|array  $relations
+     * @param  array|string  $relations
      * @return $this
      */
     public function withoutRelation($relations)
