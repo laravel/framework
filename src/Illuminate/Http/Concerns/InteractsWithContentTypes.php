@@ -131,6 +131,18 @@ trait InteractsWithContentTypes
     }
 
     /**
+     * Determine if the current request is asking for JSON:API.
+     *
+     * @return bool
+     */
+    public function wantsJsonApi()
+    {
+        $acceptable = $this->getAcceptableContentTypes();
+
+        return isset($acceptable[0]) && Str::contains(strtolower($acceptable[0]), 'vnd.api+json');
+    }
+
+    /**
      * Determines whether a request accepts JSON.
      *
      * @return bool

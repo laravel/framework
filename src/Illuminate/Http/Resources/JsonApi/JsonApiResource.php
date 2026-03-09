@@ -138,9 +138,7 @@ class JsonApiResource extends JsonResource
                 ->map(fn ($included) => Arr::except($included, ['_uniqueKey']))
                 ->values()
                 ->all(),
-            ...($implementation = static::$jsonApiInformation)
-                ? ['jsonapi' => $implementation]
-                : [],
+            ...static::jsonApiBlock(),
         ]);
     }
 
@@ -212,6 +210,18 @@ class JsonApiResource extends JsonResource
     protected static function newCollection($resource)
     {
         return new AnonymousResourceCollection($resource, static::class);
+    }
+
+    /**
+     * Get the JSON:API implementation block for inclusion in responses.
+     *
+     * @return array
+     */
+    public static function jsonApiBlock(): array
+    {
+        return static::$jsonApiInformation
+            ? ['jsonapi' => static::$jsonApiInformation]
+            : [];
     }
 
     /**

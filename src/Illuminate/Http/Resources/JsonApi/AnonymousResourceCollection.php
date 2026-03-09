@@ -29,9 +29,7 @@ class AnonymousResourceCollection extends BaseAnonymousResourceCollection
                 ->map(fn ($included) => Arr::except($included, ['_uniqueKey']))
                 ->values()
                 ->all(),
-            ...($implementation = JsonApiResource::$jsonApiInformation)
-                ? ['jsonapi' => $implementation]
-                : [],
+            ...JsonApiResource::jsonApiBlock(),
         ]);
     }
 

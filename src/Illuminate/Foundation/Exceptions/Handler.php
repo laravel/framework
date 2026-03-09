@@ -24,6 +24,7 @@ use Illuminate\Foundation\Exceptions\Renderer\Renderer;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Exceptions\OriginMismatchException;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Resources\JsonApi\JsonApiErrorResponse;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException;
 use Illuminate\Routing\Router;
@@ -751,8 +752,24 @@ class Handler implements ExceptionHandlerContract
     protected function unauthenticated($request, AuthenticationException $exception)
     {
         return $this->shouldReturnJson($request, $exception)
-            ? response()->json(['message' => $exception->getMessage()], 401)
+            ? $this->unauthenticatedJson($request, $exception)
             : redirect()->guest($exception->redirectTo($request) ?? route('login'));
+    }
+
+    /**
+     * Convert an authentication exception into a JSON response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Auth\AuthenticationException  $exception
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function unauthenticatedJson($request, AuthenticationException $exception)
+    {
+        if ($request->wantsJsonApi()) {
+            return JsonApiErrorResponse::fromThrowable(new HttpException(401, $exception->getMessage(), $exception), config('app.debug'));
+        }
+
+        return response()->json(['message' => $exception->getMessage()], 401);
     }
 
     /**
@@ -796,6 +813,10 @@ class Handler implements ExceptionHandlerContract
      */
     protected function invalidJson($request, ValidationException $exception)
     {
+        if ($request->wantsJsonApi()) {
+            return JsonApiErrorResponse::fromValidationException($exception);
+        }
+
         return response()->json([
             'message' => $exception->getMessage(),
             'errors' => $exception->errors(),
@@ -1006,6 +1027,10 @@ class Handler implements ExceptionHandlerContract
      */
     protected function prepareJsonResponse($request, Throwable $e)
     {
+        if ($request->wantsJsonApi()) {
+            return JsonApiErrorResponse::fromThrowable($e, config('app.debug'));
+        }
+
         return response()->json(
             $this->convertExceptionToArray($e),
             $this->isHttpException($e) ? $e->getStatusCode() : 500,
