@@ -482,7 +482,7 @@ class Response implements ArrayAccess, Stringable
         }
 
         if ($request = $this->transferStats?->getRequest()) {
-            dump($request->getMethod().' '.$request->getUri().' | '.$this->status());
+            dump('"'.$request->getMethod().' '.$request->getUri().'" '.$this->status());
         }
 
         dump(is_null($key) ? $content : data_get($content, $key));
