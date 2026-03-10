@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Database\DatabaseTransactionsManager;
+use Illuminate\Events\CallQueuedListener;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\SyncQueue;
@@ -101,6 +102,20 @@ class QueueSyncQueueTest extends TestCase
         } catch (LogicException $e) {
             $this->assertSame('extraValue', $e->getMessage());
         }
+    }
+
+    public function testQueuedListenerPayloadUsesListenerClassAsCommandName()
+    {
+        $queue = new SyncQueuePayloadTestQueue;
+        $queue->setContainer(new Container);
+
+        $payload = $queue->createPayloadForTest(new CallQueuedListener(
+            SyncQueuePayloadTestListener::class,
+            'handle',
+            []
+        ));
+
+        $this->assertSame(SyncQueuePayloadTestListener::class, $payload['data']['commandName']);
     }
 
     public function testItAddsATransactionCallbackForAfterCommitJobs()
@@ -268,6 +283,21 @@ class SyncQueueAfterCommitInterfaceUniqueJob implements ShouldBeUnique, ShouldQu
 {
     use InteractsWithQueue;
 
+    public function handle()
+    {
+    }
+}
+
+class SyncQueuePayloadTestQueue extends SyncQueue
+{
+    public function createPayloadForTest($job)
+    {
+        return json_decode($this->createPayload($job, 'default'), true);
+    }
+}
+
+class SyncQueuePayloadTestListener implements ShouldQueue
+{
     public function handle()
     {
     }

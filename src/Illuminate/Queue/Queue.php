@@ -12,6 +12,7 @@ use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
+use Illuminate\Events\CallQueuedListener;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Support\Collection;
@@ -191,10 +192,23 @@ abstract class Queue
 
         return array_merge($payload, [
             'data' => array_merge($payload['data'], [
-                'commandName' => get_class($job),
+                'commandName' => $this->getCommandName($job),
                 'command' => $command,
             ]),
         ]);
+    }
+
+    /**
+     * Get the command name for the given job.
+     *
+     * @param  object  $job
+     * @return string
+     */
+    protected function getCommandName($job)
+    {
+        return $job instanceof CallQueuedListener
+            ? $job->class
+            : get_class($job);
     }
 
     /**

@@ -9,6 +9,7 @@ use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Events\CallQueuedListener;
 use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\Events\JobFailed;
@@ -178,6 +179,56 @@ class CallQueuedHandlerTest extends TestCase
 
         Event::assertNotDispatched(JobFailed::class);
     }
+
+    public function testQueuedListenerIsDeletedIfListenerHasDeleteProperty()
+    {
+        Event::fake();
+
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
+
+        $job = m::mock(Job::class);
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
+        $job->shouldReceive('resolveQueuedJobClass')->andReturn(CallQueuedHandlerListenerExceptionThrower::class);
+        $job->shouldReceive('markAsFailed')->never();
+        $job->shouldReceive('isDeleted')->andReturn(false);
+        $job->shouldReceive('delete')->once();
+        $job->shouldReceive('failed')->never();
+
+        $instance->call($job, [
+            'command' => serialize(new CallQueuedListener(
+                CallQueuedHandlerListenerExceptionThrower::class,
+                'handle',
+                [new CallQueuedHandlerMissingModelEvent]
+            )),
+        ]);
+
+        Event::assertNotDispatched(JobFailed::class);
+    }
+
+    public function testQueuedListenerIsDeletedIfListenerHasDeleteAttribute()
+    {
+        Event::fake();
+
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
+
+        $job = m::mock(Job::class);
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
+        $job->shouldReceive('resolveQueuedJobClass')->andReturn(CallQueuedHandlerAttributeListenerExceptionThrower::class);
+        $job->shouldReceive('markAsFailed')->never();
+        $job->shouldReceive('isDeleted')->andReturn(false);
+        $job->shouldReceive('delete')->once();
+        $job->shouldReceive('failed')->never();
+
+        $instance->call($job, [
+            'command' => serialize(new CallQueuedListener(
+                CallQueuedHandlerAttributeListenerExceptionThrower::class,
+                'handle',
+                [new CallQueuedHandlerMissingModelEvent]
+            )),
+        ]);
+
+        Event::assertNotDispatched(JobFailed::class);
+    }
 }
 
 class CallQueuedHandlerTestJob
@@ -263,13 +314,38 @@ class CallQueuedHandlerBatchableExceptionThrower
     {
         //
     }
-
     public function __wakeup()
     {
         throw new ModelNotFoundException('Foo');
     }
 }
 
+class CallQueuedHandlerMissingModelEvent
+{
+    public function __wakeup()
+    {
+        throw new ModelNotFoundException('Foo');
+    }
+}
+
+class CallQueuedHandlerListenerExceptionThrower
+{
+    public $deleteWhenMissingModels = true;
+
+    public function handle(CallQueuedHandlerMissingModelEvent $event)
+    {
+        //
+    }
+}
+
+#[DeleteWhenMissingModels]
+class CallQueuedHandlerAttributeListenerExceptionThrower
+{
+    public function handle(CallQueuedHandlerMissingModelEvent $event)
+    {
+        //
+    }
+}
 class TestJobMiddleware
 {
     public function handle($command, $next)
