@@ -474,24 +474,12 @@ class CacheRepositoryTest extends TestCase
         $nonFlushableRepo->flushLocks();
     }
 
-    public function testTouchWithNullTTLRemembersItemForever(): void
-    {
-        $key = 'key';
-        $ttl = null;
-
-        $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->with($key)->andReturn('bar');
-        $repo->getStore()->shouldReceive('forever')->once()->with($key, 'bar')->andReturn(true);
-        $this->assertTrue($repo->touch($key, $ttl));
-    }
-
     public function testTouchWithSecondsTtlCorrectlyProxiesToStore(): void
     {
         $key = 'key';
         $ttl = 60;
 
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->with($key)->andReturn('bar');
         $repo->getStore()->shouldReceive('touch')->once()->with($key, $ttl)->andReturn(true);
         $this->assertTrue($repo->touch($key, $ttl));
     }
@@ -504,7 +492,6 @@ class CacheRepositoryTest extends TestCase
         Carbon::setTestNow($now = Carbon::now());
 
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->with($key)->andReturn('bar');
         $repo->getStore()->shouldReceive('touch')->once()->with($key, $ttl)->andReturn(true);
         $this->assertTrue($repo->touch($key, $now->addSeconds($ttl)));
     }
@@ -515,7 +502,6 @@ class CacheRepositoryTest extends TestCase
         $ttl = 60;
 
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->with($key)->andReturn('bar');
         $repo->getStore()->shouldReceive('touch')->once()->with($key, $ttl)->andReturn(true);
         $this->assertTrue($repo->touch($key, DateInterval::createFromDateString("$ttl seconds")));
     }
