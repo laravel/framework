@@ -481,11 +481,11 @@ class Response implements ArrayAccess, Stringable
             $content = $json;
         }
 
-        if (! is_null($key)) {
-            dump(data_get($content, $key));
-        } else {
-            dump($content);
+        if ($request = $this->transferStats?->getRequest()) {
+            dump('"'.$request->getMethod().' '.$request->getUri().'" '.$this->status());
         }
+
+        dump(is_null($key) ? $content : data_get($content, $key));
 
         return $this;
     }

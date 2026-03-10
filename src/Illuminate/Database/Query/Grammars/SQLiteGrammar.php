@@ -45,25 +45,6 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
-     * Compile a basic where clause.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $where
-     * @return string
-     */
-    protected function whereBasic(Builder $query, $where)
-    {
-        if ($where['operator'] === '<=>') {
-            $column = $this->wrap($where['column']);
-            $value = $this->parameter($where['value']);
-
-            return "{$column} IS {$value}";
-        }
-
-        return parent::whereBasic($query, $where);
-    }
-
-    /**
      * Compile a "where like" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -94,6 +75,18 @@ class SQLiteGrammar extends Grammar
             ['[*]', '[?]', '*', '?'],
             $value
         );
+    }
+
+    /**
+     * Compile a "where null safe equals" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereNullSafeEquals(Builder $query, $where)
+    {
+        return $this->wrap($where['column']).' is '.$this->parameter($where['value']);
     }
 
     /**

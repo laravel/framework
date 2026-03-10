@@ -1153,7 +1153,6 @@ class Arr
      *
      * @param  array<TKey, TValue>  $array
      * @param  int-mask-of<SORT_REGULAR|SORT_NUMERIC|SORT_STRING|SORT_LOCALE_STRING|SORT_NATURAL|SORT_FLAG_CASE>  $options
-     * @param  int  $options
      * @return array<TKey, TValue>
      */
     public static function sortRecursiveDesc($array, $options = SORT_REGULAR)

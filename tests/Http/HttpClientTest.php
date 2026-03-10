@@ -1866,7 +1866,8 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('http://200.com')->dump();
 
-        $this->assertSame('hello', $dumped[0]);
+        $this->assertSame('"GET http://200.com" 200', $dumped[0]);
+        $this->assertSame('hello', $dumped[1]);
 
         VarDumper::setHandler(null);
     }
@@ -1885,7 +1886,8 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('http://200.com')->dump('hello');
 
-        $this->assertSame('world', $dumped[0]);
+        $this->assertSame('"GET http://200.com" 200', $dumped[0]);
+        $this->assertSame('world', $dumped[1]);
 
         VarDumper::setHandler(null);
     }

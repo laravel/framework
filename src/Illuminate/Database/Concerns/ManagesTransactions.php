@@ -234,6 +234,12 @@ trait ManagesTransactions
         $this->transactions = max(0, $this->transactions - 1);
 
         if ($this->causedByConcurrencyError($e) && $currentAttempt < $maxAttempts) {
+            $pdo = $this->getPdo();
+
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+
             return;
         }
 

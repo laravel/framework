@@ -1519,6 +1519,17 @@ class Blueprint
     }
 
     /**
+     * Create a new tsvector column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function tsvector($column)
+    {
+        return $this->addColumn('tsvector', $column);
+    }
+
+    /**
      * Add the proper columns for a polymorphic table.
      *
      * @param  string  $name

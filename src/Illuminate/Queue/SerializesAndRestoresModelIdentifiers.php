@@ -71,18 +71,20 @@ trait SerializesAndRestoresModelIdentifiers
      */
     protected function restoreCollection($value)
     {
-        if (! $value->class || count($value->id) === 0) {
+        $class = $value->getClass();
+
+        if (! $class || count($value->id) === 0) {
             return ! is_null($value->collectionClass ?? null)
                 ? new $value->collectionClass
                 : new EloquentCollection;
         }
 
         $collection = $this->getQueryForModelRestoration(
-            (new $value->class)->setConnection($value->connection), $value->id
+            (new $class)->setConnection($value->connection), $value->id
         )->useWritePdo()->get();
 
-        if (is_a($value->class, Pivot::class, true) ||
-            in_array(AsPivot::class, class_uses($value->class))) {
+        if (is_a($class, Pivot::class, true) ||
+            in_array(AsPivot::class, class_uses($class))) {
             return $collection;
         }
 

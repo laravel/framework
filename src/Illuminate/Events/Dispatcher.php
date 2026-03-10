@@ -245,7 +245,7 @@ class Dispatcher implements DispatcherContract
      * Resolve the subscriber instance.
      *
      * @param  object|class-string  $subscriber
-     * @return $subscriber is object ? object : mixed
+     * @return ($subscriber is object ? object : mixed)
      */
     protected function resolveSubscriber($subscriber)
     {
@@ -542,6 +542,7 @@ class Dispatcher implements DispatcherContract
         $listener = $this->container->make($class);
 
         return $this->handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
+                && ! in_array($method, ['creating', 'updating', 'saving', 'deleting', 'restoring', 'forceDeleting'])
             ? $this->createCallbackForListenerRunningAfterCommits($listener, $method)
             : [$listener, $method];
     }
@@ -563,7 +564,7 @@ class Dispatcher implements DispatcherContract
      * @param  class-string  $class
      * @return bool
      *
-     * @phpstan-assert-if-true \Illuminate\Contracts\Queue\ShouldQueue $class
+     * @phpstan-assert-if-true class-string<\Illuminate\Contracts\Queue\ShouldQueue> $class
      */
     protected function handlerShouldBeQueued($class)
     {
@@ -831,7 +832,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Set the database transaction manager resolver implementation.
      *
-     * @param  (callable(): \Illuminate\Database\DatabaseTransactionsManager|null)  $resolver
+     * @param  (callable(): (\Illuminate\Database\DatabaseTransactionsManager|null))  $resolver
      * @return $this
      */
     public function setTransactionManagerResolver(callable $resolver)
