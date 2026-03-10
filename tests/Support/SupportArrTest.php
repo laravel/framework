@@ -256,6 +256,43 @@ class SupportArrTest extends TestCase
         ], $array);
     }
 
+    public function testDotWithDepth()
+    {
+        $array = Arr::dot(['user' => ['name' => 'Taylor', 'address' => ['city' => 'Dallas']]], '', 1);
+        $this->assertSame([
+            'user.name' => 'Taylor',
+            'user.address' => ['city' => 'Dallas'],
+        ], $array);
+
+        $array = Arr::dot(['user' => ['address' => ['city' => ['name' => 'Dallas']]]], '', 2);
+        $this->assertSame([
+            'user.address.city' => ['name' => 'Dallas'],
+        ], $array);
+
+        $array = Arr::dot(['user' => ['address' => ['city' => ['name' => 'Dallas']]]], '', INF);
+        $this->assertSame([
+            'user.address.city.name' => 'Dallas',
+        ], $array);
+
+        $array = Arr::dot(['name' => 'taylor', 'languages' => ['php' => true, 'js' => ['react' => true]]], '', 1);
+        $this->assertSame([
+            'name' => 'taylor',
+            'languages.php' => true,
+            'languages.js' => ['react' => true],
+        ], $array);
+
+        $array = Arr::dot(['foo' => ['bar' => []]], '', 1);
+        $this->assertSame(['foo.bar' => []], $array);
+
+        $array = Arr::dot(['user' => ['name' => 'Taylor', 'address' => ['city' => 'Dallas']]], '', 0);
+        $this->assertSame([
+            'user' => ['name' => 'Taylor', 'address' => ['city' => 'Dallas']],
+        ], $array);
+
+        $array = Arr::dot(['user' => ['name' => 'Taylor']], 'prefix.', 1);
+        $this->assertSame(['prefix.user.name' => 'Taylor'], $array);
+    }
+
     public function testUndot()
     {
         $array = Arr::undot([
