@@ -7,7 +7,6 @@ use Closure;
 use Illuminate\Bus\Events\BatchCanceled;
 use Illuminate\Bus\Events\BatchFinished;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Factory as QueueFactory;
 use Illuminate\Contracts\Support\Arrayable;
@@ -400,7 +399,7 @@ class Batch implements Arrayable, JsonSerializable
     /**
      * Cancel the batch.
      *
-     * @param Throwable|null $exception
+     * @param  \Throwable|null  $exception
      * @return void
      */
     public function cancel(?Throwable $exception = null)
