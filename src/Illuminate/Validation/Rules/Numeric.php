@@ -112,16 +112,6 @@ class Numeric implements Stringable
     }
 
     /**
-     * The type of the field under validation must integer.
-     *
-     * @return $this
-     */
-    public function strictInteger(): Numeric
-    {
-        return $this->integer(true);
-    }
-
-    /**
      * The field under validation must be less than the given field.
      *
      * @param  string  $field
