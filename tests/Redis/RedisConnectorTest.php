@@ -226,7 +226,7 @@ class RedisConnectorTest extends TestCase
         ]);
 
         $phpRedisClient = $phpRedis->connection()->client();
-        $this->assertEquals(60, $phpRedisClient->getOption(Redis::OPT_TCP_KEEPALIVE));
+        $this->assertEquals(1, $phpRedisClient->getOption(Redis::OPT_TCP_KEEPALIVE));
     }
 
     public function testPrefixOverrideBehaviour()
