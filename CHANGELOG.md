@@ -2,6 +2,9 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v12.54.1...12.x)
 
+### Added
+- Added `RegistersRouteFiles` trait to `Illuminate\Support\ServiceProvider` for fluent, cache-compatible route file loading without manual `require` calls or repetitive `Route::group()` boilerplate ([#XXXXX](https://github.com/laravel/framework/pull/XXXXX))
+
 ## [v12.54.1](https://github.com/laravel/framework/compare/v12.54.0...v12.54.1) - 2026-03-10
 
 * [12.x] Makes imports consistent by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/framework/pull/59149

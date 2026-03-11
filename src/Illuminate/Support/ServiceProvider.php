@@ -9,6 +9,7 @@ use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Database\Eloquent\Factory as ModelFactory;
 use Illuminate\View\Compilers\BladeCompiler;
+use Illuminate\Support\Traits\RegistersRouteFiles;
 
 /**
  * @property array<string, string> $bindings All of the container bindings that should be registered.
@@ -16,6 +17,8 @@ use Illuminate\View\Compilers\BladeCompiler;
  */
 abstract class ServiceProvider
 {
+
+    use RegistersRouteFiles; 
     /**
      * The application instance.
      *
