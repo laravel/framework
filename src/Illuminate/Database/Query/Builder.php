@@ -1143,7 +1143,9 @@ class Builder implements BuilderContract
         $type = 'Like';
 
         if ($escape) {
-            $value = '%'.Str::escapeLike($value).'%';
+            $start = str_starts_with($value, '%') ? '%' : '';
+            $end = str_ends_with($value, '%') && strlen($value) > 1 ? '%' : '';
+            $value = $start.Str::escapeLike(substr($value, strlen($start), strlen($value) - strlen($start) - strlen($end))).$end;
         }
 
         $this->wheres[] = compact('type', 'column', 'value', 'caseSensitive', 'boolean', 'not');

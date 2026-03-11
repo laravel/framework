@@ -937,27 +937,36 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testWhereLikeEscape()
     {
+        // Contains — preserves leading and trailing %
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->whereLike('name', '100% match', escape: true);
+        $builder->select('*')->from('users')->whereLike('name', '%100% match%', escape: true);
         $this->assertSame('select * from "users" where "name" like ?', $builder->toSql());
         $this->assertEquals([0 => '%100\% match%'], $builder->getBindings());
 
+        // Escapes underscores
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->whereLike('name', 'under_score', escape: true);
-        $this->assertSame('select * from "users" where "name" like ?', $builder->toSql());
+        $builder->select('*')->from('users')->whereLike('name', '%under_score%', escape: true);
         $this->assertEquals([0 => '%under\_score%'], $builder->getBindings());
 
+        // Starts with — preserves trailing %
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->orWhereLike('name', 'test%', escape: true);
-        $this->assertEquals([0 => '%test\%%'], $builder->getBindings());
+        $this->assertEquals([0 => 'test%'], $builder->getBindings());
 
+        // Ends with — preserves leading %
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->whereNotLike('name', 'foo_bar', escape: true);
-        $this->assertEquals([0 => '%foo\_bar%'], $builder->getBindings());
+        $builder->select('*')->from('users')->whereNotLike('name', '%foo_bar', escape: true);
+        $this->assertEquals([0 => '%foo\_bar'], $builder->getBindings());
 
+        // No wildcards — escapes only
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->orWhereNotLike('name', '50%', escape: true);
-        $this->assertEquals([0 => '%50\%%'], $builder->getBindings());
+        $builder->select('*')->from('users')->orWhereNotLike('name', 'exact_match', escape: true);
+        $this->assertEquals([0 => 'exact\_match'], $builder->getBindings());
+
+        // Escapes backslashes
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereLike('name', '%back\\slash%', escape: true);
+        $this->assertEquals([0 => '%back\\\\slash%'], $builder->getBindings());
     }
 
     public function testWhereDateSqlite()
