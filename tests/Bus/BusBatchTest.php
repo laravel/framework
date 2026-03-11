@@ -471,6 +471,24 @@ class BusBatchTest extends TestCase
         $batch->cancel();
     }
 
+    public function test_batch_cancelled_event_contains_exception()
+    {
+        Container::getInstance()->instance(EventDispatcher::class, $events = m::mock(EventDispatcher::class));
+
+        $queue = m::mock(Factory::class);
+        $batch = $this->createTestBatch($queue);
+
+        $exception = new RuntimeException('Something went wrong.');
+
+        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) use ($batch, $exception) {
+            return $event instanceof BatchCanceled
+                && $event->batch->id === $batch->id
+                && $event->exception === $exception;
+        }));
+
+        $batch->cancel($exception);
+    }
+
     public function test_batch_can_be_deleted()
     {
         $queue = m::mock(Factory::class);
