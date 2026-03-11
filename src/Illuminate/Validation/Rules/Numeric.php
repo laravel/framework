@@ -106,9 +106,19 @@ class Numeric implements Stringable
      *
      * @return $this
      */
-    public function integer(): Numeric
+    public function integer(bool $strict = false): Numeric
     {
-        return $this->addRule('integer');
+        return $this->addRule($strict ? 'integer:strict' : 'integer');
+    }
+
+    /**
+     * The type of the field under validation must integer.
+     *
+     * @return $this
+     */
+    public function strictInteger(): Numeric
+    {
+        return $this->integer(true);
     }
 
     /**
