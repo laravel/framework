@@ -1135,11 +1135,16 @@ class Builder implements BuilderContract
      * @param  bool  $caseSensitive
      * @param  string  $boolean
      * @param  bool  $not
+     * @param  bool  $escape
      * @return $this
      */
-    public function whereLike($column, $value, $caseSensitive = false, $boolean = 'and', $not = false)
+    public function whereLike($column, $value, $caseSensitive = false, $boolean = 'and', $not = false, $escape = false)
     {
         $type = 'Like';
+
+        if ($escape) {
+            $value = '%'.Str::escapeLike($value).'%';
+        }
 
         $this->wheres[] = compact('type', 'column', 'value', 'caseSensitive', 'boolean', 'not');
 
@@ -1158,11 +1163,12 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  string  $value
      * @param  bool  $caseSensitive
+     * @param  bool  $escape
      * @return $this
      */
-    public function orWhereLike($column, $value, $caseSensitive = false)
+    public function orWhereLike($column, $value, $caseSensitive = false, $escape = false)
     {
-        return $this->whereLike($column, $value, $caseSensitive, 'or', false);
+        return $this->whereLike($column, $value, $caseSensitive, 'or', false, $escape);
     }
 
     /**
@@ -1172,11 +1178,12 @@ class Builder implements BuilderContract
      * @param  string  $value
      * @param  bool  $caseSensitive
      * @param  string  $boolean
+     * @param  bool  $escape
      * @return $this
      */
-    public function whereNotLike($column, $value, $caseSensitive = false, $boolean = 'and')
+    public function whereNotLike($column, $value, $caseSensitive = false, $boolean = 'and', $escape = false)
     {
-        return $this->whereLike($column, $value, $caseSensitive, $boolean, true);
+        return $this->whereLike($column, $value, $caseSensitive, $boolean, true, $escape);
     }
 
     /**
@@ -1185,11 +1192,12 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  string  $value
      * @param  bool  $caseSensitive
+     * @param  bool  $escape
      * @return $this
      */
-    public function orWhereNotLike($column, $value, $caseSensitive = false)
+    public function orWhereNotLike($column, $value, $caseSensitive = false, $escape = false)
     {
-        return $this->whereNotLike($column, $value, $caseSensitive, 'or');
+        return $this->whereNotLike($column, $value, $caseSensitive, 'or', $escape);
     }
 
     /**

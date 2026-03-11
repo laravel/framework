@@ -745,6 +745,13 @@ class SupportStringableTest extends TestCase
         $this->assertSame('...is a beautiful morn...', (string) $this->stringable('This is a beautiful morning')->excerpt('beautiful', ['radius' => 5]));
     }
 
+    public function testEscapeLike()
+    {
+        $this->assertSame('100\\% off', (string) $this->stringable('100% off')->escapeLike());
+        $this->assertSame('hello\\_world', (string) $this->stringable('hello_world')->escapeLike());
+        $this->assertSame('back\\\\slash', (string) $this->stringable('back\\slash')->escapeLike());
+    }
+
     public function testBefore()
     {
         $this->assertSame('han', (string) $this->stringable('hannah')->before('nah'));

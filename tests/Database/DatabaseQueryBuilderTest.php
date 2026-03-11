@@ -935,6 +935,31 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => '1'], $builder->getBindings());
     }
 
+    public function testWhereLikeEscape()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereLike('name', '100% match', escape: true);
+        $this->assertSame('select * from "users" where "name" like ?', $builder->toSql());
+        $this->assertEquals([0 => '%100\% match%'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereLike('name', 'under_score', escape: true);
+        $this->assertSame('select * from "users" where "name" like ?', $builder->toSql());
+        $this->assertEquals([0 => '%under\_score%'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orWhereLike('name', 'test%', escape: true);
+        $this->assertEquals([0 => '%test\%%'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNotLike('name', 'foo_bar', escape: true);
+        $this->assertEquals([0 => '%foo\_bar%'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orWhereNotLike('name', '50%', escape: true);
+        $this->assertEquals([0 => '%50\%%'], $builder->getBindings());
+    }
+
     public function testWhereDateSqlite()
     {
         $builder = $this->getSQLiteBuilder();

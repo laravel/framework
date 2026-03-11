@@ -306,6 +306,16 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Escape special characters for a LIKE query.
+     *
+     * @return static
+     */
+    public function escapeLike()
+    {
+        return new static(Str::escapeLike($this->value));
+    }
+
+    /**
      * Explode the string into a collection.
      *
      * @param  string  $delimiter

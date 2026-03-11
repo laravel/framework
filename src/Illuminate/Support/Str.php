@@ -461,6 +461,21 @@ class Str
     }
 
     /**
+     * Escape special characters for a LIKE query.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function escapeLike(string $value): string
+    {
+        return str_replace(
+            ['\\', '%', '_'],
+            ['\\\\', '\\%', '\\_'],
+            $value,
+        );
+    }
+
+    /**
      * Cap a string with a single instance of a given value.
      *
      * @param  string  $value

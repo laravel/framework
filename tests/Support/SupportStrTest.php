@@ -540,6 +540,16 @@ class SupportStrTest extends TestCase
         $this->assertEmpty($property->getValue());
     }
 
+    public function testEscapeLike()
+    {
+        $this->assertSame('100\\% off!', Str::escapeLike('100% off!'));
+        $this->assertSame('hello\\_world', Str::escapeLike('hello_world'));
+        $this->assertSame('back\\\\slash', Str::escapeLike('back\\slash'));
+        $this->assertSame('no special chars', Str::escapeLike('no special chars'));
+        $this->assertSame('\\%\\_\\\\', Str::escapeLike('%_\\'));
+        $this->assertSame('', Str::escapeLike(''));
+    }
+
     public function testFinish()
     {
         $this->assertSame('abbc', Str::finish('ab', 'bc'));
