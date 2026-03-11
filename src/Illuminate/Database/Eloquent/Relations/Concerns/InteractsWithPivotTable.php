@@ -325,16 +325,16 @@ trait InteractsWithPivotTable
     /**
      * Attach a model to the parent within a transaction.
      *
-     * @param  mixed  $id
+     * @param  mixed  $ids
      * @param  array  $attributes
      * @param  bool  $touch
      * @return void
      *
      * @throws \Throwable
      */
-    public function attachOrFail($id, array $attributes = [], $touch = true)
+    public function attachOrFail($ids, array $attributes = [], $touch = true)
     {
-        $this->parent->getConnection()->transaction(fn () => $this->attach($id, $attributes, $touch));
+        $this->parent->getConnection()->transaction(fn () => $this->attach($ids, $attributes, $touch));
     }
 
     /**
