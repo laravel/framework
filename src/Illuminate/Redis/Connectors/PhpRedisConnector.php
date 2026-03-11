@@ -144,6 +144,10 @@ class PhpRedisConnector implements Connector
                 $client->setOption(Redis::OPT_COMPRESSION_LEVEL, $config['compression_level']);
             }
 
+            if (! empty($config['tcp_keepalive'])) {
+                $client->setOption(Redis::OPT_TCP_KEEPALIVE, $config['tcp_keepalive']);
+            }
+
             if (defined('Redis::OPT_PACK_IGNORE_NUMBERS') &&
                 array_key_exists('pack_ignore_numbers', $config)) {
                 $client->setOption(Redis::OPT_PACK_IGNORE_NUMBERS, $config['pack_ignore_numbers']);
@@ -229,6 +233,10 @@ class PhpRedisConnector implements Connector
 
             if (array_key_exists('compression_level', $options)) {
                 $client->setOption(Redis::OPT_COMPRESSION_LEVEL, $options['compression_level']);
+            }
+
+            if (! empty($options['tcp_keepalive'])) {
+                $client->setOption(Redis::OPT_TCP_KEEPALIVE, $options['tcp_keepalive']);
             }
         });
     }
