@@ -64,6 +64,20 @@ trait InteractsWithPivotTable
     }
 
     /**
+     * Toggles a model (or models) from the parent within a transaction.
+     *
+     * @param  mixed  $ids
+     * @param  bool  $touch
+     * @return array
+     *
+     * @throws \Throwable
+     */
+    public function toggleOrFail($ids, $touch = true)
+    {
+        return $this->parent->getConnection()->transaction(fn () => $this->toggle($ids, $touch));
+    }
+
+    /**
      * Sync the intermediate tables with a list of IDs without detaching.
      *
      * @param  \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array|int|string  $ids
@@ -129,6 +143,33 @@ trait InteractsWithPivotTable
         }
 
         return $changes;
+    }
+
+    /**
+     * Sync the intermediate tables with a list of IDs or collection of models within a transaction.
+     *
+     * @param  \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $ids
+     * @param  bool  $detaching
+     * @return array{attached: array, detached: array, updated: array}
+     *
+     * @throws \Throwable
+     */
+    public function syncOrFail($ids, $detaching = true)
+    {
+        return $this->parent->getConnection()->transaction(fn () => $this->sync($ids, $detaching));
+    }
+
+    /**
+     * Sync the intermediate tables with a list of IDs without detaching within a transaction.
+     *
+     * @param  \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $ids
+     * @return array{attached: array, detached: array, updated: array}
+     *
+     * @throws \Throwable
+     */
+    public function syncWithoutDetachingOrFail($ids)
+    {
+        return $this->syncOrFail($ids, false);
     }
 
     /**
@@ -279,6 +320,21 @@ trait InteractsWithPivotTable
         if ($touch) {
             $this->touchIfTouching();
         }
+    }
+
+    /**
+     * Attach a model to the parent within a transaction.
+     *
+     * @param  mixed  $ids
+     * @param  array  $attributes
+     * @param  bool  $touch
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function attachOrFail($ids, array $attributes = [], $touch = true)
+    {
+        $this->parent->getConnection()->transaction(fn () => $this->attach($ids, $attributes, $touch));
     }
 
     /**
@@ -462,6 +518,20 @@ trait InteractsWithPivotTable
         }
 
         return $results;
+    }
+
+    /**
+     * Detach models from the relationship within a transaction.
+     *
+     * @param  mixed  $ids
+     * @param  bool  $touch
+     * @return int
+     *
+     * @throws \Throwable
+     */
+    public function detachOrFail($ids = null, $touch = true)
+    {
+        return $this->parent->getConnection()->transaction(fn () => $this->detach($ids, $touch));
     }
 
     /**
