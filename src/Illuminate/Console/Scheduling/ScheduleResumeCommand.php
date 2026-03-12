@@ -14,7 +14,7 @@ class ScheduleResumeCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Resume the scheduled tasks';
+    protected $description = 'Resume the schedule';
 
     /**
      * Execute the console command.
@@ -25,7 +25,7 @@ class ScheduleResumeCommand extends Command
     {
         $cache->forget('illuminate:schedule:paused');
 
-        $this->components->info('Scheduled tasks resumed.');
+        $this->components->info('Schedule resumed.');
 
         return 0;
     }
