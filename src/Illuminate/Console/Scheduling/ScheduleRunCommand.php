@@ -117,7 +117,7 @@ class ScheduleRunCommand extends Command
             $this->clearInterruptSignal();
         }
 
-        $paused = $this->cache->has('illuminate:schedule:paused');
+        $paused = $this->isPaused();
 
         foreach ($events as $event) {
             if ($paused && ! $event->runsWhenPaused()) {
@@ -241,7 +241,7 @@ class ScheduleRunCommand extends Command
         $hasEnteredMaintenanceMode = false;
 
         while (Date::now()->lte($this->startedAt->endOfMinute())) {
-            $paused = $this->cache->has('illuminate:schedule:paused');
+            $paused = $this->isPaused();
 
             foreach ($events as $event) {
                 if ($this->shouldInterrupt()) {
@@ -281,6 +281,16 @@ class ScheduleRunCommand extends Command
 
             Sleep::usleep(100_000);
         }
+    }
+
+    /**
+     * Determine if the schedule is paused.
+     *
+     * @return bool
+     */
+    protected function isPaused()
+    {
+        return $this->cache->get('illuminate:schedule:paused', false);
     }
 
     /**
