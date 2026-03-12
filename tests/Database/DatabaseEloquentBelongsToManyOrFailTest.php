@@ -150,6 +150,37 @@ class DatabaseEloquentBelongsToManyOrFailTest extends TestCase
         $this->assertCount(1, $user->roles()->get());
     }
 
+    public function testSyncWithPivotValuesOrFail()
+    {
+        $this->seedData();
+
+        $user = OrFailUser::find(1);
+
+        $result = $user->roles()->syncWithPivotValuesOrFail([1, 2], ['active' => true]);
+
+        $this->assertEquals([1, 2], $result['attached']);
+        $this->assertEmpty($result['detached']);
+        $this->assertEmpty($result['updated']);
+
+        $pivot = DB::table('role_user')->where('user_id', 1)->where('role_id', 1)->first();
+        $this->assertEquals(1, $pivot->active);
+    }
+
+    public function testUpdateExistingPivotOrFail()
+    {
+        $this->seedData();
+
+        $user = OrFailUser::find(1);
+        $user->roles()->attach(1, ['active' => false]);
+
+        $result = $user->roles()->updateExistingPivotOrFail(1, ['active' => true]);
+
+        $this->assertEquals(1, $result);
+
+        $pivot = DB::table('role_user')->where('user_id', 1)->where('role_id', 1)->first();
+        $this->assertEquals(1, $pivot->active);
+    }
+
     /**
      * Get a database connection instance.
      *
