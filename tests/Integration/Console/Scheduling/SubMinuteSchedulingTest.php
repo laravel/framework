@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Console\Scheduling;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Sleep;
 use Orchestra\Testbench\TestCase;
@@ -172,6 +173,56 @@ class SubMinuteSchedulingTest extends TestCase
 
         Sleep::assertSleptTimes(600);
         $this->assertEquals(60, $runs);
+    }
+
+    public function test_sub_minute_events_can_be_run_when_schedule_is_paused()
+    {
+        $runs = 0;
+        $this->schedule->call(function () use (&$runs) {
+            $runs++;
+        })->everySecond()->evenWhenPaused();
+
+        Carbon::setTestNow(now()->startOfMinute());
+        $startedAt = now();
+        Sleep::fake();
+        Sleep::whenFakingSleep(function ($duration) use ($startedAt) {
+            Carbon::setTestNow(now()->add($duration));
+
+            if ($startedAt->diffInSeconds() >= 30 && ! Cache::has('illuminate:schedule:paused')) {
+                $this->artisan('schedule:pause');
+            }
+        });
+
+        $this->artisan('schedule:run')
+            ->expectsOutputToContain('Running [Callback]');
+
+        Sleep::assertSleptTimes(600);
+        $this->assertEquals(60, $runs);
+    }
+
+    public function test_sub_minute_events_stop_for_the_rest_of_the_minute_once_schedule_is_paused()
+    {
+        $runs = 0;
+        $this->schedule->call(function () use (&$runs) {
+            $runs++;
+        })->everySecond();
+
+        Carbon::setTestNow(now()->startOfMinute());
+        $startedAt = now();
+        Sleep::fake();
+        Sleep::whenFakingSleep(function ($duration) use ($startedAt) {
+            Carbon::setTestNow(now()->add($duration));
+
+            if ($startedAt->diffInSeconds() >= 30 && ! Cache::has('illuminate:schedule:paused')) {
+                $this->artisan('schedule:pause');
+            }
+        });
+
+        $this->artisan('schedule:run')
+            ->expectsOutputToContain('Running [Callback]');
+
+        Sleep::assertSleptTimes(600);
+        $this->assertEquals(30, $runs);
     }
 
     public function test_sub_minute_scheduling_respects_filters()

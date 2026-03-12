@@ -109,4 +109,19 @@ class EventTest extends TestCase
         $event->daysOfMonth([1, 10, 20, 30]);
         $this->assertSame('0 0 1,10,20,30 * *', $event->getExpression());
     }
+
+    public function testEventDoesNotRunWhenPausedByDefault()
+    {
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+
+        $this->assertFalse($event->runsWhenPaused());
+    }
+
+    public function testEventRunsWhenMarkedAsEvenWhenPaused()
+    {
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+        $event->evenWhenPaused();
+
+        $this->assertTrue($event->runsWhenPaused());
+    }
 }

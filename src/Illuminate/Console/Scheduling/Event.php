@@ -290,6 +290,16 @@ class Event
     }
 
     /**
+     * Determine if the event runs when the scheduler is paused.
+     *
+     * @return bool
+     */
+    public function runsWhenPaused()
+    {
+        return $this->evenWhenPaused;
+    }
+
+    /**
      * Determine if the Cron expression passes.
      *
      * @return bool

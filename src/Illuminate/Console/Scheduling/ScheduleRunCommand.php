@@ -117,7 +117,15 @@ class ScheduleRunCommand extends Command
             $this->clearInterruptSignal();
         }
 
+        $paused = $this->isPaused();
+
         foreach ($events as $event) {
+            if ($paused && ! $event->runsWhenPaused()) {
+                $this->dispatcher->dispatch(new ScheduledTaskSkipped($event));
+
+                continue;
+            }
+
             if (! $event->filtersPass($this->laravel)) {
                 $this->dispatcher->dispatch(new ScheduledTaskSkipped($event));
 
@@ -233,6 +241,8 @@ class ScheduleRunCommand extends Command
         $hasEnteredMaintenanceMode = false;
 
         while (Date::now()->lte($this->startedAt->endOfMinute())) {
+            $paused = $this->isPaused();
+
             foreach ($events as $event) {
                 if ($this->shouldInterrupt()) {
                     return;
@@ -245,6 +255,12 @@ class ScheduleRunCommand extends Command
                 $hasEnteredMaintenanceMode = $hasEnteredMaintenanceMode || $this->laravel->isDownForMaintenance();
 
                 if ($hasEnteredMaintenanceMode && ! $event->runsInMaintenanceMode()) {
+                    continue;
+                }
+
+                if ($paused && ! $event->runsWhenPaused()) {
+                    $this->dispatcher->dispatch(new ScheduledTaskSkipped($event));
+
                     continue;
                 }
 
@@ -265,6 +281,16 @@ class ScheduleRunCommand extends Command
 
             Sleep::usleep(100_000);
         }
+    }
+
+    /**
+     * Determine if the schedule is paused.
+     *
+     * @return bool
+     */
+    protected function isPaused()
+    {
+        return $this->cache->get('illuminate:schedule:paused', false);
     }
 
     /**
