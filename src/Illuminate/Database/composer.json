@@ -22,7 +22,7 @@
     "require": {
         "php": "^8.3",
         "ext-pdo": "*",
-        "brick/math": "^0.14.2 || ^0.15",
+        "brick/math": "^0.14.2 || ^0.15 || ^0.16",
         "illuminate/collections": "^13.0",
         "illuminate/container": "^13.0",
         "illuminate/contracts": "^13.0",
