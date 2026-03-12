@@ -227,6 +227,26 @@ class ContainerCallTest extends TestCase
             return $foo;
         });
     }
+
+    public function testCallWithVoidCallbackReturnsNull()
+    {
+        $container = new Container;
+
+        $result = $container->call(function (): void {
+            // void closure
+        });
+
+        $this->assertNull($result);
+    }
+
+    public function testCallWithVoidStaticMethodReturnsNull()
+    {
+        $container = new Container;
+
+        $result = $container->call([ContainerCallVoidMethodStub::class, 'voidMethod']);
+
+        $this->assertNull($result);
+    }
 }
 
 class ContainerTestCallStub
@@ -270,6 +290,14 @@ class ContainerCallCallableStub
     public function __invoke(ContainerCallConcreteStub $stub, $default = 'jeffrey')
     {
         return func_get_args();
+    }
+}
+
+class ContainerCallVoidMethodStub
+{
+    public static function voidMethod(): void
+    {
+        // does nothing, returns void
     }
 }
 
