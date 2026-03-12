@@ -3017,6 +3017,36 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add an "order by" clause to order results by a given sequence of values.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
+     * @return $this
+     */
+    public function inOrderOf($column, $values)
+    {
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
+
+        $values = array_values($values);
+
+        if (empty($values)) {
+            return $this;
+        }
+
+        $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
+            'type' => 'InOrderOf',
+            'column' => $column,
+            'values' => $values,
+        ];
+
+        $this->addBinding($this->cleanBindings($values), $this->unions ? 'unionOrder' : 'order');
+
+        return $this;
+    }
+
+    /**
      * Add a raw "order by" clause to the query.
      *
      * @param  string  $sql
