@@ -49,6 +49,17 @@ abstract class Seeder
 
             $name = get_class($seeder);
 
+            if (! $seeder->shouldRun()) {
+                if ($silent === false && isset($this->command)) {
+                    (new TwoColumnDetail($this->command->getOutput()))
+                        ->render($name, '<fg=yellow;options=bold>SKIPPED</>');
+
+                    $this->command->getOutput()->writeln('');
+                }
+
+                continue;
+            }
+
             if ($silent === false && isset($this->command)) {
                 (new TwoColumnDetail($this->command->getOutput()))
                     ->render($name, '<fg=yellow;options=bold>RUNNING</>');
@@ -164,6 +175,16 @@ abstract class Seeder
         $this->command = $command;
 
         return $this;
+    }
+
+    /**
+     * Determine if this seeder should run.
+     *
+     * @return bool
+     */
+    public function shouldRun(): bool
+    {
+        return true;
     }
 
     /**
