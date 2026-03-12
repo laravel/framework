@@ -188,6 +188,21 @@ trait InteractsWithPivotTable
     }
 
     /**
+     * Sync the intermediate tables with a list of IDs with the given pivot values within a transaction.
+     *
+     * @param  \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array|int|string  $ids
+     * @param  array  $values
+     * @param  bool  $detaching
+     * @return array{attached: array, detached: array, updated: array}
+     *
+     * @throws \Throwable
+     */
+    public function syncWithPivotValuesOrFail($ids, array $values, bool $detaching = true)
+    {
+        return $this->parent->getConnection()->transaction(fn () => $this->syncWithPivotValues($ids, $values, $detaching));
+    }
+
+    /**
      * Format the sync / toggle record list so that it is keyed by ID.
      *
      * @param  array  $records
@@ -269,6 +284,21 @@ trait InteractsWithPivotTable
         }
 
         return $updated;
+    }
+
+    /**
+     * Update an existing pivot record on the table within a transaction.
+     *
+     * @param  mixed  $id
+     * @param  array  $attributes
+     * @param  bool  $touch
+     * @return int
+     *
+     * @throws \Throwable
+     */
+    public function updateExistingPivotOrFail($id, array $attributes, $touch = true)
+    {
+        return $this->parent->getConnection()->transaction(fn () => $this->updateExistingPivot($id, $attributes, $touch));
     }
 
     /**
