@@ -25,6 +25,7 @@ use Illuminate\Console\Scheduling\Schedule as ConsoleSchedule;
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes user(string $user)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes environments(mixed $environments)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes evenInMaintenanceMode()
+ * @method static \Illuminate\Console\Scheduling\PendingEventAttributes evenWhenPaused()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes onOneServer()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes runInBackground()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes when(\Closure|bool $callback)
