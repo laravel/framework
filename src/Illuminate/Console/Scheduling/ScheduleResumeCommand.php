@@ -32,7 +32,7 @@ class ScheduleResumeCommand extends Command
     {
         $cache->forget('illuminate:schedule:paused');
 
-        $this->components->info('Schedule resumed.');
+        $this->components->info('Scheduled task processing has resumed.');
 
         return 0;
     }

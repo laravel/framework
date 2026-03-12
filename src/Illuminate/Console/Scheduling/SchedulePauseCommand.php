@@ -25,7 +25,7 @@ class SchedulePauseCommand extends Command
     {
         $cache->forever('illuminate:schedule:paused', true);
 
-        $this->components->info('Scheduler paused.');
+        $this->components->info('Scheduled task processing has been paused.');
 
         return 0;
     }
