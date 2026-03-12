@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Attributes\Boot;
 use Illuminate\Database\Eloquent\Attributes\Connection;
 use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Attributes\Scope as LocalScope;
+use Illuminate\Database\Eloquent\Attributes\Sluggable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -374,6 +375,18 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static function boot()
     {
         static::bootTraits();
+    }
+
+    /**
+     * Boot the sluggable attribute for the model, if present.
+     */
+    #[Boot]
+    protected static function bootSluggableAttribute(): void
+    {
+        if (static::resolveClassAttribute(Sluggable::class)) {
+            static::creating(fn (self $model) => (new SlugGenerator($model))->handleCreating());
+            static::updating(fn (self $model) => (new SlugGenerator($model))->handleUpdating());
+        }
     }
 
     /**
