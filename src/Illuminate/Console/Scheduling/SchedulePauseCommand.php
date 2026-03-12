@@ -3,7 +3,9 @@
 namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\Events\SchedulePaused;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Contracts\Events\Dispatcher;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'schedule:pause')]
@@ -21,9 +23,11 @@ class SchedulePauseCommand extends Command
      *
      * @return int
      */
-    public function handle(Cache $cache)
+    public function handle(Cache $cache, Dispatcher $dispatcher)
     {
         $cache->forever('illuminate:schedule:paused', true);
+
+        $dispatcher->dispatch(new SchedulePaused);
 
         $this->components->info('Scheduled task processing has been paused.');
 
