@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'schedule:resume')]
+#[AsCommand(name: 'schedule:resume', aliases: ['schedule:continue'])]
 class ScheduleResumeCommand extends Command
 {
     /**
@@ -15,6 +15,13 @@ class ScheduleResumeCommand extends Command
      * @var string
      */
     protected $description = 'Resume the schedule';
+
+    /**
+     * The console command name aliases.
+     *
+     * @var list<string>
+     */
+    protected $aliases = ['schedule:continue'];
 
     /**
      * Execute the console command.

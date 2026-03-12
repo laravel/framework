@@ -49,7 +49,7 @@ trait ManagesAttributes
     public $evenInMaintenanceMode = false;
 
     /**
-     * Indicates if the command should run even when the schedule is paused.
+     * Indicates if the command should run even when the scheduler is paused.
      *
      * @var bool
      */
@@ -143,7 +143,7 @@ trait ManagesAttributes
     }
 
     /**
-     * State that the command should run even when the schedule is paused.
+     * State that the command should run even when the scheduler is paused.
      *
      * @return $this
      */

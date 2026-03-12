@@ -14,7 +14,7 @@ class SchedulePauseCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Pause the schedule';
+    protected $description = 'Pause the scheduler';
 
     /**
      * Execute the console command.
@@ -25,7 +25,7 @@ class SchedulePauseCommand extends Command
     {
         $cache->forever('illuminate:schedule:paused', true);
 
-        $this->components->info('Schedule paused.');
+        $this->components->info('Scheduler paused.');
 
         return 0;
     }

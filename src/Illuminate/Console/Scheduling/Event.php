@@ -290,7 +290,7 @@ class Event
     }
 
     /**
-     * Determine if the event runs when the schedule is paused.
+     * Determine if the event runs when the scheduler is paused.
      *
      * @return bool
      */
