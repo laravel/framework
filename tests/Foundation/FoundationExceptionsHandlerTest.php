@@ -823,7 +823,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         {
             public $attempted = false;
 
-            public function attempt($key, $maxAttempts, Closure $callback, $decaySeconds = 60)
+            public function attempt($key, $maxAttempts, Closure $callback, $decaySeconds = 60, $slidingWindow = false)
             {
                 $this->attempted = true;
 
@@ -857,7 +857,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         {
             public $attempted = 0;
 
-            public function attempt($key, $maxAttempts, Closure $callback, $decaySeconds = 60)
+            public function attempt($key, $maxAttempts, Closure $callback, $decaySeconds = 60, $slidingWindow = false)
             {
                 $this->attempted++;
 
@@ -904,7 +904,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         {
             public $attempted = 0;
 
-            public function attempt($key, $maxAttempts, Closure $callback, $decaySeconds = 60)
+            public function attempt($key, $maxAttempts, Closure $callback, $decaySeconds = 60, $slidingWindow = false)
             {
                 $this->attempted++;
 
