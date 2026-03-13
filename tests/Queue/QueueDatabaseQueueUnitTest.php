@@ -8,6 +8,7 @@ use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
 use Illuminate\Database\QueryException;
 use Illuminate\Queue\DatabaseQueue;
+use Illuminate\Queue\Jobs\DatabaseJobRecord;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Str;
 use Mockery as m;
@@ -202,16 +203,20 @@ class QueueDatabaseQueueUnitTest extends TestCase
     public function testPopReturnsNullOnDeadlock()
     {
         $queue = $this->getMockBuilder(DatabaseQueue::class)
-            ->onlyMethods(['deleteReserved'])
+            ->onlyMethods(['getNextAvailableJob', 'marshalJob', 'deleteReserved'])
             ->setConstructorArgs([$database = m::mock(Connection::class), 'table', 'default'])
             ->getMock();
 
         $queue->setContainer(m::mock(Container::class));
-        $queue->expects($this->never())->method('deleteReserved');
-
-        $database->shouldReceive('transaction')->andThrow(
+        $queue->method('getNextAvailableJob')->willReturn(m::mock(DatabaseJobRecord::class));
+        $queue->method('marshalJob')->willThrowException(
             new QueryException('mysql', '', [], new PDOException('SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction'))
         );
+        $queue->expects($this->never())->method('deleteReserved');
+
+        $database->shouldReceive('transaction')->andReturnUsing(function ($callback) {
+            return $callback();
+        });
 
         $this->assertNull($queue->pop('default'));
     }
