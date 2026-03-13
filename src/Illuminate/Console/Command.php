@@ -107,6 +107,10 @@ class Command extends SymfonyCommand
             parent::__construct($this->name);
         }
 
+        // Must be configured after the command name has been set, because Symfony
+        // prepends the command name to strings that don't already include it.
+        $this->configureUsagesFromAttributes();
+
         // Once we have constructed the command, we'll set the description and other
         // related properties of the command. If a signature wasn't used to build
         // the command we'll set the arguments and the options on this command.
@@ -131,8 +135,6 @@ class Command extends SymfonyCommand
         if ($this instanceof Isolatable || $this->isolated) {
             $this->configureIsolation();
         }
-
-        $this->configureUsagesFromAttributes();
     }
 
     /**
