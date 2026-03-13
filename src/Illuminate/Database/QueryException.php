@@ -10,59 +10,20 @@ use Throwable;
 class QueryException extends PDOException
 {
     /**
-     * The database connection name.
-     *
-     * @var string
-     */
-    public $connectionName;
-
-    /**
-     * The SQL for the query.
-     *
-     * @var string
-     */
-    protected $sql;
-
-    /**
-     * The bindings for the query.
-     *
-     * @var array
-     */
-    protected $bindings;
-
-    /**
-     * The PDO read / write type for the executed query.
-     *
-     * @var null|'read'|'write'
-     */
-    public $readWriteType;
-
-    /**
-     * The connection details for the query (host, port, database, etc.).
-     *
-     * @var array
-     */
-    protected $connectionDetails = [];
-
-    /**
      * Create a new query exception instance.
      *
-     * @param  string  $connectionName
-     * @param  string  $sql
-     * @param  array  $bindings
-     * @param  \Throwable  $previous
      * @param  null|'read'|'write'  $readWriteType
-     * @param  array  $connectionDetails
      */
-    public function __construct($connectionName, $sql, array $bindings, Throwable $previous, array $connectionDetails = [], $readWriteType = null)
-    {
+    public function __construct(
+        public string $connectionName,
+        protected string $sql,
+        protected array $bindings,
+        Throwable $previous,
+        protected array $connectionDetails = [],
+        public ?string $readWriteType = null,
+    ) {
         parent::__construct('', 0, $previous);
 
-        $this->connectionName = $connectionName;
-        $this->sql = $sql;
-        $this->bindings = $bindings;
-        $this->connectionDetails = $connectionDetails;
-        $this->readWriteType = $readWriteType;
         $this->code = $previous->getCode();
         $this->message = $this->formatMessage($connectionName, $sql, $bindings, $previous);
 
