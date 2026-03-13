@@ -148,19 +148,6 @@ abstract class Connection
     }
 
     /**
-     * Fire the given event if possible.
-     *
-     * @param  mixed  $event
-     * @return void
-     *
-     * @deprecated since Laravel 11.x
-     */
-    protected function event($event)
-    {
-        $this->events?->dispatch($event);
-    }
-
-    /**
      * Register a Redis command listener with the connection.
      *
      * @param  \Closure  $callback

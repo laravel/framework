@@ -243,18 +243,6 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     }
 
     /**
-     * Get a list of possible model names.
-     *
-     * @return array<int, string>
-     *
-     * @deprecated 12.38.0 Use `findAvailableModels()` method instead.
-     */
-    protected function possibleModels()
-    {
-        return $this->findAvailableModels();
-    }
-
-    /**
      * Get a list of possible event names.
      *
      * @return array<int, string>

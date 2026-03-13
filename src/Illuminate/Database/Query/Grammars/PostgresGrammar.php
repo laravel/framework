@@ -863,11 +863,4 @@ class PostgresGrammar extends Grammar
         static::$cascadeTruncate = $value;
     }
 
-    /**
-     * @deprecated use cascadeOnTruncate
-     */
-    public static function cascadeOnTrucate(bool $value = true)
-    {
-        self::cascadeOnTruncate($value);
-    }
 }

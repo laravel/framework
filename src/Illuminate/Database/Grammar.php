@@ -283,30 +283,4 @@ abstract class Grammar
         return 'Y-m-d H:i:s';
     }
 
-    /**
-     * Get the grammar's table prefix.
-     *
-     * @deprecated Use DB::getTablePrefix()
-     *
-     * @return string
-     */
-    public function getTablePrefix()
-    {
-        return $this->connection->getTablePrefix();
-    }
-
-    /**
-     * Set the grammar's table prefix.
-     *
-     * @deprecated Use DB::setTablePrefix()
-     *
-     * @param  string  $prefix
-     * @return $this
-     */
-    public function setTablePrefix($prefix)
-    {
-        $this->connection->setTablePrefix($prefix);
-
-        return $this;
-    }
 }

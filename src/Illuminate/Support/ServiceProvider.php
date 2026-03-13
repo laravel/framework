@@ -7,7 +7,6 @@ use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Foundation\CachesConfiguration;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Contracts\Support\DeferrableProvider;
-use Illuminate\Database\Eloquent\Factory as ModelFactory;
 use Illuminate\View\Compilers\BladeCompiler;
 
 /**
@@ -283,22 +282,6 @@ abstract class ServiceProvider
         });
     }
 
-    /**
-     * Register Eloquent model factory paths.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @param  array|string  $paths
-     * @return void
-     */
-    protected function loadFactoriesFrom($paths)
-    {
-        $this->callAfterResolving(ModelFactory::class, function ($factory) use ($paths) {
-            foreach ((array) $paths as $path) {
-                $factory->load($path);
-            }
-        });
-    }
 
     /**
      * Setup an after resolving listener, or fire immediately if already resolved.

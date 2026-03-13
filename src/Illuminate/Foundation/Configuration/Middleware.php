@@ -611,19 +611,6 @@ class Middleware
     }
 
     /**
-     * Configure the CSRF token validation middleware.
-     *
-     * @deprecated Use preventRequestForgery() instead.
-     *
-     * @param  array  $except
-     * @return $this
-     */
-    public function validateCsrfTokens(array $except = [])
-    {
-        return $this->preventRequestForgery($except);
-    }
-
-    /**
      * Configure the URL signature validation middleware.
      *
      * @param  array  $except
