@@ -2428,6 +2428,36 @@ class HttpClientTest extends TestCase
         $this->factory->assertSentCount(1);
     }
 
+    public function testRetryWhenCallbackWithExceptionTypeHintDoesNotThrowTypeErrorForNon4xxOr5xxResponses()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['redirect'], 301),
+        ]);
+
+        // Should not throw a TypeError when the when callback type-hints Exception
+        // and the response is a 3xx (where toException() returns null).
+        $response = $this->factory
+            ->retry(2, 0, fn (Exception $exception) => true, false)
+            ->get('http://foo.com/get');
+
+        $this->assertSame(301, $response->status());
+    }
+
+    public function testRetryWhenCallbackWithThrowableTypeHintDoesNotThrowTypeErrorForNon4xxOr5xxResponses()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['redirect'], 301),
+        ]);
+
+        // Should not throw a TypeError when the when callback type-hints Throwable
+        // and the response is a 3xx (where toException() returns null).
+        $response = $this->factory
+            ->retry(2, 0, fn (\Throwable $exception) => true, false)
+            ->get('http://foo.com/get');
+
+        $this->assertSame(301, $response->status());
+    }
+
     public function testRequestsWillBeWaitingSleepMillisecondsReceivedBeforeRetry()
     {
         Sleep::fake();
