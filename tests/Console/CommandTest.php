@@ -299,7 +299,7 @@ class HelpCommand extends Command
 }
 
 #[Signature('foo:bar')]
-#[Isolated(isolated: false, exitCode: 1)]
+#[Isolated(enabled: false, exitCode: 1)]
 class IsolatedFalseWithExitCodeCommand extends Command
 {
     public function handle()
@@ -308,7 +308,7 @@ class IsolatedFalseWithExitCodeCommand extends Command
 }
 
 #[Signature('foo:bar')]
-#[Isolated(isolated: true, exitCode: 1)]
+#[Isolated(enabled: true, exitCode: 1)]
 class IsolatedTrueWithExitCodeCommand extends Command
 {
     public function handle()

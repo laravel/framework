@@ -179,7 +179,7 @@ class Command extends SymfonyCommand
         if (count($isolated) > 0) {
             $isolatedInstance = $isolated[0]->newInstance();
 
-            $this->isolated = $isolatedInstance->isolated;
+            $this->isolated = $isolatedInstance->enabled;
             $this->isolatedExitCode = $isolatedInstance->exitCode;
         }
     }
