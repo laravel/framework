@@ -3255,6 +3255,20 @@ class DatabaseEloquentModelTest extends TestCase
         });
     }
 
+    public function testTouchMethodWithMultipleAttributes()
+    {
+        Carbon::setTestNow($now = Carbon::now());
+
+        $model = m::mock(EloquentModelStub::class.'[save]');
+        $model->shouldReceive('save')->once()->andReturn(true);
+
+        $result = $model->touch(['published_at', 'verified_at']);
+
+        $this->assertTrue($result);
+        $this->assertEquals($now->toDateTimeString(), $model->published_at->toDateTimeString());
+        $this->assertEquals($now->toDateTimeString(), $model->verified_at->toDateTimeString());
+    }
+
     public function testTouchingModelWithTimestamps()
     {
         $this->assertFalse(
