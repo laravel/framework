@@ -796,10 +796,14 @@ class Container implements ArrayAccess, ContainerContract
             $pushedToBuildStack = true;
         }
 
-        $result = BoundMethod::call($this, $callback, $parameters, $defaultMethod);
+        $result = null;
 
-        if ($pushedToBuildStack) {
-            array_pop($this->buildStack);
+        try {
+            $result = BoundMethod::call($this, $callback, $parameters, $defaultMethod);
+        } finally {
+            if ($pushedToBuildStack) {
+                array_pop($this->buildStack);
+            }
         }
 
         return $result;

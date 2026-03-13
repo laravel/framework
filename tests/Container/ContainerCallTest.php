@@ -227,6 +227,34 @@ class ContainerCallTest extends TestCase
             return $foo;
         });
     }
+
+    public function testCallWithVoidCallback()
+    {
+        $container = new Container;
+        $result = $container->call(function () {
+            // void callback, no return value
+        });
+
+        $this->assertNull($result);
+    }
+
+    public function testCallCleansUpBuildStackOnException()
+    {
+        $container = new Container;
+
+        try {
+            $container->call([new ContainerTestCallStub, 'unresolvable']);
+        } catch (BindingResolutionException $e) {
+            // expected
+        }
+
+        $this->assertEmpty($this->getBuildStack($container));
+    }
+
+    protected function getBuildStack(Container $container): array
+    {
+        return (new \ReflectionProperty($container, 'buildStack'))->getValue($container);
+    }
 }
 
 class ContainerTestCallStub
