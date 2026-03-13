@@ -257,18 +257,11 @@ class CommandTest extends TestCase
         $this->assertSame(1, (new ReflectionProperty($command, 'isolatedExitCode'))->getValue($command));
     }
 
-    public function testUsageAttributeCanSetSingleUsage()
+    public function testUsageAttributeCanSetUsages()
     {
-        $command = new SingleUsageCommand;
+        $command = new UsageCommand;
 
-        $this->assertSame(['foo:bar 1'], $command->getUsages());
-    }
-
-    public function testUsageAttributeCanSetMultipleUsages()
-    {
-        $command = new MultipleUsageCommand;
-
-        $this->assertSame(['foo:bar 1', 'foo:bar 1 --queue', 'foo:bar 1 --force --queue'], $command->getUsages());
+        $this->assertSame(['foo:bar 1', 'foo:bar 1 --force'], $command->getUsages());
     }
 }
 
@@ -318,18 +311,8 @@ class IsolatedTrueWithExitCodeCommand extends Command
 
 #[Signature('foo:bar {user}')]
 #[Usage('foo:bar 1')]
-class SingleUsageCommand extends Command
-{
-    public function handle()
-    {
-    }
-}
-
-#[Signature('foo:bar {user}')]
-#[Usage('foo:bar 1')]
-#[Usage('foo:bar 1 --queue')]
-#[Usage('foo:bar 1 --force --queue')]
-class MultipleUsageCommand extends Command
+#[Usage('foo:bar 1 --force')]
+class UsageCommand extends Command
 {
     public function handle()
     {
