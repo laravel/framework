@@ -297,7 +297,7 @@ class SQLiteGrammar extends Grammar
      * @param  array|null  $uniqueBy
      * @return string
      */
-    public function compileInsertOrIgnoreReturning(Builder $query, array $values, array $returning, array|null $uniqueBy)
+    public function compileInsertOrIgnoreReturning(Builder $query, array $values, array $returning, ?array $uniqueBy)
     {
         $insert = $this->compileInsert($query, $values);
 

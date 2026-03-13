@@ -1256,12 +1256,12 @@ class Grammar extends BaseGrammar
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $values
      * @param  array  $returning
-     * @param  array|null $uniqueBy
+     * @param  array|null  $uniqueBy
      * @return string
      *
      * @throws \RuntimeException
      */
-    public function compileInsertOrIgnoreReturning(Builder $query, array $values, array $returning, array|null $uniqueBy)
+    public function compileInsertOrIgnoreReturning(Builder $query, array $values, array $returning, ?array $uniqueBy)
     {
         throw new RuntimeException('This database engine does not support insert or ignore with returning.');
     }

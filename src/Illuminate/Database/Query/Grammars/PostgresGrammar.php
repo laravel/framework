@@ -379,10 +379,10 @@ class PostgresGrammar extends Grammar
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $values
      * @param  array  $returning
-     * @param  array|null $uniqueBy
+     * @param  array|null  $uniqueBy
      * @return string
      */
-    public function compileInsertOrIgnoreReturning(Builder $query, array $values, array $returning, array|null $uniqueBy)
+    public function compileInsertOrIgnoreReturning(Builder $query, array $values, array $returning, ?array $uniqueBy)
     {
         $insert = $this->compileInsert($query, $values);
 

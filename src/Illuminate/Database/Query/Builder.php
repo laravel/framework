@@ -4159,7 +4159,7 @@ class Builder implements BuilderContract
      * Insert new records into the database and returning specified columns with optional ignoring specific conflicts.
      *
      * @param  non-empty-array<non-empty-string>  $returning
-     * @param non-empty-string|non-empty-array<non-empty-string>|null $uniqueBy
+     * @param  non-empty-string|non-empty-array<non-empty-string>|null  $uniqueBy
      * @return \Illuminate\Support\Collection
      */
     public function insertOrIgnoreReturning(array $values, array $returning = ['*'], array|string|null $uniqueBy = null)

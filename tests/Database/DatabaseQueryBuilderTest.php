@@ -4198,7 +4198,6 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([['id' => 1]], $result->all());
     }
 
-
     public function testSqliteInsertOrIgnoreReturningMethodWithUniqueByColumn()
     {
         $builder = $this->getSQLiteBuilder();
