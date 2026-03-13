@@ -11,6 +11,7 @@ use Illuminate\Console\Command;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components\Factory;
 use Mockery as m;
+use ReflectionProperty;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -249,6 +250,7 @@ class CommandTest extends TestCase
         $command = new IsolatedWithExitCodeCommand;
 
         $this->assertTrue($command->getDefinition()->hasOption('isolated'));
+        $this->assertSame(1, (new ReflectionProperty($command, 'isolatedExitCode'))->getValue($command));
     }
 }
 
