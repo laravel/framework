@@ -261,14 +261,14 @@ class CommandTest extends TestCase
     {
         $command = new SingleUsageCommand;
 
-        $this->assertSame(['mail:send 1'], $command->getUsages());
+        $this->assertSame(['foo:bar 1'], $command->getUsages());
     }
 
     public function testUsageAttributeCanSetMultipleUsages()
     {
         $command = new MultipleUsageCommand;
 
-        $this->assertSame(['mail:send 1', 'mail:send 1 --queue', 'mail:send 1 --force --queue'], $command->getUsages());
+        $this->assertSame(['foo:bar 1', 'foo:bar 1 --queue', 'foo:bar 1 --force --queue'], $command->getUsages());
     }
 }
 
@@ -316,8 +316,8 @@ class IsolatedTrueWithExitCodeCommand extends Command
     }
 }
 
-#[Signature('mail:send {user}')]
-#[Usage('mail:send 1')]
+#[Signature('foo:bar {user}')]
+#[Usage('foo:bar 1')]
 class SingleUsageCommand extends Command
 {
     public function handle()
@@ -325,10 +325,10 @@ class SingleUsageCommand extends Command
     }
 }
 
-#[Signature('mail:send {user}')]
-#[Usage('mail:send 1')]
-#[Usage('mail:send 1 --queue')]
-#[Usage('mail:send 1 --force --queue')]
+#[Signature('foo:bar {user}')]
+#[Usage('foo:bar 1')]
+#[Usage('foo:bar 1 --queue')]
+#[Usage('foo:bar 1 --force --queue')]
 class MultipleUsageCommand extends Command
 {
     public function handle()
