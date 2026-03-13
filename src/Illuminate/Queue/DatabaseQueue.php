@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Database\Connection;
+use Illuminate\Database\DetectsConcurrencyErrors;
 use Illuminate\Queue\Jobs\DatabaseJob;
 use Illuminate\Queue\Jobs\DatabaseJobRecord;
 use Illuminate\Support\Carbon;
@@ -16,6 +17,7 @@ use Throwable;
 
 class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
 {
+    use DetectsConcurrencyErrors;
     /**
      * The database connection instance.
      *
@@ -295,8 +297,8 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
                 }
             });
         } catch (Throwable $e) {
-            // Potentially invalid job that we need to fail (#58978)...
-            if ($jobRecord) {
+            if ($jobRecord && ! $this->causedByConcurrencyError($e)) {
+                // Potentially invalid job that we need to fail (#58978)...
                 try {
                     (new DatabaseJob(
                         $this->container, $this, $jobRecord, $this->connectionName, $queue
