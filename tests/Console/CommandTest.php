@@ -239,11 +239,22 @@ class CommandTest extends TestCase
         $this->assertSame('Extended help text.', $command->getHelp());
     }
 
-    public function testIsolatedAttributeRegistersIsolatedOption()
+    public function testIsolatedAttributeFalseWithExitCode()
     {
-        $command = new IsolatedCommand;
+        $command = new IsolatedFalseWithExitCodeCommand;
 
         $this->assertTrue($command->getDefinition()->hasOption('isolated'));
+        $this->assertFalse($command->getDefinition()->getOption('isolated')->getDefault());
+        $this->assertSame(1, (new ReflectionProperty($command, 'isolatedExitCode'))->getValue($command));
+    }
+
+    public function testIsolatedAttributeTrueWithExitCode()
+    {
+        $command = new IsolatedTrueWithExitCodeCommand;
+
+        $this->assertTrue($command->getDefinition()->hasOption('isolated'));
+        $this->assertTrue($command->getDefinition()->getOption('isolated')->getDefault());
+        $this->assertSame(1, (new ReflectionProperty($command, 'isolatedExitCode'))->getValue($command));
     }
 
     public function testUsageAttributeCanSetSingleUsage()
@@ -258,14 +269,6 @@ class CommandTest extends TestCase
         $command = new MultipleUsageCommand;
 
         $this->assertSame(['mail:send 1', 'mail:send 1 --queue', 'mail:send 1 --force --queue'], $command->getUsages());
-    }
-
-    public function testIsolatedAttributeWithExitCodeRegistersIsolatedOption()
-    {
-        $command = new IsolatedWithExitCodeCommand;
-
-        $this->assertTrue($command->getDefinition()->hasOption('isolated'));
-        $this->assertSame(1, (new ReflectionProperty($command, 'isolatedExitCode'))->getValue($command));
     }
 }
 
@@ -296,8 +299,8 @@ class HelpCommand extends Command
 }
 
 #[Signature('foo:bar')]
-#[Isolated]
-class IsolatedCommand extends Command
+#[Isolated(isolated: false, exitCode: 1)]
+class IsolatedFalseWithExitCodeCommand extends Command
 {
     public function handle()
     {
@@ -305,8 +308,8 @@ class IsolatedCommand extends Command
 }
 
 #[Signature('foo:bar')]
-#[Isolated(exitCode: 1)]
-class IsolatedWithExitCodeCommand extends Command
+#[Isolated(isolated: true, exitCode: 1)]
+class IsolatedTrueWithExitCodeCommand extends Command
 {
     public function handle()
     {
