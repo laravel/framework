@@ -12,7 +12,7 @@ class Isolated
      *
      * @param  int  $exitCode
      */
-    public function __construct(public bool $enabled = false, public int $exitCode = 0)
+    public function __construct(public int $exitCode = 0)
     {
         //
     }

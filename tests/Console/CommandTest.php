@@ -239,21 +239,20 @@ class CommandTest extends TestCase
         $this->assertSame('Extended help text.', $command->getHelp());
     }
 
-    public function testIsolatedAttributeFalseWithExitCode()
+    public function testIsolatedAttributeRegistersIsolatedOption()
     {
-        $command = new IsolatedFalseWithExitCodeCommand;
+        $command = new IsolatedCommand;
 
         $this->assertTrue($command->getDefinition()->hasOption('isolated'));
         $this->assertFalse($command->getDefinition()->getOption('isolated')->getDefault());
-        $this->assertSame(1, (new ReflectionProperty($command, 'isolatedExitCode'))->getValue($command));
     }
 
-    public function testIsolatedAttributeTrueWithExitCode()
+    public function testIsolatedAttributeWithExitCode()
     {
-        $command = new IsolatedTrueWithExitCodeCommand;
+        $command = new IsolatedWithExitCodeCommand;
 
         $this->assertTrue($command->getDefinition()->hasOption('isolated'));
-        $this->assertTrue($command->getDefinition()->getOption('isolated')->getDefault());
+        $this->assertFalse($command->getDefinition()->getOption('isolated')->getDefault());
         $this->assertSame(1, (new ReflectionProperty($command, 'isolatedExitCode'))->getValue($command));
     }
 
@@ -292,8 +291,8 @@ class HelpCommand extends Command
 }
 
 #[Signature('foo:bar')]
-#[Isolated(enabled: false, exitCode: 1)]
-class IsolatedFalseWithExitCodeCommand extends Command
+#[Isolated]
+class IsolatedCommand extends Command
 {
     public function handle()
     {
@@ -301,8 +300,8 @@ class IsolatedFalseWithExitCodeCommand extends Command
 }
 
 #[Signature('foo:bar')]
-#[Isolated(enabled: true, exitCode: 1)]
-class IsolatedTrueWithExitCodeCommand extends Command
+#[Isolated(exitCode: 1)]
+class IsolatedWithExitCodeCommand extends Command
 {
     public function handle()
     {

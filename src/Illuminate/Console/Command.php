@@ -177,10 +177,7 @@ class Command extends SymfonyCommand
         $isolated = $reflection->getAttributes(Isolated::class);
 
         if (count($isolated) > 0) {
-            $isolatedInstance = $isolated[0]->newInstance();
-
-            $this->isolated = $isolatedInstance->enabled;
-            $this->isolatedExitCode = $isolatedInstance->exitCode;
+            $this->isolatedExitCode = $isolated[0]->newInstance()->exitCode;
         }
     }
 
@@ -223,9 +220,7 @@ class Command extends SymfonyCommand
      */
     public function shouldIsolate(): bool
     {
-        return $this instanceof Isolatable
-            || $this->isolated
-            || count((new ReflectionClass($this))->getAttributes(Isolated::class)) > 0;
+        return $this instanceof Isolatable || count((new ReflectionClass($this))->getAttributes(Isolated::class)) > 0;
     }
 
     /**
