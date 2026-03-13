@@ -395,7 +395,7 @@ class Mailable implements MailableContract, Renderable
     protected function additionalMessageData(): array
     {
         return [
-            '__laravel_mailable' => get_class($this),
+            '__laravel_mailable' => $this::class,
         ];
     }
 

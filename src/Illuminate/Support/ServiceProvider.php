@@ -523,7 +523,7 @@ abstract class ServiceProvider
      */
     protected function getProviderKey(?string $key = null): string
     {
-        $key ??= (string) Str::of(get_class($this))
+        $key ??= (string) Str::of($this::class)
             ->classBasename()
             ->before('ServiceProvider')
             ->kebab()
@@ -531,7 +531,7 @@ abstract class ServiceProvider
             ->trim();
 
         if (empty($key)) {
-            $key = class_basename(get_class($this));
+            $key = class_basename($this::class);
         }
 
         return $key;

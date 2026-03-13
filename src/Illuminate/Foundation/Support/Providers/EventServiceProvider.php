@@ -107,7 +107,7 @@ class EventServiceProvider extends ServiceProvider
         if ($this->app->eventsAreCached()) {
             $cache = require $this->app->getCachedEventsPath();
 
-            return $cache[get_class($this)] ?? [];
+            return $cache[$this::class] ?? [];
         } else {
             return array_merge_recursive(
                 $this->discoveredEvents(),
@@ -135,7 +135,7 @@ class EventServiceProvider extends ServiceProvider
      */
     public function shouldDiscoverEvents()
     {
-        return get_class($this) === __CLASS__ && static::$shouldDiscoverEvents === true;
+        return $this::class === __CLASS__ && static::$shouldDiscoverEvents === true;
     }
 
     /**

@@ -680,7 +680,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                 } else {
                     throw new MassAssignmentException(sprintf(
                         'Add [%s] to fillable property to allow mass assignment on [%s].',
-                        $key, get_class($this)
+                        $key, $this::class
                     ));
                 }
             }
@@ -696,7 +696,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                 throw new MassAssignmentException(sprintf(
                     'Add fillable property [%s] to allow mass assignment on [%s].',
                     implode(', ', $keys),
-                    get_class($this)
+                    $this::class
                 ));
             }
         }
@@ -2540,7 +2540,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function broadcastChannelRoute()
     {
-        return str_replace('\\', '.', get_class($this)).'.{'.Str::camel(class_basename($this)).'}';
+        return str_replace('\\', '.', $this::class).'.{'.Str::camel(class_basename($this)).'}';
     }
 
     /**
@@ -2550,7 +2550,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function broadcastChannel()
     {
-        return str_replace('\\', '.', get_class($this)).'.'.$this->getKey();
+        return str_replace('\\', '.', $this::class).'.'.$this->getKey();
     }
 
     /**

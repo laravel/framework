@@ -546,7 +546,7 @@ class Kernel implements KernelContract
      */
     protected function shouldDiscoverCommands()
     {
-        return get_class($this) === __CLASS__;
+        return $this::class === __CLASS__;
     }
 
     /**
