@@ -1298,7 +1298,7 @@ class Builder implements BuilderContract
     /**
      * Update the column's update timestamp.
      *
-     * @param  string|array|null  $column
+     * @param  array|string|null  $column
      * @return int|false
      */
     public function touch($column = null)

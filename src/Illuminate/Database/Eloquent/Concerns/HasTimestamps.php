@@ -24,7 +24,7 @@ trait HasTimestamps
     /**
      * Update the model's update timestamp.
      *
-     * @param  string|array|null  $attribute
+     * @param  array|string|null  $attribute
      * @return bool
      */
     public function touch($attribute = null)
@@ -32,8 +32,8 @@ trait HasTimestamps
         if ($attribute) {
             $time = $this->freshTimestamp();
 
-            foreach (Arr::wrap($attribute) as $col) {
-                $this->$col = $time;
+            foreach (Arr::wrap($attribute) as $column) {
+                $this->{$column} = $time;
             }
 
             return $this->save();
@@ -51,7 +51,7 @@ trait HasTimestamps
     /**
      * Update the model's update timestamp without raising any events.
      *
-     * @param  string|array|null  $attribute
+     * @param  array|string|null  $attribute
      * @return bool
      */
     public function touchQuietly($attribute = null)
