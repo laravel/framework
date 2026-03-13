@@ -297,7 +297,11 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
                 }
             });
         } catch (Throwable $e) {
-            if ($jobRecord && ! $this->causedByConcurrencyError($e)) {
+            if ($this->causedByConcurrencyError($e)) {
+                return null;
+            }
+
+            if ($jobRecord) {
                 // Potentially invalid job that we need to fail (#58978)...
                 try {
                     (new DatabaseJob(

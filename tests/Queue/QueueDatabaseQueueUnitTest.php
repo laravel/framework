@@ -6,10 +6,12 @@ use Carbon\Carbon;
 use Illuminate\Bus\Batchable;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
+use Illuminate\Database\QueryException;
 use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Str;
 use Mockery as m;
+use PDOException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -195,6 +197,23 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $record = $queue->buildDatabaseRecord('queue', 'any_payload', 0);
         $this->assertArrayHasKey('payload', $record);
         $this->assertArrayHasKey('payload', array_slice($record, -1, 1, true));
+    }
+
+    public function testPopReturnsNullOnDeadlock()
+    {
+        $queue = $this->getMockBuilder(DatabaseQueue::class)
+            ->onlyMethods(['deleteReserved'])
+            ->setConstructorArgs([$database = m::mock(Connection::class), 'table', 'default'])
+            ->getMock();
+
+        $queue->setContainer(m::mock(Container::class));
+        $queue->expects($this->never())->method('deleteReserved');
+
+        $database->shouldReceive('transaction')->andThrow(
+            new QueryException('mysql', '', [], new PDOException('SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction'))
+        );
+
+        $this->assertNull($queue->pop('default'));
     }
 }
 
