@@ -7,6 +7,7 @@ use Illuminate\Console\Attributes\Help;
 use Illuminate\Console\Attributes\Hidden;
 use Illuminate\Console\Attributes\Isolated;
 use Illuminate\Console\Attributes\Signature;
+use Illuminate\Console\Attributes\Usage;
 use Illuminate\Console\View\Components\Factory;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Support\Traits\Macroable;
@@ -130,6 +131,8 @@ class Command extends SymfonyCommand
         if ($this instanceof Isolatable || $this->isolated) {
             $this->configureIsolation();
         }
+
+        $this->configureUsagesFromAttributes();
     }
 
     /**
@@ -175,6 +178,7 @@ class Command extends SymfonyCommand
             $this->isolated = true;
             $this->isolatedExitCode = $isolated[0]->newInstance()->exitCode;
         }
+
     }
 
     /**
@@ -209,6 +213,20 @@ class Command extends SymfonyCommand
             'Do not run the command if another instance of the command is already running',
             $this->isolated
         ));
+    }
+
+    /**
+     * Configure usage examples for the command from class attributes.
+     *
+     * @return void
+     */
+    protected function configureUsagesFromAttributes()
+    {
+        $reflection = new ReflectionClass($this);
+
+        foreach ($reflection->getAttributes(Usage::class) as $usage) {
+            $this->addUsage($usage->newInstance()->usage);
+        }
     }
 
     /**

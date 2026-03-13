@@ -7,6 +7,7 @@ use Illuminate\Console\Attributes\Help;
 use Illuminate\Console\Attributes\Hidden;
 use Illuminate\Console\Attributes\Isolated;
 use Illuminate\Console\Attributes\Signature;
+use Illuminate\Console\Attributes\Usage;
 use Illuminate\Console\Command;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components\Factory;
@@ -245,6 +246,20 @@ class CommandTest extends TestCase
         $this->assertTrue($command->getDefinition()->hasOption('isolated'));
     }
 
+    public function testUsageAttributeCanSetSingleUsage()
+    {
+        $command = new SingleUsageCommand;
+
+        $this->assertSame(['mail:send 1'], $command->getUsages());
+    }
+
+    public function testUsageAttributeCanSetMultipleUsages()
+    {
+        $command = new MultipleUsageCommand;
+
+        $this->assertSame(['mail:send 1', 'mail:send 1 --queue', 'mail:send 1 --force --queue'], $command->getUsages());
+    }
+
     public function testIsolatedAttributeWithExitCodeRegistersIsolatedOption()
     {
         $command = new IsolatedWithExitCodeCommand;
@@ -292,6 +307,26 @@ class IsolatedCommand extends Command
 #[Signature('foo:bar')]
 #[Isolated(exitCode: 1)]
 class IsolatedWithExitCodeCommand extends Command
+{
+    public function handle()
+    {
+    }
+}
+
+#[Signature('mail:send {user}')]
+#[Usage('mail:send 1')]
+class SingleUsageCommand extends Command
+{
+    public function handle()
+    {
+    }
+}
+
+#[Signature('mail:send {user}')]
+#[Usage('mail:send 1')]
+#[Usage('mail:send 1 --queue')]
+#[Usage('mail:send 1 --force --queue')]
+class MultipleUsageCommand extends Command
 {
     public function handle()
     {
