@@ -292,7 +292,7 @@ abstract class Component
     {
         return $method->getNumberOfParameters() === 0
             ? $this->createInvokableVariable($method->getName())
-            : Closure::fromCallable([$this, $method->getName()]);
+            : $this->{$method->getName()}(...);
     }
 
     /**

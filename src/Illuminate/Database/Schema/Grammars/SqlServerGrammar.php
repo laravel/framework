@@ -1037,7 +1037,7 @@ class SqlServerGrammar extends Grammar
     public function quoteString($value)
     {
         if (is_array($value)) {
-            return implode(', ', array_map([$this, __FUNCTION__], $value));
+            return implode(', ', array_map($this->quoteString(...), $value));
         }
 
         return "N'$value'";
