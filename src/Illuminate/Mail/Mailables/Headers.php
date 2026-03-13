@@ -11,40 +11,15 @@ class Headers
     use Conditionable;
 
     /**
-     * The message's message ID.
-     *
-     * @var string|null
-     */
-    public $messageId;
-
-    /**
-     * The message IDs that are referenced by the message.
-     *
-     * @var array
-     */
-    public $references;
-
-    /**
-     * The message's text headers.
-     *
-     * @var array
-     */
-    public $text;
-
-    /**
      * Create a new instance of headers for a message.
-     *
-     * @param  string|null  $messageId
-     * @param  array  $references
-     * @param  array  $text
      *
      * @named-arguments-supported
      */
-    public function __construct(?string $messageId = null, array $references = [], array $text = [])
-    {
-        $this->messageId = $messageId;
-        $this->references = $references;
-        $this->text = $text;
+    public function __construct(
+        public ?string $messageId = null,
+        public array $references = [],
+        public array $text = [],
+    ) {
     }
 
     /**
