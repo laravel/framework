@@ -8,6 +8,7 @@ use Illuminate\Tests\Support\Fixtures\StringableObjectStub;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 use ReflectionClass;
 use ValueError;
 
@@ -507,6 +508,32 @@ class SupportStrTest extends TestCase
         $this->assertEquals(["Class@anonymous\0/laravel/382.php:8$2ec", 'method'], Str::parseCallback("Class@anonymous\0/laravel/382.php:8$2ec@method", 'foo'));
         $this->assertEquals(["Class@anonymous\0/laravel/382.php:8$2ec", 'foo'], Str::parseCallback("Class@anonymous\0/laravel/382.php:8$2ec", 'foo'));
         $this->assertEquals(["Class@anonymous\0/laravel/382.php:8$2ec", null], Str::parseCallback("Class@anonymous\0/laravel/382.php:8$2ec"));
+    }
+
+    public function testSanitize()
+    {
+        $this->assertSame('', Str::sanitize(''));
+        $this->assertSame('hello world', Str::sanitize('hello world'));
+        $this->assertSame('<p>Hello </p>', Str::sanitize('<p>Hello <script>alert("xss")</script></p>'));
+        $this->assertSame('<p><strong>Bold</strong></p>', Str::sanitize('<p><strong>Bold</strong></p>'));
+        $this->assertSame('', Str::sanitize('<script>alert(1)</script>'));
+    }
+
+    public function testSanitizeWithAllowedElements()
+    {
+        $this->assertSame('<p><strong>Bold</strong> </p>', Str::sanitize('<p><strong>Bold</strong> <em>italic</em></p>', ['p', 'strong']));
+        $this->assertSame('<a href="https://laravel.com">Laravel</a>', Str::sanitize('<a href="https://laravel.com" onclick="evil()">Laravel</a>', ['a' => ['href']]));
+        $this->assertSame('<p><a href="https://laravel.com">link</a><em>hi</em></p>', Str::sanitize('<p><a href="https://laravel.com" onclick="x">link</a><em>hi</em></p>', ['p', 'a' => ['href'], 'em']));
+    }
+
+    public function testSanitizeWithClosure()
+    {
+        $result = Str::sanitize(
+            '<a href="http://example.com">Link</a>',
+            fn (HtmlSanitizerConfig $config) => $config->allowElement('a', ['href'])->forceHttpsUrls()
+        );
+
+        $this->assertSame('<a href="https://example.com">Link</a>', $result);
     }
 
     public function testSlug()

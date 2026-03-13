@@ -821,12 +821,12 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Sanitize the HTML string.
      *
-     * @param  array|(\Closure(\Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig): \Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig)  $config
+     * @param  array|(\Closure(\Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig): \Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig)  $allow
      * @return static
      */
-    public function sanitize(array|Closure $config = [])
+    public function sanitize(array|Closure $allow = [])
     {
-        return new static(Str::sanitize($this->value, $config));
+        return new static(Str::sanitize($this->value, $allow));
     }
 
     /**

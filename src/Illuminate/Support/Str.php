@@ -1528,30 +1528,28 @@ class Str
      * Sanitize the given HTML string.
      *
      * @param  string  $html
-     * @param  array|(\Closure(\Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig): \Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig)  $config
+     * @param  array|(\Closure(\Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig): \Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig)  $allow
      * @return string
      */
-    public static function sanitize(string $html, array|Closure $config = [])
+    public static function sanitize(string $html, array|Closure $allow = [])
     {
-        if ($config instanceof Closure) {
-            return (new HtmlSanitizer($config(new HtmlSanitizerConfig())))->sanitize($html);
-        }
-
-        $sanitizerConfig = new HtmlSanitizerConfig();
-
-        if (empty($config)) {
-            $sanitizerConfig = $sanitizerConfig->allowSafeElements();
+        if ($allow instanceof Closure) {
+            $config = $allow(new HtmlSanitizerConfig());
         } else {
-            foreach ($config as $key => $value) {
-                if (is_int($key)) {
-                    $sanitizerConfig = $sanitizerConfig->allowElement($value);
-                } else {
-                    $sanitizerConfig = $sanitizerConfig->allowElement($key, $value);
-                }
+            $config = new HtmlSanitizerConfig();
+
+            if (empty($allow)) {
+                $config = $config->allowSafeElements();
+            }
+
+            foreach ($allow as $key => $value) {
+                $config = is_int($key)
+                    ? $config->allowElement($value)
+                    : $config->allowElement($key, $value);
             }
         }
 
-        return (new HtmlSanitizer($sanitizerConfig))->sanitize($html);
+        return (new HtmlSanitizer($config))->sanitize($html);
     }
 
     /**

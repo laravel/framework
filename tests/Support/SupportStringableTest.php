@@ -13,6 +13,7 @@ use Illuminate\Tests\Support\Fixtures\StringableObjectStub;
 use League\CommonMark\Environment\EnvironmentBuilderInterface;
 use League\CommonMark\Extension\ExtensionInterface;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 
 class SupportStringableTest extends TestCase
 {
@@ -878,6 +879,13 @@ class SupportStringableTest extends TestCase
         $this->assertEquals(['Class', 'method'], $this->stringable('Class@method')->parseCallback('foo'));
         $this->assertEquals(['Class', 'foo'], $this->stringable('Class')->parseCallback('foo'));
         $this->assertEquals(['Class', null], $this->stringable('Class')->parseCallback());
+    }
+
+    public function testSanitize()
+    {
+        $this->assertSame('<p>Hello </p>', (string) $this->stringable('<p>Hello <script>alert("xss")</script></p>')->sanitize());
+        $this->assertSame('<p><strong>Bold</strong> </p>', (string) $this->stringable('<p><strong>Bold</strong> <em>italic</em></p>')->sanitize(['p', 'strong']));
+        $this->assertSame('<a href="https://example.com">Link</a>', (string) $this->stringable('<a href="http://example.com">Link</a>')->sanitize(fn (HtmlSanitizerConfig $config) => $config->allowElement('a', ['href'])->forceHttpsUrls()));
     }
 
     public function testSlug()
