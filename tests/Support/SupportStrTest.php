@@ -8,8 +8,8 @@ use Illuminate\Tests\Support\Fixtures\StringableObjectStub;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
-use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 use ReflectionClass;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 use ValueError;
 
 class SupportStrTest extends TestCase
