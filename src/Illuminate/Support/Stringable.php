@@ -819,6 +819,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Sanitize the HTML string.
+     *
+     * @param  array|(\Closure(\Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig): \Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig)  $config
+     * @return static
+     */
+    public function sanitize(array|Closure $config = [])
+    {
+        return new static(Str::sanitize($this->value, $config));
+    }
+
+    /**
      * Parse input from a string to a collection, according to a format.
      *
      * @param  string  $format

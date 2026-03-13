@@ -15,6 +15,8 @@ use Ramsey\Uuid\Generator\CombGenerator;
 use Ramsey\Uuid\Rfc4122\FieldsInterface;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactory;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 use Symfony\Component\Uid\Ulid;
 use Throwable;
 use Traversable;
@@ -1520,6 +1522,36 @@ class Str
     public static function singular($value)
     {
         return Pluralizer::singular($value);
+    }
+
+    /**
+     * Sanitize the given HTML string.
+     *
+     * @param  string  $html
+     * @param  array|(\Closure(\Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig): \Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig)  $config
+     * @return string
+     */
+    public static function sanitize(string $html, array|Closure $config = [])
+    {
+        if ($config instanceof Closure) {
+            return (new HtmlSanitizer($config(new HtmlSanitizerConfig())))->sanitize($html);
+        }
+
+        $sanitizerConfig = new HtmlSanitizerConfig();
+
+        if (empty($config)) {
+            $sanitizerConfig = $sanitizerConfig->allowSafeElements();
+        } else {
+            foreach ($config as $key => $value) {
+                if (is_int($key)) {
+                    $sanitizerConfig = $sanitizerConfig->allowElement($value);
+                } else {
+                    $sanitizerConfig = $sanitizerConfig->allowElement($key, $value);
+                }
+            }
+        }
+
+        return (new HtmlSanitizer($sanitizerConfig))->sanitize($html);
     }
 
     /**
