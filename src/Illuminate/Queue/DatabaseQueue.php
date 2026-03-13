@@ -301,8 +301,8 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
                 return null;
             }
 
+            // Potentially invalid job that we need to fail (#58978)...
             if ($jobRecord) {
-                // Potentially invalid job that we need to fail (#58978)...
                 try {
                     (new DatabaseJob(
                         $this->container, $this, $jobRecord, $this->connectionName, $queue
