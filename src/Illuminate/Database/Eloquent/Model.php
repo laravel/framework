@@ -1543,7 +1543,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return true;
         }
 
-        $result = $query->toBase()->insertOrIgnoreReturning($attributes, $uniqueBy);
+        $result = $query->toBase()->insertOrIgnoreReturning($attributes, ['*'], $uniqueBy);
 
         if ($result->isEmpty()) {
             return false;
