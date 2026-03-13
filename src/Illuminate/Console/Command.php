@@ -178,7 +178,20 @@ class Command extends SymfonyCommand
             $this->isolated = true;
             $this->isolatedExitCode = $isolated[0]->newInstance()->exitCode;
         }
+    }
 
+    /**
+     * Configure usage examples for the command from class attributes.
+     *
+     * @return void
+     */
+    protected function configureUsagesFromAttributes()
+    {
+        $reflection = new ReflectionClass($this);
+
+        foreach ($reflection->getAttributes(Usage::class) as $usage) {
+            $this->addUsage($usage->newInstance()->usage);
+        }
     }
 
     /**
@@ -213,20 +226,6 @@ class Command extends SymfonyCommand
             'Do not run the command if another instance of the command is already running',
             $this->isolated
         ));
-    }
-
-    /**
-     * Configure usage examples for the command from class attributes.
-     *
-     * @return void
-     */
-    protected function configureUsagesFromAttributes()
-    {
-        $reflection = new ReflectionClass($this);
-
-        foreach ($reflection->getAttributes(Usage::class) as $usage) {
-            $this->addUsage($usage->newInstance()->usage);
-        }
     }
 
     /**
