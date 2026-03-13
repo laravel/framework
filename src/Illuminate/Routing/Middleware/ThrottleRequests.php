@@ -98,6 +98,7 @@ class ThrottleRequests
                     'key' => $prefix.$this->resolveRequestSignature($request),
                     'maxAttempts' => $this->resolveMaxAttempts($request, $maxAttempts),
                     'decaySeconds' => 60 * $decayMinutes,
+                    'slidingWindow' => false,
                     'afterCallback' => null,
                     'responseCallback' => null,
                 ],
@@ -134,6 +135,7 @@ class ThrottleRequests
                     'key' => self::$shouldHashKeys ? md5($limiterName.$limit->key) : $limiterName.':'.$limit->key,
                     'maxAttempts' => $limit->maxAttempts,
                     'decaySeconds' => $limit->decaySeconds,
+                    'slidingWindow' => $limit->slidingWindow,
                     'afterCallback' => $limit->afterCallback,
                     'responseCallback' => $limit->responseCallback,
                 ];
@@ -154,12 +156,12 @@ class ThrottleRequests
     protected function handleRequest($request, Closure $next, array $limits)
     {
         foreach ($limits as $limit) {
-            if ($this->limiter->tooManyAttempts($limit->key, $limit->maxAttempts)) {
-                throw $this->buildException($request, $limit->key, $limit->maxAttempts, $limit->responseCallback);
+            if ($this->limiter->tooManyAttempts($limit->key, $limit->maxAttempts, $limit->decaySeconds, $limit->slidingWindow)) {
+                throw $this->buildException($request, $limit->key, $limit->maxAttempts, $limit->responseCallback, $limit->decaySeconds, $limit->slidingWindow);
             }
 
             if (! $limit->afterCallback) {
-                $this->limiter->hit($limit->key, $limit->decaySeconds);
+                $this->limiter->hit($limit->key, $limit->decaySeconds, $limit->slidingWindow);
             }
         }
 
@@ -167,13 +169,13 @@ class ThrottleRequests
 
         foreach ($limits as $limit) {
             if ($limit->afterCallback && ($limit->afterCallback)($response)) {
-                $this->limiter->hit($limit->key, $limit->decaySeconds);
+                $this->limiter->hit($limit->key, $limit->decaySeconds, $limit->slidingWindow);
             }
 
             $response = $this->addHeaders(
                 $response,
                 $limit->maxAttempts,
-                $this->calculateRemainingAttempts($limit->key, $limit->maxAttempts)
+                $this->calculateRemainingAttempts($limit->key, $limit->maxAttempts, null, $limit->decaySeconds, $limit->slidingWindow)
             );
         }
 
@@ -237,15 +239,17 @@ class ThrottleRequests
      * @param  string  $key
      * @param  int  $maxAttempts
      * @param  callable|null  $responseCallback
+     * @param  int  $decaySeconds
+     * @param  bool  $slidingWindow
      * @return \Illuminate\Http\Exceptions\ThrottleRequestsException|\Illuminate\Http\Exceptions\HttpResponseException
      */
-    protected function buildException($request, $key, $maxAttempts, $responseCallback = null)
+    protected function buildException($request, $key, $maxAttempts, $responseCallback = null, $decaySeconds = 60, $slidingWindow = false)
     {
-        $retryAfter = $this->getTimeUntilNextRetry($key);
+        $retryAfter = $this->getTimeUntilNextRetry($key, $decaySeconds, $slidingWindow);
 
         $headers = $this->getHeaders(
             $maxAttempts,
-            $this->calculateRemainingAttempts($key, $maxAttempts, $retryAfter),
+            $this->calculateRemainingAttempts($key, $maxAttempts, $retryAfter, $decaySeconds, $slidingWindow),
             $retryAfter
         );
 
@@ -258,11 +262,13 @@ class ThrottleRequests
      * Get the number of seconds until the next retry.
      *
      * @param  string  $key
+     * @param  int  $decaySeconds
+     * @param  bool  $slidingWindow
      * @return int
      */
-    protected function getTimeUntilNextRetry($key)
+    protected function getTimeUntilNextRetry($key, $decaySeconds = 60, $slidingWindow = false)
     {
-        return $this->limiter->availableIn($key);
+        return $this->limiter->availableIn($key, $decaySeconds, $slidingWindow);
     }
 
     /**
@@ -322,11 +328,17 @@ class ThrottleRequests
      * @param  string  $key
      * @param  int  $maxAttempts
      * @param  int|null  $retryAfter
+     * @param  int  $decaySeconds
+     * @param  bool  $slidingWindow
      * @return int
      */
-    protected function calculateRemainingAttempts($key, $maxAttempts, $retryAfter = null)
+    protected function calculateRemainingAttempts($key, $maxAttempts, $retryAfter = null, $decaySeconds = 60, $slidingWindow = false)
     {
-        return is_null($retryAfter) ? $this->limiter->retriesLeft($key, $maxAttempts) : 0;
+        if (! is_null($retryAfter)) {
+            return 0;
+        }
+
+        return $this->limiter->remaining($key, $maxAttempts, $decaySeconds, $slidingWindow);
     }
 
     /**

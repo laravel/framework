@@ -488,6 +488,176 @@ class ThrottleRequestsTest extends TestCase
         $this->get('?status=404')->assertNotFound();
         $this->get('?status=404')->assertTooManyRequests()->assertContent('ah ah ah');
     }
+
+    public function testItCanThrottlePerMinuteUsingSlidingWindow()
+    {
+        $rateLimiter = Container::getInstance()->make(RateLimiter::class);
+        $rateLimiter->for('test', fn () => Limit::perMinute(3)->slidingWindow());
+        Route::get('/', fn () => 'ok')->middleware(ThrottleRequests::using('test'));
+
+        Carbon::setTestNow('2000-01-01 00:00:00.000');
+
+        // Make 3 requests that should all succeed.
+        for ($i = 0; $i < 3; $i++) {
+            $response = $this->get('/');
+            $response->assertOk();
+            $response->assertContent('ok');
+            $response->assertHeader('X-RateLimit-Limit', 3);
+            $response->assertHeader('X-RateLimit-Remaining', 3 - ($i + 1));
+
+            Carbon::setTestNow(now()->addSecond());
+        }
+
+        // 4th request should be throttled.
+        $this->assertSame('2000-01-01 00:00:03.000', now()->toDateTimeString('m'));
+
+        $response = $this->get('/');
+        $response->assertStatus(429);
+        $response->assertHeader('X-RateLimit-Limit', 3);
+        $response->assertHeader('X-RateLimit-Remaining', 0);
+        $response->assertHeader('Retry-After');
+    }
+
+    public function testSlidingWindowPreventsWindowBoundaryBurst()
+    {
+        $rateLimiter = Container::getInstance()->make(RateLimiter::class);
+        $rateLimiter->for('test', fn () => Limit::perMinute(3)->slidingWindow());
+        Route::get('/', fn () => 'ok')->middleware(ThrottleRequests::using('test'));
+
+        Carbon::setTestNow('2000-01-01 00:00:00.000');
+
+        // Max out the limiter at the start of the first window.
+        for ($i = 0; $i < 3; $i++) {
+            $this->get('/')->assertOk();
+        }
+
+        // Move just past the window boundary (1 second into new window).
+        // With fixed window this would allow 3 more, but sliding window
+        // carries over: effective = floor((59/60) * 3) + 0 = 2
+        Carbon::setTestNow('2000-01-01 00:01:01.000');
+
+        // First request should succeed (effective = 2, under limit of 3).
+        $this->get('/')->assertOk();
+
+        // Second request should be blocked (effective = 2 + 1 = 3).
+        $response = $this->get('/');
+        $response->assertStatus(429);
+    }
+
+    public function testSlidingWindowAllowsRequestsAfterSufficientTimeElapsed()
+    {
+        $rateLimiter = Container::getInstance()->make(RateLimiter::class);
+        $rateLimiter->for('test', fn () => Limit::perMinute(3)->slidingWindow());
+        Route::get('/', fn () => 'ok')->middleware(ThrottleRequests::using('test'));
+
+        Carbon::setTestNow('2000-01-01 00:00:00.000');
+
+        // Max out the limiter.
+        for ($i = 0; $i < 3; $i++) {
+            $this->get('/')->assertOk();
+        }
+
+        $this->get('/')->assertStatus(429);
+
+        // Move forward 90 seconds (30s into second window).
+        // effective = floor((30/60) * 3) + 0 = 1, under limit of 3.
+        Carbon::setTestNow('2000-01-01 00:01:30.000');
+
+        $this->get('/')->assertOk();
+    }
+
+    public function testSlidingWindow429ResponseIncludesCorrectHeaders()
+    {
+        $rateLimiter = Container::getInstance()->make(RateLimiter::class);
+        $rateLimiter->for('test', fn () => Limit::perMinute(1)->slidingWindow());
+        Route::get('/', fn () => 'ok')->middleware(ThrottleRequests::using('test'));
+
+        Carbon::setTestNow('2000-01-01 00:00:00.000');
+
+        $this->get('/')->assertOk();
+
+        // Move 30 seconds forward and trigger throttle.
+        Carbon::setTestNow('2000-01-01 00:00:30.000');
+
+        try {
+            $this->withoutExceptionHandling()->get('/');
+        } catch (Throwable $e) {
+            $this->assertInstanceOf(ThrottleRequestsException::class, $e);
+            $this->assertEquals(429, $e->getStatusCode());
+            $this->assertEquals(1, $e->getHeaders()['X-RateLimit-Limit']);
+            $this->assertEquals(0, $e->getHeaders()['X-RateLimit-Remaining']);
+            $this->assertEquals(30, $e->getHeaders()['Retry-After']);
+            $this->assertEquals(Carbon::now()->addSeconds(30)->getTimestamp(), $e->getHeaders()['X-RateLimit-Reset']);
+        }
+    }
+
+    public function testSlidingWindowWithAfterCallback()
+    {
+        RateLimiterFacade::for('throttle-not-found', function (Request $request) {
+            return Limit::perMinute(1)
+                ->slidingWindow()
+                ->after(fn ($response) => $response->status() === 404);
+        });
+        Route::get('/', fn () => match (request('status')) {
+            '404' => abort(404),
+            default => 'ok',
+        })->middleware(ThrottleRequests::using('throttle-not-found'));
+
+        $this->travelTo('2000-01-01 00:00:00');
+
+        // Successful response should not count against the limiter.
+        $this->get('/')->assertOk();
+        $this->get('/')->assertOk();
+
+        // 404 triggers the after callback and counts.
+        $this->get('?status=404')->assertNotFound();
+
+        // Now throttled.
+        $this->get('?status=404')->assertTooManyRequests();
+
+        // Move 30 seconds — still in sliding window.
+        $this->travelTo('2000-01-01 00:00:30');
+        $this->get('?status=404')->assertTooManyRequests();
+
+        // Move past two full windows — fully expired.
+        $this->travelTo('2000-01-01 00:02:01');
+        $this->get('?status=404')->assertNotFound();
+    }
+
+    public function testMixedFixedAndSlidingWindowLimits()
+    {
+        $rateLimiter = Container::getInstance()->make(RateLimiter::class);
+        $rateLimiter->for('test', fn () => [
+            Limit::perSecond(3)->by('user-1'),
+            Limit::perMinute(5)->by('user-1')->slidingWindow(),
+        ]);
+        Route::get('/', fn () => 'ok')->middleware(ThrottleRequests::using('test'));
+
+        Carbon::setTestNow('2000-01-01 00:00:00.000');
+
+        // Make 3 requests — should hit per-second fixed limit.
+        for ($i = 0; $i < 3; $i++) {
+            $this->get('/')->assertOk();
+            Carbon::setTestNow(now()->addMilliseconds(100));
+        }
+
+        // Per-second limit hit.
+        $this->get('/')->assertStatus(429);
+
+        // Move to next second — per-second limit resets (fixed window).
+        Carbon::setTestNow('2000-01-01 00:00:01.000');
+
+        // Make 2 more requests — now 5 total against the per-minute sliding window.
+        $this->get('/')->assertOk();
+        $this->get('/')->assertOk();
+
+        // Per-minute sliding window limit hit (5 total).
+        $this->get('/')->assertStatus(429);
+
+        // Move to next second — per-second resets but per-minute sliding is still active.
+        Carbon::setTestNow('2000-01-01 00:00:02.000');
+        $this->get('/')->assertStatus(429);
+    }
 }
 
 class UserWithAccessor extends User

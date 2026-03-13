@@ -78,6 +78,7 @@ class RateLimited
                     'key' => md5($this->limiterName.$limit->key),
                     'maxAttempts' => $limit->maxAttempts,
                     'decaySeconds' => $limit->decaySeconds,
+                    'slidingWindow' => $limit->slidingWindow,
                 ];
             })->all()
         );
@@ -94,13 +95,13 @@ class RateLimited
     protected function handleJob($job, $next, array $limits)
     {
         foreach ($limits as $limit) {
-            if ($this->limiter->tooManyAttempts($limit->key, $limit->maxAttempts)) {
+            if ($this->limiter->tooManyAttempts($limit->key, $limit->maxAttempts, $limit->decaySeconds, $limit->slidingWindow)) {
                 return $this->shouldRelease
-                    ? $job->release($this->releaseAfter ?: $this->getTimeUntilNextRetry($limit->key))
+                    ? $job->release($this->releaseAfter ?: $this->getTimeUntilNextRetry($limit->key, $limit->decaySeconds, $limit->slidingWindow))
                     : false;
             }
 
-            $this->limiter->hit($limit->key, $limit->decaySeconds);
+            $this->limiter->hit($limit->key, $limit->decaySeconds, $limit->slidingWindow);
         }
 
         return $next($job);
@@ -135,11 +136,13 @@ class RateLimited
      * Get the number of seconds that should elapse before the job is retried.
      *
      * @param  string  $key
+     * @param  int  $decaySeconds
+     * @param  bool  $slidingWindow
      * @return int
      */
-    protected function getTimeUntilNextRetry($key)
+    protected function getTimeUntilNextRetry($key, $decaySeconds = 60, $slidingWindow = false)
     {
-        return $this->limiter->availableIn($key) + 3;
+        return $this->limiter->availableIn($key, $decaySeconds, $slidingWindow) + 3;
     }
 
     /**

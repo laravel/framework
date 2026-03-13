@@ -100,11 +100,12 @@ class RateLimiter
      * @param  int  $maxAttempts
      * @param  \Closure  $callback
      * @param  \DateTimeInterface|\DateInterval|int  $decaySeconds
+     * @param  bool  $slidingWindow
      * @return mixed
      */
-    public function attempt($key, $maxAttempts, Closure $callback, $decaySeconds = 60)
+    public function attempt($key, $maxAttempts, Closure $callback, $decaySeconds = 60, $slidingWindow = false)
     {
-        if ($this->tooManyAttempts($key, $maxAttempts)) {
+        if ($this->tooManyAttempts($key, $maxAttempts, $decaySeconds, $slidingWindow)) {
             return false;
         }
 
@@ -112,8 +113,8 @@ class RateLimiter
             $result = true;
         }
 
-        return tap($result, function () use ($key, $decaySeconds) {
-            $this->hit($key, $decaySeconds);
+        return tap($result, function () use ($key, $decaySeconds, $slidingWindow) {
+            $this->hit($key, $decaySeconds, $slidingWindow);
         });
     }
 
@@ -122,10 +123,16 @@ class RateLimiter
      *
      * @param  string  $key
      * @param  int  $maxAttempts
+     * @param  \DateTimeInterface|\DateInterval|int  $decaySeconds
+     * @param  bool  $slidingWindow
      * @return bool
      */
-    public function tooManyAttempts($key, $maxAttempts)
+    public function tooManyAttempts($key, $maxAttempts, $decaySeconds = 60, $slidingWindow = false)
     {
+        if ($slidingWindow) {
+            return $this->slidingWindowTooManyAttempts($key, $maxAttempts, $decaySeconds);
+        }
+
         if ($this->attempts($key) >= $maxAttempts) {
             if ($this->cache->has($this->cleanRateLimiterKey($key).':timer')) {
                 return true;
@@ -142,10 +149,15 @@ class RateLimiter
      *
      * @param  string  $key
      * @param  \DateTimeInterface|\DateInterval|int  $decaySeconds
+     * @param  bool  $slidingWindow
      * @return int
      */
-    public function hit($key, $decaySeconds = 60)
+    public function hit($key, $decaySeconds = 60, $slidingWindow = false)
     {
+        if ($slidingWindow) {
+            return $this->slidingWindowHit($key, $decaySeconds);
+        }
+
         return $this->increment($key, $decaySeconds);
     }
 
@@ -224,10 +236,16 @@ class RateLimiter
      *
      * @param  string  $key
      * @param  int  $maxAttempts
+     * @param  \DateTimeInterface|\DateInterval|int  $decaySeconds
+     * @param  bool  $slidingWindow
      * @return int
      */
-    public function remaining($key, $maxAttempts)
+    public function remaining($key, $maxAttempts, $decaySeconds = 60, $slidingWindow = false)
     {
+        if ($slidingWindow) {
+            return $this->slidingWindowRemaining($key, $maxAttempts, $decaySeconds);
+        }
+
         $key = $this->cleanRateLimiterKey($key);
 
         $attempts = $this->attempts($key);
@@ -248,6 +266,134 @@ class RateLimiter
     }
 
     /**
+     * Increment the counter for a given key using the sliding window algorithm.
+     *
+     * @param  string  $key
+     * @param  \DateTimeInterface|\DateInterval|int  $decaySeconds
+     * @param  int  $amount
+     * @return int
+     */
+    protected function slidingWindowHit($key, $decaySeconds = 60, $amount = 1)
+    {
+        $key = $this->cleanRateLimiterKey($key);
+        $decaySeconds = $this->secondsUntil($decaySeconds);
+
+        $windowStart = $this->cache->get($key.':sw:timer');
+        $now = $this->currentTime();
+
+        if (is_null($windowStart) || $now >= ($windowStart + $decaySeconds)) {
+            $previousCount = is_null($windowStart) ? 0 : (int) $this->withoutSerializationOrCompression(
+                fn () => $this->cache->get($key.':sw:current', 0)
+            );
+
+            $this->withoutSerializationOrCompression(
+                fn () => $this->cache->put($key.':sw:previous', $previousCount, $decaySeconds * 2)
+            );
+            $this->cache->put($key.':sw:timer', $now, $decaySeconds * 2);
+
+            $this->withoutSerializationOrCompression(
+                fn () => $this->cache->put($key.':sw:current', 0, $decaySeconds * 2)
+            );
+        }
+
+        return (int) $this->withoutSerializationOrCompression(
+            fn () => $this->cache->increment($key.':sw:current', $amount)
+        );
+    }
+
+    /**
+     * Determine if the given key has been "accessed" too many times using the sliding window algorithm.
+     *
+     * @param  string  $key
+     * @param  int  $maxAttempts
+     * @param  \DateTimeInterface|\DateInterval|int  $decaySeconds
+     * @return bool
+     */
+    protected function slidingWindowTooManyAttempts($key, $maxAttempts, $decaySeconds = 60)
+    {
+        return $this->slidingWindowEffectiveAttempts($key, $decaySeconds) >= $maxAttempts;
+    }
+
+    /**
+     * Get the number of retries left for the given key using the sliding window algorithm.
+     *
+     * @param  string  $key
+     * @param  int  $maxAttempts
+     * @param  \DateTimeInterface|\DateInterval|int  $decaySeconds
+     * @return int
+     */
+    protected function slidingWindowRemaining($key, $maxAttempts, $decaySeconds = 60)
+    {
+        return max(0, $maxAttempts - $this->slidingWindowEffectiveAttempts($key, $decaySeconds));
+    }
+
+    /**
+     * Get the number of seconds until the sliding window resets for the given key.
+     *
+     * @param  string  $key
+     * @param  \DateTimeInterface|\DateInterval|int  $decaySeconds
+     * @return int
+     */
+    protected function slidingWindowAvailableIn($key, $decaySeconds = 60)
+    {
+        $key = $this->cleanRateLimiterKey($key);
+        $decaySeconds = $this->secondsUntil($decaySeconds);
+
+        $windowStart = $this->cache->get($key.':sw:timer');
+
+        if (is_null($windowStart)) {
+            return 0;
+        }
+
+        return max(0, ($windowStart + $decaySeconds) - $this->currentTime());
+    }
+
+    /**
+     * Get the effective number of attempts for the given key using the sliding window algorithm.
+     *
+     * @param  string  $key
+     * @param  \DateTimeInterface|\DateInterval|int  $decaySeconds
+     * @return int
+     */
+    protected function slidingWindowEffectiveAttempts($key, $decaySeconds = 60)
+    {
+        $key = $this->cleanRateLimiterKey($key);
+        $decaySeconds = $this->secondsUntil($decaySeconds);
+
+        $windowStart = $this->cache->get($key.':sw:timer');
+
+        if (is_null($windowStart)) {
+            return 0;
+        }
+
+        $now = $this->currentTime();
+
+        if ($now >= $windowStart + ($decaySeconds * 2)) {
+            return 0;
+        }
+
+        $current = (int) $this->withoutSerializationOrCompression(
+            fn () => $this->cache->get($key.':sw:current', 0)
+        );
+
+        $previous = (int) $this->withoutSerializationOrCompression(
+            fn () => $this->cache->get($key.':sw:previous', 0)
+        );
+
+        if ($now >= $windowStart + $decaySeconds) {
+            $elapsed = $now - ($windowStart + $decaySeconds);
+            $overlapRatio = max(0, 1 - ($elapsed / $decaySeconds));
+
+            return (int) floor($overlapRatio * $current);
+        }
+
+        $elapsed = $now - $windowStart;
+        $overlapRatio = max(0, 1 - ($elapsed / $decaySeconds));
+
+        return (int) floor($overlapRatio * $previous) + $current;
+    }
+
+    /**
      * Clear the hits and lockout timer for the given key.
      *
      * @param  string  $key
@@ -260,16 +406,25 @@ class RateLimiter
         $this->resetAttempts($key);
 
         $this->cache->forget($key.':timer');
+        $this->cache->forget($key.':sw:current');
+        $this->cache->forget($key.':sw:previous');
+        $this->cache->forget($key.':sw:timer');
     }
 
     /**
      * Get the number of seconds until the "key" is accessible again.
      *
      * @param  string  $key
+     * @param  \DateTimeInterface|\DateInterval|int  $decaySeconds
+     * @param  bool  $slidingWindow
      * @return int
      */
-    public function availableIn($key)
+    public function availableIn($key, $decaySeconds = 60, $slidingWindow = false)
     {
+        if ($slidingWindow) {
+            return $this->slidingWindowAvailableIn($key, $decaySeconds);
+        }
+
         $key = $this->cleanRateLimiterKey($key);
 
         return max(0, $this->cache->get($key.':timer') - $this->currentTime());

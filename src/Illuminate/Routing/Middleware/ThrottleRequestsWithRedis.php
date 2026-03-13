@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Redis\Limiters\DurationLimiter;
+use Illuminate\Redis\Limiters\SlidingWindowDurationLimiter;
 
 class ThrottleRequestsWithRedis extends ThrottleRequests
 {
@@ -56,12 +57,12 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
     protected function handleRequest($request, Closure $next, array $limits)
     {
         foreach ($limits as $limit) {
-            if ($this->tooManyAttempts($limit->key, $limit->maxAttempts, $limit->decaySeconds)) {
-                throw $this->buildException($request, $limit->key, $limit->maxAttempts, $limit->responseCallback);
+            if ($this->tooManyAttempts($limit->key, $limit->maxAttempts, $limit->decaySeconds, $limit->slidingWindow)) {
+                throw $this->buildException($request, $limit->key, $limit->maxAttempts, $limit->responseCallback, $limit->decaySeconds, $limit->slidingWindow);
             }
 
             if (! $limit->afterCallback) {
-                $this->hit($limit->key, $limit->maxAttempts, $limit->decaySeconds);
+                $this->hit($limit->key, $limit->maxAttempts, $limit->decaySeconds, $limit->slidingWindow);
             }
         }
 
@@ -69,7 +70,7 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
 
         foreach ($limits as $limit) {
             if ($limit->afterCallback && ($limit->afterCallback)($response)) {
-                $this->hit($limit->key, $limit->maxAttempts, $limit->decaySeconds);
+                $this->hit($limit->key, $limit->maxAttempts, $limit->decaySeconds, $limit->slidingWindow);
             }
 
             $response = $this->addHeaders(
@@ -88,13 +89,12 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
      * @param  string  $key
      * @param  int  $maxAttempts
      * @param  int  $decaySeconds
+     * @param  bool  $slidingWindow
      * @return bool
      */
-    protected function tooManyAttempts($key, $maxAttempts, $decaySeconds)
+    protected function tooManyAttempts($key, $maxAttempts, $decaySeconds, $slidingWindow = false)
     {
-        $limiter = new DurationLimiter(
-            $this->getRedisConnection(), $key, $maxAttempts, $decaySeconds
-        );
+        $limiter = $this->createLimiter($key, $maxAttempts, $decaySeconds, $slidingWindow);
 
         return tap($limiter->tooManyAttempts(), function () use ($key, $limiter) {
             [$this->decaysAt[$key], $this->remaining[$key]] = [
@@ -109,13 +109,12 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
      * @param  string  $key
      * @param  int  $maxAttempts
      * @param  int  $decaySeconds
+     * @param  bool  $slidingWindow
      * @return void
      */
-    protected function hit($key, $maxAttempts, $decaySeconds)
+    protected function hit($key, $maxAttempts, $decaySeconds, $slidingWindow = false)
     {
-        $limiter = new DurationLimiter(
-            $this->getRedisConnection(), $key, $maxAttempts, $decaySeconds
-        );
+        $limiter = $this->createLimiter($key, $maxAttempts, $decaySeconds, $slidingWindow);
 
         $limiter->acquire();
 
@@ -125,14 +124,32 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
     }
 
     /**
+     * Create a new limiter instance.
+     *
+     * @param  string  $key
+     * @param  int  $maxAttempts
+     * @param  int  $decaySeconds
+     * @param  bool  $slidingWindow
+     * @return \Illuminate\Redis\Limiters\DurationLimiter|\Illuminate\Redis\Limiters\SlidingWindowDurationLimiter
+     */
+    protected function createLimiter($key, $maxAttempts, $decaySeconds, $slidingWindow = false)
+    {
+        return $slidingWindow
+            ? new SlidingWindowDurationLimiter($this->getRedisConnection(), $key, $maxAttempts, $decaySeconds)
+            : new DurationLimiter($this->getRedisConnection(), $key, $maxAttempts, $decaySeconds);
+    }
+
+    /**
      * Calculate the number of remaining attempts.
      *
      * @param  string  $key
      * @param  int  $maxAttempts
      * @param  int|null  $retryAfter
+     * @param  int  $decaySeconds
+     * @param  bool  $slidingWindow
      * @return int
      */
-    protected function calculateRemainingAttempts($key, $maxAttempts, $retryAfter = null)
+    protected function calculateRemainingAttempts($key, $maxAttempts, $retryAfter = null, $decaySeconds = 60, $slidingWindow = false)
     {
         return is_null($retryAfter) ? $this->remaining[$key] : 0;
     }
@@ -141,9 +158,11 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
      * Get the number of seconds until the lock is released.
      *
      * @param  string  $key
+     * @param  int  $decaySeconds
+     * @param  bool  $slidingWindow
      * @return int
      */
-    protected function getTimeUntilNextRetry($key)
+    protected function getTimeUntilNextRetry($key, $decaySeconds = 60, $slidingWindow = false)
     {
         return $this->decaysAt[$key] - $this->currentTime();
     }

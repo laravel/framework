@@ -26,6 +26,13 @@ class Limit
     public $decaySeconds;
 
     /**
+     * Indicates if the sliding window algorithm should be used.
+     *
+     * @var bool
+     */
+    public $slidingWindow = false;
+
+    /**
      * The after callback used to determine if the limiter should be hit.
      *
      * @var ?callable
@@ -132,6 +139,18 @@ class Limit
     public function by($key)
     {
         $this->key = $key;
+
+        return $this;
+    }
+
+    /**
+     * Set the rate limiter to use the sliding window algorithm.
+     *
+     * @return $this
+     */
+    public function slidingWindow()
+    {
+        $this->slidingWindow = true;
 
         return $this;
     }

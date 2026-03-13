@@ -329,6 +329,108 @@ class RateLimitedTest extends TestCase
         $this->assertSame($job, $result);
         $this->assertFalse($job->released);
     }
+
+    public function testItCanLimitPerMinuteUsingSlidingWindow()
+    {
+        Container::getInstance()->instance(RateLimiter::class, $limiter = new RateLimiter(new Repository(new ArrayStore)));
+        $limiter->for('test', fn () => Limit::perMinute(3)->slidingWindow());
+        $jobFactory = fn () => new class
+        {
+            public $released = false;
+
+            public function release($delay = 0)
+            {
+                $this->released = true;
+            }
+        };
+        $next = fn ($job) => $job;
+
+        $middleware = new RateLimited('test');
+
+        Carbon::setTestNow('2000-01-01 00:00:00.000');
+
+        // 3 jobs should be handled.
+        for ($i = 0; $i < 3; $i++) {
+            $result = $middleware->handle($job = $jobFactory(), $next);
+            $this->assertSame($job, $result);
+            $this->assertFalse($job->released);
+
+            Carbon::setTestNow(now()->addSecond());
+        }
+
+        // 4th job should be released.
+        $result = $middleware->handle($job = $jobFactory(), $next);
+        $this->assertNull($result);
+        $this->assertTrue($job->released);
+    }
+
+    public function testSlidingWindowPreventsWindowBoundaryBurstForJobs()
+    {
+        Container::getInstance()->instance(RateLimiter::class, $limiter = new RateLimiter(new Repository(new ArrayStore)));
+        $limiter->for('test', fn () => Limit::perMinute(3)->slidingWindow());
+        $jobFactory = fn () => new class
+        {
+            public $released = false;
+
+            public function release($delay = 0)
+            {
+                $this->released = true;
+            }
+        };
+        $next = fn ($job) => $job;
+
+        $middleware = new RateLimited('test');
+
+        Carbon::setTestNow('2000-01-01 00:00:00.000');
+
+        // Max out in first window.
+        for ($i = 0; $i < 3; $i++) {
+            $middleware->handle($jobFactory(), $next);
+        }
+
+        // Move 1 second past window boundary.
+        // Sliding window: effective = floor((59/60) * 3) + 0 = 2
+        Carbon::setTestNow('2000-01-01 00:01:01.000');
+
+        // One job should succeed.
+        $result = $middleware->handle($job = $jobFactory(), $next);
+        $this->assertSame($job, $result);
+        $this->assertFalse($job->released);
+
+        // Next job should be released (effective = 2 + 1 = 3).
+        $result = $middleware->handle($job = $jobFactory(), $next);
+        $this->assertNull($result);
+        $this->assertTrue($job->released);
+    }
+
+    public function testSlidingWindowJobsCanBeSkippedOnLimitReached()
+    {
+        Container::getInstance()->instance(RateLimiter::class, $limiter = new RateLimiter(new Repository(new ArrayStore)));
+        $limiter->for('test', fn () => Limit::perMinute(1)->slidingWindow());
+        $jobFactory = fn () => new class
+        {
+            public $released = false;
+
+            public function release($delay = 0)
+            {
+                $this->released = true;
+            }
+        };
+        $next = fn ($job) => $job;
+
+        $middleware = (new RateLimited('test'))->dontRelease();
+
+        Carbon::setTestNow('2000-01-01 00:00:00.000');
+
+        // First job succeeds.
+        $result = $middleware->handle($job = $jobFactory(), $next);
+        $this->assertSame($job, $result);
+
+        // Second job should be skipped (returns false, not released).
+        $result = $middleware->handle($job = $jobFactory(), $next);
+        $this->assertFalse($result);
+        $this->assertFalse($job->released);
+    }
 }
 
 class RateLimitedTestJob

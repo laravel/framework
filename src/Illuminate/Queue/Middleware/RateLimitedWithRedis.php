@@ -5,6 +5,7 @@ namespace Illuminate\Queue\Middleware;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Redis\Limiters\DurationLimiter;
+use Illuminate\Redis\Limiters\SlidingWindowDurationLimiter;
 use Illuminate\Support\InteractsWithTime;
 
 class RateLimitedWithRedis extends RateLimited
@@ -48,7 +49,7 @@ class RateLimitedWithRedis extends RateLimited
     protected function handleJob($job, $next, array $limits)
     {
         foreach ($limits as $limit) {
-            if ($this->tooManyAttempts($limit->key, $limit->maxAttempts, $limit->decaySeconds)) {
+            if ($this->tooManyAttempts($limit->key, $limit->maxAttempts, $limit->decaySeconds, $limit->slidingWindow)) {
                 return $this->shouldRelease
                     ? $job->release($this->releaseAfter ?: $this->getTimeUntilNextRetry($limit->key))
                     : false;
@@ -64,17 +65,18 @@ class RateLimitedWithRedis extends RateLimited
      * @param  string  $key
      * @param  int  $maxAttempts
      * @param  int  $decaySeconds
+     * @param  bool  $slidingWindow
      * @return bool
      */
-    protected function tooManyAttempts($key, $maxAttempts, $decaySeconds)
+    protected function tooManyAttempts($key, $maxAttempts, $decaySeconds, $slidingWindow = false)
     {
         $redis = Container::getInstance()
             ->make(Redis::class)
             ->connection($this->connectionName);
 
-        $limiter = new DurationLimiter(
-            $redis, $key, $maxAttempts, $decaySeconds
-        );
+        $limiter = $slidingWindow
+            ? new SlidingWindowDurationLimiter($redis, $key, $maxAttempts, $decaySeconds)
+            : new DurationLimiter($redis, $key, $maxAttempts, $decaySeconds);
 
         return tap(! $limiter->acquire(), function () use ($key, $limiter) {
             $this->decaysAt[$key] = $limiter->decaysAt;
@@ -85,9 +87,11 @@ class RateLimitedWithRedis extends RateLimited
      * Get the number of seconds that should elapse before the job is retried.
      *
      * @param  string  $key
+     * @param  int  $decaySeconds
+     * @param  bool  $slidingWindow
      * @return int
      */
-    protected function getTimeUntilNextRetry($key)
+    protected function getTimeUntilNextRetry($key, $decaySeconds = 60, $slidingWindow = false)
     {
         return ($this->decaysAt[$key] - $this->currentTime()) + 3;
     }
