@@ -2,31 +2,17 @@
 
 namespace Illuminate\Foundation\Http\Events;
 
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
 class RequestHandled
 {
     /**
-     * The request instance.
-     *
-     * @var \Illuminate\Http\Request
-     */
-    public $request;
-
-    /**
-     * The response instance.
-     *
-     * @var \Illuminate\Http\Response
-     */
-    public $response;
-
-    /**
      * Create a new event instance.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Http\Response  $response
      */
-    public function __construct($request, $response)
-    {
-        $this->request = $request;
-        $this->response = $response;
+    public function __construct(
+        public Request $request,
+        public Response $response,
+    ) {
     }
 }
