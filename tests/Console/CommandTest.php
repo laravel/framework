@@ -3,6 +3,9 @@
 namespace Illuminate\Tests\Console;
 
 use Illuminate\Console\Application;
+use Illuminate\Console\Attributes\Help;
+use Illuminate\Console\Attributes\Hidden;
+use Illuminate\Console\Attributes\Isolated;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Console\OutputStyle;
@@ -219,10 +222,74 @@ class CommandTest extends TestCase
         $this->assertSame('foo:bar', $command->getName());
         $this->assertSame(['bar:baz', 'baz:qux'], $command->getAliases());
     }
+
+    public function testHiddenAttributeHidesCommand()
+    {
+        $command = new HiddenCommand;
+
+        $this->assertTrue($command->isHidden());
+    }
+
+    public function testHelpAttributeCanSetHelp()
+    {
+        $command = new HelpCommand;
+
+        $this->assertSame('Extended help text.', $command->getHelp());
+    }
+
+    public function testIsolatedAttributeRegistersIsolatedOption()
+    {
+        $command = new IsolatedCommand;
+
+        $this->assertTrue($command->getDefinition()->hasOption('isolated'));
+    }
+
+    public function testIsolatedAttributeWithExitCodeRegistersIsolatedOption()
+    {
+        $command = new IsolatedWithExitCodeCommand;
+
+        $this->assertTrue($command->getDefinition()->hasOption('isolated'));
+    }
 }
 
 #[Signature('foo:bar', aliases: ['bar:baz', 'baz:qux'])]
 class SignatureWithAliasesCommand extends Command
+{
+    public function handle()
+    {
+    }
+}
+
+#[Signature('foo:bar')]
+#[Hidden]
+class HiddenCommand extends Command
+{
+    public function handle()
+    {
+    }
+}
+
+#[Signature('foo:bar')]
+#[Help('Extended help text.')]
+class HelpCommand extends Command
+{
+    public function handle()
+    {
+    }
+}
+
+#[Signature('foo:bar')]
+#[Isolated]
+class IsolatedCommand extends Command
+{
+    public function handle()
+    {
+    }
+}
+
+#[Signature('foo:bar')]
+#[Isolated(exitCode: 1)]
+class IsolatedWithExitCodeCommand extends Command
 {
     public function handle()
     {

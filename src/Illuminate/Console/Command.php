@@ -3,6 +3,9 @@
 namespace Illuminate\Console;
 
 use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Help;
+use Illuminate\Console\Attributes\Hidden;
+use Illuminate\Console\Attributes\Isolated;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\View\Components\Factory;
 use Illuminate\Contracts\Console\Isolatable;
@@ -124,7 +127,7 @@ class Command extends SymfonyCommand
             $this->specifyParameters();
         }
 
-        if ($this instanceof Isolatable) {
+        if ($this instanceof Isolatable || $this->isolated) {
             $this->configureIsolation();
         }
     }
@@ -154,6 +157,23 @@ class Command extends SymfonyCommand
 
         if (count($description) > 0) {
             $this->description = $description[0]->newInstance()->description;
+        }
+
+        $help = $reflection->getAttributes(Help::class);
+
+        if (count($help) > 0) {
+            $this->help = $help[0]->newInstance()->help;
+        }
+
+        if (count($reflection->getAttributes(Hidden::class)) > 0) {
+            $this->hidden = true;
+        }
+
+        $isolated = $reflection->getAttributes(Isolated::class);
+
+        if (count($isolated) > 0) {
+            $this->isolated = true;
+            $this->isolatedExitCode = $isolated[0]->newInstance()->exitCode;
         }
     }
 
@@ -227,7 +247,7 @@ class Command extends SymfonyCommand
     #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if ($this instanceof Isolatable && $this->option('isolated') !== false &&
+        if (($this instanceof Isolatable || $this->isolated) && $this->option('isolated') !== false &&
             ! $this->commandIsolationMutex()->create($this)) {
             $this->comment(sprintf(
                 'The [%s] command is already running.', $this->getName()
@@ -247,7 +267,7 @@ class Command extends SymfonyCommand
 
             return static::FAILURE;
         } finally {
-            if ($this instanceof Isolatable && $this->option('isolated') !== false) {
+            if (($this instanceof Isolatable || $this->isolated) && $this->option('isolated') !== false) {
                 $this->commandIsolationMutex()->forget($this);
             }
         }
