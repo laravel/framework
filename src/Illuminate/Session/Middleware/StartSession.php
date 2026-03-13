@@ -15,29 +15,12 @@ use Symfony\Component\HttpFoundation\Response;
 class StartSession
 {
     /**
-     * The session manager.
-     *
-     * @var \Illuminate\Session\SessionManager
-     */
-    protected $manager;
-
-    /**
-     * The callback that can resolve an instance of the cache factory.
-     *
-     * @var callable|null
-     */
-    protected $cacheFactoryResolver;
-
-    /**
      * Create a new session middleware.
-     *
-     * @param  \Illuminate\Session\SessionManager  $manager
-     * @param  callable|null  $cacheFactoryResolver
      */
-    public function __construct(SessionManager $manager, ?callable $cacheFactoryResolver = null)
-    {
-        $this->manager = $manager;
-        $this->cacheFactoryResolver = $cacheFactoryResolver;
+    public function __construct(
+        protected SessionManager $manager,
+        protected ?callable $cacheFactoryResolver = null,
+    ) {
     }
 
     /**

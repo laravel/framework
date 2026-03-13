@@ -10,37 +10,18 @@ use Illuminate\Support\Facades\Date;
 class RequirePassword
 {
     /**
-     * The response factory instance.
-     *
-     * @var \Illuminate\Contracts\Routing\ResponseFactory
-     */
-    protected $responseFactory;
-
-    /**
-     * The URL generator instance.
-     *
-     * @var \Illuminate\Contracts\Routing\UrlGenerator
-     */
-    protected $urlGenerator;
-
-    /**
      * The password timeout.
-     *
-     * @var int
      */
-    protected $passwordTimeout;
+    protected int $passwordTimeout;
 
     /**
      * Create a new middleware instance.
-     *
-     * @param  \Illuminate\Contracts\Routing\ResponseFactory  $responseFactory
-     * @param  \Illuminate\Contracts\Routing\UrlGenerator  $urlGenerator
-     * @param  int|null  $passwordTimeout
      */
-    public function __construct(ResponseFactory $responseFactory, UrlGenerator $urlGenerator, $passwordTimeout = null)
-    {
-        $this->responseFactory = $responseFactory;
-        $this->urlGenerator = $urlGenerator;
+    public function __construct(
+        protected ResponseFactory $responseFactory,
+        protected UrlGenerator $urlGenerator,
+        ?int $passwordTimeout = null,
+    ) {
         $this->passwordTimeout = $passwordTimeout ?: 10800;
     }
 

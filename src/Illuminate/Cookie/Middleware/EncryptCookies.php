@@ -14,13 +14,6 @@ use Symfony\Component\HttpFoundation\Response;
 class EncryptCookies
 {
     /**
-     * The encrypter instance.
-     *
-     * @var \Illuminate\Contracts\Encryption\Encrypter
-     */
-    protected $encrypter;
-
-    /**
      * The names of the cookies that should not be encrypted.
      *
      * @var array<int, string>
@@ -43,12 +36,10 @@ class EncryptCookies
 
     /**
      * Create a new CookieGuard instance.
-     *
-     * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
      */
-    public function __construct(EncrypterContract $encrypter)
-    {
-        $this->encrypter = $encrypter;
+    public function __construct(
+        protected EncrypterContract $encrypter,
+    ) {
     }
 
     /**

@@ -22,20 +22,6 @@ class PreventRequestForgery
         InteractsWithTime;
 
     /**
-     * The application instance.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
-
-    /**
-     * The encrypter implementation.
-     *
-     * @var \Illuminate\Contracts\Encryption\Encrypter
-     */
-    protected $encrypter;
-
-    /**
      * The URIs that should be excluded.
      *
      * @var array<int, string>
@@ -72,14 +58,11 @@ class PreventRequestForgery
 
     /**
      * Create a new middleware instance.
-     *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
      */
-    public function __construct(Application $app, Encrypter $encrypter)
-    {
-        $this->app = $app;
-        $this->encrypter = $encrypter;
+    public function __construct(
+        protected Application $app,
+        protected Encrypter $encrypter,
+    ) {
     }
 
     /**
