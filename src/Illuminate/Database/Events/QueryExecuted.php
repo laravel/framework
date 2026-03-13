@@ -2,67 +2,28 @@
 
 namespace Illuminate\Database\Events;
 
+use Illuminate\Database\Connection;
+
 class QueryExecuted
 {
     /**
-     * The SQL query that was executed.
-     *
-     * @var string
-     */
-    public $sql;
-
-    /**
-     * The array of query bindings.
-     *
-     * @var array
-     */
-    public $bindings;
-
-    /**
-     * The number of milliseconds it took to execute the query.
-     *
-     * @var float
-     */
-    public $time;
-
-    /**
-     * The database connection instance.
-     *
-     * @var \Illuminate\Database\Connection
-     */
-    public $connection;
-
-    /**
      * The database connection name.
-     *
-     * @var string
      */
-    public $connectionName;
-
-    /**
-     * The PDO read / write type for the executed query.
-     *
-     * @var null|'read'|'write'
-     */
-    public $readWriteType;
+    public string $connectionName;
 
     /**
      * Create a new event instance.
      *
-     * @param  string  $sql
-     * @param  array  $bindings
-     * @param  float|null  $time
-     * @param  \Illuminate\Database\Connection  $connection
      * @param  null|'read'|'write'  $readWriteType
      */
-    public function __construct($sql, $bindings, $time, $connection, $readWriteType = null)
-    {
-        $this->sql = $sql;
-        $this->time = $time;
-        $this->bindings = $bindings;
-        $this->connection = $connection;
+    public function __construct(
+        public string $sql,
+        public array $bindings,
+        public ?float $time,
+        public Connection $connection,
+        public ?string $readWriteType = null,
+    ) {
         $this->connectionName = $connection->getName();
-        $this->readWriteType = $readWriteType;
     }
 
     /**
