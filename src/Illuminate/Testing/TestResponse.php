@@ -20,6 +20,7 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Testing\Constraints\SeeInOrder;
+use Illuminate\Testing\Fluent\AssertableHtml;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Testing\TestResponseAssert as PHPUnit;
 use LogicException;
@@ -863,6 +864,24 @@ class TestResponse implements ArrayAccess
             if (Arr::isAssoc($assert->toArray())) {
                 $assert->interacted();
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response HTML satisfies a given set of fluent assertions.
+     *
+     * @param  string|\Closure  $selectorOrCallback
+     * @param  \Closure|null  $callback
+     * @return $this
+     */
+    public function assertHtml(string|Closure $selectorOrCallback, ?Closure $callback = null): static
+    {
+        if ($selectorOrCallback instanceof Closure) {
+            $selectorOrCallback(AssertableHtml::fromResponse($this));
+        } else {
+            AssertableHtml::fromResponse($this)->scope($selectorOrCallback, $callback);
         }
 
         return $this;
