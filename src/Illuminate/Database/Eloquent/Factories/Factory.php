@@ -617,17 +617,11 @@ abstract class Factory
 
         $effectiveOnly = $this->only;
 
-        $onlyByDefault = static::$onlyByDefaultResolver
-            ? (bool) (static::$onlyByDefaultResolver)($this)
-            : (static::$onlyByDefault ?? (bool) config('database.factories.only_by_default', false));
-
-        if ($effectiveOnly === null && $onlyByDefault) {
+        if ($effectiveOnly === null && $this->isOnlyByDefault()) {
             $effectiveOnly = $this->parseNestedRelationships($this->required);
         }
 
-        $inferRequired = static::$inferRequiredForeignKeysResolver
-            ? (bool) (static::$inferRequiredForeignKeysResolver)($this)
-            : (static::$inferRequiredForeignKeys ?? (bool) config('database.factories.infer_required_foreign_keys', false));
+        $inferRequired = $this->shouldInferRequiredForeignKeys();
 
         if ($effectiveOnly !== null && $inferRequired) {
             $model = $this->newModel();
@@ -1397,6 +1391,46 @@ abstract class Factory
     public static function resolveInferRequiredForeignKeysUsing(callable $callback)
     {
         static::$inferRequiredForeignKeysResolver = $callback;
+    }
+
+    /**
+     * Determine whether only() should be active by default for this factory instance.
+     *
+     * @return bool
+     */
+    protected function isOnlyByDefault(): bool
+    {
+        return static::$onlyByDefaultResolver
+            ? (bool) (static::$onlyByDefaultResolver)($this)
+            : (static::$onlyByDefault ?? static::resolveFactoryConfig('only_by_default'));
+    }
+
+    /**
+     * Determine whether non-nullable FK relationships should be inferred from the schema.
+     *
+     * @return bool
+     */
+    protected function shouldInferRequiredForeignKeys(): bool
+    {
+        return static::$inferRequiredForeignKeysResolver
+            ? (bool) (static::$inferRequiredForeignKeysResolver)($this)
+            : (static::$inferRequiredForeignKeys ?? static::resolveFactoryConfig('infer_required_foreign_keys'));
+    }
+
+    /**
+     * Read a value from the database.factories config, returning false when no
+     * application container is available (e.g. in bare PHPUnit test environments).
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected static function resolveFactoryConfig(string $key): bool
+    {
+        try {
+            return (bool) config('database.factories.'.$key, false);
+        } catch (Throwable) {
+            return false;
+        }
     }
 
     /**
