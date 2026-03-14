@@ -1131,7 +1131,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->name = 'taylor';
         $model->exists = false;
-        $this->assertTrue($model->saveOrIgnore(['name']));
+        $this->assertTrue($model->saveOrIgnore());
         $this->assertEquals(1, $model->id);
         $this->assertTrue($model->exists);
         $this->assertTrue($model->wasRecentlyCreated);
@@ -1154,7 +1154,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->name = 'taylor';
         $model->exists = false;
-        $this->assertFalse($model->saveOrIgnore(['name']));
+        $this->assertFalse($model->saveOrIgnore());
         $this->assertFalse($model->exists);
         $this->assertFalse($model->wasRecentlyCreated);
     }
@@ -1179,10 +1179,32 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->name = 'taylor';
         $model->exists = false;
-        $this->assertTrue($model->saveOrIgnore(['name']));
+        $this->assertTrue($model->saveOrIgnore());
         $this->assertNull($model->id);
         $this->assertTrue($model->exists);
         $this->assertTrue($model->wasRecentlyCreated);
+    }
+
+    public function testInsertOrIgnoreProcessWithNamedUnique()
+    {
+        $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'refresh'])->getMock();
+        $query = m::mock(Builder::class);
+        $baseQuery = m::mock(BaseBuilder::class);
+        $query->shouldReceive('toBase')->once()->andReturn($baseQuery);
+        $baseQuery->shouldReceive('insertOrIgnoreReturning')->once()->with(['name' => 'taylor'], ['*'], ['name'])->andReturn(new BaseCollection);
+        $query->shouldReceive('getConnection')->once();
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+        $model->expects($this->once())->method('updateTimestamps');
+
+        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
+
+        $model->name = 'taylor';
+        $model->exists = false;
+        $this->assertFalse($model->saveOrIgnore([], ['name']));
+        $this->assertFalse($model->exists);
+        $this->assertFalse($model->wasRecentlyCreated);
     }
 
     public function testInsertOrIgnoreThrowsOnExistingModel()
@@ -1191,7 +1213,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model = new EloquentModelStub;
         $model->exists = true;
-        $model->saveOrIgnore(['name']);
+        $model->saveOrIgnore();
     }
 
     public function testDeleteProperlyDeletesModel()
