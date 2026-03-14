@@ -1567,6 +1567,7 @@ class FactoryTestUserFactory extends Factory
     }
 }
 
+#[UseFactory(FactoryTestUserFactory::class)]
 class FactoryTestUser extends Eloquent
 {
     use HasFactory;
