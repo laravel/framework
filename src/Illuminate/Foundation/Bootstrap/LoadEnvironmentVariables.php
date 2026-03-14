@@ -12,6 +12,13 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 class LoadEnvironmentVariables
 {
     /**
+     * Environment variables that were loaded from environment files during this PHP process.
+     *
+     * @var array<string, true>
+     */
+    protected static $loadedEnvironmentVariables = [];
+
+    /**
      * Bootstrap the given application.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -26,7 +33,9 @@ class LoadEnvironmentVariables
         $this->checkForSpecificEnvironmentFile($app);
 
         try {
-            $this->createDotenv($app)->safeLoad();
+            $loaded = $this->createDotenv($app)->safeLoad();
+
+            $this->rememberLoadedEnvironmentVariables($loaded);
         } catch (InvalidFileException $e) {
             $this->writeErrorAndDie($e);
         }
@@ -48,7 +57,7 @@ class LoadEnvironmentVariables
 
         $environment = Env::get('APP_ENV');
 
-        if (! $environment) {
+        if (! $environment || $this->wasLoadedFromEnvironmentFile('APP_ENV')) {
             return;
         }
 
@@ -88,6 +97,30 @@ class LoadEnvironmentVariables
             $app->environmentPath(),
             $app->environmentFile()
         );
+    }
+
+    /**
+     * Remember the environment variables loaded from an environment file.
+     *
+     * @param  array<string, string>  $loaded
+     * @return void
+     */
+    protected function rememberLoadedEnvironmentVariables($loaded)
+    {
+        foreach (array_keys($loaded) as $key) {
+            static::$loadedEnvironmentVariables[$key] = true;
+        }
+    }
+
+    /**
+     * Determine if a variable was loaded from an environment file earlier in this process.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function wasLoadedFromEnvironmentFile($key)
+    {
+        return isset(static::$loadedEnvironmentVariables[$key]);
     }
 
     /**
