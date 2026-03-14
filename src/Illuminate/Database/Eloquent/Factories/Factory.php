@@ -1118,6 +1118,15 @@ abstract class Factory
                 continue;
             }
 
+            // Skip methods declared on Model itself or its built-in traits — they are not
+            // user-defined relation methods and may call string helpers with null attribute
+            // values on a fresh (unpersisted) model instance.
+            $declaringClass = $method->getDeclaringClass()->getName();
+
+            if ($declaringClass !== $modelClass && ! is_subclass_of($declaringClass, Model::class)) {
+                continue;
+            }
+
             try {
                 $rel = Relation::noConstraints(fn () => $method->invoke($model));
 
