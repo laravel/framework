@@ -186,6 +186,18 @@ class AssertableHtmlTest extends TestCase
         $this->html('<input type="email">')->hasAttr('input', 'disabled');
     }
 
+    // --- whereAttribute / hasAttribute aliases ---
+
+    public function testWhereAttributeIsAliasForWhereAttr(): void
+    {
+        $this->html('<a href="/about">About</a>')->whereAttribute('a', 'href', '/about');
+    }
+
+    public function testHasAttributeIsAliasForHasAttr(): void
+    {
+        $this->html('<input type="email" required>')->hasAttribute('input', 'required');
+    }
+
     // --- missingAttr ---
 
     public function testMissingAttrPassesWhenAttributeAbsent(): void

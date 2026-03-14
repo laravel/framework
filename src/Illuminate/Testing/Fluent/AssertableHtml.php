@@ -262,6 +262,31 @@ class AssertableHtml
     }
 
     /**
+     * Alias for whereAttr().
+     *
+     * @param  string  $selector
+     * @param  string  $attribute
+     * @param  string  $expected
+     * @return $this
+     */
+    public function whereAttribute(string $selector, string $attribute, string $expected): static
+    {
+        return $this->whereAttr($selector, $attribute, $expected);
+    }
+
+    /**
+     * Alias for hasAttr().
+     *
+     * @param  string  $selector
+     * @param  string  $attribute
+     * @return $this
+     */
+    public function hasAttribute(string $selector, string $attribute): static
+    {
+        return $this->hasAttr($selector, $attribute);
+    }
+
+    /**
      * Assert that the matched element does not have the given attribute.
      *
      * @param  string  $selector
