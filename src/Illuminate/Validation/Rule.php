@@ -23,6 +23,7 @@ use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\StringRule;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Validation\Rules\Url;
 
 class Rule
 {
@@ -254,6 +255,16 @@ class Rule
     public static function string()
     {
         return new StringRule;
+    }
+
+    /**
+     * Get a URL rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Url
+     */
+    public static function url()
+    {
+        return new Url;
     }
 
     /**

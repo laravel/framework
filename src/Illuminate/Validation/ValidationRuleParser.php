@@ -14,6 +14,7 @@ use Illuminate\Validation\Rules\Date;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Numeric;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Validation\Rules\Url;
 
 class ValidationRuleParser
 {
@@ -94,7 +95,7 @@ class ValidationRuleParser
         }
 
         if (is_object($rule)) {
-            if ($rule instanceof Date || $rule instanceof Numeric) {
+            if ($rule instanceof Date || $rule instanceof Numeric || $rule instanceof Url) {
                 return explode('|', (string) $rule);
             }
 
@@ -104,7 +105,7 @@ class ValidationRuleParser
         $rules = [];
 
         foreach ($rule as $value) {
-            if ($value instanceof Date || $value instanceof Numeric) {
+            if ($value instanceof Date || $value instanceof Numeric || $value instanceof Url) {
                 $rules = array_merge($rules, explode('|', (string) $value));
             } else {
                 $rules[] = $this->prepareRule($value, $attribute);
