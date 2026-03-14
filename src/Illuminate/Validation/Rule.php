@@ -21,6 +21,7 @@ use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\Numeric;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
+use Illuminate\Validation\Rules\StringRule;
 use Illuminate\Validation\Rules\Unique;
 
 class Rule
@@ -243,6 +244,16 @@ class Rule
     public static function dimensions(array $constraints = [])
     {
         return new Dimensions($constraints);
+    }
+
+    /**
+     * Get a string rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\StringRule
+     */
+    public static function string()
+    {
+        return new StringRule;
     }
 
     /**
