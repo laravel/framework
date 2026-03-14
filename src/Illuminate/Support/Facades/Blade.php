@@ -27,7 +27,7 @@ namespace Illuminate\Support\Facades;
  * @method static void include(string $path, string|null $alias = null)
  * @method static void aliasInclude(string $path, string|null $alias = null)
  * @method static void bindDirective(string $name, callable $handler)
- * @method static void directive(string $name, callable $handler, bool $bind = false)
+ * @method static void directive(string $name, \Closure|callable $handler, bool $bind = false)
  * @method static array getCustomDirectives()
  * @method static \Illuminate\View\Compilers\BladeCompiler prepareStringsForCompilationUsing(callable $callback)
  * @method static void precompiler(callable $precompiler)

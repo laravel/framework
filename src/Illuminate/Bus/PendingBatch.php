@@ -232,7 +232,7 @@ class PendingBatch
      *
      * Optionally, add callbacks to be executed upon each job failure.
      *
-     * @template TParam of (Closure(\Illuminate\Bus\Batch, \Throwable|null): mixed)|(callable(\Illuminate\Bus\Batch, \Throwable|null): mixed)
+     * @phpstan-type TParam (Closure(\Illuminate\Bus\Batch, \Throwable|null): mixed)|(callable(\Illuminate\Bus\Batch, \Throwable|null): mixed)
      *
      * @param  bool|TParam|array<array-key, TParam>  $param
      * @return $this

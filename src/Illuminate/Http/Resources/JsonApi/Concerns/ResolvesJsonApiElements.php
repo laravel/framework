@@ -160,7 +160,7 @@ trait ResolvesJsonApiElements
     /**
      * Resolves `relationships` for the resource's data object.
      *
-     * @return string|int
+     * @return array
      *
      * @throws \RuntimeException
      */

@@ -103,8 +103,10 @@ class EncryptCookies
      * Validate and remove the cookie value prefix from the value.
      *
      * @param  string  $key
-     * @param  string  $value
-     * @return string|array|null
+     * @param  array<string, string>|string  $value
+     * @return array|string|null
+     *
+     * @phpstan-return ($value is array ? array<string|null> : string|null)
      */
     protected function validateValue(string $key, $value)
     {

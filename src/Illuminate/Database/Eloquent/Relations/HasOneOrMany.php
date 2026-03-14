@@ -204,6 +204,10 @@ abstract class HasOneOrMany extends Relation
         foreach ($results as $key => $item) {
             $pairKey = $this->getDictionaryKey($item->{$foreign});
 
+            if ($pairKey === null) {
+                continue;
+            }
+
             if ($isAssociative) {
                 $dictionary[$pairKey][$key] = $item;
             } else {
@@ -580,7 +584,7 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
-     * Get the fully qualified parent key name.
+     * Get the fully-qualified parent key name.
      *
      * @return string
      */

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Illuminate\Tests\Integration\Console\Scheduling;
 
+use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\Schedule as ScheduleClass;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schedule;
@@ -212,5 +213,103 @@ class ScheduleGroupTest extends TestCase
         $this->assertSame('0 3 * * 1-5', $events[1]->expression);
         $this->assertSame('* * * * 1-5', $events[2]->expression);
         $this->assertSame('0 4 * * 1-5', $events[3]->expression);
+    }
+
+    public function testGroupAppliesEventMacrosToAllEvents()
+    {
+        Event::macro('sentryMonitor', function () {
+            $this->sentryMonitored = true;
+
+            return $this;
+        });
+
+        $schedule = new ScheduleClass;
+        $schedule->daily()->sentryMonitor()->group(function ($schedule) {
+            $schedule->command('inspire');
+            $schedule->command('inspire');
+        });
+
+        $events = $schedule->events();
+        $this->assertTrue($events[0]->sentryMonitored);
+        $this->assertTrue($events[1]->sentryMonitored);
+        $this->assertSame('0 0 * * *', $events[0]->expression);
+        $this->assertSame('0 0 * * *', $events[1]->expression);
+
+        Event::flushMacros();
+    }
+
+    public function testGroupAppliesEventMacroCalledBeforeBuiltInAttributes()
+    {
+        Event::macro('sentryMonitor', function () {
+            $this->sentryMonitored = true;
+
+            return $this;
+        });
+
+        $schedule = new ScheduleClass;
+        $schedule->sentryMonitor()->daily()->onOneServer()->group(function ($schedule) {
+            $schedule->command('inspire');
+        });
+
+        $events = $schedule->events();
+        $this->assertTrue($events[0]->sentryMonitored);
+        $this->assertTrue($events[0]->onOneServer);
+        $this->assertSame('0 0 * * *', $events[0]->expression);
+
+        Event::flushMacros();
+    }
+
+    public function testGroupAppliesMultipleEventMacros()
+    {
+        Event::macro('sentryMonitor', function () {
+            $this->sentryMonitored = true;
+
+            return $this;
+        });
+
+        Event::macro('customTag', function ($tag) {
+            $this->customTag = $tag;
+
+            return $this;
+        });
+
+        $schedule = new ScheduleClass;
+        $schedule->daily()->sentryMonitor()->customTag('billing')->group(function ($schedule) {
+            $schedule->command('inspire');
+            $schedule->command('inspire');
+        });
+
+        $events = $schedule->events();
+        $this->assertTrue($events[0]->sentryMonitored);
+        $this->assertSame('billing', $events[0]->customTag);
+        $this->assertTrue($events[1]->sentryMonitored);
+        $this->assertSame('billing', $events[1]->customTag);
+
+        Event::flushMacros();
+    }
+
+    public function testNestedGroupInheritsEventMacros()
+    {
+        Event::macro('sentryMonitor', function () {
+            $this->sentryMonitored = true;
+
+            return $this;
+        });
+
+        $schedule = new ScheduleClass;
+        $schedule->daily()->sentryMonitor()->group(function ($schedule) {
+            $schedule->command('inspire');
+            $schedule->weekly()->group(function ($schedule) {
+                $schedule->command('inspire');
+            });
+        });
+
+        $events = $schedule->events();
+        $this->assertTrue($events[0]->sentryMonitored);
+        $this->assertSame('0 0 * * *', $events[0]->expression);
+        $this->assertTrue($events[1]->sentryMonitored);
+        $this->assertSame('0 0 * * 0', $events[1]->expression);
+
+        Event::flushMacros();
     }
 }

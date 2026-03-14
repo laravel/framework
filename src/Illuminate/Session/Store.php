@@ -274,7 +274,7 @@ class Store implements Session
     /**
      * Checks if a key exists.
      *
-     * @param  \BackedEnum|\UnitEnum|string|array  $key
+     * @param  \UnitEnum|string|array  $key
      * @return bool
      */
     public function exists($key)
@@ -289,7 +289,7 @@ class Store implements Session
     /**
      * Determine if the given key is missing from the session data.
      *
-     * @param  \BackedEnum|\UnitEnum|string|array  $key
+     * @param  \UnitEnum|string|array  $key
      * @return bool
      */
     public function missing($key)
@@ -300,7 +300,7 @@ class Store implements Session
     /**
      * Determine if a key is present and not null.
      *
-     * @param  \BackedEnum|\UnitEnum|string|array  $key
+     * @param  \UnitEnum|string|array  $key
      * @return bool
      */
     public function has($key)
@@ -313,7 +313,7 @@ class Store implements Session
     /**
      * Determine if any of the given keys are present and not null.
      *
-     * @param  \BackedEnum|\UnitEnum|string|array  $key
+     * @param  \UnitEnum|string|array  $key
      * @return bool
      */
     public function hasAny($key)
@@ -326,7 +326,7 @@ class Store implements Session
     /**
      * Get an item from the session.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  \UnitEnum|string  $key
      * @param  mixed  $default
      * @return mixed
      */
@@ -338,7 +338,7 @@ class Store implements Session
     /**
      * Get the value of a given key and then forget it.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  \UnitEnum|string  $key
      * @param  mixed  $default
      * @return mixed
      */
@@ -386,7 +386,7 @@ class Store implements Session
     /**
      * Put a key / value pair or array of key / value pairs in the session.
      *
-     * @param  \BackedEnum|\UnitEnum|string|array  $key
+     * @param  \UnitEnum|string|array  $key
      * @param  mixed  $value
      * @return void
      */
@@ -404,7 +404,7 @@ class Store implements Session
     /**
      * Get an item from the session, or store the default value.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  \UnitEnum|string  $key
      * @param  \Closure  $callback
      * @return mixed
      */
@@ -422,7 +422,7 @@ class Store implements Session
     /**
      * Push a value onto a session array.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  \UnitEnum|string  $key
      * @param  mixed  $value
      * @return void
      */
@@ -438,7 +438,7 @@ class Store implements Session
     /**
      * Increment the value of an item in the session.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  \UnitEnum|string  $key
      * @param  int  $amount
      * @return mixed
      */
@@ -452,7 +452,7 @@ class Store implements Session
     /**
      * Decrement the value of an item in the session.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  \UnitEnum|string  $key
      * @param  int  $amount
      * @return int
      */
@@ -464,7 +464,7 @@ class Store implements Session
     /**
      * Flash a key / value pair to the session.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  \UnitEnum|string  $key
      * @param  mixed  $value
      * @return void
      */
@@ -482,7 +482,7 @@ class Store implements Session
     /**
      * Flash a key / value pair to the session for immediate use.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  \UnitEnum|string  $key
      * @param  mixed  $value
      * @return void
      */
@@ -568,7 +568,7 @@ class Store implements Session
     /**
      * Remove an item from the session, returning its value.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  \UnitEnum|string  $key
      * @return mixed
      */
     public function remove($key)
@@ -579,12 +579,12 @@ class Store implements Session
     /**
      * Remove one or many items from the session.
      *
-     * @param  \BackedEnum|\UnitEnum|string|array  $keys
+     * @param  \UnitEnum|string|array  $keys
      * @return void
      */
     public function forget($keys)
     {
-        Arr::forget($this->attributes, collect((array) $keys)->map(fn ($key) => enum_value($key))->all());
+        Arr::forget($this->attributes, (new Collection((array) $keys))->map(fn ($key) => enum_value($key))->all());
     }
 
     /**

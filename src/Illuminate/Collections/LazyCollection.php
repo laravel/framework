@@ -1028,11 +1028,12 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * Get one or a specified number of items randomly from the collection.
      *
      * @param  int|null  $number
+     * @param  bool  $preserveKeys
      * @return static<int, TValue>|TValue
      *
      * @throws \InvalidArgumentException
      */
-    public function random($number = null)
+    public function random($number = null, $preserveKeys = false)
     {
         $result = $this->collect()->random(...func_get_args());
 
@@ -1703,11 +1704,12 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Flatten a multi-dimensional associative array with dots.
      *
+     * @param  int  $depth
      * @return static
      */
-    public function dot()
+    public function dot($depth = INF)
     {
-        return $this->passthru(__FUNCTION__, []);
+        return $this->passthru(__FUNCTION__, [$depth]);
     }
 
     /**

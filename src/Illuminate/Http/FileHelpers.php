@@ -14,7 +14,7 @@ trait FileHelpers
     protected $hashName = null;
 
     /**
-     * Get the fully qualified path to the file.
+     * Get the fully-qualified path to the file.
      *
      * @return string
      */

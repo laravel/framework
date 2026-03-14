@@ -114,7 +114,7 @@ class Rule
     /**
      * Get an in rule builder instance.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string  $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|\UnitEnum|array|string  $values
      * @return \Illuminate\Validation\Rules\In
      */
     public static function in($values)
@@ -129,7 +129,7 @@ class Rule
     /**
      * Get a not_in rule builder instance.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string  $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|\UnitEnum|array|string  $values
      * @return \Illuminate\Validation\Rules\NotIn
      */
     public static function notIn($values)
@@ -271,7 +271,7 @@ class Rule
     /**
      * Get a contains rule builder instance.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string  $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|\UnitEnum|array|string  $values
      * @return \Illuminate\Validation\Rules\Contains
      */
     public static function contains($values)
@@ -286,7 +286,7 @@ class Rule
     /**
      * Get a "does not contain" rule builder instance.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string  $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|\UnitEnum|array|string  $values
      * @return \Illuminate\Validation\Rules\DoesntContain
      */
     public static function doesntContain($values)

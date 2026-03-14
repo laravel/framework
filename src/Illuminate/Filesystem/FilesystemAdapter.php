@@ -37,7 +37,6 @@ use PHPUnit\Framework\Assert as PHPUnit;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Throwable;
 
 /**
  * @mixin \League\Flysystem\FilesystemOperator
@@ -1089,10 +1088,10 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * Report the exception.
      *
-     * @param  Throwable  $exception
+     * @param  \Throwable  $exception
      * @return void
      *
-     * @throws Throwable
+     * @throws \Throwable
      */
     protected function report($exception)
     {

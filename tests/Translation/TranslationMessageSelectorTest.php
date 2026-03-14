@@ -16,6 +16,13 @@ class TranslationMessageSelectorTest extends TestCase
         $this->assertEquals($expected, $selector->choose($id, $number, 'en'));
     }
 
+    public function testChooseWithFloatDoesNotTriggerDeprecation()
+    {
+        $selector = new MessageSelector;
+
+        $this->assertEquals('many', $selector->choose('{0} zero|{1} one|[2,*] many', 2.75, 'pl'));
+    }
+
     public static function chooseTestData()
     {
         return [

@@ -291,6 +291,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      * Pop the next job off of the queue.
      *
      * @param  string|null  $queue
+     * @param  int  $index
      * @return \Illuminate\Contracts\Queue\Job|null
      */
     public function pop($queue = null, $index = 0)

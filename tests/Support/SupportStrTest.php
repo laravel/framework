@@ -691,6 +691,9 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::isUrl('http://sub.domain.com'));
         $this->assertTrue(Str::isUrl('http://my-site.com'));
         $this->assertTrue(Str::isUrl('https://example.com:8080/path?q=1#frag'));
+        $this->assertTrue(Str::isUrl('https://xn--e1afmkfd.xn--p1ai'));
+        $this->assertTrue(Str::isUrl('https://xn--e1afmkfd.xn--e1afmkfd.xn--p1ai'));
+        $this->assertTrue(Str::isUrl('https://1.xn--e1afmkfd.xn--p1ai'));
         $this->assertFalse(Str::isUrl('invalid url'));
         $this->assertFalse(Str::isUrl('http://.'));
         $this->assertFalse(Str::isUrl('http://...'));

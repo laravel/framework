@@ -89,6 +89,8 @@ abstract class Type extends JsonSchema
      * Restrict the value to one of the provided enumerated values.
      *
      * @param  class-string<\BackedEnum>|array<int, mixed>  $values
+     *
+     * @throws \InvalidArgumentException
      */
     public function enum(array|string $values): static
     {
