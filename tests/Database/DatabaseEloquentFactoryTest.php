@@ -64,7 +64,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
         $this->schema()->create('posts', function ($table) {
             $table->increments('id');
-            $table->foreignId('user_id');
+            $table->foreignId('user_id')->nullable();
             $table->string('title');
             $table->softDeletes();
             $table->timestamps();
@@ -1097,6 +1097,214 @@ class DatabaseEloquentFactoryTest extends TestCase
         }
     }
 
+    public function test_only_strips_all_factory_relations_when_called_with_no_args()
+    {
+        $post = FactoryTestPostFactory::new()->only()->make();
+
+        $this->assertNull($post->user_id);
+        $this->assertSame(0, FactoryTestUser::count());
+    }
+
+    public function test_only_keeps_specified_relation_and_strips_others()
+    {
+        $comment = FactoryTestOnlyCommentFactory::new()->only('commentable')->make();
+
+        // The related post is persisted (existing factory behaviour: definition-level factory
+        // attrs are always created even when the outer call is make()).
+        // only() propagates to nested factories, so the post's user is stripped.
+        $this->assertNotNull($comment->commentable_id);
+        $this->assertNull($comment->user_id);
+        $this->assertSame(1, FactoryTestPost::count());
+        $this->assertSame(0, FactoryTestUser::count());
+        $this->assertNull(FactoryTestPost::first()->user_id);
+    }
+
+    public function test_only_accepts_multiple_string_arguments()
+    {
+        $comment = FactoryTestOnlyCommentFactory::new()->only('commentable', 'user')->make();
+
+        $this->assertNotNull($comment->commentable_id);
+        $this->assertNotNull($comment->user_id);
+        $this->assertSame(1, FactoryTestPost::count());
+        $this->assertSame(1, FactoryTestUser::count());
+    }
+
+    public function test_only_accepts_array_argument()
+    {
+        $comment = FactoryTestOnlyCommentFactory::new()->only(['commentable', 'user'])->make();
+
+        $this->assertNotNull($comment->commentable_id);
+        $this->assertNotNull($comment->user_id);
+    }
+
+    public function test_only_with_dot_notation_restricts_nested_factory()
+    {
+        // only('commentable.user') keeps the commentable (post) and within it keeps only the user.
+        // The comment's own user_id is not in the top-level whitelist, so it is null.
+        $comment = FactoryTestOnlyCommentFactory::new()->only('commentable.user')->make();
+
+        $this->assertNull($comment->user_id);
+        $this->assertNotNull($comment->commentable_id);
+        $this->assertSame(1, FactoryTestPost::count());
+        $this->assertSame(1, FactoryTestUser::count());
+        $this->assertNotNull(FactoryTestPost::first()->user_id);
+    }
+
+    public function test_only_does_not_include_relations_in_exclude_relationships()
+    {
+        $post = FactoryTestPostFactory::new()
+            ->withoutParents(['user_id'])
+            ->only('user')
+            ->make();
+
+        $this->assertNull($post->user_id);
+        $this->assertSame(0, FactoryTestUser::count());
+    }
+
+    public function test_only_always_these_are_always_included()
+    {
+        // FactoryTestAlwaysThesePostFactory declares $required = ['user'], so even
+        // only() with no args keeps the user relation.
+        $post = FactoryTestAlwaysThesePostFactory::new()->only()->make();
+
+        $this->assertNotNull($post->user_id);
+        $this->assertSame(1, FactoryTestUser::count());
+
+        // Contrast: a plain factory with no $required strips user_id.
+        $post = FactoryTestPostFactory::new()->only()->make();
+
+        $this->assertNull($post->user_id);
+    }
+
+    public function test_only_does_not_affect_scalar_attributes()
+    {
+        $post = FactoryTestPostFactory::new()->only()->make();
+
+        $this->assertNotNull($post->title);
+        $this->assertNull($post->user_id);
+    }
+
+    public function test_only_is_chainable_with_state()
+    {
+        $post = FactoryTestPostFactory::new()
+            ->only('user')
+            ->state(['title' => 'Explicit Title'])
+            ->make();
+
+        $this->assertNotNull($post->user_id);
+        $this->assertSame('Explicit Title', $post->title);
+    }
+
+    public function test_only_works_with_sequence()
+    {
+        // Sequence states are applied after only(), so titles from the sequence persist.
+        $posts = FactoryTestPostFactory::new()
+            ->only()
+            ->forEachSequence(
+                ['title' => 'First Post'],
+                ['title' => 'Second Post'],
+            )
+            ->make();
+
+        $this->assertCount(2, $posts);
+        $this->assertSame('First Post', $posts[0]->title);
+        $this->assertSame('Second Post', $posts[1]->title);
+        $this->assertNull($posts[0]->user_id);
+        $this->assertNull($posts[1]->user_id);
+        $this->assertSame(0, FactoryTestUser::count());
+    }
+
+    public function test_only_before_sequence_is_still_preserved()
+    {
+        // only() only removes definition-level scalars from its returned state, not from
+        // the accumulated carry — so sequence titles applied before only() also survive.
+        $posts = FactoryTestPostFactory::new()
+            ->forEachSequence(
+                ['title' => 'First Post'],
+                ['title' => 'Second Post'],
+            )
+            ->only()
+            ->make();
+
+        $this->assertCount(2, $posts);
+        $this->assertSame('First Post', $posts[0]->title);
+        $this->assertSame('Second Post', $posts[1]->title);
+        $this->assertNull($posts[0]->user_id);
+        $this->assertNull($posts[1]->user_id);
+        $this->assertSame(0, FactoryTestUser::count());
+    }
+
+    public function test_only_with_count_creates_filtered_collection()
+    {
+        $posts = FactoryTestPostFactory::new()
+            ->count(3)
+            ->only()
+            ->make();
+
+        $this->assertCount(3, $posts);
+        $this->assertSame(0, FactoryTestUser::count());
+        $posts->each(fn ($post) => $this->assertNull($post->user_id));
+    }
+
+    public function test_only_does_not_override_for_parent_relationship()
+    {
+        // When for() provides a parent, that parent should survive even if the relation
+        // is not in the only() whitelist — for() represents explicit caller intent.
+        $post = FactoryTestPostFactory::new()->only()->create();
+
+        $comment = FactoryTestOnlyCommentFactory::new()
+            ->for($post, 'commentable')
+            ->only('user')
+            ->make();
+
+        $this->assertSame($post->id, $comment->commentable_id);
+        $this->assertNotNull($comment->user_id);
+        $this->assertSame(1, FactoryTestPost::count());
+        $this->assertSame(1, FactoryTestUser::count());
+    }
+
+    public function test_only_does_not_suppress_has_child_relationships()
+    {
+        // has() appends a state that sets the child FK after only() runs, so the child
+        // is still created and correctly linked to the parent.
+        $user = FactoryTestUserFactory::new()
+            ->has(FactoryTestPostFactory::new()->only(), 'posts')
+            ->create();
+
+        $this->assertSame(1, FactoryTestUser::count());
+        $this->assertSame(1, FactoryTestPost::count());
+        $this->assertSame($user->id, FactoryTestPost::first()->user_id);
+    }
+
+    public function test_only_uses_recycled_model_for_whitelisted_relation()
+    {
+        $user = FactoryTestUserFactory::new()->create();
+
+        // When the relation is whitelisted, the factory instance remains and recycle applies.
+        $post = FactoryTestPostFactory::new()
+            ->recycle($user)
+            ->only('user')
+            ->make();
+
+        $this->assertSame($user->id, $post->user_id);
+        $this->assertSame(1, FactoryTestUser::count());
+    }
+
+    public function test_only_does_not_use_recycled_model_when_relation_is_stripped()
+    {
+        $user = FactoryTestUserFactory::new()->create();
+
+        // When the relation is not whitelisted, the factory instance is nulled before
+        // expandAttributes() can check the recycle pool — so user_id stays null.
+        $post = FactoryTestPostFactory::new()
+            ->recycle($user)
+            ->only()
+            ->make();
+
+        $this->assertNull($post->user_id);
+        $this->assertSame(1, FactoryTestUser::count());
+    }
+
     /**
      * Get a database connection instance.
      *
@@ -1255,6 +1463,11 @@ class FactoryTestComment extends Eloquent
     {
         return $this->morphTo();
     }
+
+    public function user()
+    {
+        return $this->belongsTo(FactoryTestUser::class, 'user_id');
+    }
 }
 
 class FactoryTestRoleFactory extends Factory
@@ -1368,4 +1581,35 @@ enum Name: string
 {
     case Taylor = 'totwell';
     case Shad = 'shaedrich';
+}
+
+// Uses direct Factory instances (not closures) so only() can inspect and strip them.
+class FactoryTestOnlyCommentFactory extends Factory
+{
+    protected $model = FactoryTestComment::class;
+
+    public function definition()
+    {
+        return [
+            'commentable_id' => FactoryTestPostFactory::new(),
+            'commentable_type' => FactoryTestPost::class,
+            'user_id' => FactoryTestUserFactory::new(),
+            'body' => $this->faker->name(),
+        ];
+    }
+}
+
+class FactoryTestAlwaysThesePostFactory extends Factory
+{
+    protected $model = FactoryTestPost::class;
+
+    protected $required = ['user'];
+
+    public function definition()
+    {
+        return [
+            'user_id' => FactoryTestUserFactory::new(),
+            'title' => $this->faker->name(),
+        ];
+    }
 }

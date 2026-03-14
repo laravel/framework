@@ -8,6 +8,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
@@ -100,6 +101,13 @@ abstract class Factory
      * @var array
      */
     protected $excludeRelationships = [];
+
+    /**
+     * The relationships that should always be included when only().
+     *
+     * @var array<string>
+     */
+    protected $required = [];
 
     /**
      * The name of the database connection that will be used to create the models.
@@ -870,6 +878,173 @@ abstract class Factory
     public function withoutParents($parents = [])
     {
         return $this->newInstance(! $parents ? ['expandRelationships' => false] : ['excludeRelationships' => $parents]);
+    }
+
+    /**
+     * Specify which related factories in the definition should be included.
+     * All other factory-type attributes are nulled out; scalar attributes are
+     * removed from the state so they do not override other applied states.
+     *
+     * Supports dot-notation for nested relationships:
+     *   ->only('address.country')
+     *
+     * Relationships listed in $required are always merged into the whitelist.
+     * Relationships listed in $excludeRelationships are never whitelisted.
+     *
+     * @param  string|array<string>  ...$relationships
+     * @return static
+     */
+    public function only(string|array ...$relationships): static
+    {
+        $required = $this->parseNestedRelationships($this->required);
+
+        $relationships = array_merge(...array_map(fn ($r) => (array) $r, $relationships ?: [[]]));
+
+        $relationships = $this->parseNestedRelationships($relationships);
+
+        $only = [...$required, ...$relationships];
+
+        return $this->state(fn () => $this->buildOnlyDefinition($only));
+    }
+
+    /**
+     * Build the definition array for only(), nulling out unwanted factory relations.
+     *
+     * @param  array<string, mixed>  $only
+     * @return array<string, mixed>
+     */
+    private function buildOnlyDefinition(array $only): array
+    {
+        $model = $this->newModel();
+        $definition = $this->definition();
+        $expected = $this->resolveExpectedRelationships($only, $model);
+
+        // Collect FK attribute names covered by for() parent relationships so we don't
+        // null them out — the caller explicitly provided those parents via for().
+        $forAttributes = $this->for
+            ->flatMap(fn (BelongsToRelationship $for) => array_keys($for->attributesFor($model)))
+            ->all();
+
+        foreach ($definition as $attribute => $value) {
+            if (array_key_exists($attribute, $expected)) {
+                $relationName = $expected[$attribute];
+
+                if ($value instanceof self && $this->isRelationExcluded($value->modelName(), $attribute)) {
+                    $definition[$attribute] = null;
+
+                    continue;
+                }
+
+                if ($value instanceof self) {
+                    $nested = $only[$relationName] ?? [];
+                    $nested = is_array($nested) ? $nested : [];
+
+                    // Respect the nested factory's $expandRelationships setting; don't
+                    // propagate only() if the nested factory has opted out of expansion.
+                    $definition[$attribute] = $value->expandRelationships
+                        ? $value->only($nested)
+                        : $value;
+                }
+
+                continue;
+            }
+
+            // Don't override attributes explicitly provided by for() parent relationships —
+            // parentResolvers() runs before this state and its values should take precedence.
+            if (in_array($attribute, $forAttributes, true)) {
+                unset($definition[$attribute]);
+
+                continue;
+            }
+
+            if ($value instanceof self) {
+                $definition[$attribute] = null;
+
+                continue;
+            }
+
+            // Remove scalar attributes so they don't clobber states applied before or after.
+            unset($definition[$attribute]);
+        }
+
+        return $definition;
+    }
+
+    /**
+     * Resolve a mapping from definition attribute keys to relation names for the given whitelist, $only.
+     *
+     * For BelongsTo-style relations the definition key is the foreign key (e.g. "user_id"),
+     * so we map both the relation name and the foreign key name to the relation name.
+     *
+     * @param  array<string, mixed>  $only
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return array<string, string>
+     */
+    private function resolveExpectedRelationships(array $only, Model $model): array
+    {
+        $map = [];
+
+        foreach ($only as $relation => $remaining) {
+            if (! method_exists($model, $relation)) {
+                continue;
+            }
+
+            // Support definitions that use the relation name directly as the key.
+            $map[$relation] = $relation;
+
+            try {
+                $relationship = $model->{$relation}();
+
+                if (method_exists($relationship, 'getForeignKeyName')) {
+                    $map[$relationship->getForeignKeyName()] = $relation;
+                }
+            } catch (\BadMethodCallException|\LogicException $e) {
+                // Some relations require persisted model state; skip FK resolution.
+            }
+        }
+
+        return $map;
+    }
+
+    /**
+     * Convert a flat, indexed array of dot-notated relationship strings into a nested array.
+     *
+     * For example: ['address', 'address.country'] becomes ['address' => ['country' => 1]].
+     * If the array is already keyed by relation name it is returned unchanged.
+     *
+     * @param  array<string>  $relationships
+     * @return array<string, mixed>
+     */
+    private function parseNestedRelationships(array $relationships): array
+    {
+        if ($relationships === []) {
+            return [];
+        }
+
+        if (! is_int(array_key_first($relationships))) {
+            return $relationships;
+        }
+
+        return Arr::undot(array_flip($relationships));
+    }
+
+    /**
+     * Determine whether a relationship should be excluded based on the factory's exclude list.
+     *
+     * @param  string|null  $modelName
+     * @param  string  $attribute
+     * @return bool
+     */
+    private function isRelationExcluded(?string $modelName, string $attribute): bool
+    {
+        if (empty($this->excludeRelationships)) {
+            return false;
+        }
+
+        return ! empty(array_intersect(
+            array_filter([$modelName, $attribute]),
+            $this->excludeRelationships
+        ));
     }
 
     /**
