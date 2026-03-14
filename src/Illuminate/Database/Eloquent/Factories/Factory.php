@@ -8,6 +8,8 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -16,6 +18,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
+use ReflectionClass;
+use ReflectionMethod;
 use Throwable;
 use UnitEnum;
 
@@ -164,6 +168,46 @@ abstract class Factory
      * @var bool
      */
     protected static $expandRelationshipsByDefault = true;
+
+    /**
+     * Whether only() is active by default for all factories.
+     * Null means the value is read from config('database.factories.only_by_default').
+     *
+     * @var bool|null
+     */
+    protected static $onlyByDefault = null;
+
+    /**
+     * Custom resolver for the onlyByDefault flag. Takes precedence over the static
+     * property and config. Receives the factory instance; should return a bool.
+     *
+     * @var (callable(static): bool)|null
+     */
+    protected static $onlyByDefaultResolver = null;
+
+    /**
+     * Whether to automatically add non-nullable FK relationships to the only() whitelist.
+     * Null means the value is read from config('database.factories.infer_required_foreign_keys').
+     *
+     * @var bool|null
+     */
+    protected static $inferRequiredForeignKeys = null;
+
+    /**
+     * Custom resolver for the inferRequiredForeignKeys flag. Takes precedence over the
+     * static property and config. Receives the factory instance; should return a bool.
+     *
+     * @var (callable(static): bool)|null
+     */
+    protected static $inferRequiredForeignKeysResolver = null;
+
+    /**
+     * Cache of required FK relation names resolved from the schema, keyed by model class.
+     * Intentionally not cleared by flushState() — the schema is stable for a whole test run.
+     *
+     * @var array<class-string, list<string>>
+     */
+    protected static $schemaRequiredForeignKeys = [];
 
     /**
      * Create a new factory instance.
@@ -571,8 +615,36 @@ abstract class Factory
             return array_merge($carry, $state($carry, $parent));
         }, $definition);
 
-        return $this->only !== null
-            ? $this->applyOnlyFilter($definition, $attrs)
+        $effectiveOnly = $this->only;
+
+        $onlyByDefault = static::$onlyByDefaultResolver
+            ? (bool) (static::$onlyByDefaultResolver)($this)
+            : (static::$onlyByDefault ?? (bool) config('database.factories.only_by_default', false));
+
+        if ($effectiveOnly === null && $onlyByDefault) {
+            $effectiveOnly = $this->parseNestedRelationships($this->required);
+        }
+
+        $inferRequired = static::$inferRequiredForeignKeysResolver
+            ? (bool) (static::$inferRequiredForeignKeysResolver)($this)
+            : (static::$inferRequiredForeignKeys ?? (bool) config('database.factories.infer_required_foreign_keys', false));
+
+        if ($effectiveOnly !== null && $inferRequired) {
+            $model = $this->newModel();
+
+            if (isset($this->connection)) {
+                $model->setConnection($this->connection);
+            }
+
+            $inferred = $this->resolveRequiredForeignKeyRelations($model);
+
+            // Merge inferred required relations at lower priority than anything the caller
+            // explicitly put in the whitelist; array_merge gives later keys precedence.
+            $effectiveOnly = array_merge($this->parseNestedRelationships($inferred), $effectiveOnly);
+        }
+
+        return $effectiveOnly !== null
+            ? $this->applyOnlyFilter($definition, $attrs, $effectiveOnly)
             : $attrs;
     }
 
@@ -940,10 +1012,10 @@ abstract class Factory
      * @param  array<string, mixed>  $attrs
      * @return array<string, mixed>
      */
-    private function applyOnlyFilter(array $definition, array $attrs): array
+    private function applyOnlyFilter(array $definition, array $attrs, array $only): array
     {
         $model = $this->newModel();
-        $expected = $this->resolveExpectedRelationships($this->only, $model);
+        $expected = $this->resolveExpectedRelationships($only, $model);
 
         foreach ($definition as $attribute => $defValue) {
             if (! ($defValue instanceof self)) {
@@ -963,7 +1035,7 @@ abstract class Factory
                 if ($this->isRelationExcluded($current->modelName(), $attribute)) {
                     $attrs[$attribute] = null;
                 } else {
-                    $nested = $this->only[$relationName] ?? [];
+                    $nested = $only[$relationName] ?? [];
                     $nested = is_array($nested) ? $nested : [];
 
                     $attrs[$attribute] = $current->expandRelationships
@@ -1014,6 +1086,56 @@ abstract class Factory
         }
 
         return $map;
+    }
+
+    /**
+     * Resolve BelongsTo relation names whose FK column is non-nullable in the database schema.
+     *
+     * Results are cached per model class for the lifetime of the process — one DB query per
+     * model class per test suite run. The cache is intentionally not cleared by flushState().
+     * Fails gracefully and returns [] if the schema cannot be inspected (no connection,
+     * unsupported driver, or model without a mapped table).
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return list<string>
+     */
+    private function resolveRequiredForeignKeyRelations(Model $model): array
+    {
+        $modelClass = get_class($model);
+
+        if (array_key_exists($modelClass, static::$schemaRequiredForeignKeys)) {
+            return static::$schemaRequiredForeignKeys[$modelClass];
+        }
+
+        try {
+            $nonNullable = collect($model->getConnection()->getSchemaBuilder()->getColumns($model->getTable()))
+                ->where('nullable', false)
+                ->pluck('name')
+                ->flip()
+                ->all(); // ['col_name' => index] for O(1) lookup
+        } catch (Throwable) {
+            return static::$schemaRequiredForeignKeys[$modelClass] = [];
+        }
+
+        $relations = [];
+
+        foreach ((new ReflectionClass($model))->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            if ($method->isStatic() || $method->getNumberOfParameters() > 0) {
+                continue;
+            }
+
+            try {
+                $rel = Relation::noConstraints(fn () => $method->invoke($model));
+
+                if ($rel instanceof BelongsTo && array_key_exists($rel->getForeignKeyName(), $nonNullable)) {
+                    $relations[] = $method->getName();
+                }
+            } catch (Throwable) {
+                // Relation method may throw for non-relation methods or require DB state — skip.
+            }
+        }
+
+        return static::$schemaRequiredForeignKeys[$modelClass] = $relations;
     }
 
     /**
@@ -1211,6 +1333,73 @@ abstract class Factory
     }
 
     /**
+     * Specify that only() should be active by default for all factories.
+     *
+     * @return void
+     */
+    public static function onlyByDefault()
+    {
+        static::$onlyByDefault = true;
+    }
+
+    /**
+     * Specify that only() should not be active by default.
+     *
+     * @return void
+     */
+    public static function dontOnlyByDefault()
+    {
+        static::$onlyByDefault = false;
+    }
+
+    /**
+     * Specify that non-nullable FK relationships should be inferred from the schema
+     * and automatically added to the only() whitelist.
+     *
+     * @return void
+     */
+    public static function inferRequiredForeignKeys()
+    {
+        static::$inferRequiredForeignKeys = true;
+    }
+
+    /**
+     * Specify that required FK relationships should not be inferred from the schema.
+     *
+     * @return void
+     */
+    public static function dontInferRequiredForeignKeys()
+    {
+        static::$inferRequiredForeignKeys = false;
+    }
+
+    /**
+     * Specify a callback that resolves whether only() should be active by default.
+     * The callback receives the factory instance and should return a bool.
+     * It takes precedence over the static flag and config value.
+     *
+     * @param  callable(static): bool  $callback
+     * @return void
+     */
+    public static function resolveOnlyByDefaultUsing(callable $callback)
+    {
+        static::$onlyByDefaultResolver = $callback;
+    }
+
+    /**
+     * Specify a callback that resolves whether non-nullable FK relationships should
+     * be inferred from the schema. The callback receives the factory instance and
+     * should return a bool. It takes precedence over the static flag and config value.
+     *
+     * @param  callable(static): bool  $callback
+     * @return void
+     */
+    public static function resolveInferRequiredForeignKeysUsing(callable $callback)
+    {
+        static::$inferRequiredForeignKeysResolver = $callback;
+    }
+
+    /**
      * Get a new Faker instance.
      *
      * @return \Faker\Generator|null
@@ -1275,6 +1464,12 @@ abstract class Factory
         static::$factoryNameResolver = null;
         static::$namespace = 'Database\\Factories\\';
         static::$expandRelationshipsByDefault = true;
+        static::$onlyByDefault = null;
+        static::$onlyByDefaultResolver = null;
+        static::$inferRequiredForeignKeys = null;
+        static::$inferRequiredForeignKeysResolver = null;
+        // Note: $schemaRequiredForeignKeys is intentionally not reset — the schema
+        // does not change during a test run, so one DB query per model class suffices.
     }
 
     /**
