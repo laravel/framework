@@ -251,10 +251,9 @@ trait InteractsWithIO
      * @template TKey of array-key
      * @template TValue
      * @template TIterable of iterable<TKey, TValue>
-     * @template TReturnType
      *
      * @param  TIterable|int  $totalSteps
-     * @param  \Closure(\Symfony\Component\Console\Helper\ProgressBar): TReturnType|\Closure(TValue, \Symfony\Component\Console\Helper\ProgressBar, TKey): TReturnType  $callback
+     * @param  \Closure(\Symfony\Component\Console\Helper\ProgressBar): mixed|\Closure(TValue, \Symfony\Component\Console\Helper\ProgressBar, TKey): mixed  $callback
      * @return ($totalSteps is iterable ? TIterable : void)
      */
     public function withProgressBar($totalSteps, Closure $callback)
