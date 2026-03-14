@@ -1195,6 +1195,80 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame('Explicit Title', $post->title);
     }
 
+    public function test_state_scalar_before_only_takes_precedence()
+    {
+        // A scalar state applied before only() must not be clobbered.
+        $post = FactoryTestPostFactory::new()
+            ->state(['title' => 'State Title'])
+            ->only()
+            ->make();
+
+        $this->assertSame('State Title', $post->title);
+        $this->assertNull($post->user_id);
+    }
+
+    public function test_state_scalar_after_only_takes_precedence()
+    {
+        // A scalar state applied after only() must override the definition value.
+        $post = FactoryTestPostFactory::new()
+            ->only()
+            ->state(['title' => 'State Title'])
+            ->make();
+
+        $this->assertSame('State Title', $post->title);
+        $this->assertNull($post->user_id);
+    }
+
+    public function test_named_state_before_only_takes_precedence()
+    {
+        // A named state that sets a concrete FK before only() must be preserved;
+        // only() should not null out a value that was explicitly provided by a state.
+        $post = FactoryTestPostFactory::new()
+            ->withExistingUser(99)
+            ->only()
+            ->make();
+
+        $this->assertSame(99, $post->user_id);
+        $this->assertSame(0, FactoryTestUser::count());
+    }
+
+    public function test_named_state_after_only_takes_precedence()
+    {
+        // A named state applied after only() must override only()'s null.
+        $post = FactoryTestPostFactory::new()
+            ->only()
+            ->withExistingUser(99)
+            ->make();
+
+        $this->assertSame(99, $post->user_id);
+        $this->assertSame(0, FactoryTestUser::count());
+    }
+
+    public function test_factory_state_before_only_takes_precedence()
+    {
+        // A state that sets a factory instance before only() must be preserved;
+        // only() should not null out a value that a state explicitly chose.
+        $post = FactoryTestPostFactory::new()
+            ->state(['user_id' => FactoryTestUserFactory::new()])
+            ->only()
+            ->make();
+
+        $this->assertNotNull($post->user_id);
+        $this->assertSame(1, FactoryTestUser::count());
+    }
+
+    public function test_factory_state_after_only_takes_precedence()
+    {
+        // A state that sets a factory instance after only() must also be preserved.
+        $post = FactoryTestPostFactory::new()
+            ->only()
+            ->state(['user_id' => FactoryTestUserFactory::new()])
+            ->make();
+
+        $this->assertNotNull($post->user_id);
+        $this->assertSame(1, FactoryTestUser::count());
+    }
+
     public function test_only_works_with_sequence()
     {
         // Sequence states are applied after only(), so titles from the sequence persist.
@@ -1389,6 +1463,11 @@ class FactoryTestPostFactory extends Factory
             'user_id' => FactoryTestUserFactory::new(),
             'title' => $this->faker->name(),
         ];
+    }
+
+    public function withExistingUser(int $userId): static
+    {
+        return $this->state(['user_id' => $userId]);
     }
 }
 

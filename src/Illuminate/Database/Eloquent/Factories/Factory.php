@@ -110,6 +110,13 @@ abstract class Factory
     protected $required = [];
 
     /**
+     * The parsed relationship whitelist set by only(), or null when only() has not been called.
+     *
+     * @var array<string, mixed>|null
+     */
+    protected $only = null;
+
+    /**
      * The name of the database connection that will be used to create the models.
      *
      * @var \UnitEnum|string|null
@@ -183,6 +190,7 @@ abstract class Factory
         ?Collection $recycle = null,
         ?bool $expandRelationships = null,
         array $excludeRelationships = [],
+        ?array $only = null,
     ) {
         $this->count = $count;
         $this->states = $states ?? new Collection;
@@ -195,6 +203,7 @@ abstract class Factory
         $this->faker = $this->withFaker();
         $this->expandRelationships = $expandRelationships ?? self::$expandRelationshipsByDefault;
         $this->excludeRelationships = $excludeRelationships;
+        $this->only = $only;
     }
 
     /**
@@ -545,7 +554,12 @@ abstract class Factory
      */
     protected function getRawAttributes(?Model $parent)
     {
-        return $this->states->pipe(function ($states) {
+        // Call definition() exactly once so that the factory instances it returns can be
+        // used as identity sentinels: if $attrs[$key] === $definition[$key] after all states
+        // have run, no state changed that value (it is still the definition default).
+        $definition = $this->definition();
+
+        $attrs = $this->states->pipe(function ($states) {
             return $this->for->isEmpty() ? $states : new Collection(array_merge([function () {
                 return $this->parentResolvers();
             }], $states->all()));
@@ -555,7 +569,11 @@ abstract class Factory
             }
 
             return array_merge($carry, $state($carry, $parent));
-        }, $this->definition());
+        }, $definition);
+
+        return $this->only !== null
+            ? $this->applyOnlyFilter($definition, $attrs)
+            : $attrs;
     }
 
     /**
@@ -902,72 +920,64 @@ abstract class Factory
 
         $relationships = $this->parseNestedRelationships($relationships);
 
-        $only = [...$required, ...$relationships];
-
-        return $this->state(fn () => $this->buildOnlyDefinition($only));
+        return $this->newInstance(['only' => [...$required, ...$relationships]]);
     }
 
     /**
-     * Build the definition array for only(), nulling out unwanted factory relations.
+     * Apply the only() relationship whitelist after all states have been accumulated.
      *
-     * @param  array<string, mixed>  $only
+     * Because getRawAttributes() calls definition() exactly once and uses those instances
+     * as the initial carry, strict identity (===) reliably detects whether a state has
+     * explicitly changed a factory-typed attribute:
+     *
+     *   $attrs[$attr] === $definition[$attr]  →  definition default, no state touched it
+     *   $attrs[$attr] !== $definition[$attr]  →  a state (or for()) explicitly set it
+     *
+     * Only definition-default factory instances that are not whitelisted are nulled.
+     * State-set values — including factory instances — are always preserved.
+     *
+     * @param  array<string, mixed>  $definition
+     * @param  array<string, mixed>  $attrs
      * @return array<string, mixed>
      */
-    private function buildOnlyDefinition(array $only): array
+    private function applyOnlyFilter(array $definition, array $attrs): array
     {
         $model = $this->newModel();
-        $definition = $this->definition();
-        $expected = $this->resolveExpectedRelationships($only, $model);
+        $expected = $this->resolveExpectedRelationships($this->only, $model);
 
-        // Collect FK attribute names covered by for() parent relationships so we don't
-        // null them out — the caller explicitly provided those parents via for().
-        $forAttributes = $this->for
-            ->flatMap(fn (BelongsToRelationship $for) => array_keys($for->attributesFor($model)))
-            ->all();
+        foreach ($definition as $attribute => $defValue) {
+            if (! ($defValue instanceof self)) {
+                continue; // Scalars are never suppressed; states and definition both apply normally.
+            }
 
-        foreach ($definition as $attribute => $value) {
+            $current = $attrs[$attribute] ?? $defValue;
+            $stateChanged = $current !== $defValue; // strict identity: different object → state set it
+
+            if ($stateChanged) {
+                continue; // State (or for()) explicitly set this value — always preserve it.
+            }
+
             if (array_key_exists($attribute, $expected)) {
                 $relationName = $expected[$attribute];
 
-                if ($value instanceof self && $this->isRelationExcluded($value->modelName(), $attribute)) {
-                    $definition[$attribute] = null;
-
-                    continue;
-                }
-
-                if ($value instanceof self) {
-                    $nested = $only[$relationName] ?? [];
+                if ($this->isRelationExcluded($current->modelName(), $attribute)) {
+                    $attrs[$attribute] = null;
+                } else {
+                    $nested = $this->only[$relationName] ?? [];
                     $nested = is_array($nested) ? $nested : [];
 
-                    // Respect the nested factory's $expandRelationships setting; don't
-                    // propagate only() if the nested factory has opted out of expansion.
-                    $definition[$attribute] = $value->expandRelationships
-                        ? $value->only($nested)
-                        : $value;
+                    $attrs[$attribute] = $current->expandRelationships
+                        ? $current->only($nested)
+                        : $current;
                 }
 
                 continue;
             }
 
-            // Don't override attributes explicitly provided by for() parent relationships —
-            // parentResolvers() runs before this state and its values should take precedence.
-            if (in_array($attribute, $forAttributes, true)) {
-                unset($definition[$attribute]);
-
-                continue;
-            }
-
-            if ($value instanceof self) {
-                $definition[$attribute] = null;
-
-                continue;
-            }
-
-            // Remove scalar attributes so they don't clobber states applied before or after.
-            unset($definition[$attribute]);
+            $attrs[$attribute] = null; // Definition default, not whitelisted — suppress.
         }
 
-        return $definition;
+        return $attrs;
     }
 
     /**
@@ -1087,6 +1097,7 @@ abstract class Factory
             'recycle' => $this->recycle,
             'expandRelationships' => $this->expandRelationships,
             'excludeRelationships' => $this->excludeRelationships,
+            'only' => $this->only,
         ], $arguments)));
     }
 
