@@ -4156,13 +4156,13 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Insert new records into the database while ignoring specific conflicts and returning specified columns.
+     * Insert new records into the database and returning specified columns with optional ignoring specific conflicts.
      *
-     * @param  non-empty-string|non-empty-array<non-empty-string>  $uniqueBy
      * @param  non-empty-array<non-empty-string>  $returning
+     * @param  non-empty-string|non-empty-array<non-empty-string>|null  $uniqueBy
      * @return \Illuminate\Support\Collection
      */
-    public function insertOrIgnoreReturning(array $values, array|string $uniqueBy, array $returning = ['*'])
+    public function insertOrIgnoreReturning(array $values, array $returning = ['*'], array|string|null $uniqueBy = null)
     {
         if (empty($values)) {
             return new Collection;
@@ -4188,7 +4188,7 @@ class Builder implements BuilderContract
 
         $this->applyBeforeQueryCallbacks();
 
-        $sql = $this->grammar->compileInsertOrIgnoreReturning($this, $values, (array) $uniqueBy, $returning);
+        $sql = $this->grammar->compileInsertOrIgnoreReturning($this, $values, $returning, $uniqueBy === null ? null : Arr::wrap($uniqueBy));
 
         $result = new Collection(
             $this->connection->selectFromWriteConnection($sql, $this->cleanBindings(Arr::flatten($values, 1)))

@@ -1315,11 +1315,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Save the model to the database, ignoring specific unique constraint conflicts.
      *
-     * @param  array|string  $uniqueBy
      * @param  array  $options
+     * @param  array|string|null  $uniqueBy
      * @return bool
      */
-    public function saveOrIgnore(array|string $uniqueBy, array $options = [])
+    public function saveOrIgnore(array $options = [], array|string|null $uniqueBy = null)
     {
         if ($this->exists) {
             throw new LogicException('Cannot use saveOrIgnore on an existing model.');
@@ -1520,10 +1520,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Perform a model insert operation, ignoring specific unique constraint conflicts.
      *
      * @param  \Illuminate\Database\Eloquent\Builder<static>  $query
-     * @param  array|string  $uniqueBy
+     * @param  array|string|null  $uniqueBy
      * @return bool
      */
-    protected function performInsertOrIgnore(Builder $query, array|string $uniqueBy)
+    protected function performInsertOrIgnore(Builder $query, array|string|null $uniqueBy)
     {
         if ($this->usesUniqueIds()) {
             $this->setUniqueIds();
@@ -1543,7 +1543,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return true;
         }
 
-        $result = $query->toBase()->insertOrIgnoreReturning($attributes, $uniqueBy);
+        $result = $query->toBase()->insertOrIgnoreReturning($attributes, ['*'], $uniqueBy);
 
         if ($result->isEmpty()) {
             return false;
