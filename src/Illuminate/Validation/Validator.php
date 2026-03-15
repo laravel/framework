@@ -62,6 +62,15 @@ class Validator implements ValidatorContract
     protected $excludeAttributes = [];
 
     /**
+     * Pre-computed per-attribute rule flags to avoid redundant hasRule() calls.
+     *
+     * Bit flags: 1 = Bail, 2 = Nullable, 4 = has implicit rule, 8 = Sometimes.
+     *
+     * @var array|null
+     */
+    protected $attributeFlags = null;
+
+    /**
      * The message bag instance.
      *
      * @var \Illuminate\Support\MessageBag
@@ -463,6 +472,12 @@ class Validator implements ValidatorContract
 
         [$this->distinctValues, $this->failedRules] = [[], []];
 
+        // Pre-compute per-attribute flags so that shouldStopValidating,
+        // isNotNullIfMarkedAsNullable, passesOptionalCheck, and getSize
+        // can skip expensive hasRule() calls that would otherwise re-parse
+        // every rule on every check.
+        $this->precomputeAttributeFlags();
+
         // We'll spin through each rule, validating the attributes attached to that
         // rule. Any error messages will be added to the containers with each of
         // the other error messages, returning true if we don't have messages.
@@ -490,6 +505,8 @@ class Validator implements ValidatorContract
             }
         }
 
+        $this->attributeFlags = null;
+
         foreach ($this->rules as $attribute => $rules) {
             if ($this->shouldBeExcluded($attribute)) {
                 $this->removeAttribute($attribute);
@@ -504,6 +521,53 @@ class Validator implements ValidatorContract
         }
 
         return $this->messages->isEmpty();
+    }
+
+    /**
+     * Pre-compute per-attribute flags for bail, nullable, sometimes,
+     * implicit, and numeric rules.
+     *
+     * During validation, methods like shouldStopValidating, isNotNullIfMarkedAsNullable,
+     * passesOptionalCheck, and getSize call hasRule() which re-parses every rule for the
+     * attribute on each invocation. For large array validation (e.g. 500 items × 4 rules),
+     * this results in hundreds of thousands of redundant parse calls. Pre-computing flags
+     * once reduces these to O(1) lookups.
+     *
+     * @return void
+     */
+    protected function precomputeAttributeFlags()
+    {
+        $this->attributeFlags = [];
+
+        $implicitRulesMap = array_flip($this->implicitRules);
+
+        foreach ($this->rules as $attribute => $rules) {
+            $flags = 0;
+
+            foreach ($rules as $rule) {
+                if (! is_string($rule)) {
+                    continue;
+                }
+
+                // Extract the rule name without full parse() overhead.
+                $colonPos = strpos($rule, ':');
+                $name = Str::studly(trim($colonPos !== false ? substr($rule, 0, $colonPos) : $rule));
+
+                if ($name === 'Bail') {
+                    $flags |= 1;
+                } elseif ($name === 'Nullable') {
+                    $flags |= 2;
+                } elseif ($name === 'Sometimes') {
+                    $flags |= 8;
+                }
+
+                if (! ($flags & 4) && isset($implicitRulesMap[$name])) {
+                    $flags |= 4;
+                }
+            }
+
+            $this->attributeFlags[$attribute] = $flags;
+        }
     }
 
     /**
@@ -864,7 +928,11 @@ class Validator implements ValidatorContract
      */
     protected function passesOptionalCheck($attribute)
     {
-        if (! $this->hasRule($attribute, ['Sometimes'])) {
+        $hasSometimes = $this->attributeFlags !== null
+            ? ($this->attributeFlags[$attribute] ?? 0) & 8
+            : $this->hasRule($attribute, ['Sometimes']);
+
+        if (! $hasSometimes) {
             return true;
         }
 
@@ -883,7 +951,11 @@ class Validator implements ValidatorContract
      */
     protected function isNotNullIfMarkedAsNullable($rule, $attribute)
     {
-        if ($this->isImplicit($rule) || ! $this->hasRule($attribute, ['Nullable'])) {
+        $hasNullable = $this->attributeFlags !== null
+            ? ($this->attributeFlags[$attribute] ?? 0) & 2
+            : $this->hasRule($attribute, ['Nullable']);
+
+        if ($this->isImplicit($rule) || ! $hasNullable) {
             return true;
         }
 
@@ -970,21 +1042,32 @@ class Validator implements ValidatorContract
     {
         $cleanedAttribute = $this->replacePlaceholderInString($attribute);
 
-        if ($this->hasRule($attribute, ['Bail'])) {
+        if ($this->attributeFlags !== null ? ($this->attributeFlags[$attribute] ?? 0) & 1 : $this->hasRule($attribute, ['Bail'])) {
             return $this->messages->has($cleanedAttribute);
         }
 
-        if (isset($this->failedRules[$cleanedAttribute]) &&
-            array_key_exists('uploaded', $this->failedRules[$cleanedAttribute])) {
+        if (! isset($this->failedRules[$cleanedAttribute])) {
+            return false;
+        }
+
+        if (array_key_exists('uploaded', $this->failedRules[$cleanedAttribute])) {
             return true;
         }
 
         // In case the attribute has any rule that indicates that the field is required
         // and that rule already failed then we should stop validation at this point
         // as now there is no point in calling other rules with this field empty.
-        return $this->hasRule($attribute, $this->implicitRules) &&
-               isset($this->failedRules[$cleanedAttribute]) &&
-               array_intersect(array_keys($this->failedRules[$cleanedAttribute]), $this->implicitRules);
+        if (! ($this->attributeFlags !== null ? ($this->attributeFlags[$attribute] ?? 0) & 4 : $this->hasRule($attribute, $this->implicitRules))) {
+            return false;
+        }
+
+        foreach ($this->failedRules[$cleanedAttribute] as $rule => $_) {
+            if (in_array($rule, $this->implicitRules)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
