@@ -352,6 +352,87 @@ class ValidationRuleParserTest extends TestCase
         ], $results->implicitAttributes);
     }
 
+    public function testExplodeExpandsWildcardStringRules()
+    {
+        $parser = (new ValidationRuleParser([
+            'items' => [
+                ['name' => 'foo', 'price' => 10],
+                ['name' => 'bar', 'price' => 20],
+            ],
+        ]));
+
+        $results = $parser->explode([
+            'items.*.name' => 'required|string',
+            'items.*.price' => ['required', 'numeric'],
+        ]);
+
+        $this->assertEquals([
+            'items.0.name' => ['required', 'string'],
+            'items.1.name' => ['required', 'string'],
+            'items.0.price' => ['required', 'numeric'],
+            'items.1.price' => ['required', 'numeric'],
+        ], $results->rules);
+
+        $this->assertEquals([
+            'items.*.name' => ['items.0.name', 'items.1.name'],
+            'items.*.price' => ['items.0.price', 'items.1.price'],
+        ], $results->implicitAttributes);
+    }
+
+    public function testExplodeExpandsDeeplyNestedWildcardStringRules()
+    {
+        $parser = (new ValidationRuleParser([
+            'orders' => [
+                ['items' => [['sku' => 'A'], ['sku' => 'B']]],
+                ['items' => [['sku' => 'C']]],
+            ],
+        ]));
+
+        $results = $parser->explode([
+            'orders.*.items.*.sku' => 'required|string',
+        ]);
+
+        $this->assertEquals([
+            'orders.0.items.0.sku' => ['required', 'string'],
+            'orders.0.items.1.sku' => ['required', 'string'],
+            'orders.1.items.0.sku' => ['required', 'string'],
+        ], $results->rules);
+
+        $this->assertEquals([
+            'orders.*.items.*.sku' => [
+                'orders.0.items.0.sku',
+                'orders.0.items.1.sku',
+                'orders.1.items.0.sku',
+            ],
+        ], $results->implicitAttributes);
+    }
+
+    public function testExplodeExpandsWildcardWithStringArrayKeys()
+    {
+        $parser = (new ValidationRuleParser([
+            'settings' => [
+                'theme' => ['color' => 'blue'],
+                'layout' => ['color' => 'red'],
+            ],
+        ]));
+
+        $results = $parser->explode([
+            'settings.*.color' => 'required|string',
+        ]);
+
+        $this->assertEquals([
+            'settings.theme.color' => ['required', 'string'],
+            'settings.layout.color' => ['required', 'string'],
+        ], $results->rules);
+
+        $this->assertEquals([
+            'settings.*.color' => [
+                'settings.theme.color',
+                'settings.layout.color',
+            ],
+        ], $results->implicitAttributes);
+    }
+
     public function testExplodeHandlesStringDateRule()
     {
         $parser = (new ValidationRuleParser([
