@@ -231,6 +231,16 @@ class ListRule implements ValidationRule, DataAwareRule, ValidatorAwareRule
         );
 
         $subValidator->addCustomAttributes($this->validator->customAttributes);
+        $subValidator->customValues = $this->validator->customValues;
+        $subValidator->fallbackMessages = $this->validator->fallbackMessages;
+        $subValidator->extensions = $this->validator->extensions;
+        $subValidator->replacers = $this->validator->replacers;
+
+        try {
+            $subValidator->setPresenceVerifier($this->validator->getPresenceVerifier());
+        } catch (\RuntimeException) {
+            //
+        }
 
         $this->validator->messages()->merge($subValidator->messages());
     }
