@@ -189,6 +189,13 @@ trait HasAttributes
     protected static $castTypeCache = [];
 
     /**
+     * Cached result of getCasts() when incrementing is enabled.
+     *
+     * @var array|null
+     */
+    protected $mergedCastsCache = null;
+
+    /**
      * The encrypter instance that is used to encrypt attributes.
      *
      * @var \Illuminate\Contracts\Encryption\Encrypter|null
@@ -783,6 +790,8 @@ trait HasAttributes
         $casts = $this->ensureCastsAreStringValues($casts);
 
         $this->casts = array_merge($this->casts, $casts);
+
+        $this->mergedCastsCache = null;
 
         return $this;
     }
@@ -1689,7 +1698,7 @@ trait HasAttributes
     public function getCasts()
     {
         if ($this->getIncrementing()) {
-            return array_merge([$this->getKeyName() => $this->getKeyType()], $this->casts);
+            return $this->mergedCastsCache ??= array_merge([$this->getKeyName() => $this->getKeyType()], $this->casts);
         }
 
         return $this->casts;
