@@ -231,6 +231,13 @@ class ValidationRuleParser
     }
 
     /**
+     * Cache for parsed string rules.
+     *
+     * @var array
+     */
+    protected static $parseCache = [];
+
+    /**
      * Extract the rule name and parameters from a rule.
      *
      * @param  array|string  $rule
@@ -238,19 +245,37 @@ class ValidationRuleParser
      */
     public static function parse($rule)
     {
+        if (is_string($rule) && isset(static::$parseCache[$rule])) {
+            return static::$parseCache[$rule];
+        }
+
         if ($rule instanceof RuleContract || $rule instanceof CompilableRules) {
             return [$rule, []];
         }
 
         if (is_array($rule)) {
-            $rule = static::parseArrayRule($rule);
+            $parsed = static::parseArrayRule($rule);
         } else {
-            $rule = static::parseStringRule($rule);
+            $parsed = static::parseStringRule($rule);
         }
 
-        $rule[0] = static::normalizeRule($rule[0]);
+        $parsed[0] = static::normalizeRule($parsed[0]);
 
-        return $rule;
+        if (is_string($rule)) {
+            static::$parseCache[$rule] = $parsed;
+        }
+
+        return $parsed;
+    }
+
+    /**
+     * Flush the parse cache.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$parseCache = [];
     }
 
     /**
