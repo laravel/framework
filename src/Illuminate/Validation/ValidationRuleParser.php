@@ -157,35 +157,150 @@ class ValidationRuleParser
      */
     protected function explodeWildcardRules($results, $attribute, $rules)
     {
-        $pattern = str_replace('\*', '[^\.]*', preg_quote($attribute, '/'));
+        $rulesList = (array) $rules;
 
+        // CompilableRules need the flattened data context, so use the original approach.
+        foreach ($rulesList as $rule) {
+            if ($rule instanceof CompilableRules) {
+                return $this->explodeWildcardRulesCompilable($results, $attribute, $rules);
+            }
+        }
+
+        // Fast path: traverse the data structure directly to enumerate matching
+        // keys instead of flattening with Arr::dot() and regex matching.
+        $keys = $this->expandWildcardKeys($attribute, $this->data);
+
+        if (empty($keys)) {
+            return $results;
+        }
+
+        // Pre-explode rules once so we don't re-parse the same rule string
+        // for every expanded key (e.g. 500 items × same rule string).
+        $explodedRules = [];
+
+        foreach ($rulesList as $rule) {
+            if (is_string($rule)) {
+                $explodedRules = array_merge($explodedRules, explode('|', $rule));
+            } else {
+                $explodedRules = array_merge($explodedRules, $this->explodeExplicitRule($rule, $attribute));
+            }
+        }
+
+        foreach ($keys as $key) {
+            // Normalize key to match PHP's array key casting (e.g. '0' → int 0)
+            // so that strict comparisons in implicitAttributes work correctly.
+            $key = ((string) (int) $key === $key) ? (int) $key : $key;
+
+            $this->implicitAttributes[$attribute][] = $key;
+
+            $results[$key] = array_merge($results[$key] ?? [], $explodedRules);
+        }
+
+        return $results;
+    }
+
+    /**
+     * Explode wildcard rules using the original flatten and regex approach.
+     *
+     * Used for CompilableRules which need the flattened data context.
+     *
+     * @param  array  $results
+     * @param  string  $attribute
+     * @param  string|array  $rules
+     * @return array
+     */
+    protected function explodeWildcardRulesCompilable($results, $attribute, $rules)
+    {
+        $keys = $this->expandWildcardKeys($attribute, $this->data);
+
+        if (empty($keys)) {
+            return $results;
+        }
+
+        // Compute flattened data once for CompilableRules that need it.
         $data = ValidationData::initializeAndGatherData($attribute, $this->data);
 
-        foreach ($data as $key => $value) {
-            if (Str::startsWith($key, $attribute) || (bool) preg_match('/^'.$pattern.'\z/', $key)) {
-                foreach ((array) $rules as $rule) {
-                    if ($rule instanceof CompilableRules) {
-                        $context = Arr::get($this->data, Str::beforeLast($key, '.'));
+        foreach ($keys as $key) {
+            $key = ((string) (int) $key === $key) ? (int) $key : $key;
 
-                        $compiled = $rule->compile($key, $value, $data, $context);
+            foreach ((array) $rules as $rule) {
+                if ($rule instanceof CompilableRules) {
+                    $value = Arr::get($this->data, $key);
+                    $context = Arr::get($this->data, Str::beforeLast((string) $key, '.'));
 
-                        $this->implicitAttributes = array_merge_recursive(
-                            $compiled->implicitAttributes,
-                            $this->implicitAttributes,
-                            [$attribute => [$key]]
-                        );
+                    $compiled = $rule->compile($key, $value, $data, $context);
 
-                        $results = $this->mergeRules($results, $compiled->rules);
-                    } else {
-                        $this->implicitAttributes[$attribute][] = $key;
+                    $this->implicitAttributes = array_merge_recursive(
+                        $compiled->implicitAttributes,
+                        $this->implicitAttributes,
+                        [$attribute => [$key]]
+                    );
 
-                        $results = $this->mergeRules($results, $key, $rule);
-                    }
+                    $results = $this->mergeRules($results, $compiled->rules);
+                } else {
+                    $this->implicitAttributes[$attribute][] = $key;
+
+                    $results = $this->mergeRules($results, $key, $rule);
                 }
             }
         }
 
         return $results;
+    }
+
+    /**
+     * Expand a wildcard attribute into all matching concrete keys by
+     * traversing the data structure directly.
+     *
+     * @param  string  $attribute
+     * @param  array  $data
+     * @return array
+     */
+    protected function expandWildcardKeys($attribute, $data)
+    {
+        $segments = explode('.', $attribute);
+        $results = [];
+
+        $this->traverseWildcardSegments($segments, 0, $data, '', $results);
+
+        return $results;
+    }
+
+    /**
+     * Recursively traverse data segments to expand wildcard keys.
+     *
+     * @param  array  $segments
+     * @param  int  $index
+     * @param  mixed  $data
+     * @param  string  $prefix
+     * @param  array  $results
+     * @return void
+     */
+    protected function traverseWildcardSegments($segments, $index, $data, $prefix, &$results)
+    {
+        if ($index >= count($segments)) {
+            $results[] = rtrim($prefix, '.');
+
+            return;
+        }
+
+        $segment = $segments[$index];
+
+        if ($segment === '*') {
+            if (! is_array($data)) {
+                return;
+            }
+
+            foreach ($data as $key => $value) {
+                $this->traverseWildcardSegments($segments, $index + 1, $value, $prefix.$key.'.', $results);
+            }
+
+            return;
+        }
+
+        $nextData = is_array($data) && array_key_exists($segment, $data) ? $data[$segment] : null;
+
+        $this->traverseWildcardSegments($segments, $index + 1, $nextData, $prefix.$segment.'.', $results);
     }
 
     /**
