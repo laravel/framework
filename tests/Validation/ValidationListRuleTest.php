@@ -94,6 +94,7 @@ class ValidationListRuleTest extends TestCase
     {
         $this->passes(Rule::list()->distinct(), [1, 2, 3]);
         $this->fails(Rule::list()->distinct(), [1, 2, 2]);
+        $this->fails(Rule::list()->distinct(), [1, '1']);
     }
 
     public function testDistinctStrictRule()
