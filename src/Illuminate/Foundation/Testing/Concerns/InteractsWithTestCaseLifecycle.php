@@ -37,6 +37,7 @@ use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Once;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 use Illuminate\View\Component;
 use Mockery;
@@ -197,6 +198,7 @@ trait InteractsWithTestCaseLifecycle
         TrustHosts::flushState();
         ValidateCsrfToken::flushState();
         Validator::flushState();
+        Rule::flushState();
         WorkCommand::flushState();
 
         if ($this->callbackException) {
