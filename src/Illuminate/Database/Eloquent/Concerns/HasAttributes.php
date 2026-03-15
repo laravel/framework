@@ -189,6 +189,20 @@ trait HasAttributes
     protected static $castTypeCache = [];
 
     /**
+     * Per-attribute cache for isDateAttribute() results.
+     *
+     * @var array
+     */
+    protected $isDateAttributeCache = [];
+
+    /**
+     * Per-attribute cache for isEncryptedCastable() results.
+     *
+     * @var array
+     */
+    protected $isEncryptedCastableCache = [];
+
+    /**
      * The encrypter instance that is used to encrypt attributes.
      *
      * @var \Illuminate\Contracts\Encryption\Encrypter|null
@@ -1209,7 +1223,11 @@ trait HasAttributes
      */
     protected function isDateAttribute($key)
     {
-        return in_array($key, $this->getDates(), true) ||
+        if (isset($this->isDateAttributeCache[$key])) {
+            return $this->isDateAttributeCache[$key];
+        }
+
+        return $this->isDateAttributeCache[$key] = in_array($key, $this->getDates(), true) ||
             $this->isDateCastable($key);
     }
 
@@ -1746,7 +1764,11 @@ trait HasAttributes
      */
     protected function isEncryptedCastable($key)
     {
-        return $this->hasCast($key, ['encrypted', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object']);
+        if (isset($this->isEncryptedCastableCache[$key])) {
+            return $this->isEncryptedCastableCache[$key];
+        }
+
+        return $this->isEncryptedCastableCache[$key] = $this->hasCast($key, ['encrypted', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object']);
     }
 
     /**
