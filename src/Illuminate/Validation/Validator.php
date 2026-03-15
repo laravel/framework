@@ -484,7 +484,7 @@ class Validator implements ValidatorContract
                     break;
                 }
 
-                if ($this->shouldStopValidating($attribute)) {
+                if ($this->messages->isNotEmpty() && $this->shouldStopValidating($attribute)) {
                     break;
                 }
             }
@@ -838,6 +838,12 @@ class Validator implements ValidatorContract
     {
         if (is_string($value) && trim($value) === '') {
             return $this->isImplicit($rule);
+        }
+
+        // Non-null values are definitely present, so we can skip the
+        // Arr::has traversal that validatePresent would perform.
+        if ($value !== null) {
+            return true;
         }
 
         return $this->validatePresent($attribute, $value) ||
