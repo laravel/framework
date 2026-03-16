@@ -97,15 +97,9 @@ class SlugGenerator
      */
     protected function resolveSourceValue(): string
     {
-        $source = $this->options()->from;
-
-        if (is_array($source)) {
-            return collect($source)
-                ->map(fn (string $column) => $this->model->{$column})
-                ->implode(' ');
-        }
-
-        return (string) $this->model->{$source};
+        return collect(Arr::wrap($this->options()->from))
+            ->map(fn (string $column) => $this->model->{$column})
+            ->implode(' ');
     }
 
     /**
