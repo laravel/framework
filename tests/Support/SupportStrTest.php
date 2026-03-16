@@ -90,7 +90,8 @@ class SupportStrTest extends TestCase
         $this->assertSame('Orwell 1984', Str::headline(' orwell_- 1984 '));
     }
 
-    public function testStringInitials() {
+    public function testStringInitials() 
+    {
         $this->assertSame('jb', Str::initials('james bond'));
         $this->assertSame('jb', Str::initials(' james bond'));
         $this->assertSame('jb', Str::initials('james  bond'));
