@@ -421,7 +421,7 @@ class AssertableHtml
      */
     public function dump(): static
     {
-        dump($this->scopeHtml());
+        dump($this->getHtml());
 
         return $this;
     }
@@ -453,7 +453,7 @@ class AssertableHtml
             $parts[] = "Selector: {$selector}";
         }
 
-        $parts[] = "Scope HTML:\n".$this->scopeHtml();
+        $parts[] = "Scope HTML:\n".$this->getHtml();
 
         PHPUnit::fail(implode("\n", $parts));
     }
@@ -463,12 +463,8 @@ class AssertableHtml
      *
      * @return string
      */
-    private function scopeHtml(): string
+    private function getHtml(): string
     {
-        if ($this->scope instanceof HTMLDocument) {
-            return $this->document->saveHtml();
-        }
-
         return $this->document->saveHtml($this->scope);
     }
 }
