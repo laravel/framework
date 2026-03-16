@@ -140,13 +140,13 @@ class AssertableHtml
     }
 
     /**
-     * Assert that the matched element's text equals the expected value.
+     * Assert that the matched element's text equals the expected value, or passes a truth test.
      *
      * @param  string  $selector
-     * @param  string  $expected
+     * @param  string|\Closure  $expected
      * @return $this
      */
-    public function where(string $selector, string $expected): static
+    public function where(string $selector, string|Closure $expected): static
     {
         $element = $this->scope->querySelector($selector);
 
@@ -155,6 +155,17 @@ class AssertableHtml
         }
 
         $actual = trim($element->textContent);
+
+        if ($expected instanceof Closure) {
+            if (! $expected($actual)) {
+                $this->fail(
+                    "Failed asserting that [{$selector}] text was accepted by the truth test.",
+                    $selector
+                );
+            }
+
+            return $this;
+        }
 
         if ($actual !== $expected) {
             $this->fail(
@@ -194,9 +205,9 @@ class AssertableHtml
     }
 
     /**
-     * Assert multiple selector → text pairs at once.
+     * Assert multiple selector → text (or closure) pairs at once.
      *
-     * @param  array<string, string>  $bindings
+     * @param  array<string, string|\Closure>  $bindings
      * @return $this
      */
     public function whereAll(array $bindings): static

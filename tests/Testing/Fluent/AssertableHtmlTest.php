@@ -119,19 +119,19 @@ class AssertableHtmlTest extends TestCase
         $this->html('<h1>Hello</h1>')->where('h2', 'Hello');
     }
 
-    // --- whereContains ---
-
-    public function testWhereContainsPassesWhenTextContainsExpected(): void
+    public function testWherePassesWithClosureTruthTest(): void
     {
-        $this->html('<p>Hello World</p>')->whereContains('p', 'World');
+        $this->html('<p>Hello World</p>')
+            ->where('p', fn ($text) => str_contains($text, 'World'));
     }
 
-    public function testWhereContainsFailsWhenTextDoesNotContainExpected(): void
+    public function testWhereFailsWhenClosureReturnsFalse(): void
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed asserting that [p] text contains [Goodbye], found [Hello World].');
+        $this->expectExceptionMessage('Failed asserting that [p] text was accepted by the truth test.');
 
-        $this->html('<p>Hello World</p>')->whereContains('p', 'Goodbye');
+        $this->html('<p>Hello World</p>')
+            ->where('p', fn ($text) => str_contains($text, 'Goodbye'));
     }
 
     // --- whereAll ---
@@ -153,6 +153,15 @@ class AssertableHtmlTest extends TestCase
             ->whereAll([
                 'p.a' => 'Foo',
                 'p.b' => 'Wrong',
+            ]);
+    }
+
+    public function testWhereAllPassesWithClosures(): void
+    {
+        $this->html('<p class="a">Foo</p><p class="b">Bar</p>')
+            ->whereAll([
+                'p.a' => fn ($text) => str_starts_with($text, 'F'),
+                'p.b' => 'Bar',
             ]);
     }
 
