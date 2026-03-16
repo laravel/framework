@@ -51,7 +51,7 @@ class AssertableHtml
     public static function fromResponse(TestResponse $response, int $options = LIBXML_NOERROR): static
     {
         return new static(
-            HTMLDocument::createFromString($$response->getContent(), $options)
+            HTMLDocument::createFromString($$response->getContent(), $options),
         );
     }
 
