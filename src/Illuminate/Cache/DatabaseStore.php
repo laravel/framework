@@ -11,6 +11,7 @@ use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\SqlServerConnection;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
@@ -278,11 +279,23 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
             $cache = $this->table()->where('key', $prefixed)
                 ->lockForUpdate()->first();
 
-            // If there is no value in the cache, we will return false here. Otherwise the
+            // If there is no value in the cache, we'll set the value to 0. Otherwise, the
             // value will be decrypted and we will proceed with this function to either
             // increment or decrement this value based on the given action callbacks.
             if (is_null($cache)) {
-                return false;
+                $new = $callback(0, $value);
+
+                try {
+                    $this->table()->insert([
+                        'key' => $prefixed,
+                        'value' => $this->serialize($new),
+                        'expiration' => $this->getTime() + 315360000,
+                    ]);
+                } catch (UniqueConstraintViolationException) {
+                    return $this->incrementOrDecrement($key, $value, $callback);
+                }
+
+                return $new;
             }
 
             $cache = is_array($cache) ? (object) $cache : $cache;
