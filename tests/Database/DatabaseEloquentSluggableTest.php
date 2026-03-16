@@ -533,7 +533,7 @@ class DatabaseEloquentSluggableTest extends TestCase
     public function test_it_throws_when_source_produces_empty_slug()
     {
         $this->expectException(CouldNotGenerateSlugException::class);
-        $this->expectExceptionMessage('Could not generate a slug for [Illuminate\Tests\Database\SluggablePost] from the given source value.');
+        $this->expectExceptionMessage('Could not generate a slug for [Illuminate\Tests\Database\SluggablePost] using column(s) [name].');
 
         SluggablePost::create(['name' => '!!!']);
     }
@@ -541,7 +541,7 @@ class DatabaseEloquentSluggableTest extends TestCase
     public function test_it_throws_when_emoji_only_source_produces_empty_slug()
     {
         $this->expectException(CouldNotGenerateSlugException::class);
-        $this->expectExceptionMessage('Could not generate a slug for [Illuminate\Tests\Database\SluggablePost] from the given source value.');
+        $this->expectExceptionMessage('Could not generate a slug for [Illuminate\Tests\Database\SluggablePost] using column(s) [name].');
 
         SluggablePost::create(['name' => '🚀🎯🔥']);
     }

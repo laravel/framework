@@ -56,8 +56,10 @@ class SlugGenerator
         $slug = $this->slugify($this->resolveSourceValue());
 
         if ($slug === '') {
+            $columns = implode(', ', Arr::wrap($this->options()->from));
+
             throw new CouldNotGenerateSlugException(
-                'Could not generate a slug for ['.get_class($this->model).'] from the given source value.'
+                'Could not generate a slug for ['.get_class($this->model)."] using column(s) [{$columns}]."
             );
         }
 
