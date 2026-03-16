@@ -545,6 +545,14 @@ class DatabaseEloquentSluggableTest extends TestCase
 
         SluggablePost::create(['name' => '🚀🎯🔥']);
     }
+
+    public function test_it_throws_when_source_column_is_null()
+    {
+        $this->expectException(CouldNotGenerateSlugException::class);
+        $this->expectExceptionMessage('Could not generate a slug for [Illuminate\Tests\Database\SluggablePost] using column(s) [name].');
+
+        SluggablePost::create([]);
+    }
 }
 
 #[Sluggable]
