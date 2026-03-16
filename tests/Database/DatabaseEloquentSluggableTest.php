@@ -404,7 +404,7 @@ class DatabaseEloquentSluggableTest extends TestCase
             'comma' => ['Hello, World', 'hello-world'],
             'semicolon' => ['Example;Path', 'example-path'],
             'colon' => ['Example:Path', 'example-path'],
-            'quotes single' => ["It's Here", 'it-s-here'],
+            'quotes single' => ["It's Here", 'its-here'],
             'quotes double' => ['"Hello World"', 'hello-world'],
             'at sign' => ['user@host', 'user-host'],
             'hash' => ['Hello#World', 'hello-world'],
@@ -495,11 +495,11 @@ class DatabaseEloquentSluggableTest extends TestCase
             'file path' => ['src/Components/Button.tsx', 'src-components-button.tsx'],
 
             // apostrophes
-            'apostrophe in word' => ["hello'world", 'hello-world'],
-            'im contraction' => ["I'm happy", 'i-m-happy'],
-            'its contraction' => ["it's a test", 'it-s-a-test'],
+            'apostrophe in word' => ["hello'world", 'helloworld'],
+            'im contraction' => ["I'm happy", 'im-happy'],
+            'its contraction' => ["it's a test", 'its-a-test'],
             'rock n roll' => ["rock 'n' roll", 'rock-n-roll'],
-            'dont contraction' => ["don't stop", 'don-t-stop'],
+            'dont contraction' => ["don't stop", 'dont-stop'],
 
             // special symbols (transliterated)
             'trademark' => ['Test™ Product', 'test-tm-product'],

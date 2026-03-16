@@ -110,6 +110,8 @@ class SlugGenerator
 
         $value = Str::transliterate($value, unknown: '');
 
+        $value = str_replace("'", '', $value);
+
         $value = preg_replace('!['.preg_quote($flip).']+!u', $separator, $value);
 
         $value = preg_replace('![^'.preg_quote($separator).'\pL\pN\s.]+!u', $separator, mb_strtolower($value, 'UTF-8'));
