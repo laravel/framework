@@ -560,6 +560,40 @@ class BusBatchTest extends TestCase
         $this->assertInstanceOf(CarbonImmutable::class, $batch->createdAt);
     }
 
+    public function test_chained_jobs_in_batch_preserve_their_queue_when_batch_has_no_queue()
+    {
+        $queue = m::mock(Factory::class);
+
+        $repository = new DatabaseBatchRepository(new BatchFactory($queue), DB::connection(), 'job_batches');
+
+        // Create a batch WITHOUT onQueue — this is the key difference
+        $pendingBatch = (new PendingBatch(new Container, collect()))
+            ->onConnection('test-connection');
+
+        $batch = $repository->store($pendingBatch);
+
+        $firstJob = (new ChainHeadJob)->onQueue('custom-queue');
+        $secondJob = (new SecondTestJob)->onQueue('custom-queue');
+
+        $queue->shouldReceive('connection')->once()
+            ->with('test-connection')
+            ->andReturn($connection = m::mock(stdClass::class));
+
+        $connection->shouldReceive('bulk')->once()->with(m::on(function ($args) {
+            return true;
+        }), '', null);
+
+        $batch->add([
+            [$firstJob, $secondJob],
+        ]);
+
+        // Both jobs had ->onQueue('custom-queue') set before batching.
+        // The second job retains its queue, but the first job's queue
+        // is wiped to null by Batch::add() calling allOnQueue(null).
+        $this->assertSame('custom-queue', $secondJob->queue);
+        $this->assertSame('custom-queue', $firstJob->queue);
+    }
+
     public function test_chained_closure_after_multiple_batches_is_properly_dispatched()
     {
         Queue::fake();
