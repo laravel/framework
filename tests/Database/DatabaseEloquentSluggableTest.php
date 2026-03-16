@@ -342,6 +342,14 @@ class DatabaseEloquentSluggableTest extends TestCase
         $this->assertStringEndsWith('-2', $post->slug);
     }
 
+    public function test_it_handles_max_length_smaller_than_suffix()
+    {
+        SluggableTinyMaxLengthPost::create(['name' => 'Hi']);
+        $post = SluggableTinyMaxLengthPost::create(['name' => 'Hi']);
+
+        $this->assertSame('-2', $post->slug);
+    }
+
     // slug generation
 
     public static function slugProvider(): array
@@ -624,6 +632,14 @@ class SluggableGermanPost extends Model
 
 #[Sluggable(maxLength: 20)]
 class SluggableMaxLengthPost extends Model
+{
+    protected $table = 'sluggable_posts';
+
+    protected $guarded = [];
+}
+
+#[Sluggable(maxLength: 2)]
+class SluggableTinyMaxLengthPost extends Model
 {
     protected $table = 'sluggable_posts';
 

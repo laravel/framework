@@ -160,7 +160,7 @@ class SlugGenerator
             $suffix = $options->separator.$count;
 
             if ($options->maxLength) {
-                $slug = rtrim(mb_substr($originalSlug, 0, $options->maxLength - mb_strlen($suffix)), $options->separator).$suffix;
+                $slug = rtrim(mb_substr($originalSlug, 0, max(0, $options->maxLength - mb_strlen($suffix))), $options->separator).$suffix;
             } else {
                 $slug = $originalSlug.$suffix;
             }
