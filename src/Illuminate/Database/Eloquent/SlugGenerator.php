@@ -69,17 +69,8 @@ class SlugGenerator
      */
     protected function sourceHasChanged(): bool
     {
-        $source = $this->options()->from;
-
-        $columns = is_array($source) ? $source : [$source];
-
-        foreach ($columns as $column) {
-            if ($this->model->isDirty($column)) {
-                return true;
-            }
-        }
-
-        return false;
+        return collect(Arr::wrap($this->options()->from))
+            ->contains(fn (string $column) => $this->model->isDirty($column));
     }
 
     /**
