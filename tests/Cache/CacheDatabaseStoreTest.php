@@ -163,7 +163,7 @@ class CacheDatabaseStoreTest extends TestCase
         $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(function ($closure) {
             return $closure();
         });
-        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $store->getConnection()->shouldReceive('table')->twice()->with('table')->andReturn($table);
         $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
         $table->shouldReceive('lockForUpdate')->once()->andReturn($table);
         $table->shouldReceive('first')->once()->andReturn(null);
@@ -179,11 +179,11 @@ class CacheDatabaseStoreTest extends TestCase
 
         $cache->value = serialize(1);
 
-        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(function ($closure) {
+        $store->getConnection()->shouldReceive('transaction')->twice()->with(m::type(Closure::class))->andReturnUsing(function ($closure) {
             return $closure();
         });
-        $store->getConnection()->shouldReceive('table')->twice()->with('table')->andReturn($table);
-        $table->shouldReceive('where')->twice()->with('key', 'prefixfoo')->andReturn($table);
+        $store->getConnection()->shouldReceive('table')->times(4)->with('table')->andReturn($table);
+        $table->shouldReceive('where')->times(3)->with('key', 'prefixfoo')->andReturn($table);
         $table->shouldReceive('lockForUpdate')->twice()->andReturn($table);
         $table->shouldReceive('first')->twice()->andReturn(null, $cache);
         $table->shouldReceive('insert')->once()
@@ -220,12 +220,10 @@ class CacheDatabaseStoreTest extends TestCase
         $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(function ($closure) {
             return $closure();
         });
-        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
+        $store->getConnection()->shouldReceive('table')->twice()->with('table')->andReturn($table);
+        $table->shouldReceive('where')->twice()->with('key', 'prefixfoo')->andReturn($table);
         $table->shouldReceive('lockForUpdate')->once()->andReturn($table);
         $table->shouldReceive('first')->once()->andReturn($cache);
-        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
         $table->shouldReceive('update')->once()->with(['value' => serialize(3)])->andReturn(true);
         $this->assertEquals(3, $store->increment('foo'));
     }
@@ -238,7 +236,7 @@ class CacheDatabaseStoreTest extends TestCase
         $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(function ($closure) {
             return $closure();
         });
-        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $store->getConnection()->shouldReceive('table')->twice()->with('table')->andReturn($table);
         $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
         $table->shouldReceive('lockForUpdate')->once()->andReturn($table);
         $table->shouldReceive('first')->once()->andReturn(null);
@@ -273,12 +271,10 @@ class CacheDatabaseStoreTest extends TestCase
         $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(function ($closure) {
             return $closure();
         });
-        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('where')->once()->with('key', 'prefixbar')->andReturn($table);
+        $store->getConnection()->shouldReceive('table')->twice()->with('table')->andReturn($table);
+        $table->shouldReceive('where')->twice()->with('key', 'prefixbar')->andReturn($table);
         $table->shouldReceive('lockForUpdate')->once()->andReturn($table);
         $table->shouldReceive('first')->once()->andReturn($cache);
-        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('where')->once()->with('key', 'prefixbar')->andReturn($table);
         $table->shouldReceive('update')->once()->with(['value' => serialize(2)])->andReturn(true);
         $this->assertEquals(2, $store->decrement('bar'));
     }
