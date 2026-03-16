@@ -2743,6 +2743,25 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(2, $result);
     }
 
+    public function testTouchWithMultipleColumns()
+    {
+        Carbon::setTestNow($now = '2017-10-10 10:10:10');
+
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('from')->with('foo_table')->andReturn('foo_table');
+        $query->from = 'foo_table';
+
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder->setModel($model);
+
+        $query->shouldReceive('update')->once()->with(['published_at' => $now, 'verified_at' => $now])->andReturn(2);
+
+        $result = $builder->touch(['published_at', 'verified_at']);
+
+        $this->assertEquals(2, $result);
+    }
+
     public function testTouchWithoutUpdatedAtColumn()
     {
         $query = m::mock(BaseBuilder::class);

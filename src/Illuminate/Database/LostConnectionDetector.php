@@ -90,6 +90,15 @@ class LostConnectionDetector implements LostConnectionDetectorContract
             'no healthy tablet available',
             'transaction pool connection limit exceeded',
             'SSL operation failed with code 5',
+
+            // PlanetScale / pg_bouncer related things...
+            'no primary available for branch',
+            'no replica available for branch',
+            'no running members available for branch',
+            'failed to connect to upstream',
+            'failed to send startup message',
+            'failed to read startup message',
+            'canceling statement due to conflict with recovery',
         ]);
     }
 }

@@ -24,7 +24,7 @@ class MessageSelector
 
         $segments = $this->stripConditions($segments);
 
-        $pluralIndex = $this->getPluralIndex($locale, $number);
+        $pluralIndex = $this->getPluralIndex($locale, (int) $number);
 
         if (count($segments) === 1 || ! isset($segments[$pluralIndex])) {
             return $segments[0];

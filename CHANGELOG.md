@@ -1,6 +1,10 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.54.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.54.1...12.x)
+
+## [v12.54.1](https://github.com/laravel/framework/compare/v12.54.0...v12.54.1) - 2026-03-10
+
+* [12.x] Makes imports consistent by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/framework/pull/59149
 
 ## [v12.54.0](https://github.com/laravel/framework/compare/v12.53.0...v12.54.0) - 2026-03-10
 

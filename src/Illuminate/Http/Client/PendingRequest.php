@@ -379,9 +379,9 @@ class PendingRequest
      */
     public function bodyFormat(string $format)
     {
-        return tap($this, function () use ($format) {
-            $this->bodyFormat = $format;
-        });
+        $this->bodyFormat = $format;
+
+        return $this;
     }
 
     /**
@@ -392,11 +392,11 @@ class PendingRequest
      */
     public function withQueryParameters(array $parameters)
     {
-        return tap($this, function () use ($parameters) {
-            $this->options = array_merge_recursive($this->options, [
-                'query' => $parameters,
-            ]);
-        });
+        $this->options = array_merge_recursive($this->options, [
+            'query' => $parameters,
+        ]);
+
+        return $this;
     }
 
     /**
@@ -441,11 +441,11 @@ class PendingRequest
      */
     public function withHeaders(array $headers)
     {
-        return tap($this, function () use ($headers) {
-            $this->options = array_merge_recursive($this->options, [
-                'headers' => $headers,
-            ]);
-        });
+        $this->options = array_merge_recursive($this->options, [
+            'headers' => $headers,
+        ]);
+
+        return $this;
     }
 
     /**
@@ -482,9 +482,9 @@ class PendingRequest
      */
     public function withBasicAuth(string $username, string $password)
     {
-        return tap($this, function () use ($username, $password) {
-            $this->options['auth'] = [$username, $password];
-        });
+        $this->options['auth'] = [$username, $password];
+
+        return $this;
     }
 
     /**
@@ -496,9 +496,9 @@ class PendingRequest
      */
     public function withDigestAuth($username, $password)
     {
-        return tap($this, function () use ($username, $password) {
-            $this->options['auth'] = [$username, $password, 'digest'];
-        });
+        $this->options['auth'] = [$username, $password, 'digest'];
+
+        return $this;
     }
 
     /**
@@ -510,9 +510,9 @@ class PendingRequest
      */
     public function withNtlmAuth($username, $password)
     {
-        return tap($this, function () use ($username, $password) {
-            $this->options['auth'] = [$username, $password, 'ntlm'];
-        });
+        $this->options['auth'] = [$username, $password, 'ntlm'];
+
+        return $this;
     }
 
     /**
@@ -524,9 +524,9 @@ class PendingRequest
      */
     public function withToken($token, $type = 'Bearer')
     {
-        return tap($this, function () use ($token, $type) {
-            $this->options['headers']['Authorization'] = trim($type.' '.$token);
-        });
+        $this->options['headers']['Authorization'] = trim($type.' '.$token);
+
+        return $this;
     }
 
     /**
@@ -537,9 +537,9 @@ class PendingRequest
      */
     public function withUserAgent($userAgent)
     {
-        return tap($this, function () use ($userAgent) {
-            $this->options['headers']['User-Agent'] = trim($userAgent);
-        });
+        $this->options['headers']['User-Agent'] = trim($userAgent);
+
+        return $this;
     }
 
     /**
@@ -550,9 +550,9 @@ class PendingRequest
      */
     public function withUrlParameters(array $parameters = [])
     {
-        return tap($this, function () use ($parameters) {
-            $this->urlParameters = array_merge($this->urlParameters, $parameters);
-        });
+        $this->urlParameters = array_merge($this->urlParameters, $parameters);
+
+        return $this;
     }
 
     /**
@@ -564,11 +564,11 @@ class PendingRequest
      */
     public function withCookies(array $cookies, string $domain)
     {
-        return tap($this, function () use ($cookies, $domain) {
-            $this->options = array_merge_recursive($this->options, [
-                'cookies' => CookieJar::fromArray($cookies, $domain),
-            ]);
-        });
+        $this->options = array_merge_recursive($this->options, [
+            'cookies' => CookieJar::fromArray($cookies, $domain),
+        ]);
+
+        return $this;
     }
 
     /**
@@ -579,9 +579,9 @@ class PendingRequest
      */
     public function maxRedirects(int $max)
     {
-        return tap($this, function () use ($max) {
-            $this->options['allow_redirects']['max'] = $max;
-        });
+        $this->options['allow_redirects']['max'] = $max;
+
+        return $this;
     }
 
     /**
@@ -591,9 +591,9 @@ class PendingRequest
      */
     public function withoutRedirecting()
     {
-        return tap($this, function () {
-            $this->options['allow_redirects'] = false;
-        });
+        $this->options['allow_redirects'] = false;
+
+        return $this;
     }
 
     /**
@@ -603,9 +603,9 @@ class PendingRequest
      */
     public function withoutVerifying()
     {
-        return tap($this, function () {
-            $this->options['verify'] = false;
-        });
+        $this->options['verify'] = false;
+
+        return $this;
     }
 
     /**
@@ -616,9 +616,9 @@ class PendingRequest
      */
     public function sink($to)
     {
-        return tap($this, function () use ($to) {
-            $this->options['sink'] = $to;
-        });
+        $this->options['sink'] = $to;
+
+        return $this;
     }
 
     /**
@@ -629,9 +629,9 @@ class PendingRequest
      */
     public function timeout(int|float $seconds)
     {
-        return tap($this, function () use ($seconds) {
-            $this->options['timeout'] = $seconds;
-        });
+        $this->options['timeout'] = $seconds;
+
+        return $this;
     }
 
     /**
@@ -642,9 +642,9 @@ class PendingRequest
      */
     public function connectTimeout(int|float $seconds)
     {
-        return tap($this, function () use ($seconds) {
-            $this->options['connect_timeout'] = $seconds;
-        });
+        $this->options['connect_timeout'] = $seconds;
+
+        return $this;
     }
 
     /**
@@ -674,12 +674,12 @@ class PendingRequest
      */
     public function withOptions(array $options)
     {
-        return tap($this, function () use ($options) {
-            $this->options = array_replace_recursive(
-                array_merge_recursive($this->options, Arr::only($options, $this->mergeableOptions)),
-                $options
-            );
-        });
+        $this->options = array_replace_recursive(
+            array_merge_recursive($this->options, Arr::only($options, $this->mergeableOptions)),
+            $options
+        );
+
+        return $this;
     }
 
     /**
@@ -742,9 +742,9 @@ class PendingRequest
      */
     public function beforeSending($callback)
     {
-        return tap($this, function () use ($callback) {
-            $this->beforeSendingCallbacks[] = $callback;
-        });
+        $this->beforeSendingCallbacks[] = $callback;
+
+        return $this;
     }
 
     /**

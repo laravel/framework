@@ -5934,6 +5934,27 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testDotWithDepth($collection)
+    {
+        $data = $collection::make([
+            'name' => 'Taylor',
+            'meta' => [
+                'foo' => 'bar',
+                'bam' => [
+                    'boom' => 'bip',
+                ],
+            ],
+        ])->dot(1);
+        $this->assertSame([
+            'name' => 'Taylor',
+            'meta.foo' => 'bar',
+            'meta.bam' => [
+                'boom' => 'bip',
+            ],
+        ], $data->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testEnsureForScalar($collection)
     {
         $data = $collection::make([1, 2, 3]);

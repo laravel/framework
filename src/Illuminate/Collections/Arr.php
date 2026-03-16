@@ -178,25 +178,26 @@ class Arr
      *
      * @param  iterable  $array
      * @param  string  $prepend
+     * @param  int  $depth
      * @return array
      */
-    public static function dot($array, $prepend = '')
+    public static function dot($array, $prepend = '', $depth = INF)
     {
         $results = [];
 
-        $flatten = function ($data, $prefix) use (&$results, &$flatten): void {
+        $flatten = function ($data, $prefix, $currentDepth) use (&$results, &$flatten, $depth): void {
             foreach ($data as $key => $value) {
                 $newKey = $prefix.$key;
 
-                if (is_array($value) && ! empty($value)) {
-                    $flatten($value, $newKey.'.');
+                if (is_array($value) && ! empty($value) && $currentDepth < $depth) {
+                    $flatten($value, $newKey.'.', $currentDepth + 1);
                 } else {
                     $results[$newKey] = $value;
                 }
             }
         };
 
-        $flatten($array, $prepend);
+        $flatten($array, $prepend, 0);
 
         // Destroy self-referencing closure to avoid memory leak...
         $flatten = null;
