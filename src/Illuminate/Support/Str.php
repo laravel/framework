@@ -1460,7 +1460,7 @@ class Str
     }
 
     /**
-     * Returns the initials for each word in the provided string, optionally capitalizing.
+     * Get the "initials" representing each word in the provided string, optionally capitalizing.
      *
      * @param  string  $value
      * @param  bool  $capitalize
