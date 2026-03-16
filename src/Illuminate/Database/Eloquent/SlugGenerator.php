@@ -23,7 +23,7 @@ class SlugGenerator
     {
         $options = $this->options();
 
-        if ($options->onCreating && is_null($this->model->{$options->column})) {
+        if (is_null($this->model->{$options->column})) {
             $this->model->{$options->column} = $this->generate();
         }
     }

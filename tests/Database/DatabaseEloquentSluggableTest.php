@@ -197,14 +197,7 @@ class DatabaseEloquentSluggableTest extends TestCase
         $this->assertSame('hello', $post->slug);
     }
 
-    // onCreating
-
-    public function test_it_skips_generation_on_create_when_opted_out()
-    {
-        $post = SluggableNoCreatePost::create(['name' => 'Hello World']);
-
-        $this->assertNull($post->slug);
-    }
+    // creating
 
     public function test_it_preserves_manually_provided_slug_on_create()
     {
@@ -609,14 +602,6 @@ class SluggableMultiSourcePost extends Model
 class SluggableMultiSourceUpdatePost extends Model
 {
     protected $table = 'sluggable_multi_source_posts';
-
-    protected $guarded = [];
-}
-
-#[Sluggable(onCreating: false)]
-class SluggableNoCreatePost extends Model
-{
-    protected $table = 'sluggable_posts';
 
     protected $guarded = [];
 }

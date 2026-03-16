@@ -19,7 +19,6 @@ class Sluggable
         public string $separator = '-',
         public string $language = 'en',
         public array|string $scope = [],
-        public bool $onCreating = true,
         public bool $onUpdating = false,
         public bool $unique = true,
         public int $maxAttempts = 100,
