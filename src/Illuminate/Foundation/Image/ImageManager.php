@@ -7,8 +7,8 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Foundation\Image\Drivers\GdDriver;
 use Illuminate\Foundation\Image\Drivers\ImagickDriver;
-use InvalidArgumentException;
 use Intervention\Image\ImageManager as InterventionImageManager;
+use InvalidArgumentException;
 use RuntimeException;
 
 class ImageManager
