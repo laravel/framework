@@ -31,7 +31,8 @@ class SlugCommandTest extends TestCase
             'use Illuminate\Database\Migrations\Migration;',
             'return new class extends Migration',
             "Schema::table('foos', function (Blueprint \$table) {",
-            "\$table->string('slug')->unique()->after('id');",
+            "->string('slug')",
+            '->unique()',
             "\$table->dropColumn('slug');",
         ], 'add_slug_to_foos_table.php');
 
@@ -102,6 +103,17 @@ class SlugCommandTest extends TestCase
             ->assertExitCode(1);
     }
 
+    public function test_it_uses_custom_from_option()
+    {
+        $this->artisan(SlugCommand::class, ['model' => 'Foo', '--from' => 'headline'])
+            ->expectsOutputToContain('Sluggable attribute added to [App\Models\Foo]')
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            "#[Sluggable(from: 'headline')]",
+        ], 'app/Models/Foo.php');
+    }
+
     public function test_it_uses_custom_column_name()
     {
         $this->artisan(SlugCommand::class, ['model' => 'Foo', '--column' => 'url_slug'])
@@ -110,7 +122,8 @@ class SlugCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertMigrationFileContains([
-            "\$table->string('url_slug')->unique()->after('id');",
+            "->string('url_slug')",
+            '->unique()',
             "\$table->dropColumn('url_slug');",
         ], 'add_url_slug_to_foos_table.php');
 

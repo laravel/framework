@@ -20,6 +20,7 @@ class SlugCommand extends Command
      * @var string
      */
     protected $signature = 'make:sluggable {model : The model to make sluggable}
+                                       {--from= : The source column to generate the slug from}
                                        {--column=slug : The name of the slug column}';
 
     /**
@@ -47,7 +48,7 @@ class SlugCommand extends Command
         $model = $this->laravel->make($modelClass);
         $table = $model->getTable();
         $column = $this->option('column');
-        $source = $this->guessSourceColumn($model);
+        $source = $this->option('from') ?? $this->guessSourceColumn($model);
 
         $this->addAttributeToModel($modelClass, $modelPath, $source, $column);
 
