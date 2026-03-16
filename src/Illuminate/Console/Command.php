@@ -3,7 +3,10 @@
 namespace Illuminate\Console;
 
 use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Help;
+use Illuminate\Console\Attributes\Hidden;
 use Illuminate\Console\Attributes\Signature;
+use Illuminate\Console\Attributes\Usage;
 use Illuminate\Console\View\Components\Factory;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Support\Traits\Macroable;
@@ -103,6 +106,8 @@ class Command extends SymfonyCommand
             parent::__construct($this->name);
         }
 
+        $this->configureUsageFromAttribute();
+
         // Once we have constructed the command, we'll set the description and other
         // related properties of the command. If a signature wasn't used to build
         // the command we'll set the arguments and the options on this command.
@@ -154,6 +159,30 @@ class Command extends SymfonyCommand
 
         if (count($description) > 0) {
             $this->description = $description[0]->newInstance()->description;
+        }
+
+        $help = $reflection->getAttributes(Help::class);
+
+        if (count($help) > 0) {
+            $this->help = $help[0]->newInstance()->help;
+        }
+
+        if (count($reflection->getAttributes(Hidden::class)) > 0) {
+            $this->hidden = true;
+        }
+    }
+
+    /**
+     * Configure usage examples for the command from class attributes.
+     *
+     * @return void
+     */
+    protected function configureUsageFromAttribute()
+    {
+        $reflection = new ReflectionClass($this);
+
+        foreach ($reflection->getAttributes(Usage::class) as $usage) {
+            $this->addUsage($usage->newInstance()->usage);
         }
     }
 
