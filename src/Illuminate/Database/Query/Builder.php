@@ -1164,12 +1164,13 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>|string  $vector
      * @param  float  $minSimilarity  A value between 0.0 and 1.0, where 1.0 is identical.
      * @param  bool  $order
+     * @param  int|null  $dimensions  The number of dimensions for the vector, if the string needs to be converted to embeddings.
      * @return $this
      */
-    public function whereVectorSimilarTo($column, $vector, $minSimilarity = 0.6, $order = true)
+    public function whereVectorSimilarTo($column, $vector, $minSimilarity = 0.6, $order = true, $dimensions = null)
     {
         if (is_string($vector)) {
-            $vector = Str::of($vector)->toEmbeddings(cache: true);
+            $vector = Str::of($vector)->toEmbeddings(cache: true, dimensions: $dimensions);
         }
 
         $this->whereVectorDistanceLessThan($column, $vector, 1 - $minSimilarity);
@@ -1188,14 +1189,15 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>|string  $vector
      * @param  float  $maxDistance
      * @param  string  $boolean
+     * @param  int|null  $dimensions  The number of dimensions for the vector, if the string needs to be converted to embeddings.
      * @return $this
      */
-    public function whereVectorDistanceLessThan($column, $vector, $maxDistance, $boolean = 'and')
+    public function whereVectorDistanceLessThan($column, $vector, $maxDistance, $boolean = 'and', $dimensions = null)
     {
         $this->ensureConnectionSupportsVectors();
 
         if (is_string($vector)) {
-            $vector = Str::of($vector)->toEmbeddings(cache: true);
+            $vector = Str::of($vector)->toEmbeddings(cache: true, dimensions: $dimensions);
         }
 
         return $this->whereRaw(
@@ -1219,11 +1221,12 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>|string  $vector
      * @param  float  $maxDistance
+     * @param  int|null  $dimensions  The number of dimensions for the vector, if the string needs to be converted to embeddings.
      * @return $this
      */
-    public function orWhereVectorDistanceLessThan($column, $vector, $maxDistance)
+    public function orWhereVectorDistanceLessThan($column, $vector, $maxDistance, $dimensions = null)
     {
-        return $this->whereVectorDistanceLessThan($column, $vector, $maxDistance, 'or');
+        return $this->whereVectorDistanceLessThan($column, $vector, $maxDistance, 'or', $dimensions);
     }
 
     /**
