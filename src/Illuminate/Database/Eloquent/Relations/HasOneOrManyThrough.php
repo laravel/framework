@@ -99,12 +99,10 @@ abstract class HasOneOrManyThrough extends Relation
     {
         $query = $this->getRelationQuery();
 
-        $localValue = $this->farParent[$this->localKey];
-
         $this->performJoin($query);
 
         if (static::$constraints) {
-            $query->where($this->getQualifiedFirstKeyName(), '=', $localValue);
+            $query->where($this->getQualifiedFirstKeyName(), '=', $this->farParent[$this->localKey]);
         }
     }
 
