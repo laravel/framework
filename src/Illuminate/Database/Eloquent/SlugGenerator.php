@@ -78,10 +78,7 @@ class SlugGenerator
      */
     protected function hasCustomSlugBeenUsed(): bool
     {
-        $column = $this->options()->column;
-
-        return $this->model->getOriginal($column) !== $this->model->{$column}
-            && $this->model->isDirty($column);
+        return $this->model->isDirty($this->options()->column);
     }
 
     /**
