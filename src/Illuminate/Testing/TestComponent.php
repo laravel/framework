@@ -2,10 +2,12 @@
 
 namespace Illuminate\Testing;
 
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\Constraints\SeeInOrder;
+use Illuminate\Testing\Fluent\AssertableHtml;
 use Stringable;
 
 class TestComponent implements Stringable
@@ -185,6 +187,24 @@ class TestComponent implements Stringable
 
         foreach ($values as $value) {
             PHPUnit::assertStringNotContainsString((string) $value, $rendered);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the rendered component HTML satisfies a given set of fluent assertions.
+     *
+     * @param  string|\Closure  $selectorOrCallback
+     * @param  \Closure|null  $callback
+     * @return $this
+     */
+    public function assertHtml(string|Closure $selectorOrCallback, ?Closure $callback = null): static
+    {
+        if ($selectorOrCallback instanceof Closure) {
+            $selectorOrCallback(AssertableHtml::fromString($this->rendered));
+        } else {
+            AssertableHtml::fromString($this->rendered)->scope($selectorOrCallback, $callback);
         }
 
         return $this;
