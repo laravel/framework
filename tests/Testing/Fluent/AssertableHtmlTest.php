@@ -286,7 +286,7 @@ class AssertableHtmlTest extends TestCase
             ->missing('aside')
             ->count('a', 1)
             ->where('a', 'Home')
-            ->whereContains('nav', 'Home')
+            ->where('nav', fn ($text) => str_contains($text, 'Home'))
             ->whereAttr('a', 'href', '/')
             ->hasAttr('a', 'class')
             ->missingAttr('a', 'disabled');

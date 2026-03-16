@@ -177,32 +177,6 @@ class AssertableHtml
         return $this;
     }
 
-    /**
-     * Assert that the matched element's text contains the expected value.
-     *
-     * @param  string  $selector
-     * @param  string  $expected
-     * @return $this
-     */
-    public function whereContains(string $selector, string $expected): static
-    {
-        $element = $this->scope->querySelector($selector);
-
-        if ($element === null) {
-            $this->fail("Failed asserting that element [{$selector}] exists.", $selector);
-        }
-
-        $actual = trim($element->textContent);
-
-        if (! str_contains($actual, $expected)) {
-            $this->fail(
-                "Failed asserting that [{$selector}] text contains [{$expected}], found [{$actual}].",
-                $selector
-            );
-        }
-
-        return $this;
-    }
 
     /**
      * Assert multiple selector → text (or closure) pairs at once.
