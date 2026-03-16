@@ -19,7 +19,8 @@ class SlugCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'make:sluggable {model : The model to make sluggable}';
+    protected $signature = 'make:sluggable {model : The model to make sluggable}
+                                       {--column=slug : The name of the slug column}';
 
     /**
      * Create a new command instance.
@@ -45,17 +46,18 @@ class SlugCommand extends Command
 
         $model = $this->laravel->make($modelClass);
         $table = $model->getTable();
+        $column = $this->option('column');
         $source = $this->guessSourceColumn($model);
 
-        $this->addAttributeToModel($modelClass, $modelPath, $source);
+        $this->addAttributeToModel($modelClass, $modelPath, $source, $column);
 
-        return $this->createMigration($table);
+        return $this->createMigration($table, $column);
     }
 
     /**
      * Add the Sluggable attribute to the model file.
      */
-    protected function addAttributeToModel(string $modelClass, string $modelPath, string $source): void
+    protected function addAttributeToModel(string $modelClass, string $modelPath, string $source, string $column): void
     {
         $contents = $this->files->get($modelPath);
 
@@ -77,7 +79,9 @@ class SlugCommand extends Command
             }
         }
 
-        $attribute = "#[Sluggable(from: '{$source}')]";
+        $attribute = $column === 'slug'
+            ? "#[Sluggable(from: '{$source}')]"
+            : "#[Sluggable(from: '{$source}', column: '{$column}')]";
 
         $contents = preg_replace(
             '/(^)(class\s+\w+)/m',
@@ -111,27 +115,27 @@ class SlugCommand extends Command
     /**
      * Create the migration file for the slug column.
      */
-    protected function createMigration(string $table): int
+    protected function createMigration(string $table, string $column): int
     {
-        if ($this->hasSlugColumn($table)) {
-            $this->components->warn("Table [{$table}] already has a slug column. Migration not created.");
+        if ($this->hasSlugColumn($table, $column)) {
+            $this->components->warn("Table [{$table}] already has a [{$column}] column. Migration not created.");
 
             return 0;
         }
 
-        if ($this->migrationExists($table)) {
+        if ($this->migrationExists($table, $column)) {
             $this->components->error('Migration already exists.');
 
             return 1;
         }
 
         $path = $this->laravel['migration.creator']->create(
-            'add_slug_to_'.$table.'_table',
+            "add_{$column}_to_{$table}_table",
             $this->laravel->databasePath('/migrations')
         );
 
         $stub = str_replace(
-            '{{table}}', $table, $this->files->get(__DIR__.'/stubs/add_slug_column.stub')
+            ['{{table}}', '{{column}}'], [$table, $column], $this->files->get(__DIR__.'/stubs/add_slug_column.stub')
         );
 
         $this->files->put($path, $stub);
@@ -144,12 +148,12 @@ class SlugCommand extends Command
     /**
      * Determine whether the table already has a slug column.
      */
-    protected function hasSlugColumn(string $table): bool
+    protected function hasSlugColumn(string $table, string $column): bool
     {
         try {
             return $this->laravel['db']->connection()
                 ->getSchemaBuilder()
-                ->hasColumn($table, 'slug');
+                ->hasColumn($table, $column);
         } catch (QueryException) {
             return false;
         }
@@ -158,10 +162,10 @@ class SlugCommand extends Command
     /**
      * Determine whether a migration for the slug column already exists.
      */
-    protected function migrationExists(string $table): bool
+    protected function migrationExists(string $table, string $column): bool
     {
         return count($this->files->glob(
-            join_paths($this->laravel->databasePath('migrations'), '*_*_*_*_add_slug_to_'.$table.'_table.php')
+            join_paths($this->laravel->databasePath('migrations'), "*_*_*_*_add_{$column}_to_{$table}_table.php")
         )) !== 0;
     }
 

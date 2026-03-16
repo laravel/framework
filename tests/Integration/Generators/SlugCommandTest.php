@@ -10,6 +10,7 @@ class SlugCommandTest extends TestCase
     protected $files = [
         'app/Models/Foo.php',
         'database/migrations/*_add_slug_to_foos_table.php',
+        'database/migrations/*_add_url_slug_to_foos_table.php',
     ];
 
     protected function setUp(): void
@@ -68,7 +69,7 @@ class SlugCommandTest extends TestCase
         });
 
         $this->artisan(SlugCommand::class, ['model' => 'Foo'])
-            ->expectsOutputToContain('already has a slug column')
+            ->expectsOutputToContain('already has a [slug] column')
             ->assertExitCode(0);
 
         Schema::drop('foos');
@@ -99,6 +100,23 @@ class SlugCommandTest extends TestCase
         $this->artisan(SlugCommand::class, ['model' => 'Foo'])
             ->expectsOutputToContain('Migration already exists')
             ->assertExitCode(1);
+    }
+
+    public function test_it_uses_custom_column_name()
+    {
+        $this->artisan(SlugCommand::class, ['model' => 'Foo', '--column' => 'url_slug'])
+            ->expectsOutputToContain('Sluggable attribute added to [App\Models\Foo]')
+            ->expectsOutputToContain('Migration created.')
+            ->assertExitCode(0);
+
+        $this->assertMigrationFileContains([
+            "\$table->string('url_slug')->unique()->after('id');",
+            "\$table->dropColumn('url_slug');",
+        ], 'add_url_slug_to_foos_table.php');
+
+        $this->assertFileContains([
+            "#[Sluggable(from: 'name', column: 'url_slug')]",
+        ], 'app/Models/Foo.php');
     }
 
     public function test_it_errors_when_model_does_not_exist()
