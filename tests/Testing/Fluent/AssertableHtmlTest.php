@@ -66,6 +66,23 @@ class AssertableHtmlTest extends TestCase
             });
     }
 
+    // --- hasAll ---
+
+    public function testHasAllPassesWhenAllSelectorsExist(): void
+    {
+        $this->html('<header></header><main></main><footer></footer>')
+            ->hasAll(['header', 'main', 'footer']);
+    }
+
+    public function testHasAllFailsWhenOneIsMissing(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that element [footer] exists.');
+
+        $this->html('<header></header><main></main>')
+            ->hasAll(['header', 'main', 'footer']);
+    }
+
     // --- missing ---
 
     public function testMissingPassesWhenSelectorAbsent(): void
@@ -79,6 +96,23 @@ class AssertableHtmlTest extends TestCase
         $this->expectExceptionMessage('Failed asserting that [nav] is absent.');
 
         $this->html('<nav></nav>')->missing('nav');
+    }
+
+    // --- missingAll ---
+
+    public function testMissingAllPassesWhenAllSelectorsAbsent(): void
+    {
+        $this->html('<div></div>')
+            ->missingAll(['.alert', '.error', '.warning']);
+    }
+
+    public function testMissingAllFailsWhenOneIsPresent(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that [.error] is absent.');
+
+        $this->html('<div class="error"></div>')
+            ->missingAll(['.alert', '.error', '.warning']);
     }
 
     // --- count ---
@@ -163,6 +197,44 @@ class AssertableHtmlTest extends TestCase
                 'p.a' => fn ($text) => str_starts_with($text, 'F'),
                 'p.b' => 'Bar',
             ]);
+    }
+
+    // --- whereNot ---
+
+    public function testWhereNotPassesWhenTextDoesNotMatch(): void
+    {
+        $this->html('<span class="badge">Paid</span>')->whereNot('.badge', 'Overdue');
+    }
+
+    public function testWhereNotFailsWhenTextMatches(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that [.badge] text does not equal [Paid].');
+
+        $this->html('<span class="badge">Paid</span>')->whereNot('.badge', 'Paid');
+    }
+
+    public function testWhereNotPassesWhenClosureReturnsFalse(): void
+    {
+        $this->html('<p>Hello World</p>')
+            ->whereNot('p', fn ($text) => str_contains($text, 'Goodbye'));
+    }
+
+    public function testWhereNotFailsWhenClosureReturnsTrue(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that [p] text was rejected by the truth test.');
+
+        $this->html('<p>Hello World</p>')
+            ->whereNot('p', fn ($text) => str_contains($text, 'Hello'));
+    }
+
+    public function testWhereNotFailsWhenSelectorMissing(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that element [h2] exists.');
+
+        $this->html('<h1>Hello</h1>')->whereNot('h2', 'Hello');
     }
 
     // --- whereAttr ---

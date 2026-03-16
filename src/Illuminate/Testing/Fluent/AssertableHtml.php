@@ -104,6 +104,21 @@ class AssertableHtml
     }
 
     /**
+     * Assert that elements matching all of the given selectors exist.
+     *
+     * @param  array<int, string>  $selectors
+     * @return $this
+     */
+    public function hasAll(array $selectors): static
+    {
+        foreach ($selectors as $selector) {
+            $this->has($selector);
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that no element matches the selector.
      *
      * @param  string  $selector
@@ -113,6 +128,21 @@ class AssertableHtml
     {
         if ($this->scope->querySelector($selector) !== null) {
             $this->fail("Failed asserting that [{$selector}] is absent.", $selector);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that no elements matching any of the given selectors exist.
+     *
+     * @param  array<int, string>  $selectors
+     * @return $this
+     */
+    public function missingAll(array $selectors): static
+    {
+        foreach ($selectors as $selector) {
+            $this->missing($selector);
         }
 
         return $this;
@@ -188,6 +218,44 @@ class AssertableHtml
     {
         foreach ($bindings as $selector => $expected) {
             $this->where($selector, $expected);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the matched element's text does not equal the expected value, or does not pass a truth test.
+     *
+     * @param  string  $selector
+     * @param  string|\Closure  $expected
+     * @return $this
+     */
+    public function whereNot(string $selector, string|Closure $expected): static
+    {
+        $element = $this->scope->querySelector($selector);
+
+        if ($element === null) {
+            $this->fail("Failed asserting that element [{$selector}] exists.", $selector);
+        }
+
+        $actual = trim($element->textContent);
+
+        if ($expected instanceof Closure) {
+            if ($expected($actual)) {
+                $this->fail(
+                    "Failed asserting that [{$selector}] text was rejected by the truth test.",
+                    $selector
+                );
+            }
+
+            return $this;
+        }
+
+        if ($actual === $expected) {
+            $this->fail(
+                "Failed asserting that [{$selector}] text does not equal [{$expected}].",
+                $selector
+            );
         }
 
         return $this;
