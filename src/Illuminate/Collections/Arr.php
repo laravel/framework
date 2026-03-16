@@ -1282,6 +1282,45 @@ class Arr
     }
 
     /**
+     * Update items in the array where the given conditions match.
+     *
+     * @param  iterable  $array
+     * @param  array  $where
+     * @param  array  $update
+     * @return array
+     */
+    public static function updateWhere($array, array $where, array $update)
+    {
+        $results = [];
+
+        foreach ($array as $key => $item) {
+            $match = true;
+
+            foreach ($where as $whereKey => $whereValue) {
+                if (data_get($item, $whereKey) !== $whereValue) {
+                    $match = false;
+
+                    break;
+                }
+            }
+
+            if ($match) {
+                if (is_object($item)) {
+                    $item = clone $item;
+                }
+
+                foreach ($update as $updateKey => $updateValue) {
+                    data_set($item, $updateKey, $updateValue);
+                }
+            }
+
+            $results[$key] = $item;
+        }
+
+        return $results;
+    }
+
+    /**
      * Filter items where the value is not null.
      *
      * @param  array  $array

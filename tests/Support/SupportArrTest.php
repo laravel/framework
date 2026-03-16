@@ -1937,4 +1937,43 @@ class SupportArrTest extends TestCase
 
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
     }
+
+    public function testUpdateWhere()
+    {
+        $array = [
+            ['id' => 1, 'name' => 'John', 'status' => 'inactive'],
+            ['id' => 2, 'name' => 'Jane', 'status' => 'inactive'],
+            ['id' => 3, 'name' => 'John', 'status' => 'active'],
+        ];
+
+        // Basic update with single condition
+        $updated = Arr::updateWhere($array, ['id' => 1], ['status' => 'active']);
+        $this->assertSame('active', $updated[0]['status']);
+        $this->assertSame('inactive', $array[0]['status']); // Immutability
+
+        // Multiple conditions
+        $updated = Arr::updateWhere($array, ['name' => 'John', 'status' => 'inactive'], ['name' => 'Johnny']);
+        $this->assertSame('Johnny', $updated[0]['name']);
+        $this->assertSame('John', $updated[2]['name']); // Should not match
+
+        // Dot-notation support
+        $array = [
+            ['id' => 1, 'user' => ['name' => 'John', 'meta' => ['role' => 'admin']]],
+            ['id' => 2, 'user' => ['name' => 'Jane', 'meta' => ['role' => 'user']]],
+        ];
+        $updated = Arr::updateWhere($array, ['user.meta.role' => 'admin'], ['user.name' => 'Mario', 'user.meta.level' => 10]);
+        $this->assertSame('Mario', $updated[0]['user']['name']);
+        $this->assertSame(10, $updated[0]['user']['meta']['level']);
+        $this->assertSame('Jane', $updated[1]['user']['name']);
+
+        // Immutability for objects
+        $obj1 = (object) ['id' => 1, 'name' => 'John'];
+        $obj2 = (object) ['id' => 2, 'name' => 'Jane'];
+        $array = [$obj1, $obj2];
+        $updated = Arr::updateWhere($array, ['id' => 1], ['name' => 'Mario']);
+        $this->assertSame('Mario', $updated[0]->name);
+        $this->assertSame('John', $obj1->name);
+        $this->assertNotSame($obj1, $updated[0]);
+        $this->assertSame($obj2, $updated[1]);
+    }
 }

@@ -6052,6 +6052,53 @@ class SupportCollectionTest extends TestCase
         $this->assertNull($collection->percentage(fn ($value) => $value === 1));
     }
 
+    #[DataProvider('collectionClassProvider')]
+    public function testUpdateWhere($collection)
+    {
+        $c = new $collection([
+            ['id' => 1, 'name' => 'John', 'status' => 'inactive'],
+            ['id' => 2, 'name' => 'Jane', 'status' => 'inactive'],
+            ['id' => 3, 'name' => 'John', 'status' => 'active'],
+        ]);
+
+        $updated = $c->updateWhere(['id' => 1], ['status' => 'active']);
+
+        $this->assertInstanceOf($collection, $updated);
+
+        $results = $updated->all();
+        $this->assertSame('active', data_get($results[0], 'status'));
+        $this->assertSame('inactive', data_get($c->first(), 'status')); // Immutability
+
+        // Multiple conditions
+        $updated = $c->updateWhere(['name' => 'John', 'status' => 'inactive'], ['name' => 'Johnny']);
+
+        $results = $updated->all();
+        $this->assertSame('Johnny', data_get($results[0], 'name'));
+        $this->assertSame('John', data_get($results[2], 'name')); // Should not match
+
+        // Dot-notation support
+        $c = new $collection([
+            ['id' => 1, 'user' => ['name' => 'John', 'meta' => ['role' => 'admin']]],
+            ['id' => 2, 'user' => ['name' => 'Jane', 'meta' => ['role' => 'user']]],
+        ]);
+        $updated = $c->updateWhere(['user.meta.role' => 'admin'], ['user.name' => 'Mario', 'user.meta.level' => 10]);
+
+        $results = $updated->all();
+        $this->assertSame('Mario', data_get($results[0], 'user.name'));
+        $this->assertSame(10, data_get($results[0], 'user.meta.level'));
+
+        // Immutability for objects
+        $obj1 = (object) ['id' => 1, 'name' => 'John'];
+        $obj2 = (object) ['id' => 2, 'name' => 'Jane'];
+        $c = new $collection([$obj1, $obj2]);
+        $updated = $c->updateWhere(['id' => 1], ['name' => 'Mario']);
+
+        $results = $updated->all();
+        $this->assertSame('Mario', $results[0]->name);
+        $this->assertSame('John', $obj1->name);
+        $this->assertNotSame($obj1, $results[0]);
+    }
+
     /**
      * Provides each collection class, respectively.
      *

@@ -531,4 +531,20 @@ class SupportLazyCollectionTest extends TestCase
             $this->assertContains($key, ['first', 'second', 'third']);
         }
     }
+
+    public function testUpdateWhere()
+    {
+        $c = LazyCollection::make([
+            ['id' => 1, 'name' => 'John', 'status' => 'inactive'],
+            ['id' => 2, 'name' => 'Jane', 'status' => 'inactive'],
+        ]);
+
+        $updated = $c->updateWhere(['id' => 1], ['status' => 'active']);
+
+        $this->assertInstanceOf(LazyCollection::class, $updated);
+
+        $results = $updated->all();
+        $this->assertSame('active', $results[0]['status']);
+        $this->assertSame('inactive', $c->first()['status']);
+    }
 }

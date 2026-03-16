@@ -688,6 +688,34 @@ trait EnumeratesValues
     }
 
     /**
+     * Update items in the collection where the given conditions match.
+     *
+     * @param  array  $where
+     * @param  array  $update
+     * @return static
+     */
+    public function updateWhere(array $where, array $update)
+    {
+        return $this->map(function ($item) use ($where, $update) {
+            foreach ($where as $whereKey => $whereValue) {
+                if (data_get($item, $whereKey) !== $whereValue) {
+                    return $item;
+                }
+            }
+
+            if (is_object($item)) {
+                $item = clone $item;
+            }
+
+            foreach ($update as $updateKey => $updateValue) {
+                data_set($item, $updateKey, $updateValue);
+            }
+
+            return $item;
+        });
+    }
+
+    /**
      * Filter items by the given key value pair.
      *
      * @param  string  $key
