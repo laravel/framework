@@ -161,10 +161,17 @@ class Batch implements Arrayable, JsonSerializable
 
                 $chain = $this->prepareBatchedChain($job);
 
-                return $chain->first()
-                    ->allOnQueue($this->options['queue'] ?? null)
-                    ->allOnConnection($this->options['connection'] ?? null)
-                    ->chain($chain->slice(1)->values()->all());
+                $first = $chain->first();
+
+                if (isset($this->options['queue'])) {
+                    $first->allOnQueue($this->options['queue']);
+                }
+
+                if (isset($this->options['connection'])) {
+                    $first->allOnConnection($this->options['connection']);
+                }
+
+                return $first->chain($chain->slice(1)->values()->all());
             } else {
                 $job->withBatchId($this->id);
 
