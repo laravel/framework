@@ -106,9 +106,7 @@ class Command extends SymfonyCommand
             parent::__construct($this->name);
         }
 
-        // Must be configured after the command name has been set, because Symfony
-        // prepends the command name to strings that don't already include it.
-        $this->configureUsagesFromAttributes();
+        $this->configureUsageFromAttribute();
 
         // Once we have constructed the command, we'll set the description and other
         // related properties of the command. If a signature wasn't used to build
@@ -179,7 +177,7 @@ class Command extends SymfonyCommand
      *
      * @return void
      */
-    protected function configureUsagesFromAttributes()
+    protected function configureUsageFromAttribute()
     {
         $reflection = new ReflectionClass($this);
 
