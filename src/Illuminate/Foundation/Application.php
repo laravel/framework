@@ -1657,6 +1657,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
             'filesystem.disk' => [\Illuminate\Contracts\Filesystem\Filesystem::class],
             'filesystem.cloud' => [\Illuminate\Contracts\Filesystem\Cloud::class],
             'hash' => [\Illuminate\Hashing\HashManager::class],
+            'image' => [\Illuminate\Foundation\Image\ImageManager::class],
             'hash.driver' => [\Illuminate\Contracts\Hashing\Hasher::class],
             'log' => [\Illuminate\Log\LogManager::class, \Psr\Log\LoggerInterface::class],
             'mail.manager' => [\Illuminate\Mail\MailManager::class, \Illuminate\Contracts\Mail\Factory::class],

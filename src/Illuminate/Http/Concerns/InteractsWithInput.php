@@ -2,6 +2,9 @@
 
 namespace Illuminate\Http\Concerns;
 
+use Illuminate\Container\Container;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Image\PendingImage;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
@@ -248,6 +251,26 @@ trait InteractsWithInput
     public function file($key = null, $default = null)
     {
         return data_get($this->allFiles(), $key, $default);
+    }
+
+    /**
+     * Retrieve a file from the request as an image instance.
+     *
+     * @param  string  $key
+     * @return PendingImage|null
+     */
+    public function image(string $key)
+    {
+        $file = $this->file($key);
+
+        if (! $file instanceof UploadedFile) {
+            return null;
+        }
+
+        // @todo check if its fine to use container...
+        return new PendingImage($file, Container::getInstance()->make(
+            Filesystem::class
+        ));
     }
 
     /**

@@ -1096,6 +1096,27 @@ class HttpRequestTest extends TestCase
         $this->assertInstanceOf(SymfonyUploadedFile::class, $request->file('foo'));
     }
 
+    public function testImageMethod()
+    {
+        $files = [
+            'avatar' => [
+                'size' => 500,
+                'name' => 'avatar.jpg',
+                'tmp_name' => __FILE__,
+                'type' => 'image/jpeg',
+                'error' => null,
+            ],
+        ];
+        $request = Request::create('/', 'GET', [], [], $files);
+        $this->assertInstanceOf(\Illuminate\Foundation\Image\PendingImage::class, $request->image('avatar'));
+    }
+
+    public function testImageMethodReturnsNullForMissingKey()
+    {
+        $request = Request::create('/', 'GET', [], [], []);
+        $this->assertNull($request->image('avatar'));
+    }
+
     public function testHasFileMethod()
     {
         $request = Request::create('/', 'GET', [], [], []);
