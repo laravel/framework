@@ -50,6 +50,13 @@ class CompiledRouteCollection extends AbstractRouteCollection
     protected $container;
 
     /**
+     * A cache of resolved Route instances keyed by route name.
+     *
+     * @var array<string, \Illuminate\Routing\Route>
+     */
+    protected $nameCache = [];
+
+    /**
      * Create a new CompiledRouteCollection instance.
      *
      * @param  array  $compiled
@@ -192,8 +199,12 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     public function getByName($name)
     {
+        if (isset($this->nameCache[$name])) {
+            return $this->nameCache[$name];
+        }
+
         if (isset($this->attributes[$name])) {
-            return $this->newRoute($this->attributes[$name]);
+            return $this->nameCache[$name] = $this->newRoute($this->attributes[$name]);
         }
 
         return $this->routes->getByName($name);
