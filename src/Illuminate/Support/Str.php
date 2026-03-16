@@ -1463,16 +1463,16 @@ class Str
      * Returns the initials for each word in the provided string, optionally capitalizing.
      *
      * @param  string  $value
-     * @param  bool    $capitalize
+     * @param  bool  $capitalize
      * @return string
      */
     public static function initials($value, $capitalize = false)
     {
         $parts = mb_split("\s+", $value);
 
-        $parts = array_map(fn($part) => mb_substr($part, 0, 1), $parts);
+        $parts = array_map(fn ($part) => mb_substr($part, 0, 1), $parts);
 
-        $initials = implode("", $parts);
+        $initials = implode('', $parts);
 
         return $capitalize ? static::upper($initials) : $initials;
     }
