@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use ArrayAccess;
 use ArrayIterator;
+use Carbon\CarbonInterval;
 use Countable;
 use Error;
 use Illuminate\Contracts\Support\Htmlable;
@@ -1042,6 +1043,29 @@ class SupportHelpersTest extends TestCase
 
             throw new RuntimeException;
         }, 100);
+
+        // Make sure we made two attempts
+        $this->assertEquals(2, $attempts);
+
+        // Make sure we waited 100ms for the first attempt
+        Sleep::assertSleptTimes(1);
+
+        Sleep::assertSequence([
+            Sleep::usleep(100_000),
+        ]);
+    }
+
+    public function testRetryWithCarbonIntervalSleep()
+    {
+        Sleep::fake();
+
+        $attempts = retry(2, function ($attempts) {
+            if ($attempts > 1) {
+                return $attempts;
+            }
+
+            throw new RuntimeException;
+        }, CarbonInterval::milliseconds(100));
 
         // Make sure we made two attempts
         $this->assertEquals(2, $attempts);
