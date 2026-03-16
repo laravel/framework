@@ -17,7 +17,6 @@ class Sluggable
         public array|string $from = 'name',
         public string $column = 'slug',
         public string $separator = '-',
-        public string $language = 'en',
         public array|string $scope = [],
         public bool $onUpdating = false,
         public bool $unique = true,

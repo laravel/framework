@@ -152,15 +152,6 @@ class DatabaseEloquentSluggableTest extends TestCase
         $this->assertSame('hello_world_2', $post->slug);
     }
 
-    // language
-
-    public function test_it_transliterates_with_custom_language()
-    {
-        $post = SluggableGermanPost::create(['name' => 'Über die Brücke']);
-
-        $this->assertSame('uber-die-brucke', $post->slug);
-    }
-
     // scope (string)
 
     public function test_it_respects_scoped_uniqueness()
@@ -616,14 +607,6 @@ class SluggableMultiSourceUpdatePost extends Model
 
 #[Sluggable(unique: false)]
 class SluggableNonUniquePost extends Model
-{
-    protected $table = 'sluggable_posts';
-
-    protected $guarded = [];
-}
-
-#[Sluggable(language: 'de')]
-class SluggableGermanPost extends Model
 {
     protected $table = 'sluggable_posts';
 
