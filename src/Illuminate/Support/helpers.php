@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\CarbonInterval;
 use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
@@ -301,7 +302,7 @@ if (! function_exists('retry')) {
      *
      * @param  int|array<int, int>  $times
      * @param  callable(int): TValue  $callback
-     * @param  int|\Closure(int, \Throwable): int  $sleepMilliseconds
+     * @param  CarbonInterval|int|\Closure(int, \Throwable): CarbonInterval|int  $sleepMilliseconds
      * @param  (callable(\Throwable): bool)|null  $when
      * @return TValue
      *
@@ -333,7 +334,11 @@ if (! function_exists('retry')) {
             $sleepMilliseconds = $backoff[$attempts - 1] ?? $sleepMilliseconds;
 
             if ($sleepMilliseconds) {
-                Sleep::usleep(value($sleepMilliseconds, $attempts, $e) * 1000);
+                $duration = value($sleepMilliseconds, $attempts, $e);
+
+                $duration instanceof CarbonInterval
+                    ? Sleep::usleep($duration->totalMicroseconds)
+                    : Sleep::usleep($duration * 1000);
             }
 
             goto beginning;

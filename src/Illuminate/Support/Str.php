@@ -1460,6 +1460,24 @@ class Str
     }
 
     /**
+     * Get the "initials" representing each word in the provided string, optionally capitalizing.
+     *
+     * @param  string  $value
+     * @param  bool  $capitalize
+     * @return string
+     */
+    public static function initials($value, $capitalize = false)
+    {
+        $parts = mb_split("\s+", $value);
+
+        $parts = array_map(fn ($part) => mb_substr($part, 0, 1), $parts);
+
+        $initials = implode('', $parts);
+
+        return $capitalize ? static::upper($initials) : $initials;
+    }
+
+    /**
      * Convert the given string to APA-style title case.
      *
      * See: https://apastyle.apa.org/style-grammar-guidelines/capitalization/title-case

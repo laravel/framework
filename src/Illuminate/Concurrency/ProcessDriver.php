@@ -46,7 +46,13 @@ class ProcessDriver implements Driver
                 throw new Exception('Concurrent process failed with exit code ['.$result->exitCode().']. Message: '.$result->errorOutput());
             }
 
-            $result = json_decode($result->output(), true);
+            $output = $result->output();
+
+            if (($pos = strpos($output, "\x1f\x8b")) !== false) {
+                $output = substr($output, 0, $pos);
+            }
+
+            $result = json_decode($output, true);
 
             if (! $result['successful']) {
                 throw new $result['exception'](
