@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ConfigWriter;
 use Illuminate\Support\Env;
@@ -18,6 +19,7 @@ use function Laravel\Prompts\text;
 #[AsCommand(name: 'env:set')]
 class EnvironmentSetCommand extends Command
 {
+    use ConfirmableTrait;
     /**
      * The name and signature of the console command.
      *
@@ -65,6 +67,10 @@ class EnvironmentSetCommand extends Command
      */
     public function handle()
     {
+        if (! $this->confirmToProceed()) {
+            return Command::FAILURE;
+        }
+
         [$key, $value] = $this->parseKeyAndValue();
 
         if ($value === null) {
@@ -111,7 +117,11 @@ class EnvironmentSetCommand extends Command
                 $this->fail('The key argument is required in non-interactive mode.');
             }
 
-            $key = text('What is the environment variable name?', required: true);
+            $key = text(
+                'What is the environment variable name?',
+                required: true,
+                placeholder: 'E.g. MY_API_KEY',
+            );
         }
 
         if (str_contains($key, '=')) {
@@ -184,11 +194,12 @@ class EnvironmentSetCommand extends Command
         if ($configKey === null && $this->input->isInteractive()) {
             $configKey = autocomplete(
                 label: 'What config key should this be associated with? (Optional)',
-                options: fn (string $value) => $this->getConfigKeySuggestions($value),
+                options: fn(string $value) => $this->getConfigKeySuggestions($value),
                 placeholder: 'E.g. services.stripe.key',
-                validate: fn (string $value) => $value !== '' && ! str_contains($value, '.')
+                validate: fn(string $value) => $value !== '' && ! str_contains($value, '.')
                     ? 'Config key must include at least a file and a key (e.g. services.stripe).'
                     : null,
+                hint: 'Enter an existing or new config key',
             );
         }
 
@@ -286,16 +297,16 @@ class EnvironmentSetCommand extends Command
     {
         $segments = $value !== '' ? explode('.', $value) : [];
         $currentInput = array_pop($segments) ?? '';
-        $prefix = count($segments) ? implode('.', $segments).'.' : '';
+        $prefix = count($segments) ? implode('.', $segments) . '.' : '';
 
         $items = count($segments)
             ? config(implode('.', $segments))
             : array_combine(
                 $keys = array_map(
-                    fn ($file) => basename($file, '.php'),
+                    fn($file) => basename($file, '.php'),
                     glob($this->laravel->configPath('*.php'))
                 ),
-                array_map(fn ($key) => config($key), $keys),
+                array_map(fn($key) => config($key), $keys),
             );
 
         if (! is_array($items)) {
@@ -305,7 +316,7 @@ class EnvironmentSetCommand extends Command
         $suggestions = [];
 
         foreach ($items as $key => $val) {
-            $suggestion = $prefix.$key;
+            $suggestion = $prefix . $key;
 
             if (is_array($val)) {
                 $suggestion .= '.';
