@@ -44,8 +44,6 @@ class QueueWorkerTest extends TestCase
 
     protected function tearDown(): void
     {
-        Carbon::setTestNow();
-
         Container::setInstance();
 
         parent::tearDown();

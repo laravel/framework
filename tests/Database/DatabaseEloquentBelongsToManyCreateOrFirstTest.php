@@ -26,12 +26,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         Carbon::setTestNow('2023-01-01 00:00:00');
     }
 
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow();
 
-        parent::tearDown();
-    }
 
     #[DataProvider('createOrFirstValues')]
     public function testCreateOrFirstMethodCreatesNewRelated(Closure|array $values): void

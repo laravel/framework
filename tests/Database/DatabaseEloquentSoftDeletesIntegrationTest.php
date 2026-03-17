@@ -93,8 +93,6 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
      */
     protected function tearDown(): void
     {
-        Carbon::setTestNow();
-
         $this->schema()->drop('users');
         $this->schema()->drop('posts');
         $this->schema()->drop('comments');

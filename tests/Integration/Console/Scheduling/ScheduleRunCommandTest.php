@@ -19,12 +19,7 @@ class ScheduleRunCommandTest extends TestCase
         Carbon::setTestNow(Carbon::now());
     }
 
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow();
 
-        parent::tearDown();
-    }
 
     /**
      * @throws BindingResolutionException

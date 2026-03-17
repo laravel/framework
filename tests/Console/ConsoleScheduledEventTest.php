@@ -27,7 +27,6 @@ class ConsoleScheduledEventTest extends TestCase
     protected function tearDown(): void
     {
         date_default_timezone_set($this->defaultTimezone);
-        Carbon::setTestNow();
 
         parent::tearDown();
     }

@@ -18,8 +18,6 @@ class SleepTest extends TestCase
     {
         Sleep::fake(false);
 
-        Carbon::setTestNow();
-
         parent::tearDown();
     }
 

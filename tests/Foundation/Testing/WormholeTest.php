@@ -54,7 +54,5 @@ class WormholeTest extends TestCase
 
         (new Wormhole(5))->microseconds();
         $this->assertSame('2000-01-01 00:00:00.000006', Date::now()->format('Y-m-d H:i:s.u'));
-
-        Carbon::setTestnow();
     }
 }

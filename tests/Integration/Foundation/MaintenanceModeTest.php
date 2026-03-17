@@ -206,8 +206,6 @@ class MaintenanceModeTest extends TestCase
 
         $expectedDate = Carbon::parse($datetime)->format(DateTimeInterface::RFC7231);
         $this->assertSame($expectedDate, $data['retry']);
-
-        Carbon::setTestNow();
     }
 
     public static function retryAfterDatetimeProvider(): array
