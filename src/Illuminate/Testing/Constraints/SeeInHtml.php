@@ -15,25 +15,25 @@ class SeeInHtml extends Constraint
     protected $content;
 
     /**
-     * The last value that failed to pass validation.
+     * Indicates the values must appear in order.
      *
-     * @var string
+     * @var bool
      */
-    protected $failedValue;
+    protected $ordered;
 
     /**
-     * Whether to negate the assertion.
+     * Indicates whether to negate the assertion.
      *
      * @var bool
      */
     protected $negate;
 
     /**
-     * The values must appear in order.
+     * The last value that failed to pass validation.
      *
-     * @var bool
+     * @var string
      */
-    protected $ordered;
+    protected $failedValue;
 
     /**
      * Create a new constraint instance.
@@ -51,7 +51,6 @@ class SeeInHtml extends Constraint
      * Determine if the rule passes validation.
      *
      * @param  array  $values
-     * @return bool
      */
     public function matches($values): bool
     {
@@ -96,7 +95,6 @@ class SeeInHtml extends Constraint
      * Get the description of the failure.
      *
      * @param  array  $values
-     * @return string
      */
     public function failureDescription($values): string
     {
@@ -117,15 +115,8 @@ class SeeInHtml extends Constraint
     }
 
     /**
-     * Get a string representation of the object.
-     *
-     * @return string
+     * Normalize the given value.
      */
-    public function toString(): string
-    {
-        return (new ReflectionClass($this))->name;
-    }
-
     protected function normalize(string $value): ?string
     {
         $value = strip_tags($value);
@@ -134,5 +125,13 @@ class SeeInHtml extends Constraint
         $value = preg_replace('/\s+/', ' ', $value);
 
         return $value;
+    }
+
+    /**
+     * Get a string representation of the object.
+     */
+    public function toString(): string
+    {
+        return (new ReflectionClass($this))->name;
     }
 }
