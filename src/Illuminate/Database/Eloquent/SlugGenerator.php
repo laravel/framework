@@ -76,7 +76,7 @@ class SlugGenerator
         $columns = implode(', ', $from);
 
         throw new CouldNotGenerateSlugException(
-            "No slug could be generated for model [".get_class($this->model)."] using column(s) [{$columns}] with value [{$sourceValue}].",
+            'No slug could be generated for model ['.get_class($this->model)."] using column(s) [{$columns}] with value [{$sourceValue}].",
             $errorKey,
             $this->resolveErrorMessage($options),
         );
@@ -188,7 +188,7 @@ class SlugGenerator
                 $columns = implode(', ', $from);
 
                 throw new CouldNotGenerateSlugException(
-                    "No unique slug could be generated for model [".get_class($this->model)."] using column(s) [{$columns}] with value [{$originalSlug}] after {$options->maxAttempts} attempts.",
+                    'No unique slug could be generated for model ['.get_class($this->model)."] using column(s) [{$columns}] with value [{$originalSlug}] after {$options->maxAttempts} attempts.",
                     $errorKey,
                     $this->resolveErrorMessage($options, 'validation.slug_unique'),
                 );
