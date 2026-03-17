@@ -128,7 +128,7 @@ class SlugCommandTest extends TestCase
         ], 'add_url_slug_to_foos_table.php');
 
         $this->assertFileContains([
-            "#[Sluggable(from: 'name', column: 'url_slug')]",
+            "#[Sluggable(from: 'name', to: 'url_slug')]",
         ], 'app/Models/Foo.php');
     }
 

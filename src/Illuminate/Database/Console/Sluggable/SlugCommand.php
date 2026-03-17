@@ -82,7 +82,7 @@ class SlugCommand extends Command
 
         $attribute = $column === 'slug'
             ? "#[Sluggable(from: '{$source}')]"
-            : "#[Sluggable(from: '{$source}', column: '{$column}')]";
+            : "#[Sluggable(from: '{$source}', to: '{$column}')]";
 
         $contents = preg_replace(
             '/(^)(class\s+\w+)/m',

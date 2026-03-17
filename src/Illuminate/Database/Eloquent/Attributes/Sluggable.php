@@ -15,7 +15,7 @@ class Sluggable
      */
     public function __construct(
         public array|string $from = 'name',
-        public string $column = 'slug',
+        public string $to = 'slug',
         public string $separator = '-',
         public array|string $scope = [],
         public bool $onUpdating = false,

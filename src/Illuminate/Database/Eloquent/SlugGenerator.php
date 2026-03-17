@@ -23,8 +23,8 @@ class SlugGenerator
     {
         $options = $this->options();
 
-        if (is_null($this->model->{$options->column})) {
-            $this->model->{$options->column} = $this->generate();
+        if (is_null($this->model->{$options->to})) {
+            $this->model->{$options->to} = $this->generate();
         }
     }
 
@@ -43,7 +43,7 @@ class SlugGenerator
             return;
         }
 
-        $this->model->{$options->column} = $this->generate();
+        $this->model->{$options->to} = $this->generate();
     }
 
     /**
@@ -88,7 +88,7 @@ class SlugGenerator
     {
         $from = Arr::wrap($options->from);
         $attribute = count($from) === 1 ? $from[0] : implode(' and ', [implode(', ', array_slice($from, 0, -1)), end($from)]);
-        $replacements = ['attribute' => $attribute, 'column' => $options->column];
+        $replacements = ['attribute' => $attribute, 'column' => $options->to];
 
         return $options->errorMessage
             ? __($options->errorMessage, $replacements)
@@ -109,7 +109,7 @@ class SlugGenerator
      */
     protected function hasCustomSlugBeenUsed(): bool
     {
-        return $this->model->isDirty($this->options()->column);
+        return $this->model->isDirty($this->options()->to);
     }
 
     /**
@@ -182,7 +182,7 @@ class SlugGenerator
             $count++;
 
             if ($count > $options->maxAttempts) {
-                $errorKey = $options->errorKey ?? $options->column;
+                $errorKey = $options->errorKey ?? $options->to;
 
                 throw new CouldNotGenerateSlugException(
                     'Could not generate a unique slug for ['.get_class($this->model)."] with base [{$originalSlug}] after {$options->maxAttempts} attempts.",
@@ -217,7 +217,7 @@ class SlugGenerator
             $query->withTrashed();
         }
 
-        $query->where($options->column, $slug);
+        $query->where($options->to, $slug);
 
         foreach (Arr::wrap($options->scope) as $column) {
             $query->where($column, $model->{$column});

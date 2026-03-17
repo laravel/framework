@@ -608,7 +608,7 @@ class SluggableCustomSeparatorPost extends Model
     protected $guarded = [];
 }
 
-#[Sluggable(from: 'title', column: 'url_slug')]
+#[Sluggable(from: 'title', to: 'url_slug')]
 class SluggableCustomColumnsPost extends Model
 {
     protected $table = 'sluggable_custom_posts';

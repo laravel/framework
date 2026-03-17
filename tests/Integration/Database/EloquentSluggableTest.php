@@ -275,7 +275,7 @@ class SluggableValidationMultiSourcePost extends Model
     protected $guarded = [];
 }
 
-#[Sluggable(from: 'name', column: 'url_slug')]
+#[Sluggable(from: 'name', to: 'url_slug')]
 class SluggableValidationCustomColumnPost extends Model
 {
     protected $table = 'sluggable_validation_posts';
