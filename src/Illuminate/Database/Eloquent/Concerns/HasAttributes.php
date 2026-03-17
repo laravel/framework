@@ -14,6 +14,7 @@ use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Attributes\Appends;
+use Illuminate\Database\Eloquent\Attributes\Cast;
 use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
@@ -206,7 +207,7 @@ trait HasAttributes
     protected function initializeHasAttributes()
     {
         $this->casts = $this->ensureCastsAreStringValues(
-            array_merge($this->casts, $this->casts()),
+            array_merge(static::resolveAttributeCasts(), $this->casts, $this->casts()),
         );
 
         $this->dateFormat ??= static::resolveClassAttribute(Table::class)->dateFormat ?? null;
@@ -1726,6 +1727,43 @@ trait HasAttributes
     protected function casts()
     {
         return [];
+    }
+
+    /**
+     * Get the casts defined via PHP #[Cast] attributes on the model class.
+     *
+     * Walks the class hierarchy so child-class attributes override parent-class
+     * attributes, matching the precedence of the property-based $casts array.
+     *
+     * @return array<string, string>
+     */
+    protected static function resolveAttributeCasts(): array
+    {
+        $cacheKey = static::class.'@'.Cast::class;
+
+        if (array_key_exists($cacheKey, static::$classAttributes)) {
+            return static::$classAttributes[$cacheKey];
+        }
+
+        $classes = [];
+        $reflection = new ReflectionClass(static::class);
+
+        do {
+            $classes[] = $reflection;
+        } while ($reflection = $reflection->getParentClass());
+
+        $casts = [];
+
+        // Walk from the topmost parent down to the concrete class so that
+        // child-level #[Cast] declarations override inherited ones.
+        foreach (array_reverse($classes) as $class) {
+            foreach ($class->getAttributes(Cast::class) as $attribute) {
+                $instance = $attribute->newInstance();
+                $casts[$instance->attribute] = $instance->as;
+            }
+        }
+
+        return static::$classAttributes[$cacheKey] = $casts;
     }
 
     /**
