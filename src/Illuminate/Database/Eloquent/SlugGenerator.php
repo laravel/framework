@@ -86,6 +86,7 @@ class SlugGenerator
      */
     protected function resolveErrorMessage(string $errorKey, Sluggable $options): string
     {
+        $from = array_map(fn (string $name) => str_replace('_', ' ', Str::snake($name)), Arr::wrap($options->from));
         $attribute = count($from) === 1 ? $from[0] : implode(' and ', [implode(', ', array_slice($from, 0, -1)), end($from)]);
         $replacements = ['attribute' => $attribute, 'column' => str_replace('_', ' ', Str::snake($options->to))];
 
