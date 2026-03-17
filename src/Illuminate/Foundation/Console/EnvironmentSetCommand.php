@@ -112,7 +112,7 @@ class EnvironmentSetCommand extends Command
 
         $value = $this->unquote($value);
 
-        $this->components->info("Using value from argument: {$value}");
+        $this->components->info("Key/value pair detected, extracted value automatically.");
 
         return [$key, $value];
     }
