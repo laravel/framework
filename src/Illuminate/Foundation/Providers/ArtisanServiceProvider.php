@@ -51,6 +51,7 @@ use Illuminate\Foundation\Console\EnumMakeCommand;
 use Illuminate\Foundation\Console\EnvironmentCommand;
 use Illuminate\Foundation\Console\EnvironmentDecryptCommand;
 use Illuminate\Foundation\Console\EnvironmentEncryptCommand;
+use Illuminate\Foundation\Console\EnvironmentSetCommand;
 use Illuminate\Foundation\Console\EventCacheCommand;
 use Illuminate\Foundation\Console\EventClearCommand;
 use Illuminate\Foundation\Console\EventGenerateCommand;
@@ -140,6 +141,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'Environment' => EnvironmentCommand::class,
         'EnvironmentDecrypt' => EnvironmentDecryptCommand::class,
         'EnvironmentEncrypt' => EnvironmentEncryptCommand::class,
+        'EnvironmentSet' => EnvironmentSetCommand::class,
         'EventCache' => EventCacheCommand::class,
         'EventClear' => EventClearCommand::class,
         'EventList' => EventListCommand::class,
