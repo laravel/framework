@@ -3,8 +3,9 @@
 namespace Illuminate\Tests\Database;
 
 use BadMethodCallException;
-use Carbon\Carbon;
 use Closure;
+use DateInterval;
+use DatePeriod;
 use DateTime;
 use Illuminate\Contracts\Database\Query\ConditionExpression;
 use Illuminate\Database\Connection;
@@ -26,10 +27,12 @@ use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Tests\Database\Fixtures\Enums\Bar;
 use InvalidArgumentException;
 use Mockery as m;
+use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
@@ -1135,31 +1138,31 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $period = now()->startOfDay()->toPeriod(now()->addDay()->startOfDay());
+        $period = Carbon::now()->startOfDay()->toPeriod(Carbon::now()->addDay()->startOfDay());
         $builder->select('*')->from('users')->whereBetween('created_at', $period);
         $this->assertSame('select * from "users" where "created_at" between ? and ?', $builder->toSql());
-        $this->assertEquals([now()->startOfDay(), now()->addDay()->startOfDay()], $builder->getBindings());
+        $this->assertEquals([Carbon::now()->startOfDay(), Carbon::now()->addDay()->startOfDay()], $builder->getBindings());
 
         // custom long carbon period date
         $builder = $this->getBuilder();
-        $period = now()->startOfDay()->toPeriod(now()->addMonth()->startOfDay());
+        $period = Carbon::now()->startOfDay()->toPeriod(Carbon::now()->addMonth()->startOfDay());
         $builder->select('*')->from('users')->whereBetween('created_at', $period);
         $this->assertSame('select * from "users" where "created_at" between ? and ?', $builder->toSql());
-        $this->assertEquals([now()->startOfDay(), now()->addMonth()->startOfDay()], $builder->getBindings());
+        $this->assertEquals([Carbon::now()->startOfDay(), Carbon::now()->addMonth()->startOfDay()], $builder->getBindings());
 
         // DatePeriod with end date
         $builder = $this->getBuilder();
-        $period = new \DatePeriod(now()->startOfDay(), new \DateInterval('P1D'), now()->addDays(5)->startOfDay());
+        $period = new DatePeriod(Carbon::now()->startOfDay(), new DateInterval('P1D'), Carbon::now()->addDays(5)->startOfDay());
         $builder->select('*')->from('users')->whereBetween('created_at', $period);
         $this->assertSame('select * from "users" where "created_at" between ? and ?', $builder->toSql());
-        $this->assertEquals([now()->startOfDay(), now()->addDays(5)->startOfDay()], $builder->getBindings());
+        $this->assertEquals([Carbon::now()->startOfDay(), Carbon::now()->addDays(5)->startOfDay()], $builder->getBindings());
 
         // DatePeriod with recurrence count (no end date)
         $builder = $this->getBuilder();
-        $period = new \DatePeriod(now()->startOfDay(), new \DateInterval('P1D'), 5);
+        $period = new DatePeriod(Carbon::now()->startOfDay(), new DateInterval('P1D'), 5);
         $builder->select('*')->from('users')->whereBetween('created_at', $period);
         $this->assertSame('select * from "users" where "created_at" between ? and ?', $builder->toSql());
-        $this->assertEquals([now()->startOfDay(), now()->addDays(5)->startOfDay()], $builder->getBindings());
+        $this->assertEquals([Carbon::now()->startOfDay(), Carbon::now()->addDays(5)->startOfDay()], $builder->getBindings());
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereBetween('id', collect([1, 2]));
@@ -6625,7 +6628,7 @@ SQL;
 
     public function testCursorPaginateWithUnionWheres()
     {
-        $ts = now()->toDateTimeString();
+        $ts = Carbon::now()->toDateTimeString();
 
         $perPage = 16;
         $columns = ['test'];
@@ -6643,8 +6646,8 @@ SQL;
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
         $results = collect([
-            ['id' => 1, 'created_at' => now(), 'type' => 'video'],
-            ['id' => 2, 'created_at' => now(), 'type' => 'news'],
+            ['id' => 1, 'created_at' => Carbon::now(), 'type' => 'video'],
+            ['id' => 2, 'created_at' => Carbon::now(), 'type' => 'news'],
         ]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
@@ -6672,7 +6675,7 @@ SQL;
 
     public function testCursorPaginateWithMultipleUnionsAndMultipleWheres()
     {
-        $ts = now()->toDateTimeString();
+        $ts = Carbon::now()->toDateTimeString();
 
         $perPage = 16;
         $columns = ['test'];
@@ -6691,9 +6694,9 @@ SQL;
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
         $results = collect([
-            ['id' => 1, 'created_at' => now(), 'type' => 'video'],
-            ['id' => 2, 'created_at' => now(), 'type' => 'news'],
-            ['id' => 3, 'created_at' => now(), 'type' => 'podcasts'],
+            ['id' => 1, 'created_at' => Carbon::now(), 'type' => 'video'],
+            ['id' => 2, 'created_at' => Carbon::now(), 'type' => 'news'],
+            ['id' => 3, 'created_at' => Carbon::now(), 'type' => 'podcasts'],
         ]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
@@ -6721,7 +6724,7 @@ SQL;
 
     public function testCursorPaginateWithUnionMultipleWheresMultipleOrders()
     {
-        $ts = now()->toDateTimeString();
+        $ts = Carbon::now()->toDateTimeString();
 
         $perPage = 16;
         $columns = ['id', 'created_at', 'type'];
@@ -6740,10 +6743,10 @@ SQL;
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
         $results = collect([
-            ['id' => 1, 'created_at' => now()->addDay(), 'type' => 'video'],
-            ['id' => 1, 'created_at' => now(), 'type' => 'news'],
-            ['id' => 1, 'created_at' => now(), 'type' => 'podcast'],
-            ['id' => 2, 'created_at' => now(), 'type' => 'podcast'],
+            ['id' => 1, 'created_at' => Carbon::now()->addDay(), 'type' => 'video'],
+            ['id' => 1, 'created_at' => Carbon::now(), 'type' => 'news'],
+            ['id' => 1, 'created_at' => Carbon::now(), 'type' => 'podcast'],
+            ['id' => 2, 'created_at' => Carbon::now(), 'type' => 'podcast'],
         ]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
@@ -6771,7 +6774,7 @@ SQL;
 
     public function testCursorPaginateWithUnionWheresWithRawOrderExpression()
     {
-        $ts = now()->toDateTimeString();
+        $ts = Carbon::now()->toDateTimeString();
 
         $perPage = 16;
         $columns = ['test'];
@@ -6789,8 +6792,8 @@ SQL;
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
         $results = collect([
-            ['id' => 1, 'created_at' => now(), 'type' => 'video', 'is_published' => true],
-            ['id' => 2, 'created_at' => now(), 'type' => 'news', 'is_published' => true],
+            ['id' => 1, 'created_at' => Carbon::now(), 'type' => 'video', 'is_published' => true],
+            ['id' => 2, 'created_at' => Carbon::now(), 'type' => 'news', 'is_published' => true],
         ]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
@@ -6818,7 +6821,7 @@ SQL;
 
     public function testCursorPaginateWithUnionWheresReverseOrder()
     {
-        $ts = now()->toDateTimeString();
+        $ts = Carbon::now()->toDateTimeString();
 
         $perPage = 16;
         $columns = ['test'];
@@ -6836,8 +6839,8 @@ SQL;
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
         $results = collect([
-            ['id' => 1, 'created_at' => now(), 'type' => 'video'],
-            ['id' => 2, 'created_at' => now(), 'type' => 'news'],
+            ['id' => 1, 'created_at' => Carbon::now(), 'type' => 'video'],
+            ['id' => 2, 'created_at' => Carbon::now(), 'type' => 'news'],
         ]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
@@ -6865,7 +6868,7 @@ SQL;
 
     public function testCursorPaginateWithUnionWheresMultipleOrders()
     {
-        $ts = now()->toDateTimeString();
+        $ts = Carbon::now()->toDateTimeString();
 
         $perPage = 16;
         $columns = ['test'];
@@ -6883,8 +6886,8 @@ SQL;
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
         $results = collect([
-            ['id' => 1, 'created_at' => now(), 'type' => 'video'],
-            ['id' => 2, 'created_at' => now(), 'type' => 'news'],
+            ['id' => 1, 'created_at' => Carbon::now(), 'type' => 'video'],
+            ['id' => 2, 'created_at' => Carbon::now(), 'type' => 'news'],
         ]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
@@ -6912,7 +6915,7 @@ SQL;
 
     public function testCursorPaginateWithUnionWheresAndAliassedOrderColumns()
     {
-        $ts = now()->toDateTimeString();
+        $ts = Carbon::now()->toDateTimeString();
 
         $perPage = 16;
         $columns = ['test'];
@@ -6931,9 +6934,9 @@ SQL;
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
         $results = collect([
-            ['id' => 1, 'created_at' => now(), 'type' => 'video'],
-            ['id' => 2, 'created_at' => now(), 'type' => 'news'],
-            ['id' => 3, 'created_at' => now(), 'type' => 'podcast'],
+            ['id' => 1, 'created_at' => Carbon::now(), 'type' => 'video'],
+            ['id' => 2, 'created_at' => Carbon::now(), 'type' => 'news'],
+            ['id' => 3, 'created_at' => Carbon::now(), 'type' => 'podcast'],
         ]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
@@ -7667,7 +7670,7 @@ SQL;
     }
 
     /**
-     * @return \Mockery\MockInterface|\Illuminate\Database\Query\Builder
+     * @return MockInterface|\Illuminate\Database\Query\Builder
      */
     protected function getMockQueryBuilder()
     {

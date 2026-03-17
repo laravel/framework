@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use LogicException;
 use Mockery as m;
@@ -79,7 +80,7 @@ class EloquentMassPrunableTest extends DatabaseTestCase
             ->with(m::type(ModelsPruned::class));
 
         collect(range(1, 5000))->map(function ($id) {
-            return ['deleted_at' => now()];
+            return ['deleted_at' => Carbon::now()];
         })->chunk(200)->each(function ($chunk) {
             MassPrunableSoftDeleteTestModel::insert($chunk->all());
         });

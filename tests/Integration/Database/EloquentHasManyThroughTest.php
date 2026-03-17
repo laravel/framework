@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -389,8 +390,8 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
 
         $user = User::create(['team_id' => $team->id, 'name' => Str::random()]);
 
-        Article::create(['user_id' => $user->id, 'title' => Str::random(), 'created_at' => now()->subDay()]);
-        $latestArticle = Article::create(['user_id' => $user->id, 'title' => Str::random(), 'created_at' => now()]);
+        Article::create(['user_id' => $user->id, 'title' => Str::random(), 'created_at' => Carbon::now()->subDay()]);
+        $latestArticle = Article::create(['user_id' => $user->id, 'title' => Str::random(), 'created_at' => Carbon::now()]);
 
         $this->assertEquals($latestArticle->id, $team->latestArticle->id);
     }

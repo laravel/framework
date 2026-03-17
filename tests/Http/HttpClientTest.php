@@ -3824,13 +3824,13 @@ class HttpClientTest extends TestCase
 
     public function testItCanAddGlobalMiddleware()
     {
-        Carbon::setTestNow(now()->startOfDay());
+        Carbon::setTestNow(Carbon::now()->startOfDay());
         $requests = [];
         $responses = [];
         $this->factory->fake(function ($r) use (&$requests) {
             $requests[] = $r;
 
-            Carbon::setTestNow(now()->addSeconds(6 * count($requests)));
+            Carbon::setTestNow(Carbon::now()->addSeconds(6 * count($requests)));
 
             return $this->factory::response('expected content');
         });
@@ -3847,10 +3847,10 @@ class HttpClientTest extends TestCase
         }))->globalMiddleware(function ($handler) {
             // Test wrapping request in timing function...
             return function ($request, $options) use ($handler) {
-                $startedAt = now();
+                $startedAt = Carbon::now();
 
                 return $handler($request, $options)->then(function (ResponseInterface $response) use ($startedAt) {
-                    return $response->withHeader('X-Duration', "{$startedAt->diffInSeconds(now())} seconds");
+                    return $response->withHeader('X-Duration', "{$startedAt->diffInSeconds(Carbon::now())} seconds");
                 });
             };
         });
