@@ -4,8 +4,10 @@ namespace Illuminate\Tests\Testing\Fluent;
 
 use Illuminate\Testing\Fluent\AssertableHtml;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 
+#[RequiresPhp('>= 8.4.0')]
 class AssertableHtmlTest extends TestCase
 {
     private function html(string $body = ''): AssertableHtml

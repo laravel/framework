@@ -277,6 +277,10 @@ class TestView implements Stringable
      */
     public function assertHtml(string|Closure $selectorOrCallback, ?Closure $callback = null): static
     {
+        if (version_compare(PHP_VERSION, '8.4.0', '<')) {
+            throw new \RuntimeException('assertHtml() requires PHP 8.4.0 or higher.');
+        }
+
         if ($selectorOrCallback instanceof Closure) {
             $selectorOrCallback(AssertableHtml::fromString($this->rendered));
         } else {
