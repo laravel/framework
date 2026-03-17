@@ -234,6 +234,10 @@ class EnvironmentSetCommand extends Command
             return 'Config key must contain only letters, numbers, underscores, dashes, and dots.';
         }
 
+        if (preg_match('/\\.\\.|^\\.|\\.$/', $value)) {
+            return 'Config key must not contain consecutive dots or leading/trailing dots.';
+        }
+
         return null;
     }
 

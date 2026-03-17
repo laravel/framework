@@ -45,7 +45,7 @@ class EnvironmentSetCommandTest extends TestCase
     public function testItSetsVariableWithInlineValue(): void
     {
         $this->artisan('env:set', ['key' => 'STRIPE_KEY=sk_test_123', '-n' => true])
-            ->expectsOutputToContain('Using value from argument: sk_test_123')
+            ->expectsOutputToContain('Key/value pair detected, extracted value automatically.')
             ->expectsOutputToContain('Environment variable [STRIPE_KEY] set successfully.')
             ->assertExitCode(0);
 
@@ -55,7 +55,7 @@ class EnvironmentSetCommandTest extends TestCase
     public function testItSetsVariableWithQuotedInlineValue(): void
     {
         $this->artisan('env:set', ['key' => 'APP_NAME="My App"', '-n' => true])
-            ->expectsOutputToContain('Using value from argument: My App')
+            ->expectsOutputToContain('Key/value pair detected, extracted value automatically.')
             ->assertExitCode(0);
 
         $this->assertStringContainsString('APP_NAME="My App"', file_get_contents($this->tempDir.'/.env'));
@@ -64,7 +64,7 @@ class EnvironmentSetCommandTest extends TestCase
     public function testItSetsVariableWithSingleQuotedInlineValue(): void
     {
         $this->artisan('env:set', ['key' => "APP_NAME='My App'", '-n' => true])
-            ->expectsOutputToContain('Using value from argument: My App')
+            ->expectsOutputToContain('Key/value pair detected, extracted value automatically.')
             ->assertExitCode(0);
 
         $this->assertStringContainsString('APP_NAME="My App"', file_get_contents($this->tempDir.'/.env'));
@@ -250,6 +250,30 @@ PHP);
             '-n' => true,
         ])
             ->expectsOutputToContain('Config key must include at least a file and a key')
+            ->assertExitCode(1);
+    }
+
+    public function testItFailsWithConsecutiveDotsInConfigKey(): void
+    {
+        $this->artisan('env:set', [
+            'key' => 'STRIPE_KEY',
+            '--value' => 'sk_test_123',
+            '--config-key' => 'services..stripe.key',
+            '-n' => true,
+        ])
+            ->expectsOutputToContain('Config key must not contain consecutive dots or leading/trailing dots.')
+            ->assertExitCode(1);
+    }
+
+    public function testItFailsWithLeadingDotInConfigKey(): void
+    {
+        $this->artisan('env:set', [
+            'key' => 'STRIPE_KEY',
+            '--value' => 'sk_test_123',
+            '--config-key' => '.services.key',
+            '-n' => true,
+        ])
+            ->expectsOutputToContain('Config key must not contain consecutive dots or leading/trailing dots.')
             ->assertExitCode(1);
     }
 
