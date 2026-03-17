@@ -246,7 +246,7 @@ class SleepTest extends TestCase
         Sleep::fake();
         Carbon::setTestNow(Carbon::now()->startOfDay());
 
-        Sleep::until(Carbon::now()->addMinute()->timestamp);
+        Sleep::until(Carbon::now()->addMinute()->getTimestamp());
 
         Sleep::assertSequence([
             Sleep::for(60)->seconds(),
@@ -258,7 +258,7 @@ class SleepTest extends TestCase
         Sleep::fake();
         Carbon::setTestNow(Carbon::now()->startOfDay());
 
-        Sleep::until((string) Carbon::now()->addMinute()->timestamp);
+        Sleep::until((string) Carbon::now()->addMinute()->getTimestamp());
 
         Sleep::assertSequence([
             Sleep::for(60)->seconds(),

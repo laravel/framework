@@ -664,7 +664,7 @@ class BusBatchTest extends TestCase
                 'failed_jobs' => '',
                 'failed_job_ids' => '[]',
                 'options' => $serialize,
-                'created_at' => Carbon::now()->timestamp,
+                'created_at' => Carbon::now()->getTimestamp(),
                 'cancelled_at' => null,
                 'finished_at' => null,
             ]);
