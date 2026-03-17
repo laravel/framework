@@ -157,7 +157,7 @@ return [
         'numeric' => 'The :attribute field must be :size.',
         'string' => 'The :attribute field must be :size characters.',
     ],
-    'sluggable' => 'The :attribute must be able to generate a valid :column.',
+    'sluggable' => 'The :attribute must be able to generate a valid :slug.',
     'starts_with' => 'The :attribute field must start with one of the following: :values.',
     'string' => 'The :attribute field must be a string.',
     'timezone' => 'The :attribute field must be a valid timezone.',

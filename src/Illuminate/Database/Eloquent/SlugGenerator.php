@@ -77,18 +77,18 @@ class SlugGenerator
         throw new EmptySlugException(
             'Could not generate a slug for ['.get_class($this->model)."] using column(s) [{$columns}].",
             $errorKey,
-            $this->resolveErrorMessage($errorKey, $options),
+            $this->resolveErrorMessage($options),
         );
     }
 
     /**
      * Resolve the user-facing error message for a failed slug generation.
      */
-    protected function resolveErrorMessage(string $errorKey, Sluggable $options): string
+    protected function resolveErrorMessage(Sluggable $options): string
     {
         $from = array_map(fn (string $name) => str_replace('_', ' ', Str::snake($name)), Arr::wrap($options->from));
         $attribute = count($from) === 1 ? $from[0] : implode(' and ', [implode(', ', array_slice($from, 0, -1)), end($from)]);
-        $replacements = ['attribute' => $attribute, 'column' => str_replace('_', ' ', Str::snake($options->to))];
+        $replacements = ['attribute' => $attribute, 'slug' => str_replace('_', ' ', Str::snake($options->to))];
 
         return $options->errorMessage
             ? __($options->errorMessage, $replacements)
@@ -187,7 +187,7 @@ class SlugGenerator
                 throw new CouldNotGenerateSlugException(
                     'Could not generate a unique slug for ['.get_class($this->model)."] with base [{$originalSlug}] after {$options->maxAttempts} attempts.",
                     $errorKey,
-                    $this->resolveErrorMessage($errorKey, $options),
+                    $this->resolveErrorMessage($options),
                 );
             }
 
