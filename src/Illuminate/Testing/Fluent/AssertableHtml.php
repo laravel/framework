@@ -52,7 +52,7 @@ class AssertableHtml
     }
 
     /**
-     * Assert that an element matching the selector exists, with optional count and scoped callback.
+     * Assert that an element matching the given selector exists.
      *
      * @param  string  $selector
      * @param  int|\Closure|null  $countOrCallback
@@ -92,7 +92,7 @@ class AssertableHtml
     }
 
     /**
-     * Assert that no element matches the selector.
+     * Assert that no element matches the given selector.
      *
      * @param  string  $selector
      * @return $this
@@ -122,7 +122,7 @@ class AssertableHtml
     }
 
     /**
-     * Assert that exactly N elements match the selector.
+     * Assert that the given selector matches the expected number of elements.
      *
      * @param  string  $selector
      * @param  int  $expected
@@ -143,7 +143,7 @@ class AssertableHtml
     }
 
     /**
-     * Assert that the matched element's text content equals the expected value, or passes a truth test.
+     * Assert that the matched element's text content equals the given value.
      *
      * @param  string  $selector
      * @param  string|\Closure  $expected
@@ -175,7 +175,7 @@ class AssertableHtml
     }
 
     /**
-     * Assert multiple selector to text content (or closure) pairs at once.
+     * Assert that each selector's matched element has the expected text content.
      *
      * @param  array<string, string|\Closure>  $bindings
      * @return $this
@@ -190,7 +190,7 @@ class AssertableHtml
     }
 
     /**
-     * Assert that the matched element's text content does not equal the expected value, or does not pass a truth test.
+     * Assert that the matched element's text content does not equal the given value.
      *
      * @param  string  $selector
      * @param  string|\Closure  $expected
@@ -222,7 +222,7 @@ class AssertableHtml
     }
 
     /**
-     * Assert that the matched element's attribute equals the expected value, or passes a truth test.
+     * Assert that the matched element's given attribute equals the given value.
      *
      * @param  string  $selector
      * @param  string  $attribute
@@ -290,7 +290,7 @@ class AssertableHtml
     }
 
     /**
-     * Assert that the matched element's attribute does not equal the expected value, or does not pass a truth test.
+     * Assert that the matched element's given attribute does not equal the given value.
      *
      * @param  string  $selector
      * @param  string  $attribute
@@ -323,7 +323,7 @@ class AssertableHtml
     }
 
     /**
-     * Assert multiple attribute to value (or closure) pairs on the matched element at once.
+     * Assert that the matched element's attributes equal the given values.
      *
      * @param  string  $selector
      * @param  array<string, string|\Closure>  $bindings
