@@ -29,7 +29,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 {
     protected function tearDown(): void
     {
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
 
         parent::tearDown();
     }
@@ -2679,7 +2679,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $result = $builder->from('table as alias')->update(['foo' => 'bar', 'alias.updated_at' => null]);
         $this->assertEquals(1, $result);
 
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
     }
 
     public function testUpsert()

@@ -72,7 +72,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     protected function tearDown(): void
     {
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
 
         Model::unsetEventDispatcher();
         Carbon::resetToStringFormat();
