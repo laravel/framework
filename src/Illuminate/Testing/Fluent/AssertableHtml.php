@@ -237,7 +237,7 @@ class AssertableHtml
      */
     public function whereAttribute(string $selector, string $attribute, string|Closure $expected): static
     {
-        $actual = $this->findOrFail($selector)->getAttribute($attribute);
+        $actual = $this->attributeValue($selector, $attribute);
 
         if ($expected instanceof Closure) {
             if (! $expected($actual)) {
@@ -305,7 +305,7 @@ class AssertableHtml
      */
     public function whereNotAttribute(string $selector, string $attribute, string|Closure $expected): static
     {
-        $actual = $this->findOrFail($selector)->getAttribute($attribute);
+        $actual = $this->attributeValue($selector, $attribute);
 
         if ($expected instanceof Closure) {
             if ($expected($actual)) {
@@ -472,6 +472,18 @@ class AssertableHtml
     protected function textContent(string $selector): string
     {
         return trim($this->findOrFail($selector)->textContent);
+    }
+
+    /**
+     * Get the trimmed value of the given attribute on the first element matching the selector or fail.
+     *
+     * @param  string  $selector
+     * @param  string  $attribute
+     * @return string
+     */
+    protected function attributeValue(string $selector, string $attribute): string
+    {
+        return trim($this->findOrFail($selector)->getAttribute($attribute));
     }
 
     /**

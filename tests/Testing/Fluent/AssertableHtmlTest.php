@@ -472,4 +472,32 @@ class AssertableHtmlTest extends TestCase
 
         $this->fail('Expected an AssertionFailedError.');
     }
+
+    public function testFailureOutputIncludesFullSelectorPath(): void
+    {
+        try {
+            $this->html('<nav><ul><li>Item</li></ul></nav>')
+                ->scope('nav', function (AssertableHtml $nav) {
+                    $nav->scope('ul', function (AssertableHtml $ul) {
+                        $ul->has('a');
+                    });
+                });
+        } catch (AssertionFailedError $e) {
+            $this->assertStringContainsString('nav → ul → a', $e->getMessage());
+
+            return;
+        }
+
+        $this->fail('Expected an AssertionFailedError.');
+    }
+
+    public function testWhereAttributeWithWhitespace(): void
+    {
+        $this->html('<a href="  /about  ">About</a>')->whereAttribute('a', 'href', '/about');
+    }
+
+    public function testWhereNotAttributeWithWhitespace(): void
+    {
+        $this->html('<a href="  /about  ">About</a>')->whereNotAttribute('a', 'href', '/contact');
+    }
 }
