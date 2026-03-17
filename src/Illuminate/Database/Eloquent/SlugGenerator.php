@@ -86,9 +86,8 @@ class SlugGenerator
      */
     protected function resolveErrorMessage(string $errorKey, Sluggable $options): string
     {
-        $from = Arr::wrap($options->from);
         $attribute = count($from) === 1 ? $from[0] : implode(' and ', [implode(', ', array_slice($from, 0, -1)), end($from)]);
-        $replacements = ['attribute' => $attribute, 'column' => $options->to];
+        $replacements = ['attribute' => $attribute, 'column' => str_replace('_', ' ', Str::snake($options->to))];
 
         return $options->errorMessage
             ? __($options->errorMessage, $replacements)

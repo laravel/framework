@@ -193,7 +193,7 @@ class EloquentSluggableTest extends TestCase
         } catch (CouldNotGenerateSlugException $e) {
             $inner = $e->getInnerException();
             $this->assertArrayHasKey('first_name', $inner->errors());
-            $this->assertSame('The first_name and last_name must be able to generate a valid slug.', $inner->errors()['first_name'][0]);
+            $this->assertSame('The first name and last name must be able to generate a valid slug.', $inner->errors()['first_name'][0]);
         }
     }
 
@@ -204,7 +204,7 @@ class EloquentSluggableTest extends TestCase
             $this->fail('Expected CouldNotGenerateSlugException was not thrown.');
         } catch (CouldNotGenerateSlugException $e) {
             $inner = $e->getInnerException();
-            $this->assertSame('The name must be able to generate a valid url_slug.', $inner->errors()['name'][0]);
+            $this->assertSame('The name must be able to generate a valid url slug.', $inner->errors()['name'][0]);
         }
     }
 
