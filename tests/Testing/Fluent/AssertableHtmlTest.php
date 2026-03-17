@@ -308,7 +308,7 @@ class AssertableHtmlTest extends TestCase
     public function testScopeFailsWhenSelectorMissing(): void
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed to find element matching selector [aside].');
+        $this->expectExceptionMessage('Failed asserting that element [aside] exists.');
 
         $this->html('<nav></nav>')->scope('aside', function (AssertableHtml $el) {
             //

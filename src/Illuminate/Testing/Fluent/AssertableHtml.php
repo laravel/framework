@@ -88,11 +88,7 @@ class AssertableHtml
      */
     public function has(string $selector, int|Closure|null $countOrCallback = null, ?Closure $callback = null): static
     {
-        $element = $this->scope->querySelector($selector);
-
-        if ($element === null) {
-            $this->fail("Failed asserting that element [{$selector}] exists.", $selector);
-        }
+        $element = $this->findOrFail($selector);
 
         if (is_int($countOrCallback)) {
             $actual = $this->scope->querySelectorAll($selector)->length;
@@ -189,13 +185,7 @@ class AssertableHtml
      */
     public function where(string $selector, string|Closure $expected): static
     {
-        $element = $this->scope->querySelector($selector);
-
-        if ($element === null) {
-            $this->fail("Failed asserting that element [{$selector}] exists.", $selector);
-        }
-
-        $actual = trim($element->textContent);
+        $actual = trim($this->findOrFail($selector)->textContent);
 
         if ($expected instanceof Closure) {
             if (! $expected($actual)) {
@@ -243,13 +233,7 @@ class AssertableHtml
      */
     public function whereNot(string $selector, string|Closure $expected): static
     {
-        $element = $this->scope->querySelector($selector);
-
-        if ($element === null) {
-            $this->fail("Failed asserting that element [{$selector}] exists.", $selector);
-        }
-
-        $actual = trim($element->textContent);
+        $actual = trim($this->findOrFail($selector)->textContent);
 
         if ($expected instanceof Closure) {
             if ($expected($actual)) {
@@ -282,13 +266,7 @@ class AssertableHtml
      */
     public function whereAttr(string $selector, string $attribute, string $expected): static
     {
-        $element = $this->scope->querySelector($selector);
-
-        if ($element === null) {
-            $this->fail("Failed asserting that element [{$selector}] exists.", $selector);
-        }
-
-        $actual = $element->getAttribute($attribute);
+        $actual = $this->findOrFail($selector)->getAttribute($attribute);
 
         if ($actual !== $expected) {
             $this->fail(
@@ -309,13 +287,7 @@ class AssertableHtml
      */
     public function hasAttr(string $selector, string $attribute): static
     {
-        $element = $this->scope->querySelector($selector);
-
-        if ($element === null) {
-            $this->fail("Failed asserting that element [{$selector}] exists.", $selector);
-        }
-
-        if (! $element->hasAttribute($attribute)) {
+        if (! $this->findOrFail($selector)->hasAttribute($attribute)) {
             $this->fail(
                 "Failed asserting that [{$selector}] has attribute [{$attribute}].",
                 $selector
@@ -359,13 +331,7 @@ class AssertableHtml
      */
     public function missingAttr(string $selector, string $attribute): static
     {
-        $element = $this->scope->querySelector($selector);
-
-        if ($element === null) {
-            $this->fail("Failed asserting that element [{$selector}] exists.", $selector);
-        }
-
-        if ($element->hasAttribute($attribute)) {
+        if ($this->findOrFail($selector)->hasAttribute($attribute)) {
             $this->fail(
                 "Failed asserting that [{$selector}] does not have attribute [{$attribute}].",
                 $selector
@@ -384,13 +350,7 @@ class AssertableHtml
      */
     public function scope(string $selector, Closure $callback): static
     {
-        $element = $this->scope->querySelector($selector);
-
-        if ($element === null) {
-            $this->fail("Failed to find element matching selector [{$selector}].", $selector);
-        }
-
-        $callback(new static($this->document, $element, $this->buildSelector($selector)));
+        $callback(new static($this->document, $this->findOrFail($selector), $this->buildSelector($selector)));
 
         return $this;
     }
@@ -469,6 +429,23 @@ class AssertableHtml
         PHPUnit::fail(implode("\n\n", $parts));
     }
 
+
+    /**
+     * Find the first element matching the selector or fail.
+     *
+     * @param  string  $selector
+     * @return \Dom\Element
+     */
+    protected function findOrFail(string $selector): Element
+    {
+        $element = $this->scope->querySelector($selector);
+
+        if ($element === null) {
+            $this->fail("Failed asserting that element [{$selector}] exists.", $selector);
+        }
+
+        return $element;
+    }
 
     /**
      * Build the full selector path from the current scope to the given selector.
