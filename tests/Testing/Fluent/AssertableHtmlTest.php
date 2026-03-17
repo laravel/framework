@@ -13,16 +13,12 @@ class AssertableHtmlTest extends TestCase
         return AssertableHtml::fromString("<html><body>{$body}</body></html>");
     }
 
-    // --- fromString ---
-
     public function testFromStringParsesValidHtml(): void
     {
         $assert = $this->html('<p>Hello</p>');
 
         $assert->has('p');
     }
-
-    // --- has ---
 
     public function testHasPassesWhenSelectorExists(): void
     {
@@ -66,8 +62,6 @@ class AssertableHtmlTest extends TestCase
             });
     }
 
-    // --- hasAll ---
-
     public function testHasAllPassesWhenAllSelectorsExist(): void
     {
         $this->html('<header></header><main></main><footer></footer>')
@@ -83,8 +77,6 @@ class AssertableHtmlTest extends TestCase
             ->hasAll(['header', 'main', 'footer']);
     }
 
-    // --- missing ---
-
     public function testMissingPassesWhenSelectorAbsent(): void
     {
         $this->html('<div></div>')->missing('nav');
@@ -97,8 +89,6 @@ class AssertableHtmlTest extends TestCase
 
         $this->html('<nav></nav>')->missing('nav');
     }
-
-    // --- missingAll ---
 
     public function testMissingAllPassesWhenAllSelectorsAbsent(): void
     {
@@ -115,8 +105,6 @@ class AssertableHtmlTest extends TestCase
             ->missingAll(['.alert', '.error', '.warning']);
     }
 
-    // --- count ---
-
     public function testCountPassesWhenCountMatches(): void
     {
         $this->html('<ul><li>a</li><li>b</li></ul>')->count('li', 2);
@@ -129,8 +117,6 @@ class AssertableHtmlTest extends TestCase
 
         $this->html('<ul><li>a</li><li>b</li></ul>')->count('li', 3);
     }
-
-    // --- where ---
 
     public function testWherePassesWhenTextMatches(): void
     {
@@ -168,8 +154,6 @@ class AssertableHtmlTest extends TestCase
             ->where('p', fn ($text) => str_contains($text, 'Goodbye'));
     }
 
-    // --- whereAll ---
-
     public function testWhereAllPassesForAllSelectors(): void
     {
         $this->html('<p class="a">Foo</p><p class="b">Bar</p>')
@@ -198,8 +182,6 @@ class AssertableHtmlTest extends TestCase
                 'p.b' => 'Bar',
             ]);
     }
-
-    // --- whereNot ---
 
     public function testWhereNotPassesWhenTextDoesNotMatch(): void
     {
@@ -237,8 +219,6 @@ class AssertableHtmlTest extends TestCase
         $this->html('<h1>Hello</h1>')->whereNot('h2', 'Hello');
     }
 
-    // --- whereAttribute ---
-
     public function testWhereAttributePassesWhenAttributeMatches(): void
     {
         $this->html('<a href="/about">About</a>')->whereAttribute('a', 'href', '/about');
@@ -267,8 +247,6 @@ class AssertableHtmlTest extends TestCase
             ->whereAttribute('a', 'href', fn ($value) => str_starts_with($value, 'http'));
     }
 
-    // --- hasAttribute ---
-
     public function testHasAttributePassesWhenAttributePresent(): void
     {
         $this->html('<input type="email" required>')->hasAttribute('input', 'required');
@@ -282,8 +260,6 @@ class AssertableHtmlTest extends TestCase
         $this->html('<input type="email">')->hasAttribute('input', 'disabled');
     }
 
-    // --- hasAttributes ---
-
     public function testHasAttributesPassesWhenAllAttributesPresent(): void
     {
         $this->html('<input type="email" required disabled>')->hasAttributes('input', ['required', 'disabled']);
@@ -296,8 +272,6 @@ class AssertableHtmlTest extends TestCase
 
         $this->html('<input type="email" required>')->hasAttributes('input', ['required', 'disabled']);
     }
-
-    // --- whereNotAttribute ---
 
     public function testWhereNotAttributePassesWhenAttributeDoesNotMatch(): void
     {
@@ -326,8 +300,6 @@ class AssertableHtmlTest extends TestCase
         $this->html('<a href="/about">About</a>')
             ->whereNotAttribute('a', 'href', fn ($v) => str_starts_with($v, '/'));
     }
-
-    // --- whereAttributes ---
 
     public function testWhereAttributesPassesForAllAttributes(): void
     {
@@ -358,8 +330,6 @@ class AssertableHtmlTest extends TestCase
             ]);
     }
 
-    // --- missingAttribute ---
-
     public function testMissingAttributePassesWhenAttributeAbsent(): void
     {
         $this->html('<input type="email">')->missingAttribute('input', 'disabled');
@@ -372,8 +342,6 @@ class AssertableHtmlTest extends TestCase
 
         $this->html('<input type="email" required>')->missingAttribute('input', 'required');
     }
-
-    // --- scope ---
 
     public function testScopeNarrowsAssertionsToMatchedElement(): void
     {
@@ -393,8 +361,6 @@ class AssertableHtmlTest extends TestCase
             //
         });
     }
-
-    // --- each ---
 
     public function testEachIteratesAllMatchingElements(): void
     {
@@ -426,8 +392,6 @@ class AssertableHtmlTest extends TestCase
         $this->html('<div></div>')->each('li', fn ($li) => null);
     }
 
-    // --- chaining ---
-
     public function testMethodsReturnStaticForChaining(): void
     {
         $assert = $this->html('<nav><a href="/" class="active">Home</a></nav>');
@@ -444,8 +408,6 @@ class AssertableHtmlTest extends TestCase
 
         $this->assertSame($assert, $result);
     }
-
-    // --- failure output includes scope HTML ---
 
     public function testFailureMessageIncludesScopeHtml(): void
     {
