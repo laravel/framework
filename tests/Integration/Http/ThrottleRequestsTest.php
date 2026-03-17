@@ -176,7 +176,7 @@ class ThrottleRequestsTest extends TestCase
         $response = $this->get('/');
         $response->assertStatus(429);
         $response->assertHeader('Retry-After', 1);
-        $response->assertHeader('X-RateLimit-Reset', Carbon::now()->addSeconds(1)->getTimestamp());
+        $response->assertHeader('X-RateLimit-Reset', Carbon::now()->addSecond()->getTimestamp());
         $response->assertHeader('X-RateLimit-Limit', 3);
         $response->assertHeader('X-RateLimit-Remaining', 0);
 
