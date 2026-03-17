@@ -461,11 +461,11 @@ class AssertableHtmlTest extends TestCase
 
     public function testSequence(): void
     {
-        $this->html('<ul><li><span>First</span></li><li><span>Second</span></li><li><span>Third</span></li></ul>')
+        $this->html('<ul><li><span class="even">First</span></li><li><span class="odd">Second</span></li><li><span class="even">Third</span></li></ul>')
             ->sequence('li',
-                fn (AssertableHtml $li) => $li->whereText('span', 'First'),
-                fn (AssertableHtml $li) => $li->whereText('span', 'Second'),
-                fn (AssertableHtml $li) => $li->whereText('span', 'Third'),
+                fn (AssertableHtml $li, int $i) => $li->whereText('span', 'First')->whereAttribute('span', 'class', $i % 2 === 0 ? 'even' : 'odd'),
+                fn (AssertableHtml $li, int $i) => $li->whereText('span', 'Second')->whereAttribute('span', 'class', $i % 2 === 0 ? 'even' : 'odd'),
+                fn (AssertableHtml $li, int $i) => $li->whereText('span', 'Third')->whereAttribute('span', 'class', $i % 2 === 0 ? 'even' : 'odd'),
             );
     }
 

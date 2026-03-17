@@ -388,7 +388,9 @@ class AssertableHtml
     }
 
     /**
-     * Assert that the matched elements satisfy a sequence of callbacks, one per element.
+     * Assert that the matched elements satisfy a sequence of callbacks, one per element in order.
+     *
+     * Each callback receives the scoped element and its zero-based index.
      *
      * @param  string  $selector
      * @param  \Closure  ...$callbacks
@@ -407,7 +409,7 @@ class AssertableHtml
 
         foreach ($callbacks as $index => $callback) {
             try {
-                $callback(new static($nodes->item($index), $this->buildSelector($selector)));
+                $callback(new static($nodes->item($index), $this->buildSelector($selector)), $index);
             } catch (AssertionFailedError $e) {
                 PHPUnit::fail("Failed assertion on element [{$selector}] at index [{$index}]:\n".$e->getMessage());
             }
