@@ -58,43 +58,15 @@ class AssertableHtml
     }
 
     /**
-     * Assert that an element matching the given selector exists.
-     *
-     * @param  string  $selector
-     * @return $this
-     */
-    public function has(string $selector): static
-    {
-        $this->findOrFail($selector);
-
-        return $this;
-    }
-
-    /**
      * Assert that elements matching all of the given selectors exist.
      *
-     * @param  array<int, string>  $selectors
+     * @param  string  ...$selectors
      * @return $this
      */
-    public function hasAll(array $selectors): static
+    public function has(string ...$selectors): static
     {
         foreach ($selectors as $selector) {
-            $this->has($selector);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Assert that no element matches the given selector.
-     *
-     * @param  string  $selector
-     * @return $this
-     */
-    public function missing(string $selector): static
-    {
-        if ($this->scope->querySelector($selector) !== null) {
-            $this->fail("Failed asserting that [{$selector}] is absent.", $selector);
+            $this->findOrFail($selector);
         }
 
         return $this;
@@ -103,13 +75,15 @@ class AssertableHtml
     /**
      * Assert that no elements matching any of the given selectors exist.
      *
-     * @param  array<int, string>  $selectors
+     * @param  string  ...$selectors
      * @return $this
      */
-    public function missingAll(array $selectors): static
+    public function missing(string ...$selectors): static
     {
         foreach ($selectors as $selector) {
-            $this->missing($selector);
+            if ($this->scope->querySelector($selector) !== null) {
+                $this->fail("Failed asserting that [{$selector}] is absent.", $selector);
+            }
         }
 
         return $this;
@@ -249,35 +223,23 @@ class AssertableHtml
     }
 
     /**
-     * Assert that the matched element has the given attribute.
-     *
-     * @param  string  $selector
-     * @param  string  $attribute
-     * @return $this
-     */
-    public function hasAttribute(string $selector, string $attribute): static
-    {
-        if (! $this->findOrFail($selector)->hasAttribute($attribute)) {
-            $this->fail(
-                "Failed asserting that [{$selector}] has attribute [{$attribute}].",
-                $selector
-            );
-        }
-
-        return $this;
-    }
-
-    /**
      * Assert that the matched element has all of the given attributes.
      *
      * @param  string  $selector
-     * @param  array<int, string>  $attributes
+     * @param  string  ...$attributes
      * @return $this
      */
-    public function hasAttributes(string $selector, array $attributes): static
+    public function hasAttributes(string $selector, string ...$attributes): static
     {
+        $element = $this->findOrFail($selector);
+
         foreach ($attributes as $attribute) {
-            $this->hasAttribute($selector, $attribute);
+            if (! $element->hasAttribute($attribute)) {
+                $this->fail(
+                    "Failed asserting that [{$selector}] has attribute [{$attribute}].",
+                    $selector
+                );
+            }
         }
 
         return $this;
@@ -333,35 +295,23 @@ class AssertableHtml
     }
 
     /**
-     * Assert that the matched element does not have the given attribute.
-     *
-     * @param  string  $selector
-     * @param  string  $attribute
-     * @return $this
-     */
-    public function missingAttribute(string $selector, string $attribute): static
-    {
-        if ($this->findOrFail($selector)->hasAttribute($attribute)) {
-            $this->fail(
-                "Failed asserting that [{$selector}] does not have attribute [{$attribute}].",
-                $selector
-            );
-        }
-
-        return $this;
-    }
-
-    /**
      * Assert that the matched element does not have any of the given attributes.
      *
      * @param  string  $selector
-     * @param  array<int, string>  $attributes
+     * @param  string  ...$attributes
      * @return $this
      */
-    public function missingAttributes(string $selector, array $attributes): static
+    public function missingAttributes(string $selector, string ...$attributes): static
     {
+        $element = $this->findOrFail($selector);
+
         foreach ($attributes as $attribute) {
-            $this->missingAttribute($selector, $attribute);
+            if ($element->hasAttribute($attribute)) {
+                $this->fail(
+                    "Failed asserting that [{$selector}] does not have attribute [{$attribute}].",
+                    $selector
+                );
+            }
         }
 
         return $this;

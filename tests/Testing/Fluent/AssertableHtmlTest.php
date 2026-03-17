@@ -54,19 +54,19 @@ class AssertableHtmlTest extends TestCase
         $this->html('<div></div>')->has('nav');
     }
 
-    public function testHasAll(): void
+    public function testHasMultiple(): void
     {
         $this->html('<header></header><main></main><footer></footer>')
-            ->hasAll(['header', 'main', 'footer']);
+            ->has('header', 'main', 'footer');
     }
 
-    public function testHasAllMissingSelector(): void
+    public function testHasMultipleMissingSelector(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that element [footer] exists.');
 
         $this->html('<header></header><main></main>')
-            ->hasAll(['header', 'main', 'footer']);
+            ->has('header', 'main', 'footer');
     }
 
     public function testMissing(): void
@@ -82,19 +82,19 @@ class AssertableHtmlTest extends TestCase
         $this->html('<nav></nav>')->missing('nav');
     }
 
-    public function testMissingAll(): void
+    public function testMissingMultiple(): void
     {
         $this->html('<div></div>')
-            ->missingAll(['.alert', '.error', '.warning']);
+            ->missing('.alert', '.error', '.warning');
     }
 
-    public function testMissingAllPresentSelector(): void
+    public function testMissingMultiplePresentSelector(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [.error] is absent.');
 
         $this->html('<div class="error"></div>')
-            ->missingAll(['.alert', '.error', '.warning']);
+            ->missing('.alert', '.error', '.warning');
     }
 
     public function testCount(): void
@@ -249,22 +249,9 @@ class AssertableHtmlTest extends TestCase
             ->whereAttribute('a', 'href', fn ($value) => str_starts_with($value, 'http'));
     }
 
-    public function testHasAttribute(): void
-    {
-        $this->html('<input type="email" required>')->hasAttribute('input', 'required');
-    }
-
-    public function testHasAttributeMissing(): void
-    {
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed asserting that [input] has attribute [disabled].');
-
-        $this->html('<input type="email">')->hasAttribute('input', 'disabled');
-    }
-
     public function testHasAttributes(): void
     {
-        $this->html('<input type="email" required disabled>')->hasAttributes('input', ['required', 'disabled']);
+        $this->html('<input type="email" required>')->hasAttributes('input', 'required');
     }
 
     public function testHasAttributesMissing(): void
@@ -272,7 +259,20 @@ class AssertableHtmlTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [input] has attribute [disabled].');
 
-        $this->html('<input type="email" required>')->hasAttributes('input', ['required', 'disabled']);
+        $this->html('<input type="email">')->hasAttributes('input', 'disabled');
+    }
+
+    public function testHasAttributesMultiple(): void
+    {
+        $this->html('<input type="email" required disabled>')->hasAttributes('input', 'required', 'disabled');
+    }
+
+    public function testHasAttributesMultipleMissing(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that [input] has attribute [disabled].');
+
+        $this->html('<input type="email" required>')->hasAttributes('input', 'required', 'disabled');
     }
 
     public function testWhereNotAttribute(): void
@@ -332,22 +332,9 @@ class AssertableHtmlTest extends TestCase
             ]);
     }
 
-    public function testMissingAttribute(): void
-    {
-        $this->html('<input type="email">')->missingAttribute('input', 'disabled');
-    }
-
-    public function testMissingAttributePresent(): void
-    {
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed asserting that [input] does not have attribute [required].');
-
-        $this->html('<input type="email" required>')->missingAttribute('input', 'required');
-    }
-
     public function testMissingAttributes(): void
     {
-        $this->html('<input type="email">')->missingAttributes('input', ['required', 'disabled']);
+        $this->html('<input type="email">')->missingAttributes('input', 'disabled');
     }
 
     public function testMissingAttributesPresent(): void
@@ -355,7 +342,20 @@ class AssertableHtmlTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [input] does not have attribute [required].');
 
-        $this->html('<input type="email" required>')->missingAttributes('input', ['required', 'disabled']);
+        $this->html('<input type="email" required>')->missingAttributes('input', 'required');
+    }
+
+    public function testMissingAttributesMultiple(): void
+    {
+        $this->html('<input type="email">')->missingAttributes('input', 'required', 'disabled');
+    }
+
+    public function testMissingAttributesMultiplePresent(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that [input] does not have attribute [required].');
+
+        $this->html('<input type="email" required>')->missingAttributes('input', 'required', 'disabled');
     }
 
     public function testScope(): void
@@ -500,8 +500,8 @@ class AssertableHtmlTest extends TestCase
             ->whereText('a', 'Home')
             ->whereText('nav', fn ($text) => str_contains($text, 'Home'))
             ->whereAttribute('a', 'href', '/')
-            ->hasAttribute('a', 'class')
-            ->missingAttribute('a', 'disabled');
+            ->hasAttributes('a', 'class')
+            ->missingAttributes('a', 'disabled', 'hidden');
 
         $this->assertSame($assert, $result);
     }
