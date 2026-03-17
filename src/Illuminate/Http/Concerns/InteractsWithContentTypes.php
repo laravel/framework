@@ -47,7 +47,7 @@ trait InteractsWithContentTypes
     {
         $acceptable = $this->getAcceptableContentTypes();
 
-        return isset($acceptable[0]) && strtolower($acceptable[0]) === 'text/markdown';
+        return isset($acceptable[0]) && str_starts_with(strtolower($acceptable[0]), 'text/markdown');
     }
 
     /**
