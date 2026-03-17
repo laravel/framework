@@ -151,7 +151,7 @@ class AssertableHtml
      */
     public function whereText(string $selector, string|Closure $expected): static
     {
-        $actual = trim($this->findOrFail($selector)->textContent);
+        $actual = $this->textContent($selector);
 
         if ($expected instanceof Closure) {
             if (! $expected($actual)) {
@@ -198,7 +198,7 @@ class AssertableHtml
      */
     public function whereNotText(string $selector, string|Closure $expected): static
     {
-        $actual = trim($this->findOrFail($selector)->textContent);
+        $actual = $this->textContent($selector);
 
         if ($expected instanceof Closure) {
             if ($expected($actual)) {
@@ -455,6 +455,17 @@ class AssertableHtml
         $parts[] = $this->getHtml();
 
         PHPUnit::fail(implode("\n\n", $parts));
+    }
+
+    /**
+     * Get the trimmed text content of the first element matching the selector or fail.
+     *
+     * @param  string  $selector
+     * @return string
+     */
+    protected function textContent(string $selector): string
+    {
+        return trim($this->findOrFail($selector)->textContent);
     }
 
     /**
