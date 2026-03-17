@@ -17,6 +17,7 @@ final class AfterEachTestSubscriber implements AfterTestMethodFinishedSubscriber
 
         if (class_exists(\Illuminate\Support\Facades\Date::class)) {
             \Illuminate\Support\Facades\Date::useDefault();
+            \Illuminate\Support\Facades\Date::setTestNow();
         }
     }
 }
