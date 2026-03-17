@@ -459,6 +459,40 @@ class AssertableHtmlTest extends TestCase
         $this->html('<ul></ul>')->last('li', fn (AssertableHtml $li) => null);
     }
 
+    public function testSequence(): void
+    {
+        $this->html('<ul><li><span>First</span></li><li><span>Second</span></li><li><span>Third</span></li></ul>')
+            ->sequence('li',
+                fn (AssertableHtml $li) => $li->whereText('span', 'First'),
+                fn (AssertableHtml $li) => $li->whereText('span', 'Second'),
+                fn (AssertableHtml $li) => $li->whereText('span', 'Third'),
+            );
+    }
+
+    public function testSequenceCountMismatch(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that [li] matches 2 element(s), found 3.');
+
+        $this->html('<ul><li>First</li><li>Second</li><li>Third</li></ul>')
+            ->sequence('li',
+                fn (AssertableHtml $li) => null,
+                fn (AssertableHtml $li) => null,
+            );
+    }
+
+    public function testSequenceFailingIndex(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed assertion on element [li] at index [1]');
+
+        $this->html('<ul><li><a href="/a">A</a></li><li><span>no link</span></li></ul>')
+            ->sequence('li',
+                fn (AssertableHtml $li) => $li->has('a'),
+                fn (AssertableHtml $li) => $li->has('a'),
+            );
+    }
+
     public function testEach(): void
     {
         $count = 0;

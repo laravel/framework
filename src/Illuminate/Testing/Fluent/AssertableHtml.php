@@ -388,6 +388,35 @@ class AssertableHtml
     }
 
     /**
+     * Assert that the matched elements satisfy a sequence of callbacks, one per element.
+     *
+     * @param  string  $selector
+     * @param  \Closure  ...$callbacks
+     * @return $this
+     */
+    public function sequence(string $selector, Closure ...$callbacks): static
+    {
+        $nodes = $this->scope->querySelectorAll($selector);
+
+        if ($nodes->length !== count($callbacks)) {
+            $this->fail(
+                "Failed asserting that [{$selector}] matches ".count($callbacks)." element(s), found {$nodes->length}.",
+                $selector
+            );
+        }
+
+        foreach ($callbacks as $index => $callback) {
+            try {
+                $callback(new static($nodes->item($index), $this->buildSelector($selector)));
+            } catch (AssertionFailedError $e) {
+                PHPUnit::fail("Failed assertion on element [{$selector}] at index [{$index}]:\n".$e->getMessage());
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Iterate all elements matching the selector, invoking the callback for each.
      *
      * @param  string  $selector
