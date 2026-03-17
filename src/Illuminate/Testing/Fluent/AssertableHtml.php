@@ -31,15 +31,24 @@ class AssertableHtml
     protected Element|HTMLDocument $scope;
 
     /**
+     * The selector path to the current scope.
+     *
+     * @var string|null
+     */
+    protected ?string $selector;
+
+    /**
      * Create a new assertable HTML instance.
      *
      * @param  \Dom\HTMLDocument  $document
      * @param  \Dom\Element|\Dom\HTMLDocument|null  $scope
+     * @param  string|null  $selector
      */
-    protected function __construct(HTMLDocument $document, Element|HTMLDocument|null $scope = null)
+    protected function __construct(HTMLDocument $document, Element|HTMLDocument|null $scope = null, ?string $selector = null)
     {
         $this->document = $document;
         $this->scope = $scope ?? $document;
+        $this->selector = $selector;
     }
 
     /**
@@ -51,7 +60,7 @@ class AssertableHtml
     public static function fromResponse(TestResponse $response, int $options = LIBXML_NOERROR): static
     {
         return new static(
-            HTMLDocument::createFromString($$response->getContent(), $options),
+            HTMLDocument::createFromString($response->getContent(), $options),
         );
     }
 
@@ -96,10 +105,10 @@ class AssertableHtml
             }
 
             if ($callback !== null) {
-                $callback(new static($this->document, $element));
+                $callback(new static($this->document, $element, $this->buildSelector($selector)));
             }
         } elseif ($countOrCallback instanceof Closure) {
-            $countOrCallback(new static($this->document, $element));
+            $countOrCallback(new static($this->document, $element, $this->buildSelector($selector)));
         }
 
         return $this;
@@ -381,7 +390,7 @@ class AssertableHtml
             $this->fail("Failed to find element matching selector [{$selector}].", $selector);
         }
 
-        $callback(new static($this->document, $element));
+        $callback(new static($this->document, $element, $this->buildSelector($selector)));
 
         return $this;
     }
@@ -405,7 +414,7 @@ class AssertableHtml
 
         foreach ($nodes as $index => $node) {
             try {
-                $callback(new static($this->document, $node), $index);
+                $callback(new static($this->document, $node, $this->buildSelector($selector)), $index);
             } catch (AssertionFailedError $e) {
                 PHPUnit::fail("Failed assertion on element [{$selector}] at index [{$index}]:\n".$e->getMessage());
             }
@@ -439,18 +448,20 @@ class AssertableHtml
     }
 
     /**
-     * Fail an assertion with the selector and scope HTML appended to the message.
+     * Fail an assertion with the full selector path and scope HTML appended to the message.
      *
      * @param  string  $message
      * @param  string|null  $selector
      * @return never
      */
-    private function fail(string $message, ?string $selector = null): never
+    protected function fail(string $message, ?string $selector = null): never
     {
         $parts = [$message];
 
-        if ($selector !== null) {
-            $parts[] = "Selector: {$selector}";
+        $path = $this->buildSelector($selector);
+
+        if ($path !== null) {
+            $parts[] = "Selector: {$path}";
         }
 
         $parts[] = "Scope HTML:\n".$this->getHtml();
@@ -459,11 +470,22 @@ class AssertableHtml
     }
 
     /**
+     * Build the full selector path from the current scope to the given selector.
+     *
+     * @param  string|null  $selector
+     * @return string|null
+     */
+    protected function buildSelector(?string $selector = null): ?string
+    {
+        return implode(' > ', array_filter([$this->selector, $selector])) ?: null;
+    }
+
+    /**
      * Serialize the current scope to an HTML string.
      *
      * @return string
      */
-    private function getHtml(): string
+    protected function getHtml(): string
     {
         return $this->document->saveHtml($this->scope);
     }
