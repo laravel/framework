@@ -25,7 +25,7 @@ class EnvironmentSetCommand extends Command
      */
     protected $signature = 'env:set
                     {key? : The environment variable name (optionally with =value)}
-                    {--value= : The environment variable value}
+                    {value? : The environment variable value}
                     {--config-key= : Config key in dot notation}
                     {--default= : Default value for the config env() call}
                     {--example : Add to .env.example}
@@ -58,7 +58,11 @@ class EnvironmentSetCommand extends Command
         [$key, $value] = $this->parseKeyAndValue();
 
         if ($value === null) {
-            $value = $this->option('value') ?? password('What is the value?');
+            $value = $this->argument('value') ?? $this->whenInteractive(fn () => password('What is the value?'));
+        }
+
+        if ($value === null && ! $this->input->isInteractive()) {
+            $this->fail('The value argument is required in non-interactive mode.');
         }
 
         $key = strtoupper($key);
