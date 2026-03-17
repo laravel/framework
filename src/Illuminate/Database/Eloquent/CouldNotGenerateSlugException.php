@@ -2,8 +2,11 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use RuntimeException;
+use Symfony\Component\HttpFoundation\Response;
 
 class CouldNotGenerateSlugException extends RuntimeException
 {
@@ -19,12 +22,26 @@ class CouldNotGenerateSlugException extends RuntimeException
     }
 
     /**
-     * Get the exception's context for the handler.
+     * Render the exception as an HTTP response.
      */
-    public function getInnerException(): ValidationException
+    public function render(Request $request): Response
     {
-        return ValidationException::withMessages([
-            $this->errorKey => $this->errorMessage,
-        ]);
+        $validator = Validator::make([], []);
+
+        $validator->errors()->add($this->errorKey, $this->errorMessage);
+
+        $exception = new ValidationException($validator);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => $this->errorMessage,
+                'errors' => $validator->errors()->messages(),
+            ], $exception->status);
+        }
+
+        return redirect()
+            ->back()
+            ->withInput()
+            ->withErrors($validator);
     }
 }

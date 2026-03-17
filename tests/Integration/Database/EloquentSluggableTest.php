@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Validation\ValidationException;
+
 use Orchestra\Testbench\TestCase;
 
 class EloquentSluggableTest extends TestCase
@@ -49,67 +49,52 @@ class EloquentSluggableTest extends TestCase
         $this->assertSame('hello-world', $post->slug);
     }
 
-    public function test_exception_converts_to_validation_exception_via_inner_exception()
+    public function test_empty_slug_returns_422_with_default_error()
     {
-        try {
-            SluggableValidationPost::create(['name' => '!!!']);
-            $this->fail('Expected CouldNotGenerateSlugException was not thrown.');
-        } catch (CouldNotGenerateSlugException $e) {
-            $inner = $e->getInnerException();
+        Route::post('/posts', fn () => SluggableValidationPost::create(['name' => '!!!']));
 
-            $this->assertInstanceOf(ValidationException::class, $inner);
-            $this->assertArrayHasKey('name', $inner->errors());
-            $this->assertSame('The name cannot be converted into a valid slug.', $inner->errors()['name'][0]);
-        }
+        $this->postJson('/posts')
+            ->assertStatus(422)
+            ->assertJson([
+                'errors' => [
+                    'name' => ['The name cannot be converted into a valid slug.'],
+                ],
+            ]);
     }
 
-    public function test_exception_with_custom_error_key()
+    public function test_empty_slug_returns_422_with_custom_error_key()
     {
-        try {
-            SluggableValidationCustomErrorPost::create(['name' => '!!!']);
-            $this->fail('Expected CouldNotGenerateSlugException was not thrown.');
-        } catch (CouldNotGenerateSlugException $e) {
-            $inner = $e->getInnerException();
+        Route::post('/posts', fn () => SluggableValidationCustomErrorPost::create(['name' => '!!!']));
 
-            $this->assertInstanceOf(ValidationException::class, $inner);
-            $this->assertArrayHasKey('custom_field', $inner->errors());
-        }
+        $this->postJson('/posts')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['custom_field']);
     }
 
-    public function test_exception_with_custom_error_message()
+    public function test_empty_slug_returns_422_with_custom_error_message()
     {
-        try {
-            SluggableValidationCustomMessagePost::create(['name' => '!!!']);
-            $this->fail('Expected CouldNotGenerateSlugException was not thrown.');
-        } catch (CouldNotGenerateSlugException $e) {
-            $inner = $e->getInnerException();
+        Route::post('/posts', fn () => SluggableValidationCustomMessagePost::create(['name' => '!!!']));
 
-            $this->assertInstanceOf(ValidationException::class, $inner);
-            $this->assertSame('Please enter a valid name.', $inner->errors()['name'][0]);
-        }
+        $this->postJson('/posts')
+            ->assertStatus(422)
+            ->assertJson([
+                'errors' => [
+                    'name' => ['Please enter a valid name.'],
+                ],
+            ]);
     }
 
-    public function test_exception_with_custom_error_key_and_message()
+    public function test_empty_slug_returns_422_with_custom_error_key_and_message()
     {
-        try {
-            SluggableValidationFullCustomPost::create(['name' => '!!!']);
-            $this->fail('Expected CouldNotGenerateSlugException was not thrown.');
-        } catch (CouldNotGenerateSlugException $e) {
-            $inner = $e->getInnerException();
+        Route::post('/posts', fn () => SluggableValidationFullCustomPost::create(['name' => '!!!']));
 
-            $this->assertInstanceOf(ValidationException::class, $inner);
-            $this->assertArrayHasKey('title', $inner->errors());
-            $this->assertSame('Please provide a valid title.', $inner->errors()['title'][0]);
-        }
-    }
-
-    public function test_uniqueness_exception_uses_column_as_error_key()
-    {
-        $e = new CouldNotGenerateSlugException('Could not generate a unique slug.', 'slug', 'The slug could not be generated.');
-        $inner = $e->getInnerException();
-
-        $this->assertInstanceOf(ValidationException::class, $inner);
-        $this->assertArrayHasKey('slug', $inner->errors());
+        $this->postJson('/posts')
+            ->assertStatus(422)
+            ->assertJson([
+                'errors' => [
+                    'title' => ['Please provide a valid title.'],
+                ],
+            ]);
     }
 
     public function test_it_throws_when_source_produces_empty_slug()
@@ -187,25 +172,28 @@ class EloquentSluggableTest extends TestCase
 
     public function test_multi_source_error_message_lists_all_columns()
     {
-        try {
-            SluggableValidationMultiSourcePost::create(['first_name' => '!!!', 'last_name' => '!!!']);
-            $this->fail('Expected CouldNotGenerateSlugException was not thrown.');
-        } catch (CouldNotGenerateSlugException $e) {
-            $inner = $e->getInnerException();
-            $this->assertArrayHasKey('first_name', $inner->errors());
-            $this->assertSame('The first name and last name cannot be converted into a valid slug.', $inner->errors()['first_name'][0]);
-        }
+        Route::post('/posts', fn () => SluggableValidationMultiSourcePost::create(['first_name' => '!!!', 'last_name' => '!!!']));
+
+        $this->postJson('/posts')
+            ->assertStatus(422)
+            ->assertJson([
+                'errors' => [
+                    'first_name' => ['The first name and last name cannot be converted into a valid slug.'],
+                ],
+            ]);
     }
 
     public function test_custom_column_appears_in_error_message()
     {
-        try {
-            SluggableValidationCustomColumnPost::create(['name' => '!!!']);
-            $this->fail('Expected CouldNotGenerateSlugException was not thrown.');
-        } catch (CouldNotGenerateSlugException $e) {
-            $inner = $e->getInnerException();
-            $this->assertSame('The name cannot be converted into a valid url slug.', $inner->errors()['name'][0]);
-        }
+        Route::post('/posts', fn () => SluggableValidationCustomColumnPost::create(['name' => '!!!']));
+
+        $this->postJson('/posts')
+            ->assertStatus(422)
+            ->assertJson([
+                'errors' => [
+                    'name' => ['The name cannot be converted into a valid url slug.'],
+                ],
+            ]);
     }
 
     public function test_uniqueness_failure_returns_422_via_json()

@@ -65,7 +65,7 @@ class SlugGenerator
     /**
      * Throw an exception when the slug source produces an empty slug.
      *
-     * @throws EmptySlugException
+     * @throws CouldNotGenerateSlugException
      */
     protected function throwEmptySlugException(): void
     {
@@ -74,7 +74,7 @@ class SlugGenerator
         $errorKey = $options->errorKey ?? $from[0];
         $columns = implode(', ', $from);
 
-        throw new EmptySlugException(
+        throw new CouldNotGenerateSlugException(
             'Could not generate a slug for ['.get_class($this->model)."] using column(s) [{$columns}].",
             $errorKey,
             $this->resolveErrorMessage($options),
