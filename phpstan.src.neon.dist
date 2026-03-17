@@ -13,6 +13,6 @@ parameters:
         - "#Caught class [a-zA-Z0-9\\\\_]+ not found.#"
         - "#Class [a-zA-Z0-9\\\\_]+ not found.#"
         - "#unknown class Dom\\\\#"
-        - "#has invalid type#"
+        - "#has invalid (return )?type#"
         - "#Instantiated class [a-zA-Z0-9\\\\_]+ not found.#"
         - "#Unsafe usage of new static#"
