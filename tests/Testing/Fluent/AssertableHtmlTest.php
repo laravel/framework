@@ -160,6 +160,16 @@ class AssertableHtmlTest extends TestCase
         $this->html('<h1>Hello</h1>')->whereText('h2', 'Hello');
     }
 
+    public function testWhereTextWithWhitespace(): void
+    {
+        $this->html('<p>  Hello World  </p>')->whereText('p', 'Hello World');
+    }
+
+    public function testWhereNotTextWithWhitespace(): void
+    {
+        $this->html('<p>  Hello World  </p>')->whereNotText('p', 'Goodbye');
+    }
+
     public function testWhereTextWithClosure(): void
     {
         $this->html('<p>Hello World</p>')
