@@ -87,7 +87,7 @@ class RequestException extends HttpClientException
      */
     public function report()
     {
-        if (!$this->hasBeenSummarized) {
+        if (! $this->hasBeenSummarized) {
             $this->message = $this->prepareMessage($this->response);
 
             $this->hasBeenSummarized = true;
@@ -106,8 +106,6 @@ class RequestException extends HttpClientException
     {
         $message = "HTTP request returned status code {$response->status()}";
 
-        dump([$this->truncateExceptionsAt, static::$truncateAt]);
-
         $truncateExceptionsAt = $this->truncateExceptionsAt ?? static::$truncateAt;
 
         $psrResponse = $response->toPsrResponse();
@@ -120,6 +118,6 @@ class RequestException extends HttpClientException
             $summary = Message::toString($psrResponse);
         }
 
-        return is_null($summary) ? $message : $message . ":\n{$summary}\n";
+        return is_null($summary) ? $message : $message.":\n{$summary}\n";
     }
 }
