@@ -309,6 +309,22 @@ class AssertableHtml
     }
 
     /**
+     * Assert that the matched element has all of the given attributes.
+     *
+     * @param  string  $selector
+     * @param  array<int, string>  $attributes
+     * @return $this
+     */
+    public function hasAttributes(string $selector, array $attributes): static
+    {
+        foreach ($attributes as $attribute) {
+            $this->hasAttribute($selector, $attribute);
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the matched element's attribute does not equal the expected value, or does not pass a truth test.
      *
      * @param  string  $selector

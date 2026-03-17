@@ -282,6 +282,21 @@ class AssertableHtmlTest extends TestCase
         $this->html('<input type="email">')->hasAttribute('input', 'disabled');
     }
 
+    // --- hasAttributes ---
+
+    public function testHasAttributesPassesWhenAllAttributesPresent(): void
+    {
+        $this->html('<input type="email" required disabled>')->hasAttributes('input', ['required', 'disabled']);
+    }
+
+    public function testHasAttributesFailsWhenOneAttributeAbsent(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that [input] has attribute [disabled].');
+
+        $this->html('<input type="email" required>')->hasAttributes('input', ['required', 'disabled']);
+    }
+
     // --- whereNotAttribute ---
 
     public function testWhereNotAttributePassesWhenAttributeDoesNotMatch(): void
