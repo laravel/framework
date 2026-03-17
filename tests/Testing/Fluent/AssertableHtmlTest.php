@@ -252,6 +252,21 @@ class AssertableHtmlTest extends TestCase
         $this->html('<a href="/about">About</a>')->whereAttr('a', 'href', '/contact');
     }
 
+    public function testWhereAttrPassesWithClosureTruthTest(): void
+    {
+        $this->html('<a href="/about">About</a>')
+            ->whereAttr('a', 'href', fn ($value) => str_starts_with($value, '/'));
+    }
+
+    public function testWhereAttrFailsWhenClosureReturnsFalse(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that [a] attribute [href] was accepted by the truth test.');
+
+        $this->html('<a href="/about">About</a>')
+            ->whereAttr('a', 'href', fn ($value) => str_starts_with($value, 'http'));
+    }
+
     // --- hasAttr ---
 
     public function testHasAttrPassesWhenAttributePresent(): void
