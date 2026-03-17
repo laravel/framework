@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Integration\Translation;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\File;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
