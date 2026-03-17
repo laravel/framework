@@ -42,8 +42,6 @@ class EnvironmentSetCommand extends Command
     public function __construct(protected Filesystem $files)
     {
         parent::__construct();
-
-        $this->files = $files;
     }
 
     /**
