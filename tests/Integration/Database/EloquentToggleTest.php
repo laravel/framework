@@ -81,6 +81,46 @@ class EloquentToggleTest extends DatabaseTestCase
         $this->assertFalse($models[1]->is_active);
     }
 
+    public function testMassToggleWithExtraColumns()
+    {
+        ToggleModel::create(['is_active' => false, 'name' => 'foo']);
+        ToggleModel::create(['is_active' => true, 'name' => 'bar']);
+
+        ToggleModel::query()->toggle('is_active', ['name' => 'baz']);
+
+        $models = ToggleModel::orderBy('id')->get();
+        $this->assertTrue($models[0]->is_active);
+        $this->assertEquals('baz', $models[0]->name);
+        $this->assertFalse($models[1]->is_active);
+        $this->assertEquals('baz', $models[1]->name);
+    }
+
+    public function testToggleOnBaseBuilder()
+    {
+        ToggleModel::create(['is_active' => false]);
+        ToggleModel::create(['is_active' => true]);
+
+        $this->getConnection()->table('toggle_models')->toggle('is_active');
+
+        $models = ToggleModel::orderBy('id')->get();
+        $this->assertTrue($models[0]->is_active);
+        $this->assertFalse($models[1]->is_active);
+    }
+
+    public function testMassToggleManyRecords()
+    {
+        for ($i = 0; $i < 50; $i++) {
+            ToggleModel::create(['is_active' => $i % 2 === 0]);
+        }
+
+        ToggleModel::query()->toggle('is_active');
+
+        $models = ToggleModel::orderBy('id')->get();
+        for ($i = 0; $i < 50; $i++) {
+            $this->assertEquals($i % 2 !== 0, $models[$i]->is_active, "Record $i failed to toggle");
+        }
+    }
+
     public function testToggleReturningModelOnCancellation()
     {
         $model = ToggleModel::create(['is_active' => false]);
