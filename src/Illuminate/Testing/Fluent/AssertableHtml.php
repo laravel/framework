@@ -396,6 +396,10 @@ class AssertableHtml
      */
     public function sequence(string $selector, Closure ...$callbacks): static
     {
+        if (count($callbacks) === 0) {
+            $this->fail("No sequence expectations defined for [{$selector}].", $selector);
+        }
+
         $nodes = $this->scope->querySelectorAll($selector);
 
         if ($nodes->length !== count($callbacks)) {

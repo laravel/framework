@@ -469,6 +469,14 @@ class AssertableHtmlTest extends TestCase
             );
     }
 
+    public function testSequenceNoCallbacks(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('No sequence expectations defined for [li].');
+
+        $this->html('<ul><li>First</li></ul>')->sequence('li');
+    }
+
     public function testSequenceCountMismatch(): void
     {
         $this->expectException(AssertionFailedError::class);
