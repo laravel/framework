@@ -88,11 +88,13 @@ trait ConfiguresPrompts
             $prompt->validate
         ));
 
-        AutoCompletePrompt::fallbackUsing(fn (AutoCompletePrompt $prompt) => $this->promptUntilValid(
-            fn () => $this->components->askWithCompletion($prompt->label, $prompt->options, $prompt->default ?: null) ?? '',
-            $prompt->required,
-            $prompt->validate
-        ));
+        if (class_exists(AutoCompletePrompt::class)) {
+            AutoCompletePrompt::fallbackUsing(fn (AutoCompletePrompt $prompt) => $this->promptUntilValid(
+                fn () => $this->components->askWithCompletion($prompt->label, $prompt->options, $prompt->default ?: null) ?? '',
+                $prompt->required,
+                $prompt->validate
+            ));
+        }
 
         SearchPrompt::fallbackUsing(fn (SearchPrompt $prompt) => $this->promptUntilValid(
             function () use ($prompt) {
