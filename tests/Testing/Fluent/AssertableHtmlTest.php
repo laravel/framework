@@ -396,6 +396,14 @@ class AssertableHtmlTest extends TestCase
             });
     }
 
+    public function testScopeWithoutCallback(): void
+    {
+        $this->html('<nav><a href="/home">Home</a></nav><footer><a href="/about">About</a></footer>')
+            ->scope('nav')
+            ->has('a[href="/home"]')
+            ->missing('a[href="/about"]');
+    }
+
     public function testScopeMissingSelector(): void
     {
         $this->expectException(AssertionFailedError::class);
@@ -404,6 +412,80 @@ class AssertableHtmlTest extends TestCase
         $this->html('<nav></nav>')->scope('aside', function (AssertableHtml $el) {
             //
         });
+    }
+
+    public function testNth(): void
+    {
+        $this->html('<ul><li><span>First</span></li><li><span>Second</span></li><li><span>Third</span></li></ul>')
+            ->nth('li', 0, fn (AssertableHtml $li) => $li->whereText('span', 'First'))
+            ->nth('li', 1, fn (AssertableHtml $li) => $li->whereText('span', 'Second'))
+            ->nth('li', 2, fn (AssertableHtml $li) => $li->whereText('span', 'Third'));
+    }
+
+    public function testNthWithoutCallback(): void
+    {
+        $this->html('<ul><li><span>First</span></li><li><span>Second</span></li><li><span>Third</span></li></ul>')
+            ->nth('li', 1)
+            ->whereText('span', 'Second');
+    }
+
+    public function testNthMissingSelector(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that element [li] exists.');
+
+        $this->html('<ul></ul>')->nth('li', 0, fn (AssertableHtml $li) => null);
+    }
+
+    public function testNthOutOfBounds(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that [li] has an element at index [5], found 3 element(s).');
+
+        $this->html('<ul><li>a</li><li>b</li><li>c</li></ul>')
+            ->nth('li', 5, fn (AssertableHtml $li) => null);
+    }
+
+    public function testFirst(): void
+    {
+        $this->html('<ul><li><span>First</span></li><li><span>Second</span></li><li><span>Third</span></li></ul>')
+            ->first('li', fn (AssertableHtml $li) => $li->whereText('span', 'First'));
+    }
+
+    public function testFirstWithoutCallback(): void
+    {
+        $this->html('<ul><li><span>First</span></li><li><span>Second</span></li><li><span>Third</span></li></ul>')
+            ->first('li')
+            ->whereText('span', 'First');
+    }
+
+    public function testFirstMissingSelector(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that element [li] exists.');
+
+        $this->html('<ul></ul>')->first('li', fn (AssertableHtml $li) => null);
+    }
+
+    public function testLast(): void
+    {
+        $this->html('<ul><li><span>First</span></li><li><span>Second</span></li><li><span>Third</span></li></ul>')
+            ->last('li', fn (AssertableHtml $li) => $li->whereText('span', 'Third'));
+    }
+
+    public function testLastWithoutCallback(): void
+    {
+        $this->html('<ul><li><span>First</span></li><li><span>Second</span></li><li><span>Third</span></li></ul>')
+            ->last('li')
+            ->whereText('span', 'Third');
+    }
+
+    public function testLastMissingSelector(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that element [li] exists.');
+
+        $this->html('<ul></ul>')->last('li', fn (AssertableHtml $li) => null);
     }
 
     public function testEach(): void

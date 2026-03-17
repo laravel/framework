@@ -380,17 +380,73 @@ class AssertableHtml
     }
 
     /**
-     * Scope into the first element matching the selector and invoke the callback.
+     * Scope into the element at the given index matching the selector and optionally invoke the callback.
      *
      * @param  string  $selector
-     * @param  \Closure  $callback
+     * @param  int  $index
+     * @param  \Closure|null  $callback
      * @return $this
      */
-    public function scope(string $selector, Closure $callback): static
+    public function nth(string $selector, int $index, ?Closure $callback = null): static
     {
-        $callback(new static($this->findOrFail($selector), $this->buildSelector($selector)));
+        $nodes = $this->scope->querySelectorAll($selector);
 
-        return $this;
+        if ($nodes->length === 0) {
+            $this->fail("Failed asserting that element [{$selector}] exists.", $selector);
+        }
+
+        if ($index < 0 || $index >= $nodes->length) {
+            $this->fail(
+                "Failed asserting that [{$selector}] has an element at index [{$index}], found {$nodes->length} element(s).",
+                $selector
+            );
+        }
+
+        $scoped = new static($nodes->item($index), $this->buildSelector($selector));
+
+        if ($callback !== null) {
+            $callback($scoped);
+
+            return $this;
+        }
+
+        return $scoped;
+    }
+
+    /**
+     * Scope into the first element matching the selector and optionally invoke the callback.
+     *
+     * @param  string  $selector
+     * @param  \Closure|null  $callback
+     * @return $this
+     */
+    public function first(string $selector, ?Closure $callback = null): static
+    {
+        return $this->nth($selector, 0, $callback);
+    }
+
+    /**
+     * Scope into the last element matching the selector and optionally invoke the callback.
+     *
+     * @param  string  $selector
+     * @param  \Closure|null  $callback
+     * @return $this
+     */
+    public function last(string $selector, ?Closure $callback = null): static
+    {
+        return $this->nth($selector, $this->scope->querySelectorAll($selector)->length - 1, $callback);
+    }
+
+    /**
+     * Scope into the first element matching the selector and optionally invoke the callback.
+     *
+     * @param  string  $selector
+     * @param  \Closure|null  $callback
+     * @return $this
+     */
+    public function scope(string $selector, ?Closure $callback = null): static
+    {
+        return $this->first($selector, $callback);
     }
 
     /**
