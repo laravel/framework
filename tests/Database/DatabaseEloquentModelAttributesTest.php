@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Attributes\Appends;
+use Illuminate\Database\Eloquent\Attributes\Cast;
 use Illuminate\Database\Eloquent\Attributes\Connection;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
@@ -246,6 +247,45 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertTrue(ModelWithTimestampsFalseAttribute::isIgnoringTouch());
         $this->assertFalse(ModelWithFillableAttribute::isIgnoringTouch());
     }
+
+    public function test_cast_attribute(): void
+    {
+        $model = new ModelWithCastAttribute;
+
+        $this->assertSame('integer', $model->getCasts()['age']);
+        $this->assertSame('boolean', $model->getCasts()['is_active']);
+    }
+
+    public function test_cast_attribute_property_takes_precedence(): void
+    {
+        $model = new ModelWithCastAttributeAndProperty;
+
+        $this->assertSame('string', $model->getCasts()['age']);
+    }
+
+    public function test_cast_attribute_merges_with_property(): void
+    {
+        $model = new ModelWithCastAttributeAndProperty;
+
+        $this->assertSame('string', $model->getCasts()['age']);
+        $this->assertSame('boolean', $model->getCasts()['is_active']);
+    }
+
+    public function test_cast_attribute_inherited_by_child(): void
+    {
+        $model = new ModelExtendingCastParent;
+
+        $this->assertSame('integer', $model->getCasts()['age']);
+        $this->assertSame('array', $model->getCasts()['meta']);
+    }
+
+    public function test_cast_attribute_child_overrides_parent(): void
+    {
+        $model = new ModelOverridingParentCast;
+
+        $this->assertSame('string', $model->getCasts()['age']);
+        $this->assertSame('array', $model->getCasts()['meta']);
+    }
 }
 
 #[Table('custom_table_name')]
@@ -381,6 +421,38 @@ class ModelWithAppendsAttribute extends Model
 
 #[Touches(['post', 'author'])]
 class ModelWithTouchesAttribute extends Model
+{
+    //
+}
+
+#[Cast('age', 'integer')]
+#[Cast('is_active', 'boolean')]
+class ModelWithCastAttribute extends Model
+{
+    //
+}
+
+#[Cast('age', 'integer')]
+#[Cast('is_active', 'boolean')]
+class ModelWithCastAttributeAndProperty extends Model
+{
+    protected $casts = ['age' => 'string'];
+}
+
+#[Cast('age', 'integer')]
+#[Cast('meta', 'array')]
+class CastParentModel extends Model
+{
+    //
+}
+
+class ModelExtendingCastParent extends CastParentModel
+{
+    //
+}
+
+#[Cast('age', 'string')]
+class ModelOverridingParentCast extends CastParentModel
 {
     //
 }

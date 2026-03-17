@@ -14,6 +14,7 @@ use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Attributes\Appends;
+use Illuminate\Database\Eloquent\Attributes\Cast;
 use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
@@ -206,7 +207,7 @@ trait HasAttributes
     protected function initializeHasAttributes()
     {
         $this->casts = $this->ensureCastsAreStringValues(
-            array_merge($this->casts, $this->casts()),
+            array_merge(static::resolveAttributeCasts(), $this->casts, $this->casts()),
         );
 
         $this->dateFormat ??= static::resolveClassAttribute(Table::class)->dateFormat ?? null;
@@ -1726,6 +1727,28 @@ trait HasAttributes
     protected function casts()
     {
         return [];
+    }
+
+    /**
+     * Get the casts defined via PHP #[Cast] attributes on the model class.
+     *
+     * @return array<string, string>
+     */
+    protected static function resolveAttributeCasts(): array
+    {
+        $cacheKey = static::class.'@'.Cast::class;
+
+        if (array_key_exists($cacheKey, static::$classAttributes)) {
+            return static::$classAttributes[$cacheKey];
+        }
+
+        $casts = [];
+
+        foreach (class_attributes_recursive(static::class, Cast::class) as $instance) {
+            $casts[$instance->attribute] = $instance->as;
+        }
+
+        return static::$classAttributes[$cacheKey] = $casts;
     }
 
     /**

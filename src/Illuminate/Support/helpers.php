@@ -113,6 +113,45 @@ if (! function_exists('class_uses_recursive')) {
     }
 }
 
+if (! function_exists('class_attributes_recursive')) {
+    /**
+     * Returns all instances of the given PHP attribute from a class and its parents.
+     *
+     * Walks the hierarchy from the topmost parent down to the concrete class so
+     * that child-class attributes are returned last, allowing callers to apply
+     * child-wins-over-parent precedence naturally.
+     *
+     * @template TAttribute of object
+     *
+     * @param  object|string  $class
+     * @param  class-string<TAttribute>  $attribute
+     * @return list<TAttribute>
+     */
+    function class_attributes_recursive(object|string $class, string $attribute): array
+    {
+        if (is_object($class)) {
+            $class = get_class($class);
+        }
+
+        $classes = [];
+        $reflection = new ReflectionClass($class);
+
+        do {
+            $classes[] = $reflection;
+        } while ($reflection = $reflection->getParentClass());
+
+        $instances = [];
+
+        foreach (array_reverse($classes) as $reflectionClass) {
+            foreach ($reflectionClass->getAttributes($attribute) as $attr) {
+                $instances[] = $attr->newInstance();
+            }
+        }
+
+        return $instances;
+    }
+}
+
 if (! function_exists('e')) {
     /**
      * Encode HTML special characters in a string.
