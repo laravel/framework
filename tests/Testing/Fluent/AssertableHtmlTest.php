@@ -373,7 +373,6 @@ class AssertableHtmlTest extends TestCase
         try {
             $this->html('<nav><a href="/">Home</a></nav>')->has('footer');
         } catch (AssertionFailedError $e) {
-            $this->assertStringContainsString('Scope HTML:', $e->getMessage());
             $this->assertStringContainsString('<nav>', $e->getMessage());
 
             return;
@@ -390,7 +389,6 @@ class AssertableHtmlTest extends TestCase
                     $nav->has('button');
                 });
         } catch (AssertionFailedError $e) {
-            $this->assertStringContainsString('Scope HTML:', $e->getMessage());
             $this->assertStringContainsString('<nav>', $e->getMessage());
             // Should not include the full document
             $this->assertStringNotContainsString('<html>', $e->getMessage());

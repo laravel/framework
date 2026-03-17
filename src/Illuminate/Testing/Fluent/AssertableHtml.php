@@ -461,12 +461,12 @@ class AssertableHtml
         $path = $this->buildSelector($selector);
 
         if ($path !== null) {
-            $parts[] = "Selector: {$path}";
+            $parts[] = "[{$path}]";
         }
 
-        $parts[] = "Scope HTML:\n".$this->getHtml();
+        $parts[] = $this->getHtml();
 
-        PHPUnit::fail(implode("\n", $parts));
+        PHPUnit::fail(implode("\n\n", $parts));
     }
 
 
@@ -490,6 +490,8 @@ class AssertableHtml
      */
     protected function getHtml(): string
     {
-        return $this->document->saveHtml($this->scope);
+        return $this->scope instanceof HTMLDocument
+            ? $this->document->documentElement->innerHTML
+            : $this->document->saveHtml($this->scope);
     }
 }
