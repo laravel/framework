@@ -1155,6 +1155,58 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Toggle the value of a boolean column.
+     *
+     * @param string $column
+     * @param  array  $extra
+     * @return $this
+     *
+     * @throws LogicException
+     */
+    protected function toggle(string $column, array $extra = []): static
+    {
+        if (! $this->hasCast($column, ['bool', 'boolean'])) {
+            throw new LogicException("Column {$column} must be cast to a boolean to be toggled.");
+        }
+
+        if (! $this->exists) {
+            $this->newQueryWithoutRelationships()->toggle($column, $extra);
+
+            return $this;
+        }
+
+        $this->{$column} = ! $this->{$column};
+
+        $this->forceFill($extra);
+
+        if ($this->fireModelEvent('updating') === false) {
+            return $this;
+        }
+
+        $this->setKeysForSaveQuery($this->newQueryWithoutScopes())->toggle($column, $extra);
+
+        $this->syncChanges();
+
+        $this->fireModelEvent('updated', false);
+
+        $this->syncOriginalAttribute($column);
+
+        return $this;
+    }
+
+    /**
+     * Toggle the value of a boolean column without raising any events.
+     *
+     * @param string $column
+     * @param  array  $extra
+     * @return $this
+     */
+    protected function toggleQuietly(string $column, array $extra = []): static
+    {
+        return static::withoutEvents(fn () => $this->toggle($column, $extra));
+    }
+
+    /**
      * Save the model and all of its relationships.
      *
      * @return bool
@@ -1481,7 +1533,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @return bool|null
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function delete()
     {
@@ -2524,7 +2576,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function __call($method, $parameters)
     {
-        if (in_array($method, ['increment', 'decrement', 'incrementQuietly', 'decrementQuietly'])) {
+        if (in_array($method, ['increment', 'decrement', 'incrementQuietly', 'decrementQuietly', 'toggle', 'toggleQuietly'])) {
             return $this->$method(...$parameters);
         }
 

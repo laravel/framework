@@ -20,6 +20,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
+use LogicException;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -1348,6 +1349,24 @@ class Builder implements BuilderContract
         return $this->toBase()->decrement(
             $column, $amount, $this->addUpdatedAtColumn($extra)
         );
+    }
+
+    /**
+     * Toggle the value of a boolean column.
+     *
+     * @param  string  $column
+     * @param  array  $extra
+     * @return int
+     *
+     * @throws LogicException
+     */
+    public function toggle($column, array $extra = []): int
+    {
+        if (! $this->model->hasCast($column, ['bool', 'boolean'])) {
+            throw new LogicException("Column {$column} must be cast to a boolean to be toggled.");
+        }
+
+        return $this->toBase()->toggle($column, $this->addUpdatedAtColumn($extra));
     }
 
     /**
