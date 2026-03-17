@@ -318,7 +318,7 @@ class AssertableHtml
     }
 
     /**
-     * Scope into the first element matching the selector and optionally invoke the callback.
+     * Scope into the first element matching the selector, optionally invoking the callback.
      *
      * @param  string  $selector
      * @param  \Closure|null  $callback
@@ -330,7 +330,7 @@ class AssertableHtml
     }
 
     /**
-     * Scope into the first element matching the selector and optionally invoke the callback.
+     * Scope into the first matching element, optionally invoking the callback.
      *
      * @param  string  $selector
      * @param  \Closure|null  $callback
@@ -342,7 +342,7 @@ class AssertableHtml
     }
 
     /**
-     * Scope into the last element matching the selector and optionally invoke the callback.
+     * Scope into the last matching element, optionally invoking the callback.
      *
      * @param  string  $selector
      * @param  \Closure|null  $callback
@@ -354,7 +354,7 @@ class AssertableHtml
     }
 
     /**
-     * Scope into the element at the given index matching the selector and optionally invoke the callback.
+     * Scope into the matching element at the given zero-based index, optionally invoking the callback.
      *
      * @param  string  $selector
      * @param  int  $index
@@ -388,9 +388,7 @@ class AssertableHtml
     }
 
     /**
-     * Assert that the matched elements satisfy a sequence of callbacks, one per element in order.
-     *
-     * Each callback receives the scoped element and its zero-based index.
+     * Assert that the matched elements satisfy a sequence of callbacks, one per element.
      *
      * @param  string  $selector
      * @param  \Closure  ...$callbacks
