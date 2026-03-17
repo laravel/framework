@@ -59,7 +59,7 @@ class EloquentSluggableTest extends TestCase
 
             $this->assertInstanceOf(ValidationException::class, $inner);
             $this->assertArrayHasKey('name', $inner->errors());
-            $this->assertSame('The name must be able to generate a valid slug.', $inner->errors()['name'][0]);
+            $this->assertSame('The name cannot be converted into a valid slug.', $inner->errors()['name'][0]);
         }
     }
 
@@ -193,7 +193,7 @@ class EloquentSluggableTest extends TestCase
         } catch (CouldNotGenerateSlugException $e) {
             $inner = $e->getInnerException();
             $this->assertArrayHasKey('first_name', $inner->errors());
-            $this->assertSame('The first name and last name must be able to generate a valid slug.', $inner->errors()['first_name'][0]);
+            $this->assertSame('The first name and last name cannot be converted into a valid slug.', $inner->errors()['first_name'][0]);
         }
     }
 
@@ -204,7 +204,7 @@ class EloquentSluggableTest extends TestCase
             $this->fail('Expected CouldNotGenerateSlugException was not thrown.');
         } catch (CouldNotGenerateSlugException $e) {
             $inner = $e->getInnerException();
-            $this->assertSame('The name must be able to generate a valid url slug.', $inner->errors()['name'][0]);
+            $this->assertSame('The name cannot be converted into a valid url slug.', $inner->errors()['name'][0]);
         }
     }
 
@@ -218,7 +218,12 @@ class EloquentSluggableTest extends TestCase
 
         $this->postJson('/posts')
             ->assertStatus(422)
-            ->assertJsonValidationErrors(['name']);
+            ->assertJsonValidationErrors(['name'])
+            ->assertJson([
+                'errors' => [
+                    'name' => ['Too many slug entries exist for the given name. Please try a different value.'],
+                ],
+            ]);
     }
 
     public function test_uniqueness_failure_uses_custom_error_key()

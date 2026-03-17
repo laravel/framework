@@ -84,7 +84,7 @@ class SlugGenerator
     /**
      * Resolve the user-facing error message for a failed slug generation.
      */
-    protected function resolveErrorMessage(Sluggable $options): string
+    protected function resolveErrorMessage(Sluggable $options, string $translationKey = 'validation.slug_required'): string
     {
         $from = array_map(fn (string $name) => str_replace('_', ' ', Str::snake($name)), Arr::wrap($options->from));
         $attribute = count($from) === 1 ? $from[0] : implode(' and ', [implode(', ', array_slice($from, 0, -1)), end($from)]);
@@ -92,7 +92,7 @@ class SlugGenerator
 
         return $options->errorMessage
             ? __($options->errorMessage, $replacements)
-            : __('validation.sluggable', $replacements);
+            : __($translationKey, $replacements);
     }
 
     /**
@@ -187,7 +187,7 @@ class SlugGenerator
                 throw new CouldNotGenerateSlugException(
                     'Could not generate a unique slug for ['.get_class($this->model)."] with base [{$originalSlug}] after {$options->maxAttempts} attempts.",
                     $errorKey,
-                    $this->resolveErrorMessage($options),
+                    $this->resolveErrorMessage($options, 'validation.slug_unique'),
                 );
             }
 
