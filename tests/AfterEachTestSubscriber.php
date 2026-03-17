@@ -14,5 +14,9 @@ final class AfterEachTestSubscriber implements AfterTestMethodFinishedSubscriber
         if (class_exists(\Mockery::class)) {
             \Mockery::close();
         }
+
+        if (class_exists(\Illuminate\Support\Facades\Date::class)) {
+            \Illuminate\Support\Facades\Date::useDefault();
+        }
     }
 }
