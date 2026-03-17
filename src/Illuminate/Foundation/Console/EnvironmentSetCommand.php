@@ -116,7 +116,7 @@ class EnvironmentSetCommand extends Command
 
         $value = $this->unquote($value);
 
-        $this->components->info("Key/value pair detected, extracted value automatically.");
+        $this->components->info('Key/value pair detected, extracted value automatically.');
 
         return [$key, $value];
     }
@@ -224,7 +224,7 @@ class EnvironmentSetCommand extends Command
      * @param  string  $value
      * @return string|null
      */
-    protected function validateConfigKey(string $value): string|null
+    protected function validateConfigKey(string $value): ?string
     {
         if ($value === '') {
             return null;

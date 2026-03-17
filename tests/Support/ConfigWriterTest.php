@@ -56,7 +56,6 @@ class ConfigWriterTest extends TestCase
         $this->assertStringContainsString("'key'", $contents);
         $this->assertStringContainsString("env('STRIPE_KEY', null)", $contents);
         $this->assertValidPhp($contents);
-
     }
 
     public function testItCreatesNewFileWithDeeplyNestedKeys(): void
