@@ -38,10 +38,9 @@ class AssertableHtml
      */
     public static function fromResponse(TestResponse $response, int $options = LIBXML_NOERROR): static
     {
-        $content = $response->baseResponse instanceof StreamedResponse ||
-            $response->baseResponse instanceof StreamedJsonResponse
-                ? $response->streamedContent()
-                : $response->getContent();
+        $content = $response->baseResponse instanceof StreamedResponse
+            ? $response->streamedContent()
+            : $response->getContent();
 
         return new static(HTMLDocument::createFromString($content, $options));
     }
