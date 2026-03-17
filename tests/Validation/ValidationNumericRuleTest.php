@@ -137,6 +137,30 @@ class ValidationNumericRuleTest extends TestCase
         $this->assertEquals('numeric|integer|size:10', (string) $rule);
     }
 
+    public function testBailRule()
+    {
+        $rule = Rule::numeric()->bail()->integer();
+        $this->assertEquals('numeric|bail|integer', (string) $rule);
+    }
+
+    public function testNullableRule()
+    {
+        $rule = Rule::numeric()->nullable();
+        $this->assertEquals('numeric|nullable', (string) $rule);
+    }
+
+    public function testRequiredRule()
+    {
+        $rule = Rule::numeric()->required();
+        $this->assertEquals('numeric|required', (string) $rule);
+    }
+
+    public function testSometimesRule()
+    {
+        $rule = Rule::numeric()->sometimes();
+        $this->assertEquals('numeric|sometimes', (string) $rule);
+    }
+
     public function testChainedRules()
     {
         $rule = Rule::numeric()

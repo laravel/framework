@@ -23,6 +23,38 @@ class Date implements Stringable
     protected array $constraints = [];
 
     /**
+     * Stop running validation rules for the field after the first failure.
+     */
+    public function bail(): static
+    {
+        return $this->addRule('bail');
+    }
+
+    /**
+     * The field under validation may be null.
+     */
+    public function nullable(): static
+    {
+        return $this->addRule('nullable');
+    }
+
+    /**
+     * The field under validation must be present in the input data and not empty.
+     */
+    public function required(): static
+    {
+        return $this->addRule('required');
+    }
+
+    /**
+     * The field under validation will only be validated if it is present in the input data.
+     */
+    public function sometimes(): static
+    {
+        return $this->addRule('sometimes');
+    }
+
+    /**
      * Ensure the date has the given format.
      */
     public function format(string $format): static
@@ -169,9 +201,9 @@ class Date implements Stringable
      */
     public function __toString(): string
     {
-        return implode('|', [
+        return implode('|', array_unique([
             $this->format === null ? 'date' : 'date_format:'.$this->format,
             ...$this->constraints,
-        ]);
+        ]));
     }
 }

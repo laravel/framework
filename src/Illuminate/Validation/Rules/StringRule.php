@@ -16,6 +16,46 @@ class StringRule implements Stringable
     protected array $constraints = ['string'];
 
     /**
+     * Stop running validation rules for the field after the first failure.
+     *
+     * @return $this
+     */
+    public function bail(): static
+    {
+        return $this->addRule('bail');
+    }
+
+    /**
+     * The field under validation may be null.
+     *
+     * @return $this
+     */
+    public function nullable(): static
+    {
+        return $this->addRule('nullable');
+    }
+
+    /**
+     * The field under validation must be present in the input data and not empty.
+     *
+     * @return $this
+     */
+    public function required(): static
+    {
+        return $this->addRule('required');
+    }
+
+    /**
+     * The field under validation will only be validated if it is present in the input data.
+     *
+     * @return $this
+     */
+    public function sometimes(): static
+    {
+        return $this->addRule('sometimes');
+    }
+
+    /**
      * The field under validation must be entirely alphabetic characters.
      *
      * @param  bool  $ascii

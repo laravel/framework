@@ -125,6 +125,30 @@ class ValidationStringRuleTest extends TestCase
         $this->assertSame('string|doesnt_end_with:.exe,.bat', (string) $rule);
     }
 
+    public function testBailRule()
+    {
+        $rule = Rule::string()->bail()->max(255);
+        $this->assertSame('string|bail|max:255', (string) $rule);
+    }
+
+    public function testNullableRule()
+    {
+        $rule = Rule::string()->nullable();
+        $this->assertSame('string|nullable', (string) $rule);
+    }
+
+    public function testRequiredRule()
+    {
+        $rule = Rule::string()->required();
+        $this->assertSame('string|required', (string) $rule);
+    }
+
+    public function testSometimesRule()
+    {
+        $rule = Rule::string()->sometimes();
+        $this->assertSame('string|sometimes', (string) $rule);
+    }
+
     public function testChainedRules()
     {
         $rule = Rule::string()

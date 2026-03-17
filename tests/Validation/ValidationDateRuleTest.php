@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Rules;
+namespace Illuminate\Tests\Validation;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Translation\ArrayLoader;
@@ -94,6 +94,30 @@ class ValidationDateRuleTest extends TestCase
     {
         $rule = Rule::date()->betweenOrEqual('2024-01-01', '2024-02-01');
         $this->assertEquals('date|after_or_equal:2024-01-01|before_or_equal:2024-02-01', (string) $rule);
+    }
+
+    public function testBailRule()
+    {
+        $rule = Rule::date()->bail()->after('today');
+        $this->assertSame('date|bail|after:today', (string) $rule);
+    }
+
+    public function testNullableRule()
+    {
+        $rule = Rule::date()->nullable();
+        $this->assertSame('date|nullable', (string) $rule);
+    }
+
+    public function testRequiredRule()
+    {
+        $rule = Rule::date()->required();
+        $this->assertSame('date|required', (string) $rule);
+    }
+
+    public function testSometimesRule()
+    {
+        $rule = Rule::date()->sometimes();
+        $this->assertSame('date|sometimes', (string) $rule);
     }
 
     public function testChainedRules()
