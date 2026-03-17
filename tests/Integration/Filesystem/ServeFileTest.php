@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Filesystem;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
@@ -24,7 +25,7 @@ class ServeFileTest extends TestCase
 
     public function testItCanServeAnExistingFile()
     {
-        $url = Storage::temporaryUrl('serve-file-test.txt', now()->addMinutes(1));
+        $url = Storage::temporaryUrl('serve-file-test.txt', Carbon::now()->addMinutes(1));
 
         $response = $this->get($url);
 
@@ -33,7 +34,7 @@ class ServeFileTest extends TestCase
 
     public function testItWill404OnMissingFile()
     {
-        $url = Storage::temporaryUrl('serve-missing-test.txt', now()->addMinutes(1));
+        $url = Storage::temporaryUrl('serve-missing-test.txt', Carbon::now()->addMinutes(1));
 
         $response = $this->get($url);
 
@@ -42,7 +43,7 @@ class ServeFileTest extends TestCase
 
     public function testItWill403OnWrongSignature()
     {
-        $url = Storage::temporaryUrl('serve-file-test.txt', now()->addMinutes(1));
+        $url = Storage::temporaryUrl('serve-file-test.txt', Carbon::now()->addMinutes(1));
 
         $url = $url.'c';
 

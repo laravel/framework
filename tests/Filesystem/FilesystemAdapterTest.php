@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Filesystem;
 
-use Carbon\Carbon;
 use GuzzleHttp\Psr7\Stream;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
@@ -10,6 +9,7 @@ use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
 use Illuminate\Testing\Assert;
 use InvalidArgumentException;
 use League\Flysystem\Filesystem;

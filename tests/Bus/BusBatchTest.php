@@ -24,6 +24,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Queue;
@@ -495,7 +496,7 @@ class BusBatchTest extends TestCase
         $batch = $this->createTestBatch($queue);
 
         $this->assertFalse($batch->finished());
-        $batch->finishedAt = now();
+        $batch->finishedAt = Carbon::now();
         $this->assertTrue($batch->finished());
 
         $batch->options['progress'] = [];
@@ -522,7 +523,7 @@ class BusBatchTest extends TestCase
         $this->assertTrue($batch->hasCatchCallbacks());
 
         $this->assertFalse($batch->cancelled());
-        $batch->cancelledAt = now();
+        $batch->cancelledAt = Carbon::now();
         $this->assertTrue($batch->cancelled());
 
         $this->assertIsString(json_encode($batch));
@@ -629,7 +630,7 @@ class BusBatchTest extends TestCase
                 'failed_jobs' => '',
                 'failed_job_ids' => '[]',
                 'options' => $serialize,
-                'created_at' => now()->timestamp,
+                'created_at' => Carbon::now()->timestamp,
                 'cancelled_at' => null,
                 'finished_at' => null,
             ]);

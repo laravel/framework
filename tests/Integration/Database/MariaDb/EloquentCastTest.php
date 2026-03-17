@@ -36,8 +36,8 @@ class EloquentCastTest extends MariaDbTestCase
 
     public function testItCastTimestampsCreatedByTheBuilderWhenTimeHasNotPassed()
     {
-        Carbon::setTestNow(now());
-        $createdAt = now()->timestamp;
+        Carbon::setTestNow(Carbon::now());
+        $createdAt = Carbon::now()->timestamp;
 
         $castUser = UserWithIntTimestampsViaCasts::create([
             'email' => fake()->unique()->email,
@@ -79,8 +79,8 @@ class EloquentCastTest extends MariaDbTestCase
 
     public function testItCastTimestampsCreatedByTheBuilderWhenTimeHasPassed()
     {
-        Carbon::setTestNow(now());
-        $createdAt = now()->timestamp;
+        Carbon::setTestNow(Carbon::now());
+        $createdAt = Carbon::now()->timestamp;
 
         $castUser = UserWithIntTimestampsViaCasts::create([
             'email' => fake()->unique()->email,
@@ -99,8 +99,8 @@ class EloquentCastTest extends MariaDbTestCase
         $this->assertSame($createdAt, $mutatorUser->created_at->timestamp);
         $this->assertSame($createdAt, $mutatorUser->updated_at->timestamp);
 
-        Carbon::setTestNow(now()->addSecond());
-        $updatedAt = now()->timestamp;
+        Carbon::setTestNow(Carbon::now()->addSecond());
+        $updatedAt = Carbon::now()->timestamp;
 
         $castUser->update([
             'email' => fake()->unique()->email,
@@ -125,7 +125,7 @@ class EloquentCastTest extends MariaDbTestCase
 
     public function testItCastTimestampsUpdatedByAMutator()
     {
-        Carbon::setTestNow(now());
+        Carbon::setTestNow(Carbon::now());
 
         $mutatorUser = UserWithUpdatedAtViaMutator::create([
             'email' => fake()->unique()->email,
@@ -133,8 +133,8 @@ class EloquentCastTest extends MariaDbTestCase
 
         $this->assertNull($mutatorUser->updated_at);
 
-        Carbon::setTestNow(now()->addSecond());
-        $updatedAt = now()->timestamp;
+        Carbon::setTestNow(Carbon::now()->addSecond());
+        $updatedAt = Carbon::now()->timestamp;
 
         $mutatorUser->update([
             'email' => fake()->unique()->email,
