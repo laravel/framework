@@ -3,9 +3,12 @@
 namespace Illuminate\Tests\Testing\Fluent;
 
 use Illuminate\Testing\Fluent\AssertableHtml;
+use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 #[RequiresPhp('>= 8.4.0')]
 class AssertableHtmlTest extends TestCase
@@ -20,6 +23,22 @@ class AssertableHtmlTest extends TestCase
         $assert = $this->html('<p>Hello</p>');
 
         $assert->has('p');
+    }
+
+    public function testFromResponse(): void
+    {
+        $response = TestResponse::fromBaseResponse(new Response('<html><body><p>Hello</p></body></html>'));
+
+        AssertableHtml::fromResponse($response)->has('p');
+    }
+
+    public function testFromStreamedResponse(): void
+    {
+        $response = TestResponse::fromBaseResponse(new StreamedResponse(function () {
+            echo '<html><body><p>Hello</p></body></html>';
+        }));
+
+        AssertableHtml::fromResponse($response)->has('p');
     }
 
     public function testHas(): void
