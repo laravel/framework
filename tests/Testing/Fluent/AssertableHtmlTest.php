@@ -523,6 +523,32 @@ class AssertableHtmlTest extends TestCase
         $this->html('<div></div>')->each('li', fn ($li) => null);
     }
 
+    public function testTap(): void
+    {
+        $assert = $this->html('<nav></nav>');
+
+        $result = $assert->tap(fn (AssertableHtml $html) => $html->has('nav'));
+
+        $this->assertSame($assert, $result);
+    }
+
+    public function testWhen(): void
+    {
+        $this->html('<nav></nav><aside></aside>')
+            ->when(true, fn (AssertableHtml $html) => $html->has('nav'))
+            ->when(false, fn (AssertableHtml $html) => $html->missing('nav'), fn (AssertableHtml $html) => $html->has('aside'));
+    }
+
+    public function testMacro(): void
+    {
+        AssertableHtml::macro('assertHasNav', function () {
+            /** @var AssertableHtml $this */
+            return $this->has('nav');
+        });
+
+        $this->html('<nav></nav>')->assertHasNav();
+    }
+
     public function testChaining(): void
     {
         $assert = $this->html('<nav><a href="/" class="active">Home</a></nav>');
