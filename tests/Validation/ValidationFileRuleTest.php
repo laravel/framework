@@ -65,13 +65,13 @@ class ValidationFileRuleTest extends TestCase
     public function testSingleMimetype()
     {
         $this->fails(
-            File::types('text/plain'),
+            Rule::file()->types('text/plain'),
             UploadedFile::fake()->createWithContent('foo.png', file_get_contents(__DIR__.'/fixtures/image.png')),
             ['validation.mimetypes']
         );
 
         $this->passes(
-            File::types('image/png'),
+            Rule::file()->types('image/png'),
             UploadedFile::fake()->createWithContent('foo.png', file_get_contents(__DIR__.'/fixtures/image.png')),
         );
     }
@@ -79,13 +79,13 @@ class ValidationFileRuleTest extends TestCase
     public function testMultipleMimeTypes()
     {
         $this->fails(
-            File::types(['text/plain', 'image/jpeg']),
+            Rule::file()->types(['text/plain', 'image/jpeg']),
             UploadedFile::fake()->createWithContent('foo.png', file_get_contents(__DIR__.'/fixtures/image.png')),
             ['validation.mimetypes']
         );
 
         $this->passes(
-            File::types(['text/plain', 'image/png']),
+            Rule::file()->types(['text/plain', 'image/png']),
             UploadedFile::fake()->createWithContent('foo.png', file_get_contents(__DIR__.'/fixtures/image.png')),
         );
     }
@@ -93,13 +93,13 @@ class ValidationFileRuleTest extends TestCase
     public function testSingleMime()
     {
         $this->fails(
-            File::types('txt'),
+            Rule::file()->types('txt'),
             UploadedFile::fake()->createWithContent('foo.png', file_get_contents(__DIR__.'/fixtures/image.png')),
             ['validation.mimes']
         );
 
         $this->passes(
-            File::types('png'),
+            Rule::file()->types('png'),
             UploadedFile::fake()->createWithContent('foo.png', file_get_contents(__DIR__.'/fixtures/image.png')),
         );
     }
@@ -107,13 +107,13 @@ class ValidationFileRuleTest extends TestCase
     public function testMultipleMimes()
     {
         $this->fails(
-            File::types(['png', 'jpg', 'jpeg', 'svg']),
+            Rule::file()->types(['png', 'jpg', 'jpeg', 'svg']),
             UploadedFile::fake()->createWithContent('foo.txt', 'Hello World!'),
             ['validation.mimes']
         );
 
         $this->passes(
-            File::types(['png', 'jpg', 'jpeg', 'svg']),
+            Rule::file()->types(['png', 'jpg', 'jpeg', 'svg']),
             [
                 UploadedFile::fake()->createWithContent('foo.png', file_get_contents(__DIR__.'/fixtures/image.png')),
                 UploadedFile::fake()->createWithContent('foo.svg', file_get_contents(__DIR__.'/fixtures/image.svg')),
@@ -124,14 +124,23 @@ class ValidationFileRuleTest extends TestCase
     public function testMixOfMimetypesAndMimes()
     {
         $this->fails(
-            File::types(['png', 'image/png']),
+            Rule::file()->types(['png', 'image/png']),
             UploadedFile::fake()->createWithContent('foo.txt', 'Hello World!'),
             ['validation.mimetypes', 'validation.mimes']
         );
 
         $this->passes(
-            File::types(['png', 'image/png']),
+            Rule::file()->types(['png', 'image/png']),
             UploadedFile::fake()->createWithContent('foo.png', file_get_contents(__DIR__.'/fixtures/image.png')),
+        );
+    }
+
+    public function testTypesCanBeChainedAfterOtherFileConstraints()
+    {
+        $this->fails(
+            Rule::file()->max(1)->types(['png']),
+            UploadedFile::fake()->create('foo.png', 8, 'image/png'),
+            ['validation.max.file']
         );
     }
 
@@ -441,7 +450,7 @@ class ValidationFileRuleTest extends TestCase
         $this->assertInstanceOf(File::class, File::default());
 
         File::defaults(function () {
-            return File::types('txt')->max(12 * 1024);
+            return Rule::file()->types('txt')->max(12 * 1024);
         });
 
         $this->fails(

@@ -138,11 +138,13 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      * Limit the uploaded file to the given MIME types or file extensions.
      *
      * @param  string|array<int, string>  $mimetypes
-     * @return static
+     * @return $this
      */
-    public static function types($mimetypes)
+    public function types($mimetypes)
     {
-        return tap(new static(), fn ($file) => $file->allowedMimetypes = (array) $mimetypes);
+        $this->allowedMimetypes = (array) $mimetypes;
+
+        return $this;
     }
 
     /**

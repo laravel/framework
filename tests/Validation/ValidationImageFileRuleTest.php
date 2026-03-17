@@ -100,6 +100,28 @@ class ValidationImageFileRuleTest extends TestCase
         );
     }
 
+    public function testTypesCanBeChainedAfterImageConfiguration()
+    {
+        $this->passes(
+            File::image(allowSvg: true)->types(['svg']),
+            UploadedFile::fake()->createWithContent('foo.svg', file_get_contents(__DIR__.'/fixtures/image.svg')),
+        );
+    }
+
+    public function testTypesPreservesDimensionsWhenChainedAfterThem()
+    {
+        $this->fails(
+            File::image()->dimensions(Rule::dimensions()->maxWidth(50))->types(['png']),
+            UploadedFile::fake()->image('foo.png', 100, 100),
+            ['validation.dimensions'],
+        );
+
+        $this->passes(
+            File::image()->dimensions(Rule::dimensions()->maxWidth(50))->types(['png']),
+            UploadedFile::fake()->image('foo.png', 50, 50),
+        );
+    }
+
     protected function fails($rule, $values, $messages)
     {
         $this->assertValidationRules($rule, $values, false, $messages);

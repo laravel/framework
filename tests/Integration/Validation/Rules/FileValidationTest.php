@@ -24,7 +24,7 @@ class FileValidationTest extends TestCase
                 $attribute => $file,
             ],
         ], [
-            'files.*' => ['required', File::types(['image/png', 'image/jpeg'])],
+            'files.*' => ['required', Rule::file()->types(['image/png', 'image/jpeg'])],
         ]);
 
         $this->assertTrue($validator->passes());
@@ -43,7 +43,7 @@ class FileValidationTest extends TestCase
                 $attribute => $file,
             ],
         ], [
-            'files.*' => ['required', File::types($mimes = ['image/png', 'image/jpeg'])],
+            'files.*' => ['required', Rule::file()->types($mimes = ['image/png', 'image/jpeg'])],
         ]);
 
         $this->assertFalse($validator->passes());
@@ -83,7 +83,7 @@ class FileValidationTest extends TestCase
     {
         $validator = Validator::make(
             ['document' => UploadedFile::fake()->create('file.pdf')],
-            ['document' => [File::types(['jpg', 'png'])]],
+            ['document' => [Rule::file()->types(['jpg', 'png'])]],
             ['document.mimes' => 'Wrong file type']
         );
 
@@ -95,7 +95,7 @@ class FileValidationTest extends TestCase
     {
         $validator = Validator::make(
             ['upload' => UploadedFile::fake()->create('small.pdf', 50)],
-            ['upload' => [File::types(['pdf'])->min(100)]],
+            ['upload' => [Rule::file()->types(['pdf'])->min(100)]],
             ['upload.min' => 'File too small']
         );
 
@@ -107,7 +107,7 @@ class FileValidationTest extends TestCase
     {
         $validator = Validator::make(
             ['upload' => UploadedFile::fake()->create('large.pdf', 2000)],
-            ['upload' => [File::types(['pdf'])->max(1024)]],
+            ['upload' => [Rule::file()->types(['pdf'])->max(1024)]],
             ['upload.max' => 'File exceeds limit']
         );
 
@@ -127,11 +127,23 @@ class FileValidationTest extends TestCase
         $this->assertSame(['Invalid dimensions'], $validator->messages()->all());
     }
 
+    public function test_types_preserves_max_when_chained_after_it()
+    {
+        $validator = Validator::make(
+            ['file' => UploadedFile::fake()->image('photo.jpg', 800, 600)->size(8)],
+            ['file' => [File::image()->max(1)->types(['jpg', 'jpeg'])]],
+            ['file.max' => 'File too large']
+        );
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame(['File too large'], $validator->messages()->all());
+    }
+
     public function test_file_between_custom_validation_messages()
     {
         $validator = Validator::make(
             ['file' => UploadedFile::fake()->create('foo.pdf', 10)],
-            ['file' => [File::types(['pdf'])->between(100, 1000)]],
+            ['file' => [Rule::file()->types(['pdf'])->between(100, 1000)]],
             ['file.between' => 'Size out of range']
         );
 
@@ -155,7 +167,7 @@ class FileValidationTest extends TestCase
     {
         $validator = Validator::make(
             ['photo' => UploadedFile::fake()->create('foo.pdf', 5000)],
-            ['photo' => [File::types(['jpg', 'png'])->max(1024)]],
+            ['photo' => [Rule::file()->types(['jpg', 'png'])->max(1024)]],
             [
                 'photo.mimes' => 'Invalid type',
                 'photo.max' => 'Too large',
@@ -174,7 +186,7 @@ class FileValidationTest extends TestCase
     {
         $validator = Validator::make(
             ['file' => UploadedFile::fake()->create('doc.pdf', 500)],
-            ['file' => [File::types(['pdf'])->size(100)]],
+            ['file' => [Rule::file()->types(['pdf'])->size(100)]],
             ['file.size' => 'File must be exactly 100KB']
         );
 
@@ -198,7 +210,7 @@ class FileValidationTest extends TestCase
     {
         $validator = Validator::make(
             ['file' => UploadedFile::fake()->createWithContent('foo.txt', "\xf0\x28\x8c\x28")],
-            ['file' => [File::types(['txt'])->encoding('UTF-8')]],
+            ['file' => [Rule::file()->types(['txt'])->encoding('UTF-8')]],
             ['file.encoding' => 'Invalid file encoding']
         );
 

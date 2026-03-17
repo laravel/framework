@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Translation;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\File;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -111,7 +112,7 @@ class TranslatorTest extends TestCase
 
         $validator = $this->app['validator']->make(
             ['file' => UploadedFile::fake()->create('file.pdf')],
-            ['file' => [File::types(['txt'])]]
+            ['file' => [Rule::file()->types(['txt'])]]
         );
 
         $validator->fails();
