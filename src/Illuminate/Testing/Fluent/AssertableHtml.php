@@ -17,39 +17,15 @@ class AssertableHtml
     use Conditionable, Macroable, Tappable;
 
     /**
-     * The parsed HTML document.
-     *
-     * @var \Dom\HTMLDocument
-     */
-    protected HTMLDocument $document;
-
-    /**
-     * The current scope (the document root or a scoped element).
-     *
-     * @var \Dom\Element|\Dom\HTMLDocument
-     */
-    protected Element|HTMLDocument $scope;
-
-    /**
-     * The selector path to the current scope.
-     *
-     * @var string|null
-     */
-    protected ?string $selector;
-
-    /**
      * Create a new assertable HTML instance.
      *
-     * @param  \Dom\HTMLDocument  $document
-     * @param  \Dom\Element|\Dom\HTMLDocument|null  $scope
+     * @param  \Dom\Element|\Dom\HTMLDocument  $scope
      * @param  string|null  $selector
      */
-    protected function __construct(HTMLDocument $document, Element|HTMLDocument|null $scope = null, ?string $selector = null)
-    {
-        $this->document = $document;
-        $this->scope = $scope ?? $document;
-        $this->selector = $selector;
-    }
+    protected function __construct(
+        protected Element|HTMLDocument $scope,
+        protected ?string $selector = null,
+    ) {}
 
     /**
      * Create a new instance from a test response.
@@ -60,9 +36,7 @@ class AssertableHtml
      */
     public static function fromResponse(TestResponse $response, int $options = LIBXML_NOERROR): static
     {
-        return new static(
-            HTMLDocument::createFromString($response->getContent(), $options),
-        );
+        return new static(HTMLDocument::createFromString($response->getContent(), $options));
     }
 
     /**
@@ -74,9 +48,7 @@ class AssertableHtml
      */
     public static function fromString(string $html, int $options = LIBXML_NOERROR): static
     {
-        return new static(
-            HTMLDocument::createFromString($html, $options),
-        );
+        return new static(HTMLDocument::createFromString($html, $options));
     }
 
     /**
@@ -95,10 +67,10 @@ class AssertableHtml
             $this->count($selector, $countOrCallback);
 
             if ($callback !== null) {
-                $callback(new static($this->document, $element, $this->buildSelector($selector)));
+                $callback(new static($element, $this->buildSelector($selector)));
             }
         } elseif ($countOrCallback instanceof Closure) {
-            $countOrCallback(new static($this->document, $element, $this->buildSelector($selector)));
+            $countOrCallback(new static($element, $this->buildSelector($selector)));
         }
 
         return $this;
@@ -351,7 +323,7 @@ class AssertableHtml
     }
 
     /**
-     * Assert multiple attribute → value (or closure) pairs on the matched element at once.
+     * Assert multiple attribute to value (or closure) pairs on the matched element at once.
      *
      * @param  string  $selector
      * @param  array<string, string|\Closure>  $bindings
@@ -410,7 +382,7 @@ class AssertableHtml
      */
     public function scope(string $selector, Closure $callback): static
     {
-        $callback(new static($this->document, $this->findOrFail($selector), $this->buildSelector($selector)));
+        $callback(new static($this->findOrFail($selector), $this->buildSelector($selector)));
 
         return $this;
     }
@@ -432,7 +404,7 @@ class AssertableHtml
 
         foreach ($nodes as $index => $node) {
             try {
-                $callback(new static($this->document, $node, $this->buildSelector($selector)), $index);
+                $callback(new static($node, $this->buildSelector($selector)), $index);
             } catch (AssertionFailedError $e) {
                 PHPUnit::fail("Failed assertion on element [{$selector}] at index [{$index}]:\n".$e->getMessage());
             }
@@ -511,7 +483,7 @@ class AssertableHtml
     protected function buildSelector(?string $selector = null): ?string
     {
         return $this->selector && $selector
-            ? $this->selector . ' → ' . $selector
+            ? $this->selector.' → '.$selector
             : $this->selector ?? $selector;
     }
 
@@ -523,7 +495,7 @@ class AssertableHtml
     protected function getHtml(): string
     {
         return $this->scope instanceof HTMLDocument
-            ? $this->document->documentElement->innerHTML
-            : $this->document->saveHtml($this->scope);
+            ? $this->scope->documentElement->innerHTML
+            : $this->scope->ownerDocument->saveHtml($this->scope);
     }
 }
