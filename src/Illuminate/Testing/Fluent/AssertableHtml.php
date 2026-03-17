@@ -366,11 +366,9 @@ class AssertableHtml
     {
         $nodes = $this->scope->querySelectorAll($selector);
 
-        PHPUnit::assertGreaterThan(
-            0,
-            $nodes->length,
-            "Failed asserting that any elements match [{$selector}]."
-        );
+        if ($nodes->length === 0) {
+            $this->fail("Failed asserting that any elements match [{$selector}].", $selector);
+        }
 
         foreach ($nodes as $index => $node) {
             try {
