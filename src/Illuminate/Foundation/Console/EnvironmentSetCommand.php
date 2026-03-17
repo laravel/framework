@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Closure;
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Filesystem\Filesystem;
@@ -9,10 +10,8 @@ use Illuminate\Support\ConfigWriter;
 use Illuminate\Support\Env;
 use Symfony\Component\Console\Attribute\AsCommand;
 
-use Illuminate\Support\Arr;
-
-use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\autocomplete;
+use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\password;
 use function Laravel\Prompts\text;
 
@@ -20,10 +19,9 @@ use function Laravel\Prompts\text;
 class EnvironmentSetCommand extends Command
 {
     use ConfirmableTrait;
+
     /**
      * The name and signature of the console command.
-     *
-     * @var string
      */
     protected $signature = 'env:set
                     {key? : The environment variable name (optionally with =value)}
@@ -31,29 +29,17 @@ class EnvironmentSetCommand extends Command
                     {--config-key= : Config key in dot notation}
                     {--default= : Default value for the config env() call}
                     {--example : Add to .env.example}
-                    {--no-example : Do not add to .env.example}
                     {--force : Overwrite existing values without asking}';
 
     /**
      * The console command description.
-     *
-     * @var string
      */
     protected $description = 'Set an environment variable';
 
     /**
-     * The filesystem instance.
-     *
-     * @var \Illuminate\Filesystem\Filesystem
-     */
-    protected $files;
-
-    /**
      * Create a new command instance.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
      */
-    public function __construct(Filesystem $files)
+    public function __construct(protected Filesystem $files)
     {
         parent::__construct();
 
@@ -110,38 +96,31 @@ class EnvironmentSetCommand extends Command
      */
     protected function parseKeyAndValue(): array
     {
-        $key = $this->argument('key');
+        $key = $this->argument('key') ?? $this->whenInteractive(fn () => text(
+            'What is the environment variable name?',
+            required: true,
+            placeholder: 'E.g. MY_API_KEY',
+        ));
 
-        if ($key === null) {
-            if (! $this->input->isInteractive()) {
-                $this->fail('The key argument is required in non-interactive mode.');
-            }
-
-            $key = text(
-                'What is the environment variable name?',
-                required: true,
-                placeholder: 'E.g. MY_API_KEY',
-            );
+        if ($key === null && ! $this->input->isInteractive()) {
+            $this->fail('The key argument is required in non-interactive mode.');
         }
 
-        if (str_contains($key, '=')) {
-            [$key, $value] = explode('=', $key, 2);
-
-            $value = $this->unquote($value);
-
-            $this->components->info("Using value from argument: {$value}");
-
-            return [$key, $value];
+        if (! str_contains($key, '=')) {
+            return [$key, null];
         }
 
-        return [$key, null];
+        [$key, $value] = explode('=', $key, 2);
+
+        $value = $this->unquote($value);
+
+        $this->components->info("Using value from argument: {$value}");
+
+        return [$key, $value];
     }
 
     /**
      * Remove surrounding quotes from a value.
-     *
-     * @param  string  $value
-     * @return string
      */
     protected function unquote(string $value): string
     {
@@ -154,19 +133,12 @@ class EnvironmentSetCommand extends Command
 
     /**
      * Handle adding the variable to .env.example.
-     *
-     * @param  string  $key
-     * @return void
      */
     protected function handleExample(string $key): void
     {
-        $examplePath = $this->laravel->environmentPath() . '/.env.example';
+        $examplePath = $this->laravel->environmentPath().'/.env.example';
 
         if (! $this->files->exists($examplePath)) {
-            return;
-        }
-
-        if ($this->option('no-example')) {
             return;
         }
 
@@ -182,33 +154,23 @@ class EnvironmentSetCommand extends Command
 
     /**
      * Handle writing the variable to a config file.
-     *
-     * @param  string  $key
-     * @param  string  $value
-     * @return void
      */
     protected function handleConfig(string $key, string $value): void
     {
-        $configKey = $this->option('config-key');
-
-        if ($configKey === null && $this->input->isInteractive()) {
-            $configKey = autocomplete(
-                label: 'What config key should this be associated with? (Optional)',
-                options: fn(string $value) => $this->getConfigKeySuggestions($value),
-                placeholder: 'E.g. services.stripe.key',
-                validate: fn(string $value) => $value !== '' && ! str_contains($value, '.')
-                    ? 'Config key must include at least a file and a key (e.g. services.stripe).'
-                    : null,
-                hint: 'Enter an existing or new config key',
-            );
-        }
+        $configKey = $this->option('config-key') ?? $this->whenInteractive(fn () => autocomplete(
+            label: 'What config key should this be associated with? (Optional)',
+            options: fn (string $value) => $this->getConfigKeySuggestions($value),
+            placeholder: 'E.g. services.stripe.key',
+            validate: fn ($value) => $this->validateConfigKey($value),
+            hint: 'Enter a new or existing config key',
+        ));
 
         if (! $configKey) {
             return;
         }
 
-        if (! str_contains($configKey, '.')) {
-            $this->fail('Config key must include at least a file and a key (e.g. services.stripe).');
+        if ($failMessage = $this->validateConfigKey($configKey)) {
+            $this->fail($failMessage);
         }
 
         $segments = explode('.', $configKey);
@@ -229,14 +191,11 @@ class EnvironmentSetCommand extends Command
             }
         }
 
-        $default = $this->option('default');
-
-        if ($default === null && $this->input->isInteractive()) {
-            $default = text(
-                'What is the default value for the env() call? (Optional)',
-                default: '',
-            );
-        }
+        $default = $this->option('default') ?? $this->whenInteractive(fn () => password(
+            'What is the default value for the env() call? (Optional)',
+            required: false,
+            placeholder: 'E.g. null',
+        ));
 
         $writer = new ConfigWriter($this->files);
         $writer->write($configPath, $segments, $key, $default ?? '');
@@ -245,18 +204,50 @@ class EnvironmentSetCommand extends Command
     }
 
     /**
-     * Check if a variable exists in the given env file.
+     * Execute a callback when the input is interactive.
      *
-     * @param  string  $path
-     * @param  string  $key
-     * @return bool
+     * @template TReturn
+     *
+     * @param  \Closure(): TReturn  $callback
+     * @return TReturn|null
+     */
+    protected function whenInteractive(Closure $callback): mixed
+    {
+        return $this->input->isInteractive() ? $callback() : null;
+    }
+
+    /**
+     * Validate a config key.
+     *
+     * @param  string  $value
+     * @return string|null
+     */
+    protected function validateConfigKey(string $value): string|null
+    {
+        if ($value === '') {
+            return null;
+        }
+
+        if (! str_contains($value, '.')) {
+            return 'Config key must include at least a file and a key (e.g. services.stripe).';
+        }
+
+        if (preg_match('/[^a-zA-Z0-9_.\\-]/', $value)) {
+            return 'Config key must contain only letters, numbers, underscores, dashes, and dots.';
+        }
+
+        return null;
+    }
+
+    /**
+     * Check if a variable exists in the given env file.
      */
     protected function variableExistsInFile(string $path, string $key): bool
     {
         $contents = $this->files->get($path);
 
         foreach (explode(PHP_EOL, $contents) as $line) {
-            if (str_starts_with($line, $key . '=')) {
+            if (str_starts_with($line, $key.'=')) {
                 return true;
             }
         }
@@ -266,9 +257,6 @@ class EnvironmentSetCommand extends Command
 
     /**
      * Format a config value for display.
-     *
-     * @param  mixed  $value
-     * @return string
      */
     protected function formatConfigValue(mixed $value): string
     {
@@ -289,25 +277,14 @@ class EnvironmentSetCommand extends Command
 
     /**
      * Get config key suggestions based on the current input.
-     *
-     * @param  string  $value
-     * @return array
      */
     protected function getConfigKeySuggestions(string $value): array
     {
         $segments = $value !== '' ? explode('.', $value) : [];
         $currentInput = array_pop($segments) ?? '';
-        $prefix = count($segments) ? implode('.', $segments) . '.' : '';
+        $prefix = count($segments) ? implode('.', $segments).'.' : '';
 
-        $items = count($segments)
-            ? config(implode('.', $segments))
-            : array_combine(
-                $keys = array_map(
-                    fn($file) => basename($file, '.php'),
-                    glob($this->laravel->configPath('*.php'))
-                ),
-                array_map(fn($key) => config($key), $keys),
-            );
+        $items = $this->getConfigItems($segments);
 
         if (! is_array($items)) {
             return [];
@@ -316,7 +293,7 @@ class EnvironmentSetCommand extends Command
         $suggestions = [];
 
         foreach ($items as $key => $val) {
-            $suggestion = $prefix . $key;
+            $suggestion = $prefix.$key;
 
             if (is_array($val)) {
                 $suggestion .= '.';
@@ -330,5 +307,25 @@ class EnvironmentSetCommand extends Command
         sort($suggestions);
 
         return $suggestions;
+    }
+
+    /**
+     * Get the config items.
+     */
+    protected function getConfigItems(array $segments): ?array
+    {
+        if (count($segments)) {
+            return config(implode('.', $segments));
+        }
+
+        $keys = array_map(
+            fn ($file) => basename($file, '.php'),
+            glob($this->laravel->configPath('*.php'))
+        );
+
+        return array_combine(
+            $keys,
+            array_map(fn ($key) => config($key), $keys),
+        );
     }
 }

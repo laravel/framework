@@ -35,8 +35,7 @@ class EnvironmentSetCommandTest extends TestCase
 
     public function testItSetsANewEnvironmentVariable(): void
     {
-        $this->artisan('env:set', ['key' => 'STRIPE_KEY', '--value' => 'sk_test_123', '--no-example' => true])
-            ->expectsQuestion('What config key should this be associated with? (Optional)', '')
+        $this->artisan('env:set', ['key' => 'STRIPE_KEY', '--value' => 'sk_test_123', '-n' => true])
             ->expectsOutputToContain('Environment variable [STRIPE_KEY] set successfully.')
             ->assertExitCode(0);
 
@@ -45,9 +44,8 @@ class EnvironmentSetCommandTest extends TestCase
 
     public function testItSetsVariableWithInlineValue(): void
     {
-        $this->artisan('env:set', ['key' => 'STRIPE_KEY=sk_test_123', '--no-example' => true])
+        $this->artisan('env:set', ['key' => 'STRIPE_KEY=sk_test_123', '-n' => true])
             ->expectsOutputToContain('Using value from argument: sk_test_123')
-            ->expectsQuestion('What config key should this be associated with? (Optional)', '')
             ->expectsOutputToContain('Environment variable [STRIPE_KEY] set successfully.')
             ->assertExitCode(0);
 
@@ -56,9 +54,8 @@ class EnvironmentSetCommandTest extends TestCase
 
     public function testItSetsVariableWithQuotedInlineValue(): void
     {
-        $this->artisan('env:set', ['key' => 'APP_NAME="My App"', '--no-example' => true])
+        $this->artisan('env:set', ['key' => 'APP_NAME="My App"', '-n' => true])
             ->expectsOutputToContain('Using value from argument: My App')
-            ->expectsQuestion('What config key should this be associated with? (Optional)', '')
             ->assertExitCode(0);
 
         $this->assertStringContainsString('APP_NAME="My App"', file_get_contents($this->tempDir.'/.env'));
@@ -66,9 +63,8 @@ class EnvironmentSetCommandTest extends TestCase
 
     public function testItSetsVariableWithSingleQuotedInlineValue(): void
     {
-        $this->artisan('env:set', ['key' => "APP_NAME='My App'", '--no-example' => true])
+        $this->artisan('env:set', ['key' => "APP_NAME='My App'", '-n' => true])
             ->expectsOutputToContain('Using value from argument: My App')
-            ->expectsQuestion('What config key should this be associated with? (Optional)', '')
             ->assertExitCode(0);
 
         $this->assertStringContainsString('APP_NAME="My App"', file_get_contents($this->tempDir.'/.env'));
@@ -86,9 +82,11 @@ class EnvironmentSetCommandTest extends TestCase
     public function testItPromptsForOverwriteWhenVariableExists(): void
     {
         file_put_contents($this->tempDir.'/.env', 'STRIPE_KEY=old_value');
+        file_put_contents($this->tempDir.'/.env.example', '');
 
-        $this->artisan('env:set', ['key' => 'STRIPE_KEY', '--value' => 'new_value', '--no-example' => true])
+        $this->artisan('env:set', ['key' => 'STRIPE_KEY', '--value' => 'new_value'])
             ->expectsConfirmation('Environment variable [STRIPE_KEY] already exists. Overwrite?', 'yes')
+            ->expectsConfirmation('Add [STRIPE_KEY] to .env.example?', 'no')
             ->expectsQuestion('What config key should this be associated with? (Optional)', '')
             ->expectsOutputToContain('Environment variable [STRIPE_KEY] set successfully.')
             ->assertExitCode(0);
@@ -110,8 +108,10 @@ class EnvironmentSetCommandTest extends TestCase
     public function testItOverwritesWithForceOption(): void
     {
         file_put_contents($this->tempDir.'/.env', 'STRIPE_KEY=old_value');
+        file_put_contents($this->tempDir.'/.env.example', '');
 
-        $this->artisan('env:set', ['key' => 'STRIPE_KEY', '--value' => 'new_value', '--force' => true, '--no-example' => true])
+        $this->artisan('env:set', ['key' => 'STRIPE_KEY', '--value' => 'new_value', '--force' => true])
+            ->expectsConfirmation('Add [STRIPE_KEY] to .env.example?', 'no')
             ->expectsQuestion('What config key should this be associated with? (Optional)', '')
             ->expectsOutputToContain('Environment variable [STRIPE_KEY] set successfully.')
             ->assertExitCode(0);
@@ -132,20 +132,18 @@ class EnvironmentSetCommandTest extends TestCase
     {
         file_put_contents($this->tempDir.'/.env.example', '');
 
-        $this->artisan('env:set', ['key' => 'STRIPE_KEY', '--value' => 'sk_test_123', '--example' => true])
-            ->expectsQuestion('What config key should this be associated with? (Optional)', '')
+        $this->artisan('env:set', ['key' => 'STRIPE_KEY', '--value' => 'sk_test_123', '--example' => true, '-n' => true])
             ->expectsOutputToContain('Added [STRIPE_KEY] to .env.example.')
             ->assertExitCode(0);
 
         $this->assertStringContainsString('STRIPE_KEY=', file_get_contents($this->tempDir.'/.env.example'));
     }
 
-    public function testItDoesNotAddToEnvExampleWithNoExampleOption(): void
+    public function testItDoesNotAddToEnvExampleInNonInteractiveModeWithoutFlag(): void
     {
         file_put_contents($this->tempDir.'/.env.example', '');
 
-        $this->artisan('env:set', ['key' => 'STRIPE_KEY', '--value' => 'sk_test_123', '--no-example' => true])
-            ->expectsQuestion('What config key should this be associated with? (Optional)', '')
+        $this->artisan('env:set', ['key' => 'STRIPE_KEY', '--value' => 'sk_test_123', '-n' => true])
             ->assertExitCode(0);
 
         $this->assertStringNotContainsString('STRIPE_KEY', file_get_contents($this->tempDir.'/.env.example'));
@@ -153,8 +151,7 @@ class EnvironmentSetCommandTest extends TestCase
 
     public function testItSkipsEnvExampleWhenFileDoesNotExist(): void
     {
-        $this->artisan('env:set', ['key' => 'STRIPE_KEY', '--value' => 'sk_test_123'])
-            ->expectsQuestion('What config key should this be associated with? (Optional)', '')
+        $this->artisan('env:set', ['key' => 'STRIPE_KEY', '--value' => 'sk_test_123', '-n' => true])
             ->assertExitCode(0);
 
         $this->assertFileDoesNotExist($this->tempDir.'/.env.example');
@@ -165,9 +162,9 @@ class EnvironmentSetCommandTest extends TestCase
         $this->artisan('env:set', [
             'key' => 'STRIPE_KEY',
             '--value' => 'sk_test_123',
-            '--no-example' => true,
             '--config-key' => 'services.stripe.key',
             '--default' => 'null',
+            '-n' => true,
         ])
             ->expectsOutputToContain('Environment variable [STRIPE_KEY] set successfully.')
             ->expectsOutputToContain("Config [services.stripe.key] set to env('STRIPE_KEY').")
@@ -198,10 +195,10 @@ PHP);
         $this->artisan('env:set', [
             'key' => 'STRIPE_KEY',
             '--value' => 'sk_test_123',
-            '--no-example' => true,
             '--config-key' => 'services.stripe.key',
             '--default' => 'null',
             '--force' => true,
+            '-n' => true,
         ])
             ->assertExitCode(0);
 
@@ -216,9 +213,9 @@ PHP);
         $this->artisan('env:set', [
             'key' => 'APP_TIMEZONE',
             '--value' => 'America/New_York',
-            '--no-example' => true,
             '--config-key' => 'app.timezone',
             '--default' => 'UTC',
+            '-n' => true,
         ])
             ->assertExitCode(0);
 
@@ -232,9 +229,9 @@ PHP);
         $this->artisan('env:set', [
             'key' => 'STRIPE_KEY',
             '--value' => 'sk_test_123',
-            '--no-example' => true,
             '--config-key' => 'services.stripe.key',
             '--default' => '',
+            '-n' => true,
         ])
             ->assertExitCode(0);
 
@@ -249,8 +246,8 @@ PHP);
         $this->artisan('env:set', [
             'key' => 'STRIPE_KEY',
             '--value' => 'sk_test_123',
-            '--no-example' => true,
             '--config-key' => 'services',
+            '-n' => true,
         ])
             ->expectsOutputToContain('Config key must include at least a file and a key')
             ->assertExitCode(1);
@@ -283,7 +280,6 @@ PHP);
         $this->artisan('env:set', [
             'key' => 'STRIPE_KEY',
             '--value' => 'sk_test_123',
-            '--no-example' => true,
             '-n' => true,
         ])
             ->expectsOutputToContain('Environment variable [STRIPE_KEY] set successfully.')
@@ -311,9 +307,9 @@ PHP);
         $this->artisan('env:set', [
             'key' => 'STRIPE_WEBHOOK_SECRET',
             '--value' => 'whsec_test',
-            '--no-example' => true,
             '--config-key' => 'services.stripe.webhook.secret',
             '--default' => '',
+            '-n' => true,
         ])
             ->assertExitCode(0);
 
@@ -341,10 +337,10 @@ PHP);
         $this->artisan('env:set', [
             'key' => 'STRIPE_KEY',
             '--value' => 'sk_test_123',
-            '--no-example' => true,
             '--config-key' => 'services.stripe.key',
             '--default' => 'null',
             '--force' => true,
+            '-n' => true,
         ])
             ->assertExitCode(0);
 
@@ -358,9 +354,9 @@ PHP);
         $this->artisan('env:set', [
             'key' => 'APP_DEBUG',
             '--value' => 'true',
-            '--no-example' => true,
             '--config-key' => 'app.debug',
             '--default' => 'true',
+            '-n' => true,
         ])
             ->assertExitCode(0);
 
@@ -374,9 +370,9 @@ PHP);
         $this->artisan('env:set', [
             'key' => 'APP_DEBUG',
             '--value' => 'false',
-            '--no-example' => true,
             '--config-key' => 'app.debug',
             '--default' => 'false',
+            '-n' => true,
         ])
             ->assertExitCode(0);
 
@@ -392,7 +388,6 @@ PHP);
         $this->artisan('env:set', [
             'key' => 'STRIPE_KEY',
             '--value' => 'sk_test_123',
-            '--no-example' => true,
             '-n' => true,
         ])
             ->assertExitCode(0);
