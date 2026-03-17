@@ -118,105 +118,105 @@ class AssertableHtmlTest extends TestCase
         $this->html('<ul><li>a</li><li>b</li></ul>')->count('li', 3);
     }
 
-    public function testWherePassesWhenTextMatches(): void
+    public function testWhereTextPassesWhenTextMatches(): void
     {
-        $this->html('<h1>Hello World</h1>')->where('h1', 'Hello World');
+        $this->html('<h1>Hello World</h1>')->whereText('h1', 'Hello World');
     }
 
-    public function testWhereFailsWhenTextMismatches(): void
+    public function testWhereTextFailsWhenTextMismatches(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [h1] text equals [Goodbye], found [Hello World].');
 
-        $this->html('<h1>Hello World</h1>')->where('h1', 'Goodbye');
+        $this->html('<h1>Hello World</h1>')->whereText('h1', 'Goodbye');
     }
 
-    public function testWhereFailsWhenSelectorMissing(): void
+    public function testWhereTextFailsWhenSelectorMissing(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that element [h2] exists.');
 
-        $this->html('<h1>Hello</h1>')->where('h2', 'Hello');
+        $this->html('<h1>Hello</h1>')->whereText('h2', 'Hello');
     }
 
-    public function testWherePassesWithClosureTruthTest(): void
+    public function testWhereTextPassesWithClosureTruthTest(): void
     {
         $this->html('<p>Hello World</p>')
-            ->where('p', fn ($text) => str_contains($text, 'World'));
+            ->whereText('p', fn ($text) => str_contains($text, 'World'));
     }
 
-    public function testWhereFailsWhenClosureReturnsFalse(): void
+    public function testWhereTextFailsWhenClosureReturnsFalse(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [p] text was marked as invalid using a closure.');
 
         $this->html('<p>Hello World</p>')
-            ->where('p', fn ($text) => str_contains($text, 'Goodbye'));
+            ->whereText('p', fn ($text) => str_contains($text, 'Goodbye'));
     }
 
-    public function testWhereAllPassesForAllSelectors(): void
+    public function testWhereAllTextPassesForAllSelectors(): void
     {
         $this->html('<p class="a">Foo</p><p class="b">Bar</p>')
-            ->whereAll([
+            ->whereAllText([
                 'p.a' => 'Foo',
                 'p.b' => 'Bar',
             ]);
     }
 
-    public function testWhereAllFailsOnFirstMismatch(): void
+    public function testWhereAllTextFailsOnFirstMismatch(): void
     {
         $this->expectException(AssertionFailedError::class);
 
         $this->html('<p class="a">Foo</p><p class="b">Bar</p>')
-            ->whereAll([
+            ->whereAllText([
                 'p.a' => 'Foo',
                 'p.b' => 'Wrong',
             ]);
     }
 
-    public function testWhereAllPassesWithClosures(): void
+    public function testWhereAllTextPassesWithClosures(): void
     {
         $this->html('<p class="a">Foo</p><p class="b">Bar</p>')
-            ->whereAll([
+            ->whereAllText([
                 'p.a' => fn ($text) => str_starts_with($text, 'F'),
                 'p.b' => 'Bar',
             ]);
     }
 
-    public function testWhereNotPassesWhenTextDoesNotMatch(): void
+    public function testWhereNotTextPassesWhenTextDoesNotMatch(): void
     {
-        $this->html('<span class="badge">Paid</span>')->whereNot('.badge', 'Overdue');
+        $this->html('<span class="badge">Paid</span>')->whereNotText('.badge', 'Overdue');
     }
 
-    public function testWhereNotFailsWhenTextMatches(): void
+    public function testWhereNotTextFailsWhenTextMatches(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [.badge] text does not equal [Paid].');
 
-        $this->html('<span class="badge">Paid</span>')->whereNot('.badge', 'Paid');
+        $this->html('<span class="badge">Paid</span>')->whereNotText('.badge', 'Paid');
     }
 
-    public function testWhereNotPassesWhenClosureReturnsFalse(): void
+    public function testWhereNotTextPassesWhenClosureReturnsFalse(): void
     {
         $this->html('<p>Hello World</p>')
-            ->whereNot('p', fn ($text) => str_contains($text, 'Goodbye'));
+            ->whereNotText('p', fn ($text) => str_contains($text, 'Goodbye'));
     }
 
-    public function testWhereNotFailsWhenClosureReturnsTrue(): void
+    public function testWhereNotTextFailsWhenClosureReturnsTrue(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [p] text was marked as invalid using a closure.');
 
         $this->html('<p>Hello World</p>')
-            ->whereNot('p', fn ($text) => str_contains($text, 'Hello'));
+            ->whereNotText('p', fn ($text) => str_contains($text, 'Hello'));
     }
 
-    public function testWhereNotFailsWhenSelectorMissing(): void
+    public function testWhereNotTextFailsWhenSelectorMissing(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that element [h2] exists.');
 
-        $this->html('<h1>Hello</h1>')->whereNot('h2', 'Hello');
+        $this->html('<h1>Hello</h1>')->whereNotText('h2', 'Hello');
     }
 
     public function testWhereAttributePassesWhenAttributeMatches(): void
@@ -413,8 +413,8 @@ class AssertableHtmlTest extends TestCase
             ->has('nav')
             ->missing('aside')
             ->count('a', 1)
-            ->where('a', 'Home')
-            ->where('nav', fn ($text) => str_contains($text, 'Home'))
+            ->whereText('a', 'Home')
+            ->whereText('nav', fn ($text) => str_contains($text, 'Home'))
             ->whereAttribute('a', 'href', '/')
             ->hasAttribute('a', 'class')
             ->missingAttribute('a', 'disabled');

@@ -143,13 +143,13 @@ class AssertableHtml
     }
 
     /**
-     * Assert that the matched element's text equals the expected value, or passes a truth test.
+     * Assert that the matched element's text content equals the expected value, or passes a truth test.
      *
      * @param  string  $selector
      * @param  string|\Closure  $expected
      * @return $this
      */
-    public function where(string $selector, string|Closure $expected): static
+    public function whereText(string $selector, string|Closure $expected): static
     {
         $actual = trim($this->findOrFail($selector)->textContent);
 
@@ -175,28 +175,28 @@ class AssertableHtml
     }
 
     /**
-     * Assert multiple selector to text (or closure) pairs at once.
+     * Assert multiple selector to text content (or closure) pairs at once.
      *
      * @param  array<string, string|\Closure>  $bindings
      * @return $this
      */
-    public function whereAll(array $bindings): static
+    public function whereAllText(array $bindings): static
     {
         foreach ($bindings as $selector => $expected) {
-            $this->where($selector, $expected);
+            $this->whereText($selector, $expected);
         }
 
         return $this;
     }
 
     /**
-     * Assert that the matched element's text does not equal the expected value, or does not pass a truth test.
+     * Assert that the matched element's text content does not equal the expected value, or does not pass a truth test.
      *
      * @param  string  $selector
      * @param  string|\Closure  $expected
      * @return $this
      */
-    public function whereNot(string $selector, string|Closure $expected): static
+    public function whereNotText(string $selector, string|Closure $expected): static
     {
         $actual = trim($this->findOrFail($selector)->textContent);
 
@@ -494,6 +494,8 @@ class AssertableHtml
      */
     protected function getHtml(): string
     {
+        assert($this->scope instanceof HTMLDocument || $this->scope->ownerDocument !== null);
+
         return $this->scope instanceof HTMLDocument
             ? $this->scope->documentElement->innerHTML
             : $this->scope->ownerDocument->saveHtml($this->scope);
