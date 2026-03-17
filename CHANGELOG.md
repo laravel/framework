@@ -1,6 +1,13 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.47.0...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.49.0...11.x)
+
+## [v11.49.0](https://github.com/laravel/framework/compare/v11.47.0...v11.49.0) - 2026-03-17
+
+* [11.x] Fix PHPUnit compatibility by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/58735
+* [11.x] Fix MySQL inRandomOrder default seed regression by [@laraib15](https://github.com/laraib15) in https://github.com/laravel/framework/pull/58969
+* [11.x] Deduplicate paths in view:cache by [@ganyicz](https://github.com/ganyicz) in https://github.com/laravel/framework/pull/59146
+* [11.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/59248
 
 ## [v11.47.0](https://github.com/laravel/framework/compare/v11.46.2...v11.47.0) - 2025-11-28
 
