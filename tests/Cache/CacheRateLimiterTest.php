@@ -108,7 +108,7 @@ class CacheRateLimiterTest extends TestCase
     public function testAvailableInReturnsPositiveValues()
     {
         $cache = m::mock(Cache::class);
-        $cache->shouldReceive('get')->andReturn(Carbon::now()->subSeconds(60)->getTimestamp(), null);
+        $cache->shouldReceive('get')->andReturn(Carbon::now()->subMinute()->getTimestamp(), null);
         $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
         $rateLimiter = new RateLimiter($cache);
 

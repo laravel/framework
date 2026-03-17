@@ -197,7 +197,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
                 'payload' => 'mock_payload',
                 'attempts' => 0,
                 'reserved_at' => null,
-                'available_at' => Carbon::now()->addSeconds(60)->getTimestamp(),
+                'available_at' => Carbon::now()->subMinute()->getTimestamp(),
                 'created_at' => Carbon::now()->getTimestamp(),
             ]);
 
