@@ -88,7 +88,11 @@ class SupportUriTest extends TestCase
             ->withQuery(['version' => 1])
             ->withFragment('hello');
 
-        $this->assertEquals('https://taylor:password@laravel.com:80/docs/installation?version=1#hello', (string) $uri);
+        $expected = 'https://taylor:password@laravel.com:80/docs/installation?version=1#hello';
+
+        $this->assertEquals($expected, (string) $uri);
+        $this->assertEquals($expected, $uri->value());
+        $this->assertEquals($expected, $uri->toString());
     }
 
     public function test_complicated_query_string_manipulation()
