@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Generators;
 
-use Illuminate\Database\Console\Sluggable\SlugCommand;
+use Illuminate\Database\Console\Sluggable\SluggableMakeCommand;
 use Illuminate\Support\Facades\Schema;
 
-class SlugCommandTest extends TestCase
+class SluggableMakeCommandTest extends TestCase
 {
     protected $files = [
         'app/Models/Foo.php',
@@ -22,7 +22,7 @@ class SlugCommandTest extends TestCase
 
     public function test_it_creates_migration_and_adds_attribute_to_model()
     {
-        $this->artisan(SlugCommand::class, ['model' => 'Foo'])
+        $this->artisan(SluggableMakeCommand::class, ['model' => 'Foo'])
             ->expectsOutputToContain('Sluggable attribute added to [App\Models\Foo]')
             ->expectsOutputToContain('Migration created. Please review it')
             ->assertExitCode(0);
@@ -44,7 +44,7 @@ class SlugCommandTest extends TestCase
 
     public function test_it_accepts_fully_qualified_class_name()
     {
-        $this->artisan(SlugCommand::class, ['model' => 'App\Models\Foo'])
+        $this->artisan(SluggableMakeCommand::class, ['model' => 'App\Models\Foo'])
             ->expectsOutputToContain('Sluggable attribute added to [App\Models\Foo]')
             ->assertExitCode(0);
 
@@ -57,7 +57,7 @@ class SlugCommandTest extends TestCase
     {
         $this->addAttributeToModel();
 
-        $this->artisan(SlugCommand::class, ['model' => 'Foo'])
+        $this->artisan(SluggableMakeCommand::class, ['model' => 'Foo'])
             ->expectsOutputToContain('already has the Sluggable attribute')
             ->assertExitCode(0);
     }
@@ -69,7 +69,7 @@ class SlugCommandTest extends TestCase
             $table->string('slug');
         });
 
-        $this->artisan(SlugCommand::class, ['model' => 'Foo'])
+        $this->artisan(SluggableMakeCommand::class, ['model' => 'Foo'])
             ->expectsOutputToContain('already has a [slug] column')
             ->assertExitCode(0);
 
@@ -83,7 +83,7 @@ class SlugCommandTest extends TestCase
             $table->string('title');
         });
 
-        $this->artisan(SlugCommand::class, ['model' => 'Foo'])
+        $this->artisan(SluggableMakeCommand::class, ['model' => 'Foo'])
             ->assertExitCode(0);
 
         $this->assertFileContains([
@@ -95,17 +95,17 @@ class SlugCommandTest extends TestCase
 
     public function test_it_errors_when_migration_already_exists()
     {
-        $this->artisan(SlugCommand::class, ['model' => 'Foo'])
+        $this->artisan(SluggableMakeCommand::class, ['model' => 'Foo'])
             ->assertExitCode(0);
 
-        $this->artisan(SlugCommand::class, ['model' => 'Foo'])
+        $this->artisan(SluggableMakeCommand::class, ['model' => 'Foo'])
             ->expectsOutputToContain('Migration already exists')
             ->assertExitCode(1);
     }
 
     public function test_it_uses_custom_from_option()
     {
-        $this->artisan(SlugCommand::class, ['model' => 'Foo', '--from' => 'headline'])
+        $this->artisan(SluggableMakeCommand::class, ['model' => 'Foo', '--from' => 'headline'])
             ->expectsOutputToContain('Sluggable attribute added to [App\Models\Foo]')
             ->assertExitCode(0);
 
@@ -116,7 +116,7 @@ class SlugCommandTest extends TestCase
 
     public function test_it_uses_custom_column_name()
     {
-        $this->artisan(SlugCommand::class, ['model' => 'Foo', '--column' => 'url_slug'])
+        $this->artisan(SluggableMakeCommand::class, ['model' => 'Foo', '--to' => 'url_slug'])
             ->expectsOutputToContain('Sluggable attribute added to [App\Models\Foo]')
             ->expectsOutputToContain('Migration created.')
             ->assertExitCode(0);
@@ -134,7 +134,7 @@ class SlugCommandTest extends TestCase
 
     public function test_it_errors_when_model_does_not_exist()
     {
-        $this->artisan(SlugCommand::class, ['model' => 'NonExistentModel'])
+        $this->artisan(SluggableMakeCommand::class, ['model' => 'NonExistentModel'])
             ->expectsOutputToContain('does not exist')
             ->assertExitCode(1);
     }

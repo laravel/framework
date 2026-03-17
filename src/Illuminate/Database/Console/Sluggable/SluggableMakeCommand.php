@@ -12,7 +12,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use function Illuminate\Filesystem\join_paths;
 
 #[AsCommand(name: 'make:sluggable', description: 'Add the Sluggable attribute to a model and create a migration for the slug column')]
-class SlugCommand extends Command
+class SluggableMakeCommand extends Command
 {
     /**
      * The console command signature.
@@ -21,7 +21,7 @@ class SlugCommand extends Command
      */
     protected $signature = 'make:sluggable {model : The model to make sluggable}
                                        {--from= : The source column to generate the slug from}
-                                       {--column=slug : The name of the slug column}';
+                                       {--to=slug : The target column to place the slug value}';
 
     /**
      * Create a new command instance.
@@ -47,7 +47,7 @@ class SlugCommand extends Command
 
         $model = $this->laravel->make($modelClass);
         $table = $model->getTable();
-        $column = $this->option('column');
+        $column = $this->option('to');
         $source = $this->option('from') ?? $this->guessSourceColumn($model);
 
         $this->addAttributeToModel($modelClass, $modelPath, $source, $column);

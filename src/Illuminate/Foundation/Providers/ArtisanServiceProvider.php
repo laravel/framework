@@ -28,7 +28,7 @@ use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 use Illuminate\Database\Console\ShowCommand;
 use Illuminate\Database\Console\ShowModelCommand;
-use Illuminate\Database\Console\Sluggable\SlugCommand;
+use Illuminate\Database\Console\Sluggable\SluggableMakeCommand;
 use Illuminate\Database\Console\TableCommand as DatabaseTableCommand;
 use Illuminate\Database\Console\WipeCommand;
 use Illuminate\Foundation\Console\AboutCommand;
@@ -234,7 +234,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'SeederMake' => SeederMakeCommand::class,
         'SessionTable' => SessionTableCommand::class,
         'Serve' => ServeCommand::class,
-        'SluggableMake' => SlugCommand::class,
+        'SluggableMake' => SluggableMakeCommand::class,
         'StubPublish' => StubPublishCommand::class,
         'TestMake' => TestMakeCommand::class,
         'TraitMake' => TraitMakeCommand::class,
@@ -850,8 +850,8 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerSluggableMakeCommand()
     {
-        $this->app->singleton(SlugCommand::class, function ($app) {
-            return new SlugCommand($app['files']);
+        $this->app->singleton(SluggableMakeCommand::class, function ($app) {
+            return new SluggableMakeCommand($app['files']);
         });
     }
 
