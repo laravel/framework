@@ -11,7 +11,6 @@ use Illuminate\Support\Traits\Tappable;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Assert as PHPUnit;
 use PHPUnit\Framework\AssertionFailedError;
-use Symfony\Component\HttpFoundation\StreamedJsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AssertableHtml
@@ -27,7 +26,8 @@ class AssertableHtml
     protected function __construct(
         protected Element|HTMLDocument $scope,
         protected ?string $selector = null,
-    ) {}
+    ) {
+    }
 
     /**
      * Create a new instance from a test response.

@@ -326,7 +326,7 @@ class AssertableHtmlTest extends TestCase
     {
         $this->html('<a href="/about" class="nav-link">About</a>')
             ->whereAttributes('a', [
-                'href'  => '/about',
+                'href' => '/about',
                 'class' => 'nav-link',
             ]);
     }
@@ -335,7 +335,7 @@ class AssertableHtmlTest extends TestCase
     {
         $this->html('<a href="/about" class="nav-link">About</a>')
             ->whereAttributes('a', [
-                'href'  => fn ($v) => str_starts_with($v, '/'),
+                'href' => fn ($v) => str_starts_with($v, '/'),
                 'class' => 'nav-link',
             ]);
     }
@@ -346,7 +346,7 @@ class AssertableHtmlTest extends TestCase
 
         $this->html('<a href="/about" class="nav-link">About</a>')
             ->whereAttributes('a', [
-                'href'  => '/about',
+                'href' => '/about',
                 'class' => 'btn',
             ]);
     }
