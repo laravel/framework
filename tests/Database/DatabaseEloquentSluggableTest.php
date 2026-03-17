@@ -600,14 +600,6 @@ class SluggableTinyMaxLengthPost extends Model
     protected $guarded = [];
 }
 
-#[Sluggable(maxAttempts: 2)]
-class SluggableMaxAttemptsPost extends Model
-{
-    protected $table = 'sluggable_posts';
-
-    protected $guarded = [];
-}
-
 #[Sluggable(separator: '_')]
 class SluggableCustomSeparatorPost extends Model
 {
@@ -620,14 +612,6 @@ class SluggableCustomSeparatorPost extends Model
 class SluggableCustomColumnsPost extends Model
 {
     protected $table = 'sluggable_custom_posts';
-
-    protected $guarded = [];
-}
-
-#[Sluggable(errorKey: 'custom_field', errorMessage: 'Please enter a valid name.')]
-class SluggableCustomErrorPost extends Model
-{
-    protected $table = 'sluggable_posts';
 
     protected $guarded = [];
 }
