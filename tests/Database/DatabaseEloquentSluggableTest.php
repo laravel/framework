@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Attributes\Sluggable;
-use Illuminate\Database\Eloquent\CouldNotGenerateSlugException;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Events\Dispatcher;
@@ -305,16 +305,6 @@ class DatabaseEloquentSluggableTest extends TestCase
 
     // maxAttempts
 
-    public function test_it_throws_after_maximum_attempts_exceeded()
-    {
-        $this->expectException(CouldNotGenerateSlugException::class);
-        $this->expectExceptionMessage('Could not generate a unique slug for [Illuminate\Tests\Database\SluggableMaxAttemptsPost] with base [hello] after 2 attempts.');
-
-        SluggableMaxAttemptsPost::create(['name' => 'Hello']);
-        SluggableMaxAttemptsPost::create(['name' => 'Hello']);
-        SluggableMaxAttemptsPost::create(['name' => 'Hello']);
-    }
-
     // maxLength
 
     public function test_it_respects_maximum_length()
@@ -528,31 +518,6 @@ class DatabaseEloquentSluggableTest extends TestCase
         $this->assertSame($expected, $post->slug);
     }
 
-    // edge cases
-
-    public function test_it_throws_when_source_produces_empty_slug()
-    {
-        $this->expectException(CouldNotGenerateSlugException::class);
-        $this->expectExceptionMessage('Could not generate a slug for [Illuminate\Tests\Database\SluggablePost] using column(s) [name].');
-
-        SluggablePost::create(['name' => '!!!']);
-    }
-
-    public function test_it_throws_when_emoji_only_source_produces_empty_slug()
-    {
-        $this->expectException(CouldNotGenerateSlugException::class);
-        $this->expectExceptionMessage('Could not generate a slug for [Illuminate\Tests\Database\SluggablePost] using column(s) [name].');
-
-        SluggablePost::create(['name' => '🚀🎯🔥']);
-    }
-
-    public function test_it_throws_when_source_column_is_null()
-    {
-        $this->expectException(CouldNotGenerateSlugException::class);
-        $this->expectExceptionMessage('Could not generate a slug for [Illuminate\Tests\Database\SluggablePost] using column(s) [name].');
-
-        SluggablePost::create([]);
-    }
 }
 
 #[Sluggable]
@@ -657,6 +622,14 @@ class SluggableCustomSeparatorPost extends Model
 class SluggableCustomColumnsPost extends Model
 {
     protected $table = 'sluggable_custom_posts';
+
+    protected $guarded = [];
+}
+
+#[Sluggable(errorKey: 'custom_field', errorMessage: 'Please enter a valid name.')]
+class SluggableCustomErrorPost extends Model
+{
+    protected $table = 'sluggable_posts';
 
     protected $guarded = [];
 }

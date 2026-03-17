@@ -22,6 +22,8 @@ class Sluggable
         public bool $unique = true,
         public int $maxAttempts = 100,
         public ?int $maxLength = null,
+        public ?string $errorKey = null,
+        public ?string $errorMessage = null,
     ) {
     }
 }

@@ -56,14 +56,43 @@ class SlugGenerator
         $slug = $this->slugify($this->resolveSourceValue());
 
         if ($slug === '') {
-            $columns = implode(', ', Arr::wrap($this->options()->from));
-
-            throw new CouldNotGenerateSlugException(
-                'Could not generate a slug for ['.get_class($this->model)."] using column(s) [{$columns}]."
-            );
+            $this->throwEmptySlugException();
         }
 
         return $this->ensureUnique($slug);
+    }
+
+    /**
+     * Throw an exception when the slug source produces an empty slug.
+     *
+     * @throws EmptySlugException
+     */
+    protected function throwEmptySlugException(): void
+    {
+        $options = $this->options();
+        $from = Arr::wrap($options->from);
+        $errorKey = $options->errorKey ?? $from[0];
+        $columns = implode(', ', $from);
+
+        throw new EmptySlugException(
+            "Could not generate a slug for [".get_class($this->model)."] using column(s) [{$columns}].",
+            $errorKey,
+            $this->resolveErrorMessage($errorKey, $options),
+        );
+    }
+
+    /**
+     * Resolve the user-facing error message for a failed slug generation.
+     */
+    protected function resolveErrorMessage(string $errorKey, Sluggable $options): string
+    {
+        $from = Arr::wrap($options->from);
+        $attribute = count($from) === 1 ? $from[0] : implode(' and ', [implode(', ', array_slice($from, 0, -1)), end($from)]);
+        $replacements = ['attribute' => $attribute, 'column' => $options->column];
+
+        return $options->errorMessage
+            ? __($options->errorMessage, $replacements)
+            : __('validation.sluggable', $replacements);
     }
 
     /**
@@ -153,8 +182,12 @@ class SlugGenerator
             $count++;
 
             if ($count > $options->maxAttempts) {
+                $errorKey = $options->errorKey ?? $options->column;
+
                 throw new CouldNotGenerateSlugException(
-                    'Could not generate a unique slug for ['.get_class($this->model)."] with base [{$originalSlug}] after {$options->maxAttempts} attempts."
+                    'Could not generate a unique slug for ['.get_class($this->model)."] with base [{$originalSlug}] after {$options->maxAttempts} attempts.",
+                    $errorKey,
+                    $this->resolveErrorMessage($errorKey, $options),
                 );
             }
 
