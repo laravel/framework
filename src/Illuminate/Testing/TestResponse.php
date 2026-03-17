@@ -24,6 +24,7 @@ use Illuminate\Testing\Fluent\AssertableHtml;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Testing\TestResponseAssert as PHPUnit;
 use LogicException;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\StreamedJsonResponse;
@@ -879,7 +880,7 @@ class TestResponse implements ArrayAccess
     public function assertHtml(string|Closure $selectorOrCallback, ?Closure $callback = null): static
     {
         if (version_compare(PHP_VERSION, '8.4.0', '<')) {
-            throw new \RuntimeException('assertHtml() requires PHP 8.4.0 or higher.');
+            throw new RuntimeException('assertHtml() requires PHP 8.4.0 or higher.');
         }
 
         if ($selectorOrCallback instanceof Closure) {
