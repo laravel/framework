@@ -215,6 +215,25 @@ class RouteListCommand extends Command
     }
 
     /**
+     * Get the file path and line number for a closure-based route.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return string|null
+     */
+    protected function getClosurePath(Route $route)
+    {
+        if (! $route->action['uses'] instanceof Closure) {
+            return null;
+        }
+
+        $reflection = new ReflectionFunction($route->action['uses']);
+
+        return str_replace(
+            '\\', '/', ltrim(Str::after($reflection->getFileName(), base_path()), DIRECTORY_SEPARATOR)
+        ).':'.$reflection->getStartLine();
+    }
+
+    /**
      * Determine if the route has been defined outside of the application.
      *
      * @param  \Illuminate\Routing\Route  $route
@@ -254,25 +273,6 @@ class RouteListCommand extends Command
             '\Illuminate\Routing\RedirectController',
             '\Illuminate\Routing\ViewController',
         ], true);
-    }
-
-    /**
-     * Get the file path and line number for a closure-based route.
-     *
-     * @param  \Illuminate\Routing\Route  $route
-     * @return string|null
-     */
-    protected function getClosurePath(Route $route)
-    {
-        if (! $route->action['uses'] instanceof Closure) {
-            return null;
-        }
-
-        $reflection = new ReflectionFunction($route->action['uses']);
-
-        return str_replace(
-            '\\', '/', ltrim(Str::after($reflection->getFileName(), base_path()), DIRECTORY_SEPARATOR)
-        ).':'.$reflection->getStartLine();
     }
 
     /**
