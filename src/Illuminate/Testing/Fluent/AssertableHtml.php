@@ -386,6 +386,22 @@ class AssertableHtml
     }
 
     /**
+     * Assert that the matched element does not have any of the given attributes.
+     *
+     * @param  string  $selector
+     * @param  array<int, string>  $attributes
+     * @return $this
+     */
+    public function missingAttributes(string $selector, array $attributes): static
+    {
+        foreach ($attributes as $attribute) {
+            $this->missingAttribute($selector, $attribute);
+        }
+
+        return $this;
+    }
+
+    /**
      * Scope into the first element matching the selector and invoke the callback.
      *
      * @param  string  $selector

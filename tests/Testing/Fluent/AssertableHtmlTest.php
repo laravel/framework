@@ -343,6 +343,19 @@ class AssertableHtmlTest extends TestCase
         $this->html('<input type="email" required>')->missingAttribute('input', 'required');
     }
 
+    public function testMissingAttributesPassesWhenAllAttributesAbsent(): void
+    {
+        $this->html('<input type="email">')->missingAttributes('input', ['required', 'disabled']);
+    }
+
+    public function testMissingAttributesFailsWhenOneAttributePresent(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that [input] does not have attribute [required].');
+
+        $this->html('<input type="email" required>')->missingAttributes('input', ['required', 'disabled']);
+    }
+
     public function testScopeNarrowsAssertionsToMatchedElement(): void
     {
         $this->html('<nav><a href="/home">Home</a></nav><footer><a href="/about">About</a></footer>')
