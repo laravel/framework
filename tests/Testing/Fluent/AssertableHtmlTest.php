@@ -237,137 +237,125 @@ class AssertableHtmlTest extends TestCase
         $this->html('<h1>Hello</h1>')->whereNot('h2', 'Hello');
     }
 
-    // --- whereAttr ---
+    // --- whereAttribute ---
 
-    public function testWhereAttrPassesWhenAttributeMatches(): void
+    public function testWhereAttributePassesWhenAttributeMatches(): void
     {
-        $this->html('<a href="/about">About</a>')->whereAttr('a', 'href', '/about');
+        $this->html('<a href="/about">About</a>')->whereAttribute('a', 'href', '/about');
     }
 
-    public function testWhereAttrFailsWhenAttributeMismatches(): void
+    public function testWhereAttributeFailsWhenAttributeMismatches(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [a] attribute [href] equals [/contact], found [/about].');
 
-        $this->html('<a href="/about">About</a>')->whereAttr('a', 'href', '/contact');
+        $this->html('<a href="/about">About</a>')->whereAttribute('a', 'href', '/contact');
     }
 
-    public function testWhereAttrPassesWithClosureTruthTest(): void
+    public function testWhereAttributePassesWithClosureTruthTest(): void
     {
         $this->html('<a href="/about">About</a>')
-            ->whereAttr('a', 'href', fn ($value) => str_starts_with($value, '/'));
+            ->whereAttribute('a', 'href', fn ($value) => str_starts_with($value, '/'));
     }
 
-    public function testWhereAttrFailsWhenClosureReturnsFalse(): void
+    public function testWhereAttributeFailsWhenClosureReturnsFalse(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [a] attribute [href] was marked as invalid using a closure.');
 
         $this->html('<a href="/about">About</a>')
-            ->whereAttr('a', 'href', fn ($value) => str_starts_with($value, 'http'));
+            ->whereAttribute('a', 'href', fn ($value) => str_starts_with($value, 'http'));
     }
 
-    // --- hasAttr ---
+    // --- hasAttribute ---
 
-    public function testHasAttrPassesWhenAttributePresent(): void
+    public function testHasAttributePassesWhenAttributePresent(): void
     {
-        $this->html('<input type="email" required>')->hasAttr('input', 'required');
+        $this->html('<input type="email" required>')->hasAttribute('input', 'required');
     }
 
-    public function testHasAttrFailsWhenAttributeAbsent(): void
+    public function testHasAttributeFailsWhenAttributeAbsent(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [input] has attribute [disabled].');
 
-        $this->html('<input type="email">')->hasAttr('input', 'disabled');
+        $this->html('<input type="email">')->hasAttribute('input', 'disabled');
     }
 
-    // --- whereNotAttr ---
+    // --- whereNotAttribute ---
 
-    public function testWhereNotAttrPassesWhenAttributeDoesNotMatch(): void
+    public function testWhereNotAttributePassesWhenAttributeDoesNotMatch(): void
     {
-        $this->html('<a href="/about">About</a>')->whereNotAttr('a', 'href', '/contact');
+        $this->html('<a href="/about">About</a>')->whereNotAttribute('a', 'href', '/contact');
     }
 
-    public function testWhereNotAttrFailsWhenAttributeMatches(): void
+    public function testWhereNotAttributeFailsWhenAttributeMatches(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [a] attribute [href] does not equal [/about].');
 
-        $this->html('<a href="/about">About</a>')->whereNotAttr('a', 'href', '/about');
+        $this->html('<a href="/about">About</a>')->whereNotAttribute('a', 'href', '/about');
     }
 
-    public function testWhereNotAttrPassesWhenClosureReturnsFalse(): void
+    public function testWhereNotAttributePassesWhenClosureReturnsFalse(): void
     {
         $this->html('<a href="/about">About</a>')
-            ->whereNotAttr('a', 'href', fn ($v) => str_starts_with($v, 'http'));
+            ->whereNotAttribute('a', 'href', fn ($v) => str_starts_with($v, 'http'));
     }
 
-    public function testWhereNotAttrFailsWhenClosureReturnsTrue(): void
+    public function testWhereNotAttributeFailsWhenClosureReturnsTrue(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [a] attribute [href] was marked as invalid using a closure.');
 
         $this->html('<a href="/about">About</a>')
-            ->whereNotAttr('a', 'href', fn ($v) => str_starts_with($v, '/'));
+            ->whereNotAttribute('a', 'href', fn ($v) => str_starts_with($v, '/'));
     }
 
-    // --- whereAttrs ---
+    // --- whereAttributes ---
 
-    public function testWhereAttrsPassesForAllAttributes(): void
+    public function testWhereAttributesPassesForAllAttributes(): void
     {
         $this->html('<a href="/about" class="nav-link">About</a>')
-            ->whereAttrs('a', [
+            ->whereAttributes('a', [
                 'href'  => '/about',
                 'class' => 'nav-link',
             ]);
     }
 
-    public function testWhereAttrsPassesWithClosures(): void
+    public function testWhereAttributesPassesWithClosures(): void
     {
         $this->html('<a href="/about" class="nav-link">About</a>')
-            ->whereAttrs('a', [
+            ->whereAttributes('a', [
                 'href'  => fn ($v) => str_starts_with($v, '/'),
                 'class' => 'nav-link',
             ]);
     }
 
-    public function testWhereAttrsFailsOnFirstMismatch(): void
+    public function testWhereAttributesFailsOnFirstMismatch(): void
     {
         $this->expectException(AssertionFailedError::class);
 
         $this->html('<a href="/about" class="nav-link">About</a>')
-            ->whereAttrs('a', [
+            ->whereAttributes('a', [
                 'href'  => '/about',
                 'class' => 'btn',
             ]);
     }
 
-    // --- whereAttribute / hasAttribute aliases ---
+    // --- missingAttribute ---
 
-    public function testWhereAttributeIsAliasForWhereAttr(): void
+    public function testMissingAttributePassesWhenAttributeAbsent(): void
     {
-        $this->html('<a href="/about">About</a>')->whereAttribute('a', 'href', '/about');
+        $this->html('<input type="email">')->missingAttribute('input', 'disabled');
     }
 
-    public function testHasAttributeIsAliasForHasAttr(): void
-    {
-        $this->html('<input type="email" required>')->hasAttribute('input', 'required');
-    }
-
-    // --- missingAttr ---
-
-    public function testMissingAttrPassesWhenAttributeAbsent(): void
-    {
-        $this->html('<input type="email">')->missingAttr('input', 'disabled');
-    }
-
-    public function testMissingAttrFailsWhenAttributePresent(): void
+    public function testMissingAttributeFailsWhenAttributePresent(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [input] does not have attribute [required].');
 
-        $this->html('<input type="email" required>')->missingAttr('input', 'required');
+        $this->html('<input type="email" required>')->missingAttribute('input', 'required');
     }
 
     // --- scope ---
@@ -435,9 +423,9 @@ class AssertableHtmlTest extends TestCase
             ->count('a', 1)
             ->where('a', 'Home')
             ->where('nav', fn ($text) => str_contains($text, 'Home'))
-            ->whereAttr('a', 'href', '/')
-            ->hasAttr('a', 'class')
-            ->missingAttr('a', 'disabled');
+            ->whereAttribute('a', 'href', '/')
+            ->hasAttribute('a', 'class')
+            ->missingAttribute('a', 'disabled');
 
         $this->assertSame($assert, $result);
     }

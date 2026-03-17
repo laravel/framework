@@ -264,7 +264,7 @@ class AssertableHtml
      * @param  string|\Closure  $expected
      * @return $this
      */
-    public function whereAttr(string $selector, string $attribute, string|Closure $expected): static
+    public function whereAttribute(string $selector, string $attribute, string|Closure $expected): static
     {
         $actual = $this->findOrFail($selector)->getAttribute($attribute);
 
@@ -296,7 +296,7 @@ class AssertableHtml
      * @param  string  $attribute
      * @return $this
      */
-    public function hasAttr(string $selector, string $attribute): static
+    public function hasAttribute(string $selector, string $attribute): static
     {
         if (! $this->findOrFail($selector)->hasAttribute($attribute)) {
             $this->fail(
@@ -316,7 +316,7 @@ class AssertableHtml
      * @param  string|\Closure  $expected
      * @return $this
      */
-    public function whereNotAttr(string $selector, string $attribute, string|Closure $expected): static
+    public function whereNotAttribute(string $selector, string $attribute, string|Closure $expected): static
     {
         $actual = $this->findOrFail($selector)->getAttribute($attribute);
 
@@ -348,63 +348,13 @@ class AssertableHtml
      * @param  array<string, string|\Closure>  $bindings
      * @return $this
      */
-    public function whereAttrs(string $selector, array $bindings): static
+    public function whereAttributes(string $selector, array $bindings): static
     {
         foreach ($bindings as $attribute => $expected) {
-            $this->whereAttr($selector, $attribute, $expected);
+            $this->whereAttribute($selector, $attribute, $expected);
         }
 
         return $this;
-    }
-
-    /**
-     * Alias for whereAttr().
-     *
-     * @param  string  $selector
-     * @param  string  $attribute
-     * @param  string|\Closure  $expected
-     * @return $this
-     */
-    public function whereAttribute(string $selector, string $attribute, string|Closure $expected): static
-    {
-        return $this->whereAttr($selector, $attribute, $expected);
-    }
-
-    /**
-     * Alias for whereNotAttr().
-     *
-     * @param  string  $selector
-     * @param  string  $attribute
-     * @param  string|\Closure  $expected
-     * @return $this
-     */
-    public function whereNotAttribute(string $selector, string $attribute, string|Closure $expected): static
-    {
-        return $this->whereNotAttr($selector, $attribute, $expected);
-    }
-
-    /**
-     * Alias for whereAttrs().
-     *
-     * @param  string  $selector
-     * @param  array<string, string|\Closure>  $bindings
-     * @return $this
-     */
-    public function whereAttributes(string $selector, array $bindings): static
-    {
-        return $this->whereAttrs($selector, $bindings);
-    }
-
-    /**
-     * Alias for hasAttr().
-     *
-     * @param  string  $selector
-     * @param  string  $attribute
-     * @return $this
-     */
-    public function hasAttribute(string $selector, string $attribute): static
-    {
-        return $this->hasAttr($selector, $attribute);
     }
 
     /**
@@ -414,7 +364,7 @@ class AssertableHtml
      * @param  string  $attribute
      * @return $this
      */
-    public function missingAttr(string $selector, string $attribute): static
+    public function missingAttribute(string $selector, string $attribute): static
     {
         if ($this->findOrFail($selector)->hasAttribute($attribute)) {
             $this->fail(
