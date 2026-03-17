@@ -469,6 +469,7 @@ class AssertableHtml
         PHPUnit::fail(implode("\n", $parts));
     }
 
+
     /**
      * Build the full selector path from the current scope to the given selector.
      *
@@ -477,7 +478,9 @@ class AssertableHtml
      */
     protected function buildSelector(?string $selector = null): ?string
     {
-        return implode(' > ', array_filter([$this->selector, $selector])) ?: null;
+        return $this->selector && $selector
+            ? $this->selector . ' → ' . $selector
+            : $this->selector ?? $selector;
     }
 
     /**
