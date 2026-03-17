@@ -143,21 +143,6 @@ class AssertableHtml
     }
 
     /**
-     * Assert that each selector's matched element has the expected text content.
-     *
-     * @param  array<string, string|\Closure>  $bindings
-     * @return $this
-     */
-    public function whereAllText(array $bindings): static
-    {
-        foreach ($bindings as $selector => $expected) {
-            $this->whereText($selector, $expected);
-        }
-
-        return $this;
-    }
-
-    /**
      * Assert that the matched element's text content does not equal the given value.
      *
      * @param  string  $selector
@@ -184,6 +169,67 @@ class AssertableHtml
                 "Failed asserting that [{$selector}] text does not equal [{$expected}].",
                 $selector
             );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that each selector's matched element has the expected text content.
+     *
+     * @param  array<string, string|\Closure>  $bindings
+     * @return $this
+     */
+    public function whereAllText(array $bindings): static
+    {
+        foreach ($bindings as $selector => $expected) {
+            $this->whereText($selector, $expected);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the matched element has all of the given attributes.
+     *
+     * @param  string  $selector
+     * @param  string  ...$attributes
+     * @return $this
+     */
+    public function hasAttributes(string $selector, string ...$attributes): static
+    {
+        $element = $this->findOrFail($selector);
+
+        foreach ($attributes as $attribute) {
+            if (! $element->hasAttribute($attribute)) {
+                $this->fail(
+                    "Failed asserting that [{$selector}] has attribute [{$attribute}].",
+                    $selector
+                );
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the matched element does not have any of the given attributes.
+     *
+     * @param  string  $selector
+     * @param  string  ...$attributes
+     * @return $this
+     */
+    public function missingAttributes(string $selector, string ...$attributes): static
+    {
+        $element = $this->findOrFail($selector);
+
+        foreach ($attributes as $attribute) {
+            if ($element->hasAttribute($attribute)) {
+                $this->fail(
+                    "Failed asserting that [{$selector}] does not have attribute [{$attribute}].",
+                    $selector
+                );
+            }
         }
 
         return $this;
@@ -217,29 +263,6 @@ class AssertableHtml
                 "Failed asserting that [{$selector}] attribute [{$attribute}] equals [{$expected}], found [{$actual}].",
                 $selector
             );
-        }
-
-        return $this;
-    }
-
-    /**
-     * Assert that the matched element has all of the given attributes.
-     *
-     * @param  string  $selector
-     * @param  string  ...$attributes
-     * @return $this
-     */
-    public function hasAttributes(string $selector, string ...$attributes): static
-    {
-        $element = $this->findOrFail($selector);
-
-        foreach ($attributes as $attribute) {
-            if (! $element->hasAttribute($attribute)) {
-                $this->fail(
-                    "Failed asserting that [{$selector}] has attribute [{$attribute}].",
-                    $selector
-                );
-            }
         }
 
         return $this;
@@ -295,26 +318,39 @@ class AssertableHtml
     }
 
     /**
-     * Assert that the matched element does not have any of the given attributes.
+     * Scope into the first element matching the selector and optionally invoke the callback.
      *
      * @param  string  $selector
-     * @param  string  ...$attributes
+     * @param  \Closure|null  $callback
      * @return $this
      */
-    public function missingAttributes(string $selector, string ...$attributes): static
+    public function scope(string $selector, ?Closure $callback = null): static
     {
-        $element = $this->findOrFail($selector);
+        return $this->first($selector, $callback);
+    }
 
-        foreach ($attributes as $attribute) {
-            if ($element->hasAttribute($attribute)) {
-                $this->fail(
-                    "Failed asserting that [{$selector}] does not have attribute [{$attribute}].",
-                    $selector
-                );
-            }
-        }
+    /**
+     * Scope into the first element matching the selector and optionally invoke the callback.
+     *
+     * @param  string  $selector
+     * @param  \Closure|null  $callback
+     * @return $this
+     */
+    public function first(string $selector, ?Closure $callback = null): static
+    {
+        return $this->nth($selector, 0, $callback);
+    }
 
-        return $this;
+    /**
+     * Scope into the last element matching the selector and optionally invoke the callback.
+     *
+     * @param  string  $selector
+     * @param  \Closure|null  $callback
+     * @return $this
+     */
+    public function last(string $selector, ?Closure $callback = null): static
+    {
+        return $this->nth($selector, $this->scope->querySelectorAll($selector)->length - 1, $callback);
     }
 
     /**
@@ -349,42 +385,6 @@ class AssertableHtml
         }
 
         return $scoped;
-    }
-
-    /**
-     * Scope into the first element matching the selector and optionally invoke the callback.
-     *
-     * @param  string  $selector
-     * @param  \Closure|null  $callback
-     * @return $this
-     */
-    public function first(string $selector, ?Closure $callback = null): static
-    {
-        return $this->nth($selector, 0, $callback);
-    }
-
-    /**
-     * Scope into the last element matching the selector and optionally invoke the callback.
-     *
-     * @param  string  $selector
-     * @param  \Closure|null  $callback
-     * @return $this
-     */
-    public function last(string $selector, ?Closure $callback = null): static
-    {
-        return $this->nth($selector, $this->scope->querySelectorAll($selector)->length - 1, $callback);
-    }
-
-    /**
-     * Scope into the first element matching the selector and optionally invoke the callback.
-     *
-     * @param  string  $selector
-     * @param  \Closure|null  $callback
-     * @return $this
-     */
-    public function scope(string $selector, ?Closure $callback = null): static
-    {
-        return $this->first($selector, $callback);
     }
 
     /**
