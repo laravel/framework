@@ -190,7 +190,7 @@ class AssertableHtml
         if ($expected instanceof Closure) {
             if (! $expected($actual)) {
                 $this->fail(
-                    "Failed asserting that [{$selector}] text was accepted by the truth test.",
+                    "Failed asserting that [{$selector}] text was marked as invalid using a closure.",
                     $selector
                 );
             }
@@ -238,7 +238,7 @@ class AssertableHtml
         if ($expected instanceof Closure) {
             if ($expected($actual)) {
                 $this->fail(
-                    "Failed asserting that [{$selector}] text was rejected by the truth test.",
+                    "Failed asserting that [{$selector}] text was marked as invalid using a closure.",
                     $selector
                 );
             }
@@ -271,7 +271,7 @@ class AssertableHtml
         if ($expected instanceof Closure) {
             if (! $expected($actual)) {
                 $this->fail(
-                    "Failed asserting that [{$selector}] attribute [{$attribute}] was accepted by the truth test.",
+                    "Failed asserting that [{$selector}] attribute [{$attribute}] was marked as invalid using a closure.",
                     $selector
                 );
             }

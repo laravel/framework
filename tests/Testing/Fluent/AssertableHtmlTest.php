@@ -162,7 +162,7 @@ class AssertableHtmlTest extends TestCase
     public function testWhereFailsWhenClosureReturnsFalse(): void
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed asserting that [p] text was accepted by the truth test.');
+        $this->expectExceptionMessage('Failed asserting that [p] text was marked as invalid using a closure.');
 
         $this->html('<p>Hello World</p>')
             ->where('p', fn ($text) => str_contains($text, 'Goodbye'));
@@ -223,7 +223,7 @@ class AssertableHtmlTest extends TestCase
     public function testWhereNotFailsWhenClosureReturnsTrue(): void
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed asserting that [p] text was rejected by the truth test.');
+        $this->expectExceptionMessage('Failed asserting that [p] text was marked as invalid using a closure.');
 
         $this->html('<p>Hello World</p>')
             ->whereNot('p', fn ($text) => str_contains($text, 'Hello'));
@@ -261,7 +261,7 @@ class AssertableHtmlTest extends TestCase
     public function testWhereAttrFailsWhenClosureReturnsFalse(): void
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed asserting that [a] attribute [href] was accepted by the truth test.');
+        $this->expectExceptionMessage('Failed asserting that [a] attribute [href] was marked as invalid using a closure.');
 
         $this->html('<a href="/about">About</a>')
             ->whereAttr('a', 'href', fn ($value) => str_starts_with($value, 'http'));
