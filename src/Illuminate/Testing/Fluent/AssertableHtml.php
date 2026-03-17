@@ -175,21 +175,6 @@ class AssertableHtml
     }
 
     /**
-     * Assert that each selector's matched element has the expected text content.
-     *
-     * @param  array<string, string|\Closure>  $bindings
-     * @return $this
-     */
-    public function whereAllText(array $bindings): static
-    {
-        foreach ($bindings as $selector => $expected) {
-            $this->whereText($selector, $expected);
-        }
-
-        return $this;
-    }
-
-    /**
      * Assert that the matched element has all of the given attributes.
      *
      * @param  string  $selector

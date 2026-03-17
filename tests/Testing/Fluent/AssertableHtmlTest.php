@@ -156,35 +156,6 @@ class AssertableHtmlTest extends TestCase
             ->whereText('p', fn ($text) => str_contains($text, 'Goodbye'));
     }
 
-    public function testWhereAllText(): void
-    {
-        $this->html('<p class="a">Foo</p><p class="b">Bar</p>')
-            ->whereAllText([
-                'p.a' => 'Foo',
-                'p.b' => 'Bar',
-            ]);
-    }
-
-    public function testWhereAllTextMismatch(): void
-    {
-        $this->expectException(AssertionFailedError::class);
-
-        $this->html('<p class="a">Foo</p><p class="b">Bar</p>')
-            ->whereAllText([
-                'p.a' => 'Foo',
-                'p.b' => 'Wrong',
-            ]);
-    }
-
-    public function testWhereAllTextWithClosures(): void
-    {
-        $this->html('<p class="a">Foo</p><p class="b">Bar</p>')
-            ->whereAllText([
-                'p.a' => fn ($text) => str_starts_with($text, 'F'),
-                'p.b' => 'Bar',
-            ]);
-    }
-
     public function testWhereNotText(): void
     {
         $this->html('<span class="badge">Paid</span>')->whereNotText('.badge', 'Overdue');
