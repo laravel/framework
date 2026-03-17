@@ -3,8 +3,8 @@
 namespace Illuminate\Testing\Fluent;
 
 use Closure;
-use Dom\HTMLDocument;
 use Dom\Element;
+use Dom\HTMLDocument;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
@@ -460,9 +460,7 @@ class AssertableHtml
      */
     public function dd(): never
     {
-        $this->dump();
-
-        exit(1);
+        dd($this->getHtml());
     }
 
     /**
