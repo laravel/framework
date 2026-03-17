@@ -1157,7 +1157,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Toggle the value of a boolean column.
      *
-     * @param string $column
+     * @param  string  $column
      * @param  array  $extra
      * @return $this
      *
@@ -1197,7 +1197,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Toggle the value of a boolean column without raising any events.
      *
-     * @param string $column
+     * @param  string  $column
      * @param  array  $extra
      * @return $this
      */
