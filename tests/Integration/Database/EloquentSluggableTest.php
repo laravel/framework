@@ -99,7 +99,7 @@ class EloquentSluggableTest extends TestCase
     public function test_it_throws_when_source_produces_empty_slug()
     {
         $this->expectException(CouldNotGenerateSlugException::class);
-        $this->expectExceptionMessage('Could not generate a slug for [Illuminate\Tests\Integration\Database\SluggableValidationPost] using column(s) [name].');
+        $this->expectExceptionMessage('No slug could be generated for model [Illuminate\Tests\Integration\Database\SluggableValidationPost] using column(s) [name] with value [');
 
         SluggableValidationPost::create(['name' => '!!!']);
     }
@@ -107,7 +107,7 @@ class EloquentSluggableTest extends TestCase
     public function test_it_throws_when_emoji_only_source_produces_empty_slug()
     {
         $this->expectException(CouldNotGenerateSlugException::class);
-        $this->expectExceptionMessage('Could not generate a slug for [Illuminate\Tests\Integration\Database\SluggableValidationPost] using column(s) [name].');
+        $this->expectExceptionMessage('No slug could be generated for model [Illuminate\Tests\Integration\Database\SluggableValidationPost] using column(s) [name] with value [');
 
         SluggableValidationPost::create(['name' => '🚀🎯🔥']);
     }
@@ -115,7 +115,7 @@ class EloquentSluggableTest extends TestCase
     public function test_it_throws_when_source_column_is_null()
     {
         $this->expectException(CouldNotGenerateSlugException::class);
-        $this->expectExceptionMessage('Could not generate a slug for [Illuminate\Tests\Integration\Database\SluggableValidationPost] using column(s) [name].');
+        $this->expectExceptionMessage('No slug could be generated for model [Illuminate\Tests\Integration\Database\SluggableValidationPost] using column(s) [name] with value [');
 
         SluggableValidationPost::create([]);
     }
@@ -123,7 +123,7 @@ class EloquentSluggableTest extends TestCase
     public function test_it_throws_after_maximum_attempts_exceeded()
     {
         $this->expectException(CouldNotGenerateSlugException::class);
-        $this->expectExceptionMessage('Could not generate a unique slug for [Illuminate\Tests\Integration\Database\SluggableValidationMaxAttemptsPost] with base [hello] after 2 attempts.');
+        $this->expectExceptionMessage('No unique slug could be generated for model [Illuminate\Tests\Integration\Database\SluggableValidationMaxAttemptsPost] using column(s) [name] with value [hello] after 2 attempts.');
 
         SluggableValidationMaxAttemptsPost::create(['name' => 'Hello']);
         SluggableValidationMaxAttemptsPost::create(['name' => 'Hello']);

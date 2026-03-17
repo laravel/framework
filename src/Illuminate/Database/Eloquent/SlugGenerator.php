@@ -53,10 +53,11 @@ class SlugGenerator
      */
     public function generate(): string
     {
-        $slug = $this->slugify($this->resolveSourceValue());
+        $sourceValue = $this->resolveSourceValue();
+        $slug = $this->slugify($sourceValue);
 
         if ($slug === '') {
-            $this->throwEmptySlugException();
+            $this->throwEmptySlugException($sourceValue);
         }
 
         return $this->ensureUnique($slug);
@@ -67,7 +68,7 @@ class SlugGenerator
      *
      * @throws CouldNotGenerateSlugException
      */
-    protected function throwEmptySlugException(): void
+    protected function throwEmptySlugException(string $sourceValue): void
     {
         $options = $this->options();
         $from = Arr::wrap($options->from);
@@ -75,7 +76,7 @@ class SlugGenerator
         $columns = implode(', ', $from);
 
         throw new CouldNotGenerateSlugException(
-            'Could not generate a slug for ['.get_class($this->model)."] using column(s) [{$columns}].",
+            "No slug could be generated for model [".get_class($this->model)."] using column(s) [{$columns}] with value [{$sourceValue}].",
             $errorKey,
             $this->resolveErrorMessage($options),
         );
@@ -182,10 +183,12 @@ class SlugGenerator
             $count++;
 
             if ($count > $options->maxAttempts) {
-                $errorKey = $options->errorKey ?? Arr::wrap($options->from)[0];
+                $from = Arr::wrap($options->from);
+                $errorKey = $options->errorKey ?? $from[0];
+                $columns = implode(', ', $from);
 
                 throw new CouldNotGenerateSlugException(
-                    'Could not generate a unique slug for ['.get_class($this->model)."] with base [{$originalSlug}] after {$options->maxAttempts} attempts.",
+                    "No unique slug could be generated for model [".get_class($this->model)."] using column(s) [{$columns}] with value [{$originalSlug}] after {$options->maxAttempts} attempts.",
                     $errorKey,
                     $this->resolveErrorMessage($options, 'validation.slug_unique'),
                 );
