@@ -114,7 +114,7 @@
         "orchestra/testbench-core": "^9.18.0",
         "pda/pheanstalk": "^5.0.6",
         "php-http/discovery": "^1.15",
-        "phpstan/phpstan": "^2.0",
+        "phpstan/phpstan": "2.1.41",
         "phpunit/phpunit": "^10.5.35|^11.3.6|^12.0.1",
         "predis/predis": "^2.3",
         "resend/resend-php": "^0.10.0",
