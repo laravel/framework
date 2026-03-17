@@ -15,19 +15,19 @@ class AssertableHtmlTest extends TestCase
         return AssertableHtml::fromString("<html><body>{$body}</body></html>");
     }
 
-    public function testFromStringParsesValidHtml(): void
+    public function testFromString(): void
     {
         $assert = $this->html('<p>Hello</p>');
 
         $assert->has('p');
     }
 
-    public function testHasPassesWhenSelectorExists(): void
+    public function testHas(): void
     {
         $this->html('<nav><a href="/">Home</a></nav>')->has('nav');
     }
 
-    public function testHasFailsWhenSelectorMissing(): void
+    public function testHasMissingSelector(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that element [nav] exists.');
@@ -35,12 +35,12 @@ class AssertableHtmlTest extends TestCase
         $this->html('<div></div>')->has('nav');
     }
 
-    public function testHasWithCountPassesWhenCountMatches(): void
+    public function testHasWithCount(): void
     {
         $this->html('<ul><li>a</li><li>b</li><li>c</li></ul>')->has('li', 3);
     }
 
-    public function testHasWithCountFailsWhenCountMismatches(): void
+    public function testHasWithCountMismatch(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [li] matches 2 element(s), found 3.');
@@ -48,7 +48,7 @@ class AssertableHtmlTest extends TestCase
         $this->html('<ul><li>a</li><li>b</li><li>c</li></ul>')->has('li', 2);
     }
 
-    public function testHasWithCallbackScopesIntoElement(): void
+    public function testHasWithCallback(): void
     {
         $this->html('<nav><a href="/about">About</a></nav>')
             ->has('nav', function (AssertableHtml $nav) {
@@ -56,21 +56,21 @@ class AssertableHtmlTest extends TestCase
             });
     }
 
-    public function testHasWithCountAndCallbackScopesIntoFirstMatch(): void
+    public function testHasWithCountAndCallback(): void
     {
         $this->html('<ul><li class="item"><a href="/a">A</a></li><li class="item"><a href="/b">B</a></li></ul>')
             ->has('li.item', 2, function (AssertableHtml $li) {
-                $li->has('a');  // scoped into first li.item
+                $li->has('a');
             });
     }
 
-    public function testHasAllPassesWhenAllSelectorsExist(): void
+    public function testHasAll(): void
     {
         $this->html('<header></header><main></main><footer></footer>')
             ->hasAll(['header', 'main', 'footer']);
     }
 
-    public function testHasAllFailsWhenOneIsMissing(): void
+    public function testHasAllMissingSelector(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that element [footer] exists.');
@@ -79,12 +79,12 @@ class AssertableHtmlTest extends TestCase
             ->hasAll(['header', 'main', 'footer']);
     }
 
-    public function testMissingPassesWhenSelectorAbsent(): void
+    public function testMissing(): void
     {
         $this->html('<div></div>')->missing('nav');
     }
 
-    public function testMissingFailsWhenSelectorPresent(): void
+    public function testMissingPresentSelector(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [nav] is absent.');
@@ -92,13 +92,13 @@ class AssertableHtmlTest extends TestCase
         $this->html('<nav></nav>')->missing('nav');
     }
 
-    public function testMissingAllPassesWhenAllSelectorsAbsent(): void
+    public function testMissingAll(): void
     {
         $this->html('<div></div>')
             ->missingAll(['.alert', '.error', '.warning']);
     }
 
-    public function testMissingAllFailsWhenOneIsPresent(): void
+    public function testMissingAllPresentSelector(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [.error] is absent.');
@@ -107,12 +107,12 @@ class AssertableHtmlTest extends TestCase
             ->missingAll(['.alert', '.error', '.warning']);
     }
 
-    public function testCountPassesWhenCountMatches(): void
+    public function testCount(): void
     {
         $this->html('<ul><li>a</li><li>b</li></ul>')->count('li', 2);
     }
 
-    public function testCountFailsWhenCountMismatches(): void
+    public function testCountMismatch(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [li] matches 3 element(s), found 2.');
@@ -120,12 +120,12 @@ class AssertableHtmlTest extends TestCase
         $this->html('<ul><li>a</li><li>b</li></ul>')->count('li', 3);
     }
 
-    public function testWhereTextPassesWhenTextMatches(): void
+    public function testWhereText(): void
     {
         $this->html('<h1>Hello World</h1>')->whereText('h1', 'Hello World');
     }
 
-    public function testWhereTextFailsWhenTextMismatches(): void
+    public function testWhereTextMismatch(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [h1] text equals [Goodbye], found [Hello World].');
@@ -133,7 +133,7 @@ class AssertableHtmlTest extends TestCase
         $this->html('<h1>Hello World</h1>')->whereText('h1', 'Goodbye');
     }
 
-    public function testWhereTextFailsWhenSelectorMissing(): void
+    public function testWhereTextMissingSelector(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that element [h2] exists.');
@@ -141,13 +141,13 @@ class AssertableHtmlTest extends TestCase
         $this->html('<h1>Hello</h1>')->whereText('h2', 'Hello');
     }
 
-    public function testWhereTextPassesWithClosureTruthTest(): void
+    public function testWhereTextWithClosure(): void
     {
         $this->html('<p>Hello World</p>')
             ->whereText('p', fn ($text) => str_contains($text, 'World'));
     }
 
-    public function testWhereTextFailsWhenClosureReturnsFalse(): void
+    public function testWhereTextWithClosureFailing(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [p] text was marked as invalid using a closure.');
@@ -156,7 +156,7 @@ class AssertableHtmlTest extends TestCase
             ->whereText('p', fn ($text) => str_contains($text, 'Goodbye'));
     }
 
-    public function testWhereAllTextPassesForAllSelectors(): void
+    public function testWhereAllText(): void
     {
         $this->html('<p class="a">Foo</p><p class="b">Bar</p>')
             ->whereAllText([
@@ -165,7 +165,7 @@ class AssertableHtmlTest extends TestCase
             ]);
     }
 
-    public function testWhereAllTextFailsOnFirstMismatch(): void
+    public function testWhereAllTextMismatch(): void
     {
         $this->expectException(AssertionFailedError::class);
 
@@ -176,7 +176,7 @@ class AssertableHtmlTest extends TestCase
             ]);
     }
 
-    public function testWhereAllTextPassesWithClosures(): void
+    public function testWhereAllTextWithClosures(): void
     {
         $this->html('<p class="a">Foo</p><p class="b">Bar</p>')
             ->whereAllText([
@@ -185,12 +185,12 @@ class AssertableHtmlTest extends TestCase
             ]);
     }
 
-    public function testWhereNotTextPassesWhenTextDoesNotMatch(): void
+    public function testWhereNotText(): void
     {
         $this->html('<span class="badge">Paid</span>')->whereNotText('.badge', 'Overdue');
     }
 
-    public function testWhereNotTextFailsWhenTextMatches(): void
+    public function testWhereNotTextMismatch(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [.badge] text does not equal [Paid].');
@@ -198,13 +198,13 @@ class AssertableHtmlTest extends TestCase
         $this->html('<span class="badge">Paid</span>')->whereNotText('.badge', 'Paid');
     }
 
-    public function testWhereNotTextPassesWhenClosureReturnsFalse(): void
+    public function testWhereNotTextWithClosure(): void
     {
         $this->html('<p>Hello World</p>')
             ->whereNotText('p', fn ($text) => str_contains($text, 'Goodbye'));
     }
 
-    public function testWhereNotTextFailsWhenClosureReturnsTrue(): void
+    public function testWhereNotTextWithClosureFailing(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [p] text was marked as invalid using a closure.');
@@ -213,7 +213,7 @@ class AssertableHtmlTest extends TestCase
             ->whereNotText('p', fn ($text) => str_contains($text, 'Hello'));
     }
 
-    public function testWhereNotTextFailsWhenSelectorMissing(): void
+    public function testWhereNotTextMissingSelector(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that element [h2] exists.');
@@ -221,12 +221,12 @@ class AssertableHtmlTest extends TestCase
         $this->html('<h1>Hello</h1>')->whereNotText('h2', 'Hello');
     }
 
-    public function testWhereAttributePassesWhenAttributeMatches(): void
+    public function testWhereAttribute(): void
     {
         $this->html('<a href="/about">About</a>')->whereAttribute('a', 'href', '/about');
     }
 
-    public function testWhereAttributeFailsWhenAttributeMismatches(): void
+    public function testWhereAttributeMismatch(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [a] attribute [href] equals [/contact], found [/about].');
@@ -234,13 +234,13 @@ class AssertableHtmlTest extends TestCase
         $this->html('<a href="/about">About</a>')->whereAttribute('a', 'href', '/contact');
     }
 
-    public function testWhereAttributePassesWithClosureTruthTest(): void
+    public function testWhereAttributeWithClosure(): void
     {
         $this->html('<a href="/about">About</a>')
             ->whereAttribute('a', 'href', fn ($value) => str_starts_with($value, '/'));
     }
 
-    public function testWhereAttributeFailsWhenClosureReturnsFalse(): void
+    public function testWhereAttributeWithClosureFailing(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [a] attribute [href] was marked as invalid using a closure.');
@@ -249,12 +249,12 @@ class AssertableHtmlTest extends TestCase
             ->whereAttribute('a', 'href', fn ($value) => str_starts_with($value, 'http'));
     }
 
-    public function testHasAttributePassesWhenAttributePresent(): void
+    public function testHasAttribute(): void
     {
         $this->html('<input type="email" required>')->hasAttribute('input', 'required');
     }
 
-    public function testHasAttributeFailsWhenAttributeAbsent(): void
+    public function testHasAttributeMissing(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [input] has attribute [disabled].');
@@ -262,12 +262,12 @@ class AssertableHtmlTest extends TestCase
         $this->html('<input type="email">')->hasAttribute('input', 'disabled');
     }
 
-    public function testHasAttributesPassesWhenAllAttributesPresent(): void
+    public function testHasAttributes(): void
     {
         $this->html('<input type="email" required disabled>')->hasAttributes('input', ['required', 'disabled']);
     }
 
-    public function testHasAttributesFailsWhenOneAttributeAbsent(): void
+    public function testHasAttributesMissing(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [input] has attribute [disabled].');
@@ -275,12 +275,12 @@ class AssertableHtmlTest extends TestCase
         $this->html('<input type="email" required>')->hasAttributes('input', ['required', 'disabled']);
     }
 
-    public function testWhereNotAttributePassesWhenAttributeDoesNotMatch(): void
+    public function testWhereNotAttribute(): void
     {
         $this->html('<a href="/about">About</a>')->whereNotAttribute('a', 'href', '/contact');
     }
 
-    public function testWhereNotAttributeFailsWhenAttributeMatches(): void
+    public function testWhereNotAttributeMismatch(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [a] attribute [href] does not equal [/about].');
@@ -288,13 +288,13 @@ class AssertableHtmlTest extends TestCase
         $this->html('<a href="/about">About</a>')->whereNotAttribute('a', 'href', '/about');
     }
 
-    public function testWhereNotAttributePassesWhenClosureReturnsFalse(): void
+    public function testWhereNotAttributeWithClosure(): void
     {
         $this->html('<a href="/about">About</a>')
             ->whereNotAttribute('a', 'href', fn ($v) => str_starts_with($v, 'http'));
     }
 
-    public function testWhereNotAttributeFailsWhenClosureReturnsTrue(): void
+    public function testWhereNotAttributeWithClosureFailing(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [a] attribute [href] was marked as invalid using a closure.');
@@ -303,7 +303,7 @@ class AssertableHtmlTest extends TestCase
             ->whereNotAttribute('a', 'href', fn ($v) => str_starts_with($v, '/'));
     }
 
-    public function testWhereAttributesPassesForAllAttributes(): void
+    public function testWhereAttributes(): void
     {
         $this->html('<a href="/about" class="nav-link">About</a>')
             ->whereAttributes('a', [
@@ -312,7 +312,7 @@ class AssertableHtmlTest extends TestCase
             ]);
     }
 
-    public function testWhereAttributesPassesWithClosures(): void
+    public function testWhereAttributesWithClosures(): void
     {
         $this->html('<a href="/about" class="nav-link">About</a>')
             ->whereAttributes('a', [
@@ -321,7 +321,7 @@ class AssertableHtmlTest extends TestCase
             ]);
     }
 
-    public function testWhereAttributesFailsOnFirstMismatch(): void
+    public function testWhereAttributesMismatch(): void
     {
         $this->expectException(AssertionFailedError::class);
 
@@ -332,12 +332,12 @@ class AssertableHtmlTest extends TestCase
             ]);
     }
 
-    public function testMissingAttributePassesWhenAttributeAbsent(): void
+    public function testMissingAttribute(): void
     {
         $this->html('<input type="email">')->missingAttribute('input', 'disabled');
     }
 
-    public function testMissingAttributeFailsWhenAttributePresent(): void
+    public function testMissingAttributePresent(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [input] does not have attribute [required].');
@@ -345,12 +345,12 @@ class AssertableHtmlTest extends TestCase
         $this->html('<input type="email" required>')->missingAttribute('input', 'required');
     }
 
-    public function testMissingAttributesPassesWhenAllAttributesAbsent(): void
+    public function testMissingAttributes(): void
     {
         $this->html('<input type="email">')->missingAttributes('input', ['required', 'disabled']);
     }
 
-    public function testMissingAttributesFailsWhenOneAttributePresent(): void
+    public function testMissingAttributesPresent(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that [input] does not have attribute [required].');
@@ -358,7 +358,7 @@ class AssertableHtmlTest extends TestCase
         $this->html('<input type="email" required>')->missingAttributes('input', ['required', 'disabled']);
     }
 
-    public function testScopeNarrowsAssertionsToMatchedElement(): void
+    public function testScope(): void
     {
         $this->html('<nav><a href="/home">Home</a></nav><footer><a href="/about">About</a></footer>')
             ->scope('nav', function (AssertableHtml $nav) {
@@ -367,7 +367,7 @@ class AssertableHtmlTest extends TestCase
             });
     }
 
-    public function testScopeFailsWhenSelectorMissing(): void
+    public function testScopeMissingSelector(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that element [aside] exists.');
@@ -377,7 +377,7 @@ class AssertableHtmlTest extends TestCase
         });
     }
 
-    public function testEachIteratesAllMatchingElements(): void
+    public function testEach(): void
     {
         $count = 0;
 
@@ -389,7 +389,7 @@ class AssertableHtmlTest extends TestCase
         $this->assertSame(3, $count);
     }
 
-    public function testEachReportsFailingIndex(): void
+    public function testEachFailingIndex(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed assertion on element [li] at index [1]');
@@ -400,14 +400,14 @@ class AssertableHtmlTest extends TestCase
             });
     }
 
-    public function testEachFailsWhenNoElementsMatch(): void
+    public function testEachNoMatches(): void
     {
         $this->expectException(AssertionFailedError::class);
 
         $this->html('<div></div>')->each('li', fn ($li) => null);
     }
 
-    public function testMethodsReturnStaticForChaining(): void
+    public function testChaining(): void
     {
         $assert = $this->html('<nav><a href="/" class="active">Home</a></nav>');
 
@@ -424,7 +424,7 @@ class AssertableHtmlTest extends TestCase
         $this->assertSame($assert, $result);
     }
 
-    public function testFailureMessageIncludesScopeHtml(): void
+    public function testFailureOutputIncludesHtml(): void
     {
         try {
             $this->html('<nav><a href="/">Home</a></nav>')->has('footer');
@@ -437,7 +437,7 @@ class AssertableHtmlTest extends TestCase
         $this->fail('Expected an AssertionFailedError.');
     }
 
-    public function testScopedFailureMessageIncludesScopedElementHtml(): void
+    public function testScopedFailureOutputIncludesScopedHtml(): void
     {
         try {
             $this->html('<nav><a href="/">Home</a></nav>')
@@ -446,7 +446,6 @@ class AssertableHtmlTest extends TestCase
                 });
         } catch (AssertionFailedError $e) {
             $this->assertStringContainsString('<nav>', $e->getMessage());
-            // Should not include the full document
             $this->assertStringNotContainsString('<html>', $e->getMessage());
 
             return;
