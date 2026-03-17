@@ -54,35 +54,6 @@ class AssertableHtmlTest extends TestCase
         $this->html('<div></div>')->has('nav');
     }
 
-    public function testHasWithCount(): void
-    {
-        $this->html('<ul><li>a</li><li>b</li><li>c</li></ul>')->has('li', 3);
-    }
-
-    public function testHasWithCountMismatch(): void
-    {
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed asserting that [li] matches 2 element(s), found 3.');
-
-        $this->html('<ul><li>a</li><li>b</li><li>c</li></ul>')->has('li', 2);
-    }
-
-    public function testHasWithCallback(): void
-    {
-        $this->html('<nav><a href="/about">About</a></nav>')
-            ->has('nav', function (AssertableHtml $nav) {
-                $nav->has('a[href="/about"]');
-            });
-    }
-
-    public function testHasWithCountAndCallback(): void
-    {
-        $this->html('<ul><li class="item"><a href="/a">A</a></li><li class="item"><a href="/b">B</a></li></ul>')
-            ->has('li.item', 2, function (AssertableHtml $li) {
-                $li->has('a');
-            });
-    }
-
     public function testHasAll(): void
     {
         $this->html('<header></header><main></main><footer></footer>')

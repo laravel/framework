@@ -61,23 +61,11 @@ class AssertableHtml
      * Assert that an element matching the given selector exists.
      *
      * @param  string  $selector
-     * @param  int|\Closure|null  $countOrCallback
-     * @param  \Closure|null  $callback
      * @return $this
      */
-    public function has(string $selector, int|Closure|null $countOrCallback = null, ?Closure $callback = null): static
+    public function has(string $selector): static
     {
-        $element = $this->findOrFail($selector);
-
-        if (is_int($countOrCallback)) {
-            $this->count($selector, $countOrCallback);
-
-            if ($callback !== null) {
-                $callback(new static($element, $this->buildSelector($selector)));
-            }
-        } elseif ($countOrCallback instanceof Closure) {
-            $countOrCallback(new static($element, $this->buildSelector($selector)));
-        }
+        $this->findOrFail($selector);
 
         return $this;
     }
