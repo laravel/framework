@@ -444,7 +444,13 @@ class RouteListCommand extends Command
         ['action' => $action, 'name' => $name] = $route;
 
         if ($action === 'Closure' || $action === ViewController::class) {
-            return $name.($route['path'] ?? null);
+            $path = $route['path'] ?? null;
+
+            if ($name && $path) {
+                return $name.'   '.$path;
+            }
+
+            return $name ?? $path;
         }
 
         $name = $name ? "$name   " : null;
