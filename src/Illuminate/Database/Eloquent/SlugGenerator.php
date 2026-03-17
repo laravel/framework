@@ -75,7 +75,7 @@ class SlugGenerator
         $columns = implode(', ', $from);
 
         throw new EmptySlugException(
-            "Could not generate a slug for [".get_class($this->model)."] using column(s) [{$columns}].",
+            'Could not generate a slug for ['.get_class($this->model)."] using column(s) [{$columns}].",
             $errorKey,
             $this->resolveErrorMessage($errorKey, $options),
         );
