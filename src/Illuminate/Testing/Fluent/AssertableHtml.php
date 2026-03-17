@@ -55,6 +55,7 @@ class AssertableHtml
      * Create a new instance from a test response.
      *
      * @param  \Illuminate\Testing\TestResponse  $response
+     * @param  int  $options
      * @return static
      */
     public static function fromResponse(TestResponse $response, int $options = LIBXML_NOERROR): static
@@ -91,14 +92,7 @@ class AssertableHtml
         $element = $this->findOrFail($selector);
 
         if (is_int($countOrCallback)) {
-            $actual = $this->scope->querySelectorAll($selector)->length;
-
-            if ($actual !== $countOrCallback) {
-                $this->fail(
-                    "Failed asserting that [{$selector}] matches {$countOrCallback} element(s), found {$actual}.",
-                    $selector
-                );
-            }
+            $this->count($selector, $countOrCallback);
 
             if ($callback !== null) {
                 $callback(new static($this->document, $element, $this->buildSelector($selector)));
@@ -208,9 +202,8 @@ class AssertableHtml
         return $this;
     }
 
-
     /**
-     * Assert multiple selector → text (or closure) pairs at once.
+     * Assert multiple selector to text (or closure) pairs at once.
      *
      * @param  array<string, string|\Closure>  $bindings
      * @return $this
@@ -477,7 +470,6 @@ class AssertableHtml
 
         PHPUnit::fail(implode("\n\n", $parts));
     }
-
 
     /**
      * Find the first element matching the selector or fail.
