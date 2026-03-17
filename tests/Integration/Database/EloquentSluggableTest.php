@@ -218,7 +218,7 @@ class EloquentSluggableTest extends TestCase
 
         $this->postJson('/posts')
             ->assertStatus(422)
-            ->assertJsonValidationErrors(['slug']);
+            ->assertJsonValidationErrors(['name']);
     }
 
     public function test_uniqueness_failure_uses_custom_error_key()

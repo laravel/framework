@@ -182,7 +182,7 @@ class SlugGenerator
             $count++;
 
             if ($count > $options->maxAttempts) {
-                $errorKey = $options->errorKey ?? $options->to;
+                $errorKey = $options->errorKey ?? Arr::wrap($options->from)[0];
 
                 throw new CouldNotGenerateSlugException(
                     'Could not generate a unique slug for ['.get_class($this->model)."] with base [{$originalSlug}] after {$options->maxAttempts} attempts.",
