@@ -39,7 +39,7 @@ class CookieTest extends TestCase
         Carbon::setTestNow(Carbon::now());
         $response = $this->get('/');
         $this->assertCount(2, $response->headers->getCookies());
-        $this->assertEquals(Carbon::now()->getTimestamp() + 60, $response->headers->getCookies()[1]->getExpiresTime());
+        $this->assertEquals(Carbon::now()->addMinute()->getTimestamp(), $response->headers->getCookies()[1]->getExpiresTime());
     }
 
     protected function defineEnvironment($app)
