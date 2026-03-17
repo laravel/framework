@@ -516,7 +516,6 @@ class DatabaseEloquentSluggableTest extends TestCase
 
         $this->assertSame($expected, $post->slug);
     }
-
 }
 
 #[Sluggable]
