@@ -7,7 +7,7 @@ use Illuminate\Foundation\Image\PendingImageOptions;
 interface Driver
 {
     /**
-     * Process an image at the given path with the specified options.
+     * Process the given image contents with the specified options.
      */
-    public function process(string $sourcePath, PendingImageOptions $options): string;
+    public function process(string $contents, PendingImageOptions $options): string;
 }

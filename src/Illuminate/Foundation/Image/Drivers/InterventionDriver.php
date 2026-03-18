@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Image\Drivers;
 
 use Illuminate\Contracts\Image\Driver;
+use Illuminate\Foundation\Image\ImageException;
 use Illuminate\Foundation\Image\PendingImageOptions;
 use Intervention\Image\Encoders\AutoEncoder;
 use Intervention\Image\Encoders\GifEncoder;
@@ -32,23 +33,40 @@ abstract class InterventionDriver implements Driver
     abstract protected function createManager(): ImageManager;
 
     /**
-     * Process an image at the given path with the specified options.
+     * Ensure Intervention Image is installed.
+     *
+     * @throws ImageException
      */
-    public function process(string $sourcePath, PendingImageOptions $options): string
+    public function ensureRequirementsAreMet(): void
     {
-        $image = $this->manager->read($sourcePath);
+        if (! class_exists(ImageManager::class)) {
+            throw new ImageException(
+                'Intervention Image is required to use this driver. '.
+                'You may install it via: composer require intervention/image:^3.0',
+            );
+        }
+    }
+
+    /**
+     * Process the given image contents with the specified options.
+     */
+    public function process(string $contents, PendingImageOptions $options): string
+    {
+        $image = $this->manager->read($contents);
 
         if ($options->coverWidth !== null && $options->coverHeight !== null) {
             $image = $image->cover($options->coverWidth, $options->coverHeight);
         }
 
         if ($options->format !== null) {
+            $quality = $options->quality ?? -1;
+
             $encoder = match ($options->format) {
-                'webp' => new WebpEncoder($options->quality),
+                'webp' => new WebpEncoder($quality),
                 'png' => new PngEncoder,
                 'gif' => new GifEncoder,
-                'jpg', 'jpeg' => new JpegEncoder($options->quality),
-                default => new AutoEncoder($options->quality),
+                'jpg', 'jpeg' => new JpegEncoder($quality),
+                default => new AutoEncoder($quality),
             };
 
             return $image->encode($encoder)->toString();
