@@ -3,6 +3,7 @@
 namespace Illuminate\Queue\Attributes;
 
 use Attribute;
+use BackedEnum;
 
 #[Attribute(Attribute::TARGET_CLASS)]
 class Queue
@@ -12,7 +13,7 @@ class Queue
      *
      * @param  string  $queue
      */
-    public function __construct(public string $queue)
+    public function __construct(public BackedEnum|string $queue)
     {
         //
     }

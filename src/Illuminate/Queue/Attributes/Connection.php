@@ -3,6 +3,7 @@
 namespace Illuminate\Queue\Attributes;
 
 use Attribute;
+use BackedEnum;
 
 #[Attribute(Attribute::TARGET_CLASS)]
 class Connection
@@ -12,7 +13,7 @@ class Connection
      *
      * @param  string  $connection
      */
-    public function __construct(public string $connection)
+    public function __construct(public BackedEnum|string $connection)
     {
         //
     }
