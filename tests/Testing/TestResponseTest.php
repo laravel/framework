@@ -594,6 +594,7 @@ class TestResponseTest extends TestCase
     public function testAssertSeeTextCanFail(): void
     {
         $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that \'foo<strong>bar</strong>\' contains "bazfoo".');
 
         $response = $this->makeMockResponse([
             'render' => 'foo<strong>bar</strong>',
@@ -611,6 +612,20 @@ class TestResponseTest extends TestCase
 
         $response->assertSeeText('laravel & php');
         $response->assertSeeText(['php & friends', 'laravel & php']);
+    }
+
+    public function testAssertSeeTextWhitespace(): void
+    {
+        $response = $this->makeMockResponse([
+            'render' => <<<'EOT'
+<p>
+    Hello,
+    laravel &amp; php &amp; friends
+</p>,
+EOT
+        ]);
+
+        $response->assertSeeText('Hello, laravel & php & friends');
     }
 
     public function testAssertSeeTextEscapedCanFail(): void
@@ -645,9 +660,24 @@ class TestResponseTest extends TestCase
         $response->assertSeeTextInOrder(['laravel & php', 'phpstorm > sublime']);
     }
 
+    public function testAssertSeeTextInOrderWhitespace(): void
+    {
+        $response = $this->makeMockResponse([
+            'render' => <<<'EOT'
+<p>
+    Hello,
+    laravel &amp; php &amp; friends
+</p>,
+EOT
+        ]);
+
+        $response->assertSeeTextInOrder(['Hello', 'laravel & php', 'friends']);
+    }
+
     public function testAssertSeeTextInOrderCanFail(): void
     {
         $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that \'foo<strong>bar</strong> baz <strong>foo</strong>\' contains "foobar" in specified order.');
 
         $response = $this->makeMockResponse([
             'render' => 'foo<strong>bar</strong> baz <strong>foo</strong>',
@@ -746,6 +776,7 @@ class TestResponseTest extends TestCase
     public function testAssertDontSeeTextCanFail(): void
     {
         $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that \'foo<strong>bar</strong>baz<strong>qux</strong>\' does not contain "foobar".');
 
         $response = $this->makeMockResponse([
             'render' => 'foo<strong>bar</strong>baz<strong>qux</strong>',

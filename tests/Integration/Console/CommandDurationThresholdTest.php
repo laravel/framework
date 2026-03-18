@@ -193,7 +193,7 @@ class CommandDurationThresholdTest extends TestCase
         Carbon::setTestNow(Carbon::now());
         $kernel->handle($input = new StringInput('foo'), new ConsoleOutput);
 
-        Carbon::setTestNow(now()->addMinute());
+        Carbon::setTestNow(Carbon::now()->addMinute());
         $kernel->terminate($input, 21);
 
         $this->assertSame('Australia/Melbourne', $startedAt->timezone->getName());

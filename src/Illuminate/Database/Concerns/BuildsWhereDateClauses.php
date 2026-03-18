@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Concerns;
 
-use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 
 trait BuildsWhereDateClauses
 {
