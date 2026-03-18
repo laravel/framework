@@ -24,7 +24,7 @@ class ClearCommandTest extends TestCase
     protected function tearDown(): void
     {
         Container::setInstance(null);
-        m::close();
+
         parent::tearDown();
     }
 
