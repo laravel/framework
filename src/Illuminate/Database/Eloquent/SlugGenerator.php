@@ -75,17 +75,21 @@ class SlugGenerator
         $errorKey = $options->errorKey ?? $from[0];
         $columns = implode(', ', $from);
 
-        throw new CouldNotGenerateSlugException(
-            'No slug could be generated for model ['.get_class($this->model)."] using column(s) [{$columns}] with value [{$sourceValue}].",
-            $errorKey,
-            $this->resolveErrorMessage($options),
-        );
+        $exception = CouldNotGenerateSlugException::withMessages([
+            $errorKey => $this->resolveErrorMessage($options, 'validation.slug_required'),
+        ]);
+
+        $message = 'No slug could be generated for model ['.get_class($this->model)."] using column(s) [{$columns}] with value [{$sourceValue}].";
+
+        (fn () => $this->message = $message)->call($exception);
+
+        throw $exception;
     }
 
     /**
      * Resolve the user-facing error message for a failed slug generation.
      */
-    protected function resolveErrorMessage(Sluggable $options, string $translationKey = 'validation.slug_required'): string
+    protected function resolveErrorMessage(Sluggable $options, string $translationKey): string
     {
         $from = array_map(fn (string $name) => str_replace('_', ' ', Str::snake($name)), Arr::wrap($options->from));
         $attribute = count($from) === 1 ? $from[0] : implode(' and ', [implode(', ', array_slice($from, 0, -1)), end($from)]);
@@ -187,11 +191,15 @@ class SlugGenerator
                 $errorKey = $options->errorKey ?? $from[0];
                 $columns = implode(', ', $from);
 
-                throw new CouldNotGenerateSlugException(
-                    'No unique slug could be generated for model ['.get_class($this->model)."] using column(s) [{$columns}] with value [{$originalSlug}] after {$options->maxAttempts} attempts.",
-                    $errorKey,
-                    $this->resolveErrorMessage($options, 'validation.slug_unique'),
-                );
+                $exception = CouldNotGenerateSlugException::withMessages([
+                    $errorKey => $this->resolveErrorMessage($options, 'validation.slug_unique'),
+                ]);
+
+                $message = "No unique slug could be generated for model [".get_class($this->model)."] using column(s) [{$columns}] with value [{$originalSlug}] after {$options->maxAttempts} attempts.";
+
+                (fn () => $this->message = $message)->call($exception);
+
+                throw $exception;
             }
 
             $suffix = $options->separator.$count;
