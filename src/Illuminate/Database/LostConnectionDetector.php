@@ -4,6 +4,7 @@ namespace Illuminate\Database;
 
 use Illuminate\Contracts\Database\LostConnectionDetector as LostConnectionDetectorContract;
 use Illuminate\Support\Str;
+use PDOException;
 use Throwable;
 
 class LostConnectionDetector implements LostConnectionDetectorContract
@@ -16,6 +17,10 @@ class LostConnectionDetector implements LostConnectionDetectorContract
      */
     public function causedByLostConnection(Throwable $e): bool
     {
+        if ($this->hasLostConnectionErrorCode($e)) {
+            return true;
+        }
+
         $message = $e->getMessage();
 
         return Str::contains($message, [
@@ -101,6 +106,29 @@ class LostConnectionDetector implements LostConnectionDetectorContract
             'failed to send startup message',
             'failed to read startup message',
             'canceling statement due to conflict with recovery',
+        ]);
+    }
+
+    /**
+     * Determine if the exception has a locale-independent error code indicating a lost connection.
+     *
+     * @param  \Throwable  $e
+     * @return bool
+     */
+    protected function hasLostConnectionErrorCode(Throwable $e): bool
+    {
+        $previous = $e->getPrevious();
+
+        $pdo = $e instanceof PDOException ? $e : ($previous instanceof PDOException ? $previous : null);
+
+        if ($pdo === null || ! isset($pdo->errorInfo[1])) {
+            return false;
+        }
+
+        return in_array($pdo->errorInfo[1], [
+            2002, // CR_CONNECTION_ERROR
+            2006, // CR_SERVER_GONE_ERROR
+            2013, // CR_SERVER_LOST
         ]);
     }
 }
