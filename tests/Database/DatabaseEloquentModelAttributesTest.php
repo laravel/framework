@@ -310,7 +310,7 @@ class ModelWithConnectionAttribute extends Model
     //
 }
 
-#[Connection(ConnectionEnum::Secondary)]
+#[Connection(ConnectionBackedEnum::Secondary)]
 class ModelWithBackedEnumConnectionAttribute extends Model
 {
     //
@@ -411,7 +411,7 @@ class ModelWithTouchesAttribute extends Model
     //
 }
 
-enum ConnectionEnum: string
+enum ConnectionBackedEnum: string
 {
     case Secondary = 'secondary';
 }
