@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Attributes\Appends;
 use Illuminate\Database\Eloquent\Attributes\Connection;
+use Illuminate\Database\Eloquent\Attributes\DateFormat;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -123,6 +124,20 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $model = new ModelWithDateFormatAttribute;
 
         $this->assertSame('U', $model->getDateFormat());
+    }
+
+    public function test_dedicated_date_format_attribute(): void
+    {
+        $model = new ModelWithDedicatedDateFormatAttribute;
+
+        $this->assertSame('Y-m-d', $model->getDateFormat());
+    }
+
+    public function test_dedicated_date_format_attribute_overrides_table_date_format(): void
+    {
+        $model = new ModelWithDateFormatAttributeOverride;
+
+        $this->assertSame('Y-m-d', $model->getDateFormat());
     }
 
     public function test_fillable_attribute(): void
@@ -381,6 +396,19 @@ class ModelWithAppendsAttribute extends Model
 
 #[Touches(['post', 'author'])]
 class ModelWithTouchesAttribute extends Model
+{
+    //
+}
+
+#[DateFormat('Y-m-d')]
+class ModelWithDedicatedDateFormatAttribute extends Model
+{
+    //
+}
+
+#[Table(dateFormat: 'U')]
+#[DateFormat('Y-m-d')]
+class ModelWithDateFormatAttributeOverride extends Model
 {
     //
 }
