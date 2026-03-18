@@ -465,7 +465,7 @@ class BroadcastManager implements FactoryContract
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['broadcasting.default'];
+        return $this->app['config']['broadcasting.default'] ?? 'null';
     }
 
     /**
