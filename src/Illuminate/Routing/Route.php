@@ -8,6 +8,7 @@ use Illuminate\Container\Container;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Attributes\Controllers\Middleware as MiddlewareAttribute;
+use Illuminate\Routing\Attributes\Controllers\WithoutMiddleware as WithoutMiddlewareAttribute;
 use Illuminate\Routing\Contracts\CallableDispatcher;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -1183,6 +1184,19 @@ class Route
             $reflectionMethod = $reflectionClass->getMethod($method);
         } catch (ReflectionException) {
             return [];
+        }
+
+        $withoutMiddlewareAttributes = array_merge(
+            $reflectionClass->getAttributes(WithoutMiddlewareAttribute::class, ReflectionAttribute::IS_INSTANCEOF),
+            $reflectionMethod->getAttributes(WithoutMiddlewareAttribute::class, ReflectionAttribute::IS_INSTANCEOF),
+        );
+
+        foreach ($withoutMiddlewareAttributes as $attribute) {
+            $instance = $attribute->newInstance();
+
+            if (! static::methodExcludedByOptions($method, ['only' => $instance->only, 'except' => $instance->except])) {
+                $this->withoutMiddleware($instance->middleware);
+            }
         }
 
         return (new Collection(array_merge(
