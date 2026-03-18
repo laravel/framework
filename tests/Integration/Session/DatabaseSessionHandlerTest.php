@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Session;
 
+use Illuminate\Database\QueryException;
 use Illuminate\Session\DatabaseSessionHandler;
 use Illuminate\Support\Carbon;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
@@ -94,6 +95,19 @@ class DatabaseSessionHandlerTest extends DatabaseTestCase
         $this->assertEquals(true, $handler2->destroy('id_1'));
         // only one row is deleted:
         $this->assertEquals(1, $connection->table('sessions')->where('id', 'id_2')->count());
+    }
+
+    public function test_insert_rethrows_non_unique_constraint_query_exceptions()
+    {
+        $connection = $this->app['db']->connection();
+        $handler = new DatabaseSessionHandler($connection, 'sessions', 1);
+
+        // Drop the sessions table to cause a non-unique-constraint QueryException on insert
+        $connection->getSchemaBuilder()->drop('sessions');
+
+        $this->expectException(QueryException::class);
+
+        $handler->write('session_id', 'some data');
     }
 
     public function test_it_can_work_without_container()
