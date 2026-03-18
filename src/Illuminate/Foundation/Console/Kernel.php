@@ -6,6 +6,7 @@ use Carbon\CarbonInterval;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Console\Attributes\Schedule as ScheduleAttribute;
 use Illuminate\Console\Command;
 use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Console\Events\CommandStarting;
@@ -22,6 +23,7 @@ use Illuminate\Support\Env;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 use ReflectionClass;
+use ReflectionException;
 use SplFileInfo;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -288,7 +290,48 @@ class Kernel implements KernelContract
     {
         return tap(new Schedule($this->scheduleTimezone()), function ($schedule) {
             $this->schedule($schedule->useCache($this->scheduleCache()));
+
+            $this->scheduleAttributedCommands($schedule);
         });
+    }
+
+    /**
+     * Auto-register commands bearing the #[Schedule] attribute.
+     *
+     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @return void
+     */
+    protected function scheduleAttributedCommands(Schedule $schedule): void
+    {
+        $commandClasses = $this->commands;
+
+        foreach ($this->commandPaths as $path) {
+            if (! is_dir($path)) {
+                continue;
+            }
+
+            $namespace = $this->app->getNamespace();
+
+            foreach ((new Finder)->in($path)->files()->name('*.php') as $file) {
+                $commandClasses[] = $this->commandClassFromFile($file, $namespace);
+            }
+        }
+
+        foreach (array_unique($commandClasses) as $commandClass) {
+            if (! class_exists($commandClass)) {
+                continue;
+            }
+
+            try {
+                $reflection = new ReflectionClass($commandClass);
+            } catch (ReflectionException) {
+                continue;
+            }
+
+            foreach ($reflection->getAttributes(ScheduleAttribute::class) as $attribute) {
+                $attribute->newInstance()->applyTo($schedule->command($commandClass));
+            }
+        }
     }
 
     /**
