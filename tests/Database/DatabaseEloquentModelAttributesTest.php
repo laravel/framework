@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\Touches;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Attributes\Visible;
+use Illuminate\Database\Eloquent\Attributes\WithoutIncrementing;
 use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Database\Eloquent\Model;
 use PHPUnit\Framework\TestCase;
@@ -89,6 +90,20 @@ class DatabaseEloquentModelAttributesTest extends TestCase
 
         $this->assertSame('uuid', $model->getKeyName());
         $this->assertSame('string', $model->getKeyType());
+        $this->assertFalse($model->getIncrementing());
+    }
+
+    public function test_dedicated_without_incrementing_attribute(): void
+    {
+        $model = new ModelWithDedicatedWithoutIncrementingAttribute;
+
+        $this->assertFalse($model->getIncrementing());
+    }
+
+    public function test_dedicated_without_incrementing_attribute_overrides_table_incrementing(): void
+    {
+        $model = new ModelWithWithoutIncrementingAttributeOverride;
+
         $this->assertFalse($model->getIncrementing());
     }
 
@@ -437,6 +452,19 @@ class ModelWithDedicatedWithoutTimestampsAttribute extends Model
 #[Table(timestamps: true)]
 #[WithoutTimestamps]
 class ModelWithWithoutTimestampsAttributeOverride extends Model
+{
+    //
+}
+
+#[WithoutIncrementing]
+class ModelWithDedicatedWithoutIncrementingAttribute extends Model
+{
+    //
+}
+
+#[Table(incrementing: true)]
+#[WithoutIncrementing]
+class ModelWithWithoutIncrementingAttributeOverride extends Model
 {
     //
 }
