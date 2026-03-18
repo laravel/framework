@@ -1,6 +1,18 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.0.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.1.0...13.x)
+
+## [v13.1.0](https://github.com/laravel/framework/compare/v13.0.0...v13.1.0) - 2026-03-18
+
+* [12.x] Correct truncate exceptions at by [@bretto36](https://github.com/bretto36) in https://github.com/laravel/framework/pull/59239
+* [13.x] Remove useless \Mockery::close() by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/59253
+* Fix: Batch::add() wipes queue assignment on first job in array chains by [@ProjektGopher](https://github.com/ProjektGopher) in https://github.com/laravel/framework/pull/59233
+* Improvements for asserting HTML in text by [@jasonmccreary](https://github.com/jasonmccreary) in https://github.com/laravel/framework/pull/59161
+* [13.x] Use Carbon::now() instead of now() helper by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/59252
+* [13.x] Fix null broadcaster deprecation warning in PHP 8.5 by [@mortenscheel](https://github.com/mortenscheel) in https://github.com/laravel/framework/pull/59269
+* [12.x] Fix float pluralization in trans_choice() by [@JulianGlueck](https://github.com/JulianGlueck) in https://github.com/laravel/framework/pull/59268
+* [12.x] Fix tests on PHP 8.5 by [@SanderMuller](https://github.com/SanderMuller) in https://github.com/laravel/framework/pull/59251
+* [13.x] Add toString to Uri by [@dwightwatson](https://github.com/dwightwatson) in https://github.com/laravel/framework/pull/59259
 
 ## [v13.0.0](https://github.com/laravel/framework/compare/v12.54.1...v13.0.0) - 2026-03-17
 
