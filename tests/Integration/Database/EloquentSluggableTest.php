@@ -70,31 +70,6 @@ class EloquentSluggableTest extends TestCase
             ->assertJsonValidationErrors(['custom_field']);
     }
 
-    public function test_empty_slug_returns_422_with_custom_error_message()
-    {
-        Route::post('/posts', fn () => SluggableValidationCustomMessagePost::create(['name' => '!!!']));
-
-        $this->postJson('/posts')
-            ->assertStatus(422)
-            ->assertJson([
-                'errors' => [
-                    'name' => ['Please enter a valid name.'],
-                ],
-            ]);
-    }
-
-    public function test_empty_slug_returns_422_with_custom_error_key_and_message()
-    {
-        Route::post('/posts', fn () => SluggableValidationFullCustomPost::create(['name' => '!!!']));
-
-        $this->postJson('/posts')
-            ->assertStatus(422)
-            ->assertJson([
-                'errors' => [
-                    'title' => ['Please provide a valid title.'],
-                ],
-            ]);
-    }
 
     public function test_it_throws_when_source_produces_empty_slug()
     {
@@ -153,18 +128,40 @@ class EloquentSluggableTest extends TestCase
             ->assertSessionHasErrors(['name']);
     }
 
-    public function test_json_request_returns_custom_error_key_and_message()
+
+    public function test_custom_translation_for_slug_required()
     {
-        Route::post('/posts', function () {
-            SluggableValidationFullCustomPost::create(['name' => '!!!']);
-        });
+        $this->app['translator']->addLines([
+            'validation.slug_required' => 'The :attribute field cannot produce a valid :slug.',
+        ], 'en');
+
+        Route::post('/posts', fn () => SluggableValidationPost::create(['name' => '!!!']));
 
         $this->postJson('/posts')
             ->assertStatus(422)
-            ->assertJsonValidationErrors(['title'])
             ->assertJson([
                 'errors' => [
-                    'title' => ['Please provide a valid title.'],
+                    'name' => ['The name field cannot produce a valid slug.'],
+                ],
+            ]);
+    }
+
+    public function test_custom_translation_for_slug_unique()
+    {
+        $this->app['translator']->addLines([
+            'validation.slug_unique' => 'A unique :slug could not be generated for :attribute.',
+        ], 'en');
+
+        SluggableValidationMaxAttemptsPost::create(['name' => 'Hello']);
+        SluggableValidationMaxAttemptsPost::create(['name' => 'Hello']);
+
+        Route::post('/posts', fn () => SluggableValidationMaxAttemptsPost::create(['name' => 'Hello']));
+
+        $this->postJson('/posts')
+            ->assertStatus(422)
+            ->assertJson([
+                'errors' => [
+                    'name' => ['A unique slug could not be generated for name.'],
                 ],
             ]);
     }
@@ -243,21 +240,6 @@ class SluggableValidationCustomErrorPost extends Model
     protected $guarded = [];
 }
 
-#[Sluggable(errorMessage: 'Please enter a valid name.')]
-class SluggableValidationCustomMessagePost extends Model
-{
-    protected $table = 'sluggable_validation_posts';
-
-    protected $guarded = [];
-}
-
-#[Sluggable(errorKey: 'title', errorMessage: 'Please provide a valid title.')]
-class SluggableValidationFullCustomPost extends Model
-{
-    protected $table = 'sluggable_validation_posts';
-
-    protected $guarded = [];
-}
 
 #[Sluggable(from: ['first_name', 'last_name'])]
 class SluggableValidationMultiSourcePost extends Model

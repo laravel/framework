@@ -93,11 +93,8 @@ class SlugGenerator
     {
         $from = array_map(fn (string $name) => str_replace('_', ' ', Str::snake($name)), Arr::wrap($options->from));
         $attribute = count($from) === 1 ? $from[0] : implode(' and ', [implode(', ', array_slice($from, 0, -1)), end($from)]);
-        $replacements = ['attribute' => $attribute, 'slug' => str_replace('_', ' ', Str::snake($options->to))];
 
-        return $options->errorMessage
-            ? __($options->errorMessage, $replacements)
-            : __($translationKey, $replacements);
+        return __($translationKey, ['attribute' => $attribute, 'slug' => str_replace('_', ' ', Str::snake($options->to))]);
     }
 
     /**
