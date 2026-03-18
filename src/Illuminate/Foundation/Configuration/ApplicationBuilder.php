@@ -356,6 +356,30 @@ class ApplicationBuilder
     }
 
     /**
+     * Register job classes that should be automatically scheduled via the #[Schedule] attribute.
+     *
+     * @param  array  $jobs
+     * @return $this
+     */
+    public function withScheduledJobs(array $jobs = [])
+    {
+        if (empty($jobs)) {
+            $jobs = [$this->app->path('Jobs')];
+        }
+
+        $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($jobs) {
+            [$jobClasses, $paths] = (new Collection($jobs))->partition(fn ($job) => class_exists($job));
+
+            $this->app->booted(static function () use ($kernel, $jobClasses, $paths) {
+                $kernel->addScheduledJobs($jobClasses->all());
+                $kernel->addScheduledJobPaths($paths->all());
+            });
+        });
+
+        return $this;
+    }
+
+    /**
      * Register the scheduled tasks for the application.
      *
      * @param  callable(\Illuminate\Console\Scheduling\Schedule $schedule): void  $callback

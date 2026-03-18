@@ -6,13 +6,14 @@ namespace Illuminate\Tests\Console\Scheduling;
 
 use Illuminate\Console\Attributes\Schedule;
 use Illuminate\Console\Command;
+use Illuminate\Console\Scheduling\CallbackEvent;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Console\Scheduling\Schedule as Scheduler;
 use Illuminate\Console\Scheduling\SchedulingMutex;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Mockery as m;
-use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 
 class ScheduleAttributeTest extends TestCase
@@ -191,6 +192,21 @@ class ScheduleAttributeTest extends TestCase
         $this->assertEquals(['production'], $second->environments);
     }
 
+    public function test_attribute_can_be_applied_to_a_job(): void
+    {
+        $schedule = new Scheduler;
+
+        $reflection = new \ReflectionClass(ScheduledJob::class);
+        $attribute = $reflection->getAttributes(Schedule::class)[0]->newInstance();
+
+        $event = $schedule->job(ScheduledJob::class);
+        $attribute->applyTo($event);
+
+        $this->assertInstanceOf(CallbackEvent::class, $event);
+        $this->assertEquals('0 * * * *', $event->expression);
+        $this->assertEquals(['production'], $event->environments);
+    }
+
     private function makeEvent(): Event
     {
         $schedule = new Scheduler;
@@ -210,4 +226,10 @@ class ScheduledWithCronCommand extends Command
 class ScheduledWithMultipleAttributesCommand extends Command
 {
     protected $signature = 'test:multi-schedule';
+}
+
+#[Schedule(hourly: true, environments: ['production'])]
+class ScheduledJob implements ShouldQueue
+{
+    public function handle(): void {}
 }

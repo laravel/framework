@@ -87,6 +87,20 @@ class Kernel implements KernelContract
     protected $commandRoutePaths = [];
 
     /**
+     * The job class names that should be automatically scheduled via attributes.
+     *
+     * @var array
+     */
+    protected $scheduledJobs = [];
+
+    /**
+     * The paths where scheduled jobs should be automatically discovered.
+     *
+     * @var array
+     */
+    protected $scheduledJobPaths = [];
+
+    /**
      * Indicates if the Closure commands have been loaded.
      *
      * @var bool
@@ -296,7 +310,7 @@ class Kernel implements KernelContract
     }
 
     /**
-     * Auto-register commands bearing the #[Schedule] attribute.
+     * Auto-register commands and jobs bearing the #[Schedule] attribute.
      *
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
@@ -318,19 +332,54 @@ class Kernel implements KernelContract
         }
 
         foreach (array_unique($commandClasses) as $commandClass) {
-            if (! class_exists($commandClass)) {
+            $this->scheduleAttributedClass($schedule, $commandClass, isCommand: true);
+        }
+
+        $jobClasses = $this->scheduledJobs;
+
+        foreach ($this->scheduledJobPaths as $path) {
+            if (! is_dir($path)) {
                 continue;
             }
 
-            try {
-                $reflection = new ReflectionClass($commandClass);
-            } catch (ReflectionException) {
-                continue;
-            }
+            $namespace = $this->app->getNamespace();
 
-            foreach ($reflection->getAttributes(ScheduleAttribute::class) as $attribute) {
-                $attribute->newInstance()->applyTo($schedule->command($commandClass));
+            foreach ((new Finder)->in($path)->files()->name('*.php') as $file) {
+                $jobClasses[] = $this->commandClassFromFile($file, $namespace);
             }
+        }
+
+        foreach (array_unique($jobClasses) as $jobClass) {
+            $this->scheduleAttributedClass($schedule, $jobClass, isCommand: false);
+        }
+    }
+
+    /**
+     * Schedule a single class bearing the #[Schedule] attribute.
+     *
+     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @param  string  $class
+     * @param  bool  $isCommand
+     * @return void
+     */
+    protected function scheduleAttributedClass(Schedule $schedule, string $class, bool $isCommand): void
+    {
+        if (! class_exists($class)) {
+            return;
+        }
+
+        try {
+            $reflection = new ReflectionClass($class);
+        } catch (ReflectionException) {
+            return;
+        }
+
+        foreach ($reflection->getAttributes(ScheduleAttribute::class) as $attribute) {
+            $event = $isCommand
+                ? $schedule->command($class)
+                : $schedule->job($class);
+
+            $attribute->newInstance()->applyTo($event);
         }
     }
 
@@ -659,6 +708,32 @@ class Kernel implements KernelContract
     public function addCommandRoutePaths(array $paths)
     {
         $this->commandRoutePaths = array_values(array_unique(array_merge($this->commandRoutePaths, $paths)));
+
+        return $this;
+    }
+
+    /**
+     * Set the job classes that should be automatically scheduled via the #[Schedule] attribute.
+     *
+     * @param  array  $jobs
+     * @return $this
+     */
+    public function addScheduledJobs(array $jobs)
+    {
+        $this->scheduledJobs = array_values(array_unique(array_merge($this->scheduledJobs, $jobs)));
+
+        return $this;
+    }
+
+    /**
+     * Set the paths that should have their scheduled jobs automatically discovered via the #[Schedule] attribute.
+     *
+     * @param  array  $paths
+     * @return $this
+     */
+    public function addScheduledJobPaths(array $paths)
+    {
+        $this->scheduledJobPaths = array_values(array_unique(array_merge($this->scheduledJobPaths, $paths)));
 
         return $this;
     }
