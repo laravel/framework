@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Events\MaintenanceModeEnabled;
 use Illuminate\Foundation\Exceptions\RegisterErrorViewPaths;
+use Illuminate\Foundation\FileBasedMaintenanceMode;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -51,10 +52,12 @@ class DownCommand extends Command
 
             $this->laravel->maintenanceMode()->activate($downFilePayload);
 
-            file_put_contents(
-                storage_path('framework/maintenance.php'),
-                file_get_contents(__DIR__.'/stubs/maintenance-mode.stub')
-            );
+            if ($this->laravel->maintenanceMode() instanceof FileBasedMaintenanceMode) {
+                file_put_contents(
+                    storage_path('framework/maintenance.php'),
+                    file_get_contents(__DIR__.'/stubs/maintenance-mode.stub')
+                );
+            }
 
             $this->laravel->get('events')->dispatch(new MaintenanceModeEnabled());
 
