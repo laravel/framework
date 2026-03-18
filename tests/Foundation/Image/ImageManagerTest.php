@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation\Image;
 
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Foundation\Image\ImageManager;
 use InvalidArgumentException;
@@ -76,9 +77,9 @@ class ImageManagerTest extends TestCase
         $manager->driver('nonexistent');
     }
 
-    protected function makeApp(array $config): \Illuminate\Contracts\Foundation\Application
+    protected function makeApp(array $config): Application
     {
-        $app = m::mock(\Illuminate\Contracts\Foundation\Application::class, \ArrayAccess::class);
+        $app = m::mock(Application::class, \ArrayAccess::class);
 
         $configRepo = new \ArrayObject($config);
 

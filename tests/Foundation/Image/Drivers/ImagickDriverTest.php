@@ -95,6 +95,83 @@ class ImagickDriverTest extends TestCase
         $this->assertSame(IMAGETYPE_PNG, $type);
     }
 
+    public function test_processes_scale()
+    {
+        $driver = new ImagickDriver;
+        $contents = $this->fakeImageContents(400, 200);
+
+        $options = new PendingImageOptions;
+        $options->scaleWidth = 200;
+
+        $result = $driver->process($contents, $options);
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(200, $width);
+        $this->assertSame(100, $height);
+    }
+
+    public function test_processes_scale_with_both_dimensions()
+    {
+        $driver = new ImagickDriver;
+        $contents = $this->fakeImageContents(400, 400);
+
+        $options = new PendingImageOptions;
+        $options->scaleWidth = 200;
+        $options->scaleHeight = 100;
+
+        $result = $driver->process($contents, $options);
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertLessThanOrEqual(200, $width);
+        $this->assertLessThanOrEqual(100, $height);
+    }
+
+    public function test_processes_orient()
+    {
+        $driver = new ImagickDriver;
+        $contents = $this->fakeImageContents(100, 100);
+
+        $options = new PendingImageOptions;
+        $options->orient = true;
+
+        $result = $driver->process($contents, $options);
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(100, $width);
+        $this->assertSame(100, $height);
+    }
+
+    public function test_processes_blur()
+    {
+        $driver = new ImagickDriver;
+        $contents = $this->fakeImageContents(100, 100);
+
+        $options = new PendingImageOptions;
+        $options->blur = 10;
+
+        $result = $driver->process($contents, $options);
+
+        $this->assertNotEmpty($result);
+        $this->assertNotSame($contents, $result);
+    }
+
+    public function test_processes_greyscale()
+    {
+        $driver = new ImagickDriver;
+        $contents = $this->fakeImageContents(100, 100);
+
+        $options = new PendingImageOptions;
+        $options->greyscale = true;
+
+        $result = $driver->process($contents, $options);
+
+        $this->assertNotEmpty($result);
+        $this->assertNotSame($contents, $result);
+    }
+
     public function test_returns_image_without_options()
     {
         $driver = new ImagickDriver;

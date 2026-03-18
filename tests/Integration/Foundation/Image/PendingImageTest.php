@@ -48,6 +48,82 @@ class PendingImageTest extends TestCase
         $this->assertSame(IMAGETYPE_WEBP, $extension);
     }
 
+    public function test_scale_resizes_proportionally()
+    {
+        $file = UploadedFile::fake()->image('photo.jpg', 400, 200);
+
+        $image = new PendingImage($file, new Filesystem);
+        $image->scale(200)->process();
+
+        [$width, $height] = getimagesize($file->getRealPath());
+
+        $this->assertSame(200, $width);
+        $this->assertSame(100, $height);
+    }
+
+    public function test_orient_processes_without_error()
+    {
+        $file = UploadedFile::fake()->image('photo.jpg', 100, 100);
+
+        $image = new PendingImage($file, new Filesystem);
+        $image->orient()->process();
+
+        [$width, $height] = getimagesize($file->getRealPath());
+
+        $this->assertSame(100, $width);
+        $this->assertSame(100, $height);
+    }
+
+    public function test_blur_modifies_image()
+    {
+        $file = UploadedFile::fake()->image('photo.jpg', 100, 100);
+        $originalBytes = file_get_contents($file->getRealPath());
+
+        $image = new PendingImage($file, new Filesystem);
+        $image->blur(10)->process();
+
+        $this->assertNotSame($originalBytes, file_get_contents($file->getRealPath()));
+    }
+
+    public function test_greyscale_modifies_image()
+    {
+        $file = UploadedFile::fake()->image('photo.jpg', 100, 100);
+        $originalBytes = file_get_contents($file->getRealPath());
+
+        $image = new PendingImage($file, new Filesystem);
+        $image->greyscale()->process();
+
+        $this->assertNotSame($originalBytes, file_get_contents($file->getRealPath()));
+    }
+
+    public function test_full_avatar_pipeline()
+    {
+        $file = UploadedFile::fake()->image('avatar.jpg', 400, 400);
+
+        $image = new PendingImage($file, new Filesystem);
+        $image->orient()->cover(200, 200)->optimize('webp')->process();
+
+        [$width, $height, $type] = getimagesize($file->getRealPath());
+
+        $this->assertSame(200, $width);
+        $this->assertSame(200, $height);
+        $this->assertSame(IMAGETYPE_WEBP, $type);
+    }
+
+    public function test_full_album_pipeline()
+    {
+        $file = UploadedFile::fake()->image('photo.jpg', 4000, 3000);
+
+        $image = new PendingImage($file, new Filesystem);
+        $image->orient()->scale(1200)->optimize('webp', 85)->process();
+
+        [$width, $height, $type] = getimagesize($file->getRealPath());
+
+        $this->assertSame(1200, $width);
+        $this->assertSame(900, $height);
+        $this->assertSame(IMAGETYPE_WEBP, $type);
+    }
+
     public function test_file_size_changes_after_processing()
     {
         $file = UploadedFile::fake()->image('avatar.jpg', 200, 200);

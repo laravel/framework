@@ -60,6 +60,76 @@ class PendingImageTest extends TestCase
         $this->assertSame('webp', $options->format);
     }
 
+    public function test_scale_sets_options()
+    {
+        $image = $this->makePendingImage();
+        $result = $image->scale(1200, 800);
+
+        $this->assertSame($image, $result);
+
+        $options = (new \ReflectionProperty($image, 'options'))->getValue($image);
+
+        $this->assertSame(1200, $options->scaleWidth);
+        $this->assertSame(800, $options->scaleHeight);
+    }
+
+    public function test_scale_with_width_only()
+    {
+        $image = $this->makePendingImage();
+        $image->scale(1200);
+
+        $options = (new \ReflectionProperty($image, 'options'))->getValue($image);
+
+        $this->assertSame(1200, $options->scaleWidth);
+        $this->assertNull($options->scaleHeight);
+    }
+
+    public function test_orient_sets_option()
+    {
+        $image = $this->makePendingImage();
+        $result = $image->orient();
+
+        $this->assertSame($image, $result);
+
+        $options = (new \ReflectionProperty($image, 'options'))->getValue($image);
+
+        $this->assertTrue($options->orient);
+    }
+
+    public function test_blur_sets_option()
+    {
+        $image = $this->makePendingImage();
+        $result = $image->blur(15);
+
+        $this->assertSame($image, $result);
+
+        $options = (new \ReflectionProperty($image, 'options'))->getValue($image);
+
+        $this->assertSame(15, $options->blur);
+    }
+
+    public function test_blur_has_default()
+    {
+        $image = $this->makePendingImage();
+        $image->blur();
+
+        $options = (new \ReflectionProperty($image, 'options'))->getValue($image);
+
+        $this->assertSame(5, $options->blur);
+    }
+
+    public function test_greyscale_sets_option()
+    {
+        $image = $this->makePendingImage();
+        $result = $image->greyscale();
+
+        $this->assertSame($image, $result);
+
+        $options = (new \ReflectionProperty($image, 'options'))->getValue($image);
+
+        $this->assertTrue($options->greyscale);
+    }
+
     public function test_using_sets_driver_override()
     {
         $image = $this->makePendingImage();

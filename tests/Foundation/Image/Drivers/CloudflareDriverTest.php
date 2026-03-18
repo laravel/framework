@@ -204,6 +204,88 @@ class CloudflareDriverTest extends TestCase
         });
     }
 
+    public function test_build_transform_url_with_scale_options()
+    {
+        $http = new HttpFactory;
+
+        $http->fake([
+            'api.cloudflare.com/*' => $http->response([
+                'success' => true,
+                'result' => [
+                    'id' => 'img-123',
+                    'variants' => ['https://imagedelivery.net/abc/img-123/public'],
+                ],
+            ]),
+            'imagedelivery.net/*' => $http->response('bytes'),
+        ]);
+
+        $driver = new CloudflareDriver($http, 'account', 'token');
+
+        $options = new PendingImageOptions;
+        $options->scaleWidth = 800;
+
+        $driver->process('contents', $options);
+
+        $http->assertSent(function (Request $request) {
+            return str_contains($request->url(), 'width=800')
+                && str_contains($request->url(), 'fit=scale-down');
+        });
+    }
+
+    public function test_build_transform_url_with_blur()
+    {
+        $http = new HttpFactory;
+
+        $http->fake([
+            'api.cloudflare.com/*' => $http->response([
+                'success' => true,
+                'result' => [
+                    'id' => 'img-123',
+                    'variants' => ['https://imagedelivery.net/abc/img-123/public'],
+                ],
+            ]),
+            'imagedelivery.net/*' => $http->response('bytes'),
+        ]);
+
+        $driver = new CloudflareDriver($http, 'account', 'token');
+
+        $options = new PendingImageOptions;
+        $options->blur = 15;
+
+        $driver->process('contents', $options);
+
+        $http->assertSent(function (Request $request) {
+            return str_contains($request->url(), 'blur=15');
+        });
+    }
+
+    public function test_build_transform_url_with_greyscale()
+    {
+        $http = new HttpFactory;
+
+        $http->fake([
+            'api.cloudflare.com/*' => $http->response([
+                'success' => true,
+                'result' => [
+                    'id' => 'img-123',
+                    'variants' => ['https://imagedelivery.net/abc/img-123/public'],
+                ],
+            ]),
+            'imagedelivery.net/*' => $http->response('bytes'),
+        ]);
+
+        $driver = new CloudflareDriver($http, 'account', 'token');
+
+        $options = new PendingImageOptions;
+        $options->greyscale = true;
+
+        $driver->process('contents', $options);
+
+        $http->assertSent(function (Request $request) {
+            return str_contains($request->url(), 'saturation=0');
+        });
+    }
+
     public function test_build_transform_url_with_format_and_quality()
     {
         $http = new HttpFactory;
