@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
-use Illuminate\Routing\Attributes\Controllers\Middleware;
 use Illuminate\Routing\Attributes\Controllers\WithoutMiddleware;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
