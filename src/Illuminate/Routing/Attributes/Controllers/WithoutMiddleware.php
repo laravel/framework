@@ -12,7 +12,7 @@ class WithoutMiddleware
      * @param  array<string>|null  $except
      */
     public function __construct(
-        public string|array $middleware,
+        public array|string $middleware,
         public ?array $only = null,
         public ?array $except = null,
     ) {
