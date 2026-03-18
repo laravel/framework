@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Integration\Foundation;
 
 use DateTimeInterface;
+use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
+use Illuminate\Foundation\CacheBasedMaintenanceMode;
 use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Events\MaintenanceModeDisabled;
@@ -286,5 +288,21 @@ class MaintenanceModeTest extends TestCase
             '/api/*',
             '/webhooks/*',
         ], $data['except']);
+    }
+
+    public function testDownCommandDoesNotCreateMaintenanceFileWhenUsingCacheDriver()
+    {
+        $this->app->instance(
+            MaintenanceModeContract::class,
+            new CacheBasedMaintenanceMode($this->app['cache'], 'array', 'laravel:maintenance')
+        );
+
+        $maintenanceFile = storage_path('framework/maintenance.php');
+
+        @unlink($maintenanceFile);
+
+        $this->artisan(DownCommand::class);
+
+        $this->assertFileDoesNotExist($maintenanceFile);
     }
 }
