@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\Touches;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Attributes\Visible;
+use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Database\Eloquent\Model;
 use PHPUnit\Framework\TestCase;
 
@@ -138,6 +139,20 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $model = new ModelWithDateFormatAttributeOverride;
 
         $this->assertSame('Y-m-d', $model->getDateFormat());
+    }
+
+    public function test_dedicated_without_timestamps_attribute(): void
+    {
+        $model = new ModelWithDedicatedWithoutTimestampsAttribute;
+
+        $this->assertFalse($model->usesTimestamps());
+    }
+
+    public function test_dedicated_without_timestamps_attribute_overrides_table_timestamps(): void
+    {
+        $model = new ModelWithWithoutTimestampsAttributeOverride;
+
+        $this->assertFalse($model->usesTimestamps());
     }
 
     public function test_fillable_attribute(): void
@@ -409,6 +424,19 @@ class ModelWithDedicatedDateFormatAttribute extends Model
 #[Table(dateFormat: 'U')]
 #[DateFormat('Y-m-d')]
 class ModelWithDateFormatAttributeOverride extends Model
+{
+    //
+}
+
+#[WithoutTimestamps]
+class ModelWithDedicatedWithoutTimestampsAttribute extends Model
+{
+    //
+}
+
+#[Table(timestamps: true)]
+#[WithoutTimestamps]
+class ModelWithWithoutTimestampsAttributeOverride extends Model
 {
     //
 }
