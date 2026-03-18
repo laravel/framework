@@ -70,7 +70,6 @@ class EloquentSluggableTest extends TestCase
             ->assertJsonValidationErrors(['custom_field']);
     }
 
-
     public function test_it_throws_when_source_produces_empty_slug()
     {
         $this->expectException(CouldNotGenerateSlugException::class);
@@ -127,7 +126,6 @@ class EloquentSluggableTest extends TestCase
             ->assertRedirect('/create')
             ->assertSessionHasErrors(['name']);
     }
-
 
     public function test_custom_translation_for_slug_required()
     {
@@ -239,7 +237,6 @@ class SluggableValidationCustomErrorPost extends Model
 
     protected $guarded = [];
 }
-
 
 #[Sluggable(from: ['first_name', 'last_name'])]
 class SluggableValidationMultiSourcePost extends Model
