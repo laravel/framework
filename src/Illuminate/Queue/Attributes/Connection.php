@@ -13,7 +13,7 @@ class Connection
      *
      * @param  string  $connection
      */
-    public function __construct(public string|BackedEnum $connection)
+    public function __construct(public BackedEnum|string $connection)
     {
         //
     }
