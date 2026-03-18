@@ -434,7 +434,9 @@ class Worker
         try {
             return $this->process($connectionName, $job, $options);
         } catch (Throwable $e) {
-            $this->exceptions->report($e);
+            $this->exceptions->report(
+                $job->isReleased() ? new JobRetryingException($e->getMessage(), previous: $e) : $e
+            );
 
             $this->stopWorkerIfLostConnection($e);
         }

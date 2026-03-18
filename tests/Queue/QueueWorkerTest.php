@@ -15,6 +15,7 @@ use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Events\WorkerStarting;
 use Illuminate\Queue\Events\WorkerStopping;
+use Illuminate\Queue\JobRetryingException;
 use Illuminate\Queue\MaxAttemptsExceededException;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Queue\Worker;
@@ -190,7 +191,7 @@ class QueueWorkerTest extends TestCase
 
         $this->assertEquals(10, $job->releaseAfter);
         $this->assertFalse($job->deleted);
-        $this->exceptionHandler->shouldHaveReceived('report')->with($e);
+        $this->exceptionHandler->shouldHaveReceived('report')->with(m::type(JobRetryingException::class));
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobExceptionOccurred::class))->once();
         $this->events->shouldNotHaveReceived('dispatch', [m::type(JobProcessed::class)]);
     }
