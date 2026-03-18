@@ -727,10 +727,38 @@ class RoutingUrlGeneratorTest extends TestCase
         $url->getRequest()->headers->set('referer', 'http://www.foo.com/bar?baz=bah');
         $this->assertSame('/bar', $url->previousPath());
 
+        $url->getRequest()->headers->set('referer', 'http://www.bar.com/foo');
+        $this->assertSame('/foo', $url->previousPath());
+
+        $url->getRequest()->headers->set('referer', 'http://www.bar.com/foo?bar=baz');
+        $this->assertSame('/foo', $url->previousPath());
+
+        $url->getRequest()->headers->set('referer', 'http://www.bar.com');
+        $this->assertSame('/', $url->previousPath());
+
         $url->getRequest()->headers->remove('referer');
         $this->assertSame('/', $url->previousPath());
 
         $this->assertSame('/bar', $url->previousPath('/bar'));
+    }
+
+    public function testPreviousPathWithBaseUrl()
+    {
+        $url = new UrlGenerator(
+            new RouteCollection,
+            Request::create('http://www.foo.com/subdir/current')
+        );
+
+        $url->forceRootUrl('http://www.foo.com/subdir');
+
+        $url->getRequest()->headers->set('referer', 'http://www.foo.com/subdir/dashboard?x=1');
+        $this->assertSame('/dashboard', $url->previousPath());
+
+        $url->getRequest()->headers->set('referer', 'http://www.bar.com/foo');
+        $this->assertSame('/foo', $url->previousPath());
+
+        $url->getRequest()->headers->set('referer', 'http://www.foo.com/subdir');
+        $this->assertSame('/', $url->previousPath());
     }
 
     public function testRouteNotDefinedException()
