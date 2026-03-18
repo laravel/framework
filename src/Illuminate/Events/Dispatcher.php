@@ -24,7 +24,6 @@ use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Queue\Attributes\MaxExceptions;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
-use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Queue\Attributes\Timeout;
 use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Queue\Attributes\UniqueFor;
@@ -33,6 +32,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\ReadsClassAttributes;
 use Illuminate\Support\Traits\ReflectsClosures;
 use ReflectionClass;
 
@@ -40,7 +40,7 @@ use function Illuminate\Support\enum_value;
 
 class Dispatcher implements DispatcherContract
 {
-    use Macroable, ReadsQueueAttributes, ReflectsClosures, ResolvesQueueRoutes;
+    use Macroable, ReadsClassAttributes, ReflectsClosures, ResolvesQueueRoutes;
 
     /**
      * The IoC container instance.
