@@ -229,7 +229,7 @@ class QueueWorkerTest extends TestCase
             throw $e;
         });
 
-        $job->retryUntil = now()->addSeconds(1)->getTimestamp();
+        $job->retryUntil = Carbon::now()->addSeconds(1)->getTimestamp();
 
         $job->attempts = 0;
 

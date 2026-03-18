@@ -101,11 +101,11 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $this->assertTrue($model->isDirty('options'));
 
         $model = new TestEloquentModelWithCustomCast;
-        $model->birthday_at = now();
+        $model->birthday_at = Carbon::now();
         $this->assertIsString($model->toArray()['birthday_at']);
 
         $model = new TestEloquentModelWithCustomCast;
-        $now = now()->toImmutable();
+        $now = Carbon::now()->toImmutable();
         $model->anniversary_on_with_object_caching = $now;
         $model->anniversary_on_without_object_caching = $now;
         $this->assertSame($now, $model->anniversary_on_with_object_caching);

@@ -37,6 +37,12 @@ class ValidationRequiredUnlessRuleTest extends TestCase
         $this->assertSame('required', (string) $rule);
     }
 
+    public function testBooleanConditionNull()
+    {
+        $rule = Rule::requiredUnless(null);
+        $this->assertSame('required', (string) $rule);
+    }
+
     public function testClosureConditionTrue()
     {
         $rule = Rule::requiredUnless(fn () => true);

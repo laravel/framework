@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Database;
 
 use BadMethodCallException;
-use Carbon\Carbon;
 use Faker\Generator;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
@@ -17,6 +16,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use Mockery as m;
@@ -1062,7 +1062,7 @@ class DatabaseEloquentFactoryTest extends TestCase
             ->count(5)
             ->recycle([
                 (new FactoryTestUserFactory())->create(['name' => Name::Taylor]),
-                (new FactoryTestUserFactory())->create(['name' => Name::Shad, 'created_at' => now()]),
+                (new FactoryTestUserFactory())->create(['name' => Name::Shad, 'created_at' => Carbon::now()]),
             ])
             ->state(['title' => 'hello'])
             ->insert();

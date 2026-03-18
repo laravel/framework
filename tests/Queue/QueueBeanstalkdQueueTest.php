@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Queue;
 
-use Carbon\Carbon;
 use Illuminate\Container\Container;
 use Illuminate\Queue\BeanstalkdQueue;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Mockery as m;
 use Pheanstalk\Contract\JobIdInterface;

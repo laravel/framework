@@ -29,7 +29,7 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
 
         $this->setUpRedis();
 
-        Carbon::setTestNow(now());
+        Carbon::setTestNow(Carbon::now());
     }
 
     protected function tearDown(): void

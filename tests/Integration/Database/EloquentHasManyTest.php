@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -35,7 +36,7 @@ class EloquentHasManyTest extends DatabaseTestCase
     {
         $user = EloquentHasManyTestUser::create();
 
-        $user->logins()->create(['login_time' => now()]);
+        $user->logins()->create(['login_time' => Carbon::now()]);
 
         $this->assertInstanceOf(HasOne::class, $user->logins()->one());
     }

@@ -891,7 +891,7 @@ class JobChainAddingExistingJob implements ShouldQueue
 
     public function handle()
     {
-        static::$ranAt = now();
+        static::$ranAt = Carbon::now();
     }
 }
 
@@ -904,7 +904,7 @@ class JobChainAddingAddedJob implements ShouldQueue
 
     public function handle()
     {
-        static::$ranAt = now();
+        static::$ranAt = Carbon::now();
     }
 }
 

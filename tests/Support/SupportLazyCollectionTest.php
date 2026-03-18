@@ -253,7 +253,7 @@ class SupportLazyCollectionTest extends TestCase
     public function testThrottleAccountsForTimePassed()
     {
         Sleep::fake();
-        Carbon::setTestNow(now());
+        Carbon::setTestNow(Carbon::now());
 
         $data = LazyCollection::times(3)
             ->throttle(3)

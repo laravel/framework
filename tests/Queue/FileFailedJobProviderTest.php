@@ -42,7 +42,7 @@ class FileFailedJobProviderTest extends TestCase
     public function testCanRetrieveAllFailedJobs()
     {
         try {
-            Carbon::setTestNow(now());
+            Carbon::setTestNow(Carbon::now());
 
             [$uuidOne, $exceptionOne] = $this->logFailedJob();
             [$uuidTwo, $exceptionTwo] = $this->logFailedJob();
@@ -128,14 +128,14 @@ class FileFailedJobProviderTest extends TestCase
         $this->logFailedJob();
         $this->logFailedJob();
 
-        $this->provider->prune(now()->addDay(1));
+        $this->provider->prune(Carbon::now()->addDay(1));
         $failedJobs = $this->provider->all();
         $this->assertEmpty($failedJobs);
 
         $this->logFailedJob();
         $this->logFailedJob();
 
-        $this->provider->prune(now()->subDay(1));
+        $this->provider->prune(Carbon::now()->subDay(1));
         $failedJobs = $this->provider->all();
         $this->assertCount(2, $failedJobs);
     }
@@ -145,14 +145,14 @@ class FileFailedJobProviderTest extends TestCase
         $this->logFailedJob();
         $this->logFailedJob();
 
-        $this->provider->prune(now()->addHour(1));
+        $this->provider->prune(Carbon::now()->addHour(1));
         $failedJobs = $this->provider->all();
         $this->assertEmpty($failedJobs);
 
         $this->logFailedJob();
         $this->logFailedJob();
 
-        $this->provider->prune(now()->subHour(1));
+        $this->provider->prune(Carbon::now()->subHour(1));
         $failedJobs = $this->provider->all();
         $this->assertCount(2, $failedJobs);
     }

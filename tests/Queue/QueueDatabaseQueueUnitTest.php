@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Queue;
 
-use Carbon\Carbon;
 use Illuminate\Bus\Batchable;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Queue\Queue;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;

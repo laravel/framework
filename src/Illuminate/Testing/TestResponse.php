@@ -19,6 +19,7 @@ use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 use Illuminate\Support\ViewErrorBag;
+use Illuminate\Testing\Constraints\SeeInHtml;
 use Illuminate\Testing\Constraints\SeeInOrder;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Testing\TestResponseAssert as PHPUnit;
@@ -764,11 +765,7 @@ class TestResponse implements ArrayAccess
 
         $values = $escape ? array_map(e(...), $value) : $value;
 
-        $content = strip_tags($this->getContent());
-
-        foreach ($values as $value) {
-            PHPUnit::withResponse($this)->assertStringContainsString((string) $value, $content);
-        }
+        PHPUnit::withResponse($this)->assertThat($values, new SeeInHtml($this->getContent()));
 
         return $this;
     }
@@ -784,7 +781,7 @@ class TestResponse implements ArrayAccess
     {
         $values = $escape ? array_map(e(...), $values) : $values;
 
-        PHPUnit::withResponse($this)->assertThat($values, new SeeInOrder(strip_tags($this->getContent())));
+        PHPUnit::withResponse($this)->assertThat($values, new SeeInHtml($this->getContent(), true));
 
         return $this;
     }
@@ -833,11 +830,7 @@ class TestResponse implements ArrayAccess
 
         $values = $escape ? array_map(e(...), $value) : $value;
 
-        $content = strip_tags($this->getContent());
-
-        foreach ($values as $value) {
-            PHPUnit::withResponse($this)->assertStringNotContainsString((string) $value, $content);
-        }
+        PHPUnit::withResponse($this)->assertThat($values, new SeeInHtml($this->getContent(), negate: true));
 
         return $this;
     }

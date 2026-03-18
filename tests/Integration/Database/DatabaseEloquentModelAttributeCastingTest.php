@@ -100,7 +100,7 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
         $this->assertTrue($model->isDirty('options'));
 
         $model = new TestEloquentModelWithAttributeCast;
-        $model->birthday_at = now();
+        $model->birthday_at = Carbon::now();
         $this->assertIsString($model->toArray()['birthday_at']);
     }
 

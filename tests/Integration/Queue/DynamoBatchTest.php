@@ -8,6 +8,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Str;
@@ -66,7 +67,7 @@ class DynamoBatchTest extends TestCase
         $retrieved = $repo->find($batch->id);
         $this->assertEquals(2, $retrieved->totalJobs);
         $this->assertEquals(0, $retrieved->failedJobs);
-        $this->assertTrue($retrieved->finishedAt->between(now()->subSecond(30), now()));
+        $this->assertTrue($retrieved->finishedAt->between(Carbon::now()->subSecond(30), Carbon::now()));
     }
 
     public function test_retrieve_non_existent_batch()
@@ -113,8 +114,8 @@ class DynamoBatchTest extends TestCase
         $retrieved = $repo->find($batch->id);
         $this->assertEquals(2, $retrieved->totalJobs);
         $this->assertEquals(1, $retrieved->failedJobs);
-        $this->assertTrue($retrieved->finishedAt->between(now()->subSecond(30), now()));
-        $this->assertTrue($retrieved->cancelledAt->between(now()->subSecond(30), now()));
+        $this->assertTrue($retrieved->finishedAt->between(Carbon::now()->subSecond(30), Carbon::now()));
+        $this->assertTrue($retrieved->cancelledAt->between(Carbon::now()->subSecond(30), Carbon::now()));
     }
 
     public function test_get_batches()

@@ -17,6 +17,7 @@ use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Queue\QueueRoutes;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use Laravel\SerializableClosure\SerializableClosure;
 use Mockery as m;
@@ -668,7 +669,7 @@ class TestDispatcherOptions implements ShouldQueue
 
     public function retryUntil()
     {
-        return now()->addHour(1);
+        return Carbon::now()->addHour(1);
     }
 
     public function tries()

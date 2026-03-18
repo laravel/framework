@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Events\VendorTagPublished;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use League\Flysystem\Filesystem as Flysystem;
@@ -94,7 +95,7 @@ class VendorPublishCommand extends Command
      */
     public function handle()
     {
-        $this->publishedAt = now();
+        $this->publishedAt = Carbon::now();
 
         $this->determineWhatShouldBePublished();
 
