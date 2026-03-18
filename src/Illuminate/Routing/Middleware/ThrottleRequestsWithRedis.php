@@ -31,6 +31,13 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
     public $remaining = [];
 
     /**
+     * The key prefix for Redis throttle keys.
+     *
+     * @var string
+     */
+    protected $keyPrefix = '';
+
+    /**
      * Create a new request throttler.
      *
      * @param  \Illuminate\Cache\RateLimiter  $limiter
@@ -93,7 +100,7 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
     protected function tooManyAttempts($key, $maxAttempts, $decaySeconds)
     {
         $limiter = new DurationLimiter(
-            $this->getRedisConnection(), $key, $maxAttempts, $decaySeconds
+            $this->getRedisConnection(), $this->getKeyPrefix().$key, $maxAttempts, $decaySeconds
         );
 
         return tap($limiter->tooManyAttempts(), function () use ($key, $limiter) {
@@ -114,7 +121,7 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
     protected function hit($key, $maxAttempts, $decaySeconds)
     {
         $limiter = new DurationLimiter(
-            $this->getRedisConnection(), $key, $maxAttempts, $decaySeconds
+            $this->getRedisConnection(), $this->getKeyPrefix().$key, $maxAttempts, $decaySeconds
         );
 
         $limiter->acquire();
@@ -146,6 +153,33 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
     protected function getTimeUntilNextRetry($key)
     {
         return $this->decaysAt[$key] - $this->currentTime();
+    }
+
+    /**
+     * Get the prefix for Redis throttle keys.
+     *
+     * Override this method to provide a stable namespace for Redis keys,
+     * which is required in Redis environments where ACLs restrict access
+     * by key pattern.
+     *
+     * @return string
+     */
+    protected function getKeyPrefix()
+    {
+        return $this->keyPrefix;
+    }
+
+    /**
+     * Set the prefix for Redis throttle keys.
+     *
+     * @param  string  $prefix
+     * @return $this
+     */
+    public function setKeyPrefix($prefix)
+    {
+        $this->keyPrefix = $prefix;
+
+        return $this;
     }
 
     /**
