@@ -1,6 +1,10 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.1.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.1.1...13.x)
+
+## [v13.1.1](https://github.com/laravel/framework/compare/v13.1.0...v13.1.1) - 2026-03-18
+
+* Break queue dependency by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/59275
 
 ## [v13.1.0](https://github.com/laravel/framework/compare/v13.0.0...v13.1.0) - 2026-03-18
 
