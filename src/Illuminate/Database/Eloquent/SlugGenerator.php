@@ -195,7 +195,7 @@ class SlugGenerator
                     $errorKey => $this->resolveErrorMessage($options, 'validation.slug_unique'),
                 ]);
 
-                $message = "No unique slug could be generated for model [".get_class($this->model)."] using column(s) [{$columns}] with value [{$originalSlug}] after {$options->maxAttempts} attempts.";
+                $message = 'No unique slug could be generated for model ['.get_class($this->model)."] using column(s) [{$columns}] with value [{$originalSlug}] after {$options->maxAttempts} attempts.";
 
                 (fn () => $this->message = $message)->call($exception);
 
