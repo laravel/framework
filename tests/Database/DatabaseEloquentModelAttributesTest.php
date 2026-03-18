@@ -410,3 +410,13 @@ class ModelWithTouchesAttribute extends Model
 {
     //
 }
+
+enum ConnectionEnum: string
+{
+    case Secondary = 'secondary';
+}
+
+enum ConnectionUnitEnum
+{
+    case Secondary;
+}
