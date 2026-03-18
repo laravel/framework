@@ -19,7 +19,7 @@ class Throttle extends Middleware
      * resolves to `ThrottleRequests::with($limiter, $decayMinutes)`.
      *
      * @param  int|string|\UnitEnum  $limiter  Named limiter or max attempts per window.
-     * @param  int  $decayMinutes  Decay window in minutes (only used when $limiter is an int).
+     * @param  non-negative-int  $decayMinutes  Decay window in minutes (only used when $limiter is an int).
      * @param  array<string>|null  $only  Limit to these controller methods.
      * @param  array<string>|null  $except  Exclude these controller methods.
      */
