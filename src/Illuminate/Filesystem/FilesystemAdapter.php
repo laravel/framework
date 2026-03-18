@@ -295,7 +295,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             return $this->driver->read($path);
         } catch (UnableToReadFile $e) {
-            throw_if($this->throwsExceptions(), $e);
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
 
             $this->report($e);
         }
@@ -425,7 +427,9 @@ class FilesystemAdapter implements CloudFilesystemContract
                 ? $this->driver->writeStream($path, $contents, $options)
                 : $this->driver->write($path, $contents, $options);
         } catch (UnableToWriteFile|UnableToSetVisibility $e) {
-            throw_if($this->throwsExceptions(), $e);
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
 
             $this->report($e);
 
@@ -512,7 +516,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             $this->driver->setVisibility($path, $this->parseVisibility($visibility));
         } catch (UnableToSetVisibility $e) {
-            throw_if($this->throwsExceptions(), $e);
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
 
             $this->report($e);
 
@@ -572,7 +578,9 @@ class FilesystemAdapter implements CloudFilesystemContract
             try {
                 $this->driver->delete($path);
             } catch (UnableToDeleteFile $e) {
-                throw_if($this->throwsExceptions(), $e);
+                if ($this->throwsExceptions()) {
+                throw $e;
+                }
 
                 $this->report($e);
 
@@ -595,7 +603,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             $this->driver->copy($from, $to);
         } catch (UnableToCopyFile $e) {
-            throw_if($this->throwsExceptions(), $e);
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
 
             $this->report($e);
 
@@ -617,7 +627,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             $this->driver->move($from, $to);
         } catch (UnableToMoveFile $e) {
-            throw_if($this->throwsExceptions(), $e);
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
 
             $this->report($e);
 
@@ -650,7 +662,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             return $this->driver->checksum($path, $options);
         } catch (UnableToProvideChecksum $e) {
-            throw_if($this->throwsExceptions(), $e);
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
 
             $this->report($e);
 
@@ -669,7 +683,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             return $this->driver->mimeType($path);
         } catch (UnableToRetrieveMetadata $e) {
-            throw_if($this->throwsExceptions(), $e);
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
 
             $this->report($e);
         }
@@ -696,7 +712,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             return $this->driver->readStream($path);
         } catch (UnableToReadFile $e) {
-            throw_if($this->throwsExceptions(), $e);
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
 
             $this->report($e);
         }
@@ -710,7 +728,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             $this->driver->writeStream($path, $resource, $options);
         } catch (UnableToWriteFile|UnableToSetVisibility $e) {
-            throw_if($this->throwsExceptions(), $e);
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
 
             $this->report($e);
 
@@ -960,7 +980,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             $this->driver->createDirectory($path);
         } catch (UnableToCreateDirectory|UnableToSetVisibility $e) {
-            throw_if($this->throwsExceptions(), $e);
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
 
             $this->report($e);
 
@@ -981,7 +1003,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             $this->driver->deleteDirectory($directory);
         } catch (UnableToDeleteDirectory $e) {
-            throw_if($this->throwsExceptions(), $e);
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
 
             $this->report($e);
 

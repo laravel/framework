@@ -52,9 +52,11 @@ class Factory
     {
         $component = '\Illuminate\Console\View\Components\\'.ucfirst($method);
 
-        throw_unless(class_exists($component), new InvalidArgumentException(sprintf(
-            'Console component [%s] not found.', $method
-        )));
+        if(! class_exists($component)) {
+            throw new InvalidArgumentException(sprintf(
+                'Console component [%s] not found.', $method
+            ));
+        }
 
         return (new $component($this->output))->render(...$parameters);
     }
