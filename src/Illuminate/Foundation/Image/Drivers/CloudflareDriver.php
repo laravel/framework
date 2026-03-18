@@ -3,9 +3,9 @@
 namespace Illuminate\Foundation\Image\Drivers;
 
 use Illuminate\Contracts\Image\Driver;
+use Illuminate\Foundation\Image\ImageException;
 use Illuminate\Foundation\Image\PendingImageOptions;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use Illuminate\Foundation\Image\ImageException;
 
 class CloudflareDriver implements Driver
 {
@@ -92,6 +92,24 @@ class CloudflareDriver implements Driver
             $params[] = 'fit=cover';
         }
 
+        if ($options->scaleWidth !== null) {
+            $params[] = "width={$options->scaleWidth}";
+
+            if ($options->scaleHeight !== null) {
+                $params[] = "height={$options->scaleHeight}";
+            }
+
+            $params[] = 'fit=scale-down';
+        }
+
+        if ($options->blur !== null) {
+            $params[] = "blur={$options->blur}";
+        }
+
+        if ($options->greyscale) {
+            $params[] = 'saturation=0';
+        }
+
         if ($options->format !== null) {
             $params[] = "format={$options->format}";
         }
@@ -100,11 +118,10 @@ class CloudflareDriver implements Driver
             $params[] = "quality={$options->quality}";
         }
 
-        if (empty($params)) {
-            return $baseUrl;
+        if (empty($params) && $options->orient) {
+            $params[] = 'metadata=none';
         }
 
-        // Cloudflare transform URL format: /cdn-cgi/image/{options}/{delivery_url}
         $transformParams = implode(',', $params);
 
         $parsed = parse_url($baseUrl);

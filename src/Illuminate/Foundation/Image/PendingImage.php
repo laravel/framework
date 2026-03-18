@@ -51,6 +51,55 @@ class PendingImage
     }
 
     /**
+     * Set the scale dimensions.
+     *
+     * @return $this
+     */
+    public function scale(int $width, ?int $height = null): static
+    {
+        $this->options->scaleWidth = $width;
+        $this->options->scaleHeight = $height;
+
+        return $this;
+    }
+
+    /**
+     * Auto-orient the image based on EXIF data.
+     *
+     * @return $this
+     */
+    public function orient(): static
+    {
+        $this->options->orient = true;
+
+        return $this;
+    }
+
+    /**
+     * Apply a blur effect.
+     *
+     * @return $this
+     */
+    public function blur(int $amount = 5): static
+    {
+        $this->options->blur = $amount;
+
+        return $this;
+    }
+
+    /**
+     * Convert the image to greyscale.
+     *
+     * @return $this
+     */
+    public function greyscale(): static
+    {
+        $this->options->greyscale = true;
+
+        return $this;
+    }
+
+    /**
      * Set the optimization options.
      *
      * @return $this

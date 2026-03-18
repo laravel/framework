@@ -54,12 +54,28 @@ abstract class InterventionDriver implements Driver
     {
         $image = $this->manager->read($contents);
 
+        if ($options->orient) {
+            $image = $image->orient();
+        }
+
         if ($options->coverWidth !== null && $options->coverHeight !== null) {
             $image = $image->cover($options->coverWidth, $options->coverHeight);
         }
 
+        if ($options->scaleWidth !== null) {
+            $image = $image->scale($options->scaleWidth, $options->scaleHeight);
+        }
+
+        if ($options->blur !== null) {
+            $image = $image->blur($options->blur);
+        }
+
+        if ($options->greyscale) {
+            $image = $image->greyscale();
+        }
+
         if ($options->format !== null) {
-            $quality = $options->quality ?? -1;
+            $quality = $options->quality ?? 75;
 
             $encoder = match ($options->format) {
                 'webp' => new WebpEncoder($quality),
