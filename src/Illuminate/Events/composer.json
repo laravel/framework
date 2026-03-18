@@ -20,6 +20,7 @@
         "illuminate/container": "^13.0",
         "illuminate/contracts": "^13.0",
         "illuminate/macroable": "^13.0",
+        "illuminate/queue": "^13.0",
         "illuminate/support": "^13.0"
     },
     "minimum-stability": "dev",
