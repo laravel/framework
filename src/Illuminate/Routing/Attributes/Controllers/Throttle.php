@@ -18,10 +18,10 @@ class Throttle extends Middleware
      * When $limiter is an integer it is treated as a raw attempt count and
      * resolves to `ThrottleRequests::with($limiter, $decayMinutes)`.
      *
-     * @param  int|string|\UnitEnum  $limiter       Named limiter or max attempts per window.
-     * @param  int                   $decayMinutes  Decay window in minutes (only used when $limiter is an int).
-     * @param  array<string>|null    $only          Limit to these controller methods.
-     * @param  array<string>|null    $except        Exclude these controller methods.
+     * @param  int|string|\UnitEnum  $limiter  Named limiter or max attempts per window.
+     * @param  int  $decayMinutes  Decay window in minutes (only used when $limiter is an int).
+     * @param  array<string>|null  $only  Limit to these controller methods.
+     * @param  array<string>|null  $except  Exclude these controller methods.
      */
     public function __construct(
         int|string|UnitEnum $limiter = 'api',
