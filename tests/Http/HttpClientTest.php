@@ -2432,6 +2432,34 @@ class HttpClientTest extends TestCase
         $this->factory->assertSentCount(1);
     }
 
+    public function testRetryWhenCallbackWithExceptionTypeHintDoesNotThrowForNonFailedResponses()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response('', 302),
+        ]);
+
+        $response = $this->factory
+            ->retry(3, 0, fn (Exception $e) => true)
+            ->get('http://foo.com/get');
+
+        $this->assertSame(302, $response->status());
+        $this->factory->assertSentCount(1);
+    }
+
+    public function testRetryWhenCallbackWithThrowableTypeHintDoesNotThrowForNonFailedResponses()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response('', 302),
+        ]);
+
+        $response = $this->factory
+            ->retry(3, 0, fn (\Throwable $e) => true)
+            ->get('http://foo.com/get');
+
+        $this->assertSame(302, $response->status());
+        $this->factory->assertSentCount(1);
+    }
+
     public function testRequestsWillBeWaitingSleepMillisecondsReceivedBeforeRetry()
     {
         Sleep::fake();
