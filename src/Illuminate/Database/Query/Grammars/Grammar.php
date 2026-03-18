@@ -1621,6 +1621,7 @@ class Grammar extends BaseGrammar
         $bindings = array_map(fn ($value) => $this->escape($value, is_resource($value) || gettype($value) === 'resource (closed)'), $bindings);
 
         $query = '';
+        $bindingIndex = 0;
 
         $isStringLiteral = false;
 
@@ -1638,7 +1639,7 @@ class Grammar extends BaseGrammar
                 $query .= $char;
                 $isStringLiteral = ! $isStringLiteral;
             } elseif ($char === '?' && ! $isStringLiteral) { // Substitutable binding...
-                $query .= array_shift($bindings) ?? '?';
+                $query .= $bindings[$bindingIndex++] ?? '?';
             } else { // Normal character...
                 $query .= $char;
             }
