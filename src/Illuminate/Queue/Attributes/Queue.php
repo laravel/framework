@@ -13,7 +13,7 @@ class Queue
      *
      * @param  string  $queue
      */
-    public function __construct(public string|BackedEnum $queue)
+    public function __construct(public BackedEnum|string $queue)
     {
         //
     }
