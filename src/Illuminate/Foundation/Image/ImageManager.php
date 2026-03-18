@@ -5,11 +5,11 @@ namespace Illuminate\Foundation\Image;
 use Closure;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Image\Driver;
+use Illuminate\Foundation\Image\Drivers\CloudflareDriver;
 use Illuminate\Foundation\Image\Drivers\GdDriver;
 use Illuminate\Foundation\Image\Drivers\ImagickDriver;
-use Intervention\Image\ImageManager as InterventionImageManager;
+use Illuminate\Http\Client\Factory as HttpFactory;
 use InvalidArgumentException;
-use RuntimeException;
 
 class ImageManager
 {
@@ -49,16 +49,22 @@ class ImageManager
     protected function resolve(string $name): Driver
     {
         if (isset($this->customCreators[$name])) {
-            return $this->callCustomCreator($name);
+            $driver = $this->callCustomCreator($name);
+        } else {
+            $driverMethod = 'create'.ucfirst($name).'Driver';
+
+            if (! method_exists($this, $driverMethod)) {
+                throw new InvalidArgumentException("Image driver [{$name}] is not supported.");
+            }
+
+            $driver = $this->{$driverMethod}();
         }
 
-        $driverMethod = 'create'.ucfirst($name).'Driver';
-
-        if (method_exists($this, $driverMethod)) {
-            return $this->{$driverMethod}();
+        if (method_exists($driver, 'ensureRequirementsAreMet')) {
+            $driver->ensureRequirementsAreMet();
         }
 
-        throw new InvalidArgumentException("Image driver [{$name}] is not supported.");
+        return $driver;
     }
 
     /**
@@ -74,8 +80,6 @@ class ImageManager
      */
     protected function createGdDriver(): GdDriver
     {
-        $this->ensureRequirementsAreMet('gd');
-
         return new GdDriver;
     }
 
@@ -84,24 +88,21 @@ class ImageManager
      */
     protected function createImagickDriver(): ImagickDriver
     {
-        $this->ensureRequirementsAreMet('imagick');
-
         return new ImagickDriver;
     }
 
     /**
-     * Ensure the requirements for the given driver are met.
-     *
-     * @throws RuntimeException
+     * Create the Cloudflare image driver.
      */
-    protected function ensureRequirementsAreMet(string $driver): void
+    protected function createCloudflareDriver(): CloudflareDriver
     {
-        if (! class_exists(InterventionImageManager::class)) {
-            throw new RuntimeException(
-                "Intervention Image is required to use the [{$driver}] driver. ".
-                'You may require it via: [composer require intervention/image:^3.0].',
-            );
-        }
+        $config = $this->app['config']['image.cloudflare'] ?? [];
+
+        return new CloudflareDriver(
+            $this->app->make(HttpFactory::class),
+            $config['account_id'] ?? '',
+            $config['api_token'] ?? '',
+        );
     }
 
     /**

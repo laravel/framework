@@ -104,7 +104,7 @@ class PendingImage
     {
         if ($this->options->hasChanges() && ! $this->processed) {
             $bytes = $this->resolveDriver()->process(
-                $this->file->getRealPath(), $this->options
+                $this->filesystem->get($this->file->getRealPath()), $this->options
             );
 
             $this->filesystem->put($this->file->getRealPath(), $bytes);
