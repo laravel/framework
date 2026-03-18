@@ -1050,8 +1050,10 @@ class PendingRequest
                         return;
                     }
 
+                    $exception = $response->toException();
+
                     try {
-                        $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this, $this->request->toPsrRequest()->getMethod()) : true;
+                        $shouldRetry = $this->retryWhenCallback && $exception ? call_user_func($this->retryWhenCallback, $exception, $this, $this->request->toPsrRequest()->getMethod()) : true;
                     } catch (Exception $exception) {
                         $shouldRetry = false;
 
@@ -1237,10 +1239,12 @@ class PendingRequest
             $response = $this->populateResponse($this->newResponse($response->getResponse()));
         }
 
+        $exception = $response instanceof Response ? $response->toException() : $response;
+
         try {
-            $shouldRetry = $this->retryWhenCallback ? call_user_func(
+            $shouldRetry = $this->retryWhenCallback && $exception ? call_user_func(
                 $this->retryWhenCallback,
-                $response instanceof Response ? $response->toException() : $response,
+                $exception,
                 $this
             ) : true;
         } catch (Exception $exception) {
