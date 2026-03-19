@@ -93,4 +93,16 @@ class BelongsToRelationship
 
         return $this;
     }
+
+    /**
+     * Get the model class name of the related factory or model.
+     *
+     * @return string
+     */
+    public function getModelName()
+    {
+        return $this->factory instanceof Factory
+            ? $this->factory->modelName()
+            : get_class($this->factory);
+    }
 }

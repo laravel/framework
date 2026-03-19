@@ -91,6 +91,14 @@ class DatabaseEloquentFactoryTest extends TestCase
             $table->foreignId('user_id');
             $table->string('admin')->default('N');
         });
+
+        $this->schema()->create('articles', function ($table) {
+            $table->increments('id');
+            $table->foreignId('author_id');
+            $table->foreignId('reviewer_id');
+            $table->string('title');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -1097,6 +1105,36 @@ class DatabaseEloquentFactoryTest extends TestCase
         }
     }
 
+    public function test_for_method_with_model_instance_recycles_for_same_model_type()
+    {
+        $user = FactoryTestUserFactory::new(['name' => 'Taylor Otwell'])->create();
+
+        $article = FactoryTestArticleFactory::new()
+            ->for($user, 'author')
+            ->create();
+
+        // The user passed to for() should be recycled for reviewer_id too
+        $this->assertCount(1, FactoryTestUser::all());
+        $this->assertEquals($user->id, $article->author_id);
+        $this->assertEquals($user->id, $article->reviewer_id);
+    }
+
+    public function test_for_method_with_model_instance_recycles_across_multiple_relationships()
+    {
+        $author = FactoryTestUserFactory::new(['name' => 'Author'])->create();
+        $reviewer = FactoryTestUserFactory::new(['name' => 'Reviewer'])->create();
+
+        $article = FactoryTestArticleFactory::new()
+            ->for($author, 'author')
+            ->for($reviewer, 'reviewer')
+            ->create();
+
+        // Both users are explicitly provided, no duplicates should be created
+        $this->assertCount(2, FactoryTestUser::all());
+        $this->assertEquals($author->id, $article->author_id);
+        $this->assertEquals($reviewer->id, $article->reviewer_id);
+    }
+
     /**
      * Get a database connection instance.
      *
@@ -1361,6 +1399,35 @@ class FactoryTestUserWithCallbacksFactory extends Factory
         })->afterCreating(function ($user) {
             $_SERVER['__test.user.creating'] = $user;
         });
+    }
+}
+
+class FactoryTestArticleFactory extends Factory
+{
+    protected $model = FactoryTestArticle::class;
+
+    public function definition()
+    {
+        return [
+            'author_id' => FactoryTestUserFactory::new(),
+            'reviewer_id' => FactoryTestUserFactory::new(),
+            'title' => $this->faker->sentence(),
+        ];
+    }
+}
+
+class FactoryTestArticle extends Eloquent
+{
+    protected $table = 'articles';
+
+    public function author()
+    {
+        return $this->belongsTo(FactoryTestUser::class, 'author_id');
+    }
+
+    public function reviewer()
+    {
+        return $this->belongsTo(FactoryTestUser::class, 'reviewer_id');
     }
 }
 
