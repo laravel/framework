@@ -3576,8 +3576,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
-        $this->assertInstanceOf(RequestException::class, $exception);
+        $this->assertNull($exception);
 
         $exception = null;
 
@@ -3597,8 +3596,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
-        $this->assertInstanceOf(RequestException::class, $exception);
+        $this->assertNull($exception);
     }
 
     public function testRequestExceptionIsThrownIfIsServerError()
