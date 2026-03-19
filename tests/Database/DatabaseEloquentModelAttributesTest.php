@@ -97,6 +97,20 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertSame('secondary', $model->getConnectionName());
     }
 
+    public function test_connection_attribute_with_unit_enum(): void
+    {
+        $model = new ModelWithUnitEnumConnectionAttribute;
+
+        $this->assertSame('secondary', $model->getConnectionName());
+    }
+
+    public function test_connection_attribute_with_backed_enum(): void
+    {
+        $model = new ModelWithBackedEnumConnectionAttribute;
+
+        $this->assertSame('secondary', $model->getConnectionName());
+    }
+
     public function test_timestamps_attribute(): void
     {
         $model = new ModelWithTimestampsFalseAttribute;
@@ -248,6 +262,16 @@ class DatabaseEloquentModelAttributesTest extends TestCase
     }
 }
 
+enum ConnectionUnitEnum
+{
+    case secondary;
+}
+
+enum ConnectionBackedEnum: string
+{
+    case Secondary = 'secondary';
+}
+
 #[Table('custom_table_name')]
 class ModelWithTableAttribute extends Model
 {
@@ -292,6 +316,18 @@ class ModelWithFullPrimaryKeyAttribute extends Model
 
 #[Connection('secondary')]
 class ModelWithConnectionAttribute extends Model
+{
+    //
+}
+
+#[Connection(ConnectionUnitEnum::secondary)]
+class ModelWithUnitEnumConnectionAttribute extends Model
+{
+    //
+}
+
+#[Connection(ConnectionBackedEnum::Secondary)]
+class ModelWithBackedEnumConnectionAttribute extends Model
 {
     //
 }
