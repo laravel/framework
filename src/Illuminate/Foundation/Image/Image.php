@@ -7,6 +7,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class Image
@@ -25,6 +26,11 @@ class Image
      * Whether the image has been processed.
      */
     protected bool $processed = false;
+
+    /**
+     * The cached hash name.
+     */
+    protected ?string $hashName = null;
 
     /**
      * Create a new image instance.
@@ -156,13 +162,29 @@ class Image
     }
 
     /**
-     * Store the processed image on a filesystem disk with a given name.
+     * Store the processed image on a filesystem disk with public visibility.
      */
-    public function storeAs(string $path, string $name, array|string $options = []): string|false
+    public function storePublicly(string $path = '', array|string $options = []): string|false
     {
         $options = $this->parseOptions($options);
 
-        $disk = $options['disk'] ?? null;
+        $options['visibility'] = 'public';
+
+        return $this->storeAs($path, $this->hashName(), $options);
+    }
+
+    /**
+     * Store the processed image on a filesystem disk with a given name.
+     */
+    public function storeAs(string $path, string|null $name = null, array|string $options = []): string|false
+    {
+        if (is_null($name) || is_array($name)) {
+            [$path, $name, $options] = ['', $path, $name ?? []];
+        }
+
+        $options = $this->parseOptions($options);
+
+        $disk = Arr::pull($options, 'disk');
 
         return Container::getInstance()->make(FilesystemFactory::class)
             ->disk($disk)
@@ -171,6 +193,22 @@ class Image
                 $this->toBytes(),
                 $options,
             );
+    }
+
+    /**
+     * Store the processed image on a filesystem disk with public visibility and a given name.
+     */
+    public function storePubliclyAs(string $path, string|null $name = null, array|string $options = []): string|false
+    {
+        if (is_null($name) || is_array($name)) {
+            [$path, $name, $options] = ['', $path, $name ?? []];
+        }
+
+        $options = $this->parseOptions($options);
+
+        $options['visibility'] = 'public';
+
+        return $this->storeAs($path, $name, $options);
     }
 
     /**
@@ -218,7 +256,9 @@ class Image
      */
     public function hashName(string $path = ''): string
     {
-        $hash = Str::random(40).'.'.$this->extension();
+        $this->hashName ??= Str::random(40);
+
+        $hash = $this->hashName.'.'.$this->extension();
 
         return $path ? $path.'/'.$hash : $hash;
     }
