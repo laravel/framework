@@ -5,12 +5,16 @@ namespace Illuminate\Foundation\Image;
 use Closure;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Image\Driver;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Image\Drivers\CloudflareDriver;
 use Illuminate\Foundation\Image\Drivers\GdDriver;
 use Illuminate\Foundation\Image\Drivers\ImagickDriver;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use InvalidArgumentException;
 
+/**
+ * @mixin Driver
+ */
 class ImageManager
 {
     /**
@@ -103,6 +107,22 @@ class ImageManager
             $config['account_id'] ?? '',
             $config['api_token'] ?? '',
         );
+    }
+
+    /**
+     * Create an image instance from raw bytes.
+     */
+    public function read(string $contents): Image
+    {
+        return new Image($contents);
+    }
+
+    /**
+     * Create an image instance from a file path.
+     */
+    public function from(string $path): Image
+    {
+        return new Image(fn () => $this->app->make(Filesystem::class)->get($path));
     }
 
     /**

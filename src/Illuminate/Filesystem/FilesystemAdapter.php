@@ -7,6 +7,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
+use Illuminate\Foundation\Image\Image;
 use Illuminate\Http\File;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -282,6 +283,14 @@ class FilesystemAdapter implements CloudFilesystemContract
     public function path($path)
     {
         return $this->prefixer->prefixPath($path);
+    }
+
+    /**
+     * Create an image instance from a file in storage.
+     */
+    public function image(string $path): Image
+    {
+        return new Image(fn () => $this->get($path));
     }
 
     /**
