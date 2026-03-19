@@ -166,29 +166,20 @@ trait ManagesAttributes
      * The expiration time of the underlying cache lock may be specified in minutes.
      *
      * @param  int  $expiresAt
+     * @param  bool  $releaseOnSignal
      * @return $this
      */
-    public function withoutOverlapping($expiresAt = 1440)
+    public function withoutOverlapping($expiresAt = 1440, $releaseOnSignal = false)
     {
         $this->withoutOverlapping = true;
 
         $this->expiresAt = $expiresAt;
 
+        $this->releaseOnSignal = $releaseOnSignal;
+
         return $this->skip(function () {
             return $this->mutex->exists($this);
         });
-    }
-
-    /**
-     * Release the mutex if the process receives a termination signal.
-     *
-     * @return $this
-     */
-    public function releaseOnSignal()
-    {
-        $this->releaseOnSignal = true;
-
-        return $this;
     }
 
     /**
