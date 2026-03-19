@@ -53,12 +53,12 @@ class PendingImageTest extends TestCase
         $file = UploadedFile::fake()->image('photo.jpg', 400, 200);
 
         $image = new PendingImage($file, new Filesystem);
-        $image->scale(200)->process();
+        $image->scale(200, 200)->process();
 
         [$width, $height] = getimagesize($file->getRealPath());
 
         $this->assertSame(200, $width);
-        $this->assertSame(100, $height);
+        $this->assertSame(100, $height); // aspect ratio preserved
     }
 
     public function test_orient_processes_without_error()
@@ -115,7 +115,7 @@ class PendingImageTest extends TestCase
         $file = UploadedFile::fake()->image('photo.jpg', 4000, 3000);
 
         $image = new PendingImage($file, new Filesystem);
-        $image->orient()->scale(1200)->optimize('webp', 85)->process();
+        $image->orient()->scale(1200, 1200)->optimize('webp', 85)->process();
 
         [$width, $height, $type] = getimagesize($file->getRealPath());
 

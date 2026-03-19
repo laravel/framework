@@ -55,7 +55,7 @@ class PendingImage
      *
      * @return $this
      */
-    public function scale(int $width, ?int $height = null): static
+    public function scale(int $width, int $height): static
     {
         $this->options->scaleWidth = $width;
         $this->options->scaleHeight = $height;

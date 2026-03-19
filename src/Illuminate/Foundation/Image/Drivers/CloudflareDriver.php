@@ -92,13 +92,9 @@ class CloudflareDriver implements Driver
             $params[] = 'fit=cover';
         }
 
-        if ($options->scaleWidth !== null) {
+        if ($options->scaleWidth !== null && $options->scaleHeight !== null) {
             $params[] = "width={$options->scaleWidth}";
-
-            if ($options->scaleHeight !== null) {
-                $params[] = "height={$options->scaleHeight}";
-            }
-
+            $params[] = "height={$options->scaleHeight}";
             $params[] = 'fit=scale-down';
         }
 
