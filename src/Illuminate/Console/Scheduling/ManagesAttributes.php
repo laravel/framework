@@ -63,6 +63,13 @@ trait ManagesAttributes
     public $withoutOverlapping = false;
 
     /**
+     * Indicates if the mutex should be released when the process receives a termination signal.
+     *
+     * @var bool
+     */
+    public $releaseOnSignal = false;
+
+    /**
      * Indicates if the command should only be allowed to run on one server for each cron expression.
      *
      * @var bool
@@ -170,6 +177,18 @@ trait ManagesAttributes
         return $this->skip(function () {
             return $this->mutex->exists($this);
         });
+    }
+
+    /**
+     * Release the mutex if the process receives a termination signal.
+     *
+     * @return $this
+     */
+    public function releaseOnSignal()
+    {
+        $this->releaseOnSignal = true;
+
+        return $this;
     }
 
     /**
