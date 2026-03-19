@@ -176,7 +176,7 @@ class Image
     /**
      * Store the processed image on a filesystem disk with a given name.
      */
-    public function storeAs(string $path, string|null $name = null, array|string $options = []): string|false
+    public function storeAs(string $path, ?string $name = null, array|string $options = []): string|false
     {
         if (is_null($name) || is_array($name)) {
             [$path, $name, $options] = ['', $path, $name ?? []];
@@ -198,7 +198,7 @@ class Image
     /**
      * Store the processed image on a filesystem disk with public visibility and a given name.
      */
-    public function storePubliclyAs(string $path, string|null $name = null, array|string $options = []): string|false
+    public function storePubliclyAs(string $path, ?string $name = null, array|string $options = []): string|false
     {
         if (is_null($name) || is_array($name)) {
             [$path, $name, $options] = ['', $path, $name ?? []];
