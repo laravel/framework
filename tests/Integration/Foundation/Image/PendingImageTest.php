@@ -31,7 +31,7 @@ class PendingImageTest extends TestCase
         $image = new PendingImage($file, new Filesystem);
         $image->optimize('png')->process();
 
-        $this->assertSame(IMAGETYPE_PNG, exif_imagetype($file->getRealPath()));
+        $this->assertSame(IMAGETYPE_PNG, getimagesize($file->getRealPath())[2]);
     }
 
     public function test_cover_and_optimize_together()
