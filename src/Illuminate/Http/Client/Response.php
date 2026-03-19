@@ -410,10 +410,10 @@ class Response implements ArrayAccess, Stringable
     public function throwUnlessStatus($statusCode)
     {
         if (is_callable($statusCode)) {
-            return $statusCode($this->status(), $this) ? $this : throw new RequestException($this, $this->truncateExceptionsAt);
+            return $statusCode($this->status(), $this) ? $this : $this->throw();
         }
 
-        return $this->status() === $statusCode ? $this : throw new RequestException($this, $this->truncateExceptionsAt);
+        return $this->status() === $statusCode ? $this : $this->throw();
     }
 
     /**
