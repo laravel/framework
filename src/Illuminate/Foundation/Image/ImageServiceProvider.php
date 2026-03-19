@@ -9,10 +9,8 @@ class ImageServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
      * Register the service provider.
-     *
-     * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../../../../config/image.php', 'image');
 
@@ -24,9 +22,9 @@ class ImageServiceProvider extends ServiceProvider implements DeferrableProvider
     /**
      * Get the services provided by the provider.
      *
-     * @return array
+     * @return array<int, string>
      */
-    public function provides()
+    public function provides(): array
     {
         return ['image'];
     }
