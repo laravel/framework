@@ -223,11 +223,13 @@ class CloudflareDriverTest extends TestCase
 
         $options = new PendingImageOptions;
         $options->scaleWidth = 800;
+        $options->scaleHeight = 600;
 
         $driver->process('contents', $options);
 
         $http->assertSent(function (Request $request) {
             return str_contains($request->url(), 'width=800')
+                && str_contains($request->url(), 'height=600')
                 && str_contains($request->url(), 'fit=scale-down');
         });
     }

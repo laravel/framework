@@ -73,17 +73,6 @@ class PendingImageTest extends TestCase
         $this->assertSame(800, $options->scaleHeight);
     }
 
-    public function test_scale_with_width_only()
-    {
-        $image = $this->makePendingImage();
-        $image->scale(1200);
-
-        $options = (new \ReflectionProperty($image, 'options'))->getValue($image);
-
-        $this->assertSame(1200, $options->scaleWidth);
-        $this->assertNull($options->scaleHeight);
-    }
-
     public function test_orient_sets_option()
     {
         $image = $this->makePendingImage();

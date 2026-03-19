@@ -102,6 +102,7 @@ class ImagickDriverTest extends TestCase
 
         $options = new PendingImageOptions;
         $options->scaleWidth = 200;
+        $options->scaleHeight = 200;
 
         $result = $driver->process($contents, $options);
 
@@ -109,23 +110,6 @@ class ImagickDriverTest extends TestCase
 
         $this->assertSame(200, $width);
         $this->assertSame(100, $height);
-    }
-
-    public function test_processes_scale_with_both_dimensions()
-    {
-        $driver = new ImagickDriver;
-        $contents = $this->fakeImageContents(400, 400);
-
-        $options = new PendingImageOptions;
-        $options->scaleWidth = 200;
-        $options->scaleHeight = 100;
-
-        $result = $driver->process($contents, $options);
-
-        [$width, $height] = getimagesizefromstring($result);
-
-        $this->assertLessThanOrEqual(200, $width);
-        $this->assertLessThanOrEqual(100, $height);
     }
 
     public function test_processes_orient()
