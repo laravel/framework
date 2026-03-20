@@ -78,8 +78,24 @@ class UniqueConstraintViolationTest extends DatabaseTestCase
     public function testMysqlUniqueCompositeConstraint()
     {
         $e = $this->createUniqueModel();
-        $this->assertSame('unique_idx', $e->index);
+        $this->assertSame('unique_composite_idx', $e->index);
         $this->assertSame([], $e->columns);
+    }
+
+    #[RequiresDatabase('pgsql')]
+    public function testPostgresUniqueConstraint()
+    {
+        $e = $this->createUniqueModel();
+        $this->assertSame('single_unique_idx', $e->index);
+        $this->assertSame(['name'], $e->columns);
+    }
+
+    #[RequiresDatabase('pgsql')]
+    public function testPostgresUniqueCompositeConstraint()
+    {
+        $e = $this->createCompositeModel();
+        $this->assertSame('unique_composite_idx', $e->index);
+        $this->assertSame(['first_name', 'last_name'], $e->columns);
     }
 }
 
