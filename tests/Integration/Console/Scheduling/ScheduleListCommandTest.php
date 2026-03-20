@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\ProcessUtils;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class ScheduleListCommandTest extends TestCase
 {
@@ -260,7 +261,7 @@ class ScheduleListCommandTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('expressionTimezoneConversionProvider')]
+    #[DataProvider('expressionTimezoneConversionProvider')]
     public function testExpressionTimezoneConversion($expression, $eventTimezone, $displayTimezone, $expectedExpressions)
     {
         $this->schedule->command('inspire')->cron($expression)->timezone($eventTimezone);
