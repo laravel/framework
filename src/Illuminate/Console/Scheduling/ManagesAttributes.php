@@ -63,6 +63,13 @@ trait ManagesAttributes
     public $withoutOverlapping = false;
 
     /**
+     * Indicates if the mutex should be released when the process receives a termination signal.
+     *
+     * @var bool
+     */
+    public $releaseOnTerminationSignals = true;
+
+    /**
      * Indicates if the command should only be allowed to run on one server for each cron expression.
      *
      * @var bool
@@ -156,16 +163,20 @@ trait ManagesAttributes
 
     /**
      * Do not allow the event to overlap each other.
+     *
      * The expiration time of the underlying cache lock may be specified in minutes.
      *
      * @param  int  $expiresAt
+     * @param  bool  $releaseOnTerminationSignals
      * @return $this
      */
-    public function withoutOverlapping($expiresAt = 1440)
+    public function withoutOverlapping($expiresAt = 1440, $releaseOnTerminationSignals = true)
     {
         $this->withoutOverlapping = true;
 
         $this->expiresAt = $expiresAt;
+
+        $this->releaseOnTerminationSignals = $releaseOnTerminationSignals;
 
         return $this->skip(function () {
             return $this->mutex->exists($this);

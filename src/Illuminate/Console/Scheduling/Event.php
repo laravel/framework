@@ -131,6 +131,8 @@ class Event
             return;
         }
 
+        $this->ensureMutexIsReleasedOnSignal();
+
         $exitCode = $this->start($container);
 
         if (! $this->runInBackground) {
@@ -839,6 +841,30 @@ class Event
         $this->mutexNameResolver = is_string($mutexName) ? fn () => $mutexName : $mutexName;
 
         return $this;
+    }
+
+    /**
+     * Ensure the mutex is released if the process receives a termination signal.
+     *
+     * @return void
+     */
+    protected function ensureMutexIsReleasedOnSignal()
+    {
+        if (! $this->releaseOnTerminationSignals ||
+            $this->runInBackground ||
+            ! extension_loaded('pcntl')) {
+            return;
+        }
+
+        pcntl_async_signals(true);
+
+        foreach ([SIGTERM, SIGINT, SIGQUIT] as $signal) {
+            pcntl_signal($signal, function () {
+                $this->removeMutex();
+
+                exit(1);
+            });
+        }
     }
 
     /**
