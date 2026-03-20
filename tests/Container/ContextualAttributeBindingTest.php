@@ -272,6 +272,8 @@ class ContextualAttributeBindingTest extends TestCase
             $manager = m::mock(FilesystemManager::class);
             $manager->shouldReceive('disk')->with('foo')->andReturn(m::mock(Filesystem::class));
             $manager->shouldReceive('disk')->with('bar')->andReturn(m::mock(Filesystem::class));
+            $manager->shouldReceive('disk')->with(StorageDiskUnitEnum::unit)->andReturn(m::mock(Filesystem::class));
+            $manager->shouldReceive('disk')->with(StorageDiskBackedEnum::Backed)->andReturn(m::mock(Filesystem::class));
 
             return $manager;
         });
@@ -358,6 +360,16 @@ class ContainerTestAttributeThatResolvesContractImpl implements ContextualAttrib
         public readonly string $name
     ) {
     }
+}
+
+enum StorageDiskUnitEnum
+{
+    case unit;
+}
+
+enum StorageDiskBackedEnum: string
+{
+    case Backed = 'backed';
 }
 
 interface ContainerTestContract
@@ -530,9 +542,12 @@ final class RouteParameterTest
 
 final class StorageTest
 {
-    public function __construct(#[Storage('foo')] Filesystem $foo, #[Storage('bar')] Filesystem $bar)
-    {
-    }
+    public function __construct(
+        #[Storage('foo')] Filesystem $foo,
+        #[Storage('bar')] Filesystem $bar,
+        #[Storage(StorageDiskUnitEnum::unit)] Filesystem $unit,
+        #[Storage(StorageDiskBackedEnum::Backed)] Filesystem $backed,
+    ) {}
 }
 
 final class GiveTestSimple
