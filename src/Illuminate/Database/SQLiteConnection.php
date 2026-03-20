@@ -62,6 +62,22 @@ class SQLiteConnection extends Connection
         return (bool) preg_match('#(column(s)? .* (is|are) not unique|UNIQUE constraint failed: .*)#i', $exception->getMessage());
     }
 
+    protected function parseUniqueConstraintViolation(Exception $exception): array
+    {
+        preg_match('#UNIQUE constraint failed: (.+)#i', $exception->getMessage(), $matches);
+
+        $columns = [];
+
+        if (isset($matches[1])) {
+            $columns = array_map(
+                static fn ($col) => last(explode('.', trim($col))),
+                explode(',', $matches[1])
+            );
+        }
+
+        return ['columns' => $columns, 'index' => null];
+    }
+
     /**
      * Get the default query grammar instance.
      *

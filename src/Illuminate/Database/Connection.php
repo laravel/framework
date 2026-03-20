@@ -834,11 +834,13 @@ class Connection implements ConnectionInterface
         // message to include the bindings with SQL, which will make this exception a
         // lot more helpful to the developer instead of just the database's errors.
         catch (Exception $e) {
-            $exceptionType = $this->isUniqueConstraintError($e)
+            $isUniqueConstraintError = $this->isUniqueConstraintError($e);
+
+            $exceptionType = $isUniqueConstraintError
                 ? UniqueConstraintViolationException::class
                 : QueryException::class;
 
-            throw new $exceptionType(
+            $exception = new $exceptionType(
                 $this->getNameWithReadWriteType(),
                 $query,
                 $this->prepareBindings($bindings),
@@ -846,6 +848,13 @@ class Connection implements ConnectionInterface
                 $this->getConnectionDetails(),
                 $this->latestReadWriteTypeUsed(),
             );
+
+            if ($isUniqueConstraintError) {
+                ['index' => $index, 'columns' => $columns] = $this->parseUniqueConstraintViolation($e);
+                $exception->setIndex($index)->setColumns($columns);
+            }
+
+            throw $exception;
         }
     }
 
@@ -858,6 +867,17 @@ class Connection implements ConnectionInterface
     protected function isUniqueConstraintError(Exception $exception)
     {
         return false;
+    }
+
+    /**
+     * Extract the index and columns that caused a unique constraint violation.
+     *
+     * @param  Exception  $exception
+     * @return array{index: string|null, columns: list<string>}
+     */
+    protected function parseUniqueConstraintViolation(Exception $exception): array
+    {
+        return ['index' => null, 'columns' => []];
     }
 
     /**

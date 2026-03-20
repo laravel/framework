@@ -55,6 +55,24 @@ class PostgresConnection extends Connection
         return '23505' === $exception->getCode();
     }
 
+    protected function parseUniqueConstraintViolation(Exception $exception): array
+    {
+        $index = null;
+        $columns = [];
+
+        $message = $exception->getMessage();
+
+        if (preg_match('#unique constraint "([^"]+)"#i', $message, $matches)) {
+            $index = $matches[1];
+        }
+
+        if (preg_match('#Key \(([^)]+)\)=#i', $message, $matches)) {
+            $columns = array_map('trim', explode(',', $matches[1]));
+        }
+
+        return ['columns' => $columns, 'index' => $index];
+    }
+
     /**
      * Get the default query grammar instance.
      *

@@ -82,6 +82,17 @@ class MySqlConnection extends Connection
         return (bool) preg_match('#Integrity constraint violation: 1062#i', $exception->getMessage());
     }
 
+    protected function parseUniqueConstraintViolation(Exception $exception): array
+    {
+        preg_match(
+            '#Duplicate entry \'.*?\' for key \'(?:.*?\.)?(.+?)\'#i',
+            $exception->getMessage(),
+            $matches
+        );
+
+        return ['columns' => [], 'index' => $matches[1] ?? null];
+    }
+
     /**
      * Get the connection's last insert ID.
      *
