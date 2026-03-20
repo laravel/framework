@@ -40,7 +40,7 @@ class EventStreamResponseTest extends TestCase
         $this->assertStringContainsString('data: </stream>', $content);
     }
 
-    public function testEventStreamExceptionEmitsErrorEventOnStream()
+    public function testEventStreamExceptionDoesNotLeakToClient()
     {
         Route::get('/stream', function () {
             return response()->eventStream(function () {
@@ -62,8 +62,8 @@ class EventStreamResponseTest extends TestCase
 
         $this->assertStringContainsString("event: update\n", $content);
         $this->assertStringContainsString('data: {"message":"hello"}', $content);
-        $this->assertStringContainsString("event: error\n", $content);
-        $this->assertStringContainsString('data: Something went wrong during streaming', $content);
+        $this->assertStringNotContainsString('Something went wrong during streaming', $content);
+        $this->assertStringNotContainsString("event: error\n", $content);
         $this->assertStringNotContainsString('data: </stream>', $content);
     }
 

@@ -179,16 +179,6 @@ class ResponseFactory implements FactoryContract
                 }
             } catch (Throwable $e) {
                 report($e);
-
-                echo "event: error\n";
-                echo 'data: '.$e->getMessage();
-                echo "\n\n";
-
-                if (ob_get_level() > 0) {
-                    ob_flush();
-                }
-
-                flush();
             }
         }, 200, array_merge($headers, [
             'Content-Type' => 'text/event-stream',
