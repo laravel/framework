@@ -3,16 +3,12 @@
 namespace Illuminate\Tests\Integration\Filesystem;
 
 use Illuminate\Filesystem\FilesystemServiceProvider;
-use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
 
 class FilesystemServiceProviderTest extends TestCase
 {
-    public function test_it_throws_when_served_disks_have_conflicting_uris(): void
+    public function test_later_disk_takes_precedence_when_served_disks_have_conflicting_uris(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The [other] disk conflicts with the [local] disk at [/storage]. Each served disk must have a unique URL.');
-
         config(['filesystems.disks' => [
             'local' => [
                 'driver' => 'local',
@@ -27,6 +23,9 @@ class FilesystemServiceProviderTest extends TestCase
         ]]);
 
         (new FilesystemServiceProvider($this->app))->boot();
+
+        // Should not throw - later disk silently takes precedence
+        $this->assertCount(2, $this->app->make('config')->get('filesystems.disks'));
     }
 
     public function test_served_disks_with_unique_urls_do_not_conflict(): void
@@ -43,6 +42,26 @@ class FilesystemServiceProviderTest extends TestCase
                 'root' => storage_path('other'),
                 'serve' => true,
                 'url' => '/other',
+            ],
+        ]]);
+
+        (new FilesystemServiceProvider($this->app))->boot();
+
+        $this->assertCount(2, $this->app->make('config')->get('filesystems.disks'));
+    }
+
+    public function test_user_defined_disk_overrides_framework_default_at_same_uri(): void
+    {
+        config(['filesystems.disks' => [
+            'local' => [
+                'driver' => 'local',
+                'root' => storage_path('app/private'),
+                'serve' => true,
+            ],
+            'private' => [
+                'driver' => 'local',
+                'root' => storage_path('app/private'),
+                'serve' => true,
             ],
         ]]);
 
