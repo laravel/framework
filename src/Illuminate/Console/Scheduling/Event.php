@@ -850,7 +850,9 @@ class Event
      */
     protected function ensureMutexIsReleasedOnSignal()
     {
-        if (! $this->releaseOnSignal || $this->runInBackground || ! extension_loaded('pcntl')) {
+        if (! $this->releaseOnTerminationSignals ||
+            $this->runInBackground ||
+            ! extension_loaded('pcntl')) {
             return;
         }
 

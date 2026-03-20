@@ -135,7 +135,7 @@ class CallbackEvent extends Event
      *
      * @throws \LogicException
      */
-    public function withoutOverlapping($expiresAt = 1440, $releaseOnSignal = false)
+    public function withoutOverlapping($expiresAt = 1440, $releaseOnTerminationSignals = true)
     {
         if (! isset($this->description)) {
             throw new LogicException(
@@ -143,7 +143,7 @@ class CallbackEvent extends Event
             );
         }
 
-        return parent::withoutOverlapping($expiresAt, $releaseOnSignal);
+        return parent::withoutOverlapping($expiresAt, $releaseOnTerminationSignals);
     }
 
     /**

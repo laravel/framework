@@ -67,7 +67,7 @@ trait ManagesAttributes
      *
      * @var bool
      */
-    public $releaseOnSignal = false;
+    public $releaseOnTerminationSignals = true;
 
     /**
      * Indicates if the command should only be allowed to run on one server for each cron expression.
@@ -163,19 +163,20 @@ trait ManagesAttributes
 
     /**
      * Do not allow the event to overlap each other.
+     *
      * The expiration time of the underlying cache lock may be specified in minutes.
      *
      * @param  int  $expiresAt
-     * @param  bool  $releaseOnSignal
+     * @param  bool  $releaseOnTerminationSignals
      * @return $this
      */
-    public function withoutOverlapping($expiresAt = 1440, $releaseOnSignal = false)
+    public function withoutOverlapping($expiresAt = 1440, $releaseOnTerminationSignals = true)
     {
         $this->withoutOverlapping = true;
 
         $this->expiresAt = $expiresAt;
 
-        $this->releaseOnSignal = $releaseOnSignal;
+        $this->releaseOnTerminationSignals = $releaseOnTerminationSignals;
 
         return $this->skip(function () {
             return $this->mutex->exists($this);
