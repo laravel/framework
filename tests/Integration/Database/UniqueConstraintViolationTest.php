@@ -77,7 +77,7 @@ class UniqueConstraintViolationTest extends DatabaseTestCase
     #[RequiresDatabase('mysql')]
     public function testMysqlUniqueCompositeConstraint()
     {
-        $e = $this->createUniqueModel();
+        $e = $this->createCompositeModel();
         $this->assertSame('unique_composite_idx', $e->index);
         $this->assertSame([], $e->columns);
     }

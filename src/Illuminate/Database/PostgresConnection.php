@@ -55,6 +55,12 @@ class PostgresConnection extends Connection
         return '23505' === $exception->getCode();
     }
 
+    /**
+     * Extract the index and columns that caused a unique constraint violation.
+     *
+     * @param  Exception  $exception
+     * @return array{index: string|null, columns: list<string>}
+     */
     protected function parseUniqueConstraintViolation(Exception $exception): array
     {
         $index = null;
@@ -67,7 +73,7 @@ class PostgresConnection extends Connection
         }
 
         if (preg_match('#Key \(([^)]+)\)=#i', $message, $matches)) {
-            $columns = array_map('trim', explode(',', $matches[1]));
+            $columns = array_map(trim(...), explode(',', $matches[1]));
         }
 
         return ['columns' => $columns, 'index' => $index];
