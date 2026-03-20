@@ -144,7 +144,6 @@ class LoadConfiguration
             'broadcasting' => ['connections'],
             'cache' => ['stores'],
             'database' => ['connections'],
-            'filesystems' => ['disks'],
             'logging' => ['channels'],
             'mail' => ['mailers'],
             'queue' => ['connections'],

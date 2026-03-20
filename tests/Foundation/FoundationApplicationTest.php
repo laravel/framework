@@ -557,7 +557,7 @@ class FoundationApplicationTest extends TestCase
 
         $this->assertSame('overwrite', $config->get('filesystems.default'));
         $this->assertSame('filesystems', $config->get('filesystems.custom_option'));
-        $this->assertIsArray($config->get('filesystems.disks.s3'));
+        $this->assertNull($config->get('filesystems.disks.s3'));
         $this->assertSame(['overwrite' => true], $config->get('filesystems.disks.local'));
         $this->assertSame(['merge' => true], $config->get('filesystems.disks.new'));
 
