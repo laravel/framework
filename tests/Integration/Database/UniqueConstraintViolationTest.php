@@ -97,6 +97,22 @@ class UniqueConstraintViolationTest extends DatabaseTestCase
         $this->assertSame('unique_composite_idx', $e->index);
         $this->assertSame(['first_name', 'last_name'], $e->columns);
     }
+
+    #[RequiresDatabase('sqlsrv')]
+    public function testSqlServerUniqueConstraint()
+    {
+        $e = $this->createUniqueModel();
+        $this->assertSame('single_unique_idx', $e->index);
+        $this->assertSame([], $e->columns);
+    }
+
+    #[RequiresDatabase('sqlsrv')]
+    public function testSqlServerUniqueCompositeConstraint()
+    {
+        $e = $this->createCompositeModel();
+        $this->assertSame('unique_composite_idx', $e->index);
+        $this->assertSame([], $e->columns);
+    }
 }
 
 class UniqueSingleModel extends Model
