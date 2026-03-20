@@ -547,7 +547,8 @@ final class StorageTest
         #[Storage('bar')] Filesystem $bar,
         #[Storage(StorageDiskUnitEnum::unit)] Filesystem $unit,
         #[Storage(StorageDiskBackedEnum::Backed)] Filesystem $backed,
-    ) {}
+    ) {
+    }
 }
 
 final class GiveTestSimple
