@@ -37,7 +37,6 @@ class UniqueConstraintViolationTest extends DatabaseTestCase
         $this->fail('No exception was thrown');
     }
 
-
     private function createCompositeModel(): UniqueConstraintViolationException
     {
         UniqueCompositeModel::query()->create(['first_name' => 'Taylor', 'last_name' => 'Otwell']);
