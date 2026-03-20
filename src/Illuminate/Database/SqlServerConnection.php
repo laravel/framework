@@ -95,9 +95,8 @@ class SqlServerConnection extends Connection
     protected function parseUniqueConstraintViolation(Exception $exception): array
     {
         $index = null;
-        $message = $exception->getMessage();
 
-        if (preg_match('#with unique index \'([^\']+)\'#i', $message, $matches)) {
+        if (preg_match('#with unique index \'([^\']+)\'#i', $message = $exception->getMessage(), $matches)) {
             $index = $matches[1];
         } elseif (preg_match('#Violation of [A-Z ]+ constraint \'([^\']+)\'#i', $message, $matches)) {
             $index = $matches[1];

@@ -63,12 +63,9 @@ class PostgresConnection extends Connection
      */
     protected function parseUniqueConstraintViolation(Exception $exception): array
     {
-        $index = null;
-        $columns = [];
+        [$index, $columns] = [null, []];
 
-        $message = $exception->getMessage();
-
-        if (preg_match('#unique constraint "([^"]+)"#i', $message, $matches)) {
+        if (preg_match('#unique constraint "([^"]+)"#i', $message = $exception->getMessage(), $matches)) {
             $index = $matches[1];
         }
 
