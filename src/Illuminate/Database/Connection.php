@@ -834,9 +834,7 @@ class Connection implements ConnectionInterface
         // message to include the bindings with SQL, which will make this exception a
         // lot more helpful to the developer instead of just the database's errors.
         catch (Exception $e) {
-            $isUniqueConstraintError = $this->isUniqueConstraintError($e);
-
-            $exceptionType = $isUniqueConstraintError
+            $exceptionType = ($isUniqueConstraintError = $this->isUniqueConstraintError($e))
                 ? UniqueConstraintViolationException::class
                 : QueryException::class;
 
@@ -851,6 +849,7 @@ class Connection implements ConnectionInterface
 
             if ($isUniqueConstraintError) {
                 ['index' => $index, 'columns' => $columns] = $this->parseUniqueConstraintViolation($e);
+
                 $exception->setIndex($index)->setColumns($columns);
             }
 
