@@ -4416,7 +4416,7 @@ class Builder implements BuilderContract
     public function toggle(string $column, array $extra = []): int
     {
         return $this->update(array_merge([
-            $column => $this->raw("NOT {$this->grammar->wrap($column)}"),
+            $column => $this->raw($this->grammar->compileToggle($column)),
         ], $extra));
     }
 

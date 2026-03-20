@@ -410,6 +410,17 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the SQL statement to toggle a boolean column.
+     *
+     * @param  string  $column
+     * @return string
+     */
+    public function compileToggle(string $column): string
+    {
+        return '1 - '.$this->wrap($column);
+    }
+
+    /**
      * Compile an update statement with joins into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

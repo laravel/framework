@@ -22,4 +22,13 @@ class DatabaseSqlServerQueryGrammarTest extends TestCase
 
         $this->assertSame("select * from [users] where 'Hello''World?' IS NOT NULL AND [email] = 'foo'", $query);
     }
+
+    public function testCompileToggle()
+    {
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $grammar = new SqlServerGrammar($connection);
+
+        $this->assertSame('1 - [is_active]', $grammar->compileToggle('is_active'));
+    }
 }

@@ -1303,6 +1303,17 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile the SQL statement to toggle a boolean column.
+     *
+     * @param  string  $column
+     * @return string
+     */
+    public function compileToggle(string $column): string
+    {
+        return 'NOT '.$this->wrap($column);
+    }
+
+    /**
      * Compile an update statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

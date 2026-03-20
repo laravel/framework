@@ -73,4 +73,13 @@ class DatabaseQueryGrammarTest extends TestCase
 
         $this->assertSame('order by field(status, ?, ?) asc', strtolower($sql));
     }
+
+    public function testCompileToggle()
+    {
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $grammar = new Grammar($connection);
+
+        $this->assertSame('NOT "is_active"', $grammar->compileToggle('is_active'));
+    }
 }
