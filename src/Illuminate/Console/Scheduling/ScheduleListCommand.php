@@ -96,7 +96,7 @@ class ScheduleListCommand extends Command
                 }
             }
 
-            return collect($this->expressionsInTimezone($event, $timezone))->map(fn ($expression) => [
+            return collect(CronExpressionTimezoneConverter::forEvent($event, $timezone))->map(fn ($expression) => [
                 'expression' => $expression,
                 'command' => $command,
                 'description' => $event->description ?? null,
@@ -126,7 +126,7 @@ class ScheduleListCommand extends Command
         $repeatExpressionSpacing = $this->getRepeatExpressionSpacing($events);
 
         $events = $events->flatMap(function ($event) use ($terminalWidth, $expressionSpacing, $repeatExpressionSpacing, $timezone) {
-            return collect($this->expressionsInTimezone($event, $timezone))->map(
+            return collect(CronExpressionTimezoneConverter::forEvent($event, $timezone))->map(
                 fn ($expression) => $this->listEvent($event, $terminalWidth, $expressionSpacing, $repeatExpressionSpacing, $timezone, $expression)
             );
         });
@@ -144,7 +144,7 @@ class ScheduleListCommand extends Command
      */
     private function getCronExpressionSpacing($events, DateTimeZone $timezone)
     {
-        $rows = $events->flatMap(fn ($event) => collect($this->expressionsInTimezone($event, $timezone))
+        $rows = $events->flatMap(fn ($event) => collect(CronExpressionTimezoneConverter::forEvent($event, $timezone))
             ->map(fn ($expression) => array_map(mb_strlen(...), preg_split("/\s+/", $expression))));
 
         return (new Collection($rows[0] ?? []))->keys()->map(fn ($key) => $rows->max($key))->all();
@@ -301,131 +301,6 @@ class ScheduleListCommand extends Command
         return $now
             ->endOfSecond()
             ->ceilSeconds($event->repeatSeconds);
-    }
-
-    /**
-     * Convert a cron expression from the event's timezone to the display timezone.
-     *
-     * Returns one or more expressions when values straddle a day boundary.
-     *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
-     * @param  \DateTimeZone  $timezone
-     * @return array<string>
-     */
-    private function expressionsInTimezone($event, DateTimeZone $timezone)
-    {
-        $eventTimezone = $event->timezone instanceof DateTimeZone
-            ? $event->timezone
-            : new DateTimeZone($event->timezone ?? $timezone->getName());
-
-        $now = Carbon::now();
-        $offset = $timezone->getOffset($now) - $eventTimezone->getOffset($now);
-
-        if ($offset === 0) {
-            return [$event->expression];
-        }
-
-        $segments = preg_split("/\s+/", $event->expression);
-        $offsetMinutes = intdiv($offset, 60);
-        $offsetMins = $offsetMinutes % 60;
-        $offsetHours = intdiv($offsetMinutes, 60);
-
-        $minuteGroups = $this->shiftAndGroup($segments[0], $offsetMins, 60);
-
-        $expressions = [];
-
-        foreach ($minuteGroups as $minuteCarry => $minuteValues) {
-            $hourGroups = $this->shiftAndGroup($segments[1], $offsetHours + $minuteCarry, 24);
-
-            foreach ($hourGroups as $hourCarry => $hourValues) {
-                $parts = $segments;
-                $parts[0] = $minuteValues;
-                $parts[1] = $hourValues;
-
-                if ($hourCarry !== 0) {
-                    $parts[4] = $this->shiftField($segments[4], $hourCarry, 7);
-
-                    $dayGroups = $this->shiftAndGroup($segments[2], $hourCarry, 31, min: 1);
-
-                    foreach ($dayGroups as $dayCarry => $dayValues) {
-                        $dayParts = $parts;
-                        $dayParts[2] = $dayValues;
-
-                        if ($dayCarry !== 0) {
-                            $dayParts[3] = $this->shiftField($segments[3], $dayCarry, 12, min: 1);
-                        }
-
-                        $expressions[] = implode(' ', $dayParts);
-                    }
-
-                    continue;
-                }
-
-                $expressions[] = implode(' ', $parts);
-            }
-        }
-
-        return $expressions;
-    }
-
-    /**
-     * Shift values in a cron field and group them by carry direction.
-     *
-     * @param  string  $field
-     * @param  int  $offset
-     * @param  int  $mod
-     * @return array<int, string>
-     */
-    private function shiftAndGroup($field, $offset, $mod, $min = 0)
-    {
-        if ($offset === 0 || ! preg_match('/^[\d,]+$/', $field)) {
-            return [0 => $field];
-        }
-
-        $groups = [];
-
-        foreach (explode(',', $field) as $value) {
-            $new = (int) $value + $offset;
-            $carry = 0;
-
-            if ($new >= $mod + $min) {
-                $carry = 1;
-                $new -= $mod;
-            } elseif ($new < $min) {
-                $carry = -1;
-                $new += $mod;
-            }
-
-            $groups[$carry][] = $new;
-        }
-
-        return collect($groups)->map(function ($values) {
-            sort($values);
-
-            return implode(',', $values);
-        })->all();
-    }
-
-    /**
-     * Shift a cron field by the given offset.
-     *
-     * @param  string  $field
-     * @param  int  $offset
-     * @param  int  $mod
-     * @param  int  $min
-     * @return string
-     */
-    private function shiftField($field, $offset, $mod, $min = 0)
-    {
-        if ($offset === 0 || ! preg_match('/^[\d,]+$/', $field)) {
-            return $field;
-        }
-
-        $shifted = collect(explode(',', $field))
-            ->map(fn ($v) => (((int) $v + $offset - $min) % $mod + $mod) % $mod + $min)
-            ->sort();
-
-        return $shifted->implode(',');
     }
 
     /**
