@@ -14,7 +14,7 @@ class UniqueConstraintViolationTest extends DatabaseTestCase
     {
         Schema::create('test_unique_constraint', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
+            $table->string('name')->unique('single_unique_idx');
         });
 
         Schema::create('test_unique_constraint_composite', function (Blueprint $table) {
@@ -22,7 +22,7 @@ class UniqueConstraintViolationTest extends DatabaseTestCase
             $table->string('first_name');
             $table->string('last_name');
 
-            $table->unique(['first_name', 'last_name'], 'unique_idx');
+            $table->unique(['first_name', 'last_name'], 'unique_composite_idx');
         });
     }
 
@@ -68,6 +68,14 @@ class UniqueConstraintViolationTest extends DatabaseTestCase
 
     #[RequiresDatabase('mysql')]
     public function testMysqlUniqueConstraint()
+    {
+        $e = $this->createUniqueModel();
+        $this->assertSame('single_unique_idx', $e->index);
+        $this->assertSame([], $e->columns);
+    }
+
+    #[RequiresDatabase('mysql')]
+    public function testMysqlUniqueCompositeConstraint()
     {
         $e = $this->createUniqueModel();
         $this->assertSame('unique_idx', $e->index);
