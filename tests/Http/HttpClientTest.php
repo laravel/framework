@@ -1420,8 +1420,12 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
+        // Ensure the exception message is truncated according to the request level truncation setting.
+        $this->assertEquals("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
+
         $exception->report();
 
+        // Ensure that the truncation level is not changed when reporting the exception.
         $this->assertEquals("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
 
         $this->assertEquals(60, RequestException::$truncateAt);
