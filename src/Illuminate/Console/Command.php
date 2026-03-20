@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console;
 
+use Illuminate\Console\Attributes\Aliases;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Help;
 use Illuminate\Console\Attributes\Hidden;
@@ -169,6 +170,12 @@ class Command extends SymfonyCommand
 
         if (count($reflection->getAttributes(Hidden::class)) > 0) {
             $this->hidden = true;
+        }
+
+        $aliases = $reflection->getAttributes(Aliases::class);
+
+        if (count($aliases) > 0) {
+            $this->aliases = $aliases[0]->newInstance()->aliases;
         }
     }
 

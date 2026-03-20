@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Console;
 
 use Illuminate\Console\Application;
+use Illuminate\Console\Attributes\Aliases;
 use Illuminate\Console\Attributes\Help;
 use Illuminate\Console\Attributes\Hidden;
 use Illuminate\Console\Attributes\Signature;
@@ -223,6 +224,22 @@ class CommandTest extends TestCase
         $this->assertSame(['bar:baz', 'baz:qux'], $command->getAliases());
     }
 
+    public function testAliasesAttributeCanSetAliases()
+    {
+        $command = new AliasesAttributeCommand;
+
+        $this->assertSame('foo:bar', $command->getName());
+        $this->assertSame(['bar:baz', 'baz:qux'], $command->getAliases());
+    }
+
+    public function testAliasesAttributeOverridesSignatureAliases()
+    {
+        $command = new AliasesAttributeOverridesSignatureCommand;
+
+        $this->assertSame('foo:bar', $command->getName());
+        $this->assertSame(['override:alias'], $command->getAliases());
+    }
+
     public function testHiddenAttributeHidesCommand()
     {
         $command = new HiddenCommand;
@@ -275,6 +292,24 @@ class HelpCommand extends Command
 #[Usage('foo:bar 1')]
 #[Usage('foo:bar 1 --force')]
 class UsageCommand extends Command
+{
+    public function handle()
+    {
+    }
+}
+
+#[Signature('foo:bar')]
+#[Aliases(['bar:baz', 'baz:qux'])]
+class AliasesAttributeCommand extends Command
+{
+    public function handle()
+    {
+    }
+}
+
+#[Signature('foo:bar', aliases: ['ignored:alias'])]
+#[Aliases(['override:alias'])]
+class AliasesAttributeOverridesSignatureCommand extends Command
 {
     public function handle()
     {

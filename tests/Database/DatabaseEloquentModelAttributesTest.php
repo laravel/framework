@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Attributes\Appends;
 use Illuminate\Database\Eloquent\Attributes\Connection;
+use Illuminate\Database\Eloquent\Attributes\DateFormat;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\Touches;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Attributes\Visible;
+use Illuminate\Database\Eloquent\Attributes\WithoutIncrementing;
+use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Database\Eloquent\Model;
 use PHPUnit\Framework\TestCase;
 
@@ -90,6 +93,20 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertFalse($model->getIncrementing());
     }
 
+    public function test_dedicated_without_incrementing_attribute(): void
+    {
+        $model = new ModelWithDedicatedWithoutIncrementingAttribute;
+
+        $this->assertFalse($model->getIncrementing());
+    }
+
+    public function test_dedicated_without_incrementing_attribute_overrides_table_incrementing(): void
+    {
+        $model = new ModelWithWithoutIncrementingAttributeOverride;
+
+        $this->assertFalse($model->getIncrementing());
+    }
+
     public function test_connection_attribute(): void
     {
         $model = new ModelWithConnectionAttribute;
@@ -137,6 +154,34 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $model = new ModelWithDateFormatAttribute;
 
         $this->assertSame('U', $model->getDateFormat());
+    }
+
+    public function test_dedicated_date_format_attribute(): void
+    {
+        $model = new ModelWithDedicatedDateFormatAttribute;
+
+        $this->assertSame('Y-m-d', $model->getDateFormat());
+    }
+
+    public function test_dedicated_date_format_attribute_overrides_table_date_format(): void
+    {
+        $model = new ModelWithDateFormatAttributeOverride;
+
+        $this->assertSame('Y-m-d', $model->getDateFormat());
+    }
+
+    public function test_dedicated_without_timestamps_attribute(): void
+    {
+        $model = new ModelWithDedicatedWithoutTimestampsAttribute;
+
+        $this->assertFalse($model->usesTimestamps());
+    }
+
+    public function test_dedicated_without_timestamps_attribute_overrides_table_timestamps(): void
+    {
+        $model = new ModelWithWithoutTimestampsAttributeOverride;
+
+        $this->assertFalse($model->usesTimestamps());
     }
 
     public function test_fillable_attribute(): void
@@ -417,6 +462,45 @@ class ModelWithAppendsAttribute extends Model
 
 #[Touches(['post', 'author'])]
 class ModelWithTouchesAttribute extends Model
+{
+    //
+}
+
+#[DateFormat('Y-m-d')]
+class ModelWithDedicatedDateFormatAttribute extends Model
+{
+    //
+}
+
+#[Table(dateFormat: 'U')]
+#[DateFormat('Y-m-d')]
+class ModelWithDateFormatAttributeOverride extends Model
+{
+    //
+}
+
+#[WithoutTimestamps]
+class ModelWithDedicatedWithoutTimestampsAttribute extends Model
+{
+    //
+}
+
+#[Table(timestamps: true)]
+#[WithoutTimestamps]
+class ModelWithWithoutTimestampsAttributeOverride extends Model
+{
+    //
+}
+
+#[WithoutIncrementing]
+class ModelWithDedicatedWithoutIncrementingAttribute extends Model
+{
+    //
+}
+
+#[Table(incrementing: true)]
+#[WithoutIncrementing]
+class ModelWithWithoutIncrementingAttributeOverride extends Model
 {
     //
 }

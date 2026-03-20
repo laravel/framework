@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
 
@@ -32,7 +33,9 @@ trait HasTimestamps
     public function initializeHasTimestamps()
     {
         if ($this->timestamps === true) {
-            if (($table = static::resolveClassAttribute(Table::class)) && $table->timestamps !== null) {
+            if (static::resolveClassAttribute(WithoutTimestamps::class) !== null) {
+                $this->timestamps = false;
+            } elseif (($table = static::resolveClassAttribute(Table::class)) && $table->timestamps !== null) {
                 $this->timestamps = $table->timestamps;
             }
         }

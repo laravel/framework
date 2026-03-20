@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Attributes\Scope as LocalScope;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
+use Illuminate\Database\Eloquent\Attributes\WithoutIncrementing;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
@@ -445,8 +446,12 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $this->keyType = $table->keyType;
         }
 
-        if ($this->incrementing === true && $table && $table->incrementing !== null) {
-            $this->incrementing = $table->incrementing;
+        if ($this->incrementing === true) {
+            if (static::resolveClassAttribute(WithoutIncrementing::class) !== null) {
+                $this->incrementing = false;
+            } elseif ($table && $table->incrementing !== null) {
+                $this->incrementing = $table->incrementing;
+            }
         }
     }
 
