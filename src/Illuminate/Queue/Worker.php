@@ -255,7 +255,7 @@ class Worker
                 ));
             }
 
-            $this->kill(static::EXIT_ERROR, $options);
+            $this->kill(static::EXIT_ERROR, $options, WorkerStopReason::TimedOut);
         }, true);
 
         pcntl_alarm(
@@ -839,11 +839,12 @@ class Worker
      *
      * @param  int  $status
      * @param  \Illuminate\Queue\WorkerOptions|null  $options
+     * @param  \Illuminate\Queue\WorkerStopReason|null  $reason
      * @return never
      */
-    public function kill($status = 0, $options = null)
+    public function kill($status = 0, $options = null, $reason = null)
     {
-        $this->events->dispatch(new WorkerStopping($status, $options));
+        $this->events->dispatch(new WorkerStopping($status, $options, $reason));
 
         if (extension_loaded('posix')) {
             posix_kill(getmypid(), SIGKILL);
