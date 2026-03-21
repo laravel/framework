@@ -46,28 +46,37 @@ class ConfigWriter
     {
         $code = $this->files->get($filePath);
 
-        $parser = $this->createParser();
-        $oldStmts = $parser->parse($code);
+        $parser = (new ParserFactory)->createForNewestSupportedVersion();
+        $traverser = new NodeTraverser;
+
+        $oldStatements = $parser->parse($code);
         $oldTokens = $parser->getTokens();
 
-        $traverser = new NodeTraverser;
         $traverser->addVisitor(new CloningVisitor);
-        $newStmts = $traverser->traverse($oldStmts);
+        $newStatements = $traverser->traverse($oldStatements);
 
-        $returnArray = $this->findReturnArray($newStmts);
+        $returnArray = $this->findReturnArray($newStatements);
 
         if ($returnArray === null) {
             return;
         }
 
-        $targetArray = $this->findOrCreateNestedArray($returnArray, array_slice($keySegments, 0, -1));
-        $this->setValueInArray($targetArray, end($keySegments), $this->buildEnvCall($envVariable, $default));
+        $targetArray = $this->findOrCreateNestedArray(
+            $returnArray, array_slice($keySegments, 0, -1)
+        );
 
-        $printer = new Standard;
-        $newCode = $printer->printFormatPreserving($newStmts, $oldStmts, $oldTokens);
-        $newCode = preg_replace('/^\s*\/\* __CONFIGWRITER__ \*\/\n/m', '', $newCode);
+        $this->setValueInArray(
+            $targetArray,
+            end($keySegments),
+            $this->buildEnvCall($envVariable, $default)
+        );
 
-        $this->files->put($filePath, $newCode);
+        $newCode = (new Standard)->printFormatPreserving($newStatements, $oldStatements, $oldTokens);
+
+        $this->files->put(
+            $filePath,
+            preg_replace('/^\s*\/\* __CONFIGWRITER__ \*\/\n/m', '', $newCode)
+        );
     }
 
     /**
@@ -117,11 +126,11 @@ class ConfigWriter
     /**
      * Find the return statement's array in the AST.
      */
-    protected function findReturnArray(array $stmts): ?Array_
+    protected function findReturnArray(array $statements): ?Array_
     {
-        foreach ($stmts as $stmt) {
-            if ($stmt instanceof Node\Stmt\Return_ && $stmt->expr instanceof Array_) {
-                return $stmt->expr;
+        foreach ($statements as $statement) {
+            if ($statement instanceof Node\Stmt\Return_ && $statement->expr instanceof Array_) {
+                return $statement->expr;
             }
         }
 

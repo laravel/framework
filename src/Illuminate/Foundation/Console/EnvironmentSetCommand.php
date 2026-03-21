@@ -26,9 +26,9 @@ class EnvironmentSetCommand extends Command
     protected $signature = 'env:set
                     {key? : The environment variable name (optionally with =value)}
                     {value? : The environment variable value}
-                    {--config-key= : Config key in dot notation}
-                    {--default= : Default value for the config env() call}
-                    {--example : Add to .env.example}
+                    {--config-key= : Configuration key in dot notation}
+                    {--default= : Default value for the configuration env() call}
+                    {--example : Indicates if the value should be added to .env.example}
                     {--force : Overwrite existing values without asking}';
 
     /**
@@ -58,7 +58,8 @@ class EnvironmentSetCommand extends Command
         [$key, $value] = $this->parseKeyAndValue();
 
         if ($value === null) {
-            $value = $this->argument('value') ?? $this->whenInteractive(fn () => password('What is the value?'));
+            $value = $this->argument('value') ??
+                $this->whenInteractive(fn () => password('What is the value?'));
         }
 
         if ($value === null && ! $this->input->isInteractive()) {
@@ -87,8 +88,8 @@ class EnvironmentSetCommand extends Command
 
         $this->components->info("Environment variable [{$key}] set successfully.");
 
-        $this->handleExample($key);
-        $this->handleConfig($key, $value);
+        $this->writeToExampleEnvironmentFile($key);
+        $this->writeToConfigFile($key, $value);
     }
 
     /**
@@ -116,27 +117,15 @@ class EnvironmentSetCommand extends Command
 
         $value = $this->unquote($value);
 
-        $this->components->info('Key/value pair detected, extracted value automatically.');
+        $this->components->info('Key / value pair detected, extracted value automatically.');
 
         return [$key, $value];
     }
 
     /**
-     * Remove surrounding quotes from a value.
+     * Write the value to the .env.example file if applicable.
      */
-    protected function unquote(string $value): string
-    {
-        if (preg_match('/^([\'"])(.*)\1$/', $value, $matches)) {
-            return $matches[2];
-        }
-
-        return $value;
-    }
-
-    /**
-     * Handle adding the variable to .env.example.
-     */
-    protected function handleExample(string $key): void
+    protected function writeToExampleEnvironmentFile(string $key): void
     {
         $examplePath = $this->laravel->environmentPath().'/.env.example';
 
@@ -144,8 +133,9 @@ class EnvironmentSetCommand extends Command
             return;
         }
 
-        $shouldAdd = $this->option('example')
-            || ($this->input->isInteractive() && confirm("Add [{$key}] to .env.example?", default: true));
+        $shouldAdd = $this->option('example') ||
+            ($this->input->isInteractive() &&
+             confirm("Add [{$key}] to .env.example?", default: true));
 
         if ($shouldAdd) {
             Env::writeVariable($key, '', $examplePath);
@@ -155,9 +145,9 @@ class EnvironmentSetCommand extends Command
     }
 
     /**
-     * Handle writing the variable to a config file.
+     * Write the variable to the configuration files if applicable.
      */
-    protected function handleConfig(string $key, string $value): void
+    protected function writeToConfigFile(string $key, string $value): void
     {
         $configKey = $this->option('config-key') ?? $this->whenInteractive(fn () => autocomplete(
             label: 'What config key should this be associated with? (Optional)',
@@ -199,23 +189,11 @@ class EnvironmentSetCommand extends Command
             placeholder: 'E.g. null',
         ));
 
-        $writer = new ConfigWriter($this->files);
-        $writer->write($configPath, $segments, $key, $default ?? '');
+        (new ConfigWriter($this->files))->write(
+            $configPath, $segments, $key, $default ?? ''
+        );
 
         $this->components->info("Config [{$configKey}] set to env('{$key}').");
-    }
-
-    /**
-     * Execute a callback when the input is interactive.
-     *
-     * @template TReturn
-     *
-     * @param  \Closure(): TReturn  $callback
-     * @return TReturn|null
-     */
-    protected function whenInteractive(Closure $callback): mixed
-    {
-        return $this->input->isInteractive() ? $callback() : null;
     }
 
     /**
@@ -243,42 +221,6 @@ class EnvironmentSetCommand extends Command
         }
 
         return null;
-    }
-
-    /**
-     * Check if a variable exists in the given env file.
-     */
-    protected function variableExistsInFile(string $path, string $key): bool
-    {
-        $contents = $this->files->get($path);
-
-        foreach (explode(PHP_EOL, $contents) as $line) {
-            if (str_starts_with($line, $key.'=')) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Format a config value for display.
-     */
-    protected function formatConfigValue(mixed $value): string
-    {
-        if (is_null($value)) {
-            return 'null';
-        }
-
-        if (is_bool($value)) {
-            return $value ? 'true' : 'false';
-        }
-
-        if (is_array($value)) {
-            return json_encode($value);
-        }
-
-        return (string) $value;
     }
 
     /**
@@ -333,5 +275,59 @@ class EnvironmentSetCommand extends Command
             $keys,
             array_map(fn ($key) => config($key), $keys),
         );
+    }
+
+    /**
+     * Check if a variable exists in the given env file.
+     */
+    protected function variableExistsInFile(string $path, string $key): bool
+    {
+        $contents = $this->files->get($path);
+
+        foreach (explode(PHP_EOL, $contents) as $line) {
+            if (str_starts_with($line, $key.'=')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Format a config value for display.
+     */
+    protected function formatConfigValue(mixed $value): string
+    {
+        return match (true) {
+            is_null($value) => 'null',
+            is_bool($value) => $value ? 'true' : 'false',
+            is_array($value) => json_encode($value),
+            default => (string) $value,
+        };
+    }
+
+    /**
+     * Remove surrounding quotes from a value.
+     */
+    protected function unquote(string $value): string
+    {
+        if (preg_match('/^([\'"])(.*)\1$/', $value, $matches)) {
+            return $matches[2];
+        }
+
+        return $value;
+    }
+
+    /**
+     * Execute a callback when the input is interactive.
+     *
+     * @template TReturn
+     *
+     * @param  \Closure(): TReturn  $callback
+     * @return TReturn|null
+     */
+    protected function whenInteractive(Closure $callback): mixed
+    {
+        return $this->input->isInteractive() ? $callback() : null;
     }
 }
