@@ -12,8 +12,8 @@ use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use PDO;
 use RuntimeException;
-
 use UnitEnum;
+
 use function Illuminate\Support\enum_value;
 
 /**
