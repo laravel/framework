@@ -195,6 +195,27 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldNotHaveReceived('dispatch', [m::type(JobProcessed::class)]);
     }
 
+    public function testExceptionIsNotReportedIfReportExceptionsIsDisabled()
+    {
+        $e = new RuntimeException;
+
+        $job = new WorkerFakeJob(function () use ($e) {
+            throw $e;
+        });
+
+        Worker::$reportExceptions = false;
+
+        try {
+            $worker = $this->getWorker('default', ['queue' => [$job]]);
+            $worker->runNextJob('default', 'queue', $this->workerOptions(['backoff' => 10]));
+
+            $this->exceptionHandler->shouldNotHaveReceived('report');
+            $this->events->shouldHaveReceived('dispatch')->with(m::type(JobExceptionOccurred::class))->once();
+        } finally {
+            Worker::$reportExceptions = true;
+        }
+    }
+
     public function testJobIsNotReleasedIfItHasExceededMaxAttempts()
     {
         $e = new RuntimeException;
