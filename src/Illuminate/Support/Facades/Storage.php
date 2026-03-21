@@ -7,7 +7,7 @@ use Illuminate\Filesystem\Filesystem;
 use function Illuminate\Support\enum_value;
 
 /**
- * @method static \Illuminate\Contracts\Filesystem\Filesystem drive(string|null $name = null)
+ * @method static \Illuminate\Contracts\Filesystem\Filesystem drive(\UnitEnum|string|null $name = null)
  * @method static \Illuminate\Contracts\Filesystem\Filesystem disk(\UnitEnum|string|null $name = null)
  * @method static \Illuminate\Contracts\Filesystem\Cloud cloud()
  * @method static \Illuminate\Contracts\Filesystem\Filesystem build(string|array $config)
