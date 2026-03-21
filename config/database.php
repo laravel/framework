@@ -135,24 +135,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Eloquent Factories
-    |--------------------------------------------------------------------------
-    |
-    | These options control the default behaviour of Eloquent model factories.
-    | "only_by_default" applies only() globally to every factory so that
-    | related models are not created unless explicitly whitelisted.
-    | "infer_required_foreign_keys" automatically adds BelongsTo relationships
-    | whose FK column is NOT NULL in the schema to the only() whitelist.
-    |
-    */
-
-    'factories' => [
-        'only_by_default' => env('DB_FACTORY_ONLY_BY_DEFAULT', false),
-        'infer_required_foreign_keys' => env('DB_FACTORY_INFER_REQUIRED_FOREIGN_KEYS', false),
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | Redis Databases
     |--------------------------------------------------------------------------
     |

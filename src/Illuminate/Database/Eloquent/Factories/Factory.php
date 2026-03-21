@@ -18,8 +18,6 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
-use ReflectionClass;
-use ReflectionMethod;
 use Throwable;
 use UnitEnum;
 
@@ -168,46 +166,6 @@ abstract class Factory
      * @var bool
      */
     protected static $expandRelationshipsByDefault = true;
-
-    /**
-     * Whether only() is active by default for all factories.
-     * Null means the value is read from config('database.factories.only_by_default').
-     *
-     * @var bool|null
-     */
-    protected static $onlyByDefault = null;
-
-    /**
-     * Custom resolver for the onlyByDefault flag. Takes precedence over the static
-     * property and config. Receives the factory instance; should return a bool.
-     *
-     * @var (callable(static): bool)|null
-     */
-    protected static $onlyByDefaultResolver = null;
-
-    /**
-     * Whether to automatically add non-nullable FK relationships to the only() whitelist.
-     * Null means the value is read from config('database.factories.infer_required_foreign_keys').
-     *
-     * @var bool|null
-     */
-    protected static $inferRequiredForeignKeys = null;
-
-    /**
-     * Custom resolver for the inferRequiredForeignKeys flag. Takes precedence over the
-     * static property and config. Receives the factory instance; should return a bool.
-     *
-     * @var (callable(static): bool)|null
-     */
-    protected static $inferRequiredForeignKeysResolver = null;
-
-    /**
-     * Cache of required FK relation names resolved from the schema, keyed by model class.
-     * Intentionally not cleared by flushState() — the schema is stable for a whole test run.
-     *
-     * @var array<class-string, list<string>>
-     */
-    protected static $schemaRequiredForeignKeys = [];
 
     /**
      * Create a new factory instance.
@@ -615,30 +573,8 @@ abstract class Factory
             return array_merge($carry, $state($carry, $parent));
         }, $definition);
 
-        $effectiveOnly = $this->only;
-
-        if ($effectiveOnly === null && $this->isOnlyByDefault()) {
-            $effectiveOnly = $this->parseNestedRelationships($this->required);
-        }
-
-        $inferRequired = $this->shouldInferRequiredForeignKeys();
-
-        if ($effectiveOnly !== null && $inferRequired) {
-            $model = $this->newModel();
-
-            if (isset($this->connection)) {
-                $model->setConnection($this->connection);
-            }
-
-            $inferred = $this->resolveRequiredForeignKeyRelations($model);
-
-            // Merge inferred required relations at lower priority than anything the caller
-            // explicitly put in the whitelist; array_merge gives later keys precedence.
-            $effectiveOnly = array_merge($this->parseNestedRelationships($inferred), $effectiveOnly);
-        }
-
-        return $effectiveOnly !== null
-            ? $this->applyOnlyFilter($definition, $attrs, $effectiveOnly)
+        return $this->only !== null
+            ? $this->applyOnlyFilter($definition, $attrs, $this->only)
             : $attrs;
     }
 
@@ -966,8 +902,7 @@ abstract class Factory
 
     /**
      * Specify which related factories in the definition should be included.
-     * All other factory-type attributes are nulled out; scalar attributes are
-     * removed from the state so they do not override other applied states.
+     * All other factory-type attributes are nulled out.
      *
      * Supports dot-notation for nested relationships:
      *   ->only('address.country')
@@ -1080,65 +1015,6 @@ abstract class Factory
         }
 
         return $map;
-    }
-
-    /**
-     * Resolve BelongsTo relation names whose FK column is non-nullable in the database schema.
-     *
-     * Results are cached per model class for the lifetime of the process — one DB query per
-     * model class per test suite run. The cache is intentionally not cleared by flushState().
-     * Fails gracefully and returns [] if the schema cannot be inspected (no connection,
-     * unsupported driver, or model without a mapped table).
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return list<string>
-     */
-    private function resolveRequiredForeignKeyRelations(Model $model): array
-    {
-        $modelClass = get_class($model);
-
-        if (array_key_exists($modelClass, static::$schemaRequiredForeignKeys)) {
-            return static::$schemaRequiredForeignKeys[$modelClass];
-        }
-
-        try {
-            $nonNullable = collect($model->getConnection()->getSchemaBuilder()->getColumns($model->getTable()))
-                ->where('nullable', false)
-                ->pluck('name')
-                ->flip()
-                ->all(); // ['col_name' => index] for O(1) lookup
-        } catch (Throwable) {
-            return static::$schemaRequiredForeignKeys[$modelClass] = [];
-        }
-
-        $relations = [];
-
-        foreach ((new ReflectionClass($model))->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-            if ($method->isStatic() || $method->getNumberOfParameters() > 0) {
-                continue;
-            }
-
-            // Skip methods declared on Model itself or its built-in traits — they are not
-            // user-defined relation methods and may call string helpers with null attribute
-            // values on a fresh (unpersisted) model instance.
-            $declaringClass = $method->getDeclaringClass()->getName();
-
-            if ($declaringClass !== $modelClass && ! is_subclass_of($declaringClass, Model::class)) {
-                continue;
-            }
-
-            try {
-                $rel = Relation::noConstraints(fn () => $method->invoke($model));
-
-                if ($rel instanceof BelongsTo && array_key_exists($rel->getForeignKeyName(), $nonNullable)) {
-                    $relations[] = $method->getName();
-                }
-            } catch (Throwable) {
-                // Relation method may throw for non-relation methods or require DB state — skip.
-            }
-        }
-
-        return static::$schemaRequiredForeignKeys[$modelClass] = $relations;
     }
 
     /**
@@ -1336,113 +1212,6 @@ abstract class Factory
     }
 
     /**
-     * Specify that only() should be active by default for all factories.
-     *
-     * @return void
-     */
-    public static function onlyByDefault()
-    {
-        static::$onlyByDefault = true;
-    }
-
-    /**
-     * Specify that only() should not be active by default.
-     *
-     * @return void
-     */
-    public static function dontOnlyByDefault()
-    {
-        static::$onlyByDefault = false;
-    }
-
-    /**
-     * Specify that non-nullable FK relationships should be inferred from the schema
-     * and automatically added to the only() whitelist.
-     *
-     * @return void
-     */
-    public static function inferRequiredForeignKeys()
-    {
-        static::$inferRequiredForeignKeys = true;
-    }
-
-    /**
-     * Specify that required FK relationships should not be inferred from the schema.
-     *
-     * @return void
-     */
-    public static function dontInferRequiredForeignKeys()
-    {
-        static::$inferRequiredForeignKeys = false;
-    }
-
-    /**
-     * Specify a callback that resolves whether only() should be active by default.
-     * The callback receives the factory instance and should return a bool.
-     * It takes precedence over the static flag and config value.
-     *
-     * @param  callable(static): bool  $callback
-     * @return void
-     */
-    public static function resolveOnlyByDefaultUsing(callable $callback)
-    {
-        static::$onlyByDefaultResolver = $callback;
-    }
-
-    /**
-     * Specify a callback that resolves whether non-nullable FK relationships should
-     * be inferred from the schema. The callback receives the factory instance and
-     * should return a bool. It takes precedence over the static flag and config value.
-     *
-     * @param  callable(static): bool  $callback
-     * @return void
-     */
-    public static function resolveInferRequiredForeignKeysUsing(callable $callback)
-    {
-        static::$inferRequiredForeignKeysResolver = $callback;
-    }
-
-    /**
-     * Determine whether only() should be active by default for this factory instance.
-     *
-     * @return bool
-     */
-    protected function isOnlyByDefault(): bool
-    {
-        return static::$onlyByDefaultResolver
-            ? (bool) (static::$onlyByDefaultResolver)($this)
-            : (static::$onlyByDefault ?? static::resolveFactoryConfig('only_by_default'));
-    }
-
-    /**
-     * Determine whether non-nullable FK relationships should be inferred from the schema.
-     *
-     * @return bool
-     */
-    protected function shouldInferRequiredForeignKeys(): bool
-    {
-        return static::$inferRequiredForeignKeysResolver
-            ? (bool) (static::$inferRequiredForeignKeysResolver)($this)
-            : (static::$inferRequiredForeignKeys ?? static::resolveFactoryConfig('infer_required_foreign_keys'));
-    }
-
-    /**
-     * Read a value from the database.factories config, returning false when no
-     * application container is available (e.g. in bare PHPUnit test environments).
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    protected static function resolveFactoryConfig(string $key): bool
-    {
-        try {
-            return (bool) config('database.factories.'.$key, false);
-        } catch (Throwable) {
-            return false;
-        }
-    }
-
-    /**
      * Get a new Faker instance.
      *
      * @return \Faker\Generator|null
@@ -1507,12 +1276,6 @@ abstract class Factory
         static::$factoryNameResolver = null;
         static::$namespace = 'Database\\Factories\\';
         static::$expandRelationshipsByDefault = true;
-        static::$onlyByDefault = null;
-        static::$onlyByDefaultResolver = null;
-        static::$inferRequiredForeignKeys = null;
-        static::$inferRequiredForeignKeysResolver = null;
-        // Note: $schemaRequiredForeignKeys is intentionally not reset — the schema
-        // does not change during a test run, so one DB query per model class suffices.
     }
 
     /**
