@@ -72,9 +72,7 @@ trait ManagesStacks
      */
     protected function extendPush($section, $content)
     {
-        if (! isset($this->pushes[$section])) {
-            $this->pushes[$section] = [];
-        }
+        $this->pushes[$section] ??= [];
 
         if (! isset($this->pushes[$section][$this->renderCount])) {
             $this->pushes[$section][$this->renderCount] = $content;
@@ -128,9 +126,7 @@ trait ManagesStacks
      */
     protected function extendPrepend($section, $content)
     {
-        if (! isset($this->prepends[$section])) {
-            $this->prepends[$section] = [];
-        }
+        $this->prepends[$section] ??= [];
 
         if (! isset($this->prepends[$section][$this->renderCount])) {
             $this->prepends[$section][$this->renderCount] = $content;

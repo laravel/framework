@@ -23,11 +23,9 @@ class JsonApiRequest extends Request
      */
     public function sparseFields(string $key): array
     {
-        if (is_null($this->cachedSparseFields)) {
-            $this->cachedSparseFields = (new Collection($this->array('fields')))
-                ->transform(fn ($fieldsets) => empty($fieldsets) ? [] : explode(',', $fieldsets))
-                ->all();
-        }
+        $this->cachedSparseFields ??= (new Collection($this->array('fields')))
+            ->transform(fn ($fieldsets) => empty($fieldsets) ? [] : explode(',', $fieldsets))
+            ->all();
 
         return $this->cachedSparseFields[$key] ?? [];
     }

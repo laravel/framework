@@ -56,9 +56,7 @@ class Once
 
         $hash = $onceable->hash;
 
-        if (! isset($this->values[$object])) {
-            $this->values[$object] = [];
-        }
+        $this->values[$object] ??= [];
 
         if (array_key_exists($hash, $this->values[$object])) {
             return $this->values[$object][$hash];

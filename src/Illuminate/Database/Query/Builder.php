@@ -3774,9 +3774,7 @@ class Builder implements BuilderContract
      */
     public function cursor()
     {
-        if (is_null($this->columns)) {
-            $this->columns = ['*'];
-        }
+        $this->columns ??= ['*'];
 
         return (new LazyCollection(function () {
             yield from $this->connection->cursor(

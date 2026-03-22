@@ -345,9 +345,7 @@ class UrlGenerator implements UrlGeneratorContract
             return $secure ? 'https://' : 'http://';
         }
 
-        if (is_null($this->cachedScheme)) {
-            $this->cachedScheme = $this->forceScheme ?: $this->request->getScheme().'://';
-        }
+        $this->cachedScheme ??= $this->forceScheme ?: $this->request->getScheme().'://';
 
         return $this->cachedScheme;
     }
@@ -638,9 +636,7 @@ class UrlGenerator implements UrlGeneratorContract
     public function formatRoot($scheme, $root = null)
     {
         if (is_null($root)) {
-            if (is_null($this->cachedRoot)) {
-                $this->cachedRoot = $this->forcedRoot ?: $this->request->root();
-            }
+            $this->cachedRoot ??= $this->forcedRoot ?: $this->request->root();
 
             $root = $this->cachedRoot;
         }
