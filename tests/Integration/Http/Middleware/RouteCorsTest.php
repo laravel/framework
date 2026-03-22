@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Http\Middleware;
 
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Middleware\HandleCors;
+use Illuminate\Http\Middleware\HandleRouteCors;
 use Illuminate\Routing\Attributes\Cors;
 use Illuminate\Routing\Router;
 use Orchestra\Testbench\TestCase;
@@ -22,41 +23,49 @@ class RouteCorsTest extends TestCase
             'max_age' => 0,
         ];
 
+        $app['config']['app.key'] = 'base64:'.base64_encode(str_repeat('a', 32));
+
         $kernel = $app->make(Kernel::class);
         $kernel->prependMiddleware(HandleCors::class);
+        $kernel->prependMiddlewareToGroup('web', HandleRouteCors::class);
+        $kernel->prependMiddlewareToGroup('api', HandleRouteCors::class);
     }
 
     protected function defineRoutes($router)
     {
-        $router->get('api/route-cors', ['uses' => fn () => 'OK'])
-            ->cors(['origins' => ['https://app.example.com'], 'methods' => ['GET']]);
+        $router->middleware('api')->group(function (Router $router) {
+            $router->get('api/route-cors', ['uses' => fn () => 'OK'])
+                ->cors(['origins' => ['https://app.example.com'], 'methods' => ['GET']]);
 
-        $router->post('api/route-cors', ['uses' => fn () => 'OK'])
-            ->cors(['origins' => ['https://app.example.com'], 'methods' => ['GET', 'POST']]);
+            $router->post('api/route-cors', ['uses' => fn () => 'OK'])
+                ->cors(['origins' => ['https://app.example.com'], 'methods' => ['GET', 'POST']]);
 
-        $router->get('api/global-cors', ['uses' => fn () => 'GLOBAL']);
+            $router->get('api/global-cors', ['uses' => fn () => 'GLOBAL']);
 
-        $router->get('api/sibling', ['uses' => fn () => 'SIBLING'])
-            ->cors(['origins' => ['https://sibling.example.com']]);
+            $router->get('api/sibling', ['uses' => fn () => 'SIBLING'])
+                ->cors(['origins' => ['https://sibling.example.com']]);
 
-        $router->get('web/no-cors', ['uses' => fn () => 'WEB']);
+            $router->prefix('api/grouped')->cors([
+                'origins' => ['https://group.example.com'],
+                'methods' => ['GET', 'POST'],
+            ])->group(function (Router $router) {
+                $router->get('child', ['uses' => fn () => 'CHILD']);
 
-        $router->prefix('api/grouped')->cors([
-            'origins' => ['https://group.example.com'],
-            'methods' => ['GET', 'POST'],
-        ])->group(function (Router $router) {
-            $router->get('child', ['uses' => fn () => 'CHILD']);
+                $router->get('override', ['uses' => fn () => 'OVERRIDE'])
+                    ->cors(['origins' => ['https://override.example.com']]);
+            });
 
-            $router->get('override', ['uses' => fn () => 'OVERRIDE'])
-                ->cors(['origins' => ['https://override.example.com']]);
+            $router->get('api/controller-cors', [ControllerWithClassCors::class, 'index']);
+
+            $router->get('api/method-cors', [ControllerWithMethodCors::class, 'specific']);
+
+            $router->get('api/attr-over-route', [ControllerWithClassCors::class, 'index'])
+                ->cors(['origins' => ['https://route-loses.example.com']]);
         });
 
-        $router->get('api/controller-cors', [ControllerWithClassCors::class, 'index']);
-
-        $router->get('api/method-cors', [ControllerWithMethodCors::class, 'specific']);
-
-        $router->get('api/attr-over-route', [ControllerWithClassCors::class, 'index'])
-            ->cors(['origins' => ['https://route-loses.example.com']]);
+        $router->middleware('web')->group(function (Router $router) {
+            $router->get('web/no-cors', ['uses' => fn () => 'WEB']);
+        });
     }
 
     public function testRouteLevelCorsOnActualRequest()
@@ -115,6 +124,16 @@ class RouteCorsTest extends TestCase
     {
         $response = $this->call('GET', 'api/route-cors', server: [
             'HTTP_ORIGIN' => 'http://global.example.com',
+        ]);
+
+        $this->assertNotSame('http://global.example.com', $response->headers->get('Access-Control-Allow-Origin'));
+    }
+
+    public function testRouteCorsPreflightDoesNotFallBackToGlobalDefaults()
+    {
+        $response = $this->call('OPTIONS', 'api/route-cors', server: [
+            'HTTP_ORIGIN' => 'http://global.example.com',
+            'HTTP_ACCESS_CONTROL_REQUEST_METHOD' => 'GET',
         ]);
 
         $this->assertNotSame('http://global.example.com', $response->headers->get('Access-Control-Allow-Origin'));
@@ -206,7 +225,7 @@ class RouteCorsTest extends TestCase
 
     public function testRouteCorsWithCredentials()
     {
-        $this->app['router']->get('api/creds', ['uses' => fn () => 'OK'])
+        $this->app['router']->middleware('api')->get('api/creds', ['uses' => fn () => 'OK'])
             ->cors(['origins' => ['https://creds.example.com'], 'credentials' => true]);
 
         $this->call('GET', 'api/creds', server: [
