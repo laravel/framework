@@ -211,6 +211,17 @@ class Numeric implements Stringable
     }
 
     /**
+     * Add a custom validation rule.
+     *
+     * @param  array|string  $rules
+     * @return $this
+     */
+    public function rule(array|string $rules): Numeric
+    {
+        return $this->addRule($rules);
+    }
+
+    /**
      * Convert the rule to a validation string.
      */
     public function __toString(): string

@@ -145,6 +145,17 @@ class Date implements Stringable
     }
 
     /**
+     * Add a custom validation rule.
+     *
+     * @param  array|string  $rules
+     * @return $this
+     */
+    public function rule(array|string $rules): static
+    {
+        return $this->addRule($rules);
+    }
+
+    /**
      * Add custom rules to the validation rules array.
      */
     protected function addRule(array|string $rules): static
