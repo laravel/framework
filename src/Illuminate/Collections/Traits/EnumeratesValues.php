@@ -793,6 +793,42 @@ trait EnumeratesValues
     }
 
     /**
+     * Filter items where the value of the given key matches a "like" pattern.
+     *
+     * @param  string  $key
+     * @param  string  $pattern
+     * @param  bool  $caseSensitive
+     * @return static
+     */
+    public function whereLike($key, $pattern, $caseSensitive = false)
+    {
+        $regex = '/^'.str_replace(
+            ['%', '_'], ['.*', '.'],
+            preg_quote($pattern, '/')
+        ).'$/'.($caseSensitive ? '' : 'i');
+
+        return $this->filter(fn ($item) => preg_match($regex, (string) data_get($item, $key)) === 1);
+    }
+
+    /**
+     * Filter items where the value of the given key does not match a "like" pattern.
+     *
+     * @param  string  $key
+     * @param  string  $pattern
+     * @param  bool  $caseSensitive
+     * @return static
+     */
+    public function whereNotLike($key, $pattern, $caseSensitive = false)
+    {
+        $regex = '/^'.str_replace(
+            ['%', '_'], ['.*', '.'],
+            preg_quote($pattern, '/')
+        ).'$/'.($caseSensitive ? '' : 'i');
+
+        return $this->reject(fn ($item) => preg_match($regex, (string) data_get($item, $key)) === 1);
+    }
+
+    /**
      * Pass the collection to the given callback and return the result.
      *
      * @template TPipeReturnType

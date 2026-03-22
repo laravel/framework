@@ -1243,6 +1243,78 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testWhereLike($collection)
+    {
+        $c = new $collection([
+            ['name' => 'Taylor Otwell', 'email' => 'taylor@laravel.com'],
+            ['name' => 'Nuno Maduro', 'email' => 'nuno@laravel.com'],
+            ['name' => 'Dries Vints', 'email' => 'dries@example.com'],
+            ['name' => 'Tim MacDonald', 'email' => 'tim@example.org'],
+        ]);
+
+        // % wildcard - contains
+        $this->assertEquals(
+            ['Taylor Otwell', 'Nuno Maduro'],
+            $c->whereLike('email', '%@laravel.com')->pluck('name')->values()->all()
+        );
+
+        // % wildcard - starts with
+        $this->assertEquals(
+            ['Taylor Otwell', 'Tim MacDonald'],
+            $c->whereLike('name', 'T%')->pluck('name')->values()->all()
+        );
+
+        // _ wildcard - single character
+        $this->assertEquals(
+            ['Tim MacDonald'],
+            $c->whereLike('name', 'T__ MacDonald')->pluck('name')->values()->all()
+        );
+
+        // Case insensitive by default
+        $this->assertEquals(
+            ['Taylor Otwell', 'Tim MacDonald'],
+            $c->whereLike('name', 't%')->pluck('name')->values()->all()
+        );
+
+        // Case sensitive
+        $this->assertEmpty(
+            $c->whereLike('name', 't%', caseSensitive: true)->values()->all()
+        );
+
+        // Exact match (no wildcards)
+        $this->assertEquals(
+            ['Nuno Maduro'],
+            $c->whereLike('name', 'Nuno Maduro')->pluck('name')->values()->all()
+        );
+
+        // Dot in pattern is treated as literal
+        $this->assertEquals(
+            ['Dries Vints'],
+            $c->whereLike('email', '%example.com')->pluck('name')->values()->all()
+        );
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testWhereNotLike($collection)
+    {
+        $c = new $collection([
+            ['name' => 'Taylor Otwell', 'email' => 'taylor@laravel.com'],
+            ['name' => 'Nuno Maduro', 'email' => 'nuno@laravel.com'],
+            ['name' => 'Dries Vints', 'email' => 'dries@example.com'],
+        ]);
+
+        $this->assertEquals(
+            ['Dries Vints'],
+            $c->whereNotLike('email', '%@laravel.com')->pluck('name')->values()->all()
+        );
+
+        $this->assertEquals(
+            ['Nuno Maduro', 'Dries Vints'],
+            $c->whereNotLike('name', 'T%')->pluck('name')->values()->all()
+        );
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testValues($collection)
     {
         $c = new $collection([['id' => 1, 'name' => 'Hello'], ['id' => 2, 'name' => 'World']]);
