@@ -74,7 +74,6 @@ class CloudflareDriver implements Driver
                         'png' => 'image/png',
                         'gif' => 'image/gif',
                         'jpg', 'jpeg' => 'image/jpeg',
-                        'avif' => 'image/avif',
                     },
                 ]);
             }
