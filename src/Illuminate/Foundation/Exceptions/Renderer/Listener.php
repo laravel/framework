@@ -59,15 +59,25 @@ class Listener
      */
     public function onQueryExecuted(QueryExecuted $event)
     {
-        if (count($this->queries) === 101) {
+        if (count($this->queries) >= 100) {
             return;
         }
+
+        $sql = strlen($event->sql) <= 2000
+            ? $event->sql
+            : mb_strcut($event->sql, 0, 2000);
+
+        $bindings = $event->connection->prepareBindings($event->bindings);
+
+        $bindingCount = substr_count($sql, '?');
 
         $this->queries[] = [
             'connectionName' => $event->connectionName,
             'time' => $event->time,
-            'sql' => $event->sql,
-            'bindings' => $event->connection->prepareBindings($event->bindings),
+            'sql' => $sql,
+            'bindings' => count($bindings) <= $bindingCount
+                ? $bindings
+                : array_slice($bindings, 0, $bindingCount),
         ];
     }
 }
