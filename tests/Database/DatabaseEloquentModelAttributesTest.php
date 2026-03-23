@@ -107,6 +107,13 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertFalse($model->getIncrementing());
     }
 
+    public function test_table_attribute_incrementing_applies_to_pivot_models(): void
+    {
+        $model = new PivotWithIncrementing;
+
+        $this->assertTrue($model->getIncrementing());
+    }
+
     public function test_connection_attribute(): void
     {
         $model = new ModelWithConnectionAttribute;
@@ -501,6 +508,12 @@ class ModelWithDedicatedWithoutIncrementingAttribute extends Model
 #[Table(incrementing: true)]
 #[WithoutIncrementing]
 class ModelWithWithoutIncrementingAttributeOverride extends Model
+{
+    //
+}
+
+#[Table(incrementing: true)]
+class PivotWithIncrementing extends \Illuminate\Database\Eloquent\Relations\Pivot
 {
     //
 }
