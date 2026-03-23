@@ -48,6 +48,43 @@ class CloudflareDriverTest extends TestCase
         $this->assertTrue(true);
     }
 
+    public function test_process_throws_for_unsupported_source_format()
+    {
+        $driver = new CloudflareDriver(new HttpFactory, 'account', 'token');
+
+        $this->expectException(ImageException::class);
+        $this->expectExceptionMessage('The Cloudflare image driver only supports JPEG and WebP source images, [image/png] given.');
+
+        $file = UploadedFile::fake()->image('test.png', 100, 100);
+        $driver->process(file_get_contents($file->getRealPath()), new PendingImageOptions);
+    }
+
+    public function test_process_allows_unsupported_source_when_format_is_set()
+    {
+        $http = new HttpFactory;
+
+        $http->fake([
+            'api.cloudflare.com/*' => $http->response([
+                'success' => true,
+                'result' => [
+                    'id' => 'img-123',
+                    'variants' => ['https://imagedelivery.net/abc/img-123/public'],
+                ],
+            ]),
+            'imagedelivery.net/*' => $http->response('bytes'),
+        ]);
+
+        $driver = new CloudflareDriver($http, 'account', 'token');
+
+        $options = new PendingImageOptions;
+        $options->format = 'webp';
+
+        $file = UploadedFile::fake()->image('test.png', 100, 100);
+        $result = $driver->process(file_get_contents($file->getRealPath()), $options);
+
+        $this->assertSame('bytes', $result);
+    }
+
     public function test_process_uploads_and_fetches_transformed_image()
     {
         $http = new HttpFactory;
@@ -206,8 +243,8 @@ class CloudflareDriverTest extends TestCase
         $driver->process($this->fakeImageContents(), $options);
 
         $http->assertSent(function (Request $request) {
-            return str_contains($request->url(), 'w=200')
-                && str_contains($request->url(), 'h=150')
+            return str_contains($request->url(), 'width=200')
+                && str_contains($request->url(), 'height=150')
                 && str_contains($request->url(), 'fit=cover')
                 && str_contains($request->url(), 'imagedelivery.net/abc/img-123/');
         });
@@ -237,8 +274,8 @@ class CloudflareDriverTest extends TestCase
         $driver->process($this->fakeImageContents(), $options);
 
         $http->assertSent(function (Request $request) {
-            return str_contains($request->url(), 'w=800')
-                && str_contains($request->url(), 'h=600')
+            return str_contains($request->url(), 'width=800')
+                && str_contains($request->url(), 'height=600')
                 && str_contains($request->url(), 'fit=scale-down');
         });
     }
@@ -297,7 +334,7 @@ class CloudflareDriverTest extends TestCase
         });
     }
 
-    public function test_format_only_preserves_original_dimensions()
+    public function test_format_in_transform_url()
     {
         $http = new HttpFactory;
 
@@ -320,37 +357,9 @@ class CloudflareDriverTest extends TestCase
         $driver->process($this->fakeImageContents(200, 150), $options);
 
         $http->assertSent(function (Request $request) {
-            return str_contains($request->url(), 'w=200')
-                && str_contains($request->url(), 'h=150')
-                && str_contains($request->url(), 'fit=scale-down')
-                && $request->hasHeader('Accept', 'image/webp');
-        });
-    }
-
-    public function test_format_uses_accept_header()
-    {
-        $http = new HttpFactory;
-
-        $http->fake([
-            'api.cloudflare.com/*' => $http->response([
-                'success' => true,
-                'result' => [
-                    'id' => 'img-123',
-                    'variants' => ['https://imagedelivery.net/abc/img-123/public'],
-                ],
-            ]),
-            'imagedelivery.net/*' => $http->response('bytes'),
-        ]);
-
-        $driver = new CloudflareDriver($http, 'account', 'token');
-
-        $options = new PendingImageOptions;
-        $options->format = 'webp';
-
-        $driver->process($this->fakeImageContents(), $options);
-
-        $http->assertSent(function (Request $request) {
-            return str_contains($request->url(), 'imagedelivery.net')
+            return str_contains($request->url(), 'format=webp')
+                && str_contains($request->url(), 'width=200')
+                && str_contains($request->url(), 'height=150')
                 && $request->hasHeader('Accept', 'image/webp');
         });
     }
@@ -378,7 +387,7 @@ class CloudflareDriverTest extends TestCase
         $driver->process($this->fakeImageContents(), $options);
 
         $http->assertSent(function (Request $request) {
-            return str_contains($request->url(), 'q=90');
+            return str_contains($request->url(), 'quality=90');
         });
     }
 }

@@ -36,9 +36,19 @@ class CloudflareDriver implements Driver
 
     /**
      * Process the given image contents with the specified options.
+     *
+     * @throws ImageException
      */
     public function process(string $contents, PendingImageOptions $options): string
     {
+        $sourceMimeType = (new \finfo(FILEINFO_MIME_TYPE))->buffer($contents);
+
+        if (! in_array($sourceMimeType, ['image/jpeg', 'image/webp']) && $options->format === null) {
+            throw new ImageException(
+                "The Cloudflare image driver only supports JPEG and WebP source images, [{$sourceMimeType}] given.",
+            );
+        }
+
         $response = $this->http
             ->withToken($this->apiToken)
             ->attach('file', $contents, 'image')
@@ -55,29 +65,30 @@ class CloudflareDriver implements Driver
             $response->json('result.variants', []),
             $options,
             $contents,
+            $sourceMimeType,
         );
     }
 
     /**
      * Fetch the transformed image and delete the original from Cloudflare.
      */
-    protected function transformAndDelete(string $imageId, array $variants, PendingImageOptions $options, string $contents): string
+    protected function transformAndDelete(string $imageId, array $variants, PendingImageOptions $options, string $contents, string $sourceMimeType): string
     {
         try {
             if (empty($variants)) {
                 throw new ImageException('Cloudflare did not return any image variants.');
             }
 
-            $request = $this->http;
+            $acceptMimeType = $options->format !== null
+                ? match ($options->format) {
+                    'webp' => 'image/webp',
+                    'jpg', 'jpeg' => 'image/jpeg',
+                }
+                : $sourceMimeType;
 
-            if ($options->format !== null) {
-                $request = $request->withHeaders([
-                    'Accept' => match ($options->format) {
-                        'webp' => 'image/webp',
-                        'jpg', 'jpeg' => 'image/jpeg',
-                    },
-                ]);
-            }
+            $request = $this->http->withHeaders([
+                'Accept' => $acceptMimeType,
+            ]);
 
             $response = $request->get(
                 $this->buildTransformUrl($variants[0], $options, $contents),
@@ -101,18 +112,18 @@ class CloudflareDriver implements Driver
         $params = [];
 
         if ($options->coverWidth !== null && $options->coverHeight !== null) {
-            $params[] = "w={$options->coverWidth}";
-            $params[] = "h={$options->coverHeight}";
+            $params[] = "width={$options->coverWidth}";
+            $params[] = "height={$options->coverHeight}";
             $params[] = 'fit=cover';
         } elseif ($options->scaleWidth !== null && $options->scaleHeight !== null) {
-            $params[] = "w={$options->scaleWidth}";
-            $params[] = "h={$options->scaleHeight}";
+            $params[] = "width={$options->scaleWidth}";
+            $params[] = "height={$options->scaleHeight}";
             $params[] = 'fit=scale-down';
         } else {
             [$width, $height] = getimagesizefromstring($contents);
 
-            $params[] = "w={$width}";
-            $params[] = "h={$height}";
+            $params[] = "width={$width}";
+            $params[] = "height={$height}";
             $params[] = 'fit=scale-down';
         }
 
@@ -124,9 +135,14 @@ class CloudflareDriver implements Driver
             $params[] = 'saturation=0';
         }
 
-        if ($options->quality !== null) {
-            $params[] = "q={$options->quality}";
+        if ($options->format !== null) {
+            $params[] = 'format='.match ($options->format) {
+                'jpg' => 'jpeg',
+                default => $options->format,
+            };
         }
+
+        $params[] = 'quality='.($options->quality ?? PendingImageOptions::DEFAULT_QUALITY);
 
         // Cloudflare Images flexible variant format:
         // https://imagedelivery.net/{account_hash}/{image_id}/{params}

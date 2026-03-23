@@ -5,6 +5,11 @@ namespace Illuminate\Foundation\Image;
 class PendingImageOptions
 {
     /**
+     * The default output quality.
+     */
+    const DEFAULT_QUALITY = 75;
+
+    /**
      * The cover width.
      */
     public ?int $coverWidth = null;
