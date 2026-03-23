@@ -446,11 +446,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $this->keyType = $table->keyType;
         }
 
-        // Allow the Table attribute or the dedicated WithoutIncrementing attribute
-        // to determine whether the model's primary key is incrementing. The
-        // attribute should be able to override the default property value
-        // (for example Pivot models default to false), so we consult the
-        // WithoutIncrementing attribute first, then the Table attribute.
         if (static::resolveClassAttribute(WithoutIncrementing::class) !== null) {
             $this->incrementing = false;
         } elseif ($table && $table->incrementing !== null) {
