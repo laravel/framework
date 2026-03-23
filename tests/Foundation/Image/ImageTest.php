@@ -93,13 +93,6 @@ class ImageTest extends TestCase
         $this->assertNotSame($image, $image->toGif());
     }
 
-    public function test_to_avif_returns_new_instance()
-    {
-        $image = $this->makeImage();
-
-        $this->assertNotSame($image, $image->toAvif());
-    }
-
     public function test_using_returns_new_instance()
     {
         $image = $this->makeImage();
@@ -302,13 +295,6 @@ class ImageTest extends TestCase
         $image = $this->makeImage();
 
         $this->assertSame('gif', $this->getOptions($image->toGif())->format);
-    }
-
-    public function test_to_avif_sets_format()
-    {
-        $image = $this->makeImage();
-
-        $this->assertSame('avif', $this->getOptions($image->toAvif())->format);
     }
 
     public function test_format_and_quality_can_be_set_separately()

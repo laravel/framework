@@ -167,21 +167,13 @@ class Image
     }
 
     /**
-     * Convert the image to AVIF format.
-     */
-    public function toAvif(): static
-    {
-        return $this->toFormat('avif');
-    }
-
-    /**
      * Set the output format.
      *
      * @throws ImageException
      */
     protected function toFormat(string $format): static
     {
-        if (! in_array($format, ['webp', 'jpg', 'jpeg', 'png', 'gif', 'avif'])) {
+        if (! in_array($format, ['webp', 'jpg', 'jpeg', 'png', 'gif'])) {
             throw new ImageException("The [{$format}] format is not supported.");
         }
 
@@ -301,7 +293,6 @@ class Image
             'image/bmp' => 'bmp',
             'image/svg+xml' => 'svg',
             'image/tiff' => 'tiff',
-            'image/avif' => 'avif',
             default => 'bin',
         };
     }
