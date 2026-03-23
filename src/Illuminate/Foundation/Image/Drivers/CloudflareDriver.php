@@ -84,7 +84,7 @@ class CloudflareDriver implements Driver
                     'webp' => 'image/webp',
                     'jpg', 'jpeg' => 'image/jpeg',
                 }
-                : $sourceMimeType;
+            : $sourceMimeType;
 
             $request = $this->http->withHeaders([
                 'Accept' => $acceptMimeType,
