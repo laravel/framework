@@ -127,12 +127,14 @@ class CloudflareDriver implements Driver
             $params[] = 'metadata=none';
         }
 
+        if (empty($params)) {
+            return $baseUrl;
+        }
+
         // Cloudflare Images flexible variant format:
         // https://imagedelivery.net/{account_hash}/{image_id}/{params}
         // The params replace the variant name (e.g. /public) in the delivery URL.
-        $variantParams = implode(',', $params);
-
-        return preg_replace('#/[^/]+$#', '/'.$variantParams, $baseUrl);
+        return preg_replace('#/[^/]+$#', '/'.implode(',', $params), $baseUrl);
     }
 
     /**

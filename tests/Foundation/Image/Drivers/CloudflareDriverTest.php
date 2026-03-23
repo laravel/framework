@@ -289,6 +289,34 @@ class CloudflareDriverTest extends TestCase
         });
     }
 
+    public function test_format_only_keeps_original_variant_url()
+    {
+        $http = new HttpFactory;
+
+        $http->fake([
+            'api.cloudflare.com/*' => $http->response([
+                'success' => true,
+                'result' => [
+                    'id' => 'img-123',
+                    'variants' => ['https://imagedelivery.net/abc/img-123/public'],
+                ],
+            ]),
+            'imagedelivery.net/*' => $http->response('bytes'),
+        ]);
+
+        $driver = new CloudflareDriver($http, 'account', 'token');
+
+        $options = new PendingImageOptions;
+        $options->format = 'webp';
+
+        $driver->process('contents', $options);
+
+        $http->assertSent(function (Request $request) {
+            return $request->url() === 'https://imagedelivery.net/abc/img-123/public'
+                && $request->hasHeader('Accept', 'image/webp');
+        });
+    }
+
     public function test_format_uses_accept_header()
     {
         $http = new HttpFactory;
