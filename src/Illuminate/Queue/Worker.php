@@ -107,6 +107,13 @@ class Worker
     public static $memoryExceededExitCode;
 
     /**
+     * Indicates if the worker should report job exceptions.
+     *
+     * @var bool
+     */
+    public static $reportJobExceptions = true;
+
+    /**
      * Indicates if the worker should check for the restart signal in the cache.
      *
      * @var bool
@@ -434,7 +441,9 @@ class Worker
         try {
             return $this->process($connectionName, $job, $options);
         } catch (Throwable $e) {
-            $this->exceptions->report($e);
+            if (static::$reportJobExceptions) {
+                $this->exceptions->report($e);
+            }
 
             $this->stopWorkerIfLostConnection($e);
         }
