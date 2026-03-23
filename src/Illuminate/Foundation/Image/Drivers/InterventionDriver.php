@@ -6,6 +6,7 @@ use Illuminate\Contracts\Image\Driver;
 use Illuminate\Foundation\Image\ImageException;
 use Illuminate\Foundation\Image\PendingImageOptions;
 use Intervention\Image\Encoders\AutoEncoder;
+use Intervention\Image\Encoders\AvifEncoder;
 use Intervention\Image\Encoders\GifEncoder;
 use Intervention\Image\Encoders\JpegEncoder;
 use Intervention\Image\Encoders\PngEncoder;
@@ -82,7 +83,7 @@ abstract class InterventionDriver implements Driver
                 'png' => new PngEncoder,
                 'gif' => new GifEncoder,
                 'jpg', 'jpeg' => new JpegEncoder($quality),
-                default => new AutoEncoder($quality),
+                'avif' => new AvifEncoder($quality),
             };
 
             return $image->encode($encoder)->toString();

@@ -65,7 +65,21 @@ class CloudflareDriver implements Driver
                 throw new ImageException('Cloudflare did not return any image variants.');
             }
 
-            $response = $this->http->get(
+            $request = $this->http;
+
+            if ($options->format !== null) {
+                $request = $request->withHeaders([
+                    'Accept' => match ($options->format) {
+                        'webp' => 'image/webp',
+                        'png' => 'image/png',
+                        'gif' => 'image/gif',
+                        'jpg', 'jpeg' => 'image/jpeg',
+                        'avif' => 'image/avif',
+                    },
+                ]);
+            }
+
+            $response = $request->get(
                 $this->buildTransformUrl($variants[0], $options),
             );
 
@@ -104,10 +118,6 @@ class CloudflareDriver implements Driver
 
         if ($options->greyscale) {
             $params[] = 'saturation=0';
-        }
-
-        if ($options->format !== null) {
-            $params[] = "f={$options->format}";
         }
 
         if ($options->quality !== null) {

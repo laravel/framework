@@ -57,6 +57,49 @@ class ImageTest extends TestCase
         $this->assertNotSame($image, $result);
     }
 
+    public function test_quality_returns_new_instance()
+    {
+        $image = $this->makeImage();
+        $result = $image->quality(80);
+
+        $this->assertNotSame($image, $result);
+    }
+
+    public function test_to_webp_returns_new_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertNotSame($image, $image->toWebp());
+    }
+
+    public function test_to_jpg_returns_new_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertNotSame($image, $image->toJpg());
+    }
+
+    public function test_to_png_returns_new_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertNotSame($image, $image->toPng());
+    }
+
+    public function test_to_gif_returns_new_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertNotSame($image, $image->toGif());
+    }
+
+    public function test_to_avif_returns_new_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertNotSame($image, $image->toAvif());
+    }
+
     public function test_using_returns_new_instance()
     {
         $image = $this->makeImage();
@@ -213,6 +256,70 @@ class ImageTest extends TestCase
 
         $this->assertSame('webp', $options->format);
         $this->assertSame(80, $options->quality);
+    }
+
+    public function test_optimize_throws_for_unsupported_format()
+    {
+        $image = $this->makeImage();
+
+        $this->expectException(\Illuminate\Foundation\Image\ImageException::class);
+        $this->expectExceptionMessage('The [bmp] format is not supported.');
+
+        $image->optimize('bmp');
+    }
+
+    public function test_quality_sets_option()
+    {
+        $image = $this->makeImage();
+        $result = $image->quality(60);
+
+        $this->assertSame(60, $this->getOptions($result)->quality);
+    }
+
+    public function test_to_webp_sets_format()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame('webp', $this->getOptions($image->toWebp())->format);
+    }
+
+    public function test_to_jpg_sets_format()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame('jpg', $this->getOptions($image->toJpg())->format);
+    }
+
+    public function test_to_png_sets_format()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame('png', $this->getOptions($image->toPng())->format);
+    }
+
+    public function test_to_gif_sets_format()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame('gif', $this->getOptions($image->toGif())->format);
+    }
+
+    public function test_to_avif_sets_format()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame('avif', $this->getOptions($image->toAvif())->format);
+    }
+
+    public function test_format_and_quality_can_be_set_separately()
+    {
+        $image = $this->makeImage();
+        $result = $image->toWebp()->quality(60);
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame('webp', $options->format);
+        $this->assertSame(60, $options->quality);
     }
 
     public function test_blur_has_default()

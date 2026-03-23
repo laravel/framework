@@ -35,13 +35,31 @@ class ImageTest extends TestCase
         $this->assertSame(100, $height);
     }
 
-    public function test_optimize_and_to_bytes()
+    public function test_to_png_and_to_bytes()
     {
         $image = new Image($this->fakeImageContents(100, 100));
 
-        $result = $image->optimize('png')->toBytes();
+        $result = $image->toPng()->toBytes();
 
         $this->assertSame(IMAGETYPE_PNG, getimagesizefromstring($result)[2]);
+    }
+
+    public function test_to_webp_and_to_bytes()
+    {
+        $image = new Image($this->fakeImageContents(100, 100));
+
+        $result = $image->toWebp()->toBytes();
+
+        $this->assertSame(IMAGETYPE_WEBP, getimagesizefromstring($result)[2]);
+    }
+
+    public function test_to_gif_and_to_bytes()
+    {
+        $image = new Image($this->fakeImageContents(100, 100));
+
+        $result = $image->toGif()->toBytes();
+
+        $this->assertSame(IMAGETYPE_GIF, getimagesizefromstring($result)[2]);
     }
 
     public function test_blur_and_to_bytes()
@@ -68,8 +86,8 @@ class ImageTest extends TestCase
     {
         $image = new Image($this->fakeImageContents(400, 400));
 
-        $thumb = $image->cover(100, 100)->optimize('png');
-        $large = $image->scale(200, 200)->optimize('webp');
+        $thumb = $image->cover(100, 100)->toPng();
+        $large = $image->scale(200, 200)->toWebp();
 
         $thumbBytes = $thumb->toBytes();
         $largeBytes = $large->toBytes();
@@ -92,7 +110,7 @@ class ImageTest extends TestCase
 
         $image = new Image($this->fakeImageContents(100, 100));
 
-        $image->optimize('png')->store('images', 'local');
+        $image->toPng()->store('images', 'local');
 
         $files = Storage::disk('local')->files('images');
 
@@ -106,23 +124,23 @@ class ImageTest extends TestCase
 
         $image = new Image($this->fakeImageContents(100, 100));
 
-        $image->optimize('png')->storeAs('images', 'avatar.png', 'local');
+        $image->toPng()->storeAs('images', 'avatar.png', 'local');
 
         Storage::disk('local')->assertExists('images/avatar.png');
     }
 
-    public function test_mime_type_after_optimize()
+    public function test_mime_type_after_format_conversion()
     {
         $image = new Image($this->fakeImageContents(100, 100));
 
-        $this->assertSame('image/png', $image->optimize('png')->mimeType());
+        $this->assertSame('image/png', $image->toPng()->mimeType());
     }
 
-    public function test_extension_after_optimize()
+    public function test_extension_after_format_conversion()
     {
         $image = new Image($this->fakeImageContents(100, 100));
 
-        $this->assertSame('png', $image->optimize('png')->extension());
+        $this->assertSame('png', $image->toPng()->extension());
         $this->assertSame('jpg', $image->extension());
     }
 
@@ -134,13 +152,23 @@ class ImageTest extends TestCase
         $this->assertSame([400, 300], $image->dimensions());
     }
 
+    public function test_quality_affects_file_size()
+    {
+        $image = new Image($this->fakeImageContents(100, 100));
+
+        $low = $image->toJpg()->quality(1)->toBytes();
+        $high = $image->toJpg()->quality(100)->toBytes();
+
+        $this->assertLessThan(strlen($high), strlen($low));
+    }
+
     public function test_full_avatar_pipeline()
     {
         Storage::fake('local');
 
         $image = new Image($this->fakeImageContents(800, 600));
 
-        $result = $image->orient()->cover(200, 200)->optimize('webp');
+        $result = $image->orient()->cover(200, 200)->toWebp()->quality(80);
         $result->store('avatars', 'local');
 
         $this->assertSame([200, 200], $result->dimensions());
@@ -158,8 +186,8 @@ class ImageTest extends TestCase
         $file = UploadedFile::fake()->image('photo.jpg', 800, 600);
         $image = new Image(fn () => $file->getContent(), $file);
 
-        $thumb = $image->cover(100, 100)->optimize('webp');
-        $large = $image->scale(400, 400)->optimize('png');
+        $thumb = $image->cover(100, 100)->toWebp();
+        $large = $image->scale(400, 400)->toPng();
 
         $thumb->store('thumbs', 'local');
         $large->store('photos', 'local');
@@ -195,11 +223,10 @@ class ImageTest extends TestCase
 
         $file = UploadedFile::fake()->image('avatar.jpg', 600, 600);
 
-        // Simulate what $request->image() does
         $image = new Image(fn () => $file->getContent(), $file);
 
-        $avatar = $image->orient()->cover(200, 200)->optimize('webp');
-        $placeholder = $image->scale(40, 40)->blur(15)->optimize('webp', 50);
+        $avatar = $image->orient()->cover(200, 200)->toWebp();
+        $placeholder = $image->scale(40, 40)->blur(15)->toWebp()->quality(50);
 
         $avatar->store('avatars', 'local');
         $placeholder->store('placeholders', 'local');
@@ -219,7 +246,6 @@ class ImageTest extends TestCase
         $this->assertSame(40, $placeholderSize[0]);
         $this->assertSame(40, $placeholderSize[1]);
 
-        // Original is untouched
         $this->assertSame([600, 600], $image->dimensions());
         $this->assertSame('avatar.jpg', $image->file()->getClientOriginalName());
     }
