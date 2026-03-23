@@ -24,4 +24,22 @@ class ScheduleStatusCommand extends TestCase
             ->assertFailed()
             ->expectsOutputToContain('Scheduler is currently paused.');
     }
+
+    public function testDisplaysRunningJson()
+    {
+        Cache::put('illuminate:schedule:paused', false);
+
+        $this->artisan('schedule:status --json')
+            ->assertSuccessful()
+            ->expectsOutputToContain(json_encode(['status' => 'running']));
+    }
+
+    public function testDisplaysPausedJson()
+    {
+        Cache::put('illuminate:schedule:paused', true);
+
+        $this->artisan('schedule:status --json')
+            ->assertFailed()
+            ->expectsOutputToContain(json_encode(['status' => 'paused']));
+    }
 }

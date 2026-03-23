@@ -10,6 +10,14 @@ use Symfony\Component\Console\Attribute\AsCommand;
 class ScheduleStatusCommand extends Command
 {
     /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $signature = 'schedule:status 
+                {--json : Output the scheduler status as JSON}';
+
+    /**
      * The console command description.
      *
      * @var string
@@ -23,16 +31,36 @@ class ScheduleStatusCommand extends Command
      */
     public function handle(Cache $cache)
     {
-        $paused = $cache->get('illuminate:schedule:paused', false);
+        $isPaused = $cache->get('illuminate:schedule:paused', false);
 
-        if ($paused) {
-            $this->components->warn('Scheduler is currently paused.');
-
-            return self::FAILURE;
+        if ($this->option('json')) {
+            $this->displayJson($isPaused);
+        } else {
+            $this->displayForCli($isPaused);
         }
 
-        $this->components->info('Scheduler is currently running.');
+        return $isPaused ? self::FAILURE : self::SUCCESS;
+    }
 
-        return self::SUCCESS;
+    /**
+     * Render the queue status for the CLI.
+     */
+    protected function displayForCli(bool $isPaused): void
+    {
+        if ($isPaused) {
+            $this->components->warn('Scheduler is currently paused.');
+        } else {
+            $this->components->info('Scheduler is currently running.');
+        }        
+    }
+
+    /**
+     * Render the queue status as JSON.
+     */
+    protected function displayJson(bool $isPaused): void
+    {
+        $this->output->writeln(json_encode([
+            'status' => $isPaused ? 'paused' : 'running',
+        ]));
     }
 }

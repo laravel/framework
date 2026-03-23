@@ -24,4 +24,30 @@ class StatusCommandTest extends TestCase
             ->assertFailed()
             ->expectsOutputToContain('Queue [sync:default] is currently paused.');
     }
+
+    public function testDisplaysRunningJson()
+    {
+        Cache::put('illuminate:queue:paused:sync:default', false);
+
+        $this->artisan('queue:status default --json')
+            ->assertSuccessful()
+            ->expectsOutputToContain(json_encode([
+                'connection' => 'sync',
+                'queue' => 'default',
+                'status' => 'running',
+            ]));
+    }
+
+    public function testDisplaysPausedJson()
+    {
+        Cache::put('illuminate:queue:paused:sync:default', true);
+
+        $this->artisan('queue:status default --json')
+            ->assertFailed()
+            ->expectsOutputToContain(json_encode([
+                'connection' => 'sync',
+                'queue' => 'default',
+                'status' => 'paused',
+            ]));
+    }    
 }

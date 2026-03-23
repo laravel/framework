@@ -17,7 +17,9 @@ class StatusCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'queue:status {queue : The name of the queue to check}';
+    protected $signature = 'queue:status 
+                {queue : The name of the queue to check}
+                {--json : Output the queue status as JSON}';
 
     /**
      * The console command description.
@@ -35,14 +37,38 @@ class StatusCommand extends Command
     {
         [$connection, $queue] = $this->parseQueue($this->argument('queue'));
 
-        if ($manager->isPaused($connection, $queue)) {
-            $this->components->warn("Queue [{$connection}:{$queue}] is currently paused.");
+        $isPaused = $manager->isPaused($connection, $queue);
 
-            return self::FAILURE;
+        if ($this->option('json')) {
+            $this->displayJson($connection, $queue, $isPaused);
+        } else {
+            $this->displayForCli($connection, $queue, $isPaused);
         }
 
-        $this->components->info("Queue [{$connection}:{$queue}] is currently running.");
+        return $isPaused ? self::FAILURE : self::SUCCESS;
+    }
 
-        return self::SUCCESS;
+    /**
+     * Render the queue status for the CLI.
+     */
+    protected function displayForCli(string $connection, string $queue, bool $isPaused): void
+    {
+        if ($isPaused) {
+            $this->components->warn("Queue [{$connection}:{$queue}] is currently paused.");
+        } else {
+            $this->components->info("Queue [{$connection}:{$queue}] is currently running.");
+        }        
+    }
+
+    /**
+     * Render the queue status as JSON.
+     */
+    protected function displayJson(string $connection, string $queue, bool $isPaused): void
+    {
+        $this->output->writeln(json_encode([
+            'connection' => $connection, 
+            'queue' => $queue, 
+            'status' => $isPaused ? 'paused' : 'running',
+        ]));
     }
 }
