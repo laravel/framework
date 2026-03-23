@@ -28,18 +28,6 @@ class GdDriverTest extends TestCase
         $this->assertSame(50, $height);
     }
 
-    public function test_processes_optimize_to_png()
-    {
-        $driver = new GdDriver;
-
-        $options = new PendingImageOptions;
-        $options->format = 'png';
-
-        $result = $driver->process($this->fakeImageContents(), $options);
-
-        $this->assertSame(IMAGETYPE_PNG, getimagesizefromstring($result)[2]);
-    }
-
     public function test_processes_optimize_to_webp()
     {
         $driver = new GdDriver;
@@ -50,18 +38,6 @@ class GdDriverTest extends TestCase
         $result = $driver->process($this->fakeImageContents(), $options);
 
         $this->assertSame(IMAGETYPE_WEBP, getimagesizefromstring($result)[2]);
-    }
-
-    public function test_processes_optimize_to_gif()
-    {
-        $driver = new GdDriver;
-
-        $options = new PendingImageOptions;
-        $options->format = 'gif';
-
-        $result = $driver->process($this->fakeImageContents(), $options);
-
-        $this->assertSame(IMAGETYPE_GIF, getimagesizefromstring($result)[2]);
     }
 
     public function test_processes_optimize_to_jpeg()
@@ -84,7 +60,7 @@ class GdDriverTest extends TestCase
         $options = new PendingImageOptions;
         $options->coverWidth = 75;
         $options->coverHeight = 75;
-        $options->format = 'png';
+        $options->format = 'webp';
 
         $result = $driver->process($contents, $options);
 
@@ -92,7 +68,7 @@ class GdDriverTest extends TestCase
 
         $this->assertSame(75, $width);
         $this->assertSame(75, $height);
-        $this->assertSame(IMAGETYPE_PNG, $type);
+        $this->assertSame(IMAGETYPE_WEBP, $type);
     }
 
     public function test_processes_scale()

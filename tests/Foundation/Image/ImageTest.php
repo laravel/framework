@@ -79,20 +79,6 @@ class ImageTest extends TestCase
         $this->assertNotSame($image, $image->toJpg());
     }
 
-    public function test_to_png_returns_new_instance()
-    {
-        $image = $this->makeImage();
-
-        $this->assertNotSame($image, $image->toPng());
-    }
-
-    public function test_to_gif_returns_new_instance()
-    {
-        $image = $this->makeImage();
-
-        $this->assertNotSame($image, $image->toGif());
-    }
-
     public function test_using_returns_new_instance()
     {
         $image = $this->makeImage();
@@ -114,13 +100,13 @@ class ImageTest extends TestCase
     public function test_chained_operations_accumulate()
     {
         $image = $this->makeImage();
-        $result = $image->cover(100, 100)->optimize('png', 90)->blur(5);
+        $result = $image->cover(100, 100)->optimize('webp', 90)->blur(5);
 
         $options = $this->getOptions($result);
 
         $this->assertSame(100, $options->coverWidth);
         $this->assertSame(100, $options->coverHeight);
-        $this->assertSame('png', $options->format);
+        $this->assertSame('webp', $options->format);
         $this->assertSame(90, $options->quality);
         $this->assertSame(5, $options->blur);
     }
@@ -281,20 +267,6 @@ class ImageTest extends TestCase
         $image = $this->makeImage();
 
         $this->assertSame('jpg', $this->getOptions($image->toJpg())->format);
-    }
-
-    public function test_to_png_sets_format()
-    {
-        $image = $this->makeImage();
-
-        $this->assertSame('png', $this->getOptions($image->toPng())->format);
-    }
-
-    public function test_to_gif_sets_format()
-    {
-        $image = $this->makeImage();
-
-        $this->assertSame('gif', $this->getOptions($image->toGif())->format);
     }
 
     public function test_format_and_quality_can_be_set_separately()
