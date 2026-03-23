@@ -6,9 +6,7 @@ use Illuminate\Contracts\Image\Driver;
 use Illuminate\Foundation\Image\ImageException;
 use Illuminate\Foundation\Image\PendingImageOptions;
 use Intervention\Image\Encoders\AutoEncoder;
-use Intervention\Image\Encoders\GifEncoder;
 use Intervention\Image\Encoders\JpegEncoder;
-use Intervention\Image\Encoders\PngEncoder;
 use Intervention\Image\Encoders\WebpEncoder;
 use Intervention\Image\ImageManager;
 
@@ -79,8 +77,6 @@ abstract class InterventionDriver implements Driver
 
             $encoder = match ($options->format) {
                 'webp' => new WebpEncoder($quality),
-                'png' => new PngEncoder,
-                'gif' => new GifEncoder,
                 'jpg', 'jpeg' => new JpegEncoder($quality),
             };
 

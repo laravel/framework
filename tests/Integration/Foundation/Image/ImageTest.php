@@ -39,9 +39,9 @@ class ImageTest extends TestCase
     {
         $image = new Image($this->fakeImageContents(100, 100));
 
-        $result = $image->toPng()->toBytes();
+        $result = $image->toWebp()->toBytes();
 
-        $this->assertSame(IMAGETYPE_PNG, getimagesizefromstring($result)[2]);
+        $this->assertSame(IMAGETYPE_WEBP, getimagesizefromstring($result)[2]);
     }
 
     public function test_to_webp_and_to_bytes()
@@ -51,15 +51,6 @@ class ImageTest extends TestCase
         $result = $image->toWebp()->toBytes();
 
         $this->assertSame(IMAGETYPE_WEBP, getimagesizefromstring($result)[2]);
-    }
-
-    public function test_to_gif_and_to_bytes()
-    {
-        $image = new Image($this->fakeImageContents(100, 100));
-
-        $result = $image->toGif()->toBytes();
-
-        $this->assertSame(IMAGETYPE_GIF, getimagesizefromstring($result)[2]);
     }
 
     public function test_blur_and_to_bytes()
@@ -86,7 +77,7 @@ class ImageTest extends TestCase
     {
         $image = new Image($this->fakeImageContents(400, 400));
 
-        $thumb = $image->cover(100, 100)->toPng();
+        $thumb = $image->cover(100, 100)->toWebp();
         $large = $image->scale(200, 200)->toWebp();
 
         $thumbBytes = $thumb->toBytes();
@@ -97,7 +88,7 @@ class ImageTest extends TestCase
 
         $this->assertSame(100, $thumbSize[0]);
         $this->assertSame(100, $thumbSize[1]);
-        $this->assertSame(IMAGETYPE_PNG, $thumbSize[2]);
+        $this->assertSame(IMAGETYPE_WEBP, $thumbSize[2]);
 
         $this->assertSame(200, $largeSize[0]);
         $this->assertSame(200, $largeSize[1]);
@@ -110,12 +101,12 @@ class ImageTest extends TestCase
 
         $image = new Image($this->fakeImageContents(100, 100));
 
-        $image->toPng()->store('images', 'local');
+        $image->toWebp()->store('images', 'local');
 
         $files = Storage::disk('local')->files('images');
 
         $this->assertCount(1, $files);
-        $this->assertStringEndsWith('.png', $files[0]);
+        $this->assertStringEndsWith('.webp', $files[0]);
     }
 
     public function test_store_as_saves_with_custom_name()
@@ -124,23 +115,23 @@ class ImageTest extends TestCase
 
         $image = new Image($this->fakeImageContents(100, 100));
 
-        $image->toPng()->storeAs('images', 'avatar.png', 'local');
+        $image->toWebp()->storeAs('images', 'avatar.webp', 'local');
 
-        Storage::disk('local')->assertExists('images/avatar.png');
+        Storage::disk('local')->assertExists('images/avatar.webp');
     }
 
     public function test_mime_type_after_format_conversion()
     {
         $image = new Image($this->fakeImageContents(100, 100));
 
-        $this->assertSame('image/png', $image->toPng()->mimeType());
+        $this->assertSame('image/webp', $image->toWebp()->mimeType());
     }
 
     public function test_extension_after_format_conversion()
     {
         $image = new Image($this->fakeImageContents(100, 100));
 
-        $this->assertSame('png', $image->toPng()->extension());
+        $this->assertSame('webp', $image->toWebp()->extension());
         $this->assertSame('jpg', $image->extension());
     }
 
@@ -187,7 +178,7 @@ class ImageTest extends TestCase
         $image = new Image(fn () => $file->getContent(), $file);
 
         $thumb = $image->cover(100, 100)->toWebp();
-        $large = $image->scale(400, 400)->toPng();
+        $large = $image->scale(400, 400)->toWebp();
 
         $thumb->store('thumbs', 'local');
         $large->store('photos', 'local');
@@ -210,7 +201,7 @@ class ImageTest extends TestCase
 
         $this->assertLessThanOrEqual(400, $largeSize[0]);
         $this->assertLessThanOrEqual(400, $largeSize[1]);
-        $this->assertSame(IMAGETYPE_PNG, $largeSize[2]);
+        $this->assertSame(IMAGETYPE_WEBP, $largeSize[2]);
 
         $this->assertSame($file, $image->file());
         $this->assertSame($file, $thumb->file());

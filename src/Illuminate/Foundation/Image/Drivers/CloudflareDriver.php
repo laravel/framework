@@ -71,8 +71,6 @@ class CloudflareDriver implements Driver
                 $request = $request->withHeaders([
                     'Accept' => match ($options->format) {
                         'webp' => 'image/webp',
-                        'png' => 'image/png',
-                        'gif' => 'image/gif',
                         'jpg', 'jpeg' => 'image/jpeg',
                     },
                 ]);

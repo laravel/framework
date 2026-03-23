@@ -151,29 +151,13 @@ class Image
     }
 
     /**
-     * Convert the image to PNG format.
-     */
-    public function toPng(): static
-    {
-        return $this->toFormat('png');
-    }
-
-    /**
-     * Convert the image to GIF format.
-     */
-    public function toGif(): static
-    {
-        return $this->toFormat('gif');
-    }
-
-    /**
      * Set the output format.
      *
      * @throws ImageException
      */
     protected function toFormat(string $format): static
     {
-        if (! in_array($format, ['webp', 'jpg', 'jpeg', 'png', 'gif'])) {
+        if (! in_array($format, ['webp', 'jpg', 'jpeg'])) {
             throw new ImageException("The [{$format}] format is not supported.");
         }
 
