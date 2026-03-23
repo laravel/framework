@@ -446,12 +446,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $this->keyType = $table->keyType;
         }
 
-        if ($this->incrementing === true) {
-            if (static::resolveClassAttribute(WithoutIncrementing::class) !== null) {
-                $this->incrementing = false;
-            } elseif ($table && $table->incrementing !== null) {
-                $this->incrementing = $table->incrementing;
-            }
+        if (static::resolveClassAttribute(WithoutIncrementing::class) !== null) {
+            $this->incrementing = false;
+        } elseif ($table && $table->incrementing !== null) {
+            $this->incrementing = $table->incrementing;
         }
     }
 
