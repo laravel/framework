@@ -14,6 +14,7 @@ use Illuminate\Console\Scheduling\ScheduleInterruptCommand;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
 use Illuminate\Console\Scheduling\SchedulePauseCommand;
 use Illuminate\Console\Scheduling\ScheduleResumeCommand;
+use Illuminate\Console\Scheduling\ScheduleStatusCommand;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
 use Illuminate\Console\Scheduling\ScheduleTestCommand;
 use Illuminate\Console\Scheduling\ScheduleWorkCommand;
@@ -105,6 +106,7 @@ use Illuminate\Queue\Console\PruneBatchesCommand as QueuePruneBatchesCommand;
 use Illuminate\Queue\Console\PruneFailedJobsCommand as QueuePruneFailedJobsCommand;
 use Illuminate\Queue\Console\RestartCommand as QueueRestartCommand;
 use Illuminate\Queue\Console\ResumeCommand as QueueResumeCommand;
+use Illuminate\Queue\Console\StatusCommand as QueueStatusCommand;
 use Illuminate\Queue\Console\RetryBatchCommand as QueueRetryBatchCommand;
 use Illuminate\Queue\Console\RetryCommand as QueueRetryCommand;
 use Illuminate\Queue\Console\TableCommand;
@@ -162,6 +164,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'QueueResume' => QueueResumeCommand::class,
         'QueueRetry' => QueueRetryCommand::class,
         'QueueRetryBatch' => QueueRetryBatchCommand::class,
+        'QueueStatus' => QueueStatusCommand::class,
         'QueueWork' => QueueWorkCommand::class,
         'Reload' => ReloadCommand::class,
         'RouteCache' => RouteCacheCommand::class,
@@ -178,6 +181,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ScheduleInterrupt' => ScheduleInterruptCommand::class,
         'SchedulePause' => SchedulePauseCommand::class,
         'ScheduleResume' => ScheduleResumeCommand::class,
+        'ScheduleStatus' => ScheduleStatusCommand::class,
         'ShowModel' => ShowModelCommand::class,
         'StorageLink' => StorageLinkCommand::class,
         'StorageUnlink' => StorageUnlinkCommand::class,
