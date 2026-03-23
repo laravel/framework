@@ -53,7 +53,7 @@ class CloudflareDriverTest extends TestCase
         $driver = new CloudflareDriver(new HttpFactory, 'account', 'token');
 
         $this->expectException(ImageException::class);
-        $this->expectExceptionMessage('The Cloudflare image driver only supports JPEG and WebP source images, [image/png] given.');
+        $this->expectExceptionMessage('The Cloudflare image driver only supports JPEG or WebP as target format, please use [toJpg()] or [toWebp()].');
 
         $file = UploadedFile::fake()->image('test.png', 100, 100);
         $driver->process(file_get_contents($file->getRealPath()), new PendingImageOptions);

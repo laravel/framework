@@ -137,25 +137,25 @@ class Image
     /**
      * Convert the image to WebP format.
      */
-    public function toWebp(?int $quality = null): static
+    public function toWebp(): static
     {
-        return $this->toFormat('webp', $quality);
+        return $this->toFormat('webp');
     }
 
     /**
      * Convert the image to JPEG format.
      */
-    public function toJpg(?int $quality = null): static
+    public function toJpg(): static
     {
-        return $this->toFormat('jpg', $quality);
+        return $this->toFormat('jpg');
     }
 
     /**
      * Convert the image to JPEG format.
      */
-    public function toJpeg(?int $quality = null): static
+    public function toJpeg(): static
     {
-        return $this->toJpg($quality);
+        return $this->toJpg();
     }
 
     /**
@@ -163,7 +163,7 @@ class Image
      *
      * @throws ImageException
      */
-    protected function toFormat(string $format, ?int $quality = null): static
+    protected function toFormat(string $format): static
     {
         if (! in_array($format, ['webp', 'jpg', 'jpeg'])) {
             throw new ImageException("The [{$format}] format is not supported.");
@@ -172,7 +172,6 @@ class Image
         $clone = $this->cloneWith();
 
         $clone->options->format = $format;
-        $clone->options->quality = $quality;
 
         return $clone;
     }
