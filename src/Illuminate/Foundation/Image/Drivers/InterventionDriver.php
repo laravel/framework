@@ -5,8 +5,8 @@ namespace Illuminate\Foundation\Image\Drivers;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Foundation\Image\ImageException;
 use Illuminate\Foundation\Image\PendingImageOptions;
-use Intervention\Image\Encoders\AutoEncoder;
 use Intervention\Image\Encoders\JpegEncoder;
+use Intervention\Image\Encoders\MediaTypeEncoder;
 use Intervention\Image\Encoders\WebpEncoder;
 use Intervention\Image\ImageManager;
 
@@ -73,7 +73,7 @@ abstract class InterventionDriver implements Driver
         }
 
         if ($options->format !== null) {
-            $quality = $options->quality ?? 75;
+            $quality = $options->quality ?? PendingImageOptions::DEFAULT_QUALITY;
 
             $encoder = match ($options->format) {
                 'webp' => new WebpEncoder($quality),
@@ -83,6 +83,13 @@ abstract class InterventionDriver implements Driver
             return $image->encode($encoder)->toString();
         }
 
-        return $image->encode(new AutoEncoder)->toString();
+        $quality = $options->quality ?? PendingImageOptions::DEFAULT_QUALITY;
+
+        $mediaType = match ($image->origin()->mediaType()) {
+            'image/x-gif' => 'image/gif',
+            default => null,
+        };
+
+        return $image->encode(new MediaTypeEncoder($mediaType, quality: $quality))->toString();
     }
 }

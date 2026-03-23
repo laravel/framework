@@ -269,6 +269,34 @@ class ImageTest extends TestCase
         $this->assertSame('jpg', $this->getOptions($image->toJpg())->format);
     }
 
+    public function test_to_jpeg_is_alias_for_to_jpg()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame('jpg', $this->getOptions($image->toJpeg())->format);
+    }
+
+    public function test_to_jpeg_passes_quality()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame(60, $this->getOptions($image->toJpeg(60))->quality);
+    }
+
+    public function test_to_webp_passes_quality()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame(90, $this->getOptions($image->toWebp(90))->quality);
+    }
+
+    public function test_to_jpg_passes_quality()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame(50, $this->getOptions($image->toJpg(50))->quality);
+    }
+
     public function test_format_and_quality_can_be_set_separately()
     {
         $image = $this->makeImage();
