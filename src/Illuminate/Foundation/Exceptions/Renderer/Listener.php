@@ -68,6 +68,7 @@ class Listener
             : mb_strcut($event->sql, 0, 2000);
 
         $bindings = $event->connection->prepareBindings($event->bindings);
+
         $bindingCount = substr_count($sql, '?');
 
         $this->queries[] = [
