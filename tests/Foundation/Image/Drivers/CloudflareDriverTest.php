@@ -7,10 +7,18 @@ use Illuminate\Foundation\Image\ImageException;
 use Illuminate\Foundation\Image\PendingImageOptions;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\Client\Request;
+use Illuminate\Http\UploadedFile;
 use PHPUnit\Framework\TestCase;
 
 class CloudflareDriverTest extends TestCase
 {
+    protected function fakeImageContents(int $width = 100, int $height = 100): string
+    {
+        $file = UploadedFile::fake()->image('test.jpg', $width, $height);
+
+        return file_get_contents($file->getRealPath());
+    }
+
     public function test_ensure_requirements_throws_without_account_id()
     {
         $driver = new CloudflareDriver(new HttpFactory, '', 'token');
@@ -61,7 +69,7 @@ class CloudflareDriverTest extends TestCase
         $options->coverWidth = 100;
         $options->coverHeight = 100;
 
-        $result = $driver->process('original-bytes', $options);
+        $result = $driver->process($this->fakeImageContents(), $options);
 
         $this->assertSame('transformed-bytes', $result);
 
@@ -85,7 +93,7 @@ class CloudflareDriverTest extends TestCase
 
         $driver = new CloudflareDriver($http, 'my-account', 'my-secret-token');
 
-        $driver->process('contents', new PendingImageOptions);
+        $driver->process($this->fakeImageContents(), new PendingImageOptions);
 
         $http->assertSent(function (Request $request) {
             return $request->hasHeader('Authorization', 'Bearer my-secret-token')
@@ -109,7 +117,7 @@ class CloudflareDriverTest extends TestCase
         $this->expectException(ImageException::class);
         $this->expectExceptionMessage('Cloudflare image upload failed: Invalid token');
 
-        $driver->process('contents', new PendingImageOptions);
+        $driver->process($this->fakeImageContents(), new PendingImageOptions);
     }
 
     public function test_process_throws_on_empty_variants()
@@ -127,7 +135,7 @@ class CloudflareDriverTest extends TestCase
         $this->expectException(ImageException::class);
         $this->expectExceptionMessage('Cloudflare did not return any image variants.');
 
-        $driver->process('contents', new PendingImageOptions);
+        $driver->process($this->fakeImageContents(), new PendingImageOptions);
     }
 
     public function test_process_throws_on_fetch_failure()
@@ -146,7 +154,7 @@ class CloudflareDriverTest extends TestCase
         $this->expectException(ImageException::class);
         $this->expectExceptionMessage('Failed to fetch transformed image from Cloudflare.');
 
-        $driver->process('contents', new PendingImageOptions);
+        $driver->process($this->fakeImageContents(), new PendingImageOptions);
     }
 
     public function test_process_deletes_image_even_on_failure()
@@ -163,7 +171,7 @@ class CloudflareDriverTest extends TestCase
         $driver = new CloudflareDriver($http, 'account', 'token');
 
         try {
-            $driver->process('contents', new PendingImageOptions);
+            $driver->process($this->fakeImageContents(), new PendingImageOptions);
         } catch (ImageException) {
             // expected
         }
@@ -195,7 +203,7 @@ class CloudflareDriverTest extends TestCase
         $options->coverWidth = 200;
         $options->coverHeight = 150;
 
-        $driver->process('contents', $options);
+        $driver->process($this->fakeImageContents(), $options);
 
         $http->assertSent(function (Request $request) {
             return str_contains($request->url(), 'w=200')
@@ -226,7 +234,7 @@ class CloudflareDriverTest extends TestCase
         $options->scaleWidth = 800;
         $options->scaleHeight = 600;
 
-        $driver->process('contents', $options);
+        $driver->process($this->fakeImageContents(), $options);
 
         $http->assertSent(function (Request $request) {
             return str_contains($request->url(), 'w=800')
@@ -255,7 +263,7 @@ class CloudflareDriverTest extends TestCase
         $options = new PendingImageOptions;
         $options->blur = 15;
 
-        $driver->process('contents', $options);
+        $driver->process($this->fakeImageContents(), $options);
 
         $http->assertSent(function (Request $request) {
             return str_contains($request->url(), 'blur=15');
@@ -282,14 +290,14 @@ class CloudflareDriverTest extends TestCase
         $options = new PendingImageOptions;
         $options->greyscale = true;
 
-        $driver->process('contents', $options);
+        $driver->process($this->fakeImageContents(), $options);
 
         $http->assertSent(function (Request $request) {
             return str_contains($request->url(), 'saturation=0');
         });
     }
 
-    public function test_format_only_keeps_original_variant_url()
+    public function test_format_only_preserves_original_dimensions()
     {
         $http = new HttpFactory;
 
@@ -309,10 +317,12 @@ class CloudflareDriverTest extends TestCase
         $options = new PendingImageOptions;
         $options->format = 'webp';
 
-        $driver->process('contents', $options);
+        $driver->process($this->fakeImageContents(200, 150), $options);
 
         $http->assertSent(function (Request $request) {
-            return $request->url() === 'https://imagedelivery.net/abc/img-123/public'
+            return str_contains($request->url(), 'w=200')
+                && str_contains($request->url(), 'h=150')
+                && str_contains($request->url(), 'fit=scale-down')
                 && $request->hasHeader('Accept', 'image/webp');
         });
     }
@@ -337,7 +347,7 @@ class CloudflareDriverTest extends TestCase
         $options = new PendingImageOptions;
         $options->format = 'webp';
 
-        $driver->process('contents', $options);
+        $driver->process($this->fakeImageContents(), $options);
 
         $http->assertSent(function (Request $request) {
             return str_contains($request->url(), 'imagedelivery.net')
@@ -365,7 +375,7 @@ class CloudflareDriverTest extends TestCase
         $options = new PendingImageOptions;
         $options->quality = 90;
 
-        $driver->process('contents', $options);
+        $driver->process($this->fakeImageContents(), $options);
 
         $http->assertSent(function (Request $request) {
             return str_contains($request->url(), 'q=90');
