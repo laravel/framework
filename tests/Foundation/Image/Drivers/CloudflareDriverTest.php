@@ -289,7 +289,7 @@ class CloudflareDriverTest extends TestCase
         });
     }
 
-    public function test_build_transform_url_with_format_and_quality()
+    public function test_format_uses_accept_header()
     {
         $http = new HttpFactory;
 
@@ -308,13 +308,39 @@ class CloudflareDriverTest extends TestCase
 
         $options = new PendingImageOptions;
         $options->format = 'webp';
+
+        $driver->process('contents', $options);
+
+        $http->assertSent(function (Request $request) {
+            return str_contains($request->url(), 'imagedelivery.net')
+                && $request->hasHeader('Accept', 'image/webp');
+        });
+    }
+
+    public function test_quality_in_transform_url()
+    {
+        $http = new HttpFactory;
+
+        $http->fake([
+            'api.cloudflare.com/*' => $http->response([
+                'success' => true,
+                'result' => [
+                    'id' => 'img-123',
+                    'variants' => ['https://imagedelivery.net/abc/img-123/public'],
+                ],
+            ]),
+            'imagedelivery.net/*' => $http->response('bytes'),
+        ]);
+
+        $driver = new CloudflareDriver($http, 'account', 'token');
+
+        $options = new PendingImageOptions;
         $options->quality = 90;
 
         $driver->process('contents', $options);
 
         $http->assertSent(function (Request $request) {
-            return str_contains($request->url(), 'f=webp')
-                && str_contains($request->url(), 'q=90');
+            return str_contains($request->url(), 'q=90');
         });
     }
 }

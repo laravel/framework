@@ -114,13 +114,80 @@ class Image
 
     /**
      * Set the optimization options.
+     *
+     * @throws ImageException
      */
     public function optimize(string $format = 'webp', int $quality = 80): static
     {
+        return $this->toFormat($format)->quality($quality);
+    }
+
+    /**
+     * Set the output quality.
+     */
+    public function quality(int $quality): static
+    {
+        $clone = $this->cloneWith();
+
+        $clone->options->quality = $quality;
+
+        return $clone;
+    }
+
+    /**
+     * Convert the image to WebP format.
+     */
+    public function toWebp(): static
+    {
+        return $this->toFormat('webp');
+    }
+
+    /**
+     * Convert the image to JPEG format.
+     */
+    public function toJpg(): static
+    {
+        return $this->toFormat('jpg');
+    }
+
+    /**
+     * Convert the image to PNG format.
+     */
+    public function toPng(): static
+    {
+        return $this->toFormat('png');
+    }
+
+    /**
+     * Convert the image to GIF format.
+     */
+    public function toGif(): static
+    {
+        return $this->toFormat('gif');
+    }
+
+    /**
+     * Convert the image to AVIF format.
+     */
+    public function toAvif(): static
+    {
+        return $this->toFormat('avif');
+    }
+
+    /**
+     * Set the output format.
+     *
+     * @throws ImageException
+     */
+    protected function toFormat(string $format): static
+    {
+        if (! in_array($format, ['webp', 'jpg', 'jpeg', 'png', 'gif', 'avif'])) {
+            throw new ImageException("The [{$format}] format is not supported.");
+        }
+
         $clone = $this->cloneWith();
 
         $clone->options->format = $format;
-        $clone->options->quality = $quality;
 
         return $clone;
     }
