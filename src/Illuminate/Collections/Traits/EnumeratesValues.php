@@ -581,7 +581,7 @@ trait EnumeratesValues
             ? $this->identity()
             : $this->valueRetriever($callback);
 
-        return $this->reduce(fn ($result, $item) => $result + $callback($item), 0);
+        return $this->reduce(fn ($result, $item, $key) => $result + $callback($item, $key), 0);
     }
 
     /**
