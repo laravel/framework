@@ -51,7 +51,7 @@ class ScheduleStatusCommand extends Command
             $this->components->warn('Scheduler is currently paused.');
         } else {
             $this->components->info('Scheduler is currently running.');
-        }        
+        }
     }
 
     /**

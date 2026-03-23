@@ -49,5 +49,5 @@ class StatusCommandTest extends TestCase
                 'queue' => 'default',
                 'status' => 'paused',
             ]));
-    }    
+    }
 }

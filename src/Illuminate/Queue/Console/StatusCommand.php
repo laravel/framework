@@ -57,7 +57,7 @@ class StatusCommand extends Command
             $this->components->warn("Queue [{$connection}:{$queue}] is currently paused.");
         } else {
             $this->components->info("Queue [{$connection}:{$queue}] is currently running.");
-        }        
+        }
     }
 
     /**
@@ -66,8 +66,8 @@ class StatusCommand extends Command
     protected function displayJson(string $connection, string $queue, bool $isPaused): void
     {
         $this->output->writeln(json_encode([
-            'connection' => $connection, 
-            'queue' => $queue, 
+            'connection' => $connection,
+            'queue' => $queue,
             'status' => $isPaused ? 'paused' : 'running',
         ]));
     }
