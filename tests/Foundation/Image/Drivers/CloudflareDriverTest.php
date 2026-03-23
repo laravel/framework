@@ -52,7 +52,7 @@ class CloudflareDriverTest extends TestCase
                     'variants' => ['https://imagedelivery.net/abc/img-123/public'],
                 ],
             ]),
-            'imagedelivery.net/cdn-cgi/image/*' => $http->response('transformed-bytes'),
+            'imagedelivery.net/*' => $http->response('transformed-bytes'),
         ]);
 
         $driver = new CloudflareDriver($http, 'account-id', 'api-token');
@@ -198,9 +198,10 @@ class CloudflareDriverTest extends TestCase
         $driver->process('contents', $options);
 
         $http->assertSent(function (Request $request) {
-            return str_contains($request->url(), 'width=200')
-                && str_contains($request->url(), 'height=150')
-                && str_contains($request->url(), 'fit=cover');
+            return str_contains($request->url(), 'w=200')
+                && str_contains($request->url(), 'h=150')
+                && str_contains($request->url(), 'fit=cover')
+                && str_contains($request->url(), 'imagedelivery.net/abc/img-123/');
         });
     }
 
@@ -228,8 +229,8 @@ class CloudflareDriverTest extends TestCase
         $driver->process('contents', $options);
 
         $http->assertSent(function (Request $request) {
-            return str_contains($request->url(), 'width=800')
-                && str_contains($request->url(), 'height=600')
+            return str_contains($request->url(), 'w=800')
+                && str_contains($request->url(), 'h=600')
                 && str_contains($request->url(), 'fit=scale-down');
         });
     }
@@ -312,8 +313,8 @@ class CloudflareDriverTest extends TestCase
         $driver->process('contents', $options);
 
         $http->assertSent(function (Request $request) {
-            return str_contains($request->url(), 'format=webp')
-                && str_contains($request->url(), 'quality=90');
+            return str_contains($request->url(), 'f=webp')
+                && str_contains($request->url(), 'q=90');
         });
     }
 }
