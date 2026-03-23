@@ -68,6 +68,14 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $this->assertEquals([1], $query->getBindings());
     }
 
+    public function testGlobalScopeInParentClassAttributeIsApplied()
+    {
+        $model = new EloquentGlobalScopeInAttributeChildTestModel;
+        $query = $model->newQuery();
+        $this->assertSame('select * from "table" where "active" = ?', $query->toSql());
+        $this->assertEquals([1], $query->getBindings());
+    }
+
     public function testClosureGlobalScopeIsApplied()
     {
         $model = new EloquentClosureGlobalScopesTestModel;
@@ -324,4 +332,15 @@ class EloquentGlobalScopeInInheritedAttributeTestModel extends Model
     use EloquentGlobalScopeInInheritedAttributeTestTrait;
 
     protected $table = 'table';
+}
+
+#[ScopedBy(ActiveScope::class)]
+class EloquentGlobalScopeInAttributeParentTestModel extends Model
+{
+    protected $table = 'table';
+}
+
+class EloquentGlobalScopeInAttributeChildTestModel extends EloquentGlobalScopeInAttributeParentTestModel
+{
+    //
 }
