@@ -437,6 +437,21 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame($user2Price->id, $users[1]->price->id);
     }
 
+    public function testEagerLoadingWithConstraintsAppliesToSubQuery()
+    {
+        $user = HasOneOfManyTestUser::create();
+        $user->logins()->create(); // ID 1
+        $login2 = $user->logins()->create(); // ID 2
+        $user->logins()->create(); // ID 3
+
+        $users = HasOneOfManyTestUser::with(['latest_login' => function ($q) {
+            $q->where('logins.id', '<', 3);
+        }])->get();
+
+        $this->assertNotNull($users[0]->latest_login);
+        $this->assertSame($login2->id, $users[0]->latest_login->id);
+    }
+
     public function testWithExists()
     {
         $user = HasOneOfManyTestUser::create();
