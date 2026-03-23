@@ -50,15 +50,18 @@ class CloudflareDriver implements Driver
             );
         }
 
-        $imageId = $response->json('result.id');
-
-        return $this->transformAndDelete($imageId, $response->json('result.variants', []), $options);
+        return $this->transformAndDelete(
+            $response->json('result.id'),
+            $response->json('result.variants', []),
+            $options,
+            $contents,
+        );
     }
 
     /**
      * Fetch the transformed image and delete the original from Cloudflare.
      */
-    protected function transformAndDelete(string $imageId, array $variants, PendingImageOptions $options): string
+    protected function transformAndDelete(string $imageId, array $variants, PendingImageOptions $options, string $contents): string
     {
         try {
             if (empty($variants)) {
@@ -77,7 +80,7 @@ class CloudflareDriver implements Driver
             }
 
             $response = $request->get(
-                $this->buildTransformUrl($variants[0], $options),
+                $this->buildTransformUrl($variants[0], $options, $contents),
             );
 
             if ($response->failed()) {
@@ -93,7 +96,7 @@ class CloudflareDriver implements Driver
     /**
      * Build the Cloudflare transform URL with the given options.
      */
-    protected function buildTransformUrl(string $baseUrl, PendingImageOptions $options): string
+    protected function buildTransformUrl(string $baseUrl, PendingImageOptions $options, string $contents): string
     {
         $params = [];
 
@@ -101,11 +104,15 @@ class CloudflareDriver implements Driver
             $params[] = "w={$options->coverWidth}";
             $params[] = "h={$options->coverHeight}";
             $params[] = 'fit=cover';
-        }
-
-        if ($options->scaleWidth !== null && $options->scaleHeight !== null) {
+        } elseif ($options->scaleWidth !== null && $options->scaleHeight !== null) {
             $params[] = "w={$options->scaleWidth}";
             $params[] = "h={$options->scaleHeight}";
+            $params[] = 'fit=scale-down';
+        } else {
+            [$width, $height] = getimagesizefromstring($contents);
+
+            $params[] = "w={$width}";
+            $params[] = "h={$height}";
             $params[] = 'fit=scale-down';
         }
 
@@ -119,14 +126,6 @@ class CloudflareDriver implements Driver
 
         if ($options->quality !== null) {
             $params[] = "q={$options->quality}";
-        }
-
-        if (empty($params) && $options->orient) {
-            $params[] = 'metadata=none';
-        }
-
-        if (empty($params)) {
-            return $baseUrl;
         }
 
         // Cloudflare Images flexible variant format:
