@@ -33,7 +33,7 @@ class StatusCommand extends Command
      *
      * @return int
      */
-    public function handle(QueueManager $manager)
+    public function handle(QueueManager $manager): int
     {
         [$connection, $queue] = $this->parseQueue($this->argument('queue'));
 

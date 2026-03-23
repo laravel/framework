@@ -29,7 +29,7 @@ class ScheduleStatusCommand extends Command
      *
      * @return int
      */
-    public function handle(Cache $cache)
+    public function handle(Cache $cache): int
     {
         $isPaused = $cache->get('illuminate:schedule:paused', false);
 
