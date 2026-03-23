@@ -87,14 +87,14 @@ class CloudflareDriver implements Driver
         $params = [];
 
         if ($options->coverWidth !== null && $options->coverHeight !== null) {
-            $params[] = "width={$options->coverWidth}";
-            $params[] = "height={$options->coverHeight}";
+            $params[] = "w={$options->coverWidth}";
+            $params[] = "h={$options->coverHeight}";
             $params[] = 'fit=cover';
         }
 
         if ($options->scaleWidth !== null && $options->scaleHeight !== null) {
-            $params[] = "width={$options->scaleWidth}";
-            $params[] = "height={$options->scaleHeight}";
+            $params[] = "w={$options->scaleWidth}";
+            $params[] = "h={$options->scaleHeight}";
             $params[] = 'fit=scale-down';
         }
 
@@ -107,23 +107,23 @@ class CloudflareDriver implements Driver
         }
 
         if ($options->format !== null) {
-            $params[] = "format={$options->format}";
+            $params[] = "f={$options->format}";
         }
 
         if ($options->quality !== null) {
-            $params[] = "quality={$options->quality}";
+            $params[] = "q={$options->quality}";
         }
 
         if (empty($params) && $options->orient) {
             $params[] = 'metadata=none';
         }
 
-        $transformParams = implode(',', $params);
+        // Cloudflare Images flexible variant format:
+        // https://imagedelivery.net/{account_hash}/{image_id}/{params}
+        // The params replace the variant name (e.g. /public) in the delivery URL.
+        $variantParams = implode(',', $params);
 
-        $parsed = parse_url($baseUrl);
-        $host = $parsed['scheme'].'://'.$parsed['host'];
-
-        return "{$host}/cdn-cgi/image/{$transformParams}{$parsed['path']}";
+        return preg_replace('#/[^/]+$#', '/'.$variantParams, $baseUrl);
     }
 
     /**
