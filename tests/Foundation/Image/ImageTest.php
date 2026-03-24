@@ -575,6 +575,177 @@ class ImageTest extends TestCase
         serialize($image);
     }
 
+    public function test_pending_image_options_has_no_changes_by_default()
+    {
+        $options = new PendingImageOptions;
+
+        $this->assertFalse($options->hasChanges());
+    }
+
+    public function test_pending_image_options_has_changes_with_zero_quality()
+    {
+        $options = new PendingImageOptions;
+        $options->quality = 0;
+
+        $this->assertTrue($options->hasChanges());
+    }
+
+    public function test_pending_image_options_has_changes_with_zero_blur()
+    {
+        $options = new PendingImageOptions;
+        $options->blur = 0;
+
+        $this->assertTrue($options->hasChanges());
+    }
+
+    public function test_pending_image_options_has_changes_with_zero_sharpen()
+    {
+        $options = new PendingImageOptions;
+        $options->sharpen = 0;
+
+        $this->assertTrue($options->hasChanges());
+    }
+
+    public function test_pending_image_options_default_quality_constant()
+    {
+        $this->assertSame(75, PendingImageOptions::DEFAULT_QUALITY);
+    }
+
+    public function test_cover_sets_both_dimensions()
+    {
+        $image = $this->makeImage();
+        $result = $image->cover(300, 150);
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(300, $options->coverWidth);
+        $this->assertSame(150, $options->coverHeight);
+    }
+
+    public function test_scale_sets_both_dimensions()
+    {
+        $image = $this->makeImage();
+        $result = $image->scale(1200, 800);
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(1200, $options->scaleWidth);
+        $this->assertSame(800, $options->scaleHeight);
+    }
+
+    public function test_orient_sets_option()
+    {
+        $image = $this->makeImage();
+        $result = $image->orient();
+
+        $this->assertTrue($this->getOptions($result)->orient);
+    }
+
+    public function test_optimize_sets_both_format_and_quality()
+    {
+        $image = $this->makeImage();
+        $result = $image->optimize('jpg', 90);
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame('jpg', $options->format);
+        $this->assertSame(90, $options->quality);
+    }
+
+    public function test_optimize_throws_for_gif()
+    {
+        $this->expectException(\Illuminate\Foundation\Image\ImageException::class);
+        $this->expectExceptionMessage('The [gif] format is not supported.');
+
+        $this->makeImage()->optimize('gif');
+    }
+
+    public function test_optimize_throws_for_avif()
+    {
+        $this->expectException(\Illuminate\Foundation\Image\ImageException::class);
+        $this->expectExceptionMessage('The [avif] format is not supported.');
+
+        $this->makeImage()->optimize('avif');
+    }
+
+    public function test_optimize_allows_jpeg_spelling()
+    {
+        $image = $this->makeImage();
+        $result = $image->optimize('jpeg', 90);
+
+        $this->assertSame('jpeg', $this->getOptions($result)->format);
+    }
+
+    public function test_scale_does_not_set_cover()
+    {
+        $image = $this->makeImage();
+        $result = $image->scale(800, 600);
+
+        $options = $this->getOptions($result);
+
+        $this->assertNull($options->coverWidth);
+        $this->assertNull($options->coverHeight);
+    }
+
+    public function test_cover_does_not_set_scale()
+    {
+        $image = $this->makeImage();
+        $result = $image->cover(200, 200);
+
+        $options = $this->getOptions($result);
+
+        $this->assertNull($options->scaleWidth);
+        $this->assertNull($options->scaleHeight);
+    }
+
+    public function test_three_variants_from_same_source()
+    {
+        $image = $this->makeImage();
+
+        $a = $image->cover(100, 100);
+        $b = $image->scale(800, 600);
+        $c = $image->blur(10);
+
+        $this->assertSame(100, $this->getOptions($a)->coverWidth);
+        $this->assertNull($this->getOptions($a)->scaleWidth);
+        $this->assertNull($this->getOptions($a)->blur);
+
+        $this->assertNull($this->getOptions($b)->coverWidth);
+        $this->assertSame(800, $this->getOptions($b)->scaleWidth);
+        $this->assertNull($this->getOptions($b)->blur);
+
+        $this->assertNull($this->getOptions($c)->coverWidth);
+        $this->assertNull($this->getOptions($c)->scaleWidth);
+        $this->assertSame(10, $this->getOptions($c)->blur);
+    }
+
+    public function test_clone_resets_processed_flag()
+    {
+        $image = $this->makeImage();
+        $clone = $image->cover(100, 100);
+
+        $processed = (new \ReflectionProperty($clone, 'processed'))->getValue($clone);
+
+        $this->assertFalse($processed);
+    }
+
+    public function test_using_sets_driver_string()
+    {
+        $image = $this->makeImage();
+        $result = $image->using('custom-driver');
+
+        $driver = (new \ReflectionProperty($result, 'driver'))->getValue($result);
+
+        $this->assertSame('custom-driver', $driver);
+    }
+
+    public function test_image_exception_extends_runtime_exception()
+    {
+        $exception = new \Illuminate\Foundation\Image\ImageException('test');
+
+        $this->assertInstanceOf(\RuntimeException::class, $exception);
+    }
+
     protected function makeImage(): Image
     {
         return new Image($this->fakeImageContents());

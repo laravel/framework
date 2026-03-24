@@ -487,4 +487,240 @@ class CloudflareDriverTest extends TestCase
             return str_contains($request->url(), 'quality=90');
         });
     }
+
+    public function test_default_quality_is_sent_when_not_specified()
+    {
+        $http = new HttpFactory;
+
+        $http->fake([
+            'api.cloudflare.com/*' => $http->response([
+                'success' => true,
+                'result' => [
+                    'id' => 'img-123',
+                    'variants' => ['https://imagedelivery.net/abc/img-123/public'],
+                ],
+            ]),
+            'imagedelivery.net/*' => $http->response('bytes'),
+        ]);
+
+        $driver = new CloudflareDriver($http, 'account', 'token');
+
+        $options = new PendingImageOptions;
+        $options->coverWidth = 100;
+        $options->coverHeight = 100;
+
+        $driver->process($this->fakeImageContents(), $options);
+
+        $http->assertSent(function (Request $request) {
+            return str_contains($request->url(), 'quality=75');
+        });
+    }
+
+    public function test_jpg_format_is_mapped_to_jpeg()
+    {
+        $http = new HttpFactory;
+
+        $http->fake([
+            'api.cloudflare.com/*' => $http->response([
+                'success' => true,
+                'result' => [
+                    'id' => 'img-123',
+                    'variants' => ['https://imagedelivery.net/abc/img-123/public'],
+                ],
+            ]),
+            'imagedelivery.net/*' => $http->response('bytes'),
+        ]);
+
+        $driver = new CloudflareDriver($http, 'account', 'token');
+
+        $options = new PendingImageOptions;
+        $options->format = 'jpg';
+
+        $driver->process($this->fakeImageContents(), $options);
+
+        $http->assertSent(function (Request $request) {
+            return str_contains($request->url(), 'format=jpeg')
+                && ! str_contains($request->url(), 'format=jpg');
+        });
+    }
+
+    public function test_accept_header_for_jpg_format()
+    {
+        $http = new HttpFactory;
+
+        $http->fake([
+            'api.cloudflare.com/*' => $http->response([
+                'success' => true,
+                'result' => [
+                    'id' => 'img-123',
+                    'variants' => ['https://imagedelivery.net/abc/img-123/public'],
+                ],
+            ]),
+            'imagedelivery.net/*' => $http->response('bytes'),
+        ]);
+
+        $driver = new CloudflareDriver($http, 'account', 'token');
+
+        $options = new PendingImageOptions;
+        $options->format = 'jpg';
+
+        $driver->process($this->fakeImageContents(), $options);
+
+        $http->assertSent(function (Request $request) {
+            return $request->hasHeader('Accept', 'image/jpeg');
+        });
+    }
+
+    public function test_accept_header_uses_source_mime_when_no_format()
+    {
+        $http = new HttpFactory;
+
+        $http->fake([
+            'api.cloudflare.com/*' => $http->response([
+                'success' => true,
+                'result' => [
+                    'id' => 'img-123',
+                    'variants' => ['https://imagedelivery.net/abc/img-123/public'],
+                ],
+            ]),
+            'imagedelivery.net/*' => $http->response('bytes'),
+        ]);
+
+        $driver = new CloudflareDriver($http, 'account', 'token');
+
+        $options = new PendingImageOptions;
+        $options->coverWidth = 100;
+        $options->coverHeight = 100;
+
+        $driver->process($this->fakeImageContents(), $options);
+
+        $http->assertSent(function (Request $request) {
+            return $request->hasHeader('Accept', 'image/jpeg');
+        });
+    }
+
+    public function test_sharpen_scale_maps_100_to_10()
+    {
+        $http = new HttpFactory;
+
+        $http->fake([
+            'api.cloudflare.com/*' => $http->response([
+                'success' => true,
+                'result' => [
+                    'id' => 'img-123',
+                    'variants' => ['https://imagedelivery.net/abc/img-123/public'],
+                ],
+            ]),
+            'imagedelivery.net/*' => $http->response('bytes'),
+        ]);
+
+        $driver = new CloudflareDriver($http, 'account', 'token');
+
+        $options = new PendingImageOptions;
+        $options->sharpen = 100;
+
+        $driver->process($this->fakeImageContents(), $options);
+
+        $http->assertSent(function (Request $request) {
+            return str_contains($request->url(), 'sharpen=10');
+        });
+    }
+
+    public function test_sharpen_scale_maps_1_to_0()
+    {
+        $http = new HttpFactory;
+
+        $http->fake([
+            'api.cloudflare.com/*' => $http->response([
+                'success' => true,
+                'result' => [
+                    'id' => 'img-123',
+                    'variants' => ['https://imagedelivery.net/abc/img-123/public'],
+                ],
+            ]),
+            'imagedelivery.net/*' => $http->response('bytes'),
+        ]);
+
+        $driver = new CloudflareDriver($http, 'account', 'token');
+
+        $options = new PendingImageOptions;
+        $options->sharpen = 1;
+
+        $driver->process($this->fakeImageContents(), $options);
+
+        $http->assertSent(function (Request $request) {
+            return str_contains($request->url(), 'sharpen=0');
+        });
+    }
+
+    public function test_original_dimensions_used_when_no_cover_or_scale()
+    {
+        $http = new HttpFactory;
+
+        $http->fake([
+            'api.cloudflare.com/*' => $http->response([
+                'success' => true,
+                'result' => [
+                    'id' => 'img-123',
+                    'variants' => ['https://imagedelivery.net/abc/img-123/public'],
+                ],
+            ]),
+            'imagedelivery.net/*' => $http->response('bytes'),
+        ]);
+
+        $driver = new CloudflareDriver($http, 'account', 'token');
+
+        $options = new PendingImageOptions;
+        $options->blur = 10;
+
+        $driver->process($this->fakeImageContents(300, 200), $options);
+
+        $http->assertSent(function (Request $request) {
+            return str_contains($request->url(), 'width=300')
+                && str_contains($request->url(), 'height=200')
+                && str_contains($request->url(), 'fit=scale-down');
+        });
+    }
+
+    public function test_all_options_combined_in_url()
+    {
+        $http = new HttpFactory;
+
+        $http->fake([
+            'api.cloudflare.com/*' => $http->response([
+                'success' => true,
+                'result' => [
+                    'id' => 'img-123',
+                    'variants' => ['https://imagedelivery.net/abc/img-123/public'],
+                ],
+            ]),
+            'imagedelivery.net/*' => $http->response('bytes'),
+        ]);
+
+        $driver = new CloudflareDriver($http, 'account', 'token');
+
+        $options = new PendingImageOptions;
+        $options->coverWidth = 200;
+        $options->coverHeight = 200;
+        $options->blur = 5;
+        $options->greyscale = true;
+        $options->sharpen = 50;
+        $options->flip = true;
+        $options->format = 'webp';
+        $options->quality = 80;
+
+        $driver->process($this->fakeImageContents(), $options);
+
+        $http->assertSent(function (Request $request) {
+            return str_contains($request->url(), 'width=200')
+                && str_contains($request->url(), 'height=200')
+                && str_contains($request->url(), 'fit=cover')
+                && str_contains($request->url(), 'blur=5')
+                && str_contains($request->url(), 'saturation=0')
+                && str_contains($request->url(), 'sharpen=5')
+                && str_contains($request->url(), 'flip=v')
+                && str_contains($request->url(), 'format=webp')
+                && str_contains($request->url(), 'quality=80');
+        });
+    }
 }
