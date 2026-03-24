@@ -194,9 +194,15 @@ class Image
     public function toBytes(): string
     {
         if ($this->options->hasChanges() && ! $this->processed) {
-            $this->contents = $this->resolveDriver()->process(
-                value($this->contents), $this->options
-            );
+            try {
+                $this->contents = $this->resolveDriver()->process(
+                    value($this->contents), $this->options
+                );
+            } catch (ImageException $e) {
+                throw $e;
+            } catch (\Throwable $e) {
+                throw new ImageException("Failed to process image: {$e->getMessage()}", 0, $e);
+            }
 
             $this->processed = true;
         }

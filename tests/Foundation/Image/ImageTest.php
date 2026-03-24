@@ -303,6 +303,31 @@ class ImageTest extends TestCase
         $this->assertSame(5, $this->getOptions($result)->blur);
     }
 
+    public function test_driver_exception_is_wrapped_in_image_exception()
+    {
+        $image = new Image('not-a-valid-image');
+
+        $this->expectException(\Illuminate\Foundation\Image\ImageException::class);
+        $this->expectExceptionMessage('Failed to process image:');
+
+        $image->cover(100, 100)->toBytes();
+    }
+
+    public function test_wrapped_exception_preserves_original()
+    {
+        $image = new Image('not-a-valid-image');
+
+        try {
+            $image->cover(100, 100)->toBytes();
+        } catch (\Illuminate\Foundation\Image\ImageException $e) {
+            $this->assertNotNull($e->getPrevious());
+
+            return;
+        }
+
+        $this->fail('ImageException was not thrown.');
+    }
+
     protected function makeImage(): Image
     {
         return new Image($this->fakeImageContents());
