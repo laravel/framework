@@ -1,6 +1,29 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.1.1...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.2.0...13.x)
+
+## [v13.2.0](https://github.com/laravel/framework/compare/v13.1.1...v13.2.0) - 2026-03-24
+
+* feat(queue): support enums in `#[Queue]` and `#[Connection]` by [@innocenzi](https://github.com/innocenzi) in https://github.com/laravel/framework/pull/59278
+* Improve raw SQL binding substitution performance by [@gufoe](https://github.com/gufoe) in https://github.com/laravel/framework/pull/59277
+* [13.x] fix: add missing negate for SeeInHtml assertion by [@jesperbeisner](https://github.com/jesperbeisner) in https://github.com/laravel/framework/pull/59303
+* [13.x] Allow for passing enums to attributes by [@riesjart](https://github.com/riesjart) in https://github.com/laravel/framework/pull/59297
+* [13.x] Add releaseOnSignal param to withoutOverlapping by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59298
+* Add symmetrical, expressive attributes by [@jasonmccreary](https://github.com/jasonmccreary) in https://github.com/laravel/framework/pull/59284
+* [13.x] Fix LazyPromise::wait() signature compatibility with Guzzle's PromiseInterface by [@shavonn](https://github.com/shavonn) in https://github.com/laravel/framework/pull/59301
+* [13.x] `schedule:list` display expression in the correct timezone by [@xiCO2k](https://github.com/xiCO2k) in https://github.com/laravel/framework/pull/59286
+* Handle exceptions in eventStream to prevent fatal error by [@WendellAdriel](https://github.com/WendellAdriel) in https://github.com/laravel/framework/pull/59292
+* [13.x] Ensure connectUsing works with UnitEnum / FileManager drive docblock by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59306
+* [13.x] Include columns and index in UniqueConstraintViolationException by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/59299
+* [13.x] Add TimedOut worker stop reason by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59310
+* Fix Table attribute incrementing not working for Pivot models by [@sadique-cws](https://github.com/sadique-cws) in https://github.com/laravel/framework/pull/59336
+* [13.x] Ensure ScopedBy Attribute works with inheritance by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59332
+* Modify sum callback to include item key by [@mathieutu](https://github.com/mathieutu) in https://github.com/laravel/framework/pull/59322
+* [13.x] Bound error page query listener to prevent memory bloat in Octane by [@JoshSalway](https://github.com/JoshSalway) in https://github.com/laravel/framework/pull/59309
+* [13.x] Allow opting out of worker Job exception reporting by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59308
+* [13.x] Adds mobile safe-area-inset support to exception renderer by [@dr-codswallop](https://github.com/dr-codswallop) in https://github.com/laravel/framework/pull/59341
+* [13.x] Allow passing multiple arrays to has factory method by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59343
+* [13.x] Allow Backoff Attribute to be variadic by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59354
 
 ## [v13.1.1](https://github.com/laravel/framework/compare/v13.1.0...v13.1.1) - 2026-03-18
 
