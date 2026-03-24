@@ -429,6 +429,133 @@ class ImageTest extends TestCase
         $this->assertSame(100, $height);
     }
 
+    public function test_store_as_with_name_only()
+    {
+        Storage::fake('local');
+
+        $image = new Image($this->fakeImageContents(100, 100));
+
+        $image->storeAs('avatar.jpg', options: 'local');
+
+        Storage::disk('local')->assertExists('avatar.jpg');
+    }
+
+    public function test_store_publicly_sets_visibility()
+    {
+        Storage::fake('local');
+
+        $image = new Image($this->fakeImageContents(100, 100));
+
+        $image->toWebp()->storePublicly('images', 'local');
+
+        $files = Storage::disk('local')->files('images');
+
+        $this->assertCount(1, $files);
+    }
+
+    public function test_store_publicly_as()
+    {
+        Storage::fake('local');
+
+        $image = new Image($this->fakeImageContents(100, 100));
+
+        $image->toWebp()->storePubliclyAs('images', 'public-avatar.webp', 'local');
+
+        Storage::disk('local')->assertExists('images/public-avatar.webp');
+    }
+
+    public function test_store_with_empty_path()
+    {
+        Storage::fake('local');
+
+        $image = new Image($this->fakeImageContents(100, 100));
+
+        $image->store('', 'local');
+
+        $files = Storage::disk('local')->allFiles();
+
+        $this->assertCount(1, $files);
+        $this->assertStringEndsWith('.jpg', $files[0]);
+    }
+
+    public function test_hash_name_changes_extension_after_format_conversion()
+    {
+        $image = new Image($this->fakeImageContents(100, 100));
+
+        $jpgName = $image->hashName();
+        $webpName = $image->toWebp()->hashName();
+
+        $this->assertStringEndsWith('.jpg', $jpgName);
+        $this->assertStringEndsWith('.webp', $webpName);
+    }
+
+    public function test_to_jpg_conversion()
+    {
+        $image = new Image($this->fakeImageContents(100, 100));
+
+        $result = $image->toJpg()->toBytes();
+
+        $this->assertSame(IMAGETYPE_JPEG, getimagesizefromstring($result)[2]);
+    }
+
+    public function test_to_jpeg_alias_works()
+    {
+        $image = new Image($this->fakeImageContents(100, 100));
+
+        $result = $image->toJpeg()->toBytes();
+
+        $this->assertSame(IMAGETYPE_JPEG, getimagesizefromstring($result)[2]);
+    }
+
+    public function test_optimize_shortcut_produces_webp()
+    {
+        $image = new Image($this->fakeImageContents(100, 100));
+
+        $result = $image->optimize()->toBytes();
+
+        $this->assertSame(IMAGETYPE_WEBP, getimagesizefromstring($result)[2]);
+    }
+
+    public function test_orient_does_not_change_dimensions_on_non_rotated_image()
+    {
+        $image = new Image($this->fakeImageContents(300, 200));
+
+        $result = $image->orient();
+
+        $this->assertSame(300, $result->width());
+        $this->assertSame(200, $result->height());
+    }
+
+    public function test_greyscale_does_not_change_dimensions()
+    {
+        $image = new Image($this->fakeImageContents(200, 150));
+
+        $result = $image->greyscale();
+
+        $this->assertSame(200, $result->width());
+        $this->assertSame(150, $result->height());
+    }
+
+    public function test_quality_alone_changes_file_size()
+    {
+        $image = new Image($this->fakeImageContents(200, 200));
+
+        $default = $image->toBytes();
+        $low = $image->quality(1)->toBytes();
+
+        $this->assertNotSame(strlen($default), strlen($low));
+    }
+
+    public function test_request_image_returns_image_with_file()
+    {
+        $file = UploadedFile::fake()->image('avatar.jpg', 100, 100);
+        $image = new Image(fn () => $file->getContent(), $file);
+
+        $this->assertNotNull($image->file());
+        $this->assertSame('avatar.jpg', $image->file()->getClientOriginalName());
+        $this->assertSame([100, 100], $image->dimensions());
+    }
+
     protected function fakeImageContents(int $width = 100, int $height = 100): string
     {
         $file = UploadedFile::fake()->image('test.jpg', $width, $height);
