@@ -8,7 +8,6 @@ use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\AttributeBasedU
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\ConfigureOverridesAttributeResource;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\MethodOverridesAttributeResource;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
-use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Profile;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\PropertyOverridesAttributeResource;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\ResourceWithCustomWrap;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\ResourceWithJsonApiInfo;
