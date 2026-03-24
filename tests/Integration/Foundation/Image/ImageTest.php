@@ -556,6 +556,70 @@ class ImageTest extends TestCase
         $this->assertSame([100, 100], $image->dimensions());
     }
 
+    public function test_format_conversion_does_not_change_dimensions()
+    {
+        $image = new Image($this->fakeImageContents(300, 200));
+
+        $webp = $image->toWebp()->toBytes();
+        $jpg = $image->toJpg()->toBytes();
+
+        [$webpWidth, $webpHeight] = getimagesizefromstring($webp);
+        [$jpgWidth, $jpgHeight] = getimagesizefromstring($jpg);
+
+        $this->assertSame(300, $webpWidth);
+        $this->assertSame(200, $webpHeight);
+        $this->assertSame(300, $jpgWidth);
+        $this->assertSame(200, $jpgHeight);
+    }
+
+    public function test_quality_does_not_change_dimensions()
+    {
+        $image = new Image($this->fakeImageContents(300, 200));
+
+        $result = $image->quality(50)->toBytes();
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(300, $width);
+        $this->assertSame(200, $height);
+    }
+
+    public function test_quality_and_format_does_not_change_dimensions()
+    {
+        $image = new Image($this->fakeImageContents(300, 200));
+
+        $result = $image->quality(90)->toWebp()->toBytes();
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(300, $width);
+        $this->assertSame(200, $height);
+    }
+
+    public function test_scale_down_does_not_upscale()
+    {
+        $image = new Image($this->fakeImageContents(100, 80));
+
+        $result = $image->scale(800, 600)->toBytes();
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(100, $width);
+        $this->assertSame(80, $height);
+    }
+
+    public function test_scale_down_shrinks_larger_images()
+    {
+        $image = new Image($this->fakeImageContents(800, 600));
+
+        $result = $image->scale(400, 400)->toBytes();
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(400, $width);
+        $this->assertSame(300, $height);
+    }
+
     protected function fakeImageContents(int $width = 100, int $height = 100): string
     {
         $file = UploadedFile::fake()->image('test.jpg', $width, $height);

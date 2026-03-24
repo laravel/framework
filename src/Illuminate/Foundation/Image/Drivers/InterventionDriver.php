@@ -67,7 +67,7 @@ abstract class InterventionDriver implements Driver
         }
 
         if ($options->scaleWidth !== null) {
-            $image = $image->scale($options->scaleWidth, $options->scaleHeight);
+            $image = $image->scaleDown($options->scaleWidth, $options->scaleHeight);
         }
 
         if ($options->blur !== null) {
