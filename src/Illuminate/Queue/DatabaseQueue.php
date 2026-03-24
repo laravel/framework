@@ -45,6 +45,13 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     protected $retryAfter = 60;
 
     /**
+     * The cached lock type for popping jobs.
+     *
+     * @var string|bool|null
+     */
+    protected $lockForPopping = null;
+
+    /**
      * Create a new database queue instance.
      *
      * @param  \Illuminate\Database\Connection  $database
@@ -338,6 +345,10 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      */
     protected function getLockForPopping()
     {
+        if ($this->lockForPopping !== null) {
+            return $this->lockForPopping;
+        }
+
         $databaseEngine = $this->database->getPdo()->getAttribute(PDO::ATTR_DRIVER_NAME);
         $databaseVersion = $this->database->getConfig('version') ?? $this->database->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
 
@@ -354,14 +365,14 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
             ($databaseEngine === 'pgsql' && version_compare($databaseVersion, '9.5', '>=')) ||
             ($databaseEngine === 'vitess' && version_compare($databaseVersion, '19.0', '>='))
         ) {
-            return 'FOR UPDATE SKIP LOCKED';
+            return $this->lockForPopping = 'FOR UPDATE SKIP LOCKED';
         }
 
         if ($databaseEngine === 'sqlsrv') {
-            return 'with(rowlock,updlock,readpast)';
+            return $this->lockForPopping = 'with(rowlock,updlock,readpast)';
         }
 
-        return true;
+        return $this->lockForPopping = true;
     }
 
     /**
