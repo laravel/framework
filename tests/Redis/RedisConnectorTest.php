@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Redis;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\RedisManager;
+use Illuminate\Support\Env;
 use PHPUnit\Framework\TestCase;
 use Redis;
 
@@ -27,8 +28,8 @@ class RedisConnectorTest extends TestCase
 
     public function testDefaultConfiguration()
     {
-        $host = env('REDIS_HOST', '127.0.0.1');
-        $port = env('REDIS_PORT', 6379);
+        $host = Env::get('REDIS_HOST', '127.0.0.1');
+        $port = Env::get('REDIS_PORT', 6379);
 
         $predisClient = $this->redis['predis']->connection()->client();
         $parameters = $predisClient->getConnection()->getParameters();
@@ -44,8 +45,8 @@ class RedisConnectorTest extends TestCase
 
     public function testUrl()
     {
-        $host = env('REDIS_HOST', '127.0.0.1');
-        $port = env('REDIS_PORT', 6379);
+        $host = Env::get('REDIS_HOST', '127.0.0.1');
+        $port = Env::get('REDIS_PORT', 6379);
 
         $predis = new RedisManager(new Application, 'predis', [
             'cluster' => false,
@@ -82,8 +83,8 @@ class RedisConnectorTest extends TestCase
 
     public function testUrlWithScheme()
     {
-        $host = env('REDIS_HOST', '127.0.0.1');
-        $port = env('REDIS_PORT', 6379);
+        $host = Env::get('REDIS_HOST', '127.0.0.1');
+        $port = Env::get('REDIS_PORT', 6379);
 
         $predis = new RedisManager(new Application, 'predis', [
             'cluster' => false,
@@ -120,8 +121,8 @@ class RedisConnectorTest extends TestCase
 
     public function testScheme()
     {
-        $host = env('REDIS_HOST', '127.0.0.1');
-        $port = env('REDIS_PORT', 6379);
+        $host = Env::get('REDIS_HOST', '127.0.0.1');
+        $port = Env::get('REDIS_PORT', 6379);
 
         $predis = new RedisManager(new Application, 'predis', [
             'cluster' => false,
@@ -162,8 +163,8 @@ class RedisConnectorTest extends TestCase
 
     public function testPredisConfigurationWithUsername()
     {
-        $host = env('REDIS_HOST', '127.0.0.1');
-        $port = env('REDIS_PORT', 6379);
+        $host = Env::get('REDIS_HOST', '127.0.0.1');
+        $port = Env::get('REDIS_PORT', 6379);
         $username = 'testuser';
         $password = 'testpw';
 
@@ -185,8 +186,8 @@ class RedisConnectorTest extends TestCase
 
     public function testPredisConfigurationWithSentinel()
     {
-        $host = env('REDIS_HOST', '127.0.0.1');
-        $port = env('REDIS_PORT', 6379);
+        $host = Env::get('REDIS_HOST', '127.0.0.1');
+        $port = Env::get('REDIS_PORT', 6379);
 
         $predis = new RedisManager(new Application, 'predis', [
             'cluster' => false,
@@ -211,8 +212,8 @@ class RedisConnectorTest extends TestCase
 
     public function testPhpRedisTcpKeepalive()
     {
-        $host = env('REDIS_HOST', '127.0.0.1');
-        $port = env('REDIS_PORT', 6379);
+        $host = Env::get('REDIS_HOST', '127.0.0.1');
+        $port = Env::get('REDIS_PORT', 6379);
 
         $phpRedis = new RedisManager(new Application, 'phpredis', [
             'cluster' => false,
@@ -231,8 +232,8 @@ class RedisConnectorTest extends TestCase
 
     public function testPrefixOverrideBehaviour()
     {
-        $host = env('REDIS_HOST', '127.0.0.1');
-        $port = env('REDIS_PORT', 6379);
+        $host = Env::get('REDIS_HOST', '127.0.0.1');
+        $port = Env::get('REDIS_PORT', 6379);
 
         $predis1 = new RedisManager(new Application, 'predis', [
             'cluster' => false,

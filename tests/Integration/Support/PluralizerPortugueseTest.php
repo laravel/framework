@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Support;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Pluralizer;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
@@ -79,9 +80,9 @@ class PluralizerPortugueseTest extends TestCase
 
     public function testPluralSupportsCollections()
     {
-        $this->assertSame('usuários', Str::plural('usuário', collect()));
-        $this->assertSame('usuário', Str::plural('usuário', collect(['um'])));
-        $this->assertSame('usuários', Str::plural('usuário', collect(['um', 'dois'])));
+        $this->assertSame('usuários', Str::plural('usuário', new Collection));
+        $this->assertSame('usuário', Str::plural('usuário', new Collection(['um'])));
+        $this->assertSame('usuários', Str::plural('usuário', new Collection(['um', 'dois'])));
     }
 
     public function testPluralStudlySupportsArrays()
@@ -93,9 +94,9 @@ class PluralizerPortugueseTest extends TestCase
 
     public function testPluralStudlySupportsCollections()
     {
-        $this->assertPluralStudly('AlgumUsuários', 'AlgumUsuário', collect());
-        $this->assertPluralStudly('AlgumUsuário', 'AlgumUsuário', collect(['um']));
-        $this->assertPluralStudly('AlgumUsuários', 'AlgumUsuário', collect(['um', 'dois']));
+        $this->assertPluralStudly('AlgumUsuários', 'AlgumUsuário', new Collection);
+        $this->assertPluralStudly('AlgumUsuário', 'AlgumUsuário', new Collection(['um']));
+        $this->assertPluralStudly('AlgumUsuários', 'AlgumUsuário', new Collection(['um', 'dois']));
     }
 
     private function assertPluralStudly($expected, $value, $count = 2)

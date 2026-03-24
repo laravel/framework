@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
+use Illuminate\Support\Env;
 use Memcached;
 use Orchestra\Testbench\TestCase;
 
@@ -15,8 +16,8 @@ abstract class MemcachedIntegrationTestCase extends TestCase
         $testConnection = new Memcached;
 
         $testConnection->addServer(
-            env('MEMCACHED_HOST', '127.0.0.1'),
-            env('MEMCACHED_PORT', 11211)
+            Env::get('MEMCACHED_HOST', '127.0.0.1'),
+            Env::get('MEMCACHED_PORT', 11211)
         );
 
         $testConnection->getVersion();

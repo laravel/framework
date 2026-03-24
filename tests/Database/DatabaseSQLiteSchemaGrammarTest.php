@@ -10,6 +10,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Database\Schema\SQLiteBuilder;
+use Illuminate\Support\Collection;
 use Illuminate\Tests\Database\Fixtures\Enums\Foo;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -182,7 +183,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         });
 
         $this->assertFalse($schema->hasIndex('users', 'index1'));
-        $this->assertTrue(collect($schema->getIndexes('users'))->contains(
+        $this->assertTrue((new Collection($schema->getIndexes('users')))->contains(
             fn ($index) => $index['name'] === 'index2' && $index['columns'] === ['name', 'email']
         ));
     }

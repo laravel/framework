@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -867,7 +868,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         );
 
         // Test syncing with a BaseCollection of models
-        $tagCollection = collect([$tag3, $tag4]);
+        $tagCollection = new BaseCollection([$tag3, $tag4]);
 
         $post->tags()->sync($tagCollection);
 
@@ -915,7 +916,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         DB::enableQueryLog();
 
-        foreach ([collect(), [], null] as $value) {
+        foreach ([new BaseCollection, [], null] as $value) {
             $result = $post->tags()->sync($value, false);
 
             $this->assertEquals([

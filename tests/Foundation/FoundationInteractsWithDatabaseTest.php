@@ -9,6 +9,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
 use Illuminate\Foundation\Testing\TestCase as TestingTestCase;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Mockery as m;
 use Orchestra\Testbench\Concerns\CreatesApplication;
@@ -68,7 +69,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder = $this->mockCountBuilder(false);
 
-        $builder->shouldReceive('get')->andReturn(collect());
+        $builder->shouldReceive('get')->andReturn(new Collection);
 
         $this->assertDatabaseHas($this->table, $this->data);
     }
@@ -82,7 +83,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $builder = $this->mockCountBuilder(false);
 
         $builder->shouldReceive('limit')->andReturnSelf();
-        $builder->shouldReceive('get')->andReturn(collect([['title' => 'Forge']]));
+        $builder->shouldReceive('get')->andReturn(new Collection([['title' => 'Forge']]));
 
         $this->assertDatabaseHas($this->table, $this->data);
     }
@@ -97,7 +98,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder->shouldReceive('limit')->andReturnSelf();
         $builder->shouldReceive('get')->andReturn(
-            collect(array_fill(0, 3, 'data'))
+            new Collection(array_fill(0, 3, 'data'))
         );
 
         $this->assertDatabaseHas($this->table, $this->data);
@@ -138,7 +139,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $builder = $this->mockCountBuilder(true);
 
         $builder->shouldReceive('limit')->andReturnSelf();
-        $builder->shouldReceive('get')->andReturn(collect([$this->data]));
+        $builder->shouldReceive('get')->andReturn(new Collection([$this->data]));
 
         $this->assertDatabaseMissing($this->table, $this->data);
     }
@@ -188,7 +189,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder = $this->mockCountBuilder(true);
 
-        $builder->shouldReceive('get')->andReturn(collect([$this->data]));
+        $builder->shouldReceive('get')->andReturn(new Collection([$this->data]));
 
         $this->assertDatabaseMissing($this->table, $this->data);
     }
@@ -199,7 +200,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder = $this->mockCountBuilder(false);
 
-        $builder->shouldReceive('get')->andReturn(collect());
+        $builder->shouldReceive('get')->andReturn(new Collection);
 
         $this->assertModelMissing(new ProductStub($this->data));
     }
@@ -225,7 +226,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder = $this->mockCountBuilder(false);
 
-        $builder->shouldReceive('get')->andReturn(collect());
+        $builder->shouldReceive('get')->andReturn(new Collection);
 
         $this->assertSoftDeleted($this->table, $this->data);
     }
@@ -239,7 +240,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder = $this->mockCountBuilder(false);
 
-        $builder->shouldReceive('get')->andReturn(collect());
+        $builder->shouldReceive('get')->andReturn(new Collection);
 
         $this->assertSoftDeleted(new ProductStub($this->data));
     }
@@ -254,7 +255,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder = $this->mockCountBuilder(false, 'trashed_at');
 
-        $builder->shouldReceive('get')->andReturn(collect());
+        $builder->shouldReceive('get')->andReturn(new Collection);
 
         $this->assertSoftDeleted($model, ['name' => 'Tailwind']);
     }
@@ -269,7 +270,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder = $this->mockCountBuilder(false, 'trashed_at');
 
-        $builder->shouldReceive('get')->andReturn(collect());
+        $builder->shouldReceive('get')->andReturn(new Collection);
 
         $this->assertSoftDeleted(CustomProductStub::class, ['id' => $model->id]);
     }
@@ -295,7 +296,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder = $this->mockCountBuilder(false);
 
-        $builder->shouldReceive('get')->andReturn(collect(), collect(1));
+        $builder->shouldReceive('get')->andReturn(new Collection, new Collection(1));
 
         $this->assertNotSoftDeleted(ProductStub::class, $this->data);
     }
@@ -307,7 +308,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder = $this->mockCountBuilder(false);
 
-        $builder->shouldReceive('get')->andReturn(collect());
+        $builder->shouldReceive('get')->andReturn(new Collection);
 
         $this->assertNotSoftDeleted($this->table, $this->data);
     }
@@ -321,7 +322,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder = $this->mockCountBuilder(false);
 
-        $builder->shouldReceive('get')->andReturn(collect());
+        $builder->shouldReceive('get')->andReturn(new Collection);
 
         $this->assertNotSoftDeleted(new ProductStub($this->data));
     }
@@ -336,7 +337,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder = $this->mockCountBuilder(false, 'trashed_at');
 
-        $builder->shouldReceive('get')->andReturn(collect());
+        $builder->shouldReceive('get')->andReturn(new Collection);
 
         $this->assertNotSoftDeleted($model, ['name' => 'Tailwind']);
     }
@@ -351,7 +352,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder = $this->mockCountBuilder(false, 'trashed_at');
 
-        $builder->shouldReceive('get')->andReturn(collect());
+        $builder->shouldReceive('get')->andReturn(new Collection);
 
         $this->assertNotSoftDeleted(CustomProductStub::class, ['id' => $model->id]);
     }
@@ -362,7 +363,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder = $this->mockCountBuilder(true);
 
-        $builder->shouldReceive('get')->andReturn(collect($this->data));
+        $builder->shouldReceive('get')->andReturn(new Collection($this->data));
 
         $this->assertModelExists(new ProductStub($this->data));
     }

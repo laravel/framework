@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 use LogicException;
 use Mockery as m;
@@ -28,11 +29,11 @@ class EloquentMassPrunableTest extends DatabaseTestCase
 
     protected function afterRefreshingDatabase()
     {
-        collect([
+        (new Collection([
             'mass_prunable_test_models',
             'mass_prunable_soft_delete_test_models',
             'mass_prunable_test_model_missing_prunable_methods',
-        ])->each(function ($table) {
+        ]))->each(function ($table) {
             Schema::create($table, function (Blueprint $table) {
                 $table->increments('id');
                 $table->string('name')->nullable();
@@ -60,7 +61,7 @@ class EloquentMassPrunableTest extends DatabaseTestCase
             ->times(2)
             ->with(m::type(ModelsPruned::class));
 
-        collect(range(1, 5000))->map(function ($id) {
+        (new Collection(range(1, 5000)))->map(function ($id) {
             return ['name' => 'foo'];
         })->chunk(200)->each(function ($chunk) {
             MassPrunableTestModel::insert($chunk->all());
@@ -79,7 +80,7 @@ class EloquentMassPrunableTest extends DatabaseTestCase
             ->times(3)
             ->with(m::type(ModelsPruned::class));
 
-        collect(range(1, 5000))->map(function ($id) {
+        (new Collection(range(1, 5000)))->map(function ($id) {
             return ['deleted_at' => Carbon::now()];
         })->chunk(200)->each(function ($chunk) {
             MassPrunableSoftDeleteTestModel::insert($chunk->all());

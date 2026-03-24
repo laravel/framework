@@ -929,13 +929,13 @@ class LazyZebra extends LazyAnimal
 class LazyZoo
 {
     /**
-     * @var \Illuminate\Support\Collection<int, LazyAnimal>
+     * @var Collection<int, LazyAnimal>
      */
     private Collection $animals;
 
     public function __construct()
     {
-        $this->animals = collect([
+        $this->animals = new Collection([
             new LazyTiger,
             new LazyLion,
             new LazyZebra,

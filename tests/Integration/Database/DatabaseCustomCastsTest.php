@@ -43,7 +43,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
 
         $model->array_object = ['name' => 'Taylor'];
         $model->array_object_json = ['name' => 'Taylor'];
-        $model->collection = collect(['name' => 'Taylor']);
+        $model->collection = new Collection(['name' => 'Taylor']);
         $model->stringable = new Stringable('Taylor');
         $model->password = Hash::make('secret');
 
@@ -91,7 +91,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $model = TestEloquentModelWithCustomCasts::create([
             'array_object' => ['name' => 'Taylor'],
             'array_object_json' => ['name' => 'Taylor'],
-            'collection' => collect(['name' => 'Taylor']),
+            'collection' => new Collection(['name' => 'Taylor']),
             'stringable' => new Stringable('Taylor'),
             'password' => Hash::make('secret'),
         ]);
@@ -113,7 +113,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
 
         $model->array_object = null;
         $model->array_object_json = null;
-        $model->collection = collect();
+        $model->collection = new Collection;
         $model->stringable = null;
 
         $model->save();

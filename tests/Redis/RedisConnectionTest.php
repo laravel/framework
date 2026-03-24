@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Connections\Connection;
 use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\RedisManager;
+use Illuminate\Support\Env;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Predis\Client;
@@ -801,8 +802,8 @@ class RedisConnectionTest extends TestCase
             'phpredis' => $this->redis['phpredis']->connection(),
         ];
 
-        $host = env('REDIS_HOST', '127.0.0.1');
-        $port = env('REDIS_PORT', 6379);
+        $host = Env::get('REDIS_HOST', '127.0.0.1');
+        $port = Env::get('REDIS_PORT', 6379);
 
         $connections[] = (new RedisManager(new Application, 'phpredis', [
             'cluster' => false,

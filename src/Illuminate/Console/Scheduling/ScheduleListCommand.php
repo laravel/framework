@@ -96,7 +96,7 @@ class ScheduleListCommand extends Command
                 }
             }
 
-            return collect(CronExpressionTimezoneConverter::forEvent($event, $timezone))->map(fn ($expression) => [
+            return (new Collection(CronExpressionTimezoneConverter::forEvent($event, $timezone)))->map(fn ($expression) => [
                 'expression' => $expression,
                 'command' => $command,
                 'description' => $event->description ?? null,
@@ -126,7 +126,7 @@ class ScheduleListCommand extends Command
         $repeatExpressionSpacing = $this->getRepeatExpressionSpacing($events);
 
         $events = $events->flatMap(function ($event) use ($terminalWidth, $expressionSpacing, $repeatExpressionSpacing, $timezone) {
-            return collect(CronExpressionTimezoneConverter::forEvent($event, $timezone))->map(
+            return (new Collection(CronExpressionTimezoneConverter::forEvent($event, $timezone)))->map(
                 fn ($expression) => $this->listEvent($event, $terminalWidth, $expressionSpacing, $repeatExpressionSpacing, $timezone, $expression)
             );
         });
@@ -144,7 +144,7 @@ class ScheduleListCommand extends Command
      */
     private function getCronExpressionSpacing($events, DateTimeZone $timezone)
     {
-        $rows = $events->flatMap(fn ($event) => collect(CronExpressionTimezoneConverter::forEvent($event, $timezone))
+        $rows = $events->flatMap(fn ($event) => (new Collection(CronExpressionTimezoneConverter::forEvent($event, $timezone)))
             ->map(fn ($expression) => array_map(mb_strlen(...), preg_split("/\s+/", $expression))));
 
         return (new Collection($rows[0] ?? []))->keys()->map(fn ($key) => $rows->max($key))->all();
@@ -248,7 +248,7 @@ class ScheduleListCommand extends Command
      * @param  \DateTimeZone  $timezone
      * @return \Illuminate\Support\Collection
      */
-    private function sortEvents(\Illuminate\Support\Collection $events, DateTimeZone $timezone)
+    private function sortEvents(Collection $events, DateTimeZone $timezone)
     {
         return $this->option('next')
             ? $events->sortBy(fn ($event) => $this->getNextDueDateForEvent($event, $timezone))

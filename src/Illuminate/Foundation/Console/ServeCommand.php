@@ -97,14 +97,14 @@ class ServeCommand extends Command
     #[\Override]
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
-        $this->phpServerWorkers = transform((int) env('PHP_CLI_SERVER_WORKERS', 1), function (int $workers) {
+        $this->phpServerWorkers = transform((int) Env::get('PHP_CLI_SERVER_WORKERS', 1), function (int $workers) {
             if ($workers < 2) {
                 return false;
             }
 
             if ($workers > 1 &&
                 ! $this->option('no-reload') &&
-                ! (int) env('LARAVEL_SAIL', 0)) {
+                ! (int) Env::get('LARAVEL_SAIL', 0)) {
                 $this->components->warn('Unable to respect the `PHP_CLI_SERVER_WORKERS` environment variable without the `--no-reload` flag. Only creating a single server.');
 
                 return false;

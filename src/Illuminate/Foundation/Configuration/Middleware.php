@@ -657,7 +657,7 @@ class Middleware
      */
     public function trimStrings(array $except = [])
     {
-        [$skipWhen, $except] = (new Collection($except))->partition(fn ($value) => $value instanceof Closure);
+        [$skipWhen, $except] = (new Collection($except))->partition(fn ($value) => $value instanceof Closure)->all();
 
         $skipWhen->each(fn (Closure $callback) => TrimStrings::skipWhen($callback));
 

@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Cache;
 use Aws\DynamoDb\DynamoDbClient;
 use Aws\Exception\AwsException;
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\Attributes\RequiresEnv;
@@ -67,7 +68,7 @@ class DynamoDbStoreTest extends TestCase
      */
     protected function defineEnvironment($app)
     {
-        if (! env('DYNAMODB_CACHE_TABLE')) {
+        if (! Env::get('DYNAMODB_CACHE_TABLE')) {
             $this->markTestSkipped('DynamoDB not configured.');
         }
 

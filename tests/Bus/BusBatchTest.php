@@ -25,6 +25,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Queue;
@@ -165,7 +166,7 @@ class BusBatchTest extends TestCase
 
     public function test_jobs_can_be_added_to_pending_batch()
     {
-        $batch = new PendingBatch(new Container, collect());
+        $batch = new PendingBatch(new Container, new Collection);
         $this->assertCount(0, $batch->jobs);
 
         $job = new class
@@ -187,7 +188,7 @@ class BusBatchTest extends TestCase
 
     public function test_jobs_can_be_added_to_the_pending_batch_from_iterable()
     {
-        $batch = new PendingBatch(new Container, collect());
+        $batch = new PendingBatch(new Container, new Collection);
         $this->assertCount(0, $batch->jobs);
 
         $count = 3;
@@ -379,7 +380,7 @@ class BusBatchTest extends TestCase
             use Batchable;
         };
 
-        $jobsWithNulls = collect([$job, null, $secondJob, [], 0, '', false]);
+        $jobsWithNulls = new Collection([$job, null, $secondJob, [], 0, '', false]);
 
         $batch = new PendingBatch(new Container, $jobsWithNulls);
 
@@ -394,7 +395,7 @@ class BusBatchTest extends TestCase
 
         $repository = new DatabaseBatchRepository(new BatchFactory($queue), DB::connection(), 'job_batches');
 
-        $pendingBatch = (new PendingBatch(new Container, collect()))
+        $pendingBatch = (new PendingBatch(new Container, new Collection))
             ->allowFailures([
                 static fn (Batch $batch, $e): true => $_SERVER['__failure1.invoked'] = true,
                 function (Batch $batch, $e) {
@@ -572,7 +573,7 @@ class BusBatchTest extends TestCase
         $repository = new DatabaseBatchRepository(new BatchFactory($queue), DB::connection(), 'job_batches');
 
         // Create a batch WITHOUT onQueue — this is the key difference
-        $pendingBatch = (new PendingBatch(new Container, collect()))
+        $pendingBatch = (new PendingBatch(new Container, new Collection))
             ->onConnection('test-connection');
 
         $batch = $repository->store($pendingBatch);
@@ -624,7 +625,7 @@ class BusBatchTest extends TestCase
 
     public function test_options_serialization_on_postgres()
     {
-        $pendingBatch = (new PendingBatch(new Container, collect()))
+        $pendingBatch = (new PendingBatch(new Container, new Collection))
             ->onQueue('test-queue');
 
         $connection = m::spy(PostgresConnection::class);
@@ -694,7 +695,7 @@ class BusBatchTest extends TestCase
     {
         $repository = new DatabaseBatchRepository(new BatchFactory($queue), DB::connection(), 'job_batches');
 
-        $pendingBatch = (new PendingBatch(new Container, collect()))
+        $pendingBatch = (new PendingBatch(new Container, new Collection))
             ->progress(function (Batch $batch) {
                 $_SERVER['__progress.batch'] = $batch;
                 $_SERVER['__progress.count']++;

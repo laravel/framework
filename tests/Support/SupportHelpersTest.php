@@ -7,9 +7,11 @@ use ArrayIterator;
 use Carbon\CarbonInterval;
 use Countable;
 use Error;
+use Exception;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Sleep;
@@ -465,7 +467,7 @@ class SupportHelpersTest extends TestCase
         $data = ['foo' => 'bar'];
         $this->assertEquals(['bar'], data_get($data, '*'));
 
-        $data = collect(['foo' => 'bar']);
+        $data = new Collection(['foo' => 'bar']);
         $this->assertEquals(['bar'], data_get($data, '*'));
     }
 
@@ -869,26 +871,26 @@ class SupportHelpersTest extends TestCase
 
     public function testThrowClosureException()
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('test');
 
-        throw_if(true, fn () => new \Exception('test'));
+        throw_if(true, fn () => new Exception('test'));
     }
 
     public function testThrowClosureWithParamsException()
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('test');
 
-        throw_if(true, fn (string $message) => new \Exception($message), 'test');
+        throw_if(true, fn (string $message) => new Exception($message), 'test');
     }
 
     public function testThrowClosureStringWithParamsException()
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('test');
 
-        throw_if(true, fn () => \Exception::class, 'test');
+        throw_if(true, fn () => Exception::class, 'test');
     }
 
     public function testThrowUnless()
@@ -1238,74 +1240,74 @@ class SupportHelpersTest extends TestCase
     public function testEnv()
     {
         $_SERVER['foo'] = 'bar';
-        $this->assertSame('bar', env('foo'));
+        $this->assertSame('bar', Env::get('foo'));
         $this->assertSame('bar', Env::get('foo'));
     }
 
     public function testEnvTrue()
     {
         $_SERVER['foo'] = 'true';
-        $this->assertTrue(env('foo'));
+        $this->assertTrue(Env::get('foo'));
 
         $_SERVER['foo'] = '(true)';
-        $this->assertTrue(env('foo'));
+        $this->assertTrue(Env::get('foo'));
     }
 
     public function testEnvFalse()
     {
         $_SERVER['foo'] = 'false';
-        $this->assertFalse(env('foo'));
+        $this->assertFalse(Env::get('foo'));
 
         $_SERVER['foo'] = '(false)';
-        $this->assertFalse(env('foo'));
+        $this->assertFalse(Env::get('foo'));
     }
 
     public function testEnvEmpty()
     {
         $_SERVER['foo'] = '';
-        $this->assertSame('', env('foo'));
+        $this->assertSame('', Env::get('foo'));
 
         $_SERVER['foo'] = 'empty';
-        $this->assertSame('', env('foo'));
+        $this->assertSame('', Env::get('foo'));
 
         $_SERVER['foo'] = '(empty)';
-        $this->assertSame('', env('foo'));
+        $this->assertSame('', Env::get('foo'));
     }
 
     public function testEnvNull()
     {
         $_SERVER['foo'] = 'null';
-        $this->assertNull(env('foo'));
+        $this->assertNull(Env::get('foo'));
 
         $_SERVER['foo'] = '(null)';
-        $this->assertNull(env('foo'));
+        $this->assertNull(Env::get('foo'));
     }
 
     public function testEnvDefault()
     {
         $_SERVER['foo'] = 'bar';
-        $this->assertSame('bar', env('foo', 'default'));
+        $this->assertSame('bar', Env::get('foo', 'default'));
 
         $_SERVER['foo'] = '';
-        $this->assertSame('', env('foo', 'default'));
+        $this->assertSame('', Env::get('foo', 'default'));
 
         unset($_SERVER['foo']);
-        $this->assertSame('default', env('foo', 'default'));
+        $this->assertSame('default', Env::get('foo', 'default'));
 
         $_SERVER['foo'] = null;
-        $this->assertSame('default', env('foo', 'default'));
+        $this->assertSame('default', Env::get('foo', 'default'));
     }
 
     public function testEnvEscapedString()
     {
         $_SERVER['foo'] = '"null"';
-        $this->assertSame('null', env('foo'));
+        $this->assertSame('null', Env::get('foo'));
 
         $_SERVER['foo'] = "'null'";
-        $this->assertSame('null', env('foo'));
+        $this->assertSame('null', Env::get('foo'));
 
         $_SERVER['foo'] = 'x"null"x'; // this should not be unquoted
-        $this->assertSame('x"null"x', env('foo'));
+        $this->assertSame('x"null"x', Env::get('foo'));
     }
 
     public function testWriteArrayOfEnvVariablesToFile()
@@ -1538,7 +1540,7 @@ class SupportHelpersTest extends TestCase
     {
         $_ENV['foo'] = 'From $_ENV';
         $_SERVER['foo'] = 'From $_SERVER';
-        $this->assertSame('From $_SERVER', env('foo'));
+        $this->assertSame('From $_SERVER', Env::get('foo'));
     }
 
     public function testRequiredEnvVariableThrowsAnExceptionWhenNotFound(): void

@@ -38,7 +38,7 @@ class AfterQueryTest extends DatabaseTestCase
         AfterQueryUser::create();
         AfterQueryUser::create();
 
-        $afterQueryIds = collect();
+        $afterQueryIds = new Collection;
 
         $users = AfterQueryUser::query()
             ->afterQuery(function (Collection $users) use ($afterQueryIds) {
@@ -59,7 +59,7 @@ class AfterQueryTest extends DatabaseTestCase
         AfterQueryUser::create();
         AfterQueryUser::create();
 
-        $afterQueryIds = collect();
+        $afterQueryIds = new Collection;
 
         $users = AfterQueryUser::query()
             ->toBase()
@@ -81,7 +81,7 @@ class AfterQueryTest extends DatabaseTestCase
         AfterQueryUser::create();
         AfterQueryUser::create();
 
-        $afterQueryIds = collect();
+        $afterQueryIds = new Collection;
 
         $users = AfterQueryUser::query()
             ->afterQuery(function (Collection $users) use ($afterQueryIds) {
@@ -102,7 +102,7 @@ class AfterQueryTest extends DatabaseTestCase
         AfterQueryUser::create();
         AfterQueryUser::create();
 
-        $afterQueryIds = collect();
+        $afterQueryIds = new Collection;
 
         $users = AfterQueryUser::query()
             ->toBase()
@@ -124,7 +124,7 @@ class AfterQueryTest extends DatabaseTestCase
         AfterQueryUser::create();
         AfterQueryUser::create();
 
-        $afterQueryIds = collect();
+        $afterQueryIds = new Collection;
 
         $userIds = AfterQueryUser::query()
             ->afterQuery(function (Collection $userIds) use ($afterQueryIds) {
@@ -145,7 +145,7 @@ class AfterQueryTest extends DatabaseTestCase
         AfterQueryUser::create();
         AfterQueryUser::create();
 
-        $afterQueryIds = collect();
+        $afterQueryIds = new Collection;
 
         $userIds = AfterQueryUser::query()
             ->toBase()
@@ -171,7 +171,7 @@ class AfterQueryTest extends DatabaseTestCase
         $user->posts()->attach($firstPost);
         $user->posts()->attach($secondPost);
 
-        $afterQueryIds = collect();
+        $afterQueryIds = new Collection;
 
         $posts = $user->posts()
             ->afterQuery(function (Collection $posts) use ($afterQueryIds) {
@@ -209,7 +209,7 @@ class AfterQueryTest extends DatabaseTestCase
         AfterQueryUser::create(['team_id' => $team->id]);
         AfterQueryUser::create(['team_id' => $team->id]);
 
-        $afterQueryIds = collect();
+        $afterQueryIds = new Collection;
 
         $teamMates = $user->teamMates()
             ->afterQuery(function (Collection $teamMates) use ($afterQueryIds) {
@@ -232,27 +232,27 @@ class AfterQueryTest extends DatabaseTestCase
 
         $users = AfterQueryUser::query()
             ->afterQuery(function () {
-                return collect(['foo', 'bar']);
+                return new Collection(['foo', 'bar']);
             })
             ->get();
 
-        $this->assertEquals(collect(['foo', 'bar']), $users);
+        $this->assertEquals(new Collection(['foo', 'bar']), $users);
 
         $users = AfterQueryUser::query()
             ->afterQuery(function () {
-                return collect(['foo', 'bar']);
+                return new Collection(['foo', 'bar']);
             })
             ->pluck('id');
 
-        $this->assertEquals(collect(['foo', 'bar']), $users);
+        $this->assertEquals(new Collection(['foo', 'bar']), $users);
 
         $users = AfterQueryUser::query()
             ->afterQuery(function ($users) use ($firstUser) {
-                return $users->first()->is($firstUser) ? collect(['foo', 'bar']) : collect(['bar', 'foo']);
+                return $users->first()->is($firstUser) ? new Collection(['foo', 'bar']) : new Collection(['bar', 'foo']);
             })
             ->cursor();
 
-        $this->assertEquals(collect(['foo', 'bar']), $users->collect());
+        $this->assertEquals(new Collection(['foo', 'bar']), $users->collect());
 
         $users = AfterQueryUser::query()
             ->afterQuery(function ($users) use ($firstUser) {
@@ -270,11 +270,11 @@ class AfterQueryTest extends DatabaseTestCase
 
         $posts = $firstUser->posts()
             ->afterQuery(function () {
-                return collect(['foo', 'bar']);
+                return new Collection(['foo', 'bar']);
             })
             ->get();
 
-        $this->assertEquals(collect(['foo', 'bar']), $posts);
+        $this->assertEquals(new Collection(['foo', 'bar']), $posts);
 
         $user = AfterQueryUser::create();
         $team = AfterQueryTeam::create(['owner_id' => $user->id]);
@@ -284,11 +284,11 @@ class AfterQueryTest extends DatabaseTestCase
 
         $teamMates = $user->teamMates()
             ->afterQuery(function () {
-                return collect(['foo', 'bar']);
+                return new Collection(['foo', 'bar']);
             })
             ->get();
 
-        $this->assertEquals(collect(['foo', 'bar']), $teamMates);
+        $this->assertEquals(new Collection(['foo', 'bar']), $teamMates);
     }
 
     public function testAfterQueryOnBaseBuilderCanAlterReturnedResult()
@@ -299,29 +299,29 @@ class AfterQueryTest extends DatabaseTestCase
         $users = AfterQueryUser::query()
             ->toBase()
             ->afterQuery(function () {
-                return collect(['foo', 'bar']);
+                return new Collection(['foo', 'bar']);
             })
             ->get();
 
-        $this->assertEquals(collect(['foo', 'bar']), $users);
+        $this->assertEquals(new Collection(['foo', 'bar']), $users);
 
         $users = AfterQueryUser::query()
             ->toBase()
             ->afterQuery(function () {
-                return collect(['foo', 'bar']);
+                return new Collection(['foo', 'bar']);
             })
             ->pluck('id');
 
-        $this->assertEquals(collect(['foo', 'bar']), $users);
+        $this->assertEquals(new Collection(['foo', 'bar']), $users);
 
         $users = AfterQueryUser::query()
             ->toBase()
             ->afterQuery(function ($users) use ($firstUser) {
-                return ((int) $users->first()->id) === $firstUser->id ? collect(['foo', 'bar']) : collect(['bar', 'foo']);
+                return ((int) $users->first()->id) === $firstUser->id ? new Collection(['foo', 'bar']) : new Collection(['bar', 'foo']);
             })
             ->cursor();
 
-        $this->assertEquals(collect(['foo', 'bar']), $users->collect());
+        $this->assertEquals(new Collection(['foo', 'bar']), $users->collect());
 
         $users = AfterQueryUser::query()
             ->toBase()
@@ -341,11 +341,11 @@ class AfterQueryTest extends DatabaseTestCase
         $posts = $firstUser->posts()
             ->toBase()
             ->afterQuery(function () {
-                return collect(['foo', 'bar']);
+                return new Collection(['foo', 'bar']);
             })
             ->get();
 
-        $this->assertEquals(collect(['foo', 'bar']), $posts);
+        $this->assertEquals(new Collection(['foo', 'bar']), $posts);
 
         $user = AfterQueryUser::create();
         $team = AfterQueryTeam::create(['owner_id' => $user->id]);
@@ -356,11 +356,11 @@ class AfterQueryTest extends DatabaseTestCase
         $teamMates = $user->teamMates()
             ->toBase()
             ->afterQuery(function () {
-                return collect(['foo', 'bar']);
+                return new Collection(['foo', 'bar']);
             })
             ->get();
 
-        $this->assertEquals(collect(['foo', 'bar']), $teamMates);
+        $this->assertEquals(new Collection(['foo', 'bar']), $teamMates);
     }
 }
 

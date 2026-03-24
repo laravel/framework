@@ -327,8 +327,8 @@ class ApplicationBuilder
         }
 
         $this->app->afterResolving(ConsoleKernel::class, function ($kernel) use ($commands) {
-            [$commands, $paths] = (new Collection($commands))->partition(fn ($command) => class_exists($command));
-            [$routes, $paths] = $paths->partition(fn ($path) => is_file($path));
+            [$commands, $paths] = (new Collection($commands))->partition(fn ($command) => class_exists($command))->all();
+            [$routes, $paths] = $paths->partition(fn ($path) => is_file($path))->all();
 
             $this->app->booted(static function () use ($kernel, $commands, $paths, $routes) {
                 $kernel->addCommands($commands->all());

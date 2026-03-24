@@ -11,6 +11,7 @@ use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Foundation\Console\Kernel;
+use Illuminate\Support\Collection;
 use Illuminate\Tests\Console\Fixtures\FakeCommandWithArrayInputPrompting;
 use Illuminate\Tests\Console\Fixtures\FakeCommandWithInputPrompting;
 use Mockery as m;
@@ -349,6 +350,6 @@ class TestKernel extends Kernel
 
     public function getRegisteredCommands(): array
     {
-        return collect($this->getArtisan()->all())->values()->transform(fn ($command) => $command::class)->all();
+        return (new Collection($this->getArtisan()->all()))->values()->transform(fn ($command) => $command::class)->all();
     }
 }
