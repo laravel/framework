@@ -11,6 +11,6 @@ class GdDriver extends InterventionDriver
      */
     protected function createManager(): ImageManager
     {
-        return ImageManager::gd(autoOrientation: false);
+        return ImageManager::gd();
     }
 }
