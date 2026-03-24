@@ -303,6 +303,86 @@ class ImageTest extends TestCase
         $this->assertSame(5, $this->getOptions($result)->blur);
     }
 
+    public function test_sharpen_returns_new_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertNotSame($image, $image->sharpen());
+    }
+
+    public function test_sharpen_sets_option()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame(20, $this->getOptions($image->sharpen(20))->sharpen);
+    }
+
+    public function test_sharpen_has_default()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame(10, $this->getOptions($image->sharpen())->sharpen);
+    }
+
+    public function test_flip_returns_new_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertNotSame($image, $image->flip());
+    }
+
+    public function test_flip_sets_option()
+    {
+        $image = $this->makeImage();
+
+        $this->assertTrue($this->getOptions($image->flip())->flip);
+    }
+
+    public function test_flop_returns_new_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertNotSame($image, $image->flop());
+    }
+
+    public function test_flop_sets_option()
+    {
+        $image = $this->makeImage();
+
+        $this->assertTrue($this->getOptions($image->flop())->flop);
+    }
+
+    public function test_width_returns_int()
+    {
+        $image = new Image($this->fakeImageContents(300, 200));
+
+        $this->assertSame(300, $image->width());
+    }
+
+    public function test_height_returns_int()
+    {
+        $image = new Image($this->fakeImageContents(300, 200));
+
+        $this->assertSame(200, $image->height());
+    }
+
+    public function test_to_base64_returns_encoded_string()
+    {
+        $contents = $this->fakeImageContents();
+        $image = new Image($contents);
+
+        $this->assertSame(base64_encode($contents), $image->toBase64());
+    }
+
+    public function test_to_data_uri_returns_data_uri()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $dataUri = $image->toDataUri();
+
+        $this->assertStringStartsWith('data:image/jpeg;base64,', $dataUri);
+    }
+
     public function test_driver_exception_is_wrapped_in_image_exception()
     {
         $image = new Image($this->fakeImageContents());
@@ -327,6 +407,211 @@ class ImageTest extends TestCase
         }
 
         $this->fail('ImageException was not thrown.');
+    }
+
+    public function test_to_bytes_returns_same_result_on_multiple_calls()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $first = $image->toBytes();
+        $second = $image->toBytes();
+
+        $this->assertSame($first, $second);
+    }
+
+    public function test_to_bytes_without_operations_returns_original()
+    {
+        $contents = $this->fakeImageContents();
+        $image = new Image($contents);
+
+        $this->assertSame($contents, $image->toBytes());
+    }
+
+    public function test_has_changes_with_only_quality_set()
+    {
+        $image = $this->makeImage();
+        $result = $image->quality(50);
+
+        $this->assertTrue($this->getOptions($result)->hasChanges());
+    }
+
+    public function test_clone_does_not_share_hash_name_cache()
+    {
+        $image = $this->makeImage();
+        $name1 = $image->hashName();
+
+        $clone = $image->blur(1);
+        $name2 = $image->hashName();
+
+        // Same instance returns cached name
+        $this->assertSame($name1, $name2);
+    }
+
+    public function test_hash_name_is_consistent_on_same_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame($image->hashName(), $image->hashName());
+    }
+
+    public function test_flip_and_flop_together()
+    {
+        $image = $this->makeImage();
+        $result = $image->flip()->flop();
+
+        $this->assertTrue($this->getOptions($result)->flip);
+        $this->assertTrue($this->getOptions($result)->flop);
+    }
+
+    public function test_multiple_operations_chained()
+    {
+        $image = $this->makeImage();
+        $result = $image->orient()->cover(200, 200)->blur(10)->greyscale()->sharpen(5)->toWebp()->quality(80);
+
+        $options = $this->getOptions($result);
+
+        $this->assertTrue($options->orient);
+        $this->assertSame(200, $options->coverWidth);
+        $this->assertSame(200, $options->coverHeight);
+        $this->assertSame(10, $options->blur);
+        $this->assertTrue($options->greyscale);
+        $this->assertSame(5, $options->sharpen);
+        $this->assertSame('webp', $options->format);
+        $this->assertSame(80, $options->quality);
+    }
+
+    public function test_later_operation_overrides_earlier()
+    {
+        $image = $this->makeImage();
+        $result = $image->cover(200, 200)->cover(100, 100);
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(100, $options->coverWidth);
+        $this->assertSame(100, $options->coverHeight);
+    }
+
+    public function test_extension_returns_bin_for_unknown_mime()
+    {
+        $image = new Image('not-an-image');
+
+        $this->assertSame('bin', $image->extension());
+    }
+
+    public function test_file_returns_null_for_non_upload()
+    {
+        $image = Image::class;
+        $instance = new $image($this->fakeImageContents());
+
+        $this->assertNull($instance->file());
+    }
+
+    public function test_using_gd_shortcut()
+    {
+        $image = $this->makeImage();
+        $result = $image->usingGd();
+
+        $driver = (new \ReflectionProperty($result, 'driver'))->getValue($result);
+
+        $this->assertSame('gd', $driver);
+    }
+
+    public function test_using_imagick_shortcut()
+    {
+        $image = $this->makeImage();
+        $result = $image->usingImagick();
+
+        $driver = (new \ReflectionProperty($result, 'driver'))->getValue($result);
+
+        $this->assertSame('imagick', $driver);
+    }
+
+    public function test_using_cloudflare_shortcut()
+    {
+        $image = $this->makeImage();
+        $result = $image->usingCloudflare();
+
+        $driver = (new \ReflectionProperty($result, 'driver'))->getValue($result);
+
+        $this->assertSame('cloudflare', $driver);
+    }
+
+    public function test_dimensions_on_tiny_image()
+    {
+        $image = new Image($this->fakeImageContents(1, 1));
+
+        $this->assertSame([1, 1], $image->dimensions());
+        $this->assertSame(1, $image->width());
+        $this->assertSame(1, $image->height());
+    }
+
+    public function test_to_data_uri_contains_valid_base64()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $dataUri = $image->toDataUri();
+        $base64Part = substr($dataUri, strpos($dataUri, ',') + 1);
+
+        $this->assertNotFalse(base64_decode($base64Part, true));
+    }
+
+    public function test_optimize_throws_for_jpg_with_wrong_spelling()
+    {
+        $image = $this->makeImage();
+
+        $this->expectException(\Illuminate\Foundation\Image\ImageException::class);
+        $this->expectExceptionMessage('The [png] format is not supported.');
+
+        $image->optimize('png');
+    }
+
+    public function test_serialization_with_string_contents()
+    {
+        $contents = $this->fakeImageContents();
+        $image = new Image($contents);
+
+        $unserialized = unserialize(serialize($image));
+
+        $this->assertSame($contents, $unserialized->toBytes());
+    }
+
+    public function test_serialization_with_closure_contents()
+    {
+        $contents = $this->fakeImageContents();
+        $image = new Image(fn () => $contents);
+
+        $unserialized = unserialize(serialize($image));
+
+        $this->assertSame($contents, $unserialized->toBytes());
+    }
+
+    public function test_serialization_preserves_options()
+    {
+        $image = (new Image($this->fakeImageContents()))
+            ->cover(100, 100)
+            ->toWebp()
+            ->quality(80);
+
+        $unserialized = unserialize(serialize($image));
+
+        $options = $this->getOptions($unserialized);
+
+        $this->assertSame(100, $options->coverWidth);
+        $this->assertSame(100, $options->coverHeight);
+        $this->assertSame('webp', $options->format);
+        $this->assertSame(80, $options->quality);
+    }
+
+    public function test_serialization_drops_uploaded_file()
+    {
+        $file = UploadedFile::fake()->image('avatar.jpg');
+        $image = new Image(fn () => $file->getContent(), $file);
+
+        $this->assertNotNull($image->file());
+
+        $unserialized = unserialize(serialize($image));
+
+        $this->assertNull($unserialized->file());
     }
 
     protected function makeImage(): Image

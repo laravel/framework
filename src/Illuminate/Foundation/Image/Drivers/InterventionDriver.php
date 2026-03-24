@@ -78,6 +78,18 @@ abstract class InterventionDriver implements Driver
             $image = $image->greyscale();
         }
 
+        if ($options->sharpen !== null) {
+            $image = $image->sharpen($options->sharpen);
+        }
+
+        if ($options->flip) {
+            $image = $image->flip();
+        }
+
+        if ($options->flop) {
+            $image = $image->flop();
+        }
+
         if ($options->format !== null) {
             $quality = $options->quality ?? PendingImageOptions::DEFAULT_QUALITY;
 

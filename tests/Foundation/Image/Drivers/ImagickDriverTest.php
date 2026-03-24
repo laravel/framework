@@ -132,6 +132,46 @@ class ImagickDriverTest extends TestCase
         $this->assertNotSame($contents, $result);
     }
 
+    public function test_processes_sharpen()
+    {
+        $driver = new ImagickDriver;
+        $contents = $this->fakeImageContents(100, 100);
+
+        $options = new PendingImageOptions;
+        $options->sharpen = 10;
+
+        $result = $driver->process($contents, $options);
+
+        $this->assertNotEmpty($result);
+        $this->assertNotSame($contents, $result);
+    }
+
+    public function test_processes_flip()
+    {
+        $driver = new ImagickDriver;
+        $contents = $this->fakeImageContents(100, 100);
+
+        $options = new PendingImageOptions;
+        $options->flip = true;
+
+        $result = $driver->process($contents, $options);
+
+        $this->assertNotEmpty($result);
+    }
+
+    public function test_processes_flop()
+    {
+        $driver = new ImagickDriver;
+        $contents = $this->fakeImageContents(100, 100);
+
+        $options = new PendingImageOptions;
+        $options->flop = true;
+
+        $result = $driver->process($contents, $options);
+
+        $this->assertNotEmpty($result);
+    }
+
     public function test_returns_image_without_options()
     {
         $driver = new ImagickDriver;

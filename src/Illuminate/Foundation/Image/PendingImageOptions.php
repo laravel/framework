@@ -45,6 +45,21 @@ class PendingImageOptions
     public ?true $greyscale = null;
 
     /**
+     * The sharpen amount.
+     */
+    public ?int $sharpen = null;
+
+    /**
+     * Whether to flip the image vertically.
+     */
+    public ?true $flip = null;
+
+    /**
+     * Whether to flip the image horizontally.
+     */
+    public ?true $flop = null;
+
+    /**
      * The output format.
      */
     public ?string $format = null;
@@ -59,6 +74,6 @@ class PendingImageOptions
      */
     public function hasChanges(): bool
     {
-        return count(array_filter((array) $this)) > 0;
+        return count(array_filter((array) $this, fn ($value) => $value !== null)) > 0;
     }
 }

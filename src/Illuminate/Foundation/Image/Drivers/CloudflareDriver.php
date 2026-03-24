@@ -133,6 +133,18 @@ class CloudflareDriver implements Driver
             $params[] = 'saturation=0';
         }
 
+        if ($options->sharpen !== null) {
+            $params[] = 'sharpen='.max(0, min(10, round($options->sharpen / 10)));
+        }
+
+        if ($options->flip && $options->flop) {
+            $params[] = 'flip=hv';
+        } elseif ($options->flip) {
+            $params[] = 'flip=v';
+        } elseif ($options->flop) {
+            $params[] = 'flip=h';
+        }
+
         if ($options->format !== null) {
             $params[] = 'format='.match ($options->format) {
                 'jpg' => 'jpeg',
