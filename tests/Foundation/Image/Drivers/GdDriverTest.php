@@ -132,6 +132,16 @@ class GdDriverTest extends TestCase
         $this->assertNotSame($contents, $result);
     }
 
+    public function test_throws_for_unsupported_input_format()
+    {
+        $driver = new GdDriver;
+
+        $this->expectException(\Illuminate\Foundation\Image\ImageException::class);
+        $this->expectExceptionMessage('The image format [text/plain] is not supported.');
+
+        $driver->process('not-an-image', new PendingImageOptions);
+    }
+
     public function test_returns_image_without_options()
     {
         $driver = new GdDriver;

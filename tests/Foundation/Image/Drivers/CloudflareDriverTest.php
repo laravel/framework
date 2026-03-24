@@ -48,41 +48,29 @@ class CloudflareDriverTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function test_process_throws_for_unsupported_source_format()
+    public function test_throws_for_unsupported_input_format()
     {
         $driver = new CloudflareDriver(new HttpFactory, 'account', 'token');
 
         $this->expectException(ImageException::class);
-        $this->expectExceptionMessage('The Cloudflare image driver only supports JPEG or WebP as target format, please use [toJpg()] or [toWebp()].');
+        $this->expectExceptionMessage('The image format [text/plain] is not supported by the Cloudflare driver.');
 
-        $file = UploadedFile::fake()->image('test.png', 100, 100);
-        $driver->process(file_get_contents($file->getRealPath()), new PendingImageOptions);
+        $driver->process('not-an-image', new PendingImageOptions);
     }
 
-    public function test_process_allows_unsupported_source_when_format_is_set()
+    public function test_throws_for_bmp_input_format()
     {
-        $http = new HttpFactory;
+        $driver = new CloudflareDriver(new HttpFactory, 'account', 'token');
 
-        $http->fake([
-            'api.cloudflare.com/*' => $http->response([
-                'success' => true,
-                'result' => [
-                    'id' => 'img-123',
-                    'variants' => ['https://imagedelivery.net/abc/img-123/public'],
-                ],
-            ]),
-            'imagedelivery.net/*' => $http->response('bytes'),
-        ]);
+        $this->expectException(ImageException::class);
+        $this->expectExceptionMessage('The image format [image/bmp] is not supported by the Cloudflare driver.');
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $im = imagecreatetruecolor(1, 1);
+        ob_start();
+        imagebmp($im);
+        $bmp = ob_get_clean();
 
-        $options = new PendingImageOptions;
-        $options->format = 'webp';
-
-        $file = UploadedFile::fake()->image('test.png', 100, 100);
-        $result = $driver->process(file_get_contents($file->getRealPath()), $options);
-
-        $this->assertSame('bytes', $result);
+        $driver->process($bmp, new PendingImageOptions);
     }
 
     public function test_process_uploads_and_fetches_transformed_image()
