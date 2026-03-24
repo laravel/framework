@@ -11,6 +11,6 @@ class ImagickDriver extends InterventionDriver
      */
     protected function createManager(): ImageManager
     {
-        return ImageManager::imagick();
+        return ImageManager::imagick(autoOrientation: false);
     }
 }

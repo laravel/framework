@@ -88,6 +88,55 @@ class GdDriverTest extends TestCase
         $this->assertSame(100, $height);
     }
 
+    public function test_scale_does_not_upscale()
+    {
+        $driver = new GdDriver;
+        $contents = $this->fakeImageContents(100, 80);
+
+        $options = new PendingImageOptions;
+        $options->scaleWidth = 800;
+        $options->scaleHeight = 600;
+
+        $result = $driver->process($contents, $options);
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(100, $width);
+        $this->assertSame(80, $height);
+    }
+
+    public function test_format_conversion_preserves_dimensions()
+    {
+        $driver = new GdDriver;
+        $contents = $this->fakeImageContents(300, 200);
+
+        $options = new PendingImageOptions;
+        $options->format = 'webp';
+
+        $result = $driver->process($contents, $options);
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(300, $width);
+        $this->assertSame(200, $height);
+    }
+
+    public function test_quality_preserves_dimensions()
+    {
+        $driver = new GdDriver;
+        $contents = $this->fakeImageContents(300, 200);
+
+        $options = new PendingImageOptions;
+        $options->quality = 50;
+
+        $result = $driver->process($contents, $options);
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(300, $width);
+        $this->assertSame(200, $height);
+    }
+
     public function test_processes_orient()
     {
         $driver = new GdDriver;
