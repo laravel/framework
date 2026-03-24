@@ -436,34 +436,15 @@ class Image
     }
 
     /**
-     * Prepare the image for serialization.
+     * Prevent serialization of the image.
      *
-     * @return array<string, mixed>
-     */
-    public function __serialize(): array
-    {
-        return [
-            'contents' => value($this->contents),
-            'options' => $this->options,
-            'driver' => $this->driver,
-            'processed' => $this->processed,
-            'hashName' => $this->hashName,
-        ];
-    }
-
-    /**
-     * Restore the image from serialization.
+     * @return never
      *
-     * @param  array<string, mixed>  $data
+     * @throws ImageException
      */
-    public function __unserialize(array $data): void
+    public function __serialize(): never
     {
-        $this->contents = $data['contents'];
-        $this->options = $data['options'];
-        $this->driver = $data['driver'];
-        $this->processed = $data['processed'];
-        $this->hashName = $data['hashName'];
-        $this->file = null;
+        throw new ImageException('Images cannot be serialized. Store the image first and serialize the path instead.');
     }
 
     /**

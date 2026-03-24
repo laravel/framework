@@ -565,53 +565,14 @@ class ImageTest extends TestCase
         $image->optimize('png');
     }
 
-    public function test_serialization_with_string_contents()
+    public function test_serialization_throws_exception()
     {
-        $contents = $this->fakeImageContents();
-        $image = new Image($contents);
+        $image = new Image($this->fakeImageContents());
 
-        $unserialized = unserialize(serialize($image));
+        $this->expectException(\Illuminate\Foundation\Image\ImageException::class);
+        $this->expectExceptionMessage('Images cannot be serialized. Store the image first and serialize the path instead.');
 
-        $this->assertSame($contents, $unserialized->toBytes());
-    }
-
-    public function test_serialization_with_closure_contents()
-    {
-        $contents = $this->fakeImageContents();
-        $image = new Image(fn () => $contents);
-
-        $unserialized = unserialize(serialize($image));
-
-        $this->assertSame($contents, $unserialized->toBytes());
-    }
-
-    public function test_serialization_preserves_options()
-    {
-        $image = (new Image($this->fakeImageContents()))
-            ->cover(100, 100)
-            ->toWebp()
-            ->quality(80);
-
-        $unserialized = unserialize(serialize($image));
-
-        $options = $this->getOptions($unserialized);
-
-        $this->assertSame(100, $options->coverWidth);
-        $this->assertSame(100, $options->coverHeight);
-        $this->assertSame('webp', $options->format);
-        $this->assertSame(80, $options->quality);
-    }
-
-    public function test_serialization_drops_uploaded_file()
-    {
-        $file = UploadedFile::fake()->image('avatar.jpg');
-        $image = new Image(fn () => $file->getContent(), $file);
-
-        $this->assertNotNull($image->file());
-
-        $unserialized = unserialize(serialize($image));
-
-        $this->assertNull($unserialized->file());
+        serialize($image);
     }
 
     protected function makeImage(): Image
