@@ -311,8 +311,8 @@ class Image
      */
     public function storeAs(string $path, ?string $name = null, array|string $options = []): string|false
     {
-        if (is_null($name) || is_array($name)) {
-            [$path, $name, $options] = ['', $path, $name ?? []];
+        if (is_null($name)) {
+            [$path, $name, $options] = ['', $path, []];
         }
 
         $options = $this->parseOptions($options);
@@ -333,8 +333,8 @@ class Image
      */
     public function storePubliclyAs(string $path, ?string $name = null, array|string $options = []): string|false
     {
-        if (is_null($name) || is_array($name)) {
-            [$path, $name, $options] = ['', $path, $name ?? []];
+        if (is_null($name)) {
+            [$path, $name, $options] = ['', $path, []];
         }
 
         $options = $this->parseOptions($options);
