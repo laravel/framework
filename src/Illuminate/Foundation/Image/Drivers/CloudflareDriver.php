@@ -43,16 +43,8 @@ class CloudflareDriver implements Driver
     {
         $sourceMimeType = (new \finfo(FILEINFO_MIME_TYPE))->buffer($contents);
 
-        $targetFormat = $options->format ?? match ($sourceMimeType) {
-            'image/jpeg' => 'jpg',
-            'image/webp' => 'webp',
-            default => null,
-        };
-
-        if (! in_array($targetFormat, ['jpg', 'jpeg', 'webp'])) {
-            throw new ImageException(
-                'The Cloudflare image driver only supports JPEG or WebP as target format, please use [toJpg()] or [toWebp()].',
-            );
+        if (! in_array($sourceMimeType, ['image/jpeg', 'image/png', 'image/gif', 'image/webp'])) {
+            throw new ImageException("The image format [{$sourceMimeType}] is not supported by the Cloudflare driver.");
         }
 
         $response = $this->http

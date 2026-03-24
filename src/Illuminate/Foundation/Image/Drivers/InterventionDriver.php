@@ -50,6 +50,12 @@ abstract class InterventionDriver implements Driver
      */
     public function process(string $contents, PendingImageOptions $options): string
     {
+        $mimeType = (new \finfo(FILEINFO_MIME_TYPE))->buffer($contents);
+
+        if (! in_array($mimeType, ['image/jpeg', 'image/png', 'image/bmp', 'image/gif', 'image/webp'])) {
+            throw new ImageException("The image format [{$mimeType}] is not supported.");
+        }
+
         $image = $this->manager->read($contents);
 
         if ($options->orient) {
