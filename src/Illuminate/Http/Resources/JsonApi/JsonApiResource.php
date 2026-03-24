@@ -3,10 +3,18 @@
 namespace Illuminate\Http\Resources\JsonApi;
 
 use BadMethodCallException;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\JsonApi\Attributes\Attributes;
+use Illuminate\Http\Resources\JsonApi\Attributes\JsonApiInformation;
+use Illuminate\Http\Resources\JsonApi\Attributes\JsonApiLinks;
+use Illuminate\Http\Resources\JsonApi\Attributes\JsonApiMeta;
+use Illuminate\Http\Resources\JsonApi\Attributes\Relationships;
+use Illuminate\Http\Resources\JsonApi\Attributes\Wraps;
 use Illuminate\Support\Arr;
+use ReflectionClass;
 
 class JsonApiResource extends JsonResource
 {
@@ -36,6 +44,67 @@ class JsonApiResource extends JsonResource
      * The resource's "meta" for JSON:API.
      */
     protected array $jsonApiMeta = [];
+
+    /**
+     * The cache of resolved class attributes.
+     *
+     * @var array
+     */
+    protected static array $classAttributes = [];
+
+    /**
+     * Resolve a class attribute value from the resource.
+     *
+     * @template TAttribute of object
+     *
+     * @param  class-string<TAttribute>  $attributeClass
+     * @param  string|null  $property
+     * @param  string|null  $class
+     * @return mixed
+     */
+    protected static function resolveClassAttribute(string $attributeClass, ?string $property = null, ?string $class = null)
+    {
+        $class = $class ?? static::class;
+
+        $cacheKey = $class.'@'.$attributeClass;
+
+        if (array_key_exists($cacheKey, static::$classAttributes)) {
+            return static::$classAttributes[$cacheKey];
+        }
+
+        try {
+            $reflection = new ReflectionClass($class);
+
+            do {
+                $attributes = $reflection->getAttributes($attributeClass);
+
+                if (count($attributes) > 0) {
+                    $instance = $attributes[0]->newInstance();
+
+                    return static::$classAttributes[$cacheKey] = $property ? $instance->{$property} : $instance;
+                }
+            } while ($reflection = $reflection->getParentClass());
+        } catch (Exception) {
+            //
+        }
+
+        return static::$classAttributes[$cacheKey] = null;
+    }
+
+    /**
+     * Resolve a class attribute value for a given resource class.
+     *
+     * @template TAttribute of object
+     *
+     * @param  class-string  $resourceClass
+     * @param  class-string<TAttribute>  $attributeClass
+     * @param  string|null  $property
+     * @return mixed
+     */
+    public static function resolveClassAttributeFor(string $resourceClass, string $attributeClass, ?string $property = null)
+    {
+        return static::resolveClassAttribute($attributeClass, $property, $resourceClass);
+    }
 
     /**
      * Set the JSON:API version for the request.
@@ -83,6 +152,8 @@ class JsonApiResource extends JsonResource
     {
         if (property_exists($this, 'attributes')) {
             return $this->attributes;
+        } elseif ($attributes = static::resolveClassAttribute(Attributes::class, 'attributes')) {
+            return $attributes;
         }
 
         return $this->toArray($request);
@@ -98,6 +169,8 @@ class JsonApiResource extends JsonResource
     {
         if (property_exists($this, 'relationships')) {
             return $this->relationships;
+        } elseif ($relationships = static::resolveClassAttribute(Relationships::class, 'relationships')) {
+            return $relationships;
         }
 
         return [];
@@ -110,7 +183,11 @@ class JsonApiResource extends JsonResource
      */
     public function toLinks(Request $request)
     {
-        return $this->jsonApiLinks;
+        if (! empty($this->jsonApiLinks)) {
+            return $this->jsonApiLinks;
+        }
+
+        return static::resolveClassAttribute(JsonApiLinks::class, 'links') ?? [];
     }
 
     /**
@@ -120,7 +197,11 @@ class JsonApiResource extends JsonResource
      */
     public function toMeta(Request $request)
     {
-        return $this->jsonApiMeta;
+        if (! empty($this->jsonApiMeta)) {
+            return $this->jsonApiMeta;
+        }
+
+        return static::resolveClassAttribute(JsonApiMeta::class, 'meta') ?? [];
     }
 
     /**
@@ -132,15 +213,28 @@ class JsonApiResource extends JsonResource
     #[\Override]
     public function with($request)
     {
+        $implementation = static::$jsonApiInformation;
+
+        if (empty($implementation)) {
+            $info = static::resolveClassAttribute(JsonApiInformation::class);
+
+            if ($info !== null) {
+                $implementation = array_filter([
+                    'version' => $info->version,
+                    'ext' => $info->ext,
+                    'profile' => $info->profile,
+                    'meta' => $info->meta,
+                ]);
+            }
+        }
+
         return array_filter([
             'included' => $this->resolveIncludedResourceObjects($request)
                 ->uniqueStrict('_uniqueKey')
                 ->map(fn ($included) => Arr::except($included, ['_uniqueKey']))
                 ->values()
                 ->all(),
-            ...($implementation = static::$jsonApiInformation)
-                ? ['jsonapi' => $implementation]
-                : [],
+            ...($implementation ? ['jsonapi' => $implementation] : []),
         ]);
     }
 
@@ -153,8 +247,16 @@ class JsonApiResource extends JsonResource
     #[\Override]
     public function resolve($request = null)
     {
+        if (static::$wrap === 'data') {
+            $wrapper = static::resolveClassAttribute(Wraps::class, 'wrapper');
+
+            if ($wrapper !== null) {
+                static::$wrap = $wrapper;
+            }
+        }
+
         return [
-            'data' => $this->resolveResourceData($this->resolveJsonApiRequestFrom($request ?? $this->resolveRequestFromContainer())),
+            static::$wrap => $this->resolveResourceData($this->resolveJsonApiRequestFrom($request ?? $this->resolveRequestFromContainer())),
         ];
     }
 
@@ -251,5 +353,6 @@ class JsonApiResource extends JsonResource
 
         static::$jsonApiInformation = [];
         static::$maxRelationshipDepth = 5;
+        static::$classAttributes = [];
     }
 }

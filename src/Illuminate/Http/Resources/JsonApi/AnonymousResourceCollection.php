@@ -6,6 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection as BaseAnonymousResourceCollection;
+use Illuminate\Http\Resources\JsonApi\Attributes\JsonApiInformation;
 use Illuminate\Support\Arr;
 
 class AnonymousResourceCollection extends BaseAnonymousResourceCollection
@@ -21,6 +22,21 @@ class AnonymousResourceCollection extends BaseAnonymousResourceCollection
     #[\Override]
     public function with($request)
     {
+        $implementation = JsonApiResource::$jsonApiInformation;
+
+        if (empty($implementation) && $this->collects) {
+            $info = JsonApiResource::resolveClassAttributeFor($this->collects, JsonApiInformation::class);
+
+            if ($info !== null) {
+                $implementation = array_filter([
+                    'version' => $info->version,
+                    'ext' => $info->ext,
+                    'profile' => $info->profile,
+                    'meta' => $info->meta,
+                ]);
+            }
+        }
+
         return array_filter([
             'included' => $this->collection
                 ->map(fn ($resource) => $resource->resolveIncludedResourceObjects($request))
@@ -29,9 +45,7 @@ class AnonymousResourceCollection extends BaseAnonymousResourceCollection
                 ->map(fn ($included) => Arr::except($included, ['_uniqueKey']))
                 ->values()
                 ->all(),
-            ...($implementation = JsonApiResource::$jsonApiInformation)
-                ? ['jsonapi' => $implementation]
-                : [],
+            ...($implementation ? ['jsonapi' => $implementation] : []),
         ]);
     }
 
