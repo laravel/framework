@@ -131,6 +131,36 @@ class ImageManagerTest extends TestCase
         $this->assertInstanceOf(Image::class, $image);
     }
 
+    public function test_extend_overwrites_previous_registration()
+    {
+        $app = $this->makeApp([]);
+
+        $firstDriver = m::mock(Driver::class);
+        $secondDriver = m::mock(Driver::class);
+
+        $manager = new ImageManager($app);
+        $manager->extend('custom', fn () => $firstDriver);
+        $manager->extend('custom', fn () => $secondDriver);
+
+        $this->assertSame($secondDriver, $manager->driver('custom'));
+    }
+
+    public function test_driver_caches_separately_by_name()
+    {
+        $app = $this->makeApp([]);
+
+        $driver1 = m::mock(Driver::class);
+        $driver2 = m::mock(Driver::class);
+
+        $manager = new ImageManager($app);
+        $manager->extend('one', fn () => $driver1);
+        $manager->extend('two', fn () => $driver2);
+
+        $this->assertSame($driver1, $manager->driver('one'));
+        $this->assertSame($driver2, $manager->driver('two'));
+        $this->assertNotSame($manager->driver('one'), $manager->driver('two'));
+    }
+
     protected function fakeImageContents(): string
     {
         $file = UploadedFile::fake()->image('test.jpg', 100, 100);

@@ -113,6 +113,42 @@ class Image
     }
 
     /**
+     * Sharpen the image.
+     */
+    public function sharpen(int $amount = 10): static
+    {
+        $clone = $this->cloneWith();
+
+        $clone->options->sharpen = $amount;
+
+        return $clone;
+    }
+
+    /**
+     * Flip the image vertically.
+     */
+    public function flip(): static
+    {
+        $clone = $this->cloneWith();
+
+        $clone->options->flip = true;
+
+        return $clone;
+    }
+
+    /**
+     * Flip the image horizontally.
+     */
+    public function flop(): static
+    {
+        $clone = $this->cloneWith();
+
+        $clone->options->flop = true;
+
+        return $clone;
+    }
+
+    /**
      * Set the optimization options.
      *
      * @throws ImageException
@@ -189,6 +225,30 @@ class Image
     }
 
     /**
+     * Use the GD driver for processing.
+     */
+    public function usingGd(): static
+    {
+        return $this->using('gd');
+    }
+
+    /**
+     * Use the Imagick driver for processing.
+     */
+    public function usingImagick(): static
+    {
+        return $this->using('imagick');
+    }
+
+    /**
+     * Use the Cloudflare driver for processing.
+     */
+    public function usingCloudflare(): static
+    {
+        return $this->using('cloudflare');
+    }
+
+    /**
      * Process the image and return the raw bytes.
      */
     public function toBytes(): string
@@ -208,6 +268,22 @@ class Image
         }
 
         return value($this->contents);
+    }
+
+    /**
+     * Process the image and return as a base64 encoded string.
+     */
+    public function toBase64(): string
+    {
+        return base64_encode($this->toBytes());
+    }
+
+    /**
+     * Process the image and return as a data URI.
+     */
+    public function toDataUri(): string
+    {
+        return 'data:'.$this->mimeType().';base64,'.$this->toBase64();
     }
 
     /**
@@ -308,6 +384,22 @@ class Image
     }
 
     /**
+     * Get the width of the processed image.
+     */
+    public function width(): int
+    {
+        return $this->dimensions()[0];
+    }
+
+    /**
+     * Get the height of the processed image.
+     */
+    public function height(): int
+    {
+        return $this->dimensions()[1];
+    }
+
+    /**
      * Get a hashed filename with the correct extension.
      */
     public function hashName(string $path = ''): string
@@ -341,6 +433,37 @@ class Image
         return $this->driver
             ? $manager->driver($this->driver)
             : $manager->driver();
+    }
+
+    /**
+     * Prepare the image for serialization.
+     *
+     * @return array<string, mixed>
+     */
+    public function __serialize(): array
+    {
+        return [
+            'contents' => value($this->contents),
+            'options' => $this->options,
+            'driver' => $this->driver,
+            'processed' => $this->processed,
+            'hashName' => $this->hashName,
+        ];
+    }
+
+    /**
+     * Restore the image from serialization.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function __unserialize(array $data): void
+    {
+        $this->contents = $data['contents'];
+        $this->options = $data['options'];
+        $this->driver = $data['driver'];
+        $this->processed = $data['processed'];
+        $this->hashName = $data['hashName'];
+        $this->file = null;
     }
 
     /**

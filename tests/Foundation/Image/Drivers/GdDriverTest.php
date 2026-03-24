@@ -132,6 +132,46 @@ class GdDriverTest extends TestCase
         $this->assertNotSame($contents, $result);
     }
 
+    public function test_processes_sharpen()
+    {
+        $driver = new GdDriver;
+        $contents = $this->fakeImageContents(100, 100);
+
+        $options = new PendingImageOptions;
+        $options->sharpen = 10;
+
+        $result = $driver->process($contents, $options);
+
+        $this->assertNotEmpty($result);
+        $this->assertNotSame($contents, $result);
+    }
+
+    public function test_processes_flip()
+    {
+        $driver = new GdDriver;
+        $contents = $this->fakeImageContents(100, 100);
+
+        $options = new PendingImageOptions;
+        $options->flip = true;
+
+        $result = $driver->process($contents, $options);
+
+        $this->assertNotEmpty($result);
+    }
+
+    public function test_processes_flop()
+    {
+        $driver = new GdDriver;
+        $contents = $this->fakeImageContents(100, 100);
+
+        $options = new PendingImageOptions;
+        $options->flop = true;
+
+        $result = $driver->process($contents, $options);
+
+        $this->assertNotEmpty($result);
+    }
+
     public function test_throws_for_unsupported_input_format()
     {
         $driver = new GdDriver;

@@ -284,6 +284,151 @@ class ImageTest extends TestCase
         $this->assertSame([100, 100], $image->dimensions());
     }
 
+    public function test_sharpen_after_scale()
+    {
+        $image = new Image($this->fakeImageContents(400, 400));
+
+        $result = $image->scale(200, 200)->sharpen(10)->toBytes();
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(200, $width);
+        $this->assertSame(200, $height);
+    }
+
+    public function test_flip_preserves_dimensions()
+    {
+        $image = new Image($this->fakeImageContents(300, 200));
+
+        $result = $image->flip()->toBytes();
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(300, $width);
+        $this->assertSame(200, $height);
+    }
+
+    public function test_flop_preserves_dimensions()
+    {
+        $image = new Image($this->fakeImageContents(300, 200));
+
+        $result = $image->flop()->toBytes();
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(300, $width);
+        $this->assertSame(200, $height);
+    }
+
+    public function test_flip_and_flop_together()
+    {
+        $image = new Image($this->fakeImageContents(200, 200));
+
+        $result = $image->flip()->flop()->toBytes();
+
+        $this->assertNotEmpty($result);
+        $this->assertSame([200, 200], getimagesizefromstring($result) ? [getimagesizefromstring($result)[0], getimagesizefromstring($result)[1]] : [0, 0]);
+    }
+
+    public function test_all_operations_combined()
+    {
+        $image = new Image($this->fakeImageContents(800, 600));
+
+        $result = $image
+            ->orient()
+            ->cover(200, 200)
+            ->blur(5)
+            ->greyscale()
+            ->sharpen(10)
+            ->flip()
+            ->toWebp()
+            ->quality(80);
+
+        $bytes = $result->toBytes();
+        $size = getimagesizefromstring($bytes);
+
+        $this->assertSame(200, $size[0]);
+        $this->assertSame(200, $size[1]);
+        $this->assertSame(IMAGETYPE_WEBP, $size[2]);
+    }
+
+    public function test_to_bytes_is_idempotent()
+    {
+        $image = new Image($this->fakeImageContents(100, 100));
+        $processed = $image->cover(50, 50)->toWebp();
+
+        $first = $processed->toBytes();
+        $second = $processed->toBytes();
+
+        $this->assertSame($first, $second);
+    }
+
+    public function test_width_and_height_helpers()
+    {
+        $image = new Image($this->fakeImageContents(400, 300));
+        $covered = $image->cover(200, 150);
+
+        $this->assertSame(200, $covered->width());
+        $this->assertSame(150, $covered->height());
+    }
+
+    public function test_to_base64_produces_valid_base64()
+    {
+        $image = new Image($this->fakeImageContents(100, 100));
+        $result = $image->cover(50, 50)->toWebp();
+
+        $base64 = $result->toBase64();
+
+        $this->assertNotFalse(base64_decode($base64, true));
+        $this->assertSame($result->toBytes(), base64_decode($base64));
+    }
+
+    public function test_to_data_uri_produces_valid_data_uri()
+    {
+        $image = new Image($this->fakeImageContents(100, 100));
+        $result = $image->toWebp();
+
+        $dataUri = $result->toDataUri();
+
+        $this->assertStringStartsWith('data:image/webp;base64,', $dataUri);
+    }
+
+    public function test_store_with_string_disk_option()
+    {
+        Storage::fake('custom');
+
+        $image = new Image($this->fakeImageContents(100, 100));
+        $image->toWebp()->store('images', 'custom');
+
+        $files = Storage::disk('custom')->files('images');
+
+        $this->assertCount(1, $files);
+    }
+
+    public function test_store_with_array_disk_option()
+    {
+        Storage::fake('custom');
+
+        $image = new Image($this->fakeImageContents(100, 100));
+        $image->toWebp()->store('images', ['disk' => 'custom']);
+
+        $files = Storage::disk('custom')->files('images');
+
+        $this->assertCount(1, $files);
+    }
+
+    public function test_second_cover_overrides_first()
+    {
+        $image = new Image($this->fakeImageContents(400, 400));
+
+        $result = $image->cover(200, 200)->cover(100, 100)->toBytes();
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(100, $width);
+        $this->assertSame(100, $height);
+    }
+
     protected function fakeImageContents(int $width = 100, int $height = 100): string
     {
         $file = UploadedFile::fake()->image('test.jpg', $width, $height);
