@@ -1148,6 +1148,10 @@ abstract class Factory
         if (str_starts_with($method, 'for')) {
             return $this->for($factory->state($parameters[0] ?? []), $relationship);
         } elseif (str_starts_with($method, 'has')) {
+            if (count($parameters) > 1 && array_all($parameters, fn ($p) => is_array($p))) {
+                return $this->has($factory->forEachSequence(...$parameters), $relationship);
+            }
+
             return $this->has(
                 $factory
                     ->count(is_numeric($parameters[0] ?? null) ? $parameters[0] : 1)
