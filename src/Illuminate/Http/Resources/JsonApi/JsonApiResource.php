@@ -14,12 +14,13 @@ use Illuminate\Http\Resources\JsonApi\Attributes\JsonApiMeta;
 use Illuminate\Http\Resources\JsonApi\Attributes\Relationships;
 use Illuminate\Http\Resources\JsonApi\Attributes\Wraps;
 use Illuminate\Support\Arr;
-use ReflectionClass;
+use Illuminate\Support\Traits\ResolvesClassAttributes;use ReflectionClass;
 
 class JsonApiResource extends JsonResource
 {
     use Concerns\ResolvesJsonApiElements,
         Concerns\ResolvesJsonApiRequest;
+    use ResolvesClassAttributes;
 
     /**
      * The "data" wrapper that should be applied.
@@ -44,52 +45,6 @@ class JsonApiResource extends JsonResource
      * The resource's "meta" for JSON:API.
      */
     protected array $jsonApiMeta = [];
-
-    /**
-     * The cache of resolved class attributes.
-     *
-     * @var array
-     */
-    protected static array $classAttributes = [];
-
-    /**
-     * Resolve a class attribute value from the resource.
-     *
-     * @template TAttribute of object
-     *
-     * @param  class-string<TAttribute>  $attributeClass
-     * @param  string|null  $property
-     * @param  string|null  $class
-     * @return mixed
-     */
-    protected static function resolveClassAttribute(string $attributeClass, ?string $property = null, ?string $class = null)
-    {
-        $class = $class ?? static::class;
-
-        $cacheKey = $class.'@'.$attributeClass;
-
-        if (array_key_exists($cacheKey, static::$classAttributes)) {
-            return static::$classAttributes[$cacheKey];
-        }
-
-        try {
-            $reflection = new ReflectionClass($class);
-
-            do {
-                $attributes = $reflection->getAttributes($attributeClass);
-
-                if (count($attributes) > 0) {
-                    $instance = $attributes[0]->newInstance();
-
-                    return static::$classAttributes[$cacheKey] = $property ? $instance->{$property} : $instance;
-                }
-            } while ($reflection = $reflection->getParentClass());
-        } catch (Exception) {
-            //
-        }
-
-        return static::$classAttributes[$cacheKey] = null;
-    }
 
     /**
      * Resolve a class attribute value for a given resource class.

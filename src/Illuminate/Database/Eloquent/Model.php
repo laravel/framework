@@ -30,7 +30,7 @@ use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable as SupportStringable;
 use Illuminate\Support\Traits\ForwardsCalls;
-use JsonException;
+use Illuminate\Support\Traits\ResolvesClassAttributes;use JsonException;
 use JsonSerializable;
 use LogicException;
 use ReflectionClass;
@@ -54,6 +54,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         ForwardsCalls;
     /** @use HasCollection<\Illuminate\Database\Eloquent\Collection<array-key, static & self>> */
     use HasCollection;
+    use ResolvesClassAttributes;
 
     /**
      * The connection name for the model.
@@ -285,13 +286,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @var array<class-string<self>, bool>
      */
     protected static array $isMassPrunable;
-
-    /**
-     * Cache of resolved class attributes.
-     *
-     * @var array<class-string<self>, array<class-string, mixed>>
-     */
-    protected static array $classAttributes = [];
 
     /**
      * The name of the "created at" column.
@@ -2554,45 +2548,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public function broadcastChannel()
     {
         return str_replace('\\', '.', get_class($this)).'.'.$this->getKey();
-    }
-
-    /**
-     * Resolve a class attribute value from the model.
-     *
-     * @template TAttribute of object
-     *
-     * @param  class-string<TAttribute>  $attributeClass
-     * @param  string|null  $property
-     * @param  string|null  $class
-     * @return mixed
-     */
-    protected static function resolveClassAttribute(string $attributeClass, ?string $property = null, ?string $class = null)
-    {
-        $class = $class ?? static::class;
-
-        $cacheKey = $class.'@'.$attributeClass;
-
-        if (array_key_exists($cacheKey, static::$classAttributes)) {
-            return static::$classAttributes[$cacheKey];
-        }
-
-        try {
-            $reflection = new ReflectionClass($class);
-
-            do {
-                $attributes = $reflection->getAttributes($attributeClass);
-
-                if (count($attributes) > 0) {
-                    $instance = $attributes[0]->newInstance();
-
-                    return static::$classAttributes[$cacheKey] = $property ? $instance->{$property} : $instance;
-                }
-            } while ($reflection = $reflection->getParentClass());
-        } catch (Exception) {
-            //
-        }
-
-        return static::$classAttributes[$cacheKey] = null;
     }
 
     /**
