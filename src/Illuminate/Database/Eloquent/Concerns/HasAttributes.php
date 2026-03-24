@@ -193,6 +193,13 @@ trait HasAttributes
     protected static $castTypeCache = [];
 
     /**
+     * The cache for merged casts (including primary key cast), keyed by model instance.
+     *
+     * @var \WeakMap|null
+     */
+    protected static $getCastsCache = null;
+
+    /**
      * The encrypter instance that is used to encrypt attributes.
      *
      * @var \Illuminate\Contracts\Encryption\Encrypter|null
@@ -799,6 +806,8 @@ trait HasAttributes
         $casts = $this->ensureCastsAreStringValues($casts);
 
         $this->casts = array_merge($this->casts, $casts);
+
+        unset(static::$getCastsCache[$this]);
 
         return $this;
     }
@@ -1715,7 +1724,9 @@ trait HasAttributes
     public function getCasts()
     {
         if ($this->getIncrementing()) {
-            return array_merge([$this->getKeyName() => $this->getKeyType()], $this->casts);
+            static::$getCastsCache ??= new \WeakMap;
+
+            return static::$getCastsCache[$this] ??= array_merge([$this->getKeyName() => $this->getKeyType()], $this->casts);
         }
 
         return $this->casts;
