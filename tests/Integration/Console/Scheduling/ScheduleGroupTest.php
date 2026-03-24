@@ -102,6 +102,7 @@ class ScheduleGroupTest extends TestCase
         } else {
             $this->assertSame($value, $events[0]->expiresAt);
             $this->assertTrue($events[0]->withoutOverlapping);
+            $this->assertTrue($events[0]->releaseOnTerminationSignals);
         }
     }
 
