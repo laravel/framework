@@ -20,7 +20,7 @@ use Illuminate\Console\Scheduling\Schedule as ConsoleSchedule;
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  * @method static mixed macroCall(string $method, array $parameters)
- * @method static \Illuminate\Console\Scheduling\PendingEventAttributes withoutOverlapping(int $expiresAt = 1440)
+ * @method static \Illuminate\Console\Scheduling\PendingEventAttributes withoutOverlapping(int $expiresAt = 1440, bool $releaseOnTerminationSignals = true)
  * @method static void mergeAttributes(\Illuminate\Console\Scheduling\Event $event)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes user(string $user)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes environments(mixed $environments)
