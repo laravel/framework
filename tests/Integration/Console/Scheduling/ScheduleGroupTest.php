@@ -217,6 +217,20 @@ class ScheduleGroupTest extends TestCase
         $this->assertSame('0 4 * * 1-5', $events[3]->expression);
     }
 
+    public function testGroupCanOptOutOfReleaseOnTerminationSignals()
+    {
+        $schedule = new ScheduleClass;
+        $schedule->daily()
+            ->withoutOverlapping(1440, releaseOnTerminationSignals: false)
+            ->group(function ($schedule) {
+                $schedule->command('inspire');
+            });
+
+        $events = $schedule->events();
+        $this->assertTrue($events[0]->withoutOverlapping);
+        $this->assertFalse($events[0]->releaseOnTerminationSignals);
+    }
+
     public function testGroupAppliesEventMacrosToAllEvents()
     {
         Event::macro('sentryMonitor', function () {
