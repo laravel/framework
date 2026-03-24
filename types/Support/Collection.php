@@ -34,7 +34,7 @@ $invokable = new Invokable;
 
 assertType('Illuminate\Support\Collection<int, User>', $collection);
 
-assertType('Illuminate\Support\Collection<int, string>', new Collection(['string']));
+assertType("Illuminate\Support\Collection<int, 'string'>", new Collection(['string']));
 assertType('Illuminate\Support\Collection<string, User>', new Collection(['string' => new User]));
 assertType('Illuminate\Support\Collection<int, User>', new Collection($arrayable));
 assertType('Illuminate\Support\Collection<int, User>', new Collection($collection));
@@ -997,7 +997,7 @@ assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int
 assertType('Illuminate\Support\Collection<int, User>', $collection->collect());
 assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->collect());
 
-assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->push(2));
+assertType('Illuminate\Support\Collection<int, 1>', $collection->make([1])->push(2));
 
 assertType('array<int, User>', $collection->all());
 
