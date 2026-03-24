@@ -4,7 +4,6 @@ namespace Illuminate\Database\Eloquent;
 
 use ArrayAccess;
 use Closure;
-use Exception;
 use Illuminate\Contracts\Broadcasting\HasBroadcastChannel;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
@@ -30,7 +29,8 @@ use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable as SupportStringable;
 use Illuminate\Support\Traits\ForwardsCalls;
-use Illuminate\Support\Traits\ResolvesClassAttributes;use JsonException;
+use Illuminate\Support\Traits\ResolvesClassAttributes;
+use JsonException;
 use JsonSerializable;
 use LogicException;
 use ReflectionClass;

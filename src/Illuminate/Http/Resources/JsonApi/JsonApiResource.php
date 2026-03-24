@@ -14,7 +14,7 @@ use Illuminate\Http\Resources\JsonApi\Attributes\JsonApiMeta;
 use Illuminate\Http\Resources\JsonApi\Attributes\Relationships;
 use Illuminate\Http\Resources\JsonApi\Attributes\Wraps;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Traits\ResolvesClassAttributes;use ReflectionClass;
+use Illuminate\Support\Traits\ResolvesClassAttributes;
 
 class JsonApiResource extends JsonResource
 {

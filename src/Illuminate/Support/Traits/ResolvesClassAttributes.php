@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Illuminate\Support\Traits;
 
-use Exception;use ReflectionClass;trait ResolvesClassAttributes
+use Exception;
+use ReflectionClass;
+
+trait ResolvesClassAttributes
 {
     /**
      * Cache of resolved class attributes.
