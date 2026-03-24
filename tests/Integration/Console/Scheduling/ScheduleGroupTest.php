@@ -102,6 +102,7 @@ class ScheduleGroupTest extends TestCase
         } else {
             $this->assertSame($value, $events[0]->expiresAt);
             $this->assertTrue($events[0]->withoutOverlapping);
+            $this->assertTrue($events[0]->releaseOnTerminationSignals);
         }
     }
 
@@ -214,6 +215,20 @@ class ScheduleGroupTest extends TestCase
         $this->assertSame('0 3 * * 1-5', $events[1]->expression);
         $this->assertSame('* * * * 1-5', $events[2]->expression);
         $this->assertSame('0 4 * * 1-5', $events[3]->expression);
+    }
+
+    public function testGroupCanOptOutOfReleaseOnTerminationSignals()
+    {
+        $schedule = new ScheduleClass;
+        $schedule->daily()
+            ->withoutOverlapping(1440, releaseOnTerminationSignals: false)
+            ->group(function ($schedule) {
+                $schedule->command('inspire');
+            });
+
+        $events = $schedule->events();
+        $this->assertTrue($events[0]->withoutOverlapping);
+        $this->assertFalse($events[0]->releaseOnTerminationSignals);
     }
 
     public function testGroupAppliesEventMacrosToAllEvents()
