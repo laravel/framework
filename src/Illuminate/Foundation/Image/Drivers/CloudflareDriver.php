@@ -67,7 +67,7 @@ class CloudflareDriver implements Driver
 
         $response = $this->http
             ->withToken($this->apiToken)
-            ->attach('file', $contents, $id)
+            ->attach('file', $contents, basename($id))
             ->post("https://api.cloudflare.com/client/v4/accounts/{$this->accountId}/images/v1", [
                 'id' => $id,
             ]);
