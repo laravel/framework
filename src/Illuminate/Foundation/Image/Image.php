@@ -302,6 +302,8 @@ class Image
 
     /**
      * Store the processed image on a filesystem disk.
+     *
+     * @param  array<string, mixed>|string  $options
      */
     public function store(string $path = '', array|string $options = []): string|false
     {
@@ -310,6 +312,8 @@ class Image
 
     /**
      * Store the processed image on a filesystem disk with public visibility.
+     *
+     * @param  array<string, mixed>|string  $options
      */
     public function storePublicly(string $path = '', array|string $options = []): string|false
     {
@@ -322,6 +326,8 @@ class Image
 
     /**
      * Store the processed image on a filesystem disk with a given name.
+     *
+     * @param  array<string, mixed>|string  $options
      */
     public function storeAs(string $path, ?string $name = null, array|string $options = []): string|false
     {
@@ -344,6 +350,8 @@ class Image
 
     /**
      * Store the processed image on a filesystem disk with public visibility and a given name.
+     *
+     * @param  array<string, mixed>|string  $options
      */
     public function storePubliclyAs(string $path, ?string $name = null, array|string $options = []): string|false
     {
@@ -429,6 +437,9 @@ class Image
 
     /**
      * Parse the given options into an array.
+     *
+     * @param  array<string, mixed>|string  $options
+     * @return array<string, mixed>
      */
     protected function parseOptions(array|string $options): array
     {
