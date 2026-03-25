@@ -7,9 +7,11 @@ return [
     | Default Image Driver
     |--------------------------------------------------------------------------
     |
-    | TODO
+    | This option controls the default image processing driver that will be
+    | used when manipulating or converting images. This driver is always
+    | utilized unless another driver is explicitly specified instead.
     |
-    | Supported drivers: "gd", "imagick", "cloudflare"
+    | Supported: "gd", "imagick", "cloudflare"
     |
     */
 
@@ -17,17 +19,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Cloudflare Images
+    | Image Drivers
     |--------------------------------------------------------------------------
     |
-    | TODO
+    | Here you may configure the Cloudflare Images API credentials for the
+    | "cloudflare" image driver. The prefix option is used to namespace
+    | temporary uploads so that orphaned images may be pruned safely.
     |
     */
 
-    'cloudflare' => [
-        'account_id' => env('CLOUDFLARE_IMAGES_ACCOUNT_ID'),
-        'api_token' => env('CLOUDFLARE_IMAGES_API_TOKEN'),
-        'prefix' => env('CLOUDFLARE_IMAGES_PREFIX', 'laravel-image'),
+    'drivers' => [
+
+        'cloudflare' => [
+            'account_id' => env('IMAGE_CLOUDFLARE_ACCOUNT_ID'),
+            'api_token' => env('IMAGE_CLOUDFLARE_API_TOKEN'),
+            'prefix' => env('IMAGE_CLOUDFLARE_PREFIX', 'laravel-image'),
+        ],
+
     ],
 
 ];
