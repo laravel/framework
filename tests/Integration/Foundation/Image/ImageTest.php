@@ -630,6 +630,83 @@ class ImageTest extends TestCase
         $this->assertSame(300, $height);
     }
 
+    public function test_store_with_default_disk()
+    {
+        Storage::fake();
+
+        $image = new Image($this->fakeImageContents(100, 100));
+        $image->toWebp()->store('avatars');
+
+        $files = Storage::files('avatars');
+
+        $this->assertCount(1, $files);
+        $this->assertStringEndsWith('.webp', $files[0]);
+    }
+
+    public function test_store_with_no_arguments()
+    {
+        Storage::fake();
+
+        $image = new Image($this->fakeImageContents(100, 100));
+        $image->store();
+
+        $files = Storage::allFiles();
+
+        $this->assertCount(1, $files);
+    }
+
+    public function test_store_as_with_path_and_name_only()
+    {
+        Storage::fake();
+
+        $image = new Image($this->fakeImageContents(100, 100));
+        $image->storeAs('avatars', 'photo.jpg');
+
+        Storage::assertExists('avatars/photo.jpg');
+    }
+
+    public function test_store_as_with_name_only_no_options()
+    {
+        Storage::fake();
+
+        $image = new Image($this->fakeImageContents(100, 100));
+        $image->storeAs('photo.jpg');
+
+        Storage::assertExists('photo.jpg');
+    }
+
+    public function test_store_publicly_with_default_disk()
+    {
+        Storage::fake();
+
+        $image = new Image($this->fakeImageContents(100, 100));
+        $image->storePublicly('avatars');
+
+        $files = Storage::files('avatars');
+
+        $this->assertCount(1, $files);
+    }
+
+    public function test_store_publicly_as_with_name_only()
+    {
+        Storage::fake();
+
+        $image = new Image($this->fakeImageContents(100, 100));
+        $image->storePubliclyAs('avatar.jpg');
+
+        Storage::assertExists('avatar.jpg');
+    }
+
+    public function test_store_publicly_as_with_path_and_name()
+    {
+        Storage::fake();
+
+        $image = new Image($this->fakeImageContents(100, 100));
+        $image->storePubliclyAs('avatars', 'photo.jpg');
+
+        Storage::assertExists('avatars/photo.jpg');
+    }
+
     protected function fakeImageContents(int $width = 100, int $height = 100): string
     {
         $file = UploadedFile::fake()->image('test.jpg', $width, $height);
