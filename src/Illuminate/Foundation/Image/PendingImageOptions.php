@@ -7,7 +7,7 @@ class PendingImageOptions
     /**
      * The default output quality.
      */
-    const int DEFAULT_QUALITY = 75;
+    const DEFAULT_QUALITY = 75;
 
     /**
      * The cover width.
