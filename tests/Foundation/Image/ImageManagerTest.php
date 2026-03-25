@@ -232,7 +232,9 @@ class ImageManagerTest extends TestCase
 
         $driver = new class($pruned) implements Driver
         {
-            public function __construct(private &$pruned) {}
+            public function __construct(private &$pruned)
+            {
+            }
 
             public function process(string $contents, \Illuminate\Foundation\Image\PendingImageOptions $options): string
             {
@@ -260,7 +262,9 @@ class ImageManagerTest extends TestCase
 
         $cloudflareDriver = new class($pruned) implements Driver
         {
-            public function __construct(private &$pruned) {}
+            public function __construct(private &$pruned)
+            {
+            }
 
             public function process(string $contents, \Illuminate\Foundation\Image\PendingImageOptions $options): string
             {
