@@ -56,7 +56,12 @@ class CloudflareDriver implements Driver
             ->withToken($this->apiToken)
             ->attach('file', $contents, Str::random(16))
             ->post("https://api.cloudflare.com/client/v4/accounts/{$this->accountId}/images/v1", [
-                'id' => $this->prefix.'/'.Str::random(40),
+                'id' => $this->prefix.'/'.Str::random(40).match ($sourceMimeType) {
+                    'image/jpeg' => '.jpg',
+                    'image/png' => '.png',
+                    'image/gif' => '.gif',
+                    'image/webp' => '.webp',
+                },
             ]);
 
         if ($response->failed()) {
