@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Image\Drivers;
 
+use finfo;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Foundation\Image\ImageException;
 use Illuminate\Foundation\Image\PendingImageOptions;
@@ -17,6 +18,7 @@ class CloudflareDriver implements Driver
         protected HttpFactory $http,
         protected string $accountId,
         protected string $apiToken,
+        protected string $prefix,
     ) {
         //
     }
@@ -42,7 +44,7 @@ class CloudflareDriver implements Driver
      */
     public function process(string $contents, PendingImageOptions $options): string
     {
-        $sourceMimeType = (new \finfo(FILEINFO_MIME_TYPE))->buffer($contents);
+        $sourceMimeType = (new finfo(FILEINFO_MIME_TYPE))->buffer($contents);
 
         if (! in_array($sourceMimeType, ['image/jpeg', 'image/png', 'image/gif', 'image/webp'])) {
             throw new ImageException("The image format [{$sourceMimeType}] is not supported by the Cloudflare driver.");
@@ -51,7 +53,9 @@ class CloudflareDriver implements Driver
         $response = $this->http
             ->withToken($this->apiToken)
             ->attach('file', $contents, Str::random(16))
-            ->post("https://api.cloudflare.com/client/v4/accounts/{$this->accountId}/images/v1");
+            ->post("https://api.cloudflare.com/client/v4/accounts/{$this->accountId}/images/v1", [
+                'id' => $this->prefix.'/'.Str::random(40),
+            ]);
 
         if ($response->failed()) {
             throw new ImageException(

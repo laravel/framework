@@ -21,7 +21,7 @@ class CloudflareDriverTest extends TestCase
 
     public function test_ensure_requirements_throws_without_account_id()
     {
-        $driver = new CloudflareDriver(new HttpFactory, '', 'token');
+        $driver = new CloudflareDriver(new HttpFactory, '', 'token', 'laravel-image');
 
         $this->expectException(ImageException::class);
         $this->expectExceptionMessage('The Cloudflare image driver requires an account ID and API token.');
@@ -31,7 +31,7 @@ class CloudflareDriverTest extends TestCase
 
     public function test_ensure_requirements_throws_without_api_token()
     {
-        $driver = new CloudflareDriver(new HttpFactory, 'account', '');
+        $driver = new CloudflareDriver(new HttpFactory, 'account', '', 'laravel-image');
 
         $this->expectException(ImageException::class);
         $this->expectExceptionMessage('The Cloudflare image driver requires an account ID and API token.');
@@ -41,7 +41,7 @@ class CloudflareDriverTest extends TestCase
 
     public function test_ensure_requirements_passes_with_credentials()
     {
-        $driver = new CloudflareDriver(new HttpFactory, 'account', 'token');
+        $driver = new CloudflareDriver(new HttpFactory, 'account', 'token', 'laravel-image');
 
         $driver->ensureRequirementsAreMet();
 
@@ -50,7 +50,7 @@ class CloudflareDriverTest extends TestCase
 
     public function test_throws_for_unsupported_input_format()
     {
-        $driver = new CloudflareDriver(new HttpFactory, 'account', 'token');
+        $driver = new CloudflareDriver(new HttpFactory, 'account', 'token', 'laravel-image');
 
         $this->expectException(ImageException::class);
         $this->expectExceptionMessage('The image format [text/plain] is not supported by the Cloudflare driver.');
@@ -60,7 +60,7 @@ class CloudflareDriverTest extends TestCase
 
     public function test_throws_for_bmp_input_format()
     {
-        $driver = new CloudflareDriver(new HttpFactory, 'account', 'token');
+        $driver = new CloudflareDriver(new HttpFactory, 'account', 'token', 'laravel-image');
 
         $this->expectException(ImageException::class);
         $this->expectExceptionMessage('The image format [image/bmp] is not supported by the Cloudflare driver.');
@@ -88,7 +88,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('transformed-bytes'),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account-id', 'api-token');
+        $driver = new CloudflareDriver($http, 'account-id', 'api-token', 'laravel-image');
 
         $options = new PendingImageOptions;
         $options->coverWidth = 100;
@@ -116,7 +116,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('bytes'),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $options = new PendingImageOptions;
         $options->coverWidth = 100;
@@ -135,6 +135,38 @@ class CloudflareDriverTest extends TestCase
         });
     }
 
+    public function test_process_uploads_with_laravel_image_prefix()
+    {
+        $http = new HttpFactory;
+
+        $http->fake([
+            'api.cloudflare.com/*' => $http->response([
+                'success' => true,
+                'result' => [
+                    'id' => 'img-123',
+                    'variants' => ['https://imagedelivery.net/abc/img-123/public'],
+                ],
+            ]),
+            'imagedelivery.net/*' => $http->response('bytes'),
+        ]);
+
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
+
+        $options = new PendingImageOptions;
+        $options->coverWidth = 100;
+        $options->coverHeight = 100;
+
+        $driver->process($this->fakeImageContents(), $options);
+
+        $http->assertSent(function (Request $request) {
+            if (! str_contains($request->url(), 'api.cloudflare.com')) {
+                return false;
+            }
+
+            return str_contains($request->body(), 'laravel-image/');
+        });
+    }
+
     public function test_process_sends_auth_token()
     {
         $http = new HttpFactory;
@@ -150,7 +182,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('bytes'),
         ]);
 
-        $driver = new CloudflareDriver($http, 'my-account', 'my-secret-token');
+        $driver = new CloudflareDriver($http, 'my-account', 'my-secret-token', 'laravel-image');
 
         $driver->process($this->fakeImageContents(), new PendingImageOptions);
 
@@ -171,7 +203,7 @@ class CloudflareDriverTest extends TestCase
             ], 403),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'bad-token');
+        $driver = new CloudflareDriver($http, 'account', 'bad-token', 'laravel-image');
 
         $this->expectException(ImageException::class);
         $this->expectExceptionMessage('Cloudflare image upload failed: Invalid token');
@@ -189,7 +221,7 @@ class CloudflareDriverTest extends TestCase
                 ->push(['success' => true]), // delete
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $this->expectException(ImageException::class);
         $this->expectExceptionMessage('Cloudflare did not return any image variants.');
@@ -208,7 +240,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('', 500),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $this->expectException(ImageException::class);
         $this->expectExceptionMessage('Failed to fetch transformed image from Cloudflare.');
@@ -227,7 +259,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('', 500),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         try {
             $driver->process($this->fakeImageContents(), new PendingImageOptions);
@@ -256,7 +288,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('bytes'),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $options = new PendingImageOptions;
         $options->coverWidth = 200;
@@ -287,7 +319,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('bytes'),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $options = new PendingImageOptions;
         $options->scaleWidth = 800;
@@ -317,7 +349,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('bytes'),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $options = new PendingImageOptions;
         $options->blur = 15;
@@ -344,7 +376,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('bytes'),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $options = new PendingImageOptions;
         $options->sharpen = 50;
@@ -371,7 +403,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('bytes'),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $options = new PendingImageOptions;
         $options->flip = true;
@@ -398,7 +430,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('bytes'),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $options = new PendingImageOptions;
         $options->flop = true;
@@ -425,7 +457,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('bytes'),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $options = new PendingImageOptions;
         $options->flip = true;
@@ -453,7 +485,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('bytes'),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $options = new PendingImageOptions;
         $options->greyscale = true;
@@ -480,7 +512,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('bytes'),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $options = new PendingImageOptions;
         $options->format = 'webp';
@@ -510,7 +542,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('bytes'),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $options = new PendingImageOptions;
         $options->quality = 90;
@@ -537,7 +569,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('bytes'),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $options = new PendingImageOptions;
         $options->coverWidth = 100;
@@ -565,7 +597,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('bytes'),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $options = new PendingImageOptions;
         $options->format = 'jpg';
@@ -593,7 +625,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('bytes'),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $options = new PendingImageOptions;
         $options->format = 'jpg';
@@ -620,7 +652,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('bytes'),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $options = new PendingImageOptions;
         $options->coverWidth = 100;
@@ -648,7 +680,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('bytes'),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $options = new PendingImageOptions;
         $options->sharpen = 100;
@@ -675,7 +707,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('bytes'),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $options = new PendingImageOptions;
         $options->sharpen = 1;
@@ -702,7 +734,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('bytes'),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $options = new PendingImageOptions;
         $options->blur = 10;
@@ -731,7 +763,7 @@ class CloudflareDriverTest extends TestCase
             'imagedelivery.net/*' => $http->response('bytes'),
         ]);
 
-        $driver = new CloudflareDriver($http, 'account', 'token');
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $options = new PendingImageOptions;
         $options->coverWidth = 200;

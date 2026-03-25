@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Image\Drivers;
 
+use finfo;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Foundation\Image\ImageException;
 use Illuminate\Foundation\Image\PendingImageOptions;
@@ -50,7 +51,7 @@ abstract class InterventionDriver implements Driver
      */
     public function process(string $contents, PendingImageOptions $options): string
     {
-        $mimeType = (new \finfo(FILEINFO_MIME_TYPE))->buffer($contents);
+        $mimeType = (new finfo(FILEINFO_MIME_TYPE))->buffer($contents);
 
         if (! in_array($mimeType, ['image/jpeg', 'image/png', 'image/bmp', 'image/gif', 'image/webp'])) {
             throw new ImageException("The image format [{$mimeType}] is not supported.");

@@ -27,6 +27,7 @@ return [
     'cloudflare' => [
         'account_id' => env('CLOUDFLARE_IMAGES_ACCOUNT_ID'),
         'api_token' => env('CLOUDFLARE_IMAGES_API_TOKEN'),
+        'prefix' => env('CLOUDFLARE_IMAGES_PREFIX', 'laravel-image'),
     ],
 
 ];

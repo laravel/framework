@@ -3,12 +3,14 @@
 namespace Illuminate\Foundation\Image;
 
 use Closure;
+use finfo;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Throwable;
 
 class Image
 {
@@ -52,26 +54,32 @@ class Image
 
     /**
      * Set the cover dimensions.
+     *
+     * @param  int<1, max>  $width
+     * @param  int<1, max>  $height
      */
     public function cover(int $width, int $height): static
     {
         $clone = $this->cloneWith();
 
-        $clone->options->coverWidth = $width;
-        $clone->options->coverHeight = $height;
+        $clone->options->coverWidth = max(1, $width);
+        $clone->options->coverHeight = max(1, $height);
 
         return $clone;
     }
 
     /**
      * Set the scale dimensions.
+     *
+     * @param  int<1, max>  $width
+     * @param  int<1, max>  $height
      */
     public function scale(int $width, int $height): static
     {
         $clone = $this->cloneWith();
 
-        $clone->options->scaleWidth = $width;
-        $clone->options->scaleHeight = $height;
+        $clone->options->scaleWidth = max(1, $width);
+        $clone->options->scaleHeight = max(1, $height);
 
         return $clone;
     }
@@ -90,12 +98,14 @@ class Image
 
     /**
      * Apply a blur effect.
+     *
+     * @param  int<0, 100>  $amount
      */
     public function blur(int $amount = 5): static
     {
         $clone = $this->cloneWith();
 
-        $clone->options->blur = $amount;
+        $clone->options->blur = max(0, min(100, $amount));
 
         return $clone;
     }
@@ -114,12 +124,14 @@ class Image
 
     /**
      * Sharpen the image.
+     *
+     * @param  int<0, 100>  $amount
      */
     public function sharpen(int $amount = 10): static
     {
         $clone = $this->cloneWith();
 
-        $clone->options->sharpen = $amount;
+        $clone->options->sharpen = max(0, min(100, $amount));
 
         return $clone;
     }
@@ -160,12 +172,14 @@ class Image
 
     /**
      * Set the output quality.
+     *
+     * @param  int<1, 100>  $quality
      */
     public function quality(int $quality): static
     {
         $clone = $this->cloneWith();
 
-        $clone->options->quality = $quality;
+        $clone->options->quality = max(1, min(100, $quality));
 
         return $clone;
     }
@@ -260,7 +274,7 @@ class Image
                 );
             } catch (ImageException $e) {
                 throw $e;
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 throw new ImageException("Failed to process image: {$e->getMessage()}", 0, $e);
             }
 
@@ -349,9 +363,9 @@ class Image
      */
     public function mimeType(): string
     {
-        $finfo = new \finfo(FILEINFO_MIME_TYPE);
-
-        return $finfo->buffer($this->toBytes());
+        return once(function () {
+            return (new finfo(FILEINFO_MIME_TYPE))->buffer($this->toBytes());
+        });
     }
 
     /**
@@ -378,9 +392,11 @@ class Image
      */
     public function dimensions(): array
     {
-        $size = getimagesizefromstring($this->toBytes());
+        return once(function () {
+            $size = getimagesizefromstring($this->toBytes());
 
-        return [$size[0], $size[1]];
+            return [$size[0], $size[1]];
+        });
     }
 
     /**
