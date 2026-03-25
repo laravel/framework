@@ -225,6 +225,77 @@ class ImageManagerTest extends TestCase
         $this->assertNotSame($manager->driver('one'), $manager->driver('two'));
     }
 
+    public function test_prune_orphaned_uses_default_driver()
+    {
+        $app = $this->makeApp([]);
+        $pruned = false;
+
+        $driver = new class($pruned) implements Driver
+        {
+            public function __construct(private &$pruned) {}
+
+            public function process(string $contents, \Illuminate\Foundation\Image\PendingImageOptions $options): string
+            {
+                return $contents;
+            }
+
+            public function pruneOrphaned(): void
+            {
+                $this->pruned = true;
+            }
+        };
+
+        $manager = new ImageManager($app);
+        $manager->extend('gd', fn () => $driver);
+
+        $manager->pruneOrphaned();
+
+        $this->assertTrue($pruned);
+    }
+
+    public function test_prune_orphaned_accepts_specific_driver()
+    {
+        $app = $this->makeApp([]);
+        $pruned = false;
+
+        $cloudflareDriver = new class($pruned) implements Driver
+        {
+            public function __construct(private &$pruned) {}
+
+            public function process(string $contents, \Illuminate\Foundation\Image\PendingImageOptions $options): string
+            {
+                return $contents;
+            }
+
+            public function pruneOrphaned(): void
+            {
+                $this->pruned = true;
+            }
+        };
+
+        $manager = new ImageManager($app);
+        $manager->extend('gd', fn () => m::mock(Driver::class));
+        $manager->extend('cloudflare', fn () => $cloudflareDriver);
+
+        $manager->pruneOrphaned('cloudflare');
+
+        $this->assertTrue($pruned);
+    }
+
+    public function test_prune_orphaned_is_noop_when_driver_does_not_support_it()
+    {
+        $app = $this->makeApp([]);
+
+        $driver = m::mock(Driver::class);
+
+        $manager = new ImageManager($app);
+        $manager->extend('gd', fn () => $driver);
+
+        $manager->pruneOrphaned();
+
+        $this->assertTrue(true);
+    }
+
     protected function fakeImageContents(): string
     {
         $file = UploadedFile::fake()->image('test.jpg', 100, 100);
