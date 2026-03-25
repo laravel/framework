@@ -84,11 +84,7 @@ class Renderer
      */
     public function render(Request $request, Throwable $throwable)
     {
-        $flattenException = $this->bladeMapper->map(
-            $this->htmlErrorRenderer->render($throwable),
-        );
-
-        $exception = new Exception($flattenException, $request, $this->listener, $this->basePath);
+        $exception = $this->resolveException($request, $throwable);
 
         $exceptionAsMarkdown = $this->viewFactory->make('laravel-exceptions-renderer::markdown', [
             'exception' => $exception,
@@ -98,6 +94,39 @@ class Renderer
             'exception' => $exception,
             'exceptionAsMarkdown' => $exceptionAsMarkdown,
         ])->render();
+    }
+
+    /**
+     * Render the given exception as a markdown string.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Throwable  $throwable
+     * @return string
+     */
+    public function renderMarkdown(Request $request, Throwable $throwable)
+    {
+        $exception = $this->resolveException($request, $throwable);
+
+        return $this->viewFactory->make('laravel-exceptions-renderer::markdown', [
+            'exception' => $exception,
+        ])->render();
+    }
+
+    /**
+     * Resolve the exception into a renderable exception instance.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Throwable  $throwable
+     * @return \Illuminate\Foundation\Exceptions\Renderer\Exception
+     */
+    protected function resolveException(Request $request, Throwable $throwable)
+    {
+        return new Exception(
+            $this->bladeMapper->map($this->htmlErrorRenderer->render($throwable)),
+            $request,
+            $this->listener,
+            $this->basePath,
+        );
     }
 
     /**
