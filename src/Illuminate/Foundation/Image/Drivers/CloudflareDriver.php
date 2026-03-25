@@ -117,7 +117,7 @@ class CloudflareDriver implements Driver
 
             if ($response->failed()) {
                 throw new ImageException(
-                    'Failed to fetch transformed image from Cloudflare.',
+                    'Failed to fetch transformed image from Cloudflare: '.$response->json('errors.0.message', 'Unknown error'),
                     previous: $response->toException(),
                 );
             }
@@ -200,7 +200,7 @@ class CloudflareDriver implements Driver
 
             if ($response->failed()) {
                 throw new ImageException(
-                    'Failed to list images from Cloudflare.',
+                    'Failed to list images from Cloudflare: '.$response->json('errors.0.message', 'Unknown error'),
                     previous: $response->toException(),
                 );
             }
