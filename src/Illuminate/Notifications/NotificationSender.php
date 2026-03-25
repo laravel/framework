@@ -234,7 +234,8 @@ class NotificationSender
                     $notification->locale = $this->locale;
                 }
 
-                $connection = $this->getAttributeValue($notification, Connection::class, 'connection')
+                $connection = $notification->connection
+                    ?? $this->getAttributeValue($notification, Connection::class, 'connection')
                     ?? $this->manager->resolveConnectionFromQueueRoute($notification)
                     ?? null;
 
@@ -242,7 +243,8 @@ class NotificationSender
                     $connection = $notification->viaConnections()[$channel] ?? $connection;
                 }
 
-                $queue = $this->getAttributeValue($notification, QueueAttribute::class, 'queue')
+                $queue = $notification->queue
+                    ?? $this->getAttributeValue($notification, QueueAttribute::class, 'queue')
                     ?? $this->manager->resolveQueueFromQueueRoute($notification)
                     ?? null;
 
