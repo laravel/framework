@@ -477,9 +477,17 @@ class Image implements Stringable
     /**
      * Get the string representation of the image.
      */
-    public function __toString(): string
+    public function toString(): string
     {
         return $this->toDataUri();
+    }
+
+    /**
+     * Get the string representation of the image.
+     */
+    public function __toString(): string
+    {
+        return $this->toString();
     }
 
     /**

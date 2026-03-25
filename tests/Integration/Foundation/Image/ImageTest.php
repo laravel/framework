@@ -284,16 +284,6 @@ class ImageTest extends TestCase
         $this->assertSame([300, 200], $image->dimensions());
     }
 
-    public function test_stringable_to_image()
-    {
-        $contents = $this->fakeImageContents(100, 100);
-
-        $image = str($contents)->toImage();
-
-        $this->assertInstanceOf(Image::class, $image);
-        $this->assertSame([100, 100], $image->dimensions());
-    }
-
     public function test_sharpen_after_scale()
     {
         $image = new Image($this->fakeImageContents(400, 400));

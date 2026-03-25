@@ -4,7 +4,6 @@ namespace Illuminate\Support;
 
 use ArrayAccess;
 use Closure;
-use Illuminate\Foundation\Image\Image;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Dumpable;
@@ -1397,14 +1396,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     public function toHtmlString()
     {
         return new HtmlString($this->value);
-    }
-
-    /**
-     * Create an image instance from the string contents.
-     */
-    public function toImage(): Image
-    {
-        return new Image($this->value);
     }
 
     /**

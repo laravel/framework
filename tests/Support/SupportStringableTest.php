@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Container\Container;
 use Illuminate\Encryption\Encrypter;
-use Illuminate\Foundation\Image\Image;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
@@ -1433,17 +1432,6 @@ class SupportStringableTest extends TestCase
             new HtmlString('<h1>Test String</h1>'),
             $this->stringable('<h1>Test String</h1>')->toHtmlString()
         );
-    }
-
-    public function testToImage()
-    {
-        $file = \Illuminate\Http\UploadedFile::fake()->image('test.jpg', 100, 100);
-        $contents = file_get_contents($file->getRealPath());
-
-        $image = $this->stringable($contents)->toImage();
-
-        $this->assertInstanceOf(Image::class, $image);
-        $this->assertSame([100, 100], $image->dimensions());
     }
 
     public function testStripTags()
