@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Foundation\Image\Drivers;
 
 use Illuminate\Foundation\Image\Drivers\GdDriver;
+use Illuminate\Foundation\Image\ImageException;
 use Illuminate\Foundation\Image\PendingImageOptions;
 use Illuminate\Http\UploadedFile;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -225,7 +226,7 @@ class GdDriverTest extends TestCase
     {
         $driver = new GdDriver;
 
-        $this->expectException(\Illuminate\Foundation\Image\ImageException::class);
+        $this->expectException(ImageException::class);
         $this->expectExceptionMessage('The image format [text/plain] is not supported.');
 
         $driver->process('not-an-image', new PendingImageOptions);

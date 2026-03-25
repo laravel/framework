@@ -454,7 +454,6 @@ class Image
     /**
      * Prevent serialization of the image.
      *
-     * @return never
      *
      * @throws ImageException
      */
