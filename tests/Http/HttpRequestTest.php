@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Http;
 
 use Carbon\CarbonInterval;
 use Carbon\Unit;
+use Illuminate\Foundation\Image\Image;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Route;
@@ -1170,7 +1171,7 @@ class HttpRequestTest extends TestCase
             ],
         ];
         $request = Request::create('/', 'GET', [], [], $files);
-        $this->assertInstanceOf(\Illuminate\Foundation\Image\Image::class, $request->image('avatar'));
+        $this->assertInstanceOf(Image::class, $request->image('avatar'));
     }
 
     public function testImageMethodReturnsNullForMissingKey()
