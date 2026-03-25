@@ -41,7 +41,7 @@ abstract class InterventionDriver implements Driver
         if (! class_exists(ImageManager::class)) {
             throw new ImageException(
                 'Intervention Image is required to use this driver. '.
-                'You may install it via: composer require intervention/image:^3.0',
+                'You may install it via: composer require intervention/image:^3.11.7',
             );
         }
     }
