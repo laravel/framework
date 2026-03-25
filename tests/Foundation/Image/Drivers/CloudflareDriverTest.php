@@ -221,6 +221,75 @@ class CloudflareDriverTest extends TestCase
         $driver->process($this->fakeImageContents(), new PendingImageOptions);
     }
 
+    public function test_process_upload_failure_preserves_original_exception()
+    {
+        $http = new HttpFactory;
+
+        $http->fake([
+            'api.cloudflare.com/*' => $http->response(['success' => false], 403),
+        ]);
+
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
+
+        try {
+            $driver->process($this->fakeImageContents(), new PendingImageOptions);
+        } catch (ImageException $e) {
+            $this->assertNotNull($e->getPrevious());
+            $this->assertInstanceOf(\Illuminate\Http\Client\RequestException::class, $e->getPrevious());
+
+            return;
+        }
+
+        $this->fail('ImageException was not thrown.');
+    }
+
+    public function test_process_fetch_failure_preserves_original_exception()
+    {
+        $http = new HttpFactory;
+
+        $http->fake([
+            'api.cloudflare.com/client/v4/accounts/account/images/v1' => $http->sequence()
+                ->push(['success' => true, 'result' => ['id' => 'img-123', 'variants' => ['https://imagedelivery.net/abc/img-123/public']]])
+                ->push(['success' => true]),
+            'imagedelivery.net/*' => $http->response('', 500),
+        ]);
+
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
+
+        try {
+            $driver->process($this->fakeImageContents(), new PendingImageOptions);
+        } catch (ImageException $e) {
+            $this->assertNotNull($e->getPrevious());
+            $this->assertInstanceOf(\Illuminate\Http\Client\RequestException::class, $e->getPrevious());
+
+            return;
+        }
+
+        $this->fail('ImageException was not thrown.');
+    }
+
+    public function test_prune_orphaned_list_failure_preserves_original_exception()
+    {
+        $http = new HttpFactory;
+
+        $http->fake([
+            'api.cloudflare.com/*' => $http->response(['success' => false], 500),
+        ]);
+
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
+
+        try {
+            $driver->pruneOrphaned();
+        } catch (ImageException $e) {
+            $this->assertNotNull($e->getPrevious());
+            $this->assertInstanceOf(\Illuminate\Http\Client\RequestException::class, $e->getPrevious());
+
+            return;
+        }
+
+        $this->fail('ImageException was not thrown.');
+    }
+
     public function test_process_throws_on_empty_variants()
     {
         $http = new HttpFactory;
