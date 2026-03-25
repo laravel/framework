@@ -47,7 +47,7 @@ class MariaDbSchemaState extends MySqlSchemaState
     protected function detectClientVersion(): array
     {
         // Minimum version of MariaDB that supports the mariadb command
-        $version = '10.4.6';
+        $version = '10.5.2';
 
         try {
             $versionOutput = $this->makeProcess('mariadb --version')->mustRun()->getOutput();
