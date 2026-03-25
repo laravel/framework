@@ -48,6 +48,16 @@ class CloudflareDriverTest extends TestCase
         $this->assertTrue(true);
     }
 
+    public function test_ensure_requirements_throws_without_prefix()
+    {
+        $driver = new CloudflareDriver(new HttpFactory, 'account', 'token', '');
+
+        $this->expectException(ImageException::class);
+        $this->expectExceptionMessage('The Cloudflare image driver requires a prefix for temporary uploads.');
+
+        $driver->ensureRequirementsAreMet();
+    }
+
     public function test_throws_for_unsupported_input_format()
     {
         $driver = new CloudflareDriver(new HttpFactory, 'account', 'token', 'laravel-image');
