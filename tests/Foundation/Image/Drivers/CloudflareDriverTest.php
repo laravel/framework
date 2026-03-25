@@ -101,6 +101,40 @@ class CloudflareDriverTest extends TestCase
         $http->assertSentCount(3); // upload + fetch + delete
     }
 
+    public function test_process_uploads_with_random_filename()
+    {
+        $http = new HttpFactory;
+
+        $http->fake([
+            'api.cloudflare.com/*' => $http->response([
+                'success' => true,
+                'result' => [
+                    'id' => 'img-123',
+                    'variants' => ['https://imagedelivery.net/abc/img-123/public'],
+                ],
+            ]),
+            'imagedelivery.net/*' => $http->response('bytes'),
+        ]);
+
+        $driver = new CloudflareDriver($http, 'account', 'token');
+
+        $options = new PendingImageOptions;
+        $options->coverWidth = 100;
+        $options->coverHeight = 100;
+
+        $driver->process($this->fakeImageContents(), $options);
+
+        $http->assertSent(function (Request $request) {
+            if (! str_contains($request->url(), 'api.cloudflare.com')) {
+                return false;
+            }
+
+            $body = $request->body();
+
+            return str_contains($body, 'filename="') && ! str_contains($body, 'filename="image"');
+        });
+    }
+
     public function test_process_sends_auth_token()
     {
         $http = new HttpFactory;

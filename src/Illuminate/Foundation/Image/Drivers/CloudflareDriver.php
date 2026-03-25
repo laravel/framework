@@ -6,6 +6,7 @@ use Illuminate\Contracts\Image\Driver;
 use Illuminate\Foundation\Image\ImageException;
 use Illuminate\Foundation\Image\PendingImageOptions;
 use Illuminate\Http\Client\Factory as HttpFactory;
+use Illuminate\Support\Str;
 
 class CloudflareDriver implements Driver
 {
@@ -49,7 +50,7 @@ class CloudflareDriver implements Driver
 
         $response = $this->http
             ->withToken($this->apiToken)
-            ->attach('file', $contents, 'image')
+            ->attach('file', $contents, Str::random(16))
             ->post("https://api.cloudflare.com/client/v4/accounts/{$this->accountId}/images/v1");
 
         if ($response->failed()) {
