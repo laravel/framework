@@ -322,7 +322,7 @@ class CloudflareDriverTest extends TestCase
         $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $this->expectException(ImageException::class);
-        $this->expectExceptionMessage('Failed to fetch transformed image from Cloudflare.');
+        $this->expectExceptionMessage('Failed to fetch transformed image from Cloudflare: Unknown error');
 
         $driver->process($this->fakeImageContents(), new PendingImageOptions);
     }
