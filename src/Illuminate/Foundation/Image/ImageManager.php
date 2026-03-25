@@ -149,12 +149,12 @@ class ImageManager
     /**
      * Purge orphaned images from the current driver.
      */
-    public function purge(): void
+    public function pruneOrphaned(): void
     {
         $driver = $this->driver();
 
-        if (method_exists($driver, 'purge')) {
-            $driver->purge();
+        if (method_exists($driver, 'pruneOrphaned')) {
+            $driver->pruneOrphaned();
         }
     }
 

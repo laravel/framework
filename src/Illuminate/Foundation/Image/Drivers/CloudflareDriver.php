@@ -170,7 +170,7 @@ class CloudflareDriver implements Driver
     /**
      * Delete orphaned images from Cloudflare that match the configured prefix.
      */
-    public function purge(): void
+    public function pruneOrphaned(): void
     {
         $page = 1;
 
