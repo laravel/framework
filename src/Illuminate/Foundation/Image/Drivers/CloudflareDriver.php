@@ -174,9 +174,6 @@ class CloudflareDriver implements Driver
 
         $params[] = 'quality='.($options->quality ?? PendingImageOptions::DEFAULT_QUALITY);
 
-        // Cloudflare Images flexible variant format:
-        // https://imagedelivery.net/{account_hash}/{image_id}/{params}
-        // The params replace the variant name (e.g. /public) in the delivery URL.
         return preg_replace('#/[^/]+$#', '/'.implode(',', $params), $baseUrl);
     }
 
