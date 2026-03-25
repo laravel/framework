@@ -467,7 +467,7 @@ class ImageTest extends TestCase
     public function test_multiple_operations_chained()
     {
         $image = $this->makeImage();
-        $result = $image->orient()->cover(200, 200)->blur(10)->greyscale()->sharpen(5)->toWebp()->quality(80);
+        $result = $image->orient()->cover(200, 200)->blur(10)->greyscale()->sharpen(5)->toWebp()->quality(75);
 
         $options = $this->getOptions($result);
 
