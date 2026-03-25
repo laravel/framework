@@ -807,7 +807,9 @@ trait HasAttributes
 
         $this->casts = array_merge($this->casts, $casts);
 
-        unset(static::$getCastsCache[$this]);
+        if (static::$getCastsCache) {
+            unset(static::$getCastsCache[$this]);
+        }
 
         return $this;
     }
