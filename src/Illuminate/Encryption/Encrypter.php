@@ -163,7 +163,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
         }
 
         $this->ensureTagIsValid(
-            $tag = empty($payload['tag']) ? null : base64_decode($payload['tag'], true)
+            $tag = empty($payload['tag']) ? null : base64_decode($payload['tag'])
         );
 
         // Validate MAC against all keys in constant time to prevent
