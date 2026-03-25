@@ -77,6 +77,6 @@ class SentMessage
     {
         $hasAttachments = ($data['hasAttachments'] ?? false) === true;
 
-        $this->sentMessage = $hasAttachments ? unserialize(base64_decode($data['sentMessage'])) : $data['sentMessage'];
+        $this->sentMessage = $hasAttachments ? unserialize(base64_decode($data['sentMessage']), ['allowed_classes' => true]) : $data['sentMessage'];
     }
 }

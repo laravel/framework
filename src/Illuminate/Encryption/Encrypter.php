@@ -156,25 +156,38 @@ class Encrypter implements EncrypterContract, StringEncrypter
     {
         $payload = $this->getJsonPayload($payload);
 
-        $iv = base64_decode($payload['iv']);
+        $iv = base64_decode($payload['iv'], true);
+
+        if ($iv === false) {
+            throw new DecryptException('The payload is invalid.');
+        }
 
         $this->ensureTagIsValid(
-            $tag = empty($payload['tag']) ? null : base64_decode($payload['tag'])
+            $tag = empty($payload['tag']) ? null : base64_decode($payload['tag'], true)
         );
 
-        $foundValidMac = false;
+        // Validate MAC against all keys in constant time to prevent
+        // timing side-channels that leak key position in rotation.
+        $validMacKeys = [];
 
-        // Here we will decrypt the value. If we are able to successfully decrypt it
-        // we will then unserialize it and return it out to the caller. If we are
-        // unable to decrypt this value we will throw out an exception message.
-        foreach ($this->getAllKeys() as $key) {
-            if (
-                $this->shouldValidateMac() &&
-                ! ($foundValidMac = $foundValidMac || $this->validMacForKey($payload, $key))
-            ) {
-                continue;
+        if ($this->shouldValidateMac()) {
+            foreach ($this->getAllKeys() as $index => $key) {
+                if ($this->validMacForKey($payload, $key)) {
+                    $validMacKeys[] = $index;
+                }
             }
 
+            if (empty($validMacKeys)) {
+                throw new DecryptException('The MAC is invalid.');
+            }
+        }
+
+        // Attempt decryption with MAC-validated keys (or all keys if MAC validation is off).
+        $keysToTry = $this->shouldValidateMac()
+            ? array_intersect_key($this->getAllKeys(), array_flip($validMacKeys))
+            : $this->getAllKeys();
+
+        foreach ($keysToTry as $key) {
             $decrypted = \openssl_decrypt(
                 $payload['value'], strtolower($this->cipher), $key, 0, $iv, $tag ?? ''
             );
@@ -182,10 +195,6 @@ class Encrypter implements EncrypterContract, StringEncrypter
             if ($decrypted !== false) {
                 break;
             }
-        }
-
-        if ($this->shouldValidateMac() && ! $foundValidMac) {
-            throw new DecryptException('The MAC is invalid.');
         }
 
         if (($decrypted ?? false) === false) {
@@ -235,7 +244,13 @@ class Encrypter implements EncrypterContract, StringEncrypter
             throw new DecryptException('The payload is invalid.');
         }
 
-        $payload = json_decode(base64_decode($payload), true);
+        $decoded = base64_decode($payload, true);
+
+        if ($decoded === false) {
+            throw new DecryptException('The payload is invalid.');
+        }
+
+        $payload = json_decode($decoded, true);
 
         // If the payload is not valid JSON or does not have the proper keys set we will
         // assume it is invalid and bail out of the routine since we will not be able

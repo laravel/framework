@@ -511,7 +511,7 @@ class DynamoBatchRepository implements BatchRepository
      */
     protected function unserialize($serialized)
     {
-        return unserialize($serialized);
+        return unserialize($serialized, ['allowed_classes' => true]);
     }
 
     /**

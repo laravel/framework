@@ -55,14 +55,20 @@ class ProcessDriver implements Driver
             $result = json_decode($output, true);
 
             if (! $result['successful']) {
-                throw new $result['exception'](
+                $exceptionClass = $result['exception'];
+
+                if (! is_subclass_of($exceptionClass, \Throwable::class)) {
+                    throw new \RuntimeException($result['message'] ?? 'Unknown concurrency error');
+                }
+
+                throw new $exceptionClass(
                     ...(! empty(array_filter($result['parameters']))
                         ? $result['parameters']
                         : [$result['message']])
                 );
             }
 
-            return [$key => unserialize($result['result'])];
+            return [$key => unserialize($result['result'], ['allowed_classes' => true])];
         })->all();
     }
 

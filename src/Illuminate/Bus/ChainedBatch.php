@@ -119,7 +119,7 @@ class ChainedBatch implements ShouldQueue
     protected function attachRemainderOfChainToEndOfBatch(PendingBatch $batch)
     {
         if (is_array($this->chained) && ! empty($this->chained)) {
-            $next = unserialize(array_shift($this->chained));
+            $next = unserialize(array_shift($this->chained), ['allowed_classes' => true]);
 
             $next->chained = $this->chained;
 
