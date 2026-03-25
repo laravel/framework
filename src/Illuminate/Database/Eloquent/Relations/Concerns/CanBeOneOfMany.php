@@ -329,4 +329,35 @@ trait CanBeOneOfMany
     {
         return $this->relationName;
     }
+
+    /**
+     * Apply the given constraints to the relationship.
+     *
+     * @param  \Closure  $constraints
+     * @return void
+     */
+    public function applyEagerLoadingConstraints(Closure $constraints)
+    {
+        $subQuery = $this->getOneOfManySubQuery();
+
+        if ($subQuery) {
+            $whereCountBefore = count($this->query->getQuery()->wheres);
+            $bindingCountBefore = count($this->query->getQuery()->bindings['where']);
+        }
+
+        $constraints($this);
+
+        if ($subQuery) {
+            $newWheres = array_slice($this->query->getQuery()->wheres, $whereCountBefore);
+            $newBindings = array_slice($this->query->getQuery()->bindings['where'], $bindingCountBefore);
+
+            foreach ($newWheres as $where) {
+                $subQuery->getQuery()->wheres[] = $where;
+            }
+
+            foreach ($newBindings as $binding) {
+                $subQuery->getQuery()->addBinding($binding, 'where');
+            }
+        }
+    }
 }

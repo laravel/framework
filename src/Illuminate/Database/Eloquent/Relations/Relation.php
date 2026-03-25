@@ -523,6 +523,17 @@ abstract class Relation implements BuilderContract
     }
 
     /**
+     * Apply the given constraints to the relationship.
+     *
+     * @param  \Closure  $constraints
+     * @return void
+     */
+    public function applyEagerLoadingConstraints(Closure $constraints)
+    {
+        $constraints($this);
+    }
+
+    /**
      * Handle dynamic method calls to the relationship.
      *
      * @param  string  $method

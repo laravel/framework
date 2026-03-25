@@ -945,36 +945,7 @@ class Builder implements BuilderContract
 
         $relation->addEagerConstraints($models);
 
-        // For one-of-many relationships, we need to also apply the user's eager
-        // load constraints to the inner subquery that determines which record
-        // is the "latest" / "oldest". We snapshot the outer query's wheres
-        // before and after applying constraints, then copy only the new ones.
-        $subQuery = method_exists($relation, 'getOneOfManySubQuery')
-            ? $relation->getOneOfManySubQuery()
-            : null;
-
-        if ($subQuery) {
-            $whereCountBefore = count($relation->getQuery()->getQuery()->wheres);
-            $bindingCountBefore = count($relation->getQuery()->getQuery()->bindings['where']);
-        }
-
-        $constraints($relation);
-
-        if ($subQuery) {
-            $outerWheres = $relation->getQuery()->getQuery()->wheres;
-            $outerBindings = $relation->getQuery()->getQuery()->bindings['where'];
-
-            $newWheres = array_slice($outerWheres, $whereCountBefore);
-            $newBindings = array_slice($outerBindings, $bindingCountBefore);
-
-            foreach ($newWheres as $where) {
-                $subQuery->getQuery()->wheres[] = $where;
-            }
-
-            foreach ($newBindings as $binding) {
-                $subQuery->getQuery()->addBinding($binding, 'where');
-            }
-        }
+        $relation->applyEagerLoadingConstraints($constraints);
 
         // Once we have the results, we just match those back up to their parent models
         // using the relationship instance. Then we just return the finished arrays
