@@ -91,24 +91,24 @@ abstract class InterventionDriver implements Driver
             $image = $image->flop();
         }
 
-        if ($options->format !== null) {
-            $quality = $options->quality ?? PendingImageOptions::DEFAULT_QUALITY;
-
-            $encoder = match ($options->format) {
-                'webp' => new WebpEncoder($quality),
-                'jpg', 'jpeg' => new JpegEncoder($quality),
-            };
-
-            return $image->encode($encoder)->toString();
-        }
-
         $quality = $options->quality ?? PendingImageOptions::DEFAULT_QUALITY;
 
-        $mediaType = match ($image->origin()->mediaType()) {
-            'image/x-gif' => 'image/gif',
-            default => null,
-        };
+        try {
+            if ($options->format !== null) {
+                return $image->encode(match ($options->format) {
+                    'webp' => new WebpEncoder($quality),
+                    'jpg', 'jpeg' => new JpegEncoder($quality),
+                })->toString();
+            }
 
-        return $image->encode(new MediaTypeEncoder($mediaType, quality: $quality))->toString();
+            $mediaType = match ($image->origin()->mediaType()) {
+                'image/x-gif' => 'image/gif',
+                default => null,
+            };
+
+            return $image->encode(new MediaTypeEncoder($mediaType, quality: $quality))->toString();
+        } finally {
+            unset($image);
+        }
     }
 }
