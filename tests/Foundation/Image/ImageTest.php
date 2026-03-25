@@ -235,7 +235,7 @@ class ImageTest extends TestCase
         $options = $this->getOptions($result);
 
         $this->assertSame('webp', $options->format);
-        $this->assertSame(80, $options->quality);
+        $this->assertSame(75, $options->quality);
     }
 
     public function test_optimize_throws_for_unsupported_format()
@@ -478,7 +478,7 @@ class ImageTest extends TestCase
         $this->assertTrue($options->greyscale);
         $this->assertSame(5, $options->sharpen);
         $this->assertSame('webp', $options->format);
-        $this->assertSame(80, $options->quality);
+        $this->assertSame(75, $options->quality);
     }
 
     public function test_later_operation_overrides_earlier()
