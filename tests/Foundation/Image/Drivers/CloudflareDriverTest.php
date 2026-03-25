@@ -790,7 +790,7 @@ class CloudflareDriverTest extends TestCase
         });
     }
 
-    public function test_purge_deletes_old_prefixed_images()
+    public function test_prune_orphaned_deletes_old_prefixed_images()
     {
         $http = new HttpFactory;
 
@@ -812,7 +812,7 @@ class CloudflareDriverTest extends TestCase
 
         $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
-        $driver->purge();
+        $driver->pruneOrphaned();
 
         $http->assertSentCount(3); // list + 2 deletes (not 3 — other-app is skipped)
 
@@ -832,7 +832,7 @@ class CloudflareDriverTest extends TestCase
         });
     }
 
-    public function test_purge_skips_recently_uploaded_images()
+    public function test_prune_orphaned_skips_recently_uploaded_images()
     {
         $http = new HttpFactory;
 
@@ -851,12 +851,12 @@ class CloudflareDriverTest extends TestCase
 
         $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
-        $driver->purge();
+        $driver->pruneOrphaned();
 
         $http->assertSentCount(1); // only the list request, no delete
     }
 
-    public function test_purge_skips_images_without_prefix()
+    public function test_prune_orphaned_skips_images_without_prefix()
     {
         $http = new HttpFactory;
 
@@ -874,12 +874,12 @@ class CloudflareDriverTest extends TestCase
 
         $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
-        $driver->purge();
+        $driver->pruneOrphaned();
 
         $http->assertSentCount(1); // only the list request, no deletes
     }
 
-    public function test_purge_throws_on_list_failure()
+    public function test_prune_orphaned_throws_on_list_failure()
     {
         $http = new HttpFactory;
 
@@ -892,10 +892,10 @@ class CloudflareDriverTest extends TestCase
         $this->expectException(ImageException::class);
         $this->expectExceptionMessage('Failed to list images from Cloudflare.');
 
-        $driver->purge();
+        $driver->pruneOrphaned();
     }
 
-    public function test_purge_with_empty_image_list()
+    public function test_prune_orphaned_with_empty_image_list()
     {
         $http = new HttpFactory;
 
@@ -910,12 +910,12 @@ class CloudflareDriverTest extends TestCase
 
         $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
-        $driver->purge();
+        $driver->pruneOrphaned();
 
         $http->assertSentCount(1);
     }
 
-    public function test_purge_paginates_through_multiple_pages()
+    public function test_prune_orphaned_paginates_through_multiple_pages()
     {
         $http = new HttpFactory;
 
@@ -943,13 +943,13 @@ class CloudflareDriverTest extends TestCase
 
         $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
-        $driver->purge();
+        $driver->pruneOrphaned();
 
         // page 1 list + 100 deletes + page 2 list + 1 delete
         $http->assertSentCount(103);
     }
 
-    public function test_purge_uses_correct_api_endpoint()
+    public function test_prune_orphaned_uses_correct_api_endpoint()
     {
         $http = new HttpFactory;
 
@@ -962,7 +962,7 @@ class CloudflareDriverTest extends TestCase
 
         $driver = new CloudflareDriver($http, 'my-account', 'token', 'laravel-image');
 
-        $driver->purge();
+        $driver->pruneOrphaned();
 
         $http->assertSent(function (Request $request) {
             return str_contains($request->url(), 'my-account/images/v1')
@@ -970,7 +970,7 @@ class CloudflareDriverTest extends TestCase
         });
     }
 
-    public function test_purge_sends_auth_token()
+    public function test_prune_orphaned_sends_auth_token()
     {
         $http = new HttpFactory;
 
@@ -983,14 +983,14 @@ class CloudflareDriverTest extends TestCase
 
         $driver = new CloudflareDriver($http, 'account', 'my-token', 'laravel-image');
 
-        $driver->purge();
+        $driver->pruneOrphaned();
 
         $http->assertSent(function (Request $request) {
             return $request->hasHeader('Authorization', 'Bearer my-token');
         });
     }
 
-    public function test_purge_respects_custom_prefix()
+    public function test_prune_orphaned_respects_custom_prefix()
     {
         $http = new HttpFactory;
 
@@ -1010,7 +1010,7 @@ class CloudflareDriverTest extends TestCase
 
         $driver = new CloudflareDriver($http, 'account', 'token', 'my-app');
 
-        $driver->purge();
+        $driver->pruneOrphaned();
 
         $http->assertSentCount(2); // list + 1 delete (only my-app prefix)
 
@@ -1025,7 +1025,7 @@ class CloudflareDriverTest extends TestCase
         });
     }
 
-    public function test_purge_with_mix_of_old_and_recent_prefixed_images()
+    public function test_prune_orphaned_with_mix_of_old_and_recent_prefixed_images()
     {
         $http = new HttpFactory;
 
@@ -1049,7 +1049,7 @@ class CloudflareDriverTest extends TestCase
 
         $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
-        $driver->purge();
+        $driver->pruneOrphaned();
 
         $http->assertSentCount(3); // list + 2 deletes (recent skipped)
 
