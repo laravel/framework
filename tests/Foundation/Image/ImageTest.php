@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Foundation\Image;
 
 use Illuminate\Foundation\Image\Image;
+use Illuminate\Foundation\Image\ImageException;
 use Illuminate\Foundation\Image\PendingImageOptions;
 use Illuminate\Http\UploadedFile;
 use PHPUnit\Framework\TestCase;
@@ -241,7 +242,7 @@ class ImageTest extends TestCase
     {
         $image = $this->makeImage();
 
-        $this->expectException(\Illuminate\Foundation\Image\ImageException::class);
+        $this->expectException(ImageException::class);
         $this->expectExceptionMessage('The [bmp] format is not supported.');
 
         $image->optimize('bmp');
@@ -387,7 +388,7 @@ class ImageTest extends TestCase
     {
         $image = new Image($this->fakeImageContents());
 
-        $this->expectException(\Illuminate\Foundation\Image\ImageException::class);
+        $this->expectException(ImageException::class);
         $this->expectExceptionMessage('Failed to process image:');
 
         // Trigger a driver error by using a non-existent driver
@@ -400,7 +401,7 @@ class ImageTest extends TestCase
 
         try {
             $image->using('nonexistent')->cover(100, 100)->toBytes();
-        } catch (\Illuminate\Foundation\Image\ImageException $e) {
+        } catch (ImageException $e) {
             $this->assertNotNull($e->getPrevious());
 
             return;
@@ -559,7 +560,7 @@ class ImageTest extends TestCase
     {
         $image = $this->makeImage();
 
-        $this->expectException(\Illuminate\Foundation\Image\ImageException::class);
+        $this->expectException(ImageException::class);
         $this->expectExceptionMessage('The [png] format is not supported.');
 
         $image->optimize('png');
@@ -569,7 +570,7 @@ class ImageTest extends TestCase
     {
         $image = new Image($this->fakeImageContents());
 
-        $this->expectException(\Illuminate\Foundation\Image\ImageException::class);
+        $this->expectException(ImageException::class);
         $this->expectExceptionMessage('Images cannot be serialized. Store the image first and serialize the path instead.');
 
         serialize($image);
@@ -654,7 +655,7 @@ class ImageTest extends TestCase
 
     public function test_optimize_throws_for_gif()
     {
-        $this->expectException(\Illuminate\Foundation\Image\ImageException::class);
+        $this->expectException(ImageException::class);
         $this->expectExceptionMessage('The [gif] format is not supported.');
 
         $this->makeImage()->optimize('gif');
@@ -662,7 +663,7 @@ class ImageTest extends TestCase
 
     public function test_optimize_throws_for_avif()
     {
-        $this->expectException(\Illuminate\Foundation\Image\ImageException::class);
+        $this->expectException(ImageException::class);
         $this->expectExceptionMessage('The [avif] format is not supported.');
 
         $this->makeImage()->optimize('avif');
@@ -741,7 +742,7 @@ class ImageTest extends TestCase
 
     public function test_image_exception_extends_runtime_exception()
     {
-        $exception = new \Illuminate\Foundation\Image\ImageException('test');
+        $exception = new ImageException('test');
 
         $this->assertInstanceOf(\RuntimeException::class, $exception);
     }

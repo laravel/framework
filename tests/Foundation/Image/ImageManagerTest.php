@@ -6,6 +6,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Image\Image;
+use Illuminate\Foundation\Image\ImageException;
 use Illuminate\Foundation\Image\ImageManager;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\UploadedFile;
@@ -188,7 +189,7 @@ class ImageManagerTest extends TestCase
         $app = $this->makeApp([]);
         $manager = new ImageManager($app);
 
-        $this->expectException(\Illuminate\Foundation\Image\ImageException::class);
+        $this->expectException(ImageException::class);
         $this->expectExceptionMessage('Invalid base64 image data.');
 
         $manager->fromBase64('!!!not-base64!!!')->toBytes();
