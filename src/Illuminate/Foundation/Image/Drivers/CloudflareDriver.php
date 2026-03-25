@@ -8,6 +8,7 @@ use Illuminate\Contracts\Image\Driver;
 use Illuminate\Foundation\Image\ImageException;
 use Illuminate\Foundation\Image\PendingImageOptions;
 use Illuminate\Http\Client\Factory as HttpFactory;
+use Illuminate\Http\Client\Pool;
 use Illuminate\Support\Str;
 
 class CloudflareDriver implements Driver
@@ -187,19 +188,15 @@ class CloudflareDriver implements Driver
 
             $images = $response->json('result.images', []);
 
-            foreach ($images as $image) {
-                if (! str_starts_with($image['id'], $this->prefix.'/')) {
-                    continue;
-                }
-
-                $uploaded = new DateTimeImmutable($image['uploaded']);
-
-                if ($uploaded->getTimestamp() > time() - 300) {
-                    continue;
-                }
-
-                $this->deleteImage($image['id']);
-            }
+            collect($images)
+                ->filter(fn (array $image) => str_starts_with($image['id'], $this->prefix.'/'))
+                ->reject(fn (array $image) => (new DateTimeImmutable($image['uploaded']))->getTimestamp() > time() - 300)
+                ->pluck('id')
+                ->chunk(10)
+                ->each(fn ($chunk) => $this->http->pool(fn (Pool $pool) => $chunk->map(
+                    fn (string $id) => $pool->withToken($this->apiToken)
+                        ->delete("https://api.cloudflare.com/client/v4/accounts/{$this->accountId}/images/v1/{$id}"),
+                )->all()));
 
             $page++;
         } while (count($images) === 100);
