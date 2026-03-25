@@ -761,7 +761,7 @@ class ImageTest extends TestCase
         $this->assertSame($image->toDataUri(), (string) $image);
     }
 
-public function test_image_exception_extends_runtime_exception()
+    public function test_image_exception_extends_runtime_exception()
     {
         $exception = new ImageException('test');
 
