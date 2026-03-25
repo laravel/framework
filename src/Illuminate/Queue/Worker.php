@@ -86,7 +86,7 @@ class Worker
     public $shouldQuit = false;
 
     /**
-     * Indicates if the worker stopped due to a lost connection.
+     * Indicates if the worker lost its connection.
      *
      * @var bool
      */
