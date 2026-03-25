@@ -241,24 +241,34 @@ class ImageTest extends TestCase
         $this->assertSame('avatar.jpg', $image->file()->getClientOriginalName());
     }
 
-    public function test_from_facade_creates_image()
+    public function test_from_path_facade_creates_image()
     {
         $file = UploadedFile::fake()->image('test.jpg', 200, 200);
 
-        $image = \Illuminate\Support\Facades\Image::from($file->getRealPath());
+        $image = \Illuminate\Support\Facades\Image::fromPath($file->getRealPath());
 
         $this->assertInstanceOf(Image::class, $image);
         $this->assertSame([200, 200], $image->dimensions());
     }
 
-    public function test_read_facade_creates_image()
+    public function test_from_bytes_facade_creates_image()
     {
         $contents = $this->fakeImageContents(150, 150);
 
-        $image = \Illuminate\Support\Facades\Image::read($contents);
+        $image = \Illuminate\Support\Facades\Image::fromBytes($contents);
 
         $this->assertInstanceOf(Image::class, $image);
         $this->assertSame([150, 150], $image->dimensions());
+    }
+
+    public function test_from_base64_facade_creates_image()
+    {
+        $contents = $this->fakeImageContents(120, 120);
+
+        $image = \Illuminate\Support\Facades\Image::fromBase64(base64_encode($contents));
+
+        $this->assertInstanceOf(Image::class, $image);
+        $this->assertSame([120, 120], $image->dimensions());
     }
 
     public function test_storage_image_creates_image()

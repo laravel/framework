@@ -7,6 +7,7 @@ use Illuminate\Contracts\Image\Driver;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Image\Image;
 use Illuminate\Foundation\Image\ImageManager;
+use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\UploadedFile;
 use InvalidArgumentException;
 use Mockery as m;
@@ -80,19 +81,19 @@ class ImageManagerTest extends TestCase
         $manager->driver('nonexistent');
     }
 
-    public function test_read_returns_image_with_contents()
+    public function test_from_bytes_returns_image_with_contents()
     {
         $app = $this->makeApp([]);
         $manager = new ImageManager($app);
 
         $contents = $this->fakeImageContents();
-        $image = $manager->read($contents);
+        $image = $manager->fromBytes($contents);
 
         $this->assertInstanceOf(Image::class, $image);
         $this->assertSame($contents, $image->toBytes());
     }
 
-    public function test_from_returns_image_from_file_path()
+    public function test_from_path_returns_image_from_file_path()
     {
         $file = UploadedFile::fake()->image('test.jpg', 100, 100);
         $path = $file->getRealPath();
@@ -109,13 +110,13 @@ class ImageManagerTest extends TestCase
             ->andReturn($filesystem);
 
         $manager = new ImageManager($app);
-        $image = $manager->from($path);
+        $image = $manager->fromPath($path);
 
         $this->assertInstanceOf(Image::class, $image);
         $this->assertNotEmpty($image->toBytes());
     }
 
-    public function test_from_is_lazy()
+    public function test_from_path_is_lazy()
     {
         $filesystem = m::mock(Filesystem::class);
         $filesystem->shouldNotReceive('get');
@@ -126,9 +127,71 @@ class ImageManagerTest extends TestCase
             ->andReturn($filesystem);
 
         $manager = new ImageManager($app);
-        $image = $manager->from('/some/path.jpg');
+        $image = $manager->fromPath('/some/path.jpg');
 
         $this->assertInstanceOf(Image::class, $image);
+    }
+
+    public function test_from_url_returns_image()
+    {
+        $contents = $this->fakeImageContents();
+
+        $http = m::mock(HttpFactory::class);
+        $response = m::mock();
+        $response->shouldReceive('body')->andReturn($contents);
+        $http->shouldReceive('get')->with('https://example.com/photo.jpg')->andReturn($response);
+
+        $app = $this->makeApp([]);
+        $app->shouldReceive('make')
+            ->with(HttpFactory::class)
+            ->andReturn($http);
+
+        $manager = new ImageManager($app);
+        $image = $manager->fromUrl('https://example.com/photo.jpg');
+
+        $this->assertInstanceOf(Image::class, $image);
+        $this->assertSame($contents, $image->toBytes());
+    }
+
+    public function test_from_url_is_lazy()
+    {
+        $http = m::mock(HttpFactory::class);
+        $http->shouldNotReceive('get');
+
+        $app = $this->makeApp([]);
+        $app->shouldReceive('make')
+            ->with(HttpFactory::class)
+            ->andReturn($http);
+
+        $manager = new ImageManager($app);
+        $image = $manager->fromUrl('https://example.com/photo.jpg');
+
+        $this->assertInstanceOf(Image::class, $image);
+    }
+
+    public function test_from_base64_returns_image()
+    {
+        $contents = $this->fakeImageContents();
+        $base64 = base64_encode($contents);
+
+        $app = $this->makeApp([]);
+        $manager = new ImageManager($app);
+
+        $image = $manager->fromBase64($base64);
+
+        $this->assertInstanceOf(Image::class, $image);
+        $this->assertSame($contents, $image->toBytes());
+    }
+
+    public function test_from_base64_throws_for_invalid_data()
+    {
+        $app = $this->makeApp([]);
+        $manager = new ImageManager($app);
+
+        $this->expectException(\Illuminate\Foundation\Image\ImageException::class);
+        $this->expectExceptionMessage('Invalid base64 image data.');
+
+        $manager->fromBase64('!!!not-base64!!!')->toBytes();
     }
 
     public function test_extend_overwrites_previous_registration()

@@ -113,7 +113,7 @@ class ImageManager
     /**
      * Create an image instance from raw bytes.
      */
-    public function read(string $contents): Image
+    public function fromBytes(string $contents): Image
     {
         return new Image($contents);
     }
@@ -121,9 +121,31 @@ class ImageManager
     /**
      * Create an image instance from a file path.
      */
-    public function from(string $path): Image
+    public function fromPath(string $path): Image
     {
-        return new Image(fn () => $this->app->make(Filesystem::class)->get($path));
+        return new Image(
+            fn () => $this->app->make(Filesystem::class)->get($path),
+        );
+    }
+
+    /**
+     * Create an image instance from a URL.
+     */
+    public function fromUrl(string $url): Image
+    {
+        return new Image(
+            fn () => $this->app->make(HttpFactory::class)->get($url)->body(),
+        );
+    }
+
+    /**
+     * Create an image instance from a base64 encoded string.
+     */
+    public function fromBase64(string $base64): Image
+    {
+        return new Image(
+            fn () => base64_decode($base64, true) ?: throw new ImageException('Invalid base64 image data.'),
+        );
     }
 
     /**
