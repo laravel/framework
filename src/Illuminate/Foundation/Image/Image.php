@@ -10,9 +10,10 @@ use Illuminate\Contracts\Image\Driver;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Stringable;
 use Throwable;
 
-class Image implements \Stringable
+class Image implements Stringable
 {
     /**
      * The image processing options.
@@ -476,17 +477,9 @@ class Image implements \Stringable
     /**
      * Get the string representation of the image.
      */
-    public function toString(): string
-    {
-        return $this->toDataUri();
-    }
-
-    /**
-     * Get the string representation of the image.
-     */
     public function __toString(): string
     {
-        return $this->toString();
+        return $this->toDataUri();
     }
 
     /**
