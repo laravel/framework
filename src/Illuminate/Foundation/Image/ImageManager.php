@@ -12,9 +12,6 @@ use Illuminate\Foundation\Image\Drivers\ImagickDriver;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use InvalidArgumentException;
 
-/**
- * @mixin Driver
- */
 class ImageManager
 {
     /**
