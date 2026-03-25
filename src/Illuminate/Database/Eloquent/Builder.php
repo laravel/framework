@@ -945,7 +945,7 @@ class Builder implements BuilderContract
 
         $relation->addEagerConstraints($models);
 
-        $relation->applyEagerLoadingConstraints($constraints);
+        $constraints($relation);
 
         // Once we have the results, we just match those back up to their parent models
         // using the relationship instance. Then we just return the finished arrays

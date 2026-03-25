@@ -844,9 +844,6 @@ class DatabaseEloquentBuilderTest extends TestCase
             $_SERVER['__eloquent.constrain'] = $query;
         }]);
         $relation = m::mock(stdClass::class);
-        $relation->shouldReceive('applyEagerLoadingConstraints')->once()->andReturnUsing(function ($callback) use ($relation) {
-            $callback($relation);
-        });
         $relation->shouldReceive('addEagerConstraints')->once()->with(['models']);
         $relation->shouldReceive('initRelation')->once()->with(['models'], 'orders')->andReturn(['models']);
         $relation->shouldReceive('getEager')->once()->andReturn(['results']);

@@ -331,33 +331,22 @@ trait CanBeOneOfMany
     }
 
     /**
-     * Apply the given constraints to the relationship.
+     * Handle dynamic method calls to the relationship.
      *
-     * @param  \Closure  $constraints
-     * @return void
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
      */
-    public function applyEagerLoadingConstraints(Closure $constraints)
+    public function __call($method, $parameters)
     {
-        $subQuery = $this->getOneOfManySubQuery();
-
-        if ($subQuery) {
-            $whereCountBefore = count($this->query->getQuery()->wheres);
-            $bindingCountBefore = count($this->query->getQuery()->bindings['where']);
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
         }
 
-        $constraints($this);
+        $query = $this->isOneOfMany() && (str_starts_with($method, 'where') || str_starts_with($method, 'orWhere'))
+            ? $this->getOneOfManySubQuery()
+            : $this->query;
 
-        if ($subQuery) {
-            $newWheres = array_slice($this->query->getQuery()->wheres, $whereCountBefore);
-            $newBindings = array_slice($this->query->getQuery()->bindings['where'], $bindingCountBefore);
-
-            foreach ($newWheres as $where) {
-                $subQuery->getQuery()->wheres[] = $where;
-            }
-
-            foreach ($newBindings as $binding) {
-                $subQuery->getQuery()->addBinding($binding, 'where');
-            }
-        }
+        return $this->forwardDecoratedCallTo($query, $method, $parameters);
     }
 }

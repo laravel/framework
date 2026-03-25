@@ -229,7 +229,8 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $user->logins()->create();
 
         $result = $user->latest_login()->whereKey($previousLogin->getKey())->getResults();
-        $this->assertNull($result);
+        $this->assertNotNull($result);
+        $this->assertSame($previousLogin->id, $result->id);
     }
 
     public function testItEagerLoadsCorrectModels()
@@ -314,7 +315,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $previousLogin = $user->logins()->create();
         $latestLogin = $user->logins()->create();
 
-        $this->assertFalse($user->latest_login()->whereKey($previousLogin->getKey())->exists());
+        $this->assertTrue($user->latest_login()->whereKey($previousLogin->getKey())->exists());
         $this->assertTrue($user->latest_login()->whereKey($latestLogin->getKey())->exists());
     }
 
@@ -349,7 +350,8 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame($latestLogin->id, $latestLogins->first()->id);
 
         $latestLogins = $user->latest_login()->whereKey($previousLogin->getKey())->get();
-        $this->assertCount(0, $latestLogins);
+        $this->assertCount(1, $latestLogins);
+        $this->assertSame($previousLogin->id, $latestLogins->first()->id);
     }
 
     public function testCount()
