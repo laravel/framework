@@ -166,7 +166,7 @@ class Image implements Stringable
      *
      * @throws ImageException
      */
-    public function optimize(string $format = 'webp', int $quality = 80): static
+    public function optimize(string $format = 'webp', int $quality = PendingImageOptions::DEFAULT_QUALITY): static
     {
         return $this->toFormat($format)->quality($quality);
     }
