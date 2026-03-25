@@ -103,7 +103,7 @@ class ImageManager
             $this->app->make(HttpFactory::class),
             $config['account_id'] ?? '',
             $config['api_token'] ?? '',
-            $config['prefix'] ?? 'laravel-image',
+            $config['prefix'] ?? '',
         );
     }
 
