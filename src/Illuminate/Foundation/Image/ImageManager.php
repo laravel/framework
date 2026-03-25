@@ -97,7 +97,7 @@ class ImageManager
      */
     protected function createCloudflareDriver(): CloudflareDriver
     {
-        $config = $this->app['config']['image.cloudflare'] ?? [];
+        $config = $this->app['config']['image.drivers.cloudflare'] ?? [];
 
         return new CloudflareDriver(
             $this->app->make(HttpFactory::class),
