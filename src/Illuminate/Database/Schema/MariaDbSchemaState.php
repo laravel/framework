@@ -58,7 +58,6 @@ class MariaDbSchemaState extends MySqlSchemaState
         } catch (ProcessFailedException) {
         }
 
-
         return [
             'isMariaDb' => true,
             'version' => $version,
