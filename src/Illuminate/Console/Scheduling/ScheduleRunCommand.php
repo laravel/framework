@@ -240,7 +240,9 @@ class ScheduleRunCommand extends Command
     {
         $hasEnteredMaintenanceMode = false;
 
-        while (Date::now()->lte($this->startedAt->endOfMinute())) {
+        $endOfMinute = $this->startedAt->copy()->endOfMinute();
+
+        while (Date::now()->lte($endOfMinute)) {
             $paused = $this->isPaused();
 
             foreach ($events as $event) {
@@ -250,6 +252,10 @@ class ScheduleRunCommand extends Command
 
                 if (! $event->shouldRepeatNow()) {
                     continue;
+                }
+
+                if (Date::now()->gt($endOfMinute)) {
+                    return;
                 }
 
                 $hasEnteredMaintenanceMode = $hasEnteredMaintenanceMode || $this->laravel->isDownForMaintenance();

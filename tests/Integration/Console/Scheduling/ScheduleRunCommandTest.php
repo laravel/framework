@@ -6,10 +6,13 @@ use Illuminate\Console\Events\ScheduledTaskFailed;
 use Illuminate\Console\Events\ScheduledTaskFinished;
 use Illuminate\Console\Events\ScheduledTaskStarting;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Console\Scheduling\ScheduleRunCommand;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Orchestra\Testbench\TestCase;
+use ReflectionMethod;
+use ReflectionProperty;
 
 class ScheduleRunCommandTest extends TestCase
 {
@@ -211,5 +214,32 @@ class ScheduleRunCommandTest extends TestCase
         Event::assertDispatched(ScheduledTaskStarting::class);
         Event::assertDispatched(ScheduledTaskFinished::class);
         Event::assertNotDispatched(ScheduledTaskFailed::class);
+    }
+
+    public function test_repeat_events_does_not_mutate_started_at()
+    {
+        Carbon::setTestNow('2026-03-25 12:00:30');
+
+        $command = new ScheduleRunCommand;
+        $this->app->instance(ScheduleRunCommand::class, $command);
+
+        $reflection = new ReflectionProperty($command, 'startedAt');
+        $startedAt = $reflection->getValue($command);
+
+        $originalTimestamp = $startedAt->timestamp;
+        $originalMicro = $startedAt->micro;
+
+        // Call repeatEvents with an empty collection so it exits immediately
+        $reflection = new ReflectionMethod($command, 'repeatEvents');
+        $command->setLaravel($this->app);
+
+        // Set test time past the minute boundary so the while loop exits immediately
+        Carbon::setTestNow('2026-03-25 12:01:01');
+        $reflection->invoke($command, collect());
+
+        // startedAt should not have been mutated to end of minute
+        $startedAtAfter = (new ReflectionProperty($command, 'startedAt'))->getValue($command);
+        $this->assertEquals($originalTimestamp, $startedAtAfter->timestamp);
+        $this->assertEquals($originalMicro, $startedAtAfter->micro);
     }
 }
