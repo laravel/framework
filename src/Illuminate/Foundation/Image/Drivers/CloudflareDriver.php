@@ -87,6 +87,8 @@ class CloudflareDriver implements Driver
 
     /**
      * Fetch the transformed image and delete the original from Cloudflare.
+     *
+     * @param  array<int, string>  $variants
      */
     protected function transformAndDelete(string $imageId, array $variants, PendingImageOptions $options, string $contents, string $sourceMimeType): string
     {

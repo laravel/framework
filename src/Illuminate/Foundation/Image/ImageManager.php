@@ -16,11 +16,15 @@ class ImageManager
 {
     /**
      * The array of resolved drivers.
+     *
+     * @var array<string, Driver>
      */
     protected array $drivers = [];
 
     /**
      * The registered custom driver creators.
+     *
+     * @var array<string, Closure>
      */
     protected array $customCreators = [];
 
@@ -179,6 +183,8 @@ class ImageManager
 
     /**
      * Dynamically call the default driver instance.
+     *
+     * @param  array<int, mixed>  $parameters
      */
     public function __call(string $method, array $parameters): mixed
     {
