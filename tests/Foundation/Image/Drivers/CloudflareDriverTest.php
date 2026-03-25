@@ -969,7 +969,7 @@ class CloudflareDriverTest extends TestCase
         $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
 
         $this->expectException(ImageException::class);
-        $this->expectExceptionMessage('Failed to list images from Cloudflare.');
+        $this->expectExceptionMessage('Failed to list images from Cloudflare: Unknown error');
 
         $driver->pruneOrphaned();
     }
