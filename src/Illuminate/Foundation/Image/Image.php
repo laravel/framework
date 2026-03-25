@@ -12,7 +12,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Throwable;
 
-class Image
+class Image implements \Stringable
 {
     /**
      * The image processing options.
@@ -471,6 +471,22 @@ class Image
     public function __serialize(): never
     {
         throw new ImageException('Images cannot be serialized. Store the image first and serialize the path instead.');
+    }
+
+    /**
+     * Get the string representation of the image.
+     */
+    public function toString(): string
+    {
+        return $this->toDataUri();
+    }
+
+    /**
+     * Get the string representation of the image.
+     */
+    public function __toString(): string
+    {
+        return $this->toString();
     }
 
     /**

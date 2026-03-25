@@ -740,7 +740,28 @@ class ImageTest extends TestCase
         $this->assertSame('custom-driver', $driver);
     }
 
-    public function test_image_exception_extends_runtime_exception()
+    public function test_implements_stringable()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $this->assertInstanceOf(\Stringable::class, $image);
+    }
+
+    public function test_to_string_returns_data_uri()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $this->assertSame($image->toDataUri(), $image->toString());
+    }
+
+    public function test_magic_to_string_returns_data_uri()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $this->assertSame($image->toDataUri(), (string) $image);
+    }
+
+public function test_image_exception_extends_runtime_exception()
     {
         $exception = new ImageException('test');
 
