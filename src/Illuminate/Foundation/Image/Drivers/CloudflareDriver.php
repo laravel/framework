@@ -37,6 +37,12 @@ class CloudflareDriver implements Driver
                 'The Cloudflare image driver requires an account ID and API token.',
             );
         }
+
+        if (empty($this->prefix)) {
+            throw new ImageException(
+                'The Cloudflare image driver requires a prefix for temporary uploads.',
+            );
+        }
     }
 
     /**
