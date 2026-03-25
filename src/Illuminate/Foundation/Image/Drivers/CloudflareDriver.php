@@ -58,21 +58,24 @@ class CloudflareDriver implements Driver
             throw new ImageException("The image format [{$sourceMimeType}] is not supported by the Cloudflare driver.");
         }
 
+        $id = $this->prefix.'/'.Str::random(40).match ($sourceMimeType) {
+            'image/jpeg' => '.jpg',
+            'image/png' => '.png',
+            'image/gif' => '.gif',
+            'image/webp' => '.webp',
+        };
+
         $response = $this->http
             ->withToken($this->apiToken)
-            ->attach('file', $contents, Str::random(16))
+            ->attach('file', $contents, $id)
             ->post("https://api.cloudflare.com/client/v4/accounts/{$this->accountId}/images/v1", [
-                'id' => $this->prefix.'/'.Str::random(40).match ($sourceMimeType) {
-                    'image/jpeg' => '.jpg',
-                    'image/png' => '.png',
-                    'image/gif' => '.gif',
-                    'image/webp' => '.webp',
-                },
+                'id' => $id,
             ]);
 
         if ($response->failed()) {
             throw new ImageException(
                 'Cloudflare image upload failed: '.$response->json('errors.0.message', 'Unknown error'),
+                previous: $response->toException(),
             );
         }
 
@@ -113,7 +116,10 @@ class CloudflareDriver implements Driver
             );
 
             if ($response->failed()) {
-                throw new ImageException('Failed to fetch transformed image from Cloudflare.');
+                throw new ImageException(
+                    'Failed to fetch transformed image from Cloudflare.',
+                    previous: $response->toException(),
+                );
             }
 
             return $response->body();
@@ -193,7 +199,10 @@ class CloudflareDriver implements Driver
                 ]);
 
             if ($response->failed()) {
-                throw new ImageException('Failed to list images from Cloudflare.');
+                throw new ImageException(
+                    'Failed to list images from Cloudflare.',
+                    previous: $response->toException(),
+                );
             }
 
             $images = $response->json('result.images', []);
