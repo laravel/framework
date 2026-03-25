@@ -2198,9 +2198,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $this->primaryKey = $key;
 
-        if (static::$getCastsCache) {
-            unset(static::$getCastsCache[$this]);
-        }
+        $this->mergedCastsCache = null;
 
         return $this;
     }
@@ -2235,9 +2233,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $this->keyType = $type;
 
-        if (static::$getCastsCache) {
-            unset(static::$getCastsCache[$this]);
-        }
+        $this->mergedCastsCache = null;
 
         return $this;
     }
@@ -2262,9 +2258,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $this->incrementing = $value;
 
-        if (static::$getCastsCache) {
-            unset(static::$getCastsCache[$this]);
-        }
+        $this->mergedCastsCache = null;
 
         return $this;
     }

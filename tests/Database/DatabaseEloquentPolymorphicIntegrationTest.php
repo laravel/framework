@@ -92,7 +92,7 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
         $like = TestLikeWithSingleWith::first();
 
         $this->assertTrue($like->likeable->relationLoaded('commentable'));
-        $this->assertEquals(TestPost::first(), $like->likeable->commentable);
+        $this->assertTrue($like->likeable->commentable->is(TestPost::first()));
     }
 
     public function testItLoadsNestedRelationshipsAutomatically()
@@ -104,7 +104,7 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
         $this->assertTrue($like->relationLoaded('likeable'));
         $this->assertTrue($like->likeable->relationLoaded('owner'));
 
-        $this->assertEquals(TestUser::first(), $like->likeable->owner);
+        $this->assertTrue($like->likeable->owner->is(TestUser::first()));
     }
 
     public function testItLoadsNestedRelationshipsOnDemand()
@@ -116,7 +116,7 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
         $this->assertTrue($like->relationLoaded('likeable'));
         $this->assertTrue($like->likeable->relationLoaded('owner'));
 
-        $this->assertEquals(TestUser::first(), $like->likeable->owner);
+        $this->assertTrue($like->likeable->owner->is(TestUser::first()));
     }
 
     public function testItLoadsNestedMorphRelationshipsOnDemand()

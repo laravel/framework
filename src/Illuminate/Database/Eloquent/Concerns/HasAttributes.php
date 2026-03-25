@@ -102,6 +102,13 @@ trait HasAttributes
     protected $attributeCastCache = [];
 
     /**
+     * The cached result of getCasts() for this instance.
+     *
+     * @var array|null
+     */
+    protected $mergedCastsCache = null;
+
+    /**
      * The built-in, primitive cast types supported by Eloquent.
      *
      * @var string[]
@@ -191,13 +198,6 @@ trait HasAttributes
      * @var array
      */
     protected static $castTypeCache = [];
-
-    /**
-     * The cache for merged casts (including primary key cast), keyed by model instance.
-     *
-     * @var \WeakMap|null
-     */
-    protected static $getCastsCache = null;
 
     /**
      * The encrypter instance that is used to encrypt attributes.
@@ -807,9 +807,7 @@ trait HasAttributes
 
         $this->casts = array_merge($this->casts, $casts);
 
-        if (static::$getCastsCache) {
-            unset(static::$getCastsCache[$this]);
-        }
+        $this->mergedCastsCache = null;
 
         return $this;
     }
@@ -1726,9 +1724,7 @@ trait HasAttributes
     public function getCasts()
     {
         if ($this->getIncrementing()) {
-            static::$getCastsCache ??= new \WeakMap;
-
-            return static::$getCastsCache[$this] ??= array_merge([$this->getKeyName() => $this->getKeyType()], $this->casts);
+            return $this->mergedCastsCache ??= array_merge([$this->getKeyName() => $this->getKeyType()], $this->casts);
         }
 
         return $this->casts;

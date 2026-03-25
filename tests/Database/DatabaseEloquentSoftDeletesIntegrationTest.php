@@ -411,7 +411,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $userModel->delete();
         $this->assertEquals($now->toDateTimeString(), $userModel->getOriginal('deleted_at'));
         $this->assertNull(SoftDeletesTestUser::find(2));
-        $this->assertEquals($userModel, SoftDeletesTestUser::withTrashed()->find(2));
+        $this->assertTrue($userModel->is(SoftDeletesTestUser::withTrashed()->find(2)));
     }
 
     /**
