@@ -12,7 +12,7 @@ use Illuminate\Foundation\Image\ImageManager;
  * @method static \Illuminate\Foundation\Image\Image fromBase64(string $base64)
  * @method static string getDefaultDriver()
  * @method static \Illuminate\Foundation\Image\ImageManager extend(string $driver, \Closure $callback)
- * @method static void pruneOrphaned()
+ * @method static void pruneOrphaned(string|null $driver = null)
  *
  * @see ImageManager
  */
