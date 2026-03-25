@@ -9,9 +9,10 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Event;
 use Orchestra\Testbench\TestCase;
+use ReflectionMethod;
+use ReflectionProperty;
 
 class ScheduleRunCommandTest extends TestCase
 {
@@ -222,14 +223,14 @@ class ScheduleRunCommandTest extends TestCase
         $command = new ScheduleRunCommand;
         $this->app->instance(ScheduleRunCommand::class, $command);
 
-        $reflection = new \ReflectionProperty($command, 'startedAt');
+        $reflection = new ReflectionProperty($command, 'startedAt');
         $startedAt = $reflection->getValue($command);
 
         $originalTimestamp = $startedAt->timestamp;
         $originalMicro = $startedAt->micro;
 
         // Call repeatEvents with an empty collection so it exits immediately
-        $reflection = new \ReflectionMethod($command, 'repeatEvents');
+        $reflection = new ReflectionMethod($command, 'repeatEvents');
         $command->setLaravel($this->app);
 
         // Set test time past the minute boundary so the while loop exits immediately
@@ -237,7 +238,7 @@ class ScheduleRunCommandTest extends TestCase
         $reflection->invoke($command, collect());
 
         // startedAt should not have been mutated to end of minute
-        $startedAtAfter = (new \ReflectionProperty($command, 'startedAt'))->getValue($command);
+        $startedAtAfter = (new ReflectionProperty($command, 'startedAt'))->getValue($command);
         $this->assertEquals($originalTimestamp, $startedAtAfter->timestamp);
         $this->assertEquals($originalMicro, $startedAtAfter->micro);
     }
