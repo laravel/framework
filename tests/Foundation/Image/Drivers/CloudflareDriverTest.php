@@ -789,4 +789,93 @@ class CloudflareDriverTest extends TestCase
                 && str_contains($request->url(), 'quality=80');
         });
     }
+
+    public function test_purge_deletes_old_prefixed_images()
+    {
+        $http = new HttpFactory;
+
+        $http->fake([
+            'api.cloudflare.com/*' => $http->sequence()
+                ->push([
+                    'success' => true,
+                    'result' => [
+                        'images' => [
+                            ['id' => 'laravel-image/abc123', 'uploaded' => '2020-01-01T00:00:00Z'],
+                            ['id' => 'laravel-image/def456', 'uploaded' => '2020-01-01T00:00:00Z'],
+                            ['id' => 'other-app/ghi789', 'uploaded' => '2020-01-01T00:00:00Z'],
+                        ],
+                    ],
+                ])
+                ->push(['success' => true])  // delete abc123
+                ->push(['success' => true]), // delete def456
+        ]);
+
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
+
+        $driver->purge();
+
+        $http->assertSentCount(3); // list + 2 deletes (not 3 — other-app is skipped)
+
+        $http->assertSent(function (Request $request) {
+            return $request->method() === 'DELETE'
+                && str_contains($request->url(), 'laravel-image/abc123');
+        });
+
+        $http->assertSent(function (Request $request) {
+            return $request->method() === 'DELETE'
+                && str_contains($request->url(), 'laravel-image/def456');
+        });
+
+        $http->assertNotSent(function (Request $request) {
+            return $request->method() === 'DELETE'
+                && str_contains($request->url(), 'other-app/ghi789');
+        });
+    }
+
+    public function test_purge_skips_recently_uploaded_images()
+    {
+        $http = new HttpFactory;
+
+        $recentTimestamp = (new \DateTimeImmutable)->format('c');
+
+        $http->fake([
+            'api.cloudflare.com/*' => $http->response([
+                'success' => true,
+                'result' => [
+                    'images' => [
+                        ['id' => 'laravel-image/recent', 'uploaded' => $recentTimestamp],
+                    ],
+                ],
+            ]),
+        ]);
+
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
+
+        $driver->purge();
+
+        $http->assertSentCount(1); // only the list request, no delete
+    }
+
+    public function test_purge_skips_images_without_prefix()
+    {
+        $http = new HttpFactory;
+
+        $http->fake([
+            'api.cloudflare.com/*' => $http->response([
+                'success' => true,
+                'result' => [
+                    'images' => [
+                        ['id' => 'user-uploaded/photo.jpg', 'uploaded' => '2020-01-01T00:00:00Z'],
+                        ['id' => 'some-other-image', 'uploaded' => '2020-01-01T00:00:00Z'],
+                    ],
+                ],
+            ]),
+        ]);
+
+        $driver = new CloudflareDriver($http, 'account', 'token', 'laravel-image');
+
+        $driver->purge();
+
+        $http->assertSentCount(1); // only the list request, no deletes
+    }
 }

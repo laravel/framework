@@ -10,6 +10,7 @@ use Illuminate\Foundation\Image\ImageManager;
  * @method static \Illuminate\Contracts\Image\Driver driver(string|null $name = null)
  * @method static string getDefaultDriver()
  * @method static \Illuminate\Foundation\Image\ImageManager extend(string $driver, \Closure $callback)
+ * @method static void purge()
  *
  * @see ImageManager
  */

@@ -147,6 +147,18 @@ class ImageManager
     }
 
     /**
+     * Purge orphaned images from the current driver.
+     */
+    public function purge(): void
+    {
+        $driver = $this->driver();
+
+        if (method_exists($driver, 'purge')) {
+            $driver->purge();
+        }
+    }
+
+    /**
      * Dynamically call the default driver instance.
      */
     public function __call(string $method, array $parameters): mixed
