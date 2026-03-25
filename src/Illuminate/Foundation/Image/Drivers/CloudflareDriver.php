@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Image\Drivers;
 
+use DateTimeImmutable;
 use finfo;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Foundation\Image\ImageException;
@@ -163,6 +164,45 @@ class CloudflareDriver implements Driver
         // https://imagedelivery.net/{account_hash}/{image_id}/{params}
         // The params replace the variant name (e.g. /public) in the delivery URL.
         return preg_replace('#/[^/]+$#', '/'.implode(',', $params), $baseUrl);
+    }
+
+    /**
+     * Delete orphaned images from Cloudflare that match the configured prefix.
+     */
+    public function purge(): void
+    {
+        $page = 1;
+
+        do {
+            $response = $this->http
+                ->withToken($this->apiToken)
+                ->get("https://api.cloudflare.com/client/v4/accounts/{$this->accountId}/images/v1", [
+                    'per_page' => 100,
+                    'page' => $page,
+                ]);
+
+            if ($response->failed()) {
+                throw new ImageException('Failed to list images from Cloudflare.');
+            }
+
+            $images = $response->json('result.images', []);
+
+            foreach ($images as $image) {
+                if (! str_starts_with($image['id'], $this->prefix.'/')) {
+                    continue;
+                }
+
+                $uploaded = new DateTimeImmutable($image['uploaded']);
+
+                if ($uploaded->getTimestamp() > time() - 300) {
+                    continue;
+                }
+
+                $this->deleteImage($image['id']);
+            }
+
+            $page++;
+        } while (count($images) === 100);
     }
 
     /**
