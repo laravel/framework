@@ -78,7 +78,7 @@ class BinaryCodec
     /**
      * Get all available format names.
      *
-     * @return list<string>
+     * @return array<string>
      */
     public static function formats(): array
     {
