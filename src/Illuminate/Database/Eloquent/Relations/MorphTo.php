@@ -226,7 +226,7 @@ class MorphTo extends BelongsTo
     protected function matchToMorphParents($type, EloquentCollection $results)
     {
         foreach ($results as $result) {
-            $ownerKey = ! is_null($this->ownerKey) ? $this->getDictionaryKey($result->{$this->ownerKey}) : $result->getKey();
+            $ownerKey = $this->getDictionaryKey(! is_null($this->ownerKey) ? $result->{$this->ownerKey} : $result->getKey());
 
             if ($ownerKey !== null && isset($this->dictionary[$type][$ownerKey])) {
                 foreach ($this->dictionary[$type][$ownerKey] as $model) {
