@@ -562,6 +562,32 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run biweekly on the 1st and 16th of each month.
+     *
+     * @param  string  $time
+     * @return $this
+     */
+    public function biweekly($time = '0:0')
+    {
+        return $this->biweeklyOn(1, 16, $time);
+    }
+
+    /**
+     * Schedule the event to run biweekly on two given days of the month.
+     *
+     * @param  int<1, 31>  $firstDay
+     * @param  int<1, 31>  $secondDay
+     * @param  string  $time
+     * @return $this
+     */
+    public function biweeklyOn($firstDay = 1, $secondDay = 16, $time = '0:0')
+    {
+        $this->dailyAt($time);
+
+        return $this->spliceIntoPosition(3, $firstDay.','.$secondDay);
+    }
+
+    /**
      * Schedule the event to run on the last day of the month.
      *
      * @param  string  $time

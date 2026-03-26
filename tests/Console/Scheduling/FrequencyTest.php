@@ -137,6 +137,26 @@ class FrequencyTest extends TestCase
         $this->assertSame('30 1 1,16 * *', $this->event->twiceMonthly(1, 16, '1:30')->getExpression());
     }
 
+    public function testBiweekly()
+    {
+        $this->assertSame('0 0 1,16 * *', $this->event->biweekly()->getExpression());
+    }
+
+    public function testBiweeklyAtTime()
+    {
+        $this->assertSame('30 8 1,16 * *', $this->event->biweekly('8:30')->getExpression());
+    }
+
+    public function testBiweeklyOn()
+    {
+        $this->assertSame('0 0 1,16 * *', $this->event->biweeklyOn(1, 16)->getExpression());
+    }
+
+    public function testBiweeklyOnAtTime()
+    {
+        $this->assertSame('30 8 5,20 * *', $this->event->biweeklyOn(5, 20, '8:30')->getExpression());
+    }
+
     public function testMonthlyOnWithMinutes()
     {
         $this->assertSame('15 15 4 * *', $this->event->monthlyOn(4, '15:15')->getExpression());
