@@ -98,6 +98,20 @@ class ValidatedInput implements ValidatedData
     }
 
     /**
+     * Retrieve a file from the validated inputs.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return \Illuminate\Http\UploadedFile|null
+     */
+    public function file($key, $default = null)
+    {
+        $value = $this->input($key, $default);
+
+        return $value instanceof \Illuminate\Http\UploadedFile ? $value : $default;
+    }
+
+    /**
      * Dump the items.
      *
      * @param  mixed  ...$keys
