@@ -85,6 +85,7 @@
         "phpstan/phpstan": "^2.0",
         "phpunit/phpunit": "^11.5.50 || ^12.5.8 || ^13.0.3",
         "predis/predis": "^2.3 || ^3.0",
+        "rector/rector": "^2.3",
         "resend/resend-php": "^1.0",
         "symfony/cache": "^7.4.0 || ^8.0.0",
         "symfony/http-client": "^7.4.0 || ^8.0.0",

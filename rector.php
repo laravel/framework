@@ -1,0 +1,95 @@
+<?php
+
+declare(strict_types=1);
+
+use Rector\CodingStyle\Rector\ArrowFunction\ArrowFunctionDelegatingCallToFirstClassCallableRector;
+use Rector\CodingStyle\Rector\Closure\ClosureDelegatingCallToFirstClassCallableRector;
+use Rector\CodingStyle\Rector\FuncCall\ClosureFromCallableToFirstClassCallableRector;
+use Rector\CodingStyle\Rector\FuncCall\ConsistentImplodeRector;
+use Rector\CodingStyle\Rector\FuncCall\FunctionFirstClassCallableRector;
+use Rector\Config\RectorConfig;
+use Rector\Php55\Rector\Class_\ClassConstantToSelfClassRector;
+use Rector\Php55\Rector\String_\StringClassNameToClassConstantRector;
+use Rector\Php56\Rector\FuncCall\PowToExpRector;
+use Rector\Php70\Rector\FuncCall\RandomFunctionRector;
+use Rector\Php70\Rector\If_\IfToSpaceshipRector;
+use Rector\Php70\Rector\MethodCall\ThisCallOnStaticMethodToStaticCallRector;
+use Rector\Php70\Rector\StaticCall\StaticCallOnNonStaticToInstanceCallRector;
+use Rector\Php70\Rector\StmtsAwareInterface\IfIssetToCoalescingRector;
+use Rector\Php70\Rector\Ternary\TernaryToNullCoalescingRector;
+use Rector\Php71\Rector\BinaryOp\BinaryOpBetweenNumberAndStringRector;
+use Rector\Php71\Rector\FuncCall\RemoveExtraParametersRector;
+use Rector\Php74\Rector\Assign\NullCoalescingOperatorRector;
+use Rector\Php74\Rector\Closure\ClosureToArrowFunctionRector;
+use Rector\Php80\Rector\Catch_\RemoveUnusedVariableInCatchRector;
+use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
+use Rector\Php80\Rector\Class_\StringableForToStringRector;
+use Rector\Php80\Rector\ClassConstFetch\ClassOnThisVariableObjectRector;
+use Rector\Php80\Rector\FuncCall\ClassOnObjectRector;
+use Rector\Php80\Rector\Switch_\ChangeSwitchToMatchRector;
+use Rector\Php80\Rector\Ternary\GetDebugTypeRector;
+use Rector\Php81\Rector\Array_\ArrayToFirstClassCallableRector;
+use Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector;
+use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
+use Rector\Php82\Rector\Class_\ReadOnlyClassRector;
+use Rector\Php83\Rector\ClassConst\AddTypeToConstRector;
+use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
+use Rector\Php83\Rector\FuncCall\DynamicClassConstFetchRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnNeverTypeRector;
+
+return RectorConfig::configure()
+    ->withRootFiles()
+    ->withPaths([
+        __DIR__.'/config',
+        __DIR__.'/src',
+        __DIR__.'/tests',
+        __DIR__.'/types',
+    ])
+    ->withSkip([
+        AddOverrideAttributeToOverriddenMethodsRector::class,
+        AddTypeToConstRector::class,
+        ArrayToFirstClassCallableRector::class,
+        ArrowFunctionDelegatingCallToFirstClassCallableRector::class,
+        BinaryOpBetweenNumberAndStringRector::class,
+        ChangeSwitchToMatchRector::class,
+        ClassConstantToSelfClassRector::class,
+        ClassOnObjectRector::class,
+        ClassOnThisVariableObjectRector::class,
+        ClassPropertyAssignToConstructorPromotionRector::class,
+        ClosureDelegatingCallToFirstClassCallableRector::class,
+        ClosureFromCallableToFirstClassCallableRector::class,
+        ClosureToArrowFunctionRector::class,
+        ConsistentImplodeRector::class,
+        DynamicClassConstFetchRector::class,
+        FunctionFirstClassCallableRector::class,
+        GetDebugTypeRector::class,
+        IfIssetToCoalescingRector::class,
+        IfToSpaceshipRector::class,
+        NullCoalescingOperatorRector::class,
+        NullToStrictStringFuncCallArgRector::class,
+        PowToExpRector::class,
+        RandomFunctionRector::class,
+        ReadOnlyClassRector::class,
+        ReadOnlyPropertyRector::class,
+        RemoveExtraParametersRector::class,
+        RemoveUnusedVariableInCatchRector::class,
+        ReturnNeverTypeRector::class,
+        StaticCallOnNonStaticToInstanceCallRector::class,
+        StringClassNameToClassConstantRector::class,
+        StringableForToStringRector::class,
+        TernaryToNullCoalescingRector::class,
+        ThisCallOnStaticMethodToStaticCallRector::class,
+        'tests/Foundation/fixtures/bad-syntax-strategy.php',
+    ])
+    ->withPreparedSets(
+        deadCode: false,
+        codeQuality: false,
+        codingStyle: false,
+        typeDeclarations: false,
+        typeDeclarationDocblocks: false,
+        privatization: false,
+        naming: false,
+        instanceOf: false,
+        earlyReturn: false,
+    )
+    ->withPhpSets(php83: true);
