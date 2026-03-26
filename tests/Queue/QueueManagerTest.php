@@ -77,4 +77,57 @@ class QueueManagerTest extends TestCase
 
         $this->assertSame($queue, $manager->connection('null'));
     }
+
+    public function testEnumConnectionCanBeResolved()
+    {
+        $app = [
+            'config' => [
+                'queue.default' => 'sync',
+                'queue.connections.sync' => ['driver' => 'sync'],
+            ],
+            'encrypter' => $encrypter = m::mock(Encrypter::class),
+        ];
+
+        $manager = new QueueManager($app);
+        $connector = m::mock(stdClass::class);
+        $queue = m::mock(stdClass::class);
+        $queue->shouldReceive('setConnectionName')->once()->with('sync')->andReturnSelf();
+        $connector->shouldReceive('connect')->once()->with(['driver' => 'sync'])->andReturn($queue);
+        $manager->addConnector('sync', function () use ($connector) {
+            return $connector;
+        });
+        $queue->shouldReceive('setContainer')->once()->with($app);
+
+        $this->assertSame($queue, $manager->connection(QueueConnectionName::Sync));
+    }
+
+    public function testEnumConnectionCanBeChecked()
+    {
+        $app = [
+            'config' => [
+                'queue.default' => 'sync',
+                'queue.connections.sync' => ['driver' => 'sync'],
+            ],
+            'encrypter' => $encrypter = m::mock(Encrypter::class),
+        ];
+
+        $manager = new QueueManager($app);
+        $connector = m::mock(stdClass::class);
+        $queue = m::mock(stdClass::class);
+        $queue->shouldReceive('setConnectionName')->once()->with('sync')->andReturnSelf();
+        $connector->shouldReceive('connect')->once()->with(['driver' => 'sync'])->andReturn($queue);
+        $manager->addConnector('sync', function () use ($connector) {
+            return $connector;
+        });
+        $queue->shouldReceive('setContainer')->once()->with($app);
+
+        $this->assertFalse($manager->connected(QueueConnectionName::Sync));
+        $manager->connection(QueueConnectionName::Sync);
+        $this->assertTrue($manager->connected(QueueConnectionName::Sync));
+    }
+}
+
+enum QueueConnectionName: string
+{
+    case Sync = 'sync';
 }

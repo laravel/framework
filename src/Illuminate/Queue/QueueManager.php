@@ -8,6 +8,8 @@ use Illuminate\Contracts\Queue\Monitor as MonitorContract;
 use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use InvalidArgumentException;
 
+use function Illuminate\Support\enum_value;
+
 /**
  * @mixin \Illuminate\Contracts\Queue\Queue
  */
@@ -139,23 +141,23 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Determine if the driver is connected.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return bool
      */
     public function connected($name = null)
     {
-        return isset($this->connections[$name ?: $this->getDefaultDriver()]);
+        return isset($this->connections[enum_value($name) ?: $this->getDefaultDriver()]);
     }
 
     /**
      * Resolve a queue connection instance.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return \Illuminate\Contracts\Queue\Queue
      */
     public function connection($name = null)
     {
-        $name = $name ?: $this->getDefaultDriver();
+        $name = enum_value($name) ?: $this->getDefaultDriver();
 
         // If the connection has not been resolved yet we will resolve it now as all
         // of the connections are resolved when they are actually needed so we do
