@@ -14,11 +14,11 @@
         "source": "https://github.com/laravel/framework"
     },
     "require": {
-        "php": "^8.3",
-        "illuminate/collections": "^13.0",
-        "illuminate/contracts": "^13.0",
-        "illuminate/macroable": "^13.0",
-        "illuminate/support": "^13.0"
+        "php": "^8.4",
+        "illuminate/collections": "^14.0",
+        "illuminate/contracts": "^14.0",
+        "illuminate/macroable": "^14.0",
+        "illuminate/support": "^14.0"
     },
     "suggest": {
         "ext-redis": "Required to use the phpredis connector (^4.0 || ^5.0 || ^6.0).",
@@ -35,7 +35,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "13.0.x-dev"
+            "dev-master": "14.0.x-dev"
         }
     }
 }

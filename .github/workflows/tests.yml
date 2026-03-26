@@ -39,12 +39,9 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.3, 8.4, 8.5]
+        php: [8.4, 8.5]
         phpunit: ['11.5.50', '12.5.8', '13.0.3']
         stability: [prefer-lowest, prefer-stable]
-        exclude:
-          - php: 8.3
-            phpunit: '13.0.3'
 
     name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }}
 
@@ -98,12 +95,9 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.3, 8.4, 8.5]
+        php: [8.4, 8.5]
         phpunit: ['11.5.50', '12.5.8', '13.0.3']
         stability: [prefer-lowest, prefer-stable]
-        exclude:
-          - php: 8.3
-            phpunit: '13.0.3'
 
     name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }} - Windows
 
