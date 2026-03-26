@@ -5,8 +5,8 @@ namespace Illuminate\Support\Facades;
 /**
  * @method static \Psr\Log\LoggerInterface build(array $config)
  * @method static \Psr\Log\LoggerInterface stack(array $channels, string|null $channel = null)
- * @method static \Psr\Log\LoggerInterface channel(string|null $channel = null)
- * @method static \Psr\Log\LoggerInterface driver(string|null $driver = null)
+ * @method static \Psr\Log\LoggerInterface channel(\UnitEnum|string|null $channel = null)
+ * @method static \Psr\Log\LoggerInterface driver(\UnitEnum|string|null $driver = null)
  * @method static \Illuminate\Log\LogManager shareContext(array $context)
  * @method static array sharedContext()
  * @method static \Illuminate\Log\LogManager withoutContext(string[]|null $keys = null)

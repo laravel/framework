@@ -764,6 +764,26 @@ class LogManagerTest extends TestCase
         $manager->extend(__CLASS__, fn () => $this);
         $this->assertSame($manager, $manager->channel(__CLASS__)->getLogger());
     }
+
+    public function testLogManagerCanResolveBackedEnumChannel()
+    {
+        $manager = new LogManager($this->app);
+
+        $logger1 = $manager->channel(LogChannelName::Single);
+        $logger2 = $manager->channel('single');
+
+        $this->assertSame($logger1, $logger2);
+    }
+
+    public function testLogManagerCanResolveBackedEnumDriver()
+    {
+        $manager = new LogManager($this->app);
+
+        $logger1 = $manager->driver(LogChannelName::Single);
+        $logger2 = $manager->driver('single');
+
+        $this->assertSame($logger1, $logger2);
+    }
 }
 
 class CustomizeFormatter
@@ -792,4 +812,9 @@ class LoggerSpy implements LoggerInterface
             'context' => $context,
         ];
     }
+}
+
+enum LogChannelName: string
+{
+    case Single = 'single';
 }
