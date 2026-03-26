@@ -83,6 +83,44 @@ class QueueSqsJobTest extends TestCase
         $job->delete();
     }
 
+    public function testDeleteRemovesNonFailedJobFromSqsWhenRedriveExists()
+    {
+        $redrivePolicy = ['maxReceiveCount' => 5, 'deadLetterTargetArn' => 'arn:aws:sqs:us-east-1:123456789:dlq'];
+        $job = $this->getJobWithRedrivePolicy($redrivePolicy);
+        $job->getSqs()->shouldReceive('deleteMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle]);
+        $job->delete();
+    }
+
+    public function testDeleteSkipsSqsDeletionWhenFailedJobHasRedrivePolicy()
+    {
+        $redrivePolicy = ['maxReceiveCount' => 5, 'deadLetterTargetArn' => 'arn:aws:sqs:us-east-1:123456789:dlq'];
+        $job = $this->getJobWithRedrivePolicy($redrivePolicy);
+        $job->markAsFailed();
+        $job->getSqs()->shouldNotReceive('deleteMessage');
+        $job->delete();
+    }
+
+    public function testDeleteRemovesFailedJobFromSqsWhenNoRedrivePolicy()
+    {
+        $job = $this->getJob();
+        $job->markAsFailed();
+        $job->getSqs()->shouldReceive('deleteMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle]);
+        $job->delete();
+    }
+
+    public function testMaxTriesReturnsRedriveMaxReceiveCount()
+    {
+        $redrivePolicy = ['maxReceiveCount' => 3, 'deadLetterTargetArn' => 'arn:aws:sqs:us-east-1:123456789:dlq'];
+        $job = $this->getJobWithRedrivePolicy($redrivePolicy);
+        $this->assertEquals(3, $job->maxTries());
+    }
+
+    public function testMaxTriesFallsBackToPayloadWithoutRedrivePolicy()
+    {
+        $job = $this->getJob();
+        $this->assertNull($job->maxTries());
+    }
+
     public function testReleaseProperlyReleasesTheJobOntoSqs()
     {
         $this->mockedSqsClient = m::mock(SqsClient::class)->makePartial();
@@ -102,6 +140,18 @@ class QueueSqsJobTest extends TestCase
             $this->mockedJobData,
             'connection-name',
             $this->queueUrl
+        );
+    }
+
+    protected function getJobWithRedrivePolicy(array $redrivePolicy)
+    {
+        return new SqsJob(
+            $this->mockedContainer,
+            $this->mockedSqsClient,
+            $this->mockedJobData,
+            'connection-name',
+            $this->queueUrl,
+            $redrivePolicy
         );
     }
 }

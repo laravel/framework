@@ -39,6 +39,13 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     protected $suffix;
 
     /**
+     * The cached redrive policies for each queue URL.
+     *
+     * @var array<string, array|null>
+     */
+    protected $redrivePolicies = [];
+
+    /**
      * Create a new Amazon SQS queue instance.
      *
      * @param  \Aws\Sqs\SqsClient  $sqs
@@ -302,9 +309,33 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
         if (! is_null($response['Messages']) && count($response['Messages']) > 0) {
             return new SqsJob(
                 $this->container, $this->sqs, $response['Messages'][0],
-                $this->connectionName, $queue
+                $this->connectionName, $queue, $this->redrivePolicy($queue)
             );
         }
+    }
+
+    /**
+     * Get the redrive policy for the given queue.
+     *
+     * @param  string|null  $queue
+     * @return array|null
+     */
+    public function redrivePolicy($queue = null)
+    {
+        $queueUrl = $this->getQueue($queue);
+
+        if (! array_key_exists($queueUrl, $this->redrivePolicies)) {
+            $response = $this->sqs->getQueueAttributes([
+                'QueueUrl' => $queueUrl,
+                'AttributeNames' => ['RedrivePolicy'],
+            ]);
+
+            $this->redrivePolicies[$queueUrl] = isset($response['Attributes']['RedrivePolicy'])
+                ? json_decode($response['Attributes']['RedrivePolicy'], true)
+                : null;
+        }
+
+        return $this->redrivePolicies[$queueUrl];
     }
 
     /**

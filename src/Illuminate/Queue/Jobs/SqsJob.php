@@ -23,6 +23,13 @@ class SqsJob extends Job implements JobContract
     protected $job;
 
     /**
+     * The SQS queue's redrive policy.
+     *
+     * @var array|null
+     */
+    protected $redrivePolicy;
+
+    /**
      * Create a new job instance.
      *
      * @param  \Illuminate\Container\Container  $container
@@ -30,14 +37,16 @@ class SqsJob extends Job implements JobContract
      * @param  array  $job
      * @param  string  $connectionName
      * @param  string  $queue
+     * @param  array|null  $redrivePolicy
      */
-    public function __construct(Container $container, SqsClient $sqs, array $job, $connectionName, $queue)
+    public function __construct(Container $container, SqsClient $sqs, array $job, $connectionName, $queue, $redrivePolicy = null)
     {
         $this->sqs = $sqs;
         $this->job = $job;
         $this->queue = $queue;
         $this->container = $container;
         $this->connectionName = $connectionName;
+        $this->redrivePolicy = $redrivePolicy;
     }
 
     /**
@@ -66,9 +75,25 @@ class SqsJob extends Job implements JobContract
     {
         parent::delete();
 
-        $this->sqs->deleteMessage([
-            'QueueUrl' => $this->queue, 'ReceiptHandle' => $this->job['ReceiptHandle'],
-        ]);
+        if (! $this->hasFailed() || is_null($this->redrivePolicy)) {
+            $this->sqs->deleteMessage([
+                'QueueUrl' => $this->queue, 'ReceiptHandle' => $this->job['ReceiptHandle'],
+            ]);
+        }
+    }
+
+    /**
+     * Get the number of times the job may be attempted.
+     *
+     * @return int|null
+     */
+    public function maxTries()
+    {
+        if (! is_null($this->redrivePolicy)) {
+            return (int) $this->redrivePolicy['maxReceiveCount'];
+        }
+
+        return parent::maxTries();
     }
 
     /**

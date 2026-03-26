@@ -676,4 +676,60 @@ class QueueSqsQueueTest extends TestCase
 
         Str::createUuidsNormally();
     }
+
+    public function testRedrivePolicyIsFetchedAndCached()
+    {
+        $redrivePolicy = json_encode(['maxReceiveCount' => 5, 'deadLetterTargetArn' => 'arn:aws:sqs:us-east-1:123456789:dlq']);
+
+        $this->sqs->shouldReceive('getQueueAttributes')->once()->with([
+            'QueueUrl' => $this->queueUrl,
+            'AttributeNames' => ['RedrivePolicy'],
+        ])->andReturn(new Result([
+            'Attributes' => ['RedrivePolicy' => $redrivePolicy],
+        ]));
+
+        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix);
+
+        $result = $queue->redrivePolicy($this->queueName);
+        $this->assertEquals(['maxReceiveCount' => 5, 'deadLetterTargetArn' => 'arn:aws:sqs:us-east-1:123456789:dlq'], $result);
+
+        // Second call should use cache, not make another API call.
+        $cachedResult = $queue->redrivePolicy($this->queueName);
+        $this->assertEquals($result, $cachedResult);
+    }
+
+    public function testRedrivePolicyReturnsNullWhenNotConfigured()
+    {
+        $this->sqs->shouldReceive('getQueueAttributes')->once()->with([
+            'QueueUrl' => $this->queueUrl,
+            'AttributeNames' => ['RedrivePolicy'],
+        ])->andReturn(new Result([
+            'Attributes' => [],
+        ]));
+
+        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix);
+
+        $this->assertNull($queue->redrivePolicy($this->queueName));
+    }
+
+    public function testPopPassesRedrivePolicyToSqsJob()
+    {
+        $redrivePolicy = json_encode(['maxReceiveCount' => 3, 'deadLetterTargetArn' => 'arn:aws:sqs:us-east-1:123456789:dlq']);
+
+        $this->sqs->shouldReceive('receiveMessage')->once()->andReturn($this->mockedReceiveMessageResponseModel);
+        $this->sqs->shouldReceive('getQueueAttributes')->once()->with([
+            'QueueUrl' => $this->queueUrl,
+            'AttributeNames' => ['RedrivePolicy'],
+        ])->andReturn(new Result([
+            'Attributes' => ['RedrivePolicy' => $redrivePolicy],
+        ]));
+
+        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix);
+        $queue->setContainer(m::mock(Container::class));
+
+        $job = $queue->pop();
+
+        $this->assertInstanceOf(SqsJob::class, $job);
+        $this->assertEquals(3, $job->maxTries());
+    }
 }
