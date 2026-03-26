@@ -2834,7 +2834,9 @@ class DatabaseEloquentModelTest extends TestCase
         $result = $model->publicIncrementEach(['foo' => 1]);
 
         $this->assertFalse($result);
-        $this->assertEquals(1, $model->foo);
+        // Note: attributes are set before the event fires, matching increment() behavior.
+        // The in-memory value changes but the database is not updated.
+        $this->assertEquals(2, $model->foo);
     }
 
     public function testIncrementEachOnNonExistingModelForwardsToQueryBuilder()

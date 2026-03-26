@@ -1252,23 +1252,35 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return $this->newQueryWithoutRelationships()->{$method}($columns, $extra);
         }
 
+        $isIncrement = $method === 'incrementEach';
+        $singleMethod = $isIncrement ? 'increment' : 'decrement';
+
+        foreach ($columns as $column => $amount) {
+            $this->{$column} = $this->isClassDeviable($column)
+                ? $this->deviateClassCastableAttribute($singleMethod, $column, $amount)
+                : $this->{$column} + ($isIncrement ? $amount : $amount * -1);
+        }
+
+        $this->forceFill($extra);
+
         if ($this->fireModelEvent('updating') === false) {
             return false;
         }
 
-        return tap($this->setKeysForSaveQuery($this->newQueryWithoutScopes())->{$method}($columns, $extra), function () use ($columns, $extra, $method) {
-            $this->forceFill(array_merge(
-                collect($columns)->mapWithKeys(function ($amount, $column) use ($method) {
-                    return [$column => $this->{$column} + ($method === 'incrementEach' ? $amount : $amount * -1)];
-                })->all(),
-                $extra
-            ));
+        $dbColumns = $columns;
 
+        foreach ($dbColumns as $column => $amount) {
+            if ($this->isClassDeviable($column)) {
+                $dbColumns[$column] = (clone $this)->setAttribute($column, $amount)->getAttributeFromArray($column);
+            }
+        }
+
+        return tap($this->setKeysForSaveQuery($this->newQueryWithoutScopes())->{$method}($dbColumns, $extra), function () use ($columns) {
             $this->syncChanges();
 
             $this->fireModelEvent('updated', false);
 
-            $this->syncOriginal();
+            $this->syncOriginalAttributes(array_keys($columns));
         });
     }
 
