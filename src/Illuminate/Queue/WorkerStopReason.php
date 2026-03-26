@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 enum WorkerStopReason: string
 {
     case Interrupted = 'interrupted';
+    case LostConnection = 'lost_connection';
     case MaxJobsExceeded = 'max_jobs';
     case MaxMemoryExceeded = 'memory';
     case MaxTimeExceeded = 'max_time';
