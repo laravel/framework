@@ -238,6 +238,40 @@ class SupportUriTest extends TestCase
         $this->assertEquals(3, $uri->pathSegments()->count());
     }
 
+    public function test_append_path()
+    {
+        $uri = Uri::of('https://laravel.com/api/v1');
+
+        // Basic append
+        $this->assertEquals('https://laravel.com/api/v1/users', (string) $uri->appendPath('users'));
+
+        // Append with leading slash
+        $this->assertEquals('https://laravel.com/api/v1/users', (string) $uri->appendPath('/users'));
+
+        // Append to trailing slash path
+        $uri = Uri::of('https://laravel.com/api/v1/');
+        $this->assertEquals('https://laravel.com/api/v1/users', (string) $uri->appendPath('users'));
+
+        // Append multi-segment path
+        $uri = Uri::of('https://laravel.com/api');
+        $this->assertEquals('https://laravel.com/api/v1/users', (string) $uri->appendPath('v1/users'));
+
+        // Append preserves query and fragment
+        $uri = Uri::of('https://laravel.com/api?key=123#section');
+        $this->assertEquals('https://laravel.com/api/users?key=123#section', (string) $uri->appendPath('users'));
+
+        // Append to root path
+        $uri = Uri::of('https://laravel.com');
+        $this->assertEquals('https://laravel.com/users', (string) $uri->appendPath('users'));
+
+        // Chaining with other methods
+        $uri = Uri::of('https://laravel.com/api')
+            ->appendPath('v2')
+            ->appendPath('users')
+            ->withQuery(['page' => 1]);
+        $this->assertEquals('https://laravel.com/api/v2/users?page=1', (string) $uri);
+    }
+
     public function test_macroable()
     {
         Uri::macro('myMacro', function () {

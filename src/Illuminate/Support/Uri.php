@@ -248,6 +248,17 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
     }
 
     /**
+     * Append the given path to the URI's existing path.
+     */
+    public function appendPath(Stringable|string $path): static
+    {
+        $current = rtrim((string) $this->uri->getPath(), '/');
+        $append = ltrim((string) $path, '/');
+
+        return new static($this->uri->withPath($current.'/'.$append));
+    }
+
+    /**
      * Merge new query parameters into the URI.
      */
     public function withQuery(array $query, bool $merge = true): static
