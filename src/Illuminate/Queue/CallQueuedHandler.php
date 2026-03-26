@@ -246,9 +246,9 @@ class CallQueuedHandler
      */
     protected function handleModelNotFound(Job $job, $e)
     {
-        try {
-            $class = $job->resolveQueuedJobClass();
+        $class = $job->resolveQueuedJobClass();
 
+        try {
             $shouldDelete = $this->shouldDeleteWhenMissingModels($class)
                 || (($name = $job->resolveName()) !== $class
                     && class_exists($name)
