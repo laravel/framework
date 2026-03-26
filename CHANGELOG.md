@@ -1,6 +1,10 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.50.0...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.51.0...11.x)
+
+## [v11.51.0](https://github.com/laravel/framework/compare/v11.50.0...v11.51.0) - 2026-03-26
+
+* [11.x] `schedule:list` display expression in the correct timezone by [@xiCO2k](https://github.com/xiCO2k) in https://github.com/laravel/framework/pull/59340
 
 ## [v11.50.0](https://github.com/laravel/framework/compare/v11.49.0...v11.50.0) - 2026-03-17
 
