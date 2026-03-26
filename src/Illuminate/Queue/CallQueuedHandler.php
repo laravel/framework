@@ -15,7 +15,6 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Log\Context\Repository as ContextRepository;
-use Illuminate\Notifications\SendQueuedNotifications;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use ReflectionClass;
@@ -227,19 +226,13 @@ class CallQueuedHandler
      */
     protected function handleModelNotFound(Job $job, $e)
     {
-        $class = $job->resolveQueuedJobClass();
-
         try {
-            $shouldDelete = $this->shouldDeleteWhenMissingModels($class);
+            $class = $job->resolveQueuedJobClass();
 
-            if (! $shouldDelete && $class === SendQueuedNotifications::class) {
-                $payload = $job->payload();
-                $notificationClass = $payload['displayName'] ?? null;
-
-                if ($notificationClass && class_exists($notificationClass)) {
-                    $shouldDelete = $this->shouldDeleteWhenMissingModels($notificationClass);
-                }
-            }
+            $shouldDelete = $this->shouldDeleteWhenMissingModels($class)
+                || (($name = $job->resolveName()) !== $class
+                    && class_exists($name)
+                    && $this->shouldDeleteWhenMissingModels($name));
         } catch (Exception) {
             $shouldDelete = false;
         }
