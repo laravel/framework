@@ -129,7 +129,7 @@ return [
 
     'cookie' => env(
         'SESSION_COOKIE',
-        Str::snake((string) env('APP_NAME', 'laravel')).'_session'
+        Str::slug((string) env('APP_NAME', 'laravel')).'-session'
     ),
 
     /*
@@ -152,7 +152,7 @@ return [
     |
     | This value determines the domain and subdomains the session cookie is
     | available to. By default, the cookie will be available to the root
-    | domain and all subdomains. Typically, this shouldn't be changed.
+    | domain without subdomains. Typically, this shouldn't be changed.
     |
     */
 
@@ -213,5 +213,21 @@ return [
     */
 
     'partitioned' => env('SESSION_PARTITIONED_COOKIE', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Session Serialization
+    |--------------------------------------------------------------------------
+    |
+    | This value controls the serialization strategy for session data, which
+    | is JSON by default. Setting this to "php" allows the storage of PHP
+    | objects in the session but can make an application vulnerable to
+    | "gadget chain" serialization attacks if the APP_KEY is leaked.
+    |
+    | Supported: "json", "php"
+    |
+    */
+
+    'serialization' => 'json',
 
 ];
