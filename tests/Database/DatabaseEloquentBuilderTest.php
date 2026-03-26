@@ -2934,6 +2934,67 @@ class DatabaseEloquentBuilderTest extends TestCase
         return new Builder($this->getMockQueryBuilder());
     }
 
+    public function testIncrementEachCallsToBaseWithUpdatedAt()
+    {
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('from')->with('foo_table');
+        $query->from = 'foo_table';
+        $query->shouldReceive('incrementEach')->once()->withArgs(function ($columns, $extra) {
+            return $columns === ['votes' => 5] && array_key_exists('foo_table.updated_at', $extra);
+        })->andReturn(1);
+
+        $builder = new Builder($query);
+        $model = $this->getMockModel();
+        $model->shouldReceive('usesTimestamps')->andReturn(true);
+        $model->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
+        $model->shouldReceive('freshTimestampString')->andReturn('2026-03-26 00:00:00');
+        $model->shouldReceive('hasSetMutator')->andReturn(false);
+        $model->shouldReceive('hasAttributeSetMutator')->andReturn(false);
+        $model->shouldReceive('hasCast')->andReturn(false);
+        $builder->setModel($model);
+
+        $result = $builder->incrementEach(['votes' => 5]);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testDecrementEachCallsToBaseWithUpdatedAt()
+    {
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('from')->with('foo_table');
+        $query->from = 'foo_table';
+        $query->shouldReceive('decrementEach')->once()->withArgs(function ($columns, $extra) {
+            return $columns === ['votes' => 3] && array_key_exists('foo_table.updated_at', $extra);
+        })->andReturn(1);
+
+        $builder = new Builder($query);
+        $model = $this->getMockModel();
+        $model->shouldReceive('usesTimestamps')->andReturn(true);
+        $model->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
+        $model->shouldReceive('freshTimestampString')->andReturn('2026-03-26 00:00:00');
+        $model->shouldReceive('hasSetMutator')->andReturn(false);
+        $model->shouldReceive('hasAttributeSetMutator')->andReturn(false);
+        $model->shouldReceive('hasCast')->andReturn(false);
+        $builder->setModel($model);
+
+        $result = $builder->decrementEach(['votes' => 3]);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testIncrementEachWithoutTimestamps()
+    {
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('from')->with('foo_table');
+        $query->shouldReceive('incrementEach')->once()->with(['votes' => 1], [])->andReturn(1);
+
+        $builder = new Builder($query);
+        $model = $this->getMockModel();
+        $model->shouldReceive('usesTimestamps')->andReturn(false);
+        $builder->setModel($model);
+
+        $result = $builder->incrementEach(['votes' => 1]);
+        $this->assertEquals(1, $result);
+    }
+
     protected function getMockModel()
     {
         $model = m::mock(Model::class);
