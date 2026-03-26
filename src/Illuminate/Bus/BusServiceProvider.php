@@ -33,7 +33,7 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
         );
 
         $this->app->alias(
-            Dispatcher::class, QueueingDispatcherContract::class
+            DispatcherContract::class, QueueingDispatcherContract::class
         );
     }
 
