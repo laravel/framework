@@ -314,6 +314,116 @@ class DatabaseEloquentRelationTest extends TestCase
         $this->assertTrue($model->isRelation('parent'));
         $this->assertFalse($model->isRelation('field'));
     }
+
+    public function testWhenCallbackReceivesRelationInstance()
+    {
+        $builder = m::mock(Builder::class);
+        $builder->shouldReceive('getModel')->andReturn(new EloquentRelationResetModelStub);
+        $parent = new EloquentRelationResetModelStub;
+
+        $relation = new EloquentRelationStub($builder, $parent);
+
+        $relation->when(true, function ($query) {
+            $this->assertInstanceOf(Relation::class, $query);
+            $this->assertInstanceOf(EloquentRelationStub::class, $query);
+        });
+    }
+
+    public function testWhenReturnsSelfWhenCallbackReturnsNull()
+    {
+        $builder = m::mock(Builder::class);
+        $builder->shouldReceive('getModel')->andReturn(new EloquentRelationResetModelStub);
+        $parent = new EloquentRelationResetModelStub;
+
+        $relation = new EloquentRelationStub($builder, $parent);
+
+        $result = $relation->when(true, function ($query) {
+            // return null implicitly
+        });
+
+        $this->assertSame($relation, $result);
+    }
+
+    public function testWhenReturnsSelfWhenConditionIsFalse()
+    {
+        $builder = m::mock(Builder::class);
+        $builder->shouldReceive('getModel')->andReturn(new EloquentRelationResetModelStub);
+        $parent = new EloquentRelationResetModelStub;
+
+        $relation = new EloquentRelationStub($builder, $parent);
+
+        $callbackExecuted = false;
+
+        $result = $relation->when(false, function ($query) use (&$callbackExecuted) {
+            $callbackExecuted = true;
+        });
+
+        $this->assertFalse($callbackExecuted);
+        $this->assertSame($relation, $result);
+    }
+
+    public function testUnlessCallbackReceivesRelationInstance()
+    {
+        $builder = m::mock(Builder::class);
+        $builder->shouldReceive('getModel')->andReturn(new EloquentRelationResetModelStub);
+        $parent = new EloquentRelationResetModelStub;
+
+        $relation = new EloquentRelationStub($builder, $parent);
+
+        $relation->unless(false, function ($query) {
+            $this->assertInstanceOf(Relation::class, $query);
+            $this->assertInstanceOf(EloquentRelationStub::class, $query);
+        });
+    }
+
+    public function testWhenWithDefaultCallbackReceivesRelationInstance()
+    {
+        $builder = m::mock(Builder::class);
+        $builder->shouldReceive('getModel')->andReturn(new EloquentRelationResetModelStub);
+        $parent = new EloquentRelationResetModelStub;
+
+        $relation = new EloquentRelationStub($builder, $parent);
+
+        $relation->when(false, function () {
+            $this->fail('Primary callback should not be called when condition is false.');
+        }, function ($query) {
+            $this->assertInstanceOf(Relation::class, $query);
+            $this->assertInstanceOf(EloquentRelationStub::class, $query);
+        });
+    }
+
+    public function testWhenCallbackCanChainBuilderMethods()
+    {
+        $builder = m::mock(Builder::class);
+        $builder->shouldReceive('getModel')->andReturn(new EloquentRelationResetModelStub);
+        $builder->shouldReceive('where')->andReturnSelf();
+        $builder->shouldReceive('whereNotNull')->andReturnSelf();
+        $parent = m::mock(Model::class);
+        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+
+        $relation = new HasOne($builder, $parent, 'foreign_key', 'id');
+
+        $result = $relation->when(true, function ($query) {
+            $this->assertInstanceOf(HasOne::class, $query);
+
+            return $query->where('active', true);
+        });
+
+        $this->assertInstanceOf(HasOne::class, $result);
+    }
+
+    public function testHigherOrderWhenProxyReturnsRelation()
+    {
+        $builder = m::mock(Builder::class);
+        $builder->shouldReceive('getModel')->andReturn(new EloquentRelationResetModelStub);
+        $parent = new EloquentRelationResetModelStub;
+
+        $relation = new EloquentRelationStub($builder, $parent);
+
+        $proxy = $relation->when(true);
+
+        $this->assertInstanceOf(\Illuminate\Support\HigherOrderWhenProxy::class, $proxy);
+    }
 }
 
 class EloquentRelationResetModelStub extends Model

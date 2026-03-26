@@ -372,7 +372,9 @@ class MorphTo extends BelongsTo
             'parameters' => [true, $callback],
         ];
 
-        return $this->when(true, $callback);
+        $this->query->when(true, $callback);
+
+        return $this;
     }
 
     /**
@@ -389,7 +391,9 @@ class MorphTo extends BelongsTo
             'parameters' => [true, $callback],
         ];
 
-        return $this->when(true, $callback);
+        $this->query->when(true, $callback);
+
+        return $this;
     }
 
     /**
@@ -406,7 +410,9 @@ class MorphTo extends BelongsTo
             'parameters' => [true, $callback],
         ];
 
-        return $this->when(true, $callback);
+        $this->query->when(true, $callback);
+
+        return $this;
     }
 
     /**
