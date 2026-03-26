@@ -31,9 +31,7 @@ class DatabaseEloquentMorphTest extends TestCase
     public function testMorphOneEagerConstraintsAreProperlyAdded()
     {
         $relation = $this->getOneRelation();
-        $relation->getParent()->shouldReceive('getKeyName')->once()->andReturn('id');
-        $relation->getParent()->shouldReceive('getKeyType')->once()->andReturn('string');
-        $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.morph_id', [1, 2]);
+        $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.morph_id', ['1', '2']);
         $relation->getQuery()->shouldReceive('where')->once()->with('table.morph_type', get_class($relation->getParent()));
 
         $model1 = new EloquentMorphResetModelStub;
@@ -55,9 +53,7 @@ class DatabaseEloquentMorphTest extends TestCase
     public function testMorphManyEagerConstraintsAreProperlyAdded()
     {
         $relation = $this->getManyRelation();
-        $relation->getParent()->shouldReceive('getKeyName')->once()->andReturn('id');
-        $relation->getParent()->shouldReceive('getKeyType')->once()->andReturn('int');
-        $relation->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('table.morph_id', [1, 2]);
+        $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.morph_id', ['1', '2']);
         $relation->getQuery()->shouldReceive('where')->once()->with('table.morph_type', get_class($relation->getParent()));
 
         $model1 = new EloquentMorphResetModelStub;
@@ -484,7 +480,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $queryBuilder = m::mock(QueryBuilder::class);
         $builder = m::mock(Builder::class, [$queryBuilder]);
         $builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
-        $builder->shouldReceive('where')->once()->with('table.morph_id', '=', 1);
+        $builder->shouldReceive('where')->once()->with('table.morph_id', '=', '1');
         $related = m::mock(Model::class);
         $builder->shouldReceive('getModel')->andReturn($related);
         $parent = m::mock(Model::class);
@@ -499,7 +495,7 @@ class DatabaseEloquentMorphTest extends TestCase
     {
         $builder = m::mock(Builder::class);
         $builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
-        $builder->shouldReceive('where')->once()->with('table.morph_id', '=', 1);
+        $builder->shouldReceive('where')->once()->with('table.morph_id', '=', '1');
         $related = m::mock(Model::class);
         $builder->shouldReceive('getModel')->andReturn($related);
         $parent = m::mock(Model::class);
@@ -520,7 +516,7 @@ class DatabaseEloquentMorphTest extends TestCase
 
         $builder = m::mock(Builder::class);
         $builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
-        $builder->shouldReceive('where')->once()->with('table.morph_id', '=', 1);
+        $builder->shouldReceive('where')->once()->with('table.morph_id', '=', '1');
         $related = m::mock(Model::class);
         $builder->shouldReceive('getModel')->andReturn($related);
         $parent = m::mock(EloquentModelNamespacedStub::class);
@@ -529,6 +525,53 @@ class DatabaseEloquentMorphTest extends TestCase
         $builder->shouldReceive('where')->once()->with('table.morph_type', $alias);
 
         return new MorphOne($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
+    }
+
+    public function testMorphConstraintsCastParentKeyToString()
+    {
+        $builder = m::mock(Builder::class);
+        $builder->shouldReceive('whereNotNull')->once()->with('table.morph_id');
+        $builder->shouldReceive('where')->once()->with('table.morph_id', '=', '42');
+        $related = m::mock(Model::class);
+        $builder->shouldReceive('getModel')->andReturn($related);
+        $parent = m::mock(Model::class);
+        $parent->shouldReceive('getAttribute')->with('id')->andReturn(42);
+        $parent->shouldReceive('getMorphClass')->andReturn('parent_type');
+        $builder->shouldReceive('where')->once()->with('table.morph_type', 'parent_type');
+
+        new MorphMany($builder, $parent, 'table.morph_type', 'table.morph_id', 'id');
+    }
+
+    public function testMorphEagerConstraintsAlwaysUseWhereInWithStringKeys()
+    {
+        $relation = $this->getManyRelation();
+
+        $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.morph_id', ['10', '20']);
+        $relation->getQuery()->shouldReceive('where')->once()->with('table.morph_type', get_class($relation->getParent()));
+
+        $model1 = new EloquentMorphResetModelStub;
+        $model1->id = 10;
+        $model2 = new EloquentMorphResetModelStub;
+        $model2->id = 20;
+        $relation->addEagerConstraints([$model1, $model2]);
+    }
+
+    public function testMorphDictionaryMatchesIntegerParentKeyWithStringForeignKey()
+    {
+        $relation = $this->getManyRelation();
+
+        $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(fn ($items = []) => new \Illuminate\Database\Eloquent\Collection($items));
+
+        $result1 = new EloquentMorphResetModelStub;
+        $result1->morph_id = '1';
+
+        $parentModel = new EloquentMorphResetModelStub;
+        $parentModel->id = 1;
+
+        $models = $relation->matchMany([$parentModel], new \Illuminate\Database\Eloquent\Collection([$result1]), 'morphRelation');
+
+        $this->assertTrue($models[0]->relationLoaded('morphRelation'));
+        $this->assertCount(1, $models[0]->getRelation('morphRelation'));
     }
 }
 

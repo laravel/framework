@@ -3,7 +3,9 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 /**
@@ -55,16 +57,25 @@ abstract class MorphOneOrMany extends HasOneOrMany
     public function addConstraints()
     {
         if (static::$constraints) {
-            $this->getRelationQuery()->where($this->morphType, $this->morphClass);
+            $query = $this->getRelationQuery();
 
-            parent::addConstraints();
+            $query->where($this->morphType, $this->morphClass);
+
+            $query->where($this->foreignKey, '=', $this->castMorphKey($this->getParentKey()));
+
+            $query->whereNotNull($this->foreignKey);
         }
     }
 
     /** @inheritDoc */
     public function addEagerConstraints(array $models)
     {
-        parent::addEagerConstraints($models);
+        $this->whereInEager(
+            'whereIn',
+            $this->foreignKey,
+            $this->castMorphKeys($this->getKeys($models, $this->localKey)),
+            $this->getRelationQuery()
+        );
 
         $this->getRelationQuery()->where($this->morphType, $this->morphClass);
     }
@@ -176,5 +187,91 @@ abstract class MorphOneOrMany extends HasOneOrMany
             Str::beforeLast($this->getMorphType(), '_type'),
             ...parent::getPossibleInverseRelations(),
         ]);
+    }
+
+    /**
+     * Build model dictionary keyed by the relation's foreign key.
+     *
+     * Morph keys are cast to strings to ensure consistent matching
+     * across databases with strict type comparison like PostgreSQL.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>  $results
+     * @return array<array<array-key, TRelatedModel>>
+     */
+    protected function buildDictionary(EloquentCollection $results)
+    {
+        $foreign = $this->getForeignKeyName();
+
+        $dictionary = [];
+
+        $isAssociative = Arr::isAssoc($results->all());
+
+        foreach ($results as $key => $item) {
+            $pairKey = $this->castMorphKey($this->getDictionaryKey($item->{$foreign}));
+
+            if ($pairKey === null) {
+                continue;
+            }
+
+            if ($isAssociative) {
+                $dictionary[$pairKey][$key] = $item;
+            } else {
+                $dictionary[$pairKey][] = $item;
+            }
+        }
+
+        return $dictionary;
+    }
+
+    /**
+     * Match the eagerly loaded results to their parents.
+     *
+     * @param  array<int, TDeclaringModel>  $models
+     * @param  \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>  $results
+     * @param  string  $relation
+     * @param  string  $type
+     * @return array<int, TDeclaringModel>
+     */
+    protected function matchOneOrMany(array $models, EloquentCollection $results, $relation, $type)
+    {
+        $dictionary = $this->buildDictionary($results);
+
+        foreach ($models as $model) {
+            $key = $this->castMorphKey($this->getDictionaryKey($model->getAttribute($this->localKey)));
+
+            if ($key !== null && isset($dictionary[$key])) {
+                $related = $this->getRelationValue($dictionary, $key, $type);
+
+                $model->setRelation($relation, $related);
+
+                $type === 'one'
+                    ? $this->applyInverseRelationToModel($related, $model)
+                    : $this->applyInverseRelationToCollection($related, $model);
+            }
+        }
+
+        return $models;
+    }
+
+    /**
+     * Cast the given morph key to a string.
+     *
+     * @param  string|int|null  $key
+     * @return string|null
+     */
+    protected function castMorphKey($key)
+    {
+        return $key !== null ? (string) $key : null;
+    }
+
+    /**
+     * Cast all morph keys in the given array to strings.
+     *
+     * @param  array  $keys
+     * @return array
+     */
+    protected function castMorphKeys(array $keys)
+    {
+        return array_map(fn ($key) => $this->castMorphKey($key), $keys);
     }
 }
