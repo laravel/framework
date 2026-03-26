@@ -256,13 +256,14 @@ class WorkCommand extends Command
         }
 
         $runTime = $this->runTimeForHumans($this->latestStartedAt);
+        $memory = $isVerbose ? round(memory_get_usage(true) / 1024 / 1024, 1).'MB' : '';
 
         $dots = max(terminal()->width() - mb_strlen($job->resolveName()) - (
-            $isVerbose ? mb_strlen($job->getJobId()) + mb_strlen($job->getConnectionName()) + mb_strlen($job->getQueue()) + 2 : 0
+            $isVerbose ? mb_strlen($job->getJobId()) + mb_strlen($job->getConnectionName()) + mb_strlen($job->getQueue()) + mb_strlen($memory) + 3 : 0
         ) - mb_strlen($runTime) - 31, 0);
 
         $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
-        $this->output->write(" <fg=gray>$runTime</>");
+        $this->output->write(" <fg=gray>{$runTime}".($memory ? " {$memory}" : '').'</>');
 
         $this->output->writeln(match ($status) {
             'success' => ' <fg=green;options=bold>DONE</>',
