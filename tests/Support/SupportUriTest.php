@@ -95,6 +95,31 @@ class SupportUriTest extends TestCase
         $this->assertEquals($expected, $uri->toString());
     }
 
+    public function test_without_fragment()
+    {
+        $uri = Uri::of('https://laravel.com/docs/installation#introduction');
+
+        $this->assertEquals('introduction', $uri->fragment());
+
+        $withoutFragment = $uri->withoutFragment();
+
+        $this->assertNull($withoutFragment->fragment());
+        $this->assertEquals('https://laravel.com/docs/installation', $withoutFragment->value());
+
+        // Original URI should be unchanged (immutability).
+        $this->assertEquals('introduction', $uri->fragment());
+    }
+
+    public function test_without_fragment_on_uri_without_fragment()
+    {
+        $uri = Uri::of('https://laravel.com/docs');
+
+        $withoutFragment = $uri->withoutFragment();
+
+        $this->assertNull($withoutFragment->fragment());
+        $this->assertEquals('https://laravel.com/docs', $withoutFragment->value());
+    }
+
     public function test_complicated_query_string_manipulation()
     {
         $uri = Uri::of('https://laravel.com');

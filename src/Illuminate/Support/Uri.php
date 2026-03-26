@@ -335,6 +335,14 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
     }
 
     /**
+     * Remove the fragment from the URI.
+     */
+    public function withoutFragment(): static
+    {
+        return new static($this->uri->withFragment(''));
+    }
+
+    /**
      * Create a redirect HTTP response for the given URI.
      */
     public function redirect(int $status = 302, array $headers = []): RedirectResponse
