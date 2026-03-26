@@ -1,6 +1,12 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.55.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.56.0...12.x)
+
+## [v12.56.0](https://github.com/laravel/framework/compare/v12.55.1...v12.56.0) - 2026-03-26
+
+* [12.x] `schedule:list` display expression in the correct timezone by [@xiCO2k](https://github.com/xiCO2k) in https://github.com/laravel/framework/pull/59307
+* [12.x] Fix validation wildcard array message type error by [@sadique-cws](https://github.com/sadique-cws) in https://github.com/laravel/framework/pull/59339
+* Preserve class type of mocked classes by [@AJenbo](https://github.com/AJenbo) in https://github.com/laravel/framework/pull/59353
 
 ## [v12.55.1](https://github.com/laravel/framework/compare/v12.55.0...v12.55.1) - 2026-03-18
 
