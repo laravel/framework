@@ -16,6 +16,7 @@ use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Events\WorkerStarting;
 use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Queue\MaxAttemptsExceededException;
+use Illuminate\Queue\MaxExceptionsExceededException;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
@@ -313,6 +314,122 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldNotHaveReceived('dispatch', [m::type(JobProcessed::class)]);
     }
 
+    public function testMaxExceptionsCounterIncrementsBeforeFireAndDecrementsOnSuccess()
+    {
+        $cache = new \Illuminate\Cache\Repository(new \Illuminate\Cache\ArrayStore);
+
+        $job = new WorkerFakeJob;
+        $job->uuid = 'test-uuid';
+        $job->maxExceptions = 3;
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->setCache($cache);
+        $worker->runNextJob('default', 'queue', new WorkerOptions);
+
+        $this->assertTrue($job->fired);
+        $this->assertEquals(0, (int) $cache->get('job-exceptions:test-uuid', 0));
+    }
+
+    public function testMaxExceptionsCounterNotDecrementedOnException()
+    {
+        $cache = new \Illuminate\Cache\Repository(new \Illuminate\Cache\ArrayStore);
+
+        $job = new WorkerFakeJob(function () {
+            throw new RuntimeException('fail');
+        });
+        $job->uuid = 'test-uuid';
+        $job->maxExceptions = 3;
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->setCache($cache);
+        $worker->runNextJob('default', 'queue', new WorkerOptions);
+
+        $this->assertTrue($job->released);
+        $this->assertEquals(1, (int) $cache->get('job-exceptions:test-uuid', 0));
+    }
+
+    public function testJobFailedWhenExceptionCountAlreadyExceedsMaxExceptions()
+    {
+        $cache = new \Illuminate\Cache\Repository(new \Illuminate\Cache\ArrayStore);
+        $cache->put('job-exceptions:test-uuid', 1, 3600);
+
+        $job = new WorkerFakeJob;
+        $job->uuid = 'test-uuid';
+        $job->maxExceptions = 1;
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->setCache($cache);
+        $worker->runNextJob('default', 'queue', new WorkerOptions);
+
+        $this->assertTrue($job->failed);
+        $this->assertFalse($job->fired);
+        $this->assertInstanceOf(MaxExceptionsExceededException::class, $job->failedWith);
+    }
+
+    public function testMaxExceptionsSkippedWhenNoCacheAvailable()
+    {
+        $job = new WorkerFakeJob;
+        $job->uuid = 'test-uuid';
+        $job->maxExceptions = 1;
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->runNextJob('default', 'queue', new WorkerOptions);
+
+        $this->assertTrue($job->fired);
+        $this->assertFalse($job->failed);
+    }
+
+    public function testMaxExceptionsSkippedWhenJobHasNoUuid()
+    {
+        $cache = new \Illuminate\Cache\Repository(new \Illuminate\Cache\ArrayStore);
+
+        $job = new WorkerFakeJob;
+        $job->uuid = null;
+        $job->maxExceptions = 1;
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->setCache($cache);
+        $worker->runNextJob('default', 'queue', new WorkerOptions);
+
+        $this->assertTrue($job->fired);
+    }
+
+    /**
+     * Simulate the OOM scenario described in #58207: a worker is killed during
+     * job execution (e.g. by OOM), leaving the exception counter incremented in
+     * cache but the catch block never reached. On the next attempt, the pre-fire
+     * check should detect the counter and fail the job.
+     *
+     * Verified: fails on stock Laravel 13.x, passes with this fix.
+     */
+    public function testJobFailsAfterSimulatedWorkerKillDuringExecution()
+    {
+        $cache = new \Illuminate\Cache\Repository(new \Illuminate\Cache\ArrayStore);
+
+        // Simulate a previous worker run that was killed mid-execution.
+        // The optimistic increment ran before fire(), but the worker was killed
+        // before the catch block could run. The counter is left at 1 in cache.
+        $cache->put('job-exceptions:test-uuid', 0, 3600);
+        $cache->increment('job-exceptions:test-uuid');
+
+        // Now a new worker picks up the same job.
+        $job = new WorkerFakeJob;
+        $job->uuid = 'test-uuid';
+        $job->maxExceptions = 1;
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->setCache($cache);
+        $worker->runNextJob('default', 'queue', new WorkerOptions);
+
+        // The job should be failed without firing — the pre-fire check caught it.
+        $this->assertFalse($job->fired);
+        $this->assertTrue($job->failed);
+        $this->assertInstanceOf(MaxExceptionsExceededException::class, $job->failedWith);
+
+        // The cache key should be cleaned up.
+        $this->assertNull($cache->get('job-exceptions:test-uuid'));
+    }
+
     public function testJobBasedMaxRetries()
     {
         $job = new WorkerFakeJob(function ($job) {
@@ -554,6 +671,11 @@ class WorkerFakeManager extends QueueManager
     public function __construct($name, $connection)
     {
         $this->connections[$name] = $connection;
+    }
+
+    public function isPaused($connection, $queue)
+    {
+        return false;
     }
 
     public function connection($name = null)

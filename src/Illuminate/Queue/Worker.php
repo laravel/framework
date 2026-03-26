@@ -484,14 +484,27 @@ class Worker
                 $connectionName, $job, (int) $options->maxTries
             );
 
+            $this->markJobAsFailedIfAlreadyExceedsMaxExceptions(
+                $connectionName, $job
+            );
+
             if ($job->isDeleted()) {
                 return $this->raiseAfterJobEvent($connectionName, $job);
             }
+
+            // Optimistically increment the exception counter before processing. If the
+            // worker is killed unexpectedly (e.g. OOM), the counter will already reflect
+            // this attempt. On success, we decrement it back. On caught exceptions, the
+            // handleJobException method will leave the counter as-is since it was already
+            // incremented here.
+            $this->incrementExceptionCount($job);
 
             // Here we will fire off the job and let it process. We will catch any exceptions, so
             // they can be reported to the developer's logs, etc. Once the job is finished the
             // proper events will be fired to let any listeners know this job has completed.
             $job->fire();
+
+            $this->decrementExceptionCount($job);
 
             $this->raiseAfterJobEvent($connectionName, $job);
         } catch (Throwable $e) {
@@ -607,7 +620,42 @@ class Worker
     }
 
     /**
-     * Mark the given job as failed if it has exceeded the maximum allowed attempts.
+     * Mark the given job as failed if it has exceeded the maximum allowed exceptions.
+     *
+     * This is checked before the job fires. If the worker was previously killed
+     * unexpectedly (e.g. OOM), the optimistic exception count increment will
+     * already be reflected, causing this check to catch it on the next attempt.
+     *
+     * @param  string  $connectionName
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    protected function markJobAsFailedIfAlreadyExceedsMaxExceptions($connectionName, $job)
+    {
+        if (! $this->cache || is_null($uuid = $job->uuid()) ||
+            is_null($maxExceptions = $job->maxExceptions())) {
+            return;
+        }
+
+        $exceptions = (int) $this->cache->get('job-exceptions:'.$uuid, 0);
+
+        if ($exceptions >= $maxExceptions) {
+            $this->cache->forget('job-exceptions:'.$uuid);
+
+            $this->failJob($job, $e = $this->maxExceptionsExceededException($job));
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Mark the given job as failed if it has exceeded the maximum allowed exceptions.
+     *
+     * The exception counter was already incremented optimistically before the job
+     * was fired, so this method only needs to check the current value without
+     * incrementing again.
      *
      * @param  string  $connectionName
      * @param  \Illuminate\Contracts\Queue\Job  $job
@@ -621,15 +669,55 @@ class Worker
             return;
         }
 
-        if (! $this->cache->get('job-exceptions:'.$uuid)) {
-            $this->cache->put('job-exceptions:'.$uuid, 0, Carbon::now()->addDay());
-        }
+        $exceptions = (int) $this->cache->get('job-exceptions:'.$uuid, 0);
 
-        if ($maxExceptions <= $this->cache->increment('job-exceptions:'.$uuid)) {
+        if ($exceptions >= $maxExceptions) {
             $this->cache->forget('job-exceptions:'.$uuid);
 
             $this->failJob($job, $e);
         }
+    }
+
+    /**
+     * Increment the exception count for the given job.
+     *
+     * This is called optimistically before the job fires so that if the worker
+     * is killed unexpectedly (e.g. by OOM), the count is already incremented.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @return void
+     */
+    protected function incrementExceptionCount($job)
+    {
+        if (! $this->cache || is_null($uuid = $job->uuid()) ||
+            is_null($job->maxExceptions())) {
+            return;
+        }
+
+        if (! $this->cache->get('job-exceptions:'.$uuid)) {
+            $this->cache->put('job-exceptions:'.$uuid, 0, Carbon::now()->addDay());
+        }
+
+        $this->cache->increment('job-exceptions:'.$uuid);
+    }
+
+    /**
+     * Decrement the exception count for the given job.
+     *
+     * Called after the job successfully completes to reverse the optimistic
+     * increment, since no exception actually occurred.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @return void
+     */
+    protected function decrementExceptionCount($job)
+    {
+        if (! $this->cache || is_null($uuid = $job->uuid()) ||
+            is_null($job->maxExceptions())) {
+            return;
+        }
+
+        $this->cache->decrement('job-exceptions:'.$uuid);
     }
 
     /**
@@ -882,6 +970,17 @@ class Worker
     protected function timeoutExceededException($job)
     {
         return TimeoutExceededException::forJob($job);
+    }
+
+    /**
+     * Create an instance of MaxExceptionsExceededException.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @return \Illuminate\Queue\MaxExceptionsExceededException
+     */
+    protected function maxExceptionsExceededException($job)
+    {
+        return MaxExceptionsExceededException::forJob($job);
     }
 
     /**
