@@ -426,13 +426,15 @@ class FileStore implements CanFlushLocks, LockProvider, Store
      * Get the expiration time based on the given seconds.
      *
      * @param  int  $seconds
-     * @return int
+     * @return string
      */
     protected function expiration($seconds)
     {
         $time = $this->availableAt($seconds);
 
-        return $seconds === 0 || $time > 9999999999 ? 9999999999 : $time;
+        return $seconds === 0 || $time > 9999999999
+            ? '9999999999'
+            : str_pad((string) $time, 10, '0', STR_PAD_LEFT);
     }
 
     /**

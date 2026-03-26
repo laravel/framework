@@ -480,6 +480,25 @@ class CacheFileStoreTest extends TestCase
         $this->assertFileDoesNotExist($flexiblePath);
     }
 
+    public function testCacheWorksWithTimestampsShorterThanTenDigits()
+    {
+        // Timestamps before ~2001 are only 9 digits, which would break
+        // deserialization since getPayload() assumes 10-digit timestamps.
+        Carbon::setTestNow(Carbon::createFromTimestampUTC(990464400));
+
+        $store = new FileStore(new Filesystem, __DIR__);
+        $key = Str::random();
+
+        $store->put($key, 'value', 3);
+        $this->assertSame('value', $store->get($key));
+
+        // Also verify that the value is still readable after returning to normal time
+        Carbon::setTestNow(null);
+        $this->assertNull($store->get($key)); // Expired since real time > 990464403
+
+        $store->forget($key);
+    }
+
     protected function mockFilesystem()
     {
         return $this->createMock(Filesystem::class);
