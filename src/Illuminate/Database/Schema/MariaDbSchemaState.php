@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Schema;
 
+use Symfony\Component\Process\Exception\ProcessFailedException;
+
 class MariaDbSchemaState extends MySqlSchemaState
 {
     /**
@@ -35,5 +37,30 @@ class MariaDbSchemaState extends MySqlSchemaState
         $command = 'mariadb-dump '.$this->connectionString($versionInfo).' --no-tablespaces --skip-add-locks --skip-comments --skip-set-charset --tz-utc';
 
         return $command.' "${:LARAVEL_LOAD_DATABASE}"';
+    }
+
+    /**
+     * Detect the MariaDB client version.
+     *
+     * @return array{version: string, isMariaDb: bool}
+     */
+    protected function detectClientVersion(): array
+    {
+        // Minimum version of MariaDB that supports the mariadb command...
+        $version = '10.5.2';
+
+        try {
+            $versionOutput = $this->makeProcess('mariadb --version')->mustRun()->getOutput();
+
+            if (preg_match('/(\d+\.\d+\.\d+)/', $versionOutput, $matches)) {
+                $version = $matches[1];
+            }
+        } catch (ProcessFailedException) {
+        }
+
+        return [
+            'isMariaDb' => true,
+            'version' => $version,
+        ];
     }
 }
