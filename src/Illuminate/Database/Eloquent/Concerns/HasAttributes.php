@@ -214,9 +214,7 @@ trait HasAttributes
             ?? static::resolveClassAttribute(Table::class)->dateFormat
             ?? null;
 
-        if (empty($this->appends)) {
-            $this->appends = static::resolveClassAttribute(Appends::class, 'columns') ?? [];
-        }
+        $this->mergeAppends(static::resolveClassAttribute(Appends::class, 'columns') ?? []);
     }
 
     /**
