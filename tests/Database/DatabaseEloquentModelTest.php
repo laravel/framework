@@ -3772,6 +3772,14 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInstanceOf(CustomEloquentCollection::class, $collection);
     }
 
+    public function testCollectedByAttributeIsInheritedByChildModels()
+    {
+        $model = new EloquentChildModelWithCollectedByAttribute;
+        $collection = $model->newCollection([$model]);
+
+        $this->assertInstanceOf(CustomEloquentCollection::class, $collection);
+    }
+
     public function testUseFactoryAttribute()
     {
         $model = new EloquentModelWithUseFactoryAttribute;
@@ -4675,6 +4683,10 @@ class EloquentModelWithMutators extends Model
 
 #[CollectedBy(CustomEloquentCollection::class)]
 class EloquentModelWithCollectedByAttribute extends Model
+{
+}
+
+class EloquentChildModelWithCollectedByAttribute extends EloquentModelWithCollectedByAttribute
 {
 }
 
