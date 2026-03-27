@@ -7,8 +7,6 @@ use Illuminate\Contracts\Log\ContextLogProcessor;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-
-use function Illuminate\Support\enum_value;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\FingersCrossedHandler;
@@ -24,6 +22,8 @@ use Monolog\Processor\ProcessorInterface;
 use Monolog\Processor\PsrLogMessageProcessor;
 use Psr\Log\LoggerInterface;
 use Throwable;
+
+use function Illuminate\Support\enum_value;
 
 /**
  * @mixin \Illuminate\Log\Logger
