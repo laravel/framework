@@ -2,7 +2,9 @@
 
 namespace Illuminate\Foundation\Bus;
 
+use Closure;
 use Illuminate\Bus\UniqueLock;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
@@ -127,6 +129,24 @@ class PendingDispatch
         $this->job->withoutDelay();
 
         return $this;
+    }
+
+    /**
+     * Spread the job out by delaying dispatches respecting the rate limit.
+     *
+     * @param  \Illuminate\Cache\RateLimiting\Limit|(\Closure(mixed $job): \Illuminate\Cache\RateLimiting\Limit)  $limit
+     * @param  int  $index
+     * @return $this
+     */
+    public function spreadWithDelay($limit, $index)
+    {
+        if ($limit instanceof Closure) {
+            $limit = $limit($this->job);
+        }
+
+        $delay = (int) (($index / $limit->maxAttempts) * $limit->decaySeconds);
+
+        return $this->delay($delay);
     }
 
     /**
