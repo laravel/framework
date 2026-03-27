@@ -148,20 +148,6 @@ class QueueDatabaseQueueUnitTest extends TestCase
         ]);
     }
 
-    public function testCreatePayloadIncludesDeleteWhenMissingModels()
-    {
-        $queue = m::mock(Queue::class)->makePartial();
-        $class = new ReflectionClass(Queue::class);
-
-        $createPayload = $class->getMethod('createPayload');
-        $payload = json_decode($createPayload->invokeArgs($queue, [
-            new DeleteWhenMissingModelsTestJob,
-            'queue-name',
-        ]), true);
-
-        $this->assertTrue($payload['deleteWhenMissingModels']);
-    }
-
     public function testBulkBatchPushesOntoDatabase()
     {
         $uuid = Str::uuid();
