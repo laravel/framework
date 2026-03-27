@@ -245,14 +245,14 @@ class CallQueuedHandler
      */
     protected function shouldDeleteWhenMissingModels(Job $job)
     {
+        $class = $job->resolveQueuedJobClass();
+        $payload = $job->payload();
+
+        if (array_key_exists('deleteWhenMissingModels', $payload)) {
+            return $payload['deleteWhenMissingModels'];
+        }
+
         try {
-            $payload = $job->payload();
-
-            if (array_key_exists('deleteWhenMissingModels', $payload)) {
-                return $payload['deleteWhenMissingModels'];
-            }
-
-            $class = $job->resolveQueuedJobClass();
             $reflectionClass = new ReflectionClass($class);
 
             return $reflectionClass->getDefaultProperties()['deleteWhenMissingModels']
