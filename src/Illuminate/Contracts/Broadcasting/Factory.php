@@ -2,13 +2,15 @@
 
 namespace Illuminate\Contracts\Broadcasting;
 
+use UnitEnum;
+
 interface Factory
 {
     /**
      * Get a broadcaster implementation by name.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
-    public function connection($name = null);
+    public function connection(UnitEnum|string|null $name = null);
 }

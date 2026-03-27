@@ -27,6 +27,9 @@ use Psr\Log\LoggerInterface;
 use Pusher\Pusher;
 use RuntimeException;
 use Throwable;
+use UnitEnum;
+
+use function Illuminate\Support\enum_value;
 
 /**
  * @mixin \Illuminate\Contracts\Broadcasting\Broadcaster
@@ -250,10 +253,10 @@ class BroadcastManager implements FactoryContract
     /**
      * Get a driver instance.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return mixed
      */
-    public function connection($name = null)
+    public function connection(UnitEnum|string|null $name = null)
     {
         return $this->driver($name);
     }
@@ -261,12 +264,12 @@ class BroadcastManager implements FactoryContract
     /**
      * Get a driver instance.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return mixed
      */
-    public function driver($name = null)
+    public function driver(UnitEnum|string|null $name = null)
     {
-        $name = $name ?: $this->getDefaultDriver();
+        $name = enum_value($name) ?: $this->getDefaultDriver();
 
         return $this->drivers[$name] = $this->get($name);
     }

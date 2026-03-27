@@ -185,6 +185,26 @@ class BroadcastManagerTest extends TestCase
         }
     }
 
+    public function testConnectionAcceptsEnum()
+    {
+        $userConfig = [
+            'broadcasting' => [
+                'connections' => [
+                    'log' => [
+                        'driver' => 'log',
+                    ],
+                ],
+            ],
+        ];
+
+        $app = $this->getApp($userConfig);
+        $app->singleton(\Psr\Log\LoggerInterface::class, fn () => new \Psr\Log\NullLogger);
+
+        $broadcastManager = new BroadcastManager($app);
+
+        $this->assertNotNull($broadcastManager->connection(BroadcastConnectionEnum::Log));
+    }
+
     protected function getApp(array $userConfig)
     {
         $app = new Container;
@@ -192,6 +212,11 @@ class BroadcastManagerTest extends TestCase
 
         return $app;
     }
+}
+
+enum BroadcastConnectionEnum: string
+{
+    case Log = 'log';
 }
 
 class TestEvent implements ShouldBroadcast
