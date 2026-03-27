@@ -3,8 +3,10 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Tests\Database\stubs\TestEnum;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -356,6 +358,38 @@ class DatabaseEloquentMorphToTest extends TestCase
         $this->assertFalse($relation->is($model));
     }
 
+    public function testMatchToMorphParentsNormalizesKeyWhenOwnerKeyIsNullAndResultKeyIsObject()
+    {
+        $uuidObject = new class
+        {
+            public function __toString(): string
+            {
+                return 'uuid-value';
+            }
+        };
+
+        $builder = m::mock(Builder::class);
+        $related = m::mock(Model::class);
+        $builder->shouldReceive('getModel')->andReturn($related);
+
+        $parent = new EloquentMorphToModelStub;
+        $parent->morph_type = 'type_1';
+        $parent->foreign_key = 'uuid-value';
+
+        $relation = Relation::noConstraints(function () use ($builder, $parent) {
+            return new EloquentMorphToAccessibleStub($builder, $parent, 'foreign_key', null, 'morph_type', 'relation');
+        });
+
+        $relation->addEagerConstraints([$parent]);
+
+        $result = m::mock(Model::class);
+        $result->shouldReceive('getKey')->once()->andReturn($uuidObject);
+
+        $relation->callMatchToMorphParents('type_1', new EloquentCollection([$result]));
+
+        $this->assertSame($result, $parent->getRelation('relation'));
+    }
+
     protected function getRelationAssociate($parent)
     {
         $builder = m::mock(Builder::class);
@@ -399,4 +433,12 @@ class EloquentMorphToModelStub extends Model
 class EloquentMorphToRelatedStub extends Model
 {
     public $table = 'eloquent_morph_to_related_stubs';
+}
+
+class EloquentMorphToAccessibleStub extends MorphTo
+{
+    public function callMatchToMorphParents($type, EloquentCollection $results): void
+    {
+        $this->matchToMorphParents($type, $results);
+    }
 }
