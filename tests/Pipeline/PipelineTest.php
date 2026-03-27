@@ -392,6 +392,125 @@ class PipelineTest extends TestCase
         $this->assertSame(4, $result->value);
     }
 
+    public function testPipelineClearsReferencesAfterThen()
+    {
+        $pipeline = new Pipeline(new Container);
+
+        $result = $pipeline->send('foo')
+            ->through([PipelineTestPipeOne::class])
+            ->then(function ($piped) {
+                return $piped;
+            });
+
+        $this->assertSame('foo', $result);
+
+        $ref = new \ReflectionClass($pipeline);
+
+        $passable = $ref->getProperty('passable');
+
+        $this->assertNull($passable->getValue($pipeline));
+
+        $pipes = $ref->getProperty('pipes');
+
+        $this->assertEmpty($pipes->getValue($pipeline));
+
+        unset($_SERVER['__test.pipe.one']);
+    }
+
+    public function testPipelineClearsReferencesAfterThenReturn()
+    {
+        $pipeline = new Pipeline(new Container);
+
+        $result = $pipeline->send('foo')
+            ->through([PipelineTestPipeOne::class])
+            ->thenReturn();
+
+        $this->assertSame('foo', $result);
+
+        $ref = new \ReflectionClass($pipeline);
+
+        $passable = $ref->getProperty('passable');
+
+        $this->assertNull($passable->getValue($pipeline));
+
+        $pipes = $ref->getProperty('pipes');
+
+        $this->assertEmpty($pipes->getValue($pipeline));
+
+        unset($_SERVER['__test.pipe.one']);
+    }
+
+    public function testPipelineClearsReferencesAfterException()
+    {
+        $pipeline = new Pipeline(new Container);
+
+        try {
+            $pipeline->send('foo')
+                ->through([function ($passable, $next) {
+                    throw new Exception('fail');
+                }])
+                ->then(function ($piped) {
+                    return $piped;
+                });
+        } catch (Exception $e) {
+            // expected
+        }
+
+        $ref = new \ReflectionClass($pipeline);
+
+        $passable = $ref->getProperty('passable');
+
+        $this->assertNull($passable->getValue($pipeline));
+
+        $pipes = $ref->getProperty('pipes');
+
+        $this->assertEmpty($pipes->getValue($pipeline));
+    }
+
+    public function testPipelineFinallyReceivesPassableBeforeCleanup()
+    {
+        $finallyValue = null;
+        $pipeline = new Pipeline(new Container);
+
+        $pipeline->send('foo')
+            ->through([])
+            ->finally(function ($passable) use (&$finallyValue) {
+                $finallyValue = $passable;
+            })
+            ->then(function ($piped) {
+                return $piped;
+            });
+
+        $this->assertSame('foo', $finallyValue);
+
+        $ref = new \ReflectionClass($pipeline);
+
+        $passable = $ref->getProperty('passable');
+
+        $this->assertNull($passable->getValue($pipeline));
+    }
+
+    public function testPipelineAllowsGarbageCollectionAfterThen()
+    {
+        $object = new stdClass;
+        $object->data = str_repeat('x', 1024);
+        $weakRef = \WeakReference::create($object);
+
+        $pipeline = new Pipeline(new Container);
+        $pipeline->send($object)
+            ->through([function ($passable, $next) {
+                return $next($passable);
+            }])
+            ->then(function ($piped) {
+                return $piped;
+            });
+
+        unset($object);
+        gc_collect_cycles();
+
+        $this->assertNull($weakRef->get());
+    }
+
     public function testPipelineFinallyWhenExceptionOccurs()
     {
         $std = new stdClass();

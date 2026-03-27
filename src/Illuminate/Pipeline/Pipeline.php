@@ -139,6 +139,9 @@ class Pipeline implements PipelineContract
             if ($this->finally) {
                 ($this->finally)($this->passable);
             }
+
+            $this->passable = null;
+            $this->pipes = [];
         }
     }
 
