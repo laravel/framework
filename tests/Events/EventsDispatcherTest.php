@@ -429,6 +429,48 @@ class EventsDispatcherTest extends TestCase
         $this->assertFalse(isset($_SERVER['__event.test']));
     }
 
+    public function testFlushWildcardCacheClearsCache()
+    {
+        $d = new Dispatcher;
+        $d->listen('foo.*', function () {
+            $_SERVER['__event.test'] = 'wildcard';
+        });
+
+        // Dispatch to populate the wildcard cache.
+        $d->dispatch('foo.bar');
+        $this->assertSame('wildcard', $_SERVER['__event.test']);
+
+        // Flush the cache.
+        $d->flushWildcardCache();
+
+        // Listeners should still resolve correctly after flush (cache rebuilds on demand).
+        unset($_SERVER['__event.test']);
+        $d->dispatch('foo.bar');
+        $this->assertSame('wildcard', $_SERVER['__event.test']);
+    }
+
+    public function testFlushWildcardCacheDoesNotRemoveListeners()
+    {
+        $d = new Dispatcher;
+        $count = 0;
+        $d->listen('eloquent.*', function () use (&$count) {
+            $count++;
+        });
+
+        // Dispatch several unique event names to build up cache entries.
+        $d->dispatch('eloquent.created: App\\Models\\User');
+        $d->dispatch('eloquent.created: App\\Models\\Order');
+        $d->dispatch('eloquent.updated: App\\Models\\User');
+        $this->assertSame(3, $count);
+
+        // Flush the cache and dispatch again — listeners must still fire.
+        $d->flushWildcardCache();
+
+        $d->dispatch('eloquent.created: App\\Models\\User');
+        $d->dispatch('eloquent.deleted: App\\Models\\Post');
+        $this->assertSame(5, $count);
+    }
+
     public function testHasWildcardListeners()
     {
         $d = new Dispatcher;
