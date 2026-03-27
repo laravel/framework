@@ -3772,7 +3772,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInstanceOf(CustomEloquentCollection::class, $collection);
     }
 
-    public function testCollectedByAttributeIsInheritedByChildModels()
+    public function testCollectedByAttributeIsInherited()
     {
         $model = new EloquentChildModelWithCollectedByAttribute;
         $collection = $model->newCollection([$model]);
