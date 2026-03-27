@@ -1484,6 +1484,9 @@ class SupportStringableTest extends TestCase
     public function testInitials()
     {
         $this->assertSame('TO', $this->stringable('Taylor Otwell')->initials()->value());
+        $this->assertSame('to', $this->stringable('taylor otwell')->initials()->value());
+        $this->assertSame('TO', $this->stringable('taylor otwell')->initials(capitalize: true)->value());
+        $this->assertSame('JB', $this->stringable('james bond')->initials(capitalize: true)->value());
     }
 
     public function testToInteger()
