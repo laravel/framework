@@ -58,4 +58,21 @@ class InteractsWithViewsTest extends TestCase
 
         $this->assertSame('bar', $component->foo());
     }
+
+    public function testComponentAssertDontSeeTextWithHtmlEntities()
+    {
+        $exampleComponent = new class extends Component
+        {
+            public function render()
+            {
+                return '<p>Hello &amp; welcome to <strong>Laravel</strong></p>';
+            }
+        };
+
+        $component = $this->component(get_class($exampleComponent));
+
+        $component->assertSeeText('Hello & welcome to Laravel');
+        $component->assertDontSeeText('Goodbye');
+        $component->assertDontSeeText('React');
+    }
 }

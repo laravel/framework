@@ -178,11 +178,7 @@ class TestComponent implements Stringable
 
         $values = $escape ? array_map(e(...), $value) : $value;
 
-        $rendered = strip_tags($this->rendered);
-
-        foreach ($values as $value) {
-            PHPUnit::assertStringNotContainsString((string) $value, $rendered);
-        }
+        PHPUnit::assertThat($values, new SeeInHtml($this->rendered, negate: true));
 
         return $this;
     }
