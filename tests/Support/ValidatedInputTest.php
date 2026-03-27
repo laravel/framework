@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Stringable;
@@ -491,6 +492,23 @@ class ValidatedInputTest extends TestCase
         $this->assertEquals([StringBackedEnum::HELLO_WORLD], $input->enums('valid_enum_value', StringBackedEnum::class));
 
         $this->assertEmpty($input->enums('invalid_enum_value', StringBackedEnum::class));
+    }
+
+    public function test_file_method()
+    {
+        $file = UploadedFile::fake()->create('document.pdf');
+
+        $input = new ValidatedInput([
+            'name' => 'Taylor',
+            'avatar' => $file,
+        ]);
+
+        $this->assertInstanceOf(UploadedFile::class, $input->file('avatar'));
+        $this->assertSame($file, $input->file('avatar'));
+        $this->assertNull($input->file('name'));
+        $this->assertNull($input->file('missing'));
+        $this->assertSame('default', $input->file('missing', 'default'));
+        $this->assertSame('default', $input->file('name', 'default'));
     }
 
     public function test_collect_method()
