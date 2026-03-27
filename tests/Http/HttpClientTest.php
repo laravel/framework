@@ -4361,8 +4361,8 @@ class HttpClientTest extends TestCase
         $response = $this->factory
             ->afterResponse(fn (Response $response): TestResponse => new TestResponse($response->toPsrResponse()))
             ->afterResponse(fn () => 'abc')
-            ->afterResponse(function ($r, $request) {
-                $this->assertInstanceOf(TestResponse::class, $r);
+            ->afterResponse(function ($response, $request) {
+                $this->assertInstanceOf(TestResponse::class, $response);
                 $this->assertInstanceOf(Request::class, $request);
                 $this->assertSame('http://200.com', (string) $request->url());
             })
