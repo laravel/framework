@@ -783,6 +783,16 @@ class Dispatcher implements DispatcherContract
     }
 
     /**
+     * Flush the wildcard listener cache.
+     *
+     * @return void
+     */
+    public function flushWildcardCache()
+    {
+        $this->wildcardsCache = [];
+    }
+
+    /**
      * Forget all of the pushed listeners.
      *
      * @return void

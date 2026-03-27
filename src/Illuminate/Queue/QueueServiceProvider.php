@@ -257,7 +257,12 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
                     foreach ($app['db']->getConnections() as $connection) {
                         $connection->resetTotalQueryDuration();
                         $connection->allowQueryDurationHandlersToRunAgain();
+                        $connection->flushQueryLog();
                     }
+                }
+
+                if (method_exists($app['events'], 'flushWildcardCache')) {
+                    $app['events']->flushWildcardCache();
                 }
 
                 $app->forgetScopedInstances();
