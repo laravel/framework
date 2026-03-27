@@ -226,13 +226,8 @@ class CallQueuedHandler
      */
     protected function handleModelNotFound(Job $job, $e)
     {
-        $class = $job->resolveQueuedJobClass();
-
         try {
-            $shouldDelete = $this->shouldDeleteWhenMissingModels($class)
-                || (($name = $job->resolveName()) !== $class
-                    && class_exists($name)
-                    && $this->shouldDeleteWhenMissingModels($name));
+            $shouldDelete = $this->shouldDeleteWhenMissingModels($job);
         } catch (Exception) {
             $shouldDelete = false;
         }
@@ -249,15 +244,21 @@ class CallQueuedHandler
     /**
      * Determine if the job should be deleted when models are missing.
      *
-     * @param  string  $class
+     * @param  \Illuminate\Contracts\Queue\Job  $job
      * @return bool
      */
-    protected function shouldDeleteWhenMissingModels(string $class)
+    protected function shouldDeleteWhenMissingModels(Job $job)
     {
-        $reflectionClass = new ReflectionClass($class);
+        $reflectionClass = new ReflectionClass($job->resolveQueuedJobClass());
 
-        return $reflectionClass->getDefaultProperties()['deleteWhenMissingModels']
+        $shouldDelete = $reflectionClass->getDefaultProperties()['deleteWhenMissingModels']
             ?? count($reflectionClass->getAttributes(DeleteWhenMissingModels::class)) !== 0;
+
+        try {
+            return $job->payload()['deleteWhenMissingModels'] ?? $shouldDelete;
+        } catch (Exception) {
+            return $shouldDelete;
+        }
     }
 
     /**
