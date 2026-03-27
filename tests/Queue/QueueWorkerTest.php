@@ -538,6 +538,29 @@ class QueueWorkerTest extends TestCase
         $this->assertFalse($cache->has('job-exceptions:test-uuid-cleanup'));
     }
 
+    public function testMaxExceptionsNullBypassesAllExceptionTracking()
+    {
+        $cache = new \Illuminate\Cache\Repository(new \Illuminate\Cache\ArrayStore);
+
+        // maxExceptions=null (default) means no limit — exception tracking
+        // should be completely bypassed, even if exceptions are thrown.
+        $job = new WorkerFakeJob(function () {
+            throw new RuntimeException('fail');
+        });
+        $job->uuid = 'test-uuid-null';
+        // maxExceptions is null by default (not set)
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->setCache($cache);
+        $worker->runNextJob('default', 'queue', new WorkerOptions);
+
+        $this->assertTrue($job->fired);
+        $this->assertFalse($job->failed);
+        $this->assertTrue($job->released);
+        // No cache key should be created at all.
+        $this->assertFalse($cache->has('job-exceptions:test-uuid-null'));
+    }
+
     public function testJobBasedMaxRetries()
     {
         $job = new WorkerFakeJob(function ($job) {
