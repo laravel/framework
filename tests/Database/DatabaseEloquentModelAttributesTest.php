@@ -198,11 +198,11 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertSame(['name', 'email'], $model->getFillable());
     }
 
-    public function test_fillable_property_takes_precedence(): void
+    public function test_fillable_property_merges_with_attribute(): void
     {
         $model = new ModelWithFillableAttributeAndProperty;
 
-        $this->assertSame(['title'], $model->getFillable());
+        $this->assertEqualsCanonicalizing(['title', 'name', 'email'], $model->getFillable());
     }
 
     public function test_guarded_attribute(): void
@@ -311,6 +311,34 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertTrue(ModelWithoutTimestampsAttribute::isIgnoringTouch());
         $this->assertTrue(ModelWithTimestampsFalseAttribute::isIgnoringTouch());
         $this->assertFalse(ModelWithFillableAttribute::isIgnoringTouch());
+    }
+
+    public function test_trait_initializer_merges_appends_with_attribute(): void
+    {
+        $model = new ModelWithAppendsAttributeAndTrait;
+
+        $this->assertEqualsCanonicalizing(['full_name', 'is_admin', 'url'], $model->getAppends());
+    }
+
+    public function test_trait_initializer_merges_hidden_with_attribute(): void
+    {
+        $model = new ModelWithHiddenAttributeAndTrait;
+
+        $this->assertEqualsCanonicalizing(['password', 'secret', 'api_token'], $model->getHidden());
+    }
+
+    public function test_trait_initializer_merges_visible_with_attribute(): void
+    {
+        $model = new ModelWithVisibleAttributeAndTrait;
+
+        $this->assertEqualsCanonicalizing(['id', 'name', 'email'], $model->getVisible());
+    }
+
+    public function test_trait_initializer_merges_fillable_with_attribute(): void
+    {
+        $model = new ModelWithFillableAttributeAndTrait;
+
+        $this->assertEqualsCanonicalizing(['name', 'email', 'phone'], $model->getFillable());
     }
 }
 
@@ -516,4 +544,62 @@ class ModelWithWithoutIncrementingAttributeOverride extends Model
 class PivotWithIncrementing extends \Illuminate\Database\Eloquent\Relations\Pivot
 {
     //
+}
+
+// Traits for testing trait initializer + Attribute collision
+
+trait AddsUrlAppend
+{
+    protected function initializeAddsUrlAppend()
+    {
+        $this->mergeAppends(['url']);
+    }
+}
+
+trait AddsApiTokenHidden
+{
+    protected function initializeAddsApiTokenHidden()
+    {
+        $this->mergeHidden(['api_token']);
+    }
+}
+
+trait AddsEmailVisible
+{
+    protected function initializeAddsEmailVisible()
+    {
+        $this->mergeVisible(['email']);
+    }
+}
+
+trait AddsPhoneFillable
+{
+    protected function initializeAddsPhoneFillable()
+    {
+        $this->mergeFillable(['phone']);
+    }
+}
+
+#[Appends(['full_name', 'is_admin'])]
+class ModelWithAppendsAttributeAndTrait extends Model
+{
+    use AddsUrlAppend;
+}
+
+#[Hidden(['password', 'secret'])]
+class ModelWithHiddenAttributeAndTrait extends Model
+{
+    use AddsApiTokenHidden;
+}
+
+#[Visible(['id', 'name'])]
+class ModelWithVisibleAttributeAndTrait extends Model
+{
+    use AddsEmailVisible;
+}
+
+#[Fillable(['name', 'email'])]
+class ModelWithFillableAttributeAndTrait extends Model
+{
+    use AddsPhoneFillable;
 }
