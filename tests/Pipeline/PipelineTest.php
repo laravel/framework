@@ -511,6 +511,31 @@ class PipelineTest extends TestCase
         $this->assertNull($weakRef->get());
     }
 
+    public function testPipelineWorksCorrectlyWhenReused()
+    {
+        $pipeline = new Pipeline(new Container);
+
+        $result1 = $pipeline->send('first')
+            ->through([function ($passable, $next) {
+                return $next($passable.'-piped');
+            }])
+            ->then(function ($piped) {
+                return $piped.'-done';
+            });
+
+        $this->assertSame('first-piped-done', $result1);
+
+        $result2 = $pipeline->send('second')
+            ->through([function ($passable, $next) {
+                return $next($passable.'-piped');
+            }])
+            ->then(function ($piped) {
+                return $piped.'-done';
+            });
+
+        $this->assertSame('second-piped-done', $result2);
+    }
+
     public function testPipelineFinallyWhenExceptionOccurs()
     {
         $std = new stdClass();

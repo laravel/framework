@@ -20,6 +20,17 @@ class QueueRedisJobTest extends TestCase
         $job->fire();
     }
 
+    public function testFireClearsInstanceReferenceAfterExecution()
+    {
+        $job = $this->getJob();
+        $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock(stdClass::class));
+        $handler->shouldReceive('fire')->once()->with($job, ['data']);
+
+        $job->fire();
+
+        $this->assertNull($job->getResolvedJob());
+    }
+
     public function testDeleteRemovesTheJobFromRedis()
     {
         $job = $this->getJob();
