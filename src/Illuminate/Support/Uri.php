@@ -410,6 +410,14 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
     }
 
     /**
+     * Determine if the URI is not an empty string.
+     */
+    public function isNotEmpty(): bool
+    {
+        return ! $this->isEmpty();
+    }
+
+    /**
      * Dump the string representation of the URI.
      *
      * @param  mixed  ...$args

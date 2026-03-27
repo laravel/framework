@@ -45,6 +45,15 @@ class SupportUriTest extends TestCase
         $this->assertEquals('taylor:password@laravel.com', $uri->authority());
     }
 
+    public function test_is_empty_and_is_not_empty()
+    {
+        $this->assertTrue(Uri::of('')->isEmpty());
+        $this->assertFalse(Uri::of('')->isNotEmpty());
+
+        $this->assertFalse(Uri::of('https://laravel.com')->isEmpty());
+        $this->assertTrue(Uri::of('https://laravel.com')->isNotEmpty());
+    }
+
     public function test_complicated_query_string_parsing()
     {
         $uri = Uri::of('https://example.com/users?key_1=value&key_2[sub_field]=value&key_3[]=value&key_4[9]=value&key_5[][][foo][9]=bar&key.6=value&flag_value');
