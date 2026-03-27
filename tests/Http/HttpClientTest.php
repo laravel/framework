@@ -4361,8 +4361,10 @@ class HttpClientTest extends TestCase
         $response = $this->factory
             ->afterResponse(fn (Response $response): TestResponse => new TestResponse($response->toPsrResponse()))
             ->afterResponse(fn () => 'abc')
-            ->afterResponse(function ($r) {
-                $this->assertInstanceOf(TestResponse::class, $r);
+            ->afterResponse(function ($response, $request) {
+                $this->assertInstanceOf(TestResponse::class, $response);
+                $this->assertInstanceOf(Request::class, $request);
+                $this->assertSame('http://200.com', (string) $request->url());
             })
             ->afterResponse(fn (Response $r) => new Response($r->toPsrResponse()->withBody(Utils::streamFor(strtolower($r->body())))))
             ->get('http://200.com');
@@ -4393,13 +4395,21 @@ class HttpClientTest extends TestCase
             'http://401.com*' => $this->factory::response('Unauthorized.', 401),
         ]);
 
-        $o = $this->factory->pool(function (Pool $pool): void {
-            $pool->as('200')->afterResponse(fn (Response $response) => new TestResponse($response->toPsrResponse()))->get('http://200.com');
+        $requestReceived = null;
+
+        $o = $this->factory->pool(function (Pool $pool) use (&$requestReceived): void {
+            $pool->as('200')->afterResponse(function (Response $response, Request $request) use (&$requestReceived) {
+                $requestReceived = $request;
+
+                return new TestResponse($response->toPsrResponse());
+            })->get('http://200.com');
             $pool->as('401-throwing')->throw()->afterResponse(fn (Response $response) => new TestResponse($response->toPsrResponse()))->get('http://401.com');
             $pool->as('401-response')->afterResponse(fn (Response $response) => new TestResponse($response->toPsrResponse()->withBody(Utils::streamFor('different'))))->get('http://401.com');
         }, 0);
 
         $this->assertInstanceOf(TestResponse::class, $o['200']);
+        $this->assertInstanceOf(Request::class, $requestReceived);
+        $this->assertSame('http://200.com', (string) $requestReceived->url());
         $this->assertInstanceOf(TestResponse::class, $o['401-response']);
         $this->assertEquals('different', $o['401-response']->body());
         $this->assertInstanceOf(RequestException::class, $o['401-throwing']);
