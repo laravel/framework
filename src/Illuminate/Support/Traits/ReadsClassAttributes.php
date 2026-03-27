@@ -18,6 +18,10 @@ trait ReadsClassAttributes
      */
     protected function getAttributeValue($target, string $attributeClass, ?string $property = null, $default = null)
     {
+        if ($property !== null && ($target->{$property} ?? null) !== null) {
+            return $target->{$property};
+        }
+
         try {
             $reflection = new ReflectionClass($target);
 
