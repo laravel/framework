@@ -90,6 +90,7 @@ class CallQueuedHandlerTest extends TestCase
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
         $job = m::mock(Job::class);
+        $job->shouldReceive('payload')->andReturn([]);
         $job->shouldReceive('resolveQueuedJobClass')->andReturn(__CLASS__);
         $job->shouldReceive('fail')->once();
 
@@ -105,6 +106,7 @@ class CallQueuedHandlerTest extends TestCase
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
         $job = m::mock(Job::class);
+        $job->shouldReceive('payload')->andReturn([]);
         $job->shouldReceive('getConnectionName')->andReturn('connection');
         $job->shouldReceive('resolveQueuedJobClass')->andReturn(CallQueuedHandlerExceptionThrower::class);
         $job->shouldReceive('markAsFailed')->never();
@@ -126,6 +128,7 @@ class CallQueuedHandlerTest extends TestCase
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
         $job = m::mock(Job::class);
+        $job->shouldReceive('payload')->andReturn([]);
         $job->shouldReceive('getConnectionName')->andReturn('connection');
         $job->shouldReceive('resolveQueuedJobClass')->andReturn(CallQueuedHandlerAttributeExceptionThrower::class);
         $job->shouldReceive('markAsFailed')->never();
