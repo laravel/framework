@@ -165,6 +165,7 @@ abstract class Queue
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
             'maxTries' => $this->getJobTries($job),
             'maxExceptions' => $job->maxExceptions ?? null,
+            'deleteWhenMissingModels' => property_exists($job, 'deleteWhenMissingModels') ? $job->deleteWhenMissingModels : null,
             'failOnTimeout' => $job->failOnTimeout ?? false,
             'backoff' => $this->getJobBackoff($job),
             'timeout' => $job->timeout ?? null,
