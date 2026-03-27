@@ -56,6 +56,25 @@ class DeleteModelWhenMissingTest extends QueueTestCase
         $this->assertFalse(DeleteMissingModelJob::$handled);
         $this->assertNull(\DB::table('failed_jobs')->first());
     }
+
+    public function test_deleteModelWhenMissing_without_deleteWhenMissingModels_payload_key(): void
+    {
+        $model = MyTestModel::query()->create(['name' => 'test']);
+
+        DeleteMissingModelJob::dispatch($model);
+
+        $payload = json_decode(\DB::table('jobs')->value('payload'), true);
+        unset($payload['deleteWhenMissingModels']);
+
+        \DB::table('jobs')->update(['payload' => json_encode($payload)]);
+
+        MyTestModel::query()->where('name', 'test')->delete();
+
+        $this->runQueueWorkerCommand(['--once' => '1']);
+
+        $this->assertFalse(DeleteMissingModelJob::$handled);
+        $this->assertNull(\DB::table('failed_jobs')->first());
+    }
 }
 
 class DeleteMissingModelJob implements ShouldQueue
