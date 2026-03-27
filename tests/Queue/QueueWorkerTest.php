@@ -327,7 +327,7 @@ class QueueWorkerTest extends TestCase
         $worker->runNextJob('default', 'queue', new WorkerOptions);
 
         $this->assertTrue($job->fired);
-        $this->assertEquals(0, (int) $cache->get('job-exceptions:test-uuid', 0));
+        $this->assertNull($cache->get('job-exceptions:test-uuid'));
     }
 
     public function testMaxExceptionsCounterNotDecrementedOnException()
@@ -428,6 +428,114 @@ class QueueWorkerTest extends TestCase
 
         // The cache key should be cleaned up.
         $this->assertNull($cache->get('job-exceptions:test-uuid'));
+    }
+
+    public function testMaxExceptionsZeroAllowsFirstRunButFailsAfterOom()
+    {
+        $cache = new \Illuminate\Cache\Repository(new \Illuminate\Cache\ArrayStore);
+
+        // First run with maxExceptions=0: job should fire normally.
+        $job = new WorkerFakeJob;
+        $job->uuid = 'test-uuid-zero';
+        $job->maxExceptions = 0;
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->setCache($cache);
+        $worker->runNextJob('default', 'queue', new WorkerOptions);
+
+        $this->assertTrue($job->fired);
+        $this->assertFalse($job->failed);
+
+        // After a simulated OOM (counter left at 1), the pre-fire check should catch it.
+        $cache->put('job-exceptions:test-uuid-zero', 1, 3600);
+
+        $job2 = new WorkerFakeJob;
+        $job2->uuid = 'test-uuid-zero';
+        $job2->maxExceptions = 0;
+
+        $worker2 = $this->getWorker('default', ['queue' => [$job2]]);
+        $worker2->setCache($cache);
+        $worker2->runNextJob('default', 'queue', new WorkerOptions);
+
+        $this->assertFalse($job2->fired);
+        $this->assertTrue($job2->failed);
+        $this->assertInstanceOf(MaxExceptionsExceededException::class, $job2->failedWith);
+    }
+
+    public function testMaxExceptionsOneFailsImmediatelyOnFirstException()
+    {
+        $cache = new \Illuminate\Cache\Repository(new \Illuminate\Cache\ArrayStore);
+
+        // With maxExceptions=1, the first thrown exception should immediately
+        // fail the job (optimistic increment brings counter to 1, post-exception
+        // check sees 1 >= 1 and fails).
+        $job = new WorkerFakeJob(function () {
+            throw new RuntimeException('fail');
+        });
+        $job->uuid = 'test-uuid-one';
+        $job->maxExceptions = 1;
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->setCache($cache);
+        $worker->runNextJob('default', 'queue', new WorkerOptions);
+
+        $this->assertTrue($job->fired);
+        $this->assertTrue($job->failed);
+        $this->assertNull($cache->get('job-exceptions:test-uuid-one'));
+    }
+
+    public function testMaxExceptionsThreeAllowsRetryUntilThresholdReached()
+    {
+        $cache = new \Illuminate\Cache\Repository(new \Illuminate\Cache\ArrayStore);
+
+        // Simulate 2 previous OOM kills (counter left at 2, post-exception handler never ran).
+        $cache->put('job-exceptions:test-uuid-three', 2, 3600);
+
+        // Pre-fire check: 2 > 0 && 2 >= 3 is false — job is allowed to run.
+        $job = new WorkerFakeJob;
+        $job->uuid = 'test-uuid-three';
+        $job->maxExceptions = 3;
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->setCache($cache);
+        $worker->runNextJob('default', 'queue', new WorkerOptions);
+
+        $this->assertTrue($job->fired);
+        $this->assertFalse($job->failed);
+
+        // Simulate a third OOM kill (counter now at 3).
+        $cache->put('job-exceptions:test-uuid-three', 3, 3600);
+
+        // Pre-fire check: 3 > 0 && 3 >= 3 is true — job should fail without firing.
+        $job2 = new WorkerFakeJob;
+        $job2->uuid = 'test-uuid-three';
+        $job2->maxExceptions = 3;
+
+        $worker2 = $this->getWorker('default', ['queue' => [$job2]]);
+        $worker2->setCache($cache);
+        $worker2->runNextJob('default', 'queue', new WorkerOptions);
+
+        $this->assertFalse($job2->fired);
+        $this->assertTrue($job2->failed);
+        $this->assertNull($cache->get('job-exceptions:test-uuid-three'));
+    }
+
+    public function testSuccessfulJobCleansUpCacheKeyCompletely()
+    {
+        $cache = new \Illuminate\Cache\Repository(new \Illuminate\Cache\ArrayStore);
+
+        $job = new WorkerFakeJob;
+        $job->uuid = 'test-uuid-cleanup';
+        $job->maxExceptions = 3;
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->setCache($cache);
+        $worker->runNextJob('default', 'queue', new WorkerOptions);
+
+        $this->assertTrue($job->fired);
+        // Key should be fully removed, not left at 0.
+        $this->assertNull($cache->get('job-exceptions:test-uuid-cleanup'));
+        $this->assertFalse($cache->has('job-exceptions:test-uuid-cleanup'));
     }
 
     public function testJobBasedMaxRetries()

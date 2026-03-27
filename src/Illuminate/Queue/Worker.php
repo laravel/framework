@@ -641,7 +641,7 @@ class Worker
 
         $exceptions = (int) $this->cache->get('job-exceptions:'.$uuid, 0);
 
-        if ($exceptions >= $maxExceptions) {
+        if ($exceptions > 0 && $exceptions >= $maxExceptions) {
             $this->cache->forget('job-exceptions:'.$uuid);
 
             $this->failJob($job, $e = $this->maxExceptionsExceededException($job));
@@ -717,7 +717,11 @@ class Worker
             return;
         }
 
-        $this->cache->decrement('job-exceptions:'.$uuid);
+        $key = 'job-exceptions:'.$uuid;
+
+        if ($this->cache->decrement($key) <= 0) {
+            $this->cache->forget($key);
+        }
     }
 
     /**
