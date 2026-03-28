@@ -143,6 +143,24 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->findOrFail('bar', ['column']);
     }
 
+    public function testFindOrFailMethodThrowsModelNotFoundExceptionWithBackedEnum()
+    {
+        $exception = new ModelNotFoundException;
+        $exception->setModel('Foo', EloquentBuilderTestBackedEnum::Bar);
+
+        $this->assertSame('No query results for model [Foo] bar', $exception->getMessage());
+        $this->assertSame(['bar'], $exception->getIds());
+    }
+
+    public function testFindOrFailMethodThrowsModelNotFoundExceptionWithUnitEnum()
+    {
+        $exception = new ModelNotFoundException;
+        $exception->setModel('Foo', EloquentBuilderTestUnitEnum::Baz);
+
+        $this->assertSame('No query results for model [Foo] Baz', $exception->getMessage());
+        $this->assertSame(['Baz'], $exception->getIds());
+    }
+
     public function testFindOrFailMethodWithManyThrowsModelNotFoundException()
     {
         $this->expectException(ModelNotFoundException::class);
@@ -3186,4 +3204,14 @@ class EloquentBuilderTestWhereBelongsToStub extends Model
     {
         return $this->belongsTo(self::class, 'parent_id', 'id', 'parent');
     }
+}
+
+enum EloquentBuilderTestBackedEnum: string
+{
+    case Bar = 'bar';
+}
+
+enum EloquentBuilderTestUnitEnum
+{
+    case Baz;
 }
