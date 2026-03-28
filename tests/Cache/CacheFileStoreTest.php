@@ -531,6 +531,27 @@ class CacheFileStoreTest extends TestCase
         $store->forget($key);
     }
 
+    public function testCacheRecoversOldFilesWithNineDigitTimestamps()
+    {
+        // Old cache files written before the fix have 9-digit timestamps with no
+        // zero-padding. The read side detects the short timestamp and splits correctly.
+        $store = new FileStore(new Filesystem, __DIR__);
+        $key = Str::random();
+        $path = $store->path($key);
+
+        (new Filesystem)->ensureDirectoryExists(dirname($path));
+
+        // 10-digit timestamp starting with 9 — valid, not expired
+        file_put_contents($path, '9990464403'.serialize('recovered'));
+        $this->assertSame('recovered', $store->get($key));
+
+        // Actual 9-digit timestamp — already expired, should return null and clean up
+        file_put_contents($path, '990464403'.serialize('old-value'));
+        $this->assertNull($store->get($key));
+
+        @unlink($path);
+    }
+
     public function testCacheHandlesComplexSerializedValues()
     {
         // Verify that zero-padding doesn't interfere with serialized arrays/objects

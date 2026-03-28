@@ -354,7 +354,9 @@ class FileStore implements CanFlushLocks, LockProvider, Store
                 return $this->emptyPayload();
             }
 
-            $expire = substr($contents, 0, 10);
+            $timestampLength = ctype_digit(substr($contents, 9, 1)) ? 10 : 9;
+
+            $expire = substr($contents, 0, $timestampLength);
         } catch (Exception) {
             return $this->emptyPayload();
         }
@@ -369,7 +371,7 @@ class FileStore implements CanFlushLocks, LockProvider, Store
         }
 
         try {
-            $data = $this->unserialize(substr($contents, 10));
+            $data = $this->unserialize(substr($contents, $timestampLength));
         } catch (Exception) {
             $this->forget($key);
 
