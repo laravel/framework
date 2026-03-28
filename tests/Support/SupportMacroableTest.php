@@ -159,6 +159,42 @@ class SupportMacroableTest extends TestCase
 
         $this->assertSame('newMethod', $this->macroable::existingMethod());
     }
+
+    public function testStaticCallOfNonStaticClosure()
+    {
+        $this->macroable::macro('nonStaticClosure', function () {
+            return 'Taylor';
+        });
+
+        $this->assertSame('Taylor', $this->macroable::nonStaticClosure());
+    }
+
+    public function testNonStaticCallOfNonStaticClosure()
+    {
+        $this->macroable::macro('nonStaticClosure', function () {
+            return 'Taylor';
+        });
+
+        $this->assertSame('Taylor', $this->macroable->nonStaticClosure());
+    }
+
+    public function testStaticCallOfStaticClosure()
+    {
+        $this->macroable::macro('staticClosure', static function () {
+            return 'Taylor';
+        });
+
+        $this->assertSame('Taylor', $this->macroable::staticClosure());
+    }
+
+    public function testNonStaticCallOfStaticClosure()
+    {
+        $this->macroable::macro('staticClosure', static function () {
+            return 'Taylor';
+        });
+
+        $this->assertSame('Taylor', $this->macroable->staticClosure());
+    }
 }
 
 class EmptyMacroable
