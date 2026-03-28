@@ -803,6 +803,10 @@ trait HasAttributes
      */
     protected function normalizeAttributeMutatorKey($key)
     {
+        if (! preg_match('/\d/', $key)) {
+            return $key;
+        }
+
         return lcfirst(static::$snakeAttributes ? Str::snake(Str::camel($key)) : Str::camel($key));
     }
 
