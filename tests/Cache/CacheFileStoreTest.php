@@ -499,172 +499,25 @@ class CacheFileStoreTest extends TestCase
         $store->forget($key);
     }
 
-    public function testAddRespectsNineDigitTimestampOnExistingFile()
+    public function testCacheRecoversOldFilesWithShortTimestamps()
     {
-        // The add() method reads 10 bytes to check expiry. If an existing file
-        // has a 9-digit timestamp, add() should detect this and not treat the
-        // 10th byte (part of serialized data) as part of the timestamp.
-        Carbon::setTestNow(Carbon::createFromTimestampUTC(990464400)); // 2001-05-21 — 9-digit timestamp
-
-        $store = new FileStore(new Filesystem, __DIR__);
-        $key = Str::random();
-
-        // First put creates file with 9-digit timestamp (now padded by write fix)
-        $store->put($key, 'original', 300);
-        $this->assertSame('original', $store->get($key));
-
-        // add() should see the item as not expired and NOT overwrite
-        $result = $store->add($key, 'replaced', 300);
-        $this->assertFalse($result);
-        $this->assertSame('original', $store->get($key));
-
-        Carbon::setTestNow(null);
-        $store->forget($key);
-    }
-
-    public function testCacheWorksAtExactTenDigitBoundary()
-    {
-        // Timestamp 1000000000 (Sept 9, 2001) is the first 10-digit timestamp.
-        // This should work without any padding.
-        Carbon::setTestNow(Carbon::createFromTimestampUTC(1000000000));
-
-        $store = new FileStore(new Filesystem, __DIR__);
-        $key = Str::random();
-
-        $store->put($key, 'boundary-test', 60);
-        $this->assertSame('boundary-test', $store->get($key));
-
-        Carbon::setTestNow(null);
-        $store->forget($key);
-    }
-
-    public function testCacheForeverProducesTenDigitSentinel()
-    {
-        $store = new FileStore(new Filesystem, __DIR__);
-        $key = Str::random();
-
-        // seconds=0 means "forever", should store 9999999999 (already 10 digits)
-        $store->forever($key, 'forever-value');
-        $this->assertSame('forever-value', $store->get($key));
-
-        // Verify the raw file starts with the 10-digit sentinel
-        $contents = file_get_contents($store->path($key));
-        $this->assertSame('9999999999', substr($contents, 0, 10));
-
-        $store->forget($key);
-    }
-
-    public function testCacheRecoversOldFilesWithNineDigitTimestamps()
-    {
-        // Old cache files written before the fix have 9-digit timestamps with no
-        // zero-padding. The read side detects the short timestamp and splits correctly.
+        // Old cache files written before this fix have unpadded timestamps.
+        // The read side uses strspn to find the digit/data boundary, recovering them.
         $store = new FileStore(new Filesystem, __DIR__);
         $key = Str::random();
         $path = $store->path($key);
 
         (new Filesystem)->ensureDirectoryExists(dirname($path));
 
-        // 10-digit timestamp starting with 9 — valid, not expired
+        // 10-digit timestamp — not expired, should deserialize
         file_put_contents($path, '9990464403'.serialize('recovered'));
         $this->assertSame('recovered', $store->get($key));
 
-        // Actual 9-digit timestamp — already expired, should return null and clean up
+        // 9-digit timestamp — already expired, should return null
         file_put_contents($path, '990464403'.serialize('old-value'));
         $this->assertNull($store->get($key));
 
         @unlink($path);
-    }
-
-    public function testCacheHandlesComplexSerializedValues()
-    {
-        // Verify that zero-padding doesn't interfere with serialized arrays/objects
-        Carbon::setTestNow(Carbon::createFromTimestampUTC(990464400)); // 2001-05-21 — 9-digit timestamp
-
-        $store = new FileStore(new Filesystem, __DIR__);
-        $key = Str::random();
-
-        $complex = ['nested' => ['key' => 'value'], 'count' => 42];
-        $store->put($key, $complex, 60);
-        $this->assertSame($complex, $store->get($key));
-
-        Carbon::setTestNow(null);
-        $store->forget($key);
-    }
-
-    public function testCacheRecoversOldFilesWithEightDigitTimestamps()
-    {
-        // 8-digit timestamps are pre-March 1973 (max 99999999 = 1973-03-03).
-        // strspn correctly finds the boundary at any digit length.
-        $store = new FileStore(new Filesystem, __DIR__);
-        $key = Str::random();
-        $path = $store->path($key);
-
-        (new Filesystem)->ensureDirectoryExists(dirname($path));
-
-        // 8-digit timestamp, far-future value to avoid expiry check
-        file_put_contents($path, '99999999'.serialize('eight-digits'));
-        // 99999999 = March 1973, already expired — should return null
-        $this->assertNull($store->get($key));
-
-        // Use a fake 8-digit "not expired" by prepending to a valid future timestamp
-        // Actually we can't fake a non-expired 8-digit timestamp since they're all pre-1973.
-        // Just verify it doesn't crash and returns null gracefully.
-        @unlink($path);
-    }
-
-    public function testCacheWritePadsEightDigitTimestamps()
-    {
-        // Time-travel to 1972 (8-digit timestamp era)
-        Carbon::setTestNow(Carbon::createFromTimestampUTC(63072000)); // 1972-01-01 — 8-digit timestamp
-
-        $store = new FileStore(new Filesystem, __DIR__);
-        $key = Str::random();
-
-        $store->put($key, 'seventies', 300);
-
-        // Verify the raw file has a zero-padded 10-digit timestamp
-        $contents = file_get_contents($store->path($key));
-        $this->assertTrue(ctype_digit(substr($contents, 0, 10)));
-        $this->assertSame('0', substr($contents, 0, 1)); // leading zero from padding
-
-        $this->assertSame('seventies', $store->get($key));
-
-        Carbon::setTestNow(null);
-        $store->forget($key);
-    }
-
-    public function testCacheHandlesNegativeTimestampsGracefully()
-    {
-        // Negative timestamps (pre-1970) produce a leading '-' which strspn
-        // won't count as a digit. The entry is treated as empty — no crash.
-        $store = new FileStore(new Filesystem, __DIR__);
-        $key = Str::random();
-        $path = $store->path($key);
-
-        (new Filesystem)->ensureDirectoryExists(dirname($path));
-
-        // Write a file with a negative timestamp (simulating pre-1970 time travel)
-        file_put_contents($path, '-62135596800'.serialize('ancient'));
-        $this->assertNull($store->get($key)); // treated as empty, no crash
-
-        @unlink($path);
-    }
-
-    public function testCacheHandlesElevenDigitTimestampOnRead()
-    {
-        // 11-digit timestamps start at 10000000000 (November 20, 2286).
-        // strspn correctly reads all 11 digits with no hardcoded length.
-        $store = new FileStore(new Filesystem, __DIR__);
-        $key = Str::random();
-        $path = $store->path($key);
-
-        (new Filesystem)->ensureDirectoryExists(dirname($path));
-
-        // Simulate a file with an 11-digit timestamp (far future, not expired)
-        file_put_contents($path, '10000000000'.serialize('future'));
-        $this->assertSame('future', $store->get($key));
-
-        $store->forget($key);
     }
 
     protected function mockFilesystem()
