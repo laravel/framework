@@ -10,6 +10,7 @@ use Illuminate\Queue\Queue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Mockery as m;
+use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -195,6 +196,31 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $record = $queue->buildDatabaseRecord('queue', 'any_payload', 0);
         $this->assertArrayHasKey('payload', $record);
         $this->assertArrayHasKey('payload', array_slice($record, -1, 1, true));
+    }
+
+    public function testGetLockForPoppingCachesPdoLookup()
+    {
+        $pdo = m::mock(PDO::class);
+        $pdo->shouldReceive('getAttribute')->with(PDO::ATTR_DRIVER_NAME)->once()->andReturn('mysql');
+        $pdo->shouldReceive('getAttribute')->with(PDO::ATTR_SERVER_VERSION)->once()->andReturn('8.0.28');
+
+        $database = m::mock(Connection::class);
+        $database->shouldReceive('getPdo')->once()->andReturn($pdo);
+        $database->shouldReceive('getConfig')->with('version')->once()->andReturnNull();
+
+        $queue = new DatabaseQueue($database, 'table', 'default');
+
+        $method = (new ReflectionClass(DatabaseQueue::class))->getMethod('getLockForPopping');
+
+        $result1 = $method->invoke($queue);
+        $result2 = $method->invoke($queue);
+        $result3 = $method->invoke($queue);
+
+        $this->assertSame('FOR UPDATE SKIP LOCKED', $result1);
+        $this->assertSame($result1, $result2);
+        $this->assertSame($result1, $result3);
+
+        // Mockery's once() constraints verify getPdo/getAttribute were only called once
     }
 }
 
