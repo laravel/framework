@@ -125,11 +125,10 @@ class FileStore implements CanFlushLocks, LockProvider, Store
             return false;
         }
 
-        $expire = $file->read(10);
-
         // The timestamp may be fewer than 10 digits for dates before 2001-09-09.
         // Trim any trailing non-digit characters that are part of the serialized data.
-        $expire = substr($expire, 0, strspn($expire, '0123456789'));
+        $raw = $file->read(10);
+        $expire = substr($raw, 0, strspn($raw, '0123456789'));
 
         if (empty($expire) || $this->currentTime() >= $expire) {
             $file->truncate()
