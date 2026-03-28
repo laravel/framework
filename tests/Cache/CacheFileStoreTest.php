@@ -499,6 +499,54 @@ class CacheFileStoreTest extends TestCase
         $store->forget($key);
     }
 
+    public function testCacheWorksAtExactTenDigitBoundary()
+    {
+        // Timestamp 1000000000 (Sept 9, 2001) is the first 10-digit timestamp.
+        // This should work without any padding.
+        Carbon::setTestNow(Carbon::createFromTimestampUTC(1000000000));
+
+        $store = new FileStore(new Filesystem, __DIR__);
+        $key = Str::random();
+
+        $store->put($key, 'boundary-test', 60);
+        $this->assertSame('boundary-test', $store->get($key));
+
+        Carbon::setTestNow(null);
+        $store->forget($key);
+    }
+
+    public function testCacheForeverProducesTenDigitSentinel()
+    {
+        $store = new FileStore(new Filesystem, __DIR__);
+        $key = Str::random();
+
+        // seconds=0 means "forever", should store 9999999999 (already 10 digits)
+        $store->forever($key, 'forever-value');
+        $this->assertSame('forever-value', $store->get($key));
+
+        // Verify the raw file starts with the 10-digit sentinel
+        $contents = file_get_contents($store->path($key));
+        $this->assertSame('9999999999', substr($contents, 0, 10));
+
+        $store->forget($key);
+    }
+
+    public function testCacheHandlesComplexSerializedValues()
+    {
+        // Verify that zero-padding doesn't interfere with serialized arrays/objects
+        Carbon::setTestNow(Carbon::createFromTimestampUTC(990464400));
+
+        $store = new FileStore(new Filesystem, __DIR__);
+        $key = Str::random();
+
+        $complex = ['nested' => ['key' => 'value'], 'count' => 42];
+        $store->put($key, $complex, 60);
+        $this->assertSame($complex, $store->get($key));
+
+        Carbon::setTestNow(null);
+        $store->forget($key);
+    }
+
     protected function mockFilesystem()
     {
         return $this->createMock(Filesystem::class);
