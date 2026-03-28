@@ -91,7 +91,7 @@ class FileStore implements CanFlushLocks, LockProvider, Store
         $this->ensureCacheDirectoryExists($path = $this->path($key));
 
         $result = $this->files->put(
-            $path, $this->expiration($seconds).serialize($value), true
+            $path, sprintf('%010d', $this->expiration($seconds)).serialize($value), true
         );
 
         if ($result !== false && $result > 0) {
@@ -129,7 +129,7 @@ class FileStore implements CanFlushLocks, LockProvider, Store
 
         if (empty($expire) || $this->currentTime() >= $expire) {
             $file->truncate()
-                ->write($this->expiration($seconds).serialize($value))
+                ->write(sprintf('%010d', $this->expiration($seconds)).serialize($value))
                 ->close();
 
             $this->ensurePermissionsAreCorrect($path);
@@ -426,15 +426,13 @@ class FileStore implements CanFlushLocks, LockProvider, Store
      * Get the expiration time based on the given seconds.
      *
      * @param  int  $seconds
-     * @return string
+     * @return int
      */
     protected function expiration($seconds)
     {
         $time = $this->availableAt($seconds);
 
-        return $seconds === 0 || $time > 9999999999
-            ? '9999999999'
-            : str_pad((string) $time, 10, '0', STR_PAD_LEFT);
+        return $seconds === 0 || $time > 9999999999 ? 9999999999 : $time;
     }
 
     /**
