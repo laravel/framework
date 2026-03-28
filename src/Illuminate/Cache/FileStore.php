@@ -127,6 +127,12 @@ class FileStore implements CanFlushLocks, LockProvider, Store
 
         $expire = $file->read(10);
 
+        // If the timestamp is only 9 digits (pre-2001), the 10th character is part
+        // of the serialized data, not the timestamp. Trim it for a correct comparison.
+        if ($expire !== '' && ! ctype_digit($expire)) {
+            $expire = substr($expire, 0, 9);
+        }
+
         if (empty($expire) || $this->currentTime() >= $expire) {
             $file->truncate()
                 ->write(sprintf('%010d', $this->expiration($seconds)).serialize($value))

@@ -499,6 +499,29 @@ class CacheFileStoreTest extends TestCase
         $store->forget($key);
     }
 
+    public function testAddRespectsNineDigitTimestampOnExistingFile()
+    {
+        // The add() method reads 10 bytes to check expiry. If an existing file
+        // has a 9-digit timestamp, add() should detect this and not treat the
+        // 10th byte (part of serialized data) as part of the timestamp.
+        Carbon::setTestNow(Carbon::createFromTimestampUTC(990464400));
+
+        $store = new FileStore(new Filesystem, __DIR__);
+        $key = Str::random();
+
+        // First put creates file with 9-digit timestamp (now padded by write fix)
+        $store->put($key, 'original', 300);
+        $this->assertSame('original', $store->get($key));
+
+        // add() should see the item as not expired and NOT overwrite
+        $result = $store->add($key, 'replaced', 300);
+        $this->assertFalse($result);
+        $this->assertSame('original', $store->get($key));
+
+        Carbon::setTestNow(null);
+        $store->forget($key);
+    }
+
     public function testCacheWorksAtExactTenDigitBoundary()
     {
         // Timestamp 1000000000 (Sept 9, 2001) is the first 10-digit timestamp.
