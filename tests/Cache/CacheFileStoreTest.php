@@ -484,7 +484,7 @@ class CacheFileStoreTest extends TestCase
     {
         // Timestamps before ~2001 are only 9 digits, which would break
         // deserialization since getPayload() assumes 10-digit timestamps.
-        Carbon::setTestNow(Carbon::createFromTimestampUTC(990464400));
+        Carbon::setTestNow(Carbon::createFromTimestampUTC(990464400)); // 2001-05-21 — 9-digit timestamp
 
         $store = new FileStore(new Filesystem, __DIR__);
         $key = Str::random();
@@ -504,7 +504,7 @@ class CacheFileStoreTest extends TestCase
         // The add() method reads 10 bytes to check expiry. If an existing file
         // has a 9-digit timestamp, add() should detect this and not treat the
         // 10th byte (part of serialized data) as part of the timestamp.
-        Carbon::setTestNow(Carbon::createFromTimestampUTC(990464400));
+        Carbon::setTestNow(Carbon::createFromTimestampUTC(990464400)); // 2001-05-21 — 9-digit timestamp
 
         $store = new FileStore(new Filesystem, __DIR__);
         $key = Str::random();
@@ -578,7 +578,7 @@ class CacheFileStoreTest extends TestCase
     public function testCacheHandlesComplexSerializedValues()
     {
         // Verify that zero-padding doesn't interfere with serialized arrays/objects
-        Carbon::setTestNow(Carbon::createFromTimestampUTC(990464400));
+        Carbon::setTestNow(Carbon::createFromTimestampUTC(990464400)); // 2001-05-21 — 9-digit timestamp
 
         $store = new FileStore(new Filesystem, __DIR__);
         $key = Str::random();
