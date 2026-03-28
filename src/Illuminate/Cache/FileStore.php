@@ -127,11 +127,9 @@ class FileStore implements CanFlushLocks, LockProvider, Store
 
         $expire = $file->read(10);
 
-        // If the timestamp is only 9 digits (pre-2001), the 10th character is part
-        // of the serialized data, not the timestamp. Trim it for a correct comparison.
-        if ($expire !== '' && ! ctype_digit($expire)) {
-            $expire = substr($expire, 0, 9);
-        }
+        // The timestamp may be fewer than 10 digits for dates before 2001-09-09.
+        // Trim any trailing non-digit characters that are part of the serialized data.
+        $expire = substr($expire, 0, strspn($expire, '0123456789'));
 
         if (empty($expire) || $this->currentTime() >= $expire) {
             $file->truncate()
@@ -360,7 +358,10 @@ class FileStore implements CanFlushLocks, LockProvider, Store
                 return $this->emptyPayload();
             }
 
-            $timestampLength = ctype_digit(substr($contents, 9, 1)) ? 10 : 9;
+            // The timestamp may be fewer than 10 digits for dates before 2001-09-09.
+            // Serialized PHP data always starts with a letter, so we find where
+            // the digits end to split the timestamp from the serialized value.
+            $timestampLength = strspn($contents, '0123456789');
 
             $expire = substr($contents, 0, $timestampLength);
         } catch (Exception) {
