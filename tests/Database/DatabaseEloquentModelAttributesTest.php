@@ -198,6 +198,13 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertSame(['name', 'email'], $model->getFillable());
     }
 
+    public function test_fillable_attribute_variadic(): void
+    {
+        $model = new ModelWithFillableAttributeVariadic;
+
+        $this->assertSame(['name', 'email'], $model->getFillable());
+    }
+
     public function test_fillable_property_merges_with_attribute(): void
     {
         $model = new ModelWithFillableAttributeAndProperty;
@@ -208,6 +215,13 @@ class DatabaseEloquentModelAttributesTest extends TestCase
     public function test_guarded_attribute(): void
     {
         $model = new ModelWithGuardedAttribute;
+
+        $this->assertSame(['id', 'secret'], $model->getGuarded());
+    }
+
+    public function test_guarded_attribute_variadic(): void
+    {
+        $model = new ModelWithGuardedAttributeVariadic;
 
         $this->assertSame(['id', 'secret'], $model->getGuarded());
     }
@@ -241,9 +255,23 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertSame(['password', 'secret'], $model->getHidden());
     }
 
+    public function test_hidden_attribute_variadic(): void
+    {
+        $model = new ModelWithHiddenAttributeVariadic;
+
+        $this->assertSame(['password', 'secret'], $model->getHidden());
+    }
+
     public function test_visible_attribute(): void
     {
         $model = new ModelWithVisibleAttribute;
+
+        $this->assertSame(['id', 'name'], $model->getVisible());
+    }
+
+    public function test_visible_attribute_variadic(): void
+    {
+        $model = new ModelWithVisibleAttributeVariadic;
 
         $this->assertSame(['id', 'name'], $model->getVisible());
     }
@@ -255,9 +283,23 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertSame(['full_name', 'is_admin'], $model->getAppends());
     }
 
+    public function test_appends_attribute_variadic(): void
+    {
+        $model = new ModelWithAppendsAttributeVariadic;
+
+        $this->assertSame(['full_name', 'is_admin'], $model->getAppends());
+    }
+
     public function test_touches_attribute(): void
     {
         $model = new ModelWithTouchesAttribute;
+
+        $this->assertSame(['post', 'author'], $model->getTouchedRelations());
+    }
+
+    public function test_touches_attribute_variadic(): void
+    {
+        $model = new ModelWithTouchesAttributeVariadic;
 
         $this->assertSame(['post', 'author'], $model->getTouchedRelations());
     }
@@ -442,6 +484,12 @@ class ModelWithFillableAttribute extends Model
     //
 }
 
+#[Fillable('name', 'email')]
+class ModelWithFillableAttributeVariadic extends Model
+{
+    //
+}
+
 #[Fillable(['name', 'email'])]
 class ModelWithFillableAttributeAndProperty extends Model
 {
@@ -450,6 +498,12 @@ class ModelWithFillableAttributeAndProperty extends Model
 
 #[Guarded(['id', 'secret'])]
 class ModelWithGuardedAttribute extends Model
+{
+    //
+}
+
+#[Guarded('id', 'secret')]
+class ModelWithGuardedAttributeVariadic extends Model
 {
     //
 }
@@ -483,8 +537,20 @@ class ModelWithHiddenAttribute extends Model
     //
 }
 
+#[Hidden('password', 'secret')]
+class ModelWithHiddenAttributeVariadic extends Model
+{
+    //
+}
+
 #[Visible(['id', 'name'])]
 class ModelWithVisibleAttribute extends Model
+{
+    //
+}
+
+#[Visible('id', 'name')]
+class ModelWithVisibleAttributeVariadic extends Model
 {
     //
 }
@@ -495,8 +561,20 @@ class ModelWithAppendsAttribute extends Model
     //
 }
 
+#[Appends('full_name', 'is_admin')]
+class ModelWithAppendsAttributeVariadic extends Model
+{
+    //
+}
+
 #[Touches(['post', 'author'])]
 class ModelWithTouchesAttribute extends Model
+{
+    //
+}
+
+#[Touches('post', 'author')]
+class ModelWithTouchesAttributeVariadic extends Model
 {
     //
 }

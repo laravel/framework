@@ -8,11 +8,17 @@ use Attribute;
 class Hidden
 {
     /**
+     * @var array<int, string>
+     */
+    public array $columns;
+
+    /**
      * Create a new attribute instance.
      *
-     * @param  array<int, string>  $columns
+     * @param  array<int, string>|string  ...$columns
      */
-    public function __construct(public array $columns)
+    public function __construct(array|string ...$columns)
     {
+        $this->columns = is_array($columns[0]) ? $columns[0] : $columns;
     }
 }
