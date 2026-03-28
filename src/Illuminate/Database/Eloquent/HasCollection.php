@@ -45,10 +45,15 @@ trait HasCollection
     {
         $reflectionClass = new ReflectionClass(static::class);
 
+        $isEloquentGrandchild = is_subclass_of(static::class, Model::class)
+            && get_parent_class(static::class) !== Model::class;
+
         $attributes = $reflectionClass->getAttributes(CollectedBy::class);
 
         if (! isset($attributes[0]) || ! isset($attributes[0]->getArguments()[0])) {
-            return;
+            return $isEloquentGrandchild
+                ? (new (get_parent_class(static::class)))->resolveCollectionFromAttribute()
+                : null;
         }
 
         return $attributes[0]->getArguments()[0];
