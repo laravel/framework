@@ -1175,7 +1175,7 @@ class SupportStringableTest extends TestCase
     public function testSentence(): void
     {
         $this->assertSame('Foo bar', (string) $this->stringable('foo bar')->sentence());
-        $this->assertSame("Foo bar? Foo bar! Foo bar.", (string) $this->stringable('foo bar? foo bar! foo bar.')->sentence());
+        $this->assertSame('Foo bar? Foo bar! Foo bar.', (string) $this->stringable('foo bar? foo bar! foo bar.')->sentence());
         $this->assertSame('Foo bar', (string) $this->stringable('Foo bar')->sentence());
 
         $this->assertSame('', (string) $this->stringable()->sentence());
@@ -1184,7 +1184,7 @@ class SupportStringableTest extends TestCase
         $this->assertSame('Foo bar baz', (string) $this->stringable('foo bar baz')->sentence());
         $this->assertSame('Foo bar baz', (string) $this->stringable('foo bar baz')->sentence()); // test cache
 
-        $this->assertSame("Foo bar?foo bar!foo bar.", (string) $this->stringable('foo bar?foo bar!foo bar.')->sentence());
+        $this->assertSame('Foo bar?foo bar!foo bar.', (string) $this->stringable('foo bar?foo bar!foo bar.')->sentence());
 
         $this->assertSame('Añoranza. Übel.', (string) $this->stringable('añoranza. übel.')->sentence());
     }

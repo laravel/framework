@@ -53,7 +53,7 @@ class Str
     protected static $studlyCache = [];
 
     /**
-     * The cache of sentence-cased words.
+     * The cache of sentence-cased strings.
      *
      * @var array<string, string>
      */
