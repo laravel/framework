@@ -14,6 +14,7 @@ use Illuminate\Foundation\Http\Attributes\RedirectToRoute;
 use Illuminate\Foundation\Http\Attributes\StopOnFirstFailure;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use ReflectionClass;
 
@@ -71,11 +72,41 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected $stopOnFirstFailure = false;
 
     /**
+     * Per-class override for rejecting fields not defined in rules().
+     *
+     * Null falls through to the global flag or the config value.
+     *
+     * @var bool|null
+     */
+    protected ?bool $failOnUnknownFields = null;
+
+    /**
+     * Global flag set via FormRequest::failOnUnknownFields().
+     *
+     * @var bool
+     */
+    protected static bool $globalFailOnUnknownFields = false;
+
+    /**
      * The validator instance.
      *
      * @var \Illuminate\Contracts\Validation\Validator
      */
     protected $validator;
+
+    /**
+     * Enable or disable unknown-field rejection globally for all form requests.
+     *
+     * Usage in AppServiceProvider::boot():
+     *   FormRequest::failOnUnknownFields(! app()->isProduction());
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function failOnUnknownFields(bool $value = true): void
+    {
+        static::$globalFailOnUnknownFields = $value;
+    }
 
     /**
      * Get the validator instance for the request.
@@ -107,6 +138,12 @@ class FormRequest extends Request implements ValidatesWhenResolved
                 $this->after(...),
                 ['validator' => $validator]
             ));
+        }
+
+        if ($this->shouldFailOnUnknownFields()) {
+            $validator->after(function (Validator $validator) {
+                $this->validateNoExtraFields($validator);
+            });
         }
 
         $this->setValidator($validator);
@@ -144,6 +181,91 @@ class FormRequest extends Request implements ValidatesWhenResolved
         if (count($errorBag) > 0) {
             $this->errorBag = $errorBag[0]->newInstance()->name;
         }
+    }
+
+    /**
+     * Determine if fields not present in rules() should fail validation.
+     *
+     * Resolution order:
+     *   1. $failOnUnknownFields  → per-class override
+     *   2. $globalFailOnUnknownFields  → FormRequest::failOnUnknownFields() ile set edilen global değer
+     *   3. Config "validation.fail_on_unknown_fields"
+     *
+     * @return bool
+     */
+    protected function shouldFailOnUnknownFields(): bool
+    {
+        if ($this->failOnUnknownFields !== null) {
+            return $this->failOnUnknownFields;
+        }
+
+        if (static::$globalFailOnUnknownFields) {
+            return true;
+        }
+
+        if ($this->container->bound('config')) {
+            return (bool) $this->container->make('config')->get('validation.fail_on_unknown_fields', false);
+        }
+
+        return false;
+    }
+
+    /**
+     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @return void
+     */
+    protected function validateNoExtraFields(Validator $validator): void
+    {
+        $allowedKeys = array_keys($this->container->call([$this, 'rules']));
+
+        $inputKeys = array_keys(Arr::dot($this->all()));
+
+        foreach ($inputKeys as $inputKey) {
+            if (! $this->isAllowedKey($inputKey, $allowedKeys)) {
+                $validator->errors()->add(
+                    $inputKey,
+                    $this->getFailOnUnknownFieldsMessage($inputKey)
+                );
+            }
+        }
+    }
+
+    /**
+     * @param  string  $inputKey  The dot-notation key from the request input.
+     * @param  array  $allowedKeys  The keys defined in rules().
+     * @return bool
+     */
+    protected function isAllowedKey(string $inputKey, array $allowedKeys): bool
+    {
+        foreach ($allowedKeys as $ruleKey) {
+            if ($ruleKey === $inputKey) {
+                return true;
+            }
+
+            if (str_contains($ruleKey, '*')) {
+                $pattern = '/^'.str_replace(
+                        ['\*', '\.'],
+                        ['[^.]+', '\.'],
+                        preg_quote($ruleKey, '/')
+                    ).'$/';
+
+                if (preg_match($pattern, $inputKey)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param  string  $field  The name of the unexpected field.
+     * @return string
+     */
+    protected function getFailOnUnknownFieldsMessage(string $field): string
+    {
+        return trans('validation.prohibited', ['attribute' => str_replace('_', ' ', $field)])
+            ?: "The {$field} field is not allowed.";
     }
 
     /**
