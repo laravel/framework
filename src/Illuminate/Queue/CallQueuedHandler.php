@@ -293,7 +293,7 @@ class CallQueuedHandler
      */
     protected function ensureSuccessfulBatchJobIsRecordedForMissingModel(Job $job, string $class)
     {
-        if (! in_array(Batchable::class, class_uses_recursive($class), true)) {
+        if (! isset(class_uses_recursive($class)[Batchable::class])) {
             return;
         }
 
