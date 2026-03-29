@@ -235,10 +235,10 @@ class FormRequest extends Request implements ValidatesWhenResolved
 
             if (str_contains($ruleKey, '*')) {
                 $pattern = '/^'.str_replace(
-                        ['\*', '\.'],
-                        ['[^.]+', '\.'],
-                        preg_quote($ruleKey, '/')
-                    ).'$/';
+                    ['\*', '\.'],
+                    ['[^.]+', '\.'],
+                    preg_quote($ruleKey, '/')
+                ).'$/';
 
                 if (preg_match($pattern, $inputKey)) {
                     return true;
