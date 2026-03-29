@@ -174,4 +174,44 @@ trait DeterminesStatusCode
     {
         return $this->status() === 429;
     }
+
+    /**
+     * Determine if the response was a 500 "Internal Server Error" response.
+     *
+     * @return bool
+     */
+    public function internalServerError()
+    {
+        return $this->status() === 500;
+    }
+
+    /**
+     * Determine if the response was a 502 "Bad Gateway" response.
+     *
+     * @return bool
+     */
+    public function badGateway()
+    {
+        return $this->status() === 502;
+    }
+
+    /**
+     * Determine if the response was a 503 "Service Unavailable" response.
+     *
+     * @return bool
+     */
+    public function serviceUnavailable()
+    {
+        return $this->status() === 503;
+    }
+
+    /**
+     * Determine if the response was a 504 "Gateway Timeout" response.
+     *
+     * @return bool
+     */
+    public function gatewayTimeout()
+    {
+        return $this->status() === 504;
+    }
 }
