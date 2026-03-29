@@ -35,6 +35,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool hiddenStackContains(string $key, mixed $value, bool $strict = false)
  * @method static mixed scope(callable $callback, array $data = [], array $hidden = [])
  * @method static bool isEmpty()
+ * @method static bool isNotEmpty()
  * @method static \Illuminate\Log\Context\Repository dehydrating(callable $callback)
  * @method static \Illuminate\Log\Context\Repository hydrated(callable $callback)
  * @method static \Illuminate\Log\Context\Repository handleUnserializeExceptionsUsing(callable|null $callback)

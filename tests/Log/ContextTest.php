@@ -699,6 +699,31 @@ class ContextTest extends TestCase
         Context::rememberHidden('foo', $closure);
         $this->assertSame(1, $closureRunCount);
     }
+
+    public function test_is_empty_and_is_not_empty()
+    {
+        $context = app(Repository::class);
+
+        $this->assertTrue($context->isEmpty());
+        $this->assertFalse($context->isNotEmpty());
+
+        $context->add('key', 'value');
+
+        $this->assertFalse($context->isEmpty());
+        $this->assertTrue($context->isNotEmpty());
+    }
+
+    public function test_is_not_empty_with_only_hidden_data()
+    {
+        $context = app(Repository::class);
+
+        $this->assertTrue($context->isEmpty());
+
+        $context->addHidden('secret', 'value');
+
+        $this->assertFalse($context->isEmpty());
+        $this->assertTrue($context->isNotEmpty());
+    }
 }
 
 enum Suit
