@@ -4,7 +4,7 @@ namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Testing\Attributes\WithoutBootingFramework;
+use Illuminate\Foundation\Testing\Attributes\WithoutFramework;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use ReflectionMethod;
 
@@ -104,7 +104,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function withoutBootingFramework(): bool
     {
-        return (new ReflectionMethod(static::class, $this->name()))->getAttributes(WithoutBootingFramework::class) !== [];
+        return (new ReflectionMethod(static::class, $this->name()))->getAttributes(WithoutFramework::class) !== [];
     }
 
     /**
