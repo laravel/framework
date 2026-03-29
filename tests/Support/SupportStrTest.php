@@ -1156,6 +1156,23 @@ class SupportStrTest extends TestCase
         $this->assertSame('ÖffentlicheÜberraschungen', Str::studly('öffentliche-überraschungen'));
     }
 
+    public function testSentence(): void
+    {
+        $this->assertSame('Foo bar', Str::sentence('foo bar'));
+        $this->assertSame("Foo bar? Foo bar! Foo bar.", Str::sentence('foo bar? foo bar! foo bar.'));
+        $this->assertSame('Foo bar', Str::sentence('Foo bar'));
+
+        $this->assertSame('', Str::sentence(''));
+        $this->assertSame('Foo   bar.  Baz', Str::sentence('foo   bar.  baz'));
+
+        $this->assertSame('Foo bar baz', Str::sentence('foo bar baz'));
+        $this->assertSame('Foo bar baz', Str::sentence('foo bar baz')); // test cache
+
+        $this->assertSame("Foo bar?foo bar!foo bar.", Str::sentence('foo bar?foo bar!foo bar.'));
+
+        $this->assertSame('Añoranza. Übel.', Str::sentence('añoranza. übel.'));
+    }
+
     public function testPascal()
     {
         $this->assertSame('LaravelPhpFramework', Str::pascal('laravel_php_framework'));

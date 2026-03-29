@@ -53,6 +53,13 @@ class Str
     protected static $studlyCache = [];
 
     /**
+     * The cache of sentence-cased words.
+     *
+     * @var array<string, string>
+     */
+    protected static array $sentenceCache = [];
+
+    /**
      * The callback that should be used to generate UUIDs.
      *
      * @var (callable(): \Ramsey\Uuid\UuidInterface)|null
@@ -1724,6 +1731,22 @@ class Str
         $studlyWords = array_map(fn ($word) => static::ucfirst($word), $words);
 
         return static::$studlyCache[$key] = implode($studlyWords);
+    }
+
+    /**
+     * Convert a value to sentence case.
+     */
+    public static function sentence(string $value): string
+    {
+        if (isset(static::$sentenceCache[$value])) {
+            return static::$sentenceCache[$value];
+        }
+
+        $sentences = preg_split('/([.!?]\s+)/', $value, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+        $formattedSentences = array_map(fn ($sentence) => static::ucfirst($sentence), $sentences);
+
+        return static::$sentenceCache[$value] = implode($formattedSentences);
     }
 
     /**

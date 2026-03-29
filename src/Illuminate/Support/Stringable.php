@@ -991,6 +991,14 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Convert a value to sentence case.
+     */
+    public function sentence(): static
+    {
+        return new static(Str::sentence($this->value));
+    }
+
+    /**
      * Convert the string to Pascal case.
      *
      * @return static
