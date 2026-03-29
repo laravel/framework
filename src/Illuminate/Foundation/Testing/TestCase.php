@@ -4,7 +4,9 @@ namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Testing\Attributes\WithoutBootingFramework;
 use PHPUnit\Framework\TestCase as BaseTestCase;
+use ReflectionMethod;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -60,6 +62,10 @@ abstract class TestCase extends BaseTestCase
      */
     protected function setUp(): void
     {
+        if ($this->withoutBootingFramework()) {
+            return;
+        }
+
         $this->setUpTheTestEnvironment();
     }
 
@@ -82,7 +88,23 @@ abstract class TestCase extends BaseTestCase
      */
     protected function tearDown(): void
     {
+        if ($this->withoutBootingFramework()) {
+            return;
+        }
+
         $this->tearDownTheTestEnvironment();
+    }
+
+    /**
+     * Determine if the test method should boot the framework.
+     *
+     * @return bool
+     *
+     * @throws \ReflectionException
+     */
+    protected function withoutBootingFramework(): bool
+    {
+        return (new ReflectionMethod(static::class, $this->name()))->getAttributes(WithoutBootingFramework::class) !== [];
     }
 
     /**
