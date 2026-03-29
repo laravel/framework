@@ -74,7 +74,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * Per-class override for rejecting fields not defined in rules().
      *
-     * Null falls through to the global flag or the config value.
+     * Null falls through to the global flag set via FormRequest::failOnUnknownFields().
      *
      * @var bool|null
      */
@@ -187,9 +187,8 @@ class FormRequest extends Request implements ValidatesWhenResolved
      * Determine if fields not present in rules() should fail validation.
      *
      * Resolution order:
-     *   1. $failOnUnknownFields  → per-class override
-     *   2. $globalFailOnUnknownFields  → FormRequest::failOnUnknownFields() ile set edilen global değer
-     *   3. Config "validation.fail_on_unknown_fields"
+     *   1. $failOnUnknownFields — per-class override
+     *   2. $globalFailOnUnknownFields — set via FormRequest::failOnUnknownFields()
      *
      * @return bool
      */
@@ -199,15 +198,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
             return $this->failOnUnknownFields;
         }
 
-        if (static::$globalFailOnUnknownFields) {
-            return true;
-        }
-
-        if ($this->container->bound('config')) {
-            return (bool) $this->container->make('config')->get('validation.fail_on_unknown_fields', false);
-        }
-
-        return false;
+        return static::$globalFailOnUnknownFields;
     }
 
     /**

@@ -28,6 +28,8 @@ class FoundationFormRequestTest extends TestCase
 
     protected function tearDown(): void
     {
+        FormRequest::failOnUnknownFields(false);
+
         Container::setInstance(null);
 
         $this->mocks = [];
@@ -272,16 +274,13 @@ class FoundationFormRequestTest extends TestCase
         $this->assertEquals(['name' => 'Taylor'], $request->validated());
     }
 
-    public function testFailOnUnknownFieldsEnabledViaApplicationConfig()
+    public function testFailOnUnknownFieldsEnabledViaFailOnUnknownFieldsStaticMethod()
     {
+        FormRequest::failOnUnknownFields();
+
         $request = $this->createRequest(
             ['name' => 'Taylor', 'unexpected' => 'value'],
-            FoundationTestFormRequestStub::class,
-            [
-                'validation' => [
-                    'fail_on_unknown_fields' => true,
-                ],
-            ]
+            FoundationTestFormRequestStub::class
         );
 
         $exception = $this->catchException(ValidationException::class, function () use ($request) {
@@ -291,16 +290,13 @@ class FoundationFormRequestTest extends TestCase
         $this->assertTrue($exception->validator->errors()->has('unexpected'));
     }
 
-    public function testFailOnUnknownFieldsPropertyOverridesConfig()
+    public function testFailOnUnknownFieldsPropertyOverridesGlobalStatic()
     {
+        FormRequest::failOnUnknownFields();
+
         $request = $this->createRequest(
             ['name' => 'Taylor', 'with' => 'extras'],
-            FoundationTestFormRequestStrictDisabledStub::class,
-            [
-                'validation' => [
-                    'fail_on_unknown_fields' => true,
-                ],
-            ]
+            FoundationTestFormRequestStrictDisabledStub::class
         );
 
         $request->validateResolved();
