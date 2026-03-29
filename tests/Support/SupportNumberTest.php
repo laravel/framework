@@ -188,6 +188,17 @@ class SupportNumberTest extends TestCase
         $this->assertSame('1,024 YB', Number::fileSize(1024 ** 9));
     }
 
+    public function testBetween()
+    {
+        $this->assertTrue(Number::between(5, 1, 10));
+        $this->assertTrue(Number::between(1, 1, 10));
+        $this->assertTrue(Number::between(10, 1, 10));
+        $this->assertTrue(Number::between(4.5, 1, 10));
+        $this->assertFalse(Number::between(0, 1, 10));
+        $this->assertFalse(Number::between(11, 1, 10));
+        $this->assertFalse(Number::between(-1, 0, 5));
+    }
+
     public function testClamp()
     {
         $this->assertSame(2, Number::clamp(1, 2, 3));

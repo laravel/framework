@@ -293,6 +293,19 @@ class Number
     }
 
     /**
+     * Determine if the given number is between the given minimum and maximum.
+     *
+     * @param  int|float  $number
+     * @param  int|float  $min
+     * @param  int|float  $max
+     * @return bool
+     */
+    public static function between(int|float $number, int|float $min, int|float $max): bool
+    {
+        return $number >= $min && $number <= $max;
+    }
+
+    /**
      * Clamp the given number between the given minimum and maximum.
      *
      * @param  int|float  $number
