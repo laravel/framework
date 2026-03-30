@@ -220,6 +220,16 @@ class Batch implements Arrayable, JsonSerializable
     }
 
     /**
+     * Determine if this is the first job processed in the batch.
+     *
+     * @return bool
+     */
+    protected function isFirstJobProcessed(UpdatedBatchJobCounts $counts): bool
+    {
+        return $this->totalJobs - $counts->pendingJobs + $counts->failedJobs === 1;
+    }
+
+    /**
      * Get the percentage of jobs that have been processed (between 0-100).
      *
      * @return int<0, 100>
@@ -238,7 +248,7 @@ class Batch implements Arrayable, JsonSerializable
     {
         $counts = $this->decrementPendingJobs($jobId);
 
-        if ($this->totalJobs - $counts->pendingJobs + $counts->failedJobs === 1) {
+        if ($this->isFirstJobProcessed($counts)) {
             $container = Container::getInstance();
 
             if ($container->bound(Dispatcher::class)) {
@@ -351,7 +361,7 @@ class Batch implements Arrayable, JsonSerializable
     {
         $counts = $this->incrementFailedJobs($jobId);
 
-        if ($this->totalJobs - $counts->pendingJobs + $counts->failedJobs === 1) {
+        if ($this->isFirstJobProcessed($counts)) {
             $container = Container::getInstance();
 
             if ($container->bound(Dispatcher::class)) {
