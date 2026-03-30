@@ -36,7 +36,7 @@ abstract class TestCase extends BaseTestCase
     {
         $app = require Application::inferBasePath().'/bootstrap/app.php';
 
-        $this->traitsUsedByTest = array_flip(class_uses_recursive(static::class));
+        $this->traitsUsedByTest = class_uses_recursive(static::class);
 
         if (isset(CachedState::$cachedConfig) &&
             isset($this->traitsUsedByTest[WithCachedConfig::class])) {
