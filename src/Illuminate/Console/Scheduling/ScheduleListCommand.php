@@ -96,7 +96,7 @@ class ScheduleListCommand extends Command
                 }
             }
 
-            return collect(CronExpressionTimezoneConverter::forEvent($event, $timezone))->map(fn ($expression) => [
+            return (new Collection(CronExpressionTimezoneConverter::forEvent($event, $timezone)))->map(fn ($expression) => [
                 'expression' => $expression,
                 'command' => $command,
                 'description' => $event->description ?? null,
@@ -126,13 +126,13 @@ class ScheduleListCommand extends Command
         $repeatExpressionSpacing = $this->getRepeatExpressionSpacing($events);
 
         $events = $events->flatMap(function ($event) use ($terminalWidth, $expressionSpacing, $repeatExpressionSpacing, $timezone) {
-            return collect(CronExpressionTimezoneConverter::forEvent($event, $timezone))->map(
-                fn ($expression) => $this->listEvent($event, $terminalWidth, $expressionSpacing, $repeatExpressionSpacing, $timezone, $expression)
+            return (new Collection(CronExpressionTimezoneConverter::forEvent($event, $timezone)))->map(
+                fn ($expression) => $this->listEvent($event, $terminalWidth, $expressionSpacing, $repeatExpressionSpacing, $timezone, $expression),
             );
         });
 
         $this->line(
-            $events->flatten()->filter()->prepend('')->push('')->toArray()
+            $events->flatten()->filter()->prepend('')->push('')->toArray(),
         );
     }
 
@@ -144,7 +144,7 @@ class ScheduleListCommand extends Command
      */
     private function getCronExpressionSpacing($events, DateTimeZone $timezone)
     {
-        $rows = $events->flatMap(fn ($event) => collect(CronExpressionTimezoneConverter::forEvent($event, $timezone))
+        $rows = $events->flatMap(fn ($event) => (new Collection(CronExpressionTimezoneConverter::forEvent($event, $timezone)))
             ->map(fn ($expression) => array_map(mb_strlen(...), preg_split("/\s+/", $expression))));
 
         return (new Collection($rows[0] ?? []))->keys()->map(fn ($key) => $rows->max($key))->all();
@@ -207,7 +207,7 @@ class ScheduleListCommand extends Command
         $hasMutex = $event->mutex->exists($event) ? 'Has Mutex › ' : '';
 
         $dots = str_repeat('.', max(
-            $terminalWidth - mb_strwidth($expression.$repeatExpression.$command.$nextDueDateLabel.$nextDueDate.$hasMutex) - 8, 0
+            $terminalWidth - mb_strwidth($expression.$repeatExpression.$command.$nextDueDateLabel.$nextDueDate.$hasMutex) - 8, 0,
         ));
 
         // Highlight the parameters...
@@ -221,12 +221,12 @@ class ScheduleListCommand extends Command
             $dots,
             $hasMutex,
             $nextDueDateLabel,
-            $nextDueDate
+            $nextDueDate,
         ), $this->output->isVerbose() && mb_strlen($description) > 1 ? sprintf(
             '  <fg=#6C7280>%s%s %s</>',
             str_repeat(' ', mb_strlen($expression) + 2),
             '⇁',
-            $description
+            $description,
         ) : ''];
     }
 
@@ -279,7 +279,7 @@ class ScheduleListCommand extends Command
         $nextDueDate = Carbon::instance(
             (new CronExpression($event->expression))
                 ->getNextRunDate(Carbon::now()->setTimezone($event->timezone))
-                ->setTimezone($timezone)
+                ->setTimezone($timezone),
         );
 
         if (! $event->isRepeatable()) {
@@ -289,7 +289,7 @@ class ScheduleListCommand extends Command
         $previousDueDate = Carbon::instance(
             (new CronExpression($event->expression))
                 ->getPreviousRunDate(Carbon::now()->setTimezone($event->timezone), allowCurrentDate: true)
-                ->setTimezone($timezone)
+                ->setTimezone($timezone),
         );
 
         $now = Carbon::now()->setTimezone($event->timezone);
@@ -335,7 +335,7 @@ class ScheduleListCommand extends Command
             return sprintf(
                 '%s:%s',
                 str_replace($this->laravel->basePath().DIRECTORY_SEPARATOR, '', $function->getFileName() ?: ''),
-                $function->getStartLine()
+                $function->getStartLine(),
             );
         }
 
