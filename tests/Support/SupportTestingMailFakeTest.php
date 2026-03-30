@@ -413,7 +413,6 @@ class SupportTestingMailFakeTest extends TestCase
 
     public function testDriverMethod()
     {
-
         $this->fake->driver('ses')->to('taylor@laravel.com')->send($this->mailable);
 
         $this->fake->assertSent(MailableStub::class, function ($mail) {
