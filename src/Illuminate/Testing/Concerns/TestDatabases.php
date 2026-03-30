@@ -190,8 +190,17 @@ trait TestDatabases
                 $database,
             );
 
-            foreach (config('database.connections', []) as $name => $connection) {
-                if ($name !== $default && ($connection['database'] ?? null) === $previousDatabase) {
+            $connections = config('database.connections', []);
+            $defaultConnection = $connections[$default] ?? [];
+
+            foreach ($connections as $name => $connection) {
+                if ($name !== $default
+                    && isset($connection['host'])
+                    && ($connection['database'] ?? null) === $previousDatabase
+                    && ($connection['driver'] ?? null) === ($defaultConnection['driver'] ?? null)
+                    && $connection['host'] === ($defaultConnection['host'] ?? null)
+                    && ($connection['port'] ?? null) === ($defaultConnection['port'] ?? null)
+                ) {
                     config()->set("database.connections.{$name}.database", $database);
                 }
             }

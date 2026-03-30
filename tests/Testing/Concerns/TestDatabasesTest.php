@@ -52,7 +52,7 @@ class TestDatabasesTest extends TestCase
         config()->shouldReceive('get')
             ->once()
             ->with('database.connections', [])
-            ->andReturn(['mysql' => ['driver' => 'mysql', 'database' => 'my_database']]);
+            ->andReturn(['mysql' => ['driver' => 'mysql', 'host' => '127.0.0.1', 'port' => '3306', 'database' => 'my_database']]);
 
         $this->switchToDatabase('my_database_test_1');
     }
@@ -79,10 +79,12 @@ class TestDatabasesTest extends TestCase
             ->once()
             ->with('database.connections', [])
             ->andReturn([
-                'mysql' => ['driver' => 'mysql', 'database' => 'my_database'],
-                'mysql_secondary' => ['driver' => 'mysql', 'database' => 'my_database'],
-                'mysql_tertiary' => ['driver' => 'mysql', 'database' => 'my_database'],
-                'mysql_other' => ['driver' => 'mysql', 'database' => 'other_database'],
+                'mysql' => ['driver' => 'mysql', 'host' => '127.0.0.1', 'port' => '3306', 'database' => 'my_database'],
+                'mysql_secondary' => ['driver' => 'mysql', 'host' => '127.0.0.1', 'port' => '3306', 'database' => 'my_database'],
+                'mysql_tertiary' => ['driver' => 'mysql', 'host' => '127.0.0.1', 'port' => '3306', 'database' => 'my_database'],
+                'mysql_other' => ['driver' => 'mysql', 'host' => '127.0.0.1', 'port' => '3306', 'database' => 'other_database'],
+                'mysql_different_host' => ['driver' => 'mysql', 'host' => 'other-server', 'port' => '3306', 'database' => 'my_database'],
+                'mysql_different_driver' => ['driver' => 'pgsql', 'host' => '127.0.0.1', 'port' => '5432', 'database' => 'my_database'],
             ]);
 
         config()->shouldReceive('set')
