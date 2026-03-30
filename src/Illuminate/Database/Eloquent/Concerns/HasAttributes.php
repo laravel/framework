@@ -88,6 +88,13 @@ trait HasAttributes
     protected $casts = [];
 
     /**
+     * The cached merged casts array.
+     *
+     * @var array|null
+     */
+    protected $mergedCastsCache = null;
+
+    /**
      * The attributes that have been cast using custom classes.
      *
      * @var array
@@ -797,6 +804,8 @@ trait HasAttributes
         $casts = $this->ensureCastsAreStringValues($casts);
 
         $this->casts = array_merge($this->casts, $casts);
+
+        $this->mergedCastsCache = null;
 
         return $this;
     }
@@ -1713,7 +1722,9 @@ trait HasAttributes
     public function getCasts()
     {
         if ($this->getIncrementing()) {
-            return array_merge([$this->getKeyName() => $this->getKeyType()], $this->casts);
+            return $this->mergedCastsCache ??= array_merge(
+                [$this->getKeyName() => $this->getKeyType()], $this->casts
+            );
         }
 
         return $this->casts;

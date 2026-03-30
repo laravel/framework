@@ -3124,6 +3124,29 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertArrayHasKey('foo', $model->getCasts());
     }
 
+    public function testGetCastsCachesResult()
+    {
+        $model = new EloquentModelStub;
+
+        $casts1 = $model->getCasts();
+        $casts2 = $model->getCasts();
+
+        $this->assertSame($casts1, $casts2);
+    }
+
+    public function testGetCastsCacheIsInvalidatedByMergeCasts()
+    {
+        $model = new EloquentModelStub;
+
+        $castsBefore = $model->getCasts();
+        $this->assertArrayNotHasKey('new_field', $castsBefore);
+
+        $model->mergeCasts(['new_field' => 'integer']);
+
+        $castsAfter = $model->getCasts();
+        $this->assertArrayHasKey('new_field', $castsAfter);
+    }
+
     public function testMergeCastsMergesCastsUsingArrays()
     {
         $model = new EloquentModelCastingStub;
