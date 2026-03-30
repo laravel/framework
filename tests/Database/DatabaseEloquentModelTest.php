@@ -3012,6 +3012,45 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertArrayHasKey('foo', $model->getCasts());
     }
 
+    public function testGetCastsCacheIsInvalidatedBySetKeyName()
+    {
+        $model = new EloquentModelStub;
+
+        $castsBefore = $model->getCasts();
+        $this->assertSame('id', array_key_first($castsBefore));
+
+        $model->setKeyName('uuid');
+
+        $castsAfter = $model->getCasts();
+        $this->assertSame('uuid', array_key_first($castsAfter));
+    }
+
+    public function testGetCastsCacheIsInvalidatedBySetKeyType()
+    {
+        $model = new EloquentModelStub;
+
+        $castsBefore = $model->getCasts();
+        $this->assertSame('int', $castsBefore[$model->getKeyName()]);
+
+        $model->setKeyType('string');
+
+        $castsAfter = $model->getCasts();
+        $this->assertSame('string', $castsAfter[$model->getKeyName()]);
+    }
+
+    public function testGetCastsCacheIsInvalidatedBySetIncrementing()
+    {
+        $model = new EloquentModelStub;
+
+        $castsWithKey = $model->getCasts();
+        $this->assertArrayHasKey('id', $castsWithKey);
+
+        $model->setIncrementing(false);
+
+        $castsWithoutKey = $model->getCasts();
+        $this->assertArrayNotHasKey('id', $castsWithoutKey);
+    }
+
     public function testMergeCastsMergesCastsUsingArrays()
     {
         $model = new EloquentModelCastingStub;
