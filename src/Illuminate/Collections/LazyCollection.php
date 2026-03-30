@@ -60,6 +60,17 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Create a new instance of the collection.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>|(Closure(): \Generator<TKey, TValue, mixed, void>)|self<TKey, TValue>|array<TKey, TValue>|null  $items
+     * @return static
+     */
+    protected function newInstance($items = [])
+    {
+        return new static($items);
+    }
+
+    /**
      * Create a new collection instance if the value isn't one already.
      *
      * @template TMakeKey of array-key
@@ -68,9 +79,9 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * @param  \Illuminate\Contracts\Support\Arrayable<TMakeKey, TMakeValue>|iterable<TMakeKey, TMakeValue>|(Closure(): \Generator<TMakeKey, TMakeValue, mixed, void>)|self<TMakeKey, TMakeValue>|array<TMakeKey, TMakeValue>|null  $items
      * @return static<TMakeKey, TMakeValue>
      */
-    public static function make($items = [])
+    public static function make($items = [], ...$args)
     {
-        return new static($items);
+        return new static($items, ...$args);
     }
 
     /**
@@ -83,7 +94,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      *
      * @throws \InvalidArgumentException
      */
-    public static function range($from, $to, $step = 1)
+    public static function range($from, $to, $step = 1, ...$args)
     {
         if ($step == 0) {
             throw new InvalidArgumentException('Step value cannot be zero.');

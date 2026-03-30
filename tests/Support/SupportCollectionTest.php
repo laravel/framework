@@ -6052,6 +6052,153 @@ class SupportCollectionTest extends TestCase
         $this->assertNull($collection->percentage(fn ($value) => $value === 1));
     }
 
+    public function testNewInstanceIsUsedByCollectionMethods()
+    {
+        $collection = new TestCollectionWithExtraState([1, 2, 3, 4, 5], 'my-tag');
+
+        // filter
+        $filtered = $collection->filter(fn ($v) => $v > 3);
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $filtered);
+        $this->assertSame('my-tag', $filtered->tag);
+        $this->assertSame([3 => 4, 4 => 5], $filtered->all());
+
+        // filter returning empty
+        $empty = $collection->filter(fn ($v) => $v > 100);
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $empty);
+        $this->assertSame('my-tag', $empty->tag);
+        $this->assertEmpty($empty->all());
+
+        // reject
+        $rejected = $collection->reject(fn ($v) => $v <= 2);
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $rejected);
+        $this->assertSame('my-tag', $rejected->tag);
+
+        // map
+        $mapped = $collection->map(fn ($v) => $v * 2);
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $mapped);
+        $this->assertSame('my-tag', $mapped->tag);
+        $this->assertSame([2, 4, 6, 8, 10], $mapped->all());
+
+        // values
+        $values = $filtered->values();
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $values);
+        $this->assertSame('my-tag', $values->tag);
+
+        // unique
+        $duped = new TestCollectionWithExtraState([1, 1, 2, 2, 3], 'u-tag');
+        $unique = $duped->unique();
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $unique);
+        $this->assertSame('u-tag', $unique->tag);
+
+        // keys
+        $keys = $collection->keys();
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $keys);
+        $this->assertSame('my-tag', $keys->tag);
+
+        // sort
+        $sorted = $collection->sort();
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $sorted);
+        $this->assertSame('my-tag', $sorted->tag);
+
+        // slice
+        $sliced = $collection->slice(1, 2);
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $sliced);
+        $this->assertSame('my-tag', $sliced->tag);
+
+        // chunk
+        $chunks = $collection->chunk(2);
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $chunks);
+        $this->assertSame('my-tag', $chunks->tag);
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $chunks->first());
+        $this->assertSame('my-tag', $chunks->first()->tag);
+
+        // merge
+        $merged = $collection->merge([6, 7]);
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $merged);
+        $this->assertSame('my-tag', $merged->tag);
+
+        // diff
+        $diff = $collection->diff([1, 2]);
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $diff);
+        $this->assertSame('my-tag', $diff->tag);
+
+        // partition
+        [$pass, $fail] = $collection->partition(fn ($v) => $v > 3);
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $pass);
+        $this->assertSame('my-tag', $pass->tag);
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $fail);
+        $this->assertSame('my-tag', $fail->tag);
+
+        // pluck (with associative data)
+        $assoc = new TestCollectionWithExtraState([
+            ['name' => 'Taylor'], ['name' => 'Nuno'],
+        ], 'p-tag');
+        $plucked = $assoc->pluck('name');
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $plucked);
+        $this->assertSame('p-tag', $plucked->tag);
+
+        // reverse
+        $reversed = $collection->reverse();
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $reversed);
+        $this->assertSame('my-tag', $reversed->tag);
+
+        // flatten
+        $nested = new TestCollectionWithExtraState([[1, 2], [3, 4]], 'f-tag');
+        $flat = $nested->flatten();
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $flat);
+        $this->assertSame('f-tag', $flat->tag);
+
+        // pad
+        $padded = $collection->pad(7, 0);
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $padded);
+        $this->assertSame('my-tag', $padded->tag);
+    }
+
+    public function testStaticFactoryMethodsForwardExtraArguments()
+    {
+        // make
+        $made = TestCollectionWithExtraState::make([1, 2, 3], 'make-tag');
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $made);
+        $this->assertSame('make-tag', $made->tag);
+        $this->assertSame([1, 2, 3], $made->all());
+
+        // wrap
+        $wrapped = TestCollectionWithExtraState::wrap([4, 5], 'wrap-tag');
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $wrapped);
+        $this->assertSame('wrap-tag', $wrapped->tag);
+        $this->assertSame([4, 5], $wrapped->all());
+
+        // empty
+        $empty = TestCollectionWithExtraState::empty('empty-tag');
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $empty);
+        $this->assertSame('empty-tag', $empty->tag);
+        $this->assertEmpty($empty->all());
+
+        // range
+        $range = TestCollectionWithExtraState::range(1, 3, 1, 'range-tag');
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $range);
+        $this->assertSame('range-tag', $range->tag);
+        $this->assertSame([1, 2, 3], $range->all());
+
+        // times
+        $times = TestCollectionWithExtraState::times(3, fn ($i) => $i * 10, 'times-tag');
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $times);
+        $this->assertSame('times-tag', $times->tag);
+        $this->assertSame([10, 20, 30], $times->all());
+
+        // times with zero
+        $timesZero = TestCollectionWithExtraState::times(0, null, 'zero-tag');
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $timesZero);
+        $this->assertSame('zero-tag', $timesZero->tag);
+        $this->assertEmpty($timesZero->all());
+
+        // fromJson
+        $json = TestCollectionWithExtraState::fromJson('["a","b"]', 512, 0, 'json-tag');
+        $this->assertInstanceOf(TestCollectionWithExtraState::class, $json);
+        $this->assertSame('json-tag', $json->tag);
+        $this->assertSame(['a', 'b'], $json->all());
+    }
+
     /**
      * Provides each collection class, respectively.
      *
@@ -6199,6 +6346,22 @@ class TestCollectionMapIntoObject
 class TestCollectionSubclass extends Collection
 {
     //
+}
+
+class TestCollectionWithExtraState extends Collection
+{
+    public string $tag;
+
+    public function __construct($items = [], string $tag = '')
+    {
+        parent::__construct($items);
+        $this->tag = $tag;
+    }
+
+    protected function newInstance($items = []): static
+    {
+        return new static($items, $this->tag);
+    }
 }
 
 enum StaffEnum
