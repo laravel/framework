@@ -196,6 +196,27 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $this->assertArrayHasKey('payload', $record);
         $this->assertArrayHasKey('payload', array_slice($record, -1, 1, true));
     }
+
+    public function testGetLockForPoppingIsCached()
+    {
+        $database = m::mock(Connection::class);
+        $queue = new DatabaseQueue($database, 'table', 'default');
+
+        $pdo = m::mock(\PDO::class);
+        $pdo->shouldReceive('getAttribute')->with(\PDO::ATTR_DRIVER_NAME)->once()->andReturn('mysql');
+        $pdo->shouldReceive('getAttribute')->with(\PDO::ATTR_SERVER_VERSION)->once()->andReturn('8.0.36');
+
+        $database->shouldReceive('getPdo')->andReturn($pdo);
+        $database->shouldReceive('getConfig')->with('version')->andReturn(null);
+
+        $method = new \ReflectionMethod($queue, 'getLockForPopping');
+
+        $result1 = $method->invoke($queue);
+        $result2 = $method->invoke($queue);
+
+        $this->assertSame('FOR UPDATE SKIP LOCKED', $result1);
+        $this->assertSame($result1, $result2);
+    }
 }
 
 class MyTestJob
