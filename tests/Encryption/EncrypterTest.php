@@ -197,6 +197,28 @@ class EncrypterTest extends TestCase
         $e->decrypt($payload);
     }
 
+    public function testExceptionThrownWhenPayloadContainsInvalidBase64Characters()
+    {
+        $this->expectException(DecryptException::class);
+        $this->expectExceptionMessage('The payload is invalid.');
+
+        $e = new Encrypter(str_repeat('a', 16));
+        $e->decrypt('not-valid-base64!@#$%');
+    }
+
+    public function testExceptionThrownWhenIvContainsInvalidBase64()
+    {
+        $this->expectException(DecryptException::class);
+        $this->expectExceptionMessage('The payload is invalid.');
+
+        $e = new Encrypter(str_repeat('a', 16));
+        $payload = $e->encrypt('foo');
+        $decoded = json_decode(base64_decode($payload, true), true);
+        $decoded['iv'] = '!!!invalid-base64!!!';
+        $tampered = base64_encode(json_encode($decoded));
+        $e->decrypt($tampered);
+    }
+
     public function testDecryptionExceptionIsThrownWhenUnexpectedTagIsAdded()
     {
         $this->expectException(DecryptException::class);
