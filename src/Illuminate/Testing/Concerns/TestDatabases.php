@@ -183,10 +183,18 @@ trait TestDatabases
                 preg_replace('/^(.*)(\/[\w-]*)(\??.*)$/', "$1/{$database}$3", $url),
             );
         } else {
+            $previousDatabase = config("database.connections.{$default}.database");
+
             config()->set(
                 "database.connections.{$default}.database",
                 $database,
             );
+
+            foreach (config('database.connections', []) as $name => $connection) {
+                if ($name !== $default && ($connection['database'] ?? null) === $previousDatabase) {
+                    config()->set("database.connections.{$name}.database", $database);
+                }
+            }
         }
     }
 

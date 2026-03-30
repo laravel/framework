@@ -40,9 +40,58 @@ class TestDatabasesTest extends TestCase
             ->with('database.connections.mysql.url', false)
             ->andReturn(false);
 
+        config()->shouldReceive('get')
+            ->once()
+            ->with('database.connections.mysql.database', null)
+            ->andReturn('my_database');
+
         config()->shouldReceive('set')
             ->once()
             ->with('database.connections.mysql.database', 'my_database_test_1');
+
+        config()->shouldReceive('get')
+            ->once()
+            ->with('database.connections', [])
+            ->andReturn(['mysql' => ['driver' => 'mysql', 'database' => 'my_database']]);
+
+        $this->switchToDatabase('my_database_test_1');
+    }
+
+    public function testSwitchToDatabaseAlsoUpdatesSiblingConnectionsSharingTheSameDatabase()
+    {
+        DB::shouldReceive('purge')->once();
+
+        config()->shouldReceive('get')
+            ->once()
+            ->with('database.connections.mysql.url', false)
+            ->andReturn(false);
+
+        config()->shouldReceive('get')
+            ->once()
+            ->with('database.connections.mysql.database', null)
+            ->andReturn('my_database');
+
+        config()->shouldReceive('set')
+            ->once()
+            ->with('database.connections.mysql.database', 'my_database_test_1');
+
+        config()->shouldReceive('get')
+            ->once()
+            ->with('database.connections', [])
+            ->andReturn([
+                'mysql' => ['driver' => 'mysql', 'database' => 'my_database'],
+                'mysql_secondary' => ['driver' => 'mysql', 'database' => 'my_database'],
+                'mysql_tertiary' => ['driver' => 'mysql', 'database' => 'my_database'],
+                'mysql_other' => ['driver' => 'mysql', 'database' => 'other_database'],
+            ]);
+
+        config()->shouldReceive('set')
+            ->once()
+            ->with('database.connections.mysql_secondary.database', 'my_database_test_1');
+
+        config()->shouldReceive('set')
+            ->once()
+            ->with('database.connections.mysql_tertiary.database', 'my_database_test_1');
 
         $this->switchToDatabase('my_database_test_1');
     }
