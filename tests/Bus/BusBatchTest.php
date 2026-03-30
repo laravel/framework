@@ -10,6 +10,7 @@ use Illuminate\Bus\DatabaseBatchRepository;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Events\BatchCanceled;
 use Illuminate\Bus\Events\BatchFinished;
+use Illuminate\Bus\Events\BatchStarted;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
@@ -278,10 +279,84 @@ class BusBatchTest extends TestCase
         $batch = $batch->add([$job]);
 
         $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) use ($batch) {
+            return $event instanceof BatchStarted && $event->batch === $batch;
+        }));
+
+        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) use ($batch) {
             return $event instanceof BatchFinished && $event->batch === $batch;
         }));
 
         $batch->recordSuccessfulJob('test-id');
+    }
+
+    public function test_batch_started_event_is_dispatched()
+    {
+        Container::getInstance()->instance(EventDispatcher::class, $events = m::mock(EventDispatcher::class));
+
+        $queue = m::mock(Factory::class);
+        $batch = $this->createTestBatch($queue);
+
+        $job = new class
+        {
+            use Batchable;
+        };
+
+        $secondJob = new class
+        {
+            use Batchable;
+        };
+
+        $queue->shouldReceive('connection')->once()
+            ->with('test-connection')
+            ->andReturn($connection = m::mock(stdClass::class));
+
+        $connection->shouldReceive('bulk')->once();
+
+        $batch = $batch->add([$job, $secondJob]);
+
+        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) use ($batch) {
+            return $event instanceof BatchStarted && $event->batch === $batch;
+        }));
+
+        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) {
+            return $event instanceof BatchFinished;
+        }));
+
+        $batch->recordSuccessfulJob('test-id-1');
+        $batch->recordSuccessfulJob('test-id-2');
+    }
+
+    public function test_batch_started_event_is_dispatched_when_first_job_fails()
+    {
+        Container::getInstance()->instance(EventDispatcher::class, $events = m::mock(EventDispatcher::class));
+
+        $queue = m::mock(Factory::class);
+        $batch = $this->createTestBatch($queue, $allowFailures = true);
+
+        $job = new class
+        {
+            use Batchable;
+        };
+
+        $secondJob = new class
+        {
+            use Batchable;
+        };
+
+        $queue->shouldReceive('connection')->once()
+            ->with('test-connection')
+            ->andReturn($connection = m::mock(stdClass::class));
+
+        $connection->shouldReceive('bulk')->once();
+
+        $batch = $batch->add([$job, $secondJob]);
+
+        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) use ($batch) {
+            return $event instanceof BatchStarted && $event->batch === $batch;
+        }));
+
+        $batch->recordFailedJob('test-id-1', new RuntimeException('Something went wrong.'));
+        $batch->recordFailedJob('test-id-2', new RuntimeException('Something else went wrong.'));
     }
 
     public function test_failed_jobs_can_be_recorded_while_not_allowing_failures()
