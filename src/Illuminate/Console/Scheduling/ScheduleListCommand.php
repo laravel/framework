@@ -6,6 +6,7 @@ use Closure;
 use Cron\CronExpression;
 use DateTimeZone;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use ReflectionClass;
@@ -49,7 +50,7 @@ class ScheduleListCommand extends Command
      *
      * @throws \Exception
      */
-    public function handle(Schedule $schedule)
+    public function handle(Schedule $schedule, Cache $cache)
     {
         $events = new Collection($schedule->events());
 
@@ -61,6 +62,11 @@ class ScheduleListCommand extends Command
             }
 
             return;
+        }
+
+        if (! $this->option('json') && $cache->get('illuminate:schedule:paused', false)) {
+            $this->components->warn('The scheduler is currently paused.');
+            $this->newLine();
         }
 
         $timezone = new DateTimeZone($this->option('timezone') ?? config('app.timezone'));

@@ -8,6 +8,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ProcessUtils;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -421,6 +422,28 @@ class ScheduleListCommandTest extends TestCase
             ->expectsOutput('  * *   * * * 15s  php artisan five ............ Next Due: 15 seconds from now')
             ->expectsOutput('  0 *   * * * 20s  php artisan six ............. Next Due: 20 seconds from now')
             ->expectsOutput('  * */3 * * * 1s   php artisan six ............... Next Due: 1 second from now');
+    }
+
+    public function testDisplaysPausedWarningWhenSchedulerIsPaused()
+    {
+        $this->schedule->call(fn () => '')->daily();
+
+        Cache::forever('illuminate:schedule:paused', true);
+
+        $this->artisan(ScheduleListCommand::class)
+            ->assertSuccessful()
+            ->expectsOutputToContain('The scheduler is currently paused.');
+
+        Cache::forget('illuminate:schedule:paused');
+    }
+
+    public function testDoesNotDisplayPausedWarningWhenSchedulerIsRunning()
+    {
+        $this->schedule->call(fn () => '')->daily();
+
+        $this->artisan(ScheduleListCommand::class)
+            ->assertSuccessful()
+            ->doesntExpectOutputToContain('paused');
     }
 
     protected function tearDown(): void
