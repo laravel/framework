@@ -270,6 +270,21 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile the conditions of the given query builder into a single string without a leading conjunction.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    public function compileConditions($query)
+    {
+        if (empty($query->wheres)) {
+            return '';
+        }
+
+        return $this->removeLeadingBoolean(implode(' ', $this->compileWheresToArray($query)));
+    }
+
+    /**
      * Format the where clause statements into one string.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

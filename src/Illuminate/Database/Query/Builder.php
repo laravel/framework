@@ -521,6 +521,62 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a sum aggregate select to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \Closure|null  $constraints
+     * @param  string|null  $as
+     * @return $this
+     */
+    public function selectSum($column, ?Closure $constraints = null, ?string $as = null)
+    {
+        $as ??= is_string($column) ? $column.'_sum' : throw new InvalidArgumentException('An alias is required when using an expression column.');
+
+        if (is_null($constraints)) {
+            return $this->selectRaw(
+                'sum('.$this->grammar->wrap($column).') as '.$this->grammar->wrap($as)
+            );
+        }
+
+        return $this->selectConditionalAggregate('sum', $column, $constraints, $as, '0');
+    }
+
+    /**
+     * Add a conditional aggregate select to the query.
+     *
+     * @param  string  $function
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \Closure  $constraints
+     * @param  string  $as
+     * @param  string|null  $else
+     * @return $this
+     */
+    protected function selectConditionalAggregate($function, $column, Closure $constraints, $as, $else = null)
+    {
+        $query = $this->forNestedWhere();
+
+        $constraints($query);
+
+        $conditions = $this->grammar->compileConditions($query);
+
+        $columnSql = $this->grammar->wrap($column);
+
+        if ($conditions === '') {
+            return $this->selectRaw(
+                $function.'('.$columnSql.') as '.$this->grammar->wrap($as)
+            );
+        }
+
+        $elseSql = $else !== null ? ' else '.$else : '';
+
+        $this->addBinding($query->getRawBindings()['where'], 'select');
+
+        return $this->selectRaw(
+            $function.'(case when '.$conditions.' then '.$columnSql.$elseSql.' end) as '.$this->grammar->wrap($as)
+        );
+    }
+
+    /**
      * Force the query to only return distinct results.
      *
      * @return $this

@@ -5892,6 +5892,75 @@ SQL;
         $this->assertSame('select "two", "threee" as "threeee", (select "col" from "tbl") as "four", 1 + 1 from "one"', $builder->toSql());
     }
 
+    public function testSelectSum()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('orders')->selectSum('amount', fn ($q) => $q->where('status', 'paid'), 'paid_total');
+        $this->assertSame('select sum(case when "status" = ? then "amount" else 0 end) as "paid_total" from "orders"', $builder->toSql());
+        $this->assertEquals(['paid'], $builder->getBindings());
+    }
+
+    public function testSelectSumWithoutConstraints()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('orders')->selectSum('amount');
+        $this->assertSame('select sum("amount") as "amount_sum" from "orders"', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+    }
+
+    public function testSelectSumWithoutConstraintsWithCustomAlias()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('orders')->selectSum('amount', as: 'total');
+        $this->assertSame('select sum("amount") as "total" from "orders"', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+    }
+
+    public function testSelectSumWithAutoAlias()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('orders')->selectSum('amount', fn ($q) => $q->where('status', 'paid'));
+        $this->assertSame('select sum(case when "status" = ? then "amount" else 0 end) as "amount_sum" from "orders"', $builder->toSql());
+        $this->assertEquals(['paid'], $builder->getBindings());
+    }
+
+    public function testSelectSumWithEmptyConstraints()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('orders')->selectSum('amount', fn ($q) => $q, 'total');
+        $this->assertSame('select sum("amount") as "total" from "orders"', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+    }
+
+    public function testSelectSumWithMultipleConstraints()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('orders')
+            ->selectSum('amount', fn ($q) => $q->where('status', 'paid')->where('refunded', false), 'net_total');
+        $this->assertSame('select sum(case when "status" = ? and "refunded" = ? then "amount" else 0 end) as "net_total" from "orders"', $builder->toSql());
+        $this->assertEquals(['paid', false], $builder->getBindings());
+    }
+
+    public function testSelectSumWithExistingWhereClause()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('orders')
+            ->selectSum('amount', fn ($q) => $q->where('status', 'paid'), 'paid_total')
+            ->where('shop_id', 5);
+        $this->assertSame('select sum(case when "status" = ? then "amount" else 0 end) as "paid_total" from "orders" where "shop_id" = ?', $builder->toSql());
+        $this->assertEquals(['paid', 5], $builder->getBindings());
+    }
+
+    public function testSelectSumBindingsAreInCorrectOrder()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('orders')
+            ->where('shop_id', 5)
+            ->selectSum('amount', fn ($q) => $q->where('status', 'paid'), 'paid_total');
+        $this->assertSame('select sum(case when "status" = ? then "amount" else 0 end) as "paid_total" from "orders" where "shop_id" = ?', $builder->toSql());
+        $this->assertEquals(['paid', 5], $builder->getBindings());
+    }
+
     public function testSqlServerWhereDate()
     {
         $builder = $this->getSqlServerBuilder();
