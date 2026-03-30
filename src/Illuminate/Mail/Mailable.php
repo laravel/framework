@@ -1550,6 +1550,28 @@ class Mailable implements MailableContract, Renderable
      * @param  array  $options
      * @return $this
      */
+    public function assertHasNoAttachments()
+    {
+        $this->renderForAssertions();
+
+        PHPUnit::assertEmpty(
+            $this->attachments,
+            'Expected no attachments, but found ['.count($this->attachments).'] file attachment(s).'
+        );
+
+        PHPUnit::assertEmpty(
+            $this->rawAttachments,
+            'Expected no attachments, but found ['.count($this->rawAttachments).'] raw data attachment(s).'
+        );
+
+        PHPUnit::assertEmpty(
+            $this->diskAttachments,
+            'Expected no attachments, but found ['.count($this->diskAttachments).'] storage attachment(s).'
+        );
+
+        return $this;
+    }
+
     public function assertHasAttachment($file, array $options = [])
     {
         $this->renderForAssertions();
