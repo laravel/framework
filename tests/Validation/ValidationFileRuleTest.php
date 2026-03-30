@@ -497,6 +497,26 @@ class ValidationFileRuleTest extends TestCase
         (new ValidationServiceProvider($container))->register();
     }
 
+    public function testMimetypesInstanceMethodPreservesChain()
+    {
+        // Before the fix, File::image()->max(1)->types(['txt']) would silently
+        // drop the max(1) constraint because types() created a new instance.
+        // The new mimetypes() instance method preserves the chain.
+        $this->fails(
+            (new File)->max(1)->mimetypes(['text/plain']),
+            UploadedFile::fake()->create('foo.txt', 100),
+            ['validation.max.file'],
+        );
+    }
+
+    public function testStaticTypesStillWorksAsFactory()
+    {
+        $this->passes(
+            File::types('text/plain'),
+            UploadedFile::fake()->create('foo.txt'),
+        );
+    }
+
     protected function tearDown(): void
     {
         Container::setInstance(null);

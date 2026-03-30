@@ -142,7 +142,20 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public static function types($mimetypes)
     {
-        return tap(new static(), fn ($file) => $file->allowedMimetypes = (array) $mimetypes);
+        return (new static())->mimetypes($mimetypes);
+    }
+
+    /**
+     * Set the allowed MIME types or file extensions on an existing instance.
+     *
+     * @param  string|array<int, string>  $mimetypes
+     * @return $this
+     */
+    public function mimetypes($mimetypes)
+    {
+        $this->allowedMimetypes = (array) $mimetypes;
+
+        return $this;
     }
 
     /**
