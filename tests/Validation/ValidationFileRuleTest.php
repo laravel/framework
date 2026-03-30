@@ -503,7 +503,7 @@ class ValidationFileRuleTest extends TestCase
         // drop the max(1) constraint because types() created a new instance.
         // The new mimetypes() instance method preserves the chain.
         $this->fails(
-            (new File)->max(1)->mimetypes(['text/plain']),
+            (new File)->max(1)->mimeTypes(['text/plain']),
             UploadedFile::fake()->create('foo.txt', 100),
             ['validation.max.file'],
         );
