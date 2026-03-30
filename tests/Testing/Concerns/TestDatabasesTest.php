@@ -57,7 +57,7 @@ class TestDatabasesTest extends TestCase
         $this->switchToDatabase('my_database_test_1');
     }
 
-    public function testSwitchToDatabaseAlsoUpdatesSiblingConnectionsSharingTheSameDatabase()
+    public function testSwitchToDatabaseUpdatesConnectionsWithSameDatabase()
     {
         DB::shouldReceive('purge')->once();
 
