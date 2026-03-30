@@ -2382,6 +2382,24 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testRetryWhenCallbackWithTypedExceptionDoesNotReceiveNull()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->sequence()
+                ->push('', 302)
+                ->push('', 200),
+        ]);
+
+        // Before the fix, this would throw TypeError because toException()
+        // returns null for 3xx responses and the callback type-hints Exception.
+        $response = $this->factory
+            ->retry(2, 0, fn (\Exception $exception) => true, false)
+            ->get('http://foo.com/get');
+
+        // 302 response should be returned without TypeError
+        $this->assertSame(302, $response->status());
+    }
+
     public function testExceptionThrownInRetryCallbackWithoutRetrying()
     {
         $this->factory->fake([
