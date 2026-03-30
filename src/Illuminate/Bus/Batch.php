@@ -6,6 +6,7 @@ use Carbon\CarbonImmutable;
 use Closure;
 use Illuminate\Bus\Events\BatchCanceled;
 use Illuminate\Bus\Events\BatchFinished;
+use Illuminate\Bus\Events\BatchStarted;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Factory as QueueFactory;
@@ -237,6 +238,14 @@ class Batch implements Arrayable, JsonSerializable
     {
         $counts = $this->decrementPendingJobs($jobId);
 
+        if ($this->totalJobs - $counts->pendingJobs + $counts->failedJobs === 1) {
+            $container = Container::getInstance();
+
+            if ($container->bound(Dispatcher::class)) {
+                $container->make(Dispatcher::class)->dispatch(new BatchStarted($this));
+            }
+        }
+
         if ($this->hasProgressCallbacks()) {
             $this->invokeCallbacks('progress');
         }
@@ -341,6 +350,14 @@ class Batch implements Arrayable, JsonSerializable
     public function recordFailedJob(string $jobId, $e)
     {
         $counts = $this->incrementFailedJobs($jobId);
+
+        if ($this->totalJobs - $counts->pendingJobs + $counts->failedJobs === 1) {
+            $container = Container::getInstance();
+
+            if ($container->bound(Dispatcher::class)) {
+                $container->make(Dispatcher::class)->dispatch(new BatchStarted($this));
+            }
+        }
 
         if ($counts->failedJobs === 1 && ! $this->allowsFailures()) {
             $this->cancel($e);
