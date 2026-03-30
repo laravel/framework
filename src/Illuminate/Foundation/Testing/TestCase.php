@@ -7,6 +7,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\Attributes\WithoutFramework;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use ReflectionMethod;
+use Throwable;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -104,7 +105,11 @@ abstract class TestCase extends BaseTestCase
      */
     protected function withoutBootingFramework(): bool
     {
-        return (new ReflectionMethod(static::class, $this->name()))->getAttributes(WithoutFramework::class) !== [];
+        try {
+            return (new ReflectionMethod(static::class, $this->name()))->getAttributes(WithoutFramework::class) !== [];
+        } catch (Throwable) {
+            return false;
+        }
     }
 
     /**
