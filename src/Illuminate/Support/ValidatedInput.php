@@ -112,6 +112,17 @@ class ValidatedInput implements ValidatedData
     }
 
     /**
+     * Determine if the validated inputs contain a file.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasFile($key)
+    {
+        return $this->file($key) instanceof \Illuminate\Http\UploadedFile;
+    }
+
+    /**
      * Dump the items.
      *
      * @param  mixed  ...$keys

@@ -511,6 +511,20 @@ class ValidatedInputTest extends TestCase
         $this->assertSame('default', $input->file('name', 'default'));
     }
 
+    public function test_has_file_method()
+    {
+        $file = UploadedFile::fake()->create('document.pdf');
+
+        $input = new ValidatedInput([
+            'name' => 'Taylor',
+            'avatar' => $file,
+        ]);
+
+        $this->assertTrue($input->hasFile('avatar'));
+        $this->assertFalse($input->hasFile('name'));
+        $this->assertFalse($input->hasFile('missing'));
+    }
+
     public function test_collect_method()
     {
         $input = new ValidatedInput(['users' => [1, 2, 3]]);
