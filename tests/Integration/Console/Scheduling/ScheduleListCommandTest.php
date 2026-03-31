@@ -106,6 +106,7 @@ class ScheduleListCommandTest extends TestCase
         $this->assertFalse($data[0]['has_mutex']);
         $this->assertIsArray($data[0]['environments']);
         $this->assertEmpty($data[0]['environments']);
+        $this->assertFalse($data[0]['runs_when_paused']);
 
         $this->assertSame('* * * * *', $data[2]['expression']);
         $this->assertSame('php artisan foobar a='.ProcessUtils::escapeArgument('b'), $data[2]['command']);

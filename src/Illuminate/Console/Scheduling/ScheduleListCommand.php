@@ -105,6 +105,7 @@ class ScheduleListCommand extends Command
                 'timezone' => $timezone->getName(),
                 'has_mutex' => $event->mutex->exists($event),
                 'repeat_seconds' => $event->isRepeatable() ? $event->repeatSeconds : null,
+                'runs_when_paused' => $event->runsWhenPaused(),
                 'environments' => $event->environments,
             ]);
         })->values()->toJson());
