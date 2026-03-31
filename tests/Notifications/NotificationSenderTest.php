@@ -13,6 +13,7 @@ use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\NotificationSender;
+use Illuminate\Queue\Attributes\Queue;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
@@ -257,6 +258,41 @@ class NotificationSenderTest extends TestCase
         $sender = new NotificationSender($manager, $bus, $events);
 
         $sender->sendNow($notifiable, new DummyNotificationWithViaMutation);
+    }
+
+    public function testOnQueueOverridesQueueAttribute()
+    {
+        $notifiable = m::mock(Notifiable::class);
+        $manager = m::mock(ChannelManager::class);
+        $manager->shouldReceive('getContainer')->andReturn(app());
+        $manager->shouldReceive('resolveQueueFromQueueRoute')->andReturn(null);
+        $manager->shouldReceive('resolveConnectionFromQueueRoute')->andReturn(null);
+        $bus = m::mock(BusDispatcher::class);
+        $bus->shouldReceive('dispatch')->once()->withArgs(function ($job) {
+            return $job->queue === 'override-queue';
+        });
+        $events = m::mock(EventDispatcher::class);
+        $events->shouldReceive('until')->andReturn(true);
+        $events->shouldReceive('dispatch');
+        $events->shouldReceive('listen');
+
+        $sender = new NotificationSender($manager, $bus, $events);
+
+        $notification = new DummyQueuedNotificationWithQueueAttribute;
+        $notification->onQueue('override-queue');
+
+        $sender->send($notifiable, $notification);
+    }
+}
+
+#[Queue('default-queue')]
+class DummyQueuedNotificationWithQueueAttribute extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    public function via($notifiable)
+    {
+        return ['mail'];
     }
 }
 
