@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Collection;
 use Rector\CodingStyle\Rector\ArrowFunction\ArrowFunctionDelegatingCallToFirstClassCallableRector;
 use Rector\CodingStyle\Rector\Closure\ClosureDelegatingCallToFirstClassCallableRector;
 use Rector\CodingStyle\Rector\FuncCall\ClosureFromCallableToFirstClassCallableRector;
@@ -35,6 +36,7 @@ use Rector\Php82\Rector\Class_\ReadOnlyClassRector;
 use Rector\Php83\Rector\ClassConst\AddTypeToConstRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use Rector\Php83\Rector\FuncCall\DynamicClassConstFetchRector;
+use Rector\Transform\Rector\FuncCall\FuncCallToNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnNeverTypeRector;
 
 return RectorConfig::configure()
@@ -44,6 +46,9 @@ return RectorConfig::configure()
         __DIR__.'/src',
         __DIR__.'/tests',
         __DIR__.'/types',
+    ])
+    ->withConfiguredRule(FuncCallToNewRector::class, [
+        'collect' => Collection::class,
     ])
     ->withSkip([
         AddOverrideAttributeToOverriddenMethodsRector::class,
