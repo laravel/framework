@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Support;
 use Illuminate\Tests\Integration\Support\Fixtures\NullableManager;
 use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
+use stdClass;
 
 class ManagerTest extends TestCase
 {
@@ -20,5 +21,14 @@ class ManagerTest extends TestCase
         $manager = new NullableManager($this->app);
         $manager->extend(__CLASS__, fn () => $this);
         $this->assertSame($manager, $manager->driver(__CLASS__));
+    }
+
+    public function testCustomDriverStaticClosure()
+    {
+        $manager = new NullableManager($this->app);
+        $driver = new stdClass;
+
+        $manager->extend(__CLASS__, static fn () => $driver);
+        $this->assertSame($driver, $manager->driver(__CLASS__));
     }
 }
