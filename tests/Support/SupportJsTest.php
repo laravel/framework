@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Js;
 use Illuminate\Tests\Support\Fixtures\IntBackedEnum;
 use Illuminate\Tests\Support\Fixtures\StringBackedEnum;
@@ -20,7 +21,7 @@ class SupportJsTest extends TestCase
         $this->assertSame('1', (string) Js::from(1));
         $this->assertSame('1.1', (string) Js::from(1.1));
         $this->assertSame('[]', (string) Js::from([]));
-        $this->assertSame('[]', (string) Js::from(collect()));
+        $this->assertSame('[]', (string) Js::from(new Collection));
         $this->assertSame('null', (string) Js::from(null));
         $this->assertSame("'Hello world'", (string) Js::from('Hello world'));
         $this->assertSame("'Hèlló world'", (string) Js::from('Hèlló world'));

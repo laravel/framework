@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\Attributes\RequiresDatabase;
@@ -94,7 +95,7 @@ class QueryBuilderUpdateTest extends DatabaseTestCase
     public static function jsonValuesDataProvider()
     {
         yield ['payload', ['Laravel', 'Founder'], ['Laravel', 'Founder']];
-        yield ['payload', collect(['Laravel', 'Founder']), ['Laravel', 'Founder']];
+        yield ['payload', new Collection(['Laravel', 'Founder']), ['Laravel', 'Founder']];
         yield ['status', StringStatus::draft, 'draft'];
     }
 }

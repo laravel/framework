@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 
@@ -94,9 +95,9 @@ class SupportPluralizerTest extends TestCase
 
     public function testPluralSupportsCollections()
     {
-        $this->assertSame('users', Str::plural('user', collect()));
-        $this->assertSame('user', Str::plural('user', collect(['one'])));
-        $this->assertSame('users', Str::plural('user', collect(['one', 'two'])));
+        $this->assertSame('users', Str::plural('user', new Collection));
+        $this->assertSame('user', Str::plural('user', new Collection(['one'])));
+        $this->assertSame('users', Str::plural('user', new Collection(['one', 'two'])));
     }
 
     public function testPluralStudlySupportsArrays()
@@ -108,9 +109,9 @@ class SupportPluralizerTest extends TestCase
 
     public function testPluralStudlySupportsCollections()
     {
-        $this->assertPluralStudly('SomeUsers', 'SomeUser', collect());
-        $this->assertPluralStudly('SomeUser', 'SomeUser', collect(['one']));
-        $this->assertPluralStudly('SomeUsers', 'SomeUser', collect(['one', 'two']));
+        $this->assertPluralStudly('SomeUsers', 'SomeUser', new Collection);
+        $this->assertPluralStudly('SomeUser', 'SomeUser', new Collection(['one']));
+        $this->assertPluralStudly('SomeUsers', 'SomeUser', new Collection(['one', 'two']));
     }
 
     private function assertPluralStudly($expected, $value, $count = 2)

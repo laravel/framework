@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -43,6 +44,6 @@ class SupportEnumValueFunctionTest extends TestCase
         yield [true, true];
         yield [1337, 1337];
         yield [1.0, 1.0];
-        yield [$collect = collect(), $collect];
+        yield [$collect = new Collection, $collect];
     }
 }

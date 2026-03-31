@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Illuminate\Support\Collection;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rule;
@@ -29,7 +30,7 @@ class ValidationArrayRuleTest extends TestCase
 
         $this->assertSame('array:key_1,key_2,key_3', (string) $rule);
 
-        $rule = Rule::array(collect(['key_1', 'key_2', 'key_3']));
+        $rule = Rule::array(new Collection(['key_1', 'key_2', 'key_3']));
 
         $this->assertSame('array:key_1,key_2,key_3', (string) $rule);
 

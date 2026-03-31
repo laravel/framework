@@ -10,6 +10,7 @@ use Error;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Sleep;
@@ -465,7 +466,7 @@ class SupportHelpersTest extends TestCase
         $data = ['foo' => 'bar'];
         $this->assertEquals(['bar'], data_get($data, '*'));
 
-        $data = collect(['foo' => 'bar']);
+        $data = new Collection(['foo' => 'bar']);
         $this->assertEquals(['bar'], data_get($data, '*'));
     }
 

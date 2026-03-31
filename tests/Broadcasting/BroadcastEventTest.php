@@ -7,6 +7,7 @@ use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Broadcasting\InteractsWithBroadcasting;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
+use Illuminate\Support\Collection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Throwable;
@@ -127,7 +128,7 @@ class TestBroadcastEvent
 
     public function __construct()
     {
-        $this->collection = collect(['foo' => 'bar']);
+        $this->collection = new Collection(['foo' => 'bar']);
     }
 
     public function broadcastOn()

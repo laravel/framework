@@ -14,14 +14,14 @@ class Users implements Arrayable
     }
 }
 
-$collection = collect([new User]);
+$collection = new Collection([new User]);
 $arrayable = new Users;
 /** @var iterable<int, int> $iterable */
 $iterable = [1];
 /** @var Traversable<int, string> $traversable */
 $traversable = new ArrayIterator(['string']);
 
-$associativeCollection = collect(['John' => new User]);
+$associativeCollection = new Collection(['John' => new User]);
 
 class Invokable
 {
@@ -34,13 +34,13 @@ $invokable = new Invokable;
 
 assertType('Illuminate\Support\Collection<int, User>', $collection);
 
-assertType('Illuminate\Support\Collection<int, string>', collect(['string']));
-assertType('Illuminate\Support\Collection<string, User>', collect(['string' => new User]));
-assertType('Illuminate\Support\Collection<int, User>', collect($arrayable));
-assertType('Illuminate\Support\Collection<int, User>', collect($collection));
-assertType('Illuminate\Support\Collection<int, User>', collect($collection));
-assertType('Illuminate\Support\Collection<int, int>', collect($iterable));
-assertType('Illuminate\Support\Collection<int, string>', collect($traversable));
+assertType("Illuminate\Support\Collection<int, 'string'>", new Collection(['string']));
+assertType('Illuminate\Support\Collection<string, User>', new Collection(['string' => new User]));
+assertType('Illuminate\Support\Collection<int, User>', new Collection($arrayable));
+assertType('Illuminate\Support\Collection<int, User>', new Collection($collection));
+assertType('Illuminate\Support\Collection<int, User>', new Collection($collection));
+assertType('Illuminate\Support\Collection<int, int>', new Collection($iterable));
+assertType('Illuminate\Support\Collection<int, string>', new Collection($traversable));
 
 assertType('Illuminate\Support\Collection<int, string>', $collection::make(['string']));
 assertType('Illuminate\Support\Collection<string, User>', $collection::make(['string' => new User]));
@@ -916,10 +916,10 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->tap(function
     assertType('Illuminate\Support\Collection<int, User>', $collection);
 }));
 
-assertType('Illuminate\Support\Collection<int, int>', $collection->pipe(function ($collection) {
+assertType('Illuminate\Support\Collection<int, 1>', $collection->pipe(function ($collection) {
     assertType('Illuminate\Support\Collection<int, User>', $collection);
 
-    return collect([1]);
+    return new Collection([1]);
 }));
 assertType('1', $collection->make([1])->pipe(function ($collection) {
     assertType('Illuminate\Support\Collection<int, int>', $collection);
@@ -1107,8 +1107,8 @@ $collection->offsetUnset(0);
 unset($collection[0]);
 
 assertType('array<int, mixed>', $collection->toArray());
-assertType('array<string, mixed>', collect(['string' => 'string'])->toArray());
-assertType('array<int, mixed>', collect([1, 2])->toArray());
+assertType('array<string, mixed>', new Collection(['string' => 'string'])->toArray());
+assertType('array<int, mixed>', new Collection([1, 2])->toArray());
 
 assertType('ArrayIterator<int, User>', $collection->getIterator());
 foreach ($collection as $int => $user) {
@@ -1138,7 +1138,7 @@ class Zoo
 
     public function __construct()
     {
-        $this->animals = collect([
+        $this->animals = new Collection([
             new Tiger,
             new Lion,
             new Zebra,
