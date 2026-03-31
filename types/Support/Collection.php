@@ -1107,8 +1107,8 @@ $collection->offsetUnset(0);
 unset($collection[0]);
 
 assertType('array<int, mixed>', $collection->toArray());
-assertType('array<string, mixed>', new Collection(['string' => 'string'])->toArray());
-assertType('array<int, mixed>', new Collection([1, 2])->toArray());
+assertType('array<string, mixed>', (new Collection(['string' => 'string']))->toArray());
+assertType('array<int, mixed>', (new Collection([1, 2]))->toArray());
 
 assertType('ArrayIterator<int, User>', $collection->getIterator());
 foreach ($collection as $int => $user) {
