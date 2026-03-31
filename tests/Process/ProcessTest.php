@@ -1097,6 +1097,35 @@ class ProcessTest extends TestCase
         }, 2);
     }
 
+    public function testJsonMethodParsesOutput()
+    {
+        $factory = new Factory;
+
+        $factory->fake(['echo *' => $factory->result('{"name":"Taylor","age":38}')]);
+
+        $result = $factory->run('echo test');
+
+        $this->assertEquals(['name' => 'Taylor', 'age' => 38], $result->json());
+        $this->assertEquals('Taylor', $result->json('name'));
+        $this->assertEquals(38, $result->json('age'));
+        $this->assertNull($result->json('missing'));
+        $this->assertEquals('default', $result->json('missing', 'default'));
+    }
+
+    public function testCollectMethodReturnsCollection()
+    {
+        $factory = new Factory;
+
+        $factory->fake(['echo *' => $factory->result('[1,2,3]')]);
+
+        $result = $factory->run('echo test');
+
+        $collection = $result->collect();
+
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection);
+        $this->assertEquals([1, 2, 3], $collection->all());
+    }
+
     protected function ls()
     {
         return windows_os() ? 'dir' : 'ls';

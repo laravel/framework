@@ -76,6 +76,31 @@ class ProcessResult implements ProcessResultContract
     }
 
     /**
+     * Get the JSON decoded output of the process.
+     *
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function json($key = null, $default = null)
+    {
+        $data = json_decode(trim($this->output()), true);
+
+        return data_get($data, $key, $default);
+    }
+
+    /**
+     * Get the output as a collection.
+     *
+     * @param  string|null  $key
+     * @return \Illuminate\Support\Collection
+     */
+    public function collect($key = null)
+    {
+        return new \Illuminate\Support\Collection($this->json($key));
+    }
+
+    /**
      * Determine if the output contains the given string.
      *
      * @param  string  $output
