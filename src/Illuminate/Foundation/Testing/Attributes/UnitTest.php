@@ -7,7 +7,7 @@ use Attribute;
 /**
  * Run a test without configuring the Laravel framework.
  */
-#[Attribute(Attribute::TARGET_METHOD)]
+#[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
 class UnitTest
 {
 }

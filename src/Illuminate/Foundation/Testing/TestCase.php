@@ -6,6 +6,7 @@ use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\Attributes\UnitTest;
 use PHPUnit\Framework\TestCase as BaseTestCase;
+use ReflectionClass;
 use ReflectionMethod;
 use Throwable;
 
@@ -106,7 +107,8 @@ abstract class TestCase extends BaseTestCase
     protected function withoutBootingFramework(): bool
     {
         try {
-            return (new ReflectionMethod(static::class, $this->name()))->getAttributes(UnitTest::class) !== [];
+            return (new ReflectionClass(static::class))->getAttributes(UnitTest::class) !== []
+                || (new ReflectionMethod(static::class, $this->name()))->getAttributes(UnitTest::class) !== [];
         } catch (Throwable) {
             return false;
         }
