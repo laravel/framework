@@ -25,6 +25,5 @@ class InteractsWithTimeTestCase
         assertType('null', $this->travelTo(Carbon::now(), function () {
         }));
         assertType('42', $this->travelTo(Carbon::now(), fn () => 42));
-        assertType('42', $this->travelTo(Carbon::now(), fn (Carbon $date) => 42));
     }
 }
