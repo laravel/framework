@@ -18,7 +18,7 @@ trait ReadsClassAttributes
      */
     protected function getAttributeValue($target, string $attributeClass, ?string $property = null, $default = null)
     {
-        if ($property !== null && $target->{$property} !== null) {
+        if ($property !== null && isset($target->{$property})) {
             return $target->{$property};
         }
 
