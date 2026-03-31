@@ -738,6 +738,31 @@ class BusBatchTest extends TestCase
     {
         return $this->connection()->getSchemaBuilder();
     }
+
+    public function testBatchToArrayIncludesFailedJobIds()
+    {
+        $queue = m::mock(Factory::class);
+        $repository = m::mock(\Illuminate\Bus\BatchRepository::class);
+
+        $batch = new Batch(
+            $queue,
+            $repository,
+            'test-id',
+            'test-batch',
+            totalJobs: 3,
+            pendingJobs: 0,
+            failedJobs: 2,
+            failedJobIds: ['job-1', 'job-2'],
+            options: [],
+            createdAt: CarbonImmutable::now(),
+        );
+
+        $array = $batch->toArray();
+
+        $this->assertArrayHasKey('failedJobIds', $array);
+        $this->assertSame(['job-1', 'job-2'], $array['failedJobIds']);
+        $this->assertSame(2, $array['failedJobs']);
+    }
 }
 
 class ChainHeadJob implements ShouldQueue
