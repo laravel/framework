@@ -50,11 +50,12 @@ trait InteractsWithTime
 
     /**
      * @template TReturn of mixed
+     * @template TDate of \DateTimeInterface|\Closure|\Illuminate\Support\Carbon|string|bool|null
      *
      * Travel to another time.
      *
-     * @param  \DateTimeInterface|\Closure|\Illuminate\Support\Carbon|string|bool|null  $date
-     * @param  (callable(\DateTimeInterface|\Closure|\Illuminate\Support\Carbon|string|bool|null): TReturn)|null  $callback
+     * @param  TDate  $date
+     * @param  (callable(TDate): TReturn)|null  $callback
      * @return ($callback is null ? void : TReturn)
      */
     public function travelTo($date, $callback = null)
