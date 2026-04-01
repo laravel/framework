@@ -6,6 +6,7 @@ use BadMethodCallException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Foundation\Application;
 use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Queue\Jobs\InspectedJob;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use Mockery as m;
@@ -479,6 +480,20 @@ class SupportTestingQueueFakeTest extends TestCase
         } catch (ExpectationFailedException $e) {
             $this->assertStringContainsString('The job has chained jobs.', $e->getMessage());
         }
+    }
+
+    public function testPendingJobs()
+    {
+        $this->fake->push($this->job, '', 'foo');
+        $this->fake->push(new JobToFakeStub, '', 'bar');
+
+        $pending = $this->fake->pendingJobs('foo');
+
+        $this->assertCount(1, $pending);
+        $this->assertInstanceOf(InspectedJob::class, $pending->first());
+        $this->assertSame(JobStub::class, $pending->first()->name);
+        $this->assertSame('foo', $pending->first()->queue);
+        $this->assertSame(0, $pending->first()->attempts);
     }
 
     public function testGetRawPushes()
