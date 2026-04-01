@@ -178,6 +178,13 @@ class SupportUriTest extends TestCase
         $this->assertEquals('https://laravel.com/docs/11.x/installation?tags[0]=first&tags[1]=second', $uri->decode());
     }
 
+    public function test_decoding_the_entire_uri_preserves_the_fragment()
+    {
+        $uri = Uri::of('https://laravel.com/docs/11.x/routing?q=laravel%20docs#route-model-binding');
+
+        $this->assertEquals('https://laravel.com/docs/11.x/routing?q=laravel docs#route-model-binding', $uri->decode());
+    }
+
     public function test_with_query_if_missing()
     {
         // Test adding new parameters while preserving existing ones
