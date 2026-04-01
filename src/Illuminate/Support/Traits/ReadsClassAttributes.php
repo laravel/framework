@@ -11,8 +11,9 @@ trait ReadsClassAttributes
      * Get a configuration value from an attribute, falling back to a property.
      *
      * @param  object  $target
-     * @param  mixed  $default
-     * @return mixed
+     * @param  class-string  $attributeClass
+     * @param  string|null  $property
+     * @param mixed $default
      */
     protected function getAttributeValue($target, string $attributeClass, ?string $property = null, $default = null)
     {
