@@ -68,9 +68,9 @@ trait InteractsWithContainer
      *
      * @template TInstance of object
      *
-     * @param  class-string<TInstance>  $abstract
+     * @param  string|class-string<TInstance>  $abstract
      * @param  \Closure|null  $mock
-     * @return TInstance&\Mockery\MockInterface
+     * @return ($abstract is class-string<TInstance> ? TInstance&\Mockery\MockInterface : \Mockery\MockInterface)
      */
     protected function mock($abstract, ?Closure $mock = null)
     {
@@ -82,9 +82,9 @@ trait InteractsWithContainer
      *
      * @template TInstance of object
      *
-     * @param  class-string<TInstance>  $abstract
+     * @param  string|class-string<TInstance>  $abstract
      * @param  \Closure|null  $mock
-     * @return TInstance&\Mockery\MockInterface
+     * @return ($abstract is class-string<TInstance> ? TInstance&\Mockery\MockInterface : \Mockery\MockInterface)
      */
     protected function partialMock($abstract, ?Closure $mock = null)
     {
@@ -96,9 +96,9 @@ trait InteractsWithContainer
      *
      * @template TInstance of object
      *
-     * @param  class-string<TInstance>  $abstract
+     * @param  string|class-string<TInstance>  $abstract
      * @param  \Closure|null  $mock
-     * @return TInstance&\Mockery\MockInterface
+     * @return ($abstract is class-string<TInstance> ? TInstance&\Mockery\MockInterface : \Mockery\MockInterface)
      */
     protected function spy($abstract, ?Closure $mock = null)
     {
