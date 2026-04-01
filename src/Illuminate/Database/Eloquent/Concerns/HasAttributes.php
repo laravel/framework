@@ -1722,7 +1722,7 @@ trait HasAttributes
     /**
      * Get the attributes that should be cast.
      *
-     * @return array<string, string>
+     * @return array<string, string|Stringable>
      */
     protected function casts()
     {
