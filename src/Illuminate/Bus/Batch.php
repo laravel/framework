@@ -220,16 +220,6 @@ class Batch implements Arrayable, JsonSerializable
     }
 
     /**
-     * Determine if this is the first job processed in the batch.
-     *
-     * @return bool
-     */
-    protected function isFirstJobProcessed(UpdatedBatchJobCounts $counts): bool
-    {
-        return $this->totalJobs - $counts->pendingJobs + $counts->failedJobs === 1;
-    }
-
-    /**
      * Get the percentage of jobs that have been processed (between 0-100).
      *
      * @return int<0, 100>
@@ -400,6 +390,16 @@ class Batch implements Arrayable, JsonSerializable
     public function incrementFailedJobs(string $jobId)
     {
         return $this->repository->incrementFailedJobs($this->id, $jobId);
+    }
+
+    /**
+     * Determine if this is the first job processed in the batch.
+     *
+     * @return bool
+     */
+    protected function isFirstJobProcessed(UpdatedBatchJobCounts $counts): bool
+    {
+        return $this->totalJobs - $counts->pendingJobs + $counts->failedJobs === 1;
     }
 
     /**
