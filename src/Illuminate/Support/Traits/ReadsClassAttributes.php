@@ -11,8 +11,6 @@ trait ReadsClassAttributes
      * Get a configuration value from an attribute, falling back to a property.
      *
      * @param  object  $target
-     * @param  string  $attributeClass
-     * @param  string|null  $property
      * @param  mixed  $default
      * @return mixed
      */
@@ -26,7 +24,6 @@ trait ReadsClassAttributes
         }
 
         try {
-            $reflection = new ReflectionClass($target);
 
             do {
                 $attributes = $reflection->getAttributes($attributeClass);
