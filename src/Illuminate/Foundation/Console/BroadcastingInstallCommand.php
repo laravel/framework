@@ -407,7 +407,7 @@ class BroadcastingInstallCommand extends Command
 
         if (file_exists(base_path('pnpm-lock.yaml'))) {
             $commands = [
-                'pnpm add --save-dev laravel-echo pusher-js',
+                'pnpm add --save-dev laravel-echo pusher-js --ignore-scripts',
                 'pnpm run build',
             ];
         } elseif (file_exists(base_path('yarn.lock'))) {
@@ -422,7 +422,7 @@ class BroadcastingInstallCommand extends Command
             ];
         } else {
             $commands = [
-                'npm install --save-dev laravel-echo pusher-js',
+                'npm install --save-dev laravel-echo pusher-js --ignore-scripts',
                 'npm run build',
             ];
         }
