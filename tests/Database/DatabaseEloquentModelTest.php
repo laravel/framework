@@ -3788,6 +3788,14 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInstanceOf(CustomEloquentCollection::class, $collection);
     }
 
+    public function testNewCollectionWorksForConcreteModelExtendingAbstractModel()
+    {
+        $model = new EloquentConcreteChildModel;
+        $collection = $model->newCollection([$model]);
+
+        $this->assertInstanceOf(Collection::class, $collection);
+    }
+
     public function testUseFactoryAttribute()
     {
         $model = new EloquentModelWithUseFactoryAttribute;
@@ -4703,6 +4711,14 @@ abstract class EloquentAbstractModel extends EloquentModelWithCollectedByAttribu
 }
 
 class EloquentConcreteChildOfAbstractModel extends EloquentAbstractModel
+{
+}
+
+abstract class EloquentAbstractParentModel extends Model
+{
+}
+
+class EloquentConcreteChildModel extends EloquentAbstractParentModel
 {
 }
 
