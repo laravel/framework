@@ -24,7 +24,6 @@ trait ReadsClassAttributes
         }
 
         try {
-
             do {
                 $attributes = $reflection->getAttributes($attributeClass);
 
