@@ -1,6 +1,51 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.2.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.3.0...13.x)
+
+## [v13.3.0](https://github.com/laravel/framework/compare/v13.2.0...v13.3.0) - 2026-04-01
+
+* [13.x] Forward releaseOnTerminationSignals through schedule groups by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59357
+* [13.x] Fix sub-minute scheduling skips at minute boundaries by [@JoshSalway](https://github.com/JoshSalway) in https://github.com/laravel/framework/pull/59331
+* [13.x] Display memory usage in verbose queue worker output by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59379
+* [13.x] Update WithoutOverlapping@shared() for clarity by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/59375
+* [13.x] Fix dependency injection of faked queueing dispatcher by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/59378
+* [13.x] Fix incrementEach/decrementEach to scope to model instance by [@JoshSalway](https://github.com/JoshSalway) in https://github.com/laravel/framework/pull/59376
+* [13.x] Add array value types to Support module docblocks by [@Anthony14FR](https://github.com/Anthony14FR) in https://github.com/laravel/framework/pull/59383
+* [13.x] Add lost connection to WorkerStopReason by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59370
+* [13.x] MariaDbSchemaState uses mysql --version for client detection instead of mariadb --version by [@kylemilloy](https://github.com/kylemilloy) in https://github.com/laravel/framework/pull/59360
+* [13.x] Add enum support to QueueManager connection methods by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59389
+* [13.x] Setup rector by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/59385
+* [13.x] Improve `Arr::whereNotNull()` docs by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/59411
+* [13.x] Pass request to afterResponse callback by [@bilfeldt](https://github.com/bilfeldt) in https://github.com/laravel/framework/pull/59410
+* [13.x] Add isNotEmpty() method to Uri class by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59408
+* [13.x] Add missing capitalize parameter to Stringable::initials() by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59407
+* [13.x] Fix trait initializer collision with Attribute parsing by [@sadique-cws](https://github.com/sadique-cws) in https://github.com/laravel/framework/pull/59404
+* [13.x] Add session to supported drivers comment by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59399
+* [13.x] Add `->file()` method to `$request->safe()` by [@SanderMuller](https://github.com/SanderMuller) in https://github.com/laravel/framework/pull/59396
+* [13.x] Add enum support to LogManager channel and driver methods by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59391
+* [13.x] Fix MorphTo eager load matching when ownerKey is null and result key is a non-primitive by [@wietsewarendorff](https://github.com/wietsewarendorff) in https://github.com/laravel/framework/pull/59394
+* [13.x] Remove unnecessary clone in SessionManager to prevent duplicate Redis connections by [@JoshSalway](https://github.com/JoshSalway) in https://github.com/laravel/framework/pull/59323
+* [13.x] Use FQCN for Str in exception renderer blade templates by [@bankorh](https://github.com/bankorh) in https://github.com/laravel/framework/pull/59412
+* Allow variadic args for model attributes by [@jasonmccreary](https://github.com/jasonmccreary) in https://github.com/laravel/framework/pull/59421
+* [13.x] CollectedBy Attribute should follow inheritence by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59419
+* [13.x] Fix deprecation notice in JSON:API resources by [@alihamze](https://github.com/alihamze) in https://github.com/laravel/framework/pull/59418
+* [13.x] Add withoutFragment() method to Uri class by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59413
+* [13.x] Fix macros with static closures by [@FeBe95](https://github.com/FeBe95) in https://github.com/laravel/framework/pull/59414
+* [13.x] Fix sum() docblock to include key parameter in callback signature by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59444
+* [13.x] Add assertHasNoAttachments() method to Mailable by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59443
+* [13.x] Add a driver method to the MailFake class by [@kevinb1989](https://github.com/kevinb1989) in https://github.com/laravel/framework/pull/59448
+* [13.x] Cache getLockForPopping() result in DatabaseQueue by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59435
+* [13.x] prefer `new Collection()` over `collect()` helper by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/59453
+* [13.x] remove unnecessary `array_flip()` calls by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/59452
+* Make Collection methods compatible with extended subclass constructors by [@ProjektGopher](https://github.com/ProjektGopher) in https://github.com/laravel/framework/pull/59455
+* [13.x] `UnitTest` test attribute by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/59432
+* [13.x] prefer `isset()` over `in_array()` for better performance by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/59457
+* [13.x] remove temporary variable by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/59456
+* [13.x] Add BatchStarted event  by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59458
+* [13.x] Preserve URI fragment when decoding query string by [@Nipun404](https://github.com/Nipun404) in https://github.com/laravel/framework/pull/59481
+* fix: allow returning Stringable objects in casts()-method by [@Bloemendaal](https://github.com/Bloemendaal) in https://github.com/laravel/framework/pull/59479
+* [13.x] Fix manager breaking when called with static closure by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/59470
+* Prevents installed package from executing malicious code via `postinstall` in `install:broadcasting` command by [@duncanmcclean](https://github.com/duncanmcclean) in https://github.com/laravel/framework/pull/59485
 
 ## [v13.2.0](https://github.com/laravel/framework/compare/v13.1.1...v13.2.0) - 2026-03-24
 
