@@ -260,7 +260,7 @@ class NotificationSenderTest extends TestCase
         $sender->sendNow($notifiable, new DummyNotificationWithViaMutation);
     }
 
-    public function test_on_queue_overrides_queue_attribute()
+    public function test_it_queue_overrides_queue_attribute()
     {
         $notification = new #[Queue('attribute-queue')] class extends Notification implements ShouldQueue
         {
