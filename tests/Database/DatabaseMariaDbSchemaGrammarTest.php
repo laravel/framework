@@ -1374,7 +1374,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame("alter table `users` add `foo` varchar(255) not null comment 'Escape \\' when using words like it\\'s'", $statements[0]);
+        $this->assertSame("alter table `users` add `foo` varchar(255) not null comment 'Escape '' when using words like it''s'", $statements[0]);
     }
 
     public function testCreateDatabase()
