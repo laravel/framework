@@ -6,6 +6,7 @@ use Carbon\CarbonImmutable;
 use Closure;
 use Illuminate\Bus\Events\BatchCanceled;
 use Illuminate\Bus\Events\BatchFinished;
+use Illuminate\Bus\Events\BatchStarted;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Factory as QueueFactory;
@@ -237,6 +238,14 @@ class Batch implements Arrayable, JsonSerializable
     {
         $counts = $this->decrementPendingJobs($jobId);
 
+        if ($this->isFirstJobProcessed($counts)) {
+            $container = Container::getInstance();
+
+            if ($container->bound(Dispatcher::class)) {
+                $container->make(Dispatcher::class)->dispatch(new BatchStarted($this));
+            }
+        }
+
         if ($this->hasProgressCallbacks()) {
             $this->invokeCallbacks('progress');
         }
@@ -342,6 +351,14 @@ class Batch implements Arrayable, JsonSerializable
     {
         $counts = $this->incrementFailedJobs($jobId);
 
+        if ($this->isFirstJobProcessed($counts)) {
+            $container = Container::getInstance();
+
+            if ($container->bound(Dispatcher::class)) {
+                $container->make(Dispatcher::class)->dispatch(new BatchStarted($this));
+            }
+        }
+
         if ($counts->failedJobs === 1 && ! $this->allowsFailures()) {
             $this->cancel($e);
         }
@@ -373,6 +390,16 @@ class Batch implements Arrayable, JsonSerializable
     public function incrementFailedJobs(string $jobId)
     {
         return $this->repository->incrementFailedJobs($this->id, $jobId);
+    }
+
+    /**
+     * Determine if this is the first job processed in the batch.
+     *
+     * @return bool
+     */
+    protected function isFirstJobProcessed(UpdatedBatchJobCounts $counts): bool
+    {
+        return $this->totalJobs - $counts->pendingJobs + $counts->failedJobs === 1;
     }
 
     /**

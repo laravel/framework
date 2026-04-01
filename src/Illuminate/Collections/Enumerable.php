@@ -1115,7 +1115,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Get the sum of the given values.
      *
-     * @param  (callable(TValue): mixed)|string|null  $callback
+     * @param  (callable(TValue, TKey): mixed)|string|null  $callback
      * @return mixed
      */
     public function sum($callback = null);

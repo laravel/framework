@@ -410,6 +410,30 @@ class SupportTestingMailFakeTest extends TestCase
             return $mail->usesMailer('mailjet');
         });
     }
+
+    public function testDriverMethod()
+    {
+        $this->fake->driver('ses')->to('taylor@laravel.com')->send($this->mailable);
+
+        $this->fake->assertSent(MailableStub::class, function ($mail) {
+            return $mail->hasTo('taylor@laravel.com') &&
+                $mail->usesMailer('ses');
+        });
+
+        $this->fake->driver('sendgrid')->to('taylor@laravel.com')->queue($this->mailable);
+
+        $this->fake->assertQueued(MailableStub::class, function ($mail) {
+            return $mail->hasTo('taylor@laravel.com') &&
+                $mail->usesMailer('sendgrid');
+        });
+
+        $this->fake->driver('mailjet')->to('taylor@laravel.com')->queue($this->mailable);
+
+        $this->fake->assertQueued(MailableStub::class, function ($mail) {
+            return $mail->hasTo('taylor@laravel.com') &&
+                $mail->usesMailer('mailjet');
+        });
+    }
 }
 
 class MailableStub extends Mailable

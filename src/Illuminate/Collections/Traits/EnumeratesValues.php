@@ -116,9 +116,9 @@ trait EnumeratesValues
      * @param  \Illuminate\Contracts\Support\Arrayable<TMakeKey, TMakeValue>|iterable<TMakeKey, TMakeValue>|null  $items
      * @return static<TMakeKey, TMakeValue>
      */
-    public static function make($items = [])
+    public static function make($items = [], ...$args)
     {
-        return new static($items);
+        return new static($items, ...$args);
     }
 
     /**
@@ -129,11 +129,11 @@ trait EnumeratesValues
      * @param  iterable<array-key, TWrapValue>|TWrapValue  $value
      * @return static<array-key, TWrapValue>
      */
-    public static function wrap($value)
+    public static function wrap($value, ...$args)
     {
         return $value instanceof Enumerable
-            ? new static($value)
-            : new static(Arr::wrap($value));
+            ? new static($value, ...$args)
+            : new static(Arr::wrap($value), ...$args);
     }
 
     /**
@@ -155,9 +155,9 @@ trait EnumeratesValues
      *
      * @return static
      */
-    public static function empty()
+    public static function empty(...$args)
     {
-        return new static([]);
+        return new static([], ...$args);
     }
 
     /**
@@ -169,13 +169,13 @@ trait EnumeratesValues
      * @param  (callable(int): TTimesValue)|null  $callback
      * @return static<int, TTimesValue>
      */
-    public static function times($number, ?callable $callback = null)
+    public static function times($number, ?callable $callback = null, ...$args)
     {
         if ($number < 1) {
-            return new static;
+            return new static([], ...$args);
         }
 
-        return static::range(1, $number)
+        return static::range(1, $number, 1, ...$args)
             ->unless($callback == null)
             ->map($callback);
     }
@@ -188,9 +188,9 @@ trait EnumeratesValues
      * @param  int  $flags
      * @return static<TKey, TValue>
      */
-    public static function fromJson($json, $depth = 512, $flags = 0)
+    public static function fromJson($json, $depth = 512, $flags = 0, ...$args)
     {
-        return new static(json_decode($json, true, $depth, $flags));
+        return new static(json_decode($json, true, $depth, $flags), ...$args);
     }
 
     /**
@@ -545,7 +545,7 @@ trait EnumeratesValues
 
         [$passed, $failed] = Arr::partition($this->getIterator(), $callback);
 
-        return new static([new static($passed), new static($failed)]);
+        return $this->newInstance([$this->newInstance($passed), $this->newInstance($failed)]);
     }
 
     /**
@@ -572,7 +572,7 @@ trait EnumeratesValues
      *
      * @template TReturnType
      *
-     * @param  (callable(TValue): TReturnType)|string|null  $callback
+     * @param  (callable(TValue, TKey): TReturnType)|string|null  $callback
      * @return ($callback is callable ? TReturnType : mixed)
      */
     public function sum($callback = null)

@@ -1019,6 +1019,36 @@ class MailMailableTest extends TestCase
         $this->assertFalse($mailable->hasAttachmentFromStorageDisk('disk', '/path/to/foo.jpg', 'bar.jpg', ['mime' => 'text/html']));
     }
 
+    public function testAssertHasNoAttachments(): void
+    {
+        $this->stubMailer();
+
+        $mailable = new class() extends Mailable
+        {
+            public function build()
+            {
+                //
+            }
+        };
+
+        $mailable->assertHasNoAttachments();
+
+        $mailableWithAttachment = new class() extends Mailable
+        {
+            public function build()
+            {
+                $this->attach('/path/to/foo.jpg');
+            }
+        };
+
+        try {
+            $mailableWithAttachment->assertHasNoAttachments();
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertStringContainsString('Expected no attachments', $e->getMessage());
+        }
+    }
+
     public function testAssertHasAttachment(): void
     {
         $this->stubMailer();
