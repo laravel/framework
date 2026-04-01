@@ -13,7 +13,7 @@ trait ReadsClassAttributes
      * @param  object  $target
      * @param  class-string  $attributeClass
      * @param  string|null  $property
-     * @param mixed $default
+     * @param  mixed $default
      */
     protected function getAttributeValue($target, string $attributeClass, ?string $property = null, $default = null)
     {
