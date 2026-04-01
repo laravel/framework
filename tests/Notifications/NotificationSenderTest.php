@@ -294,6 +294,77 @@ class NotificationSenderTest extends TestCase
 
         $sender->send($notifiable, $notification);
     }
+
+    public function test_it_queue_attribute_is_used_when_on_queue_is_not_called()
+    {
+        $notification = new #[Queue('attribute-queue')] class extends Notification implements ShouldQueue
+        {
+            use Queueable;
+
+            public function via($notifiable): string
+            {
+                return 'mail';
+            }
+        };
+
+        $notifiable = m::mock(Notifiable::class);
+        $manager = m::mock(ChannelManager::class);
+        $manager->shouldReceive('getContainer')->andReturn(app());
+        $manager->shouldReceive('resolveQueueFromQueueRoute')->andReturn(null);
+        $manager->shouldReceive('resolveConnectionFromQueueRoute')->andReturn(null);
+
+        $events = m::mock(EventDispatcher::class);
+        $events->shouldReceive('listen');
+
+        $bus = m::mock(BusDispatcher::class);
+        $bus->shouldReceive('dispatch')
+            ->once()
+            ->withArgs(function ($job) {
+                return $job->queue === 'attribute-queue';
+            });
+
+        $sender = new NotificationSender($manager, $bus, $events);
+
+        $sender->send($notifiable, $notification);
+    }
+
+    public function test_it_constructor_override_takes_precedence_over_queue_attribute()
+    {
+        $notification = new #[Queue('attribute-queue')] class extends Notification implements ShouldQueue
+        {
+            use Queueable;
+
+            public function __construct()
+            {
+                $this->queue = 'constructor-override-queue';
+            }
+
+            public function via($notifiable): string
+            {
+                return 'mail';
+            }
+        };
+
+        $notifiable = m::mock(Notifiable::class);
+        $manager = m::mock(ChannelManager::class);
+        $manager->shouldReceive('getContainer')->andReturn(app());
+        $manager->shouldReceive('resolveQueueFromQueueRoute')->andReturn(null);
+        $manager->shouldReceive('resolveConnectionFromQueueRoute')->andReturn(null);
+
+        $events = m::mock(EventDispatcher::class);
+        $events->shouldReceive('listen');
+
+        $bus = m::mock(BusDispatcher::class);
+        $bus->shouldReceive('dispatch')
+            ->once()
+            ->withArgs(function ($job) {
+                return $job->queue === 'constructor-override-queue';
+            });
+
+        $sender = new NotificationSender($manager, $bus, $events);
+
+        $sender->send($notifiable, $notification);
+    }
 }
 
 class DummyQueuedNotificationWithStringVia extends Notification implements ShouldQueue
