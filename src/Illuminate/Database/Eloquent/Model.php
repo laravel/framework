@@ -487,6 +487,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         static::$bootedCallbacks = [];
         static::$classAttributes = [];
         static::$globalScopes = [];
+        static::$resolvedCollectionClasses = [];
     }
 
     /**
