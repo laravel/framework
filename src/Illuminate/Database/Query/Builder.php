@@ -2908,7 +2908,7 @@ class Builder implements BuilderContract
     /**
      * Add a "group by" clause to the query.
      *
-     * @param  array|\Illuminate\Contracts\Database\Query\Expression|string...$groups
+     * @param  array|\Illuminate\Contracts\Database\Query\Expression|string  ...$groups
      * @return $this
      */
     public function groupBy(...$groups)
@@ -5068,7 +5068,7 @@ class Builder implements BuilderContract
     /**
      * Specify arguments for the PDOStatement::fetchAll / fetch functions.
      *
-     * @param  mixed...$fetchUsing
+     * @param  mixed  ...$fetchUsing
      * @return $this
      */
     public function fetchUsing(...$fetchUsing)
@@ -5133,7 +5133,7 @@ class Builder implements BuilderContract
     /**
      * Dump the current SQL and bindings.
      *
-     * @param  mixed...$args
+     * @param  mixed  ...$args
      * @return $this
      */
     public function dump(...$args)
@@ -5141,7 +5141,7 @@ class Builder implements BuilderContract
         dump(
             $this->toSql(),
             $this->getBindings(),
-...$args,
+            ...$args,
         );
 
         return $this;

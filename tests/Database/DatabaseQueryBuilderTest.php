@@ -2625,10 +2625,10 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->having(
             new class() implements ConditionExpression 
             {
-            public function getValue(\Illuminate\Database\Grammar $grammar)
-            {
-                return '1 = 1';
-            }
+                public function getValue(\Illuminate\Database\Grammar $grammar)
+                {
+                    return '1 = 1';
+                }
             }
         );
         $this->assertSame('select * from "users" having 1 = 1', $builder->toSql());
@@ -3613,8 +3613,8 @@ class DatabaseQueryBuilderTest extends TestCase
             ->joinSub($sub1, 'sub1', 'users.id', '=', 1, 'inner', true)
             ->joinSub($sub2, 'sub2', 'users.id', '=', 'sub2.user_id');
         $expected = 'select * from "users" ';
-        $expected.= 'inner join (select * from "contacts" where "name" = ?) as "sub1" on "users"."id" = ? ';
-        $expected.= 'inner join (select * from "contacts" where "name" = ?) as "sub2" on "users"."id" = "sub2"."user_id"';
+        $expected .= 'inner join (select * from "contacts" where "name" = ?) as "sub1" on "users"."id" = ? ';
+        $expected .= 'inner join (select * from "contacts" where "name" = ?) as "sub2" on "users"."id" = "sub2"."user_id"';
         $this->assertEquals($expected, $builder->toSql());
         $this->assertEquals(['foo', 1, 'bar'], $builder->getRawBindings()['join']);
 
@@ -3734,8 +3734,8 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->joinLateral($sub1, 'sub1')->joinLateral($sub2, 'sub2');
 
         $expected = 'select * from `users` ';
-        $expected.= 'inner join lateral (select * from `contacts` where `contracts`.`user_id` = `users`.`id` and `name` = ?) as `sub1` on true ';
-        $expected.= 'inner join lateral (select * from `contacts` where `contracts`.`user_id` = `users`.`id` and `name` = ?) as `sub2` on true';
+        $expected .= 'inner join lateral (select * from `contacts` where `contracts`.`user_id` = `users`.`id` and `name` = ?) as `sub1` on true ';
+        $expected .= 'inner join lateral (select * from `contacts` where `contracts`.`user_id` = `users`.`id` and `name` = ?) as `sub2` on true';
 
         $this->assertEquals($expected, $builder->toSql());
         $this->assertEquals(['foo', 'bar'], $builder->getRawBindings()['join']);
@@ -7019,12 +7019,12 @@ SQL;
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('orders')->where(
-            new class() implements ConditionExpression 
+            new class() implements ConditionExpression
             {
-            public function getValue(\Illuminate\Database\Grammar $grammar)
-            {
-                return '1 = 1';
-            }
+                public function getValue(\Illuminate\Database\Grammar $grammar)
+                {
+                    return '1 = 1';
+                }
             }
         );
         $this->assertSame('select * from "orders" where 1 = 1', $builder->toSql());
