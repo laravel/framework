@@ -233,6 +233,15 @@ class SupportTestingNotificationFakeTest extends TestCase
             return $notification->value === 'hello-serialized-unserialized';
         });
     }
+
+    public function testDeliverViaAndDeliversVia()
+    {
+        $this->assertSame('mail', $this->fake->deliversVia());
+
+        $this->fake->deliverVia('database');
+
+        $this->assertSame('database', $this->fake->deliversVia());
+    }
 }
 
 class NotificationStub extends Notification

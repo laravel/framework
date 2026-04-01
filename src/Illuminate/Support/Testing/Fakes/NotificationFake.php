@@ -34,6 +34,13 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     public $locale;
 
     /**
+     * The default channel used to deliver messages.
+     *
+     * @var string|null
+     */
+    protected $defaultChannel;
+
+    /**
      * Indicates if notifications should be serialized and restored when pushed to the queue.
      *
      * @var bool
@@ -401,5 +408,26 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     public function sentNotifications()
     {
         return $this->notifications;
+    }
+
+    /**
+     * Get the default channel driver name.
+     *
+     * @return string
+     */
+    public function deliversVia()
+    {
+        return $this->defaultChannel ?? 'mail';
+    }
+
+    /**
+     * Set the default channel driver name.
+     *
+     * @param  string  $channel
+     * @return void
+     */
+    public function deliverVia($channel)
+    {
+        $this->defaultChannel = $channel;
     }
 }
