@@ -12,6 +12,7 @@ use Illuminate\Events\Dispatcher as Event;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class CacheManagerTest extends TestCase
 {
@@ -28,6 +29,24 @@ class CacheManagerTest extends TestCase
         ]));
         $manager->extend(__CLASS__, fn () => $this);
         $this->assertSame($manager, $manager->store(__CLASS__));
+    }
+
+    public function testCustomDriverStaticClosure()
+    {
+        $manager = new CacheManager($this->getApp([
+            'cache' => [
+                'stores' => [
+                    __CLASS__ => [
+                        'driver' => __CLASS__,
+                    ],
+                ],
+            ],
+        ]));
+
+        $driver = new stdClass;
+
+        $manager->extend(__CLASS__, static fn () => $driver);
+        $this->assertSame($driver, $manager->store(__CLASS__));
     }
 
     public function testCustomDriverOverridesInternalDrivers()

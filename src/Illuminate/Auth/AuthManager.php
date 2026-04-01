@@ -5,6 +5,8 @@ namespace Illuminate\Auth;
 use Closure;
 use Illuminate\Contracts\Auth\Factory as FactoryContract;
 use InvalidArgumentException;
+use RuntimeException;
+use Throwable;
 
 /**
  * @mixin \Illuminate\Contracts\Auth\Guard
@@ -271,7 +273,13 @@ class AuthManager implements FactoryContract
      */
     public function extend($driver, Closure $callback)
     {
-        $this->customCreators[$driver] = $callback->bindTo($this, $this);
+        try {
+            $callback = $callback->bindTo($this, static::class) ?? throw new RuntimeException;
+        } catch (Throwable) {
+            $callback = $callback->bindTo(null, static::class);
+        }
+
+        $this->customCreators[$driver] = $callback;
 
         return $this;
     }
