@@ -1054,6 +1054,10 @@ class Str
      */
     public static function password($length = 32, $letters = true, $numbers = true, $symbols = true, $spaces = false)
     {
+        if (! $letters && ! $numbers && ! $symbols && ! $spaces) {
+            throw new \InvalidArgumentException('At least one character type must be enabled (letters, numbers, symbols, or spaces).');
+        }
+
         $password = new Collection();
 
         $options = (new Collection([

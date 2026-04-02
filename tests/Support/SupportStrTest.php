@@ -1847,6 +1847,13 @@ class SupportStrTest extends TestCase
         );
     }
 
+    public function testPasswordWithNoCharacterTypesThrowsException()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Str::password(16, letters: false, numbers: false, symbols: false, spaces: false);
+    }
+
     public function testToBase64()
     {
         $this->assertSame(base64_encode('foo'), Str::toBase64('foo'));
