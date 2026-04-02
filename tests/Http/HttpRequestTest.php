@@ -858,6 +858,37 @@ class HttpRequestTest extends TestCase
         $this->assertSame(45, $request->interval('as_minutes', Unit::Second)->seconds);
     }
 
+    public function testIntervalMethodWithScientificNotationFloats()
+    {
+        $request = Request::create('/', 'GET', [
+            'small_float' => '0.000053',
+            'very_small' => '0.000001',
+            'scientific' => '5.3E-5',
+            'normal_float' => '1.5',
+            'integer' => '90',
+        ]);
+
+        // Small floats that PHP would render in scientific notation (e.g. 5.3E-5)
+        $interval = $request->interval('small_float', Unit::Millisecond);
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+
+        $interval = $request->interval('very_small', Unit::Second);
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+
+        // Scientific notation string passed directly
+        $interval = $request->interval('scientific', Unit::Millisecond);
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+
+        // Normal values should still work
+        $interval = $request->interval('normal_float', Unit::Hour);
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+        $this->assertSame(1, $interval->hours);
+
+        $interval = $request->interval('integer', Unit::Minute);
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+        $this->assertSame(90, $interval->minutes);
+    }
+
     public function testEnumMethod()
     {
         $request = Request::create('/', 'GET', [
