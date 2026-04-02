@@ -44,7 +44,7 @@ class DebounceLock
 
         $cache = $this->resolveCache($job);
 
-        $lock = $cache->lock(static::getKey($job), $debounceFor);
+        $lock = $cache->lock(static::getKey($job), $debounceFor * 2);
 
         $lock->forceRelease();
         $lock->get();
