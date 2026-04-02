@@ -313,6 +313,8 @@ class Number
      * @param  int|float  $start
      * @param  int|float  $offset
      * @return list<array{int|float, int|float}>
+     *
+     * @phpstan-return ($by is non-positive-int ? array{} : list<array{int|float, int|float}>)
      */
     public static function pairs(int|float $to, int|float $by, int|float $start = 0, int|float $offset = 1)
     {
