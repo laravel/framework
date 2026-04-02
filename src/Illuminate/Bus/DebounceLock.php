@@ -48,6 +48,8 @@ class DebounceLock
 
         $owner = Str::random(40);
 
+        // The TTL is intentionally generous — it exists only for garbage collection,
+        // not correctness. The token is explicitly removed after the job executes.
         $cache->put(static::getKey($job), $owner, max($debounceFor * 10, 300));
 
         return $owner;
