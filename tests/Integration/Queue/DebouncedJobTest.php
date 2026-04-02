@@ -34,6 +34,7 @@ class DebouncedJobTest extends QueueTestCase
         DebouncedTestJob::$handled = false;
 
         dispatch(new DebouncedTestJob('entity-1'));
+        $this->travelTo(now()->addSeconds(31));
         $this->runQueueWorkerCommand(['--once' => true]);
 
         $this->assertTrue(DebouncedTestJob::$handled);
@@ -50,6 +51,9 @@ class DebouncedJobTest extends QueueTestCase
         dispatch(new DebouncedTestJob('entity-1'));
         dispatch(new DebouncedTestJob('entity-1'));
 
+        // Advance time past the debounce window so jobs become available.
+        $this->travelTo(now()->addSeconds(31));
+
         // Process both jobs from the queue.
         $this->runQueueWorkerCommand(['--once' => true], 2);
 
@@ -62,6 +66,7 @@ class DebouncedJobTest extends QueueTestCase
         DebouncedTestJob::$handled = false;
 
         dispatch($job = new DebouncedTestJob('entity-1'));
+        $this->travelTo(now()->addSeconds(31));
         $this->runQueueWorkerCommand(['--once' => true]);
 
         $this->assertTrue($job::$handled);
@@ -97,6 +102,7 @@ class DebouncedJobTest extends QueueTestCase
         dispatch(new DebouncedTestJob('entity-1'));
         dispatch(new DebouncedTestJob('entity-1'));
 
+        $this->travelTo(now()->addSeconds(31));
         $this->runQueueWorkerCommand(['--once' => true], 2);
 
         Event::assertDispatched(JobDebounced::class, 1);
@@ -129,6 +135,7 @@ class DebouncedJobTest extends QueueTestCase
         dispatch(new DebouncedTestJob('entity-1'));
         dispatch(new DebouncedTestJob('entity-2'));
 
+        $this->travelTo(now()->addSeconds(31));
         $this->runQueueWorkerCommand(['--once' => true], 2);
 
         // Both should execute — different identities.

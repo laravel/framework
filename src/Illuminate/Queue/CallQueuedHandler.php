@@ -78,7 +78,7 @@ class CallQueuedHandler
             $this->ensureUniqueJobLockIsReleased($command);
         }
 
-        if (! $job->isReleased()) {
+        if ($command instanceof ShouldBeDebounced && ! $job->isReleased()) {
             $this->ensureDebounceLockIsReleased($command);
         }
 

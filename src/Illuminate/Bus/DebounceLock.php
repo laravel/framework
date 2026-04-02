@@ -2,7 +2,6 @@
 
 namespace Illuminate\Bus;
 
-use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Queue\Attributes\DebounceFor;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
