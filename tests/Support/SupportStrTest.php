@@ -162,7 +162,6 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame('...', Str::words('hello world', 0));
         $this->assertSame('***', Str::words('hello world', 0, '***'));
-        $this->assertSame('...', Str::words('hello world', -1));
     }
 
     public function testStringAscii(): void

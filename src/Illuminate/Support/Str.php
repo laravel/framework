@@ -772,8 +772,8 @@ class Str
      */
     public static function words($value, $words = 100, $end = '...')
     {
-        if ($words <= 0) {
-            return $end;
+        if ($words < 1) {
+            return $words === 0 ? $end : $value;
         }
 
         preg_match('/^\s*+(?:\S++\s*+){1,'.$words.'}/u', $value, $matches);
