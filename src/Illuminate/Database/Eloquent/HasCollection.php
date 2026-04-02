@@ -43,19 +43,16 @@ trait HasCollection
      */
     public function resolveCollectionFromAttribute()
     {
-        $reflectionClass = new ReflectionClass(static::class);
+        $reflection = new ReflectionClass(static::class);
 
-        $isEloquentGrandchild = is_subclass_of(static::class, Model::class)
-            && get_parent_class(static::class) !== Model::class;
+        do {
+            $attributes = $reflection->getAttributes(CollectedBy::class);
 
-        $attributes = $reflectionClass->getAttributes(CollectedBy::class);
+            if (isset($attributes[0], $attributes[0]->getArguments()[0])) {
+                return $attributes[0]->getArguments()[0];
+            }
+        } while ($reflection = $reflection->getParentClass());
 
-        if (! isset($attributes[0]) || ! isset($attributes[0]->getArguments()[0])) {
-            return $isEloquentGrandchild
-                ? (new (get_parent_class(static::class)))->resolveCollectionFromAttribute()
-                : null;
-        }
-
-        return $attributes[0]->getArguments()[0];
+        return null;
     }
 }

@@ -390,7 +390,7 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
             return $this->value();
         }
 
-        return Str::replace(Str::after($this->value(), '?'), $this->query()->decode(), $this->value());
+        return Str::replace($this->query()->value(), $this->query()->decode(), $this->value());
     }
 
     /**

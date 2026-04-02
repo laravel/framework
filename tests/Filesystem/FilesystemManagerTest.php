@@ -10,6 +10,7 @@ use League\Flysystem\PathPrefixing\PathPrefixedAdapter;
 use League\Flysystem\UnableToReadFile;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class FilesystemManagerTest extends TestCase
 {
@@ -228,6 +229,22 @@ class FilesystemManagerTest extends TestCase
         }));
         $manager->extend(__CLASS__, fn () => $this);
         $this->assertSame($manager, $manager->disk(__CLASS__));
+    }
+
+    public function testCustomDriverStaticClosure()
+    {
+        $manager = new FilesystemManager(tap(new Application, static function ($app) {
+            $app['config'] = [
+                'filesystems.disks.'.__CLASS__ => [
+                    'driver' => __CLASS__,
+                ],
+            ];
+        }));
+
+        $driver = new stdClass;
+
+        $manager->extend(__CLASS__, static fn () => $driver);
+        $this->assertSame($driver, $manager->disk(__CLASS__));
     }
 
     // public function testKeepTrackOfAdapterDecoration()

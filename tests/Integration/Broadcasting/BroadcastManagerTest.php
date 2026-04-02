@@ -17,7 +17,9 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
 use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
+use stdClass;
 
 class BroadcastManagerTest extends TestCase
 {
@@ -156,6 +158,24 @@ class BroadcastManagerTest extends TestCase
         $this->assertSame($manager, $manager->connection(__CLASS__));
     }
 
+    public function testCustomDriverStaticClosure()
+    {
+        $manager = new BroadcastManager($this->getApp([
+            'broadcasting' => [
+                'connections' => [
+                    __CLASS__ => [
+                        'driver' => __CLASS__,
+                    ],
+                ],
+            ],
+        ]));
+
+        $driver = new stdClass;
+
+        $manager->extend(__CLASS__, static fn () => $driver);
+        $this->assertSame($driver, $manager->connection(__CLASS__));
+    }
+
     public function testThrowExceptionWhenDriverCreationFails()
     {
         $userConfig = [
@@ -169,8 +189,8 @@ class BroadcastManagerTest extends TestCase
         ];
 
         $app = $this->getApp($userConfig);
-        $app->singleton(\Psr\Log\LoggerInterface::class, function () {
-            throw new \RuntimeException('Logger service not available');
+        $app->singleton(LoggerInterface::class, function () {
+            throw new RuntimeException('Logger service not available');
         });
 
         $broadcastManager = new BroadcastManager($app);
@@ -181,7 +201,7 @@ class BroadcastManagerTest extends TestCase
         } catch (RuntimeException $e) {
             $this->assertStringContainsString('Failed to create broadcaster for connection "log_connection_1"', $e->getMessage());
             $this->assertStringContainsString('Logger service not available', $e->getMessage());
-            $this->assertInstanceOf(\RuntimeException::class, $e->getPrevious());
+            $this->assertInstanceOf(RuntimeException::class, $e->getPrevious());
         }
     }
 

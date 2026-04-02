@@ -347,7 +347,7 @@ trait InteractsWithData
 
         $unit = $unit instanceof Unit ? $unit : Unit::fromName($unit);
 
-        return $unit->interval((float) $value);
+        return CarbonInterval::fromString(number_format((float) $value, 10, '.', '').' '.$unit->name);
     }
 
     /**

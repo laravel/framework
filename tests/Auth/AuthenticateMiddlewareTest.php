@@ -154,6 +154,14 @@ class AuthenticateMiddlewareTest extends TestCase
         $this->assertSame($this->auth, $this->auth->guard(__CLASS__));
     }
 
+    public function testCustomDriverStatic()
+    {
+        $driver = new stdClass;
+
+        $this->auth->extend(__CLASS__, fn () => $driver);
+        $this->assertSame($driver, $this->auth->guard(__CLASS__));
+    }
+
     /**
      * Create a new config repository instance.
      *
