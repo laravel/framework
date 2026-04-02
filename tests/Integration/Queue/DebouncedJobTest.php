@@ -71,9 +71,9 @@ class DebouncedJobTest extends QueueTestCase
 
         $this->assertTrue($job::$handled);
 
-        // Lock should be released — we can acquire it again.
-        $this->assertTrue(
-            $this->app->get(Cache::class)->lock(DebounceLock::getKey($job), 10)->get()
+        // Debounce token should be removed after execution.
+        $this->assertNull(
+            $this->app->get(Cache::class)->get(DebounceLock::getKey($job))
         );
     }
 
@@ -87,8 +87,8 @@ class DebouncedJobTest extends QueueTestCase
             dispatch_sync($job = new DebouncedTestFailJob('entity-1'));
         } finally {
             $this->assertTrue($job::$handled);
-            $this->assertTrue(
-                $this->app->get(Cache::class)->lock(DebounceLock::getKey($job), 10)->get()
+            $this->assertNull(
+                $this->app->get(Cache::class)->get(DebounceLock::getKey($job))
             );
         }
     }
@@ -161,17 +161,19 @@ class DebouncedJobTest extends QueueTestCase
         Queue::assertPushed(DebouncedTestJob::class);
     }
 
-    public function testJobExecutesWhenLockHasExpired()
+    public function testJobExecutesWhenCacheTokenIsEvicted()
     {
         DebouncedTestJob::$handled = false;
 
-        dispatch(new DebouncedTestJob('entity-1'));
+        dispatch($job = new DebouncedTestJob('entity-1'));
 
-        // Advance time well past the lock TTL so the lock expires.
-        $this->travelTo(now()->addSeconds(120));
+        // Simulate cache eviction by manually removing the debounce token.
+        $this->app->get(Cache::class)->forget(DebounceLock::getKey($job));
+
+        $this->travelTo(now()->addSeconds(31));
         $this->runQueueWorkerCommand(['--once' => true]);
 
-        // Job should execute (fail-open) even though lock expired.
+        // Job should execute (fail-open) even though token was evicted.
         $this->assertTrue(DebouncedTestJob::$handled);
     }
 
@@ -186,7 +188,7 @@ class DebouncedJobTest extends QueueTestCase
         $ownerA = $lock->acquire($jobA);
         $ownerB = $lock->acquire($jobB);
 
-        // Releasing with A's owner should not wipe B's lock.
+        // Releasing with A's owner should not wipe B's token.
         $lock->release($jobA, $ownerA);
 
         // B should still be the current owner.

@@ -384,10 +384,11 @@ class CallQueuedHandler
         ];
 
         if ($key && $owner) {
-            $this->container->make(CacheFactory::class)
-                ->store()
-                ->restoreLock($key, $owner)
-                ->release();
+            $store = $this->container->make(CacheFactory::class)->store();
+
+            if ($store->get($key) === $owner) {
+                $store->forget($key);
+            }
         }
     }
 

@@ -5,6 +5,7 @@ namespace Illuminate\Bus;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Queue\Attributes\DebounceFor;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
+use Illuminate\Support\Str;
 
 class DebounceLock
 {
@@ -28,10 +29,11 @@ class DebounceLock
     }
 
     /**
-     * Acquire a debounce lock for the given job.
+     * Store a debounce owner token for the given job.
      *
-     * Force-releases any existing lock and acquires a new one,
-     * implementing last-writer-wins semantics.
+     * Overwrites any existing token, implementing last-writer-wins semantics.
+     * The TTL is generous (10x debounceFor) for garbage collection only —
+     * correctness does not depend on it.
      *
      * @param  mixed  $job
      * @return string
@@ -44,16 +46,15 @@ class DebounceLock
 
         $cache = $this->resolveCache($job);
 
-        $lock = $cache->lock(static::getKey($job), $debounceFor * 2);
+        $owner = Str::random(40);
 
-        $lock->forceRelease();
-        $lock->get();
+        $cache->put(static::getKey($job), $owner, max($debounceFor * 10, 300));
 
-        return $lock->owner();
+        return $owner;
     }
 
     /**
-     * Determine if the given owner is the current lock owner.
+     * Determine if the given owner is the current owner for this debounce key.
      *
      * @param  mixed  $job
      * @param  string  $owner
@@ -61,35 +62,26 @@ class DebounceLock
      */
     public function isCurrentOwner($job, string $owner)
     {
-        $cache = $this->resolveCache($job);
-
-        return $cache->restoreLock(static::getKey($job), $owner)
-            ->isOwnedByCurrentProcess();
+        return $this->resolveCache($job)->get(static::getKey($job)) === $owner;
     }
 
     /**
-     * Determine if a debounce lock exists for the given job.
+     * Determine if a debounce token exists for the given job.
      *
      * @param  mixed  $job
      * @return bool
      */
     public function lockExists($job)
     {
-        $cache = $this->resolveCache($job);
-
-        $lock = $cache->lock(static::getKey($job), 1);
-
-        if ($lock->get()) {
-            $lock->release();
-
-            return false;
-        }
-
-        return true;
+        return ! is_null($this->resolveCache($job)->get(static::getKey($job)));
     }
 
     /**
-     * Release the debounce lock for the given job if still the owner.
+     * Remove the debounce token for the given job.
+     *
+     * When an owner is provided, the token is only removed if it still
+     * belongs to that owner — preventing a finished job from wiping
+     * a newer dispatch's token.
      *
      * @param  mixed  $job
      * @param  string  $owner
@@ -98,18 +90,17 @@ class DebounceLock
     public function release($job, string $owner = '')
     {
         $cache = $this->resolveCache($job);
+        $key = static::getKey($job);
 
-        if (empty($owner)) {
-            $cache->lock(static::getKey($job))->forceRelease();
-
+        if (! empty($owner) && $cache->get($key) !== $owner) {
             return;
         }
 
-        $cache->restoreLock(static::getKey($job), $owner)->release();
+        $cache->forget($key);
     }
 
     /**
-     * Generate the lock key for the given job.
+     * Generate the cache key for the given job.
      *
      * @param  mixed  $job
      * @return string
