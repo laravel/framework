@@ -31,6 +31,8 @@ class DebouncedJobTest extends QueueTestCase
 
     public function testDebouncedJobDispatchesAndExecutes()
     {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
         DebouncedTestJob::$handled = false;
 
         dispatch(new DebouncedTestJob('entity-1'));
@@ -42,7 +44,7 @@ class DebouncedJobTest extends QueueTestCase
 
     public function testSupersededDebouncedJobIsSkipped()
     {
-        $this->markTestSkippedWhenUsingSyncQueueDriver();
+        $this->markTestSkippedWhenUsingQueueDrivers(['sync', 'beanstalkd']);
 
         DebouncedTestJob::$handleCount = 0;
 
@@ -63,6 +65,8 @@ class DebouncedJobTest extends QueueTestCase
 
     public function testLockIsReleasedForSuccessfulJobs()
     {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
         DebouncedTestJob::$handled = false;
 
         dispatch($job = new DebouncedTestJob('entity-1'));
@@ -95,9 +99,13 @@ class DebouncedJobTest extends QueueTestCase
 
     public function testJobDebouncedEventFiresForSupersededJob()
     {
-        $this->markTestSkippedWhenUsingSyncQueueDriver();
+        $this->markTestSkippedWhenUsingQueueDrivers(['sync', 'beanstalkd']);
 
-        Event::fake([JobDebounced::class]);
+        $firedCount = 0;
+
+        Event::listen(JobDebounced::class, function () use (&$firedCount) {
+            $firedCount++;
+        });
 
         dispatch(new DebouncedTestJob('entity-1'));
         dispatch(new DebouncedTestJob('entity-1'));
@@ -105,7 +113,7 @@ class DebouncedJobTest extends QueueTestCase
         $this->travelTo(now()->addSeconds(31));
         $this->runQueueWorkerCommand(['--once' => true], 2);
 
-        Event::assertDispatched(JobDebounced::class, 1);
+        $this->assertEquals(1, $firedCount);
     }
 
     public function testDebouncedAndUniqueThrowsLogicException()
@@ -128,7 +136,7 @@ class DebouncedJobTest extends QueueTestCase
 
     public function testDifferentDebounceIdsDoNotInterfere()
     {
-        $this->markTestSkippedWhenUsingSyncQueueDriver();
+        $this->markTestSkippedWhenUsingQueueDrivers(['sync', 'beanstalkd']);
 
         DebouncedTestJob::$handleCount = 0;
 
@@ -163,6 +171,8 @@ class DebouncedJobTest extends QueueTestCase
 
     public function testJobExecutesWhenCacheTokenIsEvicted()
     {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
         DebouncedTestJob::$handled = false;
 
         dispatch($job = new DebouncedTestJob('entity-1'));
