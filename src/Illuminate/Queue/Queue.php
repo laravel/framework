@@ -4,10 +4,12 @@ namespace Illuminate\Queue;
 
 use Closure;
 use DateTimeInterface;
+use Illuminate\Bus\DebounceLock;
 use Illuminate\Bus\UniqueLock;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Contracts\Queue\ShouldBeDebounced;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
@@ -368,6 +370,14 @@ abstract class Queue
                 $this->container->make('db.transactions')->addCallbackForRollback(
                     function () use ($job) {
                         (new UniqueLock($this->container->make(Cache::class)))->release($job);
+                    }
+                );
+            }
+
+            if ($job instanceof ShouldBeDebounced) {
+                $this->container->make('db.transactions')->addCallbackForRollback(
+                    function () use ($job) {
+                        (new DebounceLock($this->container->make(Cache::class)))->release($job);
                     }
                 );
             }

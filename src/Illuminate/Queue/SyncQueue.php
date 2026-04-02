@@ -2,10 +2,12 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Bus\DebounceLock;
 use Illuminate\Bus\UniqueLock;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Contracts\Queue\ShouldBeDebounced;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Queue\Events\JobAttempted;
 use Illuminate\Queue\Events\JobExceptionOccurred;
@@ -133,6 +135,14 @@ class SyncQueue extends Queue implements QueueContract
                 $this->container->make('db.transactions')->addCallbackForRollback(
                     function () use ($job) {
                         (new UniqueLock($this->container->make(Cache::class)))->release($job);
+                    }
+                );
+            }
+
+            if ($job instanceof ShouldBeDebounced) {
+                $this->container->make('db.transactions')->addCallbackForRollback(
+                    function () use ($job) {
+                        (new DebounceLock($this->container->make(Cache::class)))->release($job);
                     }
                 );
             }

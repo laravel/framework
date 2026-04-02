@@ -2,12 +2,17 @@
 
 namespace Illuminate\Foundation\Bus;
 
+use Illuminate\Bus\DebounceLock;
 use Illuminate\Bus\UniqueLock;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Contracts\Queue\ShouldBeDebounced;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Foundation\Queue\InteractsWithUniqueJobs;
+use Illuminate\Queue\Attributes\DebounceFor;
+use LogicException;
+use ReflectionClass;
 
 class PendingDispatch
 {
@@ -210,6 +215,57 @@ class PendingDispatch
     }
 
     /**
+     * Acquire a debounce lock for the job and set its delay.
+     *
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    protected function acquireDebounceLock()
+    {
+        if (! $this->job instanceof ShouldBeDebounced) {
+            return;
+        }
+
+        if ($this->job instanceof ShouldBeUnique) {
+            throw new LogicException(
+                'A job cannot implement both ShouldBeDebounced and ShouldBeUnique. '.
+                'Debounce (last wins) and unique (first wins) are mutually exclusive.'
+            );
+        }
+
+        $lock = new DebounceLock(Container::getInstance()->make(Cache::class));
+        $this->job->debounceOwner = $lock->acquire($this->job);
+
+        if (is_null($this->job->delay)) {
+            $debounceFor = method_exists($this->job, 'debounceFor')
+                ? $this->job->debounceFor()
+                : $this->getDebounceForFromAttribute();
+
+            if ($debounceFor > 0) {
+                $this->job->delay = $debounceFor;
+            }
+        }
+    }
+
+    /**
+     * Read the debounceFor value from a DebounceFor PHP attribute.
+     *
+     * @return int
+     */
+    private function getDebounceForFromAttribute()
+    {
+        $attributes = (new ReflectionClass($this->job))
+            ->getAttributes(DebounceFor::class);
+
+        if (! empty($attributes)) {
+            return $attributes[0]->newInstance()->debounceFor;
+        }
+
+        return 0;
+    }
+
+    /**
      * Get the underlying job instance.
      *
      * @return mixed
@@ -246,7 +302,11 @@ class PendingDispatch
             $this->removeUniqueJobInformationFromContext($this->job);
 
             return;
-        } elseif ($this->afterResponse) {
+        }
+
+        $this->acquireDebounceLock();
+
+        if ($this->afterResponse) {
             app(Dispatcher::class)->dispatchAfterResponse($this->job);
         } else {
             app(Dispatcher::class)->dispatch($this->job);
