@@ -412,7 +412,7 @@ class BroadcastingInstallCommand extends Command
             ];
         } elseif (file_exists(base_path('yarn.lock'))) {
             $commands = [
-                'yarn add --dev laravel-echo pusher-js',
+                'yarn add --dev laravel-echo pusher-js --ignore-scripts',
                 'yarn run build',
             ];
         } elseif (file_exists(base_path('bun.lock')) || file_exists(base_path('bun.lockb'))) {
