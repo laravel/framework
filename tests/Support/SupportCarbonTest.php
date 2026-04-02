@@ -141,4 +141,22 @@ class SupportCarbonTest extends TestCase
         $uuidv7 = Carbon::createFromId('01880dfa-2825-72e4-acbb-b1e4981cf8af');
         $this->assertEquals('2023-05-12 03:21:18.117000', $uuidv7->toDateTimeString('microsecond'));
     }
+
+    public function testPlus(): void
+    {
+        $carbon = Carbon::parse('2026-01-31');
+        $this->assertSame('2026-03-03', $carbon->plus(months: 1, overflow: true)->toDateString());
+
+        $carbon = Carbon::parse('2026-01-31');
+        $this->assertSame('2026-02-28', $carbon->plus(months: 1, overflow: false)->toDateString());
+    }
+
+    public function testMinus(): void
+    {
+        $carbon = Carbon::parse('2026-05-31');
+        $this->assertSame('2026-05-01', $carbon->minus(months: 1, overflow: true)->toDateString());
+
+        $carbon = Carbon::parse('2026-05-31');
+        $this->assertSame('2026-04-30', $carbon->minus(months: 1, overflow: false)->toDateString());
+    }
 }
