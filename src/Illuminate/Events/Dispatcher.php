@@ -20,6 +20,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Queue\Attributes\Backoff;
 use Illuminate\Queue\Attributes\Connection;
+use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Queue\Attributes\MaxExceptions;
@@ -679,7 +680,7 @@ class Dispatcher implements DispatcherContract
 
         $delay = method_exists($listener, 'withDelay')
             ? (isset($arguments[0]) ? $listener->withDelay($arguments[0]) : $listener->withDelay())
-            : $listener->delay ?? null;
+            : $this->getAttributeValue($listener, Delay::class, 'delay');
 
         if (is_null($queue)) {
             $queue = $this->resolveQueueFromQueueRoute($listener) ?? null;
