@@ -63,7 +63,7 @@ class DebouncedJobTest extends QueueTestCase
         $this->assertEquals(1, DebouncedTestJob::$handleCount);
     }
 
-    public function testLockIsReleasedForSuccessfulJobs()
+    public function testTokenPersistsAfterSuccessfulExecution()
     {
         $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
 
@@ -75,25 +75,24 @@ class DebouncedJobTest extends QueueTestCase
 
         $this->assertTrue($job::$handled);
 
-        // Debounce token should be removed after execution.
-        $this->assertNull(
+        // Debounce token persists after execution (cleaned up by GC TTL)
+        // to prevent a race where a superseded job sees an empty cache
+        // and executes via fail-open.
+        $this->assertNotNull(
             $this->app->get(Cache::class)->get(DebounceLock::getKey($job))
         );
     }
 
-    public function testLockIsReleasedForFailedJobs()
+    public function testFailedDebouncedJobStillCallsHandler()
     {
         DebouncedTestFailJob::$handled = false;
 
         $this->expectException(Exception::class);
 
         try {
-            dispatch_sync($job = new DebouncedTestFailJob('entity-1'));
+            dispatch_sync(new DebouncedTestFailJob('entity-1'));
         } finally {
-            $this->assertTrue($job::$handled);
-            $this->assertNull(
-                $this->app->get(Cache::class)->get(DebounceLock::getKey($job))
-            );
+            $this->assertTrue(DebouncedTestFailJob::$handled);
         }
     }
 

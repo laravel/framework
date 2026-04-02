@@ -82,11 +82,7 @@ class Debounced
             return;
         }
 
-        try {
-            return $next($job);
-        } finally {
-            $debounceLock->release($proxyJob, $this->owner);
-        }
+        return $next($job);
     }
 
     /**

@@ -11,7 +11,6 @@ use Illuminate\Contracts\Queue\ShouldBeDebounced;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Foundation\Queue\InteractsWithUniqueJobs;
 use Illuminate\Queue\Attributes\DebounceFor;
-use Illuminate\Support\Facades\Context;
 use LogicException;
 use ReflectionClass;
 
@@ -237,11 +236,6 @@ class PendingDispatch
 
         $lock = new DebounceLock(Container::getInstance()->make(Cache::class));
         $this->job->debounceOwner = $lock->acquire($this->job);
-
-        Context::addHidden([
-            'laravel_debounce_lock_key' => DebounceLock::getKey($this->job),
-            'laravel_debounce_lock_owner' => $this->job->debounceOwner,
-        ]);
 
         if (is_null($this->job->delay)) {
             $debounceFor = method_exists($this->job, 'debounceFor')

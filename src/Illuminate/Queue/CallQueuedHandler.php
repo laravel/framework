@@ -78,10 +78,6 @@ class CallQueuedHandler
             $this->ensureUniqueJobLockIsReleased($command);
         }
 
-        if ($command instanceof ShouldBeDebounced && ! $job->isReleased()) {
-            $this->ensureDebounceLockIsReleased($command);
-        }
-
         if (! $job->hasFailed() && ! $job->isReleased()) {
             $this->ensureNextJobInChainIsDispatched($command);
             $this->ensureSuccessfulBatchJobIsRecorded($command);
@@ -278,23 +274,6 @@ class CallQueuedHandler
     }
 
     /**
-     * Release the debounce lock after a job finishes execution.
-     *
-     * @param  mixed  $command
-     * @return void
-     */
-    protected function ensureDebounceLockIsReleased($command)
-    {
-        if (! $command instanceof ShouldBeDebounced) {
-            return;
-        }
-
-        (new DebounceLock(
-            $this->container->make(Cache::class)
-        ))->release($command, $command->debounceOwner ?? '');
-    }
-
-    /**
      * Determine if the given command should be unique.
      */
     protected function commandShouldBeUnique(mixed $command): bool
@@ -322,7 +301,6 @@ class CallQueuedHandler
     protected function handleModelNotFound(Job $job, $e)
     {
         $this->ensureUniqueJobLockIsReleasedViaContext();
-        $this->ensureDebounceLockIsReleasedViaContext();
 
         if ($job->payload()['deleteWhenMissingModels'] ?? false) {
             $this->ensureSuccessfulBatchJobIsRecordedForMissingModel($job, $job->resolveQueuedJobClass());
@@ -359,36 +337,6 @@ class CallQueuedHandler
                 ->store($store)
                 ->lock($key)
                 ->forceRelease();
-        }
-    }
-
-    /**
-     * Ensure the debounce lock is released via context.
-     *
-     * This is required when we can't unserialize the job due to missing models.
-     *
-     * @return void
-     */
-    protected function ensureDebounceLockIsReleasedViaContext()
-    {
-        if (! $this->container->bound(ContextRepository::class) ||
-            ! $this->container->bound(CacheFactory::class)) {
-            return;
-        }
-
-        $context = $this->container->make(ContextRepository::class);
-
-        [$key, $owner] = [
-            $context->getHidden('laravel_debounce_lock_key'),
-            $context->getHidden('laravel_debounce_lock_owner'),
-        ];
-
-        if ($key && $owner) {
-            $store = $this->container->make(CacheFactory::class)->store();
-
-            if ($store->get($key) === $owner) {
-                $store->forget($key);
-            }
         }
     }
 
@@ -443,8 +391,6 @@ class CallQueuedHandler
         if (! $this->commandShouldBeUniqueUntilProcessing($command)) {
             $this->ensureUniqueJobLockIsReleased($command);
         }
-
-        $this->ensureDebounceLockIsReleased($command);
 
         if ($command instanceof \__PHP_Incomplete_Class) {
             return;
