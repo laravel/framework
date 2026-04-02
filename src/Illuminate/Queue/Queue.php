@@ -377,7 +377,7 @@ abstract class Queue
             if ($job instanceof ShouldBeDebounced) {
                 $this->container->make('db.transactions')->addCallbackForRollback(
                     function () use ($job) {
-                        (new DebounceLock($this->container->make(Cache::class)))->release($job);
+                        (new DebounceLock($this->container->make(Cache::class)))->release($job, $job->debounceOwner ?? '');
                     }
                 );
             }

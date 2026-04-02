@@ -5,6 +5,7 @@ namespace Illuminate\Queue\Middleware;
 use Illuminate\Bus\DebounceLock;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Queue\Events\JobDebounced;
 
 class Debounced
 {
@@ -68,6 +69,14 @@ class Debounced
         $proxyJob = $this->createProxyJob();
 
         if (! $debounceLock->isCurrentOwner($proxyJob, $this->owner)) {
+            $container = Container::getInstance();
+
+            if ($container->bound('events')) {
+                $container->make('events')->dispatch(
+                    new JobDebounced($job->getConnectionName(), $job, $job)
+                );
+            }
+
             $job->delete();
 
             return;
@@ -76,7 +85,7 @@ class Debounced
         try {
             return $next($job);
         } finally {
-            $debounceLock->release($proxyJob);
+            $debounceLock->release($proxyJob, $this->owner);
         }
     }
 

@@ -68,16 +68,44 @@ class DebounceLock
     }
 
     /**
-     * Release the debounce lock for the given job.
+     * Determine if a debounce lock exists for the given job.
      *
      * @param  mixed  $job
-     * @return void
+     * @return bool
      */
-    public function release($job)
+    public function lockExists($job)
     {
         $cache = $this->resolveCache($job);
 
-        $cache->lock(static::getKey($job))->forceRelease();
+        $lock = $cache->lock(static::getKey($job), 1);
+
+        if ($lock->get()) {
+            $lock->release();
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Release the debounce lock for the given job if still the owner.
+     *
+     * @param  mixed  $job
+     * @param  string  $owner
+     * @return void
+     */
+    public function release($job, string $owner = '')
+    {
+        $cache = $this->resolveCache($job);
+
+        if (empty($owner)) {
+            $cache->lock(static::getKey($job))->forceRelease();
+
+            return;
+        }
+
+        $cache->restoreLock(static::getKey($job), $owner)->release();
     }
 
     /**

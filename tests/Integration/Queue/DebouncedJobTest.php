@@ -160,6 +160,38 @@ class DebouncedJobTest extends QueueTestCase
 
         Queue::assertPushed(DebouncedTestJob::class);
     }
+
+    public function testJobExecutesWhenLockHasExpired()
+    {
+        DebouncedTestJob::$handled = false;
+
+        dispatch(new DebouncedTestJob('entity-1'));
+
+        // Advance time well past the lock TTL so the lock expires.
+        $this->travelTo(now()->addSeconds(120));
+        $this->runQueueWorkerCommand(['--once' => true]);
+
+        // Job should execute (fail-open) even though lock expired.
+        $this->assertTrue(DebouncedTestJob::$handled);
+    }
+
+    public function testOwnerAwareReleaseDoesNotWipeNewerLock()
+    {
+        $cache = $this->app->get(Cache::class);
+        $lock = new DebounceLock($cache);
+
+        $jobA = new DebouncedTestJob('entity-1');
+        $jobB = new DebouncedTestJob('entity-1');
+
+        $ownerA = $lock->acquire($jobA);
+        $ownerB = $lock->acquire($jobB);
+
+        // Releasing with A's owner should not wipe B's lock.
+        $lock->release($jobA, $ownerA);
+
+        // B should still be the current owner.
+        $this->assertTrue($lock->isCurrentOwner($jobB, $ownerB));
+    }
 }
 
 class DebouncedTestJob implements ShouldQueue, ShouldBeDebounced

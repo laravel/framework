@@ -245,9 +245,15 @@ class CallQueuedHandler
             return false;
         }
 
-        return ! (new DebounceLock(
-            $this->container->make(Cache::class)
-        ))->isCurrentOwner($command, $owner);
+        $lock = new DebounceLock($this->container->make(Cache::class));
+
+        // Fail-open: if the lock no longer exists (cache eviction, TTL expiry),
+        // let the job execute rather than silently deleting it.
+        if (! $lock->lockExists($command)) {
+            return false;
+        }
+
+        return ! $lock->isCurrentOwner($command, $owner);
     }
 
     /**
@@ -264,6 +270,9 @@ class CallQueuedHandler
                 new JobDebounced($job->getConnectionName(), $job, $command)
             );
         }
+
+        $this->ensureNextJobInChainIsDispatched($command);
+        $this->ensureSuccessfulBatchJobIsRecorded($command);
 
         $job->delete();
     }
@@ -282,7 +291,7 @@ class CallQueuedHandler
 
         (new DebounceLock(
             $this->container->make(Cache::class)
-        ))->release($command);
+        ))->release($command, $command->debounceOwner ?? '');
     }
 
     /**
@@ -313,6 +322,7 @@ class CallQueuedHandler
     protected function handleModelNotFound(Job $job, $e)
     {
         $this->ensureUniqueJobLockIsReleasedViaContext();
+        $this->ensureDebounceLockIsReleasedViaContext();
 
         if ($job->payload()['deleteWhenMissingModels'] ?? false) {
             $this->ensureSuccessfulBatchJobIsRecordedForMissingModel($job, $job->resolveQueuedJobClass());
@@ -349,6 +359,35 @@ class CallQueuedHandler
                 ->store($store)
                 ->lock($key)
                 ->forceRelease();
+        }
+    }
+
+    /**
+     * Ensure the debounce lock is released via context.
+     *
+     * This is required when we can't unserialize the job due to missing models.
+     *
+     * @return void
+     */
+    protected function ensureDebounceLockIsReleasedViaContext()
+    {
+        if (! $this->container->bound(ContextRepository::class) ||
+            ! $this->container->bound(CacheFactory::class)) {
+            return;
+        }
+
+        $context = $this->container->make(ContextRepository::class);
+
+        [$key, $owner] = [
+            $context->getHidden('laravel_debounce_lock_key'),
+            $context->getHidden('laravel_debounce_lock_owner'),
+        ];
+
+        if ($key && $owner) {
+            $this->container->make(CacheFactory::class)
+                ->store()
+                ->restoreLock($key, $owner)
+                ->release();
         }
     }
 
