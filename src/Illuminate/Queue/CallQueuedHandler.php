@@ -16,11 +16,11 @@ use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\ShouldBeDebounced;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
-use Illuminate\Queue\Events\JobDebounced;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Events\CallQueuedListener;
 use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Queue\Events\JobDebounced;
 use RuntimeException;
 
 class CallQueuedHandler
