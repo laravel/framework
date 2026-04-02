@@ -306,7 +306,7 @@ class EncrypterTest extends TestCase
         $this->expectExceptionMessage('The payload is invalid.');
 
         $e = new Encrypter(str_repeat('a', 16), 'AES-128-CBC');
-        $invalidPayload = base64_encode('invalid') . '!';
+        $invalidPayload = base64_encode('invalid').'!';
 
         $e->decrypt($invalidPayload);
     }
@@ -320,7 +320,7 @@ class EncrypterTest extends TestCase
 
         $payload = $e->encrypt('foo');
         $data = json_decode(base64_decode($payload), true);
-        $data['iv'] = $data['iv'] . '!';
+        $data['iv'] = $data['iv'].'!';
 
         $e->decrypt(base64_encode(json_encode($data)));
     }
