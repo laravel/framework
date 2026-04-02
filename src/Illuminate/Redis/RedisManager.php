@@ -10,6 +10,8 @@ use Illuminate\Redis\Connectors\PredisConnector;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ConfigurationUrlParser;
 use InvalidArgumentException;
+use RuntimeException;
+use Throwable;
 
 use function Illuminate\Support\enum_value;
 
@@ -263,7 +265,13 @@ class RedisManager implements Factory
      */
     public function extend($driver, Closure $callback)
     {
-        $this->customCreators[$driver] = $callback->bindTo($this, $this);
+        try {
+            $callback = $callback->bindTo($this, static::class) ?? throw new RuntimeException;
+        } catch (Throwable) {
+            $callback = $callback->bindTo(null, static::class);
+        }
+
+        $this->customCreators[$driver] = $callback;
 
         return $this;
     }
