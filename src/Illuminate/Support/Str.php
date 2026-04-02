@@ -1050,7 +1050,9 @@ class Str
      * @param  bool  $numbers
      * @param  bool  $symbols
      * @param  bool  $spaces
-     * @return ($letters is false ? ($numbers is true ? ($symbols is false ? ($spaces is false ? numeric-string : string) : string) : string) : string)
+     * @return string
+     *
+     * @phpstan-return ($letters is false ? ($numbers is true ? ($symbols is false ? ($spaces is false ? numeric-string : string) : string) : ($symbols is false ? ($spaces is false ? never : string) : string)) : string)
      */
     public static function password($length = 32, $letters = true, $numbers = true, $symbols = true, $spaces = false)
     {
