@@ -66,8 +66,16 @@ class ClosureCommand extends Command
         }
 
         try {
+            $callback = $this->callback;
+
+            try {
+                $callback = $callback->bindTo($this, static::class) ?? throw new \RuntimeException;
+            } catch (\Throwable) {
+                $callback = $callback->bindTo(null, static::class);
+            }
+
             return (int) $this->laravel->call(
-                $this->callback->bindTo($this, $this), $parameters
+                $callback, $parameters
             );
         } catch (ManuallyFailedException $e) {
             $this->components->error($e->getMessage());
