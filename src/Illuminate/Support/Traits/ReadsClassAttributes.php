@@ -19,6 +19,7 @@ trait ReadsClassAttributes
     protected function getAttributeValue($target, string $attributeClass, ?string $property = null, $default = null)
     {
         $reflection = new ReflectionClass($target);
+
         $defaultProperties = $reflection->getDefaultProperties();
 
         if (isset($target->{$property}) && $target->{$property} !== ($defaultProperties[$property] ?? null)) {
