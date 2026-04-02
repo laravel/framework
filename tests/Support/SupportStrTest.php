@@ -158,6 +158,13 @@ class SupportStrTest extends TestCase
         $this->assertSame("\t\t\t", Str::words("\t\t\t"));
     }
 
+    public function testWordsWithZeroLimit(): void
+    {
+        $this->assertSame('...', Str::words('hello world', 0));
+        $this->assertSame('***', Str::words('hello world', 0, '***'));
+        $this->assertSame('...', Str::words('hello world', -1));
+    }
+
     public function testStringAscii(): void
     {
         $this->assertSame('@', Str::ascii('@'));

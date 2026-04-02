@@ -772,6 +772,10 @@ class Str
      */
     public static function words($value, $words = 100, $end = '...')
     {
+        if ($words <= 0) {
+            return $end;
+        }
+
         preg_match('/^\s*+(?:\S++\s*+){1,'.$words.'}/u', $value, $matches);
 
         if (! isset($matches[0]) || static::length($value) === static::length($matches[0])) {
