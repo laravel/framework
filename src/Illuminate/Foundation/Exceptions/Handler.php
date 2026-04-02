@@ -757,7 +757,7 @@ class Handler implements ExceptionHandlerContract
         $redirectTo = $exception->redirectTo($request);
 
         if (! $redirectTo) {
-            return response()->json(['message' => $exception->getMessage()], 401);
+            return response()->noContent(401);
         }
 
         return redirect()->guest($redirectTo);
