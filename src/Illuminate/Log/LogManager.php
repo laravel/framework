@@ -21,6 +21,7 @@ use Monolog\Logger as Monolog;
 use Monolog\Processor\ProcessorInterface;
 use Monolog\Processor\PsrLogMessageProcessor;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Throwable;
 
 use function Illuminate\Support\enum_value;
@@ -600,7 +601,13 @@ class LogManager implements LoggerInterface
      */
     public function extend($driver, Closure $callback)
     {
-        $this->customCreators[$driver] = $callback->bindTo($this, $this);
+        try {
+            $callback = $callback->bindTo($this, static::class) ?? throw new RuntimeException;
+        } catch (Throwable) {
+            $callback = $callback->bindTo(null, static::class);
+        }
+
+        $this->customCreators[$driver] = $callback;
 
         return $this;
     }

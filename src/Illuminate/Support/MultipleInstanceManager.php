@@ -5,6 +5,7 @@ namespace Illuminate\Support;
 use Closure;
 use InvalidArgumentException;
 use RuntimeException;
+use Throwable;
 
 abstract class MultipleInstanceManager
 {
@@ -198,7 +199,13 @@ abstract class MultipleInstanceManager
      */
     public function extend($name, Closure $callback)
     {
-        $this->customCreators[$name] = $callback->bindTo($this, $this);
+        try {
+            $callback = $callback->bindTo($this, static::class) ?? throw new RuntimeException;
+        } catch (Throwable) {
+            $callback = $callback->bindTo(null, static::class);
+        }
+
+        $this->customCreators[$name] = $callback;
 
         return $this;
     }
