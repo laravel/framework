@@ -299,4 +299,29 @@ class EncrypterTest extends TestCase
         $this->assertFalse(Encrypter::appearsEncrypted(['foo' => 'bar']));
         $this->assertFalse(Encrypter::appearsEncrypted(null));
     }
+
+    public function testExceptionThrownWhenPayloadContainsInvalidBase64Characters()
+    {
+        $this->expectException(DecryptException::class);
+        $this->expectExceptionMessage('The payload is invalid.');
+
+        $e = new Encrypter(str_repeat('a', 16), 'AES-128-CBC');
+        $invalidPayload = base64_encode('invalid') . '!';
+
+        $e->decrypt($invalidPayload);
+    }
+
+    public function testExceptionThrownWhenIvContainsInvalidBase64Characters()
+    {
+        $this->expectException(DecryptException::class);
+        $this->expectExceptionMessage('The payload is invalid.');
+
+        $e = new Encrypter(str_repeat('a', 16), 'AES-128-CBC');
+
+        $payload = $e->encrypt('foo');
+        $data = json_decode(base64_decode($payload), true);
+        $data['iv'] = $data['iv'] . '!';
+
+        $e->decrypt(base64_encode(json_encode($data)));
+    }
 }

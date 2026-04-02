@@ -156,7 +156,11 @@ class Encrypter implements EncrypterContract, StringEncrypter
     {
         $payload = $this->getJsonPayload($payload);
 
-        $iv = base64_decode($payload['iv']);
+        $iv = base64_decode($payload['iv'], true);
+
+        if ($iv === false) {
+            throw new DecryptException('The payload is invalid.');
+        }
 
         $this->ensureTagIsValid(
             $tag = empty($payload['tag']) ? null : base64_decode($payload['tag'])
@@ -231,11 +235,13 @@ class Encrypter implements EncrypterContract, StringEncrypter
      */
     protected function getJsonPayload($payload)
     {
-        if (! is_string($payload)) {
+        $decoded = is_string($payload) ? base64_decode($payload, true) : false;
+
+        if ($decoded === false) {
             throw new DecryptException('The payload is invalid.');
         }
 
-        $payload = json_decode(base64_decode($payload), true);
+        $payload = json_decode($decoded, true);
 
         // If the payload is not valid JSON or does not have the proper keys set we will
         // assume it is invalid and bail out of the routine since we will not be able

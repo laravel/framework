@@ -111,4 +111,18 @@ class DatabaseSessionHandlerTest extends DatabaseTestCase
         $this->assertNull($session->ip_address);
         $this->assertNull($session->user_id);
     }
+
+    public function testReadReturnsEmptyStringOnInvalidBase64Payload()
+    {
+        $connection = $this->app['db']->connection();
+        $handler = new DatabaseSessionHandler($connection, 'sessions', 1);
+
+        $connection->table('sessions')->insert([
+            'id' => 'invalid_session_id',
+            'payload' => 'invalid-base64-characters!@#$',
+            'last_activity' => time(),
+        ]);
+
+        $this->assertSame('', $handler->read('invalid_session_id'));
+    }
 }
