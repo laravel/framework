@@ -765,10 +765,15 @@ class Str
     /**
      * Limit the number of words in a string.
      *
-     * @param  string  $value
+     * @template TValue of string
+     * @template TEnd of string
+     *
+     * @param  TValue  $value
      * @param  int  $words
-     * @param  string  $end
+     * @param  TEnd  $end
      * @return string
+     *
+     * @phpstan-return ($words is negative-int ? TValue : ($words is positive-int ? string : TEnd))
      */
     public static function words($value, $words = 100, $end = '...')
     {
