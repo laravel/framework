@@ -14,6 +14,7 @@ trait ReadsClassAttributes
      * @param  class-string  $attributeClass
      * @param  string|null  $property
      * @param  mixed  $default
+     * @return mixed
      */
     protected function getAttributeValue($target, string $attributeClass, ?string $property = null, $default = null)
     {
