@@ -25,7 +25,7 @@ class PreventRequestForgeryTest extends TestCase
     public function test_same_origin_header_passes()
     {
         $middleware = $this->createMiddleware();
-        $request = $this->createRequest(['HTTP_SEC_FETCH_SITE' => 'same-origin']);
+        $request = $this->createRequest(['HTTP_SEC_FETCH_SITE' => 'same-origin'], 'test-token');
 
         $response = $middleware->handle($request, fn () => new Response('OK'));
 
@@ -47,7 +47,7 @@ class PreventRequestForgeryTest extends TestCase
         PreventRequestForgery::allowSameSite();
 
         $middleware = $this->createMiddleware();
-        $request = $this->createRequest(['HTTP_SEC_FETCH_SITE' => 'same-site']);
+        $request = $this->createRequest(['HTTP_SEC_FETCH_SITE' => 'same-site'], 'test-token');
 
         $response = $middleware->handle($request, fn () => new Response('OK'));
 
@@ -114,11 +114,23 @@ class PreventRequestForgeryTest extends TestCase
         PreventRequestForgery::useOriginOnly();
 
         $middleware = $this->createMiddleware();
-        $request = $this->createRequest(['HTTP_SEC_FETCH_SITE' => 'same-origin']);
+        $request = $this->createRequest(['HTTP_SEC_FETCH_SITE' => 'same-origin'], 'test-token');
 
         $response = $middleware->handle($request, fn () => new Response('OK'));
 
         $this->assertEquals('OK', $response->getContent());
+    }
+
+    public function test_throws_a_token_mismatch_exception_when_origin_is_valid_but_token_is_invalid()
+    {
+        // Request with 'same-origin' header but WRONG token
+        $request = $this->createRequest(['HTTP_SEC_FETCH_SITE' => 'same-origin'], 'invalid-token');
+
+        $middleware = $this->createMiddleware();
+
+        $this->expectException(TokenMismatchException::class);
+
+        $middleware->handle($request, fn () => new Response('OK'));
     }
 
     protected function createRequest(array $server = [], ?string $token = null)
