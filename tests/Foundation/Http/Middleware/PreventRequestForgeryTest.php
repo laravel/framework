@@ -35,6 +35,7 @@ class PreventRequestForgeryTest extends TestCase
 
         $this->expectException(TokenMismatchException::class);
 
-        $middleware->handle($request, function () {});
+        $middleware->handle($request, function () {
+        });
     }
 }
