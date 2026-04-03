@@ -993,13 +993,26 @@ class TestDispatcherAttributeOnlyQueueHandler implements \Illuminate\Contracts\Q
 class TestDispatcherNullQueueHandler implements \Illuminate\Contracts\Queue\ShouldQueue
 {
     use \Illuminate\Bus\Queueable;
-    public function __construct() { $this->onQueue(null); }
-    public function handle() {}
+    public function __construct()
+    {
+        $this->onQueue(null);
+    }
+
+    public function handle()
+    {
+        //
+    }
 }
 
 class TestDispatcherEmptyStringQueueHandler implements \Illuminate\Contracts\Queue\ShouldQueue
 {
     use \Illuminate\Bus\Queueable;
-    public function __construct() { $this->onQueue(''); }
-    public function handle() {}
+    public function __construct()
+    {
+        $this->onQueue('');
+    }
+    public function handle()
+    {
+        //
+    }
 }
