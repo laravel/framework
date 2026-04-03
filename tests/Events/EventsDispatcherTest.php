@@ -8,11 +8,11 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Events\CallQueuedListener;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Queue\Attributes\Connection;
+use Illuminate\Queue\Attributes\Connection as ConnectionAttribute;
+use Illuminate\Queue\Attributes\Delay;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Queue\Attributes\Connection as ConnectionAttribute;
-use Illuminate\Queue\Attributes\Connection;
-use Illuminate\Queue\Attributes\Delay;
 
 class EventsDispatcherTest extends TestCase
 {
