@@ -931,5 +931,8 @@ class TestDispatcherConstructorQueueHandler implements \Illuminate\Contracts\Que
         $this->onQueue('constructor-queue');
     }
 
-    public function handle() { }
+    public function handle()
+    {
+        //
+    }
 }
