@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Queue\Attributes\Connection;
+use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Queue\InteractsWithQueue;
@@ -251,8 +252,10 @@ class Dispatcher implements QueueingDispatcher
             ?? $this->resolveQueueFromQueueRoute($command)
             ?? null;
 
-        if (isset($command->delay)) {
-            return $queue->later($command->delay, $command, queue: $queueName);
+        $delay = $this->getAttributeValue($command, Delay::class, 'delay');
+
+        if (isset($delay)) {
+            return $queue->later($delay, $command, queue: $queueName);
         }
 
         return $queue->push($command, queue: $queueName);
