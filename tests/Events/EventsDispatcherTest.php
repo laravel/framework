@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Events;
 use Error;
 use Exception;
 use Illuminate\Container\Container;
+use Illuminate\Events\CallQueuedListener;
 use Illuminate\Events\Dispatcher;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -747,6 +748,17 @@ class EventsDispatcherTest extends TestCase
             Container::setInstance($originalContainer);
         }
     }
+
+    public function testConstructorBasedQueueAssignmentIsRespected()
+    {
+        $instance = new CallQueuedListener(
+            TestDispatcherConstructorQueueHandler::class,
+            'handle',
+            ['foo']
+        );
+
+        $this->assertEquals('constructor-queue', $instance->queue);
+    }
 }
 
 class TestListenerLean
@@ -908,4 +920,16 @@ class DispatchableNamedArgumentsEvent
         public string $second,
     ) {
     }
+}
+
+class TestDispatcherConstructorQueueHandler implements \Illuminate\Contracts\Queue\ShouldQueue
+{
+    use \Illuminate\Bus\Queueable;
+
+    public function __construct()
+    {
+        $this->onQueue('constructor-queue');
+    }
+
+    public function handle() { }
 }

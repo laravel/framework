@@ -122,6 +122,8 @@ class CallQueuedListener implements ShouldQueue
         $this->data = $data;
         $this->class = $class;
         $this->method = $method;
+
+        $this->queue = $this->resolveQueueName($class);
     }
 
     /**
@@ -258,5 +260,20 @@ class CallQueuedListener implements ShouldQueue
         $this->data = array_map(function ($data) {
             return is_object($data) ? clone $data : $data;
         }, $this->data);
+    }
+
+    /**
+     * Resolve the queue name for the listener.
+     *
+     * @param  string  $class
+     * @return string|null
+     */
+    protected function resolveQueueName($class)
+    {
+        if (property_exists($class, 'queue')) {
+            return (new $class)->queue;
+        }
+
+        return null;
     }
 }
