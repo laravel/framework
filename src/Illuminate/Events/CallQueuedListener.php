@@ -124,7 +124,16 @@ class CallQueuedListener implements ShouldQueue
         $this->class = $class;
         $this->method = $method;
 
-        $this->queue = $this->resolveQueueName($class);
+        $instance = Container::getInstance()->make($class);
+
+        $this->queue = $this->getAttributeValue($instance, \Illuminate\Queue\Attributes\Queue::class, 'queue')
+            ?? (method_exists($instance, 'viaQueue') ? $instance->viaQueue() : null);
+
+        $this->connection = $this->getAttributeValue($instance, \Illuminate\Queue\Attributes\Connection::class, 'connection')
+            ?? ($instance->connection ?? null);
+
+        $this->delay = $this->getAttributeValue($instance, \Illuminate\Queue\Attributes\Delay::class, 'delay')
+            ?? ($instance->delay ?? null);
     }
 
     /**

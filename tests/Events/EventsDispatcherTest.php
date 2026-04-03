@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Events;
 use Error;
 use Exception;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Events\CallQueuedListener;
 use Illuminate\Events\Dispatcher;
 use Mockery as m;
@@ -801,6 +802,35 @@ class EventsDispatcherTest extends TestCase
 
         $fakeQueue->assertPushedOn(null, \Illuminate\Events\CallQueuedListener::class);
     }
+
+    public function testConstructorBasedConnectionAndDelayAssignmentIsRespected()
+    {
+        $instance = new CallQueuedListener(
+            TestDispatcherConstructorConnectionAndDelayHandler::class,
+            'handle',
+            ['foo']
+        );
+
+        $this->assertEquals('constructor-connection', $instance->connection);
+        $this->assertEquals(45, $instance->delay);
+    }
+
+    public function testItRespectsConnectionAndDelayAttributes()
+    {
+        $d = new Dispatcher;
+        $fakeQueue = new \Illuminate\Support\Testing\Fakes\QueueFake(new Container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('attr.conn.event', TestDispatcherAttributeConnectionAndDelayHandler::class.'@handle');
+        $d->dispatch('attr.conn.event');
+
+        $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
+            return $job->connection === 'attribute-connection' && $job->delay === 60;
+        });
+    }
 }
 
 class TestListenerLean
@@ -1014,6 +1044,33 @@ class TestDispatcherEmptyStringQueueHandler implements \Illuminate\Contracts\Que
         $this->onQueue('');
     }
 
+    public function handle()
+    {
+        //
+    }
+}
+
+class TestDispatcherConstructorConnectionAndDelayHandler implements \Illuminate\Contracts\Queue\ShouldQueue
+{
+    use \Illuminate\Bus\Queueable;
+
+    public function __construct() {
+        $this->onConnection('constructor-connection');
+        $this->delay(45);
+    }
+    public function handle()
+    {
+        //
+    }
+}
+
+use Illuminate\Queue\Attributes\Connection;
+use Illuminate\Queue\Attributes\Delay;
+
+#[Connection('attribute-connection')]
+#[Delay(60)]
+class TestDispatcherAttributeConnectionAndDelayHandler implements ShouldQueue
+{
     public function handle()
     {
         //
