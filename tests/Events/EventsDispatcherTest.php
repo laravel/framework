@@ -10,6 +10,9 @@ use Illuminate\Events\CallQueuedListener;
 use Illuminate\Events\Dispatcher;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Queue\Attributes\Connection as ConnectionAttribute;
+use Illuminate\Queue\Attributes\Connection;
+use Illuminate\Queue\Attributes\Delay;
 
 class EventsDispatcherTest extends TestCase
 {
@@ -831,6 +834,17 @@ class EventsDispatcherTest extends TestCase
             return $job->connection === 'attribute-connection' && $job->delay === 60;
         });
     }
+
+    public function testConstructorAssignmentTakesPrecedenceOverAttribute()
+    {
+        $instance = new CallQueuedListener(
+            TestDispatcherPrecedenceConnectionHandler::class,
+            'handle',
+            ['foo']
+        );
+
+        $this->assertEquals('constructor-connection', $instance->connection);
+    }
 }
 
 class TestListenerLean
@@ -1066,13 +1080,26 @@ class TestDispatcherConstructorConnectionAndDelayHandler implements \Illuminate\
     }
 }
 
-use Illuminate\Queue\Attributes\Connection;
-use Illuminate\Queue\Attributes\Delay;
-
 #[Connection('attribute-connection')]
 #[Delay(60)]
 class TestDispatcherAttributeConnectionAndDelayHandler implements ShouldQueue
 {
+    public function handle()
+    {
+        //
+    }
+}
+
+#[ConnectionAttribute('attribute-connection')]
+class TestDispatcherPrecedenceConnectionHandler implements ShouldQueue
+{
+    use \Illuminate\Bus\Queueable;
+
+    public function __construct()
+    {
+        $this->onConnection('constructor-connection');
+    }
+
     public function handle()
     {
         //
