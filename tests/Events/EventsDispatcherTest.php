@@ -1059,6 +1059,7 @@ class TestDispatcherConstructorConnectionAndDelayHandler implements \Illuminate\
         $this->onConnection('constructor-connection');
         $this->delay(45);
     }
+
     public function handle()
     {
         //
