@@ -271,19 +271,4 @@ class CallQueuedListener implements ShouldQueue
             return is_object($data) ? clone $data : $data;
         }, $this->data);
     }
-
-    /**
-     * Resolve the queue name for the listener.
-     *
-     * @param  string  $class
-     * @return string|null
-     */
-    protected function resolveQueueName($class)
-    {
-        $instance = Container::getInstance()->make($class);
-
-        $queue = $this->getAttributeValue($instance, \Illuminate\Queue\Attributes\Queue::class, 'queue');
-
-        return $queue ?? (method_exists($instance, 'viaQueue') ? $instance->viaQueue() : null);
-    }
 }
