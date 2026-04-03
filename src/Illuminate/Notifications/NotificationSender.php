@@ -10,6 +10,7 @@ use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Queue\Attributes\Connection;
+use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Support\Collection;
@@ -250,11 +251,9 @@ class NotificationSender
                     $queue = $notification->viaQueues()[$channel] ?? $queue;
                 }
 
-                $delay = $notification->delay;
-
-                if (method_exists($notification, 'withDelay')) {
-                    $delay = $notification->withDelay($notifiable, $channel) ?? null;
-                }
+                $delay = method_exists($notification, 'withDelay')
+                    ? ($notification->withDelay($notifiable, $channel) ?? null)
+                    : $this->getAttributeValue($notification, Delay::class, 'delay');
 
                 $messageGroup = $notification->messageGroup ?? (method_exists($notification, 'messageGroup') ? $notification->messageGroup() : null);
 
