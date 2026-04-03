@@ -773,6 +773,34 @@ class EventsDispatcherTest extends TestCase
 
         $fakeQueue->assertPushedOn('attribute-queue', \Illuminate\Events\CallQueuedListener::class);
     }
+
+    public function testItHandlesNullQueueGracefully()
+    {
+        $d = new Dispatcher;
+        $fakeQueue = new \Illuminate\Support\Testing\Fakes\QueueFake(new Container);
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('null.event', TestDispatcherNullQueueHandler::class.'@handle');
+        $d->dispatch('null.event');
+
+        $fakeQueue->assertPushedOn(null, \Illuminate\Events\CallQueuedListener::class);
+    }
+
+    public function testItHandlesEmptyStringQueue()
+    {
+        $d = new Dispatcher;
+        $fakeQueue = new \Illuminate\Support\Testing\Fakes\QueueFake(new Container);
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('empty.event', TestDispatcherEmptyStringQueueHandler::class.'@handle');
+        $d->dispatch('empty.event');
+
+        $fakeQueue->assertPushedOn(null, \Illuminate\Events\CallQueuedListener::class);
+    }
 }
 
 class TestListenerLean
@@ -960,4 +988,18 @@ class TestDispatcherAttributeOnlyQueueHandler implements \Illuminate\Contracts\Q
     {
         //
     }
+}
+
+class TestDispatcherNullQueueHandler implements \Illuminate\Contracts\Queue\ShouldQueue
+{
+    use \Illuminate\Bus\Queueable;
+    public function __construct() { $this->onQueue(null); }
+    public function handle() {}
+}
+
+class TestDispatcherEmptyStringQueueHandler implements \Illuminate\Contracts\Queue\ShouldQueue
+{
+    use \Illuminate\Bus\Queueable;
+    public function __construct() { $this->onQueue(''); }
+    public function handle() {}
 }
