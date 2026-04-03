@@ -8,10 +8,11 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Traits\ReadsClassAttributes;
 
 class CallQueuedListener implements ShouldQueue
 {
-    use InteractsWithQueue, Queueable;
+    use InteractsWithQueue, Queueable, ReadsClassAttributes;
 
     /**
      * The listener class name.
@@ -270,10 +271,9 @@ class CallQueuedListener implements ShouldQueue
      */
     protected function resolveQueueName($class)
     {
-        if (property_exists($class, 'queue')) {
-            return (new $class)->queue;
-        }
+        $instance = Container::getInstance()->make($class);
 
-        return null;
+        return $this->getAttributeValue($instance, \Illuminate\Queue\Attributes\Queue::class, 'queue')
+            ?? ($instance->queue ?? null);
     }
 }

@@ -759,6 +759,20 @@ class EventsDispatcherTest extends TestCase
 
         $this->assertEquals('constructor-queue', $instance->queue);
     }
+
+    public function testItRespectsQueueAttributeWhenConstructorIsEmpty()
+    {
+        $d = new Dispatcher;
+        $fakeQueue = new \Illuminate\Support\Testing\Fakes\QueueFake(new Container);
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('attribute.event', TestDispatcherAttributeOnlyQueueHandler::class.'@handle');
+        $d->dispatch('attribute.event');
+
+        $fakeQueue->assertPushedOn('attribute-queue', \Illuminate\Events\CallQueuedListener::class);
+    }
 }
 
 class TestListenerLean
@@ -930,6 +944,17 @@ class TestDispatcherConstructorQueueHandler implements \Illuminate\Contracts\Que
     {
         $this->onQueue('constructor-queue');
     }
+
+    public function handle()
+    {
+        //
+    }
+}
+
+#[\Illuminate\Queue\Attributes\Queue('attribute-queue')]
+class TestDispatcherAttributeOnlyQueueHandler implements \Illuminate\Contracts\Queue\ShouldQueue
+{
+    use \Illuminate\Bus\Queueable;
 
     public function handle()
     {
