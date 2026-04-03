@@ -935,7 +935,7 @@ class Vite implements Htmlable
      * @param  string  $buildDirectory
      * @return array
      *
-     * @throws \Illuminate\Foundation\ViteManifestNotFoundException
+     * @throws \Illuminate\Foundation\ViteException
      */
     protected function manifest($buildDirectory)
     {
@@ -943,7 +943,7 @@ class Vite implements Htmlable
 
         if (! isset(static::$manifests[$path])) {
             if (! is_file($path)) {
-                throw new ViteManifestNotFoundException("Vite manifest not found at: $path");
+                throw new ViteException("Vite manifest not found at: $path");
             }
 
             static::$manifests[$path] = json_decode(file_get_contents($path), true);
