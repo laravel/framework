@@ -145,7 +145,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
             ->whereNull('reserved_at')
             ->where('available_at', '<=', $this->currentTime())
             ->get()
-            ->map(fn ($record) => InspectedJob::fromPayload($record->payload, $record->queue, $record->attempts));
+            ->map(fn ($record) => InspectedJob::fromPayload($record->payload, $record->attempts));
     }
 
     /**
@@ -161,7 +161,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
             ->whereNull('reserved_at')
             ->where('available_at', '>', $this->currentTime())
             ->get()
-            ->map(fn ($record) => InspectedJob::fromPayload($record->payload, $record->queue, $record->attempts));
+            ->map(fn ($record) => InspectedJob::fromPayload($record->payload, $record->attempts));
     }
 
     /**
@@ -176,7 +176,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
             ->where('queue', $this->getQueue($queue))
             ->whereNotNull('reserved_at')
             ->get()
-            ->map(fn ($record) => InspectedJob::fromPayload($record->payload, $record->queue, $record->attempts));
+            ->map(fn ($record) => InspectedJob::fromPayload($record->payload, $record->attempts));
     }
 
     /**

@@ -492,7 +492,6 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->assertCount(1, $pending);
         $this->assertInstanceOf(InspectedJob::class, $pending->first());
         $this->assertSame(JobStub::class, $pending->first()->name);
-        $this->assertSame('foo', $pending->first()->queue);
         $this->assertSame(0, $pending->first()->attempts);
     }
 

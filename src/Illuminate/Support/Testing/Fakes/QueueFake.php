@@ -472,7 +472,6 @@ class QueueFake extends QueueManager implements Fake, Queue
                 name: is_object($data['job'])
                     ? (method_exists($data['job'], 'displayName') ? $data['job']->displayName() : get_class($data['job']))
                     : $data['job'],
-                queue: $data['queue'],
                 attempts: 0,
                 uuid: null,
                 createdAt: null,

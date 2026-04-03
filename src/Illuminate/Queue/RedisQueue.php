@@ -155,7 +155,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
         $queue = $this->getQueue($queue);
 
         return (new Collection($this->getConnection()->lrange($queue, 0, -1)))
-            ->map(fn ($payload) => InspectedJob::fromPayload($payload, $queue));
+            ->map(fn ($payload) => InspectedJob::fromPayload($payload));
     }
 
     /**
@@ -169,7 +169,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
         $queue = $this->getQueue($queue);
 
         return (new Collection($this->getConnection()->zrange($queue.':delayed', 0, -1)))
-            ->map(fn ($payload) => InspectedJob::fromPayload($payload, $queue));
+            ->map(fn ($payload) => InspectedJob::fromPayload($payload));
     }
 
     /**
@@ -183,7 +183,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
         $queue = $this->getQueue($queue);
 
         return (new Collection($this->getConnection()->zrange($queue.':reserved', 0, -1)))
-            ->map(fn ($payload) => InspectedJob::fromPayload($payload, $queue));
+            ->map(fn ($payload) => InspectedJob::fromPayload($payload));
     }
 
     /**
