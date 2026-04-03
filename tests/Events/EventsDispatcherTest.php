@@ -1054,7 +1054,8 @@ class TestDispatcherConstructorConnectionAndDelayHandler implements \Illuminate\
 {
     use \Illuminate\Bus\Queueable;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->onConnection('constructor-connection');
         $this->delay(45);
     }
