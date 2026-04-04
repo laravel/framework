@@ -150,7 +150,9 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
     {
         $connection = $this->connection();
 
-        // Cluster and cross-slot safe connections do not support writing multiple values if the keys hash differently...
+        // Cluster and cross-slot safe connections do not support writing multiple values if the keys hash differently.
+        // Unlike many() where PhpRedisClusterConnection handles mget natively across slots, putMany() uses
+        // MULTI/EXEC which cannot span cluster slots, so PhpRedisClusterConnection is always included here...
         if ($connection instanceof PredisClusterConnection ||
             $connection instanceof PhpRedisClusterConnection ||
             $connection->isCrossSlotSafe()) {

@@ -155,6 +155,8 @@ class RedisManager implements Factory
             $connection->setEventDispatcher($this->app->make('events'));
         }
 
+        // For cluster connections, per-connection config lives in 'clusters.options'
+        // or global 'options', not in the cluster node definitions array...
         $config = $this->config[$name] ?? [];
         $clusterOptions = $this->config['clusters']['options'] ?? [];
 

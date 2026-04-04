@@ -107,9 +107,11 @@ class ConcurrencyLimiter
             return $crossSlotSafe ? '{'.$this->name.'}'.$i : $this->name.$i;
         }, range(1, $this->maxLocks));
 
+        $nameArg = $crossSlotSafe ? '{'.$this->name.'}' : $this->name;
+
         return $this->redis->eval(...array_merge(
             [$this->lockScript(), count($slots)],
-            array_merge($slots, [$this->name, $this->releaseAfter, $id])
+            array_merge($slots, [$nameArg, $this->releaseAfter, $id])
         ));
     }
 

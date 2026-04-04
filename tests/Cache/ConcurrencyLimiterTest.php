@@ -216,6 +216,7 @@ class ConcurrencyLimiterTest extends TestCase
         $connection = m::mock(\Illuminate\Redis\Connections\PhpRedisConnection::class)->makePartial();
         $connection->enableCrossSlotSafe();
         $acquireArgs = null;
+        $releaseArgs = null;
 
         // acquire() -> eval() -> command('eval', [$script, $arguments, $numKeys])
         $connection->shouldReceive('command')->once()->withArgs(function ($method, $parameters) use (&$acquireArgs) {
@@ -224,10 +225,16 @@ class ConcurrencyLimiterTest extends TestCase
             }
 
             return true;
-        })->andReturn('test-limiter1');
+        })->andReturn('{test-limiter}1');
 
         // release() -> eval() -> command()
-        $connection->shouldReceive('command')->once()->andReturn(1);
+        $connection->shouldReceive('command')->once()->withArgs(function ($method, $parameters) use (&$releaseArgs) {
+            if ($method === 'eval') {
+                $releaseArgs = $parameters;
+            }
+
+            return true;
+        })->andReturn(1);
 
         $limiter = new \Illuminate\Redis\Limiters\ConcurrencyLimiter($connection, 'test-limiter', 3, 60);
         $limiter->block(0, function () {
@@ -243,6 +250,50 @@ class ConcurrencyLimiterTest extends TestCase
         $this->assertSame('{test-limiter}1', $arguments[0]);
         $this->assertSame('{test-limiter}2', $arguments[1]);
         $this->assertSame('{test-limiter}3', $arguments[2]);
+        $this->assertSame('{test-limiter}', $arguments[3]);
+
+        // The release key should match the actual hash-tagged Redis key
+        $this->assertSame('{test-limiter}1', $releaseArgs[1][0]);
+    }
+
+    public function testDurationLimiterAcquireUsesHashTaggedKeyWhenEnabled()
+    {
+        $connection = m::mock(\Illuminate\Redis\Connections\PhpRedisConnection::class)->makePartial();
+        $connection->enableCrossSlotSafe();
+        $acquireArgs = null;
+
+        $connection->shouldReceive('command')->once()->withArgs(function ($method, $parameters) use (&$acquireArgs) {
+            if ($method === 'eval') {
+                $acquireArgs = $parameters;
+            }
+
+            return true;
+        })->andReturn([1, time() + 60, 4]);
+
+        $limiter = new \Illuminate\Redis\Limiters\DurationLimiter($connection, 'test-limiter', 5, 60);
+        $limiter->acquire();
+
+        // $parameters = [$script, $arguments, $numKeys]
+        $this->assertSame(1, $acquireArgs[2]);
+        $this->assertSame('{test-limiter}', $acquireArgs[1][0]);
+    }
+
+    public function testDurationLimiterClearUsesHashTaggedKeyWhenEnabled()
+    {
+        $connection = m::mock(\Illuminate\Redis\Connections\PhpRedisConnection::class)->makePartial();
+        $connection->enableCrossSlotSafe();
+        $delArgs = null;
+
+        $connection->shouldReceive('command')->once()->withArgs(function ($method, $parameters) use (&$delArgs) {
+            $delArgs = $parameters;
+
+            return true;
+        })->andReturn(1);
+
+        $limiter = new \Illuminate\Redis\Limiters\DurationLimiter($connection, 'test-limiter', 5, 60);
+        $limiter->clear();
+
+        $this->assertSame('{test-limiter}', $delArgs[0]);
     }
 
     public function testFunnelBackedEnumSharesKeyWithStringEquivalent()

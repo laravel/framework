@@ -95,6 +95,16 @@ class DurationLimiter
     }
 
     /**
+     * Get the properly formatted key for this limiter.
+     *
+     * @return string
+     */
+    protected function key()
+    {
+        return $this->redis->isCrossSlotSafe() ? '{'.$this->name.'}' : $this->name;
+    }
+
+    /**
      * Attempt to acquire the lock.
      *
      * @return bool
@@ -102,7 +112,7 @@ class DurationLimiter
     public function acquire()
     {
         $results = $this->redis->eval(
-            $this->luaScript(), 1, $this->name, microtime(true), time(), $this->decay, $this->maxLocks
+            $this->luaScript(), 1, $this->key(), microtime(true), time(), $this->decay, $this->maxLocks
         );
 
         $this->decaysAt = $results[1];
@@ -120,7 +130,7 @@ class DurationLimiter
     public function tooManyAttempts()
     {
         [$this->decaysAt, $this->remaining] = $this->redis->eval(
-            $this->tooManyAttemptsLuaScript(), 1, $this->name, microtime(true), time(), $this->decay, $this->maxLocks
+            $this->tooManyAttemptsLuaScript(), 1, $this->key(), microtime(true), time(), $this->decay, $this->maxLocks
         );
 
         return $this->remaining <= 0;
@@ -133,7 +143,7 @@ class DurationLimiter
      */
     public function clear()
     {
-        $this->redis->del($this->name);
+        $this->redis->del($this->key());
     }
 
     /**
