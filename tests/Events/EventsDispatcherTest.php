@@ -4,10 +4,15 @@ namespace Illuminate\Tests\Events;
 
 use Error;
 use Exception;
+use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Queue\InteractsWithQueue;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Collection\QueueInterface;
 
 class EventsDispatcherTest extends TestCase
 {
@@ -747,6 +752,79 @@ class EventsDispatcherTest extends TestCase
             Container::setInstance($originalContainer);
         }
     }
+
+    public function testListenerConstructorIsCalledWhenQueuing()
+    {
+        $container = new \Illuminate\Container\Container;
+        $dispatcher = new \Illuminate\Events\Dispatcher($container);
+        \Illuminate\Container\Container::setInstance($container);
+
+        $connection = \Mockery::mock(\Illuminate\Contracts\Queue\Queue::class);
+
+        $queueManager = \Mockery::mock(\Illuminate\Contracts\Queue\Factory::class);
+
+        $queueManager->shouldReceive('connection')->andReturn($connection);
+
+        $dispatcher->setQueueResolver(function () use ($queueManager) {
+            return $queueManager;
+        });
+
+        $connection->shouldReceive('pushOn')
+            ->once()
+            ->with('high', \Mockery::type(\Illuminate\Events\CallQueuedListener::class)) // Change this to 'high'
+            ->andReturn(1);
+
+        $dispatcher->listen('test.event', ListenerWithConstructorQueue::class);
+        $dispatcher->dispatch('test.event');
+    }
+
+    public function testListenerConstructorCorrectlySetsConnectionAndDelay()
+    {
+        $container = new \Illuminate\Container\Container;
+        $dispatcher = new \Illuminate\Events\Dispatcher($container);
+        \Illuminate\Container\Container::setInstance($container);
+
+        $connection = \Mockery::mock(\Illuminate\Contracts\Queue\Queue::class);
+        $queueManager = \Mockery::mock(\Illuminate\Contracts\Queue\Factory::class);
+
+        $queueManager->shouldReceive('connection')->with('redis')->andReturn($connection);
+
+        $dispatcher->setQueueResolver(function () use ($queueManager) {
+            return $queueManager;
+        });
+
+        $connection->shouldReceive('laterOn')
+            ->once()
+            ->with(
+                'high-priority',
+                60,
+                \Mockery::type(\Illuminate\Events\CallQueuedListener::class)
+            )
+            ->andReturn(1);
+
+        $dispatcher->listen('test.event', ListenerWithFullConstructorOptions::class);
+        $dispatcher->dispatch('test.event');
+    }
+
+    public function testListenerWithDependencyInjectionWorks()
+    {
+        $container = new \Illuminate\Container\Container;
+        $dispatcher = new \Illuminate\Events\Dispatcher($container);
+        \Illuminate\Container\Container::setInstance($container);
+
+        $connection = \Mockery::mock(\Illuminate\Contracts\Queue\Queue::class);
+        $queueManager = \Mockery::mock(\Illuminate\Contracts\Queue\Factory::class);
+        $queueManager->shouldReceive('connection')->andReturn($connection);
+        $dispatcher->setQueueResolver(function () use ($queueManager) { return $queueManager; });
+
+        $connection->shouldReceive('pushOn')
+            ->once()
+            ->with('high-priority', \Mockery::type(\Illuminate\Events\CallQueuedListener::class))
+            ->andReturn(1);
+
+        $dispatcher->listen('test.event', ListenerWithDependency::class);
+        $dispatcher->dispatch('test.event');
+    }
 }
 
 class TestListenerLean
@@ -907,5 +985,61 @@ class DispatchableNamedArgumentsEvent
         public string $first,
         public string $second,
     ) {
+    }
+}
+
+class ListenerWithConstructorQueue implements ShouldQueue
+{
+    use InteractsWithQueue;
+    use Queueable;
+
+    public function __construct()
+    {
+        $this->onQueue('high');
+    }
+
+    public function handle($event)
+    {
+        //
+    }
+}
+
+class ListenerWithFullConstructorOptions implements \Illuminate\Contracts\Queue\ShouldQueue
+{
+    use \Illuminate\Bus\Queueable;
+
+    public function __construct()
+    {
+        $this->onConnection('redis');
+        $this->onQueue('high-priority');
+        $this->delay(60);
+    }
+
+    public function handle($event)
+    {
+        //
+    }
+}
+
+class SimpleService
+{
+    public function doSomething()
+    {
+        return true;
+    }
+}
+
+class ListenerWithDependency implements \Illuminate\Contracts\Queue\ShouldQueue
+{
+    use \Illuminate\Bus\Queueable;
+
+    public function __construct(SimpleService $service)
+    {
+        $this->onQueue('high-priority');
+    }
+
+    public function handle($event)
+    {
+        //
     }
 }
