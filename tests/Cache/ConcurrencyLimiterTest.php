@@ -10,6 +10,8 @@ use Illuminate\Cache\Limiters\LimiterTimeoutException;
 use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
+use Illuminate\Redis\Connections\PhpRedisClusterConnection;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
@@ -208,6 +210,39 @@ class ConcurrencyLimiterTest extends TestCase
 
         $this->assertEquals([1], $store);
         $this->assertSame('ok', $result);
+    }
+
+    public function testAcquireUsesHashTaggedKeysForClusterConnections()
+    {
+        $connection = m::mock(PhpRedisClusterConnection::class);
+        $acquireArgs = null;
+
+        // acquire() -> eval() -> command('eval', [$script, $arguments, $numKeys])
+        $connection->shouldReceive('command')->once()->withArgs(function ($method, $parameters) use (&$acquireArgs) {
+            if ($method === 'eval') {
+                $acquireArgs = $parameters;
+            }
+
+            return true;
+        })->andReturn('test-limiter1');
+
+        // release() -> eval() -> command()
+        $connection->shouldReceive('command')->once()->andReturn(1);
+
+        $limiter = new \Illuminate\Redis\Limiters\ConcurrencyLimiter($connection, 'test-limiter', 3, 60);
+        $limiter->block(0, function () {
+            // noop
+        });
+
+        // $parameters = [$script, $arguments, $numKeys]
+        // $arguments = [...$slots, $name, $releaseAfter, $id]
+        $arguments = $acquireArgs[1];
+        $numKeys = $acquireArgs[2];
+
+        $this->assertSame(3, $numKeys);
+        $this->assertSame('{test-limiter}1', $arguments[0]);
+        $this->assertSame('{test-limiter}2', $arguments[1]);
+        $this->assertSame('{test-limiter}3', $arguments[2]);
     }
 
     public function testFunnelBackedEnumSharesKeyWithStringEquivalent()

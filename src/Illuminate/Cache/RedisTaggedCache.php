@@ -212,6 +212,10 @@ class RedisTaggedCache extends TaggedCache
                         $connection->del($cacheKey);
                     }
                 });
+            } elseif ($connection instanceof PhpRedisClusterConnection) {
+                foreach ($cacheKeys as $cacheKey) {
+                    $connection->del($cacheKey);
+                }
             } else {
                 $connection->del(...$cacheKeys);
             }

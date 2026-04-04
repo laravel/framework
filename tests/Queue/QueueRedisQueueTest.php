@@ -7,6 +7,7 @@ use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Queue\LuaScripts;
 use Illuminate\Queue\Queue;
 use Illuminate\Queue\RedisQueue;
+use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Mockery as m;
@@ -136,6 +137,29 @@ class QueueRedisQueueTest extends TestCase
 
         Carbon::setTestNow();
         Str::createUuidsNormally();
+    }
+
+    public function testGetQueueUsesHashTagsForClusterConnections()
+    {
+        $redis = m::mock(Factory::class);
+        $queue = new RedisQueue($redis, 'default');
+
+        $clusterConnection = m::mock(PhpRedisClusterConnection::class);
+        $redis->shouldReceive('connection')->andReturn($clusterConnection);
+
+        $this->assertSame('queues:{default}', $queue->getQueue(null));
+        $this->assertSame('queues:{custom}', $queue->getQueue('custom'));
+    }
+
+    public function testGetQueueDoesNotUseHashTagsForNonClusterConnections()
+    {
+        $redis = m::mock(Factory::class);
+        $queue = new RedisQueue($redis, 'default');
+
+        $redis->shouldReceive('connection')->andReturn($redis);
+
+        $this->assertSame('queues:default', $queue->getQueue(null));
+        $this->assertSame('queues:custom', $queue->getQueue('custom'));
     }
 
     public function testDelayedPushWithDateTimeProperlyPushesJobOntoRedis()
