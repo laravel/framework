@@ -3169,6 +3169,11 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['url' => 'laravel.com'], ['url' => 'ends_with:http,https']);
         $this->assertFalse($v->passes());
         $this->assertSame('The url must end with one of the following values http, https', $v->messages()->first('url'));
+
+        // Array input must fail gracefully without throwing TypeError (issue #59521)
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => ['hello', 'world']], ['x' => 'ends_with:world']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateDoesntEndWith()
@@ -3179,6 +3184,11 @@ class ValidationValidatorTest extends TestCase
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => 'hello world'], ['x' => 'doesnt_end_with:world']);
+        $this->assertFalse($v->passes());
+
+        // Array input must fail gracefully without throwing TypeError (issue #59521)
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => ['hello', 'world']], ['x' => 'doesnt_end_with:world']);
         $this->assertFalse($v->passes());
     }
 
@@ -3207,6 +3217,11 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['url' => 'laravel.com'], ['url' => 'starts_with:http,https']);
         $this->assertFalse($v->passes());
         $this->assertSame('The url must start with one of the following values http, https', $v->messages()->first('url'));
+
+        // Array input must fail gracefully without throwing TypeError (issue #59521)
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => ['hello', 'world']], ['x' => 'starts_with:hello']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateDoesntStartWith()
@@ -3217,6 +3232,11 @@ class ValidationValidatorTest extends TestCase
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => 'hello world'], ['x' => 'doesnt_start_with:hello']);
+        $this->assertFalse($v->passes());
+
+        // Array input must fail gracefully without throwing TypeError (issue #59521)
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => ['hello', 'world']], ['x' => 'doesnt_start_with:hello']);
         $this->assertFalse($v->passes());
     }
 

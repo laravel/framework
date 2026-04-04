@@ -2636,6 +2636,10 @@ trait ValidatesAttributes
      */
     public function validateStartsWith($attribute, $value, $parameters)
     {
+        if (! is_string($value)) {
+            return false;
+        }
+
         return Str::startsWith($value, $parameters);
     }
 
@@ -2649,6 +2653,10 @@ trait ValidatesAttributes
      */
     public function validateDoesntStartWith($attribute, $value, $parameters)
     {
+        if (! is_string($value)) {
+            return false;
+        }
+
         return ! Str::startsWith($value, $parameters);
     }
 
@@ -2662,6 +2670,10 @@ trait ValidatesAttributes
      */
     public function validateEndsWith($attribute, $value, $parameters)
     {
+        if (! is_string($value)) {
+            return false;
+        }
+
         return Str::endsWith($value, $parameters);
     }
 
@@ -2675,6 +2687,10 @@ trait ValidatesAttributes
      */
     public function validateDoesntEndWith($attribute, $value, $parameters)
     {
+        if (! is_string($value)) {
+            return false;
+        }
+
         return ! Str::endsWith($value, $parameters);
     }
 
