@@ -57,6 +57,13 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     protected $migrationBatchSize = -1;
 
     /**
+     * Indicates if the connection is cross-slot safe.
+     *
+     * @var bool|null
+     */
+    protected $crossSlotSafe;
+
+    /**
      * Indicates if a secondary queue had a job available between checks of the primary queue.
      *
      * Only applicable when monitoring multiple named queues with a single instance.
@@ -441,7 +448,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     {
         $queue = $queue ?: $this->default;
 
-        if ($this->getConnection()->isCrossSlotSafe()) {
+        if ($this->crossSlotSafe ??= $this->getConnection()->isCrossSlotSafe()) {
             return 'queues:{'.$queue.'}';
         }
 
