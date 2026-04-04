@@ -98,7 +98,8 @@ class PreventRequestForgery
             $this->isReading($request) ||
             $this->runningUnitTests() ||
             $this->inExceptArray($request) ||
-            ($this->hasValidOrigin($request) && $this->tokensMatch($request))
+                        $this->hasValidOrigin($request) ||
+                        $this->tokensMatch($request)
         ) {
             return tap($next($request), function ($response) use ($request) {
                 if ($this->shouldAddXsrfTokenCookie()) {
