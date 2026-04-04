@@ -441,7 +441,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     {
         $queue = $queue ?: $this->default;
 
-        if ($this->getConnection()->hashTagsEnabled()) {
+        if ($this->getConnection()->isCrossSlotSafe()) {
             return 'queues:{'.$queue.'}';
         }
 

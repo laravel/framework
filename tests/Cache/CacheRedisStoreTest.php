@@ -169,7 +169,7 @@ class CacheRedisStoreTest extends TestCase
     protected function getRedis()
     {
         $mock = m::mock(Factory::class);
-        $mock->shouldReceive('hashTagsEnabled')->andReturn(false);
+        $mock->shouldReceive('isCrossSlotSafe')->andReturn(false);
 
         return new RedisStore($mock, 'prefix:');
     }

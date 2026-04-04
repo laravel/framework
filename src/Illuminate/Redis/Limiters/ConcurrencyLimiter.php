@@ -101,7 +101,7 @@ class ConcurrencyLimiter
      */
     protected function acquire($id)
     {
-        $hashTags = $this->redis->hashTagsEnabled();
+        $hashTags = $this->redis->isCrossSlotSafe();
 
         $slots = array_map(function ($i) use ($hashTags) {
             return $hashTags ? '{'.$this->name.'}'.$i : $this->name.$i;

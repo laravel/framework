@@ -39,11 +39,11 @@ abstract class Connection
     protected $events;
 
     /**
-     * Indicates if hash tags should be used for key slot routing.
+     * Indicates if the connection should avoid cross-slot operations.
      *
      * @var bool
      */
-    protected $hashTags = false;
+    protected $crossSlotSafe = false;
 
     /**
      * Subscribe to a set of given channels for messages.
@@ -213,25 +213,25 @@ abstract class Connection
     }
 
     /**
-     * Enable hash tags for key slot routing.
+     * Enable cross-slot safe mode for the connection.
      *
      * @return $this
      */
-    public function enableHashTags()
+    public function enableCrossSlotSafe()
     {
-        $this->hashTags = true;
+        $this->crossSlotSafe = true;
 
         return $this;
     }
 
     /**
-     * Determine if hash tags are enabled for key slot routing.
+     * Determine if the connection is operating in cross-slot safe mode.
      *
      * @return bool
      */
-    public function hashTagsEnabled()
+    public function isCrossSlotSafe()
     {
-        return $this->hashTags;
+        return $this->crossSlotSafe;
     }
 
     /**

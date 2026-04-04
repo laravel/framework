@@ -29,7 +29,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->setContainer($container = m::spy(Container::class));
         $redis->shouldReceive('connection')->andReturn($redis);
-        $redis->shouldReceive('hashTagsEnabled')->andReturn(false);
+        $redis->shouldReceive('isCrossSlotSafe')->andReturn(false);
         $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
 
         $id = $queue->push('foo', ['data']);
@@ -55,7 +55,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->setContainer($container = m::spy(Container::class));
         $redis->shouldReceive('connection')->andReturn($redis);
-        $redis->shouldReceive('hashTagsEnabled')->andReturn(false);
+        $redis->shouldReceive('isCrossSlotSafe')->andReturn(false);
         $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'custom' => 'taylor', 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
 
         Queue::createPayloadUsing(function ($connection, $queue, $payload) {
@@ -87,7 +87,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->setContainer($container = m::spy(Container::class));
         $redis->shouldReceive('connection')->andReturn($redis);
-        $redis->shouldReceive('hashTagsEnabled')->andReturn(false);
+        $redis->shouldReceive('isCrossSlotSafe')->andReturn(false);
         $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'custom' => 'taylor', 'bar' => 'foo', 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
 
         Queue::createPayloadUsing(function ($connection, $queue, $payload) {
@@ -125,7 +125,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('availableAt')->with(1)->willReturn(2);
 
         $redis->shouldReceive('connection')->andReturn($redis);
-        $redis->shouldReceive('hashTagsEnabled')->andReturn(false);
+        $redis->shouldReceive('isCrossSlotSafe')->andReturn(false);
         $redis->shouldReceive('eval')->once()->with(
             LuaScripts::later(),
             1,
@@ -148,7 +148,7 @@ class QueueRedisQueueTest extends TestCase
         $queue = new RedisQueue($redis, 'default');
 
         $connection = m::mock(\Illuminate\Redis\Connections\Connection::class);
-        $connection->shouldReceive('hashTagsEnabled')->andReturn(true);
+        $connection->shouldReceive('isCrossSlotSafe')->andReturn(true);
         $redis->shouldReceive('connection')->andReturn($connection);
 
         $this->assertSame('queues:{default}', $queue->getQueue(null));
@@ -161,7 +161,7 @@ class QueueRedisQueueTest extends TestCase
         $queue = new RedisQueue($redis, 'default');
 
         $connection = m::mock(\Illuminate\Redis\Connections\Connection::class);
-        $connection->shouldReceive('hashTagsEnabled')->andReturn(false);
+        $connection->shouldReceive('isCrossSlotSafe')->andReturn(false);
         $redis->shouldReceive('connection')->andReturn($connection);
 
         $this->assertSame('queues:default', $queue->getQueue(null));
@@ -184,7 +184,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('availableAt')->with($date)->willReturn(5);
 
         $redis->shouldReceive('connection')->andReturn($redis);
-        $redis->shouldReceive('hashTagsEnabled')->andReturn(false);
+        $redis->shouldReceive('isCrossSlotSafe')->andReturn(false);
         $redis->shouldReceive('eval')->once()->with(
             LuaScripts::later(),
             1,

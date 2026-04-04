@@ -157,8 +157,8 @@ class RedisManager implements Factory
 
         $config = $this->config[$name] ?? $this->config['clusters'][$name] ?? [];
 
-        if (! empty($config['hash_tags']) || ! empty($this->config['options']['hash_tags'] ?? false)) {
-            $connection->enableHashTags();
+        if (! empty($config['cross_slot_safe']) || ! empty($this->config['options']['cross_slot_safe'] ?? false)) {
+            $connection->enableCrossSlotSafe();
         }
 
         return $connection;

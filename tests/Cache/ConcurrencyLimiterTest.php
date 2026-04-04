@@ -214,7 +214,7 @@ class ConcurrencyLimiterTest extends TestCase
     public function testAcquireUsesHashTaggedKeysWhenEnabled()
     {
         $connection = m::mock(\Illuminate\Redis\Connections\PhpRedisConnection::class)->makePartial();
-        $connection->enableHashTags();
+        $connection->enableCrossSlotSafe();
         $acquireArgs = null;
 
         // acquire() -> eval() -> command('eval', [$script, $arguments, $numKeys])
