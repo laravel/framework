@@ -1809,6 +1809,17 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Dump the view data from the response and end the script.
+     *
+     * @param string|null $key
+     * @return never
+     */
+    public function ddViewData($key = null)
+    {
+        dd($this->viewData($key));
+    }
+
+    /**
      * Dump the session from the response and end the script.
      *
      * @param  string|array  $keys
