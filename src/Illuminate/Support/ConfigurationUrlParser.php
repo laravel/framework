@@ -44,6 +44,12 @@ class ConfigurationUrlParser
         $decodedComponents = $this->parseStringsToNativeTypes(
             array_map(rawurldecode(...), $rawComponents)
         );
+        if (array_key_exists('user', $rawComponents)) {
+            $decodedComponents['user'] = rawurldecode($rawComponents['user']);
+        }
+        if (array_key_exists('pass', $rawComponents)) {
+            $decodedComponents['pass'] = rawurldecode($rawComponents['pass']);
+        }
 
         return array_merge(
             $config,

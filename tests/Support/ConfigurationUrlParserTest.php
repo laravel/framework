@@ -188,6 +188,26 @@ class ConfigurationUrlParserTest extends TestCase
                     'timezone' => '+00:00',
                 ],
             ],
+            'URL with string credentials that look like native values' => [
+                'mysql://false:null@localhost/database',
+                [
+                    'driver' => 'mysql',
+                    'username' => 'false',
+                    'password' => 'null',
+                    'host' => 'localhost',
+                    'database' => 'database',
+                ],
+            ],
+            'URL with string credentials named false and true' => [
+                'mysql://false:true@localhost/database',
+                [
+                    'driver' => 'mysql',
+                    'username' => 'false',
+                    'password' => 'true',
+                    'host' => 'localhost',
+                    'database' => 'database',
+                ],
+            ],
             'URL with mssql alias driver' => [
                 'mssql://null',
                 [
