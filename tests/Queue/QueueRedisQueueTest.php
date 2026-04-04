@@ -7,7 +7,6 @@ use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Queue\LuaScripts;
 use Illuminate\Queue\Queue;
 use Illuminate\Queue\RedisQueue;
-use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Mockery as m;
@@ -29,7 +28,8 @@ class QueueRedisQueueTest extends TestCase
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->setContainer($container = m::spy(Container::class));
-        $redis->shouldReceive('connection')->once()->andReturn($redis);
+        $redis->shouldReceive('connection')->andReturn($redis);
+        $redis->shouldReceive('hashTagsEnabled')->andReturn(false);
         $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
 
         $id = $queue->push('foo', ['data']);
@@ -54,7 +54,8 @@ class QueueRedisQueueTest extends TestCase
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->setContainer($container = m::spy(Container::class));
-        $redis->shouldReceive('connection')->once()->andReturn($redis);
+        $redis->shouldReceive('connection')->andReturn($redis);
+        $redis->shouldReceive('hashTagsEnabled')->andReturn(false);
         $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'custom' => 'taylor', 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
 
         Queue::createPayloadUsing(function ($connection, $queue, $payload) {
@@ -85,7 +86,8 @@ class QueueRedisQueueTest extends TestCase
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->setContainer($container = m::spy(Container::class));
-        $redis->shouldReceive('connection')->once()->andReturn($redis);
+        $redis->shouldReceive('connection')->andReturn($redis);
+        $redis->shouldReceive('hashTagsEnabled')->andReturn(false);
         $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'custom' => 'taylor', 'bar' => 'foo', 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
 
         Queue::createPayloadUsing(function ($connection, $queue, $payload) {
@@ -122,7 +124,8 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->expects($this->once())->method('availableAt')->with(1)->willReturn(2);
 
-        $redis->shouldReceive('connection')->once()->andReturn($redis);
+        $redis->shouldReceive('connection')->andReturn($redis);
+        $redis->shouldReceive('hashTagsEnabled')->andReturn(false);
         $redis->shouldReceive('eval')->once()->with(
             LuaScripts::later(),
             1,
@@ -139,24 +142,27 @@ class QueueRedisQueueTest extends TestCase
         Str::createUuidsNormally();
     }
 
-    public function testGetQueueUsesHashTagsForClusterConnections()
+    public function testGetQueueUsesHashTagsWhenEnabled()
     {
         $redis = m::mock(Factory::class);
         $queue = new RedisQueue($redis, 'default');
 
-        $clusterConnection = m::mock(PhpRedisClusterConnection::class);
-        $redis->shouldReceive('connection')->andReturn($clusterConnection);
+        $connection = m::mock(\Illuminate\Redis\Connections\Connection::class);
+        $connection->shouldReceive('hashTagsEnabled')->andReturn(true);
+        $redis->shouldReceive('connection')->andReturn($connection);
 
         $this->assertSame('queues:{default}', $queue->getQueue(null));
         $this->assertSame('queues:{custom}', $queue->getQueue('custom'));
     }
 
-    public function testGetQueueDoesNotUseHashTagsForNonClusterConnections()
+    public function testGetQueueDoesNotUseHashTagsWhenDisabled()
     {
         $redis = m::mock(Factory::class);
         $queue = new RedisQueue($redis, 'default');
 
-        $redis->shouldReceive('connection')->andReturn($redis);
+        $connection = m::mock(\Illuminate\Redis\Connections\Connection::class);
+        $connection->shouldReceive('hashTagsEnabled')->andReturn(false);
+        $redis->shouldReceive('connection')->andReturn($connection);
 
         $this->assertSame('queues:default', $queue->getQueue(null));
         $this->assertSame('queues:custom', $queue->getQueue('custom'));
@@ -177,7 +183,8 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->expects($this->once())->method('availableAt')->with($date)->willReturn(5);
 
-        $redis->shouldReceive('connection')->once()->andReturn($redis);
+        $redis->shouldReceive('connection')->andReturn($redis);
+        $redis->shouldReceive('hashTagsEnabled')->andReturn(false);
         $redis->shouldReceive('eval')->once()->with(
             LuaScripts::later(),
             1,

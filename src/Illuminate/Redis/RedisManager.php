@@ -155,6 +155,12 @@ class RedisManager implements Factory
             $connection->setEventDispatcher($this->app->make('events'));
         }
 
+        $config = $this->config[$name] ?? $this->config['clusters'][$name] ?? [];
+
+        if (! empty($config['hash_tags']) || ! empty($this->config['options']['hash_tags'] ?? false)) {
+            $connection->enableHashTags();
+        }
+
         return $connection;
     }
 

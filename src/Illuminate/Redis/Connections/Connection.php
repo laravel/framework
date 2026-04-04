@@ -39,6 +39,13 @@ abstract class Connection
     protected $events;
 
     /**
+     * Indicates if hash tags should be used for key slot routing.
+     *
+     * @var bool
+     */
+    protected $hashTags = false;
+
+    /**
      * Subscribe to a set of given channels for messages.
      *
      * @param  array|string  $channels
@@ -203,6 +210,28 @@ abstract class Connection
         $this->name = $name;
 
         return $this;
+    }
+
+    /**
+     * Enable hash tags for key slot routing.
+     *
+     * @return $this
+     */
+    public function enableHashTags()
+    {
+        $this->hashTags = true;
+
+        return $this;
+    }
+
+    /**
+     * Determine if hash tags are enabled for key slot routing.
+     *
+     * @return bool
+     */
+    public function hashTagsEnabled()
+    {
+        return $this->hashTags;
     }
 
     /**

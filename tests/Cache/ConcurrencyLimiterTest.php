@@ -10,7 +10,6 @@ use Illuminate\Cache\Limiters\LimiterTimeoutException;
 use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
-use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Throwable;
@@ -212,9 +211,10 @@ class ConcurrencyLimiterTest extends TestCase
         $this->assertSame('ok', $result);
     }
 
-    public function testAcquireUsesHashTaggedKeysForClusterConnections()
+    public function testAcquireUsesHashTaggedKeysWhenEnabled()
     {
-        $connection = m::mock(PhpRedisClusterConnection::class);
+        $connection = m::mock(\Illuminate\Redis\Connections\PhpRedisConnection::class)->makePartial();
+        $connection->enableHashTags();
         $acquireArgs = null;
 
         // acquire() -> eval() -> command('eval', [$script, $arguments, $numKeys])

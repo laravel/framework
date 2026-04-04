@@ -441,10 +441,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     {
         $queue = $queue ?: $this->default;
 
-        $connection = $this->getConnection();
-
-        if ($connection instanceof PhpRedisClusterConnection ||
-            $connection instanceof PredisClusterConnection) {
+        if ($this->getConnection()->hashTagsEnabled()) {
             return 'queues:{'.$queue.'}';
         }
 

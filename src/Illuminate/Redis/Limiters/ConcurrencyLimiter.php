@@ -3,8 +3,6 @@
 namespace Illuminate\Redis\Limiters;
 
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
-use Illuminate\Redis\Connections\PhpRedisClusterConnection;
-use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Throwable;
@@ -103,11 +101,10 @@ class ConcurrencyLimiter
      */
     protected function acquire($id)
     {
-        $isCluster = $this->redis instanceof PhpRedisClusterConnection
-            || $this->redis instanceof PredisClusterConnection;
+        $hashTags = $this->redis->hashTagsEnabled();
 
-        $slots = array_map(function ($i) use ($isCluster) {
-            return $isCluster ? '{'.$this->name.'}'.$i : $this->name.$i;
+        $slots = array_map(function ($i) use ($hashTags) {
+            return $hashTags ? '{'.$this->name.'}'.$i : $this->name.$i;
         }, range(1, $this->maxLocks));
 
         return $this->redis->eval(...array_merge(
