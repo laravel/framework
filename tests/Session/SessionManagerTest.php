@@ -57,7 +57,8 @@ class SessionManagerTest extends TestCase
     {
         $app = $this->createApplication('redis', 'session');
 
-        $sharedStore = $app->make('cache')->store('redis')->getStore();
+        $sharedRepository = $app->make('cache')->store('redis');
+        $sharedStore = $sharedRepository->getStore();
         $originalConnection = (new \ReflectionProperty($sharedStore, 'connection'))->getValue($sharedStore);
 
         $manager = new SessionManager($app);
@@ -68,6 +69,13 @@ class SessionManagerTest extends TestCase
         // The shared cache store's connection should not be mutated
         $currentConnection = (new \ReflectionProperty($sharedStore, 'connection'))->getValue($sharedStore);
         $this->assertSame($originalConnection, $currentConnection);
+
+        // The shared cache repository should still reference the original store
+        $this->assertSame($sharedStore, $sharedRepository->getStore());
+
+        // The session handler should use a different repository and store
+        $this->assertNotSame($sharedRepository, $handler->getCache());
+        $this->assertNotSame($sharedStore, $handler->getCache()->getStore());
 
         // The session handler's store should have the session connection
         $sessionStore = $handler->getCache()->getStore();
