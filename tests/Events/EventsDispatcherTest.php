@@ -6,13 +6,11 @@ use Error;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Queue\InteractsWithQueue;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Ramsey\Collection\QueueInterface;
 
 class EventsDispatcherTest extends TestCase
 {
@@ -815,7 +813,9 @@ class EventsDispatcherTest extends TestCase
         $connection = \Mockery::mock(\Illuminate\Contracts\Queue\Queue::class);
         $queueManager = \Mockery::mock(\Illuminate\Contracts\Queue\Factory::class);
         $queueManager->shouldReceive('connection')->andReturn($connection);
-        $dispatcher->setQueueResolver(function () use ($queueManager) { return $queueManager; });
+        $dispatcher->setQueueResolver(function () use ($queueManager) {
+            return $queueManager;
+        });
 
         $connection->shouldReceive('pushOn')
             ->once()
