@@ -257,20 +257,6 @@ class RedisStoreTest extends TestCase
         ], 10);
     }
 
-    public function testManyCallsGetWhenClustered()
-    {
-        $store = m::mock(RedisStore::class)->makePartial();
-        $store->expects('connection')->andReturn(m::mock(PhpRedisClusterConnection::class));
-        $store->expects('get')
-            ->twice()
-            ->andReturn('bar', 'buz');
-
-        $results = $store->many(['foo', 'fizz']);
-
-        $this->assertSame('bar', $results['foo']);
-        $this->assertSame('buz', $results['fizz']);
-    }
-
     public function testPutManyCallsPutWhenCrossSlotSafe()
     {
         $connection = m::mock(\Illuminate\Redis\Connections\PhpRedisConnection::class)->makePartial();

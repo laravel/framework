@@ -213,8 +213,7 @@ class RedisTaggedCache extends TaggedCache
                         $connection->del($cacheKey);
                     }
                 });
-            } elseif ($connection instanceof PhpRedisClusterConnection ||
-                $connection->isCrossSlotSafe()) {
+            } elseif (! $connection instanceof PhpRedisClusterConnection && $connection->isCrossSlotSafe()) {
                 foreach ($cacheKeys as $cacheKey) {
                     $connection->del($cacheKey);
                 }
