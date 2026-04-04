@@ -6,6 +6,7 @@ use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Queue\Jobs\RedisJob;
+use Illuminate\Redis\Connections\Connection;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Support\Str;
@@ -66,6 +67,13 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     protected $secondaryQueueHadJob = false;
 
     /**
+     * Indicates if the connection is a Redis Cluster connection.
+     *
+     * @var bool|null
+     */
+    protected $isCluster = null;
+
+    /**
      * Create a new Redis queue instance.
      *
      * @param  \Illuminate\Contracts\Redis\Factory  $redis
@@ -102,7 +110,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function size($queue = null)
     {
-        $queue = $this->getQueue($queue);
+        $queue = $this->getRedisKey($queue);
 
         return $this->getConnection()->eval(
             LuaScripts::size(), 3, $queue, $queue.':delayed', $queue.':reserved'
@@ -117,7 +125,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function pendingSize($queue = null)
     {
-        return $this->getConnection()->llen($this->getQueue($queue));
+        return $this->getConnection()->llen($this->getRedisKey($queue));
     }
 
     /**
@@ -128,7 +136,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function delayedSize($queue = null)
     {
-        return $this->getConnection()->zcard($this->getQueue($queue).':delayed');
+        return $this->getConnection()->zcard($this->getRedisKey($queue).':delayed');
     }
 
     /**
@@ -139,7 +147,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function reservedSize($queue = null)
     {
-        return $this->getConnection()->zcard($this->getQueue($queue).':reserved');
+        return $this->getConnection()->zcard($this->getRedisKey($queue).':reserved');
     }
 
     /**
@@ -150,7 +158,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function creationTimeOfOldestPendingJob($queue = null)
     {
-        $payload = $this->getConnection()->lindex($this->getQueue($queue), 0);
+        $payload = $this->getConnection()->lindex($this->getRedisKey($queue), 0);
 
         if (! $payload) {
             return null;
@@ -223,9 +231,11 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
+        $queue = $this->getRedisKey($queue);
+
         $this->getConnection()->eval(
-            LuaScripts::push(), 2, $this->getQueue($queue),
-            $this->getQueue($queue).':notify', $payload
+            LuaScripts::push(), 2, $queue,
+            $queue.':notify', $payload
         );
 
         return json_decode($payload, true)['id'] ?? null;
@@ -264,7 +274,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     protected function laterRaw($delay, $payload, $queue = null)
     {
         $this->getConnection()->eval(
-            LuaScripts::later(), 1, $this->getQueue($queue).':delayed',
+            LuaScripts::later(), 1, $this->getRedisKey($queue).':delayed',
             $this->availableAt($delay), $payload
         );
 
@@ -296,7 +306,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function pop($queue = null, $index = 0)
     {
-        $this->migrate($prefixed = $this->getQueue($queue));
+        $this->migrate($prefixed = $this->getRedisKey($queue));
 
         $block = ! $this->secondaryQueueHadJob && $index == 0;
 
@@ -384,7 +394,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function deleteReserved($queue, $job)
     {
-        $this->getConnection()->zrem($this->getQueue($queue).':reserved', $job->getReservedJob());
+        $this->getConnection()->zrem($this->getRedisKey($queue).':reserved', $job->getReservedJob());
     }
 
     /**
@@ -397,7 +407,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function deleteAndRelease($queue, $job, $delay)
     {
-        $queue = $this->getQueue($queue);
+        $queue = $this->getRedisKey($queue);
 
         $this->getConnection()->eval(
             LuaScripts::release(), 2, $queue.':delayed', $queue.':reserved',
@@ -413,7 +423,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function clear($queue)
     {
-        $queue = $this->getQueue($queue);
+        $queue = $this->getRedisKey($queue);
 
         return $this->getConnection()->eval(
             LuaScripts::clear(), 4, $queue, $queue.':delayed',
@@ -440,6 +450,43 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     public function getQueue($queue)
     {
         return 'queues:'.($queue ?: $this->default);
+    }
+
+    /**
+     * Get the cluster-safe Redis key for the given queue.
+     *
+     * When connected to a Redis Cluster, queue names are wrapped in hash tags
+     * to ensure all related keys (queue, delayed, reserved, notify) hash to the
+     * same slot, which is required for multi-key Lua scripts.
+     *
+     * @param  string|null  $queue
+     * @return string
+     */
+    protected function getRedisKey($queue = null)
+    {
+        $queue = $queue ?: $this->default;
+
+        if ($this->isClusterConnection() && ! Connection::hasHashTag($queue)) {
+            return $this->getQueue('{'.$queue.'}');
+        }
+
+        return $this->getQueue($queue);
+    }
+
+    /**
+     * Determine if the connection is a Redis Cluster connection.
+     *
+     * The result is cached for the lifetime of this queue instance.
+     *
+     * @return bool
+     */
+    protected function isClusterConnection()
+    {
+        if (is_null($this->isCluster)) {
+            $this->isCluster = $this->getConnection()->isCluster();
+        }
+
+        return $this->isCluster;
     }
 
     /**

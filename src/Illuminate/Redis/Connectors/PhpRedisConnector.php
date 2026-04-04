@@ -202,12 +202,14 @@ class PhpRedisConnector implements Connector
             isset($options['persistent']) && $options['persistent'],
         ];
 
-        if (version_compare(phpversion('redis'), '4.3.0', '>=')) {
-            $parameters[] = $options['password'] ?? null;
-        }
+        if (version_compare(phpversion('redis'), '5.3.2', '>=')) {
+            $parameters[] = $this->formatClusterPassword($options);
 
-        if (version_compare(phpversion('redis'), '5.3.2', '>=') && ! is_null($context = Arr::get($options, 'context'))) {
-            $parameters[] = $context;
+            if (! is_null($context = Arr::get($options, 'context'))) {
+                $parameters[] = $context;
+            }
+        } elseif (version_compare(phpversion('redis'), '4.3.0', '>=')) {
+            $parameters[] = $options['password'] ?? null;
         }
 
         return tap(new RedisCluster(...$parameters), function ($client) use ($options) {
@@ -238,7 +240,40 @@ class PhpRedisConnector implements Connector
             if (! empty($options['tcp_keepalive'])) {
                 $client->setOption(Redis::OPT_TCP_KEEPALIVE, $options['tcp_keepalive']);
             }
+
+            if (array_key_exists('max_retries', $options)) {
+                $client->setOption(Redis::OPT_MAX_RETRIES, $options['max_retries']);
+            }
+
+            if (array_key_exists('backoff_algorithm', $options)) {
+                $client->setOption(Redis::OPT_BACKOFF_ALGORITHM, $this->parseBackoffAlgorithm($options['backoff_algorithm']));
+            }
+
+            if (array_key_exists('backoff_base', $options)) {
+                $client->setOption(Redis::OPT_BACKOFF_BASE, $options['backoff_base']);
+            }
+
+            if (array_key_exists('backoff_cap', $options)) {
+                $client->setOption(Redis::OPT_BACKOFF_CAP, $options['backoff_cap']);
+            }
         });
+    }
+
+    /**
+     * Format the password for a Redis cluster connection.
+     *
+     * @param  array  $options
+     * @return string|array|null
+     */
+    protected function formatClusterPassword(array $options)
+    {
+        $password = $options['password'] ?? null;
+
+        if (isset($options['username']) && $options['username'] !== '' && is_string($password)) {
+            return [$options['username'], $password];
+        }
+
+        return $password;
     }
 
     /**
