@@ -101,10 +101,10 @@ class ConcurrencyLimiter
      */
     protected function acquire($id)
     {
-        $hashTags = $this->redis->isCrossSlotSafe();
+        $crossSlotSafe = $this->redis->isCrossSlotSafe();
 
-        $slots = array_map(function ($i) use ($hashTags) {
-            return $hashTags ? '{'.$this->name.'}'.$i : $this->name.$i;
+        $slots = array_map(function ($i) use ($crossSlotSafe) {
+            return $crossSlotSafe ? '{'.$this->name.'}'.$i : $this->name.$i;
         }, range(1, $this->maxLocks));
 
         return $this->redis->eval(...array_merge(

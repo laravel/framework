@@ -125,7 +125,8 @@ class RedisTaggedCache extends TaggedCache
         $connection = $this->store->connection();
 
         if ($connection instanceof PredisClusterConnection ||
-            $connection instanceof PhpRedisClusterConnection) {
+            $connection instanceof PhpRedisClusterConnection ||
+            $connection->isCrossSlotSafe()) {
             return $this->flushClusteredConnection();
         }
 

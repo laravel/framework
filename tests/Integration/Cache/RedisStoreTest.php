@@ -271,6 +271,40 @@ class RedisStoreTest extends TestCase
         $this->assertSame('buz', $results['fizz']);
     }
 
+    public function testPutManyCallsPutWhenCrossSlotSafe()
+    {
+        $connection = m::mock(\Illuminate\Redis\Connections\PhpRedisConnection::class)->makePartial();
+        $connection->enableCrossSlotSafe();
+
+        $store = m::mock(RedisStore::class)->makePartial();
+        $store->expects('connection')->andReturn($connection);
+        $store->expects('put')
+            ->twice()
+            ->andReturn(true);
+
+        $store->putMany([
+            'foo' => 'bar',
+            'fizz' => 'buz',
+        ], 10);
+    }
+
+    public function testManyCallsGetWhenCrossSlotSafe()
+    {
+        $connection = m::mock(\Illuminate\Redis\Connections\PhpRedisConnection::class)->makePartial();
+        $connection->enableCrossSlotSafe();
+
+        $store = m::mock(RedisStore::class)->makePartial();
+        $store->expects('connection')->andReturn($connection);
+        $store->expects('get')
+            ->twice()
+            ->andReturn('bar', 'buz');
+
+        $results = $store->many(['foo', 'fizz']);
+
+        $this->assertSame('bar', $results['foo']);
+        $this->assertSame('buz', $results['fizz']);
+    }
+
     public function testIncrementWithSerializationEnabled()
     {
         $this->markTestSkipped('Test makes no sense anymore. Application must explicitly wrap such code in runClean() when used with serialization/compression enabled.');
