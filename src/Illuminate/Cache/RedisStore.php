@@ -104,9 +104,10 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
 
         $connection = $this->connection();
 
-        // Predis cluster and cross-slot safe connections do not support reading multiple values if the keys hash differently...
+        // Cluster and cross-slot safe connections do not support reading multiple values
+        // if the keys hash differently. PhpRedisClusterConnection is excluded as it handles mget natively...
         if ($connection instanceof PredisClusterConnection ||
-            (! $connection instanceof PhpRedisClusterConnection && $connection->isCrossSlotSafe())) {
+            ($connection->isCrossSlotSafe() && ! $connection instanceof PhpRedisClusterConnection)) {
             return $this->manyAlias($keys);
         }
 
@@ -149,9 +150,9 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
     {
         $connection = $this->connection();
 
-        // Cluster connections do not support writing multiple values if the keys hash differently...
-        if ($connection instanceof PhpRedisClusterConnection ||
-            $connection instanceof PredisClusterConnection ||
+        // Cluster and cross-slot safe connections do not support writing multiple values if the keys hash differently...
+        if ($connection instanceof PredisClusterConnection ||
+            $connection instanceof PhpRedisClusterConnection ||
             $connection->isCrossSlotSafe()) {
             return $this->putManyAlias($values, $seconds);
         }

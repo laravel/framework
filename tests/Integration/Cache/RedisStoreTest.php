@@ -4,9 +4,12 @@ namespace Illuminate\Tests\Integration\Cache;
 
 use DateTime;
 use Illuminate\Cache\RedisStore;
+use Illuminate\Cache\RedisTaggedCache;
+use Illuminate\Cache\RedisTagSet;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Sleep;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
@@ -289,6 +292,31 @@ class RedisStoreTest extends TestCase
 
         $this->assertSame('bar', $results['foo']);
         $this->assertSame('buz', $results['fizz']);
+    }
+
+    public function testTaggedCacheFlushUsesIndividualDeletesWhenCrossSlotSafe()
+    {
+        $connection = m::mock(\Illuminate\Redis\Connections\PhpRedisConnection::class)->makePartial();
+        $connection->enableCrossSlotSafe();
+
+        $store = m::mock(RedisStore::class)->makePartial();
+        $store->shouldReceive('connection')->andReturn($connection);
+        $store->shouldReceive('getPrefix')->andReturn('prefix:');
+
+        $tags = m::mock(RedisTagSet::class);
+        $tags->shouldReceive('entries')->once()->andReturn(
+            new LazyCollection(['key1', 'key2', 'key3'])
+        );
+        $tags->shouldReceive('flush')->once();
+        $tags->shouldReceive('getNames')->andReturn([]);
+
+        $connection->shouldReceive('del')->with('prefix:key1')->once();
+        $connection->shouldReceive('del')->with('prefix:key2')->once();
+        $connection->shouldReceive('del')->with('prefix:key3')->once();
+
+        $taggedCache = new RedisTaggedCache($store, $tags);
+
+        $this->assertTrue($taggedCache->flush());
     }
 
     public function testIncrementWithSerializationEnabled()

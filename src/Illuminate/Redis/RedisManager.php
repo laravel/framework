@@ -158,7 +158,7 @@ class RedisManager implements Factory
         $config = $this->config[$name] ?? [];
         $clusterOptions = $this->config['clusters']['options'] ?? [];
 
-        if (! empty($config['cross_slot_safe']) || ! empty($clusterOptions['cross_slot_safe']) || ! empty($this->config['options']['cross_slot_safe'] ?? false)) {
+        if (! empty($config['cross_slot_safe']) || ! empty($clusterOptions['cross_slot_safe']) || ! empty($this->config['options']['cross_slot_safe'])) {
             $connection->enableCrossSlotSafe();
         }
 
