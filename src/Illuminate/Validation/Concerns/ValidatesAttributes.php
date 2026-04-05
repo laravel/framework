@@ -1478,7 +1478,7 @@ trait ValidatesAttributes
      */
     public function validateHexColor($attribute, $value)
     {
-        return preg_match('/^#(?:(?:[0-9a-f]{3}){1,2}|(?:[0-9a-f]{4}){1,2})$/i', $value) === 1;
+        return is_string($value) && preg_match('/^#(?:(?:[0-9a-f]{3}){1,2}|(?:[0-9a-f]{4}){1,2})$/i', $value) === 1;
     }
 
     /**
@@ -1693,6 +1693,10 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'max_digits');
 
+        if (! is_string($value) && ! is_numeric($value)) {
+            return false;
+        }
+
         $length = strlen((string) $value);
 
         return ! preg_match('/[^0-9]/', $value) && $length <= $parameters[0];
@@ -1798,6 +1802,10 @@ trait ValidatesAttributes
     public function validateMinDigits($attribute, $value, $parameters)
     {
         $this->requireParameterCount(1, $parameters, 'min_digits');
+
+        if (! is_string($value) && ! is_numeric($value)) {
+            return false;
+        }
 
         $length = strlen((string) $value);
 
