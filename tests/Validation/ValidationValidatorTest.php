@@ -3237,6 +3237,13 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateAsciiDoesNotThrowOnNonStringValue()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => ['array']], ['x' => 'ascii']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateDoesntStartWith()
     {
         $trans = $this->getIlluminateArrayTranslator();

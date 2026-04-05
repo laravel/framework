@@ -159,7 +159,7 @@ trait ValidatesAttributes
      */
     public function validateAscii($attribute, $value)
     {
-        return Str::isAscii($value);
+        return is_string($value) && Str::isAscii($value);
     }
 
     /**
