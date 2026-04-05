@@ -339,6 +339,9 @@ class Number
      */
     public static function trim(int|float $number)
     {
+        if (! is_finite($number)) {
+            return $number;
+        }
         return json_decode(json_encode($number));
     }
 
