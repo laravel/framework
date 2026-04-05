@@ -3,6 +3,7 @@
 namespace Illuminate\Auth\Passwords;
 
 use Closure;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\PasswordResetLinkSent;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
@@ -139,6 +140,8 @@ class PasswordBroker implements PasswordBrokerContract
             $callback($user, $password);
 
             $this->tokens->delete($user);
+
+            $this->events?->dispatch(new PasswordReset($user));
 
             $timebox->returnEarly();
 

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Auth;
 
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\PasswordResetLinkSent;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -85,6 +86,50 @@ class ForgotPasswordTest extends TestCase
 
             return true;
         });
+    }
+
+    public function testItCanTriggerPasswordResetEvent()
+    {
+        Event::fake([PasswordReset::class]);
+
+        UserFactory::new()->create();
+
+        $user = AuthenticationTestUser::first();
+
+        $token = Password::broker()->createToken($user);
+
+        Password::broker()->reset([
+            'email' => $user->email,
+            'password' => 'new-password',
+            'token' => $token,
+        ], function ($user, $password) {
+            $user->forceFill(['password' => bcrypt($password)])->save();
+        });
+
+        Event::assertDispatched(PasswordReset::class, function ($event) {
+            $this->assertEquals(1, $event->user->id);
+
+            return true;
+        });
+    }
+
+    public function testPasswordResetEventIsNotDispatchedOnFailedReset()
+    {
+        Event::fake([PasswordReset::class]);
+
+        UserFactory::new()->create();
+
+        $user = AuthenticationTestUser::first();
+
+        Password::broker()->reset([
+            'email' => $user->email,
+            'password' => 'new-password',
+            'token' => 'invalid-token',
+        ], function ($user, $password) {
+            $user->forceFill(['password' => bcrypt($password)])->save();
+        });
+
+        Event::assertNotDispatched(PasswordReset::class);
     }
 
     public function testItCanSendForgotPasswordEmailViaCreateUrlUsing()

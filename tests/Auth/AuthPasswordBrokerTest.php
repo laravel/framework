@@ -2,11 +2,13 @@
 
 namespace Illuminate\Tests\Auth;
 
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Auth\Passwords\TokenRepositoryInterface;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -102,6 +104,20 @@ class AuthPasswordBrokerTest extends TestCase
 
         $this->assertSame(PasswordBrokerContract::PASSWORD_RESET, $broker->reset(['password' => 'password', 'token' => 'token'], $callback));
         $this->assertEquals(['user' => $user, 'password' => 'password'], $_SERVER['__password.reset.test']);
+    }
+
+    public function testResetDispatchesPasswordResetEvent()
+    {
+        $mocks = $this->getMocks();
+        $events = m::mock(Dispatcher::class);
+        $broker = m::mock(PasswordBroker::class, array_values($mocks) + [2 => $events])->makePartial()->shouldAllowMockingProtectedMethods();
+        $broker->shouldReceive('validateReset')->once()->andReturn($user = m::mock(CanResetPassword::class));
+        $mocks['tokens']->shouldReceive('delete')->once()->with($user);
+        $events->shouldReceive('dispatch')->once()->with(m::type(PasswordReset::class));
+
+        $this->assertSame(PasswordBrokerContract::PASSWORD_RESET, $broker->reset(['password' => 'password', 'token' => 'token'], function () {
+            //
+        }));
     }
 
     public function testExecutesCallbackInsteadOfSendingNotification()
