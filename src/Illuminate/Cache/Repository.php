@@ -33,7 +33,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Traits\Macroable;
-use Illuminate\Validation\Rules\Enum;
 use InvalidArgumentException;
 
 use function Illuminate\Support\defer;
@@ -788,14 +787,15 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
-     * Parse $names to accept string and Enums
+     * Parse $names to accept string and Enums.
      *
-     * @param mixed $names
+     * @param  mixed  $names
      * @return array
      */
     private function parseNames($names): array
     {
         $collection = collect($names);
+
         return $collection->map(function ($name) {
             if (is_string($name)) {
                 return $name;
@@ -803,6 +803,7 @@ class Repository implements ArrayAccess, CacheContract
             if ($name instanceof \UnitEnum || $name instanceof \BackedEnum) {
                 return enum_value($name);
             }
+
             return $name;
         })->toArray();
     }
