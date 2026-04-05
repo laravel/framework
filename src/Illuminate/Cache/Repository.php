@@ -33,6 +33,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\Rules\Enum;
 use InvalidArgumentException;
 
 use function Illuminate\Support\defer;
@@ -787,6 +788,26 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Parse $names to accept string and Enums
+     *
+     * @param mixed $names
+     * @return array
+     */
+    private function parseNames($names): array
+    {
+        $collection = collect($names);
+        return $collection->map(function ($name) {
+            if (is_string($name)) {
+                return $name;
+            }
+            if ($name instanceof \UnitEnum || $name instanceof \BackedEnum) {
+                return enum_value($name);
+            }
+            return $name;
+        })->toArray();
+    }
+
+    /**
      * Begin executing a new tags operation if the store supports it.
      *
      * @param  mixed  $names
@@ -800,7 +821,7 @@ class Repository implements ArrayAccess, CacheContract
             throw new BadMethodCallException('This cache store does not support tagging.');
         }
 
-        $cache = $this->store->tags(is_array($names) ? $names : func_get_args());
+        $cache = $this->store->tags($this->parseNames(is_array($names) ? $names : func_get_args()));
 
         $cache->config = $this->config;
 

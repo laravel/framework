@@ -372,6 +372,17 @@ class CacheRepositoryTest extends TestCase
         $repo->tags('foo', 'bar', 'baz');
     }
 
+    public function testAllTagsArePassedToTaggableStoreWithEnum()
+    {
+        $store = m::mock(ArrayStore::class);
+        $repo = new Repository($store);
+
+        $taggedCache = m::mock();
+        $taggedCache->shouldReceive('setDefaultCacheTime');
+        $store->shouldReceive('tags')->once()->with(['foo'])->andReturn($taggedCache);
+        $repo->tags(TestCacheKey::FOO);
+    }
+
     public function testItThrowsExceptionWhenStoreDoesNotSupportTags()
     {
         $this->expectException(BadMethodCallException::class);
