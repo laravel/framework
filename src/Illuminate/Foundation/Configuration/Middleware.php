@@ -544,10 +544,10 @@ class Middleware
     /**
      * Configure where users are redirected by the "guest" middleware.
      *
-     * @param  callable|string  $redirect
+     * @param  callable|string|null  $redirect
      * @return $this
      */
-    public function redirectUsersTo(callable|string $redirect)
+    public function redirectUsersTo(callable|string|null $redirect)
     {
         return $this->redirectTo(users: $redirect);
     }
@@ -562,7 +562,7 @@ class Middleware
     public function redirectTo(callable|string|null $guests = null, callable|string|null $users = null)
     {
         $guests = is_string($guests) || is_null($guests) ? fn () => $guests : $guests;
-        $users = is_string($users) ? fn () => $users : $users;
+        $users = is_string($users) || is_null($users) ? fn () => $users : $users;
 
         if ($guests) {
             Authenticate::redirectUsing($guests);
