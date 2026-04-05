@@ -1453,7 +1453,7 @@ trait ValidatesAttributes
      */
     public function validateLowercase($attribute, $value, $parameters)
     {
-        return Str::lower($value) === $value;
+        return is_string($value) && Str::lower($value) === $value;
     }
 
     /**
@@ -1466,7 +1466,7 @@ trait ValidatesAttributes
      */
     public function validateUppercase($attribute, $value, $parameters)
     {
-        return Str::upper($value) === $value;
+        return is_string($value) && Str::upper($value) === $value;
     }
 
     /**

@@ -3223,6 +3223,20 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateLowercaseDoesNotThrowOnNonStringValue()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => ['array']], ['x' => 'lowercase']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateUppercaseDoesNotThrowOnNonStringValue()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => ['array']], ['x' => 'uppercase']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateDoesntStartWith()
     {
         $trans = $this->getIlluminateArrayTranslator();
