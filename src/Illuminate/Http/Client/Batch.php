@@ -265,12 +265,13 @@ class Batch
     public function send(): array
     {
         $this->inProgress = true;
+        $results = [];
+        try{
 
         if ($this->beforeCallback !== null) {
             call_user_func($this->beforeCallback, $this);
         }
 
-        $results = [];
 
         if (! empty($this->requests)) {
             $eachPromiseOptions = [
@@ -347,11 +348,13 @@ class Batch
         if ($this->finallyCallback !== null) {
             call_user_func($this->finallyCallback, $this, $results);
         }
+        return $results;
+    } finally{
 
         $this->finishedAt = new CarbonImmutable;
         $this->inProgress = false;
+    }
 
-        return $results;
     }
 
     /**

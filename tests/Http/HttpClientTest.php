@@ -4342,6 +4342,34 @@ class HttpClientTest extends TestCase
         $this->assertSame(0, $batch->failedRequests);
     }
 
+    public function testBatchResetsStateWhenProgressCallbackThrows(): void
+    {
+        $this->factory->fake([
+            'https://200.com' => $this->factory::response('OK', 200),
+        ]);
+
+        $batch = $this->factory->batch(function (Batch $batch) {
+            $batch->as('first')->get('https://200.com');
+        })->progress(function () {
+            throw new RuntimeException('Progress callback failed.');
+        });
+
+        try {
+            $batch->send();
+
+            $this->fail('Expected the progress callback exception to be thrown.');
+        } catch (RuntimeException $e) {
+            $this->assertSame('Progress callback failed.', $e->getMessage());
+        }
+
+        $this->assertFalse($this->getPropertyValue($batch, 'inProgress'));
+        $this->assertTrue($batch->finished());
+
+        $batch->as('second')->get('https://200.com');
+
+        $this->assertCount(2, $batch->getRequests());
+    }
+
     public static function methodsReceivingArrayableDataProvider()
     {
         return [
@@ -4350,6 +4378,11 @@ class HttpClientTest extends TestCase
             'post' => ['post'],
             'delete' => ['delete'],
         ];
+    }
+
+    protected function getPropertyValue(object $target, string $property): mixed
+    {
+        return (new \ReflectionProperty($target, $property))->getValue($target);
     }
 
     public function testAfterResponse()
