@@ -323,6 +323,8 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @param  array  $headers
      * @param  string|null  $disposition
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     *
+     * @throws UnableToRetrieveMetadata
      */
     public function response($path, $name = null, array $headers = [], $disposition = 'inline')
     {
@@ -360,6 +362,8 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @param  string|null  $name
      * @param  array  $headers
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     *
+     * @throws UnableToRetrieveMetadata
      */
     public function serve(Request $request, $path, $name = null, array $headers = [])
     {
@@ -375,6 +379,8 @@ class FilesystemAdapter implements CloudFilesystemContract
      * @param  string|null  $name
      * @param  array  $headers
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     *
+     * @throws UnableToRetrieveMetadata
      */
     public function download($path, $name = null, array $headers = [])
     {
@@ -663,6 +669,8 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @param  string  $path
      * @return string|false
+     *
+     * @throws UnableToRetrieveMetadata
      */
     public function mimeType($path)
     {
