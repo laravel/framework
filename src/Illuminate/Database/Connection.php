@@ -350,7 +350,7 @@ class Connection implements ConnectionInterface
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
-     * @return mixed
+     * @return ?\stdClass
      */
     public function selectOne($query, $bindings = [], $useReadPdo = true)
     {
@@ -365,7 +365,7 @@ class Connection implements ConnectionInterface
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
-     * @return mixed
+     * @return string|int|float|bool|null
      *
      * @throws \Illuminate\Database\MultipleColumnsSelectedException
      */
@@ -391,7 +391,7 @@ class Connection implements ConnectionInterface
      *
      * @param  string  $query
      * @param  array  $bindings
-     * @return array
+     * @return list<\stdClass>
      */
     public function selectFromWriteConnection($query, $bindings = [])
     {
@@ -404,7 +404,7 @@ class Connection implements ConnectionInterface
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
-     * @return array
+     * @return list<\stdClass>
      */
     public function select($query, $bindings = [], $useReadPdo = true)
     {
@@ -434,7 +434,7 @@ class Connection implements ConnectionInterface
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
-     * @return array
+     * @return list<list<\stdClass>>
      */
     public function selectResultSets($query, $bindings = [], $useReadPdo = true)
     {

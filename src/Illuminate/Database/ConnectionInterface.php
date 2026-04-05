@@ -29,7 +29,7 @@ interface ConnectionInterface
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
-     * @return mixed
+     * @return ?\stdClass
      */
     public function selectOne($query, $bindings = [], $useReadPdo = true);
 
@@ -39,7 +39,7 @@ interface ConnectionInterface
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
-     * @return mixed
+     * @return string|int|float|bool|null
      *
      * @throws \Illuminate\Database\MultipleColumnsSelectedException
      */
@@ -51,7 +51,7 @@ interface ConnectionInterface
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
-     * @return array
+     * @return list<\stdClass>
      */
     public function select($query, $bindings = [], $useReadPdo = true);
 
@@ -61,7 +61,7 @@ interface ConnectionInterface
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
-     * @return \Generator
+     * @return \Generator<int, \stdClass>
      */
     public function cursor($query, $bindings = [], $useReadPdo = true);
 
