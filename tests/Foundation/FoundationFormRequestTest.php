@@ -10,10 +10,13 @@ use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\Attributes\ErrorBag;
+use Illuminate\Foundation\Http\Attributes\FailOnUnknownFields;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\UrlGenerator;
+use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator as TranslatorConcrete;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Validation\ValidationException;
 use Mockery as m;
@@ -25,6 +28,10 @@ class FoundationFormRequestTest extends TestCase
 
     protected function tearDown(): void
     {
+        FormRequest::failOnUnknownFields(false);
+
+        Container::setInstance(null);
+
         $this->mocks = [];
 
         parent::tearDown();
@@ -241,6 +248,213 @@ class FoundationFormRequestTest extends TestCase
         $request->validateResolved();
     }
 
+    public function testFailOnUnknownFieldsRejectsExtraInputWhenEnabledOnRequest()
+    {
+        $request = $this->createRequest(
+            ['name' => 'Taylor', 'unexpected' => 'value'],
+            FoundationTestFormRequestFailOnUnknownFieldsStub::class
+        );
+
+        $exception = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertTrue($exception->validator->errors()->has('unexpected'));
+    }
+
+    public function testFailOnUnknownFieldsAllowsExtraInputWhenExplicitlyDisabledOnRequest()
+    {
+        $request = $this->createRequest(
+            ['name' => 'Taylor', 'with' => 'extras'],
+            FoundationTestFormRequestSkipUnknownFieldsFailureStub::class
+        );
+
+        $request->validateResolved();
+
+        $this->assertEquals(['name' => 'Taylor'], $request->validated());
+    }
+
+    public function testFailOnUnknownFieldsEnabledViaFailOnUnknownFieldsStaticMethod()
+    {
+        FormRequest::failOnUnknownFields();
+
+        $request = $this->createRequest(
+            ['name' => 'Taylor', 'unexpected' => 'value'],
+            FoundationTestFormRequestStub::class
+        );
+
+        $exception = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertTrue($exception->validator->errors()->has('unexpected'));
+    }
+
+    public function testFailOnUnknownFieldsWorksWhenRequestDoesNotDefineRulesMethod()
+    {
+        FormRequest::failOnUnknownFields();
+
+        $request = $this->createRequest(
+            ['unexpected' => 'value'],
+            FoundationTestFormRequestWithoutRulesMethod::class
+        );
+
+        $exception = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertTrue($exception->validator->errors()->has('unexpected'));
+    }
+
+    public function testFailOnUnknownFieldsAttributeOverridesGlobalStatic()
+    {
+        FormRequest::failOnUnknownFields();
+
+        $request = $this->createRequest(
+            ['name' => 'Taylor', 'with' => 'extras'],
+            FoundationTestFormRequestSkipUnknownFieldsFailureStub::class
+        );
+
+        $request->validateResolved();
+
+        $this->assertEquals(['name' => 'Taylor'], $request->validated());
+    }
+
+    public function testFailOnUnknownFieldsAllowsKeysMatchingWildcardRules()
+    {
+        $request = $this->createRequest(
+            [
+                'items' => [
+                    ['id' => 1, 'name' => 'a'],
+                    ['id' => 2, 'name' => 'b'],
+                ],
+            ],
+            FoundationTestFormRequestFailOnUnknownFieldsWithWildcardStub::class
+        );
+
+        $exception = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertTrue($exception->validator->errors()->has('items.0.name'));
+    }
+
+    public function testFailOnUnknownFieldsPassesForInputMatchingWildcardRulesOnly()
+    {
+        $request = $this->createRequest(
+            [
+                'items' => [
+                    ['id' => 1],
+                    ['id' => 2],
+                ],
+            ],
+            FoundationTestFormRequestFailOnUnknownFieldsWithWildcardStub::class
+        );
+
+        $request->validateResolved();
+
+        $this->assertSame(
+            [
+                'items' => [
+                    ['id' => 1],
+                    ['id' => 2],
+                ],
+            ],
+            $request->validated()
+        );
+    }
+
+    public function testFailOnUnknownFieldsWildcardMatchesSingleSegmentOnly()
+    {
+        $request = $this->createRequest(
+            [
+                'items' => [
+                    ['name' => 'a'],
+                ],
+            ],
+            FoundationTestFormRequestFailOnUnknownFieldsSingleSegmentWildcardStub::class
+        );
+
+        $exception = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertTrue($exception->validator->errors()->has('items.0.name'));
+    }
+
+    public function testFailOnUnknownFieldsRejectsMultipleUnknownKeys()
+    {
+        $request = $this->createRequest(
+            [
+                'name' => 'Taylor',
+                'role' => 'admin',
+                'profile' => ['is_admin' => true],
+            ],
+            FoundationTestFormRequestFailOnUnknownFieldsStub::class
+        );
+
+        $exception = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertTrue($exception->validator->errors()->has('role'));
+        $this->assertTrue($exception->validator->errors()->has('profile.is_admin'));
+    }
+
+    public function testFailOnUnknownFieldsRejectsUnknownNestedSibling()
+    {
+        $request = $this->createRequest(
+            ['user' => ['name' => 'Taylor', 'role' => 'admin']],
+            FoundationTestFormRequestFailOnUnknownFieldsNestedStub::class
+        );
+
+        $exception = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertTrue($exception->validator->errors()->has('user.role'));
+    }
+
+    public function testFailOnUnknownFieldsUsesPreparedInput()
+    {
+        $request = $this->createRequest(
+            ['full_name' => 'Taylor'],
+            FoundationTestFormRequestFailOnUnknownFieldsPrepareForValidationStub::class
+        );
+
+        $request->validateResolved();
+
+        $this->assertSame(['name' => 'Taylor'], $request->validated());
+    }
+
+    public function testFailOnUnknownFieldsChecksRequestPayloadWhenValidationDataIsOverridden()
+    {
+        $request = $this->createRequest(
+            ['name' => 'Taylor', 'unexpected' => 'value'],
+            FoundationTestFormRequestFailOnUnknownFieldsValidationDataOverrideStub::class
+        );
+
+        $exception = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertTrue($exception->validator->errors()->has('unexpected'));
+    }
+
+    public function testFailOnUnknownFieldsStillRunsWithStopOnFirstFailureAttribute()
+    {
+        $request = $this->createRequest(
+            ['unexpected' => 'value'],
+            FoundationTestFormRequestFailOnUnknownFieldsStopOnFirstFailureStub::class
+        );
+
+        $exception = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertTrue($exception->validator->errors()->has('unexpected'));
+    }
+
     /**
      * Catch the given exception thrown from the executor, and return it.
      *
@@ -279,7 +493,15 @@ class FoundationFormRequestTest extends TestCase
                 ValidationFactoryContract::class,
                 $this->createValidationFactory($container)
             );
+
+            $container->instance('translator', new TranslatorConcrete(new ArrayLoader([
+                'validation' => [
+                    'prohibited' => 'The :attribute field is prohibited.',
+                ],
+            ]), 'en'));
         });
+
+        Container::setInstance($container);
 
         $request = $class::create('/', 'GET', $payload);
 
@@ -296,6 +518,7 @@ class FoundationFormRequestTest extends TestCase
     protected function createValidationFactory($container)
     {
         $translator = m::mock(Translator::class)->shouldReceive('get')
+            ->zeroOrMoreTimes()->andReturn('error')->shouldReceive('choice')
             ->zeroOrMoreTimes()->andReturn('error')->getMock();
 
         return new ValidationFactory($translator, $container);
@@ -540,5 +763,128 @@ class FoundationTestFormRequestWithGetRules extends FormRequest
                 'a' => ['required', 'int', 'min:2'],
             ];
         }
+    }
+}
+
+#[FailOnUnknownFields]
+class FoundationTestFormRequestFailOnUnknownFieldsStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['name' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+#[FailOnUnknownFields(false)]
+class FoundationTestFormRequestSkipUnknownFieldsFailureStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['name' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+#[FailOnUnknownFields]
+class FoundationTestFormRequestFailOnUnknownFieldsWithWildcardStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['items.*.id' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+#[FailOnUnknownFields]
+class FoundationTestFormRequestFailOnUnknownFieldsSingleSegmentWildcardStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['items.*' => 'array'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+#[FailOnUnknownFields]
+class FoundationTestFormRequestFailOnUnknownFieldsNestedStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['user.name' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+#[FailOnUnknownFields]
+class FoundationTestFormRequestFailOnUnknownFieldsPrepareForValidationStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['name' => 'required'];
+    }
+
+    public function prepareForValidation()
+    {
+        $this->replace(['name' => $this->input('full_name')]);
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+#[FailOnUnknownFields]
+class FoundationTestFormRequestFailOnUnknownFieldsValidationDataOverrideStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['name' => 'required'];
+    }
+
+    public function validationData()
+    {
+        return ['name' => $this->input('name')];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+#[StopOnFirstFailure]
+#[FailOnUnknownFields]
+class FoundationTestFormRequestFailOnUnknownFieldsStopOnFirstFailureStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['name' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
     }
 }
