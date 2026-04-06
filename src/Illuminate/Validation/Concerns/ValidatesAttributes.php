@@ -1339,7 +1339,11 @@ trait ValidatesAttributes
         }
 
         if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
-            return BigNumber::of($this->trim($value))->isLessThan($this->trim($comparedToValue));
+            try {
+                return BigNumber::of($this->trim($value))->isLessThan($this->trim($comparedToValue));
+            } catch (MathException) {
+                return false;
+            }
         }
 
         if (! $this->isSameType($value, $comparedToValue)) {
