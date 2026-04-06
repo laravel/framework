@@ -73,13 +73,6 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected $stopOnFirstFailure = false;
 
     /**
-     * Global flag set via FormRequest::failOnUnknownFields().
-     *
-     * @var bool
-     */
-    protected static bool $globalFailOnUnknownFields = false;
-
-    /**
      * The validator instance.
      *
      * @var \Illuminate\Contracts\Validation\Validator
@@ -87,15 +80,11 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected $validator;
 
     /**
-     * Enable or disable unknown-field rejection globally for all form requests.
+     * Indicates if unknown fields should be rejected for all form requests.
      *
-     * @param  bool  $value
-     * @return void
+     * @var bool
      */
-    public static function failOnUnknownFields(bool $value = true): void
-    {
-        static::$globalFailOnUnknownFields = $value;
-    }
+    protected static bool $globalFailOnUnknownFields = false;
 
     /**
      * Get the validator instance for the request.
@@ -131,7 +120,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
 
         if ($this->shouldFailOnUnknownFields()) {
             $validator->after(function (Validator $validator) {
-                $this->validateNoExtraFields($validator);
+                $this->validateNoUnknownFields($validator);
             });
         }
 
@@ -171,66 +160,6 @@ class FormRequest extends Request implements ValidatesWhenResolved
             $this->errorBag = $errorBag[0]->newInstance()->name;
         }
 
-    }
-
-    /**
-     * Determine if fields not present in rules() should fail validation.
-     *
-     * @return bool
-     */
-    protected function shouldFailOnUnknownFields(): bool
-    {
-        $failOnUnknownFields = (new ReflectionClass($this))->getAttributes(FailOnUnknownFields::class);
-
-        if ($failOnUnknownFields !== []) {
-            return $failOnUnknownFields[0]->newInstance()->value;
-        }
-
-        return static::$globalFailOnUnknownFields;
-    }
-
-    /**
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
-     * @return void
-     */
-    protected function validateNoExtraFields(Validator $validator): void
-    {
-        $allowedKeys = array_keys($this->validationRules());
-
-        $inputKeys = array_keys(Arr::dot($this->all()));
-
-        foreach ($inputKeys as $inputKey) {
-            if (! $this->isAllowedKey($inputKey, $allowedKeys)) {
-                $validator->errors()->add($inputKey, trans('validation.prohibited', [
-                    'attribute' => str_replace('_', ' ', $inputKey),
-                ]));
-            }
-        }
-    }
-
-    /**
-     * @param  string  $inputKey  The dot-notation key from the request input.
-     * @param  array  $allowedKeys  The keys defined in rules().
-     * @return bool
-     */
-    protected function isAllowedKey(string $inputKey, array $allowedKeys): bool
-    {
-        foreach ($allowedKeys as $ruleKey) {
-            if ($ruleKey === $inputKey) {
-                return true;
-            }
-
-            if (str_contains($ruleKey, '*')) {
-                $pattern = '/^'.str_replace('\*', '[^.]+', preg_quote($ruleKey, '/')).'$/';
-
-                if (preg_match($pattern, $inputKey)) {
-                    return true;
-                }
-            }
-
-        }
-
-        return false;
     }
 
     /**
@@ -277,6 +206,66 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected function validationRules()
     {
         return method_exists($this, 'rules') ? $this->container->call([$this, 'rules']) : [];
+    }
+
+    /**
+     * Determine if fields not present in rules should fail validation.
+     *
+     * @return bool
+     */
+    protected function shouldFailOnUnknownFields(): bool
+    {
+        $failOnUnknownFields = (new ReflectionClass($this))->getAttributes(FailOnUnknownFields::class);
+
+        return $failOnUnknownFields !== []
+            ? $failOnUnknownFields[0]->newInstance()->value
+            : static::$globalFailOnUnknownFields;
+    }
+
+    /**
+     * Validate that no unknown fields were sent as input.
+     *
+     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @return void
+     */
+    protected function validateNoUnknownFields(Validator $validator): void
+    {
+        $allowedKeys = array_keys($this->validationRules());
+
+        foreach (array_keys(Arr::dot($this->all())) as $inputKey) {
+            if (! $this->isKnownField($inputKey, $allowedKeys)) {
+                $validator->errors()->add($inputKey, trans('validation.prohibited', [
+                    'attribute' => str_replace('_', ' ', $inputKey),
+                ]));
+            }
+        }
+    }
+
+    /**
+     * Determine if the given input key is an allowed key based on the validation rules.
+     *
+     * @param  string  $inputKey
+     * @param  array  $allowedKeys
+     * @return bool
+     */
+    protected function isKnownField(string $inputKey, array $allowedKeys): bool
+    {
+        foreach ($allowedKeys as $ruleKey) {
+            if ($ruleKey === $inputKey) {
+                return true;
+            }
+
+            if (str_contains($ruleKey, '*')) {
+                $pattern = '/^'.str_replace('\*', '[^.]+', preg_quote($ruleKey, '/')).'$/';
+
+                if (preg_match($pattern, $inputKey)) {
+                    return true;
+                }
+            }
+
+        }
+
+        return false;
     }
 
     /**
@@ -389,6 +378,17 @@ class FormRequest extends Request implements ValidatesWhenResolved
     public function attributes()
     {
         return [];
+    }
+
+    /**
+     * Enable or disable unknown-field rejection globally for all form requests.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function failOnUnknownFields(bool $value = true): void
+    {
+        static::$globalFailOnUnknownFields = $value;
     }
 
     /**
