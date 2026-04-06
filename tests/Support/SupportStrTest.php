@@ -1574,12 +1574,14 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame("<p><em>hello world</em></p>\n", Str::markdown('*hello world*'));
         $this->assertSame("<h1>hello world</h1>\n", Str::markdown('# hello world'));
+        $this->assertSame('', Str::markdown(null));
     }
 
     public function testInlineMarkdown()
     {
         $this->assertSame("<em>hello world</em>\n", Str::inlineMarkdown('*hello world*'));
         $this->assertSame("<a href=\"https://laravel.com\"><strong>Laravel</strong></a>\n", Str::inlineMarkdown('[**Laravel**](https://laravel.com)'));
+        $this->assertSame('', Str::inlineMarkdown(null));
     }
 
     public function testRepeat()
