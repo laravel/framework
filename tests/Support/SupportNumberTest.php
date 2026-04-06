@@ -253,6 +253,15 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1 thousand quadrillion', Number::forHumans(-1000000000000000000));
     }
 
+    public function testForHumansWithNonFiniteValues()
+    {
+        $this->assertSame('INF', Number::forHumans(INF));
+        $this->assertSame('-INF', Number::forHumans(-INF));
+        $this->assertSame('NAN', Number::forHumans(NAN));
+        $this->assertSame('INF', Number::abbreviate(INF));
+        $this->assertSame('NAN', Number::abbreviate(NAN));
+    }
+
     public function testSummarize()
     {
         $this->assertSame('1', Number::abbreviate(1));

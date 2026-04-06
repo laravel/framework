@@ -266,6 +266,10 @@ class Number
      */
     protected static function summarize(int|float $number, int $precision = 0, ?int $maxPrecision = null, array $units = [])
     {
+        if (! is_finite($number)) {
+            return (string) $number;
+        }
+
         if (empty($units)) {
             $units = [
                 3 => 'K',
