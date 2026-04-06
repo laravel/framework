@@ -5,7 +5,6 @@ namespace Illuminate\Validation\Concerns;
 use Brick\Math\BigDecimal;
 use Brick\Math\BigNumber;
 use Brick\Math\Exception\MathException as BrickMathException;
-use Brick\Math\Exception\NumberFormatException;
 use DateTime;
 use DateTimeInterface;
 use DateTimeZone;
@@ -1436,7 +1435,7 @@ trait ValidatesAttributes
         if ($this->hasRule($attribute, $this->numericRules) && is_numeric($value) && is_numeric($comparedToValue)) {
             try {
                 return BigNumber::of($this->trim($value))->isLessThanOrEqualTo($this->trim($comparedToValue));
-            } catch (NumberFormatException) {
+            } catch (MathException) {
                 return false;
             }
         }
