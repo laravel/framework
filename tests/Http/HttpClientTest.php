@@ -2462,6 +2462,26 @@ class HttpClientTest extends TestCase
         ]);
     }
 
+    public function testRetryWhenCallbackIsNotCalledForNonFailedResponse()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['redirecting'], 301),
+        ]);
+
+        $whenCalled = false;
+
+        $response = $this->factory
+            ->retry(2, 0, function (Exception $exception) use (&$whenCalled) {
+                $whenCalled = true;
+
+                return true;
+            }, false)
+            ->get('http://foo.com/get');
+
+        $this->assertSame(301, $response->status());
+        $this->assertFalse($whenCalled);
+    }
+
     public function testRequestExceptionReturnedWhenRetriesExhaustedInPool()
     {
         $this->factory->fake([
