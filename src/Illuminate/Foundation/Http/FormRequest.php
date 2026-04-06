@@ -159,7 +159,6 @@ class FormRequest extends Request implements ValidatesWhenResolved
         if (count($errorBag) > 0) {
             $this->errorBag = $errorBag[0]->newInstance()->name;
         }
-
     }
 
     /**
@@ -262,7 +261,6 @@ class FormRequest extends Request implements ValidatesWhenResolved
                     return true;
                 }
             }
-
         }
 
         return false;
