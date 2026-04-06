@@ -2476,6 +2476,18 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['lhs' => 15], ['lhs' => 'numeric|gt:10']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['lhs' => INF, 'rhs' => 10], ['lhs' => 'numeric|gt:rhs']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => INF], ['lhs' => 'numeric|gt:10']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => NAN, 'rhs' => 15], ['lhs' => 'numeric|gt:rhs']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => NAN], ['lhs' => 'numeric|gt:10']);
+        $this->assertTrue($v->fails());
     }
 
     public function testLowercase()
@@ -2612,6 +2624,18 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['lhs' => 15], ['lhs' => 'numeric|gte:15']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['lhs' => INF, 'rhs' => 10], ['lhs' => 'numeric|gte:rhs']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => INF], ['lhs' => 'numeric|gte:10']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => NAN, 'rhs' => 15], ['lhs' => 'numeric|gte:rhs']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => NAN], ['lhs' => 'numeric|gte:10']);
+        $this->assertTrue($v->fails());
     }
 
     public function testLessThanOrEqual()
