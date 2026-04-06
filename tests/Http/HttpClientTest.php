@@ -2256,6 +2256,34 @@ class HttpClientTest extends TestCase
         $this->factory->assertSentCount(1);
     }
 
+    public function testRequestCanBeRetriedWhenRetryCallbackTypeHintsThrowableForRedirectResponses()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->sequence()
+                ->push(['redirect'], 301)
+                ->push(['ok'], 200),
+        ]);
+
+        $whenAttempts = 0;
+
+        $response = $this->factory
+            ->retry(2, 0, function (Throwable $exception, PendingRequest $request) use (&$whenAttempts) {
+                $whenAttempts++;
+
+                $this->assertInstanceOf(RequestException::class, $exception);
+                $this->assertSame(301, $exception->response->status());
+                $this->assertInstanceOf(PendingRequest::class, $request);
+
+                return true;
+            }, false)
+            ->get('http://foo.com/get');
+
+        $this->assertTrue($response->successful());
+        $this->assertSame(1, $whenAttempts);
+
+        $this->factory->assertSentCount(2);
+    }
+
     public function testRequestExceptionIsNotThrownWhenDisabledAndRetriesExhausted()
     {
         $this->factory->fake([

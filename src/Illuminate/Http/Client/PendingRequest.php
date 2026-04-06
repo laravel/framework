@@ -1046,12 +1046,14 @@ class PendingRequest
                     $this->dispatchResponseReceivedEvent($response);
                     $response = $this->runAfterResponseCallbacks($response);
 
+                    $responseException = $response->toException() ?? new \Illuminate\Http\Client\RequestException($response);
+
                     if ($response->successful()) {
                         return;
                     }
 
                     try {
-                        $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this, $this->request->toPsrRequest()->getMethod()) : true;
+                        $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $responseException, $this, $this->request->toPsrRequest()->getMethod()) : true;
                     } catch (Exception $exception) {
                         $shouldRetry = false;
 
@@ -1069,11 +1071,11 @@ class PendingRequest
                         : $this->tries;
 
                     if ($attempt < $potentialTries && $shouldRetry) {
-                        $response->throw();
+                        throw $responseException;
                     }
 
                     if ($potentialTries > 1 && $this->retryThrow) {
-                        $response->throw();
+                        throw $responseException;
                     }
                 });
             } catch (TransferException $e) {
