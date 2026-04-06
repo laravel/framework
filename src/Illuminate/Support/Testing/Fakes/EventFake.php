@@ -277,6 +277,27 @@ class EventFake implements Dispatcher, Fake
     }
 
     /**
+     * Get all of the listeners for a given event name.
+     *
+     * @param  string  $eventName
+     * @return array
+     */
+    public function getListeners($eventName)
+    {
+        return $this->dispatcher->getListeners($eventName);
+    }
+
+    /**
+     * Get all of the raw listeners.
+     *
+     * @return array
+     */
+    public function getRawListeners()
+    {
+        return $this->dispatcher->getRawListeners();
+    }
+
+    /**
      * Register an event and payload to be dispatched later.
      *
      * @param  string  $event
