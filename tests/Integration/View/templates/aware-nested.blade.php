@@ -1,0 +1,1 @@
+<x-aware-outer name="FOO" />

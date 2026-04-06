@@ -259,6 +259,14 @@ class BladeTest extends TestCase
         $this->artisan('view:cache');
     }
 
+    public function test_aware_resolves_nearest_parent_over_distant_ancestor()
+    {
+        $view = View::make('aware-nested')->render();
+
+        $this->assertStringContainsString('BAR', trim($view));
+        $this->assertStringNotContainsString('FOO', trim($view));
+    }
+
     /** {@inheritdoc} */
     #[\Override]
     protected function defineEnvironment($app)

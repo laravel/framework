@@ -137,22 +137,27 @@ trait ManagesComponents
      */
     public function getConsumableComponentData($key, $default = null)
     {
-        if (array_key_exists($key, $this->currentComponentData)) {
-            return $this->currentComponentData[$key];
-        }
-
         $currentComponent = count($this->componentStack);
 
-        if ($currentComponent === 0) {
-            return value($default);
+        // Check the current component's own data first (explicitly passed props).
+        // After renderComponent pops the component, its data remains at this index.
+        if (isset($this->componentData[$currentComponent]) &&
+            array_key_exists($key, $this->componentData[$currentComponent])) {
+            return $this->componentData[$currentComponent][$key];
         }
 
+        // Then check parent components still on the stack (nearest parent → root).
         for ($i = $currentComponent - 1; $i >= 0; $i--) {
             $data = $this->componentData[$i] ?? [];
 
             if (array_key_exists($key, $data)) {
                 return $data[$key];
             }
+        }
+
+        // Fall back to data from already-rendered ancestor components.
+        if (array_key_exists($key, $this->currentComponentData)) {
+            return $this->currentComponentData[$key];
         }
 
         return value($default);

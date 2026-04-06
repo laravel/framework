@@ -1,0 +1,2 @@
+@aware(['name'])
+{{ $name }}
