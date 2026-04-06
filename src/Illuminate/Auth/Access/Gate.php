@@ -498,17 +498,13 @@ class Gate implements GateContract
             $reflection = new ReflectionClass($class);
 
             $method = $reflection->getMethod($method);
-        } catch (Exception) {
-            return false;
-        }
 
-        if ($method) {
             $parameters = $method->getParameters();
 
             return isset($parameters[0]) && $this->parameterAllowsGuests($parameters[0]);
+        } catch (Exception) {
+            return false;
         }
-
-        return false;
     }
 
     /**
