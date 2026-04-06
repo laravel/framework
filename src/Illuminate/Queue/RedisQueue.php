@@ -5,9 +5,11 @@ namespace Illuminate\Queue;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Contracts\Redis\Factory as Redis;
+use Illuminate\Queue\Jobs\InspectedJob;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Redis\Connections\PredisClusterConnection;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class RedisQueue extends Queue implements QueueContract, ClearableQueue
@@ -140,6 +142,48 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     public function reservedSize($queue = null)
     {
         return $this->getConnection()->zcard($this->getQueue($queue).':reserved');
+    }
+
+    /**
+     * Get the pending jobs for the given queue.
+     *
+     * @param  string|null  $queue
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
+     */
+    public function pendingJobs($queue = null): Collection
+    {
+        $queue = $this->getQueue($queue);
+
+        return (new Collection($this->getConnection()->lrange($queue, 0, -1)))
+            ->map(fn ($payload) => InspectedJob::fromPayload($payload));
+    }
+
+    /**
+     * Get the delayed jobs for the given queue.
+     *
+     * @param  string|null  $queue
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
+     */
+    public function delayedJobs($queue = null): Collection
+    {
+        $queue = $this->getQueue($queue);
+
+        return (new Collection($this->getConnection()->zrange($queue.':delayed', 0, -1)))
+            ->map(fn ($payload) => InspectedJob::fromPayload($payload));
+    }
+
+    /**
+     * Get the reserved jobs for the given queue.
+     *
+     * @param  string|null  $queue
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
+     */
+    public function reservedJobs($queue = null): Collection
+    {
+        $queue = $this->getQueue($queue);
+
+        return (new Collection($this->getConnection()->zrange($queue.':reserved', 0, -1)))
+            ->map(fn ($payload) => InspectedJob::fromPayload($payload));
     }
 
     /**

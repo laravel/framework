@@ -7,8 +7,10 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
+use Illuminate\Queue\Jobs\InspectedJob;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Queue\RedisQueue;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 use Mockery as m;
@@ -592,6 +594,64 @@ class RedisQueueTest extends TestCase
             // Restore original serializer setting
             $client->setOption($optSerializer, $originalSerializer);
         }
+    }
+
+    #[DataProvider('redisDriverProvider')]
+    public function testPendingJobs($driver)
+    {
+        $default = config('queue.connections.redis.queue', 'default');
+        $this->setQueue($driver, $default);
+
+        $job = new RedisQueueIntegrationTestJob(99);
+        $this->queue->push($job);
+
+        $pending = $this->queue->pendingJobs();
+
+        $this->assertCount(1, $pending);
+        $this->assertInstanceOf(InspectedJob::class, $pending->first());
+        $this->assertSame(RedisQueueIntegrationTestJob::class, $pending->first()->name);
+        $this->assertSame(0, $pending->first()->attempts);
+        $this->assertNotNull($pending->first()->uuid);
+        $this->assertInstanceOf(Carbon::class, $pending->first()->createdAt);
+    }
+
+    #[DataProvider('redisDriverProvider')]
+    public function testDelayedJobs($driver)
+    {
+        $default = config('queue.connections.redis.queue', 'default');
+        $this->setQueue($driver, $default);
+
+        $job = new RedisQueueIntegrationTestJob(99);
+        $this->queue->later(60, $job);
+
+        $delayed = $this->queue->delayedJobs();
+
+        $this->assertCount(1, $delayed);
+        $this->assertInstanceOf(InspectedJob::class, $delayed->first());
+        $this->assertSame(RedisQueueIntegrationTestJob::class, $delayed->first()->name);
+        $this->assertSame(0, $delayed->first()->attempts);
+        $this->assertNotNull($delayed->first()->uuid);
+        $this->assertInstanceOf(Carbon::class, $delayed->first()->createdAt);
+    }
+
+    #[DataProvider('redisDriverProvider')]
+    public function testReservedJobs($driver)
+    {
+        $default = config('queue.connections.redis.queue', 'default');
+        $this->setQueue($driver, $default);
+
+        $job = new RedisQueueIntegrationTestJob(99);
+        $this->queue->push($job);
+        $this->queue->pop(); // moves job to reserved sorted set
+
+        $reserved = $this->queue->reservedJobs();
+
+        $this->assertCount(1, $reserved);
+        $this->assertInstanceOf(InspectedJob::class, $reserved->first());
+        $this->assertSame(RedisQueueIntegrationTestJob::class, $reserved->first()->name);
+        $this->assertSame(1, $reserved->first()->attempts);
+        $this->assertNotNull($reserved->first()->uuid);
+        $this->assertInstanceOf(Carbon::class, $reserved->first()->createdAt);
     }
 }
 
