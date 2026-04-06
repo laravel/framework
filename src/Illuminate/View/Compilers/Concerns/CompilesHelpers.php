@@ -65,6 +65,21 @@ trait CompilesHelpers
     }
 
     /**
+     * Compile the "fonts" statements into valid PHP.
+     *
+     * @param  string|null  $arguments
+     * @return string
+     */
+    protected function compileFonts($arguments)
+    {
+        $arguments ??= '()';
+
+        $class = Vite::class;
+
+        return "<?php echo app('$class')->fonts{$arguments}; ?>";
+    }
+
+    /**
      * Compile the "viteReactRefresh" statements into valid PHP.
      *
      * @return string

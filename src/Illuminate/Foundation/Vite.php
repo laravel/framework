@@ -98,6 +98,20 @@ class Vite implements Htmlable
     protected static $manifests = [];
 
     /**
+     * The ViteFonts instance.
+     *
+     * @var \Illuminate\Foundation\ViteFonts|null
+     */
+    protected $viteFonts = null;
+
+    /**
+     * The name of the font manifest file.
+     *
+     * @var string
+     */
+    protected $fontsManifestFilename = 'fonts-manifest.json';
+
+    /**
      * The prefetching strategy to use.
      *
      * @var null|'waterfall'|'aggressive'
@@ -1037,6 +1051,171 @@ class Vite implements Htmlable
     }
 
     /**
+     * Render font preload links and inline styles.
+     *
+     * @param  array|string|null  $families
+     * @return \Illuminate\Support\HtmlString
+     *
+     * @throws \Illuminate\Foundation\ViteException
+     */
+    public function fonts($families = null)
+    {
+        if (is_string($families)) {
+            $families = [$families];
+        }
+
+        $fonts = $this->viteFonts();
+        $isHot = $this->isRunningHot();
+
+        $manifest = $fonts->manifest($isHot, $this->buildDirectory, $this->fontsManifestFilename, $this->hotFile());
+
+        if ($manifest === null) {
+            return new HtmlString('');
+        }
+
+        $fonts->ensureValidManifest($manifest);
+
+        if ($families !== null) {
+            $fonts->ensureValidFamilies($families, $manifest);
+        }
+
+        $preloads = $manifest['preloads'] ?? [];
+
+        $fonts->ensureValidPreloads($preloads, $isHot);
+
+        if ($families !== null) {
+            $preloads = array_filter($preloads, fn ($preload) => in_array($preload['family'], $families, true));
+        }
+
+        $html = $this->renderFontPreloads($preloads, $isHot);
+        $html .= $this->renderFontStyle($manifest, $families);
+
+        return new HtmlString($html);
+    }
+
+    /**
+     * Render preload link tags for font entries.
+     *
+     * @param  array  $preloads
+     * @param  bool  $isHot
+     * @return string
+     */
+    protected function renderFontPreloads(array $preloads, $isHot)
+    {
+        $html = '';
+
+        foreach ($preloads as $preload) {
+            $url = isset($preload['url'])
+                ? $preload['url']
+                : $this->assetPath($this->buildDirectory.'/'.$preload['file']);
+
+            if (isset($this->preloadedAssets[$url])) {
+                continue;
+            }
+
+            $attributes = $this->resolveFontPreloadAttributes($url, $preload);
+
+            if ($attributes === false) {
+                continue;
+            }
+
+            $this->preloadedAssets[$url] = $this->parseAttributes(
+                (new Collection($attributes))->forget('href')->all()
+            );
+
+            $html .= '<link '.implode(' ', $this->parseAttributes($attributes)).' />';
+        }
+
+        return $html;
+    }
+
+    /**
+     * Resolve the attributes for a font preload tag.
+     *
+     * @param  string  $url
+     * @param  array  $preload
+     * @return array|false
+     */
+    protected function resolveFontPreloadAttributes($url, $preload)
+    {
+        $attributes = [
+            'rel' => 'preload',
+            'as' => $preload['as'] ?? 'font',
+            'href' => $url,
+            'type' => $preload['type'] ?? false,
+            'crossorigin' => $preload['crossorigin'] ?? false,
+            'nonce' => $this->nonce ?? false,
+        ];
+
+        foreach ($this->preloadTagAttributesResolvers as $resolver) {
+            if (false === ($resolved = $resolver(null, $url, [], []))) {
+                return false;
+            }
+
+            $attributes = array_merge($attributes, $resolved);
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * Render the inline style block for the font manifest.
+     *
+     * @param  array  $manifest
+     * @param  array|null  $families
+     * @return string
+     */
+    protected function renderFontStyle(array $manifest, ?array $families)
+    {
+        $css = $this->viteFonts()->resolveStyleContent($manifest, $families, $this->buildDirectory);
+
+        if ($css === '' || $css === null) {
+            return '';
+        }
+
+        $attributes = $this->parseAttributes([
+            'nonce' => $this->nonce ?? false,
+        ]);
+
+        $attributeString = $attributes ? ' '.implode(' ', $attributes) : '';
+
+        return "<style{$attributeString}>{$css}</style>";
+    }
+
+    /**
+     * Get the ViteFonts instance.
+     *
+     * @return \Illuminate\Foundation\ViteFonts
+     */
+    protected function viteFonts()
+    {
+        return $this->viteFonts ??= new ViteFonts;
+    }
+
+    /**
+     * Set the font manifest filename.
+     *
+     * @param  string  $filename
+     * @return $this
+     */
+    public function useFontsManifestFilename($filename)
+    {
+        $this->fontsManifestFilename = $filename;
+
+        return $this;
+    }
+
+    /**
+     * Get the build directory.
+     *
+     * @return string
+     */
+    public function buildDirectory()
+    {
+        return $this->buildDirectory;
+    }
+
+    /**
      * Flush state.
      *
      * @return void
@@ -1044,5 +1223,11 @@ class Vite implements Htmlable
     public function flush()
     {
         $this->preloadedAssets = [];
+
+        if ($this->viteFonts) {
+            $this->viteFonts->flush();
+        }
+
+        $this->viteFonts = null;
     }
 }
