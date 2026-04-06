@@ -71,6 +71,10 @@ class ValidationInRuleTest extends TestCase
         $rule = Rule::in([PureEnum::one]);
 
         $this->assertSame('in:"one"', (string) $rule);
+
+        $rule = new In([1, null, 'a']);
+
+        $this->assertSame('in:"1","","a"', (string) $rule);
     }
 
     public function testInRuleValidation()
