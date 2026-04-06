@@ -100,6 +100,13 @@ class Worker
     public $paused = false;
 
     /**
+     * The number of consecutive pop exceptions that have occurred.
+     *
+     * @var int
+     */
+    protected $popExceptions = 0;
+
+    /**
      * The callbacks used to pop jobs from queues.
      *
      * @var callable[]
@@ -348,6 +355,7 @@ class Worker
             $options->stopWhenEmpty && is_null($job) => [static::EXIT_SUCCESS, WorkerStopReason::QueueEmpty],
             $options->maxTime && hrtime(true) / 1e9 - $startTime >= $options->maxTime => [static::EXIT_SUCCESS, WorkerStopReason::MaxTimeExceeded],
             $options->maxJobs && $jobsProcessed >= $options->maxJobs => [static::EXIT_SUCCESS, WorkerStopReason::MaxJobsExceeded],
+            $options->maxPopExceptions && $this->popExceptions >= $options->maxPopExceptions => [static::EXIT_ERROR, WorkerStopReason::MaxPopExceptionsExceeded],
             default => null
         };
     }
@@ -397,6 +405,8 @@ class Worker
                     $this->raiseAfterJobPopEvent($connection->getConnectionName(), $job);
                 }
 
+                $this->popExceptions = 0;
+
                 return $job;
             }
 
@@ -408,13 +418,19 @@ class Worker
                 if (! is_null($job = $popJobCallback($queue, $index))) {
                     $this->raiseAfterJobPopEvent($connection->getConnectionName(), $job);
 
+                    $this->popExceptions = 0;
+
                     return $job;
                 }
             }
+
+            $this->popExceptions = 0;
         } catch (Throwable $e) {
             $this->exceptions->report($e);
 
             $this->stopWorkerIfLostConnection($e);
+
+            $this->popExceptions++;
 
             $this->sleep(1);
         }

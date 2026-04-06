@@ -488,6 +488,34 @@ class QueueWorkerTest extends TestCase
         }));
     }
 
+    public function testWorkerStopsAfterMaxPopExceptions()
+    {
+        $workerOptions = new WorkerOptions;
+        $workerOptions->maxPopExceptions = 3;
+
+        $worker = new InsomniacWorker(
+            new WorkerFakeManager('default', new BrokenQueueConnection('default', new RuntimeException('Connection refused'))),
+            $this->events,
+            $this->exceptionHandler,
+            function () {
+                return false;
+            }
+        );
+
+        $status = $worker->daemon('default', 'queue', $workerOptions);
+
+        $this->assertSame(1, $status);
+
+        $this->exceptionHandler->shouldHaveReceived('report')->times(3);
+
+        $this->events->shouldHaveReceived('dispatch')->with(m::on(function ($event) use ($workerOptions) {
+            return $event instanceof WorkerStopping
+                && $event->status === 1
+                && $event->workerOptions === $workerOptions
+                && $event->reason === WorkerStopReason::MaxPopExceptionsExceeded;
+        }));
+    }
+
     public function testJobReleasedEvent()
     {
         $e = new RuntimeException;

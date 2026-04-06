@@ -41,6 +41,7 @@ class WorkCommand extends Command
                             {--backoff=0 : The number of seconds to wait before retrying a job that encountered an uncaught exception}
                             {--max-jobs=0 : The number of jobs to process before stopping}
                             {--max-time=0 : The maximum number of seconds the worker should run}
+                            {--max-pop-exceptions=0 : The maximum number of consecutive pop exceptions before stopping}
                             {--force : Force the worker to run even in maintenance mode}
                             {--memory=128 : The memory limit in megabytes}
                             {--sleep=3 : The number of seconds to sleep when no job is available}
@@ -169,6 +170,7 @@ class WorkCommand extends Command
             $this->option('max-jobs'),
             $this->option('max-time'),
             $this->option('rest'),
+            $this->option('max-pop-exceptions'),
         );
     }
 

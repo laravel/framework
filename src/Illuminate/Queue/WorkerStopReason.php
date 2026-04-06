@@ -12,4 +12,5 @@ enum WorkerStopReason: string
     case QueueEmpty = 'empty';
     case ReceivedRestartSignal = 'restart_signal';
     case TimedOut = 'timed_out';
+    case MaxPopExceptionsExceeded = 'max_pop_exceptions';
 }
