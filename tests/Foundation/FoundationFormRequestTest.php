@@ -382,6 +382,79 @@ class FoundationFormRequestTest extends TestCase
         $this->assertTrue($exception->validator->errors()->has('items.0.name'));
     }
 
+    public function testFailOnUnknownFieldsRejectsMultipleUnknownKeys()
+    {
+        $request = $this->createRequest(
+            [
+                'name' => 'Taylor',
+                'role' => 'admin',
+                'profile' => ['is_admin' => true],
+            ],
+            FoundationTestFormRequestFailOnUnknownFieldsStub::class
+        );
+
+        $exception = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertTrue($exception->validator->errors()->has('role'));
+        $this->assertTrue($exception->validator->errors()->has('profile.is_admin'));
+    }
+
+    public function testFailOnUnknownFieldsRejectsUnknownNestedSibling()
+    {
+        $request = $this->createRequest(
+            ['user' => ['name' => 'Taylor', 'role' => 'admin']],
+            FoundationTestFormRequestFailOnUnknownFieldsNestedStub::class
+        );
+
+        $exception = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertTrue($exception->validator->errors()->has('user.role'));
+    }
+
+    public function testFailOnUnknownFieldsUsesPreparedInput()
+    {
+        $request = $this->createRequest(
+            ['full_name' => 'Taylor'],
+            FoundationTestFormRequestFailOnUnknownFieldsPrepareForValidationStub::class
+        );
+
+        $request->validateResolved();
+
+        $this->assertSame(['name' => 'Taylor'], $request->validated());
+    }
+
+    public function testFailOnUnknownFieldsChecksRequestPayloadWhenValidationDataIsOverridden()
+    {
+        $request = $this->createRequest(
+            ['name' => 'Taylor', 'unexpected' => 'value'],
+            FoundationTestFormRequestFailOnUnknownFieldsValidationDataOverrideStub::class
+        );
+
+        $exception = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertTrue($exception->validator->errors()->has('unexpected'));
+    }
+
+    public function testFailOnUnknownFieldsStillRunsWithStopOnFirstFailureAttribute()
+    {
+        $request = $this->createRequest(
+            ['unexpected' => 'value'],
+            FoundationTestFormRequestFailOnUnknownFieldsStopOnFirstFailureStub::class
+        );
+
+        $exception = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertTrue($exception->validator->errors()->has('unexpected'));
+    }
+
     /**
      * Catch the given exception thrown from the executor, and return it.
      *
@@ -741,6 +814,73 @@ class FoundationTestFormRequestFailOnUnknownFieldsSingleSegmentWildcardStub exte
     public function rules()
     {
         return ['items.*' => 'array'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+#[FailOnUnknownFields]
+class FoundationTestFormRequestFailOnUnknownFieldsNestedStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['user.name' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+#[FailOnUnknownFields]
+class FoundationTestFormRequestFailOnUnknownFieldsPrepareForValidationStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['name' => 'required'];
+    }
+
+    public function prepareForValidation()
+    {
+        $this->replace(['name' => $this->input('full_name')]);
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+#[FailOnUnknownFields]
+class FoundationTestFormRequestFailOnUnknownFieldsValidationDataOverrideStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['name' => 'required'];
+    }
+
+    public function validationData()
+    {
+        return ['name' => $this->input('name')];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+#[StopOnFirstFailure]
+#[FailOnUnknownFields]
+class FoundationTestFormRequestFailOnUnknownFieldsStopOnFirstFailureStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['name' => 'required'];
     }
 
     public function authorize()
