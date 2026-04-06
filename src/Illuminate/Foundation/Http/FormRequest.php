@@ -9,6 +9,7 @@ use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\Attributes\ErrorBag;
+use Illuminate\Foundation\Http\Attributes\FailOnUnknownFields;
 use Illuminate\Foundation\Http\Attributes\RedirectTo;
 use Illuminate\Foundation\Http\Attributes\RedirectToRoute;
 use Illuminate\Foundation\Http\Attributes\StopOnFirstFailure;
@@ -72,15 +73,6 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected $stopOnFirstFailure = false;
 
     /**
-     * Per-class override for rejecting fields not defined in rules().
-     *
-     * Null falls through to the global flag set via FormRequest::failOnUnknownFields().
-     *
-     * @var bool|null
-     */
-    protected ?bool $failOnUnknownFields = null;
-
-    /**
      * Global flag set via FormRequest::failOnUnknownFields().
      *
      * @var bool
@@ -96,9 +88,6 @@ class FormRequest extends Request implements ValidatesWhenResolved
 
     /**
      * Enable or disable unknown-field rejection globally for all form requests.
-     *
-     * Usage in AppServiceProvider::boot():
-     *   FormRequest::failOnUnknownFields(! app()->isProduction());
      *
      * @param  bool  $value
      * @return void
@@ -181,21 +170,20 @@ class FormRequest extends Request implements ValidatesWhenResolved
         if (count($errorBag) > 0) {
             $this->errorBag = $errorBag[0]->newInstance()->name;
         }
+
     }
 
     /**
      * Determine if fields not present in rules() should fail validation.
      *
-     * Resolution order:
-     *   1. $failOnUnknownFields — per-class override
-     *   2. $globalFailOnUnknownFields — set via FormRequest::failOnUnknownFields()
-     *
      * @return bool
      */
     protected function shouldFailOnUnknownFields(): bool
     {
-        if ($this->failOnUnknownFields !== null) {
-            return $this->failOnUnknownFields;
+        $failOnUnknownFields = (new ReflectionClass($this))->getAttributes(FailOnUnknownFields::class);
+
+        if ($failOnUnknownFields !== []) {
+            return $failOnUnknownFields[0]->newInstance()->value;
         }
 
         return static::$globalFailOnUnknownFields;
@@ -207,16 +195,15 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function validateNoExtraFields(Validator $validator): void
     {
-        $allowedKeys = array_keys($this->container->call([$this, 'rules']));
+        $allowedKeys = array_keys($this->validationRules());
 
         $inputKeys = array_keys(Arr::dot($this->all()));
 
         foreach ($inputKeys as $inputKey) {
             if (! $this->isAllowedKey($inputKey, $allowedKeys)) {
-                $validator->errors()->add(
-                    $inputKey,
-                    $this->getFailOnUnknownFieldsMessage($inputKey)
-                );
+                $validator->errors()->add($inputKey, trans('validation.prohibited', [
+                    'attribute' => str_replace('_', ' ', $inputKey),
+                ]));
             }
         }
     }
@@ -234,29 +221,16 @@ class FormRequest extends Request implements ValidatesWhenResolved
             }
 
             if (str_contains($ruleKey, '*')) {
-                $pattern = '/^'.str_replace(
-                    ['\*', '\.'],
-                    ['[^.]+', '\.'],
-                    preg_quote($ruleKey, '/')
-                ).'$/';
+                $pattern = '/^'.str_replace('\*', '[^.]+', preg_quote($ruleKey, '/')).'$/';
 
                 if (preg_match($pattern, $inputKey)) {
                     return true;
                 }
             }
+
         }
 
         return false;
-    }
-
-    /**
-     * @param  string  $field  The name of the unexpected field.
-     * @return string
-     */
-    protected function getFailOnUnknownFieldsMessage(string $field): string
-    {
-        return trans('validation.prohibited', ['attribute' => str_replace('_', ' ', $field)])
-            ?: "The {$field} field is not allowed.";
     }
 
     /**
