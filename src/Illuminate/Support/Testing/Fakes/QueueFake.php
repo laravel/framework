@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Events\CallQueuedListener;
 use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Queue\Jobs\InspectedJob;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -454,6 +455,49 @@ class QueueFake extends QueueManager implements Fake, Queue
     public function reservedSize($queue = null)
     {
         return 0;
+    }
+
+    /**
+     * Get the pending jobs for the given queue.
+     *
+     * @param  string|null  $queue
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
+     */
+    public function pendingJobs($queue = null): Collection
+    {
+        return (new Collection($this->jobs))
+            ->flatten(1)
+            ->filter(fn ($job) => $job['queue'] === $queue)
+            ->map(fn ($data) => new InspectedJob(
+                name: is_object($data['job'])
+                    ? (method_exists($data['job'], 'displayName') ? $data['job']->displayName() : get_class($data['job']))
+                    : $data['job'],
+                attempts: 0,
+                uuid: null,
+                createdAt: null,
+            ));
+    }
+
+    /**
+     * Get the delayed jobs for the given queue.
+     *
+     * @param  string|null  $queue
+     * @return \Illuminate\Support\Collection
+     */
+    public function delayedJobs($queue = null): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * Get the reserved jobs for the given queue.
+     *
+     * @param  string|null  $queue
+     * @return \Illuminate\Support\Collection
+     */
+    public function reservedJobs($queue = null): Collection
+    {
+        return new Collection;
     }
 
     /**

@@ -137,15 +137,9 @@ class SessionManager extends Manager
     {
         $handler = $this->createCacheHandler('redis');
 
-        $connection = $this->config->get('session.connection');
-
-        if ($connection) {
-            $handler->getCache()->setStore(
-                tap(clone $handler->getCache()->getStore(), function ($store) use ($connection) {
-                    $store->setConnection($connection);
-                })
-            );
-        }
+        $handler->getCache()->getStore()->setConnection(
+            $this->config->get('session.connection')
+        );
 
         return $this->buildSession($handler);
     }
@@ -182,7 +176,7 @@ class SessionManager extends Manager
         $store = $this->config->get('session.store') ?: $driver;
 
         return new CacheBasedSessionHandler(
-            $this->container->make('cache')->store($store),
+            clone $this->container->make('cache')->store($store),
             $this->config->get('session.lifetime')
         );
     }
