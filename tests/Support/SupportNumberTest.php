@@ -370,4 +370,31 @@ class SupportNumberTest extends TestCase
         $this->assertSame(1234.56, Number::parseFloat('1.234,56', locale: 'de'));
         $this->assertSame(1234.56, Number::parseFloat('1 234,56', locale: 'fr'));
     }
+
+    public function testIsEven()
+    {
+        $this->assertTrue(Number::isEven(2));
+        $this->assertTrue(Number::isEven(0));
+        $this->assertTrue(Number::isEven(-2));
+        $this->assertFalse(Number::isEven(1));
+        $this->assertFalse(Number::isEven(3));
+    }
+
+    public function testIsOdd()
+    {
+        $this->assertTrue(Number::isOdd(1));
+        $this->assertTrue(Number::isOdd(-1));
+        $this->assertFalse(Number::isOdd(2));
+        $this->assertFalse(Number::isOdd(0));
+    }
+
+    public function testIsBetween()
+    {
+        $this->assertTrue(Number::isBetween(5, 1, 10));
+        $this->assertTrue(Number::isBetween(1, 1, 10));
+        $this->assertTrue(Number::isBetween(10, 1, 10));
+        $this->assertFalse(Number::isBetween(0, 1, 10));
+        $this->assertFalse(Number::isBetween(11, 1, 10));
+        $this->assertTrue(Number::isBetween(5.5, 5, 6));
+    }
 }

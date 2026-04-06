@@ -82,6 +82,20 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable(null)->isJson());
     }
 
+    public function testIsAlphabetical()
+    {
+        $this->assertTrue($this->stringable('Laravel')->isAlphabetical());
+        $this->assertTrue($this->stringable('ü')->isAlphabetical());
+        $this->assertFalse($this->stringable('Laravel 13')->isAlphabetical());
+    }
+
+    public function testIsAlphanumeric()
+    {
+        $this->assertTrue($this->stringable('Laravel13')->isAlphanumeric());
+        $this->assertTrue($this->stringable('ü123')->isAlphanumeric());
+        $this->assertFalse($this->stringable('Laravel 13')->isAlphanumeric());
+    }
+
     public function testIsMatch()
     {
         $this->assertTrue($this->stringable('Hello, Laravel!')->isMatch('/.*,.*!/'));
@@ -1528,6 +1542,22 @@ class SupportStringableTest extends TestCase
     public function testNumbers()
     {
         $this->assertSame('5551234567', (string) $this->stringable('(555) 123-4567')->numbers());
+    }
+
+    public function testLetters()
+    {
+        $this->assertSame('Lrvl', (string) $this->stringable('L4r4v3l!')->letters());
+        $this->assertSame('', (string) $this->stringable('123!@#')->letters());
+        $this->assertSame('HelloWorld', (string) $this->stringable('Hello, World!')->letters());
+        $this->assertSame('Ünïcödé', (string) $this->stringable('Ün1ïcö2dé3')->letters());
+    }
+
+    public function testAlphanumeric()
+    {
+        $this->assertSame('L4r4v3l', (string) $this->stringable('L4r4v3l!')->alphanumeric());
+        $this->assertSame('123', (string) $this->stringable('123!@#')->alphanumeric());
+        $this->assertSame('HelloWorld', (string) $this->stringable('Hello, World!')->alphanumeric());
+        $this->assertSame('Ün1ïcö2dé3', (string) $this->stringable('Ün1ïcö2dé3!')->alphanumeric());
     }
 
     public function testToDate()

@@ -343,6 +343,41 @@ class Number
     }
 
     /**
+     * Determine if the given number is even.
+     *
+     * @param  int|float  $number
+     * @return bool
+     */
+    public static function isEven(int|float $number)
+    {
+        return (int) $number % 2 === 0;
+    }
+
+    /**
+     * Determine if the given number is odd.
+     *
+     * @param  int|float  $number
+     * @return bool
+     */
+    public static function isOdd(int|float $number)
+    {
+        return (int) $number % 2 !== 0;
+    }
+
+    /**
+     * Determine if the given number is between the given minimum and maximum.
+     *
+     * @param  int|float  $number
+     * @param  int|float  $min
+     * @param  int|float  $max
+     * @return bool
+     */
+    public static function isBetween(int|float $number, int|float $min, int|float $max)
+    {
+        return $number >= $min && $number <= $max;
+    }
+
+    /**
      * Execute the given callback using the given locale.
      *
      * @template TReturn

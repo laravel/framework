@@ -1937,4 +1937,37 @@ class SupportArrTest extends TestCase
 
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
     }
+
+    public function testAvg()
+    {
+        $this->assertEquals(2, Arr::avg([1, 2, 3]));
+        $this->assertNull(Arr::avg([]));
+        $this->assertEquals(2.5, Arr::avg([['price' => 2], ['price' => 3]], 'price'));
+    }
+
+    public function testAverage()
+    {
+        $this->assertEquals(2, Arr::average([1, 2, 3]));
+    }
+
+    public function testMax()
+    {
+        $this->assertEquals(3, Arr::max([1, 2, 3]));
+        $this->assertNull(Arr::max([]));
+        $this->assertEquals(3, Arr::max([['price' => 2], ['price' => 3]], 'price'));
+    }
+
+    public function testMin()
+    {
+        $this->assertEquals(1, Arr::min([1, 2, 3]));
+        $this->assertNull(Arr::min([]));
+        $this->assertEquals(2, Arr::min([['price' => 2], ['price' => 3]], 'price'));
+    }
+
+    public function testSum()
+    {
+        $this->assertEquals(6, Arr::sum([1, 2, 3]));
+        $this->assertEquals(0, Arr::sum([]));
+        $this->assertEquals(5, Arr::sum([['price' => 2], ['price' => 3]], 'price'));
+    }
 }

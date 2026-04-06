@@ -565,6 +565,28 @@ class Str
     }
 
     /**
+     * Determine if a given value is alphabetical (contains only letters).
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function isAlphabetical($value)
+    {
+        return is_string($value) && preg_match('/^\pL+$/u', $value) > 0;
+    }
+
+    /**
+     * Determine if a given value is alphanumeric (contains only letters and numbers).
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function isAlphanumeric($value)
+    {
+        return is_string($value) && preg_match('/^[\pL0-9]+$/u', $value) > 0;
+    }
+
+    /**
      * Determine if a given value is valid JSON.
      *
      * @param  mixed  $value
@@ -933,6 +955,28 @@ class Str
     public static function numbers($value)
     {
         return preg_replace('/[^0-9]/', '', $value);
+    }
+
+    /**
+     * Remove all non-letter characters from a string.
+     *
+     * @param  string|string[]  $value
+     * @return string|string[]
+     */
+    public static function letters($value)
+    {
+        return preg_replace('/[^\pL]+/u', '', $value);
+    }
+
+    /**
+     * Remove all non-alphanumeric characters from a string.
+     *
+     * @param  string|string[]  $value
+     * @return string|string[]
+     */
+    public static function alphanumeric($value)
+    {
+        return preg_replace('/[^\pL0-9]+/u', '', $value);
     }
 
     /**

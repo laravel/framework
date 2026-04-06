@@ -57,6 +57,39 @@ class Arr
     }
 
     /**
+     * Get the average value of a given key.
+     *
+     * @param  array  $array
+     * @param  (callable(mixed): float|int)|string|null  $callback
+     * @return float|int|null
+     */
+    public static function avg($array, $callback = null)
+    {
+        $reduced = static::reduce($array, static function ($reduce, $value) use ($callback) {
+            if (! is_null($resolved = data_get($value, $callback))) {
+                $reduce[0] += $resolved;
+                $reduce[1]++;
+            }
+
+            return $reduce;
+        }, [0, 0]);
+
+        return $reduced[1] ? $reduced[0] / $reduced[1] : null;
+    }
+
+    /**
+     * Alias for the "avg" method.
+     *
+     * @param  array  $array
+     * @param  (callable(mixed): float|int)|string|null  $callback
+     * @return float|int|null
+     */
+    public static function average($array, $callback = null)
+    {
+        return static::avg($array, $callback);
+    }
+
+    /**
      * Add an element to an array using "dot" notation if it doesn't exist.
      *
      * @param  array  $array
@@ -876,6 +909,38 @@ class Arr
     }
 
     /**
+     * Get the max value of a given key.
+     *
+     * @param  array  $array
+     * @param  (callable(mixed):mixed)|string|null  $callback
+     * @return mixed
+     */
+    public static function max($array, $callback = null)
+    {
+        return static::reduce($array, function ($result, $item) use ($callback) {
+            $value = data_get($item, $callback);
+
+            return is_null($result) || (! is_null($value) && $value > $result) ? $value : $result;
+        });
+    }
+
+    /**
+     * Get the min value of a given key.
+     *
+     * @param  array  $array
+     * @param  (callable(mixed):mixed)|string|null  $callback
+     * @return mixed
+     */
+    public static function min($array, $callback = null)
+    {
+        return static::reduce($array, function ($result, $item) use ($callback) {
+            $value = data_get($item, $callback);
+
+            return is_null($result) || (! is_null($value) && $value < $result) ? $value : $result;
+        });
+    }
+
+    /**
      * Run a map over each nested chunk of items.
      *
      * @template TKey
@@ -986,6 +1051,19 @@ class Arr
         }
 
         return $results;
+    }
+
+    /**
+     * Reduce the array to a single value using a callback.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @param  mixed  $initial
+     * @return mixed
+     */
+    public static function reduce($array, callable $callback, $initial = null)
+    {
+        return array_reduce($array, $callback, $initial);
     }
 
     /**
@@ -1177,6 +1255,20 @@ class Arr
         }
 
         return $value;
+    }
+
+    /**
+     * Get the sum of the given values.
+     *
+     * @param  array  $array
+     * @param  (callable(mixed): mixed)|string|null  $callback
+     * @return mixed
+     */
+    public static function sum($array, $callback = null)
+    {
+        return static::reduce($array, function ($result, $item) use ($callback) {
+            return $result + data_get($item, $callback);
+        }, 0);
     }
 
     /**

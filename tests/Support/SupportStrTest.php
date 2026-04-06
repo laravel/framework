@@ -826,6 +826,42 @@ class SupportStrTest extends TestCase
         $this->assertSame($arrayExpected, Str::numbers($arrayValue));
     }
 
+    public function testLetters()
+    {
+        $this->assertSame('Lrvl', Str::letters('L4r4v3l!'));
+        $this->assertSame('', Str::letters('123!@#'));
+        $this->assertSame('Hll', Str::letters('H3ll0'));
+        $this->assertSame('HelloWorld', Str::letters('Hello, World!'));
+        $this->assertSame('Laravel', Str::letters('Laravel'));
+
+        // Test with array values
+        $arrayValue = ['L4r4v3l!', '123', 'Hello World!'];
+        $arrayExpected = ['Lrvl', '', 'HelloWorld'];
+        $this->assertSame($arrayExpected, Str::letters($arrayValue));
+
+        // Test multibyte / Unicode support
+        $this->assertSame('Ünïcödé', Str::letters('Ün1ïcö2dé3'));
+        $this->assertSame('こんにちは', Str::letters('こんにちは123'));
+    }
+
+    public function testAlphanumeric()
+    {
+        $this->assertSame('L4r4v3l', Str::alphanumeric('L4r4v3l!'));
+        $this->assertSame('123', Str::alphanumeric('123!@#'));
+        $this->assertSame('H3ll0', Str::alphanumeric('H3ll0'));
+        $this->assertSame('HelloWorld', Str::alphanumeric('Hello, World!'));
+        $this->assertSame('Laravel', Str::alphanumeric('Laravel'));
+
+        // Test with array values
+        $arrayValue = ['L4r4v3l!', '123!@#', 'Hello World!'];
+        $arrayExpected = ['L4r4v3l', '123', 'HelloWorld'];
+        $this->assertSame($arrayExpected, Str::alphanumeric($arrayValue));
+
+        // Test multibyte / Unicode support
+        $this->assertSame('Ün1ïcö2dé3', Str::alphanumeric('Ün1ïcö2dé3!'));
+        $this->assertSame('こんにちは123', Str::alphanumeric('こんにちは123!'));
+    }
+
     public function testRandom()
     {
         $this->assertEquals(16, strlen(Str::random()));
@@ -1376,6 +1412,26 @@ class SupportStrTest extends TestCase
         $this->assertSame('', Str::ascii(null));
         $this->assertTrue(Str::isAscii(null));
         $this->assertSame('', Str::slug(null));
+    }
+
+    public function testIsAlphabetical()
+    {
+        $this->assertTrue(Str::isAlphabetical('Laravel'));
+        $this->assertTrue(Str::isAlphabetical('ü'));
+        $this->assertTrue(Str::isAlphabetical('こんにちは'));
+        $this->assertFalse(Str::isAlphabetical('Laravel 13'));
+        $this->assertFalse(Str::isAlphabetical('123'));
+        $this->assertFalse(Str::isAlphabetical(''));
+    }
+
+    public function testIsAlphanumeric()
+    {
+        $this->assertTrue(Str::isAlphanumeric('Laravel13'));
+        $this->assertTrue(Str::isAlphanumeric('ü123'));
+        $this->assertTrue(Str::isAlphanumeric('こんにちは123'));
+        $this->assertFalse(Str::isAlphanumeric('Laravel 13'));
+        $this->assertFalse(Str::isAlphanumeric('Laravel-13'));
+        $this->assertFalse(Str::isAlphanumeric(''));
     }
 
     public function testPadBoth()
