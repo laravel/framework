@@ -1329,7 +1329,7 @@ trait ValidatesAttributes
         if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
             try {
                 return BigNumber::of($this->getSize($attribute, $value))->isLessThan($this->trim($parameters[0]));
-            } catch (MathException) {
+            } catch (MathException|BrickMathException) {
                 return false;
             }
         }
@@ -1423,7 +1423,7 @@ trait ValidatesAttributes
         if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
             try {
                 return BigNumber::of($this->getSize($attribute, $value))->isLessThanOrEqualTo($this->trim($parameters[0]));
-            } catch (MathException) {
+            } catch (MathException|BrickMathException) {
                 return false;
             }
         }

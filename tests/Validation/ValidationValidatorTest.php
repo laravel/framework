@@ -2577,6 +2577,12 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['lhs' => NAN, 'rhs' => 100], ['lhs' => 'numeric|lt:rhs']);
         $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => INF], ['lhs' => 'numeric|lt:10']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => NAN], ['lhs' => 'numeric|lt:10']);
+        $this->assertTrue($v->fails());
     }
 
     public function testGreaterThanOrEqual()
@@ -2664,6 +2670,12 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['lhs' => NAN, 'rhs' => 100], ['lhs' => 'numeric|lte:rhs']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => INF], ['lhs' => 'numeric|lte:10']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => NAN], ['lhs' => 'numeric|lte:10']);
         $this->assertTrue($v->fails());
     }
 
