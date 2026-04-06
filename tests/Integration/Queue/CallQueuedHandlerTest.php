@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
+use Generator;
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\BatchRepository;
@@ -16,10 +17,13 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Event;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use RuntimeException;
+use Throwable;
 
 class CallQueuedHandlerTest extends TestCase
 {
-    public function testJobCanBeDispatched()
+    public function test_job_can_be_dispatched()
     {
         CallQueuedHandlerTestJob::$handled = false;
 
@@ -39,7 +43,7 @@ class CallQueuedHandlerTest extends TestCase
         $this->assertTrue(CallQueuedHandlerTestJob::$handled);
     }
 
-    public function testJobCanBeDispatchedThroughMiddleware()
+    public function test_job_can_be_dispatched_through_middleware()
     {
         CallQueuedHandlerTestJobWithMiddleware::$handled = false;
         CallQueuedHandlerTestJobWithMiddleware::$middlewareCommand = null;
@@ -61,7 +65,7 @@ class CallQueuedHandlerTest extends TestCase
         $this->assertTrue(CallQueuedHandlerTestJobWithMiddleware::$handled);
     }
 
-    public function testJobCanBeDispatchedThroughMiddlewareOnDispatch()
+    public function test_job_can_be_dispatched_through_middleware_on_dispatch()
     {
         $_SERVER['__test.dispatchMiddleware'] = false;
         CallQueuedHandlerTestJobWithMiddleware::$handled = false;
@@ -88,7 +92,7 @@ class CallQueuedHandlerTest extends TestCase
         $this->assertTrue($_SERVER['__test.dispatchMiddleware']);
     }
 
-    public function testJobIsMarkedAsFailedIfModelNotFoundExceptionIsThrown()
+    public function test_job_is_marked_as_failed_if_model_not_found_exception_is_thrown()
     {
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
@@ -101,7 +105,7 @@ class CallQueuedHandlerTest extends TestCase
         ]);
     }
 
-    public function testJobIsDeletedIfHasDeleteProperty()
+    public function test_job_is_deleted_if_has_delete_property()
     {
         Event::fake();
 
@@ -123,7 +127,7 @@ class CallQueuedHandlerTest extends TestCase
         Event::assertNotDispatched(JobFailed::class);
     }
 
-    public function testJobIsDeletedIfHasDeleteAttribute()
+    public function test_job_is_deleted_if_has_delete_attribute()
     {
         Event::fake();
 
@@ -139,13 +143,13 @@ class CallQueuedHandlerTest extends TestCase
         $job->shouldReceive('failed')->never();
 
         $instance->call($job, [
-            'command' => serialize(new CallQueuedHandlerAttributeExceptionThrower()),
+            'command' => serialize(new CallQueuedHandlerAttributeExceptionThrower),
         ]);
 
         Event::assertNotDispatched(JobFailed::class);
     }
 
-    public function testBatchJobIsRecordedWhenDeletedDueToMissingModel()
+    public function test_batch_job_is_recorded_when_deleted_due_to_missing_model()
     {
         Event::fake();
 
@@ -180,6 +184,54 @@ class CallQueuedHandlerTest extends TestCase
         ]);
 
         Event::assertNotDispatched(JobFailed::class);
+    }
+
+    /**
+     * @param  class-string<CallQueuedHandlerJobWithFailedHookStub>  $jobClass
+     */
+    #[DataProvider('failedMethodWithDependencyInjectionProvider')]
+    public function test_failed_method_receives_injected_dependencies(string $jobClass): void
+    {
+        $jobClass::$capturedServiceValue = null;
+        $jobClass::$capturedException = null;
+
+        $this->app->bind(CallQueuedHandlerTestService::class, fn () => new CallQueuedHandlerTestService('injected'));
+
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
+        $exception = new RuntimeException('something went wrong');
+
+        $instance->failed(
+            ['command' => serialize(new $jobClass)],
+            $exception,
+            'test-uuid',
+            m::mock(Job::class),
+        );
+
+        $this->assertSame('injected', $jobClass::$capturedServiceValue);
+        $this->assertSame($exception, $jobClass::$capturedException);
+    }
+
+    public static function failedMethodWithDependencyInjectionProvider(): Generator
+    {
+        yield 'exception parameter named $e' => [CallQueuedHandlerJobWithFailedHook::class];
+        yield 'exception parameter named $exception' => [CallQueuedHandlerJobWithFailedHookExceptionParam::class];
+    }
+
+    public function test_failed_method_without_dependency_injection_still_works(): void
+    {
+        CallQueuedHandlerJobWithFailedHookNoDI::$capturedException = null;
+
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
+        $exception = new RuntimeException('simple failure');
+
+        $instance->failed(
+            ['command' => serialize(new CallQueuedHandlerJobWithFailedHookNoDI)],
+            $exception,
+            'test-uuid',
+            m::mock(Job::class),
+        );
+
+        $this->assertSame($exception, CallQueuedHandlerJobWithFailedHookNoDI::$capturedException);
     }
 }
 
@@ -293,5 +345,59 @@ class TestJobMiddleware
         $_SERVER['__test.dispatchMiddleware'] = true;
 
         return $next($command);
+    }
+}
+
+readonly class CallQueuedHandlerTestService
+{
+    public function __construct(public string $value)
+    {
+    }
+}
+
+abstract class CallQueuedHandlerJobWithFailedHookStub
+{
+    use InteractsWithQueue, Queueable;
+
+    public static ?string $capturedServiceValue = null;
+
+    public static ?Throwable $capturedException = null;
+
+    public function handle(): void
+    {
+    }
+}
+
+class CallQueuedHandlerJobWithFailedHook extends CallQueuedHandlerJobWithFailedHookStub
+{
+    public function failed(Throwable $e, CallQueuedHandlerTestService $service): void
+    {
+        static::$capturedServiceValue = $service->value;
+        static::$capturedException = $e;
+    }
+}
+
+class CallQueuedHandlerJobWithFailedHookExceptionParam extends CallQueuedHandlerJobWithFailedHookStub
+{
+    public function failed(Throwable $exception, CallQueuedHandlerTestService $service): void
+    {
+        static::$capturedServiceValue = $service->value;
+        static::$capturedException = $exception;
+    }
+}
+
+class CallQueuedHandlerJobWithFailedHookNoDI
+{
+    use InteractsWithQueue, Queueable;
+
+    public static ?Throwable $capturedException = null;
+
+    public function handle(): void
+    {
+    }
+
+    public function failed(Throwable $e): void
+    {
+        static::$capturedException = $e;
     }
 }
