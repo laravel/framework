@@ -1622,6 +1622,7 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame('HHH', Str::transliterate('🎂🚧🏆', 'H'));
         $this->assertSame('Hello', Str::transliterate('🎂', 'Hello'));
+        $this->assertSame('', Str::transliterate(null));
     }
 
     #[DataProvider('specialCharacterProvider')]
