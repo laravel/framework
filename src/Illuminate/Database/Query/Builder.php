@@ -1371,6 +1371,114 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where starts with" clause to the query.
+     *
+     * The given value is automatically escaped so that "%" and "_" are treated
+     * as literal characters, and a trailing "%" wildcard is appended.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string  $value
+     * @param  bool  $caseSensitive
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereStartsWith($column, $value, $caseSensitive = false, $boolean = 'and', $not = false)
+    {
+        return $this->whereLike($column, $this->escapeLikeValue($value).'%', $caseSensitive, $boolean, $not);
+    }
+
+    /**
+     * Add an "or where starts with" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string  $value
+     * @param  bool  $caseSensitive
+     * @return $this
+     */
+    public function orWhereStartsWith($column, $value, $caseSensitive = false)
+    {
+        return $this->whereStartsWith($column, $value, $caseSensitive, 'or');
+    }
+
+    /**
+     * Add a "where ends with" clause to the query.
+     *
+     * The given value is automatically escaped so that "%" and "_" are treated
+     * as literal characters, and a leading "%" wildcard is prepended.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string  $value
+     * @param  bool  $caseSensitive
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereEndsWith($column, $value, $caseSensitive = false, $boolean = 'and', $not = false)
+    {
+        return $this->whereLike($column, '%'.$this->escapeLikeValue($value), $caseSensitive, $boolean, $not);
+    }
+
+    /**
+     * Add an "or where ends with" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string  $value
+     * @param  bool  $caseSensitive
+     * @return $this
+     */
+    public function orWhereEndsWith($column, $value, $caseSensitive = false)
+    {
+        return $this->whereEndsWith($column, $value, $caseSensitive, 'or');
+    }
+
+    /**
+     * Add a "where contains" clause to the query.
+     *
+     * The given value is automatically escaped so that "%" and "_" are treated
+     * as literal characters, and "%" wildcards are added on both sides.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string  $value
+     * @param  bool  $caseSensitive
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereContains($column, $value, $caseSensitive = false, $boolean = 'and', $not = false)
+    {
+        return $this->whereLike($column, '%'.$this->escapeLikeValue($value).'%', $caseSensitive, $boolean, $not);
+    }
+
+    /**
+     * Add an "or where contains" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string  $value
+     * @param  bool  $caseSensitive
+     * @return $this
+     */
+    public function orWhereContains($column, $value, $caseSensitive = false)
+    {
+        return $this->whereContains($column, $value, $caseSensitive, 'or');
+    }
+
+    /**
+     * Escape special characters for a LIKE clause value.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function escapeLikeValue($value)
+    {
+        return str_replace(
+            ['\\', '%', '_'],
+            ['\\\\', '\\%', '\\_'],
+            $value
+        );
+    }
+
+    /**
      * Add a "where null safe equals" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column

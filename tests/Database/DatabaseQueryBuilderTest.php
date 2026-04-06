@@ -934,6 +934,173 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => '1'], $builder->getBindings());
     }
 
+    public function testWhereStartsWith()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereStartsWith('name', 'John');
+        $this->assertSame('select * from "users" where "name" like ?', $builder->toSql());
+        $this->assertEquals([0 => 'John%'], $builder->getBindings());
+    }
+
+    public function testWhereStartsWithEscapesSpecialCharacters()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereStartsWith('name', '100%');
+        $this->assertSame('select * from "users" where "name" like ?', $builder->toSql());
+        $this->assertEquals([0 => '100\%%'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereStartsWith('name', 'foo_bar');
+        $this->assertSame('select * from "users" where "name" like ?', $builder->toSql());
+        $this->assertEquals([0 => 'foo\_bar%'], $builder->getBindings());
+    }
+
+    public function testOrWhereStartsWith()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereStartsWith('name', 'John');
+        $this->assertSame('select * from "users" where "id" = ? or "name" like ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'John%'], $builder->getBindings());
+    }
+
+    public function testWhereEndsWith()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereEndsWith('email', '@gmail.com');
+        $this->assertSame('select * from "users" where "email" like ?', $builder->toSql());
+        $this->assertEquals([0 => '%@gmail.com'], $builder->getBindings());
+    }
+
+    public function testWhereEndsWithEscapesSpecialCharacters()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereEndsWith('name', '100%');
+        $this->assertSame('select * from "users" where "name" like ?', $builder->toSql());
+        $this->assertEquals([0 => '%100\%'], $builder->getBindings());
+    }
+
+    public function testOrWhereEndsWith()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereEndsWith('email', '@gmail.com');
+        $this->assertSame('select * from "users" where "id" = ? or "email" like ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '%@gmail.com'], $builder->getBindings());
+    }
+
+    public function testWhereContains()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereContains('bio', 'Laravel');
+        $this->assertSame('select * from "users" where "bio" like ?', $builder->toSql());
+        $this->assertEquals([0 => '%Laravel%'], $builder->getBindings());
+    }
+
+    public function testWhereContainsEscapesSpecialCharacters()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereContains('bio', '100% free');
+        $this->assertSame('select * from "users" where "bio" like ?', $builder->toSql());
+        $this->assertEquals([0 => '%100\% free%'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereContains('bio', 'under_score');
+        $this->assertSame('select * from "users" where "bio" like ?', $builder->toSql());
+        $this->assertEquals([0 => '%under\_score%'], $builder->getBindings());
+    }
+
+    public function testOrWhereContains()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereContains('bio', 'Laravel');
+        $this->assertSame('select * from "users" where "id" = ? or "bio" like ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '%Laravel%'], $builder->getBindings());
+    }
+
+    public function testWhereStartsWithMysql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereStartsWith('name', 'John');
+        $this->assertSame('select * from `users` where `name` like ?', $builder->toSql());
+        $this->assertEquals([0 => 'John%'], $builder->getBindings());
+    }
+
+    public function testWhereEndsWithMysql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereEndsWith('email', '@gmail.com');
+        $this->assertSame('select * from `users` where `email` like ?', $builder->toSql());
+        $this->assertEquals([0 => '%@gmail.com'], $builder->getBindings());
+    }
+
+    public function testWhereContainsMysql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereContains('bio', 'Laravel');
+        $this->assertSame('select * from `users` where `bio` like ?', $builder->toSql());
+        $this->assertEquals([0 => '%Laravel%'], $builder->getBindings());
+    }
+
+    public function testWhereStartsWithPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereStartsWith('name', 'John');
+        $this->assertSame('select * from "users" where "name"::text ilike ?', $builder->toSql());
+        $this->assertEquals([0 => 'John%'], $builder->getBindings());
+    }
+
+    public function testWhereEndsWithPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereEndsWith('email', '@gmail.com');
+        $this->assertSame('select * from "users" where "email"::text ilike ?', $builder->toSql());
+        $this->assertEquals([0 => '%@gmail.com'], $builder->getBindings());
+    }
+
+    public function testWhereContainsPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereContains('bio', 'Laravel');
+        $this->assertSame('select * from "users" where "bio"::text ilike ?', $builder->toSql());
+        $this->assertEquals([0 => '%Laravel%'], $builder->getBindings());
+    }
+
+    public function testWhereStartsWithCaseSensitive()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereStartsWith('name', 'John', true);
+        $this->assertSame('select * from `users` where `name` like binary ?', $builder->toSql());
+        $this->assertEquals([0 => 'John%'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereStartsWith('name', 'John', true);
+        $this->assertSame('select * from "users" where "name"::text like ?', $builder->toSql());
+        $this->assertEquals([0 => 'John%'], $builder->getBindings());
+    }
+
+    public function testWhereStartsWithNot()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereStartsWith('name', 'John', not: true);
+        $this->assertSame('select * from "users" where "name" not like ?', $builder->toSql());
+        $this->assertEquals([0 => 'John%'], $builder->getBindings());
+    }
+
+    public function testWhereEndsWithNot()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereEndsWith('email', '@spam.com', not: true);
+        $this->assertSame('select * from "users" where "email" not like ?', $builder->toSql());
+        $this->assertEquals([0 => '%@spam.com'], $builder->getBindings());
+    }
+
+    public function testWhereContainsNot()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereContains('bio', 'spam', not: true);
+        $this->assertSame('select * from "users" where "bio" not like ?', $builder->toSql());
+        $this->assertEquals([0 => '%spam%'], $builder->getBindings());
+    }
+
     public function testWhereDateSqlite()
     {
         $builder = $this->getSQLiteBuilder();
