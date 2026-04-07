@@ -472,6 +472,22 @@ class ModelSerializationTest extends TestCase
         $this->assertEquals('hello', $unserialized->value->value);
     }
 
+    #[WithConfig('database.default', 'testing')]
+    public function test_it_respects_without_relations_attribute_applied_to_parent_class()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+        ])->load(['roles']);
+
+        $serialized = serialize(new ModelSerializationAttributeTargetsParentClassTestClass($user, new DataValueObject('hello')));
+
+        /** @var ModelSerializationAttributeTargetsParentClassTestClass $unserialized */
+        $unserialized = unserialize($serialized);
+
+        $this->assertFalse($unserialized->user->relationLoaded('roles'));
+        $this->assertEquals('hello', $unserialized->value->value);
+    }
+
     public function test_serialization_types_empty_custom_eloquent_collection()
     {
         $class = new ModelSerializationTypedCustomCollectionTestClass(
@@ -786,6 +802,11 @@ class ModelSerializationAttributeTargetsClassTestClass
     public function __construct(public User $user, public DataValueObject $value)
     {
     }
+}
+
+class ModelSerializationAttributeTargetsParentClassTestClass extends ModelSerializationAttributeTargetsClassTestClass
+{
+    //
 }
 
 class ModelRelationSerializationTestClass
