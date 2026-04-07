@@ -2,7 +2,9 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Reflector;
 
 trait BroadcastsEvents
 {
@@ -129,17 +131,19 @@ trait BroadcastsEvents
     public function newBroadcastableModelEvent($event)
     {
         return tap($this->newBroadcastableEvent($event), function ($event) {
+            $attribute = Reflector::getClassAttribute($this, ObservedBy::class, ascend: true);
+
             $event->connection = property_exists($this, 'broadcastConnection')
                 ? $this->broadcastConnection
-                : $this->broadcastConnection();
+                : ($attribute->connection ?? $this->broadcastConnection());
 
             $event->queue = property_exists($this, 'broadcastQueue')
                 ? $this->broadcastQueue
-                : $this->broadcastQueue();
+                : ($attribute->queue ?? $this->broadcastQueue());
 
             $event->afterCommit = property_exists($this, 'broadcastAfterCommit')
                 ? $this->broadcastAfterCommit
-                : $this->broadcastAfterCommit();
+                : ($attribute->afterCommit ?? $this->broadcastAfterCommit());
         });
     }
 
