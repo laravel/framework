@@ -107,6 +107,13 @@ class Worker
     protected static $popCallbacks = [];
 
     /**
+     * The number of consecutive pop failures.
+     *
+     * @var int
+     */
+    protected $popFailures = 0;
+
+    /**
      * The custom exit code to be used when memory is exceeded.
      *
      * @var int|null
@@ -397,6 +404,8 @@ class Worker
                     $this->raiseAfterJobPopEvent($connection->getConnectionName(), $job);
                 }
 
+                $this->popFailures = 0;
+
                 return $job;
             }
 
@@ -408,13 +417,21 @@ class Worker
                 if (! is_null($job = $popJobCallback($queue, $index))) {
                     $this->raiseAfterJobPopEvent($connection->getConnectionName(), $job);
 
+                    $this->popFailures = 0;
+
                     return $job;
                 }
             }
+
+            $this->popFailures = 0;
         } catch (Throwable $e) {
             $this->exceptions->report($e);
 
             $this->stopWorkerIfLostConnection($e);
+
+            if (++$this->popFailures > 100) {
+                $this->shouldQuit = true;
+            }
 
             $this->sleep(1);
         }

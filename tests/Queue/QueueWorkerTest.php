@@ -507,6 +507,50 @@ class QueueWorkerTest extends TestCase
         }))->once();
     }
 
+    public function testWorkerQuitsAfterConsecutivePopFailures()
+    {
+        $worker = new InsomniacWorker(
+            new WorkerFakeManager('default', new BrokenQueueConnection('default', new RuntimeException('Connection refused'))),
+            $this->events,
+            $this->exceptionHandler,
+            function () {
+                return false;
+            }
+        );
+
+        $workerOptions = new WorkerOptions;
+        $workerOptions->stopWhenEmpty = false;
+
+        $status = $worker->daemon('default', 'queue', $workerOptions);
+
+        $this->assertSame(0, $status);
+        $this->assertTrue($worker->shouldQuit);
+    }
+
+    public function testWorkerPopFailureCounterResetsOnSuccess()
+    {
+        $connection = new IntermittentBrokenQueueConnection(
+            'default', new RuntimeException('Connection refused'), 3
+        );
+
+        $worker = new InsomniacWorker(
+            new WorkerFakeManager('default', $connection),
+            $this->events,
+            $this->exceptionHandler,
+            function () {
+                return false;
+            }
+        );
+
+        $workerOptions = new WorkerOptions;
+        $workerOptions->stopWhenEmpty = true;
+
+        $status = $worker->daemon('default', 'queue', $workerOptions);
+
+        $this->assertSame(0, $status);
+        $this->assertFalse($worker->shouldQuit);
+    }
+
     /**
      * Helpers...
      */
@@ -787,6 +831,37 @@ class WorkerFakeJob implements QueueJobContract
     public function resolveQueuedJobClass()
     {
         return 'WorkerFakeJob';
+    }
+}
+
+class IntermittentBrokenQueueConnection
+{
+    public $connectionName;
+    public $exception;
+    public $failCount;
+    public $callCount = 0;
+
+    public function __construct($connectionName, $exception, $failCount)
+    {
+        $this->connectionName = $connectionName;
+        $this->exception = $exception;
+        $this->failCount = $failCount;
+    }
+
+    public function pop($queue)
+    {
+        $this->callCount++;
+
+        if ($this->callCount <= $this->failCount) {
+            throw $this->exception;
+        }
+
+        return null;
+    }
+
+    public function getConnectionName()
+    {
+        return $this->connectionName;
     }
 }
 
