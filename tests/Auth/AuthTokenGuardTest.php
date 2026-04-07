@@ -85,6 +85,19 @@ class AuthTokenGuardTest extends TestCase
         $this->assertTrue($guard->validate(['api_token' => 'foo']));
     }
 
+    public function testValidateCanDetermineIfHashedCredentialsAreValid()
+    {
+        $provider = m::mock(UserProvider::class);
+        $user = new AuthTokenGuardTestUser;
+        $user->id = 1;
+        $provider->shouldReceive('retrieveByCredentials')->once()->with(['api_token' => hash('sha256', 'foo')])->andReturn($user);
+        $request = Request::create('/', 'GET', ['api_token' => 'foo']);
+
+        $guard = new TokenGuard($provider, $request, 'api_token', 'api_token', $hash = true);
+
+        $this->assertTrue($guard->validate(['api_token' => 'foo']));
+    }
+
     public function testValidateCanDetermineIfCredentialsAreInvalid()
     {
         $provider = m::mock(UserProvider::class);
