@@ -8,7 +8,7 @@ use Illuminate\Foundation\MaintenanceModeManager;
  * @method static string getDefaultDriver()
  * @method static mixed driver(string|null $driver = null)
  * @method static \Illuminate\Foundation\MaintenanceModeManager extend(string $driver, \Closure $callback)
- * @method static array getDrivers()
+ * @method static array<string, mixed> getDrivers()
  * @method static \Illuminate\Contracts\Container\Container getContainer()
  * @method static \Illuminate\Foundation\MaintenanceModeManager setContainer(\Illuminate\Contracts\Container\Container $container)
  * @method static \Illuminate\Foundation\MaintenanceModeManager forgetDrivers()
