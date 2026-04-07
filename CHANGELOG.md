@@ -1,6 +1,31 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.3.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.4.0...13.x)
+
+## [v13.4.0](https://github.com/laravel/framework/compare/v13.3.0...v13.4.0) - 2026-04-07
+
+* [13.x] Fix missing `Illuminate\Queue\Attributes\Delay` attribute by [@fadez](https://github.com/fadez) in https://github.com/laravel/framework/pull/59504
+* [13.x] Fix `$request->interval()` failing with very small float values  by [@SanderMuller](https://github.com/SanderMuller) in https://github.com/laravel/framework/pull/59502
+* [13.x] Add pint.json to export-ignore by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/59497
+* [13.x] Add --ignore-scripts to yarn in BroadcastingInstallCommand by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59494
+* [13.x] Fix static closure binding in remaining manager classes by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59493
+* [13.x] Fix CollectedBy attribute not resolving through abstract parent classes by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59488
+* [13.x] Fix: Allow runtime property overrides (onQueue) to take precedence over class attributes by [@niduranga](https://github.com/niduranga) in https://github.com/laravel/framework/pull/59468
+* [13.x] Use #[Delay] attribute in Bus Dispatcher by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59514
+* [13.x] Use #[Delay] attribute in NotificationSender by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59513
+* [13.x] Add `overflow` option to Carbon plus and minus by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/59509
+* [13.x] Fix: respect null redirect in unauthenticated exception handler by [@timmylindh](https://github.com/timmylindh) in https://github.com/laravel/framework/pull/59505
+* [13.x] Fix TypeError in starts_with/ends_with validation rules on non-string values by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59541
+* [13.x] allow null to be passed directly to redirectGuestsTo() by [@timmylindh](https://github.com/timmylindh) in https://github.com/laravel/framework/pull/59526
+* Revert "[13.x] Remove unnecessary clone in SessionManager to prevent duplicate Redis connections" by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/59542
+* [13.x] Fix deprecation warning in Contains and DoesntContain rules when values contain null by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59561
+* [13.x] Fix Str::markdown() and Str::inlineMarkdown() crash on null input by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59554
+* [13.x] Add queue methods to inspect jobs by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59511
+* Feature/form request strict mode by [@NurullahDemirel](https://github.com/NurullahDemirel) in https://github.com/laravel/framework/pull/59430
+* Bump vite from 7.3.1 to 7.3.2 in /src/Illuminate/Foundation/resources/exceptions/renderer by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/framework/pull/59571
+* [13.x] Fix deprecation warning in In and NotIn rules when values contain null by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59576
+* [13.x] Add flushState to FormRequest to reset global strict mode between tests by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59574
+* [13.x] Fix `#[WithoutRelations]` queue attribute not being inherited by child classes by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/59568
 
 ## [v13.3.0](https://github.com/laravel/framework/compare/v13.2.0...v13.3.0) - 2026-04-01
 
