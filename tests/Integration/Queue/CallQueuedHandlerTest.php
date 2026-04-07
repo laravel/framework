@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Generator;
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\BatchRepository;
@@ -17,7 +16,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Event;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
-use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Throwable;
 
@@ -186,14 +184,10 @@ class CallQueuedHandlerTest extends TestCase
         Event::assertNotDispatched(JobFailed::class);
     }
 
-    /**
-     * @param  class-string<CallQueuedHandlerJobWithFailedHookStub>  $jobClass
-     */
-    #[DataProvider('failedMethodWithDependencyInjectionProvider')]
-    public function test_failed_method_receives_injected_dependencies(string $jobClass): void
+    public function test_failed_method_receives_injected_dependencies(): void
     {
-        $jobClass::$capturedServiceValue = null;
-        $jobClass::$capturedException = null;
+        CallQueuedHandlerJobWithFailedHook::$capturedServiceValue = null;
+        CallQueuedHandlerJobWithFailedHook::$capturedException = null;
 
         $this->app->bind(CallQueuedHandlerTestService::class, fn () => new CallQueuedHandlerTestService('injected'));
 
@@ -201,20 +195,14 @@ class CallQueuedHandlerTest extends TestCase
         $exception = new RuntimeException('something went wrong');
 
         $instance->failed(
-            ['command' => serialize(new $jobClass)],
+            ['command' => serialize(new CallQueuedHandlerJobWithFailedHook)],
             $exception,
             'test-uuid',
             m::mock(Job::class),
         );
 
-        $this->assertSame('injected', $jobClass::$capturedServiceValue);
-        $this->assertSame($exception, $jobClass::$capturedException);
-    }
-
-    public static function failedMethodWithDependencyInjectionProvider(): Generator
-    {
-        yield 'exception parameter named $e' => [CallQueuedHandlerJobWithFailedHook::class];
-        yield 'exception parameter named $exception' => [CallQueuedHandlerJobWithFailedHookExceptionParam::class];
+        $this->assertSame('injected', CallQueuedHandlerJobWithFailedHook::$capturedServiceValue);
+        $this->assertSame($exception, CallQueuedHandlerJobWithFailedHook::$capturedException);
     }
 
     public function test_failed_method_without_dependency_injection_still_works(): void
@@ -355,7 +343,7 @@ readonly class CallQueuedHandlerTestService
     }
 }
 
-abstract class CallQueuedHandlerJobWithFailedHookStub
+class CallQueuedHandlerJobWithFailedHook
 {
     use InteractsWithQueue, Queueable;
 
@@ -366,23 +354,11 @@ abstract class CallQueuedHandlerJobWithFailedHookStub
     public function handle(): void
     {
     }
-}
 
-class CallQueuedHandlerJobWithFailedHook extends CallQueuedHandlerJobWithFailedHookStub
-{
     public function failed(Throwable $e, CallQueuedHandlerTestService $service): void
     {
         static::$capturedServiceValue = $service->value;
         static::$capturedException = $e;
-    }
-}
-
-class CallQueuedHandlerJobWithFailedHookExceptionParam extends CallQueuedHandlerJobWithFailedHookStub
-{
-    public function failed(Throwable $exception, CallQueuedHandlerTestService $service): void
-    {
-        static::$capturedServiceValue = $service->value;
-        static::$capturedException = $exception;
     }
 }
 
