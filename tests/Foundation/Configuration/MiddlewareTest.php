@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Foundation\Configuration;
 
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Foundation\Application;
@@ -31,6 +33,8 @@ class MiddlewareTest extends TestCase
         PreventRequestsDuringMaintenance::flushState();
         TrimStrings::flushState();
         TrustProxies::flushState();
+        Authenticate::redirectUsing(fn () => null);
+        AuthenticationException::redirectUsing(fn () => null);
 
         parent::tearDown();
     }
@@ -302,5 +306,41 @@ class MiddlewareTest extends TestCase
         $reflection = new ReflectionClass(PreventRequestForgery::class);
         $this->assertTrue($reflection->getStaticPropertyValue('originOnly'));
         $this->assertTrue($reflection->getStaticPropertyValue('allowSameSite'));
+    }
+
+    public function testRedirectUsersToDoesNotOverwriteRedirectGuestsTo()
+    {
+        $configuration = new Middleware();
+
+        $configuration->redirectGuestsTo('/login');
+        $configuration->redirectUsersTo('/dashboard');
+
+        $request = Request::create('/protected', 'GET');
+
+        $authenticateCallback = (new ReflectionClass(Authenticate::class))
+            ->getStaticPropertyValue('redirectToCallback');
+
+        $exceptionCallback = (new ReflectionClass(AuthenticationException::class))
+            ->getStaticPropertyValue('redirectToCallback');
+
+        $this->assertSame('/login', $authenticateCallback($request));
+        $this->assertSame('/login', $exceptionCallback($request));
+    }
+
+    public function testRedirectGuestsToWithCallable()
+    {
+        $configuration = new Middleware();
+
+        $configuration->redirectGuestsTo(fn (Request $request) => $request->is('admin/*') ? '/admin/login' : '/login');
+        $configuration->redirectUsersTo('/dashboard');
+
+        $regularRequest = Request::create('/protected', 'GET');
+        $adminRequest = Request::create('/admin/settings', 'GET');
+
+        $callback = (new ReflectionClass(Authenticate::class))
+            ->getStaticPropertyValue('redirectToCallback');
+
+        $this->assertSame('/login', $callback($regularRequest));
+        $this->assertSame('/admin/login', $callback($adminRequest));
     }
 }
