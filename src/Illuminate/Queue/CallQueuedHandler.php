@@ -19,6 +19,7 @@ use Illuminate\Events\CallQueuedListener;
 use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Pipeline\Pipeline;
 use RuntimeException;
+use Throwable;
 
 class CallQueuedHandler
 {
@@ -343,7 +344,7 @@ class CallQueuedHandler
         $this->ensureChainCatchCallbacksAreInvoked($uuid, $command, $e);
 
         if (method_exists($command, 'failed')) {
-            $this->container->call([$command, 'failed'], ['e' => $e, 'exception' => $e]);
+            $this->container->call([$command, 'failed'], [Throwable::class => $e]);
         }
     }
 
