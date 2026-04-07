@@ -183,8 +183,8 @@ trait InteractsWithTestCaseLifecycle
         Component::forgetComponentsResolver();
         Component::forgetFactory();
         ConvertEmptyStringsToNull::flushState();
-        FormRequest::flushState();
         Factory::flushState();
+        FormRequest::flushState();
         EncodedHtmlString::flushState();
         EncryptCookies::flushState();
         HandleCors::flushState();
