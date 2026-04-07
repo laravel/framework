@@ -1053,7 +1053,7 @@ class Vite implements Htmlable
     /**
      * Render font preload links and inline styles.
      *
-     * @param  array|string|null  $families
+     * @param  list<string>|string|null  $families
      * @return \Illuminate\Support\HtmlString
      *
      * @throws \Illuminate\Foundation\ViteException
@@ -1096,7 +1096,7 @@ class Vite implements Htmlable
     /**
      * Render preload link tags for font entries.
      *
-     * @param  array  $preloads
+     * @param  list<array<string, string>>  $preloads
      * @param  bool  $isHot
      * @return string
      */
@@ -1133,8 +1133,8 @@ class Vite implements Htmlable
      * Resolve the attributes for a font preload tag.
      *
      * @param  string  $url
-     * @param  array  $preload
-     * @return array|false
+     * @param  array<string, string>  $preload
+     * @return array<string, string|false>|false
      */
     protected function resolveFontPreloadAttributes($url, $preload)
     {
@@ -1161,8 +1161,8 @@ class Vite implements Htmlable
     /**
      * Render the inline style block for the font manifest.
      *
-     * @param  array  $manifest
-     * @param  array|null  $families
+     * @param  array<string, mixed>  $manifest
+     * @param  list<string>|null  $families
      * @return string
      */
     protected function renderFontStyle(array $manifest, ?array $families)

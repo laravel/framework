@@ -7,7 +7,7 @@ class ViteFonts
     /**
      * The cached font manifests.
      *
-     * @var array
+     * @var array<string, array<string, mixed>>
      */
     protected static $manifests = [];
 
@@ -18,7 +18,7 @@ class ViteFonts
      * @param  string  $buildDirectory
      * @param  string  $manifestFilename
      * @param  string  $hotFile
-     * @return array|null
+     * @return array<string, mixed>|null
      *
      * @throws \Illuminate\Foundation\ViteException
      */
@@ -34,8 +34,8 @@ class ViteFonts
     /**
      * Resolve the CSS content from the manifest.
      *
-     * @param  array  $manifest
-     * @param  array|null  $families
+     * @param  array<string, mixed>  $manifest
+     * @param  list<string>|null  $families
      * @param  string  $buildDirectory
      * @return string
      *
@@ -57,9 +57,9 @@ class ViteFonts
     /**
      * Resolve filtered CSS content using per-family fragments from the manifest.
      *
-     * @param  array  $style
-     * @param  array  $families
-     * @param  array  $manifestFamilies
+     * @param  array{inline?: string, file?: string, familyStyles?: array<string, string>, variables?: string}  $style
+     * @param  list<string>  $families
+     * @param  array<string, array<string, string>>  $manifestFamilies
      * @return string
      */
     protected function resolveFilteredStyleContent(array $style, array $families, array $manifestFamilies)
@@ -86,8 +86,8 @@ class ViteFonts
      * Filter a CSS variables block to only include variables for the given families.
      *
      * @param  string  $variables
-     * @param  array  $families
-     * @param  array  $manifestFamilies
+     * @param  list<string>  $families
+     * @param  array<string, array<string, string>>  $manifestFamilies
      * @return string
      */
     protected function filterVariables($variables, array $families, array $manifestFamilies)
@@ -157,7 +157,7 @@ class ViteFonts
     /**
      * Validate the font manifest structure.
      *
-     * @param  array  $manifest
+     * @param  array<string, mixed>  $manifest
      * @return void
      *
      * @throws \Illuminate\Foundation\ViteException
@@ -180,8 +180,8 @@ class ViteFonts
     /**
      * Validate that the requested families exist in the manifest.
      *
-     * @param  array  $families
-     * @param  array  $manifest
+     * @param  list<string>  $families
+     * @param  array<string, mixed>  $manifest
      * @return void
      *
      * @throws \Illuminate\Foundation\ViteException
@@ -202,7 +202,7 @@ class ViteFonts
     /**
      * Validate that each preload entry contains the required keys.
      *
-     * @param  array  $preloads
+     * @param  list<array<string, string>>  $preloads
      * @param  bool  $isHot
      * @return void
      *
@@ -227,7 +227,7 @@ class ViteFonts
      * Read and decode a manifest file.
      *
      * @param  string  $path
-     * @return array|null
+     * @return array<string, mixed>|null
      *
      * @throws \Illuminate\Foundation\ViteException
      */
