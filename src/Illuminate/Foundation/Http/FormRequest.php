@@ -390,6 +390,16 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
+     * Flush the global state of the form request.
+     *
+     * @return void
+     */
+    public static function flushState(): void
+    {
+        static::$globalFailOnUnknownFields = false;
+    }
+
+    /**
      * Set the Validator instance.
      *
      * @param  \Illuminate\Contracts\Validation\Validator  $validator

@@ -11,6 +11,7 @@ use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Bootstrap\RegisterProviders;
 use Illuminate\Foundation\Console\AboutCommand;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
@@ -182,6 +183,7 @@ trait InteractsWithTestCaseLifecycle
         Component::forgetComponentsResolver();
         Component::forgetFactory();
         ConvertEmptyStringsToNull::flushState();
+        FormRequest::flushState();
         Factory::flushState();
         EncodedHtmlString::flushState();
         EncryptCookies::flushState();
