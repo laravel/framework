@@ -54,6 +54,8 @@ class Can implements Rule, ValidatorAwareRule
 
         $model = array_shift($arguments);
 
+        $value = is_null($value) ? '' : $value;
+
         return Gate::allows($this->ability, array_filter([$model, ...$arguments, $value]));
     }
 
