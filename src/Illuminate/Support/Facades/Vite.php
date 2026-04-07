@@ -27,7 +27,6 @@ namespace Illuminate\Support\Facades;
  * @method static string|null manifestHash(string|null $buildDirectory = null)
  * @method static \Illuminate\Support\HtmlString fonts(array|string|null $families = null)
  * @method static \Illuminate\Foundation\Vite useFontsManifestFilename(string $filename)
- * @method static string buildDirectory()
  * @method static bool isRunningHot()
  * @method static string toHtml()
  * @method static void flush()

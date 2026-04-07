@@ -47,7 +47,7 @@ class ViteFonts
 
         return match (true) {
             $style === null => '',
-            $families !== null => $this->resolveFilteredStyleContent($style, $families),
+            $families !== null => $this->resolveFilteredStyleContent($style, $families, $manifest['families'] ?? []),
             isset($style['inline']) => $style['inline'],
             isset($style['file']) => $this->readStyleFile($buildDirectory, $style['file']),
             default => '',
@@ -59,9 +59,10 @@ class ViteFonts
      *
      * @param  array  $style
      * @param  array  $families
+     * @param  array  $manifestFamilies
      * @return string
      */
-    protected function resolveFilteredStyleContent(array $style, array $families)
+    protected function resolveFilteredStyleContent(array $style, array $families, array $manifestFamilies)
     {
         $familyStyles = $style['familyStyles'] ?? [];
         $variables = $style['variables'] ?? '';
@@ -75,10 +76,62 @@ class ViteFonts
         }
 
         if ($variables !== '') {
-            $parts[] = $variables;
+            $parts[] = $this->filterVariables($variables, $families, $manifestFamilies);
         }
 
         return implode("\n\n", $parts);
+    }
+
+    /**
+     * Filter a CSS variables block to only include variables for the given families.
+     *
+     * @param  string  $variables
+     * @param  array  $families
+     * @param  array  $manifestFamilies
+     * @return string
+     */
+    protected function filterVariables($variables, array $families, array $manifestFamilies)
+    {
+        $allowedVariables = [];
+
+        foreach ($families as $family) {
+            if (isset($manifestFamilies[$family]['variable'])) {
+                $allowedVariables[] = $manifestFamilies[$family]['variable'];
+            }
+        }
+
+        if (empty($allowedVariables)) {
+            return '';
+        }
+
+        $lines = explode("\n", $variables);
+        $filtered = [];
+
+        foreach ($lines as $line) {
+            $trimmed = trim($line);
+
+            if ($trimmed === ':root {' || $trimmed === '}') {
+                $filtered[] = $line;
+
+                continue;
+            }
+
+            foreach ($allowedVariables as $variable) {
+                if (str_contains($trimmed, $variable.':')) {
+                    $filtered[] = $line;
+
+                    break;
+                }
+            }
+        }
+
+        $result = implode("\n", $filtered);
+
+        if (trim($result) === ':root {' || trim($result) === '}' || trim($result) === ":root {\n}") {
+            return '';
+        }
+
+        return $result;
     }
 
     /**

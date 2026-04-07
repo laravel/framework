@@ -183,7 +183,7 @@ class FoundationViteFontsTest extends TestCase
                     'Inter' => "@font-face { font-family: \"Inter\"; src: url('inter.woff2'); }\n\n@font-face { font-family: \"Inter fallback\"; src: local(\"Arial\"); }",
                     'JetBrains Mono' => "@font-face { font-family: \"JetBrains Mono\"; src: url('jb.woff2'); }",
                 ],
-                'variables' => ':root { --font-inter: "Inter", "Inter fallback"; --font-jb: "JetBrains Mono"; }',
+                'variables' => ":root {\n  --font-inter: \"Inter\", \"Inter fallback\";\n  --font-jb: \"JetBrains Mono\";\n}",
             ],
             'preloads' => [
                 [
@@ -206,8 +206,8 @@ class FoundationViteFontsTest extends TestCase
                 ],
             ],
             'families' => [
-                'Inter' => [],
-                'JetBrains Mono' => [],
+                'Inter' => ['variable' => '--font-inter'],
+                'JetBrains Mono' => ['variable' => '--font-jb'],
             ],
         ]);
         $this->makeFontsCssFile('build', 'assets/fonts-abc123.css', 'full-css-not-used-during-filtering');
@@ -220,7 +220,64 @@ class FoundationViteFontsTest extends TestCase
         $this->assertStringContainsString('font-family: "Inter fallback"', $result);
         $this->assertStringNotContainsString('font-family: "JetBrains Mono"', $result);
         $this->assertStringContainsString(':root {', $result);
+        $this->assertStringContainsString('--font-inter:', $result);
+        $this->assertStringNotContainsString('--font-jb:', $result);
         $this->assertStringNotContainsString('full-css-not-used-during-filtering', $result);
+    }
+
+    public function testFontsFilteredByFamilyDoesNotThrowForMalformedPreloadOfOtherFamily()
+    {
+        $this->makeFontsManifest([
+            'version' => 1,
+            'style' => [
+                'inline' => "@font-face { font-family: 'Inter'; }",
+                'familyStyles' => [
+                    'Inter' => "@font-face { font-family: 'Inter'; }",
+                ],
+                'variables' => '',
+            ],
+            'preloads' => [
+                [
+                    'family' => 'Inter',
+                    'weight' => 400,
+                    'style' => 'normal',
+                    'file' => 'assets/inter-400.woff2',
+                    'as' => 'font',
+                    'type' => 'font/woff2',
+                    'crossorigin' => 'anonymous',
+                ],
+                [
+                    'family' => 'Broken',
+                    'as' => 'font',
+                ],
+            ],
+            'families' => [
+                'Inter' => ['variable' => '--font-inter'],
+                'Broken' => ['variable' => '--font-broken'],
+            ],
+        ]);
+
+        $result = app(Vite::class)->fonts(['Inter'])->toHtml();
+
+        $this->assertStringContainsString('inter-400.woff2', $result);
+    }
+
+    public function testFontsPreloadCallbackReceivesStableSourceIdentifier()
+    {
+        $this->makeFontsManifest();
+        $this->makeFontsCssFile('build', 'assets/fonts-abc123.css', "@font-face { font-family: 'Inter'; }");
+
+        $receivedSrc = null;
+
+        ViteFacade::usePreloadTagAttributes(function ($src, $url, $chunk, $manifest) use (&$receivedSrc) {
+            $receivedSrc = $src;
+
+            return [];
+        });
+
+        app(Vite::class)->fonts();
+
+        $this->assertSame('fonts', $receivedSrc);
     }
 
     public function testFontsAcceptsStringFamily()

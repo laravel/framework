@@ -1081,11 +1081,11 @@ class Vite implements Htmlable
 
         $preloads = $manifest['preloads'] ?? [];
 
-        $fonts->ensureValidPreloads($preloads, $isHot);
-
         if ($families !== null) {
-            $preloads = array_filter($preloads, fn ($preload) => in_array($preload['family'], $families, true));
+            $preloads = array_filter($preloads, fn ($preload) => in_array($preload['family'] ?? null, $families, true));
         }
+
+        $fonts->ensureValidPreloads($preloads, $isHot);
 
         $html = $this->renderFontPreloads($preloads, $isHot);
         $html .= $this->renderFontStyle($manifest, $families);
@@ -1148,7 +1148,7 @@ class Vite implements Htmlable
         ];
 
         foreach ($this->preloadTagAttributesResolvers as $resolver) {
-            if (false === ($resolved = $resolver(null, $url, [], []))) {
+            if (false === ($resolved = $resolver('fonts', $url, [], []))) {
                 return false;
             }
 
@@ -1203,16 +1203,6 @@ class Vite implements Htmlable
         $this->fontsManifestFilename = $filename;
 
         return $this;
-    }
-
-    /**
-     * Get the build directory.
-     *
-     * @return string
-     */
-    public function buildDirectory()
-    {
-        return $this->buildDirectory;
     }
 
     /**
