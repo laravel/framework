@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
+use Illuminate\Database\Eloquent\Attributes\Broadcasts;
 use Illuminate\Database\Eloquent\BroadcastableModelEventOccurred;
 use Illuminate\Database\Eloquent\BroadcastsEvents;
 use Illuminate\Database\Eloquent\Model;
@@ -192,6 +193,20 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
         });
     }
 
+    /**
+     * @test
+     */
+    public function test_broadcasting_configuration_can_be_inherited_from_parent_attribute()
+    {
+        $model = new ChildBroadcastModel;
+
+        $event = $model->newBroadcastableModelEvent('created');
+
+        $this->assertSame('custom-connection', $event->connection);
+        $this->assertSame('custom-queue', $event->queue);
+        $this->assertTrue($event->afterCommit);
+    }
+
     private function assertHandldedBroadcastableEvent(BroadcastableModelEventOccurred $event, Closure $closure)
     {
         $broadcaster = m::mock(Broadcaster::class);
@@ -266,4 +281,15 @@ class TestEloquentBroadcastUserWithSpecificBroadcastPayload extends Model
                 return ['foo' => 'bar'];
         }
     }
+}
+
+#[Broadcasts(connection: 'custom-connection', queue: 'custom-queue', afterCommit: true)]
+abstract class ParentBroadcastModel extends Model
+{
+    use BroadcastsEvents;
+}
+
+class ChildBroadcastModel extends ParentBroadcastModel
+{
+    //
 }
