@@ -12,6 +12,7 @@ use Illuminate\Contracts\Queue\Factory as Queue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Support\Collection;
 use Illuminate\Support\EncodedHtmlString;
 use Illuminate\Support\HtmlString;
@@ -20,6 +21,7 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\ReadsClassAttributes;
 use Illuminate\Support\Traits\Tappable;
 use Illuminate\Testing\Constraints\SeeInOrder;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -31,7 +33,7 @@ use Symfony\Component\Mime\Address;
 
 class Mailable implements MailableContract, Renderable
 {
-    use Conditionable, ForwardsCalls, Localizable, Tappable, Macroable {
+    use Conditionable, ForwardsCalls, Localizable, ReadsClassAttributes, Tappable, Macroable {
         __call as macroCall;
     }
 
@@ -224,8 +226,10 @@ class Mailable implements MailableContract, Renderable
      */
     public function queue(Queue $queue)
     {
-        if (isset($this->delay)) {
-            return $this->later($this->delay, $queue);
+        $delay = $this->getAttributeValue($this, Delay::class, 'delay');
+
+        if (isset($delay)) {
+            return $this->later($delay, $queue);
         }
 
         $connection = property_exists($this, 'connection') ? $this->connection : null;
