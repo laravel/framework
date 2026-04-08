@@ -179,7 +179,7 @@ class PhpRedisConnector implements Connector
         }
 
         if (version_compare(phpversion('redis'), '5.3.0', '>=') && ! is_null($context = Arr::get($config, 'context'))) {
-            $parameters[] = $context;
+            $parameters[] = $this->normalizeContext($context);
         }
 
         $client->{$persistent ? 'pconnect' : 'connect'}(...$parameters);
@@ -207,7 +207,7 @@ class PhpRedisConnector implements Connector
         }
 
         if (version_compare(phpversion('redis'), '5.3.2', '>=') && ! is_null($context = Arr::get($options, 'context'))) {
-            $parameters[] = $context;
+            $parameters[] = $this->normalizeClusterContext($context);
         }
 
         return tap(new RedisCluster(...$parameters), function ($client) use ($options) {
@@ -254,6 +254,48 @@ class PhpRedisConnector implements Connector
         }
 
         return $options['host'];
+    }
+
+    /**
+     * Normalize the SSL context for a single Redis connection.
+     *
+     * Redis::connect() expects the context as ['stream' => ['verify_peer' => false, ...]].
+     *
+     * @param  array  $context
+     * @return array
+     */
+    protected function normalizeContext(array $context)
+    {
+        if (isset($context['stream'])) {
+            return $context;
+        }
+
+        if (isset($context['ssl']) && is_array($context['ssl'])) {
+            return ['stream' => $context['ssl']];
+        }
+
+        return ['stream' => $context];
+    }
+
+    /**
+     * Normalize the SSL context for a RedisCluster connection.
+     *
+     * RedisCluster::__construct() expects a flat context ['verify_peer' => false, ...].
+     *
+     * @param  array  $context
+     * @return array
+     */
+    protected function normalizeClusterContext(array $context)
+    {
+        if (isset($context['ssl']) && is_array($context['ssl'])) {
+            return $context['ssl'];
+        }
+
+        if (isset($context['stream']) && is_array($context['stream'])) {
+            return $context['stream'];
+        }
+
+        return $context;
     }
 
     /**
