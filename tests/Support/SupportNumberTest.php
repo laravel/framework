@@ -188,6 +188,40 @@ class SupportNumberTest extends TestCase
         $this->assertSame('1,024 YB', Number::fileSize(1024 ** 9));
     }
 
+    public function testDuration()
+    {
+        $this->assertSame('0 seconds', Number::duration(0));
+        $this->assertSame('1 second', Number::duration(1));
+        $this->assertSame('30 seconds', Number::duration(30));
+        $this->assertSame('1 minute', Number::duration(60));
+        $this->assertSame('1 minute 30 seconds', Number::duration(90));
+        $this->assertSame('1 hour', Number::duration(3600));
+        $this->assertSame('1 hour 30 minutes', Number::duration(5400));
+        $this->assertSame('1 day', Number::duration(86400));
+        $this->assertSame('1 day 1 hour 1 minute 1 second', Number::duration(90061));
+        $this->assertSame('2 weeks 3 days', Number::duration(1468800));
+        $this->assertSame('1 year', Number::duration(31536000));
+        $this->assertSame('1 year 1 day', Number::duration(31622400));
+    }
+
+    public function testDurationWithParts()
+    {
+        $this->assertSame('1 hour', Number::duration(3661, parts: 1));
+        $this->assertSame('1 hour 1 minute', Number::duration(3661, parts: 2));
+        $this->assertSame('1 hour 1 minute 1 second', Number::duration(3661, parts: 3));
+        $this->assertSame('1 day', Number::duration(90061, parts: 1));
+        $this->assertSame('1 day 1 hour', Number::duration(90061, parts: 2));
+    }
+
+    public function testDurationShort()
+    {
+        $this->assertSame('0s', Number::duration(0, short: true));
+        $this->assertSame('30s', Number::duration(30, short: true));
+        $this->assertSame('1min', Number::duration(60, short: true));
+        $this->assertSame('1hr 30min', Number::duration(5400, short: true));
+        $this->assertSame('1d 1hr', Number::duration(90061, parts: 2, short: true));
+    }
+
     public function testClamp()
     {
         $this->assertSame(2, Number::clamp(1, 2, 3));

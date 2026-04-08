@@ -293,6 +293,48 @@ class Number
     }
 
     /**
+     * Convert the given number of seconds to a human-readable duration.
+     *
+     * @param  int|float  $seconds
+     * @param  int|null  $parts
+     * @param  bool  $short
+     * @return string
+     */
+    public static function duration(int|float $seconds, ?int $parts = null, bool $short = false)
+    {
+        $seconds = (int) abs($seconds);
+
+        if ($seconds === 0) {
+            return $short ? '0s' : '0 seconds';
+        }
+
+        $units = [
+            ['year', 'yr', 31536000],
+            ['week', 'wk', 604800],
+            ['day', 'd', 86400],
+            ['hour', 'hr', 3600],
+            ['minute', 'min', 60],
+            ['second', 's', 1],
+        ];
+
+        $result = [];
+
+        foreach ($units as [$long, $shortUnit, $divisor]) {
+            $count = intdiv($seconds, $divisor);
+
+            if ($count > 0) {
+                $result[] = $short
+                    ? $count.$shortUnit
+                    : $count.' '.Str::plural($long, $count);
+
+                $seconds %= $divisor;
+            }
+        }
+
+        return implode(' ', $parts ? array_slice($result, 0, $parts) : $result);
+    }
+
+    /**
      * Clamp the given number between the given minimum and maximum.
      *
      * @param  int|float  $number
