@@ -19,6 +19,7 @@ use Illuminate\Contracts\Bus\Dispatcher as BusDispatcherContract;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Queue\Attributes\Connection as ConnectionAttribute;
+use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
@@ -218,14 +219,19 @@ class BroadcastManager implements FactoryContract
             }
         }
 
-        $push = fn () => $this->app->make('queue')
+        $connection = $this->app->make('queue')
             ->connection(
                 $event->connection
                     ?? $this->getAttributeValue($event, ConnectionAttribute::class, 'connection')
                     ?? $this->resolveConnectionFromQueueRoute($event)
                     ?? null
-            )
-            ->pushOn($queue, $broadcastEvent);
+            );
+
+        $delay = $this->getAttributeValue($event, Delay::class, 'delay');
+
+        $push = fn () => isset($delay)
+            ? $connection->laterOn($queue, $delay, $broadcastEvent)
+            : $connection->pushOn($queue, $broadcastEvent);
 
         $event instanceof ShouldRescue
             ? $this->rescue($push)

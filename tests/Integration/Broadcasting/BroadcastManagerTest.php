@@ -12,6 +12,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Contracts\Broadcasting\ShouldRescue;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
@@ -205,6 +206,35 @@ class BroadcastManagerTest extends TestCase
         }
     }
 
+    public function testEventsCanBeBroadcastWithDelayAttribute()
+    {
+        Bus::fake();
+        Queue::fake();
+
+        Broadcast::queue(new TestEventWithDelay);
+
+        Bus::assertNotDispatched(BroadcastEvent::class);
+        Queue::assertPushed(BroadcastEvent::class, function ($job) {
+            return $job->delay === 30;
+        });
+    }
+
+    public function testEventsCanBeBroadcastWithDelayProperty()
+    {
+        Bus::fake();
+        Queue::fake();
+
+        $event = new TestEventWithDelay;
+        $event->delay = 60;
+
+        Broadcast::queue($event);
+
+        Bus::assertNotDispatched(BroadcastEvent::class);
+        Queue::assertPushed(BroadcastEvent::class, function ($job) {
+            return $job->delay === 60;
+        });
+    }
+
     protected function getApp(array $userConfig)
     {
         $app = new Container;
@@ -277,6 +307,20 @@ class TestEventRescue implements ShouldBroadcast, ShouldRescue
 }
 
 class TestEventNowRescue implements ShouldBroadcastNow, ShouldRescue
+{
+    /**
+     * Get the channels the event should broadcast on.
+     *
+     * @return \Illuminate\Broadcasting\Channel|\Illuminate\Broadcasting\Channel[]
+     */
+    public function broadcastOn()
+    {
+        //
+    }
+}
+
+#[Delay(30)]
+class TestEventWithDelay implements ShouldBroadcast
 {
     /**
      * Get the channels the event should broadcast on.
