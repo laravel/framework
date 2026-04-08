@@ -4885,6 +4885,23 @@ class SupportCollectionTest extends TestCase
         VarDumper::setHandler(null);
     }
 
+
+    #[DataProvider('collectionClassProvider')]
+    public function testDumpFirst($collection)
+    {
+        $log = new Collection;
+
+        VarDumper::setHandler(function ($value) use ($log) {
+            $log->add($value);
+        });
+
+        (new $collection([1, 2, 3]))->dumpFirst('two');
+
+        $this->assertSame([1, 'two'], $log->all());
+
+        VarDumper::setHandler(null);
+    }
+
     #[DataProvider('collectionClassProvider')]
     public function testReduce($collection)
     {
