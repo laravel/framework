@@ -1189,10 +1189,12 @@ class Route
         $current = $reflectionClass;
 
         while ($current) {
-            $classAttributes = array_reverse($current->getAttributes(MiddlewareAttribute::class, ReflectionAttribute::IS_INSTANCEOF));
+            $classAttributes = array_reverse($current->getAttributes(
+                MiddlewareAttribute::class, ReflectionAttribute::IS_INSTANCEOF
+            ));
 
-            foreach ($classAttributes as $attr) {
-                $attributes->prepend($attr);
+            foreach ($classAttributes as $attribute) {
+                $attributes->prepend($attribute);
             }
 
             $current = $current->getParentClass();
