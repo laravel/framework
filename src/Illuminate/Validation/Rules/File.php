@@ -12,9 +12,16 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 
+/**
+ * @method static static types(string|array<int, string> $mimetypes)
+ * @method $this types(string|array<int, string> $mimetypes)
+ */
 class File implements Rule, DataAwareRule, ValidatorAwareRule
 {
-    use Conditionable, Macroable;
+    use Conditionable, Macroable {
+        Macroable::__call as protected macroCall;
+        Macroable::__callStatic as protected macroCallStatic;
+    }
 
     /**
      * The MIME types that the given file should match. This array may also contain file extensions.
@@ -135,14 +142,48 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
-     * Limit the uploaded file to the given MIME types or file extensions.
+     * Apply allowed MIME types or extensions to the given instance.
      *
      * @param  string|array<int, string>  $mimetypes
-     * @return static
+     * @return $this
      */
-    public static function types($mimetypes)
+    protected function applyTypes($mimetypes)
     {
-        return tap(new static(), fn ($file) => $file->allowedMimetypes = (array) $mimetypes);
+        $this->allowedMimetypes = (array) $mimetypes;
+
+        return $this;
+    }
+
+    /**
+     * Dynamically handle instance method calls into the rule.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        if ($method === 'types') {
+            return $this->applyTypes(...$parameters);
+        }
+
+        return $this->macroCall($method, $parameters);
+    }
+
+    /**
+     * Dynamically handle static method calls into the rule.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public static function __callStatic($method, $parameters)
+    {
+        if ($method === 'types') {
+            return (new static)->applyTypes(...$parameters);
+        }
+
+        return static::macroCallStatic($method, $parameters);
     }
 
     /**

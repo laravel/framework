@@ -62,6 +62,31 @@ class ValidationFileRuleTest extends TestCase
         $this->assertValidationRules($rule, $values, true, []);
     }
 
+    public function testTypesPreservesPriorChainConfiguration()
+    {
+        $this->fails(
+            File::image()->max(1)->types(['jpg', 'jpeg']),
+            UploadedFile::fake()->image('photo.jpg')->size(8),
+            ['validation.max.file'],
+        );
+    }
+
+    public function testTypesIsChainableAfterMax()
+    {
+        $this->passes(
+            File::image()->max(2)->types(['jpg', 'jpeg']),
+            UploadedFile::fake()->image('tiny.jpg')->size(1),
+        );
+    }
+
+    public function testStaticTypesStillWorks()
+    {
+        $this->passes(
+            File::types(['png']),
+            UploadedFile::fake()->createWithContent('foo.png', file_get_contents(__DIR__.'/fixtures/image.png')),
+        );
+    }
+
     public function testSingleMimetype()
     {
         $this->fails(
