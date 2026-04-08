@@ -309,10 +309,10 @@ class Number
         }
 
         $units = [
-            ['year', 'yr', 31536000],
-            ['week', 'wk', 604800],
-            ['day', 'd', 86400],
-            ['hour', 'hr', 3600],
+            ['year', 'yr', 31_536_000],
+            ['week', 'wk', 604_800],
+            ['day', 'd', 86_400],
+            ['hour', 'hr', 3_600],
             ['minute', 'min', 60],
             ['second', 's', 1],
         ];
