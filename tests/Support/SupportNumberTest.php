@@ -207,6 +207,14 @@ class SupportNumberTest extends TestCase
         $this->assertSame(1048576, Number::fromFileSize('1MB'));
     }
 
+    public function testFromFileSizeWithIecUnits()
+    {
+        $this->assertSame(1024, Number::fromFileSize('1 KiB'));
+        $this->assertSame(1048576, Number::fromFileSize('1 MiB'));
+        $this->assertSame(1073741824, Number::fromFileSize('1 GiB'));
+        $this->assertSame(1099511627776, Number::fromFileSize('1 TiB'));
+    }
+
     public function testFromFileSizeRoundTrip()
     {
         $this->assertSame('1 KB', Number::fileSize(Number::fromFileSize('1 KB')));

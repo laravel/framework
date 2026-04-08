@@ -219,12 +219,16 @@ class Number
     /**
      * Parse a human-readable file size into bytes.
      *
+     * Supports both binary units (KB, MB — base 1024, matching fileSize() output)
+     * and IEC binary units (KiB, MiB — explicitly base 1024).
+     *
      * @param  string  $size
      * @return int|float
      */
     public static function fromFileSize(string $size)
     {
-        $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        $binaryUnits = ['B' => 0, 'KB' => 1, 'MB' => 2, 'GB' => 3, 'TB' => 4, 'PB' => 5, 'EB' => 6, 'ZB' => 7, 'YB' => 8];
+        $iecUnits = ['B' => 0, 'KIB' => 1, 'MIB' => 2, 'GIB' => 3, 'TIB' => 4, 'PIB' => 5, 'EIB' => 6, 'ZIB' => 7, 'YIB' => 8];
 
         $size = trim($size);
 
@@ -235,13 +239,13 @@ class Number
         $number = (float) str_replace([',', '_'], '', $matches[1]);
         $unit = strtoupper(trim($matches[2]));
 
-        $exponent = array_search($unit, $units, true);
-
-        if ($exponent === false) {
+        if (isset($iecUnits[$unit])) {
+            $bytes = $number * (1024 ** $iecUnits[$unit]);
+        } elseif (isset($binaryUnits[$unit])) {
+            $bytes = $number * (1024 ** $binaryUnits[$unit]);
+        } else {
             return (int) $number;
         }
-
-        $bytes = $number * (1024 ** $exponent);
 
         return $bytes == (int) $bytes ? (int) $bytes : $bytes;
     }
