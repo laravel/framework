@@ -16,6 +16,14 @@ class RoutingControllerAttributeTest extends TestCase
 
         $this->assertEquals(['auth', 'log'], $route->gatherMiddleware());
     }
+
+    public function testControllerMiddlewareAttributesAreInheritedInDeclarationOrder()
+    {
+        $route = new Route('GET', 'foo', ['uses' => InheritMiddlewareDeclarationOrderController::class.'@index']);
+        $route->setContainer(new Container);
+
+        $this->assertEquals(['middleware1', 'middleware2', 'middleware3'], $route->gatherMiddleware());
+    }
 }
 
 abstract class Controller
@@ -31,6 +39,22 @@ abstract class BaseMiddlewareController extends Controller
 
 #[Middleware('log')]
 class InheritMiddlewareController extends BaseMiddlewareController
+{
+    public function index()
+    {
+        //
+    }
+}
+
+#[Middleware('middleware1')]
+#[Middleware('middleware2')]
+abstract class BaseMiddlewareDeclarationOrderController extends Controller
+{
+    //
+}
+
+#[Middleware('middleware3')]
+class InheritMiddlewareDeclarationOrderController extends BaseMiddlewareDeclarationOrderController
 {
     public function index()
     {
