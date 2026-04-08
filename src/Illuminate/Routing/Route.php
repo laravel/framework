@@ -1187,6 +1187,7 @@ class Route
         $attributes = new Collection;
 
         $current = $reflectionClass;
+
         while ($current) {
             $classAttributes = array_reverse($current->getAttributes(MiddlewareAttribute::class, ReflectionAttribute::IS_INSTANCEOF));
 
