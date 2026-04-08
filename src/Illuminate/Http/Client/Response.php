@@ -265,6 +265,21 @@ class Response implements ArrayAccess, Stringable
     }
 
     /**
+     * Execute the given callback if the response was successful.
+     *
+     * @param  callable|(\Closure(\Illuminate\Http\Client\Response): mixed)  $callback
+     * @return $this
+     */
+    public function onSuccess(callable $callback)
+    {
+        if ($this->successful()) {
+            $callback($this);
+        }
+
+        return $this;
+    }
+
+    /**
      * Execute the given callback if there was a server or client error.
      *
      * @param  callable|(\Closure(\Illuminate\Http\Client\Response): mixed)  $callback

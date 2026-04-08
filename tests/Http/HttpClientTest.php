@@ -1559,6 +1559,54 @@ class HttpClientTest extends TestCase
         $this->assertTrue($throwCallbackCalled);
     }
 
+    public function testOnSuccessCallsClosureOnSuccess()
+    {
+        $status = 0;
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 200),
+        ]);
+
+        $response = $client->get('laravel.com')
+            ->onSuccess(function ($response) use (&$status) {
+                $status = $response->status();
+            });
+
+        $this->assertSame(200, $status);
+        $this->assertSame(200, $response->status());
+    }
+
+    public function testOnSuccessDoesntCallClosureOnClientError()
+    {
+        $status = 0;
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 401),
+        ]);
+
+        $response = $client->get('laravel.com')
+            ->onSuccess(function ($response) use (&$status) {
+                $status = $response->status();
+            });
+
+        $this->assertSame(0, $status);
+        $this->assertSame(401, $response->status());
+    }
+
+    public function testOnSuccessDoesntCallClosureOnServerError()
+    {
+        $status = 0;
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 500),
+        ]);
+
+        $response = $client->get('laravel.com')
+            ->onSuccess(function ($response) use (&$status) {
+                $status = $response->status();
+            });
+
+        $this->assertSame(0, $status);
+        $this->assertSame(500, $response->status());
+    }
+
     public function testOnErrorDoesntCallClosureOnInformational()
     {
         $status = 0;
