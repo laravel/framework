@@ -264,6 +264,32 @@ trait EnumeratesValues
     }
 
     /**
+     * Dump the first item.
+     *
+     * @param  mixed  ...$args
+     * @return $this
+     */
+    public function dumpFirst(...$args)
+    {
+        dump($this->first(), ...$args);
+
+        return $this;
+    }
+
+    /**
+     * Dump a random item.
+     *
+     * @param  mixed  ...$args
+     * @return $this
+     */
+    public function dumpRandom(...$args)
+    {
+        dump($this->random(), ...$args);
+
+        return $this;
+    }
+
+    /**
      * Execute a callback over each item.
      *
      * @param  callable(TValue, TKey): mixed  $callback
