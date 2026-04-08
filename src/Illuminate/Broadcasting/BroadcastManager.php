@@ -221,7 +221,7 @@ class BroadcastManager implements FactoryContract
 
         $delay = $this->getAttributeValue($event, Delay::class, 'delay');
 
-        $push = function () use ($event, $queue, $broadcastEvent, $delay) {
+        $push = function () use ($event, $queue, $delay, $broadcastEvent) {
             $connection = $this->app->make('queue')
                 ->connection(
                     $event->connection

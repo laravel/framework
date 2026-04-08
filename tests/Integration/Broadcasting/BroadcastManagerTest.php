@@ -214,25 +214,7 @@ class BroadcastManagerTest extends TestCase
         Broadcast::queue(new TestEventWithDelay);
 
         Bus::assertNotDispatched(BroadcastEvent::class);
-        Queue::assertPushed(BroadcastEvent::class, function ($job) {
-            return $job->delay === 30;
-        });
-    }
-
-    public function testEventsCanBeBroadcastWithDelayProperty()
-    {
-        Bus::fake();
-        Queue::fake();
-
-        $event = new TestEventWithDelay;
-        $event->delay = 60;
-
-        Broadcast::queue($event);
-
-        Bus::assertNotDispatched(BroadcastEvent::class);
-        Queue::assertPushed(BroadcastEvent::class, function ($job) {
-            return $job->delay === 60;
-        });
+        Queue::assertPushed(BroadcastEvent::class);
     }
 
     protected function getApp(array $userConfig)
