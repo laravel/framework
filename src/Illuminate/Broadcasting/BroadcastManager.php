@@ -219,19 +219,21 @@ class BroadcastManager implements FactoryContract
             }
         }
 
-        $connection = $this->app->make('queue')
-            ->connection(
-                $event->connection
-                    ?? $this->getAttributeValue($event, ConnectionAttribute::class, 'connection')
-                    ?? $this->resolveConnectionFromQueueRoute($event)
-                    ?? null
-            );
-
         $delay = $this->getAttributeValue($event, Delay::class, 'delay');
 
-        $push = fn () => isset($delay)
-            ? $connection->laterOn($queue, $delay, $broadcastEvent)
-            : $connection->pushOn($queue, $broadcastEvent);
+        $push = function () use ($event, $queue, $broadcastEvent, $delay) {
+            $connection = $this->app->make('queue')
+                ->connection(
+                    $event->connection
+                        ?? $this->getAttributeValue($event, ConnectionAttribute::class, 'connection')
+                        ?? $this->resolveConnectionFromQueueRoute($event)
+                        ?? null
+                );
+
+            return isset($delay)
+                ? $connection->laterOn($queue, $delay, $broadcastEvent)
+                : $connection->pushOn($queue, $broadcastEvent);
+        };
 
         $event instanceof ShouldRescue
             ? $this->rescue($push)
