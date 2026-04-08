@@ -1179,16 +1179,30 @@ class Route
     {
         try {
             $reflectionClass = new ReflectionClass($class);
-
             $reflectionMethod = $reflectionClass->getMethod($method);
         } catch (ReflectionException) {
             return [];
         }
 
-        return (new Collection(array_merge(
-            $reflectionClass->getAttributes(MiddlewareAttribute::class, ReflectionAttribute::IS_INSTANCEOF),
-            $reflectionMethod->getAttributes(MiddlewareAttribute::class, ReflectionAttribute::IS_INSTANCEOF),
-        )))->map(function (ReflectionAttribute $attribute) use ($method) {
+        $attributes = new Collection;
+
+        $current = $reflectionClass;
+
+        while ($current) {
+            $classAttributes = array_reverse($current->getAttributes(
+                MiddlewareAttribute::class, ReflectionAttribute::IS_INSTANCEOF
+            ));
+
+            foreach ($classAttributes as $attribute) {
+                $attributes->prepend($attribute);
+            }
+
+            $current = $current->getParentClass();
+        }
+
+        return $attributes->merge(
+            $reflectionMethod->getAttributes(MiddlewareAttribute::class, ReflectionAttribute::IS_INSTANCEOF)
+        )->map(function (ReflectionAttribute $attribute) use ($method) {
             $instance = $attribute->newInstance();
 
             return static::methodExcludedByOptions(
