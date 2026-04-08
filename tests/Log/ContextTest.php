@@ -112,6 +112,26 @@ class ContextTest extends TestCase
         $this->assertNull(Context::dehydrate());
     }
 
+    public function test_is_not_empty()
+    {
+        $this->assertTrue(Context::isEmpty());
+        $this->assertFalse(Context::isNotEmpty());
+
+        Context::add('key', 'value');
+
+        $this->assertFalse(Context::isEmpty());
+        $this->assertTrue(Context::isNotEmpty());
+    }
+
+    public function test_is_not_empty_with_hidden_values()
+    {
+        $this->assertFalse(Context::isNotEmpty());
+
+        Context::addHidden('secret', 'value');
+
+        $this->assertTrue(Context::isNotEmpty());
+    }
+
     public function test_hydrating_null_triggers_hydrating_event()
     {
         $called = false;

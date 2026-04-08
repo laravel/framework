@@ -578,6 +578,16 @@ class Repository
     }
 
     /**
+     * Determine if the context is not empty.
+     *
+     * @return bool
+     */
+    public function isNotEmpty()
+    {
+        return ! $this->isEmpty();
+    }
+
+    /**
      * Execute the given callback when context is about to be dehydrated.
      *
      * @param  (callable(static): void)  $callback
