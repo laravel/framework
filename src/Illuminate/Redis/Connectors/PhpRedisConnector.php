@@ -242,6 +242,21 @@ class PhpRedisConnector implements Connector
     }
 
     /**
+     * Format the host using the scheme if available.
+     *
+     * @param  array  $options
+     * @return string
+     */
+    protected function formatHost(array $options)
+    {
+        if (isset($options['scheme'])) {
+            return Str::start($options['host'], "{$options['scheme']}://");
+        }
+
+        return $options['host'];
+    }
+
+    /**
      * Normalize the SSL context for a single Redis connection.
      *
      * Redis::connect() expects the context as ['stream' => ['verify_peer' => false, ...]].
@@ -265,8 +280,7 @@ class PhpRedisConnector implements Connector
     /**
      * Normalize the SSL context for a RedisCluster connection.
      *
-     * RedisCluster::__construct() expects a flat context ['verify_peer' => false, ...]
-     * because phpredis internally wraps each key under the 'ssl' stream context wrapper.
+     * RedisCluster::__construct() expects a flat context ['verify_peer' => false, ...].
      *
      * @param  array  $context
      * @return array
@@ -282,21 +296,6 @@ class PhpRedisConnector implements Connector
         }
 
         return $context;
-    }
-
-    /**
-     * Format the host using the scheme if available.
-     *
-     * @param  array  $options
-     * @return string
-     */
-    protected function formatHost(array $options)
-    {
-        if (isset($options['scheme'])) {
-            return Str::start($options['host'], "{$options['scheme']}://");
-        }
-
-        return $options['host'];
     }
 
     /**
