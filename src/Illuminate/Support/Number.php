@@ -217,6 +217,36 @@ class Number
     }
 
     /**
+     * Parse a human-readable file size into bytes.
+     *
+     * @param  string  $size
+     * @return int|float
+     */
+    public static function fromFileSize(string $size)
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+        $size = trim($size);
+
+        if (! preg_match('/^([\d,._]+)\s*([a-zA-Z]+)$/u', $size, $matches)) {
+            return (int) $size;
+        }
+
+        $number = (float) str_replace([',', '_'], '', $matches[1]);
+        $unit = strtoupper(trim($matches[2]));
+
+        $exponent = array_search($unit, $units, true);
+
+        if ($exponent === false) {
+            return (int) $number;
+        }
+
+        $bytes = $number * (1024 ** $exponent);
+
+        return $bytes == (int) $bytes ? (int) $bytes : $bytes;
+    }
+
+    /**
      * Convert the number to its human-readable equivalent.
      *
      * @param  int|float  $number

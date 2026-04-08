@@ -188,6 +188,32 @@ class SupportNumberTest extends TestCase
         $this->assertSame('1,024 YB', Number::fileSize(1024 ** 9));
     }
 
+    public function testFromFileSize()
+    {
+        $this->assertSame(0, Number::fromFileSize('0 B'));
+        $this->assertSame(1, Number::fromFileSize('1 B'));
+        $this->assertSame(1024, Number::fromFileSize('1 KB'));
+        $this->assertSame(2048, Number::fromFileSize('2 KB'));
+        $this->assertSame(1048576, Number::fromFileSize('1 MB'));
+        $this->assertSame(1073741824, Number::fromFileSize('1 GB'));
+        $this->assertSame(1099511627776, Number::fromFileSize('1 TB'));
+        $this->assertSame(1536, Number::fromFileSize('1.5 KB'));
+        $this->assertSame(5368709120, Number::fromFileSize('5 GB'));
+    }
+
+    public function testFromFileSizeWithoutSpace()
+    {
+        $this->assertSame(1024, Number::fromFileSize('1KB'));
+        $this->assertSame(1048576, Number::fromFileSize('1MB'));
+    }
+
+    public function testFromFileSizeRoundTrip()
+    {
+        $this->assertSame('1 KB', Number::fileSize(Number::fromFileSize('1 KB')));
+        $this->assertSame('5 GB', Number::fileSize(Number::fromFileSize('5 GB')));
+        $this->assertSame('1 MB', Number::fileSize(Number::fromFileSize('1 MB')));
+    }
+
     public function testClamp()
     {
         $this->assertSame(2, Number::clamp(1, 2, 3));
