@@ -69,6 +69,64 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
         (new FoundationTestAuthorizeTraitClass)->authorize('baz');
     }
 
+    public function testMultipleGateChecksMayBeAuthorized()
+    {
+        unset($_SERVER['_test.authorizes.trait.authorize_all.first']);
+        unset($_SERVER['_test.authorizes.trait.authorize_all.second']);
+
+        $gate = $this->getBasicGate();
+
+        $gate->define('baz', function () {
+            $_SERVER['_test.authorizes.trait.authorize_all.first'] = true;
+
+            return true;
+        });
+
+        $gate->define('qux', function () {
+            $_SERVER['_test.authorizes.trait.authorize_all.second'] = true;
+
+            return true;
+        });
+
+        (new FoundationTestAuthorizeTraitClass)->authorizeAll('baz', 'qux');
+
+        $this->assertTrue($_SERVER['_test.authorizes.trait.authorize_all.first']);
+        $this->assertTrue($_SERVER['_test.authorizes.trait.authorize_all.second']);
+    }
+
+    public function testMultipleGateChecksCanBeAuthorizedWithArray()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('baz', function () {
+            return true;
+        });
+
+        $gate->define('qux', function () {
+            return true;
+        });
+
+        (new FoundationTestAuthorizeTraitClass)->authorizeAll(['baz', 'qux']);
+    }
+
+    public function testExceptionIsThrownIfAnyGateCheckFails()
+    {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('This action is unauthorized.');
+
+        $gate = $this->getBasicGate();
+
+        $gate->define('baz', function () {
+            return true;
+        });
+
+        $gate->define('qux', function () {
+            return false;
+        });
+
+        (new FoundationTestAuthorizeTraitClass)->authorizeAll('baz', 'qux');
+    }
+
     public function testPoliciesMayBeCalled()
     {
         unset($_SERVER['_test.authorizes.trait.policy']);

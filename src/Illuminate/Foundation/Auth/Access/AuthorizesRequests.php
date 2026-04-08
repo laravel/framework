@@ -26,6 +26,23 @@ trait AuthorizesRequests
     }
 
     /**
+     * Authorize all of the given actions for the current user.
+     *
+     * @param  array|mixed  $abilities
+     * @return void
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function authorizeAll($abilities)
+    {
+        $abilities = is_array($abilities) ? $abilities : func_get_args();
+
+        foreach ($abilities as $ability) {
+            $this->authorize($ability);
+        }
+    }
+
+    /**
      * Authorize a given action for a user.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|mixed  $user
