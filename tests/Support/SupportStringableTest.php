@@ -398,6 +398,44 @@ class SupportStringableTest extends TestCase
         }));
     }
 
+    public function testWhenIsJson()
+    {
+        $this->assertSame('Json: {"key":"value"}', (string) $this->stringable('{"key":"value"}')->whenIsJson(function ($stringable) {
+            return $stringable->prepend('Json: ');
+        }, function ($stringable) {
+            return $stringable->prepend('Not Json: ');
+        }));
+
+        $this->assertSame('not-json', (string) $this->stringable('not-json')->whenIsJson(function ($stringable) {
+            return $stringable->prepend('Json: ');
+        }));
+
+        $this->assertSame('Not Json: not-json', (string) $this->stringable('not-json')->whenIsJson(function ($stringable) {
+            return $stringable->prepend('Json: ');
+        }, function ($stringable) {
+            return $stringable->prepend('Not Json: ');
+        }));
+    }
+
+    public function testWhenIsUrl()
+    {
+        $this->assertSame('Url: https://laravel.com', (string) $this->stringable('https://laravel.com')->whenIsUrl(function ($stringable) {
+            return $stringable->prepend('Url: ');
+        }, function ($stringable) {
+            return $stringable->prepend('Not Url: ');
+        }));
+
+        $this->assertSame('not-a-url', (string) $this->stringable('not-a-url')->whenIsUrl(function ($stringable) {
+            return $stringable->prepend('Url: ');
+        }));
+
+        $this->assertSame('Not Url: not-a-url', (string) $this->stringable('not-a-url')->whenIsUrl(function ($stringable) {
+            return $stringable->prepend('Url: ');
+        }, function ($stringable) {
+            return $stringable->prepend('Not Url: ');
+        }));
+    }
+
     public function testWhenIsUuid()
     {
         $this->assertSame('Uuid: 2cdc7039-65a6-4ac7-8e5d-d554a98e7b15', (string) $this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98e7b15')->whenIsUuid(function ($stringable) {

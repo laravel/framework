@@ -1267,6 +1267,30 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Execute the given callback if the string is valid JSON.
+     *
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return static
+     */
+    public function whenIsJson($callback, $default = null)
+    {
+        return $this->when($this->isJson(), $callback, $default);
+    }
+
+    /**
+     * Execute the given callback if the string is a valid URL.
+     *
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return static
+     */
+    public function whenIsUrl($callback, $default = null)
+    {
+        return $this->when($this->isUrl(), $callback, $default);
+    }
+
+    /**
      * Execute the given callback if the string is a valid UUID.
      *
      * @param  callable  $callback
