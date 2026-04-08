@@ -565,6 +565,23 @@ class Str
     }
 
     /**
+     * Determine if a given value is a valid email address.
+     *
+     * @param  mixed  $value
+     * @return bool
+     *
+     * @phpstan-assert-if-true =non-empty-string $value
+     */
+    public static function isEmail($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+    }
+
+    /**
      * Determine if a given value is valid JSON.
      *
      * @param  mixed  $value

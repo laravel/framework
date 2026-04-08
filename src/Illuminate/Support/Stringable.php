@@ -382,6 +382,16 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Determine if a given string is a valid email address.
+     *
+     * @return bool
+     */
+    public function isEmail()
+    {
+        return Str::isEmail($this->value);
+    }
+
+    /**
      * Determine if a given string is valid JSON.
      *
      * @return bool
@@ -1264,6 +1274,18 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     public function whenIsAscii($callback, $default = null)
     {
         return $this->when($this->isAscii(), $callback, $default);
+    }
+
+    /**
+     * Execute the given callback if the string is a valid email address.
+     *
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return static
+     */
+    public function whenIsEmail($callback, $default = null)
+    {
+        return $this->when($this->isEmail(), $callback, $default);
     }
 
     /**

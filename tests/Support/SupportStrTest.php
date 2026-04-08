@@ -731,6 +731,20 @@ class SupportStrTest extends TestCase
         $this->assertSame(Str::isUuid($uuid, $version), $passes);
     }
 
+    public function testIsEmail()
+    {
+        $this->assertTrue(Str::isEmail('taylor@laravel.com'));
+        $this->assertTrue(Str::isEmail('user@example.org'));
+        $this->assertTrue(Str::isEmail('user+tag@domain.com'));
+
+        $this->assertFalse(Str::isEmail('invalid'));
+        $this->assertFalse(Str::isEmail('user@'));
+        $this->assertFalse(Str::isEmail('@domain.com'));
+        $this->assertFalse(Str::isEmail(''));
+        $this->assertFalse(Str::isEmail(null));
+        $this->assertFalse(Str::isEmail([]));
+    }
+
     public function testIsJson()
     {
         $this->assertTrue(Str::isJson('1'));

@@ -65,6 +65,14 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('01GJSNW9MAF-792C0XYY8RX6ssssss-QFT')->isUlid());
     }
 
+    public function testIsEmail()
+    {
+        $this->assertTrue($this->stringable('taylor@laravel.com')->isEmail());
+        $this->assertTrue($this->stringable('user+tag@domain.com')->isEmail());
+        $this->assertFalse($this->stringable('invalid')->isEmail());
+        $this->assertFalse($this->stringable('')->isEmail());
+    }
+
     public function testIsJson()
     {
         $this->assertTrue($this->stringable('1')->isJson());
@@ -395,6 +403,25 @@ class SupportStringableTest extends TestCase
             return $stringable->prepend('Ascii: ');
         }, function ($stringable) {
             return $stringable->prepend('Not Ascii: ');
+        }));
+    }
+
+    public function testWhenIsEmail()
+    {
+        $this->assertSame('Email: taylor@laravel.com', (string) $this->stringable('taylor@laravel.com')->whenIsEmail(function ($stringable) {
+            return $stringable->prepend('Email: ');
+        }, function ($stringable) {
+            return $stringable->prepend('Not Email: ');
+        }));
+
+        $this->assertSame('invalid', (string) $this->stringable('invalid')->whenIsEmail(function ($stringable) {
+            return $stringable->prepend('Email: ');
+        }));
+
+        $this->assertSame('Not Email: invalid', (string) $this->stringable('invalid')->whenIsEmail(function ($stringable) {
+            return $stringable->prepend('Email: ');
+        }, function ($stringable) {
+            return $stringable->prepend('Not Email: ');
         }));
     }
 
