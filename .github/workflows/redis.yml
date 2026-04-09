@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - '*.x'
+      - "*.x"
   pull_request:
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        client: ['phpredis', 'predis']
+        client: ["phpredis", "predis"]
 
     name: Redis (${{ matrix.client}}) Driver
 
@@ -67,7 +67,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        client: ['phpredis', 'predis']
+        client: ["phpredis", "predis"]
 
     name: Redis Cluster (${{ matrix.client}}) Driver
 
@@ -129,6 +129,5 @@ jobs:
         env:
           REDIS_CLIENT: ${{ matrix.client }}
           REDIS_CLUSTER_HOSTS_AND_PORTS: 127.0.0.1:7000,127.0.0.1:7001,127.0.0.1:7002
-          REDIS_QUEUE: '{default}'
+          REDIS_QUEUE: "default"
           QUEUE_CONNECTION: redis
-
