@@ -9,15 +9,17 @@ use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Notifications\AnonymousNotifiable;
+use Illuminate\Notifications\Attributes\Via;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\ReadsClassAttributes;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class NotificationFake implements Fake, NotificationDispatcher, NotificationFactory
 {
-    use Macroable, ReflectsClosures;
+    use Macroable, ReadsClassAttributes, ReflectsClosures;
 
     /**
      * All of the notifications that have been sent.
@@ -317,7 +319,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
                 $notification->id = (string) Str::uuid();
             }
 
-            $notifiableChannels = $channels ?: $notification->via($notifiable);
+            $notifiableChannels = $channels ?: ($this->getAttributeValue($notification, Via::class) ?? $notification->via($notifiable));
 
             if (method_exists($notification, 'shouldSend')) {
                 $notifiableChannels = array_filter(

@@ -6,6 +6,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Attributes\Via;
 use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
@@ -108,7 +109,10 @@ class NotificationSender
         $original = clone $notification;
 
         foreach ($notifiables as $notifiable) {
-            if (empty($viaChannels = $channels ?: $original->via($notifiable))) {
+            $viaChannels = $channels
+                ?: ($this->getAttributeValue($original, Via::class) ?? $original->via($notifiable));
+
+            if (empty($viaChannels)) {
                 continue;
             }
 
@@ -224,7 +228,9 @@ class NotificationSender
         foreach ($notifiables as $notifiable) {
             $notificationId = (string) Str::uuid();
 
-            foreach ((array) $original->via($notifiable) as $channel) {
+            $viaChannels = $this->getAttributeValue($original, Via::class, 'via') ?? $original->via($notifiable);
+
+            foreach ((array) $viaChannels as $channel) {
                 $notification = clone $original;
 
                 if (! $notification->id) {
