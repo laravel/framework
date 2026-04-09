@@ -425,6 +425,33 @@ class DatabaseConnectionTest extends TestCase
         $this->assertTrue($called);
     }
 
+    public function testOnLostConnectionPDOIsSwappedOutsideTransactionWhenMysql2002ErrorInfoIsLocaleDependent()
+    {
+        $pdo = m::mock(PDO::class);
+
+        $statement = m::mock(PDOStatement::class);
+
+        $exception = new PDOException("SQLSTATE[HY000] [2002] Connexion terminée par expiration du délai d'attente");
+        $exception->errorInfo = ['HY000', 2002, null];
+
+        $statement->shouldReceive('execute')->once()->andThrow($exception);
+        $statement->shouldReceive('execute')->once()->andReturn(true);
+
+        $pdo->shouldReceive('prepare')->twice()->andReturn($statement);
+
+        $connection = new Connection($pdo);
+
+        $called = false;
+
+        $connection->setReconnector(function ($connection) use (&$called) {
+            $called = true;
+        });
+
+        $this->assertTrue($connection->statement('foo'));
+
+        $this->assertTrue($called);
+    }
+
     public function testRunMethodRetriesOnFailure()
     {
         $method = (new ReflectionClass(Connection::class))->getMethod('run');
