@@ -99,11 +99,15 @@ class RateLimited
                     ? $job->release($this->releaseAfter ?: $this->getTimeUntilNextRetry($limit->key))
                     : false;
             }
+        }
 
+        $response = $next($job);
+
+        foreach ($limits as $limit) {
             $this->limiter->hit($limit->key, $limit->decaySeconds);
         }
 
-        return $next($job);
+        return $response;
     }
 
     /**
