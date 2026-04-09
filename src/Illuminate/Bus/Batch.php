@@ -399,7 +399,7 @@ class Batch implements Arrayable, JsonSerializable
      */
     protected function isFirstJobProcessed(UpdatedBatchJobCounts $counts): bool
     {
-        return $this->totalJobs - $counts->pendingJobs + $counts->failedJobs === 1;
+        return $counts->totalJobs - $counts->pendingJobs + $counts->failedJobs === 1;
     }
 
     /**

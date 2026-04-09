@@ -255,6 +255,7 @@ class DynamoBatchRepository implements BatchRepository
         $values = $this->marshaler->unmarshalItem($batch['Attributes']);
 
         return new UpdatedBatchJobCounts(
+            $values['total_jobs'],
             $values['pending_jobs'],
             $values['failed_jobs']
         );
@@ -294,6 +295,7 @@ class DynamoBatchRepository implements BatchRepository
         $values = $this->marshaler->unmarshalItem($batch['Attributes']);
 
         return new UpdatedBatchJobCounts(
+            $values['total_jobs'],
             $values['pending_jobs'],
             $values['failed_jobs']
         );

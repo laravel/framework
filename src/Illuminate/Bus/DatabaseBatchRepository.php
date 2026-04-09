@@ -139,6 +139,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
     {
         $values = $this->updateAtomicValues($batchId, function ($batch) use ($jobId) {
             return [
+                'total_jobs' => $batch->total_jobs,
                 'pending_jobs' => $batch->pending_jobs - 1,
                 'failed_jobs' => $batch->failed_jobs,
                 'failed_job_ids' => json_encode(array_values(array_diff((array) json_decode($batch->failed_job_ids, true), [$jobId]))),
@@ -146,6 +147,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
         });
 
         return new UpdatedBatchJobCounts(
+            $values['total_jobs'],
             $values['pending_jobs'],
             $values['failed_jobs']
         );
@@ -162,6 +164,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
     {
         $values = $this->updateAtomicValues($batchId, function ($batch) use ($jobId) {
             return [
+                'total_jobs' => $batch->total_jobs,
                 'pending_jobs' => $batch->pending_jobs,
                 'failed_jobs' => $batch->failed_jobs + 1,
                 'failed_job_ids' => json_encode(array_values(array_unique(array_merge((array) json_decode($batch->failed_job_ids, true), [$jobId])))),
@@ -169,6 +172,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
         });
 
         return new UpdatedBatchJobCounts(
+            $values['total_jobs'],
             $values['pending_jobs'],
             $values['failed_jobs']
         );

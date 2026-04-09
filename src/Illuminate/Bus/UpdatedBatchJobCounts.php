@@ -5,6 +5,13 @@ namespace Illuminate\Bus;
 class UpdatedBatchJobCounts
 {
     /**
+     * The total number of jobs that belong to the batch.
+     *
+     * @var int
+     */
+    public $totalJobs;
+
+    /**
      * The number of pending jobs remaining for the batch.
      *
      * @var int
@@ -21,11 +28,13 @@ class UpdatedBatchJobCounts
     /**
      * Create a new batch job counts object.
      *
+     * @param  int  $totalJobs
      * @param  int  $pendingJobs
      * @param  int  $failedJobs
      */
-    public function __construct(int $pendingJobs = 0, int $failedJobs = 0)
+    public function __construct(int $totalJobs = 0, int $pendingJobs = 0, int $failedJobs = 0)
     {
+        $this->totalJobs = $totalJobs;
         $this->pendingJobs = $pendingJobs;
         $this->failedJobs = $failedJobs;
     }
