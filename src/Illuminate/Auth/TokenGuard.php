@@ -97,9 +97,9 @@ class TokenGuard implements Guard
     public function getTokenForRequest()
     {
         return $this->request->query($this->inputKey)
-            ?: $this->request->input($this->inputKey)
-            ?: $this->request->bearerToken()
-            ?: $this->request->getPassword();
+            ?? $this->request->input($this->inputKey)
+            ?? $this->request->bearerToken()
+            ?? $this->request->getPassword();
     }
 
     /**
