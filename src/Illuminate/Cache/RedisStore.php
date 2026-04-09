@@ -162,19 +162,14 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
 
         $connection->multi();
 
-        $manyResult = null;
-
         foreach ($serializedValues as $key => $value) {
-            $result = (bool) $connection->setex(
+            $connection->setex(
                 $key, (int) max(1, $seconds), $value
             );
-
-            $manyResult = is_null($manyResult) ? $result : $result && $manyResult;
         }
+        $results = $connection->exec();
 
-        $connection->exec();
-
-        return $manyResult ?: false;
+        return is_array($results) && ! in_array(false, $results, true);
     }
 
     /**
