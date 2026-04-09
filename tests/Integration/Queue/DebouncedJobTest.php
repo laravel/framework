@@ -186,6 +186,19 @@ class DebouncedJobTest extends QueueTestCase
         $this->assertTrue(DebouncedTestJob::$handled);
     }
 
+    public function testDebounceForMethodOverridesAttribute()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
+        DebouncedWithMethodOverrideJob::$handled = false;
+
+        dispatch(new DebouncedWithMethodOverrideJob('entity-1'));
+        $this->travelTo(now()->addSeconds(16));
+        $this->runQueueWorkerCommand(['--once' => true]);
+
+        $this->assertTrue(DebouncedWithMethodOverrideJob::$handled);
+    }
+
     public function testOwnerAwareReleaseDoesNotWipeNewerLock()
     {
         $cache = $this->app->get(Cache::class);
@@ -272,5 +285,32 @@ class DebouncedAndUniqueTestJob implements ShouldQueue, ShouldBeUnique
 
     public function handle()
     {
+    }
+}
+
+#[DebounceFor(30)]
+class DebouncedWithMethodOverrideJob implements ShouldQueue
+{
+    use InteractsWithQueue, Queueable, Dispatchable;
+
+    public static $handled = false;
+
+    public function __construct(public string $entityId)
+    {
+    }
+
+    public function debounceId(): string
+    {
+        return $this->entityId;
+    }
+
+    public function debounceFor(): int
+    {
+        return 15; // overrides the attribute's 30
+    }
+
+    public function handle()
+    {
+        static::$handled = true;
     }
 }
