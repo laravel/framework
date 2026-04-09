@@ -3099,6 +3099,46 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a fulltext relevance "order by" clause to the query.
+     *
+     * @param  string|string[]  $columns
+     * @param  string  $value
+     * @param  array  $options
+     * @param  string  $direction
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function orderByFullText($columns, $value, array $options = [], $direction = 'desc')
+    {
+        $columns = (array) $columns;
+
+        $direction = strtolower($direction);
+
+        if (! in_array($direction, ['asc', 'desc'], true)) {
+            throw new InvalidArgumentException('Order direction must be "asc" or "desc".');
+        }
+
+        return $this->orderByRaw(
+            $this->grammar->compileOrderByFullText($columns, $options, $direction),
+            [$value]
+        );
+    }
+
+    /**
+     * Add an ascending fulltext relevance "order by" clause to the query.
+     *
+     * @param  string|string[]  $columns
+     * @param  string  $value
+     * @param  array  $options
+     * @return $this
+     */
+    public function orderByFullTextAsc($columns, $value, array $options = [])
+    {
+        return $this->orderByFullText($columns, $value, $options, 'asc');
+    }
+
+    /**
      * Add a raw "order by" clause to the query.
      *
      * @param  literal-string  $sql

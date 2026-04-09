@@ -134,6 +134,29 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a fulltext relevance "order by" clause.
+     *
+     * @param  array  $columns
+     * @param  array  $options
+     * @param  string  $direction
+     * @return string
+     */
+    public function compileOrderByFullText($columns, array $options, $direction)
+    {
+        $columns = $this->columnize($columns);
+
+        $mode = ($options['mode'] ?? []) === 'boolean'
+            ? ' in boolean mode'
+            : ' in natural language mode';
+
+        $expanded = ($options['expanded'] ?? []) && ($options['mode'] ?? []) !== 'boolean'
+            ? ' with query expansion'
+            : '';
+
+        return "match ({$columns}) against (?{$mode}{$expanded}) {$direction}";
+    }
+
+    /**
      * Compile the index hints for the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

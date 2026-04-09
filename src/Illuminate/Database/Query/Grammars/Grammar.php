@@ -836,6 +836,19 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a fulltext relevance "order by" clause.
+     *
+     * @param  array  $columns
+     * @param  array  $options
+     * @param  string  $direction
+     * @return string
+     */
+    public function compileOrderByFullText($columns, array $options, $direction)
+    {
+        throw new RuntimeException('This database engine does not support fulltext search ordering.');
+    }
+
+    /**
      * Compile a clause based on an expression.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

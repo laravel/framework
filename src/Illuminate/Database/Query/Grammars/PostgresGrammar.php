@@ -193,6 +193,43 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a fulltext relevance "order by" clause.
+     *
+     * @param  array  $columns
+     * @param  array  $options
+     * @param  string  $direction
+     * @return string
+     */
+    public function compileOrderByFullText($columns, array $options, $direction)
+    {
+        $language = $options['language'] ?? 'english';
+
+        if (! in_array($language, $this->validFullTextLanguages())) {
+            $language = 'english';
+        }
+
+        $columns = (new Collection($columns))
+            ->map(fn ($column) => "to_tsvector('{$language}', {$this->wrap($column)})")
+            ->implode(' || ');
+
+        $mode = 'plainto_tsquery';
+
+        if (($options['mode'] ?? []) === 'phrase') {
+            $mode = 'phraseto_tsquery';
+        }
+
+        if (($options['mode'] ?? []) === 'websearch') {
+            $mode = 'websearch_to_tsquery';
+        }
+
+        if (($options['mode'] ?? []) === 'raw') {
+            $mode = 'to_tsquery';
+        }
+
+        return "ts_rank({$columns}, {$mode}('{$language}', ?)) {$direction}";
+    }
+
+    /**
      * Get an array of valid full text languages.
      *
      * @return array

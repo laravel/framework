@@ -1699,6 +1699,89 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['Car Plane'], $builder->getBindings());
     }
 
+    public function testOrderByFulltextMySql()
+    {
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFullText('body', 'Hello World')->orderByFullText('body', 'Hello World');
+        $this->assertSame('select * from `users` where match (`body`) against (? in natural language mode) order by match (`body`) against (? in natural language mode) desc', $builder->toSql());
+        $this->assertEquals(['Hello World', 'Hello World'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->orderByFullText('body', 'Hello World', ['expanded' => true]);
+        $this->assertSame('select * from `users` order by match (`body`) against (? in natural language mode with query expansion) desc', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->orderByFullText('body', '+Hello -World', ['mode' => 'boolean']);
+        $this->assertSame('select * from `users` order by match (`body`) against (? in boolean mode) desc', $builder->toSql());
+        $this->assertEquals(['+Hello -World'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->orderByFullText('body', '+Hello -World', ['mode' => 'boolean', 'expanded' => true]);
+        $this->assertSame('select * from `users` order by match (`body`) against (? in boolean mode) desc', $builder->toSql());
+        $this->assertEquals(['+Hello -World'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->orderByFullText(['body', 'title'], 'Car,Plane');
+        $this->assertSame('select * from `users` order by match (`body`, `title`) against (? in natural language mode) desc', $builder->toSql());
+        $this->assertEquals(['Car,Plane'], $builder->getBindings());
+    }
+
+    public function testOrderByFulltextPostgres()
+    {
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFullText('body', 'Hello World')->orderByFullText('body', 'Hello World');
+        $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ plainto_tsquery(\'english\', ?) order by ts_rank(to_tsvector(\'english\', "body"), plainto_tsquery(\'english\', ?)) desc', $builder->toSql());
+        $this->assertEquals(['Hello World', 'Hello World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->orderByFullText('body', 'Hello World', ['language' => 'simple']);
+        $this->assertSame('select * from "users" order by ts_rank(to_tsvector(\'simple\', "body"), plainto_tsquery(\'simple\', ?)) desc', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->orderByFullText('body', 'Hello World', ['mode' => 'phrase']);
+        $this->assertSame('select * from "users" order by ts_rank(to_tsvector(\'english\', "body"), phraseto_tsquery(\'english\', ?)) desc', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->orderByFullText('body', '+Hello -World', ['mode' => 'websearch']);
+        $this->assertSame('select * from "users" order by ts_rank(to_tsvector(\'english\', "body"), websearch_to_tsquery(\'english\', ?)) desc', $builder->toSql());
+        $this->assertEquals(['+Hello -World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->orderByFullText(['body', 'title'], 'Car Plane');
+        $this->assertSame('select * from "users" order by ts_rank(to_tsvector(\'english\', "body") || to_tsvector(\'english\', "title"), plainto_tsquery(\'english\', ?)) desc', $builder->toSql());
+        $this->assertEquals(['Car Plane'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->orderByFullText('body', 'Hello World', ['language' => 'simple', 'mode' => 'phrase']);
+        $this->assertSame('select * from "users" order by ts_rank(to_tsvector(\'simple\', "body"), phraseto_tsquery(\'simple\', ?)) desc', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->orderByFullText('body', 'Hello World', [], 'asc');
+        $this->assertSame('select * from "users" order by ts_rank(to_tsvector(\'english\', "body"), plainto_tsquery(\'english\', ?)) asc', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+    }
+
+    public function testOrderByFulltextInvalidDirection()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->orderByFullText('body', 'Hello World', [], 'asec');
+    }
+
+    public function testOrderByFulltextUnsupportedDriver()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('This database engine does not support fulltext search ordering.');
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderByFullText('body', 'Hello World');
+    }
+
     public function testWhereAll()
     {
         $builder = $this->getBuilder();
