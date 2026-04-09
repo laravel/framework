@@ -4,12 +4,12 @@ namespace Illuminate\Foundation\Bus;
 
 use Illuminate\Bus\DebounceLock;
 use Illuminate\Bus\UniqueLock;
-use Illuminate\Queue\Attributes\DebounceFor;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Foundation\Queue\InteractsWithUniqueJobs;
+use Illuminate\Queue\Attributes\DebounceFor;
 use LogicException;
 
 class PendingDispatch
