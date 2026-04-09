@@ -176,7 +176,26 @@ class BroadcastManagerTest extends TestCase
         $this->assertSame($driver, $manager->connection(__CLASS__));
     }
 
-    public function testThrowExceptionWhenDriverCreationFails()
+    public function testInvokableObjectDriverClosure()
+    {
+        $manager = new BroadcastManager($this->getApp([
+            'broadcasting' => [
+                'connections' => [
+                    __CLASS__ => [
+                        'driver' => __CLASS__,
+                    ],
+                ],
+            ],
+        ]));
+
+        $driver = new stdClass;
+        $creator = new CustomBroadcastDriver($driver);
+
+        $manager->extend(__CLASS__, $creator(...));
+        $this->assertSame($driver, $manager->connection(__CLASS__));
+    }
+
+    public function test_throw_exception_when_driver_creation_fails()
     {
         $userConfig = [
             'broadcasting' => [
@@ -286,5 +305,15 @@ class TestEventNowRescue implements ShouldBroadcastNow, ShouldRescue
     public function broadcastOn()
     {
         //
+    }
+}
+
+class CustomBroadcastDriver
+{
+    public function __construct(private object $driver) {}
+
+    public function __invoke()
+    {
+        return $this->driver;
     }
 }

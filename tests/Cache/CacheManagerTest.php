@@ -49,7 +49,26 @@ class CacheManagerTest extends TestCase
         $this->assertSame($driver, $manager->store(__CLASS__));
     }
 
-    public function testCustomDriverOverridesInternalDrivers()
+    public function testInvokableObjectDriverClosure()
+    {
+        $manager = new CacheManager($this->getApp([
+            'cache' => [
+                'stores' => [
+                    __CLASS__ => [
+                        'driver' => __CLASS__,
+                    ],
+                ],
+            ],
+        ]));
+
+        $driver = new stdClass;
+        $creator = new CustomCacheDriver($driver);
+
+        $manager->extend(__CLASS__, $creator(...));
+        $this->assertSame($driver, $manager->store(__CLASS__));
+    }
+
+    public function test_custom_driver_overrides_internal_drivers()
     {
         $userConfig = [
             'cache' => [
@@ -338,5 +357,15 @@ class CacheManagerTest extends TestCase
         $app->singleton('config', fn () => new Repository($userConfig));
 
         return $app;
+    }
+}
+
+class CustomCacheDriver
+{
+    public function __construct(private object $driver) {}
+
+    public function __invoke()
+    {
+        return $this->driver;
     }
 }

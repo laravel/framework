@@ -4,9 +4,10 @@ namespace Illuminate\Auth;
 
 use Closure;
 use Illuminate\Contracts\Auth\Factory as FactoryContract;
+use Illuminate\Support\RebindsCallbacksToSelf;
 use InvalidArgumentException;
+use ReflectionException;
 use RuntimeException;
-use Throwable;
 
 /**
  * @mixin \Illuminate\Contracts\Auth\Guard
@@ -14,7 +15,7 @@ use Throwable;
  */
 class AuthManager implements FactoryContract
 {
-    use CreatesUserProviders;
+    use CreatesUserProviders, RebindsCallbacksToSelf;
 
     /**
      * The application instance.
@@ -274,9 +275,9 @@ class AuthManager implements FactoryContract
     public function extend($driver, Closure $callback)
     {
         try {
-            $callback = $callback->bindTo($this, static::class) ?? throw new RuntimeException;
-        } catch (Throwable) {
-            $callback = $callback->bindTo(null, static::class);
+            $callback = $this->bindCallbackToSelf($callback) ?? throw new RuntimeException('Unable to bind custom driver callback');
+        } catch (ReflectionException $e) {
+            throw new RuntimeException('Unable to bind custom driver callback', previous: $e);
         }
 
         $this->customCreators[$driver] = $callback;
