@@ -86,6 +86,57 @@ trait PacksPhpRedisValues
     }
 
     /**
+     * Unpack the given values, including decompression and unserialization.
+     *
+     * @param  array<int|string, string|null>  $values
+     * @return array<int|string, mixed>
+     *
+     * @throws \RuntimeException
+     * @throws \UnexpectedValueException
+     */
+    public function unpack(array $values): array
+    {
+        if (empty($values)) {
+            return $values;
+        }
+
+        if ($this->supportsPacking()) {
+            return array_map(fn ($value) => $value !== null ? $this->client->_unpack($value) : null, $values);
+        }
+
+        if ($this->compressed()) {
+            if ($this->supportsLzf() && $this->lzfCompressed()) {
+                if (! function_exists('lzf_decompress')) {
+                    throw new RuntimeException("'lzf' extension required to call 'lzf_decompress'.");
+                }
+
+                $processor = function ($value) {
+                    return $value !== null ? $this->client->_unserialize(\lzf_decompress($value)) : null;
+                };
+            } elseif ($this->supportsZstd() && $this->zstdCompressed()) {
+                if (! function_exists('zstd_uncompress')) {
+                    throw new RuntimeException("'zstd' extension required to call 'zstd_uncompress'.");
+                }
+
+                $processor = function ($value) {
+                    return $value !== null ? $this->client->_unserialize(\zstd_uncompress($value)) : null;
+                };
+            } else {
+                throw new UnexpectedValueException(sprintf(
+                    'Unsupported phpredis compression in use [%d].',
+                    $this->client->getOption(Redis::OPT_COMPRESSION)
+                ));
+            }
+        } else {
+            $processor = function ($value) {
+                return $value !== null ? $this->client->_unserialize($value) : null;
+            };
+        }
+
+        return array_map($processor, $values);
+    }
+
+    /**
      * Execute the given callback without serialization or compression when applicable.
      *
      * @param  callable  $callback

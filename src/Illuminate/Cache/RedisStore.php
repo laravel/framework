@@ -109,9 +109,13 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
             return $this->manyAlias($keys);
         }
 
-        $values = $connection->mget(array_map(function ($key) {
+        $prefixedKeys = array_map(function ($key) {
             return $this->prefix.$key;
-        }, $keys));
+        }, $keys);
+
+        $values = $connection instanceof PhpRedisConnection && ($connection->serialized() || $connection->compressed())
+            ? $connection->unpack($connection->withoutSerializationOrCompression(fn () => $connection->mget($prefixedKeys)))
+            : $connection->mget($prefixedKeys);
 
         foreach ($values as $index => $value) {
             $results[$keys[$index]] = ! is_null($value) ? $this->connectionAwareUnserialize($value, $connection) : null;

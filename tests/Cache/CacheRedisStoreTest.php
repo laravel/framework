@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Redis\Factory;
+use Illuminate\Redis\Connections\PhpRedisConnection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -42,6 +43,27 @@ class CacheRedisStoreTest extends TestCase
         $this->assertSame('bar', $results['foo']);
         $this->assertSame('buzz', $results['fizz']);
         $this->assertSame('quz', $results['norf']);
+        $this->assertNull($results['null']);
+    }
+
+    public function testRedisMultipleValuesAreReturnedWhenPhpRedisSerializationIsEnabled()
+    {
+        $factory = m::mock(Factory::class);
+        $client = m::mock();
+        $connection = m::mock(PhpRedisConnection::class, [$client, null, []]);
+
+        $factory->shouldReceive('connection')->once()->with('default')->andReturn($connection);
+
+        $connection->shouldReceive('serialized')->andReturn(true);
+        $connection->shouldReceive('compressed')->andReturn(false);
+        $connection->shouldReceive('withoutSerializationOrCompression')->once()->andReturnUsing(fn ($callback) => $callback());
+        $connection->shouldReceive('mget')->once()->with(['prefix:foo', 'prefix:fizz', 'prefix:null'])->andReturn(['raw-bar', 'raw-buzz', null]);
+        $connection->shouldReceive('unpack')->once()->with(['raw-bar', 'raw-buzz', null])->andReturn(['bar', 'buzz', null]);
+
+        $results = (new RedisStore($factory, 'prefix:'))->many(['foo', 'fizz', 'null']);
+
+        $this->assertSame('bar', $results['foo']);
+        $this->assertSame('buzz', $results['fizz']);
         $this->assertNull($results['null']);
     }
 
