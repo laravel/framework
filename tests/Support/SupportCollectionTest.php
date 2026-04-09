@@ -4885,7 +4885,6 @@ class SupportCollectionTest extends TestCase
         VarDumper::setHandler(null);
     }
 
-
     #[DataProvider('collectionClassProvider')]
     public function testDumpFirst($collection)
     {
@@ -4900,6 +4899,21 @@ class SupportCollectionTest extends TestCase
         $this->assertSame([1, 'two'], $log->all());
 
         VarDumper::setHandler(null);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testDumpRandom($collection)
+    {
+        $log = new Collection;
+
+        VarDumper::setHandler(function ($value) use ($log) {
+            $log->add($value);
+        });
+
+        $data = new $collection([1, 2, 3, 4, 5, 6]);
+        $data->dumpRandom();
+
+        $this->assertContains($log->sole(), $data->all());
     }
 
     #[DataProvider('collectionClassProvider')]
