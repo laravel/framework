@@ -9,7 +9,7 @@ class Pluralizer
     /**
      * The cached inflector instance.
      *
-     * @var static
+     * @var \Doctrine\Inflector\Inflector|null
      */
     protected static $inflector;
 
@@ -39,7 +39,7 @@ class Pluralizer
      * @param  int|array|\Countable  $count
      * @return string
      */
-    public static function plural($value, $count = 2)
+    public static function plural($value, $count = 2): string
     {
         if (is_countable($count)) {
             $count = count($count);
@@ -60,7 +60,7 @@ class Pluralizer
      * @param  string  $value
      * @return string
      */
-    public static function singular($value)
+    public static function singular($value): string
     {
         $singular = static::inflector()->singularize($value);
 
@@ -73,7 +73,7 @@ class Pluralizer
      * @param  string  $value
      * @return bool
      */
-    protected static function uncountable($value)
+    protected static function uncountable($value): bool
     {
         return in_array(strtolower($value), static::$uncountable);
     }
@@ -85,7 +85,7 @@ class Pluralizer
      * @param  string  $comparison
      * @return string
      */
-    protected static function matchCase($value, $comparison)
+    protected static function matchCase($value, $comparison): string
     {
         $functions = ['mb_strtolower', 'mb_strtoupper', 'ucfirst', 'ucwords'];
 
@@ -103,7 +103,7 @@ class Pluralizer
      *
      * @return \Doctrine\Inflector\Inflector
      */
-    public static function inflector()
+    public static function inflector(): \Doctrine\Inflector\Inflector
     {
         if (is_null(static::$inflector)) {
             static::$inflector = InflectorFactory::createForLanguage(static::$language)->build();
@@ -118,7 +118,7 @@ class Pluralizer
      * @param  string  $language
      * @return void
      */
-    public static function useLanguage(string $language)
+    public static function useLanguage(string $language): void
     {
         static::$language = $language;
 
