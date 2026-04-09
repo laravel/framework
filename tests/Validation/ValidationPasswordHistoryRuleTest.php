@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 class ValidationPasswordHistoryRuleTest extends TestCase
 {
     /**
-     * Test that password history rule fails for recently used password
+     * Test that password history rule fails for recently used password.
      */
     public function test_password_history_rule_fails_for_recent_password()
     {
@@ -16,13 +16,19 @@ class ValidationPasswordHistoryRuleTest extends TestCase
         $oldPasswordHash = password_hash('oldPassword123', PASSWORD_BCRYPT);
 
         // Create a mock user with password history
-        $mockUser = new class($oldPasswordHash) {
-            public function __construct(private $hash) {}
+        $mockUser = new class($oldPasswordHash)
+        {
+            public function __construct(private $hash)
+            {
+            }
 
             public function passwordHistories()
             {
-                return new class($this->hash) {
-                    public function __construct(private $hash) {}
+                return new class($this->hash)
+                {
+                    public function __construct(private $hash)
+                    {
+                    }
 
                     public function latest()
                     {
@@ -56,15 +62,17 @@ class ValidationPasswordHistoryRuleTest extends TestCase
     }
 
     /**
-     * Test that password history rule passes for new password
+     * Test that password history rule passes for new password.
      */
     public function test_password_history_rule_passes_for_new_password()
     {
         // Create a mock user with no password history
-        $mockUser = new class {
+        $mockUser = new class
+        {
             public function passwordHistories()
             {
-                return new class {
+                return new class
+                {
                     public function latest()
                     {
                         return $this;
@@ -98,7 +106,7 @@ class ValidationPasswordHistoryRuleTest extends TestCase
     }
 
     /**
-     * Test password history rule with multiple previous passwords
+     * Test password history rule with multiple previous passwords.
      */
     public function test_password_history_rule_with_multiple_passwords()
     {
@@ -112,13 +120,19 @@ class ValidationPasswordHistoryRuleTest extends TestCase
         ];
 
         // Create a mock user with multiple password hashes
-        $mockUser = new class($passwordHashes) {
-            public function __construct(private $hashes) {}
+        $mockUser = new class($passwordHashes)
+        {
+            public function __construct(private $hashes)
+            {
+            }
 
             public function passwordHistories()
             {
-                return new class($this->hashes) {
-                    public function __construct(private $hashes) {}
+                return new class($this->hashes)
+                {
+                    public function __construct(private $hashes)
+                    {
+                    }
 
                     public function latest()
                     {
@@ -161,14 +175,16 @@ class ValidationPasswordHistoryRuleTest extends TestCase
     }
 
     /**
-     * Test that empty password history allows any password
+     * Test that empty password history allows any password.
      */
     public function test_password_history_rule_passes_with_empty_history()
     {
-        $mockUser = new class {
+        $mockUser = new class
+        {
             public function passwordHistories()
             {
-                return new class {
+                return new class
+                {
                     public function latest()
                     {
                         return $this;

@@ -13,7 +13,8 @@ class PasswordHistory implements ValidationRule
     public function __construct(
         protected $user,
         protected int $count = 5
-    ) {}
+    ) {
+    }
 
     /**
      * Run the validation rule.
@@ -31,6 +32,7 @@ class PasswordHistory implements ValidationRule
             // Use PHP's native password_verify function
             if (password_verify($value, $hash)) {
                 $fail('password.history');
+
                 return;
             }
         }
