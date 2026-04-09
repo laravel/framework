@@ -505,7 +505,7 @@ class UrlGenerator implements UrlGeneratorContract
     {
         $expires = $request->query('expires');
 
-        return ! ($expires && Carbon::now()->getTimestamp() > $expires);
+        return ! ($expires && Carbon::now()->getTimestamp() > (int) $expires);
     }
 
     /**
