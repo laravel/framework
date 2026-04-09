@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Bus;
 
 use Illuminate\Bus\DebounceLock;
 use Illuminate\Bus\UniqueLock;
+use Illuminate\Queue\Attributes\DebounceFor;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
@@ -220,13 +221,14 @@ class PendingDispatch
      */
     protected function acquireDebounceLock()
     {
+        if (! method_exists($this->job, 'debounceFor')
+            && empty((new \ReflectionClass($this->job))->getAttributes(DebounceFor::class))) {
+            return;
+        }
+
         $lock = new DebounceLock(Container::getInstance()->make(Cache::class));
 
         $debounceFor = $lock->getDebounceDelay($this->job);
-
-        if (is_null($debounceFor)) {
-            return;
-        }
 
         if ($this->job instanceof ShouldBeUnique) {
             throw new LogicException(
