@@ -874,7 +874,7 @@ class Middleware
     /**
      * Resolve the middleware alias from the "AsMiddleware" attribute.
      *
-     * @param  string  $middleware
+     * @param  class-string  $middleware
      * @return string|null
      */
     protected function resolveMiddlewareAlias(string $middleware): ?string
