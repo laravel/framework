@@ -13,7 +13,6 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Queue\Job;
-use Illuminate\Contracts\Queue\ShouldBeDebounced;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -231,10 +230,6 @@ class CallQueuedHandler
      */
     protected function commandWasDebounced($command)
     {
-        if (! $command instanceof ShouldBeDebounced) {
-            return false;
-        }
-
         $owner = $command->debounceOwner ?? '';
 
         if (empty($owner)) {

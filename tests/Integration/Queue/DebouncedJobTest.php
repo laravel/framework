@@ -6,10 +6,10 @@ use Exception;
 use Illuminate\Bus\DebounceLock;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Cache\Repository as Cache;
-use Illuminate\Contracts\Queue\ShouldBeDebounced;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\Attributes\DebounceFor;
 use Illuminate\Queue\Events\JobDebounced;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Event;
@@ -118,7 +118,7 @@ class DebouncedJobTest extends QueueTestCase
     public function testDebouncedAndUniqueThrowsLogicException()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('ShouldBeDebounced and ShouldBeUnique');
+        $this->expectExceptionMessage('debounced job cannot also implement ShouldBeUnique');
 
         DebouncedAndUniqueTestJob::dispatch('entity-1');
     }
@@ -205,7 +205,8 @@ class DebouncedJobTest extends QueueTestCase
     }
 }
 
-class DebouncedTestJob implements ShouldQueue, ShouldBeDebounced
+#[DebounceFor(30)]
+class DebouncedTestJob implements ShouldQueue
 {
     use InteractsWithQueue, Queueable, Dispatchable;
 
@@ -224,11 +225,6 @@ class DebouncedTestJob implements ShouldQueue, ShouldBeDebounced
         return $this->entityId;
     }
 
-    public function debounceFor(): int
-    {
-        return 30;
-    }
-
     public function handle()
     {
         static::$handled = true;
@@ -236,7 +232,8 @@ class DebouncedTestJob implements ShouldQueue, ShouldBeDebounced
     }
 }
 
-class DebouncedTestFailJob implements ShouldQueue, ShouldBeDebounced
+#[DebounceFor(30)]
+class DebouncedTestFailJob implements ShouldQueue
 {
     use InteractsWithQueue, Queueable, Dispatchable;
 
@@ -255,11 +252,6 @@ class DebouncedTestFailJob implements ShouldQueue, ShouldBeDebounced
         return $this->entityId;
     }
 
-    public function debounceFor(): int
-    {
-        return 30;
-    }
-
     public function handle()
     {
         static::$handled = true;
@@ -268,7 +260,8 @@ class DebouncedTestFailJob implements ShouldQueue, ShouldBeDebounced
     }
 }
 
-class DebouncedAndUniqueTestJob implements ShouldQueue, ShouldBeDebounced, ShouldBeUnique
+#[DebounceFor(30)]
+class DebouncedAndUniqueTestJob implements ShouldQueue, ShouldBeUnique
 {
     use InteractsWithQueue, Queueable, Dispatchable;
 
@@ -281,11 +274,6 @@ class DebouncedAndUniqueTestJob implements ShouldQueue, ShouldBeDebounced, Shoul
     public function debounceId(): string
     {
         return $this->entityId;
-    }
-
-    public function debounceFor(): int
-    {
-        return 30;
     }
 
     public function handle()

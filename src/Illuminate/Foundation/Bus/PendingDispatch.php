@@ -7,7 +7,6 @@ use Illuminate\Bus\UniqueLock;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
-use Illuminate\Contracts\Queue\ShouldBeDebounced;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Foundation\Queue\InteractsWithUniqueJobs;
 use Illuminate\Queue\Attributes\DebounceFor;
@@ -223,13 +222,16 @@ class PendingDispatch
      */
     protected function acquireDebounceLock()
     {
-        if (! $this->job instanceof ShouldBeDebounced) {
+        $attributes = (new ReflectionClass($this->job))
+            ->getAttributes(DebounceFor::class);
+
+        if (empty($attributes)) {
             return;
         }
 
         if ($this->job instanceof ShouldBeUnique) {
             throw new LogicException(
-                'A job cannot implement both ShouldBeDebounced and ShouldBeUnique. '.
+                'A debounced job cannot also implement ShouldBeUnique. '.
                 'Debounce (last wins) and unique (first wins) are mutually exclusive.'
             );
         }
@@ -238,31 +240,10 @@ class PendingDispatch
         $this->job->debounceOwner = $lock->acquire($this->job);
 
         if (is_null($this->job->delay)) {
-            $debounceFor = method_exists($this->job, 'debounceFor')
+            $this->job->delay = method_exists($this->job, 'debounceFor')
                 ? $this->job->debounceFor()
-                : $this->getDebounceForFromAttribute();
-
-            if ($debounceFor > 0) {
-                $this->job->delay = $debounceFor;
-            }
+                : $attributes[0]->newInstance()->debounceFor;
         }
-    }
-
-    /**
-     * Read the debounceFor value from a DebounceFor PHP attribute.
-     *
-     * @return int
-     */
-    private function getDebounceForFromAttribute()
-    {
-        $attributes = (new ReflectionClass($this->job))
-            ->getAttributes(DebounceFor::class);
-
-        if (! empty($attributes)) {
-            return $attributes[0]->newInstance()->debounceFor;
-        }
-
-        return 0;
     }
 
     /**
