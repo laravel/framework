@@ -292,11 +292,11 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
             // Here we'll call this callback function that was given to the function which
             // is used to either increment or decrement the function. We use a callback
             // so we do not have to recreate all this logic in each of the functions.
-            $new = $callback((int) $current, $value);
-
             if (! is_numeric($current)) {
                 return false;
             }
+
+            $new = $callback((int) $current, $value);
 
             // Here we will update the values in the table. We will also encrypt the value
             // since database cache values are encrypted by default with secure storage
