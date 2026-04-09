@@ -115,32 +115,10 @@ class ConcurrencyLimiter
             return $prefix.$i;
         }, range(1, $this->maxLocks));
 
-        // The Lua lockScript returns ARGV[1]..index (i.e. prefix concatenated with
-        // the slot index). The release() method uses that return value as KEYS[1],
-        // so the two must stay in sync — any change to $prefix here must be
-        // reflected in the Lua script's return expression.
         return $this->redis->eval(...array_merge(
             [$this->lockScript(), count($slots)],
             array_merge($slots, [$prefix, $this->releaseAfter, $id])
         ));
-    }
-
-    /**
-     * Get the cluster-safe key prefix for lock slots.
-     *
-     * The result is cached for the lifetime of this limiter instance.
-     *
-     * @return string
-     */
-    protected function getPrefix()
-    {
-        if (is_null($this->prefix)) {
-            $this->prefix = $this->redis->isCluster() && ! Connection::hasHashTag($this->name)
-                ? '{'.$this->name.'}'
-                : $this->name;
-        }
-
-        return $this->prefix;
     }
 
     /**
@@ -195,5 +173,23 @@ else
     return 0
 end
 LUA;
+    }
+
+    /**
+     * Get the cluster-safe key prefix for lock slots.
+     *
+     * The result is cached for the lifetime of this limiter instance.
+     *
+     * @return string
+     */
+    protected function getPrefix()
+    {
+        if (is_null($this->prefix)) {
+            $this->prefix = $this->redis->isCluster() && ! Connection::hasHashTag($this->name)
+                ? '{'.$this->name.'}'
+                : $this->name;
+        }
+
+        return $this->prefix;
     }
 }

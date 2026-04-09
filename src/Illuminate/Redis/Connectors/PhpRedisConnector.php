@@ -260,6 +260,21 @@ class PhpRedisConnector implements Connector
     }
 
     /**
+     * Format the host using the scheme if available.
+     *
+     * @param  array  $options
+     * @return string
+     */
+    protected function formatHost(array $options)
+    {
+        if (isset($options['scheme'])) {
+            return Str::start($options['host'], "{$options['scheme']}://");
+        }
+
+        return $options['host'];
+    }
+
+    /**
      * Format the password for a Redis cluster connection.
      *
      * @param  array  $options
@@ -274,21 +289,6 @@ class PhpRedisConnector implements Connector
         }
 
         return $password;
-    }
-
-    /**
-     * Format the host using the scheme if available.
-     *
-     * @param  array  $options
-     * @return string
-     */
-    protected function formatHost(array $options)
-    {
-        if (isset($options['scheme'])) {
-            return Str::start($options['host'], "{$options['scheme']}://");
-        }
-
-        return $options['host'];
     }
 
     /**

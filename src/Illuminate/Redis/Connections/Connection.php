@@ -183,6 +183,16 @@ abstract class Connection
     }
 
     /**
+     * Determine if the connection is a cluster connection.
+     *
+     * @return bool
+     */
+    public function isCluster()
+    {
+        return false;
+    }
+
+    /**
      * Get the connection name.
      *
      * @return string|null
@@ -237,21 +247,7 @@ abstract class Connection
     }
 
     /**
-     * Determine if the connection is a cluster connection.
-     *
-     * @return bool
-     */
-    public function isCluster()
-    {
-        return false;
-    }
-
-    /**
      * Determine if the given key contains a Redis Cluster hash tag.
-     *
-     * A hash tag is a substring enclosed in braces with at least one character
-     * between them (e.g., "{user}:sessions"). Empty braces ("{}") are not
-     * considered a valid hash tag.
      *
      * @param  string  $key
      * @return bool

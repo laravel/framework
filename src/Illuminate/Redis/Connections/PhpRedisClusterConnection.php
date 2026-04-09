@@ -21,17 +21,6 @@ class PhpRedisClusterConnection extends PhpRedisConnection
     protected $defaultNode;
 
     /**
-     * Determine if the connection is a cluster connection.
-     *
-     * @return bool
-     */
-    #[\Override]
-    public function isCluster()
-    {
-        return true;
-    }
-
-    /**
      * Scan all keys based on the given options.
      *
      * @param  mixed  $cursor
@@ -88,5 +77,16 @@ class PhpRedisClusterConnection extends PhpRedisConnection
         }
 
         return $this->defaultNode;
+    }
+
+    /**
+     * Determine if the connection is a cluster connection.
+     *
+     * @return bool
+     */
+    #[\Override]
+    public function isCluster()
+    {
+        return true;
     }
 }

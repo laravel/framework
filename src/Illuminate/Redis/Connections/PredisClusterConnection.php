@@ -8,17 +8,6 @@ use Predis\Command\ServerFlushDatabase;
 class PredisClusterConnection extends PredisConnection
 {
     /**
-     * Determine if the connection is a cluster connection.
-     *
-     * @return bool
-     */
-    #[\Override]
-    public function isCluster()
-    {
-        return true;
-    }
-
-    /**
      * Get the keys that match the given pattern.
      *
      * @param  string  $pattern
@@ -49,5 +38,16 @@ class PredisClusterConnection extends PredisConnection
         foreach ($this->client as $node) {
             $node->executeCommand(tap(new $command)->setArguments(func_get_args()));
         }
+    }
+
+    /**
+     * Determine if the connection is a cluster connection.
+     *
+     * @return bool
+     */
+    #[\Override]
+    public function isCluster()
+    {
+        return true;
     }
 }
