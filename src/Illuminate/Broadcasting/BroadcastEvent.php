@@ -76,7 +76,7 @@ class BroadcastEvent implements ShouldQueue
         $this->backoff = $this->getAttributeValue($event, Backoff::class, 'backoff');
         $this->afterCommit = property_exists($event, 'afterCommit') ? $event->afterCommit : null;
         $this->maxExceptions = $this->getAttributeValue($event, MaxExceptions::class, 'maxExceptions');
-        $this->deleteWhenMissingModels = $this->getAttributeValue($event, DeleteWhenMissingModels::class, 'deleteWhenMissingModels');
+        $this->deleteWhenMissingModels = $this->getAttributeValue($event, DeleteWhenMissingModels::class, 'deleteWhenMissingModels') ?? true;
     }
 
     /**
