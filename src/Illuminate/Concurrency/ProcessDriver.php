@@ -26,6 +26,8 @@ class ProcessDriver implements Driver
 
     /**
      * Run the given tasks concurrently and return an array containing the results.
+     *
+     * @throws \Throwable
      */
     public function run(Closure|array $tasks): array
     {
