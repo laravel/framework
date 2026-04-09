@@ -555,6 +555,17 @@ class CacheManager implements FactoryContract
     }
 
     /**
+     * Register a callback to be invoked when an unserializable class is encountered.
+     *
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public function handleUnserializableClassUsing(?callable $callback): void
+    {
+        Repository::handleUnserializableClassUsing($callback);
+    }
+
+    /**
      * Dynamically call the default driver instance.
      *
      * @param  string  $method
