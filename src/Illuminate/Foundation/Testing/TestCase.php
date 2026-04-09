@@ -31,6 +31,13 @@ abstract class TestCase extends BaseTestCase
     protected array $traitsUsedByTest;
 
     /**
+     * Memoized result of the withoutBootingFramework check.
+     *
+     * @var bool|null
+     */
+    protected ?bool $withoutBootingFramework = null;
+
+    /**
      * Creates the application.
      *
      * @return \Illuminate\Foundation\Application
@@ -105,10 +112,14 @@ abstract class TestCase extends BaseTestCase
      */
     protected function withoutBootingFramework(): bool
     {
+        if ($this->withoutBootingFramework !== null) {
+            return $this->withoutBootingFramework;
+        }
+
         try {
-            return (new ReflectionMethod(static::class, $this->name()))->getAttributes(UnitTest::class) !== [];
+            return $this->withoutBootingFramework = (new ReflectionMethod(static::class, $this->name()))->getAttributes(UnitTest::class) !== [];
         } catch (Throwable) {
-            return false;
+            return $this->withoutBootingFramework = false;
         }
     }
 
