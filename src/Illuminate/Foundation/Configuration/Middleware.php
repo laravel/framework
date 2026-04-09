@@ -165,7 +165,7 @@ class Middleware
     /**
      * The cached attributes for middleware aliases.
      *
-     * @var array
+     * @var array<class-string, string|null>
      */
     protected static array $attributeAliasCache = [];
 
