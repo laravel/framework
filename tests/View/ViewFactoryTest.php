@@ -696,6 +696,46 @@ class ViewFactoryTest extends TestCase
         $this->assertSame('laravel.com', $contents);
     }
 
+    public function testConsumableComponentDataPrefersNearestParentOverRenderedAncestor()
+    {
+        $factory = new class(...$this->getFactoryArgs()) extends Factory
+        {
+            public function seedComponentState(array $currentComponentData, array $componentStack, array $componentData): void
+            {
+                $this->currentComponentData = $currentComponentData;
+                $this->componentStack = $componentStack;
+                $this->componentData = $componentData;
+            }
+        };
+
+        $factory->seedComponentState(['name' => 'FOO'], ['middle', 'wrapper'], [
+            ['name' => 'BAR'],
+            [],
+        ]);
+
+        $this->assertSame('BAR', $factory->getConsumableComponentData('name'));
+    }
+
+    public function testConsumableComponentDataPrefersCurrentComponentDataOverInheritedParentData()
+    {
+        $factory = new class(...$this->getFactoryArgs()) extends Factory
+        {
+            public function seedComponentState(array $currentComponentData, array $componentStack, array $componentData): void
+            {
+                $this->currentComponentData = $currentComponentData;
+                $this->componentStack = $componentStack;
+                $this->componentData = $componentData;
+            }
+        };
+
+        $factory->seedComponentState(['name' => 'BAR'], ['parent'], [
+            ['name' => 'FOO'],
+            ['name' => 'BAR'],
+        ]);
+
+        $this->assertSame('BAR', $factory->getConsumableComponentData('name'));
+    }
+
     public function testTranslation()
     {
         $container = new Container;

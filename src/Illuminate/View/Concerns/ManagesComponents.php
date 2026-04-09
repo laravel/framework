@@ -137,14 +137,12 @@ trait ManagesComponents
      */
     public function getConsumableComponentData($key, $default = null)
     {
-        if (array_key_exists($key, $this->currentComponentData)) {
-            return $this->currentComponentData[$key];
-        }
-
         $currentComponent = count($this->componentStack);
 
-        if ($currentComponent === 0) {
-            return value($default);
+        $data = $this->componentData[$currentComponent] ?? [];
+
+        if (array_key_exists($key, $data)) {
+            return $data[$key];
         }
 
         for ($i = $currentComponent - 1; $i >= 0; $i--) {
@@ -153,6 +151,10 @@ trait ManagesComponents
             if (array_key_exists($key, $data)) {
                 return $data[$key];
             }
+        }
+
+        if (array_key_exists($key, $this->currentComponentData)) {
+            return $this->currentComponentData[$key];
         }
 
         return value($default);
