@@ -400,12 +400,12 @@ class Worker
                 return $job;
             }
 
-            foreach (explode(',', $queue) as $index => $queue) {
-                if ($this->queuePaused($connection->getConnectionName(), $queue)) {
+            foreach (explode(',', $queue) as $index => $queueName) {
+                if ($this->queuePaused($connection->getConnectionName(), $queueName)) {
                     continue;
                 }
 
-                if (! is_null($job = $popJobCallback($queue, $index))) {
+                if (! is_null($job = $popJobCallback($queueName, $index))) {
                     $this->raiseAfterJobPopEvent($connection->getConnectionName(), $job);
 
                     return $job;
