@@ -43,6 +43,13 @@ trait Queueable
     public $deduplicator;
 
     /**
+     * The owner token for debounce supersession checks.
+     *
+     * @var string
+     */
+    public $debounceOwner = '';
+
+    /**
      * The number of seconds before the job should be made available.
      *
      * @var \DateTimeInterface|\DateInterval|array|int|null

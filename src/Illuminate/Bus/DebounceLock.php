@@ -40,16 +40,16 @@ class DebounceLock
      */
     public function acquire($job)
     {
-        $debounceFor = method_exists($job, 'debounceFor')
-            ? $job->debounceFor()
-            : $this->getAttributeValue($job, DebounceFor::class, 'debounceFor');
+        $debounceFor = $this->getDebounceDelay($job);
 
         $cache = $this->resolveCache($job);
 
         $owner = Str::random(40);
 
         // The TTL is intentionally generous — it exists only for garbage collection,
-        // not correctness. The token is explicitly removed after the job executes.
+        // not correctness. The token is intentionally left in place after execution
+        // to prevent a race where a superseded job sees an empty cache and runs
+        // via fail-open.
         $cache->put(static::getKey($job), $owner, max($debounceFor * 10, 300));
 
         return $owner;
@@ -99,6 +99,19 @@ class DebounceLock
         }
 
         $cache->forget($key);
+    }
+
+    /**
+     * Get the debounce delay for the given job.
+     *
+     * @param  mixed  $job
+     * @return int|null
+     */
+    public function getDebounceDelay($job)
+    {
+        return method_exists($job, 'debounceFor')
+            ? $job->debounceFor()
+            : $this->getAttributeValue($job, DebounceFor::class, 'debounceFor');
     }
 
     /**

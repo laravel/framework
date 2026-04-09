@@ -214,8 +214,6 @@ class DebouncedTestJob implements ShouldQueue
 
     public static $handleCount = 0;
 
-    public string $debounceOwner = '';
-
     public function __construct(public string $entityId)
     {
     }
@@ -241,8 +239,6 @@ class DebouncedTestFailJob implements ShouldQueue
 
     public static $handled = false;
 
-    public string $debounceOwner = '';
-
     public function __construct(public string $entityId)
     {
     }
@@ -264,8 +260,6 @@ class DebouncedTestFailJob implements ShouldQueue
 class DebouncedAndUniqueTestJob implements ShouldQueue, ShouldBeUnique
 {
     use InteractsWithQueue, Queueable, Dispatchable;
-
-    public string $debounceOwner = '';
 
     public function __construct(public string $entityId)
     {
