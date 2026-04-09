@@ -206,8 +206,8 @@ class QueueRedisQueueTest extends TestCase
         $connection->shouldReceive('isCluster')->andReturn(false);
         $redis->shouldReceive('connection')->andReturn($connection);
 
-        $this->assertSame('queues:default', $queue->testGetRedisKey(null));
-        $this->assertSame('queues:emails', $queue->testGetRedisKey('emails'));
+        $this->assertSame('queues:default', $queue->testGetQueueRedisKey(null));
+        $this->assertSame('queues:emails', $queue->testGetQueueRedisKey('emails'));
     }
 
     public function testGetRedisKeyWrapsWithHashTagsForPhpRedisCluster()
@@ -217,8 +217,8 @@ class QueueRedisQueueTest extends TestCase
         $connection->shouldReceive('isCluster')->andReturn(true);
         $redis->shouldReceive('connection')->andReturn($connection);
 
-        $this->assertSame('queues:{default}', $queue->testGetRedisKey(null));
-        $this->assertSame('queues:{emails}', $queue->testGetRedisKey('emails'));
+        $this->assertSame('queues:{default}', $queue->testGetQueueRedisKey(null));
+        $this->assertSame('queues:{emails}', $queue->testGetQueueRedisKey('emails'));
     }
 
     public function testGetRedisKeyWrapsWithHashTagsForPredisCluster()
@@ -228,8 +228,8 @@ class QueueRedisQueueTest extends TestCase
         $connection->shouldReceive('isCluster')->andReturn(true);
         $redis->shouldReceive('connection')->andReturn($connection);
 
-        $this->assertSame('queues:{default}', $queue->testGetRedisKey(null));
-        $this->assertSame('queues:{emails}', $queue->testGetRedisKey('emails'));
+        $this->assertSame('queues:{default}', $queue->testGetQueueRedisKey(null));
+        $this->assertSame('queues:{emails}', $queue->testGetQueueRedisKey('emails'));
     }
 
     public function testGetRedisKeyDoesNotDoubleWrapExistingHashTags()
@@ -239,8 +239,8 @@ class QueueRedisQueueTest extends TestCase
         $connection->shouldReceive('isCluster')->andReturn(true);
         $redis->shouldReceive('connection')->andReturn($connection);
 
-        $this->assertSame('queues:{default}', $queue->testGetRedisKey(null));
-        $this->assertSame('queues:{custom}', $queue->testGetRedisKey('{custom}'));
+        $this->assertSame('queues:{default}', $queue->testGetQueueRedisKey(null));
+        $this->assertSame('queues:{custom}', $queue->testGetQueueRedisKey('{custom}'));
     }
 
     public function testGetRedisKeySkipsWrappingWhenQueueNameContainsBraces()
@@ -251,7 +251,7 @@ class QueueRedisQueueTest extends TestCase
         $redis->shouldReceive('connection')->andReturn($connection);
 
         // Queue name already contains hash tags — skip wrapping
-        $this->assertSame('queues:process-{batch}-results', $queue->testGetRedisKey('process-{batch}-results'));
+        $this->assertSame('queues:process-{batch}-results', $queue->testGetQueueRedisKey('process-{batch}-results'));
     }
 
     public function testGetRedisKeyWrapsEmptyHashTagOnCluster()
@@ -262,7 +262,7 @@ class QueueRedisQueueTest extends TestCase
         $redis->shouldReceive('connection')->andReturn($connection);
 
         // Empty braces '{}' are not a valid hash tag — should still get wrapped
-        $this->assertSame('queues:{my{}queue}', $queue->testGetRedisKey('my{}queue'));
+        $this->assertSame('queues:{my{}queue}', $queue->testGetQueueRedisKey('my{}queue'));
     }
 
     public function testGetRedisKeyWrapsUnmatchedOpeningBrace()
@@ -273,7 +273,7 @@ class QueueRedisQueueTest extends TestCase
         $redis->shouldReceive('connection')->andReturn($connection);
 
         // Unmatched '{' is not a valid hash tag — should still get wrapped
-        $this->assertSame('queues:{my{broken}', $queue->testGetRedisKey('my{broken'));
+        $this->assertSame('queues:{my{broken}', $queue->testGetQueueRedisKey('my{broken'));
     }
 
     public function testGetRedisKeyWrapsUnmatchedClosingBrace()
@@ -284,7 +284,7 @@ class QueueRedisQueueTest extends TestCase
         $redis->shouldReceive('connection')->andReturn($connection);
 
         // Unmatched '}' is not a valid hash tag — should still get wrapped
-        $this->assertSame('queues:{broken}queue}', $queue->testGetRedisKey('broken}queue'));
+        $this->assertSame('queues:{broken}queue}', $queue->testGetQueueRedisKey('broken}queue'));
     }
 
     public function testGetRedisKeyWrapsEmptyFirstHashTagFollowedByValidPair()
@@ -296,7 +296,7 @@ class QueueRedisQueueTest extends TestCase
 
         // Redis spec: the first '{}' is an empty hash tag, so the whole key is hashed
         // even though '{bar}' looks valid. Must be wrapped to ensure slot affinity.
-        $this->assertSame('queues:{foo{}{bar}}', $queue->testGetRedisKey('foo{}{bar}'));
+        $this->assertSame('queues:{foo{}{bar}}', $queue->testGetQueueRedisKey('foo{}{bar}'));
     }
 
     public function testPushUsesGetRedisKeyForLuaScript()
@@ -421,9 +421,9 @@ class QueueRedisQueueTest extends TestCase
 
 class TestableRedisQueue extends RedisQueue
 {
-    public function testGetRedisKey($queue = null)
+    public function testGetQueueRedisKey($queue = null)
     {
-        return $this->getRedisKey($queue);
+        return $this->getQueueRedisKey($queue);
     }
 
     public function testIsClusterConnection()
