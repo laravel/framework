@@ -21,6 +21,6 @@ class Via
      */
     public function __construct(string|array $channels)
     {
-        $this->channels = is_array($channels) ? $channels : [$channels];
+        $this->channels = (array) $channels;
     }
 }
