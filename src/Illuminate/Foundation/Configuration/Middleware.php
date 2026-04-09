@@ -13,10 +13,12 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Http\Middleware\TrustProxies;
+use Illuminate\Routing\Attributes\Controllers\AsMiddleware;
 use Illuminate\Routing\Middleware\ValidateSignature;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use ReflectionClass;
 
 class Middleware
 {
@@ -159,6 +161,13 @@ class Middleware
      * @var array
      */
     protected $appendPriority = [];
+
+    /**
+     * The cached attributes for middleware aliases.
+     *
+     * @var array
+     */
+    protected static array $attributeAliasCache = [];
 
     /**
      * Prepend middleware to the application's global middleware stack.
@@ -788,7 +797,18 @@ class Middleware
      */
     public function getMiddlewareAliases()
     {
-        return array_merge($this->defaultAliases(), $this->customAliases);
+        $discoveredAliases = [];
+
+        foreach ($this->customAliases as $alias => $class) {
+            if (is_string($class) && class_exists($class)) {
+                $attributeAlias = $this->resolveMiddlewareAlias($class);
+                if ($attributeAlias) {
+                    $discoveredAliases[$attributeAlias] = $class;
+                }
+            }
+        }
+
+        return array_merge($this->defaultAliases(), $discoveredAliases, $this->customAliases);
     }
 
     /**
@@ -849,5 +869,29 @@ class Middleware
     public function getMiddlewarePriorityAppends()
     {
         return $this->appendPriority;
+    }
+
+    /**
+     * Resolve the middleware alias from the "AsMiddleware" attribute.
+     *
+     * @param  string  $middleware
+     * @return string|null
+     */
+    protected function resolveMiddlewareAlias(string $middleware): ?string
+    {
+        if (isset(static::$attributeAliasCache[$middleware])) {
+            return static::$attributeAliasCache[$middleware];
+        }
+
+        if (! class_exists($middleware)) {
+            return null;
+        }
+
+        $reflection = new ReflectionClass($middleware);
+        $attributes = $reflection->getAttributes(AsMiddleware::class);
+
+        return static::$attributeAliasCache[$middleware] = empty($attributes)
+            ? null
+            : $attributes[0]->newInstance()->alias;
     }
 }
