@@ -93,7 +93,13 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
      */
     public function read($sessionId): string|false
     {
-        $session = (object) $this->getQuery()->find($sessionId);
+        $session = $this->getQuery()->find($sessionId);
+
+        if (is_null($session)) {
+            return '';
+        }
+
+        $session = (object) $session;
 
         if ($this->expired($session)) {
             $this->exists = true;
