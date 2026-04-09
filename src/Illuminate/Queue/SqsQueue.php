@@ -99,7 +99,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             'AttributeNames' => ['ApproximateNumberOfMessages'],
         ]);
 
-        return (int) $response['Attributes']['ApproximateNumberOfMessages'] ?? 0;
+        return (int) ($response['Attributes']['ApproximateNumberOfMessages'] ?? 0);
     }
 
     /**
@@ -115,7 +115,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             'AttributeNames' => ['ApproximateNumberOfMessagesDelayed'],
         ]);
 
-        return (int) $response['Attributes']['ApproximateNumberOfMessagesDelayed'] ?? 0;
+        return (int) ($response['Attributes']['ApproximateNumberOfMessagesDelayed'] ?? 0);
     }
 
     /**
@@ -131,7 +131,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             'AttributeNames' => ['ApproximateNumberOfMessagesNotVisible'],
         ]);
 
-        return (int) $response['Attributes']['ApproximateNumberOfMessagesNotVisible'] ?? 0;
+        return (int) ($response['Attributes']['ApproximateNumberOfMessagesNotVisible'] ?? 0);
     }
 
     /**
