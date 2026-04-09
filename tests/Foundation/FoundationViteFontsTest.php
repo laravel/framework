@@ -173,20 +173,21 @@ class FoundationViteFontsTest extends TestCase
         $this->assertStringContainsString('<style>', $result);
     }
 
-    public function testFontsFiltersByFamilyUsingManifestFamilyStyles()
+    public function testFontsFiltersByAliasUsingManifestFamilyStyles()
     {
         $this->makeFontsManifest([
             'version' => 1,
             'style' => [
                 'file' => 'assets/fonts-abc123.css',
                 'familyStyles' => [
-                    'Inter' => "@font-face { font-family: \"Inter\"; src: url('inter.woff2'); }\n\n@font-face { font-family: \"Inter fallback\"; src: local(\"Arial\"); }",
-                    'JetBrains Mono' => "@font-face { font-family: \"JetBrains Mono\"; src: url('jb.woff2'); }",
+                    'sans' => "@font-face { font-family: \"Inter\"; src: url('inter.woff2'); }\n\n@font-face { font-family: \"Inter fallback\"; src: local(\"Arial\"); }",
+                    'mono' => "@font-face { font-family: \"JetBrains Mono\"; src: url('jb.woff2'); }",
                 ],
-                'variables' => ":root {\n  --font-inter: \"Inter\", \"Inter fallback\";\n  --font-jb: \"JetBrains Mono\";\n}",
+                'variables' => ":root {\n  --font-sans: \"Inter\", \"Inter fallback\";\n  --font-mono: \"JetBrains Mono\";\n}",
             ],
             'preloads' => [
                 [
+                    'alias' => 'sans',
                     'family' => 'Inter',
                     'weight' => 400,
                     'style' => 'normal',
@@ -196,6 +197,7 @@ class FoundationViteFontsTest extends TestCase
                     'crossorigin' => 'anonymous',
                 ],
                 [
+                    'alias' => 'mono',
                     'family' => 'JetBrains Mono',
                     'weight' => 400,
                     'style' => 'normal',
@@ -206,13 +208,13 @@ class FoundationViteFontsTest extends TestCase
                 ],
             ],
             'families' => [
-                'Inter' => ['variable' => '--font-inter'],
-                'JetBrains Mono' => ['variable' => '--font-jb'],
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
+                'mono' => ['family' => 'JetBrains Mono', 'variable' => '--font-mono'],
             ],
         ]);
         $this->makeFontsCssFile('build', 'assets/fonts-abc123.css', 'full-css-not-used-during-filtering');
 
-        $result = app(Vite::class)->fonts(['Inter'])->toHtml();
+        $result = app(Vite::class)->fonts(['sans'])->toHtml();
 
         $this->assertStringContainsString('inter-400.woff2', $result);
         $this->assertStringNotContainsString('jetbrains-400.woff2', $result);
@@ -220,24 +222,25 @@ class FoundationViteFontsTest extends TestCase
         $this->assertStringContainsString('font-family: "Inter fallback"', $result);
         $this->assertStringNotContainsString('font-family: "JetBrains Mono"', $result);
         $this->assertStringContainsString(':root {', $result);
-        $this->assertStringContainsString('--font-inter:', $result);
-        $this->assertStringNotContainsString('--font-jb:', $result);
+        $this->assertStringContainsString('--font-sans:', $result);
+        $this->assertStringNotContainsString('--font-mono:', $result);
         $this->assertStringNotContainsString('full-css-not-used-during-filtering', $result);
     }
 
-    public function testFontsFilteredByFamilyDoesNotThrowForMalformedPreloadOfOtherFamily()
+    public function testFontsFilteredByAliasDoesNotThrowForMalformedPreloadOfOtherAlias()
     {
         $this->makeFontsManifest([
             'version' => 1,
             'style' => [
                 'inline' => "@font-face { font-family: 'Inter'; }",
                 'familyStyles' => [
-                    'Inter' => "@font-face { font-family: 'Inter'; }",
+                    'sans' => "@font-face { font-family: 'Inter'; }",
                 ],
                 'variables' => '',
             ],
             'preloads' => [
                 [
+                    'alias' => 'sans',
                     'family' => 'Inter',
                     'weight' => 400,
                     'style' => 'normal',
@@ -247,17 +250,18 @@ class FoundationViteFontsTest extends TestCase
                     'crossorigin' => 'anonymous',
                 ],
                 [
+                    'alias' => 'broken',
                     'family' => 'Broken',
                     'as' => 'font',
                 ],
             ],
             'families' => [
-                'Inter' => ['variable' => '--font-inter'],
-                'Broken' => ['variable' => '--font-broken'],
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
+                'broken' => ['family' => 'Broken', 'variable' => '--font-broken'],
             ],
         ]);
 
-        $result = app(Vite::class)->fonts(['Inter'])->toHtml();
+        $result = app(Vite::class)->fonts(['sans'])->toHtml();
 
         $this->assertStringContainsString('inter-400.woff2', $result);
     }
@@ -280,24 +284,24 @@ class FoundationViteFontsTest extends TestCase
         $this->assertSame('fonts', $receivedSrc);
     }
 
-    public function testFontsAcceptsStringFamily()
+    public function testFontsAcceptsStringAlias()
     {
         $this->makeFontsManifest([
             'version' => 1,
             'style' => [
                 'inline' => "@font-face { font-family: 'Inter'; }",
                 'familyStyles' => [
-                    'Inter' => "@font-face { font-family: 'Inter'; }",
+                    'sans' => "@font-face { font-family: 'Inter'; }",
                 ],
                 'variables' => '',
             ],
             'preloads' => [],
             'families' => [
-                'Inter' => [],
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
             ],
         ]);
 
-        $result = app(Vite::class)->fonts('Inter')->toHtml();
+        $result = app(Vite::class)->fonts('sans')->toHtml();
 
         $this->assertStringContainsString("font-family: 'Inter'", $result);
     }
@@ -351,7 +355,7 @@ class FoundationViteFontsTest extends TestCase
         $this->makeFontsManifest(['version' => 99, 'families' => []]);
 
         $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('Unsupported font manifest version [99]');
+        $this->expectExceptionMessage('Unsupported font manifest version [99]. Supported versions: 1.');
 
         app(Vite::class)->fonts();
     }
@@ -386,38 +390,38 @@ class FoundationViteFontsTest extends TestCase
         app(Vite::class)->fonts();
     }
 
-    public function testUnknownRequestedFamilyThrowsException()
+    public function testUnknownRequestedAliasThrowsException()
     {
         $this->makeFontsManifest([
             'version' => 1,
             'style' => ['inline' => ''],
             'preloads' => [],
             'families' => [
-                'Inter' => [],
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
             ],
         ]);
 
         $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('Font family [Roboto] is not defined in the font manifest. Available families: Inter.');
+        $this->expectExceptionMessage('Font alias [display] is not defined in the font manifest. Available aliases: sans.');
 
-        app(Vite::class)->fonts(['Roboto']);
+        app(Vite::class)->fonts(['display']);
     }
 
-    public function testMalformedPreloadEntryMissingFamilyThrowsException()
+    public function testMalformedPreloadEntryMissingAliasThrowsException()
     {
         $this->makeFontsManifest([
             'version' => 1,
             'style' => ['inline' => ''],
             'preloads' => [
-                ['file' => 'assets/font.woff2', 'as' => 'font'],
+                ['family' => 'Inter', 'file' => 'assets/font.woff2', 'as' => 'font'],
             ],
             'families' => [
-                'Inter' => [],
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
             ],
         ]);
 
         $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('preload entry [0] is missing the [family] key');
+        $this->expectExceptionMessage('preload entry [0] is missing the [alias] key');
 
         app(Vite::class)->fonts();
     }
@@ -428,15 +432,15 @@ class FoundationViteFontsTest extends TestCase
             'version' => 1,
             'style' => ['inline' => ''],
             'preloads' => [
-                ['family' => 'Inter', 'as' => 'font'],
+                ['alias' => 'sans', 'family' => 'Inter', 'as' => 'font'],
             ],
             'families' => [
-                'Inter' => [],
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
             ],
         ]);
 
         $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('preload entry [0] for family [Inter] is missing the [file] key');
+        $this->expectExceptionMessage('preload entry [0] for alias [sans] is missing the [file] key');
 
         app(Vite::class)->fonts();
     }
@@ -448,15 +452,15 @@ class FoundationViteFontsTest extends TestCase
             'version' => 1,
             'style' => ['inline' => ''],
             'preloads' => [
-                ['family' => 'Inter', 'as' => 'font'],
+                ['alias' => 'sans', 'family' => 'Inter', 'as' => 'font'],
             ],
             'families' => [
-                'Inter' => [],
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
             ],
         ]);
 
         $this->expectException(ViteException::class);
-        $this->expectExceptionMessage('preload entry [0] for family [Inter] is missing the [url] key');
+        $this->expectExceptionMessage('preload entry [0] for alias [sans] is missing the [url] key');
 
         app(Vite::class)->fonts();
     }
@@ -468,6 +472,7 @@ class FoundationViteFontsTest extends TestCase
             'style' => ['inline' => ''],
             'preloads' => [
                 [
+                    'alias' => 'sans',
                     'family' => 'Inter',
                     'weight' => 400,
                     'style' => 'normal',
@@ -477,6 +482,7 @@ class FoundationViteFontsTest extends TestCase
                     'crossorigin' => 'anonymous',
                 ],
                 [
+                    'alias' => 'sans',
                     'family' => 'Inter',
                     'weight' => 700,
                     'style' => 'normal',
@@ -487,7 +493,7 @@ class FoundationViteFontsTest extends TestCase
                 ],
             ],
             'families' => [
-                'Inter' => [],
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
             ],
         ]);
 
@@ -519,7 +525,7 @@ class FoundationViteFontsTest extends TestCase
             'style' => ['inline' => "@font-face { font-family: 'Inter'; }"],
             'preloads' => [],
             'families' => [
-                'Inter' => [],
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
             ],
         ]);
 
@@ -535,6 +541,7 @@ class FoundationViteFontsTest extends TestCase
             'version' => 1,
             'preloads' => [
                 [
+                    'alias' => 'sans',
                     'family' => 'Inter',
                     'weight' => 400,
                     'style' => 'normal',
@@ -545,7 +552,7 @@ class FoundationViteFontsTest extends TestCase
                 ],
             ],
             'families' => [
-                'Inter' => [],
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
             ],
         ]);
 
@@ -593,7 +600,7 @@ class FoundationViteFontsTest extends TestCase
             ],
             'preloads' => [],
             'families' => [
-                'Inter' => [],
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
             ],
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
@@ -632,23 +639,23 @@ class FoundationViteFontsTest extends TestCase
             'style' => [
                 'file' => 'assets/fonts-abc123.css',
                 'familyStyles' => [
-                    'Inter' => "@font-face { font-family: \"Inter\"; src: url('inter.woff2'); }\n\n.font-inter {\n  font-family: var(--font-inter);\n}",
+                    'sans' => "@font-face { font-family: \"Inter\"; src: url('inter.woff2'); }\n\n.font-sans {\n  font-family: var(--font-sans);\n}",
                 ],
-                'variables' => ':root { --font-inter: "Inter"; }',
+                'variables' => ':root { --font-sans: "Inter"; }',
             ],
             'preloads' => [
-                ['family' => 'Inter', 'weight' => 400, 'style' => 'normal', 'file' => 'assets/inter-400.woff2', 'as' => 'font', 'type' => 'font/woff2', 'crossorigin' => 'anonymous'],
+                ['alias' => 'sans', 'family' => 'Inter', 'weight' => 400, 'style' => 'normal', 'file' => 'assets/inter-400.woff2', 'as' => 'font', 'type' => 'font/woff2', 'crossorigin' => 'anonymous'],
             ],
             'families' => [
-                'Inter' => ['variable' => '--font-inter'],
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
             ],
         ]);
-        $this->makeFontsCssFile('build', 'assets/fonts-abc123.css', "@font-face { font-family: \"Inter\"; }\n\n.font-inter { font-family: var(--font-inter); }");
+        $this->makeFontsCssFile('build', 'assets/fonts-abc123.css', "@font-face { font-family: \"Inter\"; }\n\n.font-sans { font-family: var(--font-sans); }");
 
         $result = app(Vite::class)->fonts()->toHtml();
 
-        $this->assertStringContainsString('.font-inter', $result);
-        $this->assertStringContainsString('font-family: var(--font-inter)', $result);
+        $this->assertStringContainsString('.font-sans', $result);
+        $this->assertStringContainsString('font-family: var(--font-sans)', $result);
     }
 
     public function testFontsRendersUtilityClassInHotMode()
@@ -657,71 +664,141 @@ class FoundationViteFontsTest extends TestCase
         $this->makeHotFontsManifest([
             'version' => 1,
             'style' => [
-                'inline' => "@font-face { font-family: \"Inter\"; }\n\n.font-inter {\n  font-family: var(--font-inter);\n}",
+                'inline' => "@font-face { font-family: \"Inter\"; }\n\n.font-sans {\n  font-family: var(--font-sans);\n}",
                 'familyStyles' => [
-                    'Inter' => "@font-face { font-family: \"Inter\"; }\n\n.font-inter {\n  font-family: var(--font-inter);\n}",
+                    'sans' => "@font-face { font-family: \"Inter\"; }\n\n.font-sans {\n  font-family: var(--font-sans);\n}",
                 ],
-                'variables' => ':root { --font-inter: "Inter"; }',
+                'variables' => ':root { --font-sans: "Inter"; }',
             ],
             'preloads' => [
-                ['family' => 'Inter', 'weight' => 400, 'style' => 'normal', 'url' => 'http://localhost:3000/__laravel_vite_plugin__/fonts/inter.woff2', 'as' => 'font', 'type' => 'font/woff2', 'crossorigin' => 'anonymous'],
+                ['alias' => 'sans', 'family' => 'Inter', 'weight' => 400, 'style' => 'normal', 'url' => 'http://localhost:3000/__laravel_vite_plugin__/fonts/inter.woff2', 'as' => 'font', 'type' => 'font/woff2', 'crossorigin' => 'anonymous'],
             ],
             'families' => [
-                'Inter' => ['variable' => '--font-inter'],
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
             ],
         ]);
 
         $result = app(Vite::class)->fonts()->toHtml();
 
-        $this->assertStringContainsString('.font-inter', $result);
-        $this->assertStringContainsString('font-family: var(--font-inter)', $result);
+        $this->assertStringContainsString('.font-sans', $result);
+        $this->assertStringContainsString('font-family: var(--font-sans)', $result);
     }
 
-    public function testFontsFilteredByFamilyIncludesUtilityClass()
+    public function testFontsFilteredByAliasIncludesUtilityClass()
     {
         $this->makeFontsManifest([
             'version' => 1,
             'style' => [
                 'file' => 'assets/fonts-abc123.css',
                 'familyStyles' => [
-                    'Inter' => "@font-face { font-family: \"Inter\"; }\n\n.font-inter {\n  font-family: var(--font-inter);\n}",
-                    'Roboto' => "@font-face { font-family: \"Roboto\"; }\n\n.font-roboto {\n  font-family: var(--font-roboto);\n}",
+                    'sans' => "@font-face { font-family: \"Inter\"; }\n\n.font-sans {\n  font-family: var(--font-sans);\n}",
+                    'heading' => "@font-face { font-family: \"Roboto\"; }\n\n.font-heading {\n  font-family: var(--font-heading);\n}",
                 ],
-                'variables' => ":root {\n  --font-inter: \"Inter\";\n  --font-roboto: \"Roboto\";\n}",
+                'variables' => ":root {\n  --font-sans: \"Inter\";\n  --font-heading: \"Roboto\";\n}",
             ],
             'preloads' => [
-                ['family' => 'Inter', 'weight' => 400, 'style' => 'normal', 'file' => 'assets/inter-400.woff2', 'as' => 'font', 'type' => 'font/woff2', 'crossorigin' => 'anonymous'],
-                ['family' => 'Roboto', 'weight' => 400, 'style' => 'normal', 'file' => 'assets/roboto-400.woff2', 'as' => 'font', 'type' => 'font/woff2', 'crossorigin' => 'anonymous'],
+                ['alias' => 'sans', 'family' => 'Inter', 'weight' => 400, 'style' => 'normal', 'file' => 'assets/inter-400.woff2', 'as' => 'font', 'type' => 'font/woff2', 'crossorigin' => 'anonymous'],
+                ['alias' => 'heading', 'family' => 'Roboto', 'weight' => 400, 'style' => 'normal', 'file' => 'assets/roboto-400.woff2', 'as' => 'font', 'type' => 'font/woff2', 'crossorigin' => 'anonymous'],
             ],
             'families' => [
-                'Inter' => ['variable' => '--font-inter'],
-                'Roboto' => ['variable' => '--font-roboto'],
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
+                'heading' => ['family' => 'Roboto', 'variable' => '--font-heading'],
             ],
         ]);
         $this->makeFontsCssFile('build', 'assets/fonts-abc123.css', 'full-css');
 
-        $result = app(Vite::class)->fonts(['Inter'])->toHtml();
+        $result = app(Vite::class)->fonts(['sans'])->toHtml();
 
-        $this->assertStringContainsString('.font-inter', $result);
-        $this->assertStringNotContainsString('.font-roboto', $result);
+        $this->assertStringContainsString('.font-sans', $result);
+        $this->assertStringNotContainsString('.font-heading', $result);
     }
 
-    public function testFontsRendersUtilityClassWithCustomVariableName()
+    public function testFontsFiltersByMultipleAliases()
     {
         $this->makeFontsManifest([
             'version' => 1,
             'style' => [
                 'file' => 'assets/fonts-abc123.css',
                 'familyStyles' => [
-                    'Inter' => "@font-face { font-family: \"Inter\"; }\n\n.font-sans {\n  font-family: var(--font-sans);\n}",
+                    'sans' => "@font-face { font-family: \"Inter\"; }",
+                    'mono' => "@font-face { font-family: \"JetBrains Mono\"; }",
+                    'heading' => "@font-face { font-family: \"Playfair Display\"; }",
+                ],
+                'variables' => ":root {\n  --font-sans: \"Inter\";\n  --font-mono: \"JetBrains Mono\";\n  --font-heading: \"Playfair Display\";\n}",
+            ],
+            'preloads' => [
+                ['alias' => 'sans', 'family' => 'Inter', 'weight' => 400, 'style' => 'normal', 'file' => 'assets/inter-400.woff2', 'as' => 'font', 'type' => 'font/woff2', 'crossorigin' => 'anonymous'],
+                ['alias' => 'mono', 'family' => 'JetBrains Mono', 'weight' => 400, 'style' => 'normal', 'file' => 'assets/jb-400.woff2', 'as' => 'font', 'type' => 'font/woff2', 'crossorigin' => 'anonymous'],
+                ['alias' => 'heading', 'family' => 'Playfair Display', 'weight' => 400, 'style' => 'normal', 'file' => 'assets/playfair-400.woff2', 'as' => 'font', 'type' => 'font/woff2', 'crossorigin' => 'anonymous'],
+            ],
+            'families' => [
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
+                'mono' => ['family' => 'JetBrains Mono', 'variable' => '--font-mono'],
+                'heading' => ['family' => 'Playfair Display', 'variable' => '--font-heading'],
+            ],
+        ]);
+        $this->makeFontsCssFile('build', 'assets/fonts-abc123.css', 'full-css');
+
+        $result = app(Vite::class)->fonts(['sans', 'mono'])->toHtml();
+
+        $this->assertStringContainsString('inter-400.woff2', $result);
+        $this->assertStringContainsString('jb-400.woff2', $result);
+        $this->assertStringNotContainsString('playfair-400.woff2', $result);
+        $this->assertStringContainsString('font-family: "Inter"', $result);
+        $this->assertStringContainsString('font-family: "JetBrains Mono"', $result);
+        $this->assertStringNotContainsString('Playfair Display', $result);
+        $this->assertStringContainsString('--font-sans:', $result);
+        $this->assertStringContainsString('--font-mono:', $result);
+        $this->assertStringNotContainsString('--font-heading:', $result);
+    }
+
+    public function testFontsDuplicateFamilyWithDifferentAliasesRenderIndependently()
+    {
+        $this->makeFontsManifest([
+            'version' => 1,
+            'style' => [
+                'file' => 'assets/fonts-abc123.css',
+                'familyStyles' => [
+                    'sans' => "@font-face { font-family: \"Inter\"; font-weight: 400; }",
+                    'heading' => "@font-face { font-family: \"Inter\"; font-weight: 700; }",
+                ],
+                'variables' => ":root {\n  --font-sans: \"Inter\";\n  --font-heading: \"Inter\";\n}",
+            ],
+            'preloads' => [
+                ['alias' => 'sans', 'family' => 'Inter', 'weight' => 400, 'style' => 'normal', 'file' => 'assets/inter-400.woff2', 'as' => 'font', 'type' => 'font/woff2', 'crossorigin' => 'anonymous'],
+                ['alias' => 'heading', 'family' => 'Inter', 'weight' => 700, 'style' => 'normal', 'file' => 'assets/inter-700.woff2', 'as' => 'font', 'type' => 'font/woff2', 'crossorigin' => 'anonymous'],
+            ],
+            'families' => [
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
+                'heading' => ['family' => 'Inter', 'variable' => '--font-heading'],
+            ],
+        ]);
+        $this->makeFontsCssFile('build', 'assets/fonts-abc123.css', 'full-css');
+
+        $result = app(Vite::class)->fonts(['sans'])->toHtml();
+
+        $this->assertStringContainsString('inter-400.woff2', $result);
+        $this->assertStringNotContainsString('inter-700.woff2', $result);
+        $this->assertStringContainsString('font-weight: 400', $result);
+        $this->assertStringNotContainsString('font-weight: 700', $result);
+    }
+
+    public function testFontsRendersUtilityClassWithCustomAlias()
+    {
+        $this->makeFontsManifest([
+            'version' => 1,
+            'style' => [
+                'file' => 'assets/fonts-abc123.css',
+                'familyStyles' => [
+                    'sans' => "@font-face { font-family: \"Inter\"; }\n\n.font-sans {\n  font-family: var(--font-sans);\n}",
                 ],
                 'variables' => ':root { --font-sans: "Inter"; }',
             ],
             'preloads' => [
-                ['family' => 'Inter', 'weight' => 400, 'style' => 'normal', 'file' => 'assets/inter-400.woff2', 'as' => 'font', 'type' => 'font/woff2', 'crossorigin' => 'anonymous'],
+                ['alias' => 'sans', 'family' => 'Inter', 'weight' => 400, 'style' => 'normal', 'file' => 'assets/inter-400.woff2', 'as' => 'font', 'type' => 'font/woff2', 'crossorigin' => 'anonymous'],
             ],
             'families' => [
-                'Inter' => ['variable' => '--font-sans'],
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
             ],
         ]);
         $this->makeFontsCssFile('build', 'assets/fonts-abc123.css', "@font-face { font-family: \"Inter\"; }\n\n.font-sans { font-family: var(--font-sans); }");
@@ -739,12 +816,13 @@ class FoundationViteFontsTest extends TestCase
             'style' => [
                 'file' => 'assets/fonts-abc123.css',
                 'familyStyles' => [
-                    'Inter' => "@font-face { font-family: 'Inter'; }",
+                    'sans' => "@font-face { font-family: 'Inter'; }",
                 ],
-                'variables' => ':root { --font-inter: "Inter"; }',
+                'variables' => ':root { --font-sans: "Inter"; }',
             ],
             'preloads' => [
                 [
+                    'alias' => 'sans',
                     'family' => 'Inter',
                     'weight' => 400,
                     'style' => 'normal',
@@ -755,7 +833,7 @@ class FoundationViteFontsTest extends TestCase
                 ],
             ],
             'families' => [
-                'Inter' => [],
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
             ],
         ];
     }
@@ -767,12 +845,13 @@ class FoundationViteFontsTest extends TestCase
             'style' => [
                 'inline' => "@font-face { font-family: 'Inter'; src: url('http://localhost:3000/fonts/inter.woff2'); }",
                 'familyStyles' => [
-                    'Inter' => "@font-face { font-family: 'Inter'; src: url('http://localhost:3000/fonts/inter.woff2'); }",
+                    'sans' => "@font-face { font-family: 'Inter'; src: url('http://localhost:3000/fonts/inter.woff2'); }",
                 ],
-                'variables' => ':root { --font-inter: "Inter"; }',
+                'variables' => ':root { --font-sans: "Inter"; }',
             ],
             'preloads' => [
                 [
+                    'alias' => 'sans',
                     'family' => 'Inter',
                     'weight' => 400,
                     'style' => 'normal',
@@ -783,7 +862,7 @@ class FoundationViteFontsTest extends TestCase
                 ],
             ],
             'families' => [
-                'Inter' => [],
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
             ],
         ];
     }

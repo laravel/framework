@@ -35,19 +35,19 @@ class ViteFonts
      * Resolve the CSS content from the manifest.
      *
      * @param  array<string, mixed>  $manifest
-     * @param  list<string>|null  $families
+     * @param  list<string>|null  $aliases
      * @param  string  $buildDirectory
      * @return string
      *
      * @throws \Illuminate\Foundation\ViteException
      */
-    public function resolveStyleContent(array $manifest, ?array $families, $buildDirectory)
+    public function resolveStyleContent(array $manifest, ?array $aliases, $buildDirectory)
     {
         $style = $manifest['style'] ?? null;
 
         return match (true) {
             $style === null => '',
-            $families !== null => $this->resolveFilteredStyleContent($style, $families, $manifest['families'] ?? []),
+            $aliases !== null => $this->resolveFilteredStyleContent($style, $aliases, $manifest['families'] ?? []),
             isset($style['inline']) => $style['inline'],
             isset($style['file']) => $this->readStyleFile($buildDirectory, $style['file']),
             default => '',
@@ -55,48 +55,48 @@ class ViteFonts
     }
 
     /**
-     * Resolve filtered CSS content using per-family fragments from the manifest.
+     * Resolve filtered CSS content using per-alias fragments from the manifest.
      *
      * @param  array{inline?: string, file?: string, familyStyles?: array<string, string>, variables?: string}  $style
-     * @param  list<string>  $families
+     * @param  list<string>  $aliases
      * @param  array<string, array<string, string>>  $manifestFamilies
      * @return string
      */
-    protected function resolveFilteredStyleContent(array $style, array $families, array $manifestFamilies)
+    protected function resolveFilteredStyleContent(array $style, array $aliases, array $manifestFamilies)
     {
         $familyStyles = $style['familyStyles'] ?? [];
         $variables = $style['variables'] ?? '';
 
         $parts = [];
 
-        foreach ($families as $family) {
-            if (isset($familyStyles[$family])) {
-                $parts[] = $familyStyles[$family];
+        foreach ($aliases as $alias) {
+            if (isset($familyStyles[$alias])) {
+                $parts[] = $familyStyles[$alias];
             }
         }
 
         if ($variables !== '') {
-            $parts[] = $this->filterVariables($variables, $families, $manifestFamilies);
+            $parts[] = $this->filterVariables($variables, $aliases, $manifestFamilies);
         }
 
         return implode("\n\n", $parts);
     }
 
     /**
-     * Filter a CSS variables block to only include variables for the given families.
+     * Filter a CSS variables block to only include variables for the given aliases.
      *
      * @param  string  $variables
-     * @param  list<string>  $families
+     * @param  list<string>  $aliases
      * @param  array<string, array<string, string>>  $manifestFamilies
      * @return string
      */
-    protected function filterVariables($variables, array $families, array $manifestFamilies)
+    protected function filterVariables($variables, array $aliases, array $manifestFamilies)
     {
         $allowedVariables = [];
 
-        foreach ($families as $family) {
-            if (isset($manifestFamilies[$family]['variable'])) {
-                $allowedVariables[] = $manifestFamilies[$family]['variable'];
+        foreach ($aliases as $alias) {
+            if (isset($manifestFamilies[$alias]['variable'])) {
+                $allowedVariables[] = $manifestFamilies[$alias]['variable'];
             }
         }
 
@@ -178,22 +178,22 @@ class ViteFonts
     }
 
     /**
-     * Validate that the requested families exist in the manifest.
+     * Validate that the requested aliases exist in the manifest.
      *
-     * @param  list<string>  $families
+     * @param  list<string>  $aliases
      * @param  array<string, mixed>  $manifest
      * @return void
      *
      * @throws \Illuminate\Foundation\ViteException
      */
-    public function ensureValidFamilies(array $families, array $manifest)
+    public function ensureValidFamilies(array $aliases, array $manifest)
     {
         $available = array_keys($manifest['families'] ?? []);
 
-        foreach ($families as $family) {
-            if (! in_array($family, $available, true)) {
+        foreach ($aliases as $alias) {
+            if (! in_array($alias, $available, true)) {
                 throw new ViteException(
-                    "Font family [{$family}] is not defined in the font manifest. Available families: ".implode(', ', $available).'.'
+                    "Font alias [{$alias}] is not defined in the font manifest. Available aliases: ".implode(', ', $available).'.'
                 );
             }
         }
@@ -213,12 +213,12 @@ class ViteFonts
         $urlKey = $isHot ? 'url' : 'file';
 
         foreach ($preloads as $index => $preload) {
-            if (! isset($preload['family'])) {
-                throw new ViteException("Font manifest preload entry [{$index}] is missing the [family] key.");
+            if (! isset($preload['alias'])) {
+                throw new ViteException("Font manifest preload entry [{$index}] is missing the [alias] key.");
             }
 
             if (! isset($preload[$urlKey])) {
-                throw new ViteException("Font manifest preload entry [{$index}] for family [{$preload['family']}] is missing the [{$urlKey}] key.");
+                throw new ViteException("Font manifest preload entry [{$index}] for alias [{$preload['alias']}] is missing the [{$urlKey}] key.");
             }
         }
     }

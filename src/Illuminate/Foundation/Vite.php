@@ -1053,15 +1053,15 @@ class Vite implements Htmlable
     /**
      * Render font preload links and inline styles.
      *
-     * @param  list<string>|string|null  $families
+     * @param  list<string>|string|null  $aliases
      * @return \Illuminate\Support\HtmlString
      *
      * @throws \Illuminate\Foundation\ViteException
      */
-    public function fonts($families = null)
+    public function fonts($aliases = null)
     {
-        if (is_string($families)) {
-            $families = [$families];
+        if (is_string($aliases)) {
+            $aliases = [$aliases];
         }
 
         $fonts = $this->viteFonts();
@@ -1075,20 +1075,20 @@ class Vite implements Htmlable
 
         $fonts->ensureValidManifest($manifest);
 
-        if ($families !== null) {
-            $fonts->ensureValidFamilies($families, $manifest);
+        if ($aliases !== null) {
+            $fonts->ensureValidFamilies($aliases, $manifest);
         }
 
         $preloads = $manifest['preloads'] ?? [];
 
-        if ($families !== null) {
-            $preloads = array_filter($preloads, fn ($preload) => in_array($preload['family'] ?? null, $families, true));
+        if ($aliases !== null) {
+            $preloads = array_filter($preloads, fn ($preload) => in_array($preload['alias'] ?? null, $aliases, true));
         }
 
         $fonts->ensureValidPreloads($preloads, $isHot);
 
         $html = $this->renderFontPreloads($preloads, $isHot);
-        $html .= $this->renderFontStyle($manifest, $families);
+        $html .= $this->renderFontStyle($manifest, $aliases);
 
         return new HtmlString($html);
     }
@@ -1162,12 +1162,12 @@ class Vite implements Htmlable
      * Render the inline style block for the font manifest.
      *
      * @param  array<string, mixed>  $manifest
-     * @param  list<string>|null  $families
+     * @param  list<string>|null  $aliases
      * @return string
      */
-    protected function renderFontStyle(array $manifest, ?array $families)
+    protected function renderFontStyle(array $manifest, ?array $aliases)
     {
-        $css = $this->viteFonts()->resolveStyleContent($manifest, $families, $this->buildDirectory);
+        $css = $this->viteFonts()->resolveStyleContent($manifest, $aliases, $this->buildDirectory);
 
         if ($css === '' || $css === null) {
             return '';
