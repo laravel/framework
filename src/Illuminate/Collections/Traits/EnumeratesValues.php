@@ -284,7 +284,7 @@ trait EnumeratesValues
      */
     public function dumpRandom(...$args)
     {
-        dump($this->random(), ...$args);
+        dump($this->isEmpty() ? null : $this->random(), ...$args);
 
         return $this;
     }
