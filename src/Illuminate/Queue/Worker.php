@@ -900,11 +900,7 @@ class Worker
      */
     public function sleep($seconds)
     {
-        if ($seconds < 1) {
-            usleep($seconds * 1_000_000);
-        } else {
-            sleep($seconds);
-        }
+        usleep((int) ($seconds * 1_000_000));
     }
 
     /**
