@@ -16,9 +16,9 @@ class Locked
      * @return void
      */
     public function __construct(
-        public string|null $key = null,
+        public ?string $key = null,
         public int $seconds = 10,
-        public string|null $owner = null
+        public ?string $owner = null
     ) {
     }
 }

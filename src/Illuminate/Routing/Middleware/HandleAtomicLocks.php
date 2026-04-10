@@ -50,7 +50,7 @@ class HandleAtomicLocks
      */
     protected function resolveLockKey($request, $attribute)
     {
-        $baseKey = 'laravel_lock:' . $request->route()->getName();
+        $baseKey = 'laravel_lock:'.$request->route()->getName();
         $userKey = $request->user()?->id ?: $request->ip();
 
         return $attribute->key
