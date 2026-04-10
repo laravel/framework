@@ -18,6 +18,7 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Resend;
+use RuntimeException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
@@ -28,6 +29,7 @@ use Symfony\Component\Mailer\Transport\SendmailTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
+use Throwable;
 
 /**
  * @mixin \Illuminate\Mail\Mailer
@@ -567,10 +569,19 @@ class MailManager implements FactoryContract
      *
      * @param  string  $driver
      * @param  \Closure  $callback
+     *
+     * @param-closure-this  $this  $callback
+     *
      * @return $this
      */
     public function extend($driver, Closure $callback)
     {
+        try {
+            $callback = $callback->bindTo($this, static::class) ?? throw new RuntimeException;
+        } catch (Throwable) {
+            $callback = $callback->bindTo(null, static::class);
+        }
+
         $this->customCreators[$driver] = $callback;
 
         return $this;

@@ -6,6 +6,7 @@ use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
+use stdClass;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 
 class MailManagerTest extends TestCase
@@ -123,6 +124,26 @@ class MailManagerTest extends TestCase
         $this->assertSame('pwd', $transport->getPassword());
         $this->assertSame('127.0.0.2', $transport->getStream()->getHost());
         $this->assertSame(5876, $transport->getStream()->getPort());
+    }
+
+    public function testCustomTransportClosureBoundObjectIsMailManager(): void
+    {
+        $manager = $this->app['mail.manager'];
+
+        $manager->extend('custom', fn ($config) => $this);
+
+        $this->assertSame($manager, $manager->createSymfonyTransport(['transport' => 'custom']));
+    }
+
+    public function testCustomTransportStaticClosure(): void
+    {
+        $transport = new stdClass;
+
+        $manager = $this->app['mail.manager'];
+
+        $manager->extend('custom', static fn ($config) => $transport);
+
+        $this->assertSame($transport, $manager->createSymfonyTransport(['transport' => 'custom']));
     }
 
     public static function emptyTransportConfigDataProvider()
