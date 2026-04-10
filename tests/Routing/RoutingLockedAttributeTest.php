@@ -19,6 +19,7 @@ class RoutingLockedAttributeTest extends TestCase
     {
         Cache::shouldReceive('lock')
             ->once()
+            ->withAnyArgs()
             ->andReturn($lock = \Mockery::mock());
 
         $lock->shouldReceive('get')->once()->andReturn(true);
@@ -30,12 +31,14 @@ class RoutingLockedAttributeTest extends TestCase
         $response = $this->get('/withdraw');
 
         $response->assertOk();
+        $response->assertSee('success');
     }
 
     public function test_route_returns_423_when_locked()
     {
         Cache::shouldReceive('lock')
             ->once()
+            ->withAnyArgs()
             ->andReturn($lock = \Mockery::mock());
 
         $lock->shouldReceive('get')->once()->andReturn(false);
@@ -46,6 +49,24 @@ class RoutingLockedAttributeTest extends TestCase
         $response = $this->get('/withdraw-locked');
 
         $response->assertStatus(423);
+    }
+
+    public function test_it_locks_unnamed_routes_successfully()
+    {
+        Cache::shouldReceive('lock')
+            ->once()
+            ->withAnyArgs()
+            ->andReturn($lock = \Mockery::mock());
+
+        $lock->shouldReceive('get')->once()->andReturn(true);
+        $lock->shouldReceive('release')->once();
+
+        Route::get('/test-unnamed', [LockedControllerStub::class, 'withdraw'])
+            ->middleware(HandleAtomicLocks::class);
+
+        $response = $this->get('/test-unnamed');
+
+        $response->assertOk();
     }
 }
 
