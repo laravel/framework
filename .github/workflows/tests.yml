@@ -168,7 +168,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --with="phpunit/phpunit:~${{ matrix.phpunit }}"
+          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress --ignore-platform-req=ext-sockets --ignore-platform-req=ext-pcntl --with="phpunit/phpunit:~${{ matrix.phpunit }}"
 
       - name: Execute tests
         run: vendor/bin/phpunit --no-coverage
