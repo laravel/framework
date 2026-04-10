@@ -169,6 +169,13 @@ class Route
     public static $validators;
 
     /**
+     * The resolved "Locked" attribute instance for the route.
+     *
+     * @var \Illuminate\Routing\Attributes\Controllers\Locked|null
+     */
+    public $lockedAttribute;
+
+    /**
      * Create a new Route instance.
      *
      * @param  array|string  $methods
@@ -1062,9 +1069,15 @@ class Route
 
         $this->computedMiddleware = [];
 
-        return $this->computedMiddleware = Router::uniqueMiddleware(array_merge(
+        $middleware = array_merge(
             $this->middleware(), $this->controllerMiddleware()
-        ));
+        );
+
+        if ($this->hasLockedAttribute()) {
+            $middleware[] = \Illuminate\Routing\Middleware\HandleAtomicLocks::class;
+        }
+
+        return $this->computedMiddleware = Router::uniqueMiddleware($middleware);
     }
 
     /**
@@ -1461,5 +1474,42 @@ class Route
     public function __get($key)
     {
         return $this->parameter($key);
+    }
+
+    /**
+     * Determine if the route action has the "Locked" attribute.
+     *
+     * @return bool
+     */
+    protected function hasLockedAttribute()
+    {
+        return ! is_null($this->getLockedAttribute());
+    }
+
+    /**
+     * Get the "Locked" attribute instance assigned to the route action.
+     *
+     * @return object|null
+     */
+    public function getLockedAttribute()
+    {
+        return $this->lockedAttribute ??= (function () {
+            $action = $this->getAction();
+
+            if (! is_string($action['uses']) || ! str_contains($action['uses'], '@')) {
+                return null;
+            }
+
+            [$class, $method] = explode('@', $action['uses']);
+
+            if (! class_exists($class) || ! method_exists($class, $method)) {
+                return null;
+            }
+
+            $attributes = (new \ReflectionMethod($class, $method))
+                ->getAttributes(\Illuminate\Routing\Attributes\Controllers\Locked::class);
+
+            return count($attributes) > 0 ? $attributes[0]->newInstance() : null;
+        })();
     }
 }
