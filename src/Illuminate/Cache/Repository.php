@@ -834,17 +834,6 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
-     * Register a callback to be invoked when an unserializable class is encountered.
-     *
-     * @param  callable|null  $callback
-     * @return void
-     */
-    public static function handleUnserializableClassUsing(?callable $callback): void
-    {
-        static::$unserializableClassHandler = $callback;
-    }
-
-    /**
      * Handle a cache value that contains an incomplete class.
      *
      * @param  string  $key
@@ -988,6 +977,17 @@ class Repository implements ArrayAccess, CacheContract
     public function setEventDispatcher(Dispatcher $events)
     {
         $this->events = $events;
+    }
+
+    /**
+     * Register a callback to be invoked when an unserializable class is encountered.
+     *
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public static function handleUnserializableClassUsing(?callable $callback): void
+    {
+        static::$unserializableClassHandler = $callback;
     }
 
     /**
