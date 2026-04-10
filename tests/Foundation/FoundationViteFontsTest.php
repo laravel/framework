@@ -720,9 +720,9 @@ class FoundationViteFontsTest extends TestCase
             'style' => [
                 'file' => 'assets/fonts-abc123.css',
                 'familyStyles' => [
-                    'sans' => "@font-face { font-family: \"Inter\"; }",
-                    'mono' => "@font-face { font-family: \"JetBrains Mono\"; }",
-                    'heading' => "@font-face { font-family: \"Playfair Display\"; }",
+                    'sans' => '@font-face { font-family: "Inter"; }',
+                    'mono' => '@font-face { font-family: "JetBrains Mono"; }',
+                    'heading' => '@font-face { font-family: "Playfair Display"; }',
                 ],
                 'variables' => ":root {\n  --font-sans: \"Inter\";\n  --font-mono: \"JetBrains Mono\";\n  --font-heading: \"Playfair Display\";\n}",
             ],
@@ -817,8 +817,8 @@ class FoundationViteFontsTest extends TestCase
             'style' => [
                 'file' => 'assets/fonts-abc123.css',
                 'familyStyles' => [
-                    'sans' => "@font-face { font-family: \"Inter\"; font-weight: 400; }",
-                    'heading' => "@font-face { font-family: \"Inter\"; font-weight: 700; }",
+                    'sans' => '@font-face { font-family: "Inter"; font-weight: 400; }',
+                    'heading' => '@font-face { font-family: "Inter"; font-weight: 700; }',
                 ],
                 'variables' => ":root {\n  --font-sans: \"Inter\";\n  --font-heading: \"Inter\";\n}",
             ],
