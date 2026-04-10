@@ -123,6 +123,7 @@
         "phpunit/phpunit": "^10.5.35|^11.5.3|^12.0.1",
         "predis/predis": "^2.3|^3.0",
         "resend/resend-php": "^0.10.0|^1.0",
+        "spatie/fork": "^1.2",
         "symfony/cache": "^7.2.0",
         "symfony/http-client": "^7.2.0",
         "symfony/psr-http-message-bridge": "^7.2.0",
