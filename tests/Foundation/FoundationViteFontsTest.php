@@ -759,8 +759,8 @@ class FoundationViteFontsTest extends TestCase
             'style' => [
                 'file' => 'assets/fonts-abc123.css',
                 'familyStyles' => [
-                    'sans' => "@font-face { font-family: \"Inter\"; }",
-                    'mono' => "@font-face { font-family: \"JetBrains Mono\"; }",
+                    'sans' => '@font-face { font-family: "Inter"; }',
+                    'mono' => '@font-face { font-family: "JetBrains Mono"; }',
                 ],
                 'variables' => ':root { --font-sans: "Inter", "Inter fallback"; --font-mono: "JetBrains Mono"; }',
             ],
@@ -788,8 +788,8 @@ class FoundationViteFontsTest extends TestCase
             'style' => [
                 'file' => 'assets/fonts-abc123.css',
                 'familyStyles' => [
-                    'sans' => "@font-face { font-family: \"Inter\"; }",
-                    'mono' => "@font-face { font-family: \"JetBrains Mono\"; }",
+                    'sans' => '@font-face { font-family: "Inter"; }',
+                    'mono' => '@font-face { font-family: "JetBrains Mono"; }',
                 ],
                 'variables' => ':root{--font-sans:"Inter","Inter fallback";--font-mono:"JetBrains Mono";}',
             ],
