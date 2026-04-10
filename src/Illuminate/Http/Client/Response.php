@@ -3,7 +3,9 @@
 namespace Illuminate\Http\Client;
 
 use ArrayAccess;
+use Generator;
 use GuzzleHttp\Psr7\StreamWrapper;
+use GuzzleHttp\Psr7\Utils;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
@@ -161,6 +163,26 @@ class Response implements ArrayAccess, Stringable
     public function resource()
     {
         return StreamWrapper::getResource($this->response->getBody());
+    }
+
+    /**
+     * Get an iterator that yields each line of the response body.
+     *
+     * @return \Generator<int, string>
+     */
+    public function lines(): Generator
+    {
+        $body = $this->response->getBody();
+
+        while (! $body->eof()) {
+            $line = Utils::readLine($body);
+
+            if ($line === '') {
+                continue;
+            }
+
+            yield rtrim($line, "\r\n");
+        }
     }
 
     /**
