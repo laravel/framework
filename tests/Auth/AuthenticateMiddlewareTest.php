@@ -162,6 +162,35 @@ class AuthenticateMiddlewareTest extends TestCase
         $this->assertSame($driver, $this->auth->guard(__CLASS__));
     }
 
+    public function testAuthManagerCanResolveBackedEnumGuard()
+    {
+        $driver = $this->registerAuthDriver('default', true);
+
+        $guard1 = $this->auth->guard(GuardName::Default);
+        $guard2 = $this->auth->guard('default');
+
+        $this->assertSame($guard1, $guard2);
+        $this->assertSame($driver, $guard1);
+    }
+
+    public function testShouldUseAcceptsBackedEnum()
+    {
+        $this->registerAuthDriver('default', true);
+        $secondary = $this->registerAuthDriver('secondary', true);
+
+        $this->auth->shouldUse(GuardName::Secondary);
+
+        $this->assertSame('secondary', $this->auth->getDefaultDriver());
+        $this->assertSame($secondary, $this->auth->guard());
+    }
+
+    public function testSetDefaultDriverAcceptsBackedEnum()
+    {
+        $this->auth->setDefaultDriver(GuardName::Secondary);
+
+        $this->assertSame('secondary', $this->auth->getDefaultDriver());
+    }
+
     /**
      * Create a new config repository instance.
      *
@@ -236,4 +265,10 @@ class AuthenticateMiddlewareTest extends TestCase
 
         $this->assertSame($request, $nextParam);
     }
+}
+
+enum GuardName: string
+{
+    case Default = 'default';
+    case Secondary = 'secondary';
 }
