@@ -18,6 +18,7 @@ use Mockery;
  * @method static void purge(\UnitEnum|string|null $name = null)
  * @method static \Illuminate\Cache\CacheManager extend(string $driver, \Closure $callback)
  * @method static \Illuminate\Cache\CacheManager setApplication(\Illuminate\Contracts\Foundation\Application $app)
+ * @method static void handleUnserializableClassUsing(callable|null $callback)
  * @method static bool has(\UnitEnum|array|string $key)
  * @method static bool missing(\UnitEnum|string $key)
  * @method static mixed get(\UnitEnum|array|string $key, mixed $default = null)
