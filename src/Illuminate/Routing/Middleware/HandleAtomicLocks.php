@@ -5,6 +5,7 @@ namespace Illuminate\Routing\Middleware;
 use Closure;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class HandleAtomicLocks
 {
@@ -30,7 +31,7 @@ class HandleAtomicLocks
      * Handle the request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  \Closure(\Illuminate\Http\Request): \Illuminate\Http\Response  $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
@@ -46,7 +47,7 @@ class HandleAtomicLocks
         $lock = $this->cache->lock($lockKey, $attribute->seconds);
 
         if (! $lock->get()) {
-            throw new \Symfony\Component\HttpKernel\Exception\HttpException(423, 'Locked.');
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(Response::HTTP_LOCKED, 'Locked.');
         }
 
         try {
