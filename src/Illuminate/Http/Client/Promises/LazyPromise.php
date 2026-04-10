@@ -55,6 +55,13 @@ class LazyPromise implements PromiseInterface
         return $this->guzzlePromise;
     }
 
+    /**
+     * Append fulfillment and rejection handlers to the promise.
+     *
+     * @param  callable|null  $onFulfilled
+     * @param  callable|null  $onRejected
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
     #[\Override]
     public function then(?callable $onFulfilled = null, ?callable $onRejected = null): PromiseInterface
     {
@@ -67,6 +74,12 @@ class LazyPromise implements PromiseInterface
         return $this->guzzlePromise->then($onFulfilled, $onRejected);
     }
 
+    /**
+     * Append a rejection handler callback to the promise.
+     *
+     * @param  callable  $onRejected
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
     #[\Override]
     public function otherwise(callable $onRejected): PromiseInterface
     {
@@ -79,6 +92,11 @@ class LazyPromise implements PromiseInterface
         return $this->guzzlePromise->otherwise($onRejected);
     }
 
+    /**
+     * Get the state of the promise.
+     *
+     * @return string
+     */
     #[\Override]
     public function getState(): string
     {
@@ -89,24 +107,53 @@ class LazyPromise implements PromiseInterface
         return $this->guzzlePromise->getState();
     }
 
+    /**
+     * Resolve the promise with the given value.
+     *
+     * @param  mixed  $value
+     * @return void
+     *
+     * @throws \LogicException
+     */
     #[\Override]
     public function resolve($value): void
     {
         throw new \LogicException('Cannot resolve a lazy promise.');
     }
 
+    /**
+     * Reject the promise with the given reason.
+     *
+     * @param  mixed  $reason
+     * @return void
+     *
+     * @throws \LogicException
+     */
     #[\Override]
     public function reject($reason): void
     {
         throw new \LogicException('Cannot reject a lazy promise.');
     }
 
+    /**
+     * Cancel the promise.
+     *
+     * @return void
+     *
+     * @throws \LogicException
+     */
     #[\Override]
     public function cancel(): void
     {
         throw new \LogicException('Cannot cancel a lazy promise.');
     }
 
+    /**
+     * Wait until the promise completes.
+     *
+     * @param  bool  $unwrap
+     * @return mixed
+     */
     #[\Override]
     public function wait(bool $unwrap = true)
     {
