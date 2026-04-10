@@ -332,6 +332,108 @@ class CacheManagerTest extends TestCase
         $this->assertNull($repoWithoutEvents->getEventDispatcher());
     }
 
+    public function testEnumStoreCanBeResolved()
+    {
+        $userConfig = [
+            'cache' => [
+                'stores' => [
+                    'array' => [
+                        'driver' => 'array',
+                    ],
+                ],
+            ],
+        ];
+
+        $app = $this->getApp($userConfig);
+        $cacheManager = new CacheManager($app);
+
+        $store = $cacheManager->store(CacheStoreName::ArrayStore);
+
+        $this->assertInstanceOf(ArrayStore::class, $store->getStore());
+        $this->assertSame($store, $cacheManager->store(CacheStoreName::ArrayStore));
+    }
+
+    public function testEnumDriverCanBeResolved()
+    {
+        $userConfig = [
+            'cache' => [
+                'stores' => [
+                    'array' => [
+                        'driver' => 'array',
+                    ],
+                ],
+            ],
+        ];
+
+        $app = $this->getApp($userConfig);
+        $cacheManager = new CacheManager($app);
+
+        $store = $cacheManager->driver(CacheStoreName::ArrayStore);
+
+        $this->assertInstanceOf(ArrayStore::class, $store->getStore());
+    }
+
+    public function testForgetDriverAcceptsEnum()
+    {
+        $userConfig = [
+            'cache' => [
+                'stores' => [
+                    'array' => [
+                        'driver' => 'array',
+                    ],
+                ],
+            ],
+        ];
+
+        $app = $this->getApp($userConfig);
+        $cacheManager = new CacheManager($app);
+
+        $repo1 = $cacheManager->store(CacheStoreName::ArrayStore);
+        $cacheManager->forgetDriver(CacheStoreName::ArrayStore);
+        $repo2 = $cacheManager->store(CacheStoreName::ArrayStore);
+
+        $this->assertNotSame($repo1, $repo2);
+    }
+
+    public function testPurgeAcceptsEnum()
+    {
+        $userConfig = [
+            'cache' => [
+                'stores' => [
+                    'array' => [
+                        'driver' => 'array',
+                    ],
+                ],
+            ],
+        ];
+
+        $app = $this->getApp($userConfig);
+        $cacheManager = new CacheManager($app);
+
+        $repo1 = $cacheManager->store(CacheStoreName::ArrayStore);
+        $cacheManager->purge(CacheStoreName::ArrayStore);
+        $repo2 = $cacheManager->store(CacheStoreName::ArrayStore);
+
+        $this->assertNotSame($repo1, $repo2);
+    }
+
+    public function testSetDefaultDriverAcceptsEnum()
+    {
+        $userConfig = [
+            'cache' => [
+                'default' => 'old',
+                'stores' => [],
+            ],
+        ];
+
+        $app = $this->getApp($userConfig);
+        $cacheManager = new CacheManager($app);
+
+        $cacheManager->setDefaultDriver(CacheStoreName::ArrayStore);
+
+        $this->assertSame('array', $app->get('config')->get('cache.default'));
+    }
+
     protected function getApp(array $userConfig)
     {
         $app = new Container;
@@ -339,4 +441,9 @@ class CacheManagerTest extends TestCase
 
         return $app;
     }
+}
+
+enum CacheStoreName: string
+{
+    case ArrayStore = 'array';
 }

@@ -14,6 +14,8 @@ use Mockery\LegacyMockInterface;
 use RuntimeException;
 use Throwable;
 
+use function Illuminate\Support\enum_value;
+
 /**
  * @mixin \Illuminate\Cache\Repository
  * @mixin \Illuminate\Contracts\Cache\LockProvider
@@ -54,12 +56,12 @@ class CacheManager implements FactoryContract
     /**
      * Get a cache store instance by name, wrapped in a repository.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return \Illuminate\Contracts\Cache\Repository
      */
     public function store($name = null)
     {
-        $name = $name ?? $this->getDefaultDriver();
+        $name = enum_value($name) ?? $this->getDefaultDriver();
 
         return $this->stores[$name] ??= $this->resolve($name);
     }
@@ -67,7 +69,7 @@ class CacheManager implements FactoryContract
     /**
      * Get a cache driver instance.
      *
-     * @param  string|null  $driver
+     * @param  \UnitEnum|string|null  $driver
      * @return \Illuminate\Contracts\Cache\Repository
      */
     public function driver($driver = null)
@@ -78,12 +80,12 @@ class CacheManager implements FactoryContract
     /**
      * Get a memoized cache driver instance.
      *
-     * @param  string|null  $driver
+     * @param  \UnitEnum|string|null  $driver
      * @return \Illuminate\Contracts\Cache\Repository
      */
     public function memo($driver = null)
     {
-        $driver = $driver ?? $this->getDefaultDriver();
+        $driver = enum_value($driver) ?? $this->getDefaultDriver();
 
         $bindingKey = "cache.__memoized:{$driver}";
 
@@ -478,18 +480,18 @@ class CacheManager implements FactoryContract
     /**
      * Set the default cache driver name.
      *
-     * @param  string  $name
+     * @param  \UnitEnum|string  $name
      * @return void
      */
     public function setDefaultDriver($name)
     {
-        $this->app['config']['cache.default'] = $name;
+        $this->app['config']['cache.default'] = enum_value($name);
     }
 
     /**
      * Unset the given driver instances.
      *
-     * @param  array|string|null  $name
+     * @param  array|\UnitEnum|string|null  $name
      * @return $this
      */
     public function forgetDriver($name = null)
@@ -497,6 +499,8 @@ class CacheManager implements FactoryContract
         $name ??= $this->getDefaultDriver();
 
         foreach ((array) $name as $cacheName) {
+            $cacheName = enum_value($cacheName);
+
             if (isset($this->stores[$cacheName])) {
                 unset($this->stores[$cacheName]);
             }
@@ -508,12 +512,12 @@ class CacheManager implements FactoryContract
     /**
      * Disconnect the given driver and remove from local cache.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return void
      */
     public function purge($name = null)
     {
-        $name ??= $this->getDefaultDriver();
+        $name = enum_value($name) ?? $this->getDefaultDriver();
 
         unset($this->stores[$name]);
     }
