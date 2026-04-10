@@ -3,8 +3,8 @@
 namespace Illuminate\Routing\Middleware;
 
 use Closure;
-use Illuminate\Http\Request;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
+use Illuminate\Http\Request;
 
 class HandleAtomicLocks
 {
