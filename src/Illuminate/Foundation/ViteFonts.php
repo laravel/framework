@@ -104,34 +104,27 @@ class ViteFonts
             return '';
         }
 
-        $lines = explode("\n", $variables);
-        $filtered = [];
-
-        foreach ($lines as $line) {
-            $trimmed = trim($line);
-
-            if ($trimmed === ':root {' || $trimmed === '}') {
-                $filtered[] = $line;
-
-                continue;
-            }
-
-            foreach ($allowedVariables as $variable) {
-                if (str_contains($trimmed, $variable.':')) {
-                    $filtered[] = $line;
-
-                    break;
-                }
-            }
-        }
-
-        $result = implode("\n", $filtered);
-
-        if (trim($result) === ':root {' || trim($result) === '}' || trim($result) === ":root {\n}") {
+        if (! preg_match('/:root\s*\{(.*)\}/s', $variables, $match)) {
             return '';
         }
 
-        return $result;
+        preg_match_all('/(--[^:]+):\s*([^;]+);/', $match[1], $declarations, PREG_SET_ORDER);
+
+        $filtered = [];
+
+        foreach ($declarations as $declaration) {
+            $varName = trim($declaration[1]);
+
+            if (in_array($varName, $allowedVariables, true)) {
+                $filtered[] = '  '.trim($declaration[1]).': '.trim($declaration[2]).';';
+            }
+        }
+
+        if (empty($filtered)) {
+            return '';
+        }
+
+        return ":root {\n".implode("\n", $filtered)."\n}";
     }
 
     /**

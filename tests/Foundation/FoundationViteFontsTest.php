@@ -752,6 +752,64 @@ class FoundationViteFontsTest extends TestCase
         $this->assertStringNotContainsString('--font-heading:', $result);
     }
 
+    public function testFontsFiltersByAliasWithSingleLineVariables()
+    {
+        $this->makeFontsManifest([
+            'version' => 1,
+            'style' => [
+                'file' => 'assets/fonts-abc123.css',
+                'familyStyles' => [
+                    'sans' => "@font-face { font-family: \"Inter\"; }",
+                    'mono' => "@font-face { font-family: \"JetBrains Mono\"; }",
+                ],
+                'variables' => ':root { --font-sans: "Inter", "Inter fallback"; --font-mono: "JetBrains Mono"; }',
+            ],
+            'preloads' => [
+                ['alias' => 'sans', 'family' => 'Inter', 'weight' => 400, 'style' => 'normal', 'file' => 'assets/inter-400.woff2', 'as' => 'font', 'type' => 'font/woff2', 'crossorigin' => 'anonymous'],
+                ['alias' => 'mono', 'family' => 'JetBrains Mono', 'weight' => 400, 'style' => 'normal', 'file' => 'assets/jb-400.woff2', 'as' => 'font', 'type' => 'font/woff2', 'crossorigin' => 'anonymous'],
+            ],
+            'families' => [
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
+                'mono' => ['family' => 'JetBrains Mono', 'variable' => '--font-mono'],
+            ],
+        ]);
+        $this->makeFontsCssFile('build', 'assets/fonts-abc123.css', 'full-css');
+
+        $result = app(Vite::class)->fonts(['sans'])->toHtml();
+
+        $this->assertStringContainsString('--font-sans:', $result);
+        $this->assertStringNotContainsString('--font-mono:', $result);
+    }
+
+    public function testFontsFiltersByAliasWithMinifiedVariables()
+    {
+        $this->makeFontsManifest([
+            'version' => 1,
+            'style' => [
+                'file' => 'assets/fonts-abc123.css',
+                'familyStyles' => [
+                    'sans' => "@font-face { font-family: \"Inter\"; }",
+                    'mono' => "@font-face { font-family: \"JetBrains Mono\"; }",
+                ],
+                'variables' => ':root{--font-sans:"Inter","Inter fallback";--font-mono:"JetBrains Mono";}',
+            ],
+            'preloads' => [
+                ['alias' => 'sans', 'family' => 'Inter', 'weight' => 400, 'style' => 'normal', 'file' => 'assets/inter-400.woff2', 'as' => 'font', 'type' => 'font/woff2', 'crossorigin' => 'anonymous'],
+                ['alias' => 'mono', 'family' => 'JetBrains Mono', 'weight' => 400, 'style' => 'normal', 'file' => 'assets/jb-400.woff2', 'as' => 'font', 'type' => 'font/woff2', 'crossorigin' => 'anonymous'],
+            ],
+            'families' => [
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
+                'mono' => ['family' => 'JetBrains Mono', 'variable' => '--font-mono'],
+            ],
+        ]);
+        $this->makeFontsCssFile('build', 'assets/fonts-abc123.css', 'full-css');
+
+        $result = app(Vite::class)->fonts(['sans'])->toHtml();
+
+        $this->assertStringContainsString('--font-sans:', $result);
+        $this->assertStringNotContainsString('--font-mono:', $result);
+    }
+
     public function testFontsDuplicateFamilyWithDifferentAliasesRenderIndependently()
     {
         $this->makeFontsManifest([
