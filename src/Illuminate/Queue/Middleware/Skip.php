@@ -18,7 +18,7 @@ class Skip
      *
      * @param  bool|(\Closure(): bool)  $condition
      */
-    public static function when(Closure|bool $condition): self
+    public static function when(Closure|bool $condition): static
     {
         return new static(value($condition));
     }
@@ -28,7 +28,7 @@ class Skip
      *
      * @param  bool|(\Closure(): bool)  $condition
      */
-    public static function unless(Closure|bool $condition): self
+    public static function unless(Closure|bool $condition): static
     {
         return new static(! value($condition));
     }
