@@ -7,7 +7,7 @@ use Closure;
 class Skip
 {
     /**
-     * @param  bool  Whether the job should be skipped.
+     * @param  bool  $param  Whether the job should be skipped.
      */
     public function __construct(protected bool $skip = false)
     {
