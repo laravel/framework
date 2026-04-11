@@ -557,7 +557,7 @@ class MailManager implements FactoryContract
      */
     public function purge($name = null)
     {
-        $name = $name ?: $this->getDefaultDriver();
+        $name ??= $this->getDefaultDriver();
 
         unset($this->mailers[$name]);
     }
