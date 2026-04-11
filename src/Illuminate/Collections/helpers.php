@@ -160,7 +160,13 @@ if (! function_exists('data_set')) {
                     $target[$segment] = [];
                 }
 
-                data_set($target[$segment], $segments, $value, $overwrite);
+                if (is_object($target)) {
+                    $valueAtKey = $target[$segment];
+                    data_set($valueAtKey, $segments, $value, $overwrite);
+                    $target[$segment] = $valueAtKey;
+                } else {
+                    data_set($target[$segment], $segments, $value, $overwrite);
+                }
             } elseif ($overwrite || ! Arr::exists($target, $segment)) {
                 $target[$segment] = $value;
             }
@@ -170,7 +176,9 @@ if (! function_exists('data_set')) {
                     $target->{$segment} = [];
                 }
 
-                data_set($target->{$segment}, $segments, $value, $overwrite);
+                $valueAtKey = $target->{$segment};
+                data_set($valueAtKey, $segments, $value, $overwrite);
+                $target->{$segment} = $valueAtKey;
             } elseif ($overwrite || ! isset($target->{$segment})) {
                 $target->{$segment} = $value;
             }

@@ -89,10 +89,29 @@ class ValidationData
         $value = Arr::get($masterData, $attribute, '__missing__');
 
         if ($value !== '__missing__') {
-            Arr::set($results, $attribute, $value);
+            Arr::set($results, $attribute, static::arrayify($value));
         }
 
         return $results;
+    }
+
+    /**
+     * Convert the given value to an array recursively.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected static function arrayify(mixed $value): mixed
+    {
+        if (is_array($value)) {
+            foreach ($value as $key => $item) {
+                $value[$key] = static::arrayify($item);
+            }
+        } elseif ($value instanceof \Illuminate\Contracts\Support\Arrayable) {
+            $value = static::arrayify($value->toArray());
+        }
+
+        return $value;
     }
 
     /**
