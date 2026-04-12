@@ -5,7 +5,9 @@ namespace Illuminate\Console\View\Components;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\QuestionHelper;
 use ReflectionClass;
+use ReflectionProperty;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 
 use function Termwind\render;
 use function Termwind\renderUsing;
@@ -129,6 +131,12 @@ abstract class Component
     protected function resolveOutput($output)
     {
         if (! $output instanceof OutputStyle) {
+            return $output;
+        }
+
+        $property = new ReflectionProperty(OutputStyle::class, 'output');
+
+        if (! $property->isInitialized($output) || ! $property->getValue($output) instanceof ConsoleOutputInterface) {
             return $output;
         }
 
