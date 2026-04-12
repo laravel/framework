@@ -10,6 +10,8 @@ use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Attributes\Config;
+use Illuminate\Container\Attributes\FromHeader;
+use Illuminate\Container\Attributes\FromQuery;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Support\Responsable;
@@ -674,6 +676,81 @@ class RoutingRouteTest extends TestCase
             return $bar;
         })->defaults('bar', 'foo');
         $this->assertSame('foo', $router->dispatch(Request::create('foo', 'GET'))->getContent());
+    }
+
+    public function testFromQueryAttributeResolvesQueryStringValuesOnControllerActions()
+    {
+        $container = new Container;
+        $router = $this->getRouter($container);
+        $router->get('search', RouteTestControllerWithFromQueryStub::class.'@search');
+
+        $request = Request::create('search?sort=desc&per_page=50', 'GET');
+        $container->instance('request', $request);
+
+        $response = $router->dispatch($request);
+
+        $this->assertSame('sort=desc per_page=50', $response->getContent());
+    }
+
+    public function testFromQueryAttributeReturnsDefaultWhenQueryStringMissing()
+    {
+        $container = new Container;
+        $router = $this->getRouter($container);
+        $router->get('search', RouteTestControllerWithFromQueryStub::class.'@search');
+
+        $request = Request::create('search', 'GET');
+        $container->instance('request', $request);
+
+        $response = $router->dispatch($request);
+
+        $this->assertSame('sort=asc per_page=25', $response->getContent());
+    }
+
+    public function testFromQueryAttributeWorksOnRouteClosures()
+    {
+        $container = new Container;
+        $router = $this->getRouter($container);
+        $router->get('search', function (#[FromQuery('q')] ?string $q = null) {
+            return $q ?? 'empty';
+        });
+
+        $request = Request::create('search?q=laravel', 'GET');
+        $container->instance('request', $request);
+        $this->assertSame('laravel', $router->dispatch($request)->getContent());
+
+        $request = Request::create('search', 'GET');
+        $container->instance('request', $request);
+        $this->assertSame('empty', $router->dispatch($request)->getContent());
+    }
+
+    public function testFromHeaderAttributeResolvesRequestHeadersOnControllerActions()
+    {
+        $container = new Container;
+        $router = $this->getRouter($container);
+        $router->get('api/me', RouteTestControllerWithFromHeaderStub::class.'@me');
+
+        $request = Request::create('api/me', 'GET');
+        $request->headers->set('X-Tenant-Id', 'tenant-42');
+        $request->headers->set('X-Api-Version', '2');
+        $container->instance('request', $request);
+
+        $response = $router->dispatch($request);
+
+        $this->assertSame('tenant=tenant-42 version=2', $response->getContent());
+    }
+
+    public function testFromHeaderAttributeReturnsDefaultWhenHeaderMissing()
+    {
+        $container = new Container;
+        $router = $this->getRouter($container);
+        $router->get('api/me', RouteTestControllerWithFromHeaderStub::class.'@me');
+
+        $request = Request::create('api/me', 'GET');
+        $container->instance('request', $request);
+
+        $response = $router->dispatch($request);
+
+        $this->assertSame('tenant=default-tenant version=1', $response->getContent());
     }
 
     public function testControllerCallActionMethodParameters()
@@ -2321,6 +2398,26 @@ class RouteTestControllerWithParameterStub extends Controller
     public function returnParameter($bar = '')
     {
         return $bar;
+    }
+}
+
+class RouteTestControllerWithFromQueryStub extends Controller
+{
+    public function search(
+        #[FromQuery('sort', 'asc')] string $sort,
+        #[FromQuery('per_page', 25)] int $perPage,
+    ) {
+        return 'sort='.$sort.' per_page='.$perPage;
+    }
+}
+
+class RouteTestControllerWithFromHeaderStub extends Controller
+{
+    public function me(
+        #[FromHeader('X-Tenant-Id', 'default-tenant')] string $tenantId,
+        #[FromHeader('X-Api-Version', 1)] int $apiVersion,
+    ) {
+        return 'tenant='.$tenantId.' version='.$apiVersion;
     }
 }
 

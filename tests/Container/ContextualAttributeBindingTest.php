@@ -14,6 +14,8 @@ use Illuminate\Container\Attributes\Config;
 use Illuminate\Container\Attributes\Context;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Container\Attributes\Database;
+use Illuminate\Container\Attributes\FromHeader;
+use Illuminate\Container\Attributes\FromQuery;
 use Illuminate\Container\Attributes\Give;
 use Illuminate\Container\Attributes\Log;
 use Illuminate\Container\Attributes\RouteParameter;
@@ -234,6 +236,42 @@ class ContextualAttributeBindingTest extends TestCase
         });
 
         $container->make(RouteParameterTest::class);
+    }
+
+    public function testFromQueryAttribute()
+    {
+        $container = new Container;
+        $container->singleton('request', function () {
+            $request = m::mock(Request::class);
+            $request->shouldReceive('query')->with('sort', null)->andReturn('asc');
+            $request->shouldReceive('query')->with('per_page', 25)->andReturn(50);
+            $request->shouldReceive('query')->with('missing', 'fallback')->andReturn('fallback');
+
+            return $request;
+        });
+
+        $instance = $container->make(FromQueryTest::class);
+
+        $this->assertSame('asc', $instance->sort);
+        $this->assertSame(50, $instance->perPage);
+        $this->assertSame('fallback', $instance->missing);
+    }
+
+    public function testFromHeaderAttribute()
+    {
+        $container = new Container;
+        $container->singleton('request', function () {
+            $request = m::mock(Request::class);
+            $request->shouldReceive('header')->with('X-Tenant-Id', null)->andReturn('tenant-42');
+            $request->shouldReceive('header')->with('X-Requested-With', 'default')->andReturn('default');
+
+            return $request;
+        });
+
+        $instance = $container->make(FromHeaderTest::class);
+
+        $this->assertSame('tenant-42', $instance->tenantId);
+        $this->assertSame('default', $instance->requestedWith);
     }
 
     public function testContextAttribute(): void
@@ -537,6 +575,25 @@ final class RouteParameterTest
 {
     public function __construct(#[RouteParameter('foo')] Model $foo, #[RouteParameter('bar')] string $bar)
     {
+    }
+}
+
+final class FromQueryTest
+{
+    public function __construct(
+        #[FromQuery('sort')] public readonly string $sort,
+        #[FromQuery('per_page', 25)] public readonly int $perPage,
+        #[FromQuery('missing', 'fallback')] public readonly string $missing,
+    ) {
+    }
+}
+
+final class FromHeaderTest
+{
+    public function __construct(
+        #[FromHeader('X-Tenant-Id')] public readonly string $tenantId,
+        #[FromHeader('X-Requested-With', 'default')] public readonly string $requestedWith,
+    ) {
     }
 }
 
