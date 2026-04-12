@@ -125,10 +125,54 @@ class MailManagerTest extends TestCase
         $this->assertSame(5876, $transport->getStream()->getPort());
     }
 
+    public function testMailManagerCanResolveBackedEnumMailer(): void
+    {
+        $this->app['config']->set('mail.mailers.array', [
+            'transport' => 'array',
+        ]);
+
+        $mailer1 = $this->app['mail.manager']->mailer(MailerName::ArrayMailer);
+        $mailer2 = $this->app['mail.manager']->mailer('array');
+
+        $this->assertSame($mailer1, $mailer2);
+    }
+
+    public function testMailManagerCanResolveBackedEnumDriver(): void
+    {
+        $this->app['config']->set('mail.mailers.array', [
+            'transport' => 'array',
+        ]);
+
+        $mailer1 = $this->app['mail.manager']->driver(MailerName::ArrayMailer);
+        $mailer2 = $this->app['mail.manager']->driver('array');
+
+        $this->assertSame($mailer1, $mailer2);
+    }
+
+    public function testPurgeAcceptsBackedEnum(): void
+    {
+        $this->app['config']->set('mail.mailers.array', [
+            'transport' => 'array',
+        ]);
+
+        $manager = $this->app['mail.manager'];
+
+        $mailer1 = $manager->mailer(MailerName::ArrayMailer);
+        $manager->purge(MailerName::ArrayMailer);
+        $mailer2 = $manager->mailer(MailerName::ArrayMailer);
+
+        $this->assertNotSame($mailer1, $mailer2);
+    }
+
     public static function emptyTransportConfigDataProvider()
     {
         return [
             [null], [''], [' '],
         ];
     }
+}
+
+enum MailerName: string
+{
+    case ArrayMailer = 'array';
 }
