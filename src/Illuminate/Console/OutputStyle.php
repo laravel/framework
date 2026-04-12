@@ -4,12 +4,20 @@ namespace Illuminate\Console;
 
 use Illuminate\Console\Contracts\NewLineAware;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 class OutputStyle extends SymfonyStyle implements NewLineAware
 {
+    /**
+     * The input instance.
+     *
+     * @var \Symfony\Component\Console\Input\InputInterface
+     */
+    private $input;
+
     /**
      * The output instance.
      *
@@ -43,6 +51,7 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
      */
     public function __construct(InputInterface $input, OutputInterface $output)
     {
+        $this->input = $input;
         $this->output = $output;
 
         parent::__construct($input, $output);
@@ -194,5 +203,19 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
     public function getOutput()
     {
         return $this->output;
+    }
+
+    /**
+     * Get an output style instance that writes to the error output when available.
+     *
+     * @return static
+     */
+    public function errorStyle()
+    {
+        if (! $this->output instanceof ConsoleOutputInterface) {
+            return $this;
+        }
+
+        return new static($this->input, $this->output->getErrorOutput());
     }
 }

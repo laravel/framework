@@ -33,7 +33,7 @@ abstract class Component
      */
     public function __construct($output)
     {
-        $this->output = $output;
+        $this->output = $this->resolveOutput($output);
     }
 
     /**
@@ -118,5 +118,20 @@ abstract class Component
         } finally {
             $property->setValue($this->output, $currentHelper);
         }
+    }
+
+    /**
+     * Resolve the output instance used by the component.
+     *
+     * @param  mixed  $output
+     * @return mixed
+     */
+    protected function resolveOutput($output)
+    {
+        if (! $output instanceof OutputStyle) {
+            return $output;
+        }
+
+        return $output->errorStyle();
     }
 }

@@ -6,6 +6,9 @@ use Illuminate\Console\OutputStyle;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Console\Output\ConsoleSectionOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class OutputStyleTest extends TestCase
 {
@@ -70,5 +73,61 @@ class OutputStyleTest extends TestCase
 
         $style->writeln('Foo', OutputStyle::VERBOSITY_VERBOSE);
         $this->assertTrue($style->newLineWritten());
+    }
+
+    public function testErrorStyleReturnsSameInstanceWhenErrorOutputIsUnavailable()
+    {
+        $style = new OutputStyle(new ArrayInput([]), new BufferedOutput());
+
+        $this->assertSame($style, $style->errorStyle());
+    }
+
+    public function testErrorStyleUsesErrorOutputWhenAvailable()
+    {
+        $output = new TestConsoleOutput;
+        $style = new OutputStyle(new ArrayInput([]), $output);
+
+        $errorStyle = $style->errorStyle();
+        $errorStyle->writeln('Laravel');
+
+        $this->assertSame('', $output->fetch());
+        $this->assertStringContainsString('Laravel', $output->errorOutput()->fetch());
+    }
+}
+
+class TestConsoleOutput extends BufferedOutput implements ConsoleOutputInterface
+{
+    /**
+     * The error output instance.
+     *
+     * @var \Symfony\Component\Console\Output\BufferedOutput
+     */
+    protected $errorOutput;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->errorOutput = new BufferedOutput();
+    }
+
+    public function getErrorOutput(): OutputInterface
+    {
+        return $this->errorOutput;
+    }
+
+    public function setErrorOutput(OutputInterface $error): void
+    {
+        $this->errorOutput = $error;
+    }
+
+    public function section(): ConsoleSectionOutput
+    {
+        throw new \BadMethodCallException('Sections are not required for this test.');
+    }
+
+    public function errorOutput(): BufferedOutput
+    {
+        return $this->errorOutput;
     }
 }
