@@ -1449,6 +1449,7 @@ class Route
 
         $this->compileRoute();
 
+        /** @phpstan-ignore-next-line */
         unset($this->router, $this->container);
     }
 

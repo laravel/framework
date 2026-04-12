@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationIssue59650Test extends TestCase
 {
-    public function testValidationDoesNotModifyOriginalEloquentModelsInNestedCollections(): void
+    public function testValidationDoesNotModifyOriginalEloquentModelsInNestedCollections()
     {
         $person1 = new Issue59650Person(['email' => 'user1@example.com']);
         $person2 = new Issue59650Person(['email' => 'user2@example.com']);
@@ -51,7 +51,7 @@ class ValidationIssue59650Test extends TestCase
         $this->assertEquals('user1@example.com', $person1->email);
     }
 
-    public function testIndirectModificationOfOverloadedPropertyErrorIsFixed(): void
+    public function testIndirectModificationOfOverloadedPropertyErrorIsFixed()
     {
         $person = new Issue59650Person(['email' => 'user@example.com']);
         $ticket = new Issue59650Ticket(['departure' => 'NYC']);
