@@ -50,6 +50,16 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     protected $convertedFiles;
 
     /**
+     * The raw Symfony file bag snapshot that produced the cached converted files.
+     *
+     * Used to invalidate the converted files cache when the underlying file
+     * bag is mutated after the first call to allFiles().
+     *
+     * @var array<string, \Symfony\Component\HttpFoundation\File\UploadedFile|\Symfony\Component\HttpFoundation\File\UploadedFile[]>|null
+     */
+    protected $rawConvertedFiles;
+
+    /**
      * The user resolver callback.
      *
      * @var \Closure

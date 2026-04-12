@@ -1146,6 +1146,100 @@ class HttpRequestTest extends TestCase
         $this->assertFalse($request->hasFile('bar'));
     }
 
+    public function testAllFilesReflectsFilesAddedAfterFirstCall()
+    {
+        $request = Request::create('/', 'POST', [], [], [
+            'avatar' => [
+                'size' => 500,
+                'name' => 'avatar.jpg',
+                'tmp_name' => __FILE__,
+                'type' => 'image/jpeg',
+                'error' => null,
+            ],
+        ]);
+
+        $first = $request->allFiles();
+        $this->assertArrayHasKey('avatar', $first);
+        $this->assertArrayNotHasKey('banner', $first);
+
+        $request->files->set('banner', new SymfonyUploadedFile(__FILE__, 'banner.jpg', 'image/jpeg', null, true));
+
+        $second = $request->allFiles();
+        $this->assertArrayHasKey('avatar', $second);
+        $this->assertArrayHasKey('banner', $second);
+    }
+
+    public function testAllFilesReflectsFilesReplacedAfterFirstCall()
+    {
+        $request = Request::create('/', 'POST', [], [], [
+            'avatar' => [
+                'size' => 500,
+                'name' => 'original.jpg',
+                'tmp_name' => __FILE__,
+                'type' => 'image/jpeg',
+                'error' => null,
+            ],
+        ]);
+
+        $first = $request->allFiles();
+        $this->assertSame('original.jpg', $first['avatar']->getClientOriginalName());
+
+        $request->files->set('avatar', new SymfonyUploadedFile(__FILE__, 'replacement.jpg', 'image/jpeg', null, true));
+
+        $second = $request->allFiles();
+        $this->assertSame('replacement.jpg', $second['avatar']->getClientOriginalName());
+    }
+
+    public function testAllFilesReflectsFilesRemovedAfterFirstCall()
+    {
+        $request = Request::create('/', 'POST', [], [], [
+            'avatar' => [
+                'size' => 500,
+                'name' => 'avatar.jpg',
+                'tmp_name' => __FILE__,
+                'type' => 'image/jpeg',
+                'error' => null,
+            ],
+            'banner' => [
+                'size' => 800,
+                'name' => 'banner.jpg',
+                'tmp_name' => __FILE__,
+                'type' => 'image/jpeg',
+                'error' => null,
+            ],
+        ]);
+
+        $first = $request->allFiles();
+        $this->assertArrayHasKey('avatar', $first);
+        $this->assertArrayHasKey('banner', $first);
+
+        $request->files->remove('banner');
+
+        $second = $request->allFiles();
+        $this->assertArrayHasKey('avatar', $second);
+        $this->assertArrayNotHasKey('banner', $second);
+    }
+
+    public function testAllFilesReturnsCachedResultWhenFilesAreNotMutated()
+    {
+        $request = Request::create('/', 'POST', [], [], [
+            'avatar' => [
+                'size' => 500,
+                'name' => 'avatar.jpg',
+                'tmp_name' => __FILE__,
+                'type' => 'image/jpeg',
+                'error' => null,
+            ],
+        ]);
+
+        $first = $request->allFiles();
+        $second = $request->allFiles();
+
+        // The same UploadedFile instance should be returned on repeated calls
+        // so the cache is preserved when the file bag is not mutated.
+        $this->assertSame($first['avatar'], $second['avatar']);
+    }
+
     public function testServerMethod()
     {
         $request = Request::create('/', 'GET', [], [], [], ['foo' => 'bar']);

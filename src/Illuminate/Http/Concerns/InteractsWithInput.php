@@ -184,7 +184,16 @@ trait InteractsWithInput
     {
         $files = $this->files->all();
 
-        return $this->convertedFiles = $this->convertedFiles ?? $this->convertUploadedFiles($files);
+        // The converted files are cached so repeated calls do not re-wrap each
+        // Symfony UploadedFile. The cache is invalidated whenever the source
+        // file bag is mutated (e.g. by middleware that adds, replaces, or
+        // removes files after the first call to allFiles()).
+        if ($files !== $this->rawConvertedFiles) {
+            $this->rawConvertedFiles = $files;
+            $this->convertedFiles = $this->convertUploadedFiles($files);
+        }
+
+        return $this->convertedFiles;
     }
 
     /**
