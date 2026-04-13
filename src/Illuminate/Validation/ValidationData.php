@@ -2,6 +2,7 @@
 
 namespace Illuminate\Validation;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 
 class ValidationData
@@ -33,13 +34,40 @@ class ValidationData
     {
         $explicitPath = static::getLeadingExplicitAttributePath($attribute);
 
-        $data = static::extractDataFromPath($explicitPath, $masterData);
+        $data = static::initializeAndArrayify(
+            static::extractDataFromPath($explicitPath, $masterData)
+        );
 
         if (! str_contains($attribute, '*') || str_ends_with($attribute, '*')) {
             return $data;
         }
 
         return data_set($data, $attribute, null, true);
+    }
+
+    /**
+     * Recursively convert the given data into a plain array.
+     *
+     * @param  mixed  $data
+     * @return mixed
+     */
+    public static function initializeAndArrayify($data)
+    {
+        if ($data instanceof Arrayable) {
+            $data = $data->toArray();
+        }
+
+        if (! is_array($data)) {
+            return $data;
+        }
+
+        foreach ($data as $key => $value) {
+            if (is_array($value) || $value instanceof Arrayable || $value instanceof \Traversable) {
+                $data[$key] = static::initializeAndArrayify($value);
+            }
+        }
+
+        return $data;
     }
 
     /**
