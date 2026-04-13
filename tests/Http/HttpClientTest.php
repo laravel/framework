@@ -4469,6 +4469,24 @@ class HttpClientTest extends TestCase
         $response->json();
         $this->assertSame(3, $response->bodyCallCount);
     }
+
+    public function testRetryCallbackIsNotCalledForRedirects()
+    {
+         $this->factory->fake([
+            'example.com' => function () use ($factory) {
+                return $factory->response('', 301);
+            },
+        ]);
+        
+        $callbackCalled = false;
+
+        $this->factory->retry(1, 0, function (Exception $exception) use (&$callbackCalled) {
+            $callbackCalled = true;
+            return true;
+        })->get('http://example.com');
+
+        $this->assertFalse($callbackCalled);
+    }
 }
 
 class CustomFactory extends Factory
