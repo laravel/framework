@@ -1051,7 +1051,11 @@ class PendingRequest
                     }
 
                     try {
-                        $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this, $this->request->toPsrRequest()->getMethod()) : true;
+                        $responseException = $response instanceof Response ? $response->toException() : $response;
+
+                        $shouldRetry = ($this->retryWhenCallback && $responseException)
+                            ? call_user_func($this->retryWhenCallback, $responseException, $this)
+                            : true;
                     } catch (Exception $exception) {
                         $shouldRetry = false;
 
