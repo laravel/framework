@@ -717,6 +717,28 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Wrap the given vector distance.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function wrapVectorDistance($value)
+    {
+        return "{$this->wrap($value)} <=> ?";
+    }
+
+    /**
+     * Wrap the given select vector distance.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function wrapSelectVectorDistance($value)
+    {
+        return "{$this->wrap($value)} <=> ?";
+    }
+
+    /**
      * Wrap the given JSON selector.
      *
      * @param  string  $value

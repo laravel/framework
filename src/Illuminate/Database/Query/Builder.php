@@ -16,6 +16,7 @@ use Illuminate\Database\Concerns\ExplainsQueries;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\MariaDbConnection;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
@@ -516,7 +517,7 @@ class Builder implements BuilderContract
         $as = $this->getGrammar()->wrap($as ?? $column.'_distance');
 
         return $this->addSelect(
-            new Expression("({$this->getGrammar()->wrap($column)} <=> ?) as {$as}")
+            new Expression("({$this->getGrammar()->wrapSelectVectorDistance($column)}) as {$as}")
         );
     }
 
@@ -1249,7 +1250,7 @@ class Builder implements BuilderContract
         }
 
         return $this->whereRaw(
-            "({$this->getGrammar()->wrap($column)} <=> ?) <= ?",
+            "({$this->getGrammar()->wrapVectorDistance($column)}) <= ?",
             [
                 json_encode(
                     $vector instanceof Arrayable
@@ -3050,7 +3051,7 @@ class Builder implements BuilderContract
         );
 
         $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
-            'column' => new Expression("({$this->getGrammar()->wrap($column)} <=> ?)"),
+            'column' => new Expression("({$this->getGrammar()->wrapVectorDistance($column)})"),
             'direction' => 'asc',
         ];
 
@@ -4764,7 +4765,11 @@ class Builder implements BuilderContract
      */
     protected function ensureConnectionSupportsVectors()
     {
-        if (! $this->connection instanceof PostgresConnection) {
+        if ($this->connection instanceof MariaDbConnection) {
+            if (version_compare($this->connection->getServerVersion(), '11.8.2', '<')) { 
+                throw new RuntimeException('Vector distance queries are only supported on MariaDB in version 11.8.2 or later.');
+            }
+        } elseif (! $this->connection instanceof PostgresConnection) {
             throw new RuntimeException('Vector distance queries are only supported by Postgres.');
         }
     }

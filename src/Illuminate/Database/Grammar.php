@@ -177,6 +177,30 @@ abstract class Grammar
     }
 
     /**
+     * Wrap the given vector distance.
+     *
+     * @param  string  $value
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function wrapVectorDistance($field)
+    {
+        throw new RuntimeException('This database engine does not support Vector operations.');
+    }
+
+    /**
+     * Wrap the given select vector distance.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function wrapSelectVectorDistance($value)
+    {
+        throw new RuntimeException('This database engine does not support Vector operations.');
+    }
+
+    /**
      * Determine if the given string is a JSON selector.
      *
      * @param  string  $value

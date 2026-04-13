@@ -7,7 +7,7 @@ use Illuminate\Database\Query\JoinLateralClause;
 use RuntimeException;
 
 class MariaDbGrammar extends MySqlGrammar
-{
+{ 
     /**
      * Compile a "lateral join" clause.
      *
@@ -65,5 +65,27 @@ class MariaDbGrammar extends MySqlGrammar
         [$field, $path] = $this->wrapJsonFieldAndPath($value);
 
         return 'json_value('.$field.$path.')';
+    }
+
+    /**
+     * Wrap the given vector distance.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function wrapVectorDistance($value)
+    {
+        return 'vec_distance('.$value.', ?)';
+    }
+
+    /**
+     * Wrap the given select vector distance.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function wrapSelectVectorDistance($value)
+    {
+        return 'vec_distance('.$value.', vec_fromtext(?))';
     }
 }
