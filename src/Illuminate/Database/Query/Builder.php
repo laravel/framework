@@ -4766,7 +4766,7 @@ class Builder implements BuilderContract
     protected function ensureConnectionSupportsVectors()
     {
         if ($this->connection instanceof MariaDbConnection) {
-            if (version_compare($this->connection->getServerVersion(), '11.8.2', '<')) { 
+            if (version_compare($this->connection->getServerVersion(), '11.8.2', '<')) {
                 throw new RuntimeException('Vector distance queries are only supported on MariaDB in version 11.8.2 or later.');
             }
         } elseif (! $this->connection instanceof PostgresConnection) {

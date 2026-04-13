@@ -7,7 +7,7 @@ use Illuminate\Database\Query\JoinLateralClause;
 use RuntimeException;
 
 class MariaDbGrammar extends MySqlGrammar
-{ 
+{
     /**
      * Compile a "lateral join" clause.
      *
