@@ -53,7 +53,7 @@ class AsMariaDbVector implements CastsAttributes
         foreach ($value as $v) {
             if (! is_numeric($v)) {
                 throw new InvalidArgumentException(
-                    "Vector values must be numeric; non-numeric value encountered: ".print_r($v, true)
+                    'Vector values must be numeric; non-numeric value encountered: '.print_r($v, true)
                 );
             }
         }
