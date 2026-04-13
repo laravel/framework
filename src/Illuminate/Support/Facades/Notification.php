@@ -14,7 +14,7 @@ use Illuminate\Support\Testing\Fakes\NotificationFake;
  * @method static string deliversVia()
  * @method static void deliverVia(string $channel)
  * @method static \Illuminate\Notifications\ChannelManager locale(string $locale)
- * @method static mixed driver(string|null $driver = null)
+ * @method static mixed driver(\UnitEnum|string|null $driver = null)
  * @method static \Illuminate\Notifications\ChannelManager extend(string $driver, \Closure $callback)
  * @method static array<string, mixed> getDrivers()
  * @method static \Illuminate\Contracts\Container\Container getContainer()
