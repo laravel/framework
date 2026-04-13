@@ -93,7 +93,7 @@ class MySqlSchemaState extends SchemaState
     {
         $versionInfo = $this->detectClientVersion();
 
-        $command = 'mysqldump '.$this->connectionString($versionInfo).' --no-tablespaces --skip-add-locks --skip-comments --skip-set-charset --tz-utc --column-statistics=0';
+        $command = 'mysqldump '.$this->connectionString($versionInfo).' --no-tablespaces --skip-add-locks --skip-comments --skip-set-charset --tz-utc --column-statistics=0 --single-transaction';
 
         if (! $this->connection->isMaria()) {
             $command .= ' --set-gtid-purged=OFF';

@@ -135,4 +135,29 @@ class DatabaseMariaDbSchemaStateTest extends TestCase
             ],
         ];
     }
+
+    public function testBaseDumpCommandIncludesSingleTransaction(): void
+    {
+        $connection = $this->createMock(MariaDbConnection::class);
+        $connection->method('getConfig')->willReturn([
+            'username' => 'root',
+            'host' => '127.0.0.1',
+            'database' => 'forge',
+        ]);
+
+        $schemaState = $this->getMockBuilder(MariaDbSchemaState::class)
+            ->setConstructorArgs([$connection])
+            ->onlyMethods(['detectClientVersion'])
+            ->getMock();
+
+        $schemaState->method('detectClientVersion')->willReturn([
+            'version' => '11.8.3',
+            'isMariaDb' => true,
+        ]);
+
+        $method = new ReflectionMethod(get_class($schemaState), 'baseDumpCommand');
+        $command = $method->invoke($schemaState);
+
+        self::assertStringContainsString('--single-transaction', $command);
+    }
 }

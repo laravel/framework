@@ -138,6 +138,32 @@ class DatabaseMySqlSchemaStateTest extends TestCase
         ];
     }
 
+    public function testBaseDumpCommandIncludesSingleTransaction(): void
+    {
+        $connection = $this->createMock(MySqlConnection::class);
+        $connection->method('getConfig')->willReturn([
+            'username' => 'root',
+            'host' => '127.0.0.1',
+            'database' => 'forge',
+        ]);
+        $connection->method('isMaria')->willReturn(false);
+
+        $schemaState = $this->getMockBuilder(MySqlSchemaState::class)
+            ->setConstructorArgs([$connection])
+            ->onlyMethods(['detectClientVersion'])
+            ->getMock();
+
+        $schemaState->method('detectClientVersion')->willReturn([
+            'version' => '8.0.0',
+            'isMariaDb' => false,
+        ]);
+
+        $method = new ReflectionMethod(get_class($schemaState), 'baseDumpCommand');
+        $command = $method->invoke($schemaState);
+
+        self::assertStringContainsString('--single-transaction', $command);
+    }
+
     public function testExecuteDumpProcessForDepth()
     {
         $mockProcess = $this->createMock(Process::class);

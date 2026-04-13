@@ -32,7 +32,7 @@ class MariaDbSchemaState extends MySqlSchemaState
     {
         $versionInfo = $this->detectClientVersion();
 
-        $command = 'mariadb-dump '.$this->connectionString($versionInfo).' --no-tablespaces --skip-add-locks --skip-comments --skip-set-charset --tz-utc';
+        $command = 'mariadb-dump '.$this->connectionString($versionInfo).' --no-tablespaces --skip-add-locks --skip-comments --skip-set-charset --tz-utc --single-transaction';
 
         return $command.' "${:LARAVEL_LOAD_DATABASE}"';
     }
