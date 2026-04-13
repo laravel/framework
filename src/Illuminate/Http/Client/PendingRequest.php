@@ -1058,7 +1058,6 @@ class PendingRequest
                             : true;
                     } catch (Exception $exception) {
                         $shouldRetry = false;
-
                         throw $exception;
                     }
 
@@ -1242,7 +1241,7 @@ class PendingRequest
         }
 
         try {
-            $responseException = $response->toException();
+            $responseException = $response instanceof Response ? $response->toException() : $response;
 
             $shouldRetry = ($this->retryWhenCallback && $responseException)
                 ? call_user_func($this->retryWhenCallback, $responseException, $this)
