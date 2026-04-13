@@ -566,6 +566,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     {
         $this->fallback = enum_value($fallback);
     }
+    
     /**
      * Set the loaded translation groups.
      *

@@ -120,6 +120,7 @@ class TranslatorTest extends TestCase
 
         $this->app['translator']->handleMissingKeysUsing(null);
     }
+
     public function testSetLocaleAcceptsBackedEnum()
     {
         $this->app['translator']->setLocale(TranslatorTestLocale::Japanese);
@@ -133,7 +134,6 @@ class TranslatorTest extends TestCase
 
         $this->assertSame('ja', $this->app['translator']->getFallback());
     }
-
 
     #[DataProvider('greetingChoiceDataProvider')]
     public function testItCanHandleChoice(int $count, string $expected, ?string $locale = null)
