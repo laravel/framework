@@ -9,13 +9,12 @@ use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
 use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
 use League\CommonMark\MarkdownConverter;
-use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
-use Ramsey\Uuid\Exception\InvalidUuidStringException;
-use Ramsey\Uuid\Generator\CombGenerator;
-use Ramsey\Uuid\Rfc4122\FieldsInterface;
-use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidFactory;
+use Symfony\Component\Uid\Exception\InvalidArgumentException;
+use Symfony\Component\Uid\MaxUuid;
+use Symfony\Component\Uid\NilUuid;
 use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Uid\UuidV7;
 use Throwable;
 use Traversable;
 use voku\helper\ASCII;
@@ -55,7 +54,7 @@ class Str
     /**
      * The callback that should be used to generate UUIDs.
      *
-     * @var (callable(): \Ramsey\Uuid\UuidInterface)|null
+     * @var (callable(): \Symfony\Component\Uid\Uuid)|null
      */
     protected static $uuidFactory;
 
@@ -652,33 +651,25 @@ class Str
             return false;
         }
 
-        if ($version === null) {
-            return preg_match('/^[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12}$/D', $value) > 0;
+        if (is_null($version)) {
+            return Uuid::isValid($value);
         }
-
-        $factory = new UuidFactory;
 
         try {
-            $factoryUuid = $factory->fromString($value);
-        } catch (InvalidUuidStringException) {
+            $uuid = Uuid::fromString($value);
+        } catch (InvalidArgumentException) {
             return false;
         }
 
-        $fields = $factoryUuid->getFields();
-
-        if (! ($fields instanceof FieldsInterface)) {
-            return false;
-        }
-
-        if ($version === 0 || $version === 'nil') {
-            return $fields->isNil();
+        if ($version === 'nil' || $version === 0) {
+            return $uuid instanceof NilUuid;
         }
 
         if ($version === 'max') {
-            return $fields->isMax();
+            return $uuid instanceof MaxUuid;
         }
 
-        return $fields->getVersion() === $version;
+        return $version === (int) $uuid->toString()[14];
     }
 
     /**
@@ -1922,32 +1913,32 @@ class Str
     /**
      * Generate a UUID (version 4).
      *
-     * @return \Ramsey\Uuid\UuidInterface
+     * @return \Symfony\Component\Uid\Uuid
      */
     public static function uuid()
     {
         return static::$uuidFactory
             ? call_user_func(static::$uuidFactory)
-            : Uuid::uuid4();
+            : Uuid::v4();
     }
 
     /**
      * Generate a UUID (version 7).
      *
      * @param  \DateTimeInterface|null  $time
-     * @return \Ramsey\Uuid\UuidInterface
+     * @return \Symfony\Component\Uid\Uuid
      */
     public static function uuid7($time = null)
     {
         return static::$uuidFactory
             ? call_user_func(static::$uuidFactory)
-            : Uuid::uuid7($time);
+            : new UuidV7(UuidV7::generate($time));
     }
 
     /**
      * Generate a time-ordered UUID.
      *
-     * @return \Ramsey\Uuid\UuidInterface
+     * @return \Symfony\Component\Uid\Uuid
      */
     public static function orderedUuid()
     {
@@ -1955,24 +1946,13 @@ class Str
             return call_user_func(static::$uuidFactory);
         }
 
-        $factory = new UuidFactory;
-
-        $factory->setRandomGenerator(new CombGenerator(
-            $factory->getRandomGenerator(),
-            $factory->getNumberConverter()
-        ));
-
-        $factory->setCodec(new TimestampFirstCombCodec(
-            $factory->getUuidBuilder()
-        ));
-
-        return $factory->uuid4();
+        return static::uuid7();
     }
 
     /**
      * Set the callable that will be used to generate UUIDs.
      *
-     * @param  (callable(): \Ramsey\Uuid\UuidInterface)|null  $factory
+     * @param  (callable(): \Symfony\Component\Uid\Uuid)|null  $factory
      * @return void
      */
     public static function createUuidsUsing(?callable $factory = null)
@@ -1983,8 +1963,8 @@ class Str
     /**
      * Set the sequence that will be used to generate UUIDs.
      *
-     * @param  \Ramsey\Uuid\UuidInterface[]  $sequence
-     * @param  (callable(): \Ramsey\Uuid\UuidInterface)|null  $whenMissing
+     * @param  \Symfony\Component\Uid\Uuid[]  $sequence
+     * @param  (callable(): \Symfony\Component\Uid\Uuid)|null  $whenMissing
      * @return void
      */
     public static function createUuidsUsingSequence(array $sequence, $whenMissing = null)
@@ -2017,8 +1997,8 @@ class Str
     /**
      * Always return the same UUID when generating new UUIDs.
      *
-     * @param  (\Closure(\Ramsey\Uuid\UuidInterface): mixed)|null  $callback
-     * @return \Ramsey\Uuid\UuidInterface
+     * @param  (\Closure(\Symfony\Component\Uid\Uuid): mixed)|null  $callback
+     * @return \Symfony\Component\Uid\Uuid
      */
     public static function freezeUuids(?Closure $callback = null)
     {

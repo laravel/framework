@@ -30,7 +30,7 @@
     },
     "suggest": {
         "illuminate/database": "Required to use the database presence verifier (^13.0).",
-        "ramsey/uuid": "Required to use Validator::validateUuid() (^4.7)."
+        "symfony/uid": "Required to use Validator::validateUuid() or Validator::validateUlid() (^7.4 || ^8.0."
     },
     "minimum-stability": "dev",
     "autoload": {

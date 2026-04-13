@@ -24,7 +24,6 @@
         "illuminate/pipeline": "^13.0",
         "illuminate/support": "^13.0",
         "laravel/serializable-closure": "^2.0.10",
-        "ramsey/uuid": "^4.7",
         "symfony/process": "^7.4.5 || ^8.0.5"
     },
     "suggest": {

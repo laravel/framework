@@ -3,13 +3,12 @@
 namespace Illuminate\Support;
 
 use InvalidArgumentException;
-use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\Uuid;
 
 class BinaryCodec
 {
-    /** @var array<string, array{encode: callable(UuidInterface|Ulid|string|null): ?string, decode: callable(?string): ?string}> */
+    /** @var array<string, array{encode: callable(Uuid|Ulid|string|null): ?string, decode: callable(?string): ?string}> */
     protected static array $customCodecs = [];
 
     /**
@@ -28,7 +27,7 @@ class BinaryCodec
      *
      * @throws \InvalidArgumentException
      */
-    public static function encode(UuidInterface|Ulid|string|null $value, string $format): ?string
+    public static function encode(Uuid|Ulid|string|null $value, string $format): ?string
     {
         if (blank($value)) {
             return null;
@@ -40,9 +39,9 @@ class BinaryCodec
 
         return match ($format) {
             'uuid' => match (true) {
-                $value instanceof UuidInterface => $value->getBytes(),
+                $value instanceof Uuid => $value->toBinary(),
                 self::isBinary($value) => $value,
-                default => Uuid::fromString($value)->getBytes(),
+                default => Uuid::fromString($value)->toBinary(),
             },
             'ulid' => match (true) {
                 $value instanceof Ulid => $value->toBinary(),
@@ -69,7 +68,7 @@ class BinaryCodec
         }
 
         return match ($format) {
-            'uuid' => (self::isBinary($value) ? Uuid::fromBytes($value) : Uuid::fromString($value))->toString(),
+            'uuid' => (string) (self::isBinary($value) ? Uuid::fromBinary($value) : Uuid::fromString($value)),
             'ulid' => (self::isBinary($value) ? Ulid::fromBinary($value) : Ulid::fromString($value))->toString(),
             default => throw new InvalidArgumentException("Format [$format] is invalid."),
         };

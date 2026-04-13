@@ -6,8 +6,8 @@ use Illuminate\Support\BinaryCodec;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Ramsey\Uuid\Uuid;
 use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\Uuid;
 
 class SupportBinaryCodecTest extends TestCase
 {
@@ -85,12 +85,12 @@ class SupportBinaryCodecTest extends TestCase
     {
         $uuid = '550e8400-e29b-41d4-a716-446655440000';
 
-        $this->assertSame(Uuid::fromString($uuid)->getBytes(), BinaryCodec::encode($uuid, 'uuid'));
+        $this->assertSame(Uuid::fromString($uuid)->toBinary(), BinaryCodec::encode($uuid, 'uuid'));
     }
 
     public function testUuidEncodeFromBinary()
     {
-        $bytes = Uuid::fromString('550e8400-e29b-41d4-a716-446655440000')->getBytes();
+        $bytes = Uuid::fromString('550e8400-e29b-41d4-a716-446655440000')->toBinary();
 
         $this->assertSame($bytes, BinaryCodec::encode($bytes, 'uuid'));
     }
@@ -99,13 +99,13 @@ class SupportBinaryCodecTest extends TestCase
     {
         $uuid = Uuid::fromString('550e8400-e29b-41d4-a716-446655440000');
 
-        $this->assertSame($uuid->getBytes(), BinaryCodec::encode($uuid, 'uuid'));
+        $this->assertSame($uuid->toBinary(), BinaryCodec::encode($uuid, 'uuid'));
     }
 
     public function testUuidDecodeFromBinary()
     {
         $uuid = '550e8400-e29b-41d4-a716-446655440000';
-        $bytes = Uuid::fromString($uuid)->getBytes();
+        $bytes = Uuid::fromString($uuid)->toBinary();
 
         $this->assertSame($uuid, BinaryCodec::decode($bytes, 'uuid'));
     }

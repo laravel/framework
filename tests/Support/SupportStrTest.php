@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Tests\Support\Fixtures\StringableObjectStub;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Uid\Uuid;
 use ReflectionClass;
 use ValueError;
 
@@ -1366,9 +1366,9 @@ class SupportStrTest extends TestCase
 
     public function testUuid()
     {
-        $this->assertInstanceOf(UuidInterface::class, Str::uuid());
-        $this->assertInstanceOf(UuidInterface::class, Str::orderedUuid());
-        $this->assertInstanceOf(UuidInterface::class, Str::uuid7());
+        $this->assertInstanceOf(Uuid::class, Str::uuid());
+        $this->assertInstanceOf(Uuid::class, Str::orderedUuid());
+        $this->assertInstanceOf(Uuid::class, Str::uuid7());
     }
 
     public function testAsciiNull()
