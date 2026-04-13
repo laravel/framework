@@ -179,18 +179,21 @@ class Arr
      * @param  iterable  $array
      * @param  string  $prepend
      * @param  int  $depth
+     * @param  bool  $preserveEmptyArrays
      * @return array
      */
-    public static function dot($array, $prepend = '', $depth = INF)
+    public static function dot($array, $prepend = '', $depth = INF, $preserveEmptyArrays = true)
     {
         $results = [];
 
-        $flatten = function ($data, $prefix, $currentDepth) use (&$results, &$flatten, $depth): void {
+        $flatten = function ($data, $prefix, $currentDepth) use (&$results, &$flatten, $depth, $preserveEmptyArrays): void {
             foreach ($data as $key => $value) {
                 $newKey = $prefix.$key;
 
                 if (is_array($value) && ! empty($value) && $currentDepth < $depth) {
                     $flatten($value, $newKey.'.', $currentDepth + 1);
+                } elseif (is_array($value) && empty($value) && ! $preserveEmptyArrays) {
+                    continue;
                 } else {
                     $results[$newKey] = $value;
                 }

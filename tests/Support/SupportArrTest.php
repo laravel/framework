@@ -256,6 +256,30 @@ class SupportArrTest extends TestCase
         ], $array);
     }
 
+    public function testDotOmittingEmptyArrays()
+    {
+        $array = Arr::dot(['foo' => []], '', INF, false);
+        $this->assertSame([], $array);
+
+        $array = Arr::dot(['foo' => ['bar' => []]], '', INF, false);
+        $this->assertSame([], $array);
+
+        $array = Arr::dot(
+            ['foo' => 'bar', 'empty_array' => [], 'user' => ['name' => 'Taylor', 'tags' => []], 'key' => 'value'],
+            '',
+            INF,
+            false,
+        );
+        $this->assertSame([
+            'foo' => 'bar',
+            'user.name' => 'Taylor',
+            'key' => 'value',
+        ], $array);
+
+        $array = Arr::dot(['foo' => ['bar' => []]], '', 1, false);
+        $this->assertSame([], $array);
+    }
+
     public function testDotWithDepth()
     {
         $array = Arr::dot(['user' => ['name' => 'Taylor', 'address' => ['city' => 'Dallas']]], '', 1);
@@ -1713,7 +1737,9 @@ class SupportArrTest extends TestCase
         $this->assertSame($subject, Arr::from($items));
 
         $items = new WeakMap;
-        $items[$temp = new class {}] = 'bar';
+        $items[$temp = new class
+        {
+        }] = 'bar';
         $this->assertSame(['bar'], Arr::from($items));
 
         $this->expectException(InvalidArgumentException::class);
