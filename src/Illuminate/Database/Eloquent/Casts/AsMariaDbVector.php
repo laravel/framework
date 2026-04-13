@@ -71,5 +71,4 @@ class AsMariaDbVector implements CastsAttributes
 
         return new Expression("vec_fromtext('.$vectorString.')");
     }
-
 }
