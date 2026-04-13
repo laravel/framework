@@ -7,8 +7,6 @@ use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
 use Throwable;
 
-use function Illuminate\Support\enum_value;
-
 abstract class Manager
 {
     /**
