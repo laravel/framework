@@ -4,8 +4,11 @@ namespace Illuminate\Support;
 
 use Carbon\Carbon as BaseCarbon;
 use Carbon\CarbonImmutable as BaseCarbonImmutable;
+use Exception;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Dumpable;
+use Symfony\Component\Uid\BinaryUtil;
+use Symfony\Component\Uid\TimeBasedUidInterface;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 
@@ -29,6 +32,16 @@ class Carbon extends BaseCarbon
     {
         if (is_string($id)) {
             $id = Ulid::isValid($id) ? Ulid::fromString($id) : Uuid::fromString($id);
+        }
+
+        if (Str::isUuid($uuid = $id->toString(), 2)) {
+            return static::createFromInterface(
+                BinaryUtil::hexToDateTime('0'.substr($uuid, 15, 3).substr($uuid, 9, 4).'00000000')
+            );
+        }
+
+        if (! $id instanceof TimeBasedUidInterface) {
+            throw new Exception("Not a time-based UUID or ULID: [{$id->toString()}].");
         }
 
         return static::createFromInterface($id->getDateTime());

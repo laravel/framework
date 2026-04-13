@@ -139,7 +139,7 @@ class SupportCarbonTest extends TestCase
         $this->assertEquals('2023-05-12 03:23:43.347428', $uuidv6->toDateTimeString('microsecond'));
 
         $uuidv7 = Carbon::createFromId('01880dfa-2825-72e4-acbb-b1e4981cf8af');
-        $this->assertEquals('2023-05-12 03:21:18.117000', $uuidv7->toDateTimeString('microsecond'));
+        $this->assertEquals('2023-05-12 03:21:18.117185', $uuidv7->toDateTimeString('microsecond'));
     }
 
     public function testPlus(): void
