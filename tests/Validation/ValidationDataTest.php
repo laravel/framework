@@ -10,18 +10,20 @@ class ValidationDataTest extends TestCase
 {
     public function testItDoesNotModifyOriginalEloquentModelsDuringInitialization()
     {
-        $person = new class extends Model {
+        $person = new class extends Model
+        {
             protected $attributes = ['email' => 'test@example.com'];
         };
 
-        $ticket = new class extends Model {
+        $ticket = new class extends Model
+        {
             protected $attributes = ['departure' => 'Colombo'];
         };
 
         $ticket->setRelation('people', collect([$person]));
 
         $data = [
-            'tickets' => collect([$ticket])
+            'tickets' => collect([$ticket]),
         ];
 
         $attribute = 'tickets.*.people.*.email';
@@ -39,7 +41,7 @@ class ValidationDataTest extends TestCase
     {
         $nestedData = collect([
             'user' => collect(['name' => 'Nilukshana']),
-            'tags' => ['php', 'laravel']
+            'tags' => ['php', 'laravel'],
         ]);
 
         $result = ValidationData::initializeAndArrayify($nestedData);
