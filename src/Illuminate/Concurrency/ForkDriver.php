@@ -22,7 +22,7 @@ class ForkDriver implements Driver
         $keys = array_keys($tasks);
         $values = array_values($tasks);
 
-        /** @phpstan-ignore class.notFound */
+        /** @phpstan-ignore class.notFound (spatie/fork is not installed as it is practically incompatible with Windows) */
         $results = Fork::new()->run(...$values);
 
         ksort($results);
