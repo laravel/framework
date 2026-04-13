@@ -13,7 +13,6 @@ use Illuminate\Support\RebindsCallbacksToSelf;
 use InvalidArgumentException;
 use ReflectionException;
 use RuntimeException;
-use Throwable;
 
 use function Illuminate\Support\enum_value;
 

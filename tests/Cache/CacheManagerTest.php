@@ -464,7 +464,9 @@ class CacheManagerTest extends TestCase
 
 class CustomCacheDriver
 {
-    public function __construct(private object $driver) {}
+    public function __construct(private object $driver)
+    {
+    }
 
     public function __invoke()
     {

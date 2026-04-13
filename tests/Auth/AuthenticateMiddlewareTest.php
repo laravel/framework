@@ -283,7 +283,8 @@ enum GuardName: string
     case Secondary = 'secondary';
 }
 
-class CustomAuthDriver {
+class CustomAuthDriver
+{
     public function __construct(private object $driver)
     {
     }

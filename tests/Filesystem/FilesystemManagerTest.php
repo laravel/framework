@@ -291,7 +291,9 @@ class FilesystemManagerTest extends TestCase
 
 class CustomFilesystemDriver
 {
-    public function __construct(private object $driver) {}
+    public function __construct(private object $driver)
+    {
+    }
 
     public function __invoke()
     {

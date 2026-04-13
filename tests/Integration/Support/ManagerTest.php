@@ -43,8 +43,11 @@ class ManagerTest extends TestCase
     }
 }
 
-class CustomDriver {
-    public function __construct(private object $object) {}
+class CustomDriver
+{
+    public function __construct(private object $object)
+    {
+    }
 
     public function __invoke()
     {

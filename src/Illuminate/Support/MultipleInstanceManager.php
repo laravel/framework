@@ -6,7 +6,6 @@ use Closure;
 use InvalidArgumentException;
 use ReflectionException;
 use RuntimeException;
-use Throwable;
 
 abstract class MultipleInstanceManager
 {

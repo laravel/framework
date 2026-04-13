@@ -310,7 +310,9 @@ class TestEventNowRescue implements ShouldBroadcastNow, ShouldRescue
 
 class CustomBroadcastDriver
 {
-    public function __construct(private object $driver) {}
+    public function __construct(private object $driver)
+    {
+    }
 
     public function __invoke()
     {
