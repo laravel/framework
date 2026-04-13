@@ -122,16 +122,16 @@ class TranslatorTest extends TestCase
     }
     public function testSetLocaleAcceptsBackedEnum()
     {
-        $t = new Translator($this->getLoader(), 'en');
-        $t->setLocale(LocaleEnum::Japanese);   // case Japanese = 'ja';
-        $this->assertSame('ja', $t->getLocale());
+        $this->app['translator']->setLocale(TranslatorTestLocale::Japanese);
+
+        $this->assertSame('ja', $this->app['translator']->getLocale());
     }
 
     public function testSetFallbackAcceptsBackedEnum()
     {
-        $t = new Translator($this->getLoader(), 'en');
-        $t->setFallback(LocaleEnum::Japanese);
-        $this->assertSame('ja', $t->getFallback());
+        $this->app['translator']->setFallback(TranslatorTestLocale::Japanese);
+
+        $this->assertSame('ja', $this->app['translator']->getFallback());
     }
 
 
@@ -172,4 +172,10 @@ class TranslatorTest extends TestCase
         yield [0, 'Bonjour :name', 'fr'];
         yield [3, 'Bonjour :name, vous avez :count messages non lus', 'fr'];
     }
+}
+
+enum TranslatorTestLocale: string
+{
+    case English = 'en';
+    case Japanese = 'ja';
 }
