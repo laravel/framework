@@ -2382,6 +2382,31 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testRetryWhenCallbackIsNotInvokedForRedirectResponses()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->sequence()
+                ->push('', 302, ['Location' => 'http://foo.com/redirected'])
+                ->push(['ok'], 200),
+        ]);
+
+        $whenAttempts = 0;
+
+        $response = $this->factory
+            ->withoutRedirecting()
+            ->retry(2, 0, function (Exception $exception) use (&$whenAttempts) {
+                $whenAttempts++;
+
+                return true;
+            }, false)
+            ->get('http://foo.com/get');
+
+        $this->assertTrue($response->redirect());
+        $this->assertSame(0, $whenAttempts);
+
+        $this->factory->assertSentCount(1);
+    }
+
     public function testExceptionThrownInRetryCallbackWithoutRetrying()
     {
         $this->factory->fake([
