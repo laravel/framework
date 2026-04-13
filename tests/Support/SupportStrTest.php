@@ -7,8 +7,8 @@ use Illuminate\Support\Str;
 use Illuminate\Tests\Support\Fixtures\StringableObjectStub;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Uid\Uuid;
 use ReflectionClass;
+use Symfony\Component\Uid\Uuid;
 use ValueError;
 
 class SupportStrTest extends TestCase
