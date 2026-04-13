@@ -4473,9 +4473,7 @@ class HttpClientTest extends TestCase
     public function testRetryCallbackIsNotCalledForRedirects()
     {
          $this->factory->fake([
-            'example.com' => function () use ($factory) {
-                return $factory->response('', 301);
-            },
+            'example.com' => $this->factory->response('', 301),
         ]);
         
         $callbackCalled = false;
