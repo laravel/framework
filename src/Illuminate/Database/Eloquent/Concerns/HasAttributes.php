@@ -88,6 +88,13 @@ trait HasAttributes
     protected $casts = [];
 
     /**
+     * The memoized result of getCasts() for incrementing models.
+     *
+     * @var array|null
+     */
+    protected $castsCache = null;
+
+    /**
      * The attributes that have been cast using custom classes.
      *
      * @var array
@@ -797,6 +804,8 @@ trait HasAttributes
         $casts = $this->ensureCastsAreStringValues($casts);
 
         $this->casts = array_merge($this->casts, $casts);
+
+        $this->castsCache = null;
 
         return $this;
     }
@@ -1712,11 +1721,13 @@ trait HasAttributes
      */
     public function getCasts()
     {
-        if ($this->getIncrementing()) {
-            return array_merge([$this->getKeyName() => $this->getKeyType()], $this->casts);
+        if (! $this->getIncrementing()) {
+            return $this->casts;
         }
 
-        return $this->casts;
+        return $this->castsCache ??= array_merge(
+            [$this->getKeyName() => $this->getKeyType()], $this->casts
+        );
     }
 
     /**

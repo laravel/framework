@@ -3112,6 +3112,31 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInstanceOf(ArrayObject::class, $model->asEnumArrayObjectAttribute);
     }
 
+    public function testGetCastsMemoizesMergedResult()
+    {
+        $model = new EloquentModelCastingStub;
+
+        $first = $model->getCasts();
+        $second = $model->getCasts();
+
+        $this->assertSame($first, $second);
+        $this->assertArrayHasKey($model->getKeyName(), $first);
+    }
+
+    public function testMergeCastsInvalidatesGetCastsCache()
+    {
+        $model = new EloquentModelCastingStub;
+
+        $before = $model->getCasts();
+        $this->assertArrayNotHasKey('foo', $before);
+
+        $model->mergeCasts(['foo' => 'date']);
+
+        $after = $model->getCasts();
+        $this->assertArrayHasKey('foo', $after);
+        $this->assertSame('date', $after['foo']);
+    }
+
     public function testMergeCastsMergesCasts()
     {
         $model = new EloquentModelCastingStub;
