@@ -3112,7 +3112,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInstanceOf(ArrayObject::class, $model->asEnumArrayObjectAttribute);
     }
 
-    public function testGetCastsMemoizesMergedResult()
+    public function testGetCastsReturnsConsistentResultAcrossCalls()
     {
         $model = new EloquentModelCastingStub;
 
@@ -3123,7 +3123,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertArrayHasKey($model->getKeyName(), $first);
     }
 
-    public function testMergeCastsInvalidatesGetCastsCache()
+    public function testGetCastsReflectsMergedCastsAfterMutation()
     {
         $model = new EloquentModelCastingStub;
 

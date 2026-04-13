@@ -88,13 +88,6 @@ trait HasAttributes
     protected $casts = [];
 
     /**
-     * The memoized result of getCasts() for incrementing models.
-     *
-     * @var array|null
-     */
-    protected $castsCache = null;
-
-    /**
      * The attributes that have been cast using custom classes.
      *
      * @var array
@@ -198,6 +191,13 @@ trait HasAttributes
      * @var array
      */
     protected static $castTypeCache = [];
+
+    /**
+     * The cache of the merged casts result for each class's default casts.
+     *
+     * @var array
+     */
+    protected static $mergedCastsCache = [];
 
     /**
      * The encrypter instance that is used to encrypt attributes.
@@ -804,8 +804,6 @@ trait HasAttributes
         $casts = $this->ensureCastsAreStringValues($casts);
 
         $this->casts = array_merge($this->casts, $casts);
-
-        $this->castsCache = null;
 
         return $this;
     }
@@ -1725,9 +1723,25 @@ trait HasAttributes
             return $this->casts;
         }
 
-        return $this->castsCache ??= array_merge(
+        $class = static::class;
+        $snapshot = static::$mergedCastsCache[$class] ?? null;
+
+        if ($snapshot !== null && $snapshot['casts'] === $this->casts) {
+            return $snapshot['result'];
+        }
+
+        $result = array_merge(
             [$this->getKeyName() => $this->getKeyType()], $this->casts
         );
+
+        if ($snapshot === null) {
+            static::$mergedCastsCache[$class] = [
+                'casts' => $this->casts,
+                'result' => $result,
+            ];
+        }
+
+        return $result;
     }
 
     /**
