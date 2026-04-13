@@ -36,13 +36,17 @@ class DebounceLock
      * correctness does not depend on it.
      *
      * @param  mixed  $job
-     * @return string
+     * @param  int|null  $debounceFor
+     * @param  int|null  $maxWait
+     * @return array{owner: string, maxWaitExceeded: bool}
      */
-    public function acquire($job)
+    public function acquire($job, $debounceFor = null, $maxWait = null)
     {
-        $debounceFor = $this->getDebounceDelay($job);
+        $debounceFor = $debounceFor ?? $this->getDebounceDelay($job);
 
         $cache = $this->resolveCache($job);
+        $key = static::getKey($job);
+        $ttl = max($debounceFor * 10, 300);
 
         $owner = Str::random(40);
 
@@ -50,9 +54,27 @@ class DebounceLock
         // not correctness. The token is intentionally left in place after execution
         // to prevent a race where a superseded job sees an empty cache and runs
         // via fail-open.
-        $cache->put(static::getKey($job), $owner, max($debounceFor * 10, 300));
+        $cache->put($key, $owner, $ttl);
 
-        return $owner;
+        $maxWait = $maxWait ?? $this->getMaxDebounceWait($job);
+        $maxWaitExceeded = false;
+
+        if (! is_null($maxWait)) {
+            $timestampKey = $key.':first_dispatched_at';
+
+            if (! $cache->has($timestampKey)) {
+                $cache->put($timestampKey, now()->timestamp, $ttl);
+            } else {
+                $elapsed = now()->timestamp - $cache->get($timestampKey);
+
+                if ($elapsed >= $maxWait) {
+                    $maxWaitExceeded = true;
+                    $cache->forget($timestampKey);
+                }
+            }
+        }
+
+        return ['owner' => $owner, 'maxWaitExceeded' => $maxWaitExceeded];
     }
 
     /**
@@ -112,6 +134,27 @@ class DebounceLock
         return method_exists($job, 'debounceFor')
             ? $job->debounceFor()
             : $this->getAttributeValue($job, DebounceFor::class, 'debounceFor');
+    }
+
+    /**
+     * Get the maximum debounce wait time for the given job.
+     *
+     * @param  mixed  $job
+     * @return int|null
+     */
+    public function getMaxDebounceWait($job)
+    {
+        if (method_exists($job, 'maxDebounceWait')) {
+            return $job->maxDebounceWait();
+        }
+
+        $attributes = (new \ReflectionClass($job))->getAttributes(DebounceFor::class);
+
+        if (count($attributes) > 0) {
+            return $attributes[0]->newInstance()->maxWait;
+        }
+
+        return null;
     }
 
     /**

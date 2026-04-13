@@ -12,6 +12,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\Attributes\DebounceFor;
 use Illuminate\Queue\Events\JobDebounced;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Cache as CacheFacade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use LogicException;
@@ -207,14 +208,142 @@ class DebouncedJobTest extends QueueTestCase
         $jobA = new DebouncedTestJob('entity-1');
         $jobB = new DebouncedTestJob('entity-1');
 
-        $ownerA = $lock->acquire($jobA);
-        $ownerB = $lock->acquire($jobB);
+        $ownerA = $lock->acquire($jobA)['owner'];
+        $ownerB = $lock->acquire($jobB)['owner'];
 
         // Releasing with A's owner should not wipe B's token.
         $lock->release($jobA, $ownerA);
 
         // B should still be the current owner.
         $this->assertTrue($lock->isCurrentOwner($jobB, $ownerB));
+    }
+
+    public function testCallSiteDebounceForOverridesAttribute()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
+        DebouncedTestJob::$handled = false;
+
+        dispatch(new DebouncedTestJob('entity-1'))->debounceFor(10);
+
+        // At 11 seconds the job should be available (call-site 10s, not attribute 30s).
+        $this->travelTo(now()->addSeconds(11));
+        $this->runQueueWorkerCommand(['--once' => true]);
+
+        $this->assertTrue(DebouncedTestJob::$handled);
+    }
+
+    public function testCallSiteDebounceForOnPlainJob()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
+        PlainTestJob::$handled = false;
+
+        dispatch(new PlainTestJob('entity-1'))->debounceFor(5);
+
+        $this->travelTo(now()->addSeconds(6));
+        $this->runQueueWorkerCommand(['--once' => true]);
+
+        $this->assertTrue(PlainTestJob::$handled);
+    }
+
+    public function testSupersededDebouncedJobDoesNotDispatchChain()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['sync', 'beanstalkd']);
+
+        DebouncedTestJob::$handleCount = 0;
+        ChainReceiverJob::$handled = false;
+
+        // First dispatch with a chain — will be superseded.
+        dispatch(new DebouncedTestJob('entity-1'))->chain([new ChainReceiverJob]);
+
+        // Second dispatch supersedes the first (no chain).
+        dispatch(new DebouncedTestJob('entity-1'));
+
+        $this->travelTo(now()->addSeconds(31));
+        $this->runQueueWorkerCommand(['--once' => true], 3);
+
+        // Only the second dispatch should have executed.
+        $this->assertEquals(1, DebouncedTestJob::$handleCount);
+
+        // Chain from superseded job should NOT have been dispatched.
+        $this->assertFalse(ChainReceiverJob::$handled);
+    }
+
+    public function testDebounceViaUsesCustomCacheStore()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
+        DebouncedWithCustomCacheJob::$handled = false;
+
+        dispatch(new DebouncedWithCustomCacheJob('entity-1'));
+
+        $key = DebounceLock::getKey(new DebouncedWithCustomCacheJob('entity-1'));
+
+        // Token should exist in the custom 'array' store.
+        $this->assertNotNull(CacheFacade::store('array')->get($key));
+
+        // Token should NOT exist in the default 'database' store.
+        $this->assertNull(CacheFacade::store('database')->get($key));
+    }
+
+    public function testMaxDebounceWaitForcesImmediateExecution()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
+        DebouncedWithMaxWaitJob::$handleCount = 0;
+
+        // First dispatch at t=0.
+        dispatch(new DebouncedWithMaxWaitJob('entity-1'));
+
+        // Second dispatch at t=50 (within maxWait of 60s).
+        $this->travelTo(now()->addSeconds(50));
+        dispatch(new DebouncedWithMaxWaitJob('entity-1'));
+
+        // Third dispatch at t=61 — exceeds maxWait.
+        $this->travelTo(now()->addSeconds(11));
+        $job = new DebouncedWithMaxWaitJob('entity-1');
+        $pending = dispatch($job);
+        unset($pending);
+
+        // The job should be queued with delay=0 since max wait was exceeded.
+        $this->assertEquals(0, $job->delay);
+    }
+
+    public function testDebounceWithoutMaxWaitAllowsIndefiniteDelay()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
+        // Regular debounced job (no maxWait) — delay should always be the debounce value.
+        $job1 = new DebouncedTestJob('entity-1');
+        $pending = dispatch($job1);
+        unset($pending);
+
+        $this->assertEquals(30, $job1->delay);
+
+        // Dispatch again much later — still gets the full delay.
+        $this->travelTo(now()->addSeconds(600));
+        $job2 = new DebouncedTestJob('entity-1');
+        $pending2 = dispatch($job2);
+        unset($pending2);
+
+        $this->assertEquals(30, $job2->delay);
+    }
+
+    public function testCallSiteMaxDebounceWait()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
+        // First dispatch — sets first_dispatched_at.
+        $p = dispatch(new DebouncedTestJob('entity-1'))->maxDebounceWait(60);
+        unset($p);
+
+        // Dispatch after max wait exceeded.
+        $this->travelTo(now()->addSeconds(61));
+        $job = new DebouncedTestJob('entity-1');
+        dispatch($job)->maxDebounceWait(60);
+
+        $this->assertEquals(0, $job->delay);
     }
 }
 
@@ -312,5 +441,89 @@ class DebouncedWithMethodOverrideJob implements ShouldQueue
     public function handle()
     {
         static::$handled = true;
+    }
+}
+
+class PlainTestJob implements ShouldQueue
+{
+    use InteractsWithQueue, Queueable, Dispatchable;
+
+    public static $handled = false;
+
+    public function __construct(public string $entityId)
+    {
+    }
+
+    public function debounceId(): string
+    {
+        return $this->entityId;
+    }
+
+    public function handle()
+    {
+        static::$handled = true;
+    }
+}
+
+class ChainReceiverJob implements ShouldQueue
+{
+    use InteractsWithQueue, Queueable, Dispatchable;
+
+    public static $handled = false;
+
+    public function handle()
+    {
+        static::$handled = true;
+    }
+}
+
+#[DebounceFor(30)]
+class DebouncedWithCustomCacheJob implements ShouldQueue
+{
+    use InteractsWithQueue, Queueable, Dispatchable;
+
+    public static $handled = false;
+
+    public function __construct(public string $entityId)
+    {
+    }
+
+    public function debounceId(): string
+    {
+        return $this->entityId;
+    }
+
+    public function debounceVia(): \Illuminate\Contracts\Cache\Repository
+    {
+        return \Illuminate\Container\Container::getInstance()
+            ->make(\Illuminate\Contracts\Cache\Factory::class)
+            ->store('array');
+    }
+
+    public function handle()
+    {
+        static::$handled = true;
+    }
+}
+
+#[DebounceFor(30, maxWait: 60)]
+class DebouncedWithMaxWaitJob implements ShouldQueue
+{
+    use InteractsWithQueue, Queueable, Dispatchable;
+
+    public static $handleCount = 0;
+
+    public function __construct(public string $entityId)
+    {
+    }
+
+    public function debounceId(): string
+    {
+        return $this->entityId;
+    }
+
+    public function handle()
+    {
+        static::$handleCount++;
     }
 }

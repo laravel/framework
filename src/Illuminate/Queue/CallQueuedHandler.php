@@ -262,9 +262,6 @@ class CallQueuedHandler
             );
         }
 
-        $this->ensureNextJobInChainIsDispatched($command);
-        $this->ensureSuccessfulBatchJobIsRecorded($command);
-
         $job->delete();
     }
 

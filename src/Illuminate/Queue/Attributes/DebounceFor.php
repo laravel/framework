@@ -10,7 +10,7 @@ class DebounceFor
     /**
      * Create a new attribute instance.
      */
-    public function __construct(public int $debounceFor)
+    public function __construct(public int $debounceFor, public ?int $maxWait = null)
     {
         //
     }

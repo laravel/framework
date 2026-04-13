@@ -31,6 +31,20 @@ class PendingDispatch
     protected $afterResponse = false;
 
     /**
+     * The debounce delay override set at the dispatch site.
+     *
+     * @var int|null
+     */
+    protected $debounceForOverride;
+
+    /**
+     * The max debounce wait override set at the dispatch site.
+     *
+     * @var int|null
+     */
+    protected $maxDebounceWaitOverride;
+
+    /**
      * Create a new pending job dispatch.
      *
      * @param  mixed  $job
@@ -136,6 +150,32 @@ class PendingDispatch
     }
 
     /**
+     * Set the debounce delay for the job at the dispatch site.
+     *
+     * @param  int  $seconds
+     * @return $this
+     */
+    public function debounceFor($seconds)
+    {
+        $this->debounceForOverride = $seconds;
+
+        return $this;
+    }
+
+    /**
+     * Set the maximum time a debounced job can be deferred before it must execute.
+     *
+     * @param  int  $seconds
+     * @return $this
+     */
+    public function maxDebounceWait($seconds)
+    {
+        $this->maxDebounceWaitOverride = $seconds;
+
+        return $this;
+    }
+
+    /**
      * Set the delay for the job to zero seconds.
      *
      * @return $this
@@ -221,14 +261,11 @@ class PendingDispatch
      */
     protected function acquireDebounceLock()
     {
-        if (! method_exists($this->job, 'debounceFor')
+        if (is_null($this->debounceForOverride)
+            && ! method_exists($this->job, 'debounceFor')
             && empty((new \ReflectionClass($this->job))->getAttributes(DebounceFor::class))) {
             return;
         }
-
-        $lock = new DebounceLock(Container::getInstance()->make(Cache::class));
-
-        $debounceFor = $lock->getDebounceDelay($this->job);
 
         if ($this->job instanceof ShouldBeUnique) {
             throw new LogicException(
@@ -237,10 +274,16 @@ class PendingDispatch
             );
         }
 
-        $this->job->debounceOwner = $lock->acquire($this->job);
+        $lock = new DebounceLock(Container::getInstance()->make(Cache::class));
+
+        $debounceFor = $this->debounceForOverride ?? $lock->getDebounceDelay($this->job);
+
+        $result = $lock->acquire($this->job, $debounceFor, $this->maxDebounceWaitOverride);
+
+        $this->job->debounceOwner = $result['owner'];
 
         if (is_null($this->job->delay)) {
-            $this->job->delay = $debounceFor;
+            $this->job->delay = $result['maxWaitExceeded'] ? 0 : $debounceFor;
         }
     }
 
