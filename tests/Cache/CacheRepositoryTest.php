@@ -26,6 +26,7 @@ use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class CacheRepositoryTest extends TestCase
 {
@@ -39,6 +40,7 @@ class CacheRepositoryTest extends TestCase
     protected function tearDown(): void
     {
         Carbon::setTestNow(null);
+        Repository::handleUnserializableClassUsing(null);
 
         parent::tearDown();
     }
@@ -579,6 +581,46 @@ class CacheRepositoryTest extends TestCase
         $cache->put(TestCacheKey::FOO, 5);
         $this->assertSame(6, $cache->increment(TestCacheKey::FOO));
         $this->assertSame(5, $cache->decrement(TestCacheKey::FOO));
+    }
+
+    public function testGetReturnsIncompleteClassWhenNoHandlerRegistered()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(unserialize(serialize(new stdClass), ['allowed_classes' => false]));
+
+        $this->assertInstanceOf(\__PHP_Incomplete_Class::class, $repo->get('foo'));
+    }
+
+    public function testGetCallsHandlerWithKeyAndClassForIncompleteClass()
+    {
+        $class = null;
+        $key = null;
+
+        Repository::handleUnserializableClassUsing(function ($k, $c) use (&$class, &$key) {
+            $key = $k;
+            $class = $c;
+        });
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(unserialize(serialize(new stdClass), ['allowed_classes' => false]));
+        $repo->get('foo');
+
+        $this->assertSame('foo', $key);
+        $this->assertSame('stdClass', $class);
+    }
+
+    public function testManyCallsHandlerForEachIncompleteClass()
+    {
+        $handled = [];
+        Repository::handleUnserializableClassUsing(function ($key, $class) use (&$handled) {
+            $handled[] = $key;
+        });
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('many')->once()->with(['foo', 'bar'])->andReturn(['foo' => unserialize(serialize(new stdClass), ['allowed_classes' => false]), 'bar' => 'baz']);
+        $repo->many(['foo', 'bar']);
+
+        $this->assertSame(['foo'], $handled);
     }
 
     protected function getRepository()

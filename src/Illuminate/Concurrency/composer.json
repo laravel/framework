@@ -21,6 +21,9 @@
         "illuminate/support": "^13.0",
         "laravel/serializable-closure": "^2.0.10"
     },
+    "suggest": {
+        "spatie/fork": "Required to use the 'fork' concurrency driver (^1.2)."
+    },
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {

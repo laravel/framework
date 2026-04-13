@@ -50,4 +50,56 @@ class CustomDriver {
     {
         return $this->object;
     }
+
+    public function testEnumDriverCanBeResolved()
+    {
+        $manager = new NullableManager($this->app);
+        $driver = new stdClass;
+
+        $manager->extend('my_driver', static fn () => $driver);
+        $this->assertSame($driver, $manager->driver(ManagerDriverName::MyDriver));
+    }
+
+    public function testEnumDriverIsCached()
+    {
+        $manager = new NullableManager($this->app);
+
+        $manager->extend('my_driver', static fn () => new stdClass);
+
+        $driver1 = $manager->driver(ManagerDriverName::MyDriver);
+        $driver2 = $manager->driver(ManagerDriverName::MyDriver);
+
+        $this->assertSame($driver1, $driver2);
+    }
+
+    public function testEnumDriverMatchesStringDriver()
+    {
+        $manager = new NullableManager($this->app);
+
+        $manager->extend('my_driver', static fn () => new stdClass);
+
+        $fromEnum = $manager->driver(ManagerDriverName::MyDriver);
+        $fromString = $manager->driver('my_driver');
+
+        $this->assertSame($fromEnum, $fromString);
+    }
+
+    public function testUnitEnumDriverCanBeResolved()
+    {
+        $manager = new NullableManager($this->app);
+        $driver = new stdClass;
+
+        $manager->extend('MyDriver', static fn () => $driver);
+        $this->assertSame($driver, $manager->driver(ManagerUnitDriverName::MyDriver));
+    }
+}
+
+enum ManagerDriverName: string
+{
+    case MyDriver = 'my_driver';
+}
+
+enum ManagerUnitDriverName
+{
+    case MyDriver;
 }

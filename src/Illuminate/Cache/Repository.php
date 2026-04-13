@@ -76,6 +76,13 @@ class Repository implements ArrayAccess, CacheContract
     protected $config = [];
 
     /**
+     * The callback to invoke when an unserializable class is encountered.
+     *
+     * @var callable|null
+     */
+    protected static $unserializableClassHandler;
+
+    /**
      * Create a new cache repository instance.
      */
     public function __construct(Store $store, array $config = [])
@@ -131,6 +138,8 @@ class Repository implements ArrayAccess, CacheContract
 
             $value = value($default);
         } else {
+            $value = $this->handleIncompleteClass($key, $value);
+
             $this->event(new CacheHit($this->getName(), $key, $value));
         }
 
@@ -195,6 +204,8 @@ class Repository implements ArrayAccess, CacheContract
         // If we found a valid value we will fire the "hit" event and return the value
         // back from this function. The "hit" event gives developers an opportunity
         // to listen for every possible cache "hit" throughout this applications.
+        $value = $this->handleIncompleteClass($key, $value);
+
         $this->event(new CacheHit($this->getName(), $key, $value));
 
         return $value;
@@ -823,6 +834,28 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Handle a cache value that contains an incomplete class.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function handleIncompleteClass(string $key, mixed $value): mixed
+    {
+        if (! ($value instanceof \__PHP_Incomplete_Class)) {
+            return $value;
+        }
+
+        $class = ((array) $value)['__PHP_Incomplete_Class_Name'] ?? null;
+
+        if (isset(static::$unserializableClassHandler)) {
+            (static::$unserializableClassHandler)($key, $class);
+        }
+
+        return $value;
+    }
+
+    /**
      * Calculate the number of seconds for the given TTL.
      *
      * @param  \DateTimeInterface|\DateInterval|int  $ttl
@@ -944,6 +977,17 @@ class Repository implements ArrayAccess, CacheContract
     public function setEventDispatcher(Dispatcher $events)
     {
         $this->events = $events;
+    }
+
+    /**
+     * Register a callback to be invoked when an unserializable class is encountered.
+     *
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public static function handleUnserializableClassUsing(?callable $callback): void
+    {
+        static::$unserializableClassHandler = $callback;
     }
 
     /**

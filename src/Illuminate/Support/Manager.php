@@ -61,14 +61,14 @@ abstract class Manager
     /**
      * Get a driver instance.
      *
-     * @param  string|null  $driver
+     * @param  \UnitEnum|string|null  $driver
      * @return mixed
      *
      * @throws \InvalidArgumentException
      */
     public function driver($driver = null)
     {
-        $driver = $driver ?: $this->getDefaultDriver();
+        $driver = enum_value($driver) ?: $this->getDefaultDriver();
 
         if (is_null($driver)) {
             throw new InvalidArgumentException(sprintf(

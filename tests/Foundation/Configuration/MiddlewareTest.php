@@ -2,6 +2,9 @@
 
 namespace Illuminate\Tests\Foundation\Configuration;
 
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Foundation\Application;
@@ -15,6 +18,7 @@ use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
+use Illuminate\Session\Middleware\AuthenticateSession;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -31,6 +35,10 @@ class MiddlewareTest extends TestCase
         PreventRequestsDuringMaintenance::flushState();
         TrimStrings::flushState();
         TrustProxies::flushState();
+
+        foreach ([Authenticate::class, AuthenticateSession::class, AuthenticationException::class, RedirectIfAuthenticated::class] as $class) {
+            (new ReflectionClass($class))->getProperty('redirectToCallback')->setValue(null, null);
+        }
 
         parent::tearDown();
     }
@@ -302,5 +310,40 @@ class MiddlewareTest extends TestCase
         $reflection = new ReflectionClass(PreventRequestForgery::class);
         $this->assertTrue($reflection->getStaticPropertyValue('originOnly'));
         $this->assertTrue($reflection->getStaticPropertyValue('allowSameSite'));
+    }
+
+    public function testRedirectUsersToDoesNotOverwriteRedirectGuestsTo()
+    {
+        $middleware = new Middleware;
+
+        $middleware->redirectGuestsTo(fn () => '/login');
+        $middleware->redirectUsersTo('/dashboard');
+
+        $authenticateCallback = (new ReflectionClass(Authenticate::class))
+            ->getProperty('redirectToCallback')->getValue();
+        $sessionCallback = (new ReflectionClass(AuthenticateSession::class))
+            ->getProperty('redirectToCallback')->getValue();
+        $exceptionCallback = (new ReflectionClass(AuthenticationException::class))
+            ->getProperty('redirectToCallback')->getValue();
+        $usersCallback = (new ReflectionClass(RedirectIfAuthenticated::class))
+            ->getProperty('redirectToCallback')->getValue();
+
+        $this->assertSame('/login', $authenticateCallback(null));
+        $this->assertSame('/login', $sessionCallback(null));
+        $this->assertSame('/login', $exceptionCallback(null));
+        $this->assertSame('/dashboard', $usersCallback(null));
+    }
+
+    public function testRedirectGuestsToNullRegistersNullCallback()
+    {
+        $middleware = new Middleware;
+
+        $middleware->redirectGuestsTo(null);
+
+        $callback = (new ReflectionClass(Authenticate::class))
+            ->getProperty('redirectToCallback')->getValue();
+
+        $this->assertNotNull($callback);
+        $this->assertNull($callback(null));
     }
 }

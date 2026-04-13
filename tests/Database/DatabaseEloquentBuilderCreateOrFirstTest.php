@@ -473,6 +473,178 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         ], $result->toArray());
     }
 
+    #[DataProvider('createOrFirstValues')]
+    public function testUpdateOrCreateMethodAcceptsClosureValuesAndCreates(Closure|array $values): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite', [123]);
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])
+            ->andReturn([]);
+
+        $model->getConnection()->expects('insert')->with(
+            'insert into "table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
+            ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
+        )->andReturnTrue();
+
+        $result = $model->newQuery()->updateOrCreate(['attr' => 'foo'], $values);
+        $this->assertTrue($result->wasRecentlyCreated);
+        $this->assertEquals([
+            'id' => 123,
+            'attr' => 'foo',
+            'val' => 'bar',
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ], $result->toArray());
+    }
+
+    public function testUpdateOrCreateMethodAcceptsClosureValuesAndUpdates(): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])
+            ->andReturn([[
+                'id' => 123,
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01 00:00:00',
+                'updated_at' => '2023-01-01 00:00:00',
+            ]]);
+
+        $model->getConnection()
+            ->expects('update')
+            ->with(
+                'update "table" set "val" = ?, "updated_at" = ? where "id" = ?',
+                ['baz', '2023-01-01 00:00:00', 123],
+            )
+            ->andReturn(1);
+
+        $result = $model->newQuery()->updateOrCreate(['attr' => 'foo'], fn () => ['val' => 'baz']);
+        $this->assertFalse($result->wasRecentlyCreated);
+        $this->assertEquals('baz', $result->val);
+    }
+
+    public function testUpdateOrCreateInvokesClosureExactlyOnceWhenCreating(): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite', [123]);
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])
+            ->andReturn([]);
+
+        $model->getConnection()->expects('insert')->with(
+            'insert into "table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
+            ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
+        )->andReturnTrue();
+
+        $callCount = 0;
+        $model->newQuery()->updateOrCreate(['attr' => 'foo'], function () use (&$callCount) {
+            $callCount++;
+
+            return ['val' => 'bar'];
+        });
+
+        $this->assertSame(1, $callCount);
+    }
+
+    public function testUpdateOrCreateInvokesClosureExactlyOnceWhenUpdating(): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])
+            ->andReturn([[
+                'id' => 123,
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01 00:00:00',
+                'updated_at' => '2023-01-01 00:00:00',
+            ]]);
+
+        $model->getConnection()
+            ->expects('update')
+            ->with(
+                'update "table" set "val" = ?, "updated_at" = ? where "id" = ?',
+                ['baz', '2023-01-01 00:00:00', 123],
+            )
+            ->andReturn(1);
+
+        $callCount = 0;
+        $model->newQuery()->updateOrCreate(['attr' => 'foo'], function () use (&$callCount) {
+            $callCount++;
+
+            return ['val' => 'baz'];
+        });
+
+        $this->assertSame(1, $callCount);
+    }
+
+    #[DataProvider('createOrFirstValues')]
+    public function testFirstOrNewMethodAcceptsClosureValuesAndInstantiates(Closure|array $values): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])
+            ->andReturn([]);
+
+        $result = $model->newQuery()->firstOrNew(['attr' => 'foo'], $values);
+        $this->assertFalse($result->exists);
+        $this->assertSame('foo', $result->attr);
+        $this->assertSame('bar', $result->val);
+    }
+
+    public function testFirstOrNewDoesNotInvokeClosureWhenRecordExists(): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])
+            ->andReturn([[
+                'id' => 123,
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01 00:00:00',
+                'updated_at' => '2023-01-01 00:00:00',
+            ]]);
+
+        $callCount = 0;
+        $result = $model->newQuery()->firstOrNew(['attr' => 'foo'], function () use (&$callCount) {
+            $callCount++;
+
+            return ['val' => 'should-not-be-called'];
+        });
+
+        $this->assertSame(0, $callCount);
+        $this->assertTrue($result->exists);
+        $this->assertSame('bar', $result->val);
+    }
+
     public static function createOrFirstValues(): array
     {
         return [
