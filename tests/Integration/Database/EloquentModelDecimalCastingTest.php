@@ -71,7 +71,10 @@ class EloquentModelDecimalCastingTest extends DatabaseTestCase
         } catch (MathException $e) {
             $this->assertSame('Unable to cast value to a decimal.', $e->getMessage());
             $this->assertInstanceOf(NumberFormatException::class, $e->getPrevious());
-            $this->assertSame('The given value "foo" does not represent a valid number.', $e->getPrevious()->getMessage());
+            $this->assertTrue(in_array($e->getPrevious()->getMessage(), [
+                'The given value "foo" does not represent a valid number.',
+                'Value "foo" does not represent a valid number.',
+            ], true));
         }
     }
 
