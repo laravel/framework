@@ -1238,11 +1238,11 @@ class PendingRequest
         }
 
         try {
-            $shouldRetry = $this->retryWhenCallback ? call_user_func(
-                $this->retryWhenCallback,
-                $response instanceof Response ? $response->toException() : $response,
-                $this
-            ) : true;
+            $exception = $response instanceof Response ? $response->toException() : $response;
+
+            $shouldRetry = $this->retryWhenCallback && $exception !== null
+                ? call_user_func($this->retryWhenCallback, $exception, $this)
+                : true;
         } catch (Exception $exception) {
             return $exception;
         }
