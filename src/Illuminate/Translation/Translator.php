@@ -530,13 +530,15 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     /**
      * Set the default locale.
      *
-     * @param  string  $locale
+     * @param  \UnitEnum|string  $locale
      * @return void
      *
      * @throws \InvalidArgumentException
      */
     public function setLocale($locale)
     {
+        $locale = enum_value($locale);
+
         if (Str::contains($locale, ['/', '\\'])) {
             throw new InvalidArgumentException('Invalid characters present in locale.');
         }
@@ -557,14 +559,13 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     /**
      * Set the fallback locale being used.
      *
-     * @param  string  $fallback
+     * @param  \UnitEnum|string  $fallback
      * @return void
      */
     public function setFallback($fallback)
     {
-        $this->fallback = $fallback;
+        $this->fallback = enum_value($fallback);
     }
-
     /**
      * Set the loaded translation groups.
      *

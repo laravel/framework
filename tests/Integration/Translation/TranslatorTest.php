@@ -120,6 +120,20 @@ class TranslatorTest extends TestCase
 
         $this->app['translator']->handleMissingKeysUsing(null);
     }
+    public function testSetLocaleAcceptsBackedEnum()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->setLocale(LocaleEnum::Japanese);   // case Japanese = 'ja';
+        $this->assertSame('ja', $t->getLocale());
+    }
+
+    public function testSetFallbackAcceptsBackedEnum()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->setFallback(LocaleEnum::Japanese);
+        $this->assertSame('ja', $t->getFallback());
+    }
+
 
     #[DataProvider('greetingChoiceDataProvider')]
     public function testItCanHandleChoice(int $count, string $expected, ?string $locale = null)
