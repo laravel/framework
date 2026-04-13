@@ -8,11 +8,12 @@ use Illuminate\Contracts\Cache\Factory as FactoryContract;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Support\Arr;
+use Illuminate\Support\RebindsCallbacksToSelf;
 use InvalidArgumentException;
 use Mockery;
 use Mockery\LegacyMockInterface;
+use ReflectionException;
 use RuntimeException;
-use Throwable;
 
 use function Illuminate\Support\enum_value;
 
@@ -22,6 +23,8 @@ use function Illuminate\Support\enum_value;
  */
 class CacheManager implements FactoryContract
 {
+    use RebindsCallbacksToSelf;
+
     /**
      * The application instance.
      *
@@ -535,9 +538,9 @@ class CacheManager implements FactoryContract
     public function extend($driver, Closure $callback)
     {
         try {
-            $callback = $callback->bindTo($this, static::class) ?? throw new RuntimeException;
-        } catch (Throwable) {
-            $callback = $callback->bindTo(null, static::class);
+            $callback = $this->bindCallbackToSelf($callback) ?? throw new RuntimeException('Unable to bind custom driver callback');
+        } catch (ReflectionException $e) {
+            throw new RuntimeException('Unable to bind custom driver callback', previous: $e);
         }
 
         $this->customCreators[$driver] = $callback;

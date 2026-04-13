@@ -247,6 +247,23 @@ class FilesystemManagerTest extends TestCase
         $this->assertSame($driver, $manager->disk(__CLASS__));
     }
 
+    public function testInvokableObjectDriverClosure()
+    {
+        $manager = new FilesystemManager(tap(new Application, static function ($app) {
+            $app['config'] = [
+                'filesystems.disks.'.__CLASS__ => [
+                    'driver' => __CLASS__,
+                ],
+            ];
+        }));
+
+        $driver = new stdClass;
+        $creator = new CustomFilesystemDriver($driver);
+
+        $manager->extend(__CLASS__, $creator(...));
+        $this->assertSame($driver, $manager->disk(__CLASS__));
+    }
+
     // public function testKeepTrackOfAdapterDecoration()
     // {
     //     try {
@@ -270,4 +287,14 @@ class FilesystemManagerTest extends TestCase
     //         rmdir(__DIR__.'/../../to-be-scoped');
     //     }
     // }
+}
+
+class CustomFilesystemDriver
+{
+    public function __construct(private object $driver) {}
+
+    public function __invoke()
+    {
+        return $this->driver;
+    }
 }
