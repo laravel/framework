@@ -4478,8 +4478,9 @@ class HttpClientTest extends TestCase
 
         $callbackCalled = false;
 
-        $this->factory->retry(1, 0, function (Throwable $exception) use (&$callbackCalled) {
+        $this->factory->retry(1, 0, function (Exception $exception) use (&$callbackCalled) {
             $callbackCalled = true;
+
             return true;
         })->get('http://example.com');
 
