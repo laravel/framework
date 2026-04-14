@@ -101,11 +101,11 @@ interface Session
     /**
      * Flash a key / value pair to the session.
      *
-     * @param  string  $key
+     * @param  \UnitEnum|string  $key
      * @param  mixed  $value
      * @return void
      */
-    public function flash(string $key, $value = true);
+    public function flash(BackedEnum|UnitEnum|string $key, $value = true);
 
     /**
      * Get the CSRF token value.
