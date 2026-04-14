@@ -818,11 +818,11 @@ class SupportHelpersTest extends TestCase
 
         $strAccessor = str();
         $this->assertTrue((new ReflectionClass($strAccessor))->isAnonymous());
-        $this->assertSame($strAccessor->limit('string-value', 3), 'str...');
+        $this->assertSame('str...', $strAccessor->limit('string-value', 3));
 
         $strAccessor = str();
         $this->assertTrue((new ReflectionClass($strAccessor))->isAnonymous());
-        $this->assertSame((string) $strAccessor, '');
+        $this->assertSame('', (string) $strAccessor);
     }
 
     public function testTap()

@@ -80,7 +80,7 @@ class SleepTest extends TestCase
 
         $sleep = Sleep::for(1.5)->minutes();
 
-        $this->assertSame((float) $sleep->duration->totalMicroseconds, 90_000_000.0);
+        $this->assertSame(90_000_000.0, (float) $sleep->duration->totalMicroseconds);
     }
 
     public function testItCanSpecifyMinute()
@@ -89,7 +89,7 @@ class SleepTest extends TestCase
 
         $sleep = Sleep::for(1)->minute();
 
-        $this->assertSame((float) $sleep->duration->totalMicroseconds, 60_000_000.0);
+        $this->assertSame(60_000_000.0, (float) $sleep->duration->totalMicroseconds);
     }
 
     public function testItCanSpecifySeconds()
@@ -98,7 +98,7 @@ class SleepTest extends TestCase
 
         $sleep = Sleep::for(1.5)->seconds();
 
-        $this->assertSame((float) $sleep->duration->totalMicroseconds, 1_500_000.0);
+        $this->assertSame(1_500_000.0, (float) $sleep->duration->totalMicroseconds);
     }
 
     public function testItCanSpecifySecond()
@@ -107,7 +107,7 @@ class SleepTest extends TestCase
 
         $sleep = Sleep::for(1)->second();
 
-        $this->assertSame((float) $sleep->duration->totalMicroseconds, 1_000_000.0);
+        $this->assertSame(1_000_000.0, (float) $sleep->duration->totalMicroseconds);
     }
 
     public function testItCanSpecifyMilliseconds()
@@ -116,7 +116,7 @@ class SleepTest extends TestCase
 
         $sleep = Sleep::for(1.5)->milliseconds();
 
-        $this->assertSame((float) $sleep->duration->totalMicroseconds, 1_500.0);
+        $this->assertSame(1_500.0, (float) $sleep->duration->totalMicroseconds);
     }
 
     public function testItCanSpecifyMillisecond()
@@ -125,7 +125,7 @@ class SleepTest extends TestCase
 
         $sleep = Sleep::for(1)->millisecond();
 
-        $this->assertSame((float) $sleep->duration->totalMicroseconds, 1_000.0);
+        $this->assertSame(1_000.0, (float) $sleep->duration->totalMicroseconds);
     }
 
     public function testItCanSpecifyMicroseconds()
@@ -135,7 +135,7 @@ class SleepTest extends TestCase
         $sleep = Sleep::for(1.5)->microseconds();
 
         // rounded as microseconds is the smallest unit supported...
-        $this->assertSame((float) $sleep->duration->totalMicroseconds, 1.0);
+        $this->assertSame(1.0, (float) $sleep->duration->totalMicroseconds);
     }
 
     public function testItCanSpecifyMicrosecond()
@@ -144,7 +144,7 @@ class SleepTest extends TestCase
 
         $sleep = Sleep::for(1)->microsecond();
 
-        $this->assertSame((float) $sleep->duration->totalMicroseconds, 1.0);
+        $this->assertSame(1.0, (float) $sleep->duration->totalMicroseconds);
     }
 
     public function testItCanChainDurations()
@@ -154,7 +154,7 @@ class SleepTest extends TestCase
         $sleep = Sleep::for(1)->second()
             ->and(500)->microseconds();
 
-        $this->assertSame((float) $sleep->duration->totalMicroseconds, 1000500.0);
+        $this->assertSame(1000500.0, (float) $sleep->duration->totalMicroseconds);
     }
 
     public function testItCanUseDateInterval()
@@ -163,7 +163,7 @@ class SleepTest extends TestCase
 
         $sleep = Sleep::for(CarbonInterval::seconds(1)->addMilliseconds(5));
 
-        $this->assertSame((float) $sleep->duration->totalMicroseconds, 1_005_000.0);
+        $this->assertSame(1_005_000.0, (float) $sleep->duration->totalMicroseconds);
     }
 
     public function testItThrowsForUnknownTimeUnit()
@@ -486,15 +486,15 @@ class SleepTest extends TestCase
 
         // A static macro can be referenced
         $sleep = Sleep::forSomeConfiguredAmountOfTime();
-        $this->assertSame((float) $sleep->duration->totalMicroseconds, 3000000.0);
+        $this->assertSame(3000000.0, (float) $sleep->duration->totalMicroseconds);
 
         // A macro can specify a new duration
         $sleep = $sleep->useSomeOtherAmountOfTime();
-        $this->assertSame((float) $sleep->duration->totalMicroseconds, 1234000.0);
+        $this->assertSame(1234000.0, (float) $sleep->duration->totalMicroseconds);
 
         // A macro can supplement an existing duration
         $sleep = $sleep->andSomeMoreGranularControl();
-        $this->assertSame((float) $sleep->duration->totalMicroseconds, 1234567.0);
+        $this->assertSame(1234567.0, (float) $sleep->duration->totalMicroseconds);
     }
 
     public function testItCanReplacePreviouslyDefinedDurations()
@@ -506,13 +506,13 @@ class SleepTest extends TestCase
         });
 
         $sleep = Sleep::for(1)->second();
-        $this->assertSame((float) $sleep->duration->totalMicroseconds, 1000000.0);
+        $this->assertSame(1000000.0, (float) $sleep->duration->totalMicroseconds);
 
         $sleep->setDuration(2)->second();
-        $this->assertSame((float) $sleep->duration->totalMicroseconds, 2000000.0);
+        $this->assertSame(2000000.0, (float) $sleep->duration->totalMicroseconds);
 
         $sleep->setDuration(500)->milliseconds();
-        $this->assertSame((float) $sleep->duration->totalMicroseconds, 500000.0);
+        $this->assertSame(500000.0, (float) $sleep->duration->totalMicroseconds);
     }
 
     public function testItCanSleepConditionallyWhen()

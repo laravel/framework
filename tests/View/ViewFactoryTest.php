@@ -675,7 +675,7 @@ class ViewFactoryTest extends TestCase
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(false);
         $factory->startComponent(function ($data) use ($factory) {
             $this->assertArrayHasKey('name', $data);
-            $this->assertSame($data['name'], 'Taylor');
+            $this->assertSame('Taylor', $data['name']);
 
             return $factory->make('component');
         }, ['name' => 'Taylor']);
