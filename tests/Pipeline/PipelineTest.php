@@ -210,8 +210,7 @@ class PipelineTest extends TestCase
         $this->assertSame('pipe::then::not_foo::', $result);
         $this->assertSame('::not_foo::', $_SERVER['__test.then.arg']);
 
-        unset($_SERVER['__test.then.arg']);
-        unset($_SERVER['__test.pipe.return']);
+        unset($_SERVER['__test.then.arg'], $_SERVER['__test.pipe.return']);
     }
 
     public function testPipelineUsageWithParameters()

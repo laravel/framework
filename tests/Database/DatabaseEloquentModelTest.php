@@ -4165,8 +4165,7 @@ class EloquentModelBootingTestStub extends Model
 {
     public static function unboot()
     {
-        unset(static::$booted[static::class]);
-        unset(static::$bootedCallbacks[static::class]);
+        unset(static::$booted[static::class], static::$bootedCallbacks[static::class]);
     }
 
     public static function isBooted()
@@ -4756,8 +4755,7 @@ class EloquentModelBootingCallbackTestStub extends Model
 
     public static function unboot()
     {
-        unset(static::$booted[static::class]);
-        unset(static::$bootedCallbacks[static::class]);
+        unset(static::$booted[static::class], static::$bootedCallbacks[static::class]);
         static::$bootHasFinished = false;
     }
 }

@@ -48,13 +48,11 @@ abstract class TestCase extends BaseTestCase
 
         $this->traitsUsedByTest = class_uses_recursive(static::class);
 
-        if (isset(CachedState::$cachedConfig) &&
-            isset($this->traitsUsedByTest[WithCachedConfig::class])) {
+        if (isset(CachedState::$cachedConfig, $this->traitsUsedByTest[WithCachedConfig::class])) {
             $this->markConfigCached($app);
         }
 
-        if (isset(CachedState::$cachedRoutes) &&
-            isset($this->traitsUsedByTest[WithCachedRoutes::class])) {
+        if (isset(CachedState::$cachedRoutes, $this->traitsUsedByTest[WithCachedRoutes::class])) {
             $app->booting(fn () => $this->markRoutesCached($app));
         }
 
