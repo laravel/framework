@@ -16,11 +16,9 @@ use Rector\Php70\Rector\FuncCall\RandomFunctionRector;
 use Rector\Php70\Rector\If_\IfToSpaceshipRector;
 use Rector\Php70\Rector\MethodCall\ThisCallOnStaticMethodToStaticCallRector;
 use Rector\Php70\Rector\StaticCall\StaticCallOnNonStaticToInstanceCallRector;
-use Rector\Php70\Rector\StmtsAwareInterface\IfIssetToCoalescingRector;
 use Rector\Php70\Rector\Ternary\TernaryToNullCoalescingRector;
 use Rector\Php71\Rector\BinaryOp\BinaryOpBetweenNumberAndStringRector;
 use Rector\Php71\Rector\FuncCall\RemoveExtraParametersRector;
-use Rector\Php74\Rector\Assign\NullCoalescingOperatorRector;
 use Rector\Php74\Rector\Closure\ClosureToArrowFunctionRector;
 use Rector\Php80\Rector\Catch_\RemoveUnusedVariableInCatchRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
@@ -64,9 +62,7 @@ return RectorConfig::configure()
         DynamicClassConstFetchRector::class,
         FunctionFirstClassCallableRector::class,
         GetDebugTypeRector::class,
-        IfIssetToCoalescingRector::class,
         IfToSpaceshipRector::class,
-        NullCoalescingOperatorRector::class,
         NullToStrictStringFuncCallArgRector::class,
         PowToExpRector::class,
         RandomFunctionRector::class,

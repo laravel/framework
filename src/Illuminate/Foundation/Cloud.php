@@ -104,7 +104,7 @@ class Cloud
         }
 
         Migrator::resolveConnectionsUsing(function ($resolver, $connection) use ($app) {
-            $connection = $connection ?? $app['config']->get('database.default');
+            $connection ??= $app['config']->get('database.default');
 
             return $resolver->connection(
                 $connection === 'pgsql' ? 'pgsql-unpooled' : $connection

@@ -2638,7 +2638,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected static function resolveClassAttribute(string $attributeClass, ?string $property = null, ?string $class = null)
     {
-        $class = $class ?? static::class;
+        $class ??= static::class;
 
         $cacheKey = $class.'@'.$attributeClass;
 
