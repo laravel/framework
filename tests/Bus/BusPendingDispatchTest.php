@@ -2,7 +2,10 @@
 
 namespace Illuminate\Tests\Bus;
 
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Bus\PendingDispatch;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Fluent;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -67,6 +70,24 @@ class BusPendingDispatchTest extends TestCase
     {
         $this->job->shouldReceive('withoutDelay')->once();
         $this->pendingDispatch->withoutDelay();
+    }
+
+    public function testSpreadWithDelay()
+    {
+        $job = new Fluent;
+        $pendingDispatch = new PendingDispatchWithoutDestructor($job);
+        $limit = Limit::perSecond(1, 15);
+
+        $pendingDispatch->spreadWithDelay($limit, 0);
+        $this->assertSame(0, $job->delay);
+        $pendingDispatch->spreadWithDelay($limit, 1);
+        $this->assertSame(15, $job->delay);
+        $pendingDispatch->spreadWithDelay($limit, 2);
+        $this->assertSame(30, $job->delay);
+        $pendingDispatch->spreadWithDelay($limit, 3);
+        $this->assertSame(45, $job->delay);
+        $pendingDispatch->spreadWithDelay($limit, 4);
+        $this->assertSame(60, $job->delay);
     }
 
     public function testAfterCommit()
