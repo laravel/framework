@@ -179,18 +179,20 @@ class ConnectionFactory
     protected function createPdoResolverWithHosts(array $config)
     {
         return function () use ($config) {
+            $exception = null;
+
             foreach (Arr::shuffle($this->parseHosts($config)) as $host) {
                 $config['host'] = $host;
 
                 try {
                     return $this->createConnector($config)->connect($config);
-                } catch (PDOException) {
-                    continue;
+                } catch (PDOException $e) {
+                    $exception = $e;
                 }
             }
 
-            if (isset($e)) {
-                throw $e;
+            if ($exception !== null) {
+                throw $exception;
             }
         };
     }
