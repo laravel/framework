@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Rector\CodeQuality\Rector\Identical\StrlenZeroToIdenticalEmptyStringRector;
 use Rector\CodingStyle\Rector\ArrowFunction\ArrowFunctionDelegatingCallToFirstClassCallableRector;
 use Rector\CodingStyle\Rector\Closure\ClosureDelegatingCallToFirstClassCallableRector;
 use Rector\CodingStyle\Rector\FuncCall\ClosureFromCallableToFirstClassCallableRector;
@@ -80,6 +81,9 @@ return RectorConfig::configure()
         TernaryToNullCoalescingRector::class,
         ThisCallOnStaticMethodToStaticCallRector::class,
         'tests/Foundation/fixtures/bad-syntax-strategy.php',
+    ])
+    ->withRules([
+        StrlenZeroToIdenticalEmptyStringRector::class,
     ])
     ->withPreparedSets(
         deadCode: false,
