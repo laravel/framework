@@ -17,6 +17,30 @@ class NotificationMessageTest extends TestCase
         $this->assertSame('error', $message->level);
     }
 
+    public function testMailerCanBeSetFromString()
+    {
+        $message = new Message;
+        $message->mailer('postmark');
+
+        $this->assertSame('postmark', $message->mailer);
+    }
+
+    public function testMailerCanBeSetFromBackedEnum()
+    {
+        $message = new Message;
+        $message->mailer(NotificationMessageMailerEnum::Postmark);
+
+        $this->assertSame('postmark', $message->mailer);
+    }
+
+    public function testMailerCanBeSetFromUnitEnum()
+    {
+        $message = new Message;
+        $message->mailer(NotificationMessageMailerUnitEnum::Postmark);
+
+        $this->assertSame('Postmark', $message->mailer);
+    }
+
     public function testMessageFormatsMultiLineText()
     {
         $message = new Message;
@@ -35,4 +59,14 @@ class NotificationMessageTest extends TestCase
 
         $this->assertSame('This is a single line of text.', $message->introLines[0]);
     }
+}
+
+enum NotificationMessageMailerEnum: string
+{
+    case Postmark = 'postmark';
+}
+
+enum NotificationMessageMailerUnitEnum
+{
+    case Postmark;
 }
