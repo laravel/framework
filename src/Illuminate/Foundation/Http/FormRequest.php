@@ -336,8 +336,10 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * Get a validated input container for the validated input.
      *
-     * @param  array|null  $keys
-     * @return \Illuminate\Support\ValidatedInput|array
+     * @param  array<int, string>|null  $keys
+     * @return ($keys is array ? array<string, mixed> : \Illuminate\Support\ValidatedInput)
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function safe(?array $keys = null)
     {
