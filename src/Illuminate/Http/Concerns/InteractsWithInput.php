@@ -15,6 +15,13 @@ trait InteractsWithInput
     use Dumpable, InteractsWithData;
 
     /**
+     * The raw files for the request.
+     *
+     * @var array
+     */
+    protected $rawConvertedFiles;
+
+    /**
      * Retrieve a server variable from the request.
      *
      * @param  string|null  $key
@@ -184,7 +191,12 @@ trait InteractsWithInput
     {
         $files = $this->files->all();
 
-        return $this->convertedFiles = $this->convertedFiles ?? $this->convertUploadedFiles($files);
+        if ($this->convertedFiles === null || $this->rawConvertedFiles !== $files) {
+            $this->rawConvertedFiles = $files;
+            $this->convertedFiles = $this->convertUploadedFiles($files);
+        }
+
+        return $this->convertedFiles;
     }
 
     /**

@@ -1938,4 +1938,47 @@ class HttpRequestTest extends TestCase
         $this->assertSame(22.4, $request->clamp('per_page', 1.11, 22.4, 2));
         $this->assertSame(9.24, $request->clamp('float', 1, 10));
     }
+
+    public function testAllFilesReflectsChangesWhenFilesAreAddedLater()
+    {
+        $request = Request::create('/', 'POST');
+
+        $file1 = \Illuminate\Http\UploadedFile::fake()->create('avatar.jpg');
+        $request->files->set('avatar', $file1);
+
+        $this->assertCount(1, $request->allFiles());
+
+        $file2 = \Illuminate\Http\UploadedFile::fake()->create('banner.jpg');
+        $request->files->set('banner', $file2);
+
+        $this->assertCount(2, $request->allFiles());
+        $this->assertArrayHasKey('banner', $request->allFiles());
+    }
+
+    public function testAllFilesReturnsCachedResultWhenNoChangesAreMade()
+    {
+        $request = Request::create('/', 'POST');
+        $file = \Illuminate\Http\UploadedFile::fake()->create('test.jpg');
+        $request->files->set('test', $file);
+
+        $firstCall = $request->allFiles();
+        $secondCall = $request->allFiles();
+
+        $this->assertSame($firstCall, $secondCall);
+    }
+
+    public function testAllFilesReflectsChangesInPutRequests()
+    {
+        $request = \Illuminate\Http\Request::create('/', 'PUT');
+
+        $file1 = \Illuminate\Http\UploadedFile::fake()->create('document.pdf');
+        $request->files->set('document', $file1);
+
+        $this->assertCount(1, $request->allFiles());
+
+        $file2 = \Illuminate\Http\UploadedFile::fake()->create('signature.png');
+        $request->files->set('signature', $file2);
+
+        $this->assertCount(2, $request->allFiles());
+    }
 }
