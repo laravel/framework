@@ -187,7 +187,7 @@ class ValidationRuleParserTest extends TestCase
             'users.*.name' => Rule::forEach(function ($value, $attribute, $data, $context) {
                 $this->assertSame('Taylor Otwell', $value);
                 $this->assertSame('users.0.name', $attribute);
-                $this->assertEquals($data['users.0.name'], 'Taylor Otwell');
+                $this->assertEquals('Taylor Otwell', $data['users.0.name']);
                 $this->assertEquals(['name' => 'Taylor Otwell', 'email' => 'taylor@laravel.com'], $context);
 
                 return [Rule::requiredIf(true)];

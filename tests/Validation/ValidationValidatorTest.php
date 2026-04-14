@@ -1178,9 +1178,9 @@ class ValidationValidatorTest extends TestCase
             ], ['foo' => ['required' => 'Foo is required']]);
 
         $this->assertFalse($validator->passes());
-        $this->assertEquals($validator->errors()->messages(), [
+        $this->assertEquals([
             'foo' => ['foo must be false'],
-        ]);
+        ], $validator->errors()->messages());
     }
 
     public function testInlineValidationMessagesAreRespectedWithAsterisks()
