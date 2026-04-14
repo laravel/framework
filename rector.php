@@ -7,6 +7,7 @@ use Rector\CodingStyle\Rector\ArrowFunction\ArrowFunctionDelegatingCallToFirstCl
 use Rector\CodingStyle\Rector\Closure\ClosureDelegatingCallToFirstClassCallableRector;
 use Rector\CodingStyle\Rector\FuncCall\ClosureFromCallableToFirstClassCallableRector;
 use Rector\CodingStyle\Rector\FuncCall\ConsistentImplodeRector;
+use Rector\CodingStyle\Rector\FuncCall\CountArrayToEmptyArrayComparisonRector;
 use Rector\CodingStyle\Rector\FuncCall\FunctionFirstClassCallableRector;
 use Rector\Config\RectorConfig;
 use Rector\Php55\Rector\Class_\ClassConstantToSelfClassRector;
@@ -83,6 +84,7 @@ return RectorConfig::configure()
         'tests/Foundation/fixtures/bad-syntax-strategy.php',
     ])
     ->withRules([
+        CountArrayToEmptyArrayComparisonRector::class,
         StrlenZeroToIdenticalEmptyStringRector::class,
     ])
     ->withPreparedSets(

@@ -748,7 +748,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function environment(...$environments)
     {
-        if (count($environments) > 0) {
+        if ($environments !== []) {
             $patterns = is_array($environments[0]) ? $environments[0] : $environments;
 
             return Str::is($patterns, $this['env']);

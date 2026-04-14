@@ -89,9 +89,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     {
         return tap(static::newCollection($resource), function ($collection) {
             if (! array_key_exists(static::class, static::$cachedPreserveKeysAttributes)) {
-                static::$cachedPreserveKeysAttributes[static::class] = count(
-                    (new ReflectionClass(static::class))->getAttributes(PreserveKeys::class)
-                ) > 0;
+                static::$cachedPreserveKeysAttributes[static::class] = (new ReflectionClass(static::class))->getAttributes(PreserveKeys::class) !== [];
             }
 
             if (static::$cachedPreserveKeysAttributes[static::class]) {

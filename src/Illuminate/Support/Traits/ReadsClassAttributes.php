@@ -51,6 +51,6 @@ trait ReadsClassAttributes
     {
         $properties = get_object_vars($instance);
 
-        return count($properties) === 0 ? true : reset($properties);
+        return $properties === [] ? true : reset($properties);
     }
 }
