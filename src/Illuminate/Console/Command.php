@@ -146,7 +146,7 @@ class Command extends SymfonyCommand
 
         $signature = $reflection->getAttributes(Signature::class);
 
-        if (count($signature) > 0) {
+        if ($signature !== []) {
             $signatureInstance = $signature[0]->newInstance();
 
             $this->signature = $signatureInstance->signature;
@@ -158,23 +158,23 @@ class Command extends SymfonyCommand
 
         $description = $reflection->getAttributes(Description::class);
 
-        if (count($description) > 0) {
+        if ($description !== []) {
             $this->description = $description[0]->newInstance()->description;
         }
 
         $help = $reflection->getAttributes(Help::class);
 
-        if (count($help) > 0) {
+        if ($help !== []) {
             $this->help = $help[0]->newInstance()->help;
         }
 
-        if (count($reflection->getAttributes(Hidden::class)) > 0) {
+        if ($reflection->getAttributes(Hidden::class) !== []) {
             $this->hidden = true;
         }
 
         $aliases = $reflection->getAttributes(Aliases::class);
 
-        if (count($aliases) > 0) {
+        if ($aliases !== []) {
             $this->aliases = $aliases[0]->newInstance()->aliases;
         }
     }

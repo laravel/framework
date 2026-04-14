@@ -341,11 +341,11 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
 
         $mimes = array_diff($this->allowedMimetypes, $mimetypes);
 
-        if (count($mimetypes) > 0) {
+        if ($mimetypes !== []) {
             $rules[] = 'mimetypes:'.implode(',', $mimetypes);
         }
 
-        if (count($mimes) > 0) {
+        if ($mimes !== []) {
             $rules[] = 'mimes:'.implode(',', $mimes);
         }
 

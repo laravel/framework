@@ -947,7 +947,7 @@ abstract class Factory
         if (! array_key_exists(static::class, static::$cachedModelAttributes)) {
             $attribute = (new ReflectionClass($this))->getAttributes(UseModel::class);
 
-            static::$cachedModelAttributes[static::class] = count($attribute) > 0
+            static::$cachedModelAttributes[static::class] = $attribute !== []
                 ? $attribute[0]->newInstance()->class
                 : false;
         }
