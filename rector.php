@@ -22,7 +22,6 @@ use Rector\Php71\Rector\BinaryOp\BinaryOpBetweenNumberAndStringRector;
 use Rector\Php71\Rector\FuncCall\RemoveExtraParametersRector;
 use Rector\Php74\Rector\Assign\NullCoalescingOperatorRector;
 use Rector\Php74\Rector\Closure\ClosureToArrowFunctionRector;
-use Rector\Php80\Rector\Catch_\RemoveUnusedVariableInCatchRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php80\Rector\Class_\StringableForToStringRector;
 use Rector\Php80\Rector\ClassConstFetch\ClassOnThisVariableObjectRector;
@@ -73,7 +72,6 @@ return RectorConfig::configure()
         ReadOnlyClassRector::class,
         ReadOnlyPropertyRector::class,
         RemoveExtraParametersRector::class,
-        RemoveUnusedVariableInCatchRector::class,
         ReturnNeverTypeRector::class,
         StaticCallOnNonStaticToInstanceCallRector::class,
         StringClassNameToClassConstantRector::class,

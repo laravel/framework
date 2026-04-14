@@ -196,7 +196,7 @@ class EventFakeTest extends TestCase
 
                 throw new Exception('foo');
             });
-        } catch (Exception $e) {
+        } catch (Exception) {
         }
 
         Event::assertNotDispatched(ShouldDispatchAfterCommitEvent::class);

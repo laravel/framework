@@ -1231,7 +1231,7 @@ class Str
     {
         try {
             return (string) $value;
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return $fallback;
         }
     }
