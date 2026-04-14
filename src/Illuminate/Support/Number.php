@@ -291,7 +291,7 @@ class Number
 
         $formatted = static::format($number, $precision, $maxPrecision);
 
-        if(static::parseFloat($formatted) >= 1000 && isset($units[$displayExponent + 3])) {
+        if (static::parseFloat($formatted) >= 1000 && isset($units[$displayExponent + 3])) {
             $number /= 1000;
             $displayExponent += 3;
             $formatted = static::format($number, $precision, $maxPrecision);
