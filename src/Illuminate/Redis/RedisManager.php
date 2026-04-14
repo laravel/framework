@@ -89,11 +89,7 @@ class RedisManager implements Factory
     {
         $name = enum_value($name) ?: 'default';
 
-        if (isset($this->connections[$name])) {
-            return $this->connections[$name];
-        }
-
-        return $this->connections[$name] = $this->configure(
+        return $this->connections[$name] ?? $this->connections[$name] = $this->configure(
             $this->resolve($name), $name
         );
     }
