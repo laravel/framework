@@ -31,6 +31,8 @@
         "class_definition": true,
         "class_reference_name_casing": true,
         "clean_namespace": true,
+        "combine_consecutive_issets": true,
+        "combine_consecutive_unsets": true,
         "compact_nullable_type_declaration": true,
         "concat_space": true,
         "constant_case": {
