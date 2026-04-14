@@ -71,6 +71,13 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     protected $cachedAcceptHeader;
 
     /**
+     * The raw files for the request.
+     *
+     * @var array
+     */
+    protected $rawConvertedFiles;
+
+    /**
      * Create a new Illuminate HTTP request from server variables.
      *
      * @return static

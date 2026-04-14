@@ -15,13 +15,6 @@ trait InteractsWithInput
     use Dumpable, InteractsWithData;
 
     /**
-     * The raw files for the request.
-     *
-     * @var array
-     */
-    protected $rawConvertedFiles;
-
-    /**
      * Retrieve a server variable from the request.
      *
      * @param  string|null  $key
