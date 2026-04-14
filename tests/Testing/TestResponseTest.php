@@ -1750,7 +1750,7 @@ EOT
         try {
             $response->assertExactJsonStructure(['*' => ['foo', 'bar']]);
             $failed = false;
-        } catch (AssertionFailedError $e) {
+        } catch (AssertionFailedError) {
             $failed = true;
         }
 
