@@ -27,13 +27,13 @@ class DatabaseMySqlSchemaStateTest extends TestCase
         $method = new ReflectionMethod(get_class($schemaState), 'connectionString');
         $connString = $method->invoke($schemaState, $versionInfo);
 
-        self::assertEquals($expectedConnectionString, $connString);
+        $this->assertEquals($expectedConnectionString, $connString);
 
         // test baseVariables
         $method = new ReflectionMethod(get_class($schemaState), 'baseVariables');
         $variables = $method->invoke($schemaState, $dbConfig);
 
-        self::assertEquals($expectedVariables, $variables);
+        $this->assertEquals($expectedVariables, $variables);
     }
 
     public static function provider(): Generator
@@ -141,8 +141,8 @@ class DatabaseMySqlSchemaStateTest extends TestCase
     {
         $mockProcess = $this->createMock(Process::class);
         $mockProcess->method('setTimeout')->willReturnSelf();
-        $mockProcess->method('mustRun')->will(
-            $this->throwException(new Exception('column-statistics'))
+        $mockProcess->method('mustRun')->willThrowException(
+            new Exception('column-statistics')
         );
 
         $mockOutput = $this->createMock(\stdClass::class);

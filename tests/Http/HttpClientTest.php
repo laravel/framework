@@ -480,8 +480,8 @@ class HttpClientTest extends TestCase
         $body = '{"test":"phpunit"}';
 
         $fakeRequest = function (Request $request) use ($body) {
-            self::assertSame($body, $request->body());
-            self::assertContains('application/json', $request->header('Content-Type'));
+            $this->assertSame($body, $request->body());
+            $this->assertContains('application/json', $request->header('Content-Type'));
 
             return ['my' => 'response'];
         };
@@ -496,8 +496,8 @@ class HttpClientTest extends TestCase
         $body = str_repeat('A thousand &. ', 1000);
 
         $fakeRequest = function (Request $request) use ($body) {
-            self::assertSame($body, $request->body());
-            self::assertContains('text/plain', $request->header('Content-Type'));
+            $this->assertSame($body, $request->body());
+            $this->assertContains('text/plain', $request->header('Content-Type'));
 
             return ['my' => 'response'];
         };
@@ -516,8 +516,8 @@ class HttpClientTest extends TestCase
         $body = Utils::streamFor($resource);
 
         $fakeRequest = function (Request $request) use ($string) {
-            self::assertSame($string, $request->body());
-            self::assertContains('text/plain', $request->header('Content-Type'));
+            $this->assertSame($string, $request->body());
+            $this->assertContains('text/plain', $request->header('Content-Type'));
 
             return ['my' => 'response'];
         };
@@ -2582,8 +2582,8 @@ class HttpClientTest extends TestCase
             ];
         });
 
-        self::assertInstanceOf(ConnectionException::class, $responses[0]);
-        self::assertSame($requestException, $responses[0]->getPrevious());
+        $this->assertInstanceOf(ConnectionException::class, $responses[0]);
+        $this->assertSame($requestException, $responses[0]->getPrevious());
     }
 
     public function testExceptionThrownInRetryCallbackIsReturnedWithoutRetryingInPool()

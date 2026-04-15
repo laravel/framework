@@ -11,7 +11,6 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Tests\Console\Fixtures\JobToTestWithSchedule;
 use Mockery as m;
-use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -20,8 +19,6 @@ use PHPUnit\Framework\TestCase;
 final class ScheduleTest extends TestCase
 {
     private Container $container;
-    private EventMutex&MockInterface $eventMutex;
-    private SchedulingMutex&MockInterface $schedulingMutex;
 
     protected function setUp(): void
     {
@@ -29,10 +26,10 @@ final class ScheduleTest extends TestCase
 
         $this->container = new Container;
         Container::setInstance($this->container);
-        $this->eventMutex = m::mock(EventMutex::class);
-        $this->container->instance(EventMutex::class, $this->eventMutex);
-        $this->schedulingMutex = m::mock(SchedulingMutex::class);
-        $this->container->instance(SchedulingMutex::class, $this->schedulingMutex);
+        $eventMutex = m::mock(EventMutex::class);
+        $this->container->instance(EventMutex::class, $eventMutex);
+        $schedulingMutex = m::mock(SchedulingMutex::class);
+        $this->container->instance(SchedulingMutex::class, $schedulingMutex);
     }
 
     #[DataProvider('jobHonoursDisplayNameIfMethodExistsProvider')]
@@ -40,8 +37,8 @@ final class ScheduleTest extends TestCase
     {
         $schedule = new Schedule();
         $scheduledJob = $schedule->job($job);
-        self::assertSame($jobName, $scheduledJob->description);
-        self::assertFalse($this->container->resolved(JobToTestWithSchedule::class));
+        $this->assertSame($jobName, $scheduledJob->description);
+        $this->assertFalse($this->container->resolved(JobToTestWithSchedule::class));
     }
 
     public static function jobHonoursDisplayNameIfMethodExistsProvider(): array
@@ -64,7 +61,7 @@ final class ScheduleTest extends TestCase
     {
         $schedule = new Schedule();
         $scheduledJob = $schedule->job(JobToTestWithSchedule::class);
-        self::assertSame(JobToTestWithSchedule::class, $scheduledJob->description);
-        self::assertFalse($this->container->resolved(JobToTestWithSchedule::class));
+        $this->assertSame(JobToTestWithSchedule::class, $scheduledJob->description);
+        $this->assertFalse($this->container->resolved(JobToTestWithSchedule::class));
     }
 }

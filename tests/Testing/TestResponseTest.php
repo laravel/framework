@@ -1688,7 +1688,7 @@ EOT
         try {
             $response->assertExactJsonStructure(['foo']);
             $failed = false;
-        } catch (AssertionFailedError $e) {
+        } catch (AssertionFailedError) {
             $failed = true;
         }
 
@@ -1700,7 +1700,7 @@ EOT
         try {
             $response->assertExactJsonStructure(['foobar' => ['foobar_foo'], 'foo', 0, 'bars', 'baz', 'barfoo', 'numeric_keys']);
             $failed = false;
-        } catch (AssertionFailedError $e) {
+        } catch (AssertionFailedError) {
             $failed = true;
         }
 
@@ -1712,7 +1712,7 @@ EOT
         try {
             $response->assertExactJsonStructure(['bars' => ['*' => ['bar']], 'foo', 'foobar', 0, 'baz', 'barfoo', 'numeric_keys']);
             $failed = false;
-        } catch (AssertionFailedError $e) {
+        } catch (AssertionFailedError) {
             $failed = true;
         }
 
@@ -1724,7 +1724,7 @@ EOT
         try {
             $response->assertExactJsonStructure(['numeric_keys' => ['*' => ['bar']], 'foo', 'foobar', 0, 'bars', 'baz', 'barfoo']);
             $failed = false;
-        } catch (AssertionFailedError $e) {
+        } catch (AssertionFailedError) {
             $failed = true;
         }
 
@@ -1736,7 +1736,7 @@ EOT
         try {
             $response->assertExactJsonStructure(['baz' => ['*' => ['foo', 'bar' => ['foo']]], 'foo', 'foobar', 0, 'bars', 'barfoo', 'numeric_keys']);
             $failed = false;
-        } catch (AssertionFailedError $e) {
+        } catch (AssertionFailedError) {
             $failed = true;
         }
 

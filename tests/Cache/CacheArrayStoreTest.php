@@ -90,7 +90,7 @@ class CacheArrayStoreTest extends TestCase
     {
         $mock = $this->getMockBuilder(ArrayStore::class)->onlyMethods(['put'])->getMock();
         $mock->expects($this->once())
-            ->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0))
+            ->method('put')->with('foo', 'bar', 0)
             ->willReturn(true);
         $result = $mock->forever('foo', 'bar');
         $this->assertTrue($result);
