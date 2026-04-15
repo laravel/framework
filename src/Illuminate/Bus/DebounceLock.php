@@ -5,7 +5,9 @@ namespace Illuminate\Bus;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Queue\Attributes\DebounceFor;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use ReflectionClass;
 
 class DebounceLock
 {
@@ -32,8 +34,6 @@ class DebounceLock
      * Store a debounce owner token for the given job.
      *
      * Overwrites any existing token, implementing last-writer-wins semantics.
-     * The TTL is generous (10x debounceFor) for garbage collection only —
-     * correctness does not depend on it.
      *
      * @param  mixed  $job
      * @param  int|null  $debounceFor
@@ -47,13 +47,8 @@ class DebounceLock
         $cache = $this->resolveCache($job);
         $key = static::getKey($job);
         $ttl = max($debounceFor * 10, 300);
-
         $owner = Str::random(40);
 
-        // The TTL is intentionally generous — it exists only for garbage collection,
-        // not correctness. The token is intentionally left in place after execution
-        // to prevent a race where a superseded job sees an empty cache and runs
-        // via fail-open.
         $cache->put($key, $owner, $ttl);
 
         $maxWait = $maxWait ?? $this->getMaxDebounceWait($job);
@@ -63,12 +58,13 @@ class DebounceLock
             $timestampKey = $key.':first_dispatched_at';
 
             if (! $cache->has($timestampKey)) {
-                $cache->put($timestampKey, now()->timestamp, $ttl);
+                $cache->put($timestampKey, Carbon::now()->timestamp, $ttl);
             } else {
-                $elapsed = now()->timestamp - $cache->get($timestampKey);
+                $elapsed = Carbon::now()->timestamp - $cache->get($timestampKey);
 
                 if ($elapsed >= $maxWait) {
                     $maxWaitExceeded = true;
+
                     $cache->forget($timestampKey);
                 }
             }
@@ -103,24 +99,22 @@ class DebounceLock
     /**
      * Remove the debounce token for the given job.
      *
-     * When an owner is provided, the token is only removed if it still
-     * belongs to that owner — preventing a finished job from wiping
-     * a newer dispatch's token.
-     *
      * @param  mixed  $job
      * @param  string  $owner
      * @return void
      */
     public function release($job, string $owner = '')
     {
-        $cache = $this->resolveCache($job);
         $key = static::getKey($job);
+
+        $cache = $this->resolveCache($job);
 
         if (! empty($owner) && $cache->get($key) !== $owner) {
             return;
         }
 
         $cache->forget($key);
+        $cache->forget($key.':first_dispatched_at');
     }
 
     /**
@@ -142,17 +136,11 @@ class DebounceLock
      */
     public function getMaxDebounceWait($job)
     {
-        if (method_exists($job, 'maxDebounceWait')) {
-            return $job->maxDebounceWait();
-        }
+        $attributes = (new ReflectionClass($job))->getAttributes(DebounceFor::class);
 
-        $attributes = (new \ReflectionClass($job))->getAttributes(DebounceFor::class);
-
-        if (count($attributes) > 0) {
-            return $attributes[0]->newInstance()->maxWait;
-        }
-
-        return null;
+        return count($attributes) > 0
+            ? $attributes[0]->newInstance()->maxWait
+            : null;
     }
 
     /**

@@ -205,6 +205,29 @@ class DebouncedJobTest extends QueueTestCase
         $this->assertTrue($lock->isCurrentOwner($jobB, $ownerB));
     }
 
+    public function testReleaseClearsMaxWaitTimestamp()
+    {
+        $cache = $this->app->get(Cache::class);
+        $lock = new DebounceLock($cache);
+        $job = new DebouncedWithMaxWaitJob('entity-1');
+
+        $first = $lock->acquire($job);
+
+        $this->assertFalse($first['maxWaitExceeded']);
+
+        // Simulate rollback cleanup.
+        $lock->release($job, $first['owner']);
+
+        $this->assertNull($cache->get(DebounceLock::getKey($job).':first_dispatched_at'));
+
+        // If timestamp cleanup worked, max wait should not appear exceeded.
+        $this->travelTo(now()->addSeconds(61));
+
+        $second = $lock->acquire($job);
+
+        $this->assertFalse($second['maxWaitExceeded']);
+    }
+
     public function testSupersededDebouncedJobDoesNotDispatchChain()
     {
         $this->markTestSkippedWhenUsingQueueDrivers(['sync', 'beanstalkd']);
