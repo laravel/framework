@@ -35,7 +35,7 @@ interface Translator
     /**
      * Set the default locale.
      *
-     * @param  string  $locale
+     * @param  \UnitEnum|string  $locale
      * @return void
      */
     public function setLocale($locale);

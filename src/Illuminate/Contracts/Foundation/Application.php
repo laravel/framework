@@ -225,7 +225,7 @@ interface Application extends Container
     /**
      * Set the current application locale.
      *
-     * @param  string  $locale
+     * @param  \UnitEnum|string  $locale
      * @return void
      */
     public function setLocale($locale);

@@ -33,6 +33,61 @@ class FoundationApplicationTest extends TestCase
         $app->setLocale('foo');
     }
 
+    public function testSetLocaleAcceptsBackedEnum()
+    {
+        $app = new Application;
+
+        $app['config'] = $config = m::mock(stdClass::class);
+        $config->shouldReceive('get')->once()->with('app.locale')->andReturn('en');
+        $config->shouldReceive('set')->once()->with('app.locale', 'ja');
+        $app['translator'] = $trans = m::mock(stdClass::class);
+        $trans->shouldReceive('setLocale')->once()->with('ja');
+        $app['events'] = $events = m::mock(stdClass::class);
+        $events->shouldReceive('dispatch')->once()->with(m::on(function (LocaleUpdated $event) {
+            return $event->locale === 'ja' && $event->previousLocale === 'en';
+        }));
+
+        $app->setLocale(ApplicationLocaleEnum::Japanese);
+    }
+
+    public function testSetLocaleAcceptsUnitEnum()
+    {
+        $app = new Application;
+
+        $app['config'] = $config = m::mock(stdClass::class);
+        $config->shouldReceive('get')->once()->with('app.locale')->andReturn('en');
+        $config->shouldReceive('set')->once()->with('app.locale', 'Korean');
+        $app['translator'] = $trans = m::mock(stdClass::class);
+        $trans->shouldReceive('setLocale')->once()->with('Korean');
+        $app['events'] = $events = m::mock(stdClass::class);
+        $events->shouldReceive('dispatch')->once();
+
+        $app->setLocale(ApplicationPureLocaleEnum::Korean);
+    }
+
+    public function testSetFallbackLocaleAcceptsBackedEnum()
+    {
+        $app = new Application;
+
+        $app['config'] = $config = m::mock(stdClass::class);
+        $config->shouldReceive('set')->once()->with('app.fallback_locale', 'ja');
+        $app['translator'] = $trans = m::mock(stdClass::class);
+        $trans->shouldReceive('setFallback')->once()->with('ja');
+
+        $app->setFallbackLocale(ApplicationLocaleEnum::Japanese);
+    }
+
+    public function testIsLocaleAcceptsEnum()
+    {
+        $app = new Application;
+
+        $app['config'] = $config = m::mock(stdClass::class);
+        $config->shouldReceive('get')->twice()->with('app.locale')->andReturn('ja');
+
+        $this->assertTrue($app->isLocale(ApplicationLocaleEnum::Japanese));
+        $this->assertFalse($app->isLocale(ApplicationLocaleEnum::English));
+    }
+
     public function testServiceProvidersAreCorrectlyRegistered()
     {
         $provider = m::mock(ApplicationBasicServiceProviderStub::class);
@@ -660,6 +715,17 @@ class FoundationApplicationTest extends TestCase
         $this->assertTrue($app->isAlias(\Illuminate\Contracts\Auth\PasswordBroker::class));
         $this->assertSame('auth.password.broker', $app->getAlias(\Illuminate\Contracts\Auth\PasswordBroker::class));
     }
+}
+
+enum ApplicationLocaleEnum: string
+{
+    case English = 'en';
+    case Japanese = 'ja';
+}
+
+enum ApplicationPureLocaleEnum
+{
+    case Korean;
 }
 
 class ApplicationBasicServiceProviderStub extends ServiceProvider

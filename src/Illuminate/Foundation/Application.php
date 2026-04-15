@@ -35,6 +35,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 use function Illuminate\Filesystem\join_paths;
+use function Illuminate\Support\enum_value;
 
 class Application extends Container implements ApplicationContract, CachesConfiguration, CachesRoutes, HttpKernelInterface
 {
@@ -1590,11 +1591,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Set the current application locale.
      *
-     * @param  string  $locale
+     * @param  \UnitEnum|string  $locale
      * @return void
      */
     public function setLocale($locale)
     {
+        $locale = enum_value($locale);
+
         $previous = $this['config']->get('app.locale');
 
         $this['config']->set('app.locale', $locale);
@@ -1607,11 +1610,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Set the current application fallback locale.
      *
-     * @param  string  $fallbackLocale
+     * @param  \UnitEnum|string  $fallbackLocale
      * @return void
      */
     public function setFallbackLocale($fallbackLocale)
     {
+        $fallbackLocale = enum_value($fallbackLocale);
+
         $this['config']->set('app.fallback_locale', $fallbackLocale);
 
         $this['translator']->setFallback($fallbackLocale);
@@ -1620,12 +1625,12 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Determine if the application locale is the given locale.
      *
-     * @param  string  $locale
+     * @param  \UnitEnum|string  $locale
      * @return bool
      */
     public function isLocale($locale)
     {
-        return $this->getLocale() == $locale;
+        return $this->getLocale() == enum_value($locale);
     }
 
     /**

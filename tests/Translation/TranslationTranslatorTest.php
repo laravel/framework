@@ -102,6 +102,34 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('foo', $t->get('foo::bar.foo'));
     }
 
+    public function testSetLocaleAcceptsBackedEnum()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->setLocale(Baz::February);
+        $this->assertSame('February', $t->getLocale());
+    }
+
+    public function testSetLocaleAcceptsUnitEnum()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->setLocale(Foo::Hosni);
+        $this->assertSame('Hosni', $t->getLocale());
+    }
+
+    public function testSetFallbackAcceptsBackedEnum()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->setFallback(Baz::February);
+        $this->assertSame('February', $t->getFallback());
+    }
+
+    public function testSetFallbackAcceptsUnitEnum()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->setFallback(Foo::Hosni);
+        $this->assertSame('Hosni', $t->getFallback());
+    }
+
     public function testGetMethodProperlyLoadsAndRetrievesItemForFallback()
     {
         $t = new Translator($this->getLoader(), 'en');
