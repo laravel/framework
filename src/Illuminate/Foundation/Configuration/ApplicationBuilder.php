@@ -238,7 +238,7 @@ class ApplicationBuilder
 
                     if ($request->expectsJson()) {
                         return response()->json([
-                            'status' => $exception ? 'Application experiencing problems' : 'Application is up',
+                            'status' => $exception ? 'down' : 'up',
                         ], $status);
                     }
 
