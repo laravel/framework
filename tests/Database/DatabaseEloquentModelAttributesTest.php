@@ -54,6 +54,27 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertSame('property_table', $model->getTable());
     }
 
+    public function test_child_table_attribute_overrides_inherited_table_property(): void
+    {
+        $model = new ChildModelWithTableAttribute;
+
+        $this->assertSame('child_attr', $model->getTable());
+    }
+
+    public function test_child_inherits_parent_table_attribute(): void
+    {
+        $model = new ChildModelWithNoTable;
+
+        $this->assertSame('parent_attr', $model->getTable());
+    }
+
+    public function test_child_table_property_overrides_parent_table_attribute(): void
+    {
+        $model = new ChildModelWithTableProperty;
+
+        $this->assertSame('child_prop', $model->getTable());
+    }
+
     public function test_primary_key_attribute(): void
     {
         $model = new ModelWithPrimaryKeyAttribute;
@@ -404,6 +425,33 @@ class ModelWithTableAttribute extends Model
 class ModelWithTableAttributeAndProperty extends Model
 {
     protected $table = 'property_table';
+}
+
+class ParentModelWithTableProperty extends Model
+{
+    protected $table = 'parent_prop';
+}
+
+#[Table(name: 'child_attr')]
+class ChildModelWithTableAttribute extends ParentModelWithTableProperty
+{
+    //
+}
+
+#[Table(name: 'parent_attr')]
+class ParentModelWithTableAttribute extends Model
+{
+    //
+}
+
+class ChildModelWithNoTable extends ParentModelWithTableAttribute
+{
+    //
+}
+
+class ChildModelWithTableProperty extends ParentModelWithTableAttribute
+{
+    protected $table = 'child_prop';
 }
 
 #[Table(key: 'custom_id')]
