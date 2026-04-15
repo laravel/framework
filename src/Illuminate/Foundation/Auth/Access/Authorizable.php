@@ -7,6 +7,20 @@ use Illuminate\Contracts\Auth\Access\Gate;
 trait Authorizable
 {
     /**
+     * Determine if the given ability should be granted for the entity.
+     *
+     * @param  \UnitEnum|string  $ability
+     * @param  mixed  $arguments
+     * @return \Illuminate\Auth\Access\Response
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function authorize($ability, $arguments = [])
+    {
+        return app(Gate::class)->forUser($this)->authorize($ability, $arguments);
+    }
+
+    /**
      * Determine if the entity has the given abilities.
      *
      * @param  iterable|\UnitEnum|string  $abilities
