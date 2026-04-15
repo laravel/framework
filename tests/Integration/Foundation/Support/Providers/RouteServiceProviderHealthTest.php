@@ -44,7 +44,7 @@ class RouteServiceProviderHealthTest extends TestCase
     {
         $this->getJson('/up')
             ->assertOk()
-            ->assertExactJson(['status' => 'Application is up']);
+            ->assertExactJson(['status' => 'up']);
     }
 
     public function test_it_returns_json_failure_status_when_diagnosis_reports_a_problem()
@@ -55,7 +55,7 @@ class RouteServiceProviderHealthTest extends TestCase
 
         $this->getJson('/up')
             ->assertStatus(500)
-            ->assertExactJson(['status' => 'Application experiencing problems']);
+            ->assertExactJson(['status' => 'down']);
     }
 
     public function test_it_renders_html_failure_page_when_diagnosis_reports_a_problem()
