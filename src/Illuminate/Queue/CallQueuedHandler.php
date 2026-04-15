@@ -67,8 +67,8 @@ class CallQueuedHandler
             return $this->handleModelNotFound($job, $e);
         }
 
-        if ($this->commandWasDebounced($command)) {
-            return $this->handleDebouncedJob($job, $command);
+        if ($this->commandShouldBeDebounced($command)) {
+            return $this->deleteDebouncedJob($job, $command);
         }
 
         $this->dispatchThroughMiddleware($job, $command);
@@ -228,7 +228,7 @@ class CallQueuedHandler
      * @param  mixed  $command
      * @return bool
      */
-    protected function commandWasDebounced($command)
+    protected function commandShouldBeDebounced($command)
     {
         $owner = $command->debounceOwner ?? '';
 
@@ -238,8 +238,7 @@ class CallQueuedHandler
 
         $lock = new DebounceLock($this->container->make(Cache::class));
 
-        // Fail-open: if the lock no longer exists (cache eviction, TTL expiry),
-        // let the job execute rather than silently deleting it.
+        // Fail-open: if the lock no longer exists (cache eviction, TTL expiry), let the job execute...
         if (! $lock->lockExists($command)) {
             return false;
         }
@@ -254,7 +253,7 @@ class CallQueuedHandler
      * @param  mixed  $command
      * @return void
      */
-    protected function handleDebouncedJob($job, $command)
+    protected function deleteDebouncedJob($job, $command)
     {
         if ($this->container->bound('events')) {
             $this->container->make('events')->dispatch(
