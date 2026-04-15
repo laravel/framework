@@ -435,7 +435,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $table = static::resolveClassAttribute(Table::class);
 
-        $this->table ??= $table->name ?? null;
+        $reflection = new ReflectionClass(static::class);
+
+        $declaresTable = $reflection->hasProperty('table')
+            && $reflection->getProperty('table')->getDeclaringClass()->getName() === static::class;
+
+        if (! $declaresTable && $reflection->getAttributes(Table::class) !== []) {
+            $this->table = $table->name ?? null;
+        } else {
+            $this->table ??= $table->name ?? null;
+        }
+
         $this->connection ??= static::resolveClassAttribute(Connection::class, 'name');
 
         if ($this->primaryKey === 'id' && $table && $table->key !== null) {
