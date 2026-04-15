@@ -42,35 +42,46 @@ class DebounceLock
      */
     public function acquire($job, $debounceFor = null, $maxWait = null)
     {
-        $debounceFor = $debounceFor ?? $this->getDebounceDelay($job);
-
         $cache = $this->resolveCache($job);
-        $key = static::getKey($job);
-        $ttl = max($debounceFor * 10, 300);
-        $owner = Str::random(40);
 
-        $cache->put($key, $owner, $ttl);
+        $ttl = max(($debounceFor ?? $this->getDebounceDelay($job)) * 10, 300);
 
-        $maxWait = $maxWait ?? $this->getMaxDebounceWait($job);
-        $maxWaitExceeded = false;
+        $cache->put($key = static::getKey($job), $owner = Str::random(40), $ttl);
 
-        if (! is_null($maxWait)) {
-            $timestampKey = $key.':first_dispatched_at';
+        return [
+            'owner' => $owner,
+            'maxWaitExceeded' => $this->maxWaitExceeded(
+                $cache, $key, $ttl, $maxWait ?? $this->getMaxDebounceWait($job)
+            )
+        ];
+    }
 
-            if (! $cache->has($timestampKey)) {
-                $cache->put($timestampKey, Carbon::now()->timestamp, $ttl);
-            } else {
-                $elapsed = Carbon::now()->timestamp - $cache->get($timestampKey);
-
-                if ($elapsed >= $maxWait) {
-                    $maxWaitExceeded = true;
-
-                    $cache->forget($timestampKey);
-                }
-            }
+    /**
+     * Determine if the maximum debounce wait time has been exceeded.
+     */
+    protected function maxWaitExceeded(Cache $cache, string $key, int $ttl, ?int $maxWait): bool
+    {
+        if (is_null($maxWait)) {
+            return false;
         }
 
-        return ['owner' => $owner, 'maxWaitExceeded' => $maxWaitExceeded];
+        $timestampKey = $key.':first_dispatched_at';
+
+        if (! $cache->has($timestampKey)) {
+            $cache->put($timestampKey, Carbon::now()->timestamp, $ttl);
+
+            return false;
+        }
+
+        $elapsed = Carbon::now()->timestamp - $cache->get($timestampKey);
+
+        if ($elapsed >= $maxWait) {
+            $cache->forget($timestampKey);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
