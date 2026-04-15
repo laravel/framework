@@ -118,7 +118,6 @@ class CacheRateLimiterTest extends TestCase
         $rateLimiter->clear('key');
     }
 
-
     public function testAvailableInReturnsPositiveValues()
     {
         $cache = m::mock(Cache::class);
