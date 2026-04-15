@@ -26,7 +26,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         });
 
         $queue = $this->getMockBuilder(DatabaseQueue::class)->onlyMethods(['currentTime'])->setConstructorArgs([$database = m::mock(Connection::class), 'table', 'default'])->getMock();
-        $queue->expects($this->any())->method('currentTime')->willReturn('time');
+        $queue->method('currentTime')->willReturn('time');
         $queue->setContainer($container = m::spy(Container::class));
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) use ($uuid, $displayNameStartsWith, $jobStartsWith) {
@@ -74,7 +74,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
             ->onlyMethods(['currentTime'])
             ->setConstructorArgs([$database = m::mock(Connection::class), 'table', 'default'])
             ->getMock();
-        $queue->expects($this->any())->method('currentTime')->willReturn('time');
+        $queue->method('currentTime')->willReturn('time');
         $queue->setContainer($container = m::spy(Container::class));
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) use ($uuid, $time) {
@@ -104,7 +104,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $job = (new MyBatchableJob)->withBatchId('test-batch-id');
 
         $queue = $this->getMockBuilder(DatabaseQueue::class)->onlyMethods(['currentTime'])->setConstructorArgs([$database = m::mock(Connection::class), 'table', 'default'])->getMock();
-        $queue->expects($this->any())->method('currentTime')->willReturn('time');
+        $queue->method('currentTime')->willReturn('time');
         $queue->setContainer($container = m::spy(Container::class));
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
@@ -163,8 +163,8 @@ class QueueDatabaseQueueUnitTest extends TestCase
 
         $database = m::mock(Connection::class);
         $queue = $this->getMockBuilder(DatabaseQueue::class)->onlyMethods(['currentTime', 'availableAt'])->setConstructorArgs([$database, 'table', 'default'])->getMock();
-        $queue->expects($this->any())->method('currentTime')->willReturn('created');
-        $queue->expects($this->any())->method('availableAt')->willReturn('available');
+        $queue->method('currentTime')->willReturn('created');
+        $queue->method('availableAt')->willReturn('available');
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('insert')->once()->andReturnUsing(function ($records) use ($uuid, $time) {
             $this->assertEquals([[

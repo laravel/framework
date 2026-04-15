@@ -116,7 +116,7 @@ class AuthGuardTest extends TestCase
         $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn($user);
         $guard->getProvider()->shouldReceive('validateCredentials')->with($user, ['foo'])->andReturn(true);
         $guard->getProvider()->shouldReceive('rehashPasswordIfRequired')->with($user, ['foo'])->once();
-        $guard->expects($this->once())->method('login')->with($this->equalTo($user));
+        $guard->expects($this->once())->method('login')->with($user);
         $this->assertTrue($guard->attempt(['foo']));
     }
 
@@ -160,15 +160,15 @@ class AuthGuardTest extends TestCase
         $mock->getProvider()->shouldReceive('rehashPasswordIfRequired')->with($user, ['foo'])->once();
 
         $this->assertTrue($mock->attemptWhen(['foo'], function ($user, $guard) {
-            static::assertInstanceOf(Authenticatable::class, $user);
-            static::assertInstanceOf(SessionGuard::class, $guard);
+            $this->assertInstanceOf(Authenticatable::class, $user);
+            $this->assertInstanceOf(SessionGuard::class, $guard);
 
             return true;
         }));
 
         $this->assertFalse($mock->attemptWhen(['foo'], function ($user, $guard) {
-            static::assertInstanceOf(Authenticatable::class, $user);
-            static::assertInstanceOf(SessionGuard::class, $guard);
+            $this->assertInstanceOf(Authenticatable::class, $user);
+            $this->assertInstanceOf(SessionGuard::class, $guard);
 
             return false;
         }));
@@ -196,7 +196,7 @@ class AuthGuardTest extends TestCase
         $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn($user);
         $guard->getProvider()->shouldReceive('validateCredentials')->with($user, ['foo'])->andReturn(true);
         $guard->getProvider()->shouldReceive('rehashPasswordIfRequired')->with($user, ['foo'])->once();
-        $guard->expects($this->once())->method('login')->with($this->equalTo($user));
+        $guard->expects($this->once())->method('login')->with($user);
         $this->assertTrue($guard->attempt(['foo']));
     }
 
@@ -216,7 +216,7 @@ class AuthGuardTest extends TestCase
         $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn($user);
         $guard->getProvider()->shouldReceive('validateCredentials')->with($user, ['foo'])->andReturn(true);
         $guard->getProvider()->shouldNotReceive('rehashPasswordIfRequired');
-        $guard->expects($this->once())->method('login')->with($this->equalTo($user));
+        $guard->expects($this->once())->method('login')->with($user);
         $this->assertTrue($guard->attempt(['foo']));
     }
 

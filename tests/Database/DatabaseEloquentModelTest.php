@@ -902,7 +902,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query->shouldReceive('update')->once()->with(['name' => 'taylor'])->andReturn(1);
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->expects($this->never())->method('updateTimestamps');
-        $model->expects($this->any())->method('fireModelEvent')->willReturn(true);
+        $model->method('fireModelEvent')->willReturn(true);
 
         $model->id = 1;
         $model->syncOriginal();
@@ -937,7 +937,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testTimestampsAreReturnedAsObjects()
     {
         $model = $this->getMockBuilder(EloquentDateModelStub::class)->onlyMethods(['getDateFormat'])->getMock();
-        $model->expects($this->any())->method('getDateFormat')->willReturn('Y-m-d');
+        $model->method('getDateFormat')->willReturn('Y-m-d');
         $model->setRawAttributes([
             'created_at' => '2012-12-04',
             'updated_at' => '2012-12-05',
@@ -950,7 +950,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testTimestampsAreReturnedAsObjectsFromPlainDatesAndTimestamps()
     {
         $model = $this->getMockBuilder(EloquentDateModelStub::class)->onlyMethods(['getDateFormat'])->getMock();
-        $model->expects($this->any())->method('getDateFormat')->willReturn('Y-m-d H:i:s');
+        $model->method('getDateFormat')->willReturn('Y-m-d H:i:s');
         $model->setRawAttributes([
             'created_at' => '2012-12-04',
             'updated_at' => $this->currentTime(),
@@ -1047,7 +1047,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testFromDateTimeMilliseconds()
     {
         $model = $this->getMockBuilder('Illuminate\Tests\Database\EloquentDateModelStub')->onlyMethods(['getDateFormat'])->getMock();
-        $model->expects($this->any())->method('getDateFormat')->willReturn('Y-m-d H:s.vi');
+        $model->method('getDateFormat')->willReturn('Y-m-d H:s.vi');
         $model->setRawAttributes([
             'created_at' => '2012-12-04 22:59.32130',
         ]);
@@ -1861,7 +1861,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->fillable(['name']);
         $model->fill(['name' => 'Leto Atreides', 'age' => 51]);
 
-        self::assertSame(
+        $this->assertSame(
             ['name' => 'Leto Atreides', 'age' => 51],
             $model->getAttributes(),
         );

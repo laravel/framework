@@ -25,13 +25,13 @@ class DatabaseMariaDbSchemaStateTest extends TestCase
         $method = new ReflectionMethod(get_class($schemaState), 'connectionString');
         $connString = $method->invoke($schemaState, $versionInfo);
 
-        self::assertEquals($expectedConnectionString, $connString);
+        $this->assertEquals($expectedConnectionString, $connString);
 
         // test baseVariables
         $method = new ReflectionMethod(get_class($schemaState), 'baseVariables');
         $variables = $method->invoke($schemaState, $dbConfig);
 
-        self::assertEquals($expectedVariables, $variables);
+        $this->assertEquals($expectedVariables, $variables);
     }
 
     public static function provider(): Generator

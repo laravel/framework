@@ -6,7 +6,6 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\View\Factory;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
 use Illuminate\Mail\Mailable;
@@ -58,8 +57,6 @@ class MailableQueuedTest extends TestCase
     {
         $app = new Application;
         $container = Container::getInstance();
-        $this->getMockBuilder(Filesystem::class)
-            ->getMock();
         $filesystemFactory = $this->getMockBuilder(FilesystemManager::class)
             ->setConstructorArgs([$app])
             ->getMock();
