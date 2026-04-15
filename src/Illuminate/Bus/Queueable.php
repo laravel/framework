@@ -43,7 +43,7 @@ trait Queueable
     public $deduplicator;
 
     /**
-     * The owner token for debounce supersession checks.
+     * The lock owner token for debounce supersession checks.
      *
      * @var string
      */

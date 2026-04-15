@@ -11,6 +11,7 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Foundation\Queue\InteractsWithUniqueJobs;
 use Illuminate\Queue\Attributes\DebounceFor;
 use LogicException;
+use ReflectionClass;
 
 class PendingDispatch
 {
@@ -29,20 +30,6 @@ class PendingDispatch
      * @var bool
      */
     protected $afterResponse = false;
-
-    /**
-     * The debounce delay override set at the dispatch site.
-     *
-     * @var int|null
-     */
-    protected $debounceForOverride;
-
-    /**
-     * The max debounce wait override set at the dispatch site.
-     *
-     * @var int|null
-     */
-    protected $maxDebounceWaitOverride;
 
     /**
      * Create a new pending job dispatch.
@@ -150,32 +137,6 @@ class PendingDispatch
     }
 
     /**
-     * Set the debounce delay for the job at the dispatch site.
-     *
-     * @param  int  $seconds
-     * @return $this
-     */
-    public function debounceFor($seconds)
-    {
-        $this->debounceForOverride = $seconds;
-
-        return $this;
-    }
-
-    /**
-     * Set the maximum time a debounced job can be deferred before it must execute.
-     *
-     * @param  int  $seconds
-     * @return $this
-     */
-    public function maxDebounceWait($seconds)
-    {
-        $this->maxDebounceWaitOverride = $seconds;
-
-        return $this;
-    }
-
-    /**
      * Set the delay for the job to zero seconds.
      *
      * @return $this
@@ -261,24 +222,19 @@ class PendingDispatch
      */
     protected function acquireDebounceLock()
     {
-        if (is_null($this->debounceForOverride)
-            && ! method_exists($this->job, 'debounceFor')
-            && empty((new \ReflectionClass($this->job))->getAttributes(DebounceFor::class))) {
+        if (empty((new ReflectionClass($this->job))->getAttributes(DebounceFor::class))) {
             return;
         }
 
         if ($this->job instanceof ShouldBeUnique) {
-            throw new LogicException(
-                'A debounced job cannot also implement ShouldBeUnique. '.
-                'Debounce (last wins) and unique (first wins) are mutually exclusive.'
-            );
+            throw new LogicException('A debounced job cannot also implement ShouldBeUnique.');
         }
 
         $lock = new DebounceLock(Container::getInstance()->make(Cache::class));
 
-        $debounceFor = $this->debounceForOverride ?? $lock->getDebounceDelay($this->job);
-
-        $result = $lock->acquire($this->job, $debounceFor, $this->maxDebounceWaitOverride);
+        $result = $lock->acquire(
+            $this->job, $debounceFor = $lock->getDebounceDelay($this->job)
+        );
 
         $this->job->debounceOwner = $result['owner'];
 

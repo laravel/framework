@@ -187,19 +187,6 @@ class DebouncedJobTest extends QueueTestCase
         $this->assertTrue(DebouncedTestJob::$handled);
     }
 
-    public function testDebounceForMethodOverridesAttribute()
-    {
-        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
-
-        DebouncedWithMethodOverrideJob::$handled = false;
-
-        dispatch(new DebouncedWithMethodOverrideJob('entity-1'));
-        $this->travelTo(now()->addSeconds(16));
-        $this->runQueueWorkerCommand(['--once' => true]);
-
-        $this->assertTrue(DebouncedWithMethodOverrideJob::$handled);
-    }
-
     public function testOwnerAwareReleaseDoesNotWipeNewerLock()
     {
         $cache = $this->app->get(Cache::class);
@@ -216,35 +203,6 @@ class DebouncedJobTest extends QueueTestCase
 
         // B should still be the current owner.
         $this->assertTrue($lock->isCurrentOwner($jobB, $ownerB));
-    }
-
-    public function testCallSiteDebounceForOverridesAttribute()
-    {
-        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
-
-        DebouncedTestJob::$handled = false;
-
-        dispatch(new DebouncedTestJob('entity-1'))->debounceFor(10);
-
-        // At 11 seconds the job should be available (call-site 10s, not attribute 30s).
-        $this->travelTo(now()->addSeconds(11));
-        $this->runQueueWorkerCommand(['--once' => true]);
-
-        $this->assertTrue(DebouncedTestJob::$handled);
-    }
-
-    public function testCallSiteDebounceForOnPlainJob()
-    {
-        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
-
-        PlainTestJob::$handled = false;
-
-        dispatch(new PlainTestJob('entity-1'))->debounceFor(5);
-
-        $this->travelTo(now()->addSeconds(6));
-        $this->runQueueWorkerCommand(['--once' => true]);
-
-        $this->assertTrue(PlainTestJob::$handled);
     }
 
     public function testSupersededDebouncedJobDoesNotDispatchChain()
@@ -330,21 +288,6 @@ class DebouncedJobTest extends QueueTestCase
         $this->assertEquals(30, $job2->delay);
     }
 
-    public function testCallSiteMaxDebounceWait()
-    {
-        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
-
-        // First dispatch — sets first_dispatched_at.
-        $p = dispatch(new DebouncedTestJob('entity-1'))->maxDebounceWait(60);
-        unset($p);
-
-        // Dispatch after max wait exceeded.
-        $this->travelTo(now()->addSeconds(61));
-        $job = new DebouncedTestJob('entity-1');
-        dispatch($job)->maxDebounceWait(60);
-
-        $this->assertEquals(0, $job->delay);
-    }
 }
 
 #[DebounceFor(30)]
@@ -414,54 +357,6 @@ class DebouncedAndUniqueTestJob implements ShouldQueue, ShouldBeUnique
 
     public function handle()
     {
-    }
-}
-
-#[DebounceFor(30)]
-class DebouncedWithMethodOverrideJob implements ShouldQueue
-{
-    use InteractsWithQueue, Queueable, Dispatchable;
-
-    public static $handled = false;
-
-    public function __construct(public string $entityId)
-    {
-    }
-
-    public function debounceId(): string
-    {
-        return $this->entityId;
-    }
-
-    public function debounceFor(): int
-    {
-        return 15; // overrides the attribute's 30
-    }
-
-    public function handle()
-    {
-        static::$handled = true;
-    }
-}
-
-class PlainTestJob implements ShouldQueue
-{
-    use InteractsWithQueue, Queueable, Dispatchable;
-
-    public static $handled = false;
-
-    public function __construct(public string $entityId)
-    {
-    }
-
-    public function debounceId(): string
-    {
-        return $this->entityId;
-    }
-
-    public function handle()
-    {
-        static::$handled = true;
     }
 }
 
