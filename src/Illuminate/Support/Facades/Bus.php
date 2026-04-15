@@ -47,7 +47,7 @@ use Illuminate\Support\Testing\Fakes\BusFake;
  * @method static \Illuminate\Support\Collection dispatched(string $command, callable|null $callback = null)
  * @method static \Illuminate\Support\Collection dispatchedSync(string $command, callable|null $callback = null)
  * @method static \Illuminate\Support\Collection dispatchedAfterResponse(string $command, callable|null $callback = null)
- * @method static \Illuminate\Support\Collection batched(callable $callback)
+ * @method static \Illuminate\Support\Collection<int, \Illuminate\Bus\PendingBatch> batched(callable $callback)
  * @method static bool hasDispatched(string $command)
  * @method static bool hasDispatchedSync(string $command)
  * @method static bool hasDispatchedAfterResponse(string $command)
