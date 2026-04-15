@@ -310,7 +310,6 @@ class DebouncedJobTest extends QueueTestCase
 
         $this->assertEquals(30, $job2->delay);
     }
-
 }
 
 #[DebounceFor(30)]

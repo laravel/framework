@@ -52,7 +52,7 @@ class DebounceLock
             'owner' => $owner,
             'maxWaitExceeded' => $this->maxWaitExceeded(
                 $cache, $key, $ttl, $maxWait ?? $this->getMaxDebounceWait($job)
-            )
+            ),
         ];
     }
 
