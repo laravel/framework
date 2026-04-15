@@ -1410,7 +1410,7 @@ class HttpClientTest extends TestCase
         RequestException::truncateAt(60);
 
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         $exception = null;
@@ -1436,7 +1436,7 @@ class HttpClientTest extends TestCase
         RequestException::truncateAt(60);
 
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         $exception = null;
@@ -1459,7 +1459,7 @@ class HttpClientTest extends TestCase
         RequestException::dontTruncate();
 
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         $exception = null;
@@ -1480,7 +1480,7 @@ class HttpClientTest extends TestCase
     {
         RequestException::dontTruncate();
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         $exception = $this->factory->async()->throw()->truncateExceptionsAt(4)->get('http://foo.com/json')->wait();
@@ -2008,7 +2008,7 @@ class HttpClientTest extends TestCase
     public function testMiddlewareRunsInPool()
     {
         $this->factory->fake(function (Request $request) {
-            return $this->factory->response('Fake');
+            return $this->factory::response('Fake');
         });
 
         $history = [];
@@ -2094,7 +2094,7 @@ class HttpClientTest extends TestCase
 
         $factory = new Factory($events);
         $factory->fake([
-            '*' => $factory->response(['error'], 403),
+            '*' => $factory::response(['error'], 403),
         ]);
 
         $response = $factory->retry(2, 1000, null, false)->get('http://foo.com/get');
@@ -2118,7 +2118,7 @@ class HttpClientTest extends TestCase
 
     public function testTransferStatsArePresentWhenFakingTheRequestUsingAPromiseResponse()
     {
-        $this->factory->fake(['https://example.com' => $this->factory->response()]);
+        $this->factory->fake(['https://example.com' => $this->factory::response()]);
         $effectiveUri = $this->factory->get('https://example.com')->effectiveUri();
 
         $this->assertSame('https://example.com', (string) $effectiveUri);
@@ -2131,7 +2131,7 @@ class HttpClientTest extends TestCase
         $events->shouldReceive('dispatch')->once()->with(m::type(ResponseReceived::class));
 
         $factory = new Factory($events);
-        $factory->fake(['example.com' => $factory->response('foo', 200)]);
+        $factory->fake(['example.com' => $factory::response('foo', 200)]);
 
         $client = $factory->timeout(10);
         $clonedClient = clone $client;
@@ -2148,7 +2148,7 @@ class HttpClientTest extends TestCase
         $this->factory->fake(function (Request $request) {
             $this->assertSame('yes!', $request->customMethod());
 
-            return $this->factory->response();
+            return $this->factory::response();
         });
 
         $this->factory->get('https://example.com');
@@ -2157,7 +2157,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsThrownWhenRetriesExhausted()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         $exception = null;
@@ -2179,7 +2179,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsThrownWhenRetriesExhaustedWithBackoffArray()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         $exception = null;
@@ -2201,7 +2201,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsThrownWithoutRetriesIfRetryNotNecessary()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 500),
+            '*' => $this->factory::response(['error'], 500),
         ]);
 
         $exception = null;
@@ -2230,7 +2230,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsThrownWithoutRetriesIfRetryNotNecessaryWithBackoffArray()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 500),
+            '*' => $this->factory::response(['error'], 500),
         ]);
 
         $exception = null;
@@ -2259,7 +2259,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsNotThrownWhenDisabledAndRetriesExhausted()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         $response = $this->factory
@@ -2274,7 +2274,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsNotThrownWhenDisabledAndRetriesExhaustedWithBackoffArray()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         $response = $this->factory
@@ -2289,7 +2289,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsNotThrownWithoutRetriesIfRetryNotNecessary()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 500),
+            '*' => $this->factory::response(['error'], 500),
         ]);
 
         $whenAttempts = 0;
@@ -2312,7 +2312,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsNotThrownWithoutRetriesIfRetryNotNecessaryWithBackoffArray()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 500),
+            '*' => $this->factory::response(['error'], 500),
         ]);
 
         $whenAttempts = 0;
@@ -2385,7 +2385,7 @@ class HttpClientTest extends TestCase
     public function testExceptionThrownInRetryCallbackWithoutRetrying()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 500),
+            '*' => $this->factory::response(['error'], 500),
         ]);
 
         $exception = null;
@@ -2410,7 +2410,7 @@ class HttpClientTest extends TestCase
     public function testExceptionThrownInRetryCallbackWithoutRetryingWithBackoffArray()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 500),
+            '*' => $this->factory::response(['error'], 500),
         ]);
 
         $exception = null;
@@ -2465,7 +2465,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionReturnedWhenRetriesExhaustedInPool()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         [$exception] = $this->factory->pool(fn ($pool) => [
@@ -2481,7 +2481,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsReturnedWithoutRetriesIfRetryNotNecessaryInPool()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 500),
+            '*' => $this->factory::response(['error'], 500),
         ]);
 
         $whenAttempts = collect();
@@ -2505,7 +2505,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsNotReturnedWhenDisabledAndRetriesExhaustedInPool()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         [$response] = $this->factory->pool(fn ($pool) => [
@@ -2522,7 +2522,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsNotReturnedWithoutRetriesIfRetryNotNecessaryInPool()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 500),
+            '*' => $this->factory::response(['error'], 500),
         ]);
 
         $whenAttempts = collect();
@@ -2589,7 +2589,7 @@ class HttpClientTest extends TestCase
     public function testExceptionThrownInRetryCallbackIsReturnedWithoutRetryingInPool()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 500),
+            '*' => $this->factory::response(['error'], 500),
         ]);
 
         [$exception] = $this->factory->pool(fn ($pool) => [
@@ -2614,7 +2614,7 @@ class HttpClientTest extends TestCase
         $this->expectException(RuntimeException::class);
 
         $this->factory->fake(function (Request $request) {
-            return $this->factory->response('Fake');
+            return $this->factory::response('Fake');
         })->withMiddleware($middleware)
             ->retry(3, 1, function (Exception $exception, PendingRequest $request) {
                 return true;
@@ -2651,7 +2651,7 @@ class HttpClientTest extends TestCase
 
     public function testFailedRequest()
     {
-        $requestException = $this->factory->failedRequest(['code' => 'not_found'], 404, ['X-RateLimit-Remaining' => 199]);
+        $requestException = $this->factory::failedRequest(['code' => 'not_found'], 404, ['X-RateLimit-Remaining' => 199]);
 
         $this->assertInstanceOf(RequestException::class, $requestException);
         $this->assertEqualsCanonicalizing(['code' => 'not_found'], $requestException->response->json());
@@ -2661,7 +2661,7 @@ class HttpClientTest extends TestCase
 
     public function testFakeConnectionException()
     {
-        $this->factory->fake($this->factory->failedConnection('Fake'));
+        $this->factory->fake($this->factory::failedConnection('Fake'));
 
         $exception = null;
 
@@ -2683,7 +2683,7 @@ class HttpClientTest extends TestCase
 
     public function testFakeConnectionExceptionWithinFakeClosure()
     {
-        $this->factory->fake(fn () => $this->factory->failedConnection('Fake'));
+        $this->factory->fake(fn () => $this->factory::failedConnection('Fake'));
 
         $exception = null;
 
@@ -2702,7 +2702,7 @@ class HttpClientTest extends TestCase
 
     public function testFakeConnectionExceptionWithinArray()
     {
-        $this->factory->fake(['*' => $this->factory->failedConnection('Fake')]);
+        $this->factory->fake(['*' => $this->factory::failedConnection('Fake')]);
 
         $exception = null;
 
@@ -2747,7 +2747,7 @@ class HttpClientTest extends TestCase
     public function testMiddlewareRunsWhenFaked()
     {
         $this->factory->fake(function (Request $request) {
-            return $this->factory->response('Fake');
+            return $this->factory::response('Fake');
         });
 
         $history = [];
@@ -2770,7 +2770,7 @@ class HttpClientTest extends TestCase
     public function testMiddlewareRunsAndCanChangeRequestOnAssertSent()
     {
         $this->factory->fake(function (Request $request) {
-            return $this->factory->response('Fake');
+            return $this->factory::response('Fake');
         });
 
         $pendingRequest = $this->factory->withMiddleware(
@@ -2894,9 +2894,9 @@ class HttpClientTest extends TestCase
     public function testTooManyRedirectsWithFakedRedirectChain()
     {
         $this->factory->fake([
-            '1.example.com' => $this->factory->response(null, 301, ['Location' => 'https://2.example.com']),
-            '2.example.com' => $this->factory->response(null, 301, ['Location' => 'https://3.example.com']),
-            '3.example.com' => $this->factory->response('', 200),
+            '1.example.com' => $this->factory::response(null, 301, ['Location' => 'https://2.example.com']),
+            '2.example.com' => $this->factory::response(null, 301, ['Location' => 'https://3.example.com']),
+            '3.example.com' => $this->factory::response('', 200),
         ]);
 
         $this->expectException(ConnectionException::class);
@@ -2907,7 +2907,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsNotThrownIfThePendingRequestIsSetToThrowOnFailureButTheResponseIsSuccessful()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['success'], 200),
+            '*' => $this->factory::response(['success'], 200),
         ]);
 
         $response = $this->factory
@@ -2920,7 +2920,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsThrownIfThePendingRequestIsSetToThrowOnFailure()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         $exception = null;
@@ -2940,7 +2940,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsThrownIfTheThrowIfOnThePendingRequestIsSetToTrueOnFailure()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         $exception = null;
@@ -2960,7 +2960,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsNotThrownIfTheThrowIfOnThePendingRequestIsSetToFalseOnFailure()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         $response = $this->factory
@@ -2973,7 +2973,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsThrownIfTheThrowIfClosureOnThePendingRequestReturnsTrue()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         $exception = null;
@@ -3007,7 +3007,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsNotThrownIfTheThrowIfClosureOnThePendingRequestReturnsFalse()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         $hitThrowCallback = false;
@@ -3030,7 +3030,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsThrownWithCallbackIfThePendingRequestIsSetToThrowOnFailure()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         $exception = null;
@@ -3109,7 +3109,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsNotReturnedIfThePendingRequestIsSetToThrowOnFailureButTheResponseIsSuccessfulInPool()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['success'], 200),
+            '*' => $this->factory::response(['success'], 200),
         ]);
 
         [$response] = $this->factory->pool(fn ($pool) => [
@@ -3123,7 +3123,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsReturnedIfThePendingRequestIsSetToThrowOnFailureInPool()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         [$exception] = $this->factory->pool(fn ($pool) => [
@@ -3137,7 +3137,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsReturnedIfTheThrowIfOnThePendingRequestIsSetToTrueOnFailureInPool()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         [$exception] = $this->factory->pool(fn ($pool) => [
@@ -3151,7 +3151,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsNotReturnedIfTheThrowIfOnThePendingRequestIsSetToFalseOnFailureInPool()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         [$response] = $this->factory->pool(fn ($pool) => [
@@ -3165,7 +3165,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsReturnedIfTheThrowIfClosureOnThePendingRequestReturnsTrueInPool()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         $hitThrowCallback = collect();
@@ -3194,7 +3194,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsNotReturnedIfTheThrowIfClosureOnThePendingRequestReturnsFalseInPool()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         $hitThrowCallback = collect();
@@ -3217,7 +3217,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsReturnedWithCallbackIfThePendingRequestIsSetToThrowOnFailureInPool()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         $flag = collect();
@@ -3237,7 +3237,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsReturnedAfterLastRetryInPool()
     {
         $this->factory->fake([
-            '*' => $this->factory->response(['error'], 403),
+            '*' => $this->factory::response(['error'], 403),
         ]);
 
         [$exception] = $this->factory->pool(fn ($pool) => [
@@ -3987,7 +3987,7 @@ class HttpClientTest extends TestCase
             $allowRedirects = $options['allow_redirects'];
             $headers = $request->headers();
 
-            return $factory->response('');
+            return $factory::response('');
         });
 
         $factory->get('https://laravel.com');
