@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Exception;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\BatchRepository;
+use Illuminate\Bus\DebounceLock;
 use Illuminate\Bus\UniqueLock;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
@@ -18,6 +19,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Events\CallQueuedListener;
 use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Queue\Events\JobDebounced;
 use RuntimeException;
 
 class CallQueuedHandler
@@ -63,6 +65,10 @@ class CallQueuedHandler
             );
         } catch (ModelNotFoundException $e) {
             return $this->handleModelNotFound($job, $e);
+        }
+
+        if ($this->commandShouldBeDebounced($command)) {
+            return $this->deleteDebouncedJob($job, $command);
         }
 
         $this->dispatchThroughMiddleware($job, $command);
@@ -214,6 +220,48 @@ class CallQueuedHandler
         if ($this->commandShouldBeUnique($command)) {
             (new UniqueLock($this->container->make(Cache::class)))->release($command);
         }
+    }
+
+    /**
+     * Determine if the debounced command was superseded by a newer dispatch.
+     *
+     * @param  mixed  $command
+     * @return bool
+     */
+    protected function commandShouldBeDebounced($command)
+    {
+        $owner = $command->debounceOwner ?? '';
+
+        if (empty($owner)) {
+            return false;
+        }
+
+        $lock = new DebounceLock($this->container->make(Cache::class));
+
+        // Fail-open: if the lock no longer exists (cache eviction, TTL expiry), let the job execute...
+        if (! $lock->lockExists($command)) {
+            return false;
+        }
+
+        return ! $lock->isCurrentOwner($command, $owner);
+    }
+
+    /**
+     * Handle a debounced (superseded) job by firing an event and deleting it.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  mixed  $command
+     * @return void
+     */
+    protected function deleteDebouncedJob($job, $command)
+    {
+        if ($this->container->bound('events')) {
+            $this->container->make('events')->dispatch(
+                new JobDebounced($job->getConnectionName(), $job, $command)
+            );
+        }
+
+        $job->delete();
     }
 
     /**
