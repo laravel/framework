@@ -76,7 +76,7 @@ class CacheRateLimiterTest extends TestCase
         $cache = m::mock(Cache::class);
         $cache->shouldReceive('add')->once()->with('key:timer', m::type('int'), 60)->andReturn(true);
         $cache->shouldReceive('add')->once()->with('key', 0, 60)->andReturn(false);
-        $cache->shouldReceive('increment')->once()->with('key', 2)->andReturn(1);
+        $cache->shouldReceive('increment')->once()->with('key', 2)->andReturn(2);
         $cache->shouldReceive('put')->once()->with('key', 2, 60);
         $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
         $rateLimiter = new RateLimiter($cache);
