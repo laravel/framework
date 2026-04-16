@@ -132,6 +132,55 @@ class SupportReflectorTest extends TestCase
         $this->assertSame('quick', Reflector::getClassAttribute(Fixtures\ChildClass::class, Fixtures\StrAttr::class, true)->string);
         $this->assertSame('lazy', Reflector::getClassAttribute(Fixtures\ParentClass::class, Fixtures\StrAttr::class)->string);
     }
+
+    public function testGetParameterClassNames()
+    {
+        $method = (new ReflectionClass(C::class))->getMethod('f');
+
+        $names = Reflector::getParameterClassNames($method->getParameters()[0]);
+
+        $this->assertSame([A::class, Model::class], array_values($names));
+    }
+
+    public function testGetParameterClassNamesWithSingleClass()
+    {
+        $method = (new ReflectionClass(B::class))->getMethod('f');
+
+        $this->assertSame([A::class], array_values(Reflector::getParameterClassNames($method->getParameters()[0])));
+    }
+
+    public function testGetParameterClassNamesExcludesBuiltins()
+    {
+        $method = (new ReflectionClass(D::class))->getMethod('f');
+
+        $names = Reflector::getParameterClassNames($method->getParameters()[0]);
+
+        $this->assertSame([A::class], array_values($names));
+    }
+
+    public function testGetParameterClassNamesWithNoType()
+    {
+        $method = (new ReflectionClass(D::class))->getMethod('g');
+
+        $this->assertSame([], Reflector::getParameterClassNames($method->getParameters()[0]));
+    }
+
+    public function testIsParameterBackedEnumWithStringBackingType()
+    {
+        $method = (new ReflectionClass(TestClassWithEnumParams::class))->getMethod('f');
+        $params = $method->getParameters();
+
+        $this->assertTrue(Reflector::isParameterBackedEnumWithStringBackingType($params[0]));
+        $this->assertFalse(Reflector::isParameterBackedEnumWithStringBackingType($params[1]));
+        $this->assertFalse(Reflector::isParameterBackedEnumWithStringBackingType($params[2]));
+    }
+
+    public function testIsParameterBackedEnumWithStringBackingTypeReturnsFalseForUnionType()
+    {
+        $method = (new ReflectionClass(C::class))->getMethod('f');
+
+        $this->assertFalse(Reflector::isParameterBackedEnumWithStringBackingType($method->getParameters()[0]));
+    }
 }
 
 class A
@@ -149,6 +198,42 @@ class B extends A
 class C
 {
     public function f(A|Model $x)
+    {
+        //
+    }
+}
+
+class D
+{
+    public function f(A|string $x)
+    {
+        //
+    }
+
+    public function g($x)
+    {
+        //
+    }
+}
+
+enum StringBackedReflectorEnum: string
+{
+    case Foo = 'foo';
+}
+
+enum IntBackedReflectorEnum: int
+{
+    case Bar = 1;
+}
+
+enum PureReflectorEnum
+{
+    case Baz;
+}
+
+class TestClassWithEnumParams
+{
+    public function f(StringBackedReflectorEnum $a, IntBackedReflectorEnum $b, PureReflectorEnum $c)
     {
         //
     }
