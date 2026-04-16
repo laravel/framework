@@ -252,7 +252,8 @@ class FoundationFormRequestTest extends TestCase
     {
         $request = $this->createRequest(
             ['name' => 'Taylor', 'unexpected' => 'value'],
-            FoundationTestFormRequestFailOnUnknownFieldsStub::class
+            FoundationTestFormRequestFailOnUnknownFieldsStub::class,
+            'POST'
         );
 
         $exception = $this->catchException(ValidationException::class, function () use ($request) {
@@ -266,7 +267,8 @@ class FoundationFormRequestTest extends TestCase
     {
         $request = $this->createRequest(
             ['name' => 'Taylor', 'with' => 'extras'],
-            FoundationTestFormRequestSkipUnknownFieldsFailureStub::class
+            FoundationTestFormRequestSkipUnknownFieldsFailureStub::class,
+            'POST'
         );
 
         $request->validateResolved();
@@ -280,7 +282,8 @@ class FoundationFormRequestTest extends TestCase
 
         $request = $this->createRequest(
             ['name' => 'Taylor', 'unexpected' => 'value'],
-            FoundationTestFormRequestStub::class
+            FoundationTestFormRequestStub::class,
+            'POST'
         );
 
         $exception = $this->catchException(ValidationException::class, function () use ($request) {
@@ -296,7 +299,8 @@ class FoundationFormRequestTest extends TestCase
 
         $request = $this->createRequest(
             ['unexpected' => 'value'],
-            FoundationTestFormRequestWithoutRulesMethod::class
+            FoundationTestFormRequestWithoutRulesMethod::class,
+            'POST'
         );
 
         $exception = $this->catchException(ValidationException::class, function () use ($request) {
@@ -312,7 +316,8 @@ class FoundationFormRequestTest extends TestCase
 
         $request = $this->createRequest(
             ['name' => 'Taylor', 'with' => 'extras'],
-            FoundationTestFormRequestSkipUnknownFieldsFailureStub::class
+            FoundationTestFormRequestSkipUnknownFieldsFailureStub::class,
+            'POST'
         );
 
         $request->validateResolved();
@@ -329,7 +334,8 @@ class FoundationFormRequestTest extends TestCase
                     ['id' => 2, 'name' => 'b'],
                 ],
             ],
-            FoundationTestFormRequestFailOnUnknownFieldsWithWildcardStub::class
+            FoundationTestFormRequestFailOnUnknownFieldsWithWildcardStub::class,
+            'POST'
         );
 
         $exception = $this->catchException(ValidationException::class, function () use ($request) {
@@ -348,7 +354,8 @@ class FoundationFormRequestTest extends TestCase
                     ['id' => 2],
                 ],
             ],
-            FoundationTestFormRequestFailOnUnknownFieldsWithWildcardStub::class
+            FoundationTestFormRequestFailOnUnknownFieldsWithWildcardStub::class,
+            'POST'
         );
 
         $request->validateResolved();
@@ -372,7 +379,8 @@ class FoundationFormRequestTest extends TestCase
                     ['name' => 'a'],
                 ],
             ],
-            FoundationTestFormRequestFailOnUnknownFieldsSingleSegmentWildcardStub::class
+            FoundationTestFormRequestFailOnUnknownFieldsSingleSegmentWildcardStub::class,
+            'POST'
         );
 
         $exception = $this->catchException(ValidationException::class, function () use ($request) {
@@ -390,7 +398,8 @@ class FoundationFormRequestTest extends TestCase
                 'role' => 'admin',
                 'profile' => ['is_admin' => true],
             ],
-            FoundationTestFormRequestFailOnUnknownFieldsStub::class
+            FoundationTestFormRequestFailOnUnknownFieldsStub::class,
+            'POST'
         );
 
         $exception = $this->catchException(ValidationException::class, function () use ($request) {
@@ -405,7 +414,8 @@ class FoundationFormRequestTest extends TestCase
     {
         $request = $this->createRequest(
             ['user' => ['name' => 'Taylor', 'role' => 'admin']],
-            FoundationTestFormRequestFailOnUnknownFieldsNestedStub::class
+            FoundationTestFormRequestFailOnUnknownFieldsNestedStub::class,
+            'POST'
         );
 
         $exception = $this->catchException(ValidationException::class, function () use ($request) {
@@ -419,7 +429,8 @@ class FoundationFormRequestTest extends TestCase
     {
         $request = $this->createRequest(
             ['full_name' => 'Taylor'],
-            FoundationTestFormRequestFailOnUnknownFieldsPrepareForValidationStub::class
+            FoundationTestFormRequestFailOnUnknownFieldsPrepareForValidationStub::class,
+            'POST'
         );
 
         $request->validateResolved();
@@ -431,7 +442,8 @@ class FoundationFormRequestTest extends TestCase
     {
         $request = $this->createRequest(
             ['name' => 'Taylor', 'unexpected' => 'value'],
-            FoundationTestFormRequestFailOnUnknownFieldsValidationDataOverrideStub::class
+            FoundationTestFormRequestFailOnUnknownFieldsValidationDataOverrideStub::class,
+            'POST'
         );
 
         $exception = $this->catchException(ValidationException::class, function () use ($request) {
@@ -445,7 +457,8 @@ class FoundationFormRequestTest extends TestCase
     {
         $request = $this->createRequest(
             ['unexpected' => 'value'],
-            FoundationTestFormRequestFailOnUnknownFieldsStopOnFirstFailureStub::class
+            FoundationTestFormRequestFailOnUnknownFieldsStopOnFirstFailureStub::class,
+            'POST'
         );
 
         $exception = $this->catchException(ValidationException::class, function () use ($request) {
@@ -453,6 +466,106 @@ class FoundationFormRequestTest extends TestCase
         });
 
         $this->assertTrue($exception->validator->errors()->has('unexpected'));
+    }
+
+    public function testFailOnUnknownFieldsIgnoresQueryParametersOnGetRequests()
+    {
+        FormRequest::failOnUnknownFields();
+
+        $container = tap(new Container, function ($container) {
+            $container->instance(
+                ValidationFactoryContract::class,
+                $this->createValidationFactory($container)
+            );
+
+            $container->instance('translator', new TranslatorConcrete(new ArrayLoader([
+                'validation' => [
+                    'prohibited' => 'The :attribute field is prohibited.',
+                ],
+            ]), 'en'));
+        });
+
+        Container::setInstance($container);
+
+        $request = FoundationTestFormRequestWithoutRulesMethod::create(
+            '/?page=1&perPage=5&expires=1234567890&signature=abc123',
+            'GET'
+        );
+
+        $request->setRedirector($this->createMockRedirector($request))
+            ->setContainer($container);
+
+        $request->validateResolved();
+
+        $this->assertSame([], $request->validated());
+    }
+
+    public function testFailOnUnknownFieldsAllowsConfirmationFieldsWhenBaseFieldIsConfirmed()
+    {
+        FormRequest::failOnUnknownFields();
+
+        $container = tap(new Container, function ($container) {
+            $container->instance(
+                ValidationFactoryContract::class,
+                $this->createValidationFactory($container)
+            );
+
+            $container->instance('translator', new TranslatorConcrete(new ArrayLoader([
+                'validation' => [
+                    'prohibited' => 'The :attribute field is prohibited.',
+                ],
+            ]), 'en'));
+        });
+
+        Container::setInstance($container);
+
+        $request = FoundationTestFormRequestConfirmedFieldStub::create(
+            '/',
+            'POST',
+            ['password' => 'secret123', 'password_confirmation' => 'secret123']
+        );
+
+        $request->setRedirector($this->createMockRedirector($request))
+            ->setContainer($container);
+
+        $request->validateResolved();
+
+        $this->assertEquals(['password' => 'secret123'], $request->validated());
+    }
+
+    public function testFailOnUnknownFieldsRejectsConfirmationFieldsWithoutConfirmedRule()
+    {
+        FormRequest::failOnUnknownFields();
+
+        $container = tap(new Container, function ($container) {
+            $container->instance(
+                ValidationFactoryContract::class,
+                $this->createValidationFactory($container)
+            );
+
+            $container->instance('translator', new TranslatorConcrete(new ArrayLoader([
+                'validation' => [
+                    'prohibited' => 'The :attribute field is prohibited.',
+                ],
+            ]), 'en'));
+        });
+
+        Container::setInstance($container);
+
+        $request = FoundationTestFormRequestUnconfirmedFieldStub::create(
+            '/',
+            'POST',
+            ['password' => 'secret123', 'password_confirmation' => 'secret123']
+        );
+
+        $request->setRedirector($this->createMockRedirector($request))
+            ->setContainer($container);
+
+        $exception = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertTrue($exception->validator->errors()->has('password_confirmation'));
     }
 
     /**
@@ -486,7 +599,7 @@ class FoundationFormRequestTest extends TestCase
      * @param  string  $class
      * @return \Illuminate\Foundation\Http\FormRequest
      */
-    protected function createRequest($payload = [], $class = FoundationTestFormRequestStub::class)
+    protected function createRequest($payload = [], $class = FoundationTestFormRequestStub::class, $method = 'GET')
     {
         $container = tap(new Container, function ($container) {
             $container->instance(
@@ -503,7 +616,7 @@ class FoundationFormRequestTest extends TestCase
 
         Container::setInstance($container);
 
-        $request = $class::create('/', 'GET', $payload);
+        $request = $class::create('/', $method, $payload);
 
         return $request->setRedirector($this->createMockRedirector($request))
             ->setContainer($container);
@@ -881,6 +994,32 @@ class FoundationTestFormRequestFailOnUnknownFieldsStopOnFirstFailureStub extends
     public function rules()
     {
         return ['name' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+class FoundationTestFormRequestConfirmedFieldStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['password' => 'required|confirmed'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+class FoundationTestFormRequestUnconfirmedFieldStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['password' => 'required'];
     }
 
     public function authorize()
