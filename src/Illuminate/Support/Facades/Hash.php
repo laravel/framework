@@ -14,7 +14,7 @@ namespace Illuminate\Support\Facades;
  * @method static string getDefaultDriver()
  * @method static mixed driver(\UnitEnum|string|null $driver = null)
  * @method static \Illuminate\Hashing\HashManager extend(string $driver, \Closure $callback)
- * @method static array<string, mixed> getDrivers()
+ * @method static array getDrivers()
  * @method static \Illuminate\Contracts\Container\Container getContainer()
  * @method static \Illuminate\Hashing\HashManager setContainer(\Illuminate\Contracts\Container\Container $container)
  * @method static \Illuminate\Hashing\HashManager forgetDrivers()

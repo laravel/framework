@@ -12,7 +12,7 @@ namespace Illuminate\Support\Facades;
  * @method static void setDefaultDriver(string $name)
  * @method static mixed driver(\UnitEnum|string|null $driver = null)
  * @method static \Illuminate\Session\SessionManager extend(string $driver, \Closure $callback)
- * @method static array<string, mixed> getDrivers()
+ * @method static array getDrivers()
  * @method static \Illuminate\Contracts\Container\Container getContainer()
  * @method static \Illuminate\Session\SessionManager setContainer(\Illuminate\Contracts\Container\Container $container)
  * @method static \Illuminate\Session\SessionManager forgetDrivers()
