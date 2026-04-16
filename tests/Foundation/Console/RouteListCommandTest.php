@@ -258,7 +258,7 @@ class RouteListCommandTest extends TestCase
         $this->app->call('route:list', ['--json' => true, '-v' => true, '--without-middleware' => 'exampleMiddleware']);
         $output = $this->app->output();
 
-        $routes = json_decode($output, true);       
+        $routes = json_decode($output, true);
 
         $this->assertCount(1, $routes);
         $this->assertEquals('example-group', $routes[0]['uri']);
