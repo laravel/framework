@@ -934,6 +934,118 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => '1'], $builder->getBindings());
     }
 
+    public function testWhereLikeAny()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereLikeAny('name', ['%abc%', '%def%']);
+        $this->assertSame('select * from `users` where (`name` like ? or `name` like ?)', $builder->toSql());
+        $this->assertEquals(['%abc%', '%def%'], $builder->getBindings());
+    }
+
+    public function testOrWhereLikeAny()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('active', true)->orWhereLikeAny('name', ['%abc%', '%def%']);
+        $this->assertSame('select * from `users` where `active` = ? or (`name` like ? or `name` like ?)', $builder->toSql());
+        $this->assertEquals([true, '%abc%', '%def%'], $builder->getBindings());
+    }
+
+    public function testWhereNotLikeAny()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereNotLikeAny('name', ['%abc%', '%def%']);
+        $this->assertSame('select * from `users` where (`name` not like ? and `name` not like ?)', $builder->toSql());
+        $this->assertEquals(['%abc%', '%def%'], $builder->getBindings());
+    }
+
+    public function testOrWhereNotLikeAny()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('active', true)->orWhereNotLikeAny('name', ['%abc%', '%def%']);
+        $this->assertSame('select * from `users` where `active` = ? or (`name` not like ? and `name` not like ?)', $builder->toSql());
+        $this->assertEquals([true, '%abc%', '%def%'], $builder->getBindings());
+    }
+
+    public function testWhereLikeAll()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereLikeAll('name', ['%abc%', '%def%']);
+        $this->assertSame('select * from `users` where (`name` like ? and `name` like ?)', $builder->toSql());
+        $this->assertEquals(['%abc%', '%def%'], $builder->getBindings());
+    }
+
+    public function testOrWhereLikeAll()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('active', true)->orWhereLikeAll('name', ['%abc%', '%def%']);
+        $this->assertSame('select * from `users` where `active` = ? or (`name` like ? and `name` like ?)', $builder->toSql());
+        $this->assertEquals([true, '%abc%', '%def%'], $builder->getBindings());
+    }
+
+    public function testWhereNotLikeAll()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereNotLikeAll('name', ['%abc%', '%def%']);
+        $this->assertSame('select * from `users` where (`name` not like ? or `name` not like ?)', $builder->toSql());
+        $this->assertEquals(['%abc%', '%def%'], $builder->getBindings());
+    }
+
+    public function testOrWhereNotLikeAll()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('active', true)->orWhereNotLikeAll('name', ['%abc%', '%def%']);
+        $this->assertSame('select * from `users` where `active` = ? or (`name` not like ? or `name` not like ?)', $builder->toSql());
+        $this->assertEquals([true, '%abc%', '%def%'], $builder->getBindings());
+    }
+
+    public function testWhereLikeAnyCaseSensitiveMysql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereLikeAny('name', ['%abc%', '%def%'], true);
+        $this->assertSame('select * from `users` where (`name` like binary ? or `name` like binary ?)', $builder->toSql());
+        $this->assertEquals(['%abc%', '%def%'], $builder->getBindings());
+    }
+
+    public function testWhereLikeAnyPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereLikeAny('name', ['%abc%', '%def%']);
+        $this->assertSame('select * from "users" where ("name"::text ilike ? or "name"::text ilike ?)', $builder->toSql());
+        $this->assertEquals(['%abc%', '%def%'], $builder->getBindings());
+    }
+
+    public function testWhereLikeAnyCaseSensitivePostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereLikeAny('name', ['%abc%', '%def%'], true);
+        $this->assertSame('select * from "users" where ("name"::text like ? or "name"::text like ?)', $builder->toSql());
+        $this->assertEquals(['%abc%', '%def%'], $builder->getBindings());
+    }
+
+    public function testWhereLikeAnySqlite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereLikeAny('name', ['%abc%', '%def%']);
+        $this->assertSame('select * from "users" where ("name" like ? or "name" like ?)', $builder->toSql());
+        $this->assertEquals(['%abc%', '%def%'], $builder->getBindings());
+    }
+
+    public function testWhereLikeAnyWithEmptyArray()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereLikeAny('name', []);
+        $this->assertSame('select * from `users`', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+    }
+
+    public function testWhereLikeAllWithSingleValue()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereLikeAll('name', ['%abc%']);
+        $this->assertSame('select * from `users` where (`name` like ?)', $builder->toSql());
+        $this->assertEquals(['%abc%'], $builder->getBindings());
+    }
+
     public function testWhereDateSqlite()
     {
         $builder = $this->getSQLiteBuilder();
