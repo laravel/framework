@@ -232,7 +232,9 @@ class FormRequest extends Request implements ValidatesWhenResolved
     {
         $allowedKeys = array_keys($this->validationRules());
 
-        foreach (array_keys(Arr::dot($this->validationPayload())) as $inputKey) {
+        $input = $this->isJson() ? $this->json()->all() : $this->request->all();
+
+        foreach (array_keys(Arr::dot($input)) as $inputKey) {
             if (! $this->isKnownField($inputKey, $allowedKeys)) {
                 $validator->errors()->add($inputKey, trans('validation.prohibited', [
                     'attribute' => str_replace('_', ' ', $inputKey),
@@ -255,12 +257,9 @@ class FormRequest extends Request implements ValidatesWhenResolved
                 return true;
             }
 
-            if (str_ends_with($inputKey, '_confirmation')) {
-                $baseField = substr($inputKey, 0, -13);
-
-                if ($ruleKey === $baseField && $this->hasConfirmedRule($baseField)) {
-                    return true;
-                }
+            if (str_ends_with($inputKey, '_confirmation') &&
+                $ruleKey === substr($inputKey, 0, -13)) {
+                return true;
             }
 
             if (str_contains($ruleKey, '*')) {
@@ -269,45 +268,6 @@ class FormRequest extends Request implements ValidatesWhenResolved
                 if (preg_match($pattern, $inputKey)) {
                     return true;
                 }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Get the request payload that should be checked for unknown fields.
-     *
-     * @return array
-     */
-    protected function validationPayload(): array
-    {
-        return $this->isJson() ? $this->json()->all() : $this->request->all();
-    }
-
-    /**
-     * Determine if the given field has a confirmed rule.
-     *
-     * @param  string  $field
-     * @return bool
-     */
-    protected function hasConfirmedRule(string $field): bool
-    {
-        $rules = ValidationRuleParser::filterConditionalRules($this->validationRules(), $this->validationData());
-
-        if (! array_key_exists($field, $rules)) {
-            return false;
-        }
-
-        $parsedRules = (new ValidationRuleParser($this->validationData()))->explode([
-            $field => $rules[$field],
-        ])->rules[$field];
-
-        foreach ($parsedRules as $rule) {
-            [$rule] = ValidationRuleParser::parse($rule);
-
-            if ($rule === 'Confirmed') {
-                return true;
             }
         }
 
