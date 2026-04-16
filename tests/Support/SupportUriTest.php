@@ -29,7 +29,7 @@ class SupportUriTest extends TestCase
         $this->assertEquals('laravel.com', $uri->host());
         $this->assertNull($uri->port());
         $this->assertEquals('docs/installation', $uri->path());
-        $this->assertEquals([], $uri->query()->toArray());
+        $this->assertSame([], $uri->query()->toArray());
         $this->assertEquals('', (string) $uri->query());
         $this->assertEquals('', $uri->query()->decode());
         $this->assertNull($uri->fragment());
@@ -259,7 +259,7 @@ class SupportUriTest extends TestCase
     {
         $uri = Uri::of('https://laravel.com');
 
-        $this->assertEquals([], $uri->pathSegments()->toArray());
+        $this->assertSame([], $uri->pathSegments()->toArray());
 
         $uri = Uri::of('https://laravel.com/one/two/three');
 

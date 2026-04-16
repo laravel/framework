@@ -340,8 +340,8 @@ class SupportHelpersTest extends TestCase
 
         $this->assertEquals(['taylor', 'abigail', 'abigail', 'dayle', 'dayle', 'taylor'], data_get($array, 'posts.*.comments.*.author'));
         $this->assertEquals([4, 3, 2, null, null, 1], data_get($array, 'posts.*.comments.*.likes'));
-        $this->assertEquals([], data_get($array, 'posts.*.users.*.name', 'irrelevant'));
-        $this->assertEquals([], data_get($array, 'posts.*.users.*.name'));
+        $this->assertSame([], data_get($array, 'posts.*.users.*.name', 'irrelevant'));
+        $this->assertSame([], data_get($array, 'posts.*.users.*.name'));
     }
 
     public function testDataGetFirstLastDirectives()

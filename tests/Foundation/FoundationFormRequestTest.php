@@ -229,7 +229,7 @@ class FoundationFormRequestTest extends TestCase
 
         $request->validateResolved();
 
-        $this->assertEquals([], $request->all());
+        $this->assertSame([], $request->all());
     }
 
     public function testRequestWithGetRules()

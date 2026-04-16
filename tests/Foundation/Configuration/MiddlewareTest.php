@@ -240,10 +240,10 @@ class MiddlewareTest extends TestCase
         $this->assertEquals(['^(.+\.)?laravel\.test$'], $middleware->hosts());
 
         $configuration->trustHosts(at: [], subdomains: false);
-        $this->assertEquals([], $middleware->hosts());
+        $this->assertSame([], $middleware->hosts());
 
         $configuration->trustHosts(at: static fn () => [], subdomains: false);
-        $this->assertEquals([], $middleware->hosts());
+        $this->assertSame([], $middleware->hosts());
     }
 
     public function testEncryptCookies()

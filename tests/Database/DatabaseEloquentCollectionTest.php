@@ -439,7 +439,7 @@ class DatabaseEloquentCollectionTest extends TestCase
 
         $c1 = new Collection([$one, $two, $three]);
 
-        $this->assertEquals([], $c1->intersect(null)->all());
+        $this->assertSame([], $c1->intersect(null)->all());
     }
 
     public function testCollectionIntersectsWithGivenCollection()
@@ -543,7 +543,7 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c = new Collection([new TestEloquentCollectionModel]);
         $c = $c->makeVisible(['hidden']);
 
-        $this->assertEquals([], $c[0]->getHidden());
+        $this->assertSame([], $c[0]->getHidden());
     }
 
     public function testMergeHiddenAddsHiddenOnEntireCollection()
@@ -628,7 +628,7 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c = new Collection([new TestEloquentCollectionModel]);
         $c = $c->makeVisible('hidden');
 
-        $this->assertEquals([], $c[0]->getHidden());
+        $this->assertSame([], $c[0]->getHidden());
         $this->assertEquals(['visible', 'hidden'], $c[0]->getVisible());
     }
 
@@ -639,8 +639,8 @@ class DatabaseEloquentCollectionTest extends TestCase
 
         $c = new Collection([$a, $b]);
 
-        $this->assertEquals([], $c->multiply(-1)->all());
-        $this->assertEquals([], $c->multiply(0)->all());
+        $this->assertSame([], $c->multiply(-1)->all());
+        $this->assertSame([], $c->multiply(0)->all());
 
         $this->assertEquals([$a, $b], $c->multiply(1)->all());
 
@@ -704,7 +704,7 @@ class DatabaseEloquentCollectionTest extends TestCase
             },
         ]);
 
-        $this->assertEquals([], $c->getQueueableRelations());
+        $this->assertSame([], $c->getQueueableRelations());
     }
 
     public function testEmptyCollectionStayEmptyOnFresh()

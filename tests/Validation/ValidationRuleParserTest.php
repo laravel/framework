@@ -217,7 +217,7 @@ class ValidationRuleParserTest extends TestCase
         ]);
 
         $this->assertEquals(['name' => ['required']], $results->rules);
-        $this->assertEquals([], $results->implicitAttributes);
+        $this->assertSame([], $results->implicitAttributes);
     }
 
     public function testExplodeHandlesForwardSlashesInWildcardRule()

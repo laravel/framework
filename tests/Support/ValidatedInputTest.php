@@ -556,6 +556,6 @@ class ValidatedInputTest extends TestCase
 
         $this->assertEquals(['name' => 'Fatih', 'surname' => 'AYDIN', 'foo' => ['bar' => null]], $input->except('foo.baz'));
         $this->assertEquals(['surname' => 'AYDIN'], $input->except('name', 'foo'));
-        $this->assertEquals([], $input->except('name', 'surname', 'foo'));
+        $this->assertSame([], $input->except('name', 'surname', 'foo'));
     }
 }

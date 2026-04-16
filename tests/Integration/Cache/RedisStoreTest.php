@@ -240,7 +240,7 @@ class RedisStoreTest extends TestCase
             'norf' => null,
         ], $store->many(['foo', 'fizz', 'quz', 'norf']));
 
-        $this->assertEquals([], $store->many([]));
+        $this->assertSame([], $store->many([]));
     }
 
     public function testPutManyCallsPutWhenClustered()

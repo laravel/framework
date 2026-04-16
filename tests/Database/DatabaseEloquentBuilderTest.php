@@ -336,7 +336,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getModel()->shouldReceive('newCollection')->with([])->andReturn(new Collection([]));
 
         $results = $builder->get(['foo']);
-        $this->assertEquals([], $results->all());
+        $this->assertSame([], $results->all());
     }
 
     public function testValueMethodWithModelFound()

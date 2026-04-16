@@ -6955,7 +6955,7 @@ class ValidationValidatorTest extends TestCase
         $v->sometimes(['users'], 'array', function ($i, $item) {
             return (bool) $item;
         });
-        $this->assertEquals([], $v->getRules());
+        $this->assertSame([], $v->getRules());
 
         // ['company.users'] -> if users is not empty it must be validated as array
         $trans = $this->getIlluminateArrayTranslator();
