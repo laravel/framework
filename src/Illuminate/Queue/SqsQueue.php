@@ -5,12 +5,21 @@ namespace Illuminate\Queue;
 use Aws\Sqs\SqsClient;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Queue\Jobs\SqsJob;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class SqsQueue extends Queue implements QueueContract, ClearableQueue
 {
+    /**
+     * The maximum SQS payload size in bytes (1 MB).
+     *
+     * @var int
+     */
+    const MAX_SQS_PAYLOAD_SIZE = 1048576;
+
     /**
      * The Amazon SQS instance.
      *
@@ -40,6 +49,13 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     protected $suffix;
 
     /**
+     * The extended store options for large payload offloading.
+     *
+     * @var array
+     */
+    protected $extendedStoreOptions = [];
+
+    /**
      * Create a new Amazon SQS queue instance.
      *
      * @param  \Aws\Sqs\SqsClient  $sqs
@@ -47,6 +63,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string  $prefix
      * @param  string  $suffix
      * @param  bool  $dispatchAfterCommit
+     * @param  array  $extendedStoreOptions
      */
     public function __construct(
         SqsClient $sqs,
@@ -54,12 +71,14 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
         $prefix = '',
         $suffix = '',
         $dispatchAfterCommit = false,
+        array $extendedStoreOptions = [],
     ) {
         $this->sqs = $sqs;
         $this->prefix = $prefix;
         $this->default = $default;
         $this->suffix = $suffix;
         $this->dispatchAfterCommit = $dispatchAfterCommit;
+        $this->extendedStoreOptions = $extendedStoreOptions;
     }
 
     /**
@@ -212,6 +231,10 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
+        if ($this->shouldStoreToDisk($payload)) {
+            $payload = $this->storeToDisk($payload);
+        }
+
         return $this->sqs->sendMessage([
             'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload, ...$options,
         ])->get('MessageId');
@@ -336,7 +359,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
         if (! is_null($response['Messages']) && count($response['Messages']) > 0) {
             return new SqsJob(
                 $this->container, $this->sqs, $response['Messages'][0],
-                $this->connectionName, $queue
+                $this->connectionName, $queue, $this->extendedStoreOptions
             );
         }
     }
@@ -353,6 +376,10 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             $this->sqs->purgeQueue([
                 'QueueUrl' => $this->getQueue($queue),
             ]);
+
+            if (Arr::get($this->extendedStoreOptions, 'cleanup') && Arr::get($this->extendedStoreOptions, 'prefix')) {
+                $this->resolveDisk()->deleteDirectory(Arr::get($this->extendedStoreOptions, 'prefix'));
+            }
         });
     }
 
@@ -387,6 +414,55 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
         }
 
         return rtrim($this->prefix, '/').'/'.Str::finish($queue, $this->suffix);
+    }
+
+    /**
+     * Determine if the payload should be stored on disk.
+     *
+     * @param  string  $payload
+     * @return bool
+     */
+    protected function shouldStoreToDisk($payload)
+    {
+        if (! Arr::get($this->extendedStoreOptions, 'enabled', false)) {
+            return false;
+        }
+
+        return Arr::get($this->extendedStoreOptions, 'always', false)
+            || strlen($payload) >= static::MAX_SQS_PAYLOAD_SIZE;
+    }
+
+    /**
+     * Store the payload on disk and return a pointer payload.
+     *
+     * @param  string  $payload
+     * @return string
+     */
+    protected function storeToDisk($payload)
+    {
+        $decoded = json_decode($payload);
+
+        $uuid = $decoded->uuid ?? (string) Str::uuid();
+
+        $prefix = Arr::get($this->extendedStoreOptions, 'prefix', '');
+
+        $path = ltrim($prefix.'/'.$uuid.'.json', '/');
+
+        $this->resolveDisk()->put($path, $payload);
+
+        return json_encode(['@pointer' => $path]);
+    }
+
+    /**
+     * Resolve the configured filesystem disk for extended storage.
+     *
+     * @return \Illuminate\Filesystem\FilesystemAdapter
+     */
+    protected function resolveDisk()
+    {
+        return $this->container->make('filesystem')->disk(
+            Arr::get($this->extendedStoreOptions, 'disk')
+        );
     }
 
     /**

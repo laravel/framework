@@ -5,6 +5,7 @@ namespace Illuminate\Queue\Jobs;
 use Aws\Sqs\SqsClient;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job as JobContract;
+use Illuminate\Support\Arr;
 
 class SqsJob extends Job implements JobContract
 {
@@ -23,6 +24,20 @@ class SqsJob extends Job implements JobContract
     protected $job;
 
     /**
+     * The extended store options for large payload offloading.
+     *
+     * @var array
+     */
+    protected $extendedStoreOptions = [];
+
+    /**
+     * The cached raw body of the job.
+     *
+     * @var string|null
+     */
+    protected $cachedRawBody = null;
+
+    /**
      * Create a new job instance.
      *
      * @param  \Illuminate\Container\Container  $container
@@ -30,14 +45,16 @@ class SqsJob extends Job implements JobContract
      * @param  array  $job
      * @param  string  $connectionName
      * @param  string  $queue
+     * @param  array  $extendedStoreOptions
      */
-    public function __construct(Container $container, SqsClient $sqs, array $job, $connectionName, $queue)
+    public function __construct(Container $container, SqsClient $sqs, array $job, $connectionName, $queue, array $extendedStoreOptions = [])
     {
         $this->sqs = $sqs;
         $this->job = $job;
         $this->queue = $queue;
         $this->container = $container;
         $this->connectionName = $connectionName;
+        $this->extendedStoreOptions = $extendedStoreOptions;
     }
 
     /**
@@ -69,6 +86,10 @@ class SqsJob extends Job implements JobContract
         $this->sqs->deleteMessage([
             'QueueUrl' => $this->queue, 'ReceiptHandle' => $this->job['ReceiptHandle'],
         ]);
+
+        if (Arr::get($this->extendedStoreOptions, 'cleanup') && $pointer = $this->resolvePointer()) {
+            $this->resolveDisk()->delete($pointer);
+        }
     }
 
     /**
@@ -98,6 +119,14 @@ class SqsJob extends Job implements JobContract
      */
     public function getRawBody()
     {
+        if ($this->cachedRawBody !== null) {
+            return $this->cachedRawBody;
+        }
+
+        if ($pointer = $this->resolvePointer()) {
+            return $this->cachedRawBody = $this->resolveDisk()->get($pointer);
+        }
+
         return $this->job['Body'];
     }
 
@@ -119,5 +148,39 @@ class SqsJob extends Job implements JobContract
     public function getSqsJob()
     {
         return $this->job;
+    }
+
+    /**
+     * Resolve the pointer path from the job body, if present.
+     *
+     * @return string|null
+     */
+    protected function resolvePointer()
+    {
+        $body = $this->job['Body'] ?? null;
+
+        if (! is_string($body) || $body === '') {
+            return null;
+        }
+
+        $decoded = json_decode($body, true);
+
+        if (! is_array($decoded) || ! isset($decoded['@pointer'])) {
+            return null;
+        }
+
+        return is_string($decoded['@pointer']) ? $decoded['@pointer'] : null;
+    }
+
+    /**
+     * Resolve the configured filesystem disk for extended storage.
+     *
+     * @return \Illuminate\Filesystem\FilesystemAdapter
+     */
+    protected function resolveDisk()
+    {
+        return $this->container->make('filesystem')->disk(
+            Arr::get($this->extendedStoreOptions, 'disk')
+        );
     }
 }
