@@ -396,7 +396,7 @@ class Vite implements Htmlable
                 $manifest,
             ]);
 
-            foreach ($chunk['imports'] ?? [] as $import) {
+            foreach ($this->resolveImports($manifest, $chunk) as $import) {
                 $preloads->push([
                     $import,
                     $this->assetPath("{$buildDirectory}/{$manifest[$import]['file']}"),
@@ -982,6 +982,34 @@ class Vite implements Htmlable
         }
 
         return md5_file($path) ?: null;
+    }
+
+    /**
+     * Recursively resolve all imports for the given chunk.
+     *
+     * @param  array  $manifest
+     * @param  array  $chunk
+     * @param  array  $seen
+     * @return array
+     */
+    protected function resolveImports($manifest, $chunk, $seen = [])
+    {
+        $imports = [];
+
+        foreach ($chunk['imports'] ?? [] as $import) {
+            if (isset($seen[$import])) {
+                continue;
+            }
+
+            $seen[$import] = true;
+            $imports[] = $import;
+
+            if (isset($manifest[$import])) {
+                $imports = array_merge($imports, $this->resolveImports($manifest, $manifest[$import], $seen));
+            }
+        }
+
+        return $imports;
     }
 
     /**
