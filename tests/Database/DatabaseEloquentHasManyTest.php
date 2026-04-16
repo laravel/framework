@@ -59,7 +59,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $created = $this->expectForceCreatedModel($relation, ['name' => 'taylor']);
 
         $this->assertEquals($created, $relation->forceCreate(['name' => 'taylor']));
-        $this->assertEquals(1, $created->getAttribute('foreign_key'));
+        $this->assertSame(1, $created->getAttribute('foreign_key'));
     }
 
     public function testFindOrNewMethodFindsModel()
@@ -347,10 +347,10 @@ class DatabaseEloquentHasManyTest extends TestCase
         });
         $models = $relation->match([$model1, $model2, $model3], new Collection([$result1, $result2, $result3]), 'foo');
 
-        $this->assertEquals(1, $models[0]->foo[0]->foreign_key);
+        $this->assertSame(1, $models[0]->foo[0]->foreign_key);
         $this->assertCount(1, $models[0]->foo);
-        $this->assertEquals(2, $models[1]->foo[0]->foreign_key);
-        $this->assertEquals(2, $models[1]->foo[1]->foreign_key);
+        $this->assertSame(2, $models[1]->foo[0]->foreign_key);
+        $this->assertSame(2, $models[1]->foo[1]->foreign_key);
         $this->assertCount(2, $models[1]->foo);
         $this->assertNull($models[2]->foo);
     }

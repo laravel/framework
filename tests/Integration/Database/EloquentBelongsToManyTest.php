@@ -162,9 +162,9 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $pivot->tag_id = 2;
         $pivot->save();
 
-        $this->assertEquals(1, PostTagPivot::count());
-        $this->assertEquals(1, PostTagPivot::first()->post_id);
-        $this->assertEquals(2, PostTagPivot::first()->tag_id);
+        $this->assertSame(1, PostTagPivot::count());
+        $this->assertSame(1, PostTagPivot::first()->post_id);
+        $this->assertSame(2, PostTagPivot::first()->tag_id);
     }
 
     public function testCustomPivotClassUsingSync()
@@ -1337,15 +1337,15 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $user->postsWithCustomPivot()->sync([$post1->uuid]);
         $this->assertEquals($user->uuid, $user->postsWithCustomPivot()->first()->pivot->user_uuid);
         $this->assertEquals($post1->uuid, $user->postsWithCustomPivot()->first()->pivot->post_uuid);
-        $this->assertEquals(1, $user->postsWithCustomPivot()->first()->pivot->is_draft);
+        $this->assertSame(1, $user->postsWithCustomPivot()->first()->pivot->is_draft);
 
         $user->postsWithCustomPivot()->sync([$post2->uuid]);
         $this->assertEquals($user->uuid, $user->postsWithCustomPivot()->first()->pivot->user_uuid);
         $this->assertEquals($post2->uuid, $user->postsWithCustomPivot()->first()->pivot->post_uuid);
-        $this->assertEquals(1, $user->postsWithCustomPivot()->first()->pivot->is_draft);
+        $this->assertSame(1, $user->postsWithCustomPivot()->first()->pivot->is_draft);
 
         $user->postsWithCustomPivot()->updateExistingPivot($post2->uuid, ['is_draft' => 0]);
-        $this->assertEquals(0, $user->postsWithCustomPivot()->first()->pivot->is_draft);
+        $this->assertSame(0, $user->postsWithCustomPivot()->first()->pivot->is_draft);
     }
 
     public function testOrderByPivotMethod()

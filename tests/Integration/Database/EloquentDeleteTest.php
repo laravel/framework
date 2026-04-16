@@ -174,7 +174,7 @@ class EloquentDeleteTest extends DatabaseTestCase
 
         $logs = PostStringyKey::query()->getConnection()->getQueryLog();
 
-        $this->assertEquals(0, PostStringyKey::query()->count());
+        $this->assertSame(0, PostStringyKey::query()->count());
 
         $this->assertStringStartsWith('select * from "my_posts" where "my_id" in (', str_replace(['`', '[', ']'], '"', $logs[0]['query']));
 

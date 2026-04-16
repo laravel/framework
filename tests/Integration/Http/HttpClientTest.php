@@ -66,8 +66,8 @@ class HttpClientTest extends TestCase
         }, 3);
 
         $this->assertInstanceOf(Response::class, $responses['laravel']);
-        $this->assertEquals(5, $responses['forge']);
-        $this->assertEquals(200, $responses['nightwatch']);
+        $this->assertSame(5, $responses['forge']);
+        $this->assertSame(200, $responses['nightwatch']);
 
         $this->assertCount(3, Http::recorded());
     }

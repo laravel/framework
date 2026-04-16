@@ -31,22 +31,22 @@ class ThrottleRequestsWithRedisTest extends TestCase
 
             $response = $this->withoutExceptionHandling()->get('/');
             $this->assertSame('yes', $response->getContent());
-            $this->assertEquals(2, $response->headers->get('X-RateLimit-Limit'));
-            $this->assertEquals(1, $response->headers->get('X-RateLimit-Remaining'));
+            $this->assertSame(2, $response->headers->get('X-RateLimit-Limit'));
+            $this->assertSame(1, $response->headers->get('X-RateLimit-Remaining'));
 
             $response = $this->withoutExceptionHandling()->get('/');
             $this->assertSame('yes', $response->getContent());
-            $this->assertEquals(2, $response->headers->get('X-RateLimit-Limit'));
-            $this->assertEquals(0, $response->headers->get('X-RateLimit-Remaining'));
+            $this->assertSame(2, $response->headers->get('X-RateLimit-Limit'));
+            $this->assertSame(0, $response->headers->get('X-RateLimit-Remaining'));
 
             Carbon::setTestNow($finish = $now->addSeconds(58));
 
             try {
                 $this->withoutExceptionHandling()->get('/');
             } catch (Throwable $e) {
-                $this->assertEquals(429, $e->getStatusCode());
-                $this->assertEquals(2, $e->getHeaders()['X-RateLimit-Limit']);
-                $this->assertEquals(0, $e->getHeaders()['X-RateLimit-Remaining']);
+                $this->assertSame(429, $e->getStatusCode());
+                $this->assertSame(2, $e->getHeaders()['X-RateLimit-Limit']);
+                $this->assertSame(0, $e->getHeaders()['X-RateLimit-Remaining']);
                 // $this->assertTrue(in_array($e->getHeaders()['Retry-After'], [2, 3]));
                 // $this->assertTrue(in_array($e->getHeaders()['X-RateLimit-Reset'], [$finish->getTimestamp() + 2, $finish->getTimestamp() + 3]));
             }

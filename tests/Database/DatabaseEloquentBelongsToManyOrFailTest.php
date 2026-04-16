@@ -107,7 +107,7 @@ class DatabaseEloquentBelongsToManyOrFailTest extends TestCase
         $user->roles()->attachOrFail(1, ['active' => true]);
 
         $pivot = DB::table('role_user')->where('user_id', 1)->where('role_id', 1)->first();
-        $this->assertEquals(1, $pivot->active);
+        $this->assertSame(1, $pivot->active);
     }
 
     public function testDetachOrFail()
@@ -119,7 +119,7 @@ class DatabaseEloquentBelongsToManyOrFailTest extends TestCase
 
         $result = $user->roles()->detachOrFail([1, 2]);
 
-        $this->assertEquals(2, $result);
+        $this->assertSame(2, $result);
         $this->assertCount(1, $user->roles()->get());
     }
 
@@ -132,7 +132,7 @@ class DatabaseEloquentBelongsToManyOrFailTest extends TestCase
 
         $result = $user->roles()->detachOrFail();
 
-        $this->assertEquals(3, $result);
+        $this->assertSame(3, $result);
         $this->assertCount(0, $user->roles()->get());
     }
 
@@ -163,7 +163,7 @@ class DatabaseEloquentBelongsToManyOrFailTest extends TestCase
         $this->assertEmpty($result['updated']);
 
         $pivot = DB::table('role_user')->where('user_id', 1)->where('role_id', 1)->first();
-        $this->assertEquals(1, $pivot->active);
+        $this->assertSame(1, $pivot->active);
     }
 
     public function testUpdateExistingPivotOrFail()
@@ -175,10 +175,10 @@ class DatabaseEloquentBelongsToManyOrFailTest extends TestCase
 
         $result = $user->roles()->updateExistingPivotOrFail(1, ['active' => true]);
 
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $pivot = DB::table('role_user')->where('user_id', 1)->where('role_id', 1)->first();
-        $this->assertEquals(1, $pivot->active);
+        $this->assertSame(1, $pivot->active);
     }
 
     /**

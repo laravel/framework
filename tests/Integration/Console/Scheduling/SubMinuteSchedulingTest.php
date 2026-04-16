@@ -86,8 +86,8 @@ class SubMinuteSchedulingTest extends TestCase
             ->expectsOutputToContain('Running [Callback]');
 
         Sleep::assertSleptTimes(600);
-        $this->assertEquals(60, $everySecondRuns);
-        $this->assertEquals(2, $everyThirtySecondsRuns);
+        $this->assertSame(60, $everySecondRuns);
+        $this->assertSame(2, $everyThirtySecondsRuns);
     }
 
     public function test_sub_minute_scheduling_can_be_interrupted()
@@ -113,8 +113,8 @@ class SubMinuteSchedulingTest extends TestCase
             ->expectsOutputToContain('Running [Callback]');
 
         Sleep::assertSleptTimes(300);
-        $this->assertEquals(30, $runs);
-        $this->assertEquals(30, $startedAt->diffInSeconds(Carbon::now()));
+        $this->assertSame(30, $runs);
+        $this->assertSame(30.0, $startedAt->diffInSeconds(Carbon::now()));
     }
 
     public function test_sub_minute_events_stop_for_the_rest_of_the_minute_once_maintenance_mode_is_enabled()
@@ -145,7 +145,7 @@ class SubMinuteSchedulingTest extends TestCase
             ->expectsOutputToContain('Running [Callback]');
 
         Sleep::assertSleptTimes(600);
-        $this->assertEquals(30, $runs);
+        $this->assertSame(30, $runs);
     }
 
     public function test_sub_minute_events_can_be_run_in_maintenance_mode()
@@ -172,7 +172,7 @@ class SubMinuteSchedulingTest extends TestCase
             ->expectsOutputToContain('Running [Callback]');
 
         Sleep::assertSleptTimes(600);
-        $this->assertEquals(60, $runs);
+        $this->assertSame(60, $runs);
     }
 
     public function test_sub_minute_events_can_be_run_when_schedule_is_paused()
@@ -197,7 +197,7 @@ class SubMinuteSchedulingTest extends TestCase
             ->expectsOutputToContain('Running [Callback]');
 
         Sleep::assertSleptTimes(600);
-        $this->assertEquals(60, $runs);
+        $this->assertSame(60, $runs);
     }
 
     public function test_sub_minute_events_stop_for_the_rest_of_the_minute_once_schedule_is_paused()
@@ -222,7 +222,7 @@ class SubMinuteSchedulingTest extends TestCase
             ->expectsOutputToContain('Running [Callback]');
 
         Sleep::assertSleptTimes(600);
-        $this->assertEquals(30, $runs);
+        $this->assertSame(30, $runs);
     }
 
     public function test_sub_minute_scheduling_respects_filters()
@@ -240,7 +240,7 @@ class SubMinuteSchedulingTest extends TestCase
             ->expectsOutputToContain('Running [Callback]');
 
         Sleep::assertSleptTimes(600);
-        $this->assertEquals(30, $runs);
+        $this->assertSame(30, $runs);
     }
 
     public function test_sub_minute_scheduling_can_run_on_one_server()
@@ -260,7 +260,7 @@ class SubMinuteSchedulingTest extends TestCase
             ->expectsOutputToContain('Running [test]');
 
         Sleep::assertSleptTimes(600);
-        $this->assertEquals(60, $runs);
+        $this->assertSame(60, $runs);
 
         // Fake a second server running at the same minute.
         Carbon::setTestNow($startedAt);
@@ -270,7 +270,7 @@ class SubMinuteSchedulingTest extends TestCase
             ->expectsOutputToContain('Skipping [test]');
 
         Sleep::assertSleptTimes(1200);
-        $this->assertEquals(60, $runs);
+        $this->assertSame(60, $runs);
     }
 
     public static function frequencyProvider()

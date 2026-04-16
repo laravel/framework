@@ -214,7 +214,7 @@ class DatabaseQueryBuilderTest extends TestCase
         };
 
         $default = function ($query, $condition) {
-            $this->assertEquals(0, $condition);
+            $this->assertSame(0, $condition);
 
             $query->where('id', '=', 2);
         };
@@ -267,7 +267,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testUnlessCallbackWithDefault()
     {
         $callback = function ($query, $condition) {
-            $this->assertEquals(0, $condition);
+            $this->assertSame(0, $condition);
 
             $query->where('id', '=', 1);
         };
@@ -2738,7 +2738,7 @@ class DatabaseQueryBuilderTest extends TestCase
         });
 
         $count = $builder->getCountForPagination();
-        $this->assertEquals(1, $count);
+        $this->assertSame(1, $count);
         $this->assertEquals([4], $builder->getBindings());
     }
 
@@ -2754,7 +2754,7 @@ class DatabaseQueryBuilderTest extends TestCase
         });
 
         $count = $builder->getCountForPagination($columns);
-        $this->assertEquals(1, $count);
+        $this->assertSame(1, $count);
     }
 
     public function testGetCountForPaginationWithUnion()
@@ -2768,7 +2768,7 @@ class DatabaseQueryBuilderTest extends TestCase
         });
 
         $count = $builder->getCountForPagination();
-        $this->assertEquals(1, $count);
+        $this->assertSame(1, $count);
     }
 
     public function testGetCountForPaginationWithUnionOrders()
@@ -2782,7 +2782,7 @@ class DatabaseQueryBuilderTest extends TestCase
         });
 
         $count = $builder->getCountForPagination();
-        $this->assertEquals(1, $count);
+        $this->assertSame(1, $count);
     }
 
     public function testGetCountForPaginationWithUnionLimitAndOffset()
@@ -2796,7 +2796,7 @@ class DatabaseQueryBuilderTest extends TestCase
         });
 
         $count = $builder->getCountForPagination();
-        $this->assertEquals(1, $count);
+        $this->assertSame(1, $count);
     }
 
     public function testWhereShortcut()
@@ -3921,7 +3921,7 @@ class DatabaseQueryBuilderTest extends TestCase
             return $results;
         });
         $results = $builder->from('users')->count();
-        $this->assertEquals(1, $results);
+        $this->assertSame(1, $results);
 
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select exists(select * from "users") as "exists"', [], true)->andReturn([['exists' => 1]]);
@@ -3939,7 +3939,7 @@ class DatabaseQueryBuilderTest extends TestCase
             return $results;
         });
         $results = $builder->from('users')->max('id');
-        $this->assertEquals(1, $results);
+        $this->assertSame(1, $results);
 
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select min("id") as aggregate from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
@@ -3947,7 +3947,7 @@ class DatabaseQueryBuilderTest extends TestCase
             return $results;
         });
         $results = $builder->from('users')->min('id');
-        $this->assertEquals(1, $results);
+        $this->assertSame(1, $results);
 
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select sum("id") as aggregate from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
@@ -3955,7 +3955,7 @@ class DatabaseQueryBuilderTest extends TestCase
             return $results;
         });
         $results = $builder->from('users')->sum('id');
-        $this->assertEquals(1, $results);
+        $this->assertSame(1, $results);
 
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select avg("id") as aggregate from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
@@ -3963,7 +3963,7 @@ class DatabaseQueryBuilderTest extends TestCase
             return $results;
         });
         $results = $builder->from('users')->avg('id');
-        $this->assertEquals(1, $results);
+        $this->assertSame(1, $results);
 
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select avg("id") as aggregate from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
@@ -3971,7 +3971,7 @@ class DatabaseQueryBuilderTest extends TestCase
             return $results;
         });
         $results = $builder->from('users')->average('id');
-        $this->assertEquals(1, $results);
+        $this->assertSame(1, $results);
     }
 
     public function testSqlServerExists()
@@ -4025,9 +4025,9 @@ class DatabaseQueryBuilderTest extends TestCase
         });
         $builder->from('users')->select('column1', 'column2');
         $count = $builder->count();
-        $this->assertEquals(1, $count);
+        $this->assertSame(1, $count);
         $sum = $builder->sum('id');
-        $this->assertEquals(2, $sum);
+        $this->assertSame(2, $sum);
         $result = $builder->get();
         $this->assertEquals([['column1' => 'foo', 'column2' => 'bar']], $result->all());
     }
@@ -4042,7 +4042,7 @@ class DatabaseQueryBuilderTest extends TestCase
         });
         $builder->from('users');
         $count = $builder->count('column1');
-        $this->assertEquals(1, $count);
+        $this->assertSame(1, $count);
         $result = $builder->select('column2', 'column3')->get();
         $this->assertEquals([['column2' => 'foo', 'column3' => 'bar']], $result->all());
     }
@@ -4057,7 +4057,7 @@ class DatabaseQueryBuilderTest extends TestCase
         });
         $builder->from('users');
         $count = $builder->count('column1');
-        $this->assertEquals(1, $count);
+        $this->assertSame(1, $count);
         $result = $builder->get(['column2', 'column3']);
         $this->assertEquals([['column2' => 'foo', 'column3' => 'bar']], $result->all());
     }
@@ -4073,7 +4073,7 @@ class DatabaseQueryBuilderTest extends TestCase
             $query->from('posts')->select('foo', 'bar')->where('title', 'foo');
         }, 'post');
         $count = $builder->count();
-        $this->assertEquals(1, $count);
+        $this->assertSame(1, $count);
         $this->assertSame('(select "foo", "bar" from "posts" where "title" = ?) as "post"', $builder->getGrammar()->getValue($builder->columns[0]));
         $this->assertEquals(['foo'], $builder->getBindings());
     }
@@ -4115,7 +4115,7 @@ class DatabaseQueryBuilderTest extends TestCase
             }
         );
 
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testInsertUsingWithEmptyColumns()
@@ -4130,7 +4130,7 @@ class DatabaseQueryBuilderTest extends TestCase
             }
         );
 
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testInsertUsingInvalidSubquery()
@@ -4153,7 +4153,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert ignore into `users` (`email`) values (?)', ['foo'])->andReturn(1);
         $result = $builder->from('users')->insertOrIgnore(['email' => 'foo']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testPostgresInsertOrIgnoreMethod()
@@ -4161,7 +4161,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email") values (?) on conflict do nothing', ['foo'])->andReturn(1);
         $result = $builder->from('users')->insertOrIgnore(['email' => 'foo']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testSQLiteInsertOrIgnoreMethod()
@@ -4169,7 +4169,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getSQLiteBuilder();
         $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert or ignore into "users" ("email") values (?)', ['foo'])->andReturn(1);
         $result = $builder->from('users')->insertOrIgnore(['email' => 'foo']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testSqlServerInsertOrIgnoreMethod()
@@ -4388,7 +4388,7 @@ class DatabaseQueryBuilderTest extends TestCase
             }
         );
 
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testMySqlInsertOrIgnoreUsingWithEmptyColumns()
@@ -4404,7 +4404,7 @@ class DatabaseQueryBuilderTest extends TestCase
             }
         );
 
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testMySqlInsertOrIgnoreUsingInvalidSubquery()
@@ -4426,7 +4426,7 @@ class DatabaseQueryBuilderTest extends TestCase
             }
         );
 
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testPostgresInsertOrIgnoreUsingWithEmptyColumns()
@@ -4441,7 +4441,7 @@ class DatabaseQueryBuilderTest extends TestCase
             }
         );
 
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testPostgresInsertOrIgnoreUsingInvalidSubquery()
@@ -4464,7 +4464,7 @@ class DatabaseQueryBuilderTest extends TestCase
             }
         );
 
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testSQLiteInsertOrIgnoreUsingWithEmptyColumns()
@@ -4480,7 +4480,7 @@ class DatabaseQueryBuilderTest extends TestCase
             }
         );
 
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testSQLiteInsertOrIgnoreUsingInvalidSubquery()
@@ -4495,7 +4495,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getProcessor()->shouldReceive('processInsertGetId')->once()->with($builder, 'insert into "users" ("email") values (?)', ['foo'], 'id')->andReturn(1);
         $result = $builder->from('users')->insertGetId(['email' => 'foo'], 'id');
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testInsertGetIdMethodRemovesExpressions()
@@ -4503,7 +4503,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getProcessor()->shouldReceive('processInsertGetId')->once()->with($builder, 'insert into "users" ("email", "bar") values (?, bar)', ['foo'], 'id')->andReturn(1);
         $result = $builder->from('users')->insertGetId(['email' => 'foo', 'bar' => new Raw('bar')], 'id');
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testInsertGetIdWithEmptyValues()
@@ -4546,12 +4546,12 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "id" = ?', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users')->where('id', '=', 1)->update(['email' => 'foo', 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update `users` set `email` = ?, `name` = ? where `id` = ? order by `foo` desc limit 5', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users')->where('id', '=', 1)->orderBy('foo', 'desc')->limit(5)->update(['email' => 'foo', 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testUpsertMethod()
@@ -4561,29 +4561,29 @@ class DatabaseQueryBuilderTest extends TestCase
             ->shouldReceive('getConfig')->with('use_upsert_alias')->andReturn(false)
             ->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`, `name`) values (?, ?), (?, ?) on duplicate key update `email` = values(`email`), `name` = values(`name`)', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
         $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email');
-        $this->assertEquals(2, $result);
+        $this->assertSame(2, $result);
 
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()
             ->shouldReceive('getConfig')->with('use_upsert_alias')->andReturn(true)
             ->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`, `name`) values (?, ?), (?, ?) as laravel_upsert_alias on duplicate key update `email` = `laravel_upsert_alias`.`email`, `name` = `laravel_upsert_alias`.`name`', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
         $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email');
-        $this->assertEquals(2, $result);
+        $this->assertSame(2, $result);
 
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email", "name") values (?, ?), (?, ?) on conflict ("email") do update set "email" = "excluded"."email", "name" = "excluded"."name"', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
         $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email');
-        $this->assertEquals(2, $result);
+        $this->assertSame(2, $result);
 
         $builder = $this->getSQLiteBuilder();
         $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email", "name") values (?, ?), (?, ?) on conflict ("email") do update set "email" = "excluded"."email", "name" = "excluded"."name"', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
         $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email');
-        $this->assertEquals(2, $result);
+        $this->assertSame(2, $result);
 
         $builder = $this->getSqlServerBuilder();
         $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('merge [users] using (values (?, ?), (?, ?)) [laravel_source] ([email], [name]) on [laravel_source].[email] = [users].[email] when matched then update set [email] = [laravel_source].[email], [name] = [laravel_source].[name] when not matched then insert ([email], [name]) values ([email], [name]);', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
         $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email');
-        $this->assertEquals(2, $result);
+        $this->assertSame(2, $result);
     }
 
     public function testUpsertMethodWithUpdateColumns()
@@ -4593,29 +4593,29 @@ class DatabaseQueryBuilderTest extends TestCase
             ->shouldReceive('getConfig')->with('use_upsert_alias')->andReturn(false)
             ->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`, `name`) values (?, ?), (?, ?) on duplicate key update `name` = values(`name`)', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
         $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email', ['name']);
-        $this->assertEquals(2, $result);
+        $this->assertSame(2, $result);
 
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()
             ->shouldReceive('getConfig')->with('use_upsert_alias')->andReturn(true)
             ->shouldReceive('affectingStatement')->once()->with('insert into `users` (`email`, `name`) values (?, ?), (?, ?) as laravel_upsert_alias on duplicate key update `name` = `laravel_upsert_alias`.`name`', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
         $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email', ['name']);
-        $this->assertEquals(2, $result);
+        $this->assertSame(2, $result);
 
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email", "name") values (?, ?), (?, ?) on conflict ("email") do update set "name" = "excluded"."name"', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
         $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email', ['name']);
-        $this->assertEquals(2, $result);
+        $this->assertSame(2, $result);
 
         $builder = $this->getSQLiteBuilder();
         $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('insert into "users" ("email", "name") values (?, ?), (?, ?) on conflict ("email") do update set "name" = "excluded"."name"', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
         $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email', ['name']);
-        $this->assertEquals(2, $result);
+        $this->assertSame(2, $result);
 
         $builder = $this->getSqlServerBuilder();
         $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('merge [users] using (values (?, ?), (?, ?)) [laravel_source] ([email], [name]) on [laravel_source].[email] = [users].[email] when matched then update set [name] = [laravel_source].[name] when not matched then insert ([email], [name]) values ([email], [name]);', ['foo', 'bar', 'foo2', 'bar2'])->andReturn(2);
         $result = $builder->from('users')->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], 'email', ['name']);
-        $this->assertEquals(2, $result);
+        $this->assertSame(2, $result);
     }
 
     public function testUpsertMethodWithEmptyUniqueByArray()
@@ -4639,7 +4639,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" inner join "orders" on "users"."id" = "orders"."user_id" set "email" = ?, "name" = ? where "users"."id" = ?', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users')->join('orders', 'users.id', '=', 'orders.user_id')->where('users.id', '=', 1)->update(['email' => 'foo', 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" inner join "orders" on "users"."id" = "orders"."user_id" and "users"."id" = ? set "email" = ?, "name" = ?', [1, 'foo', 'bar'])->andReturn(1);
@@ -4647,7 +4647,7 @@ class DatabaseQueryBuilderTest extends TestCase
             $join->on('users.id', '=', 'orders.user_id')
                 ->where('users.id', '=', 1);
         })->update(['email' => 'foo', 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testUpdateMethodWithJoinsOnSqlServer()
@@ -4655,7 +4655,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getSqlServerBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update [users] set [email] = ?, [name] = ? from [users] inner join [orders] on [users].[id] = [orders].[user_id] where [users].[id] = ?', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users')->join('orders', 'users.id', '=', 'orders.user_id')->where('users.id', '=', 1)->update(['email' => 'foo', 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getSqlServerBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update [users] set [email] = ?, [name] = ? from [users] inner join [orders] on [users].[id] = [orders].[user_id] and [users].[id] = ?', ['foo', 'bar', 1])->andReturn(1);
@@ -4663,7 +4663,7 @@ class DatabaseQueryBuilderTest extends TestCase
             $join->on('users.id', '=', 'orders.user_id')
                 ->where('users.id', '=', 1);
         })->update(['email' => 'foo', 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testUpdateMethodWithJoinsOnMySql()
@@ -4671,7 +4671,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update `users` inner join `orders` on `users`.`id` = `orders`.`user_id` set `email` = ?, `name` = ? where `users`.`id` = ?', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users')->join('orders', 'users.id', '=', 'orders.user_id')->where('users.id', '=', 1)->update(['email' => 'foo', 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update `users` inner join `orders` on `users`.`id` = `orders`.`user_id` and `users`.`id` = ? set `email` = ?, `name` = ?', [1, 'foo', 'bar'])->andReturn(1);
@@ -4679,7 +4679,7 @@ class DatabaseQueryBuilderTest extends TestCase
             $join->on('users.id', '=', 'orders.user_id')
                 ->where('users.id', '=', 1);
         })->update(['email' => 'foo', 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testUpdateMethodWithJoinsOnSQLite()
@@ -4687,12 +4687,12 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getSQLiteBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "rowid" in (select "users"."rowid" from "users" where "users"."id" > ? order by "id" asc limit 3)', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users')->where('users.id', '>', 1)->limit(3)->oldest('id')->update(['email' => 'foo', 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getSQLiteBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "rowid" in (select "users"."rowid" from "users" inner join "orders" on "users"."id" = "orders"."user_id" where "users"."id" = ?)', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users')->join('orders', 'users.id', '=', 'orders.user_id')->where('users.id', '=', 1)->update(['email' => 'foo', 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getSQLiteBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "rowid" in (select "users"."rowid" from "users" inner join "orders" on "users"."id" = "orders"."user_id" and "users"."id" = ?)', ['foo', 'bar', 1])->andReturn(1);
@@ -4700,12 +4700,12 @@ class DatabaseQueryBuilderTest extends TestCase
             $join->on('users.id', '=', 'orders.user_id')
                 ->where('users.id', '=', 1);
         })->update(['email' => 'foo', 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getSQLiteBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" as "u" set "email" = ?, "name" = ? where "rowid" in (select "u"."rowid" from "users" as "u" inner join "orders" as "o" on "u"."id" = "o"."user_id")', ['foo', 'bar'])->andReturn(1);
         $result = $builder->from('users as u')->join('orders as o', 'u.id', '=', 'o.user_id')->update(['email' => 'foo', 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testUpdateMethodWithJoinsAndAliasesOnSqlServer()
@@ -4713,7 +4713,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getSqlServerBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update [u] set [email] = ?, [name] = ? from [users] as [u] inner join [orders] on [u].[id] = [orders].[user_id] where [u].[id] = ?', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users as u')->join('orders', 'u.id', '=', 'orders.user_id')->where('u.id', '=', 1)->update(['email' => 'foo', 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testUpdateMethodWithoutJoinsOnPostgres()
@@ -4721,17 +4721,17 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "id" = ?', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users')->where('id', '=', 1)->update(['users.email' => 'foo', 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "id" = ?', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users')->where('id', '=', 1)->selectRaw('?', ['ignore'])->update(['users.email' => 'foo', 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users"."users" set "email" = ?, "name" = ? where "id" = ?', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users.users')->where('id', '=', 1)->selectRaw('?', ['ignore'])->update(['users.users.email' => 'foo', 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testUpdateMethodWithJoinsOnPostgres()
@@ -4739,7 +4739,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "ctid" in (select "users"."ctid" from "users" inner join "orders" on "users"."id" = "orders"."user_id" where "users"."id" = ?)', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users')->join('orders', 'users.id', '=', 'orders.user_id')->where('users.id', '=', 1)->update(['email' => 'foo', 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "ctid" in (select "users"."ctid" from "users" inner join "orders" on "users"."id" = "orders"."user_id" and "users"."id" = ?)', ['foo', 'bar', 1])->andReturn(1);
@@ -4747,7 +4747,7 @@ class DatabaseQueryBuilderTest extends TestCase
             $join->on('users.id', '=', 'orders.user_id')
                 ->where('users.id', '=', 1);
         })->update(['email' => 'foo', 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "ctid" in (select "users"."ctid" from "users" inner join "orders" on "users"."id" = "orders"."user_id" and "users"."id" = ? where "name" = ?)', ['foo', 'bar', 1, 'baz'])->andReturn(1);
@@ -4757,7 +4757,7 @@ class DatabaseQueryBuilderTest extends TestCase
                     ->where('users.id', '=', 1);
             })->where('name', 'baz')
             ->update(['email' => 'foo', 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testUpdateFromMethodWithJoinsOnPostgres()
@@ -4765,7 +4765,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? from "orders" where "users"."id" = ? and "users"."id" = "orders"."user_id"', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users')->join('orders', 'users.id', '=', 'orders.user_id')->where('users.id', '=', 1)->updateFrom(['email' => 'foo', 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? from "orders" where "users"."id" = "orders"."user_id" and "users"."id" = ?', ['foo', 'bar', 1])->andReturn(1);
@@ -4773,7 +4773,7 @@ class DatabaseQueryBuilderTest extends TestCase
             $join->on('users.id', '=', 'orders.user_id')
                 ->where('users.id', '=', 1);
         })->updateFrom(['email' => 'foo', 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? from "orders" where "name" = ? and "users"."id" = "orders"."user_id" and "users"."id" = ?', ['foo', 'bar', 'baz', 1])->andReturn(1);
@@ -4783,7 +4783,7 @@ class DatabaseQueryBuilderTest extends TestCase
                     ->where('users.id', '=', 1);
             })->where('name', 'baz')
             ->updateFrom(['email' => 'foo', 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testUpdateMethodRespectsRaw()
@@ -4791,7 +4791,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = foo, "name" = ? where "id" = ?', ['bar', 1])->andReturn(1);
         $result = $builder->from('users')->where('id', '=', 1)->update(['email' => new Raw('foo'), 'name' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testUpdateMethodWorksWithQueryAsValue()
@@ -4800,13 +4800,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $subQueryBuilder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "credits" = (select sum(credits) from "transactions" where "transactions"."user_id" = "users"."id" and "type" = ?) where "id" = ?', ['foo', 1])->andReturn(1);
         $result = $builder->from('users')->where('id', '=', 1)->update(['credits' => $subQueryBuilder->from('transactions')->selectRaw('sum(credits)')->whereColumn('transactions.user_id', 'users.id')->where('type', 'foo')]);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getBuilder();
         $subQueryBuilder = new EloquentBuilder($this->getBuilder());
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "credits" = (select sum(credits) from "transactions" where "transactions"."user_id" = "users"."id" and "type" = ?) where "id" = ?', ['foo', 1])->andReturn(1);
         $result = $builder->from('users')->where('id', '=', 1)->update(['credits' => $subQueryBuilder->from('transactions')->selectRaw('sum(credits)')->whereColumn('transactions.user_id', 'users.id')->where('type', 'foo')]);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testUpdateOrInsertMethod()
@@ -4857,37 +4857,37 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "email" = ?', ['foo'])->andReturn(1);
         $result = $builder->from('users')->where('email', '=', 'foo')->delete();
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "users"."id" = ?', [1])->andReturn(1);
         $result = $builder->from('users')->delete(1);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "users"."id" = ?', [1])->andReturn(1);
         $result = $builder->from('users')->selectRaw('?', ['ignore'])->delete(1);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getSqliteBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "rowid" in (select "users"."rowid" from "users" where "email" = ? order by "id" asc limit 1)', ['foo'])->andReturn(1);
         $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->limit(1)->delete();
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from `users` where `email` = ? order by `id` asc limit 1', ['foo'])->andReturn(1);
         $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->limit(1)->delete();
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getSqlServerBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from [users] where [email] = ?', ['foo'])->andReturn(1);
         $result = $builder->from('users')->where('email', '=', 'foo')->delete();
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getSqlServerBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete top (1) from [users] where [email] = ?', ['foo'])->andReturn(1);
         $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->limit(1)->delete();
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testDeleteWithJoinMethod()
@@ -4895,57 +4895,57 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getSqliteBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "rowid" in (select "users"."rowid" from "users" inner join "contacts" on "users"."id" = "contacts"."id" where "users"."email" = ? order by "users"."id" asc limit 1)', ['foo'])->andReturn(1);
         $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->where('users.email', '=', 'foo')->orderBy('users.id')->limit(1)->delete();
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getSqliteBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" as "u" where "rowid" in (select "u"."rowid" from "users" as "u" inner join "contacts" as "c" on "u"."id" = "c"."id")', [])->andReturn(1);
         $result = $builder->from('users as u')->join('contacts as c', 'u.id', '=', 'c.id')->delete();
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete `users` from `users` inner join `contacts` on `users`.`id` = `contacts`.`id` where `email` = ?', ['foo'])->andReturn(1);
         $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->where('email', '=', 'foo')->delete();
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete `a` from `users` as `a` inner join `users` as `b` on `a`.`id` = `b`.`user_id` where `email` = ?', ['foo'])->andReturn(1);
         $result = $builder->from('users AS a')->join('users AS b', 'a.id', '=', 'b.user_id')->where('email', '=', 'foo')->delete();
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete `users` from `users` inner join `contacts` on `users`.`id` = `contacts`.`id` where `users`.`id` = ?', [1])->andReturn(1);
         $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->delete(1);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getSqlServerBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete [users] from [users] inner join [contacts] on [users].[id] = [contacts].[id] where [email] = ?', ['foo'])->andReturn(1);
         $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->where('email', '=', 'foo')->delete();
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getSqlServerBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete [a] from [users] as [a] inner join [users] as [b] on [a].[id] = [b].[user_id] where [email] = ?', ['foo'])->andReturn(1);
         $result = $builder->from('users AS a')->join('users AS b', 'a.id', '=', 'b.user_id')->where('email', '=', 'foo')->orderBy('id')->limit(1)->delete();
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getSqlServerBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete [users] from [users] inner join [contacts] on [users].[id] = [contacts].[id] where [users].[id] = ?', [1])->andReturn(1);
         $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->delete(1);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "ctid" in (select "users"."ctid" from "users" inner join "contacts" on "users"."id" = "contacts"."id" where "users"."email" = ?)', ['foo'])->andReturn(1);
         $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->where('users.email', '=', 'foo')->delete();
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" as "a" where "ctid" in (select "a"."ctid" from "users" as "a" inner join "users" as "b" on "a"."id" = "b"."user_id" where "email" = ? order by "id" asc limit 1)', ['foo'])->andReturn(1);
         $result = $builder->from('users AS a')->join('users AS b', 'a.id', '=', 'b.user_id')->where('email', '=', 'foo')->orderBy('id')->limit(1)->delete();
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "ctid" in (select "users"."ctid" from "users" inner join "contacts" on "users"."id" = "contacts"."id" where "users"."id" = ? order by "id" asc limit 1)', [1])->andReturn(1);
         $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->orderBy('id')->limit(1)->delete(1);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "ctid" in (select "users"."ctid" from "users" inner join "contacts" on "users"."id" = "contacts"."user_id" and "users"."id" = ? where "name" = ?)', [1, 'baz'])->andReturn(1);
@@ -4955,12 +4955,12 @@ class DatabaseQueryBuilderTest extends TestCase
                     ->where('users.id', '=', 1);
             })->where('name', 'baz')
             ->delete();
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "ctid" in (select "users"."ctid" from "users" inner join "contacts" on "users"."id" = "contacts"."id")', [])->andReturn(1);
         $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->delete();
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testTruncateMethod()
@@ -5137,7 +5137,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getPostgresBuilder();
         $builder->getProcessor()->shouldReceive('processInsertGetId')->once()->with($builder, 'insert into "users" ("email") values (?) returning "id"', ['foo'], 'id')->andReturn(1);
         $result = $builder->from('users')->insertGetId(['email' => 'foo'], 'id');
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testMySqlWrapping()
@@ -6277,7 +6277,7 @@ SQL;
 
         $result = $builder->paginate($perPage, $columns, $pageName, $page, 10);
 
-        $this->assertEquals(10, $result->total());
+        $this->assertSame(10, $result->total());
     }
 
     public function testCursorPaginate()

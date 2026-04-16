@@ -17,7 +17,7 @@ class QueueDelayTest extends TestCase
 
         dispatch($job);
 
-        $this->assertEquals(60, $job->delay);
+        $this->assertSame(60, $job->delay);
     }
 
     public function test_queue_without_delay()
@@ -28,7 +28,7 @@ class QueueDelayTest extends TestCase
 
         dispatch($job->withoutDelay());
 
-        $this->assertEquals(0, $job->delay);
+        $this->assertSame(0, $job->delay);
     }
 
     public function test_pending_dispatch_without_delay()
@@ -39,7 +39,7 @@ class QueueDelayTest extends TestCase
 
         dispatch($job)->withoutDelay();
 
-        $this->assertEquals(0, $job->delay);
+        $this->assertSame(0, $job->delay);
     }
 }
 

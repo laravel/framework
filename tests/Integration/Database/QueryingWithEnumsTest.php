@@ -38,7 +38,7 @@ class QueryingWithEnumsTest extends DatabaseTestCase
         $this->assertNotNull($record3);
         $this->assertNotNull($record4);
         $this->assertSame('pending', $record->string_status);
-        $this->assertEquals(1, $record2->integer_status);
+        $this->assertSame(1, $record2->integer_status);
         $this->assertSame('pending', $record4->non_backed_status);
     }
 
@@ -54,7 +54,7 @@ class QueryingWithEnumsTest extends DatabaseTestCase
 
         $this->assertNotNull($record);
         $this->assertSame('pending', $record->string_status);
-        $this->assertEquals(1, $record->integer_status);
+        $this->assertSame(1, $record->integer_status);
         $this->assertSame('pending', $record->non_backed_status);
     }
 }

@@ -16,8 +16,8 @@ class CookieSessionHandlerTest extends TestCase
         $sessionIdCookie = $response->getCookie('laravel_session');
         $sessionValueCookie = $response->getCookie($sessionIdCookie->getValue());
 
-        $this->assertEquals(0, $sessionIdCookie->getExpiresTime());
-        $this->assertEquals(0, $sessionValueCookie->getExpiresTime());
+        $this->assertSame(0, $sessionIdCookie->getExpiresTime());
+        $this->assertSame(0, $sessionValueCookie->getExpiresTime());
     }
 
     public function testCookieSessionInheritsRequestSecureState()

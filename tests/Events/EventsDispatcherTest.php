@@ -579,7 +579,7 @@ class EventsDispatcherTest extends TestCase
         $d->listen('event', TestListener::class.'@handle');
         $d->dispatch('event');
 
-        $this->assertEquals(4, TestListener::$counter);
+        $this->assertSame(4, TestListener::$counter);
         TestListener::$counter = 0;
     }
 

@@ -132,38 +132,38 @@ class SupportLazyCollectionTest extends TestCase
         $a = $collection->getIterator();
         $b = $collection->getIterator();
 
-        $this->assertEquals(1, $a->current());
-        $this->assertEquals(1, $b->current());
+        $this->assertSame(1, $a->current());
+        $this->assertSame(1, $b->current());
 
         $b->next();
 
-        $this->assertEquals(1, $a->current());
-        $this->assertEquals(2, $b->current());
+        $this->assertSame(1, $a->current());
+        $this->assertSame(2, $b->current());
 
         $b->next();
 
-        $this->assertEquals(1, $a->current());
-        $this->assertEquals(3, $b->current());
+        $this->assertSame(1, $a->current());
+        $this->assertSame(3, $b->current());
 
         $a->next();
 
-        $this->assertEquals(2, $a->current());
-        $this->assertEquals(3, $b->current());
+        $this->assertSame(2, $a->current());
+        $this->assertSame(3, $b->current());
 
         $a->next();
 
-        $this->assertEquals(3, $a->current());
-        $this->assertEquals(3, $b->current());
+        $this->assertSame(3, $a->current());
+        $this->assertSame(3, $b->current());
 
         $a->next();
 
-        $this->assertEquals(4, $a->current());
-        $this->assertEquals(3, $b->current());
+        $this->assertSame(4, $a->current());
+        $this->assertSame(3, $b->current());
 
         $b->next();
 
-        $this->assertEquals(4, $a->current());
-        $this->assertEquals(4, $b->current());
+        $this->assertSame(4, $a->current());
+        $this->assertSame(4, $b->current());
     }
 
     public function testRememberWithDuplicateKeys()

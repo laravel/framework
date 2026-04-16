@@ -33,7 +33,7 @@ trait EloquentTransactionWithAfterCommitTests
         $user1 = User::create(UserFactory::new()->raw());
 
         $this->assertTrue($user1->exists);
-        $this->assertEquals(1, $observer::$calledTimes, 'Failed to assert the observer was called once.');
+        $this->assertSame(1, $observer::$calledTimes, 'Failed to assert the observer was called once.');
     }
 
     public function testObserverCalledWithAfterCommitWhenInsideTransaction()
@@ -43,7 +43,7 @@ trait EloquentTransactionWithAfterCommitTests
         $user1 = DB::transaction(fn () => User::create(UserFactory::new()->raw()));
 
         $this->assertTrue($user1->exists);
-        $this->assertEquals(1, $observer::$calledTimes, 'Failed to assert the observer was called once.');
+        $this->assertSame(1, $observer::$calledTimes, 'Failed to assert the observer was called once.');
     }
 
     public function testObserverCalledWithAfterCommitWhenInsideTransactionWithDispatchSync()
@@ -53,7 +53,7 @@ trait EloquentTransactionWithAfterCommitTests
         $user1 = DB::transaction(fn () => User::create(UserFactory::new()->raw()));
 
         $this->assertTrue($user1->exists);
-        $this->assertEquals(1, $observer::$calledTimes, 'Failed to assert the observer was called once.');
+        $this->assertSame(1, $observer::$calledTimes, 'Failed to assert the observer was called once.');
 
         $this->assertDatabaseHas('password_reset_tokens', [
             'email' => $user1->email,
@@ -68,7 +68,7 @@ trait EloquentTransactionWithAfterCommitTests
         $user1 = User::createOrFirst(UserFactory::new()->raw());
 
         $this->assertTrue($user1->exists);
-        $this->assertEquals(1, $observer::$calledTimes, 'Failed to assert the observer was called once.');
+        $this->assertSame(1, $observer::$calledTimes, 'Failed to assert the observer was called once.');
     }
 
     public function testObserverIsCalledOnTestsWithAfterCommitWhenUsingSavepointAndInsideTransaction()
@@ -78,7 +78,7 @@ trait EloquentTransactionWithAfterCommitTests
         $user1 = DB::transaction(fn () => User::createOrFirst(UserFactory::new()->raw()));
 
         $this->assertTrue($user1->exists);
-        $this->assertEquals(1, $observer::$calledTimes, 'Failed to assert the observer was called once.');
+        $this->assertSame(1, $observer::$calledTimes, 'Failed to assert the observer was called once.');
     }
 
     public function testObserverIsCalledEvenWhenDeeplyNestingTransactions()
@@ -89,18 +89,18 @@ trait EloquentTransactionWithAfterCommitTests
             return tap(DB::transaction(function () use ($observer) {
                 return tap(DB::transaction(function () use ($observer) {
                     return tap(User::createOrFirst(UserFactory::new()->raw()), function () use ($observer) {
-                        $this->assertEquals(0, $observer::$calledTimes, 'Should not have been called');
+                        $this->assertSame(0, $observer::$calledTimes, 'Should not have been called');
                     });
                 }), function () use ($observer) {
-                    $this->assertEquals(0, $observer::$calledTimes, 'Should not have been called');
+                    $this->assertSame(0, $observer::$calledTimes, 'Should not have been called');
                 });
             }), function () use ($observer) {
-                $this->assertEquals(0, $observer::$calledTimes, 'Should not have been called');
+                $this->assertSame(0, $observer::$calledTimes, 'Should not have been called');
             });
         });
 
         $this->assertTrue($user1->exists);
-        $this->assertEquals(1, $observer::$calledTimes, 'Failed to assert the observer was called once.');
+        $this->assertSame(1, $observer::$calledTimes, 'Failed to assert the observer was called once.');
     }
 
     public function testAfterCommitObserverCreatingEventFiresImmediately()
@@ -180,7 +180,7 @@ trait EloquentTransactionWithAfterCommitTests
 
         $this->assertTrue($firstObject->ran);
         $this->assertFalse($secondObject->ran);
-        $this->assertEquals(1, $firstObject->runs);
+        $this->assertSame(1, $firstObject->runs);
     }
 }
 

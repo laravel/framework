@@ -124,8 +124,8 @@ class EloquentUpdateTest extends DatabaseTestCase
         TestUpdateModel3::increment('counter');
 
         $models = TestUpdateModel3::withoutGlobalScopes()->orderBy('id')->get();
-        $this->assertEquals(1, $models[0]->counter);
-        $this->assertEquals(0, $models[1]->counter);
+        $this->assertSame(1, $models[0]->counter);
+        $this->assertSame(0, $models[1]->counter);
     }
 
     public function testIncrementOrDecrementIgnoresGlobalScopes()
@@ -137,13 +137,13 @@ class EloquentUpdateTest extends DatabaseTestCase
 
         $deletedModel->increment('counter');
 
-        $this->assertEquals(1, $deletedModel->counter);
+        $this->assertSame(1, $deletedModel->counter);
 
         $deletedModel->fresh();
-        $this->assertEquals(1, $deletedModel->counter);
+        $this->assertSame(1, $deletedModel->counter);
 
         $deletedModel->decrement('counter');
-        $this->assertEquals(0, $deletedModel->fresh()->counter);
+        $this->assertSame(0, $deletedModel->fresh()->counter);
     }
 
     public function testUpdateSyncsPrevious()
@@ -185,7 +185,7 @@ class EloquentUpdateTest extends DatabaseTestCase
 
         $model->increment('counter');
 
-        $this->assertEquals(1, $model->counter);
+        $this->assertSame(1, $model->counter);
         $this->assertSame(['counter' => 1], $model->getChanges());
         $this->assertSame(['counter' => 0], $model->getPrevious());
     }
@@ -198,13 +198,13 @@ class EloquentUpdateTest extends DatabaseTestCase
 
         $post1->incrementEach(['views' => 1, 'likes' => 2]);
 
-        $this->assertEquals(11, $post1->views);
-        $this->assertEquals(7, $post1->likes);
+        $this->assertSame(11, $post1->views);
+        $this->assertSame(7, $post1->likes);
 
-        $this->assertEquals(50, $post2->fresh()->views);
-        $this->assertEquals(20, $post2->fresh()->likes);
-        $this->assertEquals(100, $post3->fresh()->views);
-        $this->assertEquals(40, $post3->fresh()->likes);
+        $this->assertSame(50, $post2->fresh()->views);
+        $this->assertSame(20, $post2->fresh()->likes);
+        $this->assertSame(100, $post3->fresh()->views);
+        $this->assertSame(40, $post3->fresh()->likes);
     }
 
     public function testDecrementEachOnModelInstanceOnlyAffectsThatRow()
@@ -214,11 +214,11 @@ class EloquentUpdateTest extends DatabaseTestCase
 
         $post1->decrementEach(['views' => 3, 'likes' => 2]);
 
-        $this->assertEquals(7, $post1->views);
-        $this->assertEquals(3, $post1->likes);
+        $this->assertSame(7, $post1->views);
+        $this->assertSame(3, $post1->likes);
 
-        $this->assertEquals(50, $post2->fresh()->views);
-        $this->assertEquals(20, $post2->fresh()->likes);
+        $this->assertSame(50, $post2->fresh()->views);
+        $this->assertSame(20, $post2->fresh()->likes);
     }
 
     public function testIncrementEachViaQueryBuilderStillAffectsAllMatchingRows()
@@ -229,8 +229,8 @@ class EloquentUpdateTest extends DatabaseTestCase
         TestUpdateModel4::incrementEach(['views' => 1]);
 
         $models = TestUpdateModel4::orderBy('id')->get();
-        $this->assertEquals(11, $models[0]->views);
-        $this->assertEquals(51, $models[1]->views);
+        $this->assertSame(11, $models[0]->views);
+        $this->assertSame(51, $models[1]->views);
     }
 
     public function testIncrementEachOnModelInstanceUpdatesTimestamps()
@@ -253,12 +253,12 @@ class EloquentUpdateTest extends DatabaseTestCase
 
         $post->incrementEach(['views' => 1, 'likes' => 1]);
 
-        $this->assertEquals(11, $post->views);
-        $this->assertEquals(6, $post->likes);
+        $this->assertSame(11, $post->views);
+        $this->assertSame(6, $post->likes);
 
         $fresh = TestUpdateModel4::withTrashed()->find($post->id);
-        $this->assertEquals(11, $fresh->views);
-        $this->assertEquals(6, $fresh->likes);
+        $this->assertSame(11, $fresh->views);
+        $this->assertSame(6, $fresh->likes);
     }
 
     public function testIncrementEachDoesNotResetUnrelatedDirtyAttributes()
@@ -279,8 +279,8 @@ class EloquentUpdateTest extends DatabaseTestCase
 
         $post->incrementEach(['views' => 1, 'likes' => 2]);
 
-        $this->assertEquals(11, $post->views);
-        $this->assertEquals(7, $post->likes);
+        $this->assertSame(11, $post->views);
+        $this->assertSame(7, $post->likes);
         $this->assertArrayHasKey('views', $post->getChanges());
         $this->assertArrayHasKey('likes', $post->getChanges());
     }

@@ -40,8 +40,8 @@ class TransformsRequestTest extends TestCase
 
         $middleware->handle($request, function (Request $request) {
             $this->assertSame('Damian', $request->get('name'));
-            $this->assertEquals(27, $request->get('age'));
-            $this->assertEquals(5, $request->get('beers'));
+            $this->assertSame(27, $request->get('age'));
+            $this->assertSame(5, $request->get('beers'));
         });
     }
 
@@ -87,8 +87,8 @@ class TransformsRequestTest extends TestCase
 
         $middleware->handle($request, function (Request $request) {
             $this->assertSame('Damian', $request->input('name'));
-            $this->assertEquals(27, $request->input('age'));
-            $this->assertEquals(5, $request->input('beers'));
+            $this->assertSame(27, $request->input('age'));
+            $this->assertSame(5, $request->input('beers'));
         });
     }
 }

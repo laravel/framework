@@ -12,7 +12,7 @@ class PaginatorTest extends TestCase
         /** @var Paginator<int, string> $p */
         $p = new Paginator(['item3', 'item4', 'item5'], 2, 2);
 
-        $this->assertEquals(2, $p->currentPage());
+        $this->assertSame(2, $p->currentPage());
         $this->assertTrue($p->hasPages());
         $this->assertTrue($p->hasMorePages());
         $this->assertEquals(['item3', 'item4'], $p->items());

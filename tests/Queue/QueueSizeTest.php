@@ -13,8 +13,8 @@ class QueueSizeTest extends TestCase
     {
         Queue::fake();
 
-        $this->assertEquals(0, Queue::size());
-        $this->assertEquals(0, Queue::size('Q2'));
+        $this->assertSame(0, Queue::size());
+        $this->assertSame(0, Queue::size('Q2'));
 
         $job = new TestJob1;
 
@@ -22,8 +22,8 @@ class QueueSizeTest extends TestCase
         dispatch(new TestJob2);
         dispatch($job)->onQueue('Q2');
 
-        $this->assertEquals(2, Queue::size());
-        $this->assertEquals(1, Queue::size('Q2'));
+        $this->assertSame(2, Queue::size());
+        $this->assertSame(1, Queue::size('Q2'));
     }
 }
 

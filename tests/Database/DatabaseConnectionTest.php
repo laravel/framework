@@ -195,7 +195,7 @@ class DatabaseConnectionTest extends TestCase
         try {
             $connection->beginTransaction();
         } catch (Exception) {
-            $this->assertEquals(0, $connection->transactionLevel());
+            $this->assertSame(0, $connection->transactionLevel());
         }
     }
 
@@ -207,7 +207,7 @@ class DatabaseConnectionTest extends TestCase
         $connection = $this->getMockConnection(['reconnect'], $pdo);
         $connection->expects($this->once())->method('reconnect');
         $connection->beginTransaction();
-        $this->assertEquals(1, $connection->transactionLevel());
+        $this->assertSame(1, $connection->transactionLevel());
     }
 
     public function testBeginTransactionMethodReconnectsMissingConnection()
@@ -219,7 +219,7 @@ class DatabaseConnectionTest extends TestCase
         });
         $connection->disconnect();
         $connection->beginTransaction();
-        $this->assertEquals(1, $connection->transactionLevel());
+        $this->assertSame(1, $connection->transactionLevel());
     }
 
     public function testBeginTransactionMethodNeverRetriesIfWithinTransaction()
@@ -234,11 +234,11 @@ class DatabaseConnectionTest extends TestCase
         $connection->setQueryGrammar($queryGrammar);
         $connection->expects($this->never())->method('reconnect');
         $connection->beginTransaction();
-        $this->assertEquals(1, $connection->transactionLevel());
+        $this->assertSame(1, $connection->transactionLevel());
         try {
             $connection->beginTransaction();
         } catch (Exception) {
-            $this->assertEquals(1, $connection->transactionLevel());
+            $this->assertSame(1, $connection->transactionLevel());
         }
     }
 
@@ -249,7 +249,7 @@ class DatabaseConnectionTest extends TestCase
         $connection = $this->getMockConnection([], $pdo);
         $connection->beginTransaction();
         $connection->disconnect();
-        $this->assertEquals(0, $connection->transactionLevel());
+        $this->assertSame(0, $connection->transactionLevel());
     }
 
     public function testBeganTransactionFiresEventsIfSet()

@@ -2593,7 +2593,7 @@ class DatabaseEloquentBuilderTest extends TestCase
             ->with('update "table" set "foo" = ?, "table"."updated_at" = ?', ['bar', $now])->andReturn(1);
 
         $result = $builder->update(['foo' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testUpdateWithTimestampValue()
@@ -2609,7 +2609,7 @@ class DatabaseEloquentBuilderTest extends TestCase
             ->with('update "table" set "foo" = ?, "table"."updated_at" = ?', ['bar', null])->andReturn(1);
 
         $result = $builder->update(['foo' => 'bar', 'updated_at' => null]);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testUpdateWithQualifiedTimestampValue()
@@ -2625,7 +2625,7 @@ class DatabaseEloquentBuilderTest extends TestCase
             ->with('update "table" set "table"."foo" = ?, "table"."updated_at" = ?', ['bar', null])->andReturn(1);
 
         $result = $builder->update(['table.foo' => 'bar', 'table.updated_at' => null]);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testUpdateWithoutTimestamp()
@@ -2641,7 +2641,7 @@ class DatabaseEloquentBuilderTest extends TestCase
             ->with('update "table" set "foo" = ?', ['bar'])->andReturn(1);
 
         $result = $builder->update(['foo' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testUpdateWithAlias()
@@ -2659,7 +2659,7 @@ class DatabaseEloquentBuilderTest extends TestCase
             ->with('update "table" as "alias" set "foo" = ?, "alias"."updated_at" = ?', ['bar', $now])->andReturn(1);
 
         $result = $builder->from('table as alias')->update(['foo' => 'bar']);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testUpdateWithAliasWithQualifiedTimestampValue()
@@ -2677,7 +2677,7 @@ class DatabaseEloquentBuilderTest extends TestCase
             ->with('update "table" as "alias" set "foo" = ?, "alias"."updated_at" = ?', ['bar', null])->andReturn(1);
 
         $result = $builder->from('table as alias')->update(['foo' => 'bar', 'alias.updated_at' => null]);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
 
         Carbon::setTestNow(null);
     }
@@ -2702,7 +2702,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $result = $builder->upsert([['email' => 'foo', 'name' => 'bar'], ['name' => 'bar2', 'email' => 'foo2']], ['email']);
 
-        $this->assertEquals(2, $result);
+        $this->assertSame(2, $result);
     }
 
     public function testTouch()
@@ -2721,7 +2721,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $result = $builder->touch();
 
-        $this->assertEquals(2, $result);
+        $this->assertSame(2, $result);
     }
 
     public function testTouchWithCustomColumn()
@@ -2740,7 +2740,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $result = $builder->touch('published_at');
 
-        $this->assertEquals(2, $result);
+        $this->assertSame(2, $result);
     }
 
     public function testTouchWithMultipleColumns()
@@ -2759,7 +2759,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $result = $builder->touch(['published_at', 'verified_at']);
 
-        $this->assertEquals(2, $result);
+        $this->assertSame(2, $result);
     }
 
     public function testTouchWithoutUpdatedAtColumn()
@@ -2954,7 +2954,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($model);
 
         $result = $builder->incrementEach(['votes' => 5]);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testDecrementEachCallsToBaseWithUpdatedAt()
@@ -2977,7 +2977,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($model);
 
         $result = $builder->decrementEach(['votes' => 3]);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testIncrementEachWithoutTimestamps()
@@ -2992,7 +2992,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($model);
 
         $result = $builder->incrementEach(['votes' => 1]);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     protected function getMockModel()

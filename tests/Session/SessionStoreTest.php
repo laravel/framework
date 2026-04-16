@@ -229,14 +229,14 @@ class SessionStoreTest extends TestCase
 
         $this->assertTrue($session->hasOldInput('foo'));
         $this->assertSame('bar', $session->getOldInput('foo'));
-        $this->assertEquals(0, $session->getOldInput('bar'));
+        $this->assertSame(0, $session->getOldInput('bar'));
         $this->assertFalse($session->hasOldInput('boom'));
 
         $session->ageFlashData();
 
         $this->assertTrue($session->hasOldInput('foo'));
         $this->assertSame('bar', $session->getOldInput('foo'));
-        $this->assertEquals(0, $session->getOldInput('bar'));
+        $this->assertSame(0, $session->getOldInput('bar'));
         $this->assertFalse($session->hasOldInput('boom'));
 
         $this->assertSame('default', $session->getOldInput('input', 'default'));
@@ -252,14 +252,14 @@ class SessionStoreTest extends TestCase
 
         $this->assertTrue($session->has('foo'));
         $this->assertSame('bar', $session->get('foo'));
-        $this->assertEquals(0, $session->get('bar'));
+        $this->assertSame(0, $session->get('bar'));
         $this->assertTrue($session->get('baz'));
 
         $session->ageFlashData();
 
         $this->assertTrue($session->has('foo'));
         $this->assertSame('bar', $session->get('foo'));
-        $this->assertEquals(0, $session->get('bar'));
+        $this->assertSame(0, $session->get('bar'));
 
         $session->ageFlashData();
 
@@ -275,7 +275,7 @@ class SessionStoreTest extends TestCase
 
         $this->assertTrue($session->has('foo'));
         $this->assertSame('bar', $session->get('foo'));
-        $this->assertEquals(0, $session->get('bar'));
+        $this->assertSame(0, $session->get('bar'));
 
         $session->ageFlashData();
 
@@ -376,15 +376,15 @@ class SessionStoreTest extends TestCase
 
         $session->put('foo', 5);
         $foo = $session->increment('foo');
-        $this->assertEquals(6, $foo);
-        $this->assertEquals(6, $session->get('foo'));
+        $this->assertSame(6, $foo);
+        $this->assertSame(6, $session->get('foo'));
 
         $foo = $session->increment('foo', 4);
-        $this->assertEquals(10, $foo);
-        $this->assertEquals(10, $session->get('foo'));
+        $this->assertSame(10, $foo);
+        $this->assertSame(10, $session->get('foo'));
 
         $session->increment('bar');
-        $this->assertEquals(1, $session->get('bar'));
+        $this->assertSame(1, $session->get('bar'));
     }
 
     public function testDecrement()
@@ -393,12 +393,12 @@ class SessionStoreTest extends TestCase
 
         $session->put('foo', 5);
         $foo = $session->decrement('foo');
-        $this->assertEquals(4, $foo);
-        $this->assertEquals(4, $session->get('foo'));
+        $this->assertSame(4, $foo);
+        $this->assertSame(4, $session->get('foo'));
 
         $foo = $session->decrement('foo', 4);
-        $this->assertEquals(0, $foo);
-        $this->assertEquals(0, $session->get('foo'));
+        $this->assertSame(0, $foo);
+        $this->assertSame(0, $session->get('foo'));
 
         $session->decrement('bar');
         $this->assertEquals(-1, $session->get('bar'));

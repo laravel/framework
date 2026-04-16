@@ -34,7 +34,7 @@ class SleepTest extends TestCase
 
     public function testCallbacksMayBeExecutedUsingThen()
     {
-        $this->assertEquals(123, Sleep::for(1)->milliseconds()->then(fn () => 123));
+        $this->assertSame(123, Sleep::for(1)->milliseconds()->then(fn () => 123));
     }
 
     public function testSleepRespectsWhile()
@@ -48,8 +48,8 @@ class SleepTest extends TestCase
             return array_shift($results);
         })->then(fn () => 100);
 
-        $this->assertEquals(3, $_SERVER['__sleep.while']);
-        $this->assertEquals(100, $result);
+        $this->assertSame(3, $_SERVER['__sleep.while']);
+        $this->assertSame(100, $result);
 
         unset($_SERVER['__sleep.while']);
     }

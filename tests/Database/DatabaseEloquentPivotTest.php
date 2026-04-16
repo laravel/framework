@@ -125,7 +125,7 @@ class DatabaseEloquentPivotTest extends TestCase
         $pivot->expects($this->once())->method('newQueryWithoutRelationships')->willReturn($query);
 
         $rowsAffected = $pivot->delete();
-        $this->assertEquals(1, $rowsAffected);
+        $this->assertSame(1, (int) $rowsAffected);
     }
 
     public function testPivotModelTableNameIsSingular()

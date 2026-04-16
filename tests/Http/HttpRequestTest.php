@@ -1719,7 +1719,7 @@ class HttpRequestTest extends TestCase
             return $route;
         });
 
-        $this->assertEquals(40, mb_strlen($request->fingerprint()));
+        $this->assertSame(40, mb_strlen($request->fingerprint()));
     }
 
     public function testFingerprintWithoutRoute()

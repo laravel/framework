@@ -22,7 +22,7 @@ class ProcessTest extends TestCase
         $this->assertInstanceOf(ProcessResult::class, $result);
         $this->assertTrue($result->successful());
         $this->assertFalse($result->failed());
-        $this->assertEquals(0, $result->exitCode());
+        $this->assertSame(0, $result->exitCode());
         $this->assertTrue(str_contains($result->output(), 'ProcessTest.php'));
         $this->assertEquals('', $result->errorOutput());
 
@@ -171,7 +171,7 @@ class ProcessTest extends TestCase
 
         $this->assertEquals('', $result->output());
         $this->assertEquals('', $result->errorOutput());
-        $this->assertEquals(0, $result->exitCode());
+        $this->assertSame(0, $result->exitCode());
         $this->assertTrue($result->successful());
     }
 

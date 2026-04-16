@@ -1103,7 +1103,8 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['name' => ''], ['name' => 'required']);
 
-        $exception = new class($v) extends ValidationException {
+        $exception = new class($v) extends ValidationException
+        {
         };
         $v->setException($exception);
 
@@ -4144,15 +4145,15 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['items' => '3'], ['items' => 'gt:4']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(4, $v->messages()->first('items'));
+        $this->assertSame(4, (int) $v->messages()->first('items'));
 
         $v = new Validator($trans, ['items' => 3, 'more' => 5], ['items' => 'numeric|gt:more']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(5, $v->messages()->first('items'));
+        $this->assertSame(5, (int) $v->messages()->first('items'));
 
         $v = new Validator($trans, ['items' => 'abc', 'more' => 'abcde'], ['items' => 'gt:more']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(5, $v->messages()->first('items'));
+        $this->assertSame(5, (int) $v->messages()->first('items'));
 
         $v = new Validator($trans, ['max' => 10], ['min' => 'numeric', 'max' => 'numeric|gt:min'], [], ['min' => 'minimum value', 'max' => 'maximum value']);
         $this->assertFalse($v->passes());
@@ -4167,11 +4168,11 @@ class ValidationValidatorTest extends TestCase
         $biggerFile->method('isValid')->willReturn(true);
         $v = new Validator($trans, ['photo' => $file, 'bigger' => $biggerFile], ['photo' => 'file|gt:bigger']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(5, $v->messages()->first('photo'));
+        $this->assertSame(5, (int) $v->messages()->first('photo'));
 
         $v = new Validator($trans, ['items' => [1, 2, 3], 'more' => [0, 1, 2, 3]], ['items' => 'gt:more']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(4, $v->messages()->first('items'));
+        $this->assertSame(4, (int) $v->messages()->first('items'));
     }
 
     public function testValidateLtPlaceHolderIsReplacedProperly()
@@ -4186,15 +4187,15 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['items' => '3'], ['items' => 'lt:2']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(2, $v->messages()->first('items'));
+        $this->assertSame(2, (int) $v->messages()->first('items'));
 
         $v = new Validator($trans, ['items' => 3, 'less' => 2], ['items' => 'numeric|lt:less']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(2, $v->messages()->first('items'));
+        $this->assertSame(2, (int) $v->messages()->first('items'));
 
         $v = new Validator($trans, ['items' => 'abc', 'less' => 'ab'], ['items' => 'lt:less']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(2, $v->messages()->first('items'));
+        $this->assertSame(2, (int) $v->messages()->first('items'));
 
         $v = new Validator($trans, ['min' => 1], ['min' => 'numeric|lt:max', 'max' => 'numeric'], [], ['min' => 'minimum value', 'max' => 'maximum value']);
         $this->assertFalse($v->passes());
@@ -4209,11 +4210,11 @@ class ValidationValidatorTest extends TestCase
         $smallerFile->method('isValid')->willReturn(true);
         $v = new Validator($trans, ['photo' => $file, 'smaller' => $smallerFile], ['photo' => 'file|lt:smaller']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(2, $v->messages()->first('photo'));
+        $this->assertSame(2, (int) $v->messages()->first('photo'));
 
         $v = new Validator($trans, ['items' => [1, 2, 3], 'less' => [0, 1]], ['items' => 'lt:less']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(2, $v->messages()->first('items'));
+        $this->assertSame(2, (int) $v->messages()->first('items'));
     }
 
     public function testValidateGtePlaceHolderIsReplacedProperly()
@@ -4228,15 +4229,15 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['items' => '3'], ['items' => 'gte:4']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(4, $v->messages()->first('items'));
+        $this->assertSame(4, (int) $v->messages()->first('items'));
 
         $v = new Validator($trans, ['items' => 3, 'more' => 5], ['items' => 'numeric|gte:more']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(5, $v->messages()->first('items'));
+        $this->assertSame(5, (int) $v->messages()->first('items'));
 
         $v = new Validator($trans, ['items' => 'abc', 'more' => 'abcde'], ['items' => 'gte:more']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(5, $v->messages()->first('items'));
+        $this->assertSame(5, (int) $v->messages()->first('items'));
 
         $v = new Validator($trans, ['max' => 10], ['min' => 'numeric', 'max' => 'numeric|gte:min'], [], ['min' => 'minimum value', 'max' => 'maximum value']);
         $this->assertFalse($v->passes());
@@ -4251,11 +4252,11 @@ class ValidationValidatorTest extends TestCase
         $biggerFile->method('isValid')->willReturn(true);
         $v = new Validator($trans, ['photo' => $file, 'bigger' => $biggerFile], ['photo' => 'file|gte:bigger']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(5, $v->messages()->first('photo'));
+        $this->assertSame(5, (int) $v->messages()->first('photo'));
 
         $v = new Validator($trans, ['items' => [1, 2, 3], 'more' => [0, 1, 2, 3]], ['items' => 'gte:more']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(4, $v->messages()->first('items'));
+        $this->assertSame(4, (int) $v->messages()->first('items'));
     }
 
     public function testValidateLtePlaceHolderIsReplacedProperly()
@@ -4270,15 +4271,15 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['items' => '3'], ['items' => 'lte:2']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(2, $v->messages()->first('items'));
+        $this->assertSame(2, (int) $v->messages()->first('items'));
 
         $v = new Validator($trans, ['items' => 3, 'less' => 2], ['items' => 'numeric|lte:less']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(2, $v->messages()->first('items'));
+        $this->assertSame(2, (int) $v->messages()->first('items'));
 
         $v = new Validator($trans, ['items' => 'abc', 'less' => 'ab'], ['items' => 'lte:less']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(2, $v->messages()->first('items'));
+        $this->assertSame(2, (int) $v->messages()->first('items'));
 
         $v = new Validator($trans, ['min' => 1], ['min' => 'numeric|lte:max', 'max' => 'numeric'], [], ['min' => 'minimum value', 'max' => 'maximum value']);
         $this->assertFalse($v->passes());
@@ -4293,11 +4294,11 @@ class ValidationValidatorTest extends TestCase
         $smallerFile->method('isValid')->willReturn(true);
         $v = new Validator($trans, ['photo' => $file, 'smaller' => $smallerFile], ['photo' => 'file|lte:smaller']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(2, $v->messages()->first('photo'));
+        $this->assertSame(2, (int) $v->messages()->first('photo'));
 
         $v = new Validator($trans, ['items' => [1, 2, 3], 'less' => [0, 1]], ['items' => 'lte:less']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(2, $v->messages()->first('items'));
+        $this->assertSame(2, (int) $v->messages()->first('items'));
     }
 
     public function testValidateContains()
@@ -8905,7 +8906,7 @@ class ValidationValidatorTest extends TestCase
         $v->validated();
 
         $this->assertEquals(['first' => 'john', 'preferred' => 'john'], $data);
-        $this->assertEquals(1, $validateCount);
+        $this->assertSame(1, $validateCount);
     }
 
     public function testMultiplePassesCalls()

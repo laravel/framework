@@ -241,7 +241,7 @@ class CacheFileStoreTest extends TestCase
         $files->expects($this->once())->method('put')->with($filePath, $valueAfterIncrement);
 
         $result = $store->increment('foo', 3);
-        $this->assertEquals(4, $result);
+        $this->assertSame(4, $result);
     }
 
     public function testDecrementCanAtomicallyJump()
@@ -257,7 +257,7 @@ class CacheFileStoreTest extends TestCase
         $files->expects($this->once())->method('put')->with($filePath, $valueAfterIncrement);
 
         $result = $store->decrement('foo', 2);
-        $this->assertEquals(0, $result);
+        $this->assertSame(0, $result);
     }
 
     public function testIncrementNonNumericValues()
@@ -272,7 +272,7 @@ class CacheFileStoreTest extends TestCase
         $files->expects($this->once())->method('put')->with($filePath, $valueAfterIncrement);
         $result = $store->increment('foo');
 
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testIncrementNonExistentKeys()
@@ -287,7 +287,7 @@ class CacheFileStoreTest extends TestCase
         $files->expects($this->once())->method('put')->with($filePath, $valueAfterIncrement);
         $result = $store->increment('foo');
         $this->assertIsInt($result);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testIncrementDoesNotExtendCacheLife()

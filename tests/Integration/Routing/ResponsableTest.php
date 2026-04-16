@@ -16,7 +16,7 @@ class ResponsableTest extends TestCase
 
         $response = $this->get('/responsable');
 
-        $this->assertEquals(201, $response->status());
+        $this->assertSame(201, $response->status());
         $this->assertSame('Taylor', $response->headers->get('X-Test-Header'));
         $this->assertSame('hello world', $response->getContent());
     }

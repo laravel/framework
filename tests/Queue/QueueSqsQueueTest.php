@@ -191,7 +191,7 @@ class QueueSqsQueueTest extends TestCase
 
         $size = $queue->size($this->queueName);
 
-        $this->assertEquals(6, $size); // 1 + 2 + 3
+        $this->assertSame(6, $size); // 1 + 2 + 3
     }
 
     public function testGetQueueProperlyResolvesUrlWithPrefix()

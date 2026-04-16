@@ -32,7 +32,7 @@ class DatabaseEloquentBelongsToManyAggregateTest extends TestCase
             ->withSum('products as total_products', 'order_product.quantity')
             ->first();
 
-        $this->assertEquals(12, $order->total_products);
+        $this->assertSame(12, $order->total_products);
     }
 
     public function testWithSumSameTable()
@@ -43,7 +43,7 @@ class DatabaseEloquentBelongsToManyAggregateTest extends TestCase
             ->withSum('allocatedTo as total_allocated', 'allocations.amount')
             ->first();
 
-        $this->assertEquals(1200, $order->total_allocated);
+        $this->assertSame(1200, $order->total_allocated);
     }
 
     public function testWithSumExpression()
@@ -54,7 +54,7 @@ class DatabaseEloquentBelongsToManyAggregateTest extends TestCase
             ->withSum('allocatedTo as total_allocated', new Expression('allocations.amount * 2'))
             ->first();
 
-        $this->assertEquals(2400, $order->total_allocated);
+        $this->assertSame(2400, $order->total_allocated);
     }
 
     /**

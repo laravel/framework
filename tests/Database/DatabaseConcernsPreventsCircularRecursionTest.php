@@ -19,44 +19,44 @@ class DatabaseConcernsPreventsCircularRecursionTest extends TestCase
     {
         $instance = new PreventsCircularRecursionWithRecursiveMethod();
 
-        $this->assertEquals(0, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(0, $instance->instanceStack);
+        $this->assertSame(0, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(0, $instance->instanceStack);
 
-        $this->assertEquals(0, $instance->callStack());
-        $this->assertEquals(1, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(1, $instance->instanceStack);
+        $this->assertSame(0, $instance->callStack());
+        $this->assertSame(1, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(1, $instance->instanceStack);
 
-        $this->assertEquals(1, $instance->callStack());
-        $this->assertEquals(2, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(2, $instance->instanceStack);
+        $this->assertSame(1, $instance->callStack());
+        $this->assertSame(2, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(2, $instance->instanceStack);
     }
 
     public function testRecursiveDefaultCallbackIsCalledOnlyOnRecursion()
     {
         $instance = new PreventsCircularRecursionWithRecursiveMethod();
 
-        $this->assertEquals(0, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(0, $instance->instanceStack);
-        $this->assertEquals(0, $instance->defaultStack);
+        $this->assertSame(0, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(0, $instance->instanceStack);
+        $this->assertSame(0, $instance->defaultStack);
 
         $this->assertEquals(['instance' => 1, 'default' => 0], $instance->callCallableDefaultStack());
-        $this->assertEquals(1, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(1, $instance->instanceStack);
-        $this->assertEquals(1, $instance->defaultStack);
+        $this->assertSame(1, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(1, $instance->instanceStack);
+        $this->assertSame(1, $instance->defaultStack);
 
         $this->assertEquals(['instance' => 2, 'default' => 1], $instance->callCallableDefaultStack());
-        $this->assertEquals(2, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(2, $instance->instanceStack);
-        $this->assertEquals(2, $instance->defaultStack);
+        $this->assertSame(2, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(2, $instance->instanceStack);
+        $this->assertSame(2, $instance->defaultStack);
     }
 
     public function testRecursiveDefaultCallbackIsCalledOnlyOncePerCallStack()
     {
         $instance = new PreventsCircularRecursionWithRecursiveMethod();
 
-        $this->assertEquals(0, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(0, $instance->instanceStack);
-        $this->assertEquals(0, $instance->defaultStack);
+        $this->assertSame(0, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(0, $instance->instanceStack);
+        $this->assertSame(0, $instance->defaultStack);
 
         $this->assertEquals(
             [
@@ -66,9 +66,9 @@ class DatabaseConcernsPreventsCircularRecursionTest extends TestCase
             ],
             $instance->callCallableDefaultStackRepeatedly(),
         );
-        $this->assertEquals(1, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(1, $instance->instanceStack);
-        $this->assertEquals(1, $instance->defaultStack);
+        $this->assertSame(1, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(1, $instance->instanceStack);
+        $this->assertSame(1, $instance->defaultStack);
 
         $this->assertEquals(
             [
@@ -78,9 +78,9 @@ class DatabaseConcernsPreventsCircularRecursionTest extends TestCase
             ],
             $instance->callCallableDefaultStackRepeatedly(),
         );
-        $this->assertEquals(2, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(2, $instance->instanceStack);
-        $this->assertEquals(2, $instance->defaultStack);
+        $this->assertSame(2, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(2, $instance->instanceStack);
+        $this->assertSame(2, $instance->defaultStack);
     }
 
     public function testRecursiveCallsAreLimitedToIndividualInstances()
@@ -88,29 +88,29 @@ class DatabaseConcernsPreventsCircularRecursionTest extends TestCase
         $instance = new PreventsCircularRecursionWithRecursiveMethod();
         $other = $instance->other;
 
-        $this->assertEquals(0, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(0, $instance->instanceStack);
-        $this->assertEquals(0, $other->instanceStack);
+        $this->assertSame(0, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(0, $instance->instanceStack);
+        $this->assertSame(0, $other->instanceStack);
 
         $instance->callStack();
-        $this->assertEquals(1, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(1, $instance->instanceStack);
-        $this->assertEquals(0, $other->instanceStack);
+        $this->assertSame(1, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(1, $instance->instanceStack);
+        $this->assertSame(0, $other->instanceStack);
 
         $instance->callStack();
-        $this->assertEquals(2, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(2, $instance->instanceStack);
-        $this->assertEquals(0, $other->instanceStack);
+        $this->assertSame(2, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(2, $instance->instanceStack);
+        $this->assertSame(0, $other->instanceStack);
 
         $other->callStack();
-        $this->assertEquals(3, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(2, $instance->instanceStack);
-        $this->assertEquals(1, $other->instanceStack);
+        $this->assertSame(3, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(2, $instance->instanceStack);
+        $this->assertSame(1, $other->instanceStack);
 
         $other->callStack();
-        $this->assertEquals(4, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(2, $instance->instanceStack);
-        $this->assertEquals(2, $other->instanceStack);
+        $this->assertSame(4, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(2, $instance->instanceStack);
+        $this->assertSame(2, $other->instanceStack);
     }
 
     public function testRecursiveCallsToCircularReferenceCallsOtherInstanceOnce()
@@ -118,29 +118,29 @@ class DatabaseConcernsPreventsCircularRecursionTest extends TestCase
         $instance = new PreventsCircularRecursionWithRecursiveMethod();
         $other = $instance->other;
 
-        $this->assertEquals(0, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(0, $instance->instanceStack);
-        $this->assertEquals(0, $other->instanceStack);
+        $this->assertSame(0, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(0, $instance->instanceStack);
+        $this->assertSame(0, $other->instanceStack);
 
         $instance->callOtherStack();
-        $this->assertEquals(2, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(1, $instance->instanceStack);
-        $this->assertEquals(1, $other->instanceStack);
+        $this->assertSame(2, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(1, $instance->instanceStack);
+        $this->assertSame(1, $other->instanceStack);
 
         $instance->callOtherStack();
-        $this->assertEquals(4, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(2, $instance->instanceStack);
-        $this->assertEquals(2, $other->instanceStack);
+        $this->assertSame(4, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(2, $instance->instanceStack);
+        $this->assertSame(2, $other->instanceStack);
 
         $other->callOtherStack();
-        $this->assertEquals(6, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(3, $other->instanceStack);
-        $this->assertEquals(3, $instance->instanceStack);
+        $this->assertSame(6, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(3, $other->instanceStack);
+        $this->assertSame(3, $instance->instanceStack);
 
         $other->callOtherStack();
-        $this->assertEquals(8, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(4, $other->instanceStack);
-        $this->assertEquals(4, $instance->instanceStack);
+        $this->assertSame(8, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(4, $other->instanceStack);
+        $this->assertSame(4, $instance->instanceStack);
     }
 
     public function testRecursiveCallsToCircularLinkedListCallsEachInstanceOnce()
@@ -150,28 +150,28 @@ class DatabaseConcernsPreventsCircularRecursionTest extends TestCase
         $third = new PreventsCircularRecursionWithRecursiveMethod($second);
         $instance->other = $third;
 
-        $this->assertEquals(0, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(0, $instance->instanceStack);
-        $this->assertEquals(0, $second->instanceStack);
-        $this->assertEquals(0, $third->instanceStack);
+        $this->assertSame(0, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(0, $instance->instanceStack);
+        $this->assertSame(0, $second->instanceStack);
+        $this->assertSame(0, $third->instanceStack);
 
         $instance->callOtherStack();
-        $this->assertEquals(3, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(1, $instance->instanceStack);
-        $this->assertEquals(1, $second->instanceStack);
-        $this->assertEquals(1, $third->instanceStack);
+        $this->assertSame(3, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(1, $instance->instanceStack);
+        $this->assertSame(1, $second->instanceStack);
+        $this->assertSame(1, $third->instanceStack);
 
         $second->callOtherStack();
-        $this->assertEquals(6, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(2, $instance->instanceStack);
-        $this->assertEquals(2, $second->instanceStack);
-        $this->assertEquals(2, $third->instanceStack);
+        $this->assertSame(6, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(2, $instance->instanceStack);
+        $this->assertSame(2, $second->instanceStack);
+        $this->assertSame(2, $third->instanceStack);
 
         $third->callOtherStack();
-        $this->assertEquals(9, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
-        $this->assertEquals(3, $instance->instanceStack);
-        $this->assertEquals(3, $second->instanceStack);
-        $this->assertEquals(3, $third->instanceStack);
+        $this->assertSame(9, PreventsCircularRecursionWithRecursiveMethod::$globalStack);
+        $this->assertSame(3, $instance->instanceStack);
+        $this->assertSame(3, $second->instanceStack);
+        $this->assertSame(3, $third->instanceStack);
     }
 
     public function testMockedModelCallToWithoutRecursionMethodWorks(): void

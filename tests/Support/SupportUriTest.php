@@ -41,7 +41,7 @@ class SupportUriTest extends TestCase
         $this->assertEquals('password', $uri->password());
         $this->assertEquals('hello', $uri->fragment());
         $this->assertEquals(['version' => 1], $uri->query()->all());
-        $this->assertEquals(1, $uri->query()->integer('version'));
+        $this->assertSame(1, $uri->query()->integer('version'));
         $this->assertEquals('taylor:password@laravel.com', $uri->authority());
     }
 
@@ -268,15 +268,15 @@ class SupportUriTest extends TestCase
 
         $uri = Uri::of('https://laravel.com/one/two/three?foo=bar');
 
-        $this->assertEquals(3, $uri->pathSegments()->count());
+        $this->assertSame(3, $uri->pathSegments()->count());
 
         $uri = Uri::of('https://laravel.com/one/two/three/?foo=bar');
 
-        $this->assertEquals(3, $uri->pathSegments()->count());
+        $this->assertSame(3, $uri->pathSegments()->count());
 
         $uri = Uri::of('https://laravel.com/one/two/three/#foo=bar');
 
-        $this->assertEquals(3, $uri->pathSegments()->count());
+        $this->assertSame(3, $uri->pathSegments()->count());
     }
 
     public function test_macroable()

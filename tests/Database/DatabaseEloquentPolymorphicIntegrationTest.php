@@ -153,15 +153,15 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
 
         $this->assertTrue($likes[0]->relationLoaded('likeable'));
         $this->assertTrue($likes[0]->likeable->relationLoaded('owner'));
-        $this->assertEquals(2, $likes[0]->likeable->likes_count);
+        $this->assertSame(2, $likes[0]->likeable->likes_count);
 
         $this->assertTrue($likes[1]->relationLoaded('likeable'));
         $this->assertTrue($likes[1]->likeable->relationLoaded('owner'));
-        $this->assertEquals(1, $likes[1]->likeable->comments_count);
+        $this->assertSame(1, $likes[1]->likeable->comments_count);
 
         $this->assertTrue($likes[2]->relationLoaded('likeable'));
         $this->assertTrue($likes[2]->likeable->relationLoaded('owner'));
-        $this->assertEquals(2, $likes[2]->likeable->likes_count);
+        $this->assertSame(2, $likes[2]->likeable->likes_count);
     }
 
     /**

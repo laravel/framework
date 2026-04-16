@@ -36,7 +36,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
             $this->assertStringContainsString($jobStartsWith, $payload['job']);
 
             $this->assertSame('default', $array['queue']);
-            $this->assertEquals(0, $array['attempts']);
+            $this->assertSame(0, $array['attempts']);
             $this->assertNull($array['reserved_at']);
             $this->assertIsInt($array['available_at']);
         });
@@ -80,7 +80,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) use ($uuid, $time) {
             $this->assertSame('default', $array['queue']);
             $this->assertSame(json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'delay' => 10]), $array['payload']);
-            $this->assertEquals(0, $array['attempts']);
+            $this->assertSame(0, $array['attempts']);
             $this->assertNull($array['reserved_at']);
             $this->assertIsInt($array['available_at']);
         });

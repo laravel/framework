@@ -52,7 +52,7 @@ class RedisCacheIntegrationTest extends TestCase
         $rateLimiter = new RateLimiter($repository);
 
         $this->assertFalse($rateLimiter->tooManyAttempts('key', 1));
-        $this->assertEquals(1, $rateLimiter->hit('key', 60));
+        $this->assertSame(1, $rateLimiter->hit('key', 60));
         $this->assertTrue($rateLimiter->tooManyAttempts('key', 1));
         $this->assertFalse($rateLimiter->tooManyAttempts('key', 2));
     }

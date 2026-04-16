@@ -29,11 +29,11 @@ class EloquentAggregateTest extends DatabaseTestCase
 
         $this->assertEquals(-1, UserAggregateTest::query()->min('balance'));
         $this->assertNull(UserAggregateTest::query()->where('name', 'no-name')->min('balance'));
-        $this->assertEquals(1, UserAggregateTest::query()->where('c', '>', 3)->min('balance'));
+        $this->assertSame(1, UserAggregateTest::query()->where('c', '>', 3)->min('balance'));
 
-        $this->assertEquals(2, UserAggregateTest::query()->max('balance'));
+        $this->assertSame(2, UserAggregateTest::query()->max('balance'));
         $this->assertNull(UserAggregateTest::query()->where('name', 'no-name')->max('balance'));
-        $this->assertEquals(0, UserAggregateTest::query()->where('c', '<', 4)->max('balance'));
+        $this->assertSame(0, UserAggregateTest::query()->where('c', '<', 4)->max('balance'));
     }
 
     public function testAvg()
@@ -45,11 +45,11 @@ class EloquentAggregateTest extends DatabaseTestCase
         UserAggregateTest::create(['c' => 5, 'name' => 'test-name5', 'balance' => +20]);
         UserAggregateTest::create(['c' => 6, 'name' => 'test-name5', 'balance' => null]);
 
-        $this->assertEquals(2, UserAggregateTest::query()->avg('balance'));
+        $this->assertSame(2.0, UserAggregateTest::query()->avg('balance'));
         $this->assertNull(UserAggregateTest::query()->where('name', 'no-name')->avg('balance'));
-        $this->assertEquals(15, UserAggregateTest::query()->where('c', '>', 3)->avg('balance'));
+        $this->assertSame(15.0, UserAggregateTest::query()->where('c', '>', 3)->avg('balance'));
 
-        $this->assertEquals(2, UserAggregateTest::query()->average('balance'));
+        $this->assertSame(2.0, UserAggregateTest::query()->average('balance'));
         $this->assertNull(UserAggregateTest::query()->where('name', 'no-name')->average('balance'));
         $this->assertEquals(-10, UserAggregateTest::query()->where('c', '<', 3)->average('balance'));
     }
@@ -65,8 +65,8 @@ class EloquentAggregateTest extends DatabaseTestCase
         $this->assertEquals(-9, UserAggregateTest::query()->sum('balance'));
         $result = UserAggregateTest::query()->where('name', 'no-name')->sum('balance');
         $this->assertNotNull($result);
-        $this->assertEquals(0, $result);
-        $this->assertEquals(2, UserAggregateTest::query()->where('c', '>', 1)->sum('balance'));
+        $this->assertSame(0, $result);
+        $this->assertSame(2, UserAggregateTest::query()->where('c', '>', 1)->sum('balance'));
     }
 
     public function testNumericAggregate()
@@ -77,10 +77,10 @@ class EloquentAggregateTest extends DatabaseTestCase
         UserAggregateTest::create(['c' => 4, 'name' => 'name-4', 'balance' => 20]);
         UserAggregateTest::create(['c' => 5, 'name' => 'name-5', 'balance' => null]);
 
-        $this->assertEquals(20, UserAggregateTest::query()->numericAggregate('sum', ['balance']));
+        $this->assertSame(20, UserAggregateTest::query()->numericAggregate('sum', ['balance']));
         // When calculating the average, rows with NULL values are excluded
-        $this->assertEquals(5, UserAggregateTest::query()->numericAggregate('avg', ['balance']));
-        $this->assertEquals(40, UserAggregateTest::query()->numericAggregate('max', ['balance']));
+        $this->assertSame(5.0, UserAggregateTest::query()->numericAggregate('avg', ['balance']));
+        $this->assertSame(40, UserAggregateTest::query()->numericAggregate('max', ['balance']));
         $this->assertEquals(-40, UserAggregateTest::query()->numericAggregate('min', ['balance']));
     }
 }

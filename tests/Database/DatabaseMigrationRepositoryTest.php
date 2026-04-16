@@ -81,7 +81,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         ])->getMock();
         $repo->expects($this->once())->method('getLastBatchNumber')->willReturn(1);
 
-        $this->assertEquals(2, $repo->getNextBatchNumber());
+        $this->assertSame(2, $repo->getNextBatchNumber());
     }
 
     public function testGetLastBatchNumberReturnsMaxBatch()
@@ -94,7 +94,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $query->shouldReceive('max')->once()->andReturn(1);
         $query->shouldReceive('useWritePdo')->once()->andReturn($query);
 
-        $this->assertEquals(1, $repo->getLastBatchNumber());
+        $this->assertSame(1, $repo->getLastBatchNumber());
     }
 
     public function testCreateRepositoryCreatesProperDatabaseTable()

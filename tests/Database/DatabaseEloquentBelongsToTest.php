@@ -154,10 +154,10 @@ class DatabaseEloquentBelongsToTest extends TestCase
             'foo'
         );
 
-        $this->assertEquals(1, $models[0]->foo->getAttribute('id'));
-        $this->assertEquals(2, $models[1]->foo->getAttribute('id'));
+        $this->assertSame(1, $models[0]->foo->getAttribute('id'));
+        $this->assertSame(2, $models[1]->foo->getAttribute('id'));
         $this->assertSame('3', (string) $models[2]->foo->getAttribute('id'));
-        $this->assertEquals(5, $models[3]->foo->getAttribute('id')->value);
+        $this->assertSame(5, $models[3]->foo->getAttribute('id')->value);
     }
 
     public function testAssociateMethodSetsForeignKeyOnModel()

@@ -77,13 +77,13 @@ class DatabaseEloquentCollectionTest extends TestCase
     public function testGettingMaxItemsFromCollection()
     {
         $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
-        $this->assertEquals(20, $c->max('foo'));
+        $this->assertSame(20, $c->max('foo'));
     }
 
     public function testGettingMinItemsFromCollection()
     {
         $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
-        $this->assertEquals(10, $c->min('foo'));
+        $this->assertSame(10, $c->min('foo'));
     }
 
     public function testContainsWithMultipleArguments()
@@ -220,12 +220,12 @@ class DatabaseEloquentCollectionTest extends TestCase
 
         $c->push($model1);
         $this->assertCount(1, $c->find([1]));
-        $this->assertEquals(1, $c->find([1])->first()->id);
+        $this->assertSame(1, $c->find([1])->first()->id);
         $this->assertCount(0, $c->find([2]));
 
         $c->push($model2)->push($model3);
         $this->assertCount(1, $c->find([2]));
-        $this->assertEquals(2, $c->find([2])->first()->id);
+        $this->assertSame(2, $c->find([2])->first()->id);
         $this->assertCount(2, $c->find([2, 3, 4]));
         $this->assertCount(2, $c->find(collect([2, 3, 4])));
         $this->assertEquals([2, 3], $c->find(collect([2, 3, 4]))->pluck('id')->all());
@@ -252,7 +252,7 @@ class DatabaseEloquentCollectionTest extends TestCase
 
         $c->push($model1);
         $this->assertCount(1, $c->findOrFail([1]));
-        $this->assertEquals(1, $c->findOrFail([1])->first()->id);
+        $this->assertSame(1, $c->findOrFail([1])->first()->id);
 
         $c->push($model2);
         $this->assertCount(2, $c->findOrFail([1, 2]));

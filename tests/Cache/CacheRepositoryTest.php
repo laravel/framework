@@ -87,7 +87,7 @@ class CacheRepositoryTest extends TestCase
     {
         $repo = $this->getRepository();
         $repo->setDefaultCacheTime(10);
-        $this->assertEquals(10, $repo->getDefaultCacheTime());
+        $this->assertSame(10, $repo->getDefaultCacheTime());
     }
 
     public function testHasMethod()

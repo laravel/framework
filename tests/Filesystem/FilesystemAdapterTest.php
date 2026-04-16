@@ -445,7 +445,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertInstanceOf(FtpAdapter::class, $driver->getAdapter());
 
         $config = $driver->getConfig();
-        $this->assertEquals(0700, $config['permPublic']);
+        $this->assertSame(0700, $config['permPublic']);
         $this->assertSame('ftp.example.com', $config['host']);
         $this->assertSame('admin', $config['username']);
     }

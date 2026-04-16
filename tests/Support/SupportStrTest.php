@@ -811,8 +811,8 @@ class SupportStrTest extends TestCase
 
     public function testLength()
     {
-        $this->assertEquals(11, Str::length('foo bar baz'));
-        $this->assertEquals(11, Str::length('foo bar baz', 'UTF-8'));
+        $this->assertSame(11, Str::length('foo bar baz'));
+        $this->assertSame(11, Str::length('foo bar baz', 'UTF-8'));
     }
 
     public function testNumbers()
@@ -828,7 +828,7 @@ class SupportStrTest extends TestCase
 
     public function testRandom()
     {
-        $this->assertEquals(16, strlen(Str::random()));
+        $this->assertSame(16, strlen(Str::random()));
         $randomInteger = random_int(1, 100);
         $this->assertEquals($randomInteger, strlen(Str::random($randomInteger)));
         $this->assertIsString(Str::random());
@@ -1422,8 +1422,8 @@ class SupportStrTest extends TestCase
 
     public function testWordCount()
     {
-        $this->assertEquals(2, Str::wordCount('Hello, world!'));
-        $this->assertEquals(10, Str::wordCount('Hi, this is my first contribution to the Laravel framework.'));
+        $this->assertSame(2, Str::wordCount('Hello, world!'));
+        $this->assertSame(10, Str::wordCount('Hi, this is my first contribution to the Laravel framework.'));
 
         // str_word_count() without $characters does not reliably handle multibyte
         // strings — results depend on the system locale's isalpha() behavior
@@ -1431,11 +1431,11 @@ class SupportStrTest extends TestCase
         $this->assertEquals(str_word_count('мама'), Str::wordCount('мама'));
         $this->assertEquals(str_word_count('мама мыла раму'), Str::wordCount('мама мыла раму'));
 
-        $this->assertEquals(1, Str::wordCount('мама', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
-        $this->assertEquals(3, Str::wordCount('мама мыла раму', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
+        $this->assertSame(1, Str::wordCount('мама', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
+        $this->assertSame(3, Str::wordCount('мама мыла раму', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
 
-        $this->assertEquals(1, Str::wordCount('МАМА', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
-        $this->assertEquals(3, Str::wordCount('МАМА МЫЛА РАМУ', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
+        $this->assertSame(1, Str::wordCount('МАМА', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
+        $this->assertSame(3, Str::wordCount('МАМА МЫЛА РАМУ', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
     }
 
     public function testWordWrap()

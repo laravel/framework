@@ -65,7 +65,7 @@ class CommandMutexTest extends TestCase
 
         $this->runCommand();
 
-        $this->assertEquals(1, $this->command->ran);
+        $this->assertSame(1, $this->command->ran);
     }
 
     public function testCannotRunIsolatedCommandIfBlocked()
@@ -76,7 +76,7 @@ class CommandMutexTest extends TestCase
 
         $this->runCommand();
 
-        $this->assertEquals(0, $this->command->ran);
+        $this->assertSame(0, $this->command->ran);
     }
 
     public function testCanRunCommandAgainAfterOtherCommandFinished()
@@ -91,7 +91,7 @@ class CommandMutexTest extends TestCase
         $this->runCommand();
         $this->runCommand();
 
-        $this->assertEquals(2, $this->command->ran);
+        $this->assertSame(2, $this->command->ran);
     }
 
     public function testCanRunCommandAgainNonAutomated()
@@ -100,7 +100,7 @@ class CommandMutexTest extends TestCase
 
         $this->runCommand(false);
 
-        $this->assertEquals(1, $this->command->ran);
+        $this->assertSame(1, $this->command->ran);
     }
 
     protected function runCommand($withIsolated = true)

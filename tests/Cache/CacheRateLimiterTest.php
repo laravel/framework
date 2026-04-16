@@ -104,7 +104,7 @@ class CacheRateLimiterTest extends TestCase
         $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
         $rateLimiter = new RateLimiter($cache);
 
-        $this->assertEquals(2, $rateLimiter->retriesLeft('key', 5));
+        $this->assertSame(2, $rateLimiter->retriesLeft('key', 5));
     }
 
     public function testClearClearsTheCacheKeys()

@@ -361,8 +361,8 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
             $count += $collection->count();
         });
 
-        $this->assertEquals(3, $i);
-        $this->assertEquals(6, $count);
+        $this->assertSame(3, $i);
+        $this->assertSame(6, $count);
     }
 
     public function testCursorReturnsCorrectModels()
@@ -472,7 +472,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
             ], array_keys($post->getAttributes()));
         });
 
-        $this->assertEquals(6, $i);
+        $this->assertSame(6, $i);
     }
 
     public function testIntermediateSoftDeletesAreIgnored()

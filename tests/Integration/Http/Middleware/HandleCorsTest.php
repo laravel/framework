@@ -42,7 +42,7 @@ class HandleCorsTest extends TestCase
         ]);
 
         $this->assertSame('http://localhost', $crawler->headers->get('Access-Control-Allow-Origin'));
-        $this->assertEquals(204, $crawler->getStatusCode());
+        $this->assertSame(204, $crawler->getStatusCode());
     }
 
     public function testOptionsAllowOriginAllowed()
@@ -53,7 +53,7 @@ class HandleCorsTest extends TestCase
         ]);
 
         $this->assertSame('http://localhost', $crawler->headers->get('Access-Control-Allow-Origin'));
-        $this->assertEquals(204, $crawler->getStatusCode());
+        $this->assertSame(204, $crawler->getStatusCode());
     }
 
     public function testAllowAllOrigins()
@@ -66,7 +66,7 @@ class HandleCorsTest extends TestCase
         ]);
 
         $this->assertSame('*', $crawler->headers->get('Access-Control-Allow-Origin'));
-        $this->assertEquals(204, $crawler->getStatusCode());
+        $this->assertSame(204, $crawler->getStatusCode());
     }
 
     public function testAllowAllOriginsWildcard()
@@ -79,7 +79,7 @@ class HandleCorsTest extends TestCase
         ]);
 
         $this->assertSame('http://test.laravel.com', $crawler->headers->get('Access-Control-Allow-Origin'));
-        $this->assertEquals(204, $crawler->getStatusCode());
+        $this->assertSame(204, $crawler->getStatusCode());
     }
 
     public function testOriginsWildcardIncludesNestedSubdomains()
@@ -92,7 +92,7 @@ class HandleCorsTest extends TestCase
         ]);
 
         $this->assertSame('http://api.service.test.laravel.com', $crawler->headers->get('Access-Control-Allow-Origin'));
-        $this->assertEquals(204, $crawler->getStatusCode());
+        $this->assertSame(204, $crawler->getStatusCode());
     }
 
     public function testAllowAllOriginsWildcardNoMatch()
@@ -115,7 +115,7 @@ class HandleCorsTest extends TestCase
         ]);
 
         $this->assertSame('http://localhost', $crawler->headers->get('Access-Control-Allow-Origin'));
-        $this->assertEquals(204, $crawler->getStatusCode());
+        $this->assertSame(204, $crawler->getStatusCode());
     }
 
     public function testOptionsAllowOriginNotAllowed()
@@ -135,7 +135,7 @@ class HandleCorsTest extends TestCase
             'HTTP_ACCESS_CONTROL_REQUEST_METHOD' => 'POST',
         ]);
         $this->assertEquals(null, $crawler->headers->get('Access-Control-Allow-Methods'));
-        $this->assertEquals(200, $crawler->getStatusCode());
+        $this->assertSame(200, $crawler->getStatusCode());
 
         $this->assertSame('PONG', $crawler->getContent());
     }
@@ -147,7 +147,7 @@ class HandleCorsTest extends TestCase
             'HTTP_ACCESS_CONTROL_REQUEST_METHOD' => 'PUT',
         ]);
         $this->assertEquals(null, $crawler->headers->get('Access-Control-Allow-Methods'));
-        $this->assertEquals(200, $crawler->getStatusCode());
+        $this->assertSame(200, $crawler->getStatusCode());
     }
 
     public function testAllowHeaderAllowedOptions()
@@ -158,7 +158,7 @@ class HandleCorsTest extends TestCase
             'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' => 'x-custom-1, x-custom-2',
         ]);
         $this->assertSame('x-custom-1, x-custom-2', $crawler->headers->get('Access-Control-Allow-Headers'));
-        $this->assertEquals(204, $crawler->getStatusCode());
+        $this->assertSame(204, $crawler->getStatusCode());
 
         $this->assertSame('', $crawler->getContent());
     }
@@ -173,7 +173,7 @@ class HandleCorsTest extends TestCase
             'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' => 'x-custom-3',
         ]);
         $this->assertSame('x-custom-3', $crawler->headers->get('Access-Control-Allow-Headers'));
-        $this->assertEquals(204, $crawler->getStatusCode());
+        $this->assertSame(204, $crawler->getStatusCode());
 
         $this->assertSame('', $crawler->getContent());
     }
@@ -195,7 +195,7 @@ class HandleCorsTest extends TestCase
             'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' => 'x-custom-1, x-custom-2',
         ]);
         $this->assertEquals(null, $crawler->headers->get('Access-Control-Allow-Headers'));
-        $this->assertEquals(200, $crawler->getStatusCode());
+        $this->assertSame(200, $crawler->getStatusCode());
 
         $this->assertSame('PONG', $crawler->getContent());
     }
@@ -209,7 +209,7 @@ class HandleCorsTest extends TestCase
             'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' => 'x-custom-3',
         ]);
         $this->assertEquals(null, $crawler->headers->get('Access-Control-Allow-Headers'));
-        $this->assertEquals(200, $crawler->getStatusCode());
+        $this->assertSame(200, $crawler->getStatusCode());
 
         $this->assertSame('PONG', $crawler->getContent());
     }
@@ -221,7 +221,7 @@ class HandleCorsTest extends TestCase
             'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' => 'x-custom-3',
         ]);
         $this->assertEquals(null, $crawler->headers->get('Access-Control-Allow-Headers'));
-        $this->assertEquals(200, $crawler->getStatusCode());
+        $this->assertSame(200, $crawler->getStatusCode());
     }
 
     public function testError()
@@ -232,7 +232,7 @@ class HandleCorsTest extends TestCase
         ]);
 
         $this->assertSame('http://localhost', $crawler->headers->get('Access-Control-Allow-Origin'));
-        $this->assertEquals(500, $crawler->getStatusCode());
+        $this->assertSame(500, $crawler->getStatusCode());
     }
 
     public function testValidationException()
@@ -242,7 +242,7 @@ class HandleCorsTest extends TestCase
             'HTTP_ACCESS_CONTROL_REQUEST_METHOD' => 'POST',
         ]);
         $this->assertSame('http://localhost', $crawler->headers->get('Access-Control-Allow-Origin'));
-        $this->assertEquals(302, $crawler->getStatusCode());
+        $this->assertSame(302, $crawler->getStatusCode());
     }
 
     protected function addWebRoutes(Router $router)

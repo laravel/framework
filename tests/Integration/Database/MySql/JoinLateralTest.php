@@ -77,8 +77,8 @@ class JoinLateralTest extends MySqlTestCase
             ->get();
 
         $this->assertCount(2, $userWithPosts);
-        $this->assertEquals(7, $userWithPosts[0]->best_post_rating);
-        $this->assertEquals(3, $userWithPosts[1]->best_post_rating);
+        $this->assertSame(7, $userWithPosts[0]->best_post_rating);
+        $this->assertSame(3, $userWithPosts[1]->best_post_rating);
 
         $userWithoutPosts = DB::table('users')
             ->where('id', 2)
@@ -102,8 +102,8 @@ class JoinLateralTest extends MySqlTestCase
             ->get();
 
         $this->assertCount(2, $userWithPosts);
-        $this->assertEquals(7, $userWithPosts[0]->best_post_rating);
-        $this->assertEquals(3, $userWithPosts[1]->best_post_rating);
+        $this->assertSame(7, $userWithPosts[0]->best_post_rating);
+        $this->assertSame(3, $userWithPosts[1]->best_post_rating);
 
         $userWithoutPosts = DB::table('users')
             ->where('id', 2)

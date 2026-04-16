@@ -20,7 +20,7 @@ class DynamoDbStoreTest extends TestCase
 
         Cache::driver('dynamodb')->put(['name' => 'Abigail', 'age' => 28], 10);
         $this->assertSame('Abigail', Cache::driver('dynamodb')->get('name'));
-        $this->assertEquals(28, Cache::driver('dynamodb')->get('age'));
+        $this->assertSame(28, Cache::driver('dynamodb')->get('age'));
 
         $this->assertEquals([
             'name' => 'Abigail',
@@ -46,10 +46,10 @@ class DynamoDbStoreTest extends TestCase
         Cache::driver('dynamodb')->increment('counter');
         Cache::driver('dynamodb')->increment('counter', 4);
 
-        $this->assertEquals(5, Cache::driver('dynamodb')->get('counter'));
+        $this->assertSame(5, Cache::driver('dynamodb')->get('counter'));
 
         Cache::driver('dynamodb')->decrement('counter', 5);
-        $this->assertEquals(0, Cache::driver('dynamodb')->get('counter'));
+        $this->assertSame(0, Cache::driver('dynamodb')->get('counter'));
     }
 
     public function testLocksCanBeAcquired()

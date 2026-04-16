@@ -71,7 +71,7 @@ class CacheBasedSessionHandlerTest extends TestCase
     {
         $result = $this->sessionHandler->gc(lifetime: 120);
 
-        $this->assertEquals(0, $result);
+        $this->assertSame(0, $result);
     }
 
     public function test_get_cache_returns_cache_instance()

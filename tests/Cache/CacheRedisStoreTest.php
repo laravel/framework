@@ -50,7 +50,7 @@ class CacheRedisStoreTest extends TestCase
         $redis = $this->getRedis();
         $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
         $redis->getRedis()->shouldReceive('get')->once()->with('prefix:foo')->andReturn(1);
-        $this->assertEquals(1, $redis->get('foo'));
+        $this->assertSame(1, $redis->get('foo'));
     }
 
     public function testSetMethodProperlyCallsRedis()

@@ -32,7 +32,7 @@ class ContainerExtendTest extends TestCase
         $result = $container->make('foo');
 
         $this->assertSame('taylor', $result->name);
-        $this->assertEquals(26, $result->age);
+        $this->assertSame(26, $result->age);
         $this->assertSame($result, $container->make('foo'));
     }
 

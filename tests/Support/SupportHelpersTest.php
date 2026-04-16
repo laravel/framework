@@ -270,7 +270,7 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('Taylor', data_get($dottedArray, ['users', 'first.name']));
         $this->assertNull(data_get($dottedArray, ['users', 'middle.name']));
         $this->assertSame('Not found', data_get($dottedArray, ['users', 'last.name'], 'Not found'));
-        $this->assertEquals(56, data_get($arrayAccess, 'price'));
+        $this->assertSame(56, data_get($arrayAccess, 'price'));
         $this->assertSame('John', data_get($arrayAccess, 'user.name'));
         $this->assertSame('void', data_get($arrayAccess, 'foo', 'void'));
         $this->assertSame('void', data_get($arrayAccess, 'user.foo', 'void'));
@@ -828,7 +828,7 @@ class SupportHelpersTest extends TestCase
     public function testTap()
     {
         $object = (object) ['id' => 1];
-        $this->assertEquals(2, tap($object, function ($object) {
+        $this->assertSame(2, tap($object, function ($object) {
             $object->id = 2;
         })->id);
 
@@ -938,7 +938,7 @@ class SupportHelpersTest extends TestCase
     {
         $this->assertNull(optional(null)->something());
 
-        $this->assertEquals(10, optional(new class
+        $this->assertSame(10, optional(new class
         {
             public function something()
             {
@@ -955,7 +955,7 @@ class SupportHelpersTest extends TestCase
             );
         }));
 
-        $this->assertEquals(10, optional(5, function ($number) {
+        $this->assertSame(10, optional(5, function ($number) {
             return $number * 2;
         }));
     }
@@ -1045,7 +1045,7 @@ class SupportHelpersTest extends TestCase
         }, 100);
 
         // Make sure we made two attempts
-        $this->assertEquals(2, $attempts);
+        $this->assertSame(2, $attempts);
 
         // Make sure we waited 100ms for the first attempt
         Sleep::assertSleptTimes(1);
@@ -1068,7 +1068,7 @@ class SupportHelpersTest extends TestCase
         }, CarbonInterval::milliseconds(100));
 
         // Make sure we made two attempts
-        $this->assertEquals(2, $attempts);
+        $this->assertSame(2, $attempts);
 
         // Make sure we waited 100ms for the first attempt
         Sleep::assertSleptTimes(1);
@@ -1095,7 +1095,7 @@ class SupportHelpersTest extends TestCase
         });
 
         // Make sure we made three attempts
-        $this->assertEquals(3, $attempts);
+        $this->assertSame(3, $attempts);
 
         // Make sure we waited 300ms for the first two attempts
         Sleep::assertSleptTimes(2);
@@ -1121,7 +1121,7 @@ class SupportHelpersTest extends TestCase
         });
 
         // Make sure we made two attempts
-        $this->assertEquals(2, $attempts);
+        $this->assertSame(2, $attempts);
 
         // Make sure we waited 100ms for the first attempt
         Sleep::assertSleptTimes(1);
@@ -1159,7 +1159,7 @@ class SupportHelpersTest extends TestCase
         });
 
         // Make sure we made four attempts
-        $this->assertEquals(4, $attempts);
+        $this->assertSame(4, $attempts);
 
         Sleep::assertSleptTimes(3);
 
@@ -1183,7 +1183,7 @@ class SupportHelpersTest extends TestCase
         }, 100);
 
         // Make sure we made two attempts
-        $this->assertEquals(2, $attempts);
+        $this->assertSame(2, $attempts);
 
         // Make sure we waited 100ms for the first attempt
         Sleep::assertSleptTimes(1);
@@ -1195,7 +1195,7 @@ class SupportHelpersTest extends TestCase
 
     public function testTransform()
     {
-        $this->assertEquals(10, transform(5, function ($value) {
+        $this->assertSame(10, transform(5, function ($value) {
             return $value * 2;
         }));
 
@@ -1219,9 +1219,9 @@ class SupportHelpersTest extends TestCase
 
     public function testWith()
     {
-        $this->assertEquals(10, with(10));
+        $this->assertSame(10, with(10));
 
-        $this->assertEquals(10, with(5, function ($five) {
+        $this->assertSame(10, with(5, function ($five) {
             return $five + 5;
         }));
     }
@@ -1556,7 +1556,7 @@ class SupportHelpersTest extends TestCase
 
     public function testLiteral(): void
     {
-        $this->assertEquals(1, literal(1));
+        $this->assertSame(1, literal(1));
         $this->assertEquals('taylor', literal('taylor'));
         $this->assertEquals((object) ['name' => 'Taylor', 'role' => 'Developer'], literal(name: 'Taylor', role: 'Developer'));
     }

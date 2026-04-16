@@ -52,7 +52,7 @@ class RoutingRedirectorTest extends TestCase
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertSame('http://foo.com/bar', $response->getTargetUrl());
-        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertSame(302, $response->getStatusCode());
         $this->assertEquals($this->session, $response->getSession());
     }
 
@@ -61,9 +61,9 @@ class RoutingRedirectorTest extends TestCase
         $response = $this->redirect->to('bar', 303, ['X-RateLimit-Limit' => 60, 'X-RateLimit-Remaining' => 59], true);
 
         $this->assertSame('https://foo.com/bar', $response->getTargetUrl());
-        $this->assertEquals(303, $response->getStatusCode());
-        $this->assertEquals(60, $response->headers->get('X-RateLimit-Limit'));
-        $this->assertEquals(59, $response->headers->get('X-RateLimit-Remaining'));
+        $this->assertSame(303, $response->getStatusCode());
+        $this->assertSame(60, (int) $response->headers->get('X-RateLimit-Limit'));
+        $this->assertSame(59, (int) $response->headers->get('X-RateLimit-Remaining'));
     }
 
     public function testGuestPutCurrentUrlInSession()

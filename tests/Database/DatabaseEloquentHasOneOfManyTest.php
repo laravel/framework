@@ -305,7 +305,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $user->logins()->create();
 
         $user = HasOneOfManyTestUser::withCount('latest_login')->first();
-        $this->assertEquals(1, $user->latest_login_count);
+        $this->assertSame(1, $user->latest_login_count);
     }
 
     public function testExists()

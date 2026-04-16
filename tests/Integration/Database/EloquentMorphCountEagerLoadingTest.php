@@ -57,7 +57,7 @@ class EloquentMorphCountEagerLoadingTest extends DatabaseTestCase
             ->get();
 
         $this->assertTrue($comments[0]->relationLoaded('commentable'));
-        $this->assertEquals(2, $comments[0]->commentable->likes_count);
+        $this->assertSame(2, $comments[0]->commentable->likes_count);
         $this->assertTrue($comments[1]->relationLoaded('commentable'));
         $this->assertNull($comments[1]->commentable->views_count);
     }
@@ -71,7 +71,7 @@ class EloquentMorphCountEagerLoadingTest extends DatabaseTestCase
             ->get();
 
         $this->assertTrue($comments[0]->relationLoaded('commentable'));
-        $this->assertEquals(2, $comments[0]->commentable->likes_count);
+        $this->assertSame(2, $comments[0]->commentable->likes_count);
     }
 }
 

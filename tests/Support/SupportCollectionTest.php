@@ -345,12 +345,12 @@ class SupportCollectionTest extends TestCase
         $result = $data->last(function ($value) {
             return $value < 250;
         });
-        $this->assertEquals(200, $result);
+        $this->assertSame(200, $result);
 
         $result = $data->last(function ($value, $key) {
             return $key < 2;
         });
-        $this->assertEquals(200, $result);
+        $this->assertSame(200, $result);
 
         $result = $data->last(function ($value) {
             return $value > 300;
@@ -1290,7 +1290,7 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection([['id' => 1, 'balance' => 0], ['id' => 2, 'balance' => 200]]);
 
-        $this->assertEquals(0, $c->value('balance'));
+        $this->assertSame(0, $c->value('balance'));
 
         $c = new $collection([['id' => 1, 'balance' => ''], ['id' => 2, 'balance' => 200]]);
 
@@ -1302,11 +1302,11 @@ class SupportCollectionTest extends TestCase
 
         $c = new $collection([['id' => 1], ['id' => 2, 'balance' => 200]]);
 
-        $this->assertEquals(200, $c->value('balance'));
+        $this->assertSame(200, $c->value('balance'));
 
         $c = new $collection([['id' => 1], ['id' => 2, 'balance' => 0], ['id' => 3, 'balance' => 200]]);
 
-        $this->assertEquals(0, $c->value('balance'));
+        $this->assertSame(0, $c->value('balance'));
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -1326,7 +1326,7 @@ class SupportCollectionTest extends TestCase
             literal(id: 3, balance: literal(currency: 'USD', value: 200)),
         ]);
 
-        $this->assertEquals(0, $c->value('balance.value'));
+        $this->assertSame(0, $c->value('balance.value'));
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -2586,10 +2586,12 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testImplodeModels($collection)
     {
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
         };
         $model->setAttribute('email', 'foo');
-        $modelTwo = new class extends Model {
+        $modelTwo = new class extends Model
+        {
         };
         $modelTwo->setAttribute('email', 'bar');
         $data = new $collection([$model, $modelTwo]);
@@ -4049,10 +4051,10 @@ class SupportCollectionTest extends TestCase
     public function testGettingSumFromCollection($collection)
     {
         $c = new $collection([(object) ['foo' => 50], (object) ['foo' => 50]]);
-        $this->assertEquals(100, $c->sum('foo'));
+        $this->assertSame(100, $c->sum('foo'));
 
         $c = new $collection([(object) ['foo' => 50], (object) ['foo' => 50]]);
-        $this->assertEquals(100, $c->sum(function ($i) {
+        $this->assertSame(100, $c->sum(function ($i) {
             return $i->foo;
         }));
     }
@@ -4061,14 +4063,14 @@ class SupportCollectionTest extends TestCase
     public function testCanSumValuesWithoutACallback($collection)
     {
         $c = new $collection([1, 2, 3, 4, 5]);
-        $this->assertEquals(15, $c->sum());
+        $this->assertSame(15, $c->sum());
     }
 
     #[DataProvider('collectionClassProvider')]
     public function testGettingSumFromEmptyCollection($collection)
     {
         $c = new $collection;
-        $this->assertEquals(0, $c->sum('foo'));
+        $this->assertSame(0, $c->sum('foo'));
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -4192,10 +4194,10 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection([1, 2, 3, 4, 5, 2, 5, 'foo' => 'bar']);
 
-        $this->assertEquals(1, $c->search(2));
-        $this->assertEquals(1, $c->search('2'));
+        $this->assertSame(1, $c->search(2));
+        $this->assertSame(1, $c->search('2'));
         $this->assertSame('foo', $c->search('bar'));
-        $this->assertEquals(4, $c->search(function ($value) {
+        $this->assertSame(4, $c->search(function ($value) {
             return $value > 4;
         }));
         $this->assertSame('foo', $c->search(function ($value) {
@@ -4209,11 +4211,11 @@ class SupportCollectionTest extends TestCase
         $c = new $collection([false, 0, 1, [], '']);
         $this->assertFalse($c->search('false', true));
         $this->assertFalse($c->search('1', true));
-        $this->assertEquals(0, $c->search(false, true));
-        $this->assertEquals(1, $c->search(0, true));
-        $this->assertEquals(2, $c->search(1, true));
-        $this->assertEquals(3, $c->search([], true));
-        $this->assertEquals(4, $c->search('', true));
+        $this->assertSame(0, $c->search(false, true));
+        $this->assertSame(1, $c->search(0, true));
+        $this->assertSame(2, $c->search(1, true));
+        $this->assertSame(3, $c->search([], true));
+        $this->assertSame(4, $c->search('', true));
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -4236,14 +4238,14 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection([1, 2, 3, 4, 5, 2, 5, 'name' => 'taylor', 'framework' => 'laravel']);
 
-        $this->assertEquals(1, $c->before(2));
-        $this->assertEquals(1, $c->before('2'));
-        $this->assertEquals(5, $c->before('taylor'));
+        $this->assertSame(1, $c->before(2));
+        $this->assertSame(1, $c->before('2'));
+        $this->assertSame(5, $c->before('taylor'));
         $this->assertSame('taylor', $c->before('laravel'));
-        $this->assertEquals(4, $c->before(function ($value) {
+        $this->assertSame(4, $c->before(function ($value) {
             return $value > 4;
         }));
-        $this->assertEquals(5, $c->before(function ($value) {
+        $this->assertSame(5, $c->before(function ($value) {
             return ! is_numeric($value);
         }));
     }
@@ -4256,8 +4258,8 @@ class SupportCollectionTest extends TestCase
         $this->assertNull($c->before('1', true));
         $this->assertNull($c->before(false, true));
         $this->assertEquals(false, $c->before(0, true));
-        $this->assertEquals(0, $c->before(1, true));
-        $this->assertEquals(1, $c->before([], true));
+        $this->assertSame(0, $c->before(1, true));
+        $this->assertSame(1, $c->before([], true));
         $this->assertEquals([], $c->before('', true));
     }
 
@@ -4295,14 +4297,14 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection([1, 2, 3, 4, 2, 5, 'name' => 'taylor', 'framework' => 'laravel']);
 
-        $this->assertEquals(2, $c->after(1));
-        $this->assertEquals(3, $c->after(2));
-        $this->assertEquals(4, $c->after(3));
-        $this->assertEquals(2, $c->after(4));
+        $this->assertSame(2, $c->after(1));
+        $this->assertSame(3, $c->after(2));
+        $this->assertSame(4, $c->after(3));
+        $this->assertSame(2, $c->after(4));
         $this->assertEquals('taylor', $c->after(5));
         $this->assertEquals('laravel', $c->after('taylor'));
 
-        $this->assertEquals(4, $c->after(function ($value) {
+        $this->assertSame(4, $c->after(function ($value) {
             return $value > 2;
         }));
         $this->assertEquals('laravel', $c->after(function ($value) {
@@ -4318,7 +4320,7 @@ class SupportCollectionTest extends TestCase
         $this->assertNull($c->after('false', true));
         $this->assertNull($c->after('1', true));
         $this->assertNull($c->after('', true));
-        $this->assertEquals(0, $c->after(false, true));
+        $this->assertSame(0, $c->after(false, true));
         $this->assertEquals([], $c->after(1, true));
         $this->assertEquals('', $c->after([], true));
     }
@@ -4543,18 +4545,18 @@ class SupportCollectionTest extends TestCase
     public function testGettingMaxItemsFromCollection($collection)
     {
         $c = new $collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
-        $this->assertEquals(20, $c->max(function ($item) {
+        $this->assertSame(20, $c->max(function ($item) {
             return $item->foo;
         }));
-        $this->assertEquals(20, $c->max('foo'));
-        $this->assertEquals(20, $c->max->foo);
+        $this->assertSame(20, $c->max('foo'));
+        $this->assertSame(20, $c->max->foo);
 
         $c = new $collection([['foo' => 10], ['foo' => 20]]);
-        $this->assertEquals(20, $c->max('foo'));
-        $this->assertEquals(20, $c->max->foo);
+        $this->assertSame(20, $c->max('foo'));
+        $this->assertSame(20, $c->max->foo);
 
         $c = new $collection([1, 2, 3, 4, 5]);
-        $this->assertEquals(5, $c->max());
+        $this->assertSame(5, $c->max());
 
         $c = new $collection;
         $this->assertNull($c->max());
@@ -4564,28 +4566,28 @@ class SupportCollectionTest extends TestCase
     public function testGettingMinItemsFromCollection($collection)
     {
         $c = new $collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
-        $this->assertEquals(10, $c->min(function ($item) {
+        $this->assertSame(10, $c->min(function ($item) {
             return $item->foo;
         }));
-        $this->assertEquals(10, $c->min('foo'));
-        $this->assertEquals(10, $c->min->foo);
+        $this->assertSame(10, $c->min('foo'));
+        $this->assertSame(10, $c->min->foo);
 
         $c = new $collection([['foo' => 10], ['foo' => 20]]);
-        $this->assertEquals(10, $c->min('foo'));
-        $this->assertEquals(10, $c->min->foo);
+        $this->assertSame(10, $c->min('foo'));
+        $this->assertSame(10, $c->min->foo);
 
         $c = new $collection([['foo' => 10], ['foo' => 20], ['foo' => null]]);
-        $this->assertEquals(10, $c->min('foo'));
-        $this->assertEquals(10, $c->min->foo);
+        $this->assertSame(10, $c->min('foo'));
+        $this->assertSame(10, $c->min->foo);
 
         $c = new $collection([1, 2, 3, 4, 5]);
-        $this->assertEquals(1, $c->min());
+        $this->assertSame(1, $c->min());
 
         $c = new $collection([1, null, 3, 4, 5]);
-        $this->assertEquals(1, $c->min());
+        $this->assertSame(1, $c->min());
 
         $c = new $collection([0, 1, 2, 3, 4]);
-        $this->assertEquals(0, $c->min());
+        $this->assertSame(0, $c->min());
 
         $c = new $collection;
         $this->assertNull($c->min());
@@ -4697,32 +4699,32 @@ class SupportCollectionTest extends TestCase
     public function testGettingAvgItemsFromCollection($collection)
     {
         $c = new $collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
-        $this->assertEquals(15, $c->avg(function ($item) {
+        $this->assertSame(15, $c->avg(function ($item) {
             return $item->foo;
         }));
-        $this->assertEquals(15, $c->avg('foo'));
-        $this->assertEquals(15, $c->avg->foo);
+        $this->assertSame(15, $c->avg('foo'));
+        $this->assertSame(15, $c->avg->foo);
 
         $c = new $collection([(object) ['foo' => 10], (object) ['foo' => 20], (object) ['foo' => null]]);
-        $this->assertEquals(15, $c->avg(function ($item) {
+        $this->assertSame(15, $c->avg(function ($item) {
             return $item->foo;
         }));
-        $this->assertEquals(15, $c->avg('foo'));
-        $this->assertEquals(15, $c->avg->foo);
+        $this->assertSame(15, $c->avg('foo'));
+        $this->assertSame(15, $c->avg->foo);
 
         $c = new $collection([['foo' => 10], ['foo' => 20]]);
-        $this->assertEquals(15, $c->avg('foo'));
-        $this->assertEquals(15, $c->avg->foo);
+        $this->assertSame(15, $c->avg('foo'));
+        $this->assertSame(15, $c->avg->foo);
 
         $c = new $collection([1, 2, 3, 4, 5]);
-        $this->assertEquals(3, $c->avg());
+        $this->assertSame(3, $c->avg());
 
         $c = new $collection;
         $this->assertNull($c->avg());
 
         $c = new $collection([['foo' => '4'], ['foo' => '2']]);
         $this->assertIsInt($c->avg('foo'));
-        $this->assertEquals(3, $c->avg('foo'));
+        $this->assertSame(3, $c->avg('foo'));
 
         $c = new $collection([['foo' => 1], ['foo' => 2]]);
         $this->assertIsFloat($c->avg('foo'));
@@ -4732,10 +4734,10 @@ class SupportCollectionTest extends TestCase
             ['foo' => 1], ['foo' => 2],
             (object) ['foo' => 6],
         ]);
-        $this->assertEquals(3, $c->avg('foo'));
+        $this->assertSame(3, $c->avg('foo'));
 
         $c = new $collection([0]);
-        $this->assertEquals(0, $c->avg());
+        $this->assertSame(0, $c->avg());
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -4889,7 +4891,7 @@ class SupportCollectionTest extends TestCase
     public function testReduce($collection)
     {
         $data = new $collection([1, 2, 3]);
-        $this->assertEquals(6, $data->reduce(function ($carry, $element) {
+        $this->assertSame(6, $data->reduce(function ($carry, $element) {
             return $carry += $element;
         }));
 
@@ -4915,8 +4917,8 @@ class SupportCollectionTest extends TestCase
             return [$sum, $max, $min];
         }, 0, PHP_INT_MIN, PHP_INT_MAX);
 
-        $this->assertEquals(14, $sum);
-        $this->assertEquals(5, $max);
+        $this->assertSame(14, $sum);
+        $this->assertSame(5, $max);
         $this->assertEquals(-1, $min);
     }
 
@@ -4946,7 +4948,7 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection([1, 2, 3]);
 
-        $this->assertEquals(6, $data->pipe(function ($data) {
+        $this->assertSame(6, $data->pipe(function ($data) {
             return $data->sum();
         }));
     }
@@ -4977,7 +4979,7 @@ class SupportCollectionTest extends TestCase
             },
         ]);
 
-        $this->assertEquals(15, $result);
+        $this->assertSame(15, $result);
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -4985,7 +4987,7 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection([1, 2, 2, 4]);
 
-        $this->assertEquals(2, $data->median());
+        $this->assertSame(2, $data->median());
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -4997,7 +4999,7 @@ class SupportCollectionTest extends TestCase
             (object) ['foo' => 2],
             (object) ['foo' => 4],
         ]);
-        $this->assertEquals(2, $data->median('foo'));
+        $this->assertSame(2, $data->median('foo'));
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -5009,7 +5011,7 @@ class SupportCollectionTest extends TestCase
             (object) ['foo' => 4],
             (object) ['foo' => null],
         ]);
-        $this->assertEquals(2, $data->median('foo'));
+        $this->assertSame(2, $data->median('foo'));
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -5030,7 +5032,7 @@ class SupportCollectionTest extends TestCase
             (object) ['foo' => 5],
             (object) ['foo' => 3],
         ]);
-        $this->assertEquals(3, $data->median('foo'));
+        $this->assertSame(3, $data->median('foo'));
     }
 
     #[DataProvider('collectionClassProvider')]

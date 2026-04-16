@@ -1428,7 +1428,7 @@ class HttpClientTest extends TestCase
         // Ensure that the truncation level is not changed when reporting the exception.
         $this->assertEquals("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
 
-        $this->assertEquals(60, RequestException::$truncateAt);
+        $this->assertSame(60, RequestException::$truncateAt);
     }
 
     public function testNoTruncationOnRequestLevel()
@@ -1451,7 +1451,7 @@ class HttpClientTest extends TestCase
 
         $this->assertEquals("HTTP request returned status code 403:\nHTTP/1.1 403 Forbidden\r\nContent-Type: application/json\r\n\r\n[\"error\"]\n", $exception->getMessage());
 
-        $this->assertEquals(60, RequestException::$truncateAt);
+        $this->assertSame(60, RequestException::$truncateAt);
     }
 
     public function testRequestExceptionDoesNotTruncateButRequestDoes()
@@ -1519,7 +1519,7 @@ class HttpClientTest extends TestCase
         $exception->report();
         $exception->report();
 
-        $this->assertEquals(1, substr_count($exception->getMessage(), '{"error":{"code":403,"message":"The Request can not be completed"}}'));
+        $this->assertSame(1, substr_count($exception->getMessage(), '{"error":{"code":403,"message":"The Request can not be completed"}}'));
     }
 
     #[TestWith([false])]
@@ -2655,8 +2655,8 @@ class HttpClientTest extends TestCase
 
         $this->assertInstanceOf(RequestException::class, $requestException);
         $this->assertEqualsCanonicalizing(['code' => 'not_found'], $requestException->response->json());
-        $this->assertEquals(404, $requestException->response->status());
-        $this->assertEquals(199, $requestException->response->header('X-RateLimit-Remaining'));
+        $this->assertSame(404, $requestException->response->status());
+        $this->assertSame(199, (int) $requestException->response->header('X-RateLimit-Remaining'));
     }
 
     public function testFakeConnectionException()

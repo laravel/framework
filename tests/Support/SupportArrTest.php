@@ -405,13 +405,13 @@ class SupportArrTest extends TestCase
         }));
 
         // Callback is null and array is not empty
-        $this->assertEquals(100, Arr::first($array));
+        $this->assertSame(100, Arr::first($array));
 
         // Callback is not null and array is not empty
         $value = Arr::first($array, function ($value) {
             return $value >= 150;
         });
-        $this->assertEquals(200, $value);
+        $this->assertSame(200, $value);
 
         // Callback is not null, array is not empty but no satisfied item
         $value2 = Arr::first($array, function ($value) {
@@ -431,7 +431,7 @@ class SupportArrTest extends TestCase
         $this->assertNull($value2);
         $this->assertSame('bar', $value3);
         $this->assertSame('baz', $value4);
-        $this->assertEquals(100, $value5);
+        $this->assertSame(100, $value5);
 
         $cursor = (function () {
             while (false) {
@@ -475,13 +475,13 @@ class SupportArrTest extends TestCase
         }));
 
         // Callback is null and array is not empty
-        $this->assertEquals(300, Arr::last($array));
+        $this->assertSame(300, Arr::last($array));
 
         // Callback is not null and array is not empty
         $value = Arr::last($array, function ($value) {
             return $value < 250;
         });
-        $this->assertEquals(200, $value);
+        $this->assertSame(200, $value);
 
         // Callback is not null, array is not empty but no satisfied item
         $value2 = Arr::last($array, function ($value) {
@@ -501,7 +501,7 @@ class SupportArrTest extends TestCase
         $this->assertNull($value2);
         $this->assertSame('bar', $value3);
         $this->assertSame('baz', $value4);
-        $this->assertEquals(200, $value5);
+        $this->assertSame(200, $value5);
     }
 
     public function testFlatten()
@@ -1713,7 +1713,9 @@ class SupportArrTest extends TestCase
         $this->assertSame($subject, Arr::from($items));
 
         $items = new WeakMap;
-        $items[$temp = new class {}] = 'bar';
+        $items[$temp = new class
+        {
+        }] = 'bar';
         $this->assertSame(['bar'], Arr::from($items));
 
         $this->expectException(InvalidArgumentException::class);

@@ -88,7 +88,7 @@ class FoundationFormRequestTest extends TestCase
         $request->validateResolved();
         $request->validated();
 
-        $this->assertEquals(1, FoundationTestFormRequestTwiceStub::$count);
+        $this->assertSame(1, FoundationTestFormRequestTwiceStub::$count);
     }
 
     public function testValidateThrowsWhenValidationFails()

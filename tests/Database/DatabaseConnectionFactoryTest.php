@@ -148,9 +148,9 @@ class DatabaseConnectionFactoryTest extends TestCase
             'url' => 'sqlite:///:memory:?foreign_key_constraints=true',
         ], 'constraints_set');
 
-        $this->assertEquals(0, $this->db->getConnection()->select('PRAGMA foreign_keys')[0]->foreign_keys);
+        $this->assertSame(0, $this->db->getConnection()->select('PRAGMA foreign_keys')[0]->foreign_keys);
 
-        $this->assertEquals(1, $this->db->getConnection('constraints_set')->select('PRAGMA foreign_keys')[0]->foreign_keys);
+        $this->assertSame(1, $this->db->getConnection('constraints_set')->select('PRAGMA foreign_keys')[0]->foreign_keys);
     }
 
     public function testSqliteBusyTimeout()

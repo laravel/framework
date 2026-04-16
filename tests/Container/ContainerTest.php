@@ -919,7 +919,7 @@ class ContainerTest extends TestCase
         $r = $container->make(RequestDto::class);
 
         $this->assertInstanceOf(RequestDto::class, $r);
-        $this->assertEquals(999, $r->userId);
+        $this->assertSame(999, $r->userId);
         $this->assertEquals('taylor@laravel.com', $r->email);
     }
 
@@ -1118,9 +1118,7 @@ class WildcardConcrete implements WildcardOnlyInterface
 {
 }
 
-/*
- * The order of these attributes matters because we want to ensure we only fallback to '*' when there's no more specific environment.
- */
+// The order of these attributes matters because we want to ensure we only fallback to '*' when there's no more specific environment.
 #[Bind(FallbackConcrete::class)]
 #[Bind(ProdConcrete::class, environments: 'prod')]
 interface WildcardAndProdInterface

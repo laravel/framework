@@ -146,7 +146,7 @@ class FoundationApplicationTest extends TestCase
         $obj = $app->make('foo');
         $this->assertInstanceOf(stdClass::class, $obj);
         $this->assertSame($obj, $app->make('foo'));
-        $this->assertEquals(1, ApplicationDeferredServiceProviderCountStub::$count);
+        $this->assertSame(1, ApplicationDeferredServiceProviderCountStub::$count);
     }
 
     public function testDeferredServiceDontRunWhenInstanceSet()
@@ -178,9 +178,9 @@ class FoundationApplicationTest extends TestCase
         $app = new Application;
         $app->setDeferredServices(['foo' => ApplicationFactoryProviderStub::class]);
         $this->assertTrue($app->bound('foo'));
-        $this->assertEquals(1, $app->make('foo'));
-        $this->assertEquals(2, $app->make('foo'));
-        $this->assertEquals(3, $app->make('foo'));
+        $this->assertSame(1, $app->make('foo'));
+        $this->assertSame(2, $app->make('foo'));
+        $this->assertSame(3, $app->make('foo'));
     }
 
     public function testSingleProviderCanProvideMultipleDeferredServices()
@@ -323,7 +323,7 @@ class FoundationApplicationTest extends TestCase
 
         $app->terminate();
 
-        $this->assertEquals(1, ConcreteTerminator::$counter);
+        $this->assertSame(1, ConcreteTerminator::$counter);
     }
 
     public function testBootingCallbacks()
@@ -346,7 +346,7 @@ class FoundationApplicationTest extends TestCase
 
         $application->boot();
 
-        $this->assertEquals(2, $counter);
+        $this->assertSame(2, $counter);
     }
 
     public function testBootedCallbacks()
@@ -374,11 +374,11 @@ class FoundationApplicationTest extends TestCase
         $application->booted($closure2);
         $application->boot();
 
-        $this->assertEquals(3, $counter);
+        $this->assertSame(3, $counter);
 
         $application->booted($closure3);
 
-        $this->assertEquals(4, $counter);
+        $this->assertSame(4, $counter);
     }
 
     public function testGetNamespace()

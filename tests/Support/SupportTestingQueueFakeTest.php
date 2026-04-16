@@ -89,11 +89,11 @@ class SupportTestingQueueFakeTest extends TestCase
 
     public function testQueueSize()
     {
-        $this->assertEquals(0, $this->fake->size());
+        $this->assertSame(0, $this->fake->size());
 
         $this->fake->push($this->job);
 
-        $this->assertEquals(1, $this->fake->size());
+        $this->assertSame(1, $this->fake->size());
     }
 
     public function testAssertNotPushed()

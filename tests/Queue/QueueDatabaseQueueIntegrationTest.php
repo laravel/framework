@@ -151,8 +151,8 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
 
         $database_record = $this->connection()->table('jobs')->find($job['id']);
 
-        $this->assertEquals(1, $database_record->attempts, 'Job attempts not updated in the database!');
-        $this->assertEquals(1, $popped_job->attempts(), 'The "attempts" attribute of the Job object was not updated by pop!');
+        $this->assertSame(1, $database_record->attempts, 'Job attempts not updated in the database!');
+        $this->assertSame(1, $popped_job->attempts(), 'The "attempts" attribute of the Job object was not updated by pop!');
     }
 
     /**
@@ -180,8 +180,8 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
                 'created_at' => Carbon::now()->getTimestamp(),
             ]]);
 
-        $this->assertEquals(2, $this->queue->clear($mock_queue_name));
-        $this->assertEquals(0, $this->queue->size());
+        $this->assertSame(2, $this->queue->clear($mock_queue_name));
+        $this->assertSame(0, $this->queue->size());
     }
 
     /**

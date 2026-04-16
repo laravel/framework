@@ -110,7 +110,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $result = $relation->save($mockModel);
 
         $attributes = $result->getAttributes();
-        $this->assertEquals(1, $attributes['foreign_key']);
+        $this->assertSame(1, $attributes['foreign_key']);
     }
 
     public function testCreateMethodProperlyCreatesNewModel()
@@ -135,7 +135,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $relation->getRelated()->shouldReceive('forceCreate')->once()->with($attributes)->andReturn($created);
 
         $this->assertEquals($created, $relation->forceCreate(['name' => 'taylor']));
-        $this->assertEquals(1, $created->getAttribute('foreign_key'));
+        $this->assertSame(1, $created->getAttribute('foreign_key'));
     }
 
     public function testRelationIsProperlyInitialized()
@@ -189,8 +189,8 @@ class DatabaseEloquentHasOneTest extends TestCase
 
         $models = $relation->match([$model1, $model2, $model3, $model4], new Collection([$result1, $result2, $result3]), 'foo');
 
-        $this->assertEquals(1, $models[0]->foo->foreign_key);
-        $this->assertEquals(2, $models[1]->foo->foreign_key);
+        $this->assertSame(1, $models[0]->foo->foreign_key);
+        $this->assertSame(2, $models[1]->foo->foreign_key);
         $this->assertNull($models[2]->foo);
         $this->assertSame('4', (string) $models[3]->foo->foreign_key);
     }

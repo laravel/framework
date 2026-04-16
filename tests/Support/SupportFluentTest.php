@@ -82,7 +82,7 @@ class SupportFluentTest extends TestCase
         $fluent = new Fluent(['attributes' => '1']);
 
         $this->assertTrue(isset($fluent['attributes']));
-        $this->assertEquals(1, $fluent['attributes']);
+        $this->assertSame(1, (int) $fluent['attributes']);
 
         $fluent->attributes();
 
@@ -99,7 +99,7 @@ class SupportFluentTest extends TestCase
 
         $this->assertSame('Taylor', $fluent->name);
         $this->assertTrue($fluent->developer);
-        $this->assertEquals(25, $fluent->age);
+        $this->assertSame(25, $fluent->age);
         $this->assertInstanceOf(Fluent::class, $fluent->programmer());
     }
 

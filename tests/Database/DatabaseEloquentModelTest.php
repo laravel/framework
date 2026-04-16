@@ -632,9 +632,9 @@ class DatabaseEloquentModelTest extends TestCase
         unset($model['table']);
 
         $this->assertTrue(isset($model['attributes']));
-        $this->assertEquals(1, $model['attributes']);
+        $this->assertSame(1, $model['attributes']);
         $this->assertTrue(isset($model['connection']));
-        $this->assertEquals(2, $model['connection']);
+        $this->assertSame(2, $model['connection']);
         $this->assertFalse(isset($model['table']));
         $this->assertEquals(null, $model['table']);
         $this->assertFalse(isset($model['with']));
@@ -712,7 +712,7 @@ class DatabaseEloquentModelTest extends TestCase
         $_SERVER['__eloquent.saved'] = false;
         $model = EloquentModelSaveStub::forceCreate(['id' => 21]);
         $this->assertTrue($_SERVER['__eloquent.saved']);
-        $this->assertEquals(21, $model->id);
+        $this->assertSame(21, $model->id);
     }
 
     public function testFindMethodUseWritePdo()
@@ -1074,7 +1074,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->name = 'taylor';
         $model->exists = false;
         $this->assertTrue($model->save());
-        $this->assertEquals(1, $model->id);
+        $this->assertSame(1, $model->id);
         $this->assertTrue($model->exists);
 
         $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'refresh'])->getMock();
@@ -1132,7 +1132,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->name = 'taylor';
         $model->exists = false;
         $this->assertTrue($model->saveOrIgnore());
-        $this->assertEquals(1, $model->id);
+        $this->assertSame(1, $model->id);
         $this->assertTrue($model->exists);
         $this->assertTrue($model->wasRecentlyCreated);
     }
@@ -1242,7 +1242,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->exists = false;
 
         $this->assertTrue($model->push());
-        $this->assertEquals(1, $model->id);
+        $this->assertSame(1, $model->id);
         $this->assertTrue($model->exists);
     }
 
@@ -1260,7 +1260,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->setRelation('relationOne', null);
 
         $this->assertTrue($model->push());
-        $this->assertEquals(1, $model->id);
+        $this->assertSame(1, $model->id);
         $this->assertTrue($model->exists);
         $this->assertNull($model->relationOne);
     }
@@ -1288,11 +1288,11 @@ class DatabaseEloquentModelTest extends TestCase
         $model->setRelation('relationOne', $related1);
 
         $this->assertTrue($model->push());
-        $this->assertEquals(1, $model->id);
+        $this->assertSame(1, $model->id);
         $this->assertTrue($model->exists);
-        $this->assertEquals(2, $model->relationOne->id);
+        $this->assertSame(2, $model->relationOne->id);
         $this->assertTrue($model->relationOne->exists);
-        $this->assertEquals(2, $related1->id);
+        $this->assertSame(2, $related1->id);
         $this->assertTrue($related1->exists);
     }
 
@@ -1310,7 +1310,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->setRelation('relationMany', new Collection([]));
 
         $this->assertTrue($model->push());
-        $this->assertEquals(1, $model->id);
+        $this->assertSame(1, $model->id);
         $this->assertTrue($model->exists);
         $this->assertCount(0, $model->relationMany);
     }
@@ -1347,7 +1347,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->setRelation('relationMany', new Collection([$related1, $related2]));
 
         $this->assertTrue($model->push());
-        $this->assertEquals(1, $model->id);
+        $this->assertSame(1, $model->id);
         $this->assertTrue($model->exists);
         $this->assertCount(2, $model->relationMany);
         $this->assertEquals([2, 3], $model->relationMany->pluck('id')->all());
@@ -1402,7 +1402,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelStub;
         $model->id = 1;
-        $this->assertEquals(1, $model->getKey());
+        $this->assertSame(1, $model->getKey());
         $this->assertSame('id', $model->getKeyName());
     }
 
@@ -1777,7 +1777,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testForceFillMethodFillsGuardedAttributes()
     {
         $model = (new EloquentModelSaveStub)->forceFill(['id' => 21]);
-        $this->assertEquals(21, $model->id);
+        $this->assertSame(21, $model->id);
     }
 
     public function testFillingJSONAttributes()
@@ -2681,8 +2681,8 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isDirty());
 
         $model->publicIncrement('foo', 1, ['category' => 1]);
-        $this->assertEquals(4, $model->foo);
-        $this->assertEquals(1, $model->category);
+        $this->assertSame(4, $model->foo);
+        $this->assertSame(1, $model->category);
         $this->assertTrue($model->isDirty('category'));
     }
 
@@ -2708,8 +2708,8 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isDirty());
 
         $model->publicIncrementQuietly('foo', 1, ['category' => 1]);
-        $this->assertEquals(4, $model->foo);
-        $this->assertEquals(1, $model->category);
+        $this->assertSame(4, $model->foo);
+        $this->assertSame(1, $model->category);
         $this->assertTrue($model->isDirty('category'));
     }
 
@@ -2735,8 +2735,8 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isDirty());
 
         $model->publicDecrementQuietly('foo', 1, ['category' => 1]);
-        $this->assertEquals(2, $model->foo);
-        $this->assertEquals(1, $model->category);
+        $this->assertSame(2, $model->foo);
+        $this->assertSame(1, $model->category);
         $this->assertTrue($model->isDirty('category'));
     }
 
@@ -2755,9 +2755,9 @@ class DatabaseEloquentModelTest extends TestCase
 
         $result = $model->publicIncrementEach(['foo' => 1, 'bar' => 2]);
 
-        $this->assertEquals(1, $result);
-        $this->assertEquals(3, $model->foo);
-        $this->assertEquals(7, $model->bar);
+        $this->assertSame(1, $result);
+        $this->assertSame(3, $model->foo);
+        $this->assertSame(7, $model->bar);
     }
 
     public function testDecrementEachOnExistingModelScopesQueryToModelKey()
@@ -2775,9 +2775,9 @@ class DatabaseEloquentModelTest extends TestCase
 
         $result = $model->publicDecrementEach(['foo' => 3, 'bar' => 2]);
 
-        $this->assertEquals(1, $result);
-        $this->assertEquals(7, $model->foo);
-        $this->assertEquals(3, $model->bar);
+        $this->assertSame(1, $result);
+        $this->assertSame(7, $model->foo);
+        $this->assertSame(3, $model->bar);
     }
 
     public function testIncrementEachWithExtraColumnsOnExistingModel()
@@ -2794,8 +2794,8 @@ class DatabaseEloquentModelTest extends TestCase
 
         $result = $model->publicIncrementEach(['foo' => 5], ['category' => 'test']);
 
-        $this->assertEquals(1, $result);
-        $this->assertEquals(7, $model->foo);
+        $this->assertSame(1, $result);
+        $this->assertSame(7, $model->foo);
         $this->assertEquals('test', $model->category);
     }
 
@@ -2836,7 +2836,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($result);
         // Note: attributes are set before the event fires, matching increment() behavior.
         // The in-memory value changes but the database is not updated.
-        $this->assertEquals(2, $model->foo);
+        $this->assertSame(2, $model->foo);
     }
 
     public function testIncrementEachOnNonExistingModelForwardsToQueryBuilder()
@@ -2849,7 +2849,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $result = $model->publicIncrementEach(['foo' => 1]);
 
-        $this->assertEquals(5, $result);
+        $this->assertSame(5, $result);
     }
 
     public function testRelationshipTouchOwnersIsPropagated()
@@ -3189,7 +3189,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model = m::mock(EloquentModelStub::class.'[delete]');
         $model->delete = 123;
-        $this->assertEquals(123, $model->delete);
+        $this->assertSame(123, $model->delete);
     }
 
     public function testIntKeyTypePreserved()
@@ -3201,7 +3201,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
 
         $this->assertTrue($model->save());
-        $this->assertEquals(1, $model->id);
+        $this->assertSame(1, $model->id);
     }
 
     public function testStringKeyTypePreserved()
@@ -3319,7 +3319,7 @@ class DatabaseEloquentModelTest extends TestCase
             $model = new EloquentModelStub(['id' => 1]);
             $model->exists = true;
 
-            $this->assertEquals(1, $model->id);
+            $this->assertSame(1, $model->id);
             $this->expectException(MissingAttributeException::class);
 
             $model->this_attribute_does_not_exist;
@@ -3355,7 +3355,7 @@ class DatabaseEloquentModelTest extends TestCase
 
             $this->assertInstanceOf(Address::class, $model->address);
 
-            $this->assertEquals(1, $model->id);
+            $this->assertSame(1, $model->id);
             $this->assertEquals('ok', $model->this_is_fine);
             $this->assertEquals('ok', $model->this_is_also_fine);
 
@@ -3383,7 +3383,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub(['id' => 1]);
         $model->exists = true;
 
-        $this->assertEquals(1, $model->id);
+        $this->assertSame(1, $model->id);
 
         $model->this_attribute_does_not_exist;
 
@@ -3403,7 +3403,7 @@ class DatabaseEloquentModelTest extends TestCase
             $model = new EloquentModelStub(['id' => 1]);
             $model->exists = false;
 
-            $this->assertEquals(1, $model->id);
+            $this->assertSame(1, $model->id);
             $this->assertNull($model->this_attribute_does_not_exist);
         } finally {
             Model::preventAccessingMissingAttributes($originalMode);
@@ -3420,7 +3420,7 @@ class DatabaseEloquentModelTest extends TestCase
             $model->exists = true;
             $model->wasRecentlyCreated = true;
 
-            $this->assertEquals(1, $model->id);
+            $this->assertSame(1, $model->id);
             $this->assertNull($model->this_attribute_does_not_exist);
         } finally {
             Model::preventAccessingMissingAttributes($originalMode);
@@ -3548,9 +3548,9 @@ class DatabaseEloquentModelTest extends TestCase
         ]);
 
         $this->assertIsInt($model->getOriginal('intAttribute'));
-        $this->assertEquals(1, $model->getOriginal('intAttribute'));
-        $this->assertEquals(2, $model->intAttribute);
-        $this->assertEquals(2, $model->getAttribute('intAttribute'));
+        $this->assertSame(1, $model->getOriginal('intAttribute'));
+        $this->assertSame(2, $model->intAttribute);
+        $this->assertSame(2, $model->getAttribute('intAttribute'));
 
         $this->assertIsFloat($model->getOriginal('floatAttribute'));
         $this->assertEquals(0.1234, $model->getOriginal('floatAttribute'));
@@ -3595,8 +3595,8 @@ class DatabaseEloquentModelTest extends TestCase
         ], true);
 
         $this->assertIsInt($model->duplicatedAttribute);
-        $this->assertEquals(1, $model->duplicatedAttribute);
-        $this->assertEquals(1, $model->getAttribute('duplicatedAttribute'));
+        $this->assertSame(1, $model->duplicatedAttribute);
+        $this->assertSame(1, $model->getAttribute('duplicatedAttribute'));
     }
 
     public function testCastsMethodIsTakenInConsiderationOnSerialization()
@@ -3609,8 +3609,8 @@ class DatabaseEloquentModelTest extends TestCase
         $model = unserialize(serialize($model));
 
         $this->assertIsInt($model->duplicatedAttribute);
-        $this->assertEquals(1, $model->duplicatedAttribute);
-        $this->assertEquals(1, $model->getAttribute('duplicatedAttribute'));
+        $this->assertSame(1, $model->duplicatedAttribute);
+        $this->assertSame(1, $model->getAttribute('duplicatedAttribute'));
     }
 
     public function testCastOnArrayFormatWithOneElement()

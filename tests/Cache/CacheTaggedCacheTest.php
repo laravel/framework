@@ -175,7 +175,7 @@ class CacheTaggedCacheTest extends TestCase
     {
         $store = new ArrayStore;
         $store->tags('bop')->increment('foo', 5);
-        $this->assertEquals(5, $store->tags('bop')->get('foo'));
+        $this->assertSame(5, $store->tags('bop')->get('foo'));
         $store->tags('bop')->flush();
         $this->assertNull($store->tags('bop')->get('foo'));
     }

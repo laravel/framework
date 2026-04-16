@@ -61,7 +61,7 @@ class DebouncedJobTest extends QueueTestCase
         $this->runQueueWorkerCommand(['--once' => true], 2);
 
         // Only the second (latest) dispatch should have executed.
-        $this->assertEquals(1, DebouncedTestJob::$handleCount);
+        $this->assertSame(1, DebouncedTestJob::$handleCount);
     }
 
     public function testTokenPersistsAfterSuccessfulExecution()
@@ -113,7 +113,7 @@ class DebouncedJobTest extends QueueTestCase
         $this->travelTo(now()->addSeconds(31));
         $this->runQueueWorkerCommand(['--once' => true], 2);
 
-        $this->assertEquals(1, $firedCount);
+        $this->assertSame(1, $firedCount);
     }
 
     public function testDebouncedAndUniqueThrowsLogicException()
@@ -147,7 +147,7 @@ class DebouncedJobTest extends QueueTestCase
         $this->runQueueWorkerCommand(['--once' => true], 2);
 
         // Both should execute — different identities.
-        $this->assertEquals(2, DebouncedTestJob::$handleCount);
+        $this->assertSame(2, DebouncedTestJob::$handleCount);
     }
 
     public function testDebounceLockKeyFormat()
@@ -245,7 +245,7 @@ class DebouncedJobTest extends QueueTestCase
         $this->runQueueWorkerCommand(['--once' => true], 3);
 
         // Only the second dispatch should have executed.
-        $this->assertEquals(1, DebouncedTestJob::$handleCount);
+        $this->assertSame(1, DebouncedTestJob::$handleCount);
 
         // Chain from superseded job should NOT have been dispatched.
         $this->assertFalse(ChainReceiverJob::$handled);
@@ -288,7 +288,7 @@ class DebouncedJobTest extends QueueTestCase
         unset($pending);
 
         // The job should be queued with delay=0 since max wait was exceeded.
-        $this->assertEquals(0, $job->delay);
+        $this->assertSame(0, $job->delay);
     }
 
     public function testDebounceWithoutMaxWaitAllowsIndefiniteDelay()
@@ -300,7 +300,7 @@ class DebouncedJobTest extends QueueTestCase
         $pending = dispatch($job1);
         unset($pending);
 
-        $this->assertEquals(30, $job1->delay);
+        $this->assertSame(30, $job1->delay);
 
         // Dispatch again much later — still gets the full delay.
         $this->travelTo(now()->addSeconds(600));
@@ -308,7 +308,7 @@ class DebouncedJobTest extends QueueTestCase
         $pending2 = dispatch($job2);
         unset($pending2);
 
-        $this->assertEquals(30, $job2->delay);
+        $this->assertSame(30, $job2->delay);
     }
 }
 

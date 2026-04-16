@@ -159,7 +159,7 @@ class MailableQueuedTest extends TestCase
         $queueFake->assertPushedOn(null, SendQueuedMailable::class);
 
         $pushedJob = $queueFake->pushed(SendQueuedMailable::class)->first();
-        $this->assertEquals(30, $pushedJob->delay);
+        $this->assertSame(30, $pushedJob->delay);
     }
 
     public function testQueuedMailableDelayPropertyOverridesAttribute(): void
@@ -177,7 +177,7 @@ class MailableQueuedTest extends TestCase
         $queueFake->assertPushedOn(null, SendQueuedMailable::class);
 
         $pushedJob = $queueFake->pushed(SendQueuedMailable::class)->first();
-        $this->assertEquals(60, $pushedJob->delay);
+        $this->assertSame(60, $pushedJob->delay);
     }
 
     public function testQueuedMailableForwardsDeduplicationIdMethodToQueueJob(): void

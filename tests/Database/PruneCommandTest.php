@@ -121,7 +121,7 @@ class PruneCommandTest extends TestCase
             $output,
         );
 
-        $this->assertEquals(2, Pruning\Models\PrunableTestSoftDeletedModelWithPrunableRecords::withTrashed()->count());
+        $this->assertSame(2, Pruning\Models\PrunableTestSoftDeletedModelWithPrunableRecords::withTrashed()->count());
     }
 
     public function testNonPrunableTest()
@@ -197,7 +197,7 @@ class PruneCommandTest extends TestCase
             $output->fetch(),
         );
 
-        $this->assertEquals(5, Pruning\Models\PrunableTestModelWithPrunableRecords::count());
+        $this->assertSame(5, Pruning\Models\PrunableTestModelWithPrunableRecords::count());
     }
 
     public function testTheCommandMayBePretendedOnSoftDeletedModel()
@@ -230,7 +230,7 @@ class PruneCommandTest extends TestCase
             $output->fetch(),
         );
 
-        $this->assertEquals(4, Pruning\Models\PrunableTestSoftDeletedModelWithPrunableRecords::withTrashed()->count());
+        $this->assertSame(4, Pruning\Models\PrunableTestSoftDeletedModelWithPrunableRecords::withTrashed()->count());
     }
 
     public function testTheCommandDispatchesEvents()

@@ -45,7 +45,7 @@ class EloquentModelLoadMinTest extends DatabaseTestCase
         $model->loadMin('related1', 'number');
 
         $this->assertCount(1, DB::getQueryLog());
-        $this->assertEquals(10, $model->related1_min_number);
+        $this->assertSame(10, $model->related1_min_number);
     }
 
     public function testLoadMinMultipleRelations()
@@ -57,8 +57,8 @@ class EloquentModelLoadMinTest extends DatabaseTestCase
         $model->loadMin(['related1', 'related2'], 'number');
 
         $this->assertCount(1, DB::getQueryLog());
-        $this->assertEquals(10, $model->related1_min_number);
-        $this->assertEquals(12, $model->related2_min_number);
+        $this->assertSame(10, $model->related1_min_number);
+        $this->assertSame(12, $model->related2_min_number);
     }
 }
 

@@ -524,7 +524,7 @@ class RoutingRouteTest extends TestCase
         });
         $response = $router->dispatch(Request::create('foo/bar', 'OPTIONS'));
 
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('GET,HEAD,POST', $response->headers->get('Allow'));
     }
 
@@ -536,11 +536,11 @@ class RoutingRouteTest extends TestCase
         });
 
         $response = $router->dispatch(Request::create('foo', 'OPTIONS'));
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('GET,HEAD,POST', $response->headers->get('Allow'));
 
         $response = $router->dispatch(Request::create('foo', 'HEAD'));
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame(200, $response->getStatusCode());
         $this->assertEmpty($response->getContent());
 
         $router = $this->getRouter();
@@ -549,7 +549,7 @@ class RoutingRouteTest extends TestCase
         });
 
         $response = $router->dispatch(Request::create('foo', 'OPTIONS'));
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('GET,HEAD', $response->headers->get('Allow'));
 
         $router = $this->getRouter();
@@ -558,7 +558,7 @@ class RoutingRouteTest extends TestCase
         });
 
         $response = $router->dispatch(Request::create('foo', 'OPTIONS'));
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('POST', $response->headers->get('Allow'));
     }
 
@@ -721,7 +721,7 @@ class RoutingRouteTest extends TestCase
         $values = array_values($_SERVER['__test.controller_callAction_parameters']);
 
         $this->assertInstanceOf(Request::class, $values[0]);
-        $this->assertEquals(1, $values[1]->value);
+        $this->assertSame(1, (int) $values[1]->value);
         $this->assertNull($values[2]);
         $this->assertNull($values[3]);
     }
@@ -1378,7 +1378,7 @@ class RoutingRouteTest extends TestCase
             },
         ]);
 
-        $this->assertEquals(6, $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+        $this->assertSame(6, (int) $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
     public function testMergingControllerUses()
@@ -1710,7 +1710,7 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('Hello World', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
         $this->assertTrue($_SERVER['route.test.controller.middleware']);
         $this->assertEquals(Response::class, $_SERVER['route.test.controller.middleware.class']);
-        $this->assertEquals(0, $_SERVER['route.test.controller.middleware.parameters.one']);
+        $this->assertSame(0, (int) $_SERVER['route.test.controller.middleware.parameters.one']);
         $this->assertEquals(['foo', 'bar'], $_SERVER['route.test.controller.middleware.parameters.two']);
         $this->assertFalse(isset($_SERVER['route.test.controller.except.middleware']));
     }
@@ -1730,7 +1730,7 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('Hello World', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
         $this->assertTrue($_SERVER['route.test.controller.middleware']);
         $this->assertEquals(Response::class, $_SERVER['route.test.controller.middleware.class']);
-        $this->assertEquals(0, $_SERVER['route.test.controller.middleware.parameters.one']);
+        $this->assertSame(0, (int) $_SERVER['route.test.controller.middleware.parameters.one']);
         $this->assertEquals(['foo', 'bar'], $_SERVER['route.test.controller.middleware.parameters.two']);
         $this->assertFalse(isset($_SERVER['route.test.controller.except.middleware']));
         $action = $router->getRoutes()->getRoutes()[0]->getAction()['controller'];
@@ -1945,7 +1945,7 @@ class RoutingRouteTest extends TestCase
 
         $response = $router->dispatch($request);
         $this->assertTrue($response->isRedirect('/'));
-        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertSame(302, $response->getStatusCode());
     }
 
     public function testImplicitBindingsWithMissingModelHandledByMissingOnGroupLevel()
@@ -1968,7 +1968,7 @@ class RoutingRouteTest extends TestCase
 
         $response = $router->dispatch($request);
         $this->assertTrue($response->isRedirect('/'));
-        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertSame(302, $response->getStatusCode());
     }
 
     public function testImplicitBindingsWithOptionalParameterWithNoKeyInUri()
@@ -2104,7 +2104,7 @@ class RoutingRouteTest extends TestCase
 
         $response = $router->dispatch($request);
         $this->assertTrue($response->isRedirect('contact'));
-        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertSame(302, $response->getStatusCode());
     }
 
     public function testRouteRedirectRetainsExistingStartingForwardSlash()
@@ -2123,7 +2123,7 @@ class RoutingRouteTest extends TestCase
 
         $response = $router->dispatch($request);
         $this->assertTrue($response->isRedirect('/contact'));
-        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertSame(302, $response->getStatusCode());
     }
 
     public function testRouteRedirectStripsMissingStartingForwardSlash()
@@ -2142,7 +2142,7 @@ class RoutingRouteTest extends TestCase
 
         $response = $router->dispatch($request);
         $this->assertTrue($response->isRedirect('contact'));
-        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertSame(302, $response->getStatusCode());
     }
 
     public function testRouteRedirectExceptionWhenMissingExpectedParameters()
@@ -2181,7 +2181,7 @@ class RoutingRouteTest extends TestCase
 
         $response = $router->dispatch($request);
         $this->assertTrue($response->isRedirect('contact'));
-        $this->assertEquals(301, $response->getStatusCode());
+        $this->assertSame(301, $response->getStatusCode());
     }
 
     public function testRoutePermanentRedirect()
@@ -2200,7 +2200,7 @@ class RoutingRouteTest extends TestCase
 
         $response = $router->dispatch($request);
         $this->assertTrue($response->isRedirect('contact'));
-        $this->assertEquals(301, $response->getStatusCode());
+        $this->assertSame(301, $response->getStatusCode());
     }
 
     public function testRouteCanMiddlewareCanBeAssigned()
