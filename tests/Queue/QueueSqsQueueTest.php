@@ -7,6 +7,8 @@ use Aws\Sqs\SqsClient;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Queue\QueueRoutes;
 use Illuminate\Queue\SqsQueue;
@@ -675,5 +677,178 @@ class QueueSqsQueueTest extends TestCase
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
         Str::createUuidsNormally();
+    }
+
+    public function testPushRawStoresPayloadToDiskWhenExceedingThreshold()
+    {
+        $uuid = 'test-uuid-1234';
+        $largePayload = json_encode(['uuid' => $uuid, 'job' => 'App\\Jobs\\TestJob', 'data' => str_repeat('x', SqsQueue::MAX_SQS_PAYLOAD_SIZE)]);
+        $expectedPath = 'sqs-payloads/'.$uuid.'.json';
+        $expectedPointer = json_encode(['@pointer' => $expectedPath]);
+
+        $disk = m::mock(FilesystemAdapter::class);
+        $disk->shouldReceive('put')->once()->with($expectedPath, $largePayload);
+
+        $filesystem = m::mock(FilesystemFactory::class);
+        $filesystem->shouldReceive('disk')->with('s3')->andReturn($disk);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('filesystem')->andReturn($filesystem);
+
+        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix, '', false, [
+            'enabled' => true,
+            'disk' => 's3',
+            'prefix' => 'sqs-payloads',
+            'always' => false,
+            'cleanup' => true,
+        ]);
+        $queue->setContainer($container);
+
+        $this->sqs->shouldReceive('sendMessage')->once()->withArgs(function ($args) use ($expectedPointer) {
+            return $args['MessageBody'] === $expectedPointer;
+        })->andReturn($this->mockedSendMessageResponseModel);
+
+        $queue->pushRaw($largePayload, $this->queueName);
+    }
+
+    public function testPushRawDoesNotStoreToDiskWhenBelowThreshold()
+    {
+        $smallPayload = json_encode(['uuid' => 'test-uuid', 'job' => 'App\\Jobs\\TestJob', 'data' => 'small']);
+
+        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix, '', false, [
+            'enabled' => true,
+            'disk' => 's3',
+            'prefix' => 'sqs-payloads',
+            'always' => false,
+            'cleanup' => true,
+        ]);
+        $queue->setContainer(m::mock(Container::class));
+
+        $this->sqs->shouldReceive('sendMessage')->once()->withArgs(function ($args) use ($smallPayload) {
+            return $args['MessageBody'] === $smallPayload;
+        })->andReturn($this->mockedSendMessageResponseModel);
+
+        $queue->pushRaw($smallPayload, $this->queueName);
+    }
+
+    public function testPushRawAlwaysStoresToDiskWhenAlwaysIsTrue()
+    {
+        $uuid = 'test-uuid-always';
+        $smallPayload = json_encode(['uuid' => $uuid, 'job' => 'App\\Jobs\\TestJob', 'data' => 'small']);
+        $expectedPath = 'sqs-payloads/'.$uuid.'.json';
+        $expectedPointer = json_encode(['@pointer' => $expectedPath]);
+
+        $disk = m::mock(FilesystemAdapter::class);
+        $disk->shouldReceive('put')->once()->with($expectedPath, $smallPayload);
+
+        $filesystem = m::mock(FilesystemFactory::class);
+        $filesystem->shouldReceive('disk')->with('s3')->andReturn($disk);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('filesystem')->andReturn($filesystem);
+
+        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix, '', false, [
+            'enabled' => true,
+            'disk' => 's3',
+            'prefix' => 'sqs-payloads',
+            'always' => true,
+            'cleanup' => true,
+        ]);
+        $queue->setContainer($container);
+
+        $this->sqs->shouldReceive('sendMessage')->once()->withArgs(function ($args) use ($expectedPointer) {
+            return $args['MessageBody'] === $expectedPointer;
+        })->andReturn($this->mockedSendMessageResponseModel);
+
+        $queue->pushRaw($smallPayload, $this->queueName);
+    }
+
+    public function testPushRawDoesNotStoreToDiskWhenNotEnabled()
+    {
+        $largePayload = json_encode(['uuid' => 'test-uuid', 'job' => 'App\\Jobs\\TestJob', 'data' => str_repeat('x', SqsQueue::MAX_SQS_PAYLOAD_SIZE)]);
+
+        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix);
+        $queue->setContainer(m::mock(Container::class));
+
+        $this->sqs->shouldReceive('sendMessage')->once()->withArgs(function ($args) use ($largePayload) {
+            return $args['MessageBody'] === $largePayload;
+        })->andReturn($this->mockedSendMessageResponseModel);
+
+        $queue->pushRaw($largePayload, $this->queueName);
+    }
+
+    public function testClearDeletesDiskDirectoryWhenCleanupEnabled()
+    {
+        $disk = m::mock(FilesystemAdapter::class);
+        $disk->shouldReceive('deleteDirectory')->once()->with('sqs-payloads');
+
+        $filesystem = m::mock(FilesystemFactory::class);
+        $filesystem->shouldReceive('disk')->with('s3')->andReturn($disk);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('filesystem')->andReturn($filesystem);
+
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue', 'size'])
+            ->setConstructorArgs([$this->sqs, $this->queueName, $this->prefix, '', false, [
+                'enabled' => true,
+                'disk' => 's3',
+                'prefix' => 'sqs-payloads',
+                'always' => false,
+                'cleanup' => true,
+            ]])
+            ->getMock();
+        $queue->setContainer($container);
+        $queue->expects($this->once())->method('getQueue')->willReturn($this->queueUrl);
+        $queue->expects($this->once())->method('size')->willReturn(5);
+
+        $this->sqs->shouldReceive('purgeQueue')->once();
+
+        $queue->clear($this->queueName);
+    }
+
+    public function testClearDoesNotDeleteDiskDirectoryWhenCleanupDisabled()
+    {
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue', 'size'])
+            ->setConstructorArgs([$this->sqs, $this->queueName, $this->prefix, '', false, [
+                'enabled' => true,
+                'disk' => 's3',
+                'prefix' => 'sqs-payloads',
+                'always' => false,
+                'cleanup' => false,
+            ]])
+            ->getMock();
+        $queue->setContainer(m::mock(Container::class));
+        $queue->expects($this->once())->method('getQueue')->willReturn($this->queueUrl);
+        $queue->expects($this->once())->method('size')->willReturn(5);
+
+        $this->sqs->shouldReceive('purgeQueue')->once();
+
+        $queue->clear($this->queueName);
+    }
+
+    public function testPopPassesExtendedStoreOptionsToJob()
+    {
+        $extendedStoreOptions = [
+            'enabled' => true,
+            'disk' => 's3',
+            'prefix' => 'sqs-payloads',
+            'always' => false,
+            'cleanup' => true,
+        ];
+
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue'])
+            ->setConstructorArgs([$this->sqs, $this->queueName, $this->account, '', false, $extendedStoreOptions])
+            ->getMock();
+        $queue->setContainer(m::mock(Container::class));
+        $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
+
+        $this->sqs->shouldReceive('receiveMessage')->once()->andReturn($this->mockedReceiveMessageResponseModel);
+
+        $job = $queue->pop($this->queueName);
+
+        $this->assertInstanceOf(SqsJob::class, $job);
     }
 }
