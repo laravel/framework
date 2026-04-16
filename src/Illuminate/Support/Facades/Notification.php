@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Facades;
 
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\ChannelManager;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
@@ -52,7 +53,7 @@ class Notification extends Facade
      */
     public static function fake()
     {
-        return tap(new NotificationFake, function ($fake) {
+        return tap(new NotificationFake(static::$app->make(Dispatcher::class)), function ($fake) {
             static::swap($fake);
         });
     }

@@ -4,10 +4,12 @@ namespace Illuminate\Tests\Support;
 
 use Exception;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Notifications\AnonymousNotifiable;
+use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
@@ -224,6 +226,32 @@ class SupportTestingNotificationFakeTest extends TestCase
         $this->fake->assertNotSentTo($user, NotificationWithFalsyShouldSendStub::class);
     }
 
+    public function testNotificationSendingEventBlocksNotification()
+    {
+        $events = $this->createMock(EventDispatcher::class);
+        $events->method('until')->willReturn(false);
+
+        $fake = new NotificationFake($events);
+        $fake->send($this->user, new NotificationStub);
+
+        $fake->assertNotSentTo($this->user, NotificationStub::class);
+    }
+
+    public function testNotificationSendingEventCanBlockIndividualChannels()
+    {
+        $events = $this->createMock(EventDispatcher::class);
+        $events->method('until')->willReturnCallback(
+            fn (NotificationSending $event) => $event->channel === 'mail' ? false : null
+        );
+
+        $fake = new NotificationFake($events);
+        $fake->send($this->user, new NotificationWithMultipleChannelsStub);
+
+        $fake->assertSentTo($this->user, NotificationWithMultipleChannelsStub::class, function ($notification, $channels) {
+            return array_values($channels) === ['database'];
+        });
+    }
+
     public function testAssertItCanSerializeAndRestoreNotifications()
     {
         $this->fake->serializeAndRestore();
@@ -240,6 +268,14 @@ class NotificationStub extends Notification
     public function via($notifiable)
     {
         return ['mail'];
+    }
+}
+
+class NotificationWithMultipleChannelsStub extends Notification
+{
+    public function via($notifiable)
+    {
+        return ['mail', 'database'];
     }
 }
 

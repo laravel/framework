@@ -4,11 +4,13 @@ namespace Illuminate\Support\Testing\Fakes;
 
 use Closure;
 use Exception;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Contracts\Notifications\Dispatcher as NotificationDispatcher;
 use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Notifications\AnonymousNotifiable;
+use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -18,6 +20,13 @@ use PHPUnit\Framework\Assert as PHPUnit;
 class NotificationFake implements Fake, NotificationDispatcher, NotificationFactory
 {
     use Macroable, ReflectsClosures;
+
+    /**
+     * The event dispatcher.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher|null
+     */
+    protected $events = null;
 
     /**
      * All of the notifications that have been sent.
@@ -39,6 +48,17 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      * @var bool
      */
     protected $serializeAndRestore = false;
+
+    /**
+     * Create a new notification fake instance.
+     *
+     * @param  \Illuminate\Contracts\Events\Dispatcher|null  $events
+     * @return void
+     */
+    public function __construct(?EventDispatcher $events = null)
+    {
+        $this->events = $events;
+    }
 
     /**
      * Assert if a notification was sent on-demand based on a truth-test callback.
@@ -323,6 +343,15 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
                 $notifiableChannels = array_filter(
                     $notifiableChannels,
                     fn ($channel) => $notification->shouldSend($notifiable, $channel) !== false
+                );
+            }
+
+            if ($this->events) {
+                $notifiableChannels = array_filter(
+                    $notifiableChannels,
+                    fn ($channel) => $this->events->until(
+                        new NotificationSending($notifiable, $notification, $channel)
+                    ) !== false
                 );
             }
 
