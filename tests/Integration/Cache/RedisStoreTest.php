@@ -108,7 +108,7 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->tags(['people', 'author'])->put('name', 'Sally', 5);
         Cache::store('redis')->tags(['people', 'author'])->put('age', 30, 5);
 
-        $this->assertEquals('Sally', Cache::store('redis')->tags(['people', 'author'])->get('name'));
+        $this->assertSame('Sally', Cache::store('redis')->tags(['people', 'author'])->get('name'));
         $this->assertSame(30, Cache::store('redis')->tags(['people', 'author'])->get('age'));
 
         Cache::store('redis')->tags(['people', 'author'])->flush();
@@ -124,7 +124,7 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->tags(['people', 'author'])->forever('name', 'Sally');
         Cache::store('redis')->tags(['people', 'author'])->forever('age', 30);
 
-        $this->assertEquals('Sally', Cache::store('redis')->tags(['people', 'author'])->get('name'));
+        $this->assertSame('Sally', Cache::store('redis')->tags(['people', 'author'])->get('name'));
         $this->assertSame(30, Cache::store('redis')->tags(['people', 'author'])->get('age'));
 
         Cache::store('redis')->tags(['people', 'author'])->flush();
@@ -198,7 +198,7 @@ class RedisStoreTest extends TestCase
 
         Cache::store('redis')->tags(['artist'])->flush();
 
-        $this->assertEquals('Sally', Cache::store('redis')->tags(['people', 'author'])->get('person-1'));
+        $this->assertSame('Sally', Cache::store('redis')->tags(['people', 'author'])->get('person-1'));
         $this->assertNull(Cache::store('redis')->tags(['people', 'artist'])->get('person-2'));
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
@@ -285,9 +285,9 @@ class RedisStoreTest extends TestCase
             Cache::store('redis')->tags($tags)->put("key:{$i}", "value:{$i}", 300);
         }
 
-        $this->assertEquals('value:1', Cache::store('redis')->tags($tags)->get('key:1'));
-        $this->assertEquals('value:2500', Cache::store('redis')->tags($tags)->get('key:2500'));
-        $this->assertEquals('value:5000', Cache::store('redis')->tags($tags)->get('key:5000'));
+        $this->assertSame('value:1', Cache::store('redis')->tags($tags)->get('key:1'));
+        $this->assertSame('value:2500', Cache::store('redis')->tags($tags)->get('key:2500'));
+        $this->assertSame('value:5000', Cache::store('redis')->tags($tags)->get('key:5000'));
 
         Cache::store('redis')->tags($tags)->flush();
 

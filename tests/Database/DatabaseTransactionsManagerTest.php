@@ -304,21 +304,21 @@ class DatabaseTransactionsManagerTest extends TestCase
         $pendingTransactions = $manager->getPendingTransactions();
 
         $this->assertSame(1, $pendingTransactions[0]->level);
-        $this->assertEquals('default', $pendingTransactions[0]->connection);
+        $this->assertSame('default', $pendingTransactions[0]->connection);
         $this->assertSame(1, $pendingTransactions[1]->level);
-        $this->assertEquals('admin', $pendingTransactions[1]->connection);
+        $this->assertSame('admin', $pendingTransactions[1]->connection);
 
         $manager->stageTransactions('default', 1);
 
         $this->assertCount(1, $manager->getPendingTransactions());
         $this->assertCount(1, $manager->getCommittedTransactions());
-        $this->assertEquals('default', $manager->getCommittedTransactions()[0]->connection);
+        $this->assertSame('default', $manager->getCommittedTransactions()[0]->connection);
 
         $manager->stageTransactions('admin', 1);
 
         $this->assertCount(0, $manager->getPendingTransactions());
         $this->assertCount(2, $manager->getCommittedTransactions());
-        $this->assertEquals('admin', $manager->getCommittedTransactions()[1]->connection);
+        $this->assertSame('admin', $manager->getCommittedTransactions()[1]->connection);
     }
 
     public function testStageTransactionsOnlyStagesTheTransactionsAtOrAboveTheGivenLevel()

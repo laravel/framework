@@ -269,7 +269,7 @@ class EloquentUpdateTest extends DatabaseTestCase
         $post->incrementEach(['views' => 1]);
 
         $this->assertTrue($post->isDirty('name'));
-        $this->assertEquals('Changed', $post->name);
+        $this->assertSame('Changed', $post->name);
         $this->assertFalse($post->isDirty('views'));
     }
 

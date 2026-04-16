@@ -12,37 +12,37 @@ class SupportUriTest extends TestCase
     {
         Uri::setUrlGeneratorResolver(fn () => new CustomUrlGeneratorResolver);
 
-        $this->assertEquals('https://laravel.com/to', Uri::to('')->value());
-        $this->assertEquals('https://laravel.com/route', Uri::route('')->value());
-        $this->assertEquals('https://laravel.com/signed-route', Uri::signedRoute('')->value());
-        $this->assertEquals('https://laravel.com/signed-route', Uri::temporarySignedRoute('', '')->value());
-        $this->assertEquals('https://laravel.com/action', Uri::action('')->value());
+        $this->assertSame('https://laravel.com/to', Uri::to('')->value());
+        $this->assertSame('https://laravel.com/route', Uri::route('')->value());
+        $this->assertSame('https://laravel.com/signed-route', Uri::signedRoute('')->value());
+        $this->assertSame('https://laravel.com/signed-route', Uri::temporarySignedRoute('', '')->value());
+        $this->assertSame('https://laravel.com/action', Uri::action('')->value());
     }
 
     public function test_basic_uri_interactions()
     {
         $uri = Uri::of($originalUri = 'https://laravel.com/docs/installation');
 
-        $this->assertEquals('https', $uri->scheme());
+        $this->assertSame('https', $uri->scheme());
         $this->assertNull($uri->user());
         $this->assertNull($uri->password());
-        $this->assertEquals('laravel.com', $uri->host());
+        $this->assertSame('laravel.com', $uri->host());
         $this->assertNull($uri->port());
-        $this->assertEquals('docs/installation', $uri->path());
+        $this->assertSame('docs/installation', $uri->path());
         $this->assertSame([], $uri->query()->toArray());
-        $this->assertEquals('', (string) $uri->query());
-        $this->assertEquals('', $uri->query()->decode());
+        $this->assertSame('', (string) $uri->query());
+        $this->assertSame('', $uri->query()->decode());
         $this->assertNull($uri->fragment());
         $this->assertEquals($originalUri, (string) $uri);
 
         $uri = Uri::of('https://taylor:password@laravel.com/docs/installation?version=1#hello');
 
-        $this->assertEquals('taylor', $uri->user());
-        $this->assertEquals('password', $uri->password());
-        $this->assertEquals('hello', $uri->fragment());
+        $this->assertSame('taylor', $uri->user());
+        $this->assertSame('password', $uri->password());
+        $this->assertSame('hello', $uri->fragment());
         $this->assertEquals(['version' => 1], $uri->query()->all());
         $this->assertSame(1, $uri->query()->integer('version'));
-        $this->assertEquals('taylor:password@laravel.com', $uri->authority());
+        $this->assertSame('taylor:password@laravel.com', $uri->authority());
     }
 
     public function test_is_empty_and_is_not_empty()
@@ -58,15 +58,15 @@ class SupportUriTest extends TestCase
     {
         $uri = Uri::of('https://laravel.com/docs/installation#introduction');
 
-        $this->assertEquals('introduction', $uri->fragment());
+        $this->assertSame('introduction', $uri->fragment());
 
         $withoutFragment = $uri->withoutFragment();
 
         $this->assertNull($withoutFragment->fragment());
-        $this->assertEquals('https://laravel.com/docs/installation', $withoutFragment->value());
+        $this->assertSame('https://laravel.com/docs/installation', $withoutFragment->value());
 
         // Original URI should be unchanged (immutability).
-        $this->assertEquals('introduction', $uri->fragment());
+        $this->assertSame('introduction', $uri->fragment());
     }
 
     public function test_without_fragment_on_uri_without_fragment()
@@ -76,7 +76,7 @@ class SupportUriTest extends TestCase
         $withoutFragment = $uri->withoutFragment();
 
         $this->assertNull($withoutFragment->fragment());
-        $this->assertEquals('https://laravel.com/docs', $withoutFragment->value());
+        $this->assertSame('https://laravel.com/docs', $withoutFragment->value());
     }
 
     public function test_complicated_query_string_parsing()
@@ -107,7 +107,7 @@ class SupportUriTest extends TestCase
             'flag_value' => '',
         ], $uri->query()->all());
 
-        $this->assertEquals('key_1=value&key_2[sub_field]=value&key_3[]=value&key_4[9]=value&key_5[][][foo][9]=bar&key.6=value&flag_value', $uri->query()->decode());
+        $this->assertSame('key_1=value&key_2[sub_field]=value&key_3[]=value&key_4[9]=value&key_5[][][foo][9]=bar&key.6=value&flag_value', $uri->query()->decode());
     }
 
     public function test_uri_building()
@@ -147,8 +147,8 @@ class SupportUriTest extends TestCase
             'flag' => '',
         ])->withoutQuery(['name']);
 
-        $this->assertEquals('age=38&role[title]=Developer&role[focus]=PHP&tags[0]=person&tags[1]=employee&flag=', $uri->query()->decode());
-        $this->assertEquals('name=Taylor', $uri->replaceQuery(['name' => 'Taylor'])->query()->decode());
+        $this->assertSame('age=38&role[title]=Developer&role[focus]=PHP&tags[0]=person&tags[1]=employee&flag=', $uri->query()->decode());
+        $this->assertSame('name=Taylor', $uri->replaceQuery(['name' => 'Taylor'])->query()->decode());
 
         // Push onto multi-value and missing items...
         $uri = Uri::of('https://laravel.com?tags[]=foo');
@@ -167,22 +167,22 @@ class SupportUriTest extends TestCase
     {
         $uri = Uri::of('https://dot.test/?foo.bar=baz');
 
-        $this->assertEquals('foo.bar=baz&foo[bar]=zab', $uri->withQuery(['foo.bar' => 'zab'])->query()->decode());
-        $this->assertEquals('foo[bar]=zab', $uri->replaceQuery(['foo.bar' => 'zab'])->query()->decode());
+        $this->assertSame('foo.bar=baz&foo[bar]=zab', $uri->withQuery(['foo.bar' => 'zab'])->query()->decode());
+        $this->assertSame('foo[bar]=zab', $uri->replaceQuery(['foo.bar' => 'zab'])->query()->decode());
     }
 
     public function test_decoding_the_entire_uri()
     {
         $uri = Uri::of('https://laravel.com/docs/11.x/installation')->withQuery(['tags' => ['first', 'second']]);
 
-        $this->assertEquals('https://laravel.com/docs/11.x/installation?tags[0]=first&tags[1]=second', $uri->decode());
+        $this->assertSame('https://laravel.com/docs/11.x/installation?tags[0]=first&tags[1]=second', $uri->decode());
     }
 
     public function test_decoding_the_entire_uri_preserves_the_fragment()
     {
         $uri = Uri::of('https://laravel.com/docs/11.x/routing?q=laravel%20docs#route-model-binding');
 
-        $this->assertEquals('https://laravel.com/docs/11.x/routing?q=laravel docs#route-model-binding', $uri->decode());
+        $this->assertSame('https://laravel.com/docs/11.x/routing?q=laravel docs#route-model-binding', $uri->decode());
     }
 
     public function test_with_query_if_missing()
@@ -195,7 +195,7 @@ class SupportUriTest extends TestCase
             'existing' => 'new_value',
         ]);
 
-        $this->assertEquals('existing=value&new=parameter', $uri->query()->decode());
+        $this->assertSame('existing=value&new=parameter', $uri->query()->decode());
 
         // Test adding complex nested arrays to empty query string
         $uri = Uri::of('https://laravel.com');
@@ -212,7 +212,7 @@ class SupportUriTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals('name=Taylor&role[title]=Developer&role[focus]=PHP&tags[0]=person&tags[1]=employee', $uri->query()->decode());
+        $this->assertSame('name=Taylor&role[title]=Developer&role[focus]=PHP&tags[0]=person&tags[1]=employee', $uri->query()->decode());
 
         // Test partial array merging and preserving indexed arrays
         $uri = Uri::of('https://laravel.com?name=Taylor&tags[0]=person');
@@ -223,7 +223,7 @@ class SupportUriTest extends TestCase
             'tags' => ['should', 'not', 'change'],
         ]);
 
-        $this->assertEquals('name=Taylor&tags[0]=person&age=38', $uri->query()->decode());
+        $this->assertSame('name=Taylor&tags[0]=person&age=38', $uri->query()->decode());
         $this->assertEquals(['name' => 'Taylor', 'tags' => ['person'], 'age' => 38], $uri->query()->all());
 
         $uri = Uri::of('https://laravel.com?user[name]=Taylor');
@@ -251,8 +251,8 @@ class SupportUriTest extends TestCase
     {
         $uri = Uri::of('https://laravel.com');
 
-        $this->assertEquals('https://laravel.com', (string) $uri);
-        $this->assertEquals('https://laravel.com', (string) $uri->withQuery([]));
+        $this->assertSame('https://laravel.com', (string) $uri);
+        $this->assertSame('https://laravel.com', (string) $uri->withQuery([]));
     }
 
     public function test_path_segments()
@@ -264,7 +264,7 @@ class SupportUriTest extends TestCase
         $uri = Uri::of('https://laravel.com/one/two/three');
 
         $this->assertEquals(['one', 'two', 'three'], $uri->pathSegments()->toArray());
-        $this->assertEquals('one', $uri->pathSegments()->first());
+        $this->assertSame('one', $uri->pathSegments()->first());
 
         $uri = Uri::of('https://laravel.com/one/two/three?foo=bar');
 

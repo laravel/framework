@@ -1421,12 +1421,12 @@ class HttpClientTest extends TestCase
         }
 
         // Ensure the exception message is truncated according to the request level truncation setting.
-        $this->assertEquals("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
+        $this->assertSame("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
 
         $exception->report();
 
         // Ensure that the truncation level is not changed when reporting the exception.
-        $this->assertEquals("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
+        $this->assertSame("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
 
         $this->assertSame(60, RequestException::$truncateAt);
     }
@@ -1449,7 +1449,7 @@ class HttpClientTest extends TestCase
 
         $exception->report();
 
-        $this->assertEquals("HTTP request returned status code 403:\nHTTP/1.1 403 Forbidden\r\nContent-Type: application/json\r\n\r\n[\"error\"]\n", $exception->getMessage());
+        $this->assertSame("HTTP request returned status code 403:\nHTTP/1.1 403 Forbidden\r\nContent-Type: application/json\r\n\r\n[\"error\"]\n", $exception->getMessage());
 
         $this->assertSame(60, RequestException::$truncateAt);
     }
@@ -1471,7 +1471,7 @@ class HttpClientTest extends TestCase
 
         $exception->report();
 
-        $this->assertEquals("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
+        $this->assertSame("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
 
         $this->assertFalse(RequestException::$truncateAt);
     }
@@ -1488,7 +1488,7 @@ class HttpClientTest extends TestCase
         $exception->report();
 
         $this->assertInstanceOf(RequestException::class, $exception);
-        $this->assertEquals("HTTP request returned status code 403:\n[\"er (truncated...)\n", $exception->getMessage());
+        $this->assertSame("HTTP request returned status code 403:\n[\"er (truncated...)\n", $exception->getMessage());
         $this->assertFalse(RequestException::$truncateAt);
     }
 
@@ -2402,7 +2402,7 @@ class HttpClientTest extends TestCase
 
         $this->assertNotNull($exception);
         $this->assertInstanceOf(Exception::class, $exception);
-        $this->assertEquals('Foo bar', $exception->getMessage());
+        $this->assertSame('Foo bar', $exception->getMessage());
 
         $this->factory->assertSentCount(1);
     }
@@ -2427,7 +2427,7 @@ class HttpClientTest extends TestCase
 
         $this->assertNotNull($exception);
         $this->assertInstanceOf(Exception::class, $exception);
-        $this->assertEquals('Foo bar', $exception->getMessage());
+        $this->assertSame('Foo bar', $exception->getMessage());
 
         $this->factory->assertSentCount(1);
     }
@@ -2600,7 +2600,7 @@ class HttpClientTest extends TestCase
 
         $this->assertNotNull($exception);
         $this->assertInstanceOf(Exception::class, $exception);
-        $this->assertEquals('Foo bar', $exception->getMessage());
+        $this->assertSame('Foo bar', $exception->getMessage());
 
         $this->factory->assertSentCount(1);
     }
@@ -3693,7 +3693,7 @@ class HttpClientTest extends TestCase
         });
 
         $this->assertInstanceOf(StrayRequestException::class, $exception);
-        $this->assertEquals('Attempted request to [https://laravel.com] without a matching fake.', $exception->getMessage());
+        $this->assertSame('Attempted request to [https://laravel.com] without a matching fake.', $exception->getMessage());
     }
 
     public function testPreventingStrayRequests()
@@ -4411,7 +4411,7 @@ class HttpClientTest extends TestCase
         $this->assertInstanceOf(Request::class, $requestReceived);
         $this->assertSame('http://200.com', (string) $requestReceived->url());
         $this->assertInstanceOf(TestResponse::class, $o['401-response']);
-        $this->assertEquals('different', $o['401-response']->body());
+        $this->assertSame('different', $o['401-response']->body());
         $this->assertInstanceOf(RequestException::class, $o['401-throwing']);
         $this->assertInstanceOf(TestResponse::class, $o['401-throwing']->response);
     }

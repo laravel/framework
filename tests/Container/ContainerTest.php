@@ -920,7 +920,7 @@ class ContainerTest extends TestCase
 
         $this->assertInstanceOf(RequestDto::class, $r);
         $this->assertSame(999, $r->userId);
-        $this->assertEquals('taylor@laravel.com', $r->email);
+        $this->assertSame('taylor@laravel.com', $r->email);
     }
 
     // public function testContainerCanCatchCircularDependency()

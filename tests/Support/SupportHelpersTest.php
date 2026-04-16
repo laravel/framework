@@ -57,7 +57,7 @@ class SupportHelpersTest extends TestCase
     public function testEWithInvalidCodePoints()
     {
         $str = mb_convert_encoding('føø bar', 'ISO-8859-1', 'UTF-8');
-        $this->assertEquals('f�� bar', e($str));
+        $this->assertSame('f�� bar', e($str));
     }
 
     public function testEWithEnums()
@@ -127,26 +127,26 @@ class SupportHelpersTest extends TestCase
 
     public function testWhen()
     {
-        $this->assertEquals('Hello', when(true, 'Hello'));
+        $this->assertSame('Hello', when(true, 'Hello'));
         $this->assertNull(when(false, 'Hello'));
-        $this->assertEquals('There', when(1 === 1, 'There')); // strict types
-        $this->assertEquals('There', when(1 == '1', 'There')); // loose types
+        $this->assertSame('There', when(1 === 1, 'There')); // strict types
+        $this->assertSame('There', when(1 == '1', 'There')); // loose types
         $this->assertNull(when(1 == 2, 'There'));
         $this->assertNull(when('1', fn () => null));
         $this->assertNull(when(0, fn () => null));
-        $this->assertEquals('True', when([1, 2, 3, 4], 'True')); // Array
+        $this->assertSame('True', when([1, 2, 3, 4], 'True')); // Array
         $this->assertNull(when([], 'True')); // Empty Array = Falsy
-        $this->assertEquals('True', when(new StdClass, fn () => 'True')); // Object
-        $this->assertEquals('World', when(false, 'Hello', 'World'));
-        $this->assertEquals('World', when(1 === 0, 'Hello', 'World')); // strict types
-        $this->assertEquals('World', when(1 == '0', 'Hello', 'World')); // loose types
+        $this->assertSame('True', when(new StdClass, fn () => 'True')); // Object
+        $this->assertSame('World', when(false, 'Hello', 'World'));
+        $this->assertSame('World', when(1 === 0, 'Hello', 'World')); // strict types
+        $this->assertSame('World', when(1 == '0', 'Hello', 'World')); // loose types
         $this->assertNull(when('', fn () => 'There', fn () => null));
         $this->assertNull(when(0, fn () => 'There', fn () => null));
-        $this->assertEquals('False', when([], 'True', 'False'));  // Empty Array = Falsy
+        $this->assertSame('False', when([], 'True', 'False'));  // Empty Array = Falsy
         $this->assertTrue(when(true, fn ($value) => $value, fn ($value) => ! $value)); // lazy evaluation
         $this->assertTrue(when(false, fn ($value) => $value, fn ($value) => ! $value)); // lazy evaluation
-        $this->assertEquals('Hello', when(fn () => true, 'Hello')); // lazy evaluation condition
-        $this->assertEquals('World', when(fn () => false, 'Hello', 'World')); // lazy evaluation condition
+        $this->assertSame('Hello', when(fn () => true, 'Hello')); // lazy evaluation condition
+        $this->assertSame('World', when(fn () => false, 'Hello', 'World')); // lazy evaluation condition
     }
 
     public function testFilled()
@@ -364,13 +364,13 @@ class SupportHelpersTest extends TestCase
             'empty' => [],
         ];
 
-        $this->assertEquals('LHR', data_get($array, 'flights.0.segments.{first}.from'));
-        $this->assertEquals('PKX', data_get($array, 'flights.0.segments.{last}.to'));
+        $this->assertSame('LHR', data_get($array, 'flights.0.segments.{first}.from'));
+        $this->assertSame('PKX', data_get($array, 'flights.0.segments.{last}.to'));
 
-        $this->assertEquals('LHR', data_get($array, 'flights.{first}.segments.{first}.from'));
-        $this->assertEquals('PEK', data_get($array, 'flights.{last}.segments.{last}.to'));
-        $this->assertEquals('PKX', data_get($array, 'flights.{first}.segments.{last}.to'));
-        $this->assertEquals('LGW', data_get($array, 'flights.{last}.segments.{first}.from'));
+        $this->assertSame('LHR', data_get($array, 'flights.{first}.segments.{first}.from'));
+        $this->assertSame('PEK', data_get($array, 'flights.{last}.segments.{last}.to'));
+        $this->assertSame('PKX', data_get($array, 'flights.{first}.segments.{last}.to'));
+        $this->assertSame('LGW', data_get($array, 'flights.{last}.segments.{first}.from'));
 
         $this->assertEquals(['LHR', 'IST'], data_get($array, 'flights.{first}.segments.*.from'));
         $this->assertEquals(['SAW', 'PEK'], data_get($array, 'flights.{last}.segments.*.to'));
@@ -378,8 +378,8 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(['LHR', 'LGW'], data_get($array, 'flights.*.segments.{first}.from'));
         $this->assertEquals(['PKX', 'PEK'], data_get($array, 'flights.*.segments.{last}.to'));
 
-        $this->assertEquals('Not found', data_get($array, 'empty.{first}', 'Not found'));
-        $this->assertEquals('Not found', data_get($array, 'empty.{last}', 'Not found'));
+        $this->assertSame('Not found', data_get($array, 'empty.{first}', 'Not found'));
+        $this->assertSame('Not found', data_get($array, 'empty.{last}', 'Not found'));
     }
 
     public function testDataGetFirstLastDirectivesOnArrayAccessIterable()
@@ -402,13 +402,13 @@ class SupportHelpersTest extends TestCase
             'empty' => new SupportTestArrayAccessIterable([]),
         ];
 
-        $this->assertEquals('LHR', data_get($arrayAccessIterable, 'flights.0.segments.{first}.from'));
-        $this->assertEquals('PKX', data_get($arrayAccessIterable, 'flights.0.segments.{last}.to'));
+        $this->assertSame('LHR', data_get($arrayAccessIterable, 'flights.0.segments.{first}.from'));
+        $this->assertSame('PKX', data_get($arrayAccessIterable, 'flights.0.segments.{last}.to'));
 
-        $this->assertEquals('LHR', data_get($arrayAccessIterable, 'flights.{first}.segments.{first}.from'));
-        $this->assertEquals('PEK', data_get($arrayAccessIterable, 'flights.{last}.segments.{last}.to'));
-        $this->assertEquals('PKX', data_get($arrayAccessIterable, 'flights.{first}.segments.{last}.to'));
-        $this->assertEquals('LGW', data_get($arrayAccessIterable, 'flights.{last}.segments.{first}.from'));
+        $this->assertSame('LHR', data_get($arrayAccessIterable, 'flights.{first}.segments.{first}.from'));
+        $this->assertSame('PEK', data_get($arrayAccessIterable, 'flights.{last}.segments.{last}.to'));
+        $this->assertSame('PKX', data_get($arrayAccessIterable, 'flights.{first}.segments.{last}.to'));
+        $this->assertSame('LGW', data_get($arrayAccessIterable, 'flights.{last}.segments.{first}.from'));
 
         $this->assertEquals(['LHR', 'IST'], data_get($arrayAccessIterable, 'flights.{first}.segments.*.from'));
         $this->assertEquals(['SAW', 'PEK'], data_get($arrayAccessIterable, 'flights.{last}.segments.*.to'));
@@ -416,8 +416,8 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(['LHR', 'LGW'], data_get($arrayAccessIterable, 'flights.*.segments.{first}.from'));
         $this->assertEquals(['PKX', 'PEK'], data_get($arrayAccessIterable, 'flights.*.segments.{last}.to'));
 
-        $this->assertEquals('Not found', data_get($arrayAccessIterable, 'empty.{first}', 'Not found'));
-        $this->assertEquals('Not found', data_get($arrayAccessIterable, 'empty.{last}', 'Not found'));
+        $this->assertSame('Not found', data_get($arrayAccessIterable, 'empty.{first}', 'Not found'));
+        $this->assertSame('Not found', data_get($arrayAccessIterable, 'empty.{last}', 'Not found'));
     }
 
     public function testDataGetFirstLastDirectivesOnKeyedArrays()
@@ -435,11 +435,11 @@ class SupportHelpersTest extends TestCase
             ],
         ];
 
-        $this->assertEquals('second', data_get($array, 'numericKeys.0'));
-        $this->assertEquals('first', data_get($array, 'numericKeys.{first}'));
-        $this->assertEquals('last', data_get($array, 'numericKeys.{last}'));
-        $this->assertEquals('first', data_get($array, 'stringKeys.{first}'));
-        $this->assertEquals('last', data_get($array, 'stringKeys.{last}'));
+        $this->assertSame('second', data_get($array, 'numericKeys.0'));
+        $this->assertSame('first', data_get($array, 'numericKeys.{first}'));
+        $this->assertSame('last', data_get($array, 'numericKeys.{last}'));
+        $this->assertSame('first', data_get($array, 'stringKeys.{first}'));
+        $this->assertSame('last', data_get($array, 'stringKeys.{last}'));
     }
 
     public function testDataGetEscapedSegmentKeys()
@@ -452,12 +452,12 @@ class SupportHelpersTest extends TestCase
             ],
         ];
 
-        $this->assertEquals('caret', data_get($array, 'symbols.\{first}.description'));
-        $this->assertEquals('dollar', data_get($array, 'symbols.{first}.description'));
-        $this->assertEquals('asterisk', data_get($array, 'symbols.\*.description'));
+        $this->assertSame('caret', data_get($array, 'symbols.\{first}.description'));
+        $this->assertSame('dollar', data_get($array, 'symbols.{first}.description'));
+        $this->assertSame('asterisk', data_get($array, 'symbols.\*.description'));
         $this->assertEquals(['dollar', 'asterisk', 'caret'], data_get($array, 'symbols.*.description'));
-        $this->assertEquals('dollar', data_get($array, 'symbols.\{last}.description'));
-        $this->assertEquals('caret', data_get($array, 'symbols.{last}.description'));
+        $this->assertSame('dollar', data_get($array, 'symbols.\{last}.description'));
+        $this->assertSame('caret', data_get($array, 'symbols.{last}.description'));
     }
 
     public function testDataGetStar()
@@ -1557,7 +1557,7 @@ class SupportHelpersTest extends TestCase
     public function testLiteral(): void
     {
         $this->assertSame(1, literal(1));
-        $this->assertEquals('taylor', literal('taylor'));
+        $this->assertSame('taylor', literal('taylor'));
         $this->assertEquals((object) ['name' => 'Taylor', 'role' => 'Developer'], literal(name: 'Taylor', role: 'Developer'));
     }
 

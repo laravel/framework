@@ -246,7 +246,7 @@ class TestResponseTest extends TestCase
             'gatherData' => ['foo' => 'bar', 'baz' => 'qux'],
         ]);
 
-        $this->assertEquals('bar', $response->viewData('foo'));
+        $this->assertSame('bar', $response->viewData('foo'));
 
         $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $response->viewData());
     }

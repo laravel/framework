@@ -155,7 +155,7 @@ class MiddlewareTest extends TestCase
         ], $method->invoke($middleware));
 
         $configuration->trustProxies(at: '*');
-        $this->assertEquals('*', $method->invoke($middleware));
+        $this->assertSame('*', $method->invoke($middleware));
 
         $configuration->trustProxies(at: [
             '192.168.1.3',

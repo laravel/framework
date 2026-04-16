@@ -14,7 +14,7 @@ class ValidationNumericRuleTest extends TestCase
     public function testDefaultNumericRule()
     {
         $rule = Rule::numeric();
-        $this->assertEquals('numeric', (string) $rule);
+        $this->assertSame('numeric', (string) $rule);
 
         $rule = new Numeric();
         $this->assertSame('numeric', (string) $rule);
@@ -23,118 +23,118 @@ class ValidationNumericRuleTest extends TestCase
     public function testBetweenRule()
     {
         $rule = Rule::numeric()->between(1, 10);
-        $this->assertEquals('numeric|between:1,10', (string) $rule);
+        $this->assertSame('numeric|between:1,10', (string) $rule);
 
         $rule = Rule::numeric()->between(1.5, 10.5);
-        $this->assertEquals('numeric|between:1.5,10.5', (string) $rule);
+        $this->assertSame('numeric|between:1.5,10.5', (string) $rule);
     }
 
     public function testDecimalRule()
     {
         $rule = Rule::numeric()->decimal(2, 4);
-        $this->assertEquals('numeric|decimal:2,4', (string) $rule);
+        $this->assertSame('numeric|decimal:2,4', (string) $rule);
 
         $rule = Rule::numeric()->decimal(2);
-        $this->assertEquals('numeric|decimal:2', (string) $rule);
+        $this->assertSame('numeric|decimal:2', (string) $rule);
     }
 
     public function testDifferentRule()
     {
         $rule = Rule::numeric()->different('some_field');
-        $this->assertEquals('numeric|different:some_field', (string) $rule);
+        $this->assertSame('numeric|different:some_field', (string) $rule);
     }
 
     public function testDigitsRule()
     {
         $rule = Rule::numeric()->digits(10);
-        $this->assertEquals('numeric|integer|digits:10', (string) $rule);
+        $this->assertSame('numeric|integer|digits:10', (string) $rule);
     }
 
     public function testDigitsBetweenRule()
     {
         $rule = Rule::numeric()->digitsBetween(2, 10);
-        $this->assertEquals('numeric|integer|digits_between:2,10', (string) $rule);
+        $this->assertSame('numeric|integer|digits_between:2,10', (string) $rule);
     }
 
     public function testGreaterThanRule()
     {
         $rule = Rule::numeric()->greaterThan('some_field');
-        $this->assertEquals('numeric|gt:some_field', (string) $rule);
+        $this->assertSame('numeric|gt:some_field', (string) $rule);
     }
 
     public function testGreaterThanOrEqualRule()
     {
         $rule = Rule::numeric()->greaterThanOrEqualTo('some_field');
-        $this->assertEquals('numeric|gte:some_field', (string) $rule);
+        $this->assertSame('numeric|gte:some_field', (string) $rule);
     }
 
     public function testIntegerRule()
     {
         $rule = Rule::numeric()->integer();
-        $this->assertEquals('numeric|integer', (string) $rule);
+        $this->assertSame('numeric|integer', (string) $rule);
 
         $rule = Rule::numeric()->integer(strict: true);
-        $this->assertEquals('numeric|integer:strict', (string) $rule);
+        $this->assertSame('numeric|integer:strict', (string) $rule);
     }
 
     public function testLessThanRule()
     {
         $rule = Rule::numeric()->lessThan('some_field');
-        $this->assertEquals('numeric|lt:some_field', (string) $rule);
+        $this->assertSame('numeric|lt:some_field', (string) $rule);
     }
 
     public function testLessThanOrEqualRule()
     {
         $rule = Rule::numeric()->lessThanOrEqualTo('some_field');
-        $this->assertEquals('numeric|lte:some_field', (string) $rule);
+        $this->assertSame('numeric|lte:some_field', (string) $rule);
     }
 
     public function testMaxRule()
     {
         $rule = Rule::numeric()->max(10);
-        $this->assertEquals('numeric|max:10', (string) $rule);
+        $this->assertSame('numeric|max:10', (string) $rule);
 
         $rule = Rule::numeric()->max(10.5);
-        $this->assertEquals('numeric|max:10.5', (string) $rule);
+        $this->assertSame('numeric|max:10.5', (string) $rule);
     }
 
     public function testMaxDigitsRule()
     {
         $rule = Rule::numeric()->maxDigits(10);
-        $this->assertEquals('numeric|max_digits:10', (string) $rule);
+        $this->assertSame('numeric|max_digits:10', (string) $rule);
     }
 
     public function testMinRule()
     {
         $rule = Rule::numeric()->min(10);
-        $this->assertEquals('numeric|min:10', (string) $rule);
+        $this->assertSame('numeric|min:10', (string) $rule);
 
         $rule = Rule::numeric()->min(10.5);
-        $this->assertEquals('numeric|min:10.5', (string) $rule);
+        $this->assertSame('numeric|min:10.5', (string) $rule);
     }
 
     public function testMinDigitsRule()
     {
         $rule = Rule::numeric()->minDigits(10);
-        $this->assertEquals('numeric|min_digits:10', (string) $rule);
+        $this->assertSame('numeric|min_digits:10', (string) $rule);
     }
 
     public function testMultipleOfRule()
     {
         $rule = Rule::numeric()->multipleOf(10);
-        $this->assertEquals('numeric|multiple_of:10', (string) $rule);
+        $this->assertSame('numeric|multiple_of:10', (string) $rule);
     }
 
     public function testSameRule()
     {
         $rule = Rule::numeric()->same('some_field');
-        $this->assertEquals('numeric|same:some_field', (string) $rule);
+        $this->assertSame('numeric|same:some_field', (string) $rule);
     }
 
     public function testSizeRule()
     {
         $rule = Rule::numeric()->exactly(10);
-        $this->assertEquals('numeric|integer|size:10', (string) $rule);
+        $this->assertSame('numeric|integer|size:10', (string) $rule);
     }
 
     public function testChainedRules()
@@ -144,7 +144,7 @@ class ValidationNumericRuleTest extends TestCase
             ->multipleOf(10)
             ->lessThanOrEqualTo('some_field')
             ->max(100);
-        $this->assertEquals('numeric|integer|multiple_of:10|lte:some_field|max:100', (string) $rule);
+        $this->assertSame('numeric|integer|multiple_of:10|lte:some_field|max:100', (string) $rule);
 
         $rule = Rule::numeric()
             ->decimal(2)
@@ -356,6 +356,6 @@ class ValidationNumericRuleTest extends TestCase
     public function testUniquenessValidation()
     {
         $rule = Rule::numeric()->integer()->digits(2)->exactly(2);
-        $this->assertEquals('numeric|integer|digits:2|size:2', (string) $rule);
+        $this->assertSame('numeric|integer|digits:2|size:2', (string) $rule);
     }
 }

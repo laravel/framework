@@ -2796,7 +2796,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertSame(1, $result);
         $this->assertSame(7, $model->foo);
-        $this->assertEquals('test', $model->category);
+        $this->assertSame('test', $model->category);
     }
 
     public function testIncrementEachFiresModelEvents()
@@ -3138,8 +3138,8 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertCount($castCount + 2, $model->getCasts());
         $this->assertArrayHasKey('foo', $model->getCasts());
-        $this->assertEquals('MyClass:myArgumentA', $model->getCasts()['foo']);
-        $this->assertEquals('MyClass:myArgumentA,myArgumentB', $model->getCasts()['bar']);
+        $this->assertSame('MyClass:myArgumentA', $model->getCasts()['foo']);
+        $this->assertSame('MyClass:myArgumentA,myArgumentB', $model->getCasts()['bar']);
     }
 
     public function testUnsetCastAttributes()
@@ -3356,8 +3356,8 @@ class DatabaseEloquentModelTest extends TestCase
             $this->assertInstanceOf(Address::class, $model->address);
 
             $this->assertSame(1, $model->id);
-            $this->assertEquals('ok', $model->this_is_fine);
-            $this->assertEquals('ok', $model->this_is_also_fine);
+            $this->assertSame('ok', $model->this_is_fine);
+            $this->assertSame('ok', $model->this_is_also_fine);
 
             // Primitive castables, enum castable
             $expectedExceptionCount = count($primitiveCasts) + 1;
@@ -3388,7 +3388,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->this_attribute_does_not_exist;
 
         $this->assertInstanceOf(EloquentModelStub::class, $callbackModel);
-        $this->assertEquals('this_attribute_does_not_exist', $callbackKey);
+        $this->assertSame('this_attribute_does_not_exist', $callbackKey);
 
         Model::preventAccessingMissingAttributes($originalMode);
         Model::handleMissingAttributeViolationUsing(null);
@@ -3630,7 +3630,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelCastingStub;
 
-        $this->assertEquals('int', $model->getCasts()['castStringableObject']);
+        $this->assertSame('int', $model->getCasts()['castStringableObject']);
     }
 
     public function testMergeingStringableObjectCastUSesStringRepresentation()
@@ -3642,7 +3642,7 @@ class DatabaseEloquentModelTest extends TestCase
             'something' => $stringable,
         ]);
 
-        $this->assertEquals('test', $model->getCasts()['something']);
+        $this->assertSame('test', $model->getCasts()['something']);
     }
 
     public function testUsingPlainObjectAsCastThrowsException()
@@ -3688,8 +3688,8 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->address_line_one = '123 Main Street';
 
-        $this->assertEquals('123 Main Street', $model->address->lineOne);
-        $this->assertEquals('123 MAIN STREET', $model->address_in_caps);
+        $this->assertSame('123 Main Street', $model->address->lineOne);
+        $this->assertSame('123 MAIN STREET', $model->address_in_caps);
 
         $model->discardChanges();
 
@@ -3805,7 +3805,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInstanceOf(EloquentModelWithUseFactoryAttributeFactory::class, $model::factory());
         $this->assertInstanceOf(EloquentModelWithUseFactoryAttributeFactory::class, $model::newFactory());
         $this->assertEquals(EloquentModelWithUseFactoryAttribute::class, $factory->modelName());
-        $this->assertEquals('test name', $instance->name); // Small smoke test to ensure the factory is working
+        $this->assertSame('test name', $instance->name); // Small smoke test to ensure the factory is working
     }
 
     public function testNestedModelBootingIsDisallowed()

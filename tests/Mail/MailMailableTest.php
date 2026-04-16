@@ -1183,12 +1183,12 @@ class MailMailableTest extends TestCase
         $this->assertSame('custom-message-id@example.com', $sentMessage->getMessageId());
 
         $this->assertTrue($sentMessage->getOriginalMessage()->getHeaders()->has('references'));
-        $this->assertEquals('References', $sentMessage->getOriginalMessage()->getHeaders()->get('references')->getName());
-        $this->assertEquals('<previous-message@example.com>', $sentMessage->getOriginalMessage()->getHeaders()->get('references')->getValue());
+        $this->assertSame('References', $sentMessage->getOriginalMessage()->getHeaders()->get('references')->getName());
+        $this->assertSame('<previous-message@example.com>', $sentMessage->getOriginalMessage()->getHeaders()->get('references')->getValue());
 
         $this->assertTrue($sentMessage->getOriginalMessage()->getHeaders()->has('x-custom-header'));
-        $this->assertEquals('X-Custom-Header', $sentMessage->getOriginalMessage()->getHeaders()->get('x-custom-header')->getName());
-        $this->assertEquals('Custom Value', $sentMessage->getOriginalMessage()->getHeaders()->get('x-custom-header')->getValue());
+        $this->assertSame('X-Custom-Header', $sentMessage->getOriginalMessage()->getHeaders()->get('x-custom-header')->getName());
+        $this->assertSame('Custom Value', $sentMessage->getOriginalMessage()->getHeaders()->get('x-custom-header')->getValue());
     }
 
     public function testMailableAttributesInBuild(): void

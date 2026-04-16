@@ -6297,7 +6297,7 @@ SQL;
         $results = collect([['test' => 'foo'], ['test' => 'bar']]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
-            $this->assertEquals(
+            $this->assertSame(
                 'select * from "foobar" where ("test" > ?) order by "test" asc limit 17',
                 $builder->toSql());
             $this->assertEquals(['bar'], $builder->bindings['where']);
@@ -6335,7 +6335,7 @@ SQL;
         $results = collect([['test' => 'foo', 'another' => 1], ['test' => 'bar', 'another' => 2]]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
-            $this->assertEquals(
+            $this->assertSame(
                 'select * from "foobar" where ("test" > ? or ("test" = ? and ("another" > ?))) order by "test" asc, "another" asc limit 17',
                 $builder->toSql()
             );
@@ -6373,7 +6373,7 @@ SQL;
         $results = collect([['test' => 'foo'], ['test' => 'bar']]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
-            $this->assertEquals(
+            $this->assertSame(
                 'select * from "foobar" where ("test" > ?) order by "test" asc limit 16',
                 $builder->toSql());
             $this->assertEquals(['bar'], $builder->bindings['where']);
@@ -6443,7 +6443,7 @@ SQL;
         $results = collect([['id' => 3, 'name' => 'Taylor'], ['id' => 5, 'name' => 'Mohamed']]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
-            $this->assertEquals(
+            $this->assertSame(
                 'select * from "foobar" where ("id" > ?) order by "id" asc limit 17',
                 $builder->toSql());
             $this->assertEquals([2], $builder->bindings['where']);
@@ -6481,7 +6481,7 @@ SQL;
         $results = collect([['foo' => 1, 'bar' => 2, 'baz' => 4], ['foo' => 1, 'bar' => 1, 'baz' => 1]]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
-            $this->assertEquals(
+            $this->assertSame(
                 'select * from "foobar" where ("foo" > ? or ("foo" = ? and ("bar" < ? or ("bar" = ? and ("baz" > ?))))) order by "foo" asc, "bar" desc, "baz" asc limit 17',
                 $builder->toSql()
             );
@@ -6519,7 +6519,7 @@ SQL;
         $results = collect([['test' => 'foo'], ['test' => 'bar']]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
-            $this->assertEquals(
+            $this->assertSame(
                 'select *, (CONCAT(firstname, \' \', lastname)) as test from "foobar" where ((CONCAT(firstname, \' \', lastname)) > ?) order by "test" asc limit 16',
                 $builder->toSql());
             $this->assertEquals(['bar'], $builder->bindings['where']);
@@ -6560,7 +6560,7 @@ SQL;
         $results = collect([['test' => 'foo'], ['test' => 'bar']]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
-            $this->assertEquals(
+            $this->assertSame(
                 'select *, (CAST(CONCAT(firstname, \' \', lastname) as VARCHAR)) as test from "foobar" where ((CAST(CONCAT(firstname, \' \', lastname) as VARCHAR)) > ?) order by "test" asc limit 16',
                 $builder->toSql());
             $this->assertEquals(['bar'], $builder->bindings['where']);
@@ -6601,7 +6601,7 @@ SQL;
         $results = collect([['test' => 'foo'], ['test' => 'bar']]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
-            $this->assertEquals(
+            $this->assertSame(
                 'select *, (CONCAT(firstname, \' \', lastname)) as "test" from "foobar" where ((CONCAT(firstname, \' \', lastname)) > ?) order by "test" asc limit 16',
                 $builder->toSql());
             $this->assertEquals(['bar'], $builder->bindings['where']);
@@ -6651,7 +6651,7 @@ SQL;
         ]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
-            $this->assertEquals(
+            $this->assertSame(
                 '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" > ?)) union (select "id", "created_at", \'news\' as type from "news" where ("created_at" > ?)) order by "created_at" asc limit 17',
                 $builder->toSql());
             $this->assertEquals([$ts], $builder->bindings['where']);
@@ -6700,7 +6700,7 @@ SQL;
         ]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
-            $this->assertEquals(
+            $this->assertSame(
                 '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" > ?)) union (select "id", "created_at", \'news\' as type from "news" where "extra" = ? and ("created_at" > ?)) union (select "id", "created_at", \'podcast\' as type from "podcasts" where "extra" = ? and ("created_at" > ?)) order by "created_at" asc limit 17',
                 $builder->toSql());
             $this->assertEquals([$ts], $builder->bindings['where']);
@@ -6750,7 +6750,7 @@ SQL;
         ]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
-            $this->assertEquals(
+            $this->assertSame(
                 '(select "id", "start_time" as "created_at", "type" from "videos" where "extra" = ? and ("id" > ? or ("id" = ? and ("start_time" < ? or ("start_time" = ? and ("type" > ?)))))) union (select "id", "created_at", "type" from "news" where "extra" = ? and ("id" > ? or ("id" = ? and ("start_time" < ? or ("start_time" = ? and ("type" > ?)))))) union (select "id", "created_at", "type" from "podcasts" where "extra" = ? and ("id" > ? or ("id" = ? and ("start_time" < ? or ("start_time" = ? and ("type" > ?)))))) order by "id" asc, "created_at" desc, "type" asc limit 17',
                 $builder->toSql());
             $this->assertEquals(['first', 1, 1, $ts, $ts, 'news'], $builder->bindings['where']);
@@ -6797,7 +6797,7 @@ SQL;
         ]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
-            $this->assertEquals(
+            $this->assertSame(
                 '(select "id", "is_published", "start_time" as "created_at", \'video\' as type from "videos" where "is_published" = ? and ("start_time" > ?)) union (select "id", "is_published", "created_at", \'news\' as type from "news" where "is_published" = ? and ("created_at" > ?)) order by case when (id = 3 and type="news" then 0 else 1 end), "created_at" asc limit 17',
                 $builder->toSql());
             $this->assertEquals([true, $ts], $builder->bindings['where']);
@@ -6844,7 +6844,7 @@ SQL;
         ]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
-            $this->assertEquals(
+            $this->assertSame(
                 '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" < ?)) union (select "id", "created_at", \'news\' as type from "news" where ("created_at" < ?)) order by "created_at" desc limit 17',
                 $builder->toSql());
             $this->assertEquals([$ts], $builder->bindings['where']);
@@ -6891,7 +6891,7 @@ SQL;
         ]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
-            $this->assertEquals(
+            $this->assertSame(
                 '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" < ? or ("start_time" = ? and ("id" > ?)))) union (select "id", "created_at", \'news\' as type from "news" where ("created_at" < ? or ("created_at" = ? and ("id" > ?)))) order by "created_at" desc, "id" asc limit 17',
                 $builder->toSql());
             $this->assertEquals([$ts, $ts, 1], $builder->bindings['where']);
@@ -6940,7 +6940,7 @@ SQL;
         ]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
-            $this->assertEquals(
+            $this->assertSame(
                 '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" > ?)) union (select "id", "created_at", \'news\' as type from "news" where ("created_at" > ?)) union (select "id", "init_at" as "created_at", \'podcast\' as type from "podcasts" where ("init_at" > ?)) order by "created_at" asc limit 17',
                 $builder->toSql());
             $this->assertEquals([$ts], $builder->bindings['where']);

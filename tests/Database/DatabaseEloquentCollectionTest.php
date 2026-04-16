@@ -602,7 +602,7 @@ class DatabaseEloquentCollectionTest extends TestCase
     {
         $this->seedData();
         $c = EloquentAppendingTestUserModel::query()->get();
-        $this->assertEquals('hello', $c->toArray()[0]['appended_field']);
+        $this->assertSame('hello', $c->toArray()[0]['appended_field']);
 
         $c = $c->withoutAppends();
         $this->assertArrayNotHasKey('appended_field', $c->toArray()[0]);

@@ -48,8 +48,8 @@ class CloudTest extends TestCase
 
         Cloud::configureDisks($this->app);
 
-        $this->assertEquals('test-disk-2', $this->app['config']->get('filesystems.default'));
-        $this->assertEquals('test-access-key-id', $this->app['config']->get('filesystems.disks.test-disk.key'));
+        $this->assertSame('test-disk-2', $this->app['config']->get('filesystems.default'));
+        $this->assertSame('test-access-key-id', $this->app['config']->get('filesystems.disks.test-disk.key'));
 
         unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG']);
     }
@@ -79,7 +79,7 @@ class CloudTest extends TestCase
 
         Cloud::configureCloudLogging($this->app);
 
-        $this->assertEquals('notice', $this->app['config']->get('logging.channels.laravel-cloud-socket.level'));
+        $this->assertSame('notice', $this->app['config']->get('logging.channels.laravel-cloud-socket.level'));
 
         unset($_SERVER['LOG_LEVEL']);
 

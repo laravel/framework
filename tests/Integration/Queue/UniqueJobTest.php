@@ -246,7 +246,7 @@ class UniqueJobTest extends QueueTestCase
 
     public function testUniqueLockCreatesKeyWithClassName()
     {
-        $this->assertEquals(
+        $this->assertSame(
             'laravel_unique_job:'.UniqueTestJob::class.':',
             UniqueLock::getKey(new UniqueTestJob)
         );
@@ -254,7 +254,7 @@ class UniqueJobTest extends QueueTestCase
 
     public function testUniqueLockCreatesKeyWithIdAndClassName()
     {
-        $this->assertEquals(
+        $this->assertSame(
             'laravel_unique_job:'.UniqueIdTestJob::class.':unique-id-1',
             UniqueLock::getKey(new UniqueIdTestJob)
         );
@@ -262,7 +262,7 @@ class UniqueJobTest extends QueueTestCase
 
     public function testUniqueLockCreatesKeyWithDisplayNameWhenAvailable()
     {
-        $this->assertEquals(
+        $this->assertSame(
             'laravel_unique_job:'.hash('xxh128', 'App\\Actions\\UniqueTestAction').':unique-id-2',
             UniqueLock::getKey(new UniqueIdTestJobWithDisplayName)
         );
@@ -270,7 +270,7 @@ class UniqueJobTest extends QueueTestCase
 
     public function testUniqueLockCreatesKeyWithIdAndDisplayNameWhenAvailable()
     {
-        $this->assertEquals(
+        $this->assertSame(
             'laravel_unique_job:'.hash('xxh128', 'App\\Actions\\UniqueTestAction').':unique-id-2',
             UniqueLock::getKey(new UniqueIdTestJobWithDisplayName)
         );

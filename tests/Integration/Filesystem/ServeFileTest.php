@@ -29,7 +29,7 @@ class ServeFileTest extends TestCase
 
         $response = $this->get($url);
 
-        $this->assertEquals('Hello World', $response->streamedContent());
+        $this->assertSame('Hello World', $response->streamedContent());
     }
 
     public function testItWill404OnMissingFile()

@@ -47,7 +47,7 @@ class EventsDispatcherTest extends TestCase
             return 'callback_result';
         });
 
-        $this->assertEquals('callback_result', $result);
+        $this->assertSame('callback_result', $result);
         $this->assertSame('bar', $_SERVER['__event.test']);
     }
 

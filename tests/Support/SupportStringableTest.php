@@ -1202,10 +1202,10 @@ class SupportStringableTest extends TestCase
 
     public function testCharAt()
     {
-        $this->assertEquals('р', $this->stringable('Привет, мир!')->charAt(1));
-        $this->assertEquals('ち', $this->stringable('「こんにちは世界」')->charAt(4));
-        $this->assertEquals('w', $this->stringable('Привет, world!')->charAt(8));
-        $this->assertEquals('界', $this->stringable('「こんにちは世界」')->charAt(-2));
+        $this->assertSame('р', $this->stringable('Привет, мир!')->charAt(1));
+        $this->assertSame('ち', $this->stringable('「こんにちは世界」')->charAt(4));
+        $this->assertSame('w', $this->stringable('Привет, world!')->charAt(8));
+        $this->assertSame('界', $this->stringable('「こんにちは世界」')->charAt(-2));
         $this->assertEquals(null, $this->stringable('「こんにちは世界」')->charAt(-200));
         $this->assertEquals(null, $this->stringable('Привет, мир!')->charAt('Привет, мир!', 100));
     }
@@ -1345,8 +1345,8 @@ class SupportStringableTest extends TestCase
 
     public function testMarkdown()
     {
-        $this->assertEquals("<p><em>hello world</em></p>\n", $this->stringable('*hello world*')->markdown());
-        $this->assertEquals("<h1>hello world</h1>\n", $this->stringable('# hello world')->markdown());
+        $this->assertSame("<p><em>hello world</em></p>\n", (string) $this->stringable('*hello world*')->markdown());
+        $this->assertSame("<h1>hello world</h1>\n", (string) $this->stringable('# hello world')->markdown());
 
         $extension = new class implements ExtensionInterface
         {
@@ -1363,8 +1363,8 @@ class SupportStringableTest extends TestCase
 
     public function testInlineMarkdown()
     {
-        $this->assertEquals("<em>hello world</em>\n", $this->stringable('*hello world*')->inlineMarkdown());
-        $this->assertEquals("<a href=\"https://laravel.com\"><strong>Laravel</strong></a>\n", $this->stringable('[**Laravel**](https://laravel.com)')->inlineMarkdown());
+        $this->assertSame("<em>hello world</em>\n", (string) $this->stringable('*hello world*')->inlineMarkdown());
+        $this->assertSame("<a href=\"https://laravel.com\"><strong>Laravel</strong></a>\n", (string) $this->stringable('[**Laravel**](https://laravel.com)')->inlineMarkdown());
 
         $extension = new class implements ExtensionInterface
         {
@@ -1415,15 +1415,15 @@ class SupportStringableTest extends TestCase
 
     public function testWrap()
     {
-        $this->assertEquals('This is me!', $this->stringable('is')->wrap('This ', ' me!'));
-        $this->assertEquals('"value"', $this->stringable('value')->wrap('"'));
+        $this->assertSame('This is me!', (string) $this->stringable('is')->wrap('This ', ' me!'));
+        $this->assertSame('"value"', (string) $this->stringable('value')->wrap('"'));
     }
 
     public function testUnwrap()
     {
-        $this->assertEquals('value', $this->stringable('"value"')->unwrap('"'));
-        $this->assertEquals('bar', $this->stringable('foo-bar-baz')->unwrap('foo-', '-baz'));
-        $this->assertEquals('some: "json"', $this->stringable('{some: "json"}')->unwrap('{', '}'));
+        $this->assertSame('value', (string) $this->stringable('"value"')->unwrap('"'));
+        $this->assertSame('bar', (string) $this->stringable('foo-bar-baz')->unwrap('foo-', '-baz'));
+        $this->assertSame('some: "json"', (string) $this->stringable('{some: "json"}')->unwrap('{', '}'));
     }
 
     public function testToHtmlString()

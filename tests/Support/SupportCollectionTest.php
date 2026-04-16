@@ -1263,8 +1263,8 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection([['id' => 1, 'name' => 'Hello'], ['id' => 2, 'name' => 'World']]);
 
-        $this->assertEquals('Hello', $c->value('name'));
-        $this->assertEquals('World', $c->where('id', 2)->value('name'));
+        $this->assertSame('Hello', $c->value('name'));
+        $this->assertSame('World', $c->where('id', 2)->value('name'));
 
         $c = new $collection([
             ['id' => 1, 'pivot' => ['value' => 'foo']],
@@ -1272,8 +1272,8 @@ class SupportCollectionTest extends TestCase
         ]);
 
         $this->assertEquals(['value' => 'foo'], $c->value('pivot'));
-        $this->assertEquals('foo', $c->value('pivot.value'));
-        $this->assertEquals('bar', $c->where('id', 2)->value('pivot.value'));
+        $this->assertSame('foo', $c->value('pivot.value'));
+        $this->assertSame('bar', $c->where('id', 2)->value('pivot.value'));
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -1294,7 +1294,7 @@ class SupportCollectionTest extends TestCase
 
         $c = new $collection([['id' => 1, 'balance' => ''], ['id' => 2, 'balance' => 200]]);
 
-        $this->assertEquals('', $c->value('balance'));
+        $this->assertSame('', $c->value('balance'));
 
         $c = new $collection([['id' => 1, 'balance' => null], ['id' => 2, 'balance' => 200]]);
 
@@ -1318,7 +1318,7 @@ class SupportCollectionTest extends TestCase
             literal(id: 3, balance: 200),
         ]);
 
-        $this->assertEquals('', $c->value('balance'));
+        $this->assertSame('', $c->value('balance'));
 
         $c = new $collection([
             literal(id: 1),
@@ -4301,13 +4301,13 @@ class SupportCollectionTest extends TestCase
         $this->assertSame(3, $c->after(2));
         $this->assertSame(4, $c->after(3));
         $this->assertSame(2, $c->after(4));
-        $this->assertEquals('taylor', $c->after(5));
-        $this->assertEquals('laravel', $c->after('taylor'));
+        $this->assertSame('taylor', $c->after(5));
+        $this->assertSame('laravel', $c->after('taylor'));
 
         $this->assertSame(4, $c->after(function ($value) {
             return $value > 2;
         }));
-        $this->assertEquals('laravel', $c->after(function ($value) {
+        $this->assertSame('laravel', $c->after(function ($value) {
             return ! is_numeric($value);
         }));
     }
@@ -4322,7 +4322,7 @@ class SupportCollectionTest extends TestCase
         $this->assertNull($c->after('', true));
         $this->assertSame(0, $c->after(false, true));
         $this->assertSame([], $c->after(1, true));
-        $this->assertEquals('', $c->after([], true));
+        $this->assertSame('', $c->after([], true));
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -5774,7 +5774,7 @@ class SupportCollectionTest extends TestCase
     public function testGetWithDefaultValue($collection)
     {
         $data = new $collection(['name' => 'taylor', 'framework' => 'laravel']);
-        $this->assertEquals('34', $data->get('age', 34));
+        $this->assertSame('34', (string) $data->get('age', 34));
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -5784,7 +5784,7 @@ class SupportCollectionTest extends TestCase
         $result = $data->get('email', function () {
             return 'taylor@example.com';
         });
-        $this->assertEquals('taylor@example.com', $result);
+        $this->assertSame('taylor@example.com', $result);
     }
 
     #[DataProvider('collectionClassProvider')]

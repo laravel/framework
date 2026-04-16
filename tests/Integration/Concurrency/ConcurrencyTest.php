@@ -154,9 +154,9 @@ PHP);
             },
         ]);
 
-        $this->assertEquals('first', $first);
-        $this->assertEquals('second', $second);
-        $this->assertEquals('third', $third);
+        $this->assertSame('first', $first);
+        $this->assertSame('second', $second);
+        $this->assertSame('third', $third);
     }
 }
 

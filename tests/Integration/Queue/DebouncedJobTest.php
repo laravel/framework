@@ -131,7 +131,7 @@ class DebouncedJobTest extends QueueTestCase
 
         $restored = unserialize(serialize($job));
 
-        $this->assertEquals('test-owner-token-123', $restored->debounceOwner);
+        $this->assertSame('test-owner-token-123', $restored->debounceOwner);
     }
 
     public function testDifferentDebounceIdsDoNotInterfere()
