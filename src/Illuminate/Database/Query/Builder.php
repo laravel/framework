@@ -1367,6 +1367,124 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where like any" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  array  $values
+     * @param  bool  $caseSensitive
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereLikeAny($column, array $values, $caseSensitive = false, $boolean = 'and', $not = false)
+    {
+        return $this->where(function ($query) use ($column, $values, $caseSensitive, $not) {
+            foreach ($values as $value) {
+                $query->whereLike($column, $value, $caseSensitive, $not ? 'and' : 'or', $not);
+            }
+        }, null, null, $boolean);
+    }
+
+    /**
+     * Add an "or where like any" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  array  $values
+     * @param  bool  $caseSensitive
+     * @return $this
+     */
+    public function orWhereLikeAny($column, array $values, $caseSensitive = false)
+    {
+        return $this->whereLikeAny($column, $values, $caseSensitive, 'or');
+    }
+
+    /**
+     * Add a "where not like any" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  array  $values
+     * @param  bool  $caseSensitive
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNotLikeAny($column, array $values, $caseSensitive = false, $boolean = 'and')
+    {
+        return $this->whereLikeAny($column, $values, $caseSensitive, $boolean, true);
+    }
+
+    /**
+     * Add an "or where not like any" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  array  $values
+     * @param  bool  $caseSensitive
+     * @return $this
+     */
+    public function orWhereNotLikeAny($column, array $values, $caseSensitive = false)
+    {
+        return $this->whereNotLikeAny($column, $values, $caseSensitive, 'or');
+    }
+
+    /**
+     * Add a "where like all" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  array  $values
+     * @param  bool  $caseSensitive
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereLikeAll($column, array $values, $caseSensitive = false, $boolean = 'and', $not = false)
+    {
+        return $this->where(function ($query) use ($column, $values, $caseSensitive, $not) {
+            foreach ($values as $value) {
+                $query->whereLike($column, $value, $caseSensitive, $not ? 'or' : 'and', $not);
+            }
+        }, null, null, $boolean);
+    }
+
+    /**
+     * Add an "or where like all" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  array  $values
+     * @param  bool  $caseSensitive
+     * @return $this
+     */
+    public function orWhereLikeAll($column, array $values, $caseSensitive = false)
+    {
+        return $this->whereLikeAll($column, $values, $caseSensitive, 'or');
+    }
+
+    /**
+     * Add a "where not like all" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  array  $values
+     * @param  bool  $caseSensitive
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNotLikeAll($column, array $values, $caseSensitive = false, $boolean = 'and')
+    {
+        return $this->whereLikeAll($column, $values, $caseSensitive, $boolean, true);
+    }
+
+    /**
+     * Add an "or where not like all" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  array  $values
+     * @param  bool  $caseSensitive
+     * @return $this
+     */
+    public function orWhereNotLikeAll($column, array $values, $caseSensitive = false)
+    {
+        return $this->whereNotLikeAll($column, $values, $caseSensitive, 'or');
+    }
+
+    /**
      * Add a "where in" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
