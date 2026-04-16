@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Foundation;
 
 use Illuminate\Foundation\Cloud;
+use Illuminate\Queue\Worker;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
@@ -51,6 +52,21 @@ class CloudTest extends TestCase
         $this->assertEquals('test-access-key-id', $this->app['config']->get('filesystems.disks.test-disk.key'));
 
         unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG']);
+    }
+
+    public function test_it_disables_queue_restart_polling_for_managed_queues()
+    {
+        Worker::$restartable = true;
+        $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES'] = '1';
+
+        try {
+            Cloud::configureManagedQueues();
+
+            $this->assertFalse(Worker::$restartable);
+        } finally {
+            unset($_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES']);
+            Worker::$restartable = true;
+        }
     }
 
     public function test_it_respects_log_levels()

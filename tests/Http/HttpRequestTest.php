@@ -1764,12 +1764,12 @@ class HttpRequestTest extends TestCase
         $params = ['foo' => 'bar'];
 
         $getRequest = Request::create('/', 'GET', $params, [], [], []);
-        $this->assertEquals($getRequest->request->all(), []);
+        $this->assertEquals([], $getRequest->request->all());
         $this->assertEquals($getRequest->query->all(), $params);
 
         $postRequest = Request::create('/', 'POST', $params, [], [], []);
         $this->assertEquals($postRequest->request->all(), $params);
-        $this->assertEquals($postRequest->query->all(), []);
+        $this->assertEquals([], $postRequest->query->all());
     }
 
     /**

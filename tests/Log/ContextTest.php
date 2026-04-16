@@ -165,17 +165,17 @@ class ContextTest extends TestCase
 
         Context::hydrate($dehydrated);
 
-        $this->assertSame(Context::get('string'), 'string');
-        $this->assertSame(Context::get('bool'), false);
-        $this->assertSame(Context::get('int'), 5);
-        $this->assertSame(Context::get('float'), 5.5);
-        $this->assertSame(Context::get('null'), null);
-        $this->assertSame(Context::get('array'), [1, 2, 3]);
-        $this->assertSame(Context::get('hash'), ['foo' => 'bar']);
+        $this->assertSame('string', Context::get('string'));
+        $this->assertSame(false, Context::get('bool'));
+        $this->assertSame(5, Context::get('int'));
+        $this->assertSame(5.5, Context::get('float'));
+        $this->assertSame(null, Context::get('null'));
+        $this->assertSame([1, 2, 3], Context::get('array'));
+        $this->assertSame(['foo' => 'bar'], Context::get('hash'));
         $this->assertEquals(Context::get('object'), (object) ['foo' => 'bar']);
-        $this->assertSame(Context::get('enum'), Suit::Clubs);
-        $this->assertSame(Context::get('backed_enum'), StringBackedSuit::Clubs);
-        $this->assertSame(Context::getHidden('number'), 55);
+        $this->assertSame(Suit::Clubs, Context::get('enum'));
+        $this->assertSame(StringBackedSuit::Clubs, Context::get('backed_enum'));
+        $this->assertSame(55, Context::getHidden('number'));
     }
 
     public function test_it_can_push_to_list()

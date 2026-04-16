@@ -111,8 +111,8 @@ class LogManagerTest extends TestCase
         $manager->channel('stack');
 
         $this->assertSame(
-            array_keys($manager->getChannels()),
-            ['single', 'daily', 'stderr', 'stack']
+            ['single', 'daily', 'stderr', 'stack'],
+            array_keys($manager->getChannels())
         );
     }
 
@@ -646,7 +646,7 @@ class LogManagerTest extends TestCase
             'invocation-id' => 'expected-id',
         ]);
 
-        $this->assertSame($manager->sharedContext(), ['invocation-id' => 'expected-id']);
+        $this->assertSame(['invocation-id' => 'expected-id'], $manager->sharedContext());
     }
 
     public function testItSharesContextWithStacksWhenTheyAreResolved()

@@ -99,7 +99,7 @@ class Response implements ArrayAccess, Stringable
      */
     public function json($key = null, $default = null, $flags = null)
     {
-        $flags = $flags ?? self::$defaultJsonDecodingFlags;
+        $flags ??= self::$defaultJsonDecodingFlags;
 
         if (! $this->decoded || (isset($this->decodingFlags) && $this->decodingFlags !== $flags)) {
             $this->decoded = json_decode(

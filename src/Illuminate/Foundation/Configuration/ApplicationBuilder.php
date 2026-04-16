@@ -13,6 +13,7 @@ use Illuminate\Foundation\Events\DiagnosingHealth;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as AppEventServiceProvider;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as AppRouteServiceProvider;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Event;
@@ -218,7 +219,7 @@ class ApplicationBuilder
             }
 
             if (is_string($health)) {
-                Route::get($health, function () {
+                Route::get($health, function (Request $request) {
                     $exception = null;
 
                     try {
@@ -233,9 +234,17 @@ class ApplicationBuilder
                         $exception = $e->getMessage();
                     }
 
+                    $status = $exception ? 500 : 200;
+
+                    if ($request->expectsJson()) {
+                        return response()->json([
+                            'status' => $exception ? 'down' : 'up',
+                        ], $status);
+                    }
+
                     return response(View::file(__DIR__.'/../resources/health-up.blade.php', [
                         'exception' => $exception,
-                    ]), status: $exception ? 500 : 200);
+                    ]), status: $status);
                 });
             }
 

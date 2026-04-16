@@ -628,7 +628,6 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(6, FactoryTestPost::all());
         $this->assertCount(3, FactoryTestUser::latest()->first()->posts);
         $this->assertEquals(
-            FactoryTestPost::orderBy('title')->pluck('title')->all(),
             [
                 'Abigail Otwell Post 1',
                 'Abigail Otwell Post 2',
@@ -636,7 +635,8 @@ class DatabaseEloquentFactoryTest extends TestCase
                 'Taylor Otwell Post 1',
                 'Taylor Otwell Post 2',
                 'Taylor Otwell Post 3',
-            ]
+            ],
+            FactoryTestPost::orderBy('title')->pluck('title')->all()
         );
     }
 
@@ -999,8 +999,8 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_factory_model_names_correct()
     {
-        $this->assertEquals(FactoryTestUseFactoryAttribute::factory()->modelName(), FactoryTestUseFactoryAttribute::class);
-        $this->assertEquals(FactoryTestGuessModel::factory()->modelName(), FactoryTestGuessModel::class);
+        $this->assertEquals(FactoryTestUseFactoryAttribute::class, FactoryTestUseFactoryAttribute::factory()->modelName());
+        $this->assertEquals(FactoryTestGuessModel::class, FactoryTestGuessModel::factory()->modelName());
     }
 
     public function test_factory_global_model_resolver()
@@ -1009,11 +1009,11 @@ class DatabaseEloquentFactoryTest extends TestCase
             return __NAMESPACE__.'\\'.Str::replaceLast('Factory', '', class_basename($factory::class));
         });
 
-        $this->assertEquals(FactoryTestGuessModel::factory()->modelName(), FactoryTestGuessModel::class);
-        $this->assertEquals(FactoryTestUseFactoryAttribute::factory()->modelName(), FactoryTestUseFactoryAttribute::class);
+        $this->assertEquals(FactoryTestGuessModel::class, FactoryTestGuessModel::factory()->modelName());
+        $this->assertEquals(FactoryTestUseFactoryAttribute::class, FactoryTestUseFactoryAttribute::factory()->modelName());
 
-        $this->assertEquals(FactoryTestUseFactoryAttributeFactory::new()->modelName(), FactoryTestUseFactoryAttribute::class);
-        $this->assertEquals(FactoryTestGuessModelFactory::new()->modelName(), FactoryTestGuessModel::class);
+        $this->assertEquals(FactoryTestUseFactoryAttribute::class, FactoryTestUseFactoryAttributeFactory::new()->modelName());
+        $this->assertEquals(FactoryTestGuessModel::class, FactoryTestGuessModelFactory::new()->modelName());
     }
 
     public function test_factory_model_has_many_relationship_has_pending_attributes()

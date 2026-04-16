@@ -126,7 +126,7 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
      */
     public function many(array $keys)
     {
-        if (count($keys) === 0) {
+        if ($keys === []) {
             return [];
         }
 

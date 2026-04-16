@@ -1158,7 +1158,7 @@ class PendingRequest
             ->flatMap(function ($value, $key) {
                 if (is_array($value)) {
                     // If the array has 'name' and 'contents' keys, it's already formatted for multipart...
-                    if (isset($value['name']) && isset($value['contents'])) {
+                    if (isset($value['name'], $value['contents'])) {
                         return [$value];
                     }
 

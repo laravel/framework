@@ -8,6 +8,7 @@ use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\AuthenticateWithBasicAuth;
 use Illuminate\Auth\RequestGuard;
+use Illuminate\Config\Repository;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
@@ -162,6 +163,44 @@ class AuthenticateMiddlewareTest extends TestCase
         $this->assertSame($driver, $this->auth->guard(__CLASS__));
     }
 
+    public function testCustomInvokableDriver()
+    {
+        $driver = new stdClass;
+        $creator = new CustomAuthDriver($driver);
+
+        $this->auth->extend(__CLASS__, $creator(...));
+        $this->assertSame($driver, $this->auth->guard(__CLASS__));
+    }
+
+    public function testAuthManagerCanResolveBackedEnumGuard()
+    {
+        $driver = $this->registerAuthDriver('default', true);
+
+        $guard1 = $this->auth->guard(GuardName::Default);
+        $guard2 = $this->auth->guard('default');
+
+        $this->assertSame($guard1, $guard2);
+        $this->assertSame($driver, $guard1);
+    }
+
+    public function testShouldUseAcceptsBackedEnum()
+    {
+        $this->registerAuthDriver('default', true);
+        $secondary = $this->registerAuthDriver('secondary', true);
+
+        $this->auth->shouldUse(GuardName::Secondary);
+
+        $this->assertSame('secondary', $this->auth->getDefaultDriver());
+        $this->assertSame($secondary, $this->auth->guard());
+    }
+
+    public function testSetDefaultDriverAcceptsBackedEnum()
+    {
+        $this->auth->setDefaultDriver(GuardName::Secondary);
+
+        $this->assertSame('secondary', $this->auth->getDefaultDriver());
+    }
+
     /**
      * Create a new config repository instance.
      *
@@ -235,5 +274,23 @@ class AuthenticateMiddlewareTest extends TestCase
         (new Authenticate($this->auth))->handle($request, $next, ...$guards);
 
         $this->assertSame($request, $nextParam);
+    }
+}
+
+enum GuardName: string
+{
+    case Default = 'default';
+    case Secondary = 'secondary';
+}
+
+class CustomAuthDriver
+{
+    public function __construct(private object $driver)
+    {
+    }
+
+    public function __invoke()
+    {
+        return $this->driver;
     }
 }

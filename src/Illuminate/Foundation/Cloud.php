@@ -5,6 +5,7 @@ namespace Illuminate\Foundation;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
+use Illuminate\Queue\Worker;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\SocketHandler;
 use PDO;
@@ -29,6 +30,7 @@ class Cloud
                 static::configureDisks($app);
                 static::configureUnpooledPostgresConnection($app);
                 static::ensureMigrationsUseUnpooledConnection($app);
+                static::configureManagedQueues();
             },
             HandleExceptions::class => function () use ($app) {
                 static::configureCloudLogging($app);
@@ -104,12 +106,22 @@ class Cloud
         }
 
         Migrator::resolveConnectionsUsing(function ($resolver, $connection) use ($app) {
-            $connection = $connection ?? $app['config']->get('database.default');
+            $connection ??= $app['config']->get('database.default');
 
             return $resolver->connection(
                 $connection === 'pgsql' ? 'pgsql-unpooled' : $connection
             );
         });
+    }
+
+    /**
+     * Configure managed queues if applicable.
+     */
+    public static function configureManagedQueues(): void
+    {
+        if ((int) ($_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES'] ?? 0) === 1) {
+            Worker::$restartable = false;
+        }
     }
 
     /**

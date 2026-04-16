@@ -9,9 +9,7 @@ class FoundationApplicationBuilderTest extends TestCase
 {
     protected function tearDown(): void
     {
-        unset($_ENV['APP_BASE_PATH']);
-
-        unset($_ENV['LARAVEL_STORAGE_PATH'], $_SERVER['LARAVEL_STORAGE_PATH']);
+        unset($_ENV['APP_BASE_PATH'], $_ENV['LARAVEL_STORAGE_PATH'], $_SERVER['LARAVEL_STORAGE_PATH']);
 
         parent::tearDown();
     }

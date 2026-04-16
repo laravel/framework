@@ -119,7 +119,7 @@ class ValidatedInput implements ValidatedData
      */
     public function dump(...$keys)
     {
-        dump(count($keys) > 0 ? $this->only($keys) : $this->all());
+        dump($keys !== [] ? $this->only($keys) : $this->all());
 
         return $this;
     }

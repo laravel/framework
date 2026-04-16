@@ -138,25 +138,25 @@ class FormRequest extends Request implements ValidatesWhenResolved
     {
         $reflection = new ReflectionClass($this);
 
-        if (count($reflection->getAttributes(StopOnFirstFailure::class)) > 0) {
+        if ($reflection->getAttributes(StopOnFirstFailure::class) !== []) {
             $this->stopOnFirstFailure = true;
         }
 
         $redirectTo = $reflection->getAttributes(RedirectTo::class);
 
-        if (count($redirectTo) > 0) {
+        if ($redirectTo !== []) {
             $this->redirect = $redirectTo[0]->newInstance()->url;
         }
 
         $redirectToRoute = $reflection->getAttributes(RedirectToRoute::class);
 
-        if (count($redirectToRoute) > 0) {
+        if ($redirectToRoute !== []) {
             $this->redirectRoute = $redirectToRoute[0]->newInstance()->route;
         }
 
         $errorBag = $reflection->getAttributes(ErrorBag::class);
 
-        if (count($errorBag) > 0) {
+        if ($errorBag !== []) {
             $this->errorBag = $errorBag[0]->newInstance()->name;
         }
     }
@@ -336,8 +336,10 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * Get a validated input container for the validated input.
      *
-     * @param  array|null  $keys
-     * @return \Illuminate\Support\ValidatedInput|array
+     * @param  array<int, string>|null  $keys
+     * @return ($keys is array ? array<string, mixed> : \Illuminate\Support\ValidatedInput)
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function safe(?array $keys = null)
     {

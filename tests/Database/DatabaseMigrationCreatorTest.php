@@ -14,7 +14,7 @@ class DatabaseMigrationCreatorTest extends TestCase
     {
         $creator = $this->getCreator();
 
-        $creator->expects($this->any())->method('getDatePrefix')->willReturn('foo');
+        $creator->method('getDatePrefix')->willReturn('foo');
         $creator->getFilesystem()->shouldReceive('exists')->once()->with('stubs/migration.stub')->andReturn(false);
         $creator->getFilesystem()->shouldReceive('get')->once()->with($creator->stubPath().'/migration.stub')->andReturn('return new class');
         $creator->getFilesystem()->shouldReceive('ensureDirectoryExists')->once()->with('foo');
@@ -36,7 +36,7 @@ class DatabaseMigrationCreatorTest extends TestCase
             $_SERVER['__migration.creator.path'] = $path;
         });
 
-        $creator->expects($this->any())->method('getDatePrefix')->willReturn('foo');
+        $creator->method('getDatePrefix')->willReturn('foo');
         $creator->getFilesystem()->shouldReceive('exists')->once()->with('stubs/migration.update.stub')->andReturn(false);
         $creator->getFilesystem()->shouldReceive('get')->once()->with($creator->stubPath().'/migration.update.stub')->andReturn('return new class DummyTable');
         $creator->getFilesystem()->shouldReceive('ensureDirectoryExists')->once()->with('foo');
@@ -47,7 +47,7 @@ class DatabaseMigrationCreatorTest extends TestCase
         $creator->create('create_bar', 'foo', $table);
 
         $this->assertEquals($_SERVER['__migration.creator.table'], $table);
-        $this->assertEquals($_SERVER['__migration.creator.path'], 'foo/foo_create_bar.php');
+        $this->assertEquals('foo/foo_create_bar.php', $_SERVER['__migration.creator.path']);
 
         unset($_SERVER['__migration.creator.table'], $_SERVER['__migration.creator.path']);
     }
@@ -55,7 +55,7 @@ class DatabaseMigrationCreatorTest extends TestCase
     public function testTableUpdateMigrationStoresMigrationFile()
     {
         $creator = $this->getCreator();
-        $creator->expects($this->any())->method('getDatePrefix')->willReturn('foo');
+        $creator->method('getDatePrefix')->willReturn('foo');
         $creator->getFilesystem()->shouldReceive('exists')->once()->with('stubs/migration.update.stub')->andReturn(false);
         $creator->getFilesystem()->shouldReceive('get')->once()->with($creator->stubPath().'/migration.update.stub')->andReturn('return new class DummyTable');
         $creator->getFilesystem()->shouldReceive('ensureDirectoryExists')->once()->with('foo');
@@ -69,7 +69,7 @@ class DatabaseMigrationCreatorTest extends TestCase
     public function testTableCreationMigrationStoresMigrationFile()
     {
         $creator = $this->getCreator();
-        $creator->expects($this->any())->method('getDatePrefix')->willReturn('foo');
+        $creator->method('getDatePrefix')->willReturn('foo');
         $creator->getFilesystem()->shouldReceive('exists')->once()->with('stubs/migration.create.stub')->andReturn(false);
         $creator->getFilesystem()->shouldReceive('get')->once()->with($creator->stubPath().'/migration.create.stub')->andReturn('return new class DummyTable');
         $creator->getFilesystem()->shouldReceive('ensureDirectoryExists')->once()->with('foo');

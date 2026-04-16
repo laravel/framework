@@ -22,9 +22,11 @@ use Illuminate\Queue\Attributes\Connection as ConnectionAttribute;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
+use Illuminate\Support\RebindsCallbacksToSelf;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Pusher\Pusher;
+use ReflectionException;
 use RuntimeException;
 use Throwable;
 
@@ -33,7 +35,7 @@ use Throwable;
  */
 class BroadcastManager implements FactoryContract
 {
-    use ReadsQueueAttributes, ResolvesQueueRoutes;
+    use ReadsQueueAttributes, RebindsCallbacksToSelf, ResolvesQueueRoutes;
 
     /**
      * The application instance.
@@ -505,9 +507,9 @@ class BroadcastManager implements FactoryContract
     public function extend($driver, Closure $callback)
     {
         try {
-            $callback = $callback->bindTo($this, static::class) ?? throw new RuntimeException;
-        } catch (Throwable) {
-            $callback = $callback->bindTo(null, static::class);
+            $callback = $this->bindCallbackToSelf($callback) ?? throw new RuntimeException('Unable to bind custom driver callback');
+        } catch (ReflectionException $e) {
+            throw new RuntimeException('Unable to bind custom driver callback', previous: $e);
         }
 
         $this->customCreators[$driver] = $callback;

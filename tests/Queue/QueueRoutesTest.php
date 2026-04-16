@@ -68,6 +68,16 @@ class QueueRoutesTest extends TestCase
         $this->assertSame('job-connection', $defaults->getConnection(new SomeJob));
         $this->assertNull($defaults->getConnection(new Payment));
     }
+
+    public function testStringRouteDefaultsToQueueNotConnection()
+    {
+        $defaults = new QueueRoutes();
+
+        $defaults->set([BaseNotification::class => 'notifications']);
+
+        $this->assertSame('notifications', $defaults->getQueue(new FinanceNotification));
+        $this->assertNull($defaults->getConnection(new FinanceNotification));
+    }
 }
 
 trait CustomTrait

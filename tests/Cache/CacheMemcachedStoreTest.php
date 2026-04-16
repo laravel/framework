@@ -15,7 +15,7 @@ class CacheMemcachedStoreTest extends TestCase
     public function testGetReturnsNullWhenNotFound()
     {
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['get', 'getResultCode'])->getMock();
-        $memcache->expects($this->once())->method('get')->with($this->equalTo('foo:bar'))->willReturn(null);
+        $memcache->expects($this->once())->method('get')->with('foo:bar')->willReturn(null);
         $memcache->expects($this->once())->method('getResultCode')->willReturn(1);
         $store = new MemcachedStore($memcache, 'foo:');
         $this->assertNull($store->get('bar'));
@@ -53,7 +53,7 @@ class CacheMemcachedStoreTest extends TestCase
     {
         Carbon::setTestNow($now = Carbon::now());
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['set'])->getMock();
-        $memcache->expects($this->once())->method('set')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo($now->timestamp + 60))->willReturn(true);
+        $memcache->expects($this->once())->method('set')->with('foo', 'bar', $now->timestamp + 60)->willReturn(true);
         $store = new MemcachedStore($memcache);
         $result = $store->put('foo', 'bar', 60);
         $this->assertTrue($result);
@@ -69,7 +69,7 @@ class CacheMemcachedStoreTest extends TestCase
 
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['touch'])->getMock();
 
-        $memcache->expects($this->once())->method('touch')->with($this->equalTo($key), $this->equalTo($now->addSeconds($ttl)->getTimestamp()))->willReturn(true);
+        $memcache->expects($this->once())->method('touch')->with($key, $now->addSeconds($ttl)->getTimestamp())->willReturn(true);
 
         $this->assertTrue((new MemcachedStore($memcache))->touch($key, $ttl));
     }
@@ -95,7 +95,7 @@ class CacheMemcachedStoreTest extends TestCase
     public function testStoreItemForeverProperlyCallsMemcached()
     {
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['set'])->getMock();
-        $memcache->expects($this->once())->method('set')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0))->willReturn(true);
+        $memcache->expects($this->once())->method('set')->with('foo', 'bar', 0)->willReturn(true);
         $store = new MemcachedStore($memcache);
         $result = $store->forever('foo', 'bar');
         $this->assertTrue($result);
@@ -104,7 +104,7 @@ class CacheMemcachedStoreTest extends TestCase
     public function testForgetMethodProperlyCallsMemcache()
     {
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['delete'])->getMock();
-        $memcache->expects($this->once())->method('delete')->with($this->equalTo('foo'));
+        $memcache->expects($this->once())->method('delete')->with('foo');
         $store = new MemcachedStore($memcache);
         $store->forget('foo');
     }

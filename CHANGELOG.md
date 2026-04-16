@@ -1,6 +1,35 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.4.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.5.0...13.x)
+
+## [v13.5.0](https://github.com/laravel/framework/compare/v13.4.0...v13.5.0) - 2026-04-14
+
+* [13.x] Support #[Delay] attribute on queued mailables by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59580
+* [13.x] Added inheritance support for Controller Middleware attributes. by [@niduranga](https://github.com/niduranga) in https://github.com/laravel/framework/pull/59597
+* [13.x] Normalize phpredis SSL context for single and cluster connections   by [@timmylindh](https://github.com/timmylindh) in https://github.com/laravel/framework/pull/59569
+* [13.x] Memoize the result of `TestCase@withoutBootingFramework()` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/59610
+* [13.x] Add missing [@throws](https://github.com/throws) and docblocks for concurrency and model in… by [@scabarcas17](https://github.com/scabarcas17) in https://github.com/laravel/framework/pull/59602
+* [13.x] Fix that retries of `ShouldBeUniqueUntilProcessing` jobs are force-releasing locks they don't own by [@kohlerdominik](https://github.com/kohlerdominik) in https://github.com/laravel/framework/pull/59567
+* [13.x] Add first-class Redis Cluster support for Queue and ConcurrencyLimiter by [@timmylindh](https://github.com/timmylindh) in https://github.com/laravel/framework/pull/59533
+* [13.x] chore: Update PHP version from 8.2 to 8.3 in `bin/test.sh` script by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/59605
+* [13.x] Fix RedisQueueTest by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59613
+* [13.x] Add enum support to CacheManager store and driver methods by [@yousefkadah](https://github.com/yousefkadah) in https://github.com/laravel/framework/pull/59637
+* [13.x] Fix redirectUsersTo() overwriting redirectGuestsTo() callback by [@timmylindh](https://github.com/timmylindh) in https://github.com/laravel/framework/pull/59633
+* [13.x] Add ability to detect unserializable values returned from cache by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59630
+* [13.x] Fix loose comparison false positive in NotPwnedVerifier with magic hash passwords by [@scabarcas17](https://github.com/scabarcas17) in https://github.com/laravel/framework/pull/59644
+* [13.x] Refactor `Skip` middleware by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/59651
+* [13.x] Resolve stan errors on MySqlSchemaState by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59652
+* [13.x] Allow closure values in updateOrCreate and firstOrNew by [@yousefkadah](https://github.com/yousefkadah) in https://github.com/laravel/framework/pull/59647
+* [13.x] Add enum support to MailManager mailer and driver methods by [@yousefkadah](https://github.com/yousefkadah) in https://github.com/laravel/framework/pull/59645
+* [13.x] Add enum support to AuthManager guard and shouldUse methods by [@yousefkadah](https://github.com/yousefkadah) in https://github.com/laravel/framework/pull/59646
+* [13.x] Add spatie/fork to composer suggestions by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/59660
+* [13.x] Add enum support to Manager driver method by [@scabarcas17](https://github.com/scabarcas17) in https://github.com/laravel/framework/pull/59659
+* [13.x] Fix custom driver binding bug and improve  by [@ollieread](https://github.com/ollieread) in https://github.com/laravel/framework/pull/59614
+* [13.x] Improve PHPDoc for "safe" method with conditional return type by [@leo95batista](https://github.com/leo95batista) in https://github.com/laravel/framework/pull/59684
+* [13.x] Bump Retry action in CI by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59681
+* [13.x] Move Scope interface [@template](https://github.com/template) from method-level to class-level to fix LSP violation by [@kayw-geek](https://github.com/kayw-geek) in https://github.com/laravel/framework/pull/59675
+* [13.x] Combine consecutive `isset` and `unset` by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/59685
+* [13.x] Changes `strlen` comparison to 0 to direct empty string compare by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/59686
 
 ## [v13.4.0](https://github.com/laravel/framework/compare/v13.3.0...v13.4.0) - 2026-04-07
 

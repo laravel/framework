@@ -26,7 +26,7 @@ class QueueRoutes
         }
 
         return is_string($route)
-            ? $route
+            ? null
             : $route[0];
     }
 

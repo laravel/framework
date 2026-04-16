@@ -53,7 +53,7 @@ class RedisEventsTest extends TestCase
 
         try {
             $connection->command('get', ['key']);
-        } catch (Exception $e) {
+        } catch (Exception) {
             // Expected exception
         }
     }
@@ -77,7 +77,7 @@ class RedisEventsTest extends TestCase
 
         try {
             $connection->command('get', ['key']);
-        } catch (Exception $e) {
+        } catch (Exception) {
             // Expected exception
         }
     }

@@ -289,7 +289,15 @@ class Number
         $displayExponent = $numberExponent - ($numberExponent % 3);
         $number /= pow(10, $displayExponent);
 
-        return trim(sprintf('%s%s', static::format($number, $precision, $maxPrecision), $units[$displayExponent] ?? ''));
+        $formatted = static::format($number, $precision, $maxPrecision);
+
+        if (static::parseFloat($formatted) >= 1000 && isset($units[$displayExponent + 3])) {
+            $number /= 1000;
+            $displayExponent += 3;
+            $formatted = static::format($number, $precision, $maxPrecision);
+        }
+
+        return trim(sprintf('%s%s', $formatted, $units[$displayExponent] ?? ''));
     }
 
     /**

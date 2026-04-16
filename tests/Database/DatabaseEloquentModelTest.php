@@ -821,7 +821,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query->shouldReceive('update')->once()->with(['name' => 'taylor'])->andReturn(1);
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->expects($this->once())->method('updateTimestamps');
-        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('dispatch')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
@@ -843,7 +843,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query->shouldReceive('where')->once()->with('id', '=', 1);
         $query->shouldReceive('update')->once()->with(['created_at' => 'foo', 'updated_at' => 'bar'])->andReturn(1);
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
-        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until');
         $events->shouldReceive('dispatch');
 
@@ -860,7 +860,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery'])->getMock();
         $query = m::mock(Builder::class);
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
-        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(false);
         $model->exists = true;
 
@@ -872,7 +872,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery'])->getMock();
         $query = m::mock(Builder::class);
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
-        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(false);
         $model->exists = true;
@@ -886,7 +886,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = $this->getMockBuilder(EloquentModelEventObjectStub::class)->onlyMethods(['newModelQuery'])->getMock();
         $query = m::mock(Builder::class);
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
-        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until')->once()->with(m::type(EloquentModelSavingEventStub::class))->andReturn(false);
         $model->exists = true;
 
@@ -902,7 +902,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query->shouldReceive('update')->once()->with(['name' => 'taylor'])->andReturn(1);
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->expects($this->never())->method('updateTimestamps');
-        $model->expects($this->any())->method('fireModelEvent')->willReturn(true);
+        $model->method('fireModelEvent')->willReturn(true);
 
         $model->id = 1;
         $model->syncOriginal();
@@ -919,7 +919,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query->shouldReceive('update')->once()->with(['id' => 2, 'foo' => 'bar'])->andReturn(1);
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->expects($this->once())->method('updateTimestamps');
-        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('dispatch')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
@@ -937,7 +937,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testTimestampsAreReturnedAsObjects()
     {
         $model = $this->getMockBuilder(EloquentDateModelStub::class)->onlyMethods(['getDateFormat'])->getMock();
-        $model->expects($this->any())->method('getDateFormat')->willReturn('Y-m-d');
+        $model->method('getDateFormat')->willReturn('Y-m-d');
         $model->setRawAttributes([
             'created_at' => '2012-12-04',
             'updated_at' => '2012-12-05',
@@ -950,7 +950,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testTimestampsAreReturnedAsObjectsFromPlainDatesAndTimestamps()
     {
         $model = $this->getMockBuilder(EloquentDateModelStub::class)->onlyMethods(['getDateFormat'])->getMock();
-        $model->expects($this->any())->method('getDateFormat')->willReturn('Y-m-d H:i:s');
+        $model->method('getDateFormat')->willReturn('Y-m-d H:i:s');
         $model->setRawAttributes([
             'created_at' => '2012-12-04',
             'updated_at' => $this->currentTime(),
@@ -1047,7 +1047,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testFromDateTimeMilliseconds()
     {
         $model = $this->getMockBuilder('Illuminate\Tests\Database\EloquentDateModelStub')->onlyMethods(['getDateFormat'])->getMock();
-        $model->expects($this->any())->method('getDateFormat')->willReturn('Y-m-d H:s.vi');
+        $model->method('getDateFormat')->willReturn('Y-m-d H:s.vi');
         $model->setRawAttributes([
             'created_at' => '2012-12-04 22:59.32130',
         ]);
@@ -1065,7 +1065,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->expects($this->once())->method('updateTimestamps');
 
-        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('dispatch')->once()->with('eloquent.created: '.get_class($model), $model);
@@ -1085,7 +1085,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->expects($this->once())->method('updateTimestamps');
         $model->setIncrementing(false);
 
-        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('dispatch')->once()->with('eloquent.created: '.get_class($model), $model);
@@ -1104,7 +1104,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query = m::mock(Builder::class);
         $query->shouldReceive('getConnection')->once();
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
-        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(false);
 
@@ -1123,7 +1123,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->expects($this->once())->method('updateTimestamps');
 
-        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('dispatch')->once()->with('eloquent.created: '.get_class($model), $model);
@@ -1148,7 +1148,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->expects($this->once())->method('updateTimestamps');
 
-        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
 
@@ -1171,7 +1171,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->expects($this->once())->method('updateTimestamps');
         $model->setIncrementing(false);
 
-        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('dispatch')->once()->with('eloquent.created: '.get_class($model), $model);
@@ -1196,7 +1196,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->expects($this->once())->method('newModelQuery')->willReturn($query);
         $model->expects($this->once())->method('updateTimestamps');
 
-        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
 
@@ -1861,7 +1861,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->fillable(['name']);
         $model->fill(['name' => 'Leto Atreides', 'age' => 51]);
 
-        self::assertSame(
+        $this->assertSame(
             ['name' => 'Leto Atreides', 'age' => 51],
             $model->getAttributes(),
         );
@@ -2638,7 +2638,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelStub;
 
-        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('dispatch')->once()->with('eloquent.replicating: '.get_class($model), m::on(function ($m) use ($model) {
             return $model->is($m);
         }));
@@ -2655,7 +2655,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->updated_at = new DateTime;
         $replicated = $model->replicateQuietly();
 
-        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('dispatch')->never()->with('eloquent.replicating: '.get_class($model), $model)->andReturn(true);
 
         $this->assertNull($replicated->id);
@@ -2698,7 +2698,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query->shouldReceive('where')->andReturn($query);
         $query->shouldReceive('increment');
 
-        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until')->never()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('until')->never()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('dispatch')->never()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
@@ -2725,7 +2725,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query->shouldReceive('where')->andReturn($query);
         $query->shouldReceive('decrement');
 
-        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until')->never()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('until')->never()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('dispatch')->never()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
@@ -2811,7 +2811,7 @@ class DatabaseEloquentModelTest extends TestCase
         $query->shouldReceive('where')->andReturn($query);
         $query->shouldReceive('incrementEach')->andReturn(1);
 
-        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('dispatch')->once()->with('eloquent.updated: '.get_class($model), $model);
 
@@ -2828,7 +2828,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->shouldReceive('newQueryWithoutScopes')->never();
 
-        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(false);
 
         $result = $model->publicIncrementEach(['foo' => 1]);
@@ -3138,8 +3138,8 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertCount($castCount + 2, $model->getCasts());
         $this->assertArrayHasKey('foo', $model->getCasts());
-        $this->assertEquals($model->getCasts()['foo'], 'MyClass:myArgumentA');
-        $this->assertEquals($model->getCasts()['bar'], 'MyClass:myArgumentA,myArgumentB');
+        $this->assertEquals('MyClass:myArgumentA', $model->getCasts()['foo']);
+        $this->assertEquals('MyClass:myArgumentA,myArgumentB', $model->getCasts()['bar']);
     }
 
     public function testUnsetCastAttributes()
@@ -4165,8 +4165,7 @@ class EloquentModelBootingTestStub extends Model
 {
     public static function unboot()
     {
-        unset(static::$booted[static::class]);
-        unset(static::$bootedCallbacks[static::class]);
+        unset(static::$booted[static::class], static::$bootedCallbacks[static::class]);
     }
 
     public static function isBooted()
@@ -4756,8 +4755,7 @@ class EloquentModelBootingCallbackTestStub extends Model
 
     public static function unboot()
     {
-        unset(static::$booted[static::class]);
-        unset(static::$bootedCallbacks[static::class]);
+        unset(static::$booted[static::class], static::$bootedCallbacks[static::class]);
         static::$bootHasFinished = false;
     }
 }

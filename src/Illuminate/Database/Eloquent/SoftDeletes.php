@@ -93,7 +93,7 @@ trait SoftDeletes
 
         $ids = is_array($ids) ? $ids : func_get_args();
 
-        if (count($ids) === 0) {
+        if ($ids === []) {
             return 0;
         }
 
@@ -104,7 +104,7 @@ trait SoftDeletes
 
         $count = 0;
 
-        foreach ($instance->withTrashed()->whereIn($key, $ids)->get() as $model) {
+        foreach ($instance::withTrashed()->whereIn($key, $ids)->get() as $model) {
             if ($model->forceDelete()) {
                 $count++;
             }

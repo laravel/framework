@@ -557,7 +557,7 @@ class FilesystemAdapterTest extends TestCase
         $exceptionHandler->shouldReceive('report')
             ->once()
             ->andReturnUsing(function (UnableToReadFile $e) {
-                self::assertStringContainsString(
+                $this->assertStringContainsString(
                     'Unable to read file from location: foo.txt.',
                     $e->getMessage(),
                 );
@@ -585,7 +585,7 @@ class FilesystemAdapterTest extends TestCase
         $exceptionHandler->shouldReceive('report')
             ->once()
             ->andReturnUsing(function (UnableToReadFile $e) {
-                self::assertStringContainsString(
+                $this->assertStringContainsString(
                     'Unable to read file from location: foo.txt.',
                     $e->getMessage(),
                 );
@@ -613,7 +613,7 @@ class FilesystemAdapterTest extends TestCase
         $exceptionHandler->shouldReceive('report')
             ->once()
             ->andReturnUsing(function (UnableToWriteFile $e) {
-                self::assertStringContainsString(
+                $this->assertStringContainsString(
                     'Unable to write file at location: foo.txt.',
                     $e->getMessage(),
                 );
@@ -647,7 +647,7 @@ class FilesystemAdapterTest extends TestCase
         $exceptionHandler->shouldReceive('report')
             ->once()
             ->andReturnUsing(function (UnableToRetrieveMetadata $e) {
-                self::assertStringContainsString(
+                $this->assertStringContainsString(
                     'Unable to retrieve the mime_type for file at location: unknown.mime-type.',
                     $e->getMessage(),
                 );
@@ -677,7 +677,7 @@ class FilesystemAdapterTest extends TestCase
 
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
 
-        $this->assertSame($filesystemAdapter->files(), ['body.txt', 'existing.txt', 'file.txt', 'file1.txt']);
+        $this->assertSame(['body.txt', 'existing.txt', 'file.txt', 'file1.txt'], $filesystemAdapter->files());
     }
 
     public function testProvidesTemporaryUrls()

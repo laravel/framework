@@ -4,6 +4,7 @@ namespace Illuminate\Queue;
 
 use Closure;
 use DateTimeInterface;
+use Illuminate\Bus\DebounceLock;
 use Illuminate\Bus\UniqueLock;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as Cache;
@@ -368,6 +369,14 @@ abstract class Queue
                 $this->container->make('db.transactions')->addCallbackForRollback(
                     function () use ($job) {
                         (new UniqueLock($this->container->make(Cache::class)))->release($job);
+                    }
+                );
+            }
+
+            if (! empty($job->debounceOwner ?? '')) {
+                $this->container->make('db.transactions')->addCallbackForRollback(
+                    function () use ($job) {
+                        (new DebounceLock($this->container->make(Cache::class)))->release($job, $job->debounceOwner ?? '');
                     }
                 );
             }

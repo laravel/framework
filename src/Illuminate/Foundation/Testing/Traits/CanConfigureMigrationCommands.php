@@ -56,7 +56,7 @@ trait CanConfigureMigrationCommands
         $class = new ReflectionClass($this);
 
         do {
-            if (count($class->getAttributes(Seed::class)) > 0) {
+            if ($class->getAttributes(Seed::class) !== []) {
                 return true;
             }
         } while ($class = $class->getParentClass());
