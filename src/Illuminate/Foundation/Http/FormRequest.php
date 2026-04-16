@@ -16,6 +16,7 @@ use Illuminate\Foundation\Http\Attributes\StopOnFirstFailure;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Arr;
+use Illuminate\Validation\ValidationRuleParser;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use ReflectionClass;
 
@@ -231,7 +232,9 @@ class FormRequest extends Request implements ValidatesWhenResolved
     {
         $allowedKeys = array_keys($this->validationRules());
 
-        foreach (array_keys(Arr::dot($this->all())) as $inputKey) {
+        $input = $this->isJson() ? $this->json()->all() : $this->request->all();
+
+        foreach (array_keys(Arr::dot($input)) as $inputKey) {
             if (! $this->isKnownField($inputKey, $allowedKeys)) {
                 $validator->errors()->add($inputKey, trans('validation.prohibited', [
                     'attribute' => str_replace('_', ' ', $inputKey),
@@ -251,6 +254,11 @@ class FormRequest extends Request implements ValidatesWhenResolved
     {
         foreach ($allowedKeys as $ruleKey) {
             if ($ruleKey === $inputKey) {
+                return true;
+            }
+
+            if (str_ends_with($inputKey, '_confirmation') &&
+                $ruleKey === substr($inputKey, 0, -13)) {
                 return true;
             }
 
