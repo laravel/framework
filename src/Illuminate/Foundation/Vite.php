@@ -1002,6 +1002,7 @@ class Vite implements Htmlable
             }
 
             $seen[$import] = true;
+
             $imports[] = $import;
 
             if (isset($manifest[$import])) {
