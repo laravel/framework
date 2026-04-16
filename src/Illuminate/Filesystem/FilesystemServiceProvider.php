@@ -110,19 +110,23 @@ class FilesystemServiceProvider extends ServiceProvider
                 $isProduction = $app->isProduction();
 
                 Route::get($uri.'/{path}', function (Request $request) use ($disk, $config, $isProduction, $uri) {
+                    $path = Str::after($request->path(), trim($uri, '/').'/');
+
                     return (new ServeFile(
                         $disk,
                         $config,
                         $isProduction
-                    ))($request, $this->servedFilePath($request, $uri));
+                    ))($request, $path);
                 })->where('path', '.*')->name('storage.'.$disk);
 
                 Route::put($uri.'/{path}', function (Request $request) use ($disk, $config, $isProduction, $uri) {
+                    $path = Str::after($request->path(), trim($uri, '/').'/');
+
                     return (new ReceiveFile(
                         $disk,
                         $config,
                         $isProduction
-                    ))($request, $this->servedFilePath($request, $uri));
+                    ))($request, $path);
                 })->where('path', '.*')->name('storage.'.$disk.'.upload');
             });
         }
@@ -159,15 +163,4 @@ class FilesystemServiceProvider extends ServiceProvider
         return $this->app['config']['filesystems.cloud'];
     }
 
-    /**
-     * Get the path of the file being served.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $uri
-     * @return string
-     */
-    protected function servedFilePath(Request $request, string $uri): string
-    {
-        return Str::after($request->path(), trim($uri, '/').'/');
-    }
 }
