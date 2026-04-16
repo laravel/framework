@@ -741,6 +741,10 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(2, $parameters, 'digits_between');
 
+        if (! is_string($value) && ! is_numeric($value)) {
+            return false;
+        }
+
         $length = strlen((string) $value);
 
         return ! preg_match('/[^0-9]/', $value)

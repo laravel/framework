@@ -3265,6 +3265,13 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateDigitsBetweenDoesNotThrowOnNonStringValue()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => ['array']], ['x' => 'digits_between:1,10']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateDoesntStartWith()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -3762,6 +3769,9 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => '+12.3'], ['foo' => 'digits_between:1,6']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['12345']], ['foo' => 'digits_between:1,6']);
         $this->assertFalse($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
