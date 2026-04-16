@@ -992,7 +992,7 @@ class Vite implements Htmlable
      * @param  array  $seen
      * @return array
      */
-    protected function resolveImports($manifest, $chunk, &$seen = [])
+    protected function resolveImports($manifest, $chunk, $seen = [])
     {
         $imports = [];
 
