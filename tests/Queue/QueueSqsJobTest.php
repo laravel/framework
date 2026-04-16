@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Queue;
 
 use Aws\Sqs\SqsClient;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Queue\SqsQueue;
 use Mockery as m;
@@ -92,6 +94,136 @@ class QueueSqsJobTest extends TestCase
         $job->getSqs()->shouldReceive('changeMessageVisibility')->once()->with(['QueueUrl' => $this->queueUrl, 'ReceiptHandle' => $this->mockedReceiptHandle, 'VisibilityTimeout' => $this->releaseDelay]);
         $job->release($this->releaseDelay);
         $this->assertTrue($job->isReleased());
+    }
+
+    public function testGetRawBodyResolvesPointerFromDisk()
+    {
+        $fullPayload = json_encode(['job' => 'foo', 'data' => ['key' => 'value']]);
+        $pointerPath = 'sqs-payloads/some-uuid.json';
+        $pointerBody = json_encode(['@pointer' => $pointerPath]);
+
+        $disk = m::mock(FilesystemAdapter::class);
+        $disk->shouldReceive('get')->once()->with($pointerPath)->andReturn($fullPayload);
+
+        $filesystem = m::mock(FilesystemFactory::class);
+        $filesystem->shouldReceive('disk')->with('s3')->andReturn($disk);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('filesystem')->andReturn($filesystem);
+
+        $jobData = $this->mockedJobData;
+        $jobData['Body'] = $pointerBody;
+
+        $job = new SqsJob($container, $this->mockedSqsClient, $jobData, 'connection-name', $this->queueUrl, [
+            'enabled' => true,
+            'disk' => 's3',
+            'prefix' => 'sqs-payloads',
+            'cleanup' => true,
+        ]);
+
+        $this->assertEquals($fullPayload, $job->getRawBody());
+    }
+
+    public function testGetRawBodyReturnsNormalBodyWithoutPointer()
+    {
+        $job = $this->getJob();
+        $this->assertEquals($this->mockedPayload, $job->getRawBody());
+    }
+
+    public function testGetRawBodyCachesResult()
+    {
+        $fullPayload = json_encode(['job' => 'foo', 'data' => ['key' => 'value']]);
+        $pointerPath = 'sqs-payloads/some-uuid.json';
+        $pointerBody = json_encode(['@pointer' => $pointerPath]);
+
+        $disk = m::mock(FilesystemAdapter::class);
+        $disk->shouldReceive('get')->once()->with($pointerPath)->andReturn($fullPayload);
+
+        $filesystem = m::mock(FilesystemFactory::class);
+        $filesystem->shouldReceive('disk')->with('s3')->andReturn($disk);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('filesystem')->andReturn($filesystem);
+
+        $jobData = $this->mockedJobData;
+        $jobData['Body'] = $pointerBody;
+
+        $job = new SqsJob($container, $this->mockedSqsClient, $jobData, 'connection-name', $this->queueUrl, [
+            'enabled' => true,
+            'disk' => 's3',
+            'prefix' => 'sqs-payloads',
+            'cleanup' => true,
+        ]);
+
+        // Call twice — disk should only be hit once.
+        $job->getRawBody();
+        $this->assertEquals($fullPayload, $job->getRawBody());
+    }
+
+    public function testDeleteCleansUpDiskFileWhenCleanupEnabled()
+    {
+        $pointerPath = 'sqs-payloads/some-uuid.json';
+        $pointerBody = json_encode(['@pointer' => $pointerPath]);
+
+        $disk = m::mock(FilesystemAdapter::class);
+        $disk->shouldReceive('delete')->once()->with($pointerPath);
+
+        $filesystem = m::mock(FilesystemFactory::class);
+        $filesystem->shouldReceive('disk')->with('s3')->andReturn($disk);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('filesystem')->andReturn($filesystem);
+
+        $jobData = $this->mockedJobData;
+        $jobData['Body'] = $pointerBody;
+
+        $sqsClient = m::mock(SqsClient::class)->makePartial();
+        $sqsClient->shouldReceive('deleteMessage')->once();
+
+        $job = new SqsJob($container, $sqsClient, $jobData, 'connection-name', $this->queueUrl, [
+            'enabled' => true,
+            'disk' => 's3',
+            'prefix' => 'sqs-payloads',
+            'cleanup' => true,
+        ]);
+
+        $job->delete();
+    }
+
+    public function testDeleteDoesNotCleanUpWhenCleanupDisabled()
+    {
+        $pointerPath = 'sqs-payloads/some-uuid.json';
+        $pointerBody = json_encode(['@pointer' => $pointerPath]);
+
+        $jobData = $this->mockedJobData;
+        $jobData['Body'] = $pointerBody;
+
+        $sqsClient = m::mock(SqsClient::class)->makePartial();
+        $sqsClient->shouldReceive('deleteMessage')->once();
+
+        $job = new SqsJob($this->mockedContainer, $sqsClient, $jobData, 'connection-name', $this->queueUrl, [
+            'enabled' => true,
+            'disk' => 's3',
+            'prefix' => 'sqs-payloads',
+            'cleanup' => false,
+        ]);
+
+        $job->delete();
+    }
+
+    public function testDeleteDoesNotCleanUpWhenNoPointer()
+    {
+        $sqsClient = m::mock(SqsClient::class)->makePartial();
+        $sqsClient->shouldReceive('deleteMessage')->once();
+
+        $job = new SqsJob($this->mockedContainer, $sqsClient, $this->mockedJobData, 'connection-name', $this->queueUrl, [
+            'enabled' => true,
+            'disk' => 's3',
+            'prefix' => 'sqs-payloads',
+            'cleanup' => true,
+        ]);
+
+        $job->delete();
     }
 
     protected function getJob()
