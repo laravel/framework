@@ -237,6 +237,35 @@ class RouteListCommandTest extends TestCase
         $this->assertStringContainsString('RouteListCommandTest.php:', $routes[0]['path']);
     }
 
+    public function testFilterWithoutMiddlewareGroup()
+    {
+        $this->app->call('route:list', ['--json' => true, '-v' => true, '--without-middleware' => 'auth']);
+        $output = $this->app->output();
+
+        $routes = json_decode($output, true);
+
+        $this->assertCount(2, $routes);
+        $this->assertEquals('example', $routes[0]['uri']);
+        $this->assertEquals(['exampleMiddleware'], $routes[0]['middleware']);
+        $this->assertStringContainsString('RouteListCommandTest.php:', $routes[0]['path']);
+        $this->assertEquals('sub-example', $routes[1]['uri']);
+        $this->assertEquals(['exampleMiddleware'], $routes[1]['middleware']);
+        $this->assertStringContainsString('RouteListCommandTest.php:', $routes[1]['path']);
+    }
+
+    public function testFilterWithoutMiddleware()
+    {
+        $this->app->call('route:list', ['--json' => true, '-v' => true, '--without-middleware' => 'exampleMiddleware']);
+        $output = $this->app->output();
+
+        $routes = json_decode($output, true);       
+
+        $this->assertCount(1, $routes);
+        $this->assertEquals('example-group', $routes[0]['uri']);
+        $this->assertEquals(['web', 'auth'], $routes[0]['middleware']);
+        $this->assertStringContainsString('RouteListCommandTest.php:', $routes[0]['path']);
+    }
+
     public function testClosureRouteShowsPathInCli()
     {
         RouteListCommand::resolveTerminalWidthUsing(fn () => 200);
