@@ -162,5 +162,4 @@ class FilesystemServiceProvider extends ServiceProvider
     {
         return $this->app['config']['filesystems.cloud'];
     }
-
 }
