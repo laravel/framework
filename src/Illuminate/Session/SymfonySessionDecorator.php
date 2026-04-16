@@ -2,7 +2,6 @@
 
 namespace Illuminate\Session;
 
-use BadMethodCallException;
 use Illuminate\Contracts\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -16,6 +15,27 @@ class SymfonySessionDecorator implements SessionInterface
      * @var \Illuminate\Contracts\Session\Session
      */
     public readonly Session $store;
+
+    /**
+     * The registered session bags.
+     *
+     * @var array<string, \Symfony\Component\HttpFoundation\Session\SessionBagInterface>
+     */
+    protected $bags = [];
+
+    /**
+     * The data for each registered bag, keyed by the bag's storage key.
+     *
+     * @var array<string, array>
+     */
+    protected $bagData = [];
+
+    /**
+     * The metadata bag instance.
+     *
+     * @var \Symfony\Component\HttpFoundation\Session\Storage\MetadataBag|null
+     */
+    protected $metadataBag;
 
     /**
      * Create a new session decorator.
@@ -92,6 +112,10 @@ class SymfonySessionDecorator implements SessionInterface
      */
     public function save(): void
     {
+        foreach ($this->bags as $bag) {
+            $this->store->put($bag->getStorageKey(), $this->bagData[$bag->getStorageKey()]);
+        }
+
         $this->store->save();
     }
 
@@ -161,31 +185,35 @@ class SymfonySessionDecorator implements SessionInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @throws \BadMethodCallException
      */
     public function registerBag(SessionBagInterface $bag): void
     {
-        throw new BadMethodCallException('Method not implemented by Laravel.');
+        $storageKey = $bag->getStorageKey();
+
+        $this->bagData[$storageKey] = $this->store->get($storageKey, []);
+
+        $bag->initialize($this->bagData[$storageKey]);
+
+        $this->bags[$bag->getName()] = $bag;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @throws \BadMethodCallException
      */
     public function getBag(string $name): SessionBagInterface
     {
-        throw new BadMethodCallException('Method not implemented by Laravel.');
+        if (! isset($this->bags[$name])) {
+            throw new \InvalidArgumentException("No bag registered under the name \"{$name}\".");
+        }
+
+        return $this->bags[$name];
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @throws \BadMethodCallException
      */
     public function getMetadataBag(): MetadataBag
     {
-        throw new BadMethodCallException('Method not implemented by Laravel.');
+        return $this->metadataBag ??= new MetadataBag;
     }
 }
