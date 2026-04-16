@@ -466,6 +466,43 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Reload the attributes for every model in the collection from the database.
+     *
+     * @return $this
+     */
+    public function refresh()
+    {
+        if ($this->isEmpty()) {
+            return $this;
+        }
+
+        $model = $this->first();
+
+        $freshModels = $model->newQueryWithoutScopes()
+            ->useWritePdo()
+            ->whereIn($model->getKeyName(), $this->modelKeys())
+            ->get()
+            ->getDictionary();
+
+        foreach ($this->items as $key => &$model) {
+            if (! isset($freshModels[$model->getKey()])) {
+                $model = null;
+
+                continue;
+            }
+
+            $model->setRawAttributes(
+                $freshModels[$model->getKey()]->getAttributes()
+            );
+
+            $model->syncOriginal();
+        }
+        unset($model);
+
+        return $this;
+    }
+
+    /**
      * Diff the collection with the given items.
      *
      * @param  iterable<array-key, TModel>  $items
