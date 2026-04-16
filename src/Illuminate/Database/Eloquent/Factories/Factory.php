@@ -725,8 +725,8 @@ abstract class Factory
     public function hasAttached($factory, $pivot = [], $relationship = null)
     {
         if (is_array($pivot) && count($pivot) > 0 && array_all($pivot, fn ($p) => is_array($p))) {
-            $factory = $factory instanceof Factory && $factory->count === null 
-                ? $factory->count(count($pivot)) 
+            $factory = $factory instanceof Factory && $factory->count === null
+                ? $factory->count(count($pivot))
                 : $factory;
 
             $pivot = new Sequence(...$pivot);
