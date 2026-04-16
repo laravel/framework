@@ -12,12 +12,6 @@ use PHPUnit\Framework\TestCase;
 
 class ConcurrencyLimiterTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-        parent::tearDown();
-    }
-
     public function testAcquireUsesHashTagsOnPhpRedisClusterConnection()
     {
         $connection = m::mock(PhpRedisClusterConnection::class);
