@@ -11,6 +11,8 @@ use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 
+use function Illuminate\Support\enum_value;
+
 class ChannelManager extends Manager implements DispatcherContract, FactoryContract
 {
     use Macroable, ResolvesQueueRoutes;
@@ -64,7 +66,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * Get a channel instance.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return mixed
      */
     public function channel($name = null)
@@ -158,12 +160,12 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * Set the default channel driver name.
      *
-     * @param  string  $channel
+     * @param  \UnitEnum|string  $channel
      * @return void
      */
     public function deliverVia($channel)
     {
-        $this->defaultChannel = $channel;
+        $this->defaultChannel = enum_value($channel);
     }
 
     /**

@@ -470,6 +470,37 @@ class NotificationChannelManagerTest extends TestCase
         $this->assertSame('test', NotificationChannelManagerWithAfterSendingMethodNotification::$afterSendingChannel);
         $this->assertSame($response, NotificationChannelManagerWithAfterSendingMethodNotification::$afterSendingResponse);
     }
+
+    public function testChannelManagerCanResolveBackedEnumChannel(): void
+    {
+        $container = new Container;
+        $container->instance('config', []);
+        Container::setInstance($container);
+
+        $channel = new \stdClass;
+        $manager = new ChannelManager($container);
+        $manager->extend('mail', static fn () => $channel);
+
+        $this->assertSame($channel, $manager->channel(NotificationChannelName::Mail));
+        $this->assertSame($manager->channel('mail'), $manager->channel(NotificationChannelName::Mail));
+    }
+
+    public function testDeliverViaAcceptsBackedEnum(): void
+    {
+        $container = new Container;
+        $container->instance('config', []);
+        Container::setInstance($container);
+
+        $manager = new ChannelManager($container);
+        $manager->deliverVia(NotificationChannelName::Mail);
+
+        $this->assertSame('mail', $manager->deliversVia());
+    }
+}
+
+enum NotificationChannelName: string
+{
+    case Mail = 'mail';
 }
 
 class TestSendQueuedNotifications implements ShouldQueue
