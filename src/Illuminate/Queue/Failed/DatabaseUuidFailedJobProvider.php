@@ -5,6 +5,7 @@ namespace Illuminate\Queue\Failed;
 use DateTimeInterface;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Str;
 
 class DatabaseUuidFailedJobProvider implements CountableFailedJobProvider, FailedJobProviderInterface, PrunableFailedJobProvider
 {
@@ -55,7 +56,7 @@ class DatabaseUuidFailedJobProvider implements CountableFailedJobProvider, Faile
     public function log($connection, $queue, $payload, $exception)
     {
         $this->getTable()->insert([
-            'uuid' => $uuid = json_decode($payload, true)['uuid'],
+            'uuid' => $uuid = json_decode($payload, true)['uuid'] ?? (string) Str::uuid(),
             'connection' => $connection,
             'queue' => $queue,
             'payload' => $payload,

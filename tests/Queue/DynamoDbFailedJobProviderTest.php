@@ -170,4 +170,41 @@ class DynamoDbFailedJobProviderTest extends TestCase
 
         $provider->forget('id');
     }
+
+    public function testLogWithCorruptedPayloadGeneratesFallbackUuid()
+    {
+        $fallbackUuid = Str::orderedUuid();
+
+        Str::createUuidsUsing(function () use ($fallbackUuid) {
+            return $fallbackUuid;
+        });
+
+        $now = CarbonImmutable::now();
+
+        $exception = new Exception('Something went wrong.');
+
+        $dynamoDbClient = m::mock(DynamoDbClient::class);
+
+        $dynamoDbClient->shouldReceive('putItem')->once()->with([
+            'TableName' => 'table',
+            'Item' => [
+                'application' => ['S' => 'application'],
+                'uuid' => ['S' => (string) $fallbackUuid],
+                'connection' => ['S' => 'connection'],
+                'queue' => ['S' => 'queue'],
+                'payload' => ['S' => 'not-valid-json'],
+                'exception' => ['S' => (string) $exception],
+                'failed_at' => ['N' => (string) $now->getTimestamp()],
+                'expires_at' => ['N' => (string) $now->addDays(7)->getTimestamp()],
+            ],
+        ]);
+
+        $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');
+
+        $id = $provider->log('connection', 'queue', 'not-valid-json', $exception);
+
+        $this->assertSame((string) $fallbackUuid, $id);
+
+        Str::createUuidsNormally();
+    }
 }

@@ -178,6 +178,17 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
         $this->assertSame(2, $provider->count('connection-2', 'queue-1'));
     }
 
+    public function testLogWithCorruptedPayloadGeneratesFallbackUuid()
+    {
+        $provider = $this->getFailedJobProvider();
+
+        $id = $provider->log('connection', 'queue', 'not-valid-json', new RuntimeException());
+
+        $this->assertNotNull($id);
+        $this->assertTrue(Str::isUuid($id));
+        $this->assertCount(1, $provider->all());
+    }
+
     protected function getFailedJobProvider(string $database = 'default', string $table = 'failed_jobs')
     {
         $db = new DB;

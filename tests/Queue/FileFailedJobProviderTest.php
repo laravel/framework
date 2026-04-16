@@ -214,6 +214,20 @@ class FileFailedJobProviderTest extends TestCase
         $this->assertSame(2, $this->provider->count('connection-2', 'queue-1'));
     }
 
+    public function testLogWithCorruptedPayloadGeneratesFallbackUuid()
+    {
+        $exception = new Exception('Something went wrong.');
+
+        $id = $this->provider->log('connection', 'queue', 'not-valid-json', $exception);
+
+        $this->assertNotNull($id);
+        $this->assertTrue(Str::isUuid($id));
+
+        $failedJobs = $this->provider->all();
+        $this->assertCount(1, $failedJobs);
+        $this->assertEquals($id, $failedJobs[0]->id);
+    }
+
     public function logFailedJob($connection = 'connection', $queue = 'queue')
     {
         $uuid = Str::uuid();
