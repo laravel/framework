@@ -6,6 +6,7 @@ use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 class FilesystemServiceProvider extends ServiceProvider
@@ -108,20 +109,20 @@ class FilesystemServiceProvider extends ServiceProvider
 
                 $isProduction = $app->isProduction();
 
-                Route::get($uri.'/{path}', function (Request $request, string $path) use ($disk, $config, $isProduction) {
+                Route::get($uri.'/{path}', function (Request $request) use ($disk, $config, $isProduction, $uri) {
                     return (new ServeFile(
                         $disk,
                         $config,
                         $isProduction
-                    ))($request, $path);
+                    ))($request, $this->servedFilePath($request, $uri));
                 })->where('path', '.*')->name('storage.'.$disk);
 
-                Route::put($uri.'/{path}', function (Request $request, string $path) use ($disk, $config, $isProduction) {
+                Route::put($uri.'/{path}', function (Request $request) use ($disk, $config, $isProduction, $uri) {
                     return (new ReceiveFile(
                         $disk,
                         $config,
                         $isProduction
-                    ))($request, $path);
+                    ))($request, $this->servedFilePath($request, $uri));
                 })->where('path', '.*')->name('storage.'.$disk.'.upload');
             });
         }
@@ -156,5 +157,17 @@ class FilesystemServiceProvider extends ServiceProvider
     protected function getCloudDriver()
     {
         return $this->app['config']['filesystems.cloud'];
+    }
+
+    /**
+     * Get the path of the file being served.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $uri
+     * @return string
+     */
+    protected function servedFilePath(Request $request, string $uri): string
+    {
+        return Str::after($request->path(), trim($uri, '/').'/');
     }
 }
