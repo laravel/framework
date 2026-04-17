@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Mail;
 
 use Exception;
+use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Mail\MailManager;
 use Illuminate\Mail\Transport\CloudflareTransport;
@@ -19,13 +20,20 @@ class MailCloudflareTransportTest extends TestCase
     {
         $container = new Container;
 
+        $container->singleton('config', function () {
+            return new Repository([
+                'services' => [
+                    'cloudflare' => [
+                        'account_id' => 'test-account-id',
+                        'token' => 'test-token',
+                    ],
+                ],
+            ]);
+        });
+
         $manager = new MailManager($container);
 
-        $transport = $manager->createSymfonyTransport([
-            'transport' => 'cloudflare',
-            'account_id' => 'test-account-id',
-            'key' => 'test-key',
-        ]);
+        $transport = $manager->createSymfonyTransport(['transport' => 'cloudflare']);
 
         $this->assertInstanceOf(CloudflareTransport::class, $transport);
         $this->assertSame('cloudflare', (string) $transport);
