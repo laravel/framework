@@ -60,14 +60,14 @@ class ThrottlesExceptions
     /**
      * The callbacks that determine if the job should be deleted.
      *
-     * @var callable[]
+     * @var array<int, callable>
      */
     protected array $deleteWhenCallbacks = [];
 
     /**
      * The callbacks that determine if the job should be failed.
      *
-     * @var callable[]
+     * @var array<int, callable>
      */
     protected array $failWhenCallbacks = [];
 

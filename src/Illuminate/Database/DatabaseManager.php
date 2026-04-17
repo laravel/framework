@@ -403,7 +403,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Get all of the supported drivers.
      *
-     * @return string[]
+     * @return array<int, string>
      */
     public function supportedDrivers()
     {
@@ -413,7 +413,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Get all of the drivers that are actually available.
      *
-     * @return string[]
+     * @return array<int, string>
      */
     public function availableDrivers()
     {

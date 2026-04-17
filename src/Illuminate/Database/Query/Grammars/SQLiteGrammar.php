@@ -13,7 +13,7 @@ class SQLiteGrammar extends Grammar
     /**
      * All of the available clause operators.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $operators = [
         '=', '<', '>', '<=', '>=', '<>', '!=',

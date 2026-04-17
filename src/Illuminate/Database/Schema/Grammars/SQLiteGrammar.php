@@ -15,14 +15,14 @@ class SQLiteGrammar extends Grammar
     /**
      * The possible column modifiers.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $modifiers = ['Increment', 'Nullable', 'Default', 'Collate', 'VirtualAs', 'StoredAs'];
 
     /**
      * The columns available as serials.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
@@ -98,7 +98,7 @@ class SQLiteGrammar extends Grammar
     /**
      * Compile the query to determine the tables.
      *
-     * @param  string|string[]|null  $schema
+     * @param  string|array<int, string>|null  $schema
      * @param  bool  $withSize
      * @return string
      */
@@ -242,7 +242,7 @@ class SQLiteGrammar extends Grammar
     /**
      * Get the foreign key syntax for a table creation statement.
      *
-     * @param  \Illuminate\Database\Schema\ForeignKeyDefinition[]  $foreignKeys
+     * @param  array<int, \Illuminate\Database\Schema\ForeignKeyDefinition>  $foreignKeys
      * @return string|null
      */
     protected function addForeignKeys($foreignKeys)

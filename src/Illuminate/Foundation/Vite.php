@@ -361,7 +361,7 @@ class Vite implements Htmlable
     /**
      * Generate Vite tags for an entrypoint.
      *
-     * @param  string|string[]  $entrypoints
+     * @param  string|array<int, string>  $entrypoints
      * @param  string|null  $buildDirectory
      * @return \Illuminate\Support\HtmlString
      *

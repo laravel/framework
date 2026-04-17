@@ -382,7 +382,7 @@ class CustomCasts extends Eloquent
     protected $table = 'casting_table';
 
     /**
-     * @var string[]
+     * @var array<int, string>
      */
     protected $guarded = [];
 

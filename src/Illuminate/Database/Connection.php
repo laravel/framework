@@ -192,7 +192,7 @@ class Connection implements ConnectionInterface
     /**
      * All of the callbacks that should be invoked before a transaction is started.
      *
-     * @var \Closure[]
+     * @var array<int, \Closure>
      */
     protected $beforeStartingTransaction = [];
 
@@ -206,7 +206,7 @@ class Connection implements ConnectionInterface
     /**
      * The connection resolvers.
      *
-     * @var \Closure[]
+     * @var array<int, \Closure>
      */
     protected static $resolvers = [];
 

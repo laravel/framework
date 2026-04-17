@@ -35,7 +35,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     /**
      * Reserved names that cannot be used for generation.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $reservedNames = [
         '__halt_compiler',

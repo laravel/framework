@@ -14,7 +14,7 @@ class MySqlGrammar extends Grammar
     /**
      * The possible column modifiers.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $modifiers = [
         'Unsigned', 'Charset', 'Collate', 'VirtualAs', 'StoredAs', 'Nullable',
@@ -24,14 +24,14 @@ class MySqlGrammar extends Grammar
     /**
      * The possible column serials.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
     /**
      * The commands to be executed outside of create or alter commands.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $fluentCommands = ['AutoIncrementStartingValues'];
 
@@ -88,7 +88,7 @@ class MySqlGrammar extends Grammar
     /**
      * Compile the query to determine the tables.
      *
-     * @param  string|string[]|null  $schema
+     * @param  string|array<int, string>|null  $schema
      * @return string
      */
     public function compileTables($schema)
@@ -106,7 +106,7 @@ class MySqlGrammar extends Grammar
     /**
      * Compile the query to determine the views.
      *
-     * @param  string|string[]|null  $schema
+     * @param  string|array<int, string>|null  $schema
      * @return string
      */
     public function compileViews($schema)
@@ -120,7 +120,7 @@ class MySqlGrammar extends Grammar
     /**
      * Compile the query to compare the schema.
      *
-     * @param  string|string[]|null  $schema
+     * @param  string|array<int, string>|null  $schema
      * @param  string  $column
      * @return string
      */

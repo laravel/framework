@@ -805,7 +805,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * Replace the patterns matching the given regular expression.
      *
      * @param  array|string  $pattern
-     * @param  \Closure|string[]|string  $replace
+     * @param  \Closure|array<int, string>|string  $replace
      * @param  int  $limit
      * @return static
      */
@@ -853,7 +853,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Strip HTML and PHP tags from the given string.
      *
-     * @param  string[]|string|null  $allowedTags
+     * @param  array<int, string>|string|null  $allowedTags
      * @return static
      */
     public function stripTags($allowedTags = null)
@@ -1029,9 +1029,9 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Replace text within a portion of a string.
      *
-     * @param  string|string[]  $replace
-     * @param  int|int[]  $offset
-     * @param  int|int[]|null  $length
+     * @param  string|array<int, string>  $replace
+     * @param  int|array<int, int>  $offset
+     * @param  int|array<int, int>|null  $length
      * @return static
      */
     public function substrReplace($replace, $offset = 0, $length = null)

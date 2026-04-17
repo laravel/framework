@@ -57,7 +57,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * The array of registered callbacks.
      *
-     * @var callable[]
+     * @var array<int, callable>
      */
     protected $registeredCallbacks = [];
 
@@ -78,21 +78,21 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * The array of booting callbacks.
      *
-     * @var callable[]
+     * @var array<int, callable>
      */
     protected $bootingCallbacks = [];
 
     /**
      * The array of booted callbacks.
      *
-     * @var callable[]
+     * @var array<int, callable>
      */
     protected $bootedCallbacks = [];
 
     /**
      * The array of terminating callbacks.
      *
-     * @var callable[]
+     * @var array<int, callable>
      */
     protected $terminatingCallbacks = [];
 
@@ -204,7 +204,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * The prefixes of absolute cache paths for use during normalization.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $absoluteCachePathPrefixes = ['/', '\\'];
 
@@ -329,7 +329,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Run the given array of bootstrap classes.
      *
-     * @param  string[]  $bootstrappers
+     * @param  array<int, string>  $bootstrappers
      * @return void
      */
     public function bootstrapWith(array $bootstrappers)
@@ -1183,7 +1183,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Call the booting callbacks for the application.
      *
-     * @param  callable[]  $callbacks
+     * @param  array<int, callable>  $callbacks
      * @return void
      */
     protected function fireAppCallbacks(array &$callbacks)

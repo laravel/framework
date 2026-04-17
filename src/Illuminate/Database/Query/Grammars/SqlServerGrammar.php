@@ -14,7 +14,7 @@ class SqlServerGrammar extends Grammar
     /**
      * All of the available clause operators.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $operators = [
         '=', '<', '>', '<=', '>=', '!<', '!>', '<>', '!=',
@@ -25,7 +25,7 @@ class SqlServerGrammar extends Grammar
     /**
      * The components that make up a select clause.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $selectComponents = [
         'aggregate',

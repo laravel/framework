@@ -11,7 +11,7 @@ interface BatchRepository
      *
      * @param  int  $limit
      * @param  mixed  $before
-     * @return \Illuminate\Bus\Batch[]
+     * @return array<int, \Illuminate\Bus\Batch>
      */
     public function get($limit, $before);
 

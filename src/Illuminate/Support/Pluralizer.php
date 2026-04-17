@@ -25,7 +25,7 @@ class Pluralizer
      *
      * Contains words supported by Doctrine/Inflector/Rules/English/Uninflected.php
      *
-     * @var string[]
+     * @var array<int, string>
      */
     public static $uncountable = [
         'recommended',

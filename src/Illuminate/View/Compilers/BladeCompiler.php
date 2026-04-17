@@ -86,7 +86,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * All of the available compiler functions.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $compilers = [
         // 'Comments',
@@ -98,21 +98,21 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Array of opening and closing tags for raw echos.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $rawTags = ['{!!', '!!}'];
 
     /**
      * Array of opening and closing tags for regular echos.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $contentTags = ['{{', '}}'];
 
     /**
      * Array of opening and closing tags for escaped echos.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $escapedTags = ['{{{', '}}}'];
 

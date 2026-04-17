@@ -11,7 +11,7 @@ use Illuminate\Support\Fluent;
  * @method ForeignKeyDefinition on(string $table) Specify the referenced table
  * @method ForeignKeyDefinition onDelete(('cascade'|'restrict'|'set null'|'no action') $action) Add an ON DELETE action
  * @method ForeignKeyDefinition onUpdate(('cascade'|'restrict'|'set null'|'no action') $action) Add an ON UPDATE action
- * @method ForeignKeyDefinition references(string|string[] $columns) Specify the referenced column(s)
+ * @method ForeignKeyDefinition references(string|array<int, string> $columns) Specify the referenced column(s)
  */
 class ForeignKeyDefinition extends Fluent
 {

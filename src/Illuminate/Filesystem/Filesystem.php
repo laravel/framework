@@ -580,7 +580,7 @@ class Filesystem
      *
      * @param  string  $directory
      * @param  bool  $hidden
-     * @return \Symfony\Component\Finder\SplFileInfo[]
+     * @return array<int, \Symfony\Component\Finder\SplFileInfo>
      */
     public function files($directory, $hidden = false, array|string|int $depth = 0)
     {
@@ -595,7 +595,7 @@ class Filesystem
      *
      * @param  string  $directory
      * @param  bool  $hidden
-     * @return \Symfony\Component\Finder\SplFileInfo[]
+     * @return array<int, \Symfony\Component\Finder\SplFileInfo>
      */
     public function allFiles($directory, $hidden = false)
     {

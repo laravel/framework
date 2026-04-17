@@ -7,7 +7,7 @@ interface MigrationRepositoryInterface
     /**
      * Get the completed migrations.
      *
-     * @return string[]
+     * @return array<int, string>
      */
     public function getRan();
 

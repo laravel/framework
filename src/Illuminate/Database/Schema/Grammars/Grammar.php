@@ -19,7 +19,7 @@ abstract class Grammar extends BaseGrammar
     /**
      * The possible column modifiers.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $modifiers = [];
 
@@ -90,7 +90,7 @@ abstract class Grammar extends BaseGrammar
     /**
      * Compile the query to determine the tables.
      *
-     * @param  string|string[]|null  $schema
+     * @param  string|array<int, string>|null  $schema
      * @return string
      *
      * @throws \RuntimeException
@@ -103,7 +103,7 @@ abstract class Grammar extends BaseGrammar
     /**
      * Compile the query to determine the views.
      *
-     * @param  string|string[]|null  $schema
+     * @param  string|array<int, string>|null  $schema
      * @return string
      *
      * @throws \RuntimeException
@@ -116,7 +116,7 @@ abstract class Grammar extends BaseGrammar
     /**
      * Compile the query to determine the user-defined types.
      *
-     * @param  string|string[]|null  $schema
+     * @param  string|array<int, string>|null  $schema
      * @return string
      *
      * @throws \RuntimeException

@@ -243,7 +243,7 @@ class Builder implements BuilderContract
     /**
      * All of the available clause operators.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     public $operators = [
         '=', '<', '>', '<=', '>=', '<>', '!=', '<=>',
@@ -257,7 +257,7 @@ class Builder implements BuilderContract
     /**
      * All of the available bitwise operators.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     public $bitwiseOperators = [
         '&', '|', '^', '<<', '>>', '&~',
@@ -2527,7 +2527,7 @@ class Builder implements BuilderContract
     /**
      * Add a "where fulltext" clause to the query.
      *
-     * @param  string|string[]  $columns
+     * @param  string|array<int, string>  $columns
      * @param  string  $value
      * @param  string  $boolean
      * @return $this
@@ -2548,7 +2548,7 @@ class Builder implements BuilderContract
     /**
      * Add an "or where fulltext" clause to the query.
      *
-     * @param  string|string[]  $columns
+     * @param  string|array<int, string>  $columns
      * @param  string  $value
      * @return $this
      */
@@ -2560,7 +2560,7 @@ class Builder implements BuilderContract
     /**
      * Add a "where" clause to the query for multiple columns with "and" conditions between them.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  array<int, \Illuminate\Contracts\Database\Query\Expression>|array<int, \Closure>|array<int, string>  $columns
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
@@ -2584,7 +2584,7 @@ class Builder implements BuilderContract
     /**
      * Add an "or where" clause to the query for multiple columns with "and" conditions between them.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  array<int, \Illuminate\Contracts\Database\Query\Expression>|array<int, \Closure>|array<int, string>  $columns
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
@@ -2597,7 +2597,7 @@ class Builder implements BuilderContract
     /**
      * Add a "where" clause to the query for multiple columns with "or" conditions between them.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  array<int, \Illuminate\Contracts\Database\Query\Expression>|array<int, \Closure>|array<int, string>  $columns
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
@@ -2621,7 +2621,7 @@ class Builder implements BuilderContract
     /**
      * Add an "or where" clause to the query for multiple columns with "or" conditions between them.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  array<int, \Illuminate\Contracts\Database\Query\Expression>|array<int, \Closure>|array<int, string>  $columns
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
@@ -2634,7 +2634,7 @@ class Builder implements BuilderContract
     /**
      * Add a "where not" clause to the query for multiple columns where none of the conditions should be true.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  array<int, \Illuminate\Contracts\Database\Query\Expression>|array<int, \Closure>|array<int, string>  $columns
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
@@ -2648,7 +2648,7 @@ class Builder implements BuilderContract
     /**
      * Add an "or where not" clause to the query for multiple columns where none of the conditions should be true.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  array<int, \Illuminate\Contracts\Database\Query\Expression>|array<int, \Closure>|array<int, string>  $columns
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this

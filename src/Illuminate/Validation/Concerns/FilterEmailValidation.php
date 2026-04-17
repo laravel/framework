@@ -62,7 +62,7 @@ class FilterEmailValidation implements EmailValidation
     /**
      * Returns the validation warnings.
      *
-     * @return \Egulias\EmailValidator\Warning\Warning[]
+     * @return array<int, \Egulias\EmailValidator\Warning\Warning>
      */
     public function getWarnings(): array
     {

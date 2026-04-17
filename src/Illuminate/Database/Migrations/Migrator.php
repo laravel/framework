@@ -69,7 +69,7 @@ class Migrator
     /**
      * The paths to all of the migration files.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $paths = [];
 
@@ -117,9 +117,9 @@ class Migrator
     /**
      * Run the pending migrations at a given path.
      *
-     * @param  string[]|string  $paths
+     * @param  array<int, string>|string  $paths
      * @param  array<string, mixed>  $options
-     * @return string[]
+     * @return array<int, string>
      */
     public function run($paths = [], array $options = [])
     {
@@ -143,9 +143,9 @@ class Migrator
     /**
      * Get the migration files that have not yet run.
      *
-     * @param  string[]  $files
-     * @param  string[]  $ran
-     * @return string[]
+     * @param  array<int, string>  $files
+     * @param  array<int, string>  $ran
+     * @return array<int, string>
      */
     protected function pendingMigrations($files, $ran)
     {
@@ -174,7 +174,7 @@ class Migrator
     /**
      * Run an array of migrations.
      *
-     * @param  string[]  $migrations
+     * @param  array<int, string>  $migrations
      * @param  array<string, mixed>  $options
      * @return void
      */
@@ -262,9 +262,9 @@ class Migrator
     /**
      * Rollback the last migration operation.
      *
-     * @param  string[]|string  $paths
+     * @param  array<int, string>|string  $paths
      * @param  array<string, mixed>  $options
-     * @return string[]
+     * @return array<int, string>
      */
     public function rollback($paths = [], array $options = [])
     {
@@ -309,9 +309,9 @@ class Migrator
      * Rollback the given migrations.
      *
      * @param  array  $migrations
-     * @param  string[]|string  $paths
+     * @param  array<int, string>|string  $paths
      * @param  array<string, mixed>  $options
-     * @return string[]
+     * @return array<int, string>
      */
     protected function rollbackMigrations(array $migrations, $paths, array $options)
     {
@@ -351,7 +351,7 @@ class Migrator
     /**
      * Rolls all of the currently applied migrations back.
      *
-     * @param  string[]|string  $paths
+     * @param  array<int, string>|string  $paths
      * @param  bool  $pretend
      * @return array
      */
@@ -376,8 +376,8 @@ class Migrator
     /**
      * Reset the given migrations.
      *
-     * @param  string[]  $migrations
-     * @param  string[]  $paths
+     * @param  array<int, string>  $migrations
+     * @param  array<int, string>  $paths
      * @param  bool  $pretend
      * @return array
      */
@@ -589,7 +589,7 @@ class Migrator
     /**
      * Require in all the migration files in a given path.
      *
-     * @param  string[]  $files
+     * @param  array<int, string>  $files
      * @return void
      */
     public function requireFiles(array $files)
@@ -624,7 +624,7 @@ class Migrator
     /**
      * Get all of the custom migration paths.
      *
-     * @return string[]
+     * @return array<int, string>
      */
     public function paths()
     {

@@ -1902,9 +1902,9 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Explode the "value" and "key" arguments passed to "pluck".
      *
-     * @param  string|string[]  $value
-     * @param  string|string[]|null  $key
-     * @return array{string[],string[]|null}
+     * @param  string|array<int, string>  $value
+     * @param  string|array<int, string>|null  $key
+     * @return array{array<int, string>,array<int, string>|null}
      */
     protected function explodePluckParameters($value, $key)
     {

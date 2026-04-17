@@ -152,7 +152,7 @@ abstract class Broadcaster implements BroadcasterContract
      * Extracts the parameters out of what the user passed to handle the channel authentication.
      *
      * @param  callable|string  $callback
-     * @return \ReflectionParameter[]
+     * @return array<int, \ReflectionParameter>
      *
      * @throws \Exception
      */
@@ -171,7 +171,7 @@ abstract class Broadcaster implements BroadcasterContract
      * Extracts the parameters out of a class channel's "join" method.
      *
      * @param  string  $callback
-     * @return \ReflectionParameter[]
+     * @return array<int, \ReflectionParameter>
      *
      * @throws \Exception
      */

@@ -209,7 +209,7 @@ class Builder
     /**
      * Get the tables that belong to the connection.
      *
-     * @param  string|string[]|null  $schema
+     * @param  string|array<int, string>|null  $schema
      * @return list<array{name: string, schema: string|null, schema_qualified_name: string, size: int|null, comment: string|null, collation: string|null, engine: string|null}>
      */
     public function getTables($schema = null)
@@ -222,7 +222,7 @@ class Builder
     /**
      * Get the names of the tables that belong to the connection.
      *
-     * @param  string|string[]|null  $schema
+     * @param  string|array<int, string>|null  $schema
      * @param  bool  $schemaQualified
      * @return list<string>
      */
@@ -237,7 +237,7 @@ class Builder
     /**
      * Get the views that belong to the connection.
      *
-     * @param  string|string[]|null  $schema
+     * @param  string|array<int, string>|null  $schema
      * @return list<array{name: string, schema: string|null, schema_qualified_name: string, definition: string}>
      */
     public function getViews($schema = null)
@@ -250,7 +250,7 @@ class Builder
     /**
      * Get the user-defined types that belong to the connection.
      *
-     * @param  string|string[]|null  $schema
+     * @param  string|array<int, string>|null  $schema
      * @return list<array{name: string, schema: string, type: string, type: string, category: string, implicit: bool}>
      */
     public function getTypes($schema = null)
@@ -711,7 +711,7 @@ class Builder
     /**
      * Get the names of the current schemas for the connection.
      *
-     * @return string[]|null
+     * @return array<int, string>|null
      */
     public function getCurrentSchemaListing()
     {

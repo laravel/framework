@@ -10,7 +10,7 @@ class Aliases
     /**
      * Create a new attribute instance.
      *
-     * @param  string[]  $aliases
+     * @param  array<int, string>  $aliases
      */
     public function __construct(public array $aliases)
     {

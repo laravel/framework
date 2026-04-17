@@ -74,7 +74,7 @@ class ServeCommand extends Command
     /**
      * The environment variables that should be passed from host machine to the PHP server process.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     public static $passthroughVariables = [
         'APP_ENV',

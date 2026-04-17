@@ -17,7 +17,7 @@ class FileViewFinder implements ViewFinderInterface
     /**
      * The array of active view paths.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $paths;
 
@@ -38,7 +38,7 @@ class FileViewFinder implements ViewFinderInterface
     /**
      * Register a view extension with the finder.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $extensions = ['blade.php', 'php', 'css', 'html'];
 
@@ -46,8 +46,8 @@ class FileViewFinder implements ViewFinderInterface
      * Create a new file view loader instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  string[]  $paths
-     * @param  string[]|null  $extensions
+     * @param  array<int, string>  $paths
+     * @param  array<int, string>|null  $extensions
      */
     public function __construct(Filesystem $files, array $paths, ?array $extensions = null)
     {
@@ -95,7 +95,7 @@ class FileViewFinder implements ViewFinderInterface
      * Get the segments of a template with a named path.
      *
      * @param  string  $name
-     * @return string[]
+     * @return array<int, string>
      *
      * @throws \InvalidArgumentException
      */
@@ -118,7 +118,7 @@ class FileViewFinder implements ViewFinderInterface
      * Find the given view in the list of paths.
      *
      * @param  string  $name
-     * @param  string|string[]  $paths
+     * @param  string|array<int, string>  $paths
      * @return string
      *
      * @throws \InvalidArgumentException
@@ -142,7 +142,7 @@ class FileViewFinder implements ViewFinderInterface
      * Get an array of possible view files.
      *
      * @param  string  $name
-     * @return string[]
+     * @return array<int, string>
      */
     protected function getPossibleViewFiles($name)
     {
@@ -186,7 +186,7 @@ class FileViewFinder implements ViewFinderInterface
      * Add a namespace hint to the finder.
      *
      * @param  string  $namespace
-     * @param  string|string[]  $hints
+     * @param  string|array<int, string>  $hints
      * @return void
      */
     public function addNamespace($namespace, $hints)
@@ -204,7 +204,7 @@ class FileViewFinder implements ViewFinderInterface
      * Prepend a namespace hint to the finder.
      *
      * @param  string  $namespace
-     * @param  string|string[]  $hints
+     * @param  string|array<int, string>  $hints
      * @return void
      */
     public function prependNamespace($namespace, $hints)
@@ -222,7 +222,7 @@ class FileViewFinder implements ViewFinderInterface
      * Replace the namespace hints for the given namespace.
      *
      * @param  string  $namespace
-     * @param  string|string[]  $hints
+     * @param  string|array<int, string>  $hints
      * @return void
      */
     public function replaceNamespace($namespace, $hints)
@@ -279,7 +279,7 @@ class FileViewFinder implements ViewFinderInterface
     /**
      * Set the active view paths.
      *
-     * @param  string[]  $paths
+     * @param  array<int, string>  $paths
      * @return $this
      */
     public function setPaths($paths)
@@ -292,7 +292,7 @@ class FileViewFinder implements ViewFinderInterface
     /**
      * Get the active view paths.
      *
-     * @return string[]
+     * @return array<int, string>
      */
     public function getPaths()
     {
@@ -322,7 +322,7 @@ class FileViewFinder implements ViewFinderInterface
     /**
      * Get registered extensions.
      *
-     * @return string[]
+     * @return array<int, string>
      */
     public function getExtensions()
     {

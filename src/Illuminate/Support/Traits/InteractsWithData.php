@@ -377,7 +377,7 @@ trait InteractsWithData
      *
      * @param  string  $key
      * @param  class-string<TEnum>  $enumClass
-     * @return TEnum[]
+     * @return array<int, TEnum>
      */
     public function enums($key, $enumClass)
     {

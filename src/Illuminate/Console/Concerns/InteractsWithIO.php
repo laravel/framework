@@ -169,7 +169,7 @@ trait InteractsWithIO
      * Prompt the user for input with auto completion.
      *
      * @param  string  $question
-     * @param  iterable|(callable(string): string[])  $choices
+     * @param  iterable|(callable(string): array<int, string>)  $choices
      * @param  string|null  $default
      * @return mixed
      */

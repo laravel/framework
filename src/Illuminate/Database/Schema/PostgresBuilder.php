@@ -84,7 +84,7 @@ class PostgresBuilder extends Builder
     /**
      * Get the current schemas for the connection.
      *
-     * @return string[]
+     * @return array<int, string>
      */
     public function getCurrentSchemaListing()
     {

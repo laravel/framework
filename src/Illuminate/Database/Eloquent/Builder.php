@@ -91,7 +91,7 @@ class Builder implements BuilderContract
     /**
      * The properties that should be returned from query builder.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $propertyPassthru = [
         'from',
@@ -100,7 +100,7 @@ class Builder implements BuilderContract
     /**
      * The methods that should be returned from query builder.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $passthru = [
         'aggregate',

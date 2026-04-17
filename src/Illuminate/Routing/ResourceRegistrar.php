@@ -16,14 +16,14 @@ class ResourceRegistrar
     /**
      * The default actions for a resourceful controller.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $resourceDefaults = ['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'];
 
     /**
      * The default actions for a singleton resource controller.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $singletonResourceDefaults = ['show', 'edit', 'update'];
 

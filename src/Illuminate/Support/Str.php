@@ -250,7 +250,7 @@ class Str
      * Remove the given string(s) if it exists at the start of the haystack.
      *
      * @param  string  $subject
-     * @param  string|string[]  $needle
+     * @param  string|array<int, string>  $needle
      * @return string
      */
     public static function chopStart($subject, $needle)
@@ -268,7 +268,7 @@ class Str
      * Remove the given string(s) if it exists at the end of the haystack.
      *
      * @param  string  $subject
-     * @param  string|string[]  $needle
+     * @param  string|array<int, string>  $needle
      * @return string
      */
     public static function chopEnd($subject, $needle)
@@ -581,7 +581,7 @@ class Str
      * Determine if a given value is a valid URL.
      *
      * @param  mixed  $value
-     * @param  string[]  $protocols
+     * @param  array<int, string>  $protocols
      * @return bool
      *
      * @phpstan-assert-if-true =non-empty-string $value
@@ -782,7 +782,7 @@ class Str
      *
      * @param  string  $string
      * @param  array  $options
-     * @param  \League\CommonMark\Extension\ExtensionInterface[]  $extensions
+     * @param  array<int, \League\CommonMark\Extension\ExtensionInterface>  $extensions
      * @return ($string is '' ? '' : string)
      */
     public static function markdown($string, array $options = [], array $extensions = [])
@@ -805,7 +805,7 @@ class Str
      *
      * @param  string  $string
      * @param  array  $options
-     * @param  \League\CommonMark\Extension\ExtensionInterface[]  $extensions
+     * @param  array<int, \League\CommonMark\Extension\ExtensionInterface>  $extensions
      * @return ($string is '' ? '' : string)
      */
     public static function inlineMarkdown($string, array $options = [], array $extensions = [])
@@ -1138,7 +1138,7 @@ class Str
     /**
      * Set the sequence that will be used to generate random strings.
      *
-     * @param  string[]  $sequence
+     * @param  array<int, string>  $sequence
      * @param  (callable(int): string)|null  $whenMissing
      * @return void
      */
@@ -1239,7 +1239,7 @@ class Str
      * @param  string|iterable<string>  $replace
      * @param  string|iterable<string>  $subject
      * @param  bool  $caseSensitive
-     * @return ($subject is string ? string : string[])
+     * @return ($subject is string ? string : array<int, string>)
      */
     public static function replace($search, $replace, $subject, $caseSensitive = true)
     {
@@ -1359,11 +1359,11 @@ class Str
     /**
      * Replace the patterns matching the given regular expression.
      *
-     * @param  string|string[]  $pattern
-     * @param  (\Closure(array): string)|string[]|string  $replace
-     * @param  string[]|string  $subject
+     * @param  string|array<int, string>  $pattern
+     * @param  (\Closure(array): string)|array<int, string>|string  $replace
+     * @param  array<int, string>|string  $subject
      * @param  int  $limit
-     * @return ($subject is array ? string[]|null : string|null)
+     * @return ($subject is array ? array<int, string>|null : string|null)
      */
     public static function replaceMatches($pattern, $replace, $subject, $limit = -1)
     {
@@ -1772,11 +1772,11 @@ class Str
     /**
      * Replace text within a portion of a string.
      *
-     * @param  string|string[]  $string
-     * @param  string|string[]  $replace
-     * @param  int|int[]  $offset
-     * @param  int|int[]|null  $length
-     * @return string|string[]
+     * @param  string|array<int, string>  $string
+     * @param  string|array<int, string>  $replace
+     * @param  int|array<int, int>  $offset
+     * @param  int|array<int, int>|null  $length
+     * @return string|array<int, string>
      */
     public static function substrReplace($string, $replace, $offset = 0, $length = null)
     {
@@ -1882,7 +1882,7 @@ class Str
      * Split a string into pieces by uppercase characters.
      *
      * @param  string  $string
-     * @return ($string is '' ? array{} : string[])
+     * @return ($string is '' ? array{} : array<int, string>)
      */
     public static function ucsplit($string)
     {
@@ -1979,7 +1979,7 @@ class Str
     /**
      * Set the sequence that will be used to generate UUIDs.
      *
-     * @param  \Ramsey\Uuid\UuidInterface[]  $sequence
+     * @param  array<int, \Ramsey\Uuid\UuidInterface>  $sequence
      * @param  (callable(): \Ramsey\Uuid\UuidInterface)|null  $whenMissing
      * @return void
      */
@@ -2086,7 +2086,7 @@ class Str
     /**
      * Set the sequence that will be used to generate ULIDs.
      *
-     * @param  \Symfony\Component\Uid\Ulid[]  $sequence
+     * @param  array<int, \Symfony\Component\Uid\Ulid>  $sequence
      * @param  (callable(): \Symfony\Component\Uid\Ulid)|null  $whenMissing
      * @return void
      */

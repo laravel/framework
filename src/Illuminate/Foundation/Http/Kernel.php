@@ -38,7 +38,7 @@ class Kernel implements KernelContract
     /**
      * The bootstrap classes for the application.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $bootstrappers = [
         \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables::class,
@@ -98,7 +98,7 @@ class Kernel implements KernelContract
      *
      * Forces non-global middleware to always be in the given order.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $middlewarePriority = [
         \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,

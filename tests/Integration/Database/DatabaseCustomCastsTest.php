@@ -222,7 +222,7 @@ class TestEloquentModelWithCustomCasts extends Model
     /**
      * The attributes that aren't mass assignable.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $guarded = [];
 
@@ -245,7 +245,7 @@ class TestEloquentModelWithCustomCastsNullable extends Model
     /**
      * The attributes that aren't mass assignable.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $guarded = [];
 

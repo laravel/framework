@@ -173,7 +173,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
      * Get routes from the collection by method.
      *
      * @param  string|null  $method
-     * @return \Illuminate\Routing\Route[]
+     * @return array<int, \Illuminate\Routing\Route>
      */
     public function get($method = null)
     {
@@ -236,7 +236,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
     /**
      * Get all of the routes in the collection.
      *
-     * @return \Illuminate\Routing\Route[]
+     * @return array<int, \Illuminate\Routing\Route>
      */
     public function getRoutes()
     {
@@ -271,7 +271,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
     /**
      * Get all of the routes keyed by their name.
      *
-     * @return \Illuminate\Routing\Route[]
+     * @return array<int, \Illuminate\Routing\Route>
      */
     public function getRoutesByName()
     {

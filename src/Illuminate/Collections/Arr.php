@@ -166,7 +166,7 @@ class Arr
      * @template TValue
      *
      * @param  array<TKey, TValue>  $array
-     * @return array{TKey[], TValue[]}
+     * @return array{array<int, TKey>, array<int, TValue>}
      */
     public static function divide($array)
     {

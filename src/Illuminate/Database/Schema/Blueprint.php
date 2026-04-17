@@ -39,14 +39,14 @@ class Blueprint
     /**
      * The columns that should be added to the table.
      *
-     * @var \Illuminate\Database\Schema\ColumnDefinition[]
+     * @var array<int, \Illuminate\Database\Schema\ColumnDefinition>
      */
     protected $columns = [];
 
     /**
      * The commands that should be run for the table.
      *
-     * @var \Illuminate\Support\Fluent[]
+     * @var array<int, \Illuminate\Support\Fluent>
      */
     protected $commands = [];
 
@@ -1910,7 +1910,7 @@ class Blueprint
     /**
      * Get the columns on the blueprint.
      *
-     * @return \Illuminate\Database\Schema\ColumnDefinition[]
+     * @return array<int, \Illuminate\Database\Schema\ColumnDefinition>
      */
     public function getColumns()
     {
@@ -1920,7 +1920,7 @@ class Blueprint
     /**
      * Get the commands on the blueprint.
      *
-     * @return \Illuminate\Support\Fluent[]
+     * @return array<int, \Illuminate\Support\Fluent>
      */
     public function getCommands()
     {
@@ -1950,7 +1950,7 @@ class Blueprint
     /**
      * Get the columns on the blueprint that should be added.
      *
-     * @return \Illuminate\Database\Schema\ColumnDefinition[]
+     * @return array<int, \Illuminate\Database\Schema\ColumnDefinition>
      */
     public function getAddedColumns()
     {
@@ -1964,7 +1964,7 @@ class Blueprint
      *
      * @deprecated Will be removed in a future Laravel version.
      *
-     * @return \Illuminate\Database\Schema\ColumnDefinition[]
+     * @return array<int, \Illuminate\Database\Schema\ColumnDefinition>
      */
     public function getChangedColumns()
     {

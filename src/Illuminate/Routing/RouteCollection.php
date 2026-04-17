@@ -17,21 +17,21 @@ class RouteCollection extends AbstractRouteCollection
     /**
      * A flattened array of all of the routes.
      *
-     * @var \Illuminate\Routing\Route[]
+     * @var array<int, \Illuminate\Routing\Route>
      */
     protected $allRoutes = [];
 
     /**
      * A look-up table of routes by their names.
      *
-     * @var \Illuminate\Routing\Route[]
+     * @var array<int, \Illuminate\Routing\Route>
      */
     protected $nameList = [];
 
     /**
      * A look-up table of routes by controller action.
      *
-     * @var \Illuminate\Routing\Route[]
+     * @var array<int, \Illuminate\Routing\Route>
      */
     protected $actionList = [];
 
@@ -200,7 +200,7 @@ class RouteCollection extends AbstractRouteCollection
      * Get routes from the collection by method.
      *
      * @param  string|null  $method
-     * @return \Illuminate\Routing\Route[]
+     * @return array<int, \Illuminate\Routing\Route>
      */
     public function get($method = null)
     {
@@ -243,7 +243,7 @@ class RouteCollection extends AbstractRouteCollection
     /**
      * Get all of the routes in the collection.
      *
-     * @return \Illuminate\Routing\Route[]
+     * @return array<int, \Illuminate\Routing\Route>
      */
     public function getRoutes()
     {
@@ -263,7 +263,7 @@ class RouteCollection extends AbstractRouteCollection
     /**
      * Get all of the routes keyed by their name.
      *
-     * @return \Illuminate\Routing\Route[]
+     * @return array<int, \Illuminate\Routing\Route>
      */
     public function getRoutesByName()
     {

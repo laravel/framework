@@ -43,7 +43,7 @@ class CookieJar implements JarContract
     /**
      * All of the cookies queued for sending.
      *
-     * @var \Symfony\Component\HttpFoundation\Cookie[]
+     * @var array<int, \Symfony\Component\HttpFoundation\Cookie>
      */
     protected $queued = [];
 
@@ -221,7 +221,7 @@ class CookieJar implements JarContract
     /**
      * Get the cookies which have been queued for the next request.
      *
-     * @return \Symfony\Component\HttpFoundation\Cookie[]
+     * @return array<int, \Symfony\Component\HttpFoundation\Cookie>
      */
     public function getQueuedCookies()
     {

@@ -83,7 +83,7 @@ class Enum implements Rule, ValidatorAwareRule, Stringable
     /**
      * Specify the cases that should be considered valid.
      *
-     * @param  \UnitEnum[]|\UnitEnum|\Illuminate\Contracts\Support\Arrayable<array-key, \UnitEnum>  $values
+     * @param  array<int, \UnitEnum>|\UnitEnum|\Illuminate\Contracts\Support\Arrayable<array-key, \UnitEnum>  $values
      * @return $this
      */
     public function only($values)
@@ -96,7 +96,7 @@ class Enum implements Rule, ValidatorAwareRule, Stringable
     /**
      * Specify the cases that should be considered invalid.
      *
-     * @param  \UnitEnum[]|\UnitEnum|\Illuminate\Contracts\Support\Arrayable<array-key, \UnitEnum>  $values
+     * @param  array<int, \UnitEnum>|\UnitEnum|\Illuminate\Contracts\Support\Arrayable<array-key, \UnitEnum>  $values
      * @return $this
      */
     public function except($values)

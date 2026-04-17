@@ -523,7 +523,7 @@ class LogManager implements LoggerInterface
     /**
      * Flush the log context on all currently resolved channels.
      *
-     * @param  string[]|null  $keys
+     * @param  array<int, string>|null  $keys
      * @return $this
      */
     public function withoutContext(?array $keys = null)

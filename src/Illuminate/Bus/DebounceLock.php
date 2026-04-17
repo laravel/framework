@@ -149,7 +149,7 @@ class DebounceLock
     {
         $attributes = (new ReflectionClass($job))->getAttributes(DebounceFor::class);
 
-        return count($attributes) > 0
+        return $attributes !== []
             ? $attributes[0]->newInstance()->maxWait
             : null;
     }

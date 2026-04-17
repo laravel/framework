@@ -84,7 +84,7 @@ class DynamoBatchRepository implements BatchRepository
      *
      * @param  int  $limit
      * @param  mixed  $before
-     * @return \Illuminate\Bus\Batch[]
+     * @return array<int, \Illuminate\Bus\Batch>
      */
     public function get($limit = 50, $before = null)
     {

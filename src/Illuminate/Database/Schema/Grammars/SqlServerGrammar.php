@@ -18,21 +18,21 @@ class SqlServerGrammar extends Grammar
     /**
      * The possible column modifiers.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $modifiers = ['Collate', 'Nullable', 'Default', 'Persisted', 'Increment'];
 
     /**
      * The columns available as serials.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $serials = ['tinyInteger', 'smallInteger', 'mediumInteger', 'integer', 'bigInteger'];
 
     /**
      * The commands to be executed outside of create or alter command.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $fluentCommands = ['Default'];
 
@@ -65,7 +65,7 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile the query to determine the tables.
      *
-     * @param  string|string[]|null  $schema
+     * @param  string|array<int, string>|null  $schema
      * @return string
      */
     public function compileTables($schema)
@@ -83,7 +83,7 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile the query to determine the views.
      *
-     * @param  string|string[]|null  $schema
+     * @param  string|array<int, string>|null  $schema
      * @return string
      */
     public function compileViews($schema)
@@ -98,7 +98,7 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile the query to compare the schema.
      *
-     * @param  string|string[]|null  $schema
+     * @param  string|array<int, string>|null  $schema
      * @param  string  $column
      * @return string
      */

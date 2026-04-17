@@ -15,7 +15,7 @@ class BatchRepositoryFake implements BatchRepository
     /**
      * The batches stored in the repository.
      *
-     * @var \Illuminate\Bus\Batch[]
+     * @var array<int, \Illuminate\Bus\Batch>
      */
     protected $batches = [];
 
@@ -24,7 +24,7 @@ class BatchRepositoryFake implements BatchRepository
      *
      * @param  int  $limit
      * @param  mixed  $before
-     * @return \Illuminate\Bus\Batch[]
+     * @return array<int, \Illuminate\Bus\Batch>
      */
     public function get($limit, $before)
     {

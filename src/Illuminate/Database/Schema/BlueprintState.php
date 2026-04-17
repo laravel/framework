@@ -27,7 +27,7 @@ class BlueprintState
     /**
      * The columns.
      *
-     * @var \Illuminate\Database\Schema\ColumnDefinition[]
+     * @var array<int, \Illuminate\Database\Schema\ColumnDefinition>
      */
     private $columns;
 
@@ -41,14 +41,14 @@ class BlueprintState
     /**
      * The indexes.
      *
-     * @var \Illuminate\Database\Schema\IndexDefinition[]
+     * @var array<int, \Illuminate\Database\Schema\IndexDefinition>
      */
     private $indexes;
 
     /**
      * The foreign keys.
      *
-     * @var \Illuminate\Database\Schema\ForeignKeyDefinition[]
+     * @var array<int, \Illuminate\Database\Schema\ForeignKeyDefinition>
      */
     private $foreignKeys;
 
@@ -118,7 +118,7 @@ class BlueprintState
     /**
      * Get the columns.
      *
-     * @return \Illuminate\Database\Schema\ColumnDefinition[]
+     * @return array<int, \Illuminate\Database\Schema\ColumnDefinition>
      */
     public function getColumns()
     {
@@ -128,7 +128,7 @@ class BlueprintState
     /**
      * Get the indexes.
      *
-     * @return \Illuminate\Database\Schema\IndexDefinition[]
+     * @return array<int, \Illuminate\Database\Schema\IndexDefinition>
      */
     public function getIndexes()
     {
@@ -138,7 +138,7 @@ class BlueprintState
     /**
      * Get the foreign keys.
      *
-     * @return \Illuminate\Database\Schema\ForeignKeyDefinition[]
+     * @return array<int, \Illuminate\Database\Schema\ForeignKeyDefinition>
      */
     public function getForeignKeys()
     {

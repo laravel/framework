@@ -9,7 +9,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Psr\Log\LoggerInterface driver(\UnitEnum|string|null $driver = null)
  * @method static \Illuminate\Log\LogManager shareContext(array $context)
  * @method static array sharedContext()
- * @method static \Illuminate\Log\LogManager withoutContext(string[]|null $keys = null)
+ * @method static \Illuminate\Log\LogManager withoutContext(array<int, string>|null $keys = null)
  * @method static \Illuminate\Log\LogManager flushSharedContext()
  * @method static string|null getDefaultDriver()
  * @method static void setDefaultDriver(string $name)

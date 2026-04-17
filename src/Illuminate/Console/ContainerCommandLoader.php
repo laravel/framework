@@ -66,7 +66,7 @@ class ContainerCommandLoader implements CommandLoaderInterface
     /**
      * Get the command names.
      *
-     * @return string[]
+     * @return array<int, string>
      */
     public function getNames(): array
     {

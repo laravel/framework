@@ -102,7 +102,7 @@ class Dispatcher implements DispatcherContract
     /**
      * The specific events to defer (null means defer all events).
      *
-     * @var string[]|null
+     * @var array<int, string>|null
      */
     protected $eventsToDefer = null;
 
@@ -461,7 +461,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Prepare the listeners for a given event.
      *
-     * @return \Closure[]
+     * @return array<int, \Closure>
      */
     protected function prepareListeners(string $eventName)
     {
@@ -849,7 +849,7 @@ class Dispatcher implements DispatcherContract
      * @template TResult
      *
      * @param  callable(): TResult  $callback
-     * @param  string[]|null  $events
+     * @param  array<int, string>|null  $events
      * @return TResult
      */
     public function defer(callable $callback, ?array $events = null)

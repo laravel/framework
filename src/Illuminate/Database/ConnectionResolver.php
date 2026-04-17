@@ -7,7 +7,7 @@ class ConnectionResolver implements ConnectionResolverInterface
     /**
      * All of the registered connections.
      *
-     * @var \Illuminate\Database\ConnectionInterface[]
+     * @var array<int, \Illuminate\Database\ConnectionInterface>
      */
     protected $connections = [];
 

@@ -21,7 +21,7 @@ use Illuminate\Support\Testing\Fakes\EventFake;
  * @method static void forgetPushed()
  * @method static \Illuminate\Events\Dispatcher setQueueResolver(callable $resolver)
  * @method static \Illuminate\Events\Dispatcher setTransactionManagerResolver(callable $resolver)
- * @method static mixed defer(callable $callback, string[]|null $events = null)
+ * @method static mixed defer(callable $callback, array<int, string>|null $events = null)
  * @method static array getRawListeners()
  * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)
@@ -68,7 +68,7 @@ class Event extends Facade
     /**
      * Replace the bound instance with a fake that fakes all events except the given events.
      *
-     * @param  string[]|string  $eventsToAllow
+     * @param  array<int, string>|string  $eventsToAllow
      * @return \Illuminate\Support\Testing\Fakes\EventFake
      */
     public static function fakeExcept($eventsToAllow)

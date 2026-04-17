@@ -41,7 +41,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
     /**
      * The provider class names.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $providers = [
         FormRequestServiceProvider::class,

@@ -148,7 +148,7 @@ class PruneCommand extends Command
     /**
      * Get the path where models are located.
      *
-     * @return string[]|string
+     * @return array<int, string>|string
      */
     protected function getPath()
     {

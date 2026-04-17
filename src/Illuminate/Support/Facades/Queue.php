@@ -114,7 +114,7 @@ class Queue extends Facade
     /**
      * Replace the bound instance with a fake that fakes all jobs except the given jobs.
      *
-     * @param  string[]|string  $jobsToAllow
+     * @param  array<int, string>|string  $jobsToAllow
      * @return \Illuminate\Support\Testing\Fakes\QueueFake
      */
     public static function fakeExcept($jobsToAllow)

@@ -63,7 +63,7 @@ abstract class Queue
     /**
      * The create payload callbacks.
      *
-     * @var callable[]
+     * @var array<int, callable>
      */
     protected static $createPayloadCallbacks = [];
 

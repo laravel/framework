@@ -252,7 +252,7 @@ class Message
      * Add an address debug header for a list of recipients.
      *
      * @param  string  $header
-     * @param  \Symfony\Component\Mime\Address[]  $addresses
+     * @param  array<int, \Symfony\Component\Mime\Address>  $addresses
      * @return $this
      */
     protected function addAddressDebugHeader(string $header, array $addresses)

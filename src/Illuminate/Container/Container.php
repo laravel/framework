@@ -36,7 +36,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * An array of the types that have been resolved.
      *
-     * @var bool[]
+     * @var array<int, bool>
      */
     protected $resolved = [];
 
@@ -50,14 +50,14 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * The container's method bindings.
      *
-     * @var \Closure[]
+     * @var array<int, \Closure>
      */
     protected $methodBindings = [];
 
     /**
      * The container's shared instances.
      *
-     * @var object[]
+     * @var array<int, object>
      */
     protected $instances = [];
 
@@ -71,7 +71,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * The registered type aliases.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $aliases = [];
 
@@ -148,21 +148,21 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * All of the global before resolving callbacks.
      *
-     * @var \Closure[]
+     * @var array<int, \Closure>
      */
     protected $globalBeforeResolvingCallbacks = [];
 
     /**
      * All of the global resolving callbacks.
      *
-     * @var \Closure[]
+     * @var array<int, \Closure>
      */
     protected $globalResolvingCallbacks = [];
 
     /**
      * All of the global after resolving callbacks.
      *
-     * @var \Closure[]
+     * @var array<int, \Closure>
      */
     protected $globalAfterResolvingCallbacks = [];
 
@@ -1207,7 +1207,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Resolve all of the dependencies from the ReflectionParameters.
      *
-     * @param  \ReflectionParameter[]  $dependencies
+     * @param  array<int, \ReflectionParameter>  $dependencies
      * @return array
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
@@ -1566,7 +1566,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Fire all of the after resolving attribute callbacks.
      *
-     * @param  \ReflectionAttribute[]  $attributes
+     * @param  array<int, \ReflectionAttribute>  $attributes
      * @param  mixed  $object
      * @return void
      */

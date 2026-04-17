@@ -102,7 +102,7 @@ class Worker
     /**
      * The callbacks used to pop jobs from queues.
      *
-     * @var callable[]
+     * @var array<int, callable>
      */
     protected static $popCallbacks = [];
 

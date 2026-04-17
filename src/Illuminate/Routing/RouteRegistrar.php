@@ -56,7 +56,7 @@ class RouteRegistrar
     /**
      * The methods to dynamically pass through to the router.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $passthru = [
         'get', 'post', 'put', 'patch', 'delete', 'options', 'any',
@@ -65,7 +65,7 @@ class RouteRegistrar
     /**
      * The attributes that can be set through this class.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $allowedAttributes = [
         'as',

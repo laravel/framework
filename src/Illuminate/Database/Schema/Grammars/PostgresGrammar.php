@@ -20,21 +20,21 @@ class PostgresGrammar extends Grammar
     /**
      * The possible column modifiers.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $modifiers = ['Collate', 'Nullable', 'Default', 'VirtualAs', 'StoredAs', 'GeneratedAs', 'Increment'];
 
     /**
      * The columns available as serials.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
     /**
      * The commands to be executed outside of create or alter command.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $fluentCommands = ['AutoIncrementStartingValues', 'Comment'];
 
@@ -87,7 +87,7 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the query to determine the tables.
      *
-     * @param  string|string[]|null  $schema
+     * @param  string|array<int, string>|null  $schema
      * @return string
      */
     public function compileTables($schema)
@@ -102,7 +102,7 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the query to determine the views.
      *
-     * @param  string|string[]|null  $schema
+     * @param  string|array<int, string>|null  $schema
      * @return string
      */
     public function compileViews($schema)
@@ -115,7 +115,7 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the query to determine the user-defined types.
      *
-     * @param  string|string[]|null  $schema
+     * @param  string|array<int, string>|null  $schema
      * @return string
      */
     public function compileTypes($schema)
@@ -134,7 +134,7 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the query to compare the schema.
      *
-     * @param  string|string[]|null  $schema
+     * @param  string|array<int, string>|null  $schema
      * @param  string  $column
      * @return string
      */
@@ -324,7 +324,7 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @return string[]
+     * @return array<int, string>
      */
     public function compileUnique(Blueprint $blueprint, Fluent $command)
     {

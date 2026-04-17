@@ -82,7 +82,7 @@ class Handler implements ExceptionHandlerContract
     /**
      * The callbacks that should be used during reporting.
      *
-     * @var \Illuminate\Foundation\Exceptions\ReportableHandler[]
+     * @var array<int, \Illuminate\Foundation\Exceptions\ReportableHandler>
      */
     protected $reportCallbacks = [];
 
@@ -110,7 +110,7 @@ class Handler implements ExceptionHandlerContract
     /**
      * The callbacks that should be used during rendering.
      *
-     * @var \Closure[]
+     * @var array<int, \Closure>
      */
     protected $renderCallbacks = [];
 

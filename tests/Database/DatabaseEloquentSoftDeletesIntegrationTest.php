@@ -972,7 +972,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
     /**
      * Helpers...
      *
-     * @return \Illuminate\Tests\Database\SoftDeletesTestUser[]
+     * @return array<int, \Illuminate\Tests\Database\SoftDeletesTestUser>
      */
     protected function createUsers()
     {
