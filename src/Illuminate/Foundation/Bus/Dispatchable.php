@@ -77,6 +77,50 @@ trait Dispatchable
     }
 
     /**
+     * Dispatch a command to its handler in the current process if the given truth test passes.
+     *
+     * @param  bool|\Closure  $boolean
+     * @param  mixed  ...$arguments
+     * @return mixed
+     */
+    public static function dispatchSyncIf($boolean, ...$arguments)
+    {
+        if ($boolean instanceof Closure) {
+            $dispatchable = new static(...$arguments);
+
+            return value($boolean, $dispatchable)
+                ? app(Dispatcher::class)->dispatchSync($dispatchable)
+                : new Fluent;
+        }
+
+        return value($boolean)
+            ? app(Dispatcher::class)->dispatchSync(new static(...$arguments))
+            : new Fluent;
+    }
+
+    /**
+     * Dispatch a command to its handler in the current process unless the given truth test passes.
+     *
+     * @param  bool|\Closure  $boolean
+     * @param  mixed  ...$arguments
+     * @return mixed
+     */
+    public static function dispatchSyncUnless($boolean, ...$arguments)
+    {
+        if ($boolean instanceof Closure) {
+            $dispatchable = new static(...$arguments);
+
+            return ! value($boolean, $dispatchable)
+                ? app(Dispatcher::class)->dispatchSync($dispatchable)
+                : new Fluent;
+        }
+
+        return ! value($boolean)
+            ? app(Dispatcher::class)->dispatchSync(new static(...$arguments))
+            : new Fluent;
+    }
+
+    /**
      * Dispatch a command to its appropriate handler after the current process.
      *
      * @param  mixed  ...$arguments

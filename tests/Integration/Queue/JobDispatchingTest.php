@@ -102,6 +102,54 @@ class JobDispatchingTest extends QueueTestCase
         $this->assertTrue(Job::$ran);
     }
 
+    public function testDispatchesSyncConditionallyWithBoolean()
+    {
+        Job::dispatchSyncIf(false, 'test');
+
+        $this->assertFalse(Job::$ran);
+        $this->assertNull(Job::$value);
+
+        Job::dispatchSyncIf(true, 'test');
+
+        $this->assertTrue(Job::$ran);
+        $this->assertSame('test', Job::$value);
+    }
+
+    public function testDispatchesSyncConditionallyWithClosure()
+    {
+        Job::dispatchSyncIf(fn ($job) => $job instanceof Job ? 0 : 1, 'test');
+
+        $this->assertFalse(Job::$ran);
+
+        Job::dispatchSyncIf(fn ($job) => $job instanceof Job ? 1 : 0, 'test');
+
+        $this->assertTrue(Job::$ran);
+    }
+
+    public function testDoesNotDispatchSyncConditionallyWithBoolean()
+    {
+        Job::dispatchSyncUnless(true, 'test');
+
+        $this->assertFalse(Job::$ran);
+        $this->assertNull(Job::$value);
+
+        Job::dispatchSyncUnless(false, 'test');
+
+        $this->assertTrue(Job::$ran);
+        $this->assertSame('test', Job::$value);
+    }
+
+    public function testDoesNotDispatchSyncConditionallyWithClosure()
+    {
+        Job::dispatchSyncUnless(fn ($job) => $job instanceof Job ? 1 : 0, 'test');
+
+        $this->assertFalse(Job::$ran);
+
+        Job::dispatchSyncUnless(fn ($job) => $job instanceof Job ? 0 : 1, 'test');
+
+        $this->assertTrue(Job::$ran);
+    }
+
     public function testUniqueJobLockIsReleasedForJobDispatchedAfterResponse()
     {
         // get initial terminatingCallbacks
