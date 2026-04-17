@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Foundation;
 
 use Illuminate\Contracts\Http\Kernel as HttpKernelContract;
 use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Configuration\ApplicationBuilder;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Illuminate\Http\Middleware\PrefersJsonResponses;
 use PHPUnit\Framework\TestCase;
