@@ -193,7 +193,7 @@ class MailManager implements FactoryContract
     {
         return new CloudflareTransport(
             $config['account_id'],
-            $config['token'],
+            $config['key'],
             $this->getHttpClient($config),
         );
     }

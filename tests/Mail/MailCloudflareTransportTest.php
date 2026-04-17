@@ -24,7 +24,7 @@ class MailCloudflareTransportTest extends TestCase
         $transport = $manager->createSymfonyTransport([
             'transport' => 'cloudflare',
             'account_id' => 'test-account-id',
-            'token' => 'test-token',
+            'key' => 'test-key',
         ]);
 
         $this->assertInstanceOf(CloudflareTransport::class, $transport);
@@ -54,7 +54,7 @@ class MailCloudflareTransportTest extends TestCase
             ]), ['http_code' => 200]);
         });
 
-        $transport = new CloudflareTransport('my-account-id', 'my-api-token', $client);
+        $transport = new CloudflareTransport('test-account-id', 'test-key', $client);
 
         $message = new Email();
         $message->subject('Test subject');
@@ -69,8 +69,8 @@ class MailCloudflareTransportTest extends TestCase
 
         $transport->send($message);
 
-        $this->assertStringContainsString('my-account-id', $requestUrl);
-        $this->assertSame('https://api.cloudflare.com/client/v4/accounts/my-account-id/email/sending/send', $requestUrl);
+        $this->assertStringContainsString('test-account-id', $requestUrl);
+        $this->assertSame('https://api.cloudflare.com/client/v4/accounts/test-account-id/email/sending/send', $requestUrl);
         $this->assertSame('sender@example.com', $requestBody['from']);
         $this->assertSame(['me@example.com'], $requestBody['to']);
         $this->assertSame(['cc@example.com'], $requestBody['cc']);
@@ -81,7 +81,7 @@ class MailCloudflareTransportTest extends TestCase
         $this->assertSame('Hello', $requestBody['text']);
         $this->assertSame('CustomValue', $requestBody['headers']['X-Custom-Header']);
         $this->assertArrayHasKey('authorization', $requestHeaders);
-        $this->assertSame(['Authorization: Bearer my-api-token'], $requestHeaders['authorization']);
+        $this->assertSame(['Authorization: Bearer test-key'], $requestHeaders['authorization']);
     }
 
     public function testSendWithNamedAddresses(): void
@@ -107,7 +107,7 @@ class MailCloudflareTransportTest extends TestCase
             ]), ['http_code' => 200]);
         });
 
-        $transport = new CloudflareTransport('my-account-id', 'my-api-token', $client);
+        $transport = new CloudflareTransport('test-account-id', 'test-key', $client);
 
         $message = new Email();
         $message->subject('Test subject');
@@ -143,7 +143,7 @@ class MailCloudflareTransportTest extends TestCase
             ]), ['http_code' => 200]);
         });
 
-        $transport = new CloudflareTransport('my-account-id', 'my-api-token', $client);
+        $transport = new CloudflareTransport('test-account-id', 'test-key', $client);
 
         $message = new Email();
         $message->subject('With attachment');
@@ -177,7 +177,7 @@ class MailCloudflareTransportTest extends TestCase
             ]), ['http_code' => 400]);
         });
 
-        $transport = new CloudflareTransport('my-account-id', 'my-api-token', $client);
+        $transport = new CloudflareTransport('test-account-id', 'test-key', $client);
 
         $message = new Email();
         $message->subject('Fail');

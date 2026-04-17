@@ -28,12 +28,12 @@ class CloudflareTransport extends AbstractTransport
      * Create a new Cloudflare transport instance.
      *
      * @param  string  $accountId
-     * @param  string  $apiToken
+     * @param  string  $key
      * @param  \Symfony\Contracts\HttpClient\HttpClientInterface|null  $client
      */
     public function __construct(
         protected string $accountId,
-        #[SensitiveParameter] protected string $apiToken,
+        #[SensitiveParameter] protected string $key,
         ?HttpClientInterface $client = null,
     ) {
         parent::__construct();
@@ -53,7 +53,7 @@ class CloudflareTransport extends AbstractTransport
                 'https://api.cloudflare.com/client/v4/accounts/%s/email/sending/send',
                 $this->accountId,
             ), [
-                'auth_bearer' => $this->apiToken,
+                'auth_bearer' => $this->key,
                 'headers' => ['Accept' => 'application/json'],
                 'json' => $this->getPayload($message),
             ]);
@@ -128,12 +128,6 @@ class CloudflareTransport extends AbstractTransport
 
         return $headers;
     }
-
-    /**
-     * @param  Address[]  $addresses
-     * @return string[]
-     */
-
 
     /**
      * Get the address formatted for the Cloudflare API.
