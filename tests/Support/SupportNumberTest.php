@@ -186,6 +186,8 @@ class SupportNumberTest extends TestCase
         $this->assertSame('1 ZB', Number::fileSize(1024 ** 7));
         $this->assertSame('1 YB', Number::fileSize(1024 ** 8));
         $this->assertSame('1,024 YB', Number::fileSize(1024 ** 9));
+        $this->assertSame('2,00 KB', Number::fileSize(2048, precision: 2, locale: 'de'));
+        $this->assertSame('2,00 KB', Number::fileSize(2048, precision: 2, locale: 'fr'));
     }
 
     public function testClamp()
@@ -320,6 +322,8 @@ class SupportNumberTest extends TestCase
 
         Number::withLocale('de', fn () => $this->assertSame('1M', Number::abbreviate(999500)));
         Number::withLocale('fr', fn () => $this->assertSame('1M', Number::abbreviate(999500)));
+        $this->assertSame('1,23K', Number::abbreviate(1234, precision: 2, locale: 'de'));
+        $this->assertSame('1,23 thousand', Number::forHumans(1234, precision: 2, locale: 'fr'));
     }
 
     public function testPairs()

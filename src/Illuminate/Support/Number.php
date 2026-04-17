@@ -201,9 +201,10 @@ class Number
      * @param  int|float  $bytes
      * @param  int  $precision
      * @param  int|null  $maxPrecision
+     * @param  string|null  $locale
      * @return string
      */
-    public static function fileSize(int|float $bytes, int $precision = 0, ?int $maxPrecision = null)
+    public static function fileSize(int|float $bytes, int $precision = 0, ?int $maxPrecision = null, ?string $locale = null)
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
@@ -213,7 +214,7 @@ class Number
             $bytes /= 1024;
         }
 
-        return sprintf('%s %s', static::format($bytes, $precision, $maxPrecision), $units[$i]);
+        return sprintf('%s %s', static::format($bytes, $precision, $maxPrecision, $locale), $units[$i]);
     }
 
     /**
@@ -222,11 +223,12 @@ class Number
      * @param  int|float  $number
      * @param  int  $precision
      * @param  int|null  $maxPrecision
+     * @param  string|null  $locale
      * @return string|false
      */
-    public static function abbreviate(int|float $number, int $precision = 0, ?int $maxPrecision = null)
+    public static function abbreviate(int|float $number, int $precision = 0, ?int $maxPrecision = null, ?string $locale = null)
     {
-        return static::forHumans($number, $precision, $maxPrecision, abbreviate: true);
+        return static::forHumans($number, $precision, $maxPrecision, abbreviate: true, locale: $locale);
     }
 
     /**
@@ -236,9 +238,10 @@ class Number
      * @param  int  $precision
      * @param  int|null  $maxPrecision
      * @param  bool  $abbreviate
+     * @param  string|null  $locale
      * @return string|false
      */
-    public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null, bool $abbreviate = false)
+    public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null, bool $abbreviate = false, ?string $locale = null)
     {
         return static::summarize($number, $precision, $maxPrecision, $abbreviate ? [
             3 => 'K',
@@ -252,7 +255,7 @@ class Number
             9 => ' billion',
             12 => ' trillion',
             15 => ' quadrillion',
-        ]);
+        ], $locale);
     }
 
     /**
@@ -262,9 +265,10 @@ class Number
      * @param  int  $precision
      * @param  int|null  $maxPrecision
      * @param  array<int, string>  $units
+     * @param  string|null  $locale
      * @return string|false
      */
-    protected static function summarize(int|float $number, int $precision = 0, ?int $maxPrecision = null, array $units = [])
+    protected static function summarize(int|float $number, int $precision = 0, ?int $maxPrecision = null, array $units = [], ?string $locale = null)
     {
         if (empty($units)) {
             $units = [
@@ -278,23 +282,23 @@ class Number
 
         switch (true) {
             case (float) $number === 0.0:
-                return $precision > 0 ? static::format(0, $precision, $maxPrecision) : '0';
+                return $precision > 0 ? static::format(0, $precision, $maxPrecision, $locale) : '0';
             case $number < 0:
-                return sprintf('-%s', static::summarize(abs($number), $precision, $maxPrecision, $units));
+                return sprintf('-%s', static::summarize(abs($number), $precision, $maxPrecision, $units, $locale));
             case $number >= 1e15:
-                return sprintf('%s'.end($units), static::summarize($number / 1e15, $precision, $maxPrecision, $units));
+                return sprintf('%s'.end($units), static::summarize($number / 1e15, $precision, $maxPrecision, $units, $locale));
         }
 
         $numberExponent = floor(log10($number));
         $displayExponent = $numberExponent - ($numberExponent % 3);
         $number /= pow(10, $displayExponent);
 
-        $formatted = static::format($number, $precision, $maxPrecision);
+        $formatted = static::format($number, $precision, $maxPrecision, $locale);
 
-        if (static::parseFloat($formatted) >= 1000 && isset($units[$displayExponent + 3])) {
+        if (static::parseFloat($formatted, locale: $locale) >= 1000 && isset($units[$displayExponent + 3])) {
             $number /= 1000;
             $displayExponent += 3;
-            $formatted = static::format($number, $precision, $maxPrecision);
+            $formatted = static::format($number, $precision, $maxPrecision, $locale);
         }
 
         return trim(sprintf('%s%s', $formatted, $units[$displayExponent] ?? ''));
