@@ -591,10 +591,12 @@ class SupportStrTest extends TestCase
     public function testUnwrap()
     {
         $this->assertEquals('value', Str::unwrap('"value"', '"'));
-        $this->assertEquals('value', Str::unwrap('"value', '"'));
-        $this->assertEquals('value', Str::unwrap('value"', '"'));
+        $this->assertEquals('"value', Str::unwrap('"value', '"'));
+        $this->assertEquals('value"', Str::unwrap('value"', '"'));
         $this->assertEquals('bar', Str::unwrap('foo-bar-baz', 'foo-', '-baz'));
         $this->assertEquals('some: "json"', Str::unwrap('{some: "json"}', '{', '}'));
+        $this->assertEquals('foo-bar', Str::unwrap('foo-bar', 'foo-', '-baz'));
+        $this->assertEquals('bar-baz', Str::unwrap('bar-baz', 'foo-', '-baz'));
     }
 
     public function testIs()

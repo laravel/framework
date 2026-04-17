@@ -493,12 +493,14 @@ class Str
      */
     public static function unwrap($value, $before, $after = null)
     {
-        if (static::startsWith($value, $before)) {
-            $value = static::substr($value, static::length($before));
-        }
+        $after ??= $before;
 
-        if (static::endsWith($value, $after ??= $before)) {
-            $value = static::substr($value, 0, -static::length($after));
+        if (static::startsWith($value, $before) && static::endsWith($value, $after)) {
+            $value = static::substr($value, static::length($before));
+
+            if ($after !== '') {
+                $value = static::substr($value, 0, -static::length($after));
+            }
         }
 
         return $value;
