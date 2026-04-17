@@ -3256,12 +3256,24 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => ['array']], ['x' => 'max_digits:5']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'max_digits:5']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 123456], ['x' => 'max_digits:5']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateMinDigitsDoesNotThrowOnNonStringValue()
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => ['array']], ['x' => 'min_digits:1']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'min_digits:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 1], ['x' => 'min_digits:2']);
         $this->assertFalse($v->passes());
     }
 
@@ -3724,6 +3736,12 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => '123.34'], ['foo' => 'Decimal:0,2']);
         $this->assertTrue($v->passes());
         $v = new Validator($trans, ['foo' => '123.34'], ['foo' => 'Decimal:0,2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 123], ['foo' => 'Decimal:0']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 1.23], ['foo' => 'Decimal:0,3']);
         $this->assertTrue($v->passes());
     }
 
