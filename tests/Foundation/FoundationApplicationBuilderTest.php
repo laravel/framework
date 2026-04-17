@@ -131,9 +131,7 @@ class FoundationApplicationBuilderTest extends TestCase
         // provider chain which expects a real application — so invoke the
         // booted callbacks directly. Real boot behavior is covered by the
         // PrefersJson integration tests.
-        $reflection = new \ReflectionClass(Application::class);
-        $property = $reflection->getProperty('bootedCallbacks');
-        $property->setAccessible(true);
+        $property = (new \ReflectionClass(Application::class))->getProperty('bootedCallbacks');
 
         foreach ($property->getValue($app) as $callback) {
             $callback($app);
