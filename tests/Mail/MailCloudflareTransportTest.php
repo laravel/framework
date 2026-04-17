@@ -10,7 +10,6 @@ use Illuminate\Mail\Transport\CloudflareTransport;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
-use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 
@@ -177,8 +176,8 @@ class MailCloudflareTransportTest extends TestCase
                 'errors' => [
                     [
                         'code' => 10001,
-                        'message' => 'invalid_request_schema'
-                    ]
+                        'message' => 'invalid_request_schema',
+                    ],
                 ],
                 'messages' => [],
                 'result' => null,
