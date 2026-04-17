@@ -5,7 +5,6 @@ namespace Illuminate\Queue;
 use Aws\Sqs\SqsClient;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
-use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
