@@ -69,8 +69,9 @@ class CloudflareTransport extends AbstractTransport
 
         throw_if(
             $response->getStatusCode() !== Response::HTTP_OK,
-            Exception::class,
+            TransportException::class,
             $result['errors'][0]['message'] ?? 'Unknown error',
+            $response->getStatusCode(),
         );
     }
 

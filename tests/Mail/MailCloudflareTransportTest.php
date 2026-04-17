@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Mail;
 
 use Exception;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Mail\MailManager;
@@ -188,7 +189,7 @@ class MailCloudflareTransportTest extends TestCase
         $message->sender('sender@example.com');
         $message->to('me@example.com');
 
-        $this->expectException(Exception::class);
+        $this->expectException(TransportException::class);
         $this->expectExceptionMessage('invalid_request_schema');
 
         $transport->send($message);
