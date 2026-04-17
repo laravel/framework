@@ -8,6 +8,7 @@ use Closure;
 use Illuminate\Contracts\Mail\Factory as FactoryContract;
 use Illuminate\Log\LogManager;
 use Illuminate\Mail\Transport\ArrayTransport;
+use Illuminate\Mail\Transport\CloudflareTransport;
 use Illuminate\Mail\Transport\LogTransport;
 use Illuminate\Mail\Transport\ResendTransport;
 use Illuminate\Mail\Transport\SesTransport;
@@ -180,6 +181,21 @@ class MailManager implements FactoryContract
         }
 
         return $this->{$method}($config);
+    }
+
+    /**
+     * Create an instance of the Cloudflare Transport driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Mail\Transport\CloudflareTransport
+     */
+    protected function createCloudflareTransport(array $config)
+    {
+        return new CloudflareTransport(
+            $config['account_id'],
+            $config['token'],
+            $this->getHttpClient($config),
+        );
     }
 
     /**
