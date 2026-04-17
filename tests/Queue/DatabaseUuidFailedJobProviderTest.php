@@ -178,6 +178,27 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
         $this->assertSame(2, $provider->count('connection-2', 'queue-1'));
     }
 
+    public function testLogDoesNotCrashOnCorruptedPayload()
+    {
+        $provider = $this->getFailedJobProvider();
+
+        $uuid = $provider->log('connection', 'queue', 'not valid json', new RuntimeException());
+
+        $this->assertNotNull($uuid);
+        $this->assertCount(1, $provider->all());
+        $this->assertSame($uuid, $provider->all()[0]->id);
+    }
+
+    public function testLogDoesNotCrashWhenPayloadIsMissingUuid()
+    {
+        $provider = $this->getFailedJobProvider();
+
+        $uuid = $provider->log('connection', 'queue', json_encode(['foo' => 'bar']), new RuntimeException());
+
+        $this->assertNotNull($uuid);
+        $this->assertCount(1, $provider->all());
+    }
+
     protected function getFailedJobProvider(string $database = 'default', string $table = 'failed_jobs')
     {
         $db = new DB;

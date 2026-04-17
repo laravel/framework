@@ -49,6 +49,31 @@ class DynamoDbFailedJobProviderTest extends TestCase
         Str::createUuidsNormally();
     }
 
+    public function testLogDoesNotCrashOnCorruptedPayload()
+    {
+        $fallback = Str::orderedUuid();
+
+        Str::createUuidsUsing(fn () => $fallback);
+
+        $exception = new Exception('Something went wrong.');
+
+        $dynamoDbClient = m::mock(DynamoDbClient::class);
+
+        $dynamoDbClient->shouldReceive('putItem')->once()
+            ->withArgs(function ($args) use ($fallback) {
+                return $args['Item']['uuid']['S'] === (string) $fallback
+                    && $args['Item']['payload']['S'] === 'not valid json';
+            });
+
+        $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');
+
+        $id = $provider->log('connection', 'queue', 'not valid json', $exception);
+
+        $this->assertSame((string) $fallback, $id);
+
+        Str::createUuidsNormally();
+    }
+
     public function testCanRetrieveAllFailedJobs()
     {
         $dynamoDbClient = m::mock(DynamoDbClient::class);

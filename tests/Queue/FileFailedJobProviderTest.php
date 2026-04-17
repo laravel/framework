@@ -214,6 +214,41 @@ class FileFailedJobProviderTest extends TestCase
         $this->assertSame(2, $this->provider->count('connection-2', 'queue-1'));
     }
 
+    public function testLogDoesNotCrashOnCorruptedPayload()
+    {
+        $exception = new Exception('Something went wrong.');
+
+        $id = $this->provider->log('connection', 'queue', 'not valid json', $exception);
+
+        $this->assertNull($id);
+
+        $failedJobs = $this->provider->all();
+
+        $this->assertCount(1, $failedJobs);
+        $this->assertNull($failedJobs[0]->id);
+        $this->assertSame('not valid json', $failedJobs[0]->payload);
+    }
+
+    public function testLogDoesNotCrashWhenPayloadJsonIsNotAnArray()
+    {
+        $exception = new Exception('Something went wrong.');
+
+        $id = $this->provider->log('connection', 'queue', json_encode('string-payload'), $exception);
+
+        $this->assertNull($id);
+        $this->assertCount(1, $this->provider->all());
+    }
+
+    public function testLogDoesNotCrashWhenPayloadIsMissingUuid()
+    {
+        $exception = new Exception('Something went wrong.');
+
+        $id = $this->provider->log('connection', 'queue', json_encode(['foo' => 'bar']), $exception);
+
+        $this->assertNull($id);
+        $this->assertCount(1, $this->provider->all());
+    }
+
     public function logFailedJob($connection = 'connection', $queue = 'queue')
     {
         $uuid = Str::uuid();
