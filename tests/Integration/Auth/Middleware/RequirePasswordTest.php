@@ -4,8 +4,10 @@ namespace Illuminate\Tests\Integration\Auth\Middleware;
 
 use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Contracts\Config\Repository;
+use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Http\Middleware\PrefersJsonResponses;
 use Illuminate\Http\Response;
 use Illuminate\Session\Middleware\StartSession;
 use Orchestra\Testbench\TestCase;
@@ -81,6 +83,49 @@ class RequirePasswordTest extends TestCase
 
         $response->assertStatus(302);
         $response->assertRedirect($this->app->make(UrlGenerator::class)->route('my-password.confirm'));
+    }
+
+    public function testPrefersJsonReturnsJsonResponseForWildcardAcceptInsteadOfRedirecting()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->app->make(HttpKernel::class)->prependMiddleware(PrefersJsonResponses::class);
+
+        /** @var \Illuminate\Contracts\Routing\Registrar $router */
+        $router = $this->app->make(Registrar::class);
+
+        $router->get('test-route', function (): Response {
+            return new Response('foobar');
+        })->middleware([StartSession::class, RequirePassword::class]);
+
+        $response = $this->withSession(['auth.password_confirmed_at' => time() - 10801])
+            ->get('test-route', ['Accept' => '*/*']);
+
+        $response->assertStatus(423);
+        $response->assertJson(['message' => 'Password confirmation required.']);
+    }
+
+    public function testPrefersJsonStillRedirectsWhenAcceptIsExplicitHtml()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->app->make(HttpKernel::class)->prependMiddleware(PrefersJsonResponses::class);
+
+        /** @var \Illuminate\Contracts\Routing\Registrar $router */
+        $router = $this->app->make(Registrar::class);
+
+        $router->get('password-confirm', function (): Response {
+            return new Response('foo');
+        })->name('password.confirm');
+
+        $router->get('test-route', function (): Response {
+            return new Response('foobar');
+        })->middleware([StartSession::class, RequirePassword::class]);
+
+        $response = $this->withSession(['auth.password_confirmed_at' => time() - 10801])
+            ->get('test-route', ['Accept' => 'text/html']);
+
+        $response->assertRedirect($this->app->make(UrlGenerator::class)->route('password.confirm'));
     }
 
     public function testAuthPasswordTimeoutIsConfigurable()

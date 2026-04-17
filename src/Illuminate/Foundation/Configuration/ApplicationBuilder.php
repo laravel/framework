@@ -13,6 +13,7 @@ use Illuminate\Foundation\Events\DiagnosingHealth;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as AppEventServiceProvider;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as AppRouteServiceProvider;
+use Illuminate\Http\Middleware\PrefersJsonResponses;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Broadcast;
@@ -494,6 +495,33 @@ class ApplicationBuilder
     public function booted(callable $callback)
     {
         $this->app->booted($callback);
+
+        return $this;
+    }
+
+    /**
+     * Globally prefer JSON responses when the incoming "Accept" header is broad.
+     *
+     * Registers the {@see PrefersJsonResponses} middleware at the front of the
+     * global HTTP middleware stack. The middleware mutates the incoming
+     * request by rewriting broad "Accept" headers (missing, empty, "*\/*",
+     * or "application/*") to "application/json", which causes every
+     * downstream consumer — exception handler, auth/validation middleware,
+     * content negotiation — to return JSON. The original header value is
+     * stashed on "X-Original-Accept" for logging or inspection.
+     *
+     * @param  bool  $prefer
+     * @return $this
+     */
+    public function prefersJsonResponses(bool $prefer = true)
+    {
+        if (! $prefer) {
+            return $this;
+        }
+
+        $this->app->booted(function () {
+            $this->app->make(HttpKernel::class)->prependMiddleware(PrefersJsonResponses::class);
+        });
 
         return $this;
     }

@@ -9,8 +9,10 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Debug\ShouldntReport;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Middleware\PrefersJsonResponses;
 use Illuminate\Routing\ResponseFactory;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
@@ -284,6 +286,31 @@ EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
             'msg' => 'Server Error',
             'success' => false,
         ]);
+    }
+
+    public function testItRendersAuthorizationExceptionsAsJsonUnderPrefersJsonForBroadAccept()
+    {
+        $this->app->make(HttpKernel::class)->prependMiddleware(PrefersJsonResponses::class);
+
+        Route::get('test-route', fn () => Response::deny('expected message', 321)->authorize());
+
+        $this->get('test-route', ['Accept' => '*/*'])
+            ->assertForbidden()
+            ->assertExactJson([
+                'message' => 'expected message',
+            ]);
+    }
+
+    public function testItStillRendersAuthorizationExceptionsAsHtmlForExplicitHtmlAcceptUnderPrefersJson()
+    {
+        $this->app->make(HttpKernel::class)->prependMiddleware(PrefersJsonResponses::class);
+
+        Route::get('test-route', fn () => Response::deny('expected message', 321)->authorize());
+
+        $this->get('test-route', ['Accept' => 'text/html'])
+            ->assertForbidden()
+            ->assertSeeText('expected message')
+            ->assertHeader('Content-Type', 'text/html; charset=UTF-8');
     }
 
     public function test_it_reports_request_exceptions()
