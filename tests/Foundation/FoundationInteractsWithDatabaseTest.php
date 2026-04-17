@@ -63,17 +63,9 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
     public function testAssertDatabaseHasWithArrays()
     {
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('where')->with(['title' => 'Spark', 'name' => 'Laravel'])->once()->andReturnSelf();
-        $builder->shouldReceive('where')->with(['title' => 'Forge', 'name' => 'Laravel'])->once()->andReturnSelf();
-        $builder->shouldReceive('exists')->twice()->andReturn(true);
+        $this->mockCountBuilder(true);
 
-        $this->connection->shouldReceive('table')->with($this->table)->andReturn($builder);
-
-        $this->assertDatabaseHas($this->table, [
-            ['title' => 'Spark', 'name' => 'Laravel'],
-            ['title' => 'Forge', 'name' => 'Laravel'],
-        ]);
+        $this->assertDatabaseHas($this->table, [$this->data, $this->data]);
     }
 
     public function testSeeInDatabaseDoesNotFindResults()
@@ -120,17 +112,9 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
     public function testAssertDatabaseMissingWithArrays()
     {
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('where')->with(['title' => 'Spark', 'name' => 'Laravel'])->once()->andReturnSelf();
-        $builder->shouldReceive('where')->with(['title' => 'Forge', 'name' => 'Laravel'])->once()->andReturnSelf();
-        $builder->shouldReceive('exists')->twice()->andReturn(false);
+        $this->mockCountBuilder(false);
 
-        $this->connection->shouldReceive('table')->with($this->table)->andReturn($builder);
-
-        $this->assertDatabaseMissing($this->table, [
-            ['title' => 'Spark', 'name' => 'Laravel'],
-            ['title' => 'Forge', 'name' => 'Laravel'],
-        ]);
+        $this->assertDatabaseMissing($this->table, [$this->data, $this->data]);
     }
 
     public function testDontSeeInDatabaseDoesNotFindResults()
