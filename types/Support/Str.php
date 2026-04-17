@@ -53,7 +53,7 @@ if (Str::doesntStartWith($strStartsWith, '')) {
  * @var string $subject
  */
 assertType('string', Str::replace($search, $replace, $subject));
-assertType('array<string>', Str::replace($search, $replace, [$subject]));
+assertType('array<int, string>', Str::replace($search, $replace, [$subject]));
 
 assertType('\'\'', Str::camel(''));
 assertType('string', Str::camel('Taylor Otwell'));
@@ -108,7 +108,7 @@ assertType('false', Str::position('', 'Taylor'));
 assertType('int|false', Str::position('Taylor Otwell', 'Taylor'));
 
 assertType('string|null', Str::replaceMatches('', '', 'Taylor Otwell'));
-assertType('array<string>|null', Str::replaceMatches('', '', ['Taylor', 'Otwell']));
+assertType('array<int, string>|null', Str::replaceMatches('', '', ['Taylor', 'Otwell']));
 
 assertType('false', Str::startsWith('Taylor Otwell', []));
 assertType('false', Str::startsWith('', 'Taylor'));
@@ -140,4 +140,4 @@ assertType('\'\'', Str::ucwords(''));
 assertType('non-empty-string', Str::ucwords('Taylor Otwell'));
 
 assertType('array{}', Str::ucsplit(''));
-assertType('array<string>', Str::ucsplit('Taylor Otwell'));
+assertType('array<int, string>', Str::ucsplit('Taylor Otwell'));

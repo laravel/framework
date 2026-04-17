@@ -104,8 +104,8 @@ assertType("'string'|User", Arr::last($traversable, null, function () {
     return 'string';
 }));
 
-assertType("array{array<'a'|'b'>, array<1|2>}", Arr::divide(['a' => 1, 'b' => 2]));
-assertType('array{array<0>, array<1>}', Arr::divide([1]));
+assertType("array{array<int, 'a'|'b'>, array<int, 1|2>}", Arr::divide(['a' => 1, 'b' => 2]));
+assertType('array{array<int, 0>, array<int, 1>}', Arr::divide([1]));
 
 /**
  * @return iterable<int>
