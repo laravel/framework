@@ -283,7 +283,7 @@ abstract class Job
      */
     public function payload()
     {
-        return json_decode($this->getRawBody(), true);
+        return json_decode($this->getRawBody(), true) ?? [];
     }
 
     /**
