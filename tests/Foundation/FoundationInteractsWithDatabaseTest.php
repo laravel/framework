@@ -61,7 +61,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseHas(new ProductStub(['id' => 1]), $data);
     }
 
-    public function testAssertDatabaseHasWithArrays()
+    public function testAssertDatabaseSupportsArrays()
     {
         $builder = m::mock(Builder::class);
         $builder->shouldReceive('where')->with(['title' => 'Spark', 'name' => 'Laravel'])->once()->andReturnSelf();
@@ -118,7 +118,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseHas($this->table, $this->data);
     }
 
-    public function testAssertDatabaseMissingWithArrays()
+    public function testAssertDatabaseMissingSupportsArrays()
     {
         $builder = m::mock(Builder::class);
         $builder->shouldReceive('where')->with(['title' => 'Spark', 'name' => 'Laravel'])->once()->andReturnSelf();
