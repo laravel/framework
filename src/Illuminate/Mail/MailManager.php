@@ -192,8 +192,8 @@ class MailManager implements FactoryContract
     protected function createCloudflareTransport(array $config)
     {
         return new CloudflareTransport(
-            $this->app['config']->get('services.cloudflare.account_id'),
-            $this->app['config']->get('services.cloudflare.token'),
+            $config['account_id'] ?? $this->app['config']->get('services.cloudflare.account_id'),
+            $config['token'] ?? $this->app['config']->get('services.cloudflare.token'),
             $this->getHttpClient($config),
         );
     }
