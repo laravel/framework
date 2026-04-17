@@ -25,7 +25,7 @@ class DatabaseMariaDbSchemaBuilderTest extends MariaDbTestCase
             ->select('table_comment as table_comment')
             ->first();
 
-        $this->assertEquals('This is a comment', $tableInfo->table_comment);
+        $this->assertSame('This is a comment', $tableInfo->table_comment);
 
         Schema::drop('users');
     }

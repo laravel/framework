@@ -15,7 +15,7 @@ class SupportMailTest extends TestCase
             : 'it failed.',
         );
 
-        $this->assertEquals('it works!', Mail::test('foo'));
+        $this->assertSame('it works!', Mail::test('foo'));
     }
 
     public function testItRegisterAndCallMacrosWhenFaked()
@@ -27,7 +27,7 @@ class SupportMailTest extends TestCase
 
         Mail::fake();
 
-        $this->assertEquals('it works!', Mail::test('foo'));
+        $this->assertSame('it works!', Mail::test('foo'));
     }
 
     public function testEmailSent()

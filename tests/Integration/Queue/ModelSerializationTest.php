@@ -469,7 +469,7 @@ class ModelSerializationTest extends TestCase
         $unserialized = unserialize($serialized);
 
         $this->assertFalse($unserialized->user->relationLoaded('roles'));
-        $this->assertEquals('hello', $unserialized->value->value);
+        $this->assertSame('hello', $unserialized->value->value);
     }
 
     #[WithConfig('database.default', 'testing')]
@@ -485,7 +485,7 @@ class ModelSerializationTest extends TestCase
         $unserialized = unserialize($serialized);
 
         $this->assertFalse($unserialized->user->relationLoaded('roles'));
-        $this->assertEquals('hello', $unserialized->value->value);
+        $this->assertSame('hello', $unserialized->value->value);
     }
 
     public function test_serialization_types_empty_custom_eloquent_collection()

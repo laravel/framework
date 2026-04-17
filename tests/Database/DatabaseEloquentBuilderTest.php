@@ -336,7 +336,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getModel()->shouldReceive('newCollection')->with([])->andReturn(new Collection([]));
 
         $results = $builder->get(['foo']);
-        $this->assertEquals([], $results->all());
+        $this->assertSame([], $results->all());
     }
 
     public function testValueMethodWithModelFound()
@@ -1107,7 +1107,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = new EloquentBuilderTestStub();
         $this->mockConnectionForModel($model, 'SQLite');
         $query = $model->newQuery()->whereNot('name', 'foo')->whereNot('name', '<>', 'bar');
-        $this->assertEquals('select * from "table" where not "name" = ? and not "name" <> ?', $query->toSql());
+        $this->assertSame('select * from "table" where not "name" = ? and not "name" <> ?', $query->toSql());
         $this->assertEquals(['foo', 'bar'], $query->getBindings());
     }
 
@@ -1137,7 +1137,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = new EloquentBuilderTestStub();
         $this->mockConnectionForModel($model, 'SQLite');
         $query = $model->newQuery()->orWhereNot('name', 'foo')->orWhereNot('name', '<>', 'bar');
-        $this->assertEquals('select * from "table" where not "name" = ? or not "name" <> ?', $query->toSql());
+        $this->assertSame('select * from "table" where not "name" = ? or not "name" <> ?', $query->toSql());
         $this->assertEquals(['foo', 'bar'], $query->getBindings());
     }
 

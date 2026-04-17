@@ -34,28 +34,28 @@ class BladeBoolTest extends AbstractBladeTestCase
 
         ob_start();
         eval(substr($compiled, 6, -3));
-        $this->assertEquals('true', ob_get_clean());
+        $this->assertSame('true', ob_get_clean());
 
         $someViewVarFalsey = '0';
         $compiled = $this->compiler->compileString('@bool($someViewVarFalsey)');
 
         ob_start();
         eval(substr($compiled, 6, -3));
-        $this->assertEquals('false', ob_get_clean());
+        $this->assertSame('false', ob_get_clean());
 
         $anotherSomeViewVarTruthy = new SomeClass();
         $compiled = $this->compiler->compileString('@bool($anotherSomeViewVarTruthy)');
 
         ob_start();
         eval(substr($compiled, 6, -3));
-        $this->assertEquals('true', ob_get_clean());
+        $this->assertSame('true', ob_get_clean());
 
         $anotherSomeViewVarFalsey = null;
         $compiled = $this->compiler->compileString('@bool($anotherSomeViewVarFalsey)');
 
         ob_start();
         eval(substr($compiled, 6, -3));
-        $this->assertEquals('false', ob_get_clean());
+        $this->assertSame('false', ob_get_clean());
     }
 }
 

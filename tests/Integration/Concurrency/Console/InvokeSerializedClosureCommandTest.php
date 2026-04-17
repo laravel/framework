@@ -48,7 +48,7 @@ class InvokeSerializedClosureCommandTest extends TestCase
 
         // Verify the result
         $this->assertTrue($result['successful']);
-        $this->assertEquals('Hello, World!', unserialize($result['result']));
+        $this->assertSame('Hello, World!', unserialize($result['result']));
     }
 
     public function testItCanInvokeSerializedClosureFromEnvironment()
@@ -71,7 +71,7 @@ class InvokeSerializedClosureCommandTest extends TestCase
 
         // Verify the result
         $this->assertTrue($result['successful']);
-        $this->assertEquals('From Environment', unserialize($result['result']));
+        $this->assertSame('From Environment', unserialize($result['result']));
 
         // Clean up
         unset($_SERVER['LARAVEL_INVOKABLE_CLOSURE']);
@@ -112,8 +112,8 @@ class InvokeSerializedClosureCommandTest extends TestCase
 
         // Verify the exception was caught
         $this->assertFalse($result['successful']);
-        $this->assertEquals('RuntimeException', $result['exception']);
-        $this->assertEquals('Test exception', $result['message']);
+        $this->assertSame('RuntimeException', $result['exception']);
+        $this->assertSame('Test exception', $result['message']);
     }
 
     public function testItHandlesCustomExceptionWithParameters()
@@ -136,6 +136,6 @@ class InvokeSerializedClosureCommandTest extends TestCase
         // Verify the exception was caught and parameters were captured
         $this->assertFalse($result['successful']);
         $this->assertArrayHasKey('parameters', $result);
-        $this->assertEquals('Test param', $result['parameters']['customParam'] ?? null);
+        $this->assertSame('Test param', $result['parameters']['customParam'] ?? null);
     }
 }
