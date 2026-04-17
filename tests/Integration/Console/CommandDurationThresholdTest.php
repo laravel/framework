@@ -27,7 +27,7 @@ class CommandDurationThresholdTest extends TestCase
 
         $this->assertFalse($called);
 
-        Carbon::setTestNow(Carbon::now()->addSeconds(1)->addMilliseconds(1));
+        Carbon::setTestNow(Carbon::now()->addSecond()->addMilliseconds(1));
         $kernel->terminate($input, 21);
 
         $this->assertTrue($called);
@@ -48,7 +48,7 @@ class CommandDurationThresholdTest extends TestCase
 
         $this->assertFalse($called);
 
-        Carbon::setTestNow(Carbon::now()->addSeconds(1));
+        Carbon::setTestNow(Carbon::now()->addSecond());
         $kernel->terminate($input, 21);
 
         $this->assertFalse($called);
@@ -66,7 +66,7 @@ class CommandDurationThresholdTest extends TestCase
 
         Carbon::setTestNow($startedAt = Carbon::now());
         $kernel->handle($input, new ConsoleOutput);
-        Carbon::setTestNow(Carbon::now()->addSeconds(1));
+        Carbon::setTestNow(Carbon::now()->addSecond());
         $kernel->terminate($input, 21);
 
         $this->assertCount(3, $args);
@@ -90,7 +90,7 @@ class CommandDurationThresholdTest extends TestCase
 
         $this->assertFalse($called);
 
-        Carbon::setTestNow(Carbon::now()->addSeconds(1)->addMilliseconds(1));
+        Carbon::setTestNow(Carbon::now()->addSecond()->addMilliseconds(1));
         $kernel->terminate($input, 21);
 
         $this->assertTrue($called);
@@ -111,7 +111,7 @@ class CommandDurationThresholdTest extends TestCase
 
         $this->assertFalse($called);
 
-        Carbon::setTestNow(Carbon::now()->addSeconds(1));
+        Carbon::setTestNow(Carbon::now()->addSecond());
         $kernel->terminate($input, 21);
 
         $this->assertFalse($called);
@@ -135,7 +135,7 @@ class CommandDurationThresholdTest extends TestCase
 
             $this->assertFalse($called);
 
-            Carbon::setTestNow(Carbon::now()->addSeconds(1)->addMillisecond());
+            Carbon::setTestNow(Carbon::now()->addSecond()->addMillisecond());
 
             $kernel->terminate($input, 21);
 
@@ -158,7 +158,7 @@ class CommandDurationThresholdTest extends TestCase
 
         $this->assertFalse($called);
 
-        Carbon::setTestNow(Carbon::now()->addSeconds(1));
+        Carbon::setTestNow(Carbon::now()->addSecond());
         $kernel->terminate($input, 21);
 
         $this->assertFalse($called);

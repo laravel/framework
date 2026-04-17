@@ -39,7 +39,7 @@ class CacheRepositoryTest extends TestCase
 
     protected function tearDown(): void
     {
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
         Repository::handleUnserializableClassUsing(null);
 
         parent::tearDown();

@@ -57,7 +57,7 @@ class DatabaseLockTest extends DatabaseTestCase
     {
         $lock = Cache::driver('database')->lock('foo');
         $this->assertTrue($lock->get());
-        DB::table('cache_locks')->update(['expiration' => Carbon::now()->subDays(1)->getTimestamp()]);
+        DB::table('cache_locks')->update(['expiration' => Carbon::now()->subDay()->getTimestamp()]);
 
         $otherLock = Cache::driver('database')->lock('foo');
         $this->assertTrue($otherLock->get());

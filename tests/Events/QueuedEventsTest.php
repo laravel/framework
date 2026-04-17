@@ -670,7 +670,7 @@ class TestDispatcherOptions implements ShouldQueue
 
     public function retryUntil()
     {
-        return Carbon::now()->addHour(1);
+        return Carbon::now()->addHour();
     }
 
     public function tries()

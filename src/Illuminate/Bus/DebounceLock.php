@@ -68,12 +68,12 @@ class DebounceLock
         $timestampKey = $key.':first_dispatched_at';
 
         if (! $cache->has($timestampKey)) {
-            $cache->put($timestampKey, Carbon::now()->timestamp, $ttl);
+            $cache->put($timestampKey, Carbon::now()->getTimestamp(), $ttl);
 
             return false;
         }
 
-        $elapsed = Carbon::now()->timestamp - $cache->get($timestampKey);
+        $elapsed = Carbon::now()->getTimestamp() - $cache->get($timestampKey);
 
         if ($elapsed >= $maxWait) {
             $cache->forget($timestampKey);
