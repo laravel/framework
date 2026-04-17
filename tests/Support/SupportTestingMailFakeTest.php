@@ -381,7 +381,7 @@ class SupportTestingMailFakeTest extends TestCase
     {
         $this->mailManager->shouldReceive('foo')->andReturn('bar');
 
-        $this->assertEquals('bar', $this->fake->foo());
+        $this->assertSame('bar', $this->fake->foo());
     }
 
     public function testAssertMailer()

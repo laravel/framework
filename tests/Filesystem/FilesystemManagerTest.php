@@ -57,7 +57,7 @@ class FilesystemManagerTest extends TestCase
         file_put_contents(__DIR__.'/../../my-custom-path/path.txt', 'contents');
 
         // read operations work
-        $this->assertEquals('contents', $disk->get('path.txt'));
+        $this->assertSame('contents', $disk->get('path.txt'));
         $this->assertEquals(['path.txt'], $disk->files());
 
         // write operations fail
@@ -95,7 +95,7 @@ class FilesystemManagerTest extends TestCase
             ]);
 
             $scoped->put('dirname/filename.txt', 'file content');
-            $this->assertEquals('file content', $local->get('path-prefix/dirname/filename.txt'));
+            $this->assertSame('file content', $local->get('path-prefix/dirname/filename.txt'));
             $local->deleteDirectory('path-prefix');
         } finally {
             rmdir(__DIR__.'/../../to-be-scoped');
@@ -127,7 +127,7 @@ class FilesystemManagerTest extends TestCase
             ]);
 
             $nestedScoped->put('dirname/filename.txt', 'file content');
-            $this->assertEquals('file content', $root->get('scoped-from-root-prefix/nested-scoped-prefix/dirname/filename.txt'));
+            $this->assertSame('file content', $root->get('scoped-from-root-prefix/nested-scoped-prefix/dirname/filename.txt'));
             $root->deleteDirectory('scoped-from-root-prefix');
         } finally {
             rmdir(__DIR__.'/../../root-to-be-scoped');
@@ -157,7 +157,7 @@ class FilesystemManagerTest extends TestCase
 
             $scoped->put('dirname/filename.txt', 'file content');
 
-            $this->assertEquals('private', $scoped->getVisibility('dirname/filename.txt'));
+            $this->assertSame('private', $scoped->getVisibility('dirname/filename.txt'));
         } finally {
             unlink(__DIR__.'/../../to-be-scoped/path-prefix/dirname/filename.txt');
             rmdir(__DIR__.'/../../to-be-scoped/path-prefix/dirname');
@@ -209,7 +209,7 @@ class FilesystemManagerTest extends TestCase
 
             $scoped->put('dirname/filename.txt', 'file content');
             $this->assertTrue(is_dir(__DIR__.'/../../to-be-scoped/path-prefix'));
-            $this->assertEquals('file content', file_get_contents(__DIR__.'/../../to-be-scoped/path-prefix/dirname/filename.txt'));
+            $this->assertSame('file content', file_get_contents(__DIR__.'/../../to-be-scoped/path-prefix/dirname/filename.txt'));
         } finally {
             unlink(__DIR__.'/../../to-be-scoped/path-prefix/dirname/filename.txt');
             rmdir(__DIR__.'/../../to-be-scoped/path-prefix/dirname');

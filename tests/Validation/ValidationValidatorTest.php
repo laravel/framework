@@ -1103,7 +1103,8 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['name' => ''], ['name' => 'required']);
 
-        $exception = new class($v) extends ValidationException {
+        $exception = new class($v) extends ValidationException
+        {
         };
         $v->setException($exception);
 
@@ -4652,10 +4653,10 @@ class ValidationValidatorTest extends TestCase
         ]);
 
         $this->assertFalse($v->passes());
-        $this->assertEquals('The numeric field must be greater than 10.', $v->messages()->first('numeric'));
-        $this->assertEquals('The string field must be greater than 5 characters.', $v->messages()->first('string'));
-        $this->assertEquals('The file field must be greater than 9 kilobytes.', $v->messages()->first('file'));
-        $this->assertEquals('The array field must have more than 4 items.', $v->messages()->first('array'));
+        $this->assertSame('The numeric field must be greater than 10.', $v->messages()->first('numeric'));
+        $this->assertSame('The string field must be greater than 5 characters.', $v->messages()->first('string'));
+        $this->assertSame('The file field must be greater than 9 kilobytes.', $v->messages()->first('file'));
+        $this->assertSame('The array field must have more than 4 items.', $v->messages()->first('array'));
     }
 
     public function testValidateGteMessagesAreCorrect()
@@ -4692,10 +4693,10 @@ class ValidationValidatorTest extends TestCase
         ]);
 
         $this->assertFalse($v->passes());
-        $this->assertEquals('The numeric field must be greater than or equal to 10.', $v->messages()->first('numeric'));
-        $this->assertEquals('The string field must be greater than or equal to 5 characters.', $v->messages()->first('string'));
-        $this->assertEquals('The file field must be greater than or equal to 9 kilobytes.', $v->messages()->first('file'));
-        $this->assertEquals('The array field must have 4 items or more.', $v->messages()->first('array'));
+        $this->assertSame('The numeric field must be greater than or equal to 10.', $v->messages()->first('numeric'));
+        $this->assertSame('The string field must be greater than or equal to 5 characters.', $v->messages()->first('string'));
+        $this->assertSame('The file field must be greater than or equal to 9 kilobytes.', $v->messages()->first('file'));
+        $this->assertSame('The array field must have 4 items or more.', $v->messages()->first('array'));
     }
 
     public function testValidateLtMessagesAreCorrect()
@@ -4732,10 +4733,10 @@ class ValidationValidatorTest extends TestCase
         ]);
 
         $this->assertFalse($v->passes());
-        $this->assertEquals('The numeric field must be less than 5.', $v->messages()->first('numeric'));
-        $this->assertEquals('The string field must be less than 3 characters.', $v->messages()->first('string'));
-        $this->assertEquals('The file field must be less than 8 kilobytes.', $v->messages()->first('file'));
-        $this->assertEquals('The array field must have less than 2 items.', $v->messages()->first('array'));
+        $this->assertSame('The numeric field must be less than 5.', $v->messages()->first('numeric'));
+        $this->assertSame('The string field must be less than 3 characters.', $v->messages()->first('string'));
+        $this->assertSame('The file field must be less than 8 kilobytes.', $v->messages()->first('file'));
+        $this->assertSame('The array field must have less than 2 items.', $v->messages()->first('array'));
     }
 
     public function testValidateLteMessagesAreCorrect()
@@ -4772,10 +4773,10 @@ class ValidationValidatorTest extends TestCase
         ]);
 
         $this->assertFalse($v->passes());
-        $this->assertEquals('The numeric field must be less than or equal to 5.', $v->messages()->first('numeric'));
-        $this->assertEquals('The string field must be less than or equal to 3 characters.', $v->messages()->first('string'));
-        $this->assertEquals('The file field must be less than or equal to 8 kilobytes.', $v->messages()->first('file'));
-        $this->assertEquals('The array field must not have more than 2 items.', $v->messages()->first('array'));
+        $this->assertSame('The numeric field must be less than or equal to 5.', $v->messages()->first('numeric'));
+        $this->assertSame('The string field must be less than or equal to 3 characters.', $v->messages()->first('string'));
+        $this->assertSame('The file field must be less than or equal to 8 kilobytes.', $v->messages()->first('file'));
+        $this->assertSame('The array field must not have more than 2 items.', $v->messages()->first('array'));
     }
 
     public function testValidateIp()
@@ -6954,7 +6955,7 @@ class ValidationValidatorTest extends TestCase
         $v->sometimes(['users'], 'array', function ($i, $item) {
             return (bool) $item;
         });
-        $this->assertEquals([], $v->getRules());
+        $this->assertSame([], $v->getRules());
 
         // ['company.users'] -> if users is not empty it must be validated as array
         $trans = $this->getIlluminateArrayTranslator();

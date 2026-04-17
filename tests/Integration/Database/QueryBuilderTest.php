@@ -138,8 +138,8 @@ class QueryBuilderTest extends DatabaseTestCase
 
         $rows = DB::table('accounting')->get();
 
-        $this->assertEquals(1.5, $rows[0]->wallet_1);
-        $this->assertEquals(1.5, $rows[1]->wallet_1);
+        $this->assertSame(1.5, $rows[0]->wallet_1);
+        $this->assertSame(1.5, $rows[1]->wallet_1);
 
         Schema::drop('accounting');
     }

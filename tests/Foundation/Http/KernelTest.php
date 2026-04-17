@@ -17,14 +17,14 @@ class KernelTest extends TestCase
     {
         $kernel = new Kernel($this->getApplication(), $this->getRouter());
 
-        $this->assertEquals([], $kernel->getMiddlewareGroups());
+        $this->assertSame([], $kernel->getMiddlewareGroups());
     }
 
     public function testGetRouteMiddleware()
     {
         $kernel = new Kernel($this->getApplication(), $this->getRouter());
 
-        $this->assertEquals([], $kernel->getRouteMiddleware());
+        $this->assertSame([], $kernel->getRouteMiddleware());
     }
 
     public function testGetMiddlewarePriority()
