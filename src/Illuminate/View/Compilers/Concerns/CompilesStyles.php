@@ -14,6 +14,6 @@ trait CompilesStyles
     {
         $expression = is_null($expression) ? '([])' : $expression;
 
-        return "style=\"<?php echo \Illuminate\Support\Arr::toCssStyles{$expression} ?>\"";
+        return "<?php \$__styles = \Illuminate\Support\Arr::toCssStyles{$expression}; echo \$__styles !== '' ? 'style=\"'.\$__styles.'\"' : ''; ?>";
     }
 }

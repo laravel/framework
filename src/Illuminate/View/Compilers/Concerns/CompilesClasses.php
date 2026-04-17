@@ -14,6 +14,6 @@ trait CompilesClasses
     {
         $expression = is_null($expression) ? '([])' : $expression;
 
-        return "class=\"<?php echo \Illuminate\Support\Arr::toCssClasses{$expression}; ?>\"";
+        return "<?php \$__classes = \Illuminate\Support\Arr::toCssClasses{$expression}; echo \$__classes !== '' ? 'class=\"'.\$__classes.'\"' : ''; ?>";
     }
 }

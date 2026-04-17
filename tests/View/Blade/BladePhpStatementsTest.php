@@ -122,12 +122,12 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
     public function testUnclosedParenthesisForBladeTags()
     {
         $string = "<span @class(['(']></span>";
-        $expected = "<span class=\"<?php echo \Illuminate\Support\Arr::toCssClasses([]); ?>\"(['(']></span>";
+        $expected = "<span <?php \$__classes = \Illuminate\Support\Arr::toCssClasses([]); echo \$__classes !== '' ? 'class=\"'.\$__classes.'\"' : ''; ?>(['(']></span>";
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
 
         $string = "<span @class(['']></span>";
-        $expected = "<span class=\"<?php echo \Illuminate\Support\Arr::toCssClasses([]); ?>\"(['']></span>";
+        $expected = "<span <?php \$__classes = \Illuminate\Support\Arr::toCssClasses([]); echo \$__classes !== '' ? 'class=\"'.\$__classes.'\"' : ''; ?>(['']></span>";
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
 
@@ -145,31 +145,31 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
     public function testNestedTagCalls()
     {
         $string = "<span @class(['k' => @empty(\$v)])></span>";
-        $expected = '<span class="<?php echo \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v)]); ?>"></span>';
+        $expected = '<span <?php $__classes = \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v)]); echo $__classes !== \'\' ? \'class="\'.$__classes.\'"\' : \'\'; ?>></span>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
 
         $string = "<span @class(['k))' => @empty(\$v)])></span>";
-        $expected = '<span class="<?php echo \Illuminate\Support\Arr::toCssClasses([\'k))\' => @empty($v)]); ?>"></span>';
+        $expected = '<span <?php $__classes = \Illuminate\Support\Arr::toCssClasses([\'k))\' => @empty($v)]); echo $__classes !== \'\' ? \'class="\'.$__classes.\'"\' : \'\'; ?>></span>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
 
         $string = "<span @class(['k' => @empty(\$v), 't' => @empty(\$v1)])></span>";
-        $expected = '<span class="<?php echo \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v), \'t\' => @empty($v1)]); ?>"></span>';
+        $expected = '<span <?php $__classes = \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v), \'t\' => @empty($v1)]); echo $__classes !== \'\' ? \'class="\'.$__classes.\'"\' : \'\'; ?>></span>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
 
         $string = "<span @class(['k' => @empty(\$v), 't' => @empty(\$v1)])></span>";
-        $expected = '<span class="<?php echo \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v), \'t\' => @empty($v1)]); ?>"></span>';
+        $expected = '<span <?php $__classes = \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v), \'t\' => @empty($v1)]); echo $__classes !== \'\' ? \'class="\'.$__classes.\'"\' : \'\'; ?>></span>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
 
         $string = "<span @class(['k' => @empty(\$v), 't' => @empty(\$v1), 'r' => @empty(\$v2)])></span>";
-        $expected = '<span class="<?php echo \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v), \'t\' => @empty($v1), \'r\' => @empty($v2)]); ?>"></span>';
+        $expected = '<span <?php $__classes = \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v), \'t\' => @empty($v1), \'r\' => @empty($v2)]); echo $__classes !== \'\' ? \'class="\'.$__classes.\'"\' : \'\'; ?>></span>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
 
         $string = "<span @class(['k' => @empty(\$v), 't))' => @empty(\$v1), 'r' => @empty(\$v2)])></span>";
-        $expected = '<span class="<?php echo \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v), \'t))\' => @empty($v1), \'r\' => @empty($v2)]); ?>"></span>';
+        $expected = '<span <?php $__classes = \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v), \'t))\' => @empty($v1), \'r\' => @empty($v2)]); echo $__classes !== \'\' ? \'class="\'.$__classes.\'"\' : \'\'; ?>></span>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
 
         $string = "<span @class(['k' => @empty(\$v), 't' => @empty(\$v1), 'r' => @empty(\$v2), 'l' => 'l'])></span><span @class(['k' => @empty(\$v)])></span>";
-        $expected = '<span class="<?php echo \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v), \'t\' => @empty($v1), \'r\' => @empty($v2), \'l\' => \'l\']); ?>"></span><span class="<?php echo \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v)]); ?>"></span>';
+        $expected = '<span <?php $__classes = \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v), \'t\' => @empty($v1), \'r\' => @empty($v2), \'l\' => \'l\']); echo $__classes !== \'\' ? \'class="\'.$__classes.\'"\' : \'\'; ?>></span><span <?php $__classes = \Illuminate\Support\Arr::toCssClasses([\'k\' => @empty($v)]); echo $__classes !== \'\' ? \'class="\'.$__classes.\'"\' : \'\'; ?>></span>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
