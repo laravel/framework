@@ -94,13 +94,9 @@ class MailCloudflareTransportTest extends TestCase
     public function testSendWithNamedAddresses(): void
     {
         $requestBody = null;
-        $requestUrl = null;
-        $requestHeaders = null;
 
-        $client = new MockHttpClient(function ($method, $url, $options) use (&$requestBody, &$requestUrl, &$requestHeaders) {
-            $requestUrl = $url;
+        $client = new MockHttpClient(function ($method, $url, $options) use (&$requestBody) {
             $requestBody = json_decode($options['body'], true);
-            $requestHeaders = $options['normalized_headers'];
 
             return new MockResponse(json_encode([
                 'success' => true,
