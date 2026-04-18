@@ -31,7 +31,8 @@
         "resend/resend-php": "Required to enable support for the Resend mail transport (^1.0).",
         "symfony/http-client": "Required to use the Symfony API mail transports (^8.0).",
         "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail transport (^8.0).",
-        "symfony/postmark-mailer": "Required to enable support for the Postmark mail transport (^8.0)."
+        "symfony/postmark-mailer": "Required to enable support for the Postmark mail transport (^8.0).",
+        "symfony/resend-mailer": "Required to enable support for the Resend mail transport (^8.0)."
     },
     "minimum-stability": "dev",
     "autoload": {

@@ -9,7 +9,6 @@ use Illuminate\Contracts\Mail\Factory as FactoryContract;
 use Illuminate\Log\LogManager;
 use Illuminate\Mail\Transport\ArrayTransport;
 use Illuminate\Mail\Transport\LogTransport;
-use Illuminate\Mail\Transport\ResendTransport;
 use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Mail\Transport\SesV2Transport;
 use Illuminate\Support\Arr;
@@ -17,10 +16,10 @@ use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
-use Resend;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
+use Symfony\Component\Mailer\Bridge\Resend\Transport\ResendTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\FailoverTransport;
 use Symfony\Component\Mailer\Transport\RoundRobinTransport;
@@ -309,16 +308,20 @@ class MailManager implements FactoryContract
     }
 
     /**
-     * Create an instance of the Resend Transport driver.
+     * Create an instance of the Symfony Resend Transport driver.
      *
      * @param  array  $config
-     * @return \Illuminate\Mail\Transport\ResendTransport
+     * @return \Symfony\Component\Mailer\Transport\TransportInterface
      */
     protected function createResendTransport(array $config)
     {
-        return new ResendTransport(
-            Resend::client($config['key'] ?? $this->app['config']->get('services.resend.key')),
-        );
+        $factory = new ResendTransportFactory(null, $this->getHttpClient($config));
+
+        return $factory->create(new Dsn(
+            'resend+api',
+            'default',
+            $config['key'] ?? $this->app['config']->get('services.resend.key'),
+        ));
     }
 
     /**
