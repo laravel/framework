@@ -28,7 +28,6 @@
     "suggest": {
         "aws/aws-sdk-php": "Required to use the SES mail driver (^3.322.9).",
         "illuminate/http": "Required to create an attachment from an UploadedFile instance (^14.0).",
-        "resend/resend-php": "Required to enable support for the Resend mail transport (^1.0).",
         "symfony/http-client": "Required to use the Symfony API mail transports (^8.0).",
         "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail transport (^8.0).",
         "symfony/postmark-mailer": "Required to enable support for the Postmark mail transport (^8.0).",
