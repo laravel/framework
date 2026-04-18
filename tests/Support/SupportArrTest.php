@@ -1713,7 +1713,8 @@ class SupportArrTest extends TestCase
         $this->assertSame($subject, Arr::from($items));
 
         $items = new WeakMap;
-        $items[$temp = new class {
+        $items[$temp = new class
+        {
         }] = 'bar';
         $this->assertSame(['bar'], Arr::from($items));
 
@@ -1937,5 +1938,48 @@ class SupportArrTest extends TestCase
         $result = Arr::partition($array, fn (string $value) => str_contains($value, 'J'));
 
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
+    }
+
+    public function testVariations()
+    {
+        // Single attribute: picks one from each array per combination
+        $this->assertSame([
+            [1, 6], [1, 8],
+            [2, 6], [2, 8],
+            [3, 6], [3, 8],
+        ], Arr::variations([1, 2, 3], [6, 8]));
+
+        // Multiple attributes: full cartesian product
+        $result = Arr::variations(['Black', 'Maroon', 'Red'], [32, 34, 36], ['S', 'M', 'L'], ['BD', 'USA']);
+
+        // Total: 3 colors × 3 waists × 3 sizes × 2 origins = 54
+        $this->assertCount(54, $result);
+
+        // First attribute (waist) cycles fastest
+        $this->assertSame(['Black', 32, 'S', 'BD'], $result[0]);
+        $this->assertSame(['Black', 34, 'S', 'BD'], $result[1]);
+        $this->assertSame(['Black', 36, 'S', 'BD'], $result[2]);
+        $this->assertSame(['Black', 32, 'M', 'BD'], $result[3]);
+        $this->assertSame(['Black', 34, 'M', 'BD'], $result[4]);
+        $this->assertSame(['Black', 36, 'M', 'BD'], $result[5]);
+        $this->assertSame(['Black', 32, 'L', 'BD'], $result[6]);
+        $this->assertSame(['Black', 34, 'L', 'BD'], $result[7]);
+        $this->assertSame(['Black', 36, 'L', 'BD'], $result[8]);
+
+        // Origin cycles after all waist+size combos
+        $this->assertSame(['Black', 32, 'S', 'USA'], $result[9]);
+
+        // Base (color) cycles slowest
+        $this->assertSame(['Maroon', 32, 'S', 'BD'], $result[18]);
+        $this->assertSame(['Red', 32, 'S', 'BD'], $result[36]);
+
+        // No attributes: wraps each base item
+        $this->assertSame([[1], [2], [3]], Arr::variations([1, 2, 3]));
+
+        // Empty base: returns []
+        $this->assertSame([], Arr::variations([], [6, 8]));
+
+        // No arguments: returns []
+        $this->assertSame([], Arr::variations());
     }
 }

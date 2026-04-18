@@ -1296,6 +1296,66 @@ class Arr
     }
 
     /**
+     * Generate all possible combinations by selecting one element from each array.
+     *
+     * The first array provides the base items. Each subsequent array is an attribute
+     * set. One value is picked from each array per combination. The first attribute
+     * array cycles fastest in the output, making it easy to build product variation
+     * matrices for e-commerce and similar use cases.
+     *
+     * Example:
+     *   Arr::variations(['Black', 'Maroon'], [32, 34], ['S', 'M'])
+     *   // → [
+     *   //     ['Black', 32, 'S'], ['Black', 34, 'S'],
+     *   //     ['Black', 32, 'M'], ['Black', 34, 'M'],
+     *   //     ['Maroon', 32, 'S'], ['Maroon', 34, 'S'],
+     *   //     ['Maroon', 32, 'M'], ['Maroon', 34, 'M'],
+     *   //   ]
+     *
+     * @param  array  ...$arrays
+     * @return array
+     */
+    public static function variations(array ...$arrays): array
+    {
+        if (empty($arrays)) {
+            return [];
+        }
+
+        $base = array_shift($arrays);
+
+        if (empty($arrays)) {
+            return array_values(array_map(fn ($item) => [$item], $base));
+        }
+
+        // Build the cartesian product of attribute arrays by processing them in
+        // reverse order and prepending each item. This ensures the first attribute
+        // array (earliest argument) cycles fastest in the final output.
+        $attrCombinations = [[]];
+
+        foreach (array_reverse($arrays) as $array) {
+            $append = [];
+
+            foreach ($attrCombinations as $combination) {
+                foreach ($array as $item) {
+                    $append[] = array_merge([$item], $combination);
+                }
+            }
+
+            $attrCombinations = $append;
+        }
+
+        $results = [];
+
+        foreach (array_values($base) as $baseItem) {
+            foreach ($attrCombinations as $attrCombo) {
+                $results[] = array_merge([$baseItem], $attrCombo);
+            }
+        }
+
+        return $results;
+    }
+
+    /**
      * If the given value is not an array and not null, wrap it in one.
      *
      * @template TKey of array-key = array-key
