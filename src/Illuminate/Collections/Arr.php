@@ -514,7 +514,6 @@ class Arr
      *
      * @param  array<TKey, TValue>  $array
      * @param  (callable(TValue, TKey): array-key)|string  $groupBy
-     * @param  bool  $preserveKeys
      * @return array<array-key, array<array-key, TValue>>
      */
     public static function groupBy(array $array, callable|string $groupBy, bool $preserveKeys = false): array
@@ -688,7 +687,6 @@ class Arr
      *
      * An array is "associative" if it doesn't have sequential numerical keys beginning with zero.
      *
-     * @param  array  $array
      * @return ($array is list ? false : true)
      */
     public static function isAssoc(array $array)
@@ -874,8 +872,6 @@ class Arr
     /**
      * Run a map over each of the items in the array.
      *
-     * @param  array  $array
-     * @param  callable  $callback
      * @return array
      */
     public static function map(array $array, callable $callback)
@@ -1075,11 +1071,6 @@ class Arr
 
     /**
      * Push an item into an array using "dot" notation.
-     *
-     * @param  \ArrayAccess|array  $array
-     * @param  string|int|null  $key
-     * @param  mixed  $values
-     * @return array
      */
     public static function push(ArrayAccess|array &$array, string|int|null $key, mixed ...$values): array
     {
