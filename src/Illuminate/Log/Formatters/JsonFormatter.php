@@ -16,7 +16,6 @@ class JsonFormatter extends MonologJsonFormatter
         $response = parent::normalizeException($e, $depth);
 
         try {
-            /** @var Handler $handler */
             $handler = Container::getInstance()->make(ExceptionHandler::class);
         } catch (Throwable) {
             return $response;
