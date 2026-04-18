@@ -357,7 +357,7 @@ class RouteCollectionTest extends TestCase
         $request = Request::create('users/1/show', 'GET');
 
         $this->assertCount(2, $this->routeCollection->getRoutes());
-        $this->assertEquals('first', $this->routeCollection->match($request)->getName());
+        $this->assertSame('first', $this->routeCollection->match($request)->getName());
     }
 
     public function testPrependsRoutesWithDomain()

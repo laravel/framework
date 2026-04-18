@@ -22,7 +22,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
 
         LazyCollection::make($closure);
 
-        $this->assertEquals([], $recorder->all());
+        $this->assertSame([], $recorder->all());
     }
 
     public function testMakeWithLazyCollectionIsLazy()

@@ -2588,7 +2588,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertNull($users[0]->birthday);
         $this->assertInstanceOf(\DateTime::class, $users[1]->birthday);
         $this->assertInstanceOf(\DateTime::class, $users[2]->birthday);
-        $this->assertEquals('1987-11-01', $users[2]->birthday->format('Y-m-d'));
+        $this->assertSame('1987-11-01', $users[2]->birthday->format('Y-m-d'));
 
         DB::flushQueryLog();
 

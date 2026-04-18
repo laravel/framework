@@ -189,7 +189,7 @@ class TranslationTranslatorTest extends TestCase
         $t->setSelector($selector = m::mock(MessageSelector::class));
         $selector->shouldReceive('choose')->once()->with('{1} :count foos|[2,*] :count foos', 1234, 'en')->andReturn(':count foos');
 
-        $this->assertEquals('1,234 foos', $t->choice(':count foos', 1234, ['count' => '1,234']));
+        $this->assertSame('1,234 foos', $t->choice(':count foos', 1234, ['count' => '1,234']));
     }
 
     public function testGetJson()
