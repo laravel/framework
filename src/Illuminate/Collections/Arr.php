@@ -57,6 +57,47 @@ class Arr
     }
 
     /**
+     * Get the average value of a given key.
+     *
+     * @template TKey of array-key
+     * @template TValue
+     *
+     * @param  array<TKey, TValue>  $array
+     * @param  (callable(TValue): float|int)|string|null  $callback
+     * @return float|int|null
+     */
+    public static function avg(array $array, callable|string|null $callback = null): float|int|null
+    {
+        $callback = is_null($callback)
+            ? fn ($value) => $value
+            : (is_callable($callback) ? $callback : fn ($item) => data_get($item, $callback));
+
+        $values = array_filter(
+            array_map($callback, $array),
+            fn ($value) => ! is_null($value)
+        );
+
+        $count = count($values);
+
+        return $count ? array_sum($values) / $count : null;
+    }
+
+    /**
+     * Alias for the "avg" method.
+     *
+     * @template TKey of array-key
+     * @template TValue
+     *
+     * @param  array<TKey, TValue>  $array
+     * @param  (callable(TValue): float|int)|string|null  $callback
+     * @return float|int|null
+     */
+    public static function average(array $array, callable|string|null $callback = null): float|int|null
+    {
+        return static::avg($array, $callback);
+    }
+
+    /**
      * Add an element to an array using "dot" notation if it doesn't exist.
      *
      * @param  array  $array
@@ -895,6 +936,40 @@ class Arr
     }
 
     /**
+     * Get the median of a given key.
+     *
+     * @template TKey of array-key
+     * @template TValue
+     *
+     * @param  array<TKey, TValue>  $array
+     * @param  string|null  $key
+     * @return float|int|null
+     */
+    public static function median(array $array, ?string $key = null): float|int|null
+    {
+        $values = array_values(array_filter(
+            isset($key) ? static::pluck($array, $key) : $array,
+            fn ($value) => ! is_null($value)
+        ));
+
+        sort($values);
+
+        $count = count($values);
+
+        if ($count === 0) {
+            return null;
+        }
+
+        $middle = intdiv($count, 2);
+
+        if ($count % 2) {
+            return $values[$middle];
+        }
+
+        return ($values[$middle - 1] + $values[$middle]) / 2;
+    }
+
+    /**
      * Push an item onto the beginning of an array.
      *
      * @param  array  $array
@@ -1177,6 +1252,25 @@ class Arr
         }
 
         return $value;
+    }
+
+    /**
+     * Get the sum of the given values.
+     *
+     * @template TKey of array-key
+     * @template TValue
+     *
+     * @param  array<TKey, TValue>  $array
+     * @param  (callable(TValue): float|int)|string|null  $callback
+     * @return float|int
+     */
+    public static function sum(array $array, callable|string|null $callback = null): float|int
+    {
+        $callback = is_null($callback)
+            ? fn ($value) => $value
+            : (is_callable($callback) ? $callback : fn ($item) => data_get($item, $callback));
+
+        return array_reduce($array, fn ($result, $item) => $result + $callback($item), 0);
     }
 
     /**
