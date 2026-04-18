@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\MessageProvider;
 use Illuminate\Session\Store as SessionStore;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Uri;
@@ -15,7 +16,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse as BaseRedirectResponse;
 
 class RedirectResponse extends BaseRedirectResponse
 {
-    use ForwardsCalls, ResponseTrait, Macroable {
+    use Conditionable, ForwardsCalls, ResponseTrait, Macroable {
         Macroable::__call as macroCall;
     }
 
