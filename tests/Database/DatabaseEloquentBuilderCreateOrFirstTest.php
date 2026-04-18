@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Closure;
 use Exception;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Model;
@@ -719,7 +720,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
             ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
         )->andReturnTrue();
 
-        $dispatcher = m::mock(\Illuminate\Contracts\Events\Dispatcher::class);
+        $dispatcher = m::mock(Dispatcher::class);
         $dispatcher->shouldNotReceive('dispatch');
         $dispatcher->shouldNotReceive('until');
         EloquentBuilderCreateOrFirstTestModel::setEventDispatcher($dispatcher);
@@ -811,7 +812,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
             ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
         )->andReturnTrue();
 
-        $dispatcher = m::mock(\Illuminate\Contracts\Events\Dispatcher::class);
+        $dispatcher = m::mock(Dispatcher::class);
         $dispatcher->shouldNotReceive('dispatch');
         $dispatcher->shouldNotReceive('until');
         EloquentBuilderCreateOrFirstTestModel::setEventDispatcher($dispatcher);
@@ -847,7 +848,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
             )
             ->andReturn(1);
 
-        $dispatcher = m::mock(\Illuminate\Contracts\Events\Dispatcher::class);
+        $dispatcher = m::mock(Dispatcher::class);
         $dispatcher->shouldNotReceive('dispatch');
         $dispatcher->shouldNotReceive('until');
         EloquentBuilderCreateOrFirstTestModel::setEventDispatcher($dispatcher);
