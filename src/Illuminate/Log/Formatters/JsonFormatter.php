@@ -18,7 +18,11 @@ class JsonFormatter extends MonologJsonFormatter
             return $response;
         }
 
-        $handler = Container::getInstance()->make(ExceptionHandler::class);
+        try {
+            $handler = Container::getInstance()->make(ExceptionHandler::class);
+        } catch (Throwable $e) {
+            return $response;
+        }
 
         if (method_exists($handler, 'createExceptionContext')) {
             $response = array_merge(
