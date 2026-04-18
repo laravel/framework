@@ -8,6 +8,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Log\Formatters\JsonFormatter;
 use Illuminate\Log\Logger;
+use Illuminate\Support\Facades\Log;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger as Monolog;
 use Orchestra\Testbench\TestCase;
@@ -17,17 +18,26 @@ use Throwable;
 
 final class JsonFormatterTest extends TestCase
 {
+    #[\Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config(['logging.default' => 'testing']);
+        config(['logging.channels' => [
+            'testing' => [
+                'driver' => 'monolog',
+                'handler' => TestHandler::class,
+                'formatter' => JsonFormatter::class,
+            ],
+        ]]);
+    }
+
     public function testExceptionContextIsEnrichedOnDirectLogging()
     {
-        $handler = $this->createTestHandler();
-        $logger = $this->createLogger($handler);
-        $this->app->instance(LoggerInterface::class, $logger);
+        Log::error('fail', ['exception' => new ContextProvidingException('Something went wrong')]);
 
-        $exception = new ContextProvidingException('Something went wrong');
-
-        $logger->error('fail', ['exception' => $exception]);
-
-        $formatted = $this->getFormattedJson($handler);
+        $formatted = $this->getFormattedJson();
         $exceptionData = $formatted['context']['exception'];
 
         self::assertSame('bar', $exceptionData['foo']);
@@ -36,7 +46,7 @@ final class JsonFormatterTest extends TestCase
 
     public function testExceptionContextIsNotDuplicatedWhenGoingThroughReport()
     {
-        $handler = $this->createTestHandler();
+        $handler = new TestHandler();
         $logger = $this->createLogger($handler);
         $this->app->instance(LoggerInterface::class, $logger);
 
@@ -59,8 +69,8 @@ final class JsonFormatterTest extends TestCase
 
     public function testStackDriverEnrichesBothHandlersOnDirectLogging()
     {
-        $handlerA = $this->createTestHandler();
-        $handlerB = $this->createTestHandler();
+        $handlerA = new TestHandler();
+        $handlerB = new TestHandler();
 
         $monolog = new Monolog('test', [$handlerA, $handlerB]);
         foreach ([$handlerA, $handlerB] as $h) {
@@ -85,8 +95,8 @@ final class JsonFormatterTest extends TestCase
 
     public function testStackDriverSkipsEnrichmentOnBothHandlersWhenReporting()
     {
-        $handlerA = $this->createTestHandler();
-        $handlerB = $this->createTestHandler();
+        $handlerA = new TestHandler();
+        $handlerB = new TestHandler();
 
         $monolog = new Monolog('test', [$handlerA, $handlerB]);
         foreach ([$handlerA, $handlerB] as $h) {
@@ -114,7 +124,7 @@ final class JsonFormatterTest extends TestCase
 
     public function testPreviousExceptionContextIsAlsoEnriched()
     {
-        $handler = $this->createTestHandler();
+        $handler = new TestHandler();
         $logger = $this->createLogger($handler);
 
         $exceptionHandler = new Handler($this->app);
@@ -138,7 +148,7 @@ final class JsonFormatterTest extends TestCase
 
     public function testReportEnrichesPreviousExceptionContext()
     {
-        $handler = $this->createTestHandler();
+        $handler = new TestHandler();
         $monolog = new Monolog('test', [$handler]);
         $handler->setFormatter(new JsonFormatter());
         $this->app->instance(LoggerInterface::class, new Logger($monolog));
@@ -170,7 +180,7 @@ final class JsonFormatterTest extends TestCase
 
     public function testExceptionWithoutContextMethodIsNotEnriched()
     {
-        $handler = $this->createTestHandler();
+        $handler = new TestHandler();
         $logger = $this->createLogger($handler);
 
         $exceptionHandler = new Handler($this->app);
@@ -190,7 +200,7 @@ final class JsonFormatterTest extends TestCase
 
     public function testContextCallbacksAreIncludedInFormatterEnrichment()
     {
-        $handler = $this->createTestHandler();
+        $handler = new TestHandler();
         $logger = $this->createLogger($handler);
 
         $exceptionHandler = new Handler($this->app);
@@ -214,7 +224,7 @@ final class JsonFormatterTest extends TestCase
     {
         Container::setInstance(new Container());
 
-        $handler = $this->createTestHandler();
+        $handler = new TestHandler();
         $monolog = new Monolog('test', [$handler]);
         $handler->setFormatter(new JsonFormatter());
 
@@ -232,7 +242,7 @@ final class JsonFormatterTest extends TestCase
 
     public function testNonScalarContextValuesAreNormalized()
     {
-        $handler = $this->createTestHandler();
+        $handler = new TestHandler();
         $logger = $this->createLogger($handler);
 
         $exceptionHandler = new Handler($this->app);
@@ -251,7 +261,7 @@ final class JsonFormatterTest extends TestCase
 
     public function testBothOuterAndPreviousContextEnrichedOnDirectLogging()
     {
-        $handler = $this->createTestHandler();
+        $handler = new TestHandler();
         $logger = $this->createLogger($handler);
 
         $exceptionHandler = new Handler($this->app);
@@ -282,7 +292,7 @@ final class JsonFormatterTest extends TestCase
 
     public function testBothOuterAndPreviousContextOnReport()
     {
-        $handler = $this->createTestHandler();
+        $handler = new TestHandler();
         $monolog = new Monolog('test', [$handler]);
         $handler->setFormatter(new JsonFormatter());
         $this->app->instance(LoggerInterface::class, new Logger($monolog));
@@ -325,8 +335,9 @@ final class JsonFormatterTest extends TestCase
         return new Logger($monolog);
     }
 
-    private function getFormattedJson(TestHandler $handler): array
+    private function getFormattedJson(?TestHandler $handler = null): array
     {
+        $handler ??= $this->app->make('log')->driver()->getLogger()->getHandlers()[0];
         $records = $handler->getRecords();
         self::assertNotEmpty($records, 'Expected at least one log record');
 
