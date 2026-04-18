@@ -25,7 +25,6 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Exceptions\OriginMismatchException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
-use Illuminate\Log\Formatters\ExceptionContextState;
 use Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException;
 use Illuminate\Routing\Router;
 use Illuminate\Session\TokenMismatchException;
@@ -111,9 +110,9 @@ class Handler implements ExceptionHandlerContract
     /**
      * The exception currently being reported.
      *
-     * @var Throwable|null
+     * @var \Throwable|null
      */
-    protected Throwable|null $currentlyReporting = null;
+    protected ?Throwable $currentlyReporting = null;
 
     /**
      * The callbacks that should be used during rendering.
