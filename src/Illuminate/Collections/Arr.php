@@ -13,7 +13,6 @@ use JsonSerializable;
 use Random\Randomizer;
 use Traversable;
 use WeakMap;
-use function Illuminate\Support\enum_value;
 
 class Arr
 {
