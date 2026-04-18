@@ -3,25 +3,40 @@
 namespace Illuminate\Log\Formatters;
 
 use WeakMap;
+use Throwable;
 
 class ExceptionContextState
 {
     /**
+     * The exceptions which have had their context built.
+     *
      * @var \WeakMap<\Throwable, true>
      */
-    protected static \WeakMap $map;
+    protected static WeakMap $map;
 
-    public static function reportContextBuilt(\Throwable $e): void
+    /**
+     * Record that we have already built context for the Throwable.
+     */
+    public static function reportContextBuilt(Throwable $e): void
     {
-        static::$map ??= new \WeakMap();
-
-        static::$map[$e] = true;
+        static::getMap()[$e] = true;
     }
 
-    public static function hasBuiltContextFor(\Throwable $e): bool
+    /**
+     * Determine if context has already been built for the exception.
+     */
+    public static function hasBuiltContextFor(Throwable $e): bool
     {
-        static::$map ??= new \WeakMap();
+        return isset(static::getMap()[$e]);
+    }
 
-        return isset(static::$map[$e]);
+    /**
+     * Get the underlying map of exceptions for which context has been built.
+     *
+     * @return WeakMap<\Throwable, true>
+     */
+    public static function getMap(): WeakMap
+    {
+        return self::$map ??= new WeakMap();
     }
 }

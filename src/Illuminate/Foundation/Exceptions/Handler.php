@@ -540,6 +540,11 @@ class Handler implements ExceptionHandlerContract
         );
     }
 
+    /**
+     * Creates the context for an exception.
+     *
+     * @return array<array-key, mixed>
+     */
     public function createExceptionContext(Throwable $e)
     {
         $context = array_merge($this->exceptionContext($e), $this->context());
