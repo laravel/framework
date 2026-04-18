@@ -645,6 +645,218 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
         $this->assertSame('bar', $result->val);
     }
 
+    public function testFirstOrCreateQuietlyCreatesNewRecord(): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite', [123]);
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])
+            ->andReturn([]);
+
+        $model->getConnection()->expects('insert')->with(
+            'insert into "table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
+            ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
+        )->andReturnTrue();
+
+        $result = $model->newQuery()->firstOrCreateQuietly(['attr' => 'foo'], ['val' => 'bar']);
+        $this->assertTrue($result->wasRecentlyCreated);
+        $this->assertEquals([
+            'id' => 123,
+            'attr' => 'foo',
+            'val' => 'bar',
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ], $result->toArray());
+    }
+
+    public function testFirstOrCreateQuietlyRetrievesExistingRecord(): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])
+            ->andReturn([[
+                'id' => 123,
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01 00:00:00',
+                'updated_at' => '2023-01-01 00:00:00',
+            ]]);
+
+        $result = $model->newQuery()->firstOrCreateQuietly(['attr' => 'foo'], ['val' => 'bar']);
+        $this->assertFalse($result->wasRecentlyCreated);
+        $this->assertEquals([
+            'id' => 123,
+            'attr' => 'foo',
+            'val' => 'bar',
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ], $result->toArray());
+    }
+
+    public function testFirstOrCreateQuietlyDoesNotDispatchEvents(): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite', [123]);
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])
+            ->andReturn([]);
+
+        $model->getConnection()->expects('insert')->with(
+            'insert into "table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
+            ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
+        )->andReturnTrue();
+
+        $dispatcher = m::mock(\Illuminate\Contracts\Events\Dispatcher::class);
+        $dispatcher->shouldNotReceive('dispatch');
+        $dispatcher->shouldNotReceive('until');
+        EloquentBuilderCreateOrFirstTestModel::setEventDispatcher($dispatcher);
+
+        $result = $model->newQuery()->firstOrCreateQuietly(['attr' => 'foo'], ['val' => 'bar']);
+
+        $this->assertTrue($result->wasRecentlyCreated);
+    }
+
+    public function testUpdateOrCreateQuietlyCreatesNewRecord(): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite', [123]);
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])
+            ->andReturn([]);
+
+        $model->getConnection()->expects('insert')->with(
+            'insert into "table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
+            ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
+        )->andReturnTrue();
+
+        $result = $model->newQuery()->updateOrCreateQuietly(['attr' => 'foo'], ['val' => 'bar']);
+        $this->assertTrue($result->wasRecentlyCreated);
+        $this->assertEquals([
+            'id' => 123,
+            'attr' => 'foo',
+            'val' => 'bar',
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ], $result->toArray());
+    }
+
+    public function testUpdateOrCreateQuietlyUpdatesExistingRecord(): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])
+            ->andReturn([[
+                'id' => 123,
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01 00:00:00',
+                'updated_at' => '2023-01-01 00:00:00',
+            ]]);
+
+        $model->getConnection()
+            ->expects('update')
+            ->with(
+                'update "table" set "val" = ?, "updated_at" = ? where "id" = ?',
+                ['baz', '2023-01-01 00:00:00', 123],
+            )
+            ->andReturn(1);
+
+        $result = $model->newQuery()->updateOrCreateQuietly(['attr' => 'foo'], ['val' => 'baz']);
+        $this->assertFalse($result->wasRecentlyCreated);
+        $this->assertEquals([
+            'id' => 123,
+            'attr' => 'foo',
+            'val' => 'baz',
+            'created_at' => '2023-01-01T00:00:00.000000Z',
+            'updated_at' => '2023-01-01T00:00:00.000000Z',
+        ], $result->toArray());
+    }
+
+    public function testUpdateOrCreateQuietlyDoesNotDispatchEvents(): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite', [123]);
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])
+            ->andReturn([]);
+
+        $model->getConnection()->expects('insert')->with(
+            'insert into "table" ("attr", "val", "updated_at", "created_at") values (?, ?, ?, ?)',
+            ['foo', 'bar', '2023-01-01 00:00:00', '2023-01-01 00:00:00'],
+        )->andReturnTrue();
+
+        $dispatcher = m::mock(\Illuminate\Contracts\Events\Dispatcher::class);
+        $dispatcher->shouldNotReceive('dispatch');
+        $dispatcher->shouldNotReceive('until');
+        EloquentBuilderCreateOrFirstTestModel::setEventDispatcher($dispatcher);
+
+        $result = $model->newQuery()->updateOrCreateQuietly(['attr' => 'foo'], ['val' => 'bar']);
+
+        $this->assertTrue($result->wasRecentlyCreated);
+    }
+
+    public function testUpdateOrCreateQuietlyDoesNotDispatchEventsWhenUpdating(): void
+    {
+        $model = new EloquentBuilderCreateOrFirstTestModel();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $model->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $model->getConnection()
+            ->expects('select')
+            ->with('select * from "table" where ("attr" = ?) limit 1', ['foo'], true, [])
+            ->andReturn([[
+                'id' => 123,
+                'attr' => 'foo',
+                'val' => 'bar',
+                'created_at' => '2023-01-01 00:00:00',
+                'updated_at' => '2023-01-01 00:00:00',
+            ]]);
+
+        $model->getConnection()
+            ->expects('update')
+            ->with(
+                'update "table" set "val" = ?, "updated_at" = ? where "id" = ?',
+                ['baz', '2023-01-01 00:00:00', 123],
+            )
+            ->andReturn(1);
+
+        $dispatcher = m::mock(\Illuminate\Contracts\Events\Dispatcher::class);
+        $dispatcher->shouldNotReceive('dispatch');
+        $dispatcher->shouldNotReceive('until');
+        EloquentBuilderCreateOrFirstTestModel::setEventDispatcher($dispatcher);
+
+        $result = $model->newQuery()->updateOrCreateQuietly(['attr' => 'foo'], ['val' => 'baz']);
+
+        $this->assertFalse($result->wasRecentlyCreated);
+    }
+
     public static function createOrFirstValues(): array
     {
         return [

@@ -734,6 +734,18 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get the first record matching the attributes. If the record is not found, create it without raising model events.
+     *
+     * @param  array  $attributes
+     * @param  (\Closure(): array)|array  $values
+     * @return TModel
+     */
+    public function firstOrCreateQuietly(array $attributes = [], Closure|array $values = [])
+    {
+        return Model::withoutEvents(fn () => $this->firstOrCreate($attributes, $values));
+    }
+
+    /**
      * Create or update a record matching the attributes, and fill it with values.
      *
      * @param  array  $attributes
@@ -747,6 +759,18 @@ class Builder implements BuilderContract
                 $instance->fill(value($values))->save();
             }
         });
+    }
+
+    /**
+     * Create or update a record matching the attributes, and fill it with values without raising model events.
+     *
+     * @param  array  $attributes
+     * @param  (\Closure(): array)|array  $values
+     * @return TModel
+     */
+    public function updateOrCreateQuietly(array $attributes, Closure|array $values = [])
+    {
+        return Model::withoutEvents(fn () => $this->updateOrCreate($attributes, $values));
     }
 
     /**
