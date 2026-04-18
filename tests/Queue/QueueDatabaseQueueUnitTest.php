@@ -256,7 +256,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('where')->with('queue', 'default')->andReturnSelf();
         $query->shouldReceive('whereNotNull')->with('reserved_at')->andReturnSelf();
-        $query->shouldReceive('get')->andReturn(collect([(object) ['id' => 1, 'queue' => 'default', 'payload' => $payload, 'attempts' => 1, 'reserved_at' => now()->timestamp]]));
+        $query->shouldReceive('get')->andReturn(collect([(object) ['id' => 1, 'queue' => 'default', 'payload' => $payload, 'attempts' => 1, 'reserved_at' => Carbon::now()->getTimestamp()]]));
 
         $jobs = $queue->reservedJobs();
 

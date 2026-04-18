@@ -25,7 +25,7 @@ class ServeFileTest extends TestCase
 
     public function testItCanServeAnExistingFile()
     {
-        $url = Storage::temporaryUrl('serve-file-test.txt', Carbon::now()->addMinutes(1));
+        $url = Storage::temporaryUrl('serve-file-test.txt', Carbon::now()->addMinute());
 
         $response = $this->get($url);
 
@@ -34,7 +34,7 @@ class ServeFileTest extends TestCase
 
     public function testItWill404OnMissingFile()
     {
-        $url = Storage::temporaryUrl('serve-missing-test.txt', Carbon::now()->addMinutes(1));
+        $url = Storage::temporaryUrl('serve-missing-test.txt', Carbon::now()->addMinute());
 
         $response = $this->get($url);
 
@@ -43,7 +43,7 @@ class ServeFileTest extends TestCase
 
     public function testItWill403OnWrongSignature()
     {
-        $url = Storage::temporaryUrl('serve-file-test.txt', Carbon::now()->addMinutes(1));
+        $url = Storage::temporaryUrl('serve-file-test.txt', Carbon::now()->addMinute());
 
         $url = $url.'c';
 

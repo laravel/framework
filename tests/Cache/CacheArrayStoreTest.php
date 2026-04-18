@@ -11,7 +11,7 @@ class CacheArrayStoreTest extends TestCase
 {
     protected function tearDown(): void
     {
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
 
         parent::tearDown();
     }
@@ -248,7 +248,7 @@ class CacheArrayStoreTest extends TestCase
         $store = new ArrayStore;
         $lock = $store->lock('foo');
         $lock->acquire();
-        Carbon::setTestNow(Carbon::now()->addYears(100));
+        Carbon::setTestNow(Carbon::now()->addCentury());
 
         $this->assertFalse($lock->acquire());
     }

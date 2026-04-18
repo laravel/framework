@@ -67,7 +67,7 @@ class DynamoBatchTest extends TestCase
         $retrieved = $repo->find($batch->id);
         $this->assertEquals(2, $retrieved->totalJobs);
         $this->assertEquals(0, $retrieved->failedJobs);
-        $this->assertTrue($retrieved->finishedAt->between(Carbon::now()->subSecond(30), Carbon::now()));
+        $this->assertTrue($retrieved->finishedAt->between(Carbon::now()->subSecond(), Carbon::now()));
     }
 
     public function test_retrieve_non_existent_batch()
@@ -114,8 +114,8 @@ class DynamoBatchTest extends TestCase
         $retrieved = $repo->find($batch->id);
         $this->assertEquals(2, $retrieved->totalJobs);
         $this->assertEquals(1, $retrieved->failedJobs);
-        $this->assertTrue($retrieved->finishedAt->between(Carbon::now()->subSecond(30), Carbon::now()));
-        $this->assertTrue($retrieved->cancelledAt->between(Carbon::now()->subSecond(30), Carbon::now()));
+        $this->assertTrue($retrieved->finishedAt->between(Carbon::now()->subSecond(), Carbon::now()));
+        $this->assertTrue($retrieved->cancelledAt->between(Carbon::now()->subSecond(), Carbon::now()));
     }
 
     public function test_get_batches()

@@ -205,7 +205,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         Relation::morphMap([], false);
         Eloquent::unsetConnectionResolver();
 
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
         Str::createUuidsNormally();
         DB::flushQueryLog();
 

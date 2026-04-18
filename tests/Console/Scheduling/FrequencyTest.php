@@ -124,7 +124,7 @@ class FrequencyTest extends TestCase
 
         $this->assertSame('0 0 31 * *', $this->event->lastDayOfMonth()->getExpression());
 
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
     }
 
     public function testTwiceMonthly()
