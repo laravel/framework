@@ -109,6 +109,13 @@ class Handler implements ExceptionHandlerContract
     protected $contextCallbacks = [];
 
     /**
+     * The exception currently being reported.
+     *
+     * @var Throwable|null
+     */
+    protected Throwable|null $currentlyReporting = null;
+
+    /**
      * The callbacks that should be used during rendering.
      *
      * @var \Closure[]
@@ -399,28 +406,22 @@ class Handler implements ExceptionHandlerContract
 
         $level = $this->mapLogLevel($e);
 
-        $this->reporting($e, function() use ($e, $logger, $level): void {
+        $originallyReporting = $this->currentlyReporting;
+        $this->currentlyReporting = $e;
+        try {
             $context = $this->buildExceptionContext($e);
 
             method_exists($logger, $level)
                 ? $logger->{$level}($e->getMessage(), $context)
                 : $logger->log($level, $e->getMessage(), $context);
-        });
-    }
-
-    protected Throwable|null $currentlyReporting = null;
-    protected function reporting(Throwable $e, \Closure $callback): void
-    {
-        $originallyReporting = $this->currentlyReporting;
-        $this->currentlyReporting = $e;
-
-        try {
-            $callback();
         } finally {
             $this->currentlyReporting = $originallyReporting;
         }
     }
 
+    /**
+     * Determine if a given exception is being reported.
+     */
     public function isReporting(Throwable $e): bool
     {
         return $this->currentlyReporting === $e;
