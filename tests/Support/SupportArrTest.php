@@ -1938,4 +1938,78 @@ class SupportArrTest extends TestCase
 
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
     }
+
+    public function testSum()
+    {
+        $this->assertSame(6, Arr::sum([1, 2, 3]));
+        $this->assertSame(0, Arr::sum([]));
+        $this->assertSame(6.5, Arr::sum([1.5, 2, 3]));
+
+        // with string key
+        $array = [['price' => 10], ['price' => 20], ['price' => 30]];
+        $this->assertSame(60, Arr::sum($array, 'price'));
+
+        // with callback
+        $this->assertSame(60, Arr::sum($array, fn ($item) => $item['price']));
+
+        // dot notation
+        $array = [['product' => ['price' => 5]], ['product' => ['price' => 15]]];
+        $this->assertSame(20, Arr::sum($array, 'product.price'));
+    }
+
+    public function testAvg()
+    {
+        $this->assertSame(2, Arr::avg([1, 2, 3]));
+        $this->assertNull(Arr::avg([]));
+
+        // nulls are excluded
+        $this->assertSame(2, Arr::avg([1, null, 3]));
+
+        // with string key
+        $array = [['score' => 10], ['score' => 20], ['score' => 30]];
+        $this->assertSame(20, Arr::avg($array, 'score'));
+
+        // with callback
+        $this->assertSame(20, Arr::avg($array, fn ($item) => $item['score']));
+
+        // non-integer average
+        $this->assertSame(1.5, Arr::avg([1, 2]));
+
+        // dot notation
+        $array = [['item' => ['value' => 4]], ['item' => ['value' => 8]]];
+        $this->assertSame(6, Arr::avg($array, 'item.value'));
+    }
+
+    public function testAverage()
+    {
+        $this->assertSame(2, Arr::average([1, 2, 3]));
+        $this->assertNull(Arr::average([]));
+        $this->assertSame(20, Arr::average([['score' => 10], ['score' => 30]], 'score'));
+    }
+
+    public function testMedian()
+    {
+        // odd count
+        $this->assertSame(3, Arr::median([1, 3, 5]));
+
+        // even count - average of two middle values
+        $this->assertSame(2.5, Arr::median([1, 2, 3, 4]));
+
+        // unsorted input
+        $this->assertSame(3, Arr::median([5, 1, 3]));
+
+        // empty array
+        $this->assertNull(Arr::median([]));
+
+        // nulls are excluded
+        $this->assertSame(3, Arr::median([1, null, 3, null, 5]));
+
+        // with string key
+        $array = [['age' => 10], ['age' => 20], ['age' => 30]];
+        $this->assertSame(20, Arr::median($array, 'age'));
+
+        // even count with key — result is exact integer division
+        $array = [['age' => 10], ['age' => 20], ['age' => 30], ['age' => 40]];
+        $this->assertSame(25, Arr::median($array, 'age'));
+    }
 }
