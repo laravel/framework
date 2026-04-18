@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Log;
 
 use Exception;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Log\Formatters\JsonFormatter;
@@ -135,6 +136,38 @@ final class JsonFormatterTest extends TestCase
         self::assertSame('bar', $previousData['foo']);
     }
 
+    public function testReportEnrichesPreviousExceptionContext()
+    {
+        $handler = $this->createTestHandler();
+        $monolog = new Monolog('test', [$handler]);
+        $handler->setFormatter(new JsonFormatter());
+        $this->app->instance(LoggerInterface::class, new Logger($monolog));
+
+        $exceptionHandler = new Handler($this->app);
+        $this->app->instance(ExceptionHandlerContract::class, $exceptionHandler);
+
+        $previous = new ContextProvidingException('Root cause');
+        $outer = new RuntimeException('Wrapper', 0, $previous);
+
+        $exceptionHandler->report($outer);
+
+        $formatted = $this->getFormattedJson($handler);
+
+        // The outer exception has no context() method, so nothing at the top level
+        self::assertArrayNotHasKey('foo', $formatted['context']);
+
+        $exceptionData = $formatted['context']['exception'];
+
+        // Outer exception should NOT be enriched (isReporting matches it)
+        self::assertArrayNotHasKey('foo', $exceptionData);
+
+        // Previous exception SHOULD be enriched (isReporting does not match it)
+        self::assertArrayHasKey('previous', $exceptionData);
+        $previousData = $exceptionData['previous'];
+        self::assertSame(ContextProvidingException::class, $previousData['class']);
+        self::assertSame('bar', $previousData['foo']);
+    }
+
     public function testExceptionWithoutContextMethodIsNotEnriched()
     {
         $handler = $this->createTestHandler();
@@ -179,6 +212,8 @@ final class JsonFormatterTest extends TestCase
 
     public function testGracefulFallbackWhenContainerCannotResolveHandler()
     {
+        Container::setInstance(new Container());
+
         $handler = $this->createTestHandler();
         $monolog = new Monolog('test', [$handler]);
         $handler->setFormatter(new JsonFormatter());
@@ -192,6 +227,7 @@ final class JsonFormatterTest extends TestCase
 
         self::assertSame(ContextProvidingException::class, $exceptionData['class']);
         self::assertSame('No handler bound', $exceptionData['message']);
+        self::assertArrayNotHasKey('foo', $exceptionData);
     }
 
     public function testNonScalarContextValuesAreNormalized()
@@ -211,6 +247,69 @@ final class JsonFormatterTest extends TestCase
 
         self::assertIsArray($exceptionData['nested']);
         self::assertSame(ObjectContextException::class, $exceptionData['class']);
+    }
+
+    public function testBothOuterAndPreviousContextEnrichedOnDirectLogging()
+    {
+        $handler = $this->createTestHandler();
+        $logger = $this->createLogger($handler);
+
+        $exceptionHandler = new Handler($this->app);
+        $this->app->instance(ExceptionHandlerContract::class, $exceptionHandler);
+
+        $previous = new ContextProvidingException('Root cause');
+        $outer = new AnotherContextProvidingException('Wrapper', 0, $previous);
+
+        $logger->error('fail', ['exception' => $outer]);
+
+        $formatted = $this->getFormattedJson($handler);
+        $exceptionData = $formatted['context']['exception'];
+
+        // Outer exception should have its own context
+        self::assertSame('outer_value', $exceptionData['outer_key']);
+        self::assertSame(AnotherContextProvidingException::class, $exceptionData['class']);
+
+        // Previous exception should have its own context
+        self::assertArrayHasKey('previous', $exceptionData);
+        $previousData = $exceptionData['previous'];
+        self::assertSame('bar', $previousData['foo']);
+        self::assertSame(ContextProvidingException::class, $previousData['class']);
+
+        // Context keys should not bleed between exceptions
+        self::assertArrayNotHasKey('foo', $exceptionData);
+        self::assertArrayNotHasKey('outer_key', $previousData);
+    }
+
+    public function testBothOuterAndPreviousContextOnReport()
+    {
+        $handler = $this->createTestHandler();
+        $monolog = new Monolog('test', [$handler]);
+        $handler->setFormatter(new JsonFormatter());
+        $this->app->instance(LoggerInterface::class, new Logger($monolog));
+
+        $exceptionHandler = new Handler($this->app);
+        $this->app->instance(ExceptionHandlerContract::class, $exceptionHandler);
+
+        $previous = new ContextProvidingException('Root cause');
+        $outer = new AnotherContextProvidingException('Wrapper', 0, $previous);
+
+        $exceptionHandler->report($outer);
+
+        $formatted = $this->getFormattedJson($handler);
+
+        // Outer's context should be at the top level (from the handler)
+        self::assertSame('outer_value', $formatted['context']['outer_key']);
+
+        $exceptionData = $formatted['context']['exception'];
+
+        // Outer should NOT be enriched by the formatter (isReporting matches)
+        self::assertArrayNotHasKey('outer_key', $exceptionData);
+
+        // Previous SHOULD be enriched by the formatter (isReporting does not match)
+        self::assertArrayHasKey('previous', $exceptionData);
+        $previousData = $exceptionData['previous'];
+        self::assertSame('bar', $previousData['foo']);
+        self::assertSame(ContextProvidingException::class, $previousData['class']);
     }
 
     private function createTestHandler(): TestHandler
@@ -242,6 +341,14 @@ class ContextProvidingException extends Exception
     public function context(): array
     {
         return ['foo' => 'bar'];
+    }
+}
+
+class AnotherContextProvidingException extends Exception
+{
+    public function context(): array
+    {
+        return ['outer_key' => 'outer_value'];
     }
 }
 
