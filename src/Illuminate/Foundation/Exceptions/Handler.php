@@ -556,6 +556,7 @@ class Handler implements ExceptionHandlerContract
     {
         return array_merge(
             $this->createExceptionContext($e),
+            $this->context(),
             ['exception' => $e]
         );
     }
@@ -567,7 +568,7 @@ class Handler implements ExceptionHandlerContract
      */
     public function createExceptionContext(Throwable $e)
     {
-        return array_merge($this->exceptionContext($e), $this->context());
+        return $this->exceptionContext($e);
     }
 
     /**
