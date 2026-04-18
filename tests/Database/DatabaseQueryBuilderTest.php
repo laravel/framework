@@ -8041,4 +8041,456 @@ SQL;
                 ['revenue', 'sum', ['ratio']],
             );
     }
+
+    public function testWithSequentialPeriodMetricsAcceptsExpressionColumnViaFluentAggregate()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            Aggregate::sum(new Raw('`revenue` * `quantity`'))->as('gross_revenue'),
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('sum(`revenue` * `quantity`) as `gross_revenue`', $sql);
+        $this->assertStringContainsString('gross_revenue_change_percent', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsAcceptsExpressionColumnViaPositionalArray()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            [new Raw('`revenue` * `quantity`'), 'sum', 'gross_revenue'],
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('sum(`revenue` * `quantity`) as `gross_revenue`', $sql);
+        $this->assertStringContainsString('gross_revenue_change_percent', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsAcceptsClosureSubQueryColumn()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            Aggregate::sum(function ($query) {
+                $query->from('order_items')
+                    ->selectRaw('sum(`price` * `qty`)')
+                    ->whereColumn('order_items.order_id', 'orders.id')
+                    ->where('order_items.status', 'paid');
+            })->as('gross_revenue'),
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('sum((select sum(`price` * `qty`) from `order_items`', $sql);
+        $this->assertStringContainsString('gross_revenue_change_percent', $sql);
+        $this->assertContains('paid', $builder->getBindings());
+    }
+
+    public function testWithSequentialPeriodMetricsAcceptsMixedExpressionAndStringAggregates()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            [
+                'revenue',
+                Aggregate::sum(new Raw('`revenue` - `cost`'))->as('profit'),
+                ['*', 'count', 'order_count'],
+            ],
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('sum(`revenue`) as `revenue_sum`', $sql);
+        $this->assertStringContainsString('sum(`revenue` - `cost`) as `profit`', $sql);
+        $this->assertStringContainsString('count(*) as `order_count`', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsRejectsExpressionColumnWithoutAlias()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('An explicit alias is required when the aggregate column is an Expression or Closure.');
+
+        $this->getMySqlBuilder()
+            ->from('orders')
+            ->withSequentialPeriodMetrics(
+                'Y-m',
+                Aggregate::sum(new Raw('`revenue` * `quantity`')),
+            );
+    }
+
+    public function testWithSequentialPeriodMetricsRejectsClosureColumnWithoutAlias()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('An explicit alias is required when the aggregate column is an Expression or Closure.');
+
+        $this->getMySqlBuilder()
+            ->from('orders')
+            ->withSequentialPeriodMetrics(
+                'Y-m',
+                Aggregate::sum(function ($query) {
+                    $query->from('order_items')->selectRaw('sum(`price`)');
+                }),
+            );
+    }
+
+    public function testWithSequentialPeriodMetricsSkipsStarColumnCheckForExpression()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            Aggregate::avg(new Raw('coalesce(`price`, 0)'))->as('avg_price'),
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('avg(coalesce(`price`, 0)) as `avg_price`', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsAcceptsExpressionViaLegacyKeyedForm()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            ['gross_revenue' => ['sum', new Raw('`revenue` * `quantity`')]],
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('sum(`revenue` * `quantity`) as `gross_revenue`', $sql);
+        $this->assertStringContainsString('gross_revenue_change_percent', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsDefaultPercentPrecisionIsTwoAndDifferenceIsUnrounded()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            ['revenue', 'sum', [SequentialPeriodComparison::Percent, SequentialPeriodComparison::Difference], 'total_revenue'],
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('* 100, 2) as `total_revenue_change_percent`', $sql);
+        $this->assertStringNotContainsString('round(`laravel_seq_period_metrics`', $sql);
+        $this->assertStringContainsString('(`laravel_seq_period_metrics`.`total_revenue` - `laravel_seq_period_metrics`.`total_revenue_previous_period`) as `total_revenue_change`', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsGlobalPrecisionAppliesToAggregatePercentAndDifference()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            ['revenue', 'sum', [SequentialPeriodComparison::Percent, SequentialPeriodComparison::Difference], 'total_revenue'],
+            precision: 4,
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('round(sum(`revenue`), 4) as `total_revenue`', $sql);
+        $this->assertStringContainsString('* 100, 4) as `total_revenue_change_percent`', $sql);
+        $this->assertStringContainsString('round(`laravel_seq_period_metrics`.`total_revenue` - `laravel_seq_period_metrics`.`total_revenue_previous_period`, 4) as `total_revenue_change`', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsPerAggregatePrecisionOverridesGlobal()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            [
+                Aggregate::sum('revenue')->as('total_revenue')->precision(2),
+                Aggregate::avg('cost')->as('avg_cost'),
+            ],
+            precision: 4,
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('round(sum(`revenue`), 2) as `total_revenue`', $sql);
+        $this->assertStringContainsString('* 100, 2) as `total_revenue_change_percent`', $sql);
+        $this->assertStringContainsString('round(avg(`cost`), 4) as `avg_cost`', $sql);
+        $this->assertStringContainsString('* 100, 4) as `avg_cost_change_percent`', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsPrecisionZeroProducesIntegerRounding()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            Aggregate::sum('revenue')->as('total_revenue')->precision(0),
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('round(sum(`revenue`), 0) as `total_revenue`', $sql);
+        $this->assertStringContainsString('* 100, 0) as `total_revenue_change_percent`', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsPrecisionAppliesToCountAggregate()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            Aggregate::count('*')->as('order_count')->precision(0),
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('round(count(*), 0) as `order_count`', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsRejectsNegativeGlobalPrecision()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Default precision must be a non-negative integer or null.');
+
+        $this->getMySqlBuilder()
+            ->from('orders')
+            ->withSequentialPeriodMetrics(
+                'Y-m',
+                ['revenue'],
+                precision: -1,
+            );
+    }
+
+    public function testAggregatePrecisionFluentSetterRejectsNegativeValues()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Aggregate precision must be a non-negative integer or null.');
+
+        Aggregate::sum('revenue')->precision(-1);
+    }
+
+    public function testAggregatePrecisionFluentSetterAcceptsNullToReset()
+    {
+        $aggregate = Aggregate::sum('revenue')->precision(3)->precision(null);
+
+        $this->assertNull($aggregate->precision);
+    }
+
+    public function testWithSequentialPeriodMetricsPrecisionWithoutComparisonsStillRoundsAggregate()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            Aggregate::sum('revenue')->as('total_revenue')->withoutComparison()->precision(2),
+            selectComparisonsOnly: false,
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('round(sum(`revenue`), 2) as `total_revenue`', $sql);
+        $this->assertStringNotContainsString('change_percent', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsWithoutNumberFormatLeavesResultsUntouched()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            Aggregate::sum('revenue')->as('total_revenue')->precision(2),
+        );
+
+        $results = new Collection([
+            (object) ['period' => '2024-03', 'total_revenue_change_percent' => '9.12'],
+        ]);
+
+        $formatted = $builder->applyAfterQueryCallbacks($results);
+
+        $this->assertSame('9.12', $formatted[0]->total_revenue_change_percent);
+    }
+
+    public function testWithSequentialPeriodMetricsMethodLevelNumberFormatFormatsEveryOutputColumn()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            Aggregate::sum('revenue')->as('total_revenue'),
+            selectComparisonsOnly: false,
+            precision: 2,
+            thousandsSeparator: '.',
+            decimalSeparator: ',',
+        );
+
+        $results = new Collection([
+            (object) [
+                'period' => '2024-03',
+                'total_revenue' => '13868830.91',
+                'total_revenue_previous_period' => '12719568.88',
+                'total_revenue_change_percent' => '9.04',
+            ],
+        ]);
+
+        $formatted = $builder->applyAfterQueryCallbacks($results);
+        $row = $formatted[0];
+
+        $this->assertSame('13.868.830,91', $row->total_revenue);
+        $this->assertSame('12.719.568,88', $row->total_revenue_previous_period);
+        $this->assertSame('9,04', $row->total_revenue_change_percent);
+        $this->assertSame('2024-03', $row->period);
+    }
+
+    public function testWithSequentialPeriodMetricsSelectComparisonsOnlyFormatsOnlyComparisonColumns()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            Aggregate::sum('revenue')->as('total_revenue')->precision(2)->numberFormat('.', ','),
+        );
+
+        $results = new Collection([
+            (object) [
+                'period' => '2024-03',
+                'total_revenue_change_percent' => '9.04',
+            ],
+        ]);
+
+        $formatted = $builder->applyAfterQueryCallbacks($results);
+
+        $this->assertSame('9,04', $formatted[0]->total_revenue_change_percent);
+    }
+
+    public function testWithSequentialPeriodMetricsPerAggregateNumberFormatOverridesMethodLevel()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            [
+                Aggregate::sum('revenue')->as('total_revenue')->precision(2)->numberFormat('.', ','),
+                Aggregate::avg('cost')->as('avg_cost')->precision(2),
+            ],
+            precision: 2,
+            thousandsSeparator: ',',
+            decimalSeparator: '.',
+        );
+
+        $results = new Collection([
+            (object) [
+                'period' => '2024-03',
+                'total_revenue_change_percent' => '9.04',
+                'avg_cost_change_percent' => '3200.75',
+            ],
+        ]);
+
+        $formatted = $builder->applyAfterQueryCallbacks($results);
+        $row = $formatted[0];
+
+        $this->assertSame('9,04', $row->total_revenue_change_percent);
+        $this->assertSame('3,200.75', $row->avg_cost_change_percent);
+    }
+
+    public function testWithSequentialPeriodMetricsNumberFormatHandlesArrayRows()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            Aggregate::sum('revenue')->as('total_revenue')->precision(2)->numberFormat('.', ','),
+        );
+
+        $results = new Collection([
+            ['period' => '2024-03', 'total_revenue_change_percent' => '9.04'],
+        ]);
+
+        $formatted = $builder->applyAfterQueryCallbacks($results);
+
+        $this->assertSame('9,04', $formatted[0]['total_revenue_change_percent']);
+    }
+
+    public function testWithSequentialPeriodMetricsNumberFormatLeavesNullAndNonNumericValuesUntouched()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            Aggregate::sum('revenue')->as('total_revenue')->precision(2)->numberFormat('.', ','),
+        );
+
+        $results = new Collection([
+            (object) ['period' => '2024-03', 'total_revenue_change_percent' => null],
+            (object) ['period' => '2024-04', 'total_revenue_change_percent' => 'not-a-number'],
+        ]);
+
+        $formatted = $builder->applyAfterQueryCallbacks($results);
+
+        $this->assertNull($formatted[0]->total_revenue_change_percent);
+        $this->assertSame('not-a-number', $formatted[1]->total_revenue_change_percent);
+    }
+
+    public function testWithSequentialPeriodMetricsNumberFormatWithoutPrecisionPreservesNaturalDecimals()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            Aggregate::sum('revenue')->as('total_revenue')->numberFormat('.', ','),
+            selectComparisonsOnly: false,
+        );
+
+        $results = new Collection([
+            (object) [
+                'period' => '2024-03',
+                'total_revenue' => '13868830.9100',
+                'total_revenue_previous_period' => '12719568',
+                'total_revenue_change_percent' => '9.04',
+            ],
+        ]);
+
+        $formatted = $builder->applyAfterQueryCallbacks($results);
+        $row = $formatted[0];
+
+        $this->assertSame('13.868.830,9100', $row->total_revenue);
+        $this->assertSame('12.719.568', $row->total_revenue_previous_period);
+        $this->assertSame('9,04', $row->total_revenue_change_percent);
+    }
+
+    public function testWithSequentialPeriodMetricsNumberFormatOnlyDecimalSeparator()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            Aggregate::sum('revenue')->as('total_revenue')->precision(2)->numberFormat(decimalSeparator: ','),
+        );
+
+        $results = new Collection([
+            (object) ['period' => '2024-03', 'total_revenue_change_percent' => '9.04'],
+        ]);
+
+        $formatted = $builder->applyAfterQueryCallbacks($results);
+
+        $this->assertSame('9,04', $formatted[0]->total_revenue_change_percent);
+    }
+
+    public function testAggregateNumberFormatFluentSetter()
+    {
+        $aggregate = Aggregate::sum('revenue')->numberFormat('.', ',');
+
+        $this->assertSame('.', $aggregate->thousandsSeparator);
+        $this->assertSame(',', $aggregate->decimalSeparator);
+
+        $aggregate->numberFormat(null, null);
+
+        $this->assertNull($aggregate->thousandsSeparator);
+        $this->assertNull($aggregate->decimalSeparator);
+    }
 }

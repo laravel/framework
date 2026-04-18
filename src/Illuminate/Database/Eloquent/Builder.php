@@ -468,6 +468,9 @@ class Builder implements BuilderContract
      * @param  string  $periodColumnAlias
      * @param  bool  $includePreviousPeriodValues
      * @param  bool  $selectComparisonsOnly
+     * @param  int|null  $precision  Default precision (number of decimals) applied to aggregate outputs and their comparison columns. Overridden per aggregate via `Aggregate::precision()`.
+     * @param  string|null  $thousandsSeparator  Default thousands separator used when formatting aggregate / comparison columns in PHP via an after-query callback. Overridden per aggregate via `Aggregate::numberFormat()`.
+     * @param  string|null  $decimalSeparator  Default decimal separator paired with $thousandsSeparator. Setting either enables the formatting.
      * @return $this
      */
     public function withSequentialPeriodMetrics(
@@ -477,6 +480,9 @@ class Builder implements BuilderContract
         string $periodColumnAlias = 'period',
         bool $includePreviousPeriodValues = true,
         bool $selectComparisonsOnly = true,
+        ?int $precision = null,
+        ?string $thousandsSeparator = null,
+        ?string $decimalSeparator = null,
     ) {
         $dateColumn ??= $this->model->getCreatedAtColumn() ?? 'created_at';
 
@@ -487,6 +493,9 @@ class Builder implements BuilderContract
             $periodColumnAlias,
             $includePreviousPeriodValues,
             $selectComparisonsOnly,
+            $precision,
+            $thousandsSeparator,
+            $decimalSeparator,
         );
 
         return $this;
