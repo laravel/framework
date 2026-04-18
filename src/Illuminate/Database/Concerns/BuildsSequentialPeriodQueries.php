@@ -19,27 +19,29 @@ trait BuildsSequentialPeriodQueries
      * the column is optional. A single aggregate may be passed as a flat list (or plain string),
      * while multiple aggregates are passed as a list of lists, much like {@see Builder::where()}.
      *
+     * Supported $aggregates shapes:
+     *   - 'revenue'                                                                  column only; function "sum", comparison Percent
+     *   - ['revenue']                                                                same as above
+     *   - ['revenue', 'avg']                                                         column + function
+     *   - ['revenue', 'sum', SequentialPeriodComparison::Difference]                 + comparison
+     *   - ['revenue', 'sum', [SequentialPeriodComparison::Percent, 'difference']]    + multiple comparisons
+     *   - ['revenue', 'sum', SequentialPeriodComparison::Percent, 'total_revenue']   + alias
+     *   - ['revenue', 'sum', 'total_revenue']                                        3-slot shorthand: alias goes in slot 3 when it is not a comparison
+     *   - ['revenue', 'sum', false]                                                  no comparison for this aggregate
+     *   - [['revenue'], ['cost', 'avg']]                                             multiple aggregates
+     *   - ['total_revenue' => ['sum', 'revenue']]                                    legacy keyed form; uses default Percent
+     *   - Aggregate::sum('revenue')->as('total_revenue')->comparison(...)            fluent form, may be mixed with any other shape in a list
+     *   - Aggregate::sum(DB::raw('revenue * quantity'))->as('gross')                 raw Expression column; alias required
+     *   - Aggregate::sum(fn ($q) => $q->from('items')->selectRaw('sum(price)'))->as('gross')  Closure sub-query as column; alias required
+     *
      * @param  string  $periodFormat  PHP date()-style format (e.g. Y-m, Y-m-d) translated per database driver.
-     * @param  \Illuminate\Database\Query\Aggregate|array<int|string, mixed>|string  $aggregates  Aggregate definitions. Supported shapes:
-     *                                                         - 'revenue'  (column only; function "sum", comparison Percent)
-     *                                                         - ['revenue']  (same as above)
-     *                                                         - ['revenue', 'avg']  (column + function)
-     *                                                         - ['revenue', 'sum', SequentialPeriodComparison::Difference]  (+ comparison)
-     *                                                         - ['revenue', 'sum', [SequentialPeriodComparison::Percent, 'difference']]  (+ multiple comparisons)
-     *                                                         - ['revenue', 'sum', SequentialPeriodComparison::Percent, 'total_revenue']  (+ alias)
-     *                                                         - ['revenue', 'sum', 'total_revenue']  (3-slot shorthand: alias goes in slot 3 when it's not a comparison)
-     *                                                         - ['revenue', 'sum', false]  (no comparison for this aggregate)
-     *                                                         - [['revenue'], ['cost', 'avg']]  (multiple aggregates)
-     *                                                         - ['total_revenue' => ['sum', 'revenue']]  (legacy keyed form; uses default Percent)
-     *                                                         - Aggregate::sum('revenue')->as('total_revenue')->comparison(...) (fluent form, may be mixed with any other shape in a list)
-     *                                                         - Aggregate::sum(DB::raw('revenue * quantity'))->as('gross') (raw Expression column; alias required)
-     *                                                         - Aggregate::sum(fn ($q) => $q->from('items')->selectRaw('sum(price)'))->as('gross') (Closure sub-query as column; alias required)
+     * @param  \Illuminate\Database\Query\Aggregate|array<int|string, mixed>|string  $aggregates  Aggregate definitions; see supported shapes above.
      * @param  string  $dateColumn  The date or datetime column to bucket (default created_at).
      * @param  string  $periodColumnAlias  Alias for the bucket column in the result set.
      * @param  bool  $includePreviousPeriodValues  When true, each aggregate gets a "{alias}_previous_period" column via LAG.
-     * @param  bool  $selectComparisonsOnly  When true (default), the outer query returns only the period column and comparison columns (e.g. *_change_percent); aggregates and *_previous_period remain in subqueries for the formulas but are omitted from the selected result set.
-     * @param  int|null  $precision  Default number of decimals applied to aggregate outputs, previous-period outputs and every comparison column. Per-aggregate `Aggregate::precision()` overrides this default. When null (the default), aggregate and difference columns stay unrounded and percent-change columns keep their historical 2-decimal rounding.
-     * @param  string|null  $thousandsSeparator  Default thousands separator used when formatting aggregate and comparison columns as strings in PHP (e.g. "." for "13.868.830,91"). Null disables formatting. Per-aggregate `Aggregate::numberFormat()` overrides this default.
+     * @param  bool  $selectComparisonsOnly  When true (default), the outer query returns only the period column and comparison columns; aggregates and *_previous_period remain in subqueries for the formulas but are omitted from the selected result set.
+     * @param  int|null  $precision  Default number of decimals applied to aggregate, previous-period and comparison columns. Per-aggregate Aggregate::precision() overrides this default. When null (the default), aggregate and difference columns stay unrounded and percent-change columns keep their historical 2-decimal rounding.
+     * @param  string|null  $thousandsSeparator  Default thousands separator used when formatting aggregate and comparison columns as strings in PHP (e.g. "." for "13.868.830,91"). Null disables formatting. Per-aggregate Aggregate::numberFormat() overrides this default.
      * @param  string|null  $decimalSeparator  Default decimal separator used together with $thousandsSeparator. Either argument enables the post-query formatting.
      * @return $this
      */
