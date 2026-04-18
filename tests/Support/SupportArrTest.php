@@ -1938,4 +1938,50 @@ class SupportArrTest extends TestCase
 
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
     }
+
+    public function testMin()
+    {
+        $this->assertSame(1, Arr::min([3, 1, 2]));
+        $this->assertNull(Arr::min([]));
+
+        // nulls are excluded
+        $this->assertSame(1, Arr::min([null, 1, 2]));
+
+        // with string key
+        $array = [['price' => 30], ['price' => 10], ['price' => 20]];
+        $this->assertSame(10, Arr::min($array, 'price'));
+
+        // with callback
+        $this->assertSame(10, Arr::min($array, fn ($item) => $item['price']));
+
+        // dot notation
+        $array = [['product' => ['price' => 5]], ['product' => ['price' => 15]]];
+        $this->assertSame(5, Arr::min($array, 'product.price'));
+
+        // strings
+        $this->assertSame('apple', Arr::min(['banana', 'apple', 'cherry']));
+    }
+
+    public function testMax()
+    {
+        $this->assertSame(3, Arr::max([1, 3, 2]));
+        $this->assertNull(Arr::max([]));
+
+        // nulls are excluded
+        $this->assertSame(3, Arr::max([null, 3, 1]));
+
+        // with string key
+        $array = [['price' => 30], ['price' => 10], ['price' => 20]];
+        $this->assertSame(30, Arr::max($array, 'price'));
+
+        // with callback
+        $this->assertSame(30, Arr::max($array, fn ($item) => $item['price']));
+
+        // dot notation
+        $array = [['product' => ['price' => 5]], ['product' => ['price' => 15]]];
+        $this->assertSame(15, Arr::max($array, 'product.price'));
+
+        // strings
+        $this->assertSame('cherry', Arr::max(['banana', 'apple', 'cherry']));
+    }
 }
