@@ -13,6 +13,7 @@ use JsonSerializable;
 use Random\Randomizer;
 use Traversable;
 use WeakMap;
+use function Illuminate\Support\enum_value;
 
 class Arr
 {
@@ -504,6 +505,51 @@ class Arr
         }
 
         return $array;
+    }
+
+    /**
+     * Group an array by a field or using a callback.
+     *
+     * @template TKey of array-key
+     * @template TValue
+     *
+     * @param  array<TKey, TValue>  $array
+     * @param  (callable(TValue, TKey): array-key)|string  $groupBy
+     * @param  bool  $preserveKeys
+     * @return array<array-key, array<array-key, TValue>>
+     */
+    public static function groupBy(array $array, callable|string $groupBy, bool $preserveKeys = false): array
+    {
+        $callback = is_callable($groupBy)
+            ? $groupBy
+            : fn ($item) => data_get($item, $groupBy);
+
+        $results = [];
+
+        foreach ($array as $key => $value) {
+            $groupKeys = $callback($value, $key);
+
+            if (! is_array($groupKeys)) {
+                $groupKeys = [$groupKeys];
+            }
+
+            foreach ($groupKeys as $groupKey) {
+                $groupKey = match (true) {
+                    is_bool($groupKey) => (int) $groupKey,
+                    $groupKey instanceof \UnitEnum => enum_value($groupKey),
+                    $groupKey instanceof \Stringable, is_null($groupKey) => (string) $groupKey,
+                    default => $groupKey,
+                };
+
+                if ($preserveKeys) {
+                    $results[$groupKey][$key] = $value;
+                } else {
+                    $results[$groupKey][] = $value;
+                }
+            }
+        }
+
+        return $results;
     }
 
     /**
