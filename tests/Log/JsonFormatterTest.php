@@ -38,26 +38,19 @@ final class JsonFormatterTest extends TestCase
         Log::error('fail', ['exception' => new ContextProvidingException('Something went wrong')]);
 
         $formatted = $this->getFormattedJson();
-        $exceptionData = $formatted['context']['exception'];
 
+        $exceptionData = $formatted['context']['exception'];
         self::assertSame('bar', $exceptionData['foo']);
         self::assertSame(ContextProvidingException::class, $exceptionData['class']);
     }
 
     public function testExceptionContextIsNotDuplicatedWhenGoingThroughReport()
     {
-        $handler = new TestHandler();
-        $logger = $this->createLogger($handler);
-        $this->app->instance(LoggerInterface::class, $logger);
-
-        $exceptionHandler = new Handler($this->app);
-        $this->app->instance(ExceptionHandlerContract::class, $exceptionHandler);
-
         $exception = new ContextProvidingException('Something went wrong');
 
-        $exceptionHandler->report($exception);
+        $this->app->make(ExceptionHandlerContract::class)->report($exception);
 
-        $formatted = $this->getFormattedJson($handler);
+        $formatted = $this->getFormattedJson();
 
         // Context should be at the top level (from the handler)
         self::assertSame('bar', $formatted['context']['foo']);
@@ -76,9 +69,6 @@ final class JsonFormatterTest extends TestCase
         foreach ([$handlerA, $handlerB] as $h) {
             $h->setFormatter(new JsonFormatter());
         }
-
-        $exceptionHandler = new Handler($this->app);
-        $this->app->instance(ExceptionHandlerContract::class, $exceptionHandler);
 
         $exception = new ContextProvidingException('Stack test');
 
@@ -124,18 +114,12 @@ final class JsonFormatterTest extends TestCase
 
     public function testPreviousExceptionContextIsAlsoEnriched()
     {
-        $handler = new TestHandler();
-        $logger = $this->createLogger($handler);
-
-        $exceptionHandler = new Handler($this->app);
-        $this->app->instance(ExceptionHandlerContract::class, $exceptionHandler);
-
         $previous = new ContextProvidingException('Root cause');
         $outer = new RuntimeException('Wrapper', 0, $previous);
 
-        $logger->error('fail', ['exception' => $outer]);
+        Log::error('fail', ['exception' => $outer]);
 
-        $formatted = $this->getFormattedJson($handler);
+        $formatted = $this->getFormattedJson();
         $exceptionData = $formatted['context']['exception'];
 
         self::assertSame(RuntimeException::class, $exceptionData['class']);
@@ -148,20 +132,11 @@ final class JsonFormatterTest extends TestCase
 
     public function testReportEnrichesPreviousExceptionContext()
     {
-        $handler = new TestHandler();
-        $monolog = new Monolog('test', [$handler]);
-        $handler->setFormatter(new JsonFormatter());
-        $this->app->instance(LoggerInterface::class, new Logger($monolog));
+        $exception = new RuntimeException('Wrapper', 0, new ContextProvidingException('Root cause'));
 
-        $exceptionHandler = new Handler($this->app);
-        $this->app->instance(ExceptionHandlerContract::class, $exceptionHandler);
+        $this->app->make(ExceptionHandlerContract::class)->report($exception);
 
-        $previous = new ContextProvidingException('Root cause');
-        $outer = new RuntimeException('Wrapper', 0, $previous);
-
-        $exceptionHandler->report($outer);
-
-        $formatted = $this->getFormattedJson($handler);
+        $formatted = $this->getFormattedJson();
 
         // The outer exception has no context() method, so nothing at the top level
         self::assertArrayNotHasKey('foo', $formatted['context']);
@@ -180,17 +155,9 @@ final class JsonFormatterTest extends TestCase
 
     public function testExceptionWithoutContextMethodIsNotEnriched()
     {
-        $handler = new TestHandler();
-        $logger = $this->createLogger($handler);
+        Log::error('fail', ['exception' => new RuntimeException('Plain exception')]);
 
-        $exceptionHandler = new Handler($this->app);
-        $this->app->instance(ExceptionHandlerContract::class, $exceptionHandler);
-
-        $exception = new RuntimeException('Plain exception');
-
-        $logger->error('fail', ['exception' => $exception]);
-
-        $formatted = $this->getFormattedJson($handler);
+        $formatted = $this->getFormattedJson();
         $exceptionData = $formatted['context']['exception'];
 
         self::assertSame(RuntimeException::class, $exceptionData['class']);
@@ -200,20 +167,15 @@ final class JsonFormatterTest extends TestCase
 
     public function testContextCallbacksAreIncludedInFormatterEnrichment()
     {
-        $handler = new TestHandler();
-        $logger = $this->createLogger($handler);
-
-        $exceptionHandler = new Handler($this->app);
-        $exceptionHandler->buildContextUsing(function (Throwable $e) {
+        $this->app->make(ExceptionHandlerContract::class)->buildContextUsing(function (Throwable $e) {
             return ['callback_key' => 'callback_value'];
         });
-        $this->app->instance(ExceptionHandlerContract::class, $exceptionHandler);
 
         $exception = new ContextProvidingException('With callbacks');
 
-        $logger->error('fail', ['exception' => $exception]);
+        Log::error('fail', ['exception' => $exception]);
 
-        $formatted = $this->getFormattedJson($handler);
+        $formatted = $this->getFormattedJson();
         $exceptionData = $formatted['context']['exception'];
 
         self::assertSame('bar', $exceptionData['foo']);
@@ -242,17 +204,11 @@ final class JsonFormatterTest extends TestCase
 
     public function testNonScalarContextValuesAreNormalized()
     {
-        $handler = new TestHandler();
-        $logger = $this->createLogger($handler);
-
-        $exceptionHandler = new Handler($this->app);
-        $this->app->instance(ExceptionHandlerContract::class, $exceptionHandler);
-
         $exception = new ObjectContextException('Has objects in context');
 
-        $logger->error('fail', ['exception' => $exception]);
+        Log::error('fail', ['exception' => $exception]);
 
-        $formatted = $this->getFormattedJson($handler);
+        $formatted = $this->getFormattedJson();
         $exceptionData = $formatted['context']['exception'];
 
         self::assertIsArray($exceptionData['nested']);
@@ -261,18 +217,12 @@ final class JsonFormatterTest extends TestCase
 
     public function testBothOuterAndPreviousContextEnrichedOnDirectLogging()
     {
-        $handler = new TestHandler();
-        $logger = $this->createLogger($handler);
-
-        $exceptionHandler = new Handler($this->app);
-        $this->app->instance(ExceptionHandlerContract::class, $exceptionHandler);
-
         $previous = new ContextProvidingException('Root cause');
         $outer = new AnotherContextProvidingException('Wrapper', 0, $previous);
 
-        $logger->error('fail', ['exception' => $outer]);
+        Log::error('fail', ['exception' => $outer]);
 
-        $formatted = $this->getFormattedJson($handler);
+        $formatted = $this->getFormattedJson();
         $exceptionData = $formatted['context']['exception'];
 
         // Outer exception should have its own context
@@ -292,20 +242,12 @@ final class JsonFormatterTest extends TestCase
 
     public function testBothOuterAndPreviousContextOnReport()
     {
-        $handler = new TestHandler();
-        $monolog = new Monolog('test', [$handler]);
-        $handler->setFormatter(new JsonFormatter());
-        $this->app->instance(LoggerInterface::class, new Logger($monolog));
-
-        $exceptionHandler = new Handler($this->app);
-        $this->app->instance(ExceptionHandlerContract::class, $exceptionHandler);
-
         $previous = new ContextProvidingException('Root cause');
         $outer = new AnotherContextProvidingException('Wrapper', 0, $previous);
 
-        $exceptionHandler->report($outer);
+        $this->app->make(ExceptionHandlerContract::class)->report($outer);
 
-        $formatted = $this->getFormattedJson($handler);
+        $formatted = $this->getFormattedJson();
 
         // Outer's context should be at the top level (from the handler)
         self::assertSame('outer_value', $formatted['context']['outer_key']);
