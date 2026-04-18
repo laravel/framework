@@ -1938,4 +1938,54 @@ class SupportArrTest extends TestCase
 
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
     }
+
+    public function testGroupBy()
+    {
+        // group by string key
+        $data = [
+            ['dept' => 'engineering', 'name' => 'Alice'],
+            ['dept' => 'engineering', 'name' => 'Bob'],
+            ['dept' => 'hr', 'name' => 'Carol'],
+        ];
+
+        $result = Arr::groupBy($data, 'dept');
+
+        $this->assertCount(2, $result['engineering']);
+        $this->assertCount(1, $result['hr']);
+        $this->assertSame('Alice', $result['engineering'][0]['name']);
+        $this->assertSame('Bob', $result['engineering'][1]['name']);
+
+        // keys reset (default $preserveKeys = false)
+        $this->assertSame([0, 1], array_keys($result['engineering']));
+
+        // preserveKeys = true
+        $result = Arr::groupBy($data, 'dept', true);
+        $this->assertSame([0, 1], array_keys($result['engineering']));
+        $this->assertSame([2], array_keys($result['hr']));
+
+        // group by callback
+        $result = Arr::groupBy([1, 2, 3, 4, 5], fn ($v) => $v % 2 === 0 ? 'even' : 'odd');
+        $this->assertSame([2, 4], $result['even']);
+        $this->assertSame([1, 3, 5], $result['odd']);
+
+        // dot notation
+        $data = [
+            ['user' => ['role' => 'admin'], 'name' => 'Alice'],
+            ['user' => ['role' => 'editor'], 'name' => 'Bob'],
+            ['user' => ['role' => 'admin'], 'name' => 'Carol'],
+        ];
+
+        $result = Arr::groupBy($data, 'user.role');
+        $this->assertCount(2, $result['admin']);
+        $this->assertCount(1, $result['editor']);
+
+        // empty array
+        $this->assertSame([], Arr::groupBy([], 'key'));
+
+        // null group key cast to empty string
+        $data = [['type' => null, 'val' => 1], ['type' => 'a', 'val' => 2]];
+        $result = Arr::groupBy($data, 'type');
+        $this->assertArrayHasKey('', $result);
+        $this->assertArrayHasKey('a', $result);
+    }
 }
