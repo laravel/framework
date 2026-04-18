@@ -375,6 +375,47 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::exists(new Collection(['a' => null]), 'b'));
     }
 
+    public function testUnique()
+    {
+        // scalar values, no callback
+        $this->assertSame(['apple', 'banana', 'cherry'], array_values(Arr::unique(['apple', 'banana', 'apple', 'cherry', 'banana'])));
+
+        // preserves keys by default
+        $result = Arr::unique(['a' => 1, 'b' => 2, 'c' => 1]);
+        $this->assertSame(['a' => 1, 'b' => 2], $result);
+
+        // by string key
+        $data = [
+            ['id' => 1, 'type' => 'fruit'],
+            ['id' => 2, 'type' => 'vegetable'],
+            ['id' => 3, 'type' => 'fruit'],
+        ];
+        $result = array_values(Arr::unique($data, 'type'));
+        $this->assertCount(2, $result);
+        $this->assertSame('fruit', $result[0]['type']);
+        $this->assertSame('vegetable', $result[1]['type']);
+
+        // by dot notation
+        $data = [
+            ['meta' => ['tag' => 'php']],
+            ['meta' => ['tag' => 'laravel']],
+            ['meta' => ['tag' => 'php']],
+        ];
+        $result = array_values(Arr::unique($data, 'meta.tag'));
+        $this->assertCount(2, $result);
+
+        // by callback
+        $result = array_values(Arr::unique([1, 2, 3, 4, 5], fn ($v) => $v % 2));
+        $this->assertCount(2, $result);
+
+        // strict mode
+        $result = array_values(Arr::unique([1, '1', true], null, true));
+        $this->assertCount(3, $result);
+
+        // empty array
+        $this->assertSame([], Arr::unique([]));
+    }
+
     public function testWhereNotNull(): void
     {
         $array = array_values(Arr::whereNotNull([null, 0, false, '', null, []]));
@@ -1713,7 +1754,8 @@ class SupportArrTest extends TestCase
         $this->assertSame($subject, Arr::from($items));
 
         $items = new WeakMap;
-        $items[$temp = new class {
+        $items[$temp = new class
+        {
         }] = 'bar';
         $this->assertSame(['bar'], Arr::from($items));
 

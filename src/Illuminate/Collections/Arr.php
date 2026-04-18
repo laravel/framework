@@ -643,7 +643,6 @@ class Arr
      *
      * An array is "associative" if it doesn't have sequential numerical keys beginning with zero.
      *
-     * @param  array  $array
      * @return ($array is list ? false : true)
      */
     public static function isAssoc(array $array)
@@ -829,8 +828,6 @@ class Arr
     /**
      * Run a map over each of the items in the array.
      *
-     * @param  array  $array
-     * @param  callable  $callback
      * @return array
      */
     public static function map(array $array, callable $callback)
@@ -1030,11 +1027,6 @@ class Arr
 
     /**
      * Push an item into an array using "dot" notation.
-     *
-     * @param  \ArrayAccess|array  $array
-     * @param  string|int|null  $key
-     * @param  mixed  $values
-     * @return array
      */
     public static function push(ArrayAccess|array &$array, string|int|null $key, mixed ...$values): array
     {
@@ -1223,6 +1215,39 @@ class Arr
         }
 
         return implode(' ', $styles);
+    }
+
+    /**
+     * Return unique items from the array, optionally keyed by a field or callback.
+     *
+     * @template TKey of array-key
+     * @template TValue
+     *
+     * @param  array<TKey, TValue>  $array
+     * @param  (callable(TValue, TKey): mixed)|string|null  $key
+     * @return array<TKey, TValue>
+     */
+    public static function unique(array $array, callable|string|null $key = null, bool $strict = false): array
+    {
+        if (is_null($key) && $strict === false) {
+            return array_unique($array, SORT_REGULAR);
+        }
+
+        $callback = is_null($key)
+            ? fn ($value) => $value
+            : (is_callable($key) ? $key : fn ($item) => data_get($item, $key));
+
+        $exists = [];
+
+        return static::reject($array, function ($item, $k) use ($callback, $strict, &$exists) {
+            if (in_array($id = $callback($item, $k), $exists, $strict)) {
+                return true;
+            }
+
+            $exists[] = $id;
+
+            return false;
+        });
     }
 
     /**
