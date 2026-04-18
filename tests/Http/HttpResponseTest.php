@@ -245,6 +245,76 @@ class HttpResponseTest extends TestCase
         $response = new RedirectResponse('foo.bar');
         $response->doesNotExist('bar');
     }
+
+    public function testResponseConditionable()
+    {
+        $response = new Response('foo');
+
+        $result = $response->when(true, function (Response $r) {
+            $r->setContent('bar');
+        });
+
+        $this->assertSame($response, $result);
+        $this->assertSame('bar', $response->getContent());
+
+        $response->when(false, function (Response $r) {
+            $r->setContent('baz');
+        });
+
+        $this->assertSame('bar', $response->getContent());
+    }
+
+    public function testResponseUnless()
+    {
+        $response = new Response('foo');
+
+        $response->unless(false, function (Response $r) {
+            $r->setContent('bar');
+        });
+
+        $this->assertSame('bar', $response->getContent());
+
+        $response->unless(true, function (Response $r) {
+            $r->setContent('baz');
+        });
+
+        $this->assertSame('bar', $response->getContent());
+    }
+
+    public function testRedirectResponseConditionable()
+    {
+        $response = new RedirectResponse('foo.bar');
+
+        $result = $response->when(true, function (RedirectResponse $r) {
+            $r->setTargetUrl('baz.qux');
+        });
+
+        $this->assertSame($response, $result);
+        $this->assertSame('baz.qux', $response->getTargetUrl());
+
+        $response->when(false, function (RedirectResponse $r) {
+            $r->setTargetUrl('should.not.change');
+        });
+
+        $this->assertSame('baz.qux', $response->getTargetUrl());
+    }
+
+    public function testRedirectResponseUnless()
+    {
+        $response = new RedirectResponse('foo.bar');
+
+        $response->unless(false, function (RedirectResponse $r) {
+            $r->setTargetUrl('baz.qux');
+        });
+
+        $this->assertSame('baz.qux', $response->getTargetUrl());
+
+        $response->unless(true, function (RedirectResponse $r) {
+            $r->setTargetUrl('should.not.change');
+        });
+
+        $this->assertSame('baz.qux', $response->getTargetUrl());
+    }
 }
 
 class ArrayableStub implements Arrayable

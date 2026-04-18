@@ -108,6 +108,41 @@ class HttpJsonResponseTest extends TestCase
 
         $this->assertSame('bar', $response->getData()->foo);
     }
+
+    public function testJsonResponseConditionable()
+    {
+        $response = new JsonResponse(['foo' => 'bar']);
+
+        $result = $response->when(true, function (JsonResponse $r) {
+            $r->setData(['foo' => 'baz']);
+        });
+
+        $this->assertSame($response, $result);
+        $this->assertSame('baz', $response->getData()->foo);
+
+        $response->when(false, function (JsonResponse $r) {
+            $r->setData(['foo' => 'qux']);
+        });
+
+        $this->assertSame('baz', $response->getData()->foo);
+    }
+
+    public function testJsonResponseUnless()
+    {
+        $response = new JsonResponse(['foo' => 'bar']);
+
+        $response->unless(false, function (JsonResponse $r) {
+            $r->setData(['foo' => 'baz']);
+        });
+
+        $this->assertSame('baz', $response->getData()->foo);
+
+        $response->unless(true, function (JsonResponse $r) {
+            $r->setData(['foo' => 'qux']);
+        });
+
+        $this->assertSame('baz', $response->getData()->foo);
+    }
 }
 
 class JsonResponseTestJsonableObject implements Jsonable
