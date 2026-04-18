@@ -895,6 +895,50 @@ class Arr
     }
 
     /**
+     * Get the max value of a given key.
+     *
+     * @template TKey of array-key
+     * @template TValue
+     *
+     * @param  array<TKey, TValue>  $array
+     * @param  (callable(TValue): mixed)|string|null  $callback
+     * @return mixed
+     */
+    public static function max(array $array, callable|string|null $callback = null): mixed
+    {
+        $callback = is_null($callback)
+            ? fn ($value) => $value
+            : (is_callable($callback) ? $callback : fn ($item) => data_get($item, $callback));
+
+        return array_reduce(
+            array_filter(array_map($callback, $array), fn ($value) => ! is_null($value)),
+            fn ($result, $value) => is_null($result) || $value > $result ? $value : $result
+        );
+    }
+
+    /**
+     * Get the min value of a given key.
+     *
+     * @template TKey of array-key
+     * @template TValue
+     *
+     * @param  array<TKey, TValue>  $array
+     * @param  (callable(TValue): mixed)|string|null  $callback
+     * @return mixed
+     */
+    public static function min(array $array, callable|string|null $callback = null): mixed
+    {
+        $callback = is_null($callback)
+            ? fn ($value) => $value
+            : (is_callable($callback) ? $callback : fn ($item) => data_get($item, $callback));
+
+        return array_reduce(
+            array_filter(array_map($callback, $array), fn ($value) => ! is_null($value)),
+            fn ($result, $value) => is_null($result) || $value < $result ? $value : $result
+        );
+    }
+
+    /**
      * Push an item onto the beginning of an array.
      *
      * @param  array  $array
