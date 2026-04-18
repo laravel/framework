@@ -162,8 +162,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
             $tag = empty($payload['tag']) ? null : base64_decode($payload['tag'])
         );
 
-        $keys = $this->getAllKeys();
-        $validKey = null;
+        [$keys, $validKey] = [$this->getAllKeys(), null];
 
         // Here we will decrypt the value. If we are able to successfully decrypt it
         // we will then unserialize it and return it out to the caller. If we are
