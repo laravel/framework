@@ -120,6 +120,39 @@ class SupportArrTest extends TestCase
         $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], Arr::collapse($mixedArray));
     }
 
+    public function testCountBy()
+    {
+        // count by value (default)
+        $result = Arr::countBy(['apple', 'banana', 'apple', 'cherry', 'banana', 'apple']);
+        $this->assertSame(['apple' => 3, 'banana' => 2, 'cherry' => 1], $result);
+
+        // count by string key
+        $data = [
+            ['type' => 'fruit', 'name' => 'apple'],
+            ['type' => 'vegetable', 'name' => 'carrot'],
+            ['type' => 'fruit', 'name' => 'banana'],
+            ['type' => 'fruit', 'name' => 'cherry'],
+        ];
+        $result = Arr::countBy($data, 'type');
+        $this->assertSame(['fruit' => 3, 'vegetable' => 1], $result);
+
+        // count by dot notation
+        $data = [
+            ['meta' => ['status' => 'active']],
+            ['meta' => ['status' => 'inactive']],
+            ['meta' => ['status' => 'active']],
+        ];
+        $result = Arr::countBy($data, 'meta.status');
+        $this->assertSame(['active' => 2, 'inactive' => 1], $result);
+
+        // count by callback
+        $result = Arr::countBy([1, 2, 3, 4, 5, 6], fn ($v) => $v % 2 === 0 ? 'even' : 'odd');
+        $this->assertSame(['odd' => 3, 'even' => 3], $result);
+
+        // empty array
+        $this->assertSame([], Arr::countBy([]));
+    }
+
     public function testCrossJoin()
     {
         // Single dimension
@@ -1713,7 +1746,8 @@ class SupportArrTest extends TestCase
         $this->assertSame($subject, Arr::from($items));
 
         $items = new WeakMap;
-        $items[$temp = new class {
+        $items[$temp = new class
+        {
         }] = 'bar';
         $this->assertSame(['bar'], Arr::from($items));
 

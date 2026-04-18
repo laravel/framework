@@ -131,6 +131,37 @@ class Arr
     }
 
     /**
+     * Count the occurrences of values using an optional callback.
+     *
+     * @template TKey of array-key
+     * @template TValue
+     *
+     * @param  array<TKey, TValue>  $array
+     * @param  (callable(TValue, TKey): array-key)|string|null  $countBy
+     * @return array<array-key, int>
+     */
+    public static function countBy(array $array, callable|string|null $countBy = null): array
+    {
+        $callback = is_null($countBy)
+            ? fn ($value) => $value
+            : (is_callable($countBy) ? $countBy : fn ($item) => data_get($item, $countBy));
+
+        $counts = [];
+
+        foreach ($array as $key => $value) {
+            $group = $callback($value, $key);
+
+            if (! isset($counts[$group])) {
+                $counts[$group] = 0;
+            }
+
+            $counts[$group]++;
+        }
+
+        return $counts;
+    }
+
+    /**
      * Cross join the given arrays, returning all possible permutations.
      *
      * @template TValue
