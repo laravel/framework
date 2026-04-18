@@ -399,11 +399,31 @@ class Handler implements ExceptionHandlerContract
 
         $level = $this->mapLogLevel($e);
 
-        $context = $this->buildExceptionContext($e);
+        $this->reporting($e, function() use ($e, $logger, $level): void {
+            $context = $this->buildExceptionContext($e);
 
-        method_exists($logger, $level)
-            ? $logger->{$level}($e->getMessage(), $context)
-            : $logger->log($level, $e->getMessage(), $context);
+            method_exists($logger, $level)
+                ? $logger->{$level}($e->getMessage(), $context)
+                : $logger->log($level, $e->getMessage(), $context);
+        });
+    }
+
+    protected Throwable|null $currentlyReporting = null;
+    protected function reporting(Throwable $e, \Closure $callback): void
+    {
+        $originallyReporting = $this->currentlyReporting;
+        $this->currentlyReporting = $e;
+
+        try {
+            $callback();
+        } finally {
+            $this->currentlyReporting = $originallyReporting;
+        }
+    }
+
+    public function isReporting(Throwable $e): bool
+    {
+        return $this->currentlyReporting === $e;
     }
 
     /**
@@ -547,11 +567,7 @@ class Handler implements ExceptionHandlerContract
      */
     public function createExceptionContext(Throwable $e)
     {
-        $context = array_merge($this->exceptionContext($e), $this->context());
-
-        ExceptionContextState::reportContextBuilt($e);
-
-        return $context;
+        return array_merge($this->exceptionContext($e), $this->context());
     }
 
     /**
