@@ -4,6 +4,7 @@ namespace Illuminate\Http;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use JsonSerializable;
@@ -11,7 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse as BaseJsonResponse;
 
 class JsonResponse extends BaseJsonResponse
 {
-    use ResponseTrait, Macroable {
+    use Conditionable, ResponseTrait, Macroable {
         Macroable::__call as macroCall;
     }
 
