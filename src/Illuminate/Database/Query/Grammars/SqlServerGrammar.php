@@ -609,4 +609,49 @@ class SqlServerGrammar extends Grammar
 
         return $table;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function compileGroupedDate($column, $format)
+    {
+        $this->ensurePhpDateFormatIsSafeForSqlGrouping($format);
+
+        $pattern = $this->compileSqlServerFormatPatternFromPhpDateFormat($format);
+
+        return 'format('.$this->wrap($column).', '.$this->quoteString($pattern).', \'en-US\')';
+    }
+
+    /**
+     * Translate a PHP date format into SQL Server FORMAT() template characters.
+     *
+     * @param  string  $format
+     * @return string
+     */
+    protected function compileSqlServerFormatPatternFromPhpDateFormat($format)
+    {
+        $result = '';
+        $length = strlen($format);
+
+        for ($i = 0; $i < $length; $i++) {
+            $char = $format[$i];
+
+            $result .= match ($char) {
+                'Y' => 'yyyy',
+                'y' => 'yy',
+                'm' => 'MM',
+                'n' => 'MM',
+                'd' => 'dd',
+                'j' => 'dd',
+                'H' => 'HH',
+                'h' => 'hh',
+                'G' => 'H',
+                'i' => 'mm',
+                's' => 'ss',
+                default => $char,
+            };
+        }
+
+        return $result;
+    }
 }

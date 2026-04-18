@@ -873,4 +873,47 @@ class PostgresGrammar extends Grammar
     {
         self::cascadeOnTruncate($value);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function compileGroupedDate($column, $format)
+    {
+        $this->ensurePhpDateFormatIsSafeForSqlGrouping($format);
+
+        $pattern = $this->compilePostgresToCharPatternFromPhpDateFormat($format);
+
+        return 'to_char('.$this->wrap($column).', '.$this->quoteString($pattern).')';
+    }
+
+    /**
+     * Translate a PHP date format into PostgreSQL to_char() template characters.
+     *
+     * @param  string  $format
+     * @return string
+     */
+    protected function compilePostgresToCharPatternFromPhpDateFormat($format)
+    {
+        $result = '';
+        $length = strlen($format);
+
+        for ($i = 0; $i < $length; $i++) {
+            $char = $format[$i];
+
+            $result .= match ($char) {
+                'Y' => 'YYYY',
+                'y' => 'YY',
+                'm', 'n' => 'MM',
+                'd', 'j' => 'DD',
+                'H' => 'HH24',
+                'h' => 'HH12',
+                'G' => 'FMHH24',
+                'i' => 'MI',
+                's' => 'SS',
+                default => $char,
+            };
+        }
+
+        return $result;
+    }
 }

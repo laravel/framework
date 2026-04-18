@@ -10,6 +10,7 @@ use Illuminate\Database\Query\JoinClause;
 use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
 use RuntimeException;
 
 class Grammar extends BaseGrammar
@@ -1666,5 +1667,39 @@ class Grammar extends BaseGrammar
     public function getBitwiseOperators()
     {
         return $this->bitwiseOperators;
+    }
+
+    /**
+     * Compile SQL that buckets a date/datetime column using a PHP date()-style format string.
+     *
+     * @param  string  $column
+     * @param  string  $format
+     * @return string
+     */
+    public function compileGroupedDate($column, $format)
+    {
+        throw new RuntimeException(sprintf(
+            'This database grammar does not support compileGroupedDate(). Driver [%s] must override this method.',
+            static::class
+        ));
+    }
+
+    /**
+     * Ensure the given PHP date format only contains characters safe for SQL date grouping translations.
+     *
+     * @param  string  $format
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function ensurePhpDateFormatIsSafeForSqlGrouping($format)
+    {
+        if ($format === '') {
+            throw new InvalidArgumentException('The period format must be a non-empty string.');
+        }
+
+        if (! preg_match('/^[YymndjHhGis\-\/:.,_ ]+$/D', $format)) {
+            throw new InvalidArgumentException('The period format contains unsupported characters.');
+        }
     }
 }

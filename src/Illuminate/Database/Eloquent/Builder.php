@@ -12,6 +12,7 @@ use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Aggregate;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -455,6 +456,38 @@ class Builder implements BuilderContract
         }
 
         $this->query->oldest($column);
+
+        return $this;
+    }
+
+    /**
+     * Bucket rows by a date/datetime column, aggregate metrics per period, then add windowed period-over-period columns.
+     *
+     * @param  \Illuminate\Database\Query\Aggregate|array<int|string, mixed>|string  $aggregates  [column, function?, comparison?, alias?] positional entry, a list of such entries, or fluent Aggregate instances. See {@see \Illuminate\Database\Query\Builder::withSequentialPeriodMetrics()}.
+     * @param  string|null  $dateColumn
+     * @param  string  $periodColumnAlias
+     * @param  bool  $includePreviousPeriodValues
+     * @param  bool  $selectComparisonsOnly
+     * @return $this
+     */
+    public function withSequentialPeriodMetrics(
+        string $periodFormat,
+        Aggregate|array|string $aggregates,
+        ?string $dateColumn = null,
+        string $periodColumnAlias = 'period',
+        bool $includePreviousPeriodValues = true,
+        bool $selectComparisonsOnly = true,
+    ) {
+        $dateColumn ??= $this->model->getCreatedAtColumn() ?? 'created_at';
+
+        $this->query->withSequentialPeriodMetrics(
+            $periodFormat,
+            $aggregates,
+            $dateColumn,
+            $periodColumnAlias,
+            $includePreviousPeriodValues,
+            $selectComparisonsOnly,
+        );
 
         return $this;
     }

@@ -10,6 +10,7 @@ use DateTime;
 use Illuminate\Contracts\Database\Query\ConditionExpression;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Query\Aggregate;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression as Raw;
 use Illuminate\Database\Query\Grammars\Grammar;
@@ -22,6 +23,7 @@ use Illuminate\Database\Query\JoinClause;
 use Illuminate\Database\Query\Processors\MySqlProcessor;
 use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Database\Query\SequentialPeriodComparison;
 use Illuminate\Database\RecordNotFoundException;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\Cursor;
@@ -7679,5 +7681,364 @@ SQL;
             new Grammar($connection),
             m::mock(Processor::class),
         ])->makePartial();
+    }
+
+    public function testWithSequentialPeriodMetricsThrowsWhenGrammarUnsupported()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $this->getBuilder()->from('orders')->withSequentialPeriodMetrics(
+            'Y-m',
+            ['total_revenue' => ['sum', 'revenue']],
+        );
+    }
+
+    public function testWithSequentialPeriodMetricsMysql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            ['total_revenue' => ['sum', 'revenue']],
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('date_format', $sql);
+        $this->assertStringContainsString('lag(', $sql);
+        $this->assertStringContainsString('total_revenue_change_percent', $sql);
+        $this->assertStringContainsString('from (', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsMysqlSelectComparisonsOnlyOmitsAggregateColumnsFromOuterSelect()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            ['total_revenue' => ['sum', 'revenue']],
+        );
+
+        $this->assertCount(2, $builder->columns);
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('total_revenue_change_percent', $sql);
+        $this->assertStringContainsString('lag(', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsMysqlAppliesMultipleComparisonsPerAggregate()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            [
+                ['revenue', 'sum', [SequentialPeriodComparison::Percent, 'difference'], 'total_revenue'],
+                ['*', 'count', [SequentialPeriodComparison::Percent, 'difference'], 'order_count'],
+            ],
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('total_revenue_change_percent', $sql);
+        $this->assertStringContainsString('total_revenue_change', $sql);
+        $this->assertStringContainsString('order_count_change_percent', $sql);
+        $this->assertStringContainsString('order_count_change', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsMysqlAcceptsColumnNameOnlyAggregateDefaultsToSum()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            ['revenue'],
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('sum(`revenue`) as `revenue_sum`', $sql);
+        $this->assertStringContainsString('revenue_sum_change_percent', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsMysqlAcceptsFlatStringListAsMultipleColumns()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            ['revenue', 'cost'],
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('sum(`revenue`) as `revenue_sum`', $sql);
+        $this->assertStringContainsString('sum(`cost`) as `cost_sum`', $sql);
+        $this->assertStringContainsString('revenue_sum_change_percent', $sql);
+        $this->assertStringContainsString('cost_sum_change_percent', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsMysqlAcceptsSingleStringAggregate()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            'revenue',
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('sum(`revenue`) as `revenue_sum`', $sql);
+        $this->assertStringContainsString('revenue_sum_change_percent', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsMysqlAcceptsListShorthandAggregatesWithDefaultAlias()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            [
+                ['revenue', 'sum'],
+                ['*', 'count'],
+            ],
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('sum(`revenue`) as `revenue_sum`', $sql);
+        $this->assertStringContainsString('count(*) as `count`', $sql);
+        $this->assertStringContainsString('revenue_sum_change_percent', $sql);
+        $this->assertStringContainsString('count_change_percent', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsMysqlPositionalAliasInSlot3()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            ['revenue', 'sum', 'total_revenue'],
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('sum(`revenue`) as `total_revenue`', $sql);
+        $this->assertStringContainsString('total_revenue_change_percent', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsMysqlAcceptsSingleComparisonEnum()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m-d',
+            ['revenue', 'sum', SequentialPeriodComparison::Difference, 'total_revenue'],
+        );
+
+        $sql = $builder->toSql();
+
+        $this->assertStringContainsString('total_revenue_change', $sql);
+        $this->assertStringNotContainsString('total_revenue_change_percent', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsMysqlAcceptsSingleComparisonString()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m-d',
+            ['revenue', 'sum', 'difference', 'total_revenue'],
+        );
+
+        $sql = $builder->toSql();
+
+        $this->assertStringContainsString('total_revenue_change', $sql);
+        $this->assertStringNotContainsString('total_revenue_change_percent', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsMysqlDisablesComparisonWhenFalse()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m-d',
+            ['revenue', 'sum', false, 'total_revenue'],
+            selectComparisonsOnly: false,
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('total_revenue', $sql);
+        $this->assertStringNotContainsString('change_percent', $sql);
+        $this->assertStringNotContainsString('change', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsSqliteWithoutWindowing()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            ['*', 'count', false, 'order_count'],
+            periodColumnAlias: 'period',
+            includePreviousPeriodValues: false,
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('strftime', $sql);
+        $this->assertStringNotContainsString('lag(', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsMysqlAcceptsStringComparisonTypes()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            ['revenue', 'sum', ['percent', 'difference'], 'total_revenue'],
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('total_revenue_change_percent', $sql);
+        $this->assertStringContainsString('total_revenue_change', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsAcceptsFluentAggregateSingle()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            Aggregate::sum('revenue')->as('total_revenue'),
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('sum(`revenue`) as `total_revenue`', $sql);
+        $this->assertStringContainsString('total_revenue_change_percent', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsAcceptsFluentAggregateList()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            [
+                Aggregate::sum('revenue')->as('total_revenue'),
+                Aggregate::avg('cost')->comparisons([SequentialPeriodComparison::Percent, SequentialPeriodComparison::Difference]),
+                Aggregate::count('*')->as('order_count')->comparison(SequentialPeriodComparison::Difference),
+                Aggregate::min('price')->withoutComparison(),
+            ],
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('sum(`revenue`) as `total_revenue`', $sql);
+        $this->assertStringContainsString('avg(`cost`) as `cost_avg`', $sql);
+        $this->assertStringContainsString('count(*) as `order_count`', $sql);
+        $this->assertStringContainsString('min(`price`) as `price_min`', $sql);
+
+        $this->assertStringContainsString('total_revenue_change_percent', $sql);
+        $this->assertStringContainsString('cost_avg_change_percent', $sql);
+        $this->assertStringContainsString('cost_avg_change', $sql);
+        $this->assertStringContainsString('order_count_change', $sql);
+        $this->assertStringNotContainsString('order_count_change_percent', $sql);
+        $this->assertStringNotContainsString('price_min_change', $sql);
+    }
+
+    public function testWithSequentialPeriodMetricsAcceptsMixedFluentAndArrayAggregates()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->from('orders');
+        $builder->withSequentialPeriodMetrics(
+            'Y-m',
+            [
+                Aggregate::sum('revenue')->as('total_revenue'),
+                ['cost', 'avg'],
+                'profit',
+            ],
+        );
+
+        $sql = strtolower($builder->toSql());
+
+        $this->assertStringContainsString('sum(`revenue`) as `total_revenue`', $sql);
+        $this->assertStringContainsString('avg(`cost`) as `cost_avg`', $sql);
+        $this->assertStringContainsString('sum(`profit`) as `profit_sum`', $sql);
+    }
+
+    public function testAggregateFluentColumnDefaultsToSumAndSupportsUsing()
+    {
+        $aggregate = Aggregate::column('revenue')->using('avg')->as('rev_avg');
+
+        $this->assertSame('revenue', $aggregate->column);
+        $this->assertSame('avg', $aggregate->function);
+        $this->assertSame('rev_avg', $aggregate->alias);
+        $this->assertSame([SequentialPeriodComparison::Percent], $aggregate->comparisons);
+    }
+
+    public function testWithSequentialPeriodMetricsRejectsNonDateColumnType()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Date column [profit] on table [orders] must be a date or datetime type, got [decimal].');
+
+        $schema = m::mock(\Illuminate\Database\Schema\Builder::class);
+        $schema->shouldReceive('getColumnType')->with('orders', 'profit')->andReturn('decimal');
+
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('getSchemaBuilder')->andReturn($schema);
+
+        $builder->from('orders')->withSequentialPeriodMetrics(
+            'Y-m',
+            ['revenue'],
+            dateColumn: 'profit',
+        );
+    }
+
+    public function testWithSequentialPeriodMetricsAllowsKnownDateColumnTypes()
+    {
+        $schema = m::mock(\Illuminate\Database\Schema\Builder::class);
+        $schema->shouldReceive('getColumnType')->with('orders', 'created_at')->andReturn('datetime');
+
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('getSchemaBuilder')->andReturn($schema);
+
+        $builder->from('orders')->withSequentialPeriodMetrics(
+            'Y-m',
+            ['revenue'],
+        );
+
+        $this->assertStringContainsString('revenue_sum_change_percent', strtolower($builder->toSql()));
+    }
+
+    public function testWithSequentialPeriodMetricsRejectsStarColumnWithNonCountFunction()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Aggregate column [*] is only supported with the count() function, got [sum].');
+
+        $this->getMySqlBuilder()
+            ->from('orders')
+            ->withSequentialPeriodMetrics(
+                'Y-m',
+                [['*', 'sum']],
+            );
+    }
+
+    public function testWithSequentialPeriodMetricsRejectsInvalidComparisonType()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported sequential period comparison type [ratio].');
+
+        $this->getMySqlBuilder()
+            ->from('orders')
+            ->withSequentialPeriodMetrics(
+                'Y-m',
+                ['revenue', 'sum', ['ratio']],
+            );
     }
 }

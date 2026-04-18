@@ -11,6 +11,7 @@ use Illuminate\Contracts\Database\Query\ConditionExpression;
 use Illuminate\Contracts\Database\Query\Expression as ExpressionContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
+use Illuminate\Database\Concerns\BuildsSequentialPeriodQueries;
 use Illuminate\Database\Concerns\BuildsWhereDateClauses;
 use Illuminate\Database\Concerns\ExplainsQueries;
 use Illuminate\Database\ConnectionInterface;
@@ -36,7 +37,7 @@ use function Illuminate\Support\enum_value;
 class Builder implements BuilderContract
 {
     /** @use \Illuminate\Database\Concerns\BuildsQueries<\stdClass> */
-    use BuildsWhereDateClauses, BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {
+    use BuildsSequentialPeriodQueries, BuildsWhereDateClauses, BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {
         __call as macroCall;
     }
 

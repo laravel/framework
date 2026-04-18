@@ -508,4 +508,49 @@ class SQLiteGrammar extends Grammar
 
         return 'json_extract('.$field.$path.')';
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function compileGroupedDate($column, $format)
+    {
+        $this->ensurePhpDateFormatIsSafeForSqlGrouping($format);
+
+        $pattern = $this->compileSqliteStrftimeFormatPatternFromPhpDateFormat($format);
+
+        return 'strftime('.$this->quoteString($pattern).', '.$this->wrap($column).')';
+    }
+
+    /**
+     * Translate a PHP date format into SQLite strftime() format characters.
+     *
+     * @param  string  $format
+     * @return string
+     */
+    protected function compileSqliteStrftimeFormatPatternFromPhpDateFormat($format)
+    {
+        $result = '';
+        $length = strlen($format);
+
+        for ($i = 0; $i < $length; $i++) {
+            $char = $format[$i];
+
+            $result .= match ($char) {
+                'Y' => '%Y',
+                'y' => '%y',
+                'm' => '%m',
+                'n' => '%m',
+                'd' => '%d',
+                'j' => '%d',
+                'H' => '%H',
+                'h' => '%H',
+                'G' => '%H',
+                'i' => '%M',
+                's' => '%S',
+                default => $char,
+            };
+        }
+
+        return $result;
+    }
 }

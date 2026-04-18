@@ -616,4 +616,50 @@ class MySqlGrammar extends Grammar
 
         return 'json_extract('.$field.$path.')';
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function compileGroupedDate($column, $format)
+    {
+        $this->ensurePhpDateFormatIsSafeForSqlGrouping($format);
+
+        $pattern = $this->compileMysqlDateFormatPatternFromPhpDateFormat($format);
+
+        return 'date_format('.$this->wrap($column).', '.$this->quoteString($pattern).')';
+    }
+
+    /**
+     * Translate a PHP date format into MySQL date_format() pattern characters.
+     *
+     * @param  string  $format
+     * @return string
+     */
+    protected function compileMysqlDateFormatPatternFromPhpDateFormat($format)
+    {
+        $result = '';
+        $length = strlen($format);
+
+        for ($i = 0; $i < $length; $i++) {
+            $char = $format[$i];
+
+            $result .= match ($char) {
+                'Y' => '%Y',
+                'y' => '%y',
+                'm' => '%m',
+                'n' => '%c',
+                'd' => '%d',
+                'j' => '%e',
+                'H' => '%H',
+                'h' => '%h',
+                'G' => '%k',
+                'i' => '%i',
+                's' => '%s',
+                '%' => '%%',
+                default => $char,
+            };
+        }
+
+        return $result;
+    }
 }
