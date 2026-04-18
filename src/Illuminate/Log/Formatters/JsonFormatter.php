@@ -4,7 +4,6 @@ namespace Illuminate\Log\Formatters;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Foundation\Exceptions\Handler;
 use Monolog\Formatter\JsonFormatter as MonologJsonFormatter;
 use Throwable;
 
