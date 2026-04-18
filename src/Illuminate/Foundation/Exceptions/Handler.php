@@ -25,6 +25,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Exceptions\OriginMismatchException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
+use Illuminate\Log\Formatters\ExceptionContextState;
 use Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException;
 use Illuminate\Routing\Router;
 use Illuminate\Session\TokenMismatchException;
@@ -534,10 +535,18 @@ class Handler implements ExceptionHandlerContract
     protected function buildExceptionContext(Throwable $e)
     {
         return array_merge(
-            $this->exceptionContext($e),
-            $this->context(),
+            $this->createExceptionContext($e),
             ['exception' => $e]
         );
+    }
+
+    public function createExceptionContext(Throwable $e)
+    {
+        $context = array_merge($this->exceptionContext($e), $this->context());
+
+        ExceptionContextState::reportContextBuilt($e);
+
+        return $context;
     }
 
     /**
