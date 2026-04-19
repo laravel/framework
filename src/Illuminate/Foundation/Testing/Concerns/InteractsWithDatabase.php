@@ -33,7 +33,7 @@ trait InteractsWithDatabase
             return $this;
         }
 
-        if (count($data) > 0 && array_is_list($data) && array_all($data, fn ($row) => is_array($row))) {
+        if ($data !== [] && array_is_list($data) && array_all($data, fn ($row) => is_array($row))) {
             foreach ($data as $row) {
                 $this->assertDatabaseHas($table, $row, $connection);
             }
@@ -73,7 +73,7 @@ trait InteractsWithDatabase
             return $this;
         }
 
-        if (count($data) > 0 && array_is_list($data) && array_all($data, fn ($row) => is_array($row))) {
+        if ($data !== [] && array_is_list($data) && array_all($data, fn ($row) => is_array($row))) {
             foreach ($data as $row) {
                 $this->assertDatabaseMissing($table, $row, $connection);
             }
