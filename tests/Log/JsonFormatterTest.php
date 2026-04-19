@@ -8,6 +8,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Log\Formatters\JsonFormatter;
 use Illuminate\Log\Logger;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger as Monolog;
@@ -264,17 +265,25 @@ final class JsonFormatterTest extends TestCase
         self::assertSame(ContextProvidingException::class, $previousData['class']);
     }
 
-    private function createTestHandler(): TestHandler
+    public function testFormatterHandlesNormalizationDepthLimit()
     {
-        return new TestHandler();
-    }
+        $formatter = new JsonFormatter();
+        $formatter->setMaxNormalizeDepth(3);
 
-    private function createLogger(TestHandler $handler): Logger
-    {
+        $handler = new TestHandler();
+        $handler->setFormatter($formatter);
         $monolog = new Monolog('test', [$handler]);
-        $handler->setFormatter(new JsonFormatter());
 
-        return new Logger($monolog);
+        $inner = new ContextProvidingException('inner');
+        $outer = new ContextProvidingException('outer', 0, $inner);
+
+        $monolog->error('fail', ['exception' => ['e' => $outer]]);
+
+        $formatted = $this->getFormattedJson($handler);
+        self::assertSame(
+            'Over 3 levels deep, aborting normalization',
+            Arr::get($formatted, 'context.exception.e.previous.0'),
+        );
     }
 
     private function getFormattedJson(?TestHandler $handler = null): array
