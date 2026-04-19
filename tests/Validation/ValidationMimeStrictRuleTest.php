@@ -103,17 +103,12 @@ class ValidationMimeStrictRuleTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
-    public function test_throws_when_no_guesser_is_bound()
+    public function test_default_guesser_is_magika_cli_guesser()
     {
-        $trans = new Translator(new ArrayLoader, 'en');
-        $file = UploadedFile::fake()->createWithContent('foo.png', file_get_contents(__DIR__.'/fixtures/image.png'));
-        $v = new Validator($trans, ['x' => $file], ['x' => 'mime_strict:png']);
-        $v->setContainer(Container::getInstance());
+        $container = Container::getInstance();
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageMatches('/StrictMimeTypeGuesser/');
-
-        $v->passes();
+        $this->assertInstanceOf(StrictMimeTypeGuesser::class, $container->make(StrictMimeTypeGuesser::class));
+        $this->assertInstanceOf(MagikaCliGuesser::class, $container->make(StrictMimeTypeGuesser::class));
     }
 
     public function test_blocks_php_upload()

@@ -3,9 +3,11 @@
 namespace Illuminate\Validation;
 
 use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Contracts\Validation\StrictMimeTypeGuesser;
 use Illuminate\Contracts\Validation\UncompromisedVerifier;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Magika\MagikaCliGuesser;
 
 class ValidationServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -18,6 +20,7 @@ class ValidationServiceProvider extends ServiceProvider implements DeferrablePro
     {
         $this->registerPresenceVerifier();
         $this->registerUncompromisedVerifier();
+        $this->registerStrictMimeTypeGuesser();
         $this->registerValidationFactory();
     }
 
@@ -67,12 +70,22 @@ class ValidationServiceProvider extends ServiceProvider implements DeferrablePro
     }
 
     /**
+     * Register the default strict MIME type guesser.
+     *
+     * @return void
+     */
+    protected function registerStrictMimeTypeGuesser(): void
+    {
+        $this->app->bind(StrictMimeTypeGuesser::class, MagikaCliGuesser::class);
+    }
+
+    /**
      * Get the services provided by the provider.
      *
      * @return array
      */
     public function provides(): array
     {
-        return ['validator', 'validation.presence', UncompromisedVerifier::class];
+        return ['validator', 'validation.presence', UncompromisedVerifier::class, StrictMimeTypeGuesser::class];
     }
 }
