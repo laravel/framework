@@ -34,7 +34,7 @@ class MagikaCliDetector implements MagikaDetector
         if (! $process->isSuccessful()) {
             if (! $this->binaryExists()) {
                 throw new RuntimeException(
-                    "The Magika binary [{$this->binary}] was not found. Install it via `pip install magika` and ensure it is available in your PATH."
+                    "The Magika binary [{$this->binary}] was not found. Install it via `pip install magika` and ensure the binary path is correct."
                 );
             }
 
