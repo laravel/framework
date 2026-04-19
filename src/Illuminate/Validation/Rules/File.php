@@ -59,11 +59,11 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     protected $customRules = [];
 
     /**
-     * Whether to use Magika AI-based content detection instead of finfo.
+     * Whether to use strict content-type detection instead of finfo.
      *
      * @var bool
      */
-    protected $useMagika = false;
+    protected $strict = false;
 
     /**
      * The error message after validation, if any.
@@ -234,13 +234,13 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
-     * Use Magika AI-based content detection instead of finfo for file type validation.
+     * Use strict content-type detection instead of finfo for file type validation.
      *
      * @return $this
      */
-    public function magika(): static
+    public function strict(): static
     {
-        $this->useMagika = true;
+        $this->strict = true;
 
         return $this;
     }
@@ -365,7 +365,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
         }
 
         if ($mimes !== []) {
-            $rules[] = ($this->useMagika ? 'magika' : 'mimes').':'.implode(',', $mimes);
+            $rules[] = ($this->strict ? 'mime_strict' : 'mimes').':'.implode(',', $mimes);
         }
 
         return $rules;

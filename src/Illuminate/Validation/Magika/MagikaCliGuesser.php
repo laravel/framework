@@ -1,15 +1,15 @@
 <?php
 
-namespace Illuminate\Validation;
+namespace Illuminate\Validation\Magika;
 
-use Illuminate\Contracts\Validation\MagikaDetector;
+use Illuminate\Contracts\Validation\StrictMimeTypeGuesser;
 use RuntimeException;
 use Symfony\Component\Process\Process;
 
-class MagikaCliDetector implements MagikaDetector
+class MagikaCliGuesser implements StrictMimeTypeGuesser
 {
     /**
-     * Create a new Magika CLI detector instance.
+     * Create a new Magika CLI guesser instance.
      *
      * @param  string  $binary
      */
@@ -18,14 +18,14 @@ class MagikaCliDetector implements MagikaDetector
     }
 
     /**
-     * Detect the content type of a file and return its canonical extension.
+     * Guess the content type of a file and return its canonical extension.
      *
      * @param  string  $path
      * @return string|null
      *
      * @throws \RuntimeException
      */
-    public function detect(string $path): ?string
+    public function guess(string $path): ?string
     {
         $process = new Process([$this->binary, '--json', $path]);
 
@@ -34,7 +34,7 @@ class MagikaCliDetector implements MagikaDetector
         if (! $process->isSuccessful()) {
             if (! $this->binaryExists()) {
                 throw new RuntimeException(
-                    "The Magika binary [{$this->binary}] was not found. Install it via `pip install magika` and ensure the binary path is correct."
+                    "The Magika binary [{$this->binary}] was not found. Install it via `pip install magika` or provide the fully-qualified path to the binary."
                 );
             }
 
