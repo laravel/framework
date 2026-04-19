@@ -120,6 +120,62 @@ class ValidationMagikaRuleTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testAllowsPhpUploadWhenPhpIsExplicitlyInParams()
+    {
+        $this->bindDetector('php');
+
+        $trans = new Translator(new ArrayLoader, 'en');
+
+        $file = new UploadedFile(__FILE__, 'script.php', null, null, true);
+
+        $v = new Validator($trans, ['x' => $file], ['x' => 'magika:php']);
+        $v->setContainer(Container::getInstance());
+
+        $this->assertTrue($v->passes());
+    }
+
+    public function testFluentWithoutMagikaDoesNotInvokeDetector()
+    {
+        $calls = 0;
+        $spy = new class($calls) implements MagikaDetector {
+            public function __construct(private int &$calls) {}
+            public function detect(string $path): ?string { $this->calls++; return 'png'; }
+        };
+
+        Container::getInstance()->instance(MagikaDetector::class, $spy);
+
+        $trans = new Translator(new ArrayLoader, 'en');
+        $file = UploadedFile::fake()->createWithContent('foo.png', file_get_contents(__DIR__.'/fixtures/image.png'));
+        $v = new Validator($trans, ['x' => $file], ['x' => File::types(['png'])]);
+        $v->setContainer(Container::getInstance());
+        $v->passes();
+
+        $this->assertSame(0, $calls, 'Detector must not be called when ->magika() is not set.');
+    }
+
+    public function testDetectedValueDoesNotLeakBetweenAttributes()
+    {
+        $this->bindDetector('txt');
+
+        $trans = new Translator(new ArrayLoader, 'en');
+        $trans->addLines(['validation.magika' => 'detected: :detected'], 'en');
+
+        $fileA = UploadedFile::fake()->createWithContent('a.txt', 'text content');
+        $fileB = UploadedFile::fake()->createWithContent('b.bin', '');
+
+        $this->bindDetector('txt');
+        $vA = new Validator($trans, ['x' => $fileA], ['x' => 'magika:png']);
+        $vA->setContainer(Container::getInstance());
+        $vA->passes();
+        $this->assertStringContainsString('detected: txt', $vA->messages()->first('x'));
+
+        $this->bindDetector(null);
+        $vB = new Validator($trans, ['x' => $fileB], ['x' => 'magika:png']);
+        $vB->setContainer(Container::getInstance());
+        $vB->passes();
+        $this->assertStringContainsString('detected: unknown', $vB->messages()->first('x'));
+    }
+
     public function testFluentMagikaToggleEmitsMagikaRule()
     {
         $this->bindDetector('png');
