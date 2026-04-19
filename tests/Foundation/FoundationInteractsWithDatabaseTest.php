@@ -234,6 +234,32 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertModelMissing(new ProductStub($this->data));
     }
 
+    public function testAssertModelMissingFailsWhenFindsModelResults()
+    {
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->data = ['id' => 1];
+
+        $builder = $this->mockCountBuilder(true);
+
+        $builder->shouldReceive('get')->andReturn(collect([$this->data]));
+
+        $this->assertModelMissing(new ProductStub($this->data));
+    }
+
+    public function testAssertModelExistsFailsWhenDoesNotFindModelResults()
+    {
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->data = ['id' => 1];
+
+        $builder = $this->mockCountBuilder(false);
+
+        $builder->shouldReceive('get')->andReturn(collect());
+
+        $this->assertModelExists(new ProductStub($this->data));
+    }
+
     public function testAssertSoftDeletedInDatabaseFindsResults()
     {
         $this->mockCountBuilder(true);
