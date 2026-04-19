@@ -390,22 +390,24 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         static::$traitInitializers[$class] = [];
 
-        $uses = class_uses_recursive($class);
+        $ref = (new ReflectionClass($class));
 
-        $conventionalBootMethods = array_map(static fn ($trait) => 'boot'.class_basename($trait), $uses);
-        $conventionalInitMethods = array_map(static fn ($trait) => 'initialize'.class_basename($trait), $uses);
+        foreach (class_uses_recursive($class) as $trait) {
+            $conventionalBootMethod = 'boot'.class_basename($trait);
+            $conventionalInitMethod = 'initialize'.class_basename($trait);
 
-        foreach ((new ReflectionClass($class))->getMethods() as $method) {
-            if (! in_array($method->getName(), $booted) &&
+            if ($ref->hasMethod($conventionalBootMethod) &&
+                ($method = $ref->getMethod($conventionalBootMethod)) &&
+                ! in_array($method->getName(), $booted) &&
                 $method->isStatic() &&
-                (in_array($method->getName(), $conventionalBootMethods) ||
-                $method->getAttributes(Boot::class) !== [])) {
+                $method->getAttributes(Boot::class) !== []) {
                 $method->invoke(null);
 
                 $booted[] = $method->getName();
             }
 
-            if (in_array($method->getName(), $conventionalInitMethods) ||
+            if ($ref->hasMethod($conventionalInitMethod) &&
+                ($method = $ref->getMethod($conventionalInitMethod)) ||
                 $method->getAttributes(Initialize::class) !== []) {
                 static::$traitInitializers[$class][] = $method->getName();
             }
