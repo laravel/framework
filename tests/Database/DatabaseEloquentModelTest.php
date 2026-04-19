@@ -3842,6 +3842,16 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertNotInstanceOf(CustomBuilder::class, $eloquentBuilder);
     }
+
+    public function testTraitInitializersAreCalledInCorrectOrder()
+    {
+        $model = new EloquentModelTraitInitializeOrderStub;
+
+        $this->assertTrue(
+            $model->castsWereReadyDuringInit,
+            'HasAttributes::initializeHasAttributes() must run before dependent trait initializers that rely on getCasts().'
+        );
+    }
 }
 
 class CustomBuilder extends Builder
@@ -4785,4 +4795,24 @@ enum ConnectionNameBacked: string
 {
     case Foo = 'Foo';
     case Bar = 'Bar';
+}
+
+trait EloquentTraitInitializeOrderStub
+{
+    public bool $castsWereReadyDuringInit = false;
+
+    protected function initializeEloquentTraitInitializeOrderStub(): void
+    {
+        $this->castsWereReadyDuringInit = array_key_exists('status', $this->getCasts());
+    }
+}
+
+class EloquentModelTraitInitializeOrderStub extends Model
+{
+    use EloquentTraitInitializeOrderStub;
+
+    protected function casts(): array
+    {
+        return ['status' => 'string'];
+    }
 }
