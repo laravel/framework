@@ -223,6 +223,72 @@ class Arr
     }
 
     /**
+     * Retrieve duplicate items from the array.
+     *
+     * @template TKey of array-key
+     * @template TValue
+     *
+     * @param  array<TKey, TValue>  $array
+     * @param  (callable(TValue, TKey): mixed)|string|null  $callback
+     * @param  bool  $strict
+     * @return array<TKey, TValue>
+     */
+    public static function duplicates($array, $callback = null, $strict = false)
+    {
+        if ($callback === null && $strict === false) {
+            return array_diff_assoc($array, array_unique($array));
+        }
+
+        $items = static::map(
+            $array,
+            is_null($callback)
+                ? fn ($value) => $value
+                : (is_callable($callback) ? $callback : fn ($item) => data_get($item, $callback))
+        );
+
+        $seen = [];
+        $uniqueItems = [];
+
+        foreach ($items as $value) {
+            if (! in_array($value, $seen, $strict)) {
+                $seen[] = $value;
+                $uniqueItems[] = $value;
+            }
+        }
+
+        $compare = $strict
+            ? fn ($a, $b) => $a === $b
+            : fn ($a, $b) => $a == $b;
+
+        $duplicates = [];
+
+        foreach ($items as $key => $value) {
+            if (! empty($uniqueItems) && $compare($value, reset($uniqueItems))) {
+                array_shift($uniqueItems);
+            } else {
+                $duplicates[$key] = $value;
+            }
+        }
+
+        return $duplicates;
+    }
+
+    /**
+     * Retrieve duplicate items from the array using strict comparison.
+     *
+     * @template TKey of array-key
+     * @template TValue
+     *
+     * @param  array<TKey, TValue>  $array
+     * @param  (callable(TValue, TKey): mixed)|string|null  $callback
+     * @return array<TKey, TValue>
+     */
+    public static function duplicatesStrict($array, $callback = null)
+    {
+        return static::duplicates($array, $callback, true);
+    }
+
+    /**
      * Get all of the given array except for a specified array of keys.
      *
      * @param  array  $array

@@ -317,6 +317,49 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['foo', 'foo' => ['bar' => 'baz', 'baz' => ['a' => 'b']]], $array);
     }
 
+    public function testDuplicates()
+    {
+        // basic scalar duplicates
+        $result = Arr::duplicates(['a', 'b', 'a', 'c', 'b']);
+        $this->assertSame([2 => 'a', 4 => 'b'], $result);
+
+        // no duplicates
+        $this->assertSame([], Arr::duplicates(['a', 'b', 'c']));
+
+        // by string key
+        $data = [
+            ['role' => 'admin', 'name' => 'Alice'],
+            ['role' => 'editor', 'name' => 'Bob'],
+            ['role' => 'admin', 'name' => 'Carol'],
+        ];
+        $result = Arr::duplicates($data, 'role');
+        $this->assertSame([2 => 'admin'], $result);
+
+        // by dot notation
+        $data = [
+            ['meta' => ['type' => 'fruit']],
+            ['meta' => ['type' => 'vegetable']],
+            ['meta' => ['type' => 'fruit']],
+        ];
+        $result = Arr::duplicates($data, 'meta.type');
+        $this->assertSame([2 => 'fruit'], $result);
+
+        // by callback (returns mapped values for duplicate positions)
+        $result = Arr::duplicates([1, 2, 3, 4, 5], fn ($v) => $v % 2);
+        $this->assertSame([2 => 1, 3 => 0, 4 => 1], $result);
+
+        // duplicatesStrict
+        $result = Arr::duplicatesStrict([1, '1', 1]);
+        $this->assertSame([2 => 1], $result);
+
+        // loose comparison does not distinguish types
+        $result = Arr::duplicates([1, '1']);
+        $this->assertSame([1 => '1'], $result);
+
+        // empty array
+        $this->assertSame([], Arr::duplicates([]));
+    }
+
     public function testExcept()
     {
         $array = ['name' => 'taylor', 'age' => 26];
