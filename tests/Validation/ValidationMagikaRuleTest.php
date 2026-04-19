@@ -149,12 +149,12 @@ class ValidationMagikaRuleTest extends TestCase
         );
     }
 
-    public function testErrorMessageContainsAllowedTypes()
+    public function testErrorMessageContainsAllowedTypesAndDetected()
     {
         $this->bindDetector('txt');
 
         $trans = new Translator(new ArrayLoader, 'en');
-        $trans->addLines(['validation.magika' => 'The :attribute field must be a file of type: :values.'], 'en');
+        $trans->addLines(['validation.magika' => 'The :attribute field must be a file of type: :values (detected: :detected).'], 'en');
 
         $file = UploadedFile::fake()->createWithContent('foo.txt', 'Hello World!');
         $v = new Validator($trans, ['x' => $file], ['x' => 'magika:png,jpg']);
@@ -162,6 +162,47 @@ class ValidationMagikaRuleTest extends TestCase
 
         $this->assertFalse($v->passes());
         $this->assertStringContainsString('png, jpg', $v->messages()->first('x'));
+        $this->assertStringContainsString('detected: txt', $v->messages()->first('x'));
+    }
+
+    public function testErrorMessageShowsUnknownWhenDetectorReturnsNull()
+    {
+        $this->bindDetector(null);
+
+        $trans = new Translator(new ArrayLoader, 'en');
+        $trans->addLines(['validation.magika' => 'The :attribute field must be a file of type: :values (detected: :detected).'], 'en');
+
+        $file = UploadedFile::fake()->createWithContent('foo.bin', 'binary');
+        $v = new Validator($trans, ['x' => $file], ['x' => 'magika:png']);
+        $v->setContainer(Container::getInstance());
+
+        $this->assertFalse($v->passes());
+        $this->assertStringContainsString('detected: unknown', $v->messages()->first('x'));
+    }
+
+    public function testMagikaDetectsFilesThatFoolFinfo()
+    {
+        $which = new Process(['which', 'magika']);
+        $which->run();
+
+        if (! $which->isSuccessful()) {
+            $this->markTestSkipped('The magika binary is not installed.');
+        }
+
+        Container::getInstance()->bind(\Illuminate\Contracts\Validation\MagikaDetector::class, \Illuminate\Validation\MagikaCliDetector::class);
+
+        $fixture = __DIR__.'/fixtures/spoofed_php_as_png.png';
+
+        $trans = new Translator(new ArrayLoader, 'en');
+        $file = new \Illuminate\Http\UploadedFile($fixture, 'upload.png', null, null, true);
+
+        $mimesValidator = new Validator($trans, ['x' => $file], ['x' => 'mimes:png']);
+        $mimesValidator->setContainer(Container::getInstance());
+        $this->assertTrue($mimesValidator->passes(), 'finfo should be fooled by the PNG header');
+
+        $magikaValidator = new Validator($trans, ['x' => $file], ['x' => 'magika:png']);
+        $magikaValidator->setContainer(Container::getInstance());
+        $this->assertFalse($magikaValidator->passes(), 'Magika should detect the true PHP content');
     }
 
     public function testMagikaCliDetectorThrowsWhenBinaryMissing()

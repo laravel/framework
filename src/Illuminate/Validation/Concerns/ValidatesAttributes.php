@@ -1740,6 +1740,10 @@ trait ValidatesAttributes
 
         $detected = $detector->detect($value->getRealPath());
 
+        if ($detected !== null) {
+            $this->magikaDetected[$attribute] = $detected;
+        }
+
         return $detected !== null && in_array($detected, $parameters);
     }
 

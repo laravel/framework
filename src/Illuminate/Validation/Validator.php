@@ -55,6 +55,13 @@ class Validator implements ValidatorContract
     protected $failedRules = [];
 
     /**
+     * The Magika-detected content types keyed by attribute name.
+     *
+     * @var array<string, string>
+     */
+    protected $magikaDetected = [];
+
+    /**
      * Attributes that should be excluded from the validated data.
      *
      * @var array

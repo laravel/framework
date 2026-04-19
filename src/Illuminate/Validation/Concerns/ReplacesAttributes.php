@@ -403,7 +403,11 @@ trait ReplacesAttributes
      */
     protected function replaceMagika($message, $attribute, $rule, $parameters): string
     {
-        return str_replace(':values', implode(', ', $parameters), $message);
+        $message = str_replace(':values', implode(', ', $parameters), $message);
+
+        $detected = $this->magikaDetected[$attribute] ?? null;
+
+        return str_replace(':detected', $detected ?? __('unknown'), $message);
     }
 
     protected function replaceMimes($message, $attribute, $rule, $parameters)
