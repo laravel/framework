@@ -918,10 +918,12 @@ class Validator implements ValidatorContract
     {
         $originalAttribute = $this->replacePlaceholderInString($attribute);
 
+        $invokable = $rule instanceof InvokableValidationRule ? $rule->invokable() : $rule;
+
         $attribute = match (true) {
-            $rule instanceof Rules\Email => $attribute,
-            $rule instanceof Rules\File => $attribute,
-            $rule instanceof Rules\Password => $attribute,
+            $invokable instanceof Rules\Email => $attribute,
+            $invokable instanceof Rules\File => $attribute,
+            $invokable instanceof Rules\Password => $attribute,
             default => $originalAttribute,
         };
 
