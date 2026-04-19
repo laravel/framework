@@ -15,7 +15,7 @@ class ValidationServiceProvider extends ServiceProvider implements DeferrablePro
      *
      * @return void
      */
-    public function register(): void
+    public function register()
     {
         $this->registerPresenceVerifier();
         $this->registerUncompromisedVerifier();
