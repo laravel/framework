@@ -59,6 +59,13 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     protected $customRules = [];
 
     /**
+     * Whether to use Magika AI-based content detection instead of finfo.
+     *
+     * @var bool
+     */
+    protected $useMagika = false;
+
+    /**
      * The error message after validation, if any.
      *
      * @var array
@@ -227,6 +234,18 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
+     * Use Magika AI-based content detection instead of finfo for file type validation.
+     *
+     * @return $this
+     */
+    public function magika(): static
+    {
+        $this->useMagika = true;
+
+        return $this;
+    }
+
+    /**
      * Convert a potentially human-friendly file size to kilobytes.
      *
      * @param  string|int  $size
@@ -346,7 +365,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
         }
 
         if ($mimes !== []) {
-            $rules[] = 'mimes:'.implode(',', $mimes);
+            $rules[] = ($this->useMagika ? 'magika' : 'mimes').':'.implode(',', $mimes);
         }
 
         return $rules;

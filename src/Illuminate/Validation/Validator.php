@@ -192,6 +192,7 @@ class Validator implements ValidatorContract
         'Extensions',
         'File',
         'Image',
+        'Magika',
         'Max',
         'Mimes',
         'Mimetypes',

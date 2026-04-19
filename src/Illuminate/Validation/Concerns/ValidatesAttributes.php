@@ -1714,6 +1714,35 @@ trait ValidatesAttributes
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
+    /**
+     * Validate the content type of a file upload using Magika AI-based detection.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateMagika($attribute, $value, $parameters): bool
+    {
+        if (! $this->isValidFileInstance($value)) {
+            return false;
+        }
+
+        if ($this->shouldBlockPhpUpload($value, $parameters)) {
+            return false;
+        }
+
+        if ($value->getPath() === '') {
+            return false;
+        }
+
+        $detector = $this->container->make(\Illuminate\Contracts\Validation\MagikaDetector::class);
+
+        $detected = $detector->detect($value->getRealPath());
+
+        return $detected !== null && in_array($detected, $parameters);
+    }
+
     public function validateMimes($attribute, $value, $parameters)
     {
         if (! $this->isValidFileInstance($value)) {

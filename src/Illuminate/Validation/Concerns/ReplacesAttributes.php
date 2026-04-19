@@ -393,7 +393,7 @@ trait ReplacesAttributes
     }
 
     /**
-     * Replace all place-holders for the mimes rule.
+     * Replace all place-holders for the magika rule.
      *
      * @param  string  $message
      * @param  string  $attribute
@@ -401,6 +401,11 @@ trait ReplacesAttributes
      * @param  array<int,string>  $parameters
      * @return string
      */
+    protected function replaceMagika($message, $attribute, $rule, $parameters): string
+    {
+        return str_replace(':values', implode(', ', $parameters), $message);
+    }
+
     protected function replaceMimes($message, $attribute, $rule, $parameters)
     {
         return str_replace(':values', implode(', ', $parameters), $message);

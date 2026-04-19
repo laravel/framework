@@ -3,6 +3,7 @@
 namespace Illuminate\Validation;
 
 use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Contracts\Validation\MagikaDetector;
 use Illuminate\Contracts\Validation\UncompromisedVerifier;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Support\ServiceProvider;
@@ -14,10 +15,11 @@ class ValidationServiceProvider extends ServiceProvider implements DeferrablePro
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->registerPresenceVerifier();
         $this->registerUncompromisedVerifier();
+        $this->registerMagikaDetector();
         $this->registerValidationFactory();
     }
 
@@ -67,12 +69,26 @@ class ValidationServiceProvider extends ServiceProvider implements DeferrablePro
     }
 
     /**
+     * Register the Magika content-type detector.
+     *
+     * @return void
+     */
+    protected function registerMagikaDetector(): void
+    {
+        $this->app->singleton(MagikaDetector::class, function ($app) {
+            $binary = isset($app['config']) ? $app['config']->get('validation.magika.binary', 'magika') : 'magika';
+
+            return new MagikaCliDetector($binary);
+        });
+    }
+
+    /**
      * Get the services provided by the provider.
      *
      * @return array
      */
-    public function provides()
+    public function provides(): array
     {
-        return ['validator', 'validation.presence', UncompromisedVerifier::class];
+        return ['validator', 'validation.presence', UncompromisedVerifier::class, MagikaDetector::class];
     }
 }
