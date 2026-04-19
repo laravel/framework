@@ -39,7 +39,7 @@ class ValidationMimeStrictRuleTest extends TestCase
         parent::tearDown();
     }
 
-    public function testPassesWhenDetectedExtensionMatchesSingleParam()
+    public function test_passes_when_detected_extension_matches_single_param()
     {
         $this->bindGuesser('png');
 
@@ -49,7 +49,7 @@ class ValidationMimeStrictRuleTest extends TestCase
         );
     }
 
-    public function testFailsWhenDetectedExtensionDoesNotMatchSingleParam()
+    public function test_fails_when_detected_extension_does_not_match_single_param()
     {
         $this->bindGuesser('png');
 
@@ -60,7 +60,7 @@ class ValidationMimeStrictRuleTest extends TestCase
         );
     }
 
-    public function testPassesWhenDetectedExtensionIsInMultipleParams()
+    public function test_passes_when_detected_extension_is_in_multiple_params()
     {
         $this->bindGuesser('jpg');
 
@@ -70,7 +70,7 @@ class ValidationMimeStrictRuleTest extends TestCase
         );
     }
 
-    public function testFailsWhenDetectedExtensionIsNotInMultipleParams()
+    public function test_fails_when_detected_extension_is_not_in_multiple_params()
     {
         $this->bindGuesser('txt');
 
@@ -81,7 +81,7 @@ class ValidationMimeStrictRuleTest extends TestCase
         );
     }
 
-    public function testFailsWhenGuesserReturnsNull()
+    public function test_fails_when_guesser_returns_null()
     {
         $this->bindGuesser(null);
 
@@ -92,7 +92,7 @@ class ValidationMimeStrictRuleTest extends TestCase
         );
     }
 
-    public function testFailsWhenValueIsNotAFile()
+    public function test_fails_when_value_is_not_a_file()
     {
         $this->bindGuesser('png');
 
@@ -103,7 +103,7 @@ class ValidationMimeStrictRuleTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
-    public function testThrowsWhenNoGuesserIsBound()
+    public function test_throws_when_no_guesser_is_bound()
     {
         $trans = new Translator(new ArrayLoader, 'en');
         $file = UploadedFile::fake()->createWithContent('foo.png', file_get_contents(__DIR__.'/fixtures/image.png'));
@@ -116,7 +116,7 @@ class ValidationMimeStrictRuleTest extends TestCase
         $v->passes();
     }
 
-    public function testBlocksPhpUpload()
+    public function test_blocks_php_upload()
     {
         $this->bindGuesser('php');
 
@@ -133,7 +133,7 @@ class ValidationMimeStrictRuleTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
-    public function testAllowsPhpUploadWhenPhpIsExplicitlyInParams()
+    public function test_allows_php_upload_when_php_is_explicitly_in_params()
     {
         $this->bindGuesser('php');
 
@@ -147,19 +147,18 @@ class ValidationMimeStrictRuleTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
-    public function testFluentWithoutStrictDoesNotInvokeGuesser()
+    public function test_fluent_without_strict_does_not_invoke_guesser()
     {
         $calls = 0;
         $spy = new class($calls) implements StrictMimeTypeGuesser
         {
-            public function __construct(private int &$calls)
-            {
-            }
+            public function __construct(private int &$calls) {}
+
             public function guess(string $path): ?string
             {
-            $this->calls++;
+                $this->calls++;
 
-return 'png';
+                return 'png';
             }
         };
 
@@ -174,7 +173,7 @@ return 'png';
         $this->assertSame(0, $calls, 'Guesser must not be called when ->strict() is not set.');
     }
 
-    public function testDetectedValueDoesNotLeakBetweenAttributes()
+    public function test_detected_value_does_not_leak_between_attributes()
     {
         $this->bindGuesser('txt');
 
@@ -197,7 +196,7 @@ return 'png';
         $this->assertStringContainsString('detected: unknown', $vB->messages()->first('x'));
     }
 
-    public function testFluentStrictToggleEmitsMimeStrictRule()
+    public function test_fluent_strict_toggle_emits_mime_strict_rule()
     {
         $this->bindGuesser('png');
 
@@ -207,7 +206,7 @@ return 'png';
         );
     }
 
-    public function testFluentStrictToggleFailsOnWrongType()
+    public function test_fluent_strict_toggle_fails_on_wrong_type()
     {
         $this->bindGuesser('txt');
 
@@ -218,7 +217,7 @@ return 'png';
         );
     }
 
-    public function testFluentWithoutStrictStillUsesMimes()
+    public function test_fluent_without_strict_still_uses_mimes()
     {
         $this->passes(
             File::types(['png']),
@@ -226,7 +225,7 @@ return 'png';
         );
     }
 
-    public function testErrorMessageContainsAllowedTypesAndDetected()
+    public function test_error_message_contains_allowed_types_and_detected()
     {
         $this->bindGuesser('txt');
 
@@ -242,7 +241,7 @@ return 'png';
         $this->assertStringContainsString('detected: txt', $v->messages()->first('x'));
     }
 
-    public function testErrorMessageShowsUnknownWhenGuesserReturnsNull()
+    public function test_error_message_shows_unknown_when_guesser_returns_null()
     {
         $this->bindGuesser(null);
 
@@ -257,7 +256,7 @@ return 'png';
         $this->assertStringContainsString('detected: unknown', $v->messages()->first('x'));
     }
 
-    public function testMimeStrictDetectsFilesThatFoolFinfo()
+    public function test_mime_strict_detects_files_that_fool_finfo()
     {
         $which = new Process(['which', 'magika']);
         $which->run();
@@ -282,7 +281,7 @@ return 'png';
         $this->assertFalse($strictValidator->passes(), 'Strict guesser should detect the true PHP content');
     }
 
-    public function testMagikaCliGuesserThrowsWhenBinaryMissing()
+    public function test_magika_cli_guesser_throws_when_binary_missing()
     {
         $guesser = new MagikaCliGuesser('nonexistent-magika-binary-xyz');
 
@@ -292,7 +291,7 @@ return 'png';
         $guesser->guess('/tmp/some-file.png');
     }
 
-    public function testGuesserCanBeSwappedViaContainer()
+    public function test_guesser_can_be_swapped_via_container()
     {
         $fake = new class implements StrictMimeTypeGuesser
         {
@@ -316,7 +315,7 @@ return 'png';
         );
     }
 
-    public function testFluentStrictChainedWithSizeConstraints()
+    public function test_fluent_strict_chained_with_size_constraints()
     {
         $this->bindGuesser('png');
 
@@ -338,7 +337,7 @@ return 'png';
         );
     }
 
-    public function testMagikaCliGuesserAgainstRealBinary()
+    public function test_magika_cli_guesser_against_real_binary()
     {
         $which = new Process(['which', 'magika']);
         $which->run();
@@ -359,9 +358,7 @@ return 'png';
     {
         $fake = new class($returnExtension) implements StrictMimeTypeGuesser
         {
-            public function __construct(private readonly ?string $ext)
-            {
-            }
+            public function __construct(private readonly ?string $ext) {}
 
             public function guess(string $path): ?string
             {
