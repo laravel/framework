@@ -8,7 +8,6 @@ use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Log\Formatters\JsonFormatter;
 use Illuminate\Log\Logger;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger as Monolog;
@@ -277,13 +276,20 @@ final class JsonFormatterTest extends TestCase
         $inner = new ContextProvidingException('inner');
         $outer = new ContextProvidingException('outer', 0, $inner);
 
-        $monolog->error('fail', ['exception' => ['e' => $outer]]);
+        $monolog->error('fail', ['exception' => $outer]);
 
         $formatted = $this->getFormattedJson($handler);
-        self::assertSame(
-            'Over 3 levels deep, aborting normalization',
-            Arr::get($formatted, 'context.exception.e.previous.0'),
-        );
+        $exceptionData = $formatted['context']['exception'];
+
+        // Outermost exception at depth 2 — context normalize called at depth 3,
+        // within limit so the array is returned (values inside may be depth-truncated)
+        self::assertArrayHasKey('foo', $exceptionData);
+
+        // Previous exception at depth 3 — context normalize called at depth 4,
+        // exceeds limit so normalize returns a string. is_array() guard skips enrichment.
+        self::assertArrayHasKey('previous', $exceptionData);
+        self::assertArrayNotHasKey('foo', $exceptionData['previous']);
+        self::assertSame(ContextProvidingException::class, $exceptionData['previous']['class']);
     }
 
     private function getFormattedJson(?TestHandler $handler = null): array
