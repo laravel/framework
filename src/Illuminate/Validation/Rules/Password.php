@@ -3,11 +3,13 @@
 namespace Illuminate\Validation\Rules;
 
 use ArrayIterator;
+use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\UncompromisedVerifier;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
@@ -16,9 +18,20 @@ use InvalidArgumentException;
 use IteratorAggregate;
 use Traversable;
 
-class Password implements DataAwareRule, ImplicitRule, IteratorAggregate, Rule, ValidatorAwareRule
+class Password implements DataAwareRule, ImplicitRule, IteratorAggregate, Rule, ValidationRule, ValidatorAwareRule
 {
     use Conditionable;
+
+    /**
+     * Indicates the rule runs even when the attribute is missing.
+     *
+     * Paired with implementing ValidationRule — this is the non-deprecated
+     * equivalent of the (deprecated) ImplicitRule interface, which is kept
+     * in the implements list only for backwards compatibility.
+     *
+     * @var bool
+     */
+    public $implicit = true;
 
     /**
      * The validator performing the validation.
@@ -327,11 +340,33 @@ class Password implements DataAwareRule, ImplicitRule, IteratorAggregate, Rule, 
     }
 
     /**
+     * Run the validation rule.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  \Closure(string, ?string=): \Illuminate\Translation\PotentiallyTranslatedString  $fail
+     * @return void
+     */
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if ($this->passes($attribute, $value)) {
+            return;
+        }
+
+        foreach ($this->messages as $message) {
+            $fail($message);
+        }
+    }
+
+    /**
      * Determine if the validation rule passes.
      *
      * @param  string  $attribute
      * @param  mixed  $value
      * @return bool
+     *
+     * @deprecated Implement Illuminate\Contracts\Validation\ValidationRule
+     *             via the validate() method instead.
      */
     public function passes($attribute, $value)
     {
