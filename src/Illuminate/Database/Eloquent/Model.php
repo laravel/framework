@@ -432,7 +432,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             if (! in_array($method->getName(), $booted) &&
                 $method->isStatic() &&
                 (in_array($method->getName(), $conventionalBootMethods) ||
-                    $method->getAttributes(Boot::class) !== [])) {
+                $method->getAttributes(Boot::class) !== [])) {
                 $method->invoke(null);
 
                 $booted[] = $method->getName();
