@@ -1715,14 +1715,14 @@ trait ValidatesAttributes
      * @return bool
      */
     /**
-     * Validate the content type of a file upload using Magika AI-based detection.
+     * Validate the content type of a file upload using a strict MIME type guesser.
      *
      * @param  string  $attribute
      * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
-    public function validateMagika($attribute, $value, $parameters): bool
+    public function validateMimeStrict($attribute, $value, $parameters): bool
     {
         if (! $this->isValidFileInstance($value)) {
             return false;
@@ -1736,12 +1736,18 @@ trait ValidatesAttributes
             return false;
         }
 
-        $detector = $this->container->make(\Illuminate\Contracts\Validation\MagikaDetector::class);
+        if (! $this->container->bound(\Illuminate\Contracts\Validation\StrictMimeTypeGuesser::class)) {
+            throw new \RuntimeException(
+                'No [\Illuminate\Contracts\Validation\StrictMimeTypeGuesser] implementation is bound. Bind one (e.g. MagikaCliGuesser) in a service provider to use the [mime_strict] rule.'
+            );
+        }
 
-        $detected = $detector->detect($value->getRealPath());
+        $guesser = $this->container->make(\Illuminate\Contracts\Validation\StrictMimeTypeGuesser::class);
+
+        $detected = $guesser->guess($value->getRealPath());
 
         if ($detected !== null) {
-            $this->magikaDetected[$attribute] = $detected;
+            $this->strictDetected[$attribute] = $detected;
         }
 
         return $detected !== null && in_array($detected, $parameters);

@@ -393,7 +393,7 @@ trait ReplacesAttributes
     }
 
     /**
-     * Replace all place-holders for the magika rule.
+     * Replace all place-holders for the mime_strict rule.
      *
      * @param  string  $message
      * @param  string  $attribute
@@ -401,11 +401,11 @@ trait ReplacesAttributes
      * @param  array<int,string>  $parameters
      * @return string
      */
-    protected function replaceMagika($message, $attribute, $rule, $parameters): string
+    protected function replaceMimeStrict($message, $attribute, $rule, $parameters): string
     {
         $message = str_replace(':values', implode(', ', $parameters), $message);
 
-        $detected = $this->magikaDetected[$attribute] ?? null;
+        $detected = $this->strictDetected[$attribute] ?? null;
 
         return str_replace(':detected', $detected ?? __('unknown'), $message);
     }

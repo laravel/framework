@@ -3,13 +3,13 @@
 namespace Illuminate\Tests\Validation;
 
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Validation\MagikaDetector;
+use Illuminate\Contracts\Validation\StrictMimeTypeGuesser;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
-use Illuminate\Validation\MagikaCliDetector;
+use Illuminate\Validation\Magika\MagikaCliGuesser;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\Process\Process;
 
-class ValidationMagikaRuleTest extends TestCase
+class ValidationMimeStrictRuleTest extends TestCase
 {
     protected function setUp(): void
     {
@@ -41,71 +41,84 @@ class ValidationMagikaRuleTest extends TestCase
 
     public function testPassesWhenDetectedExtensionMatchesSingleParam()
     {
-        $this->bindDetector('png');
+        $this->bindGuesser('png');
 
         $this->passes(
-            'magika:png',
+            'mime_strict:png',
             UploadedFile::fake()->createWithContent('foo.png', file_get_contents(__DIR__.'/fixtures/image.png'))
         );
     }
 
     public function testFailsWhenDetectedExtensionDoesNotMatchSingleParam()
     {
-        $this->bindDetector('png');
+        $this->bindGuesser('png');
 
         $this->fails(
-            'magika:pdf',
+            'mime_strict:pdf',
             UploadedFile::fake()->createWithContent('foo.png', file_get_contents(__DIR__.'/fixtures/image.png')),
-            ['validation.magika']
+            ['validation.mime_strict']
         );
     }
 
     public function testPassesWhenDetectedExtensionIsInMultipleParams()
     {
-        $this->bindDetector('jpg');
+        $this->bindGuesser('jpg');
 
         $this->passes(
-            'magika:png,jpg,pdf',
+            'mime_strict:png,jpg,pdf',
             UploadedFile::fake()->createWithContent('foo.jpg', file_get_contents(__DIR__.'/fixtures/image.png'))
         );
     }
 
     public function testFailsWhenDetectedExtensionIsNotInMultipleParams()
     {
-        $this->bindDetector('txt');
+        $this->bindGuesser('txt');
 
         $this->fails(
-            'magika:png,jpg,pdf',
+            'mime_strict:png,jpg,pdf',
             UploadedFile::fake()->createWithContent('foo.txt', 'Hello World!'),
-            ['validation.magika']
+            ['validation.mime_strict']
         );
     }
 
-    public function testFailsWhenDetectorReturnsNull()
+    public function testFailsWhenGuesserReturnsNull()
     {
-        $this->bindDetector(null);
+        $this->bindGuesser(null);
 
         $this->fails(
-            'magika:png',
+            'mime_strict:png',
             UploadedFile::fake()->createWithContent('foo.bin', 'binary'),
-            ['validation.magika']
+            ['validation.mime_strict']
         );
     }
 
     public function testFailsWhenValueIsNotAFile()
     {
-        $this->bindDetector('png');
+        $this->bindGuesser('png');
 
         $trans = new Translator(new ArrayLoader, 'en');
-        $v = new Validator($trans, ['x' => 'not-a-file'], ['x' => 'magika:png']);
+        $v = new Validator($trans, ['x' => 'not-a-file'], ['x' => 'mime_strict:png']);
         $v->setContainer(Container::getInstance());
 
         $this->assertFalse($v->passes());
     }
 
+    public function testThrowsWhenNoGuesserIsBound()
+    {
+        $trans = new Translator(new ArrayLoader, 'en');
+        $file = UploadedFile::fake()->createWithContent('foo.png', file_get_contents(__DIR__.'/fixtures/image.png'));
+        $v = new Validator($trans, ['x' => $file], ['x' => 'mime_strict:png']);
+        $v->setContainer(Container::getInstance());
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageMatches('/StrictMimeTypeGuesser/');
+
+        $v->passes();
+    }
+
     public function testBlocksPhpUpload()
     {
-        $this->bindDetector('php');
+        $this->bindGuesser('php');
 
         $trans = new Translator(new ArrayLoader, 'en');
         $uploadedFile = [__FILE__, 'shell.php', null, null, true];
@@ -114,7 +127,7 @@ class ValidationMagikaRuleTest extends TestCase
         $file->__construct(...$uploadedFile);
         $file->method('getClientOriginalExtension')->willReturn('php');
 
-        $v = new Validator($trans, ['x' => $file], ['x' => 'magika:png,jpg']);
+        $v = new Validator($trans, ['x' => $file], ['x' => 'mime_strict:png,jpg']);
         $v->setContainer(Container::getInstance());
 
         $this->assertFalse($v->passes());
@@ -122,27 +135,35 @@ class ValidationMagikaRuleTest extends TestCase
 
     public function testAllowsPhpUploadWhenPhpIsExplicitlyInParams()
     {
-        $this->bindDetector('php');
+        $this->bindGuesser('php');
 
         $trans = new Translator(new ArrayLoader, 'en');
 
         $file = new UploadedFile(__FILE__, 'script.php', null, null, true);
 
-        $v = new Validator($trans, ['x' => $file], ['x' => 'magika:php']);
+        $v = new Validator($trans, ['x' => $file], ['x' => 'mime_strict:php']);
         $v->setContainer(Container::getInstance());
 
         $this->assertTrue($v->passes());
     }
 
-    public function testFluentWithoutMagikaDoesNotInvokeDetector()
+    public function testFluentWithoutStrictDoesNotInvokeGuesser()
     {
         $calls = 0;
-        $spy = new class($calls) implements MagikaDetector {
-            public function __construct(private int &$calls) {}
-            public function detect(string $path): ?string { $this->calls++; return 'png'; }
+        $spy = new class($calls) implements StrictMimeTypeGuesser
+        {
+            public function __construct(private int &$calls)
+            {
+            }
+            public function guess(string $path): ?string
+            {
+            $this->calls++;
+
+return 'png';
+            }
         };
 
-        Container::getInstance()->instance(MagikaDetector::class, $spy);
+        Container::getInstance()->instance(StrictMimeTypeGuesser::class, $spy);
 
         $trans = new Translator(new ArrayLoader, 'en');
         $file = UploadedFile::fake()->createWithContent('foo.png', file_get_contents(__DIR__.'/fixtures/image.png'));
@@ -150,54 +171,54 @@ class ValidationMagikaRuleTest extends TestCase
         $v->setContainer(Container::getInstance());
         $v->passes();
 
-        $this->assertSame(0, $calls, 'Detector must not be called when ->magika() is not set.');
+        $this->assertSame(0, $calls, 'Guesser must not be called when ->strict() is not set.');
     }
 
     public function testDetectedValueDoesNotLeakBetweenAttributes()
     {
-        $this->bindDetector('txt');
+        $this->bindGuesser('txt');
 
         $trans = new Translator(new ArrayLoader, 'en');
-        $trans->addLines(['validation.magika' => 'detected: :detected'], 'en');
+        $trans->addLines(['validation.mime_strict' => 'detected: :detected'], 'en');
 
         $fileA = UploadedFile::fake()->createWithContent('a.txt', 'text content');
         $fileB = UploadedFile::fake()->createWithContent('b.bin', '');
 
-        $this->bindDetector('txt');
-        $vA = new Validator($trans, ['x' => $fileA], ['x' => 'magika:png']);
+        $this->bindGuesser('txt');
+        $vA = new Validator($trans, ['x' => $fileA], ['x' => 'mime_strict:png']);
         $vA->setContainer(Container::getInstance());
         $vA->passes();
         $this->assertStringContainsString('detected: txt', $vA->messages()->first('x'));
 
-        $this->bindDetector(null);
-        $vB = new Validator($trans, ['x' => $fileB], ['x' => 'magika:png']);
+        $this->bindGuesser(null);
+        $vB = new Validator($trans, ['x' => $fileB], ['x' => 'mime_strict:png']);
         $vB->setContainer(Container::getInstance());
         $vB->passes();
         $this->assertStringContainsString('detected: unknown', $vB->messages()->first('x'));
     }
 
-    public function testFluentMagikaToggleEmitsMagikaRule()
+    public function testFluentStrictToggleEmitsMimeStrictRule()
     {
-        $this->bindDetector('png');
+        $this->bindGuesser('png');
 
         $this->passes(
-            File::types(['png'])->magika(),
+            File::types(['png'])->strict(),
             UploadedFile::fake()->createWithContent('foo.png', file_get_contents(__DIR__.'/fixtures/image.png'))
         );
     }
 
-    public function testFluentMagikaToggleFailsOnWrongType()
+    public function testFluentStrictToggleFailsOnWrongType()
     {
-        $this->bindDetector('txt');
+        $this->bindGuesser('txt');
 
         $this->fails(
-            File::types(['png', 'jpg'])->magika(),
+            File::types(['png', 'jpg'])->strict(),
             UploadedFile::fake()->createWithContent('foo.txt', 'Hello World!'),
-            ['validation.magika']
+            ['validation.mime_strict']
         );
     }
 
-    public function testFluentWithoutMagikaStillUsesMimes()
+    public function testFluentWithoutStrictStillUsesMimes()
     {
         $this->passes(
             File::types(['png']),
@@ -207,13 +228,13 @@ class ValidationMagikaRuleTest extends TestCase
 
     public function testErrorMessageContainsAllowedTypesAndDetected()
     {
-        $this->bindDetector('txt');
+        $this->bindGuesser('txt');
 
         $trans = new Translator(new ArrayLoader, 'en');
-        $trans->addLines(['validation.magika' => 'The :attribute field must be a file of type: :values (detected: :detected).'], 'en');
+        $trans->addLines(['validation.mime_strict' => 'The :attribute field must be a file of type: :values (detected: :detected).'], 'en');
 
         $file = UploadedFile::fake()->createWithContent('foo.txt', 'Hello World!');
-        $v = new Validator($trans, ['x' => $file], ['x' => 'magika:png,jpg']);
+        $v = new Validator($trans, ['x' => $file], ['x' => 'mime_strict:png,jpg']);
         $v->setContainer(Container::getInstance());
 
         $this->assertFalse($v->passes());
@@ -221,22 +242,22 @@ class ValidationMagikaRuleTest extends TestCase
         $this->assertStringContainsString('detected: txt', $v->messages()->first('x'));
     }
 
-    public function testErrorMessageShowsUnknownWhenDetectorReturnsNull()
+    public function testErrorMessageShowsUnknownWhenGuesserReturnsNull()
     {
-        $this->bindDetector(null);
+        $this->bindGuesser(null);
 
         $trans = new Translator(new ArrayLoader, 'en');
-        $trans->addLines(['validation.magika' => 'The :attribute field must be a file of type: :values (detected: :detected).'], 'en');
+        $trans->addLines(['validation.mime_strict' => 'The :attribute field must be a file of type: :values (detected: :detected).'], 'en');
 
         $file = UploadedFile::fake()->createWithContent('foo.bin', 'binary');
-        $v = new Validator($trans, ['x' => $file], ['x' => 'magika:png']);
+        $v = new Validator($trans, ['x' => $file], ['x' => 'mime_strict:png']);
         $v->setContainer(Container::getInstance());
 
         $this->assertFalse($v->passes());
         $this->assertStringContainsString('detected: unknown', $v->messages()->first('x'));
     }
 
-    public function testMagikaDetectsFilesThatFoolFinfo()
+    public function testMimeStrictDetectsFilesThatFoolFinfo()
     {
         $which = new Process(['which', 'magika']);
         $which->run();
@@ -245,87 +266,79 @@ class ValidationMagikaRuleTest extends TestCase
             $this->markTestSkipped('The magika binary is not installed.');
         }
 
-        Container::getInstance()->bind(\Illuminate\Contracts\Validation\MagikaDetector::class, \Illuminate\Validation\MagikaCliDetector::class);
+        Container::getInstance()->bind(StrictMimeTypeGuesser::class, MagikaCliGuesser::class);
 
         $fixture = __DIR__.'/fixtures/spoofed_php_as_png.png';
 
         $trans = new Translator(new ArrayLoader, 'en');
-        $file = new \Illuminate\Http\UploadedFile($fixture, 'upload.png', null, null, true);
+        $file = new UploadedFile($fixture, 'upload.png', null, null, true);
 
         $mimesValidator = new Validator($trans, ['x' => $file], ['x' => 'mimes:png']);
         $mimesValidator->setContainer(Container::getInstance());
         $this->assertTrue($mimesValidator->passes(), 'finfo should be fooled by the PNG header');
 
-        $magikaValidator = new Validator($trans, ['x' => $file], ['x' => 'magika:png']);
-        $magikaValidator->setContainer(Container::getInstance());
-        $this->assertFalse($magikaValidator->passes(), 'Magika should detect the true PHP content');
+        $strictValidator = new Validator($trans, ['x' => $file], ['x' => 'mime_strict:png']);
+        $strictValidator->setContainer(Container::getInstance());
+        $this->assertFalse($strictValidator->passes(), 'Strict guesser should detect the true PHP content');
     }
 
-    public function testMagikaCliDetectorThrowsWhenBinaryMissing()
+    public function testMagikaCliGuesserThrowsWhenBinaryMissing()
     {
-        $detector = new MagikaCliDetector('nonexistent-magika-binary-xyz');
+        $guesser = new MagikaCliGuesser('nonexistent-magika-binary-xyz');
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessageMatches('/nonexistent-magika-binary-xyz/');
 
-        $detector->detect('/tmp/some-file.png');
+        $guesser->guess('/tmp/some-file.png');
     }
 
-    public function testMagikaCliDetectorContractBinding()
+    public function testGuesserCanBeSwappedViaContainer()
     {
-        $container = Container::getInstance();
-
-        $this->assertInstanceOf(MagikaDetector::class, $container->make(MagikaDetector::class));
-        $this->assertInstanceOf(MagikaCliDetector::class, $container->make(MagikaDetector::class));
-    }
-
-    public function testMagikaDetectorCanBeSwappedViaContainer()
-    {
-        $fake = new class implements MagikaDetector
+        $fake = new class implements StrictMimeTypeGuesser
         {
-            public function detect(string $path): ?string
+            public function guess(string $path): ?string
             {
                 return 'pdf';
             }
         };
 
-        Container::getInstance()->instance(MagikaDetector::class, $fake);
+        Container::getInstance()->instance(StrictMimeTypeGuesser::class, $fake);
 
         $this->passes(
-            'magika:pdf',
+            'mime_strict:pdf',
             UploadedFile::fake()->createWithContent('foo.pdf', '%PDF-1.4 fake')
         );
 
         $this->fails(
-            'magika:png',
+            'mime_strict:png',
             UploadedFile::fake()->createWithContent('foo.pdf', '%PDF-1.4 fake'),
-            ['validation.magika']
+            ['validation.mime_strict']
         );
     }
 
-    public function testFluentMagikaChainedWithSizeConstraints()
+    public function testFluentStrictChainedWithSizeConstraints()
     {
-        $this->bindDetector('png');
+        $this->bindGuesser('png');
 
         $this->passes(
-            File::types(['png'])->magika()->max('10mb'),
+            File::types(['png'])->strict()->max('10mb'),
             UploadedFile::fake()->createWithContent('foo.png', file_get_contents(__DIR__.'/fixtures/image.png'))
         );
 
         $this->fails(
-            File::types(['png'])->magika()->max('1kb'),
+            File::types(['png'])->strict()->max('1kb'),
             UploadedFile::fake()->create('foo.png', 2048),
             ['validation.max.file']
         );
 
         $this->fails(
-            File::types(['png'])->magika()->min('5kb'),
+            File::types(['png'])->strict()->min('5kb'),
             UploadedFile::fake()->create('foo.png', 1),
             ['validation.min.file']
         );
     }
 
-    public function testMagikaCliDetectorAgainstRealBinary()
+    public function testMagikaCliGuesserAgainstRealBinary()
     {
         $which = new Process(['which', 'magika']);
         $which->run();
@@ -334,29 +347,29 @@ class ValidationMagikaRuleTest extends TestCase
             $this->markTestSkipped('The magika binary is not installed. Install via `pip install magika` to run this integration test.');
         }
 
-        $detector = new MagikaCliDetector('magika');
+        $guesser = new MagikaCliGuesser('magika');
 
-        $detected = $detector->detect(__DIR__.'/fixtures/image.png');
+        $detected = $guesser->guess(__DIR__.'/fixtures/image.png');
 
         $this->assertNotNull($detected, 'Magika should detect a known PNG fixture.');
         $this->assertSame('png', strtolower($detected));
     }
 
-    protected function bindDetector(?string $returnExtension): void
+    protected function bindGuesser(?string $returnExtension): void
     {
-        $fake = new class($returnExtension) implements MagikaDetector
+        $fake = new class($returnExtension) implements StrictMimeTypeGuesser
         {
             public function __construct(private readonly ?string $ext)
             {
             }
 
-            public function detect(string $path): ?string
+            public function guess(string $path): ?string
             {
                 return $this->ext;
             }
         };
 
-        Container::getInstance()->instance(MagikaDetector::class, $fake);
+        Container::getInstance()->instance(StrictMimeTypeGuesser::class, $fake);
     }
 
     protected function passes(mixed $rule, mixed $values): void

@@ -55,11 +55,11 @@ class Validator implements ValidatorContract
     protected $failedRules = [];
 
     /**
-     * The Magika-detected content types keyed by attribute name.
+     * The strict-detected content types keyed by attribute name.
      *
      * @var array<string, string>
      */
-    protected $magikaDetected = [];
+    protected $strictDetected = [];
 
     /**
      * Attributes that should be excluded from the validated data.
@@ -199,8 +199,8 @@ class Validator implements ValidatorContract
         'Extensions',
         'File',
         'Image',
-        'Magika',
         'Max',
+        'MimeStrict',
         'Mimes',
         'Mimetypes',
         'Min',
