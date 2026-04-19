@@ -390,26 +390,37 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         static::$traitInitializers[$class] = [];
 
-        $ref = (new ReflectionClass($class));
+        $ref = new ReflectionClass($class);
+        $uses = class_uses_recursive($class);
 
-        foreach (class_uses_recursive($class) as $trait) {
-            $conventionalBootMethod = 'boot'.class_basename($trait);
-            $conventionalInitMethod = 'initialize'.class_basename($trait);
+        $conventionalBootMethods = array_map(static fn ($trait) => 'boot'.class_basename($trait), $uses);
+        $conventionalInitMethods = array_map(static fn ($trait) => 'initialize'.class_basename($trait), $uses);
 
-            if ($ref->hasMethod($conventionalBootMethod) &&
-                ($method = $ref->getMethod($conventionalBootMethod)) &&
-                ! in_array($method->getName(), $booted) &&
-                $method->isStatic() &&
-                $method->getAttributes(Boot::class) !== []) {
-                $method->invoke(null);
+        foreach ($uses as $trait) {
+            foreach ((new ReflectionClass($trait))->getMethods() as $method) {
+                if ($method->getDeclaringClass()->getName() !== $trait) {
+                    continue;
+                }
 
-                $booted[] = $method->getName();
-            }
+                if (! $ref->hasMethod($method->getName())) {
+                    continue;
+                }
 
-            if ($ref->hasMethod($conventionalInitMethod) &&
-                ($method = $ref->getMethod($conventionalInitMethod)) ||
-                $method->getAttributes(Initialize::class) !== []) {
-                static::$traitInitializers[$class][] = $method->getName();
+                $classMethod = $ref->getMethod($method->getName());
+
+                if (! in_array($classMethod->getName(), $booted) &&
+                    $classMethod->isStatic() &&
+                    (in_array($classMethod->getName(), $conventionalBootMethods) ||
+                        $classMethod->getAttributes(Boot::class) !== [])) {
+                    $classMethod->invoke(null);
+
+                    $booted[] = $classMethod->getName();
+                }
+
+                if (in_array($classMethod->getName(), $conventionalInitMethods) ||
+                    $classMethod->getAttributes(Initialize::class) !== []) {
+                    static::$traitInitializers[$class][] = $classMethod->getName();
+                }
             }
         }
 
