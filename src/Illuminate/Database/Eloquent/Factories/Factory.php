@@ -366,7 +366,7 @@ abstract class Factory
     /**
      * Set the connection name on the results and store them.
      *
-     * @param  \Illuminate\Support\Collection<int, \Illuminate\Database\Eloquent\Model>  $results
+     * @param  \Illuminate\Support\Collection<int, TModel>  $results
      * @return void
      */
     protected function store(Collection $results)
@@ -391,7 +391,7 @@ abstract class Factory
     /**
      * Create the children for the given model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  TModel  $model
      * @return void
      */
     protected function createChildren(Model $model)
@@ -514,7 +514,7 @@ abstract class Factory
      * Make an instance of the model with the given attributes.
      *
      * @param  \Illuminate\Database\Eloquent\Model|null  $parent
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return TModel
      */
     protected function makeInstance(?Model $parent)
     {
