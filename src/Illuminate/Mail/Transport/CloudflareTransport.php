@@ -19,17 +19,11 @@ class CloudflareTransport extends AbstractTransport
 {
     /**
      * The HTTP Client instance.
-     *
-     * @var \Symfony\Contracts\HttpClient\HttpClientInterface
      */
     protected HttpClientInterface $client;
 
     /**
      * Create a new Cloudflare transport instance.
-     *
-     * @param  string  $accountId
-     * @param  string  $key
-     * @param  \Symfony\Contracts\HttpClient\HttpClientInterface|null  $client
      */
     public function __construct(
         protected string $accountId,
@@ -44,7 +38,7 @@ class CloudflareTransport extends AbstractTransport
     /**
      * {@inheritDoc}
      *
-     * @throws \Symfony\Component\Mailer\Exception\TransportException
+     * @throws TransportException
      */
     protected function doSend(SentMessage $message): void
     {
@@ -77,8 +71,6 @@ class CloudflareTransport extends AbstractTransport
 
     /**
      * Get the Cloudflare payload for the given message.
-     *
-     * @return array
      */
     protected function getPayload(SentMessage $message): array
     {
@@ -131,6 +123,27 @@ class CloudflareTransport extends AbstractTransport
     }
 
     /**
+     * Get the attachments formatted for the Cloudflare API.
+     */
+    protected function getAttachments(Email $email): array
+    {
+        $attachments = [];
+
+        foreach ($email->getAttachments() as $attachment) {
+            $headers = $attachment->getPreparedHeaders();
+
+            $attachments[] = [
+                'content' => str_replace("\r\n", '', $attachment->bodyToString()),
+                'filename' => $headers->getHeaderParameter('Content-Disposition', 'filename'),
+                'type' => $headers->get('Content-Type')->getBody(),
+                'disposition' => $headers->getHeaderBody('Content-Disposition') ?: 'attachment',
+            ];
+        }
+
+        return $attachments;
+    }
+
+    /**
      * Get the address formatted for the Cloudflare API.
      *
      * @return string|array
@@ -149,35 +162,10 @@ class CloudflareTransport extends AbstractTransport
 
     /**
      * Get multiple addresses formatted as strings for the Cloudflare API.
-     *
-     * @return array
      */
     protected function stringifyAddresses(array $addresses): array
     {
         return array_map(fn (Address $a) => $a->getAddress(), $addresses);
-    }
-
-    /**
-     * Get the attachments formatted for the Cloudflare API.
-     *
-     * @return array
-     */
-    protected function getAttachments(Email $email): array
-    {
-        $attachments = [];
-
-        foreach ($email->getAttachments() as $attachment) {
-            $headers = $attachment->getPreparedHeaders();
-
-            $attachments[] = [
-                'content' => str_replace("\r\n", '', $attachment->bodyToString()),
-                'filename' => $headers->getHeaderParameter('Content-Disposition', 'filename'),
-                'type' => $headers->get('Content-Type')->getBody(),
-                'disposition' => $headers->getHeaderBody('Content-Disposition') ?: 'attachment',
-            ];
-        }
-
-        return $attachments;
     }
 
     /**

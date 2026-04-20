@@ -184,21 +184,6 @@ class MailManager implements FactoryContract
     }
 
     /**
-     * Create an instance of the Cloudflare Transport driver.
-     *
-     * @param  array  $config
-     * @return \Illuminate\Mail\Transport\CloudflareTransport
-     */
-    protected function createCloudflareTransport(array $config)
-    {
-        return new CloudflareTransport(
-            $config['account_id'] ?? $this->app['config']->get('services.cloudflare.account_id'),
-            $config['token'] ?? $this->app['config']->get('services.cloudflare.token'),
-            $this->getHttpClient($config),
-        );
-    }
-
-    /**
      * Create an instance of the Symfony SMTP Transport driver.
      *
      * @param  array  $config
@@ -336,6 +321,25 @@ class MailManager implements FactoryContract
     {
         return new ResendTransport(
             Resend::client($config['key'] ?? $this->app['config']->get('services.resend.key')),
+        );
+    }
+
+    /**
+     * Create an instance of the Cloudflare Transport driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Mail\Transport\CloudflareTransport
+     */
+    protected function createCloudflareTransport(array $config)
+    {
+        return new CloudflareTransport(
+            $config['account_id'] ??
+                $this->app['config']->get('services.cloudflare.account_id'),
+            $config['token'] ??
+                $config['key'] ??
+                $this->app['config']->get('services.cloudflare.token') ??
+                $this->app['config']->get('services.cloudflare.key'),
+            $this->getHttpClient($config),
         );
     }
 
