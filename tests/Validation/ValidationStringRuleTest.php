@@ -226,4 +226,25 @@ class ValidationStringRuleTest extends TestCase
         $rule = Rule::string()->alpha()->alpha();
         $this->assertSame('string|alpha', (string) $rule);
     }
+
+    public function test_string_rule_accepts_valid_string_and_rejects_null()
+    {
+        $trans = new Translator(new ArrayLoader, 'en');
+
+        $validator = new Validator(
+            $trans,
+            ['field' => 'hello'],
+            ['field' => Rule::string()]
+        );
+
+        $this->assertEmpty($validator->errors()->first('field'));
+
+        $validator = new Validator(
+            $trans,
+            ['field' => null],
+            ['field' => Rule::string()]
+        );
+
+        $this->assertNotEmpty($validator->errors()->first('field'));
+    }
 }
