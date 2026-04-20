@@ -19,6 +19,7 @@ use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
 use Illuminate\Queue\Failed\DatabaseUuidFailedJobProvider;
 use Illuminate\Queue\Failed\DynamoDbFailedJobProvider;
 use Illuminate\Queue\Failed\FileFailedJobProvider;
+use Illuminate\Queue\Failed\LaravelCloudFailedJobProvider;
 use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Facade;
@@ -322,6 +323,8 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
                     $config['limit'] ?? 100,
                     fn () => $app['cache']->store('file'),
                 );
+            } elseif (isset($config['driver']) && $config['driver'] === 'laravel-cloud') {
+                return new LaravelCloudFailedJobProvider;
             } elseif (isset($config['driver']) && $config['driver'] === 'dynamodb') {
                 return $this->dynamoFailedJobProvider($config);
             } elseif (isset($config['driver']) && $config['driver'] === 'database-uuids') {
