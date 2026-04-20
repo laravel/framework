@@ -51,4 +51,40 @@ class ServeFileTest extends TestCase
 
         $response->assertForbidden();
     }
+
+    public function testItCanServeAFileWithPercentEncodedCharactersInItsName()
+    {
+        $path = 'hello%20world.txt';
+
+        Storage::put($path, 'Hello World');
+
+        $url = Storage::temporaryUrl($path, Carbon::now()->addMinute());
+
+        $this->assertStringContainsString('hello%2520world.txt', $url);
+
+        $response = $this->get($url);
+
+        $response->assertOk();
+        $this->assertSame('Hello World', $response->streamedContent());
+
+        Storage::delete($path);
+    }
+
+    public function testItCanServeAFileWithSpacesInItsName()
+    {
+        $path = 'hello world.txt';
+
+        Storage::put($path, 'Hello World');
+
+        $url = Storage::temporaryUrl($path, Carbon::now()->addMinute());
+
+        $this->assertStringContainsString('hello%20world.txt', $url);
+
+        $response = $this->get($url);
+
+        $response->assertOk();
+        $this->assertSame('Hello World', $response->streamedContent());
+
+        Storage::delete($path);
+    }
 }

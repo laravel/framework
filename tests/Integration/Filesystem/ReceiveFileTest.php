@@ -73,4 +73,36 @@ class ReceiveFileTest extends TestCase
 
         $response->assertForbidden();
     }
+
+    public function testItCanReceiveAFileWithPercentEncodedCharactersInItsName()
+    {
+        $path = 'uploaded%20document.txt';
+
+        $result = Storage::temporaryUploadUrl($path, Carbon::now()->addMinute());
+
+        $this->assertStringContainsString('uploaded%2520document.txt', $result['url']);
+
+        $response = $this->call('PUT', $result['url'], [], [], [], [], 'Hello World');
+
+        $response->assertNoContent();
+        Storage::assertExists($path, 'Hello World');
+
+        Storage::delete($path);
+    }
+
+    public function testItCanReceiveAFileWithSpacesInItsName()
+    {
+        $path = 'uploaded document.txt';
+
+        $result = Storage::temporaryUploadUrl($path, Carbon::now()->addMinute());
+
+        $this->assertStringContainsString('uploaded%20document.txt', $result['url']);
+
+        $response = $this->call('PUT', $result['url'], [], [], [], [], 'Hello World');
+
+        $response->assertNoContent();
+        Storage::assertExists($path, 'Hello World');
+
+        Storage::delete($path);
+    }
 }

@@ -745,6 +745,13 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame('https://example.org/images/picture.jpeg', $filesystemAdapter->url('picture.jpeg'));
     }
 
+    public function testLocalUrlsEscapePercentCharacters()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['url' => 'https://example.org/storage']);
+
+        $this->assertSame('https://example.org/storage/file%2520name.txt', $filesystemAdapter->url('file%20name.txt'));
+    }
+
     public function testGetChecksum()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);

@@ -82,7 +82,7 @@ class LocalFilesystemAdapter extends FilesystemAdapter
         return $url->to($url->temporarySignedRoute(
             'storage.'.$this->disk,
             $expiration,
-            ['path' => $path],
+            ['path' => $this->escapeUrlPath($path)],
             absolute: false
         ));
     }
@@ -115,7 +115,7 @@ class LocalFilesystemAdapter extends FilesystemAdapter
             'url' => $url->to($url->temporarySignedRoute(
                 'storage.'.$this->disk.'.upload',
                 $expiration,
-                ['path' => $path, 'upload' => true],
+                ['path' => $this->escapeUrlPath($path), 'upload' => true],
                 absolute: false
             )),
             'headers' => [],

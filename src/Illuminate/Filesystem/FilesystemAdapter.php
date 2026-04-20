@@ -774,10 +774,10 @@ class FilesystemAdapter implements CloudFilesystemContract
         // it as the base URL instead of the default path. This allows the developer to
         // have full control over the base path for this filesystem's generated URLs.
         if (isset($this->config['url'])) {
-            return $this->concatPathToUrl($this->config['url'], $path);
+            return $this->concatPathToUrl($this->config['url'], $this->escapeUrlPath($path));
         }
 
-        $path = '/storage/'.$path;
+        $path = '/storage/'.$this->escapeUrlPath($path);
 
         // If the path contains "storage/public", it probably means the developer is using
         // the default disk to generate the path instead of the "public" disk like they
@@ -869,6 +869,17 @@ class FilesystemAdapter implements CloudFilesystemContract
     protected function concatPathToUrl($url, $path)
     {
         return rtrim($url, '/').'/'.ltrim($path, '/');
+    }
+
+    /**
+     * Escape literal percent characters before exposing a storage path as a URL.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    protected function escapeUrlPath($path)
+    {
+        return str_replace('%', '%25', $path);
     }
 
     /**
