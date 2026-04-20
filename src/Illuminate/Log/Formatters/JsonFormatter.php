@@ -30,6 +30,7 @@ class JsonFormatter extends MonologJsonFormatter
                 );
             } elseif (method_exists($e, 'context')) {
                 $exceptionContext = $this->normalize($e->context(), $depth + 1);
+
                 if (is_array($exceptionContext)) {
                     $response = array_merge(
                         $exceptionContext,
