@@ -22,7 +22,7 @@ class JsonFormatter extends MonologJsonFormatter
 
         if ((! method_exists($handler, 'isReporting')) || ! $handler->isReporting($e)) {
             if (method_exists($handler, 'buildContextForException')
-                && (is_array($normalizedHandlerExceptionContext = $this->normalize($handler->buildContextForException($e), $depth + 1)))
+                && is_array($normalizedHandlerExceptionContext = $this->normalize($handler->buildContextForException($e), $depth + 1))
             ) {
                 $response = array_merge(
                     $normalizedHandlerExceptionContext,
