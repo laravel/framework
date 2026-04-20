@@ -1549,6 +1549,31 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $this->assertTrue($c);
     }
 
+    public function testCompileColumnsOmitsGenerationExpressionOnMariaDbBefore1025()
+    {
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getServerVersion')->andReturn('10.2.4-MariaDB');
+
+        $sql = $this->getGrammar($connection)->compileColumns('mydb', 'users');
+
+        $this->assertStringNotContainsString('generation_expression', $sql);
+        $this->assertStringContainsString('null as `expression`', $sql);
+        $this->assertStringContainsString("table_schema = 'mydb'", $sql);
+        $this->assertStringContainsString("table_name = 'users'", $sql);
+    }
+
+    public function testCompileColumnsUsesGenerationExpressionOnMariaDb1025AndLater()
+    {
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getServerVersion')->andReturn('10.2.5');
+
+        $sql = $this->getGrammar($connection)->compileColumns(null, 'users');
+
+        $this->assertStringContainsString('generation_expression as `expression`', $sql);
+        $this->assertStringContainsString('table_schema = schema()', $sql);
+        $this->assertStringContainsString("table_name = 'users'", $sql);
+    }
+
     protected function getConnection(
         ?MariaDbGrammar $grammar = null,
         ?MariaDbBuilder $builder = null,
