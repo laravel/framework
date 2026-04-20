@@ -57,7 +57,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd, redis, igbinary, msgpack, memcached, gmp, :php-psr
-          ini-values: error_reporting=E_ALL
+          ini-values: error_reporting=E_ALL, memory_limit=2048M, log_errors=On, error_log=php://stderr
           tools: composer:v2
           coverage: none
         env:

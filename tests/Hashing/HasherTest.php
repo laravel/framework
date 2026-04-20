@@ -35,7 +35,7 @@ class HasherTest extends TestCase
 
         $container->singleton(
             /*abstract:*/ 'config',
-            /*concrete:*/ fn() => new Config()
+            /*concrete:*/ fn () => new Config()
         );
 
         $this->hashManager = new HashManager(/*container: */ $container);
@@ -72,17 +72,17 @@ class HasherTest extends TestCase
             [new BcryptHasher(), 'bcrypt', ['cost' => PASSWORD_BCRYPT_DEFAULT_COST]],
             [
                 new ArgonHasher(), 'argon2i', [
-                    'memory_cost' => PASSWORD_ARGON2_DEFAULT_MEMORY_COST,
-                    'time_cost' => PASSWORD_ARGON2_DEFAULT_TIME_COST,
-                    'threads' => PASSWORD_ARGON2_DEFAULT_THREADS
-                ]
+                    'memory_cost' => 1024,
+                    'time_cost' => 2,
+                    'threads' => 2,
+                ],
             ],
             [
                 new Argon2IdHasher(), 'argon2id', [
-                    'memory_cost' => PASSWORD_ARGON2_DEFAULT_MEMORY_COST,
-                    'time_cost' => PASSWORD_ARGON2_DEFAULT_TIME_COST,
-                    'threads' => PASSWORD_ARGON2_DEFAULT_THREADS
-                ]
+                    'memory_cost' => 1024,
+                    'time_cost' => 2,
+                    'threads' => 2,
+                ],
             ],
         ];
     }
@@ -232,8 +232,8 @@ class HasherTest extends TestCase
 
         // Simulate a configuration change that would require rehashing
         $rehashOptions = match ($expectedAlgo) {
-            'bcrypt' => ['rounds' => PASSWORD_BCRYPT_DEFAULT_COST + 1],
-            default => ['threads' => PASSWORD_ARGON2_DEFAULT_THREADS + 1],
+            'bcrypt' => ['rounds' => $expectedOptions['cost'] + 1],
+            default => ['time' => $expectedOptions['time_cost'] + 1],
         };
 
         // Ensure that the hasher detects when a rehash is needed due to configuration changes
