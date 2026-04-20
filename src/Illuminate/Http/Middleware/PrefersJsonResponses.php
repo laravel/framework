@@ -9,12 +9,6 @@ class PrefersJsonResponses
     /**
      * Handle an incoming request.
      *
-     * This middleware mutates the incoming request: when the "Accept" header
-     * expresses no specific media-type preference, it is rewritten to
-     * "application/json" so downstream consumers (exception handler,
-     * auth/validation middleware, content negotiation) return JSON. The
-     * original value is preserved on the "X-Original-Accept" header.
-     *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @return mixed
@@ -37,10 +31,7 @@ class PrefersJsonResponses
     /**
      * Determine if the given "Accept" header value is broad enough to be treated as JSON.
      *
-     * The header is considered broad when it is missing, empty, or every
-     * media-type it lists is a wildcard ("*\/*" or "application/*"). A mixed
-     * header that contains any specific media-type is left alone so that the
-     * client's preference wins.
+     * The header is broad when it's missing or every media-type listed is wildcard ("*\/*" or "application/*").
      *
      * @param  string|null  $accept
      * @return bool
