@@ -406,7 +406,9 @@ class Handler implements ExceptionHandlerContract
         $level = $this->mapLogLevel($e);
 
         $originallyReporting = $this->currentlyReporting;
+
         $this->currentlyReporting = $e;
+
         try {
             $context = $this->buildExceptionContext($e);
 
