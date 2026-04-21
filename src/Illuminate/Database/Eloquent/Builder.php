@@ -944,14 +944,19 @@ class Builder implements BuilderContract
         $relation = $this->getRelation($name);
 
         $relation->addEagerConstraints($models);
+        $query = null;
+        $whereCount = 0;
+        $whereBindingsCount = 0;
 
-        $query = $relation->getQuery()->getQuery();
-        $whereCount = count($query->wheres ?? []);
-        $whereBindingsCount = count($query->getRawBindings()['where'] ?? []);
+        if (method_exists($relation, 'getOneOfManySubQuery')) {
+            $query = $relation->getQuery()->getQuery();
+            $whereCount = count($query->wheres ?? []);
+            $whereBindingsCount = count($query->getRawBindings()['where'] ?? []);
+        }
 
         $constraints($relation);
 
-        if (method_exists($relation, 'getOneOfManySubQuery') && ($subQuery = $relation->getOneOfManySubQuery()) !== null) {
+        if ($query !== null && ($subQuery = $relation->getOneOfManySubQuery()) !== null) {
             $wheres = array_slice($query->wheres ?? [], $whereCount);
             $whereBindings = array_slice($query->getRawBindings()['where'] ?? [], $whereBindingsCount);
 
