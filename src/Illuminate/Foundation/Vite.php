@@ -1163,7 +1163,7 @@ class Vite implements Htmlable
     {
         $css = $this->viteFonts()->resolveStyleContent($manifest, $aliases, $this->buildDirectory);
 
-        if ($css === '' || $css === null) {
+        if ($css === '') {
             return '';
         }
 
