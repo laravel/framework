@@ -107,21 +107,9 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
         $methods = array_keys($routes);
 
         if ($request->isMethod('OPTIONS')) {
-            $route = new Route('OPTIONS', $request->path(), function () use ($methods) {
+            return (new Route('OPTIONS', $request->path(), function () use ($methods) {
                 return new Response('', 200, ['Allow' => implode(',', $methods)]);
-            });
-
-            $route->setAction([
-                'uses' => $route->getAction('uses'),
-                'controller' => $route->getAction('controller'),
-                'middleware' => array_values(array_unique(array_merge(...array_map(
-                    fn ($alternateRoute) => (array) $alternateRoute->getAction('middleware'),
-                    array_values($routes),
-                )))),
-                'cors_routes' => $routes,
-            ]);
-
-            return $route->bind($request);
+            }))->bind($request);
         }
 
         $this->requestMethodNotAllowed($request, $methods, $request->method());

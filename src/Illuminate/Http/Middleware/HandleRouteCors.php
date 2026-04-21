@@ -17,7 +17,7 @@ class HandleRouteCors extends HandleCors
      */
     public function handle($request, Closure $next)
     {
-        if ($this->shouldSkip($request)) {
+        if ($this->shouldSkip($request) || $this->cors->isPreflightRequest($request)) {
             return $next($request);
         }
 
@@ -44,20 +44,6 @@ class HandleRouteCors extends HandleCors
 
         if (! $route instanceof Route) {
             return null;
-        }
-
-        if (! $request->isMethod('OPTIONS')) {
-            return $route->effectiveCorsOptions();
-        }
-
-        $intendedMethod = strtoupper((string) $request->headers->get('Access-Control-Request-Method'));
-
-        if ($intendedMethod !== '') {
-            $alternateRoute = $route->getAction('cors_routes.'.$intendedMethod);
-
-            if ($alternateRoute instanceof Route) {
-                return $alternateRoute->effectiveCorsOptions();
-            }
         }
 
         return $route->effectiveCorsOptions();

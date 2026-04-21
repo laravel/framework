@@ -6,6 +6,9 @@ use Closure;
 use Fruitcake\Cors\CorsService;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class HandleCors
 {
@@ -57,6 +60,16 @@ class HandleCors
             return $next($request);
         }
 
+        if ($this->cors->isPreflightRequest($request)) {
+            $this->cors->setOptions($this->resolveOptionsForPreflight($request));
+
+            $response = $this->cors->handlePreflightRequest($request);
+
+            $this->cors->varyHeader($response, 'Access-Control-Request-Method');
+
+            return $response;
+        }
+
         $response = $next($request);
 
         if ($request->attributes->get(static::ROUTE_CORS_HANDLED_ATTRIBUTE)) {
@@ -64,6 +77,38 @@ class HandleCors
         }
 
         return $this->handleRequest($request, fn () => $response, $this->container['config']->get('cors', []));
+    }
+
+    /**
+     * Resolve the CORS options to use when answering a preflight request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    protected function resolveOptionsForPreflight(Request $request): array
+    {
+        $globalOptions = $this->container['config']->get('cors', []);
+
+        $intendedMethod = strtoupper((string) $request->headers->get('Access-Control-Request-Method'));
+
+        if ($intendedMethod === '') {
+            return $globalOptions;
+        }
+
+        try {
+            $probe = $request->duplicate();
+            $probe->setMethod($intendedMethod);
+
+            $route = $this->container['router']->getRoutes()->match($probe);
+        } catch (NotFoundHttpException | MethodNotAllowedHttpException) {
+            return $globalOptions;
+        }
+
+        if ($route instanceof Route && ($routeOptions = $route->effectiveCorsOptions()) !== null) {
+            return $this->normalizeCorsOptions($routeOptions);
+        }
+
+        return $globalOptions;
     }
 
     /**
