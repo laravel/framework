@@ -49,6 +49,14 @@ class ViewMakeCommand extends GeneratorCommand
     {
         $contents = parent::buildClass($name);
 
+        if ($layout = $this->option('layout')) {
+            $contents = str_replace(
+                '{{ layout }}',
+                $layout,
+                $contents,
+            );
+        }
+
         return str_replace(
             '{{ quote }}',
             Inspiring::quotes()->random(),
@@ -65,7 +73,7 @@ class ViewMakeCommand extends GeneratorCommand
     protected function getPath($name)
     {
         return $this->viewPath(
-            $this->getNameInput().'.'.$this->option('extension'),
+            $this->getNameInput() . '.' . $this->option('extension'),
         );
     }
 
@@ -105,7 +113,7 @@ class ViewMakeCommand extends GeneratorCommand
     {
         return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
             ? $customPath
-            : __DIR__.$stub;
+            : __DIR__ . $stub;
     }
 
     /**
@@ -182,21 +190,21 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function testClassFullyQualifiedName()
     {
-        $name = Str::of(Str::lower($this->getNameInput()))->replace('.'.$this->option('extension'), '');
+        $name = Str::of(Str::lower($this->getNameInput()))->replace('.' . $this->option('extension'), '');
 
         $namespacedName = Str::of(
             (new Stringable($name))
                 ->replace('/', ' ')
                 ->explode(' ')
-                ->map(fn ($part) => (new Stringable($part))->ucfirst())
+                ->map(fn($part) => (new Stringable($part))->ucfirst())
                 ->implode('\\')
         )
             ->replace(['-', '_'], ' ')
             ->explode(' ')
-            ->map(fn ($part) => (new Stringable($part))->ucfirst())
+            ->map(fn($part) => (new Stringable($part))->ucfirst())
             ->implode('');
 
-        return 'Tests\\Feature\\View\\'.$namespacedName;
+        return 'Tests\\Feature\\View\\' . $namespacedName;
     }
 
     /**
@@ -206,11 +214,11 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function getTestStub()
     {
-        $stubName = 'view.'.($this->usingPest() ? 'pest' : 'test').'.stub';
+        $stubName = 'view.' . ($this->usingPest() ? 'pest' : 'test') . '.stub';
 
         return file_exists($customPath = $this->laravel->basePath("stubs/$stubName"))
             ? $customPath
-            : __DIR__.'/stubs/'.$stubName;
+            : __DIR__ . '/stubs/' . $stubName;
     }
 
     /**
@@ -239,7 +247,7 @@ class ViewMakeCommand extends GeneratorCommand
 
         return $this->option('pest') ||
             (function_exists('\Pest\\version') &&
-             file_exists(base_path('tests').'/Pest.php'));
+                file_exists(base_path('tests') . '/Pest.php'));
     }
 
     /**
@@ -251,6 +259,7 @@ class ViewMakeCommand extends GeneratorCommand
     {
         return [
             ['extension', null, InputOption::VALUE_OPTIONAL, 'The extension of the generated view', 'blade.php'],
+            ['layout', null, InputOption::VALUE_OPTIONAL, 'The layout to extend in the generated view'],
             ['force', 'f', InputOption::VALUE_NONE, 'Create the view even if the view already exists'],
         ];
     }
