@@ -15,7 +15,7 @@ class UserScope implements Scope
 {
     public function apply(Builder $builder, Model $model): void
     {
-        assertType('Illuminate\Database\Eloquent\Builder<Illuminate\Types\Scope\User>', $builder);
+        assertType('Illuminate\Database\Eloquent\Builder<covariant Illuminate\Types\Scope\User>', $builder);
         assertType('Illuminate\Types\Scope\User', $model);
     }
 }
@@ -27,7 +27,7 @@ class GenericScope implements Scope
 {
     public function apply(Builder $builder, Model $model): void
     {
-        assertType('Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>', $builder);
+        assertType('Illuminate\Database\Eloquent\Builder<covariant Illuminate\Database\Eloquent\Model>', $builder);
         assertType('Illuminate\Database\Eloquent\Model', $model);
     }
 }
