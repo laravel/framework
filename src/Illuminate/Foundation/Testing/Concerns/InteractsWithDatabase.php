@@ -158,7 +158,7 @@ trait InteractsWithDatabase
             );
         }
 
-        if (array_is_list($data) && array_all($data, fn ($row) => is_array($row))) {
+        if ($data !== [] && array_is_list($data) && array_all($data, fn ($row) => is_array($row))) {
             foreach ($data as $row) {
                 $this->assertSoftDeleted($table, $row, $connection, $deletedAtColumn);
             }
@@ -206,7 +206,7 @@ trait InteractsWithDatabase
             );
         }
 
-        if (array_is_list($data) && array_all($data, fn ($row) => is_array($row))) {
+        if ($data !== [] && array_is_list($data) && array_all($data, fn ($row) => is_array($row))) {
             foreach ($data as $row) {
                 $this->assertNotSoftDeleted($table, $row, $connection, $deletedAtColumn);
             }
