@@ -28,7 +28,14 @@ class Cors
     /**
      * Get the CORS options as an array, excluding null values.
      *
-     * @return array
+     * @return array{
+     *     origins?: array<string>,
+     *     methods?: array<string>,
+     *     headers?: array<string>,
+     *     exposed_headers?: array<string>,
+     *     max_age?: int,
+     *     credentials?: bool,
+     * }
      */
     public function toArray(): array
     {
