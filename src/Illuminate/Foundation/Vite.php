@@ -1099,9 +1099,7 @@ class Vite implements Htmlable
         $html = '';
 
         foreach ($preloads as $preload) {
-            $url = isset($preload['url'])
-                ? $preload['url']
-                : $this->assetPath($this->buildDirectory.'/'.$preload['file']);
+            $url = $preload['url'] ?? $this->assetPath($this->buildDirectory.'/'.$preload['file']);
 
             if (isset($this->preloadedAssets[$url])) {
                 continue;
