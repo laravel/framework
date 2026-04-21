@@ -100,7 +100,7 @@ class HandleCors
             $probe->setMethod($intendedMethod);
 
             $route = $this->container['router']->getRoutes()->match($probe);
-        } catch (NotFoundHttpException | MethodNotAllowedHttpException) {
+        } catch (NotFoundHttpException|MethodNotAllowedHttpException) {
             return $globalOptions;
         }
 
