@@ -40,8 +40,8 @@ final class JsonFormatterTest extends TestCase
         $formatted = $this->getFormattedJson();
 
         $exceptionData = $formatted['context']['exception'];
-        self::assertSame('bar', $exceptionData['foo']);
-        self::assertSame(ContextProvidingException::class, $exceptionData['class']);
+        $this->assertSame('bar', $exceptionData['foo']);
+        $this->assertSame(ContextProvidingException::class, $exceptionData['class']);
     }
 
     public function testExceptionContextIsNotDuplicatedWhenGoingThroughReport()
@@ -53,11 +53,11 @@ final class JsonFormatterTest extends TestCase
         $formatted = $this->getFormattedJson();
 
         // Context should be at the top level (from the handler)
-        self::assertSame('bar', $formatted['context']['foo']);
+        $this->assertSame('bar', $formatted['context']['foo']);
 
         // But NOT enriched inside the normalized exception (formatter should skip)
         $exceptionData = $formatted['context']['exception'];
-        self::assertArrayNotHasKey('foo', $exceptionData);
+        $this->assertArrayNotHasKey('foo', $exceptionData);
     }
 
     public function testStackDriverEnrichesBothHandlersOnDirectLogging()
@@ -78,8 +78,8 @@ final class JsonFormatterTest extends TestCase
             $formatted = $this->getFormattedJson($h);
             $exceptionData = $formatted['context']['exception'];
 
-            self::assertSame('bar', $exceptionData['foo'], "Expected enriched context on {$name}");
-            self::assertSame(ContextProvidingException::class, $exceptionData['class']);
+            $this->assertSame('bar', $exceptionData['foo'], "Expected enriched context on {$name}");
+            $this->assertSame(ContextProvidingException::class, $exceptionData['class']);
         }
     }
 
@@ -105,10 +105,10 @@ final class JsonFormatterTest extends TestCase
         foreach (['handlerA' => $handlerA, 'handlerB' => $handlerB] as $name => $h) {
             $formatted = $this->getFormattedJson($h);
 
-            self::assertSame('bar', $formatted['context']['foo'], "Context should be at top level on {$name}");
+            $this->assertSame('bar', $formatted['context']['foo'], "Context should be at top level on {$name}");
 
             $exceptionData = $formatted['context']['exception'];
-            self::assertArrayNotHasKey('foo', $exceptionData, "Formatter should not enrich on {$name}");
+            $this->assertArrayNotHasKey('foo', $exceptionData, "Formatter should not enrich on {$name}");
         }
     }
 
@@ -122,12 +122,12 @@ final class JsonFormatterTest extends TestCase
         $formatted = $this->getFormattedJson();
         $exceptionData = $formatted['context']['exception'];
 
-        self::assertSame(RuntimeException::class, $exceptionData['class']);
-        self::assertArrayHasKey('previous', $exceptionData);
+        $this->assertSame(RuntimeException::class, $exceptionData['class']);
+        $this->assertArrayHasKey('previous', $exceptionData);
 
         $previousData = $exceptionData['previous'];
-        self::assertSame(ContextProvidingException::class, $previousData['class']);
-        self::assertSame('bar', $previousData['foo']);
+        $this->assertSame(ContextProvidingException::class, $previousData['class']);
+        $this->assertSame('bar', $previousData['foo']);
     }
 
     public function testReportEnrichesPreviousExceptionContext()
@@ -139,18 +139,18 @@ final class JsonFormatterTest extends TestCase
         $formatted = $this->getFormattedJson();
 
         // The outer exception has no context() method, so nothing at the top level
-        self::assertArrayNotHasKey('foo', $formatted['context']);
+        $this->assertArrayNotHasKey('foo', $formatted['context']);
 
         $exceptionData = $formatted['context']['exception'];
 
         // Outer exception should NOT be enriched (isReporting matches it)
-        self::assertArrayNotHasKey('foo', $exceptionData);
+        $this->assertArrayNotHasKey('foo', $exceptionData);
 
         // Previous exception SHOULD be enriched (isReporting does not match it)
-        self::assertArrayHasKey('previous', $exceptionData);
+        $this->assertArrayHasKey('previous', $exceptionData);
         $previousData = $exceptionData['previous'];
-        self::assertSame(ContextProvidingException::class, $previousData['class']);
-        self::assertSame('bar', $previousData['foo']);
+        $this->assertSame(ContextProvidingException::class, $previousData['class']);
+        $this->assertSame('bar', $previousData['foo']);
     }
 
     public function testExceptionWithoutContextMethodIsNotEnriched()
@@ -160,9 +160,9 @@ final class JsonFormatterTest extends TestCase
         $formatted = $this->getFormattedJson();
         $exceptionData = $formatted['context']['exception'];
 
-        self::assertSame(RuntimeException::class, $exceptionData['class']);
-        self::assertSame('Plain exception', $exceptionData['message']);
-        self::assertArrayNotHasKey('foo', $exceptionData);
+        $this->assertSame(RuntimeException::class, $exceptionData['class']);
+        $this->assertSame('Plain exception', $exceptionData['message']);
+        $this->assertArrayNotHasKey('foo', $exceptionData);
     }
 
     public function testContextCallbacksAreIncludedInFormatterEnrichment()
@@ -178,8 +178,8 @@ final class JsonFormatterTest extends TestCase
         $formatted = $this->getFormattedJson();
         $exceptionData = $formatted['context']['exception'];
 
-        self::assertSame('bar', $exceptionData['foo']);
-        self::assertSame('callback_value', $exceptionData['callback_key']);
+        $this->assertSame('bar', $exceptionData['foo']);
+        $this->assertSame('callback_value', $exceptionData['callback_key']);
     }
 
     public function testGracefulFallbackWhenContainerCannotResolveHandler()
@@ -197,9 +197,9 @@ final class JsonFormatterTest extends TestCase
         $formatted = $this->getFormattedJson($handler);
         $exceptionData = $formatted['context']['exception'];
 
-        self::assertSame(ContextProvidingException::class, $exceptionData['class']);
-        self::assertSame('No handler bound', $exceptionData['message']);
-        self::assertArrayNotHasKey('foo', $exceptionData);
+        $this->assertSame(ContextProvidingException::class, $exceptionData['class']);
+        $this->assertSame('No handler bound', $exceptionData['message']);
+        $this->assertArrayNotHasKey('foo', $exceptionData);
     }
 
     public function testNonScalarContextValuesAreNormalized()
@@ -211,8 +211,8 @@ final class JsonFormatterTest extends TestCase
         $formatted = $this->getFormattedJson();
         $exceptionData = $formatted['context']['exception'];
 
-        self::assertIsArray($exceptionData['nested']);
-        self::assertSame(ObjectContextException::class, $exceptionData['class']);
+        $this->assertIsArray($exceptionData['nested']);
+        $this->assertSame(ObjectContextException::class, $exceptionData['class']);
     }
 
     public function testBothOuterAndPreviousContextEnrichedOnDirectLogging()
@@ -226,18 +226,18 @@ final class JsonFormatterTest extends TestCase
         $exceptionData = $formatted['context']['exception'];
 
         // Outer exception should have its own context
-        self::assertSame('outer_value', $exceptionData['outer_key']);
-        self::assertSame(AnotherContextProvidingException::class, $exceptionData['class']);
+        $this->assertSame('outer_value', $exceptionData['outer_key']);
+        $this->assertSame(AnotherContextProvidingException::class, $exceptionData['class']);
 
         // Previous exception should have its own context
-        self::assertArrayHasKey('previous', $exceptionData);
+        $this->assertArrayHasKey('previous', $exceptionData);
         $previousData = $exceptionData['previous'];
-        self::assertSame('bar', $previousData['foo']);
-        self::assertSame(ContextProvidingException::class, $previousData['class']);
+        $this->assertSame('bar', $previousData['foo']);
+        $this->assertSame(ContextProvidingException::class, $previousData['class']);
 
         // Context keys should not bleed between exceptions
-        self::assertArrayNotHasKey('foo', $exceptionData);
-        self::assertArrayNotHasKey('outer_key', $previousData);
+        $this->assertArrayNotHasKey('foo', $exceptionData);
+        $this->assertArrayNotHasKey('outer_key', $previousData);
     }
 
     public function testBothOuterAndPreviousContextOnReport()
@@ -250,18 +250,18 @@ final class JsonFormatterTest extends TestCase
         $formatted = $this->getFormattedJson();
 
         // Outer's context should be at the top level (from the handler)
-        self::assertSame('outer_value', $formatted['context']['outer_key']);
+        $this->assertSame('outer_value', $formatted['context']['outer_key']);
 
         $exceptionData = $formatted['context']['exception'];
 
         // Outer should NOT be enriched by the formatter (isReporting matches)
-        self::assertArrayNotHasKey('outer_key', $exceptionData);
+        $this->assertArrayNotHasKey('outer_key', $exceptionData);
 
         // Previous SHOULD be enriched by the formatter (isReporting does not match)
-        self::assertArrayHasKey('previous', $exceptionData);
+        $this->assertArrayHasKey('previous', $exceptionData);
         $previousData = $exceptionData['previous'];
-        self::assertSame('bar', $previousData['foo']);
-        self::assertSame(ContextProvidingException::class, $previousData['class']);
+        $this->assertSame('bar', $previousData['foo']);
+        $this->assertSame(ContextProvidingException::class, $previousData['class']);
     }
 
     public function testFormatterHandlesNormalizationDepthLimit()
@@ -283,20 +283,20 @@ final class JsonFormatterTest extends TestCase
 
         // Outermost exception at depth 2 — context normalize called at depth 3,
         // within limit so the array is returned (values inside may be depth-truncated)
-        self::assertArrayHasKey('foo', $exceptionData);
+        $this->assertArrayHasKey('foo', $exceptionData);
 
         // Previous exception at depth 3 — context normalize called at depth 4,
         // exceeds limit so normalize returns a string. is_array() guard skips enrichment.
-        self::assertArrayHasKey('previous', $exceptionData);
-        self::assertArrayNotHasKey('foo', $exceptionData['previous']);
-        self::assertSame(ContextProvidingException::class, $exceptionData['previous']['class']);
+        $this->assertArrayHasKey('previous', $exceptionData);
+        $this->assertArrayNotHasKey('foo', $exceptionData['previous']);
+        $this->assertSame(ContextProvidingException::class, $exceptionData['previous']['class']);
     }
 
     private function getFormattedJson(?TestHandler $handler = null): array
     {
         $handler ??= $this->app->make('log')->driver()->getLogger()->getHandlers()[0];
         $records = $handler->getRecords();
-        self::assertNotEmpty($records, 'Expected at least one log record');
+        $this->assertNotEmpty($records, 'Expected at least one log record');
 
         $formatted = $records[0]['formatted'];
 
