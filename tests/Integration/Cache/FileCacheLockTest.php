@@ -113,6 +113,18 @@ class FileCacheLockTest extends TestCase
         $lock->release();
     }
 
+    public function testIsLocked()
+    {
+        $lock = Cache::lock('foo', 10);
+        $this->assertFalse($lock->isLocked());
+
+        $lock->get();
+        $this->assertTrue($lock->isLocked());
+
+        $lock->release();
+        $this->assertFalse($lock->isLocked());
+    }
+
     public function testOtherOwnerDoesNotOwnLockAfterRestore()
     {
         $firstLock = Cache::lock('foo', 10);
