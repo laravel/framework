@@ -945,7 +945,18 @@ class Builder implements BuilderContract
 
         $relation->addEagerConstraints($models);
 
+        $query = $relation->getQuery()->getQuery();
+        $whereCount = count($query->wheres ?? []);
+        $whereBindingsCount = count($query->getRawBindings()['where'] ?? []);
+
         $constraints($relation);
+
+        if (method_exists($relation, 'getOneOfManySubQuery') && ($subQuery = $relation->getOneOfManySubQuery()) !== null) {
+            $wheres = array_slice($query->wheres ?? [], $whereCount);
+            $whereBindings = array_slice($query->getRawBindings()['where'] ?? [], $whereBindingsCount);
+
+            $subQuery->getQuery()->mergeWheres($wheres, $whereBindings);
+        }
 
         // Once we have the results, we just match those back up to their parent models
         // using the relationship instance. Then we just return the finished arrays

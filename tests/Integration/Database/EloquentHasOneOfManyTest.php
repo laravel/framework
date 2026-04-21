@@ -79,6 +79,21 @@ class EloquentHasOneOfManyTest extends DatabaseTestCase
         $this->assertSame($users[0]->latest_updated_state->id, $latestState->id);
         $this->assertSame($users[0]->latest_updated_latest_created_state->id, $latestState->id);
     }
+
+    public function testItAppliesEagerLoadConstraintsToTheInnerSubquery()
+    {
+        $user = User::create();
+        $user->latest_login()->create();
+        $expectedLogin = $user->latest_login()->create();
+        $user->latest_login()->create();
+
+        $result = User::with(['latest_login' => function ($query) use ($expectedLogin) {
+            $query->whereKey($expectedLogin->getKey());
+        }])->first();
+
+        $this->assertNotNull($result->latest_login);
+        $this->assertSame($expectedLogin->id, $result->latest_login->id);
+    }
 }
 
 class User extends Model
