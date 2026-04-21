@@ -1060,10 +1060,6 @@ class Vite implements Htmlable
      */
     public function fonts($aliases = null)
     {
-        if (is_string($aliases)) {
-            $aliases = [$aliases];
-        }
-
         $isHot = $this->isRunningHot();
 
         $fonts = $this->viteFonts();
@@ -1079,13 +1075,14 @@ class Vite implements Htmlable
         $preloads = $manifest['preloads'] ?? [];
 
         if ($aliases !== null) {
+            $aliases = is_string($aliases) ? [$aliases] : $aliases;
             $fonts->ensureValidFamilies($aliases, $manifest);
             $preloads = array_filter($preloads, fn ($preload) => in_array($preload['alias'] ?? null, $aliases, true));
         }
 
         $fonts->ensureValidPreloads($preloads, $isHot);
 
-        $html = $this->renderFontPreloads($preloads, $isHot);
+        $html = $this->renderFontPreloads($preloads);
         $html .= $this->renderFontStyle($manifest, $aliases);
 
         return new HtmlString($html);
@@ -1095,10 +1092,9 @@ class Vite implements Htmlable
      * Render preload link tags for font entries.
      *
      * @param  list<array<string, string>>  $preloads
-     * @param  bool  $isHot
      * @return string
      */
-    protected function renderFontPreloads(array $preloads, $isHot)
+    protected function renderFontPreloads($preloads)
     {
         $html = '';
 
@@ -1163,7 +1159,7 @@ class Vite implements Htmlable
      * @param  list<string>|null  $aliases
      * @return string
      */
-    protected function renderFontStyle(array $manifest, ?array $aliases)
+    protected function renderFontStyle($manifest, $aliases)
     {
         $css = $this->viteFonts()->resolveStyleContent($manifest, $aliases, $this->buildDirectory);
 

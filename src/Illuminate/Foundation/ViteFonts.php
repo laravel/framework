@@ -22,7 +22,7 @@ class ViteFonts
      *
      * @throws \Illuminate\Foundation\ViteException
      */
-    public function manifest($isHot, $buildDirectory, $manifestFilename, $hotFile)
+    public function manifest(bool $isHot, string $buildDirectory, string $manifestFilename, string $hotFile)
     {
         $path = $isHot
             ? dirname($hotFile).'/fonts-manifest.dev.json'
@@ -41,7 +41,7 @@ class ViteFonts
      *
      * @throws \Illuminate\Foundation\ViteException
      */
-    public function resolveStyleContent(array $manifest, ?array $aliases, $buildDirectory)
+    public function resolveStyleContent(array $manifest, ?array $aliases, string $buildDirectory)
     {
         $style = $manifest['style'] ?? null;
 
@@ -114,7 +114,7 @@ class ViteFonts
      *
      * @throws \Illuminate\Foundation\ViteException
      */
-    protected function readStyleFile($buildDirectory, $file)
+    protected function readStyleFile(string $buildDirectory, string $file)
     {
         $path = public_path($buildDirectory.'/'.$file);
 
@@ -179,7 +179,7 @@ class ViteFonts
      *
      * @throws \Illuminate\Foundation\ViteException
      */
-    public function ensureValidPreloads(array $preloads, $isHot)
+    public function ensureValidPreloads(array $preloads, bool $isHot)
     {
         $urlKey = $isHot ? 'url' : 'file';
 
@@ -202,7 +202,7 @@ class ViteFonts
      *
      * @throws \Illuminate\Foundation\ViteException
      */
-    protected function readManifest($path)
+    protected function readManifest(string $path)
     {
         if (isset(static::$manifests[$path])) {
             return static::$manifests[$path];
