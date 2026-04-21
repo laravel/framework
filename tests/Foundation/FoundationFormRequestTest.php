@@ -12,6 +12,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\Attributes\ErrorBag;
 use Illuminate\Foundation\Http\Attributes\FailOnUnknownFields;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Foundation\Http\UnknownFieldsException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\UrlGenerator;
@@ -29,6 +30,7 @@ class FoundationFormRequestTest extends TestCase
     protected function tearDown(): void
     {
         FormRequest::failOnUnknownFields(false);
+        FormRequest::handleUnknownFieldsUsing(null);
 
         Container::setInstance(null);
 
@@ -567,6 +569,63 @@ class FoundationFormRequestTest extends TestCase
 
     //     $this->assertTrue($exception->validator->errors()->has('password_confirmation'));
     // }
+
+    public function testHandleUnknownFieldsUsingCallbackIsInvokedInsteadOfAddingValidatorErrors()
+    {
+        FormRequest::failOnUnknownFields();
+
+        $callbackFields = null;
+        $callbackRequest = null;
+
+        FormRequest::handleUnknownFieldsUsing(function (FormRequest $formRequest, array $fields) use (&$callbackFields, &$callbackRequest) {
+            $callbackRequest = $formRequest;
+            $callbackFields = $fields;
+        });
+
+        $request = $this->createRequest(
+            ['name' => 'Taylor', 'unexpected' => 'value', 'also_unknown' => 'test'],
+            FoundationTestFormRequestStub::class,
+            'POST'
+        );
+
+        $request->validateResolved();
+
+        $this->assertInstanceOf(FormRequest::class, $callbackRequest);
+        $this->assertEquals(['unexpected', 'also_unknown'], $callbackFields);
+    }
+
+    public function testHandleUnknownFieldsUsingNullResetsToDefaultBehavior()
+    {
+        FormRequest::failOnUnknownFields();
+
+        FormRequest::handleUnknownFieldsUsing(function () {
+            // No-op.
+        });
+
+        FormRequest::handleUnknownFieldsUsing(null);
+
+        $request = $this->createRequest(
+            ['name' => 'Taylor', 'unexpected' => 'value'],
+            FoundationTestFormRequestStub::class,
+            'POST'
+        );
+
+        $exception = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertTrue($exception->validator->errors()->has('unexpected'));
+    }
+
+    public function testUnknownFieldsExceptionContainsFormRequestAndFields()
+    {
+        $request = FoundationTestFormRequestStub::create('/', 'POST', ['name' => 'Taylor']);
+        $exception = new UnknownFieldsException($request, ['bogus', 'extra']);
+
+        $this->assertEquals(FoundationTestFormRequestStub::class, $exception->formRequest);
+        $this->assertEquals(['bogus', 'extra'], $exception->fields);
+        $this->assertStringContainsString('bogus, extra', $exception->getMessage());
+    }
 
     /**
      * Catch the given exception thrown from the executor, and return it.
