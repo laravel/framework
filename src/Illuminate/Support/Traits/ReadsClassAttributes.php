@@ -26,16 +26,8 @@ trait ReadsClassAttributes
             return $target->{$property};
         }
 
-        try {
-            do {
-                $attributes = $reflection->getAttributes($attributeClass);
-
-                if (count($attributes) > 0) {
-                    return $this->extractAttributeValue($attributes[0]->newInstance());
-                }
-            } while ($reflection = $reflection->getParentClass());
-        } catch (Exception) {
-            //
+        if ($instance = $this->getAttributeInstance($target, $attributeClass)) {
+            return $this->extractAttributeValue($instance);
         }
 
         return $target->{$property} ?? $default;
@@ -52,5 +44,31 @@ trait ReadsClassAttributes
         $properties = get_object_vars($instance);
 
         return $properties === [] ? true : reset($properties);
+    }
+
+    /**
+     * Get an instance of the given attribute class from the target class or its parents.
+     *
+     * @param object $target
+     * @param class-string $attributeClass
+     * @return object|null
+     */
+    protected function getAttributeInstance($target, string $attributeClass)
+    {
+        $reflection = new ReflectionClass($target);
+
+        try {
+            do {
+                $attributes = $reflection->getAttributes($attributeClass);
+
+                if (count($attributes) > 0) {
+                    return $attributes[0]->newInstance();
+                }
+            } while ($reflection = $reflection->getParentClass());
+        } catch (Exception) {
+            //
+        }
+
+        return null;
     }
 }

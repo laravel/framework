@@ -9,9 +9,7 @@ use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Foundation\Queue\InteractsWithUniqueJobs;
-use Illuminate\Queue\Attributes\DebounceFor;
 use LogicException;
-use ReflectionClass;
 
 class PendingDispatch
 {
@@ -218,11 +216,15 @@ class PendingDispatch
      *
      * @return void
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     protected function acquireDebounceLock()
     {
-        if (empty((new ReflectionClass($this->job))->getAttributes(DebounceFor::class))) {
+        $lock = new DebounceLock(Container::getInstance()->make(Cache::class));
+
+        $debounceFor = $lock->getDebounceDelay($this->job);
+
+        if ($debounceFor === null) {
             return;
         }
 
@@ -230,10 +232,8 @@ class PendingDispatch
             throw new LogicException('A debounced job cannot also implement ShouldBeUnique.');
         }
 
-        $lock = new DebounceLock(Container::getInstance()->make(Cache::class));
-
         $result = $lock->acquire(
-            $this->job, $debounceFor = $lock->getDebounceDelay($this->job)
+            $this->job, $debounceFor
         );
 
         $this->job->debounceOwner = $result['owner'];
