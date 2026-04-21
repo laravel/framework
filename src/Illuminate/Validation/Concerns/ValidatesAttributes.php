@@ -984,6 +984,10 @@ trait ValidatesAttributes
             throw new InvalidArgumentException("Validation rule encoding parameter [{$parameters[0]}] is not a valid encoding.");
         }
 
+        if (is_object($value) && ! $value instanceof File && ! method_exists($value, '__toString')) {
+            return false;
+        }
+
         return mb_check_encoding($value instanceof File ? $value->getContent() : $value, $parameters[0]);
     }
 
