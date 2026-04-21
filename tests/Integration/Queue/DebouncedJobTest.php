@@ -314,7 +314,6 @@ class DebouncedJobTest extends QueueTestCase
 
     public function testChildDebouncedJobInheritsFromParent()
     {
-
         $this->markTestSkippedWhenUsingQueueDrivers(['sync', 'beanstalkd']);
 
         ChildOfDebouncedTestJob::$handleCount = 0;
