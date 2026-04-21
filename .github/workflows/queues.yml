@@ -2,10 +2,10 @@ name: queues
 
 on:
   push:
-    branches:
-      - master
-      - '*.x'
-  pull_request:
+#    branches:
+#      - master
+#      - '*.x'
+#  pull_request:
 
 jobs:
   sync:
