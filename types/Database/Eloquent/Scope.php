@@ -38,5 +38,5 @@ class User extends Model
 
 $user = new User();
 $query = User::query();
-new UserScope()->apply($query, $user);
-new GenericScope()->apply($query, $user);
+(new UserScope())->apply($query, $user);
+(new GenericScope())->apply($query, $user);
