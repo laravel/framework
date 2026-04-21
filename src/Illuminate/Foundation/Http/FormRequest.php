@@ -87,6 +87,13 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected static bool $globalFailOnUnknownFields = false;
 
     /**
+     * The callback that is responsible for handling unknown fields violations.
+     *
+     * @var (callable(self, array<int, string>))|null
+     */
+    protected static $unknownFieldsViolationCallback;
+
+    /**
      * Get the validator instance for the request.
      *
      * @return \Illuminate\Contracts\Validation\Validator
@@ -233,12 +240,28 @@ class FormRequest extends Request implements ValidatesWhenResolved
 
         $input = $this->isJson() ? $this->json()->all() : $this->request->all();
 
+        $unknownFields = [];
+
         foreach (array_keys(Arr::dot($input)) as $inputKey) {
             if (! $this->isKnownField($inputKey, $allowedKeys)) {
-                $validator->errors()->add($inputKey, trans('validation.prohibited', [
-                    'attribute' => str_replace('_', ' ', $inputKey),
-                ]));
+                $unknownFields[] = $inputKey;
             }
+        }
+
+        if (empty($unknownFields)) {
+            return;
+        }
+
+        if (isset(static::$unknownFieldsViolationCallback)) {
+            call_user_func(static::$unknownFieldsViolationCallback, $this, $unknownFields);
+
+            return;
+        }
+
+        foreach ($unknownFields as $field) {
+            $validator->errors()->add($field, trans('validation.prohibited', [
+                'attribute' => str_replace('_', ' ', $field),
+            ]));
         }
     }
 
@@ -399,6 +422,17 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
+     * Register a callback that is responsible for handling unknown fields violations.
+     *
+     * @param  (callable(self, array<int, string>))|null  $callback
+     * @return void
+     */
+    public static function handleUnknownFieldsUsing(?callable $callback): void
+    {
+        static::$unknownFieldsViolationCallback = $callback;
+    }
+
+    /**
      * Set the Validator instance.
      *
      * @param  \Illuminate\Contracts\Validation\Validator  $validator
@@ -445,5 +479,6 @@ class FormRequest extends Request implements ValidatesWhenResolved
     public static function flushState(): void
     {
         static::$globalFailOnUnknownFields = false;
+        static::$unknownFieldsViolationCallback = null;
     }
 }
