@@ -1064,8 +1064,9 @@ class Vite implements Htmlable
             $aliases = [$aliases];
         }
 
-        $fonts = $this->viteFonts();
         $isHot = $this->isRunningHot();
+
+        $fonts = $this->viteFonts();
 
         $manifest = $fonts->manifest($isHot, $this->buildDirectory, $this->fontsManifestFilename, $this->hotFile());
 
@@ -1075,13 +1076,10 @@ class Vite implements Htmlable
 
         $fonts->ensureValidManifest($manifest);
 
-        if ($aliases !== null) {
-            $fonts->ensureValidFamilies($aliases, $manifest);
-        }
-
         $preloads = $manifest['preloads'] ?? [];
 
         if ($aliases !== null) {
+            $fonts->ensureValidFamilies($aliases, $manifest);
             $preloads = array_filter($preloads, fn ($preload) => in_array($preload['alias'] ?? null, $aliases, true));
         }
 
@@ -1214,9 +1212,7 @@ class Vite implements Htmlable
     {
         $this->preloadedAssets = [];
 
-        if ($this->viteFonts) {
-            $this->viteFonts->flush();
-        }
+        $this->viteFonts?->flush();
 
         $this->viteFonts = null;
     }

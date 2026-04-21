@@ -47,7 +47,7 @@ class ViteFonts
 
         return match (true) {
             $style === null => '',
-            $aliases !== null => $this->resolveFilteredStyleContent($style, $aliases, $manifest['families'] ?? []),
+            $aliases !== null => $this->resolveFilteredStyleContent($style, $aliases),
             isset($style['inline']) => $style['inline'],
             isset($style['file']) => $this->readStyleFile($buildDirectory, $style['file']),
             default => '',
@@ -57,15 +57,14 @@ class ViteFonts
     /**
      * Resolve filtered CSS content using per-alias fragments from the manifest.
      *
-     * @param  array{inline?: string, file?: string, familyStyles?: array<string, string>, variables?: string}  $style
+     * @param  array{inline?: string, file?: string, familyStyles?: array<string, string>, variables?: array<string, string>}  $style
      * @param  list<string>  $aliases
-     * @param  array<string, array<string, string>>  $manifestFamilies
      * @return string
      */
-    protected function resolveFilteredStyleContent(array $style, array $aliases, array $manifestFamilies)
+    protected function resolveFilteredStyleContent(array $style, array $aliases)
     {
         $familyStyles = $style['familyStyles'] ?? [];
-        $variables = $style['variables'] ?? '';
+        $variables = $style['variables'] ?? [];
 
         $parts = [];
 
@@ -75,56 +74,35 @@ class ViteFonts
             }
         }
 
-        if ($variables !== '') {
-            $parts[] = $this->filterVariables($variables, $aliases, $manifestFamilies);
+        if ($variables !== []) {
+            $parts[] = $this->filterVariables($variables, $aliases);
         }
 
         return implode("\n\n", $parts);
     }
 
     /**
-     * Filter a CSS variables block to only include variables for the given aliases.
+     * Build a `:root` block containing only the CSS variables for the given aliases.
      *
-     * @param  string  $variables
-     * @param  list<string>  $aliases
-     * @param  array<string, array<string, string>>  $manifestFamilies
+     * @param  array<string, string>  $variables
+     * @param  list<string>  $aliases  List of aliases in desired emission order.
      * @return string
      */
-    protected function filterVariables($variables, array $aliases, array $manifestFamilies)
+    protected function filterVariables(array $variables, array $aliases)
     {
-        $allowedVariables = [];
+        $declarations = [];
 
         foreach ($aliases as $alias) {
-            if (isset($manifestFamilies[$alias]['variable'])) {
-                $allowedVariables[] = $manifestFamilies[$alias]['variable'];
+            if (isset($variables[$alias])) {
+                $declarations[] = '  '.$variables[$alias];
             }
         }
 
-        if (empty($allowedVariables)) {
+        if ($declarations === []) {
             return '';
         }
 
-        if (! preg_match('/:root\s*\{(.*)\}/s', $variables, $match)) {
-            return '';
-        }
-
-        preg_match_all('/(--[^:]+):\s*([^;]+);/', $match[1], $declarations, PREG_SET_ORDER);
-
-        $filtered = [];
-
-        foreach ($declarations as $declaration) {
-            $varName = trim($declaration[1]);
-
-            if (in_array($varName, $allowedVariables, true)) {
-                $filtered[] = '  '.trim($declaration[1]).': '.trim($declaration[2]).';';
-            }
-        }
-
-        if (empty($filtered)) {
-            return '';
-        }
-
-        return ":root {\n".implode("\n", $filtered)."\n}";
+        return ":root {\n".implode("\n", $declarations)."\n}";
     }
 
     /**
