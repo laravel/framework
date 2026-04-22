@@ -311,6 +311,18 @@ class DebouncedJobTest extends QueueTestCase
 
         $this->assertEquals(30, $job2->delay);
     }
+
+    public function testGetCurrentOwner()
+    {
+        $cache = $this->app->get(Cache::class);
+        $lock = new DebounceLock($cache);
+
+        $job = new DebouncedTestJob('entity-1');
+
+        $owner = $lock->acquire($job)['owner'];
+
+        $this->assertEquals($lock->getCurrentOwner($job), $owner);
+    }
 }
 
 #[DebounceFor(30)]
