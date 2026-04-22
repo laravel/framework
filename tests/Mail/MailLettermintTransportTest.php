@@ -115,15 +115,15 @@ class MailLettermintTransportTest extends TestCase
 
             return new MockResponse(json_encode([
                 'message_id' => 'lettermint-message-id',
-                'status' => 'queued',
+                'status' => 'pending',
             ]), ['http_code' => 202]);
         });
 
         $transport = new LettermintTransport('test-token', 'broadcast', $client);
 
         $sender = new Address('sender@example.com', 'Taylor Otwell');
-        $recipient = new Address('to@example.com', 'Acme');
-        $replyTo = new Address('reply@example.com', 'Reply Person');
+        $recipient = new Address('me@example.com', 'Acme');
+        $replyTo = new Address('taylor@example.com', 'Taylor Otwell');
 
         $message = new Email();
         $message->subject('Test subject');
@@ -169,7 +169,7 @@ class MailLettermintTransportTest extends TestCase
 
             return new MockResponse(json_encode([
                 'message_id' => 'lettermint-message-id',
-                'status' => 'queued',
+                'status' => 'pending',
             ]), ['http_code' => 202]);
         });
 
@@ -179,7 +179,7 @@ class MailLettermintTransportTest extends TestCase
         $message->subject('With attachments');
         $message->text('See attached');
         $message->sender('sender@example.com');
-        $message->to('to@example.com');
+        $message->to('me@example.com');
         $message->attach('file contents', 'document.txt', 'text/plain');
         $message->addPart((new DataPart('image-bytes', 'logo.png', 'image/png'))->asInline()->setContentId('logo@example.com'));
 
@@ -212,7 +212,7 @@ class MailLettermintTransportTest extends TestCase
         $message->subject('Fail');
         $message->text('Body');
         $message->sender('sender@example.com');
-        $message->to('to@example.com');
+        $message->to('me@example.com');
 
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage("The domain 'example.com' is not verified");
@@ -232,7 +232,7 @@ class MailLettermintTransportTest extends TestCase
         $message->subject('Fail');
         $message->text('Body');
         $message->sender('sender@example.com');
-        $message->to('to@example.com');
+        $message->to('me@example.com');
 
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Connection refused');
