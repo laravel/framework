@@ -9,6 +9,7 @@ use Illuminate\Contracts\Mail\Factory as FactoryContract;
 use Illuminate\Log\LogManager;
 use Illuminate\Mail\Transport\ArrayTransport;
 use Illuminate\Mail\Transport\CloudflareTransport;
+use Illuminate\Mail\Transport\LettermintTransport;
 use Illuminate\Mail\Transport\LogTransport;
 use Illuminate\Mail\Transport\ResendTransport;
 use Illuminate\Mail\Transport\SesTransport;
@@ -339,6 +340,25 @@ class MailManager implements FactoryContract
                 $config['key'] ??
                 $this->app['config']->get('services.cloudflare.token') ??
                 $this->app['config']->get('services.cloudflare.key'),
+            $this->getHttpClient($config),
+        );
+    }
+
+    /**
+     * Create an instance of the Lettermint transport driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Mail\Transport\LettermintTransport
+     */
+    protected function createLettermintTransport(array $config)
+    {
+        return new LettermintTransport(
+            $config['token'] ??
+                $config['key'] ??
+                $this->app['config']->get('services.lettermint.token') ??
+                $this->app['config']->get('services.lettermint.key'),
+            $config['route'] ??
+                $this->app['config']->get('services.lettermint.route'),
             $this->getHttpClient($config),
         );
     }
