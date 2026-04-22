@@ -3752,6 +3752,20 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testKeyByBackedEnum($collection)
+    {
+        $data = new $collection([
+            ['id' => 1, 'status' => TestStringBackedEnum::A],
+            ['id' => 2, 'status' => TestStringBackedEnum::B],
+        ]);
+
+        $this->assertEquals([
+            TestStringBackedEnum::A->value => ['id' => 1, 'status' => TestStringBackedEnum::A],
+            TestStringBackedEnum::B->value => ['id' => 2, 'status' => TestStringBackedEnum::B],
+        ], $data->keyBy('status')->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testKeyByClosure($collection)
     {
         $data = new $collection([

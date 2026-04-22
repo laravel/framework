@@ -17,7 +17,7 @@ class JsonFormatter extends MonologJsonFormatter
         try {
             $handler = Container::getInstance()->make(ExceptionHandler::class);
         } catch (Throwable) {
-            return $response;
+            return array_merge($this->getExceptionContext($e, $depth), $response);
         }
 
         if ((! method_exists($handler, 'isReporting')) || ! $handler->isReporting($e)) {
@@ -29,17 +29,30 @@ class JsonFormatter extends MonologJsonFormatter
                     $response
                 );
             } elseif (method_exists($e, 'context')) {
-                $exceptionContext = $this->normalize($e->context(), $depth + 1);
-
-                if (is_array($exceptionContext)) {
-                    $response = array_merge(
-                        $exceptionContext,
-                        $response
-                    );
-                }
+                $response = array_merge($this->getExceptionContext($e, $depth), $response);
             }
         }
 
         return $response;
+    }
+
+    /**
+     * Extract the context from the exception if available.
+     *
+     * @return array<array-key, mixed>
+     */
+    protected function getExceptionContext(Throwable $e, int $depth): array
+    {
+        if (! method_exists($e, 'context')) {
+            return [];
+        }
+
+        try {
+            $exceptionContext = $this->normalize($e->context(), $depth + 1);
+        } catch (Throwable) {
+            return [];
+        }
+
+        return is_array($exceptionContext) ? $exceptionContext : [];
     }
 }

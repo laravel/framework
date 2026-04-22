@@ -419,4 +419,19 @@ class RouteCollectionTest extends TestCase
             ],
         ], $this->routeCollection->getRoutesByMethod());
     }
+
+    public function testDomainRoutesAreMatchedBeforeNonDomainRoutes()
+    {
+        $this->routeCollection->add(
+            (new Route('GET', 'users', ['uses' => 'NoDomainController@index']))->name('no-domain')
+        );
+
+        $this->routeCollection->add(
+            (new Route('GET', 'users', ['uses' => 'DomainController@index']))->domain('api.test')->name('with-domain')
+        );
+
+        $request = Request::create('http://api.test/users', 'GET');
+
+        $this->assertSame('with-domain', $this->routeCollection->match($request)->getName());
+    }
 }
