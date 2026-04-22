@@ -1,6 +1,21 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.56.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.57.0...12.x)
+
+## [v12.57.0](https://github.com/laravel/framework/compare/v12.56.0...v12.57.0) - 2026-04-22
+
+* Preserve types on partialMock() and spy() by [@AJenbo](https://github.com/AJenbo) in https://github.com/laravel/framework/pull/59384
+* Fix missing UnitEnum support in ModelNotFoundException by [@jtheuerkauf](https://github.com/jtheuerkauf) in https://github.com/laravel/framework/pull/59423
+* [12.x] Fix macros with static closures by [@FeBe95](https://github.com/FeBe95) in https://github.com/laravel/framework/pull/59449
+* Correct Storage::fake() return type by [@AJenbo](https://github.com/AJenbo) in https://github.com/laravel/framework/pull/59469
+* [12.x] Fix callable type for freezeTime, freezeSecond, and travelTo by [@nbayramberdiyev](https://github.com/nbayramberdiyev) in https://github.com/laravel/framework/pull/59466
+* [12.x] Support string abstract in mock/partialMock/spy PHPDoc by [@kayw-geek](https://github.com/kayw-geek) in https://github.com/laravel/framework/pull/59477
+* Document thrown exceptions in FilesystemAdapter by [@AJenbo](https://github.com/AJenbo) in https://github.com/laravel/framework/pull/59534
+* Hint \Redis `@mixin` on Connection by [@AJenbo](https://github.com/AJenbo) in https://github.com/laravel/framework/pull/59532
+* [12.x] Use PDO subclass polyfill by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/59640
+* [12.x] Fix infinite rate limiter TTL on custom increments by [@paulandroshchuk](https://github.com/paulandroshchuk) in https://github.com/laravel/framework/pull/59693
+* [12.x] Support named credential providers for SQS queue connections by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/59754
+* [12.x] Prevent array to string conversion in signature validation by [@alies-dev](https://github.com/alies-dev) in https://github.com/laravel/framework/pull/59778
 
 ## [v12.56.0](https://github.com/laravel/framework/compare/v12.55.1...v12.56.0) - 2026-03-26
 
