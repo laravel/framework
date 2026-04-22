@@ -33,7 +33,7 @@ class PredisConnector implements Connector
             $config['host'] = Str::after($config['host'], 'tls://');
         }
 
-        return new PredisConnection(new Client($config, $formattedOptions));
+        return new PredisConnection(new Client($config, $formattedOptions), $config);
     }
 
     /**

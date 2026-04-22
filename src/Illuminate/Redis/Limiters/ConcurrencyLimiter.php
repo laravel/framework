@@ -185,7 +185,7 @@ LUA;
     protected function getPrefix()
     {
         if (is_null($this->prefix)) {
-            $this->prefix = $this->redis->isCluster() && ! Connection::hasHashTag($this->name)
+            $this->prefix = $this->redis->isClusterAware() && ! Connection::hasHashTag($this->name)
                 ? '{'.$this->name.'}'
                 : $this->name;
         }

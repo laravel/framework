@@ -25,6 +25,13 @@ abstract class Connection
     protected $client;
 
     /**
+     * The connection configuration array.
+     *
+     * @var array
+     */
+    protected $config = [];
+
+    /**
      * The Redis connection name.
      *
      * @var string|null
@@ -183,13 +190,36 @@ abstract class Connection
     }
 
     /**
-     * Determine if the connection is a cluster connection.
+     * Determine if the underlying client is a Redis Cluster client.
      *
      * @return bool
      */
     public function isCluster()
     {
         return false;
+    }
+
+    /**
+     * Determine if the connection should use cluster-safe key layouts.
+     *
+     * True for real cluster clients and for standalone connections with
+     * `cluster_aware: true` (e.g. ElastiCache Serverless, Upstash, DMC proxy).
+     *
+     * @return bool
+     */
+    public function isClusterAware()
+    {
+        return $this->isCluster() || (bool) ($this->config['cluster_aware'] ?? false);
+    }
+
+    /**
+     * Determine if the client routes a single multi-key command across slots.
+     *
+     * @return bool
+     */
+    public function supportsMultiSlotMultiKeyCommands()
+    {
+        return ! $this->isClusterAware();
     }
 
     /**

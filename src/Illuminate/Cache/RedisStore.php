@@ -5,9 +5,7 @@ namespace Illuminate\Cache;
 use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Redis\Factory as Redis;
-use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Redis\Connections\PhpRedisConnection;
-use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Redis\Connections\PredisConnection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
@@ -104,8 +102,7 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
 
         $connection = $this->connection();
 
-        // PredisClusterConnection does not support reading multiple values if the keys hash differently...
-        if ($connection instanceof PredisClusterConnection) {
+        if (! $connection->supportsMultiSlotMultiKeyCommands()) {
             return $this->manyAlias($keys);
         }
 
@@ -148,9 +145,7 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
     {
         $connection = $this->connection();
 
-        // Cluster connections do not support writing multiple values if the keys hash differently...
-        if ($connection instanceof PhpRedisClusterConnection ||
-            $connection instanceof PredisClusterConnection) {
+        if ($connection->isClusterAware()) {
             return $this->putManyAlias($values, $seconds);
         }
 

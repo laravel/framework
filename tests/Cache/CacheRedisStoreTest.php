@@ -29,6 +29,7 @@ class CacheRedisStoreTest extends TestCase
     {
         $redis = $this->getRedis();
         $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
+        $redis->getRedis()->shouldReceive('supportsMultiSlotMultiKeyCommands')->andReturn(true);
         $redis->getRedis()->shouldReceive('mget')->once()->with(['prefix:foo', 'prefix:fizz', 'prefix:norf', 'prefix:null'])
             ->andReturn([
                 serialize('bar'),
@@ -43,6 +44,21 @@ class CacheRedisStoreTest extends TestCase
         $this->assertSame('buzz', $results['fizz']);
         $this->assertSame('quz', $results['norf']);
         $this->assertNull($results['null']);
+    }
+
+    public function testManyFallsBackToPerKeyWhenMultiSlotMultiKeyUnsupported()
+    {
+        $redis = $this->getRedis();
+        $redis->getRedis()->shouldReceive('connection')->with('default')->andReturn($redis->getRedis());
+        $redis->getRedis()->shouldReceive('supportsMultiSlotMultiKeyCommands')->andReturn(false);
+        $redis->getRedis()->shouldNotReceive('mget');
+        $redis->getRedis()->shouldReceive('get')->once()->with('prefix:foo')->andReturn(serialize('bar'));
+        $redis->getRedis()->shouldReceive('get')->once()->with('prefix:baz')->andReturn(null);
+
+        $results = $redis->many(['foo', 'baz']);
+
+        $this->assertSame('bar', $results['foo']);
+        $this->assertNull($results['baz']);
     }
 
     public function testRedisValueIsReturnedForNumerics()
@@ -68,6 +84,7 @@ class CacheRedisStoreTest extends TestCase
         /** @var m\MockInterface $connection */
         $connection = $redis->getRedis();
         $connection->shouldReceive('connection')->with('default')->andReturn($redis->getRedis());
+        $connection->shouldReceive('isClusterAware')->andReturn(false);
         $connection->shouldReceive('multi')->once();
         $redis->getRedis()->shouldReceive('setex')->once()->with('prefix:foo', 60, serialize('bar'))->andReturn('OK');
         $redis->getRedis()->shouldReceive('setex')->once()->with('prefix:baz', 60, serialize('qux'))->andReturn('OK');
@@ -78,6 +95,24 @@ class CacheRedisStoreTest extends TestCase
             'foo' => 'bar',
             'baz' => 'qux',
             'bar' => 'norf',
+        ], 60);
+        $this->assertTrue($result);
+    }
+
+    public function testPutManyFallsBackToPerKeyOnClusterAwareStandalone()
+    {
+        $redis = $this->getRedis();
+        $connection = $redis->getRedis();
+        $connection->shouldReceive('connection')->with('default')->andReturn($redis->getRedis());
+        $connection->shouldReceive('isClusterAware')->andReturn(true);
+        $connection->shouldNotReceive('multi');
+        $connection->shouldNotReceive('exec');
+        $connection->shouldReceive('setex')->once()->with('prefix:foo', 60, serialize('bar'))->andReturn('OK');
+        $connection->shouldReceive('setex')->once()->with('prefix:baz', 60, serialize('qux'))->andReturn('OK');
+
+        $result = $redis->putMany([
+            'foo' => 'bar',
+            'baz' => 'qux',
         ], 60);
         $this->assertTrue($result);
     }

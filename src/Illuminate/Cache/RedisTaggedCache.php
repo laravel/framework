@@ -4,9 +4,7 @@ namespace Illuminate\Cache;
 
 use Illuminate\Cache\Events\CacheFlushed;
 use Illuminate\Cache\Events\CacheFlushing;
-use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Redis\Connections\PhpRedisConnection;
-use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Redis\Connections\PredisConnection;
 
 use function Illuminate\Support\enum_value;
@@ -124,8 +122,7 @@ class RedisTaggedCache extends TaggedCache
     {
         $connection = $this->store->connection();
 
-        if ($connection instanceof PredisClusterConnection ||
-            $connection instanceof PhpRedisClusterConnection) {
+        if ($connection->isClusterAware()) {
             return $this->flushClusteredConnection();
         }
 
@@ -206,7 +203,7 @@ class RedisTaggedCache extends TaggedCache
         $connection = $this->store->connection();
 
         foreach ($entries as $cacheKeys) {
-            if ($connection instanceof PredisClusterConnection) {
+            if (! $connection->supportsMultiSlotMultiKeyCommands()) {
                 $connection->pipeline(function ($connection) use ($cacheKeys) {
                     foreach ($cacheKeys as $cacheKey) {
                         $connection->del($cacheKey);

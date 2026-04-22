@@ -89,4 +89,15 @@ class PhpRedisClusterConnection extends PhpRedisConnection
     {
         return true;
     }
+
+    /**
+     * Determine if the client routes a single multi-key command across slots.
+     *
+     * @return bool
+     */
+    #[\Override]
+    public function supportsMultiSlotMultiKeyCommands()
+    {
+        return true;
+    }
 }

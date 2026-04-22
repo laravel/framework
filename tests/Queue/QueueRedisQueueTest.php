@@ -31,7 +31,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->setContainer($container = m::spy(Container::class));
         $redis->shouldReceive('connection')->atLeast()->once()->andReturn($redis);
-        $redis->shouldReceive('isCluster')->andReturn(false);
+        $redis->shouldReceive('isClusterAware')->andReturn(false);
         $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
 
         $id = $queue->push('foo', ['data']);
@@ -57,7 +57,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->setContainer($container = m::spy(Container::class));
         $redis->shouldReceive('connection')->atLeast()->once()->andReturn($redis);
-        $redis->shouldReceive('isCluster')->andReturn(false);
+        $redis->shouldReceive('isClusterAware')->andReturn(false);
         $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'custom' => 'taylor', 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
 
         Queue::createPayloadUsing(function ($connection, $queue, $payload) {
@@ -89,7 +89,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->setContainer($container = m::spy(Container::class));
         $redis->shouldReceive('connection')->atLeast()->once()->andReturn($redis);
-        $redis->shouldReceive('isCluster')->andReturn(false);
+        $redis->shouldReceive('isClusterAware')->andReturn(false);
         $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'custom' => 'taylor', 'bar' => 'foo', 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
 
         Queue::createPayloadUsing(function ($connection, $queue, $payload) {
@@ -127,7 +127,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('availableAt')->with(1)->willReturn(2);
 
         $redis->shouldReceive('connection')->atLeast()->once()->andReturn($redis);
-        $redis->shouldReceive('isCluster')->andReturn(false);
+        $redis->shouldReceive('isClusterAware')->andReturn(false);
         $redis->shouldReceive('eval')->once()->with(
             LuaScripts::later(),
             1,
@@ -160,7 +160,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('availableAt')->with($date)->willReturn(5);
 
         $redis->shouldReceive('connection')->atLeast()->once()->andReturn($redis);
-        $redis->shouldReceive('isCluster')->andReturn(false);
+        $redis->shouldReceive('isClusterAware')->andReturn(false);
         $redis->shouldReceive('eval')->once()->with(
             LuaScripts::later(),
             1,
@@ -197,7 +197,7 @@ class QueueRedisQueueTest extends TestCase
     {
         $queue = new TestableRedisQueue($redis = m::mock(Factory::class), 'default');
         $connection = m::mock(\Illuminate\Redis\Connections\Connection::class);
-        $connection->shouldReceive('isCluster')->andReturn(false);
+        $connection->shouldReceive('isClusterAware')->andReturn(false);
         $redis->shouldReceive('connection')->andReturn($connection);
 
         $this->assertSame('queues:default', $queue->testGetQueueRedisKey(null));
@@ -208,7 +208,7 @@ class QueueRedisQueueTest extends TestCase
     {
         $queue = new TestableRedisQueue($redis = m::mock(Factory::class), 'default');
         $connection = m::mock(PhpRedisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(true);
+        $connection->shouldReceive('isClusterAware')->andReturn(true);
         $redis->shouldReceive('connection')->andReturn($connection);
 
         $this->assertSame('queues:{default}', $queue->testGetQueueRedisKey(null));
@@ -219,7 +219,7 @@ class QueueRedisQueueTest extends TestCase
     {
         $queue = new TestableRedisQueue($redis = m::mock(Factory::class), 'default');
         $connection = m::mock(PredisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(true);
+        $connection->shouldReceive('isClusterAware')->andReturn(true);
         $redis->shouldReceive('connection')->andReturn($connection);
 
         $this->assertSame('queues:{default}', $queue->testGetQueueRedisKey(null));
@@ -230,7 +230,7 @@ class QueueRedisQueueTest extends TestCase
     {
         $queue = new TestableRedisQueue($redis = m::mock(Factory::class), '{default}');
         $connection = m::mock(PhpRedisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(true);
+        $connection->shouldReceive('isClusterAware')->andReturn(true);
         $redis->shouldReceive('connection')->andReturn($connection);
 
         $this->assertSame('queues:{default}', $queue->testGetQueueRedisKey(null));
@@ -241,7 +241,7 @@ class QueueRedisQueueTest extends TestCase
     {
         $queue = new TestableRedisQueue($redis = m::mock(Factory::class), 'default');
         $connection = m::mock(PhpRedisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(true);
+        $connection->shouldReceive('isClusterAware')->andReturn(true);
         $redis->shouldReceive('connection')->andReturn($connection);
 
         // Queue name already contains hash tags — skip wrapping
@@ -252,7 +252,7 @@ class QueueRedisQueueTest extends TestCase
     {
         $queue = new TestableRedisQueue($redis = m::mock(Factory::class), 'default');
         $connection = m::mock(PhpRedisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(true);
+        $connection->shouldReceive('isClusterAware')->andReturn(true);
         $redis->shouldReceive('connection')->andReturn($connection);
 
         // Empty braces '{}' are not a valid hash tag — should still get wrapped
@@ -263,7 +263,7 @@ class QueueRedisQueueTest extends TestCase
     {
         $queue = new TestableRedisQueue($redis = m::mock(Factory::class), 'default');
         $connection = m::mock(PhpRedisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(true);
+        $connection->shouldReceive('isClusterAware')->andReturn(true);
         $redis->shouldReceive('connection')->andReturn($connection);
 
         // Unmatched '{' is not a valid hash tag — should still get wrapped
@@ -274,7 +274,7 @@ class QueueRedisQueueTest extends TestCase
     {
         $queue = new TestableRedisQueue($redis = m::mock(Factory::class), 'default');
         $connection = m::mock(PhpRedisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(true);
+        $connection->shouldReceive('isClusterAware')->andReturn(true);
         $redis->shouldReceive('connection')->andReturn($connection);
 
         // Unmatched '}' is not a valid hash tag — should still get wrapped
@@ -285,7 +285,7 @@ class QueueRedisQueueTest extends TestCase
     {
         $queue = new TestableRedisQueue($redis = m::mock(Factory::class), 'default');
         $connection = m::mock(PhpRedisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(true);
+        $connection->shouldReceive('isClusterAware')->andReturn(true);
         $redis->shouldReceive('connection')->andReturn($connection);
 
         // Redis spec: the first '{}' is an empty hash tag, so the whole key is hashed
@@ -309,7 +309,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->setContainer($container = m::spy(Container::class));
 
         $clusterConnection = m::mock(PhpRedisClusterConnection::class)->shouldIgnoreMissing();
-        $clusterConnection->shouldReceive('isCluster')->andReturn(true);
+        $clusterConnection->shouldReceive('isClusterAware')->andReturn(true);
         $redis->shouldReceive('connection')->andReturn($clusterConnection);
 
         // command() is called by eval() — assert it receives hash-tagged keys
@@ -342,7 +342,7 @@ class QueueRedisQueueTest extends TestCase
         $queue->setContainer($container = m::spy(Container::class));
 
         $clusterConnection = m::mock(PhpRedisClusterConnection::class)->shouldIgnoreMissing();
-        $clusterConnection->shouldReceive('isCluster')->andReturn(true);
+        $clusterConnection->shouldReceive('isClusterAware')->andReturn(true);
         $redis->shouldReceive('connection')->andReturn($clusterConnection);
 
         $receivedQueue = null;
@@ -366,7 +366,7 @@ class QueueRedisQueueTest extends TestCase
     {
         $queue = new RedisQueue($redis = m::mock(Factory::class), 'default');
         $clusterConnection = m::mock(PhpRedisClusterConnection::class)->shouldIgnoreMissing();
-        $clusterConnection->shouldReceive('isCluster')->andReturn(true);
+        $clusterConnection->shouldReceive('isClusterAware')->andReturn(true);
         $redis->shouldReceive('connection')->andReturn($clusterConnection);
 
         $clusterConnection->shouldReceive('command')->once()->with('eval', m::on(function ($args) {
@@ -384,7 +384,7 @@ class QueueRedisQueueTest extends TestCase
     {
         $queue = new RedisQueue($redis = m::mock(Factory::class), 'default');
         $clusterConnection = m::mock(PhpRedisClusterConnection::class)->shouldIgnoreMissing();
-        $clusterConnection->shouldReceive('isCluster')->andReturn(true);
+        $clusterConnection->shouldReceive('isClusterAware')->andReturn(true);
         $redis->shouldReceive('connection')->andReturn($clusterConnection);
 
         $clusterConnection->shouldReceive('command')->once()->with('eval', m::on(function ($args) {
@@ -399,17 +399,17 @@ class QueueRedisQueueTest extends TestCase
         $this->assertSame(3, $queue->clear('default'));
     }
 
-    public function testIsClusterConnectionCachesResult()
+    public function testIsClusterAwareConnectionCachesResult()
     {
         $queue = new TestableRedisQueue($redis = m::mock(Factory::class), 'default');
         $connection = m::mock(PhpRedisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->once()->andReturn(true);
+        $connection->shouldReceive('isClusterAware')->once()->andReturn(true);
         $redis->shouldReceive('connection')->once()->andReturn($connection);
 
         // Multiple calls should only trigger one connection() call
-        $this->assertTrue($queue->testIsClusterConnection());
-        $this->assertTrue($queue->testIsClusterConnection());
-        $this->assertTrue($queue->testIsClusterConnection());
+        $this->assertTrue($queue->testIsClusterAwareConnection());
+        $this->assertTrue($queue->testIsClusterAwareConnection());
+        $this->assertTrue($queue->testIsClusterAwareConnection());
     }
 }
 
@@ -420,8 +420,8 @@ class TestableRedisQueue extends RedisQueue
         return $this->getQueueRedisKey($queue);
     }
 
-    public function testIsClusterConnection()
+    public function testIsClusterAwareConnection()
     {
-        return $this->isClusterConnection();
+        return $this->isClusterAwareConnection();
     }
 }

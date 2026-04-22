@@ -245,8 +245,11 @@ class RedisStoreTest extends TestCase
 
     public function testPutManyCallsPutWhenClustered()
     {
+        $connection = m::mock(PhpRedisClusterConnection::class);
+        $connection->expects('isClusterAware')->andReturn(true);
+
         $store = m::mock(RedisStore::class)->makePartial();
-        $store->expects('connection')->andReturn(m::mock(PhpRedisClusterConnection::class));
+        $store->expects('connection')->andReturn($connection);
         $store->expects('put')
             ->twice()
             ->andReturn(true);

@@ -69,11 +69,11 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     protected $secondaryQueueHadJob = false;
 
     /**
-     * Indicates if the connection is a Redis Cluster connection.
+     * Indicates if the connection should use cluster-safe key layouts.
      *
      * @var bool|null
      */
-    protected $isCluster = null;
+    protected $isClusterAware = null;
 
     /**
      * Create a new Redis queue instance.
@@ -506,7 +506,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     {
         $queue = $queue ?: $this->default;
 
-        return $this->isClusterConnection() && ! Connection::hasHashTag($queue)
+        return $this->isClusterAwareConnection() && ! Connection::hasHashTag($queue)
             ? $this->getQueue('{'.$queue.'}')
             : $this->getQueue($queue);
     }
@@ -522,13 +522,13 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Determine if the connection is a Redis Cluster connection.
+     * Determine if the connection should use cluster-safe key layouts.
      *
      * @return bool
      */
-    protected function isClusterConnection()
+    protected function isClusterAwareConnection()
     {
-        return $this->isCluster ??= $this->getConnection()->isCluster();
+        return $this->isClusterAware ??= $this->getConnection()->isClusterAware();
     }
 
     /**

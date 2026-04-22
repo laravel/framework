@@ -23,13 +23,6 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     protected $connector;
 
     /**
-     * The connection configuration array.
-     *
-     * @var array
-     */
-    protected $config;
-
-    /**
      * Create a new PhpRedis connection.
      *
      * @param  \Redis  $client

@@ -15,7 +15,7 @@ class ConcurrencyLimiterTest extends TestCase
     public function testAcquireUsesHashTagsOnPhpRedisClusterConnection()
     {
         $connection = m::mock(PhpRedisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(true);
+        $connection->shouldReceive('isClusterAware')->andReturn(true);
 
         // acquire() calls eval → command('eval', ...) with the lock script
         $connection->shouldReceive('command')->once()->with('eval', m::on(function ($args) {
@@ -44,7 +44,7 @@ class ConcurrencyLimiterTest extends TestCase
     public function testAcquireUsesPlainKeysOnNonClusterConnection()
     {
         $connection = m::mock(PhpRedisConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(false);
+        $connection->shouldReceive('isClusterAware')->andReturn(false);
 
         $connection->shouldReceive('command')->once()->with('eval', m::on(function ($args) {
             return str_contains($args[0], 'mget')
@@ -70,7 +70,7 @@ class ConcurrencyLimiterTest extends TestCase
     public function testAcquireUsesHashTagsOnPredisClusterConnection()
     {
         $connection = m::mock(PredisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(true);
+        $connection->shouldReceive('isClusterAware')->andReturn(true);
 
         $connection->shouldReceive('eval')->once()->with(
             m::on(fn ($s) => str_contains($s, 'mget')),
@@ -96,7 +96,7 @@ class ConcurrencyLimiterTest extends TestCase
     public function testReleaseKeyMatchesAcquireKeyOnCluster()
     {
         $connection = m::mock(PhpRedisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(true);
+        $connection->shouldReceive('isClusterAware')->andReturn(true);
 
         // Acquire returns the slot key
         $connection->shouldReceive('command')->once()->with('eval', m::on(function ($args) {
@@ -118,7 +118,7 @@ class ConcurrencyLimiterTest extends TestCase
     public function testAcquireDoesNotDoubleWrapPreExistingHashTags()
     {
         $connection = m::mock(PhpRedisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(true);
+        $connection->shouldReceive('isClusterAware')->andReturn(true);
 
         // Name already has hash tags — should NOT be double-wrapped
         $connection->shouldReceive('command')->once()->with('eval', m::on(function ($args) {
@@ -144,7 +144,7 @@ class ConcurrencyLimiterTest extends TestCase
     public function testAcquireWrapsUnmatchedBraceOnCluster()
     {
         $connection = m::mock(PhpRedisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(true);
+        $connection->shouldReceive('isClusterAware')->andReturn(true);
 
         // Name has '{' but no '}' — not a valid hash tag, should be wrapped
         $connection->shouldReceive('command')->once()->with('eval', m::on(function ($args) {
@@ -170,7 +170,7 @@ class ConcurrencyLimiterTest extends TestCase
     public function testAcquireWrapsEmptyBracesOnCluster()
     {
         $connection = m::mock(PhpRedisClusterConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(true);
+        $connection->shouldReceive('isClusterAware')->andReturn(true);
 
         // Name has '{}' but that's an empty hash tag — should be wrapped
         $connection->shouldReceive('command')->once()->with('eval', m::on(function ($args) {
@@ -196,7 +196,7 @@ class ConcurrencyLimiterTest extends TestCase
     public function testAcquireUsesPlainKeysOnPredisNonClusterConnection()
     {
         $connection = m::mock(PredisConnection::class);
-        $connection->shouldReceive('isCluster')->andReturn(false);
+        $connection->shouldReceive('isClusterAware')->andReturn(false);
 
         $connection->shouldReceive('eval')->once()->with(
             m::on(fn ($s) => str_contains($s, 'mget')),
