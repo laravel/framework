@@ -2,15 +2,17 @@
 
 {!! $exception->message() !!}
 
-PHP {{ PHP_VERSION }}
-Laravel {{ app()->version() }}
-{{ $exception->request()->httpHost() }}
+PHP `{{ PHP_VERSION }}`  
+Laravel `{{ app()->version() }}`  
+`{{ $exception->request()->httpHost() }}`
 
 ## Stack Trace
 
+```
 @foreach($exception->frames() as $index => $frame)
 {{ $index }} - {{ $frame->file() }}:{{ $frame->line() }}
 @endforeach
+```
 
 @if ($exception->previousExceptions()->isNotEmpty())
 ## Previous {{ \Illuminate\Support\Str::plural('exception', $exception->previousExceptions()->count()) }}
@@ -20,20 +22,22 @@ Laravel {{ app()->version() }}
 
 {!! $previous->message() !!}
 
+```
 @foreach($previous->frames() as $index => $frame)
 {{ $index }} - {{ $frame->file() }}:{{ $frame->line() }}
 @endforeach
+```
 @endforeach
 @endif
 
 ## Request
 
-{{ $exception->request()->method() }} {{ \Illuminate\Support\Str::start($exception->request()->path(), '/') }}
+`{{ $exception->request()->method() }} {{ \Illuminate\Support\Str::start($exception->request()->path(), '/') }}`
 
 ## Headers
 
 @forelse ($exception->requestHeaders() as $key => $value)
-* **{{ $key }}**: {!! $value !!}
+* **{{ $key }}**: `{!! $value !!}`
 @empty
 No header data available.
 @endforelse
@@ -41,7 +45,7 @@ No header data available.
 ## Route Context
 
 @forelse($exception->applicationRouteContext() as $name => $value)
-{{ $name }}: {!! $value !!}
+{{ \Illuminate\Support\Str::headline($name) }}: `{!! $value !!}`  
 @empty
 No routing data available.
 @endforelse
@@ -57,7 +61,9 @@ No route parameter data available.
 ## Database Queries
 
 @forelse ($exception->applicationQueries() as ['connectionName' => $connectionName, 'sql' => $sql, 'time' => $time])
-* {{ $connectionName }} - {!! $sql !!} ({{ $time }} ms)
+```sql
+{{ $connectionName }} - {!! $sql !!} ({{ $time }} ms)
+```
 @empty
 No database queries detected.
 @endforelse
