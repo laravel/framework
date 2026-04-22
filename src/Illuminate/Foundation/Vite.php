@@ -1082,8 +1082,13 @@ class Vite implements Htmlable
 
         $fonts->ensureValidPreloads($preloads, $isHot);
 
-        $html = $this->renderFontPreloads($preloads);
-        $html .= $this->renderFontStyle($manifest, $aliases);
+        $preloadsHtml = $this->renderFontPreloads($preloads);
+        $styleHtml = $this->renderFontStyle($manifest, $aliases);
+
+        $html = match (true) {
+            $preloadsHtml !== '' && $styleHtml !== '' => $preloadsHtml."\n".$styleHtml,
+            default => $preloadsHtml.$styleHtml,
+        };
 
         return new HtmlString($html);
     }
@@ -1096,7 +1101,7 @@ class Vite implements Htmlable
      */
     protected function renderFontPreloads($preloads)
     {
-        $html = '';
+        $tags = [];
 
         foreach ($preloads as $preload) {
             $url = $preload['url'] ?? $this->assetPath($this->buildDirectory.'/'.$preload['file']);
@@ -1115,10 +1120,10 @@ class Vite implements Htmlable
                 (new Collection($attributes))->forget('href')->all()
             );
 
-            $html .= '<link '.implode(' ', $this->parseAttributes($attributes)).' />';
+            $tags[] = '<link '.implode(' ', $this->parseAttributes($attributes)).' />';
         }
 
-        return $html;
+        return implode("\n", $tags);
     }
 
     /**
@@ -1171,7 +1176,7 @@ class Vite implements Htmlable
 
         $attributeString = $attributes ? ' '.implode(' ', $attributes) : '';
 
-        return "<style{$attributeString}>{$css}</style>";
+        return "<style{$attributeString}>\n".trim($css, "\n")."\n</style>";
     }
 
     /**

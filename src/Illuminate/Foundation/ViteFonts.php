@@ -60,11 +60,25 @@ class ViteFonts
      * @param  array{inline?: string, file?: string, familyStyles?: array<string, string>, variables?: array<string, string>}  $style
      * @param  list<string>  $aliases
      * @return string
+     *
+     * @throws \Illuminate\Foundation\ViteException
      */
     protected function resolveFilteredStyleContent(array $style, array $aliases)
     {
         $familyStyles = $style['familyStyles'] ?? [];
         $variables = $style['variables'] ?? [];
+
+        if (! is_array($familyStyles)) {
+            throw new ViteException(
+                'The font manifest [style.familyStyles] must be an object keyed by alias; the manifest was likely produced by an incompatible plugin version.'
+            );
+        }
+
+        if (! is_array($variables)) {
+            throw new ViteException(
+                'The font manifest [style.variables] must be an object keyed by alias; the manifest was likely produced by an incompatible plugin version.'
+            );
+        }
 
         $parts = [];
 

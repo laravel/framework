@@ -62,7 +62,7 @@ class FoundationViteFontsTest extends TestCase
             $result->toHtml()
         );
         $this->assertStringContainsString(
-            "<style>@font-face { font-family: 'Inter'; src: url('../fonts/inter-400.woff2') format('woff2'); }</style>",
+            "<style>\n@font-face { font-family: 'Inter'; src: url('../fonts/inter-400.woff2') format('woff2'); }\n</style>",
             $result->toHtml()
         );
     }
@@ -94,7 +94,7 @@ class FoundationViteFontsTest extends TestCase
             $result->toHtml()
         );
         $this->assertStringContainsString(
-            "<style>@font-face { font-family: 'Inter'; src: url('http://localhost:3000/fonts/inter.woff2'); }</style>",
+            "<style>\n@font-face { font-family: 'Inter'; src: url('http://localhost:3000/fonts/inter.woff2'); }\n</style>",
             $result->toHtml()
         );
     }
@@ -509,6 +509,133 @@ class FoundationViteFontsTest extends TestCase
         $this->assertStringContainsString('inter-700.woff2', $result);
     }
 
+    public function testFontsRendersEachPreloadLinkOnItsOwnLine()
+    {
+        $this->makeFontsManifest([
+            'version' => 1,
+            'style' => ['inline' => ''],
+            'preloads' => [
+                [
+                    'alias' => 'sans',
+                    'family' => 'Inter',
+                    'weight' => 400,
+                    'style' => 'normal',
+                    'file' => 'assets/inter-400.woff2',
+                    'as' => 'font',
+                    'type' => 'font/woff2',
+                    'crossorigin' => 'anonymous',
+                ],
+                [
+                    'alias' => 'sans',
+                    'family' => 'Inter',
+                    'weight' => 700,
+                    'style' => 'normal',
+                    'file' => 'assets/inter-700.woff2',
+                    'as' => 'font',
+                    'type' => 'font/woff2',
+                    'crossorigin' => 'anonymous',
+                ],
+            ],
+            'families' => [
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
+            ],
+        ]);
+
+        $result = app(Vite::class)->fonts()->toHtml();
+
+        $this->assertStringContainsString("/>\n<link", $result);
+        $this->assertStringNotContainsString('/><link', $result);
+    }
+
+    public function testFontsRendersStyleTagOnItsOwnLines()
+    {
+        $this->makeFontsManifest();
+        $this->makeFontsCssFile('build', 'assets/fonts-abc123.css', "@font-face { font-family: 'Inter'; }");
+
+        $result = app(Vite::class)->fonts()->toHtml();
+
+        $this->assertMatchesRegularExpression('/<style>\n@font-face \{ font-family: \'Inter\'; \}\n<\/style>/', $result);
+    }
+
+    public function testFontsPutsANewlineBetweenTheLastPreloadAndTheStyleBlock()
+    {
+        $this->makeFontsManifest();
+        $this->makeFontsCssFile('build', 'assets/fonts-abc123.css', "@font-face { font-family: 'Inter'; }");
+
+        $result = app(Vite::class)->fonts()->toHtml();
+
+        $this->assertMatchesRegularExpression('/\/>\n<style>/', $result);
+    }
+
+    public function testFontsThrowsContractExceptionWhenStyleVariablesIsAString()
+    {
+        $this->makeFontsManifest([
+            'version' => 1,
+            'style' => [
+                'file' => 'assets/fonts-abc123.css',
+                'familyStyles' => [
+                    'sans' => "@font-face { font-family: 'Inter'; }",
+                ],
+                'variables' => ":root {\n  --font-sans: \"Inter\";\n}",
+            ],
+            'preloads' => [],
+            'families' => [
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
+            ],
+        ]);
+        $this->makeFontsCssFile('build', 'assets/fonts-abc123.css', "@font-face { font-family: 'Inter'; }");
+
+        $this->expectException(ViteException::class);
+        $this->expectExceptionMessage('keyed by alias');
+
+        app(Vite::class)->fonts(['sans']);
+    }
+
+    public function testFontsThrowsContractExceptionWhenStyleFamilyStylesIsAString()
+    {
+        $this->makeFontsManifest([
+            'version' => 1,
+            'style' => [
+                'file' => 'assets/fonts-abc123.css',
+                'familyStyles' => "@font-face { font-family: 'Inter'; }",
+                'variables' => ['sans' => '--font-sans: "Inter";'],
+            ],
+            'preloads' => [],
+            'families' => [
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
+            ],
+        ]);
+        $this->makeFontsCssFile('build', 'assets/fonts-abc123.css', "@font-face { font-family: 'Inter'; }");
+
+        $this->expectException(ViteException::class);
+        $this->expectExceptionMessage('keyed by alias');
+
+        app(Vite::class)->fonts(['sans']);
+    }
+
+    public function testFontsDoesNotCheckVariablesShapeWhenNoAliasFilterIsGiven()
+    {
+        $this->makeFontsManifest([
+            'version' => 1,
+            'style' => [
+                'file' => 'assets/fonts-abc123.css',
+                'familyStyles' => [
+                    'sans' => "@font-face { font-family: 'Inter'; }",
+                ],
+                'variables' => 'legacy-string-payload',
+            ],
+            'preloads' => [],
+            'families' => [
+                'sans' => ['family' => 'Inter', 'variable' => '--font-sans'],
+            ],
+        ]);
+        $this->makeFontsCssFile('build', 'assets/fonts-abc123.css', "@font-face { font-family: 'Inter'; }");
+
+        $result = app(Vite::class)->fonts()->toHtml();
+
+        $this->assertStringContainsString("@font-face { font-family: 'Inter'; }", $result);
+    }
+
     public function testFontsOutputIsDeterministic()
     {
         $this->makeFontsManifest();
@@ -537,7 +664,7 @@ class FoundationViteFontsTest extends TestCase
         $result = app(Vite::class)->fonts()->toHtml();
 
         $this->assertStringNotContainsString('<link', $result);
-        $this->assertStringContainsString("<style>@font-face { font-family: 'Inter'; }</style>", $result);
+        $this->assertStringContainsString("<style>\n@font-face { font-family: 'Inter'; }\n</style>", $result);
     }
 
     public function testFontsWithNoStyleStillRendersPreloads()
