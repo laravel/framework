@@ -1123,14 +1123,24 @@ class Route
         ];
 
         if (is_a($controllerClass, HasMiddleware::class, true)) {
-            return $this->staticallyProvidedControllerMiddleware(
-                $controllerClass, $controllerMethod
+            return array_merge(
+                $this->staticallyProvidedControllerMiddleware(
+                    $controllerClass, $controllerMethod
+                ),
+                $this->attributeProvidedControllerMiddleware(
+                    $controllerClass, $controllerMethod
+                ),
             );
         }
 
         if (method_exists($controllerClass, 'getMiddleware')) {
-            return $this->controllerDispatcher()->getMiddleware(
-                $this->getController(), $controllerMethod
+            return array_merge(
+                $this->controllerDispatcher()->getMiddleware(
+                    $this->getController(), $controllerMethod
+                ),
+                $this->attributeProvidedControllerMiddleware(
+                    $controllerClass, $controllerMethod
+                ),
             );
         }
 
