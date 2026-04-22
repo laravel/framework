@@ -895,6 +895,37 @@ class Arr
     }
 
     /**
+     * Get the median of a given key.
+     *
+     * @param  array  $array
+     * @param  string|array|null  $key
+     * @return float|int|null
+     */
+    public static function median($array, $key = null)
+    {
+        $values = array_values(array_filter(
+            isset($key) ? array_map(fn ($item) => data_get($item, $key), $array) : $array,
+            fn ($item) => ! is_null($item)
+        ));
+
+        sort($values);
+
+        $count = count($values);
+
+        if ($count === 0) {
+            return null;
+        }
+
+        $middle = intdiv($count, 2);
+
+        if ($count % 2) {
+            return $values[$middle];
+        }
+
+        return ($values[$middle - 1] + $values[$middle]) / 2;
+    }
+
+    /**
      * Push an item onto the beginning of an array.
      *
      * @param  array  $array

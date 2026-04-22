@@ -1145,6 +1145,18 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['1-a-0', '2-b-1'], $result);
     }
 
+    public function testMedian()
+    {
+        $this->assertSame(1.5, Arr::median([1, 2]));
+        $this->assertEquals(2, Arr::median([1, 2, 3]));
+        $this->assertSame(1.5, Arr::median([1, null, 2]));
+        $this->assertNull(Arr::median([]));
+        $this->assertNull(Arr::median([null, null]));
+        $this->assertSame(1.5, Arr::median([['foo' => 1], ['foo' => 2]], 'foo'));
+        $this->assertEquals(2, Arr::median([['foo' => 1], ['foo' => 2], ['foo' => 3]], 'foo'));
+        $this->assertSame(1.5, Arr::median([['foo' => 1], ['foo' => null], ['foo' => 2]], 'foo'));
+    }
+
     #[IgnoreDeprecations]
     public function testPrepend()
     {
