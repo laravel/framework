@@ -7,6 +7,7 @@ use Aws\Sqs\SqsClient;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Queue\QueueRoutes;
 use Illuminate\Queue\SqsQueue;
@@ -42,8 +43,18 @@ class QueueSqsQueueTest extends TestCase
     protected $mockedReceiveEmptyMessageResponseModel;
     protected $mockedQueueAttributesResponseModel;
 
+    protected function tearDown(): void
+    {
+        Container::setInstance();
+
+        parent::tearDown();
+    }
+
     protected function setUp(): void
     {
+        Container::setInstance($container = new Container);
+        $container->instance(Cache::class, m::mock(Cache::class));
+
         // Use Mockery to mock the SqsClient
         $this->sqs = m::mock(SqsClient::class);
 
