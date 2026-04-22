@@ -7,11 +7,13 @@ use Illuminate\Bus\BatchRepository;
 use Illuminate\Bus\ChainedBatch;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
+use Illuminate\Queue\Attributes\DebounceFor;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
+use ReflectionClass;
 use RuntimeException;
 
 class BusFake implements Fake, QueueingDispatcher
@@ -552,6 +554,64 @@ class BusFake implements Fake, QueueingDispatcher
     {
         $this->assertNothingDispatched();
         $this->assertNothingBatched();
+    }
+
+    /**
+     * Assert if a job was dispatched with the DebounceFor attribute.
+     *
+     * @param  string|\Closure  $command
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public function assertDispatchedWithDebounce($command, $callback = null)
+    {
+        if ($command instanceof Closure) {
+            [$command, $callback] = [$this->firstClosureParameterType($command), $command];
+        }
+
+        PHPUnit::assertTrue(
+            $this->dispatchedWithDebounce($command, $callback)->count() > 0,
+            "The expected [{$command}] job was not dispatched with debounce."
+        );
+    }
+
+    /**
+     * Assert if a job was not dispatched with the DebounceFor attribute.
+     *
+     * @param  string|\Closure  $command
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public function assertNotDispatchedWithDebounce($command, $callback = null)
+    {
+        if ($command instanceof Closure) {
+            [$command, $callback] = [$this->firstClosureParameterType($command), $command];
+        }
+
+        PHPUnit::assertFalse(
+            $this->dispatchedWithDebounce($command, $callback)->count() > 0,
+            "The unexpected [{$command}] job was dispatched with debounce."
+        );
+    }
+
+    /**
+     * Get all of the debounced jobs matching a truth-test callback.
+     *
+     * @param  string  $command
+     * @param  callable|null  $callback
+     * @return \Illuminate\Support\Collection
+     */
+    public function dispatchedWithDebounce(string $command, $callback = null)
+    {
+        if (! $this->hasDispatched($command)) {
+            return new Collection;
+        }
+
+        $callback = $callback ?: fn () => true;
+
+        return (new Collection($this->commands[$command]))->filter(function ($command) use ($callback) {
+            return ! empty((new ReflectionClass($command))->getAttributes(DebounceFor::class)) && $callback($command);
+        });
     }
 
     /**

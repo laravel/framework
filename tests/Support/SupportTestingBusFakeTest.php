@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
+use Illuminate\Queue\Attributes\DebounceFor;
 use Illuminate\Support\Testing\Fakes\BatchRepositoryFake;
 use Illuminate\Support\Testing\Fakes\BusFake;
 use Illuminate\Support\Testing\Fakes\PendingBatchFake;
@@ -1016,6 +1017,50 @@ class SupportTestingBusFakeTest extends TestCase
             $this->assertStringContainsString('The expected batch was not dispatched.', $e->getMessage());
         }
     }
+
+    public function testAssertDispatchedWithDebounce()
+    {
+        try {
+            $this->fake->assertDispatchedWithDebounce(DebouncedBusJobStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\DebouncedBusJobStub] job was not dispatched with debounce.', $e->getMessage());
+        }
+
+        $this->fake->dispatch(new DebouncedBusJobStub);
+
+        $this->fake->assertDispatchedWithDebounce(DebouncedBusJobStub::class);
+    }
+
+    public function testAssertDispatchedWithDebounceWithClosure()
+    {
+        $this->fake->dispatch(new DebouncedBusJobStub);
+
+        $this->fake->assertDispatchedWithDebounce(function (DebouncedBusJobStub $job) {
+            return true;
+        });
+    }
+
+    public function testAssertNotDispatchedWithDebounce()
+    {
+        $this->fake->dispatch(new BusJobStub);
+
+        $this->fake->assertNotDispatchedWithDebounce(BusJobStub::class);
+
+        $this->fake->dispatch(new DebouncedBusJobStub);
+
+        try {
+            $this->fake->assertNotDispatchedWithDebounce(DebouncedBusJobStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The unexpected [Illuminate\Tests\Support\DebouncedBusJobStub] job was dispatched with debounce.', $e->getMessage());
+        }
+    }
+
+    public function testAssertNotDispatchedWithDebounceWhenNothingDispatched()
+    {
+        $this->fake->assertNotDispatchedWithDebounce(DebouncedBusJobStub::class);
+    }
 }
 
 class BusJobStub
@@ -1067,4 +1112,10 @@ class BusFakeJobWithSerialization
     {
         $this->value = $data['value'].'-unserialized';
     }
+}
+
+#[DebounceFor(5)]
+class DebouncedBusJobStub
+{
+    use Queueable;
 }
