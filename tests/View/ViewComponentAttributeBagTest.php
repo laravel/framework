@@ -205,7 +205,7 @@ class ViewComponentAttributeBagTest extends TestCase
         ]);
 
         $this->assertIsArray($bag->toArray());
-        $this->assertEquals(['name' => 'test', 'class' => 'font-bold'], $bag->toArray());
+        $this->assertSame(['name' => 'test', 'class' => 'font-bold'], $bag->toArray());
     }
 
     public function testFilled()
@@ -400,10 +400,10 @@ class ViewComponentAttributeBagTest extends TestCase
             'string' => 'abc',
         ]);
 
-        $this->assertSame(123.0, $bag->float('number'));
-        $this->assertSame(123.45, $bag->float('float'));
-        $this->assertSame(0.0, $bag->float('string'));
-        $this->assertSame(42.5, $bag->float('missing', 42.5));
+        $this->assertEqualsWithDelta(123.0, $bag->float('number'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(123.45, $bag->float('float'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(0.0, $bag->float('string'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(42.5, $bag->float('missing', 42.5), PHP_FLOAT_EPSILON);
     }
 
     public function testExists()

@@ -42,6 +42,7 @@ class EloquentPushTest extends DatabaseTestCase
         $user->name = 'Test 1';
         $user->posts[0]->title = 'Test title 1';
         $user->posts[0]->comments[0]->comment = 'Test comment 1';
+        $this->assertInstanceOf(UserX::class, $user);
         $user->push();
 
         $this->assertSame(1, UserX::count());

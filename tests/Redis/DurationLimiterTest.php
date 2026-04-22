@@ -46,7 +46,7 @@ class DurationLimiterTest extends TestCase
             $this->assertInstanceOf(LimiterTimeoutException::class, $e);
         }
 
-        $this->assertEquals([1, 2], $store);
+        $this->assertSame([1, 2], $store);
 
         sleep(2);
 
@@ -54,7 +54,7 @@ class DurationLimiterTest extends TestCase
             $store[] = 3;
         });
 
-        $this->assertEquals([1, 2, 3], $store);
+        $this->assertSame([1, 2, 3], $store);
     }
 
     public function testItFailsImmediatelyOrRetriesForAWhileBasedOnAGivenTimeout()
@@ -77,7 +77,7 @@ class DurationLimiterTest extends TestCase
             $store[] = 3;
         });
 
-        $this->assertEquals([1, 3], $store);
+        $this->assertSame([1, 3], $store);
     }
 
     public function testItReturnsTheCallbackResult()

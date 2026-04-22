@@ -17,7 +17,7 @@ class ViewEngineResolverTest extends TestCase
         });
         $result = $resolver->resolve('foo');
 
-        $this->assertEquals(spl_object_hash($result), spl_object_hash($resolver->resolve('foo')));
+        $this->assertSame(spl_object_hash($result), spl_object_hash($resolver->resolve('foo')));
     }
 
     public function testResolverThrowsExceptionOnUnknownEngine()

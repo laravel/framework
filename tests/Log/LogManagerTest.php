@@ -91,8 +91,8 @@ class LogManagerTest extends TestCase
         $this->assertInstanceOf(StreamHandler::class, $handlers[0]);
         $this->assertInstanceOf(PsrLogMessageProcessor::class, $logger->getLogger()->getProcessors()[2]);
         $this->assertInstanceOf(StreamHandler::class, $handlers[1]);
-        $this->assertEquals(Level::Notice, $handlers[0]->getLevel());
-        $this->assertEquals(Level::Info, $handlers[1]->getLevel());
+        $this->assertSame(Level::Notice, $handlers[0]->getLevel());
+        $this->assertSame(Level::Info, $handlers[1]->getLevel());
         $this->assertFalse($handlers[0]->getBubble());
         $this->assertTrue($handlers[1]->getBubble());
     }
@@ -140,7 +140,7 @@ class LogManagerTest extends TestCase
         $this->assertSame('foobar', $logger->getName());
         $this->assertCount(1, $handlers);
         $this->assertInstanceOf(StreamHandler::class, $handlers[0]);
-        $this->assertEquals(Level::Notice, $handlers[0]->getLevel());
+        $this->assertSame(Level::Notice, $handlers[0]->getLevel());
         $this->assertFalse($handlers[0]->getBubble());
 
         $url = new ReflectionProperty(get_class($handlers[0]), 'url');
@@ -542,7 +542,7 @@ class LogManagerTest extends TestCase
             $expectedStreamHandler = $handlerProp->getValue($expectedFingersCrossedHandler);
         }
         $this->assertInstanceOf(StreamHandler::class, $expectedStreamHandler);
-        $this->assertEquals(Level::Debug, $expectedStreamHandler->getLevel());
+        $this->assertSame(Level::Debug, $expectedStreamHandler->getLevel());
     }
 
     public function testFingersCrossedHandlerStopsRecordBufferingAfterFirstFlushByDefault()

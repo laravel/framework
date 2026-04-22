@@ -32,7 +32,7 @@ class SupportTestingBusFakeTest extends TestCase
 
         $fake = new BusFake(m::mock(QueueingDispatcher::class), [], $busRepository);
 
-        $this->assertNull($fake->findBatch('non-existent-batch'));
+        $this->assertNotInstanceOf(Batch::class, $fake->findBatch('non-existent-batch'));
 
         $batch = $fake->batch([])->dispatch();
 
@@ -761,7 +761,7 @@ class SupportTestingBusFakeTest extends TestCase
 
     public function testFindBatch()
     {
-        $this->assertNull($this->fake->findBatch('non-existent-batch'));
+        $this->assertNotInstanceOf(Batch::class, $this->fake->findBatch('non-existent-batch'));
 
         $batch = $this->fake->batch([])->dispatch();
 

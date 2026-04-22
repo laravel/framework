@@ -639,8 +639,8 @@ class HttpRequestTest extends TestCase
             'empty_str' => '',
             'null' => null,
         ]);
-        $this->assertTrue($request->string('int') instanceof Stringable);
-        $this->assertTrue($request->string('unknown_key') instanceof Stringable);
+        $this->assertInstanceOf(Stringable::class, $request->string('int'));
+        $this->assertInstanceOf(Stringable::class, $request->string('unknown_key'));
         $this->assertSame('123', $request->string('int')->value());
         $this->assertSame('456', $request->string('int_str')->value());
         $this->assertSame('123.456', $request->string('float')->value());
@@ -701,17 +701,17 @@ class HttpRequestTest extends TestCase
             'scientific_notation' => '1e3',
             'null' => null,
         ]);
-        $this->assertSame(1.23, $request->float('float'));
-        $this->assertSame(45.6, $request->float('raw_float'));
-        $this->assertSame(.6, $request->float('decimal_only'));
-        $this->assertSame(0.78, $request->float('zero_padded'));
-        $this->assertSame(90.1, $request->float('space_padded'));
-        $this->assertSame(0.0, $request->float('nan'));
-        $this->assertSame(1.0, $request->float('mixed'));
-        $this->assertSame(1e3, $request->float('scientific_notation'));
-        $this->assertSame(123.456, $request->float('unknown_key', 123.456));
-        $this->assertSame(0.0, $request->float('null'));
-        $this->assertSame(0.0, $request->float('null', 123.456));
+        $this->assertEqualsWithDelta(1.23, $request->float('float'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(45.6, $request->float('raw_float'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(.6, $request->float('decimal_only'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(0.78, $request->float('zero_padded'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(90.1, $request->float('space_padded'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(0.0, $request->float('nan'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(1.0, $request->float('mixed'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(1e3, $request->float('scientific_notation'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(123.456, $request->float('unknown_key', 123.456), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(0.0, $request->float('null'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(0.0, $request->float('null', 123.456), PHP_FLOAT_EPSILON);
     }
 
     public function testArrayMethod()
@@ -784,8 +784,8 @@ class HttpRequestTest extends TestCase
 
         $current = Carbon::create(2020, 1, 1, 16, 30, 25);
 
-        $this->assertNull($request->date('as_null'));
-        $this->assertNull($request->date('doesnt_exists'));
+        $this->assertNotInstanceOf(Carbon::class, $request->date('as_null'));
+        $this->assertNotInstanceOf(Carbon::class, $request->date('doesnt_exists'));
 
         $this->assertEquals($current, $request->date('as_datetime'));
         $this->assertEquals($current->format('Y-m-d H:i:s P'), $request->date('as_format', 'U')->format('Y-m-d H:i:s P'));
@@ -828,9 +828,9 @@ class HttpRequestTest extends TestCase
             'as_minutes' => '45',
         ]);
 
-        $this->assertNull($request->interval('as_null'));
-        $this->assertNull($request->interval('as_empty'));
-        $this->assertNull($request->interval('doesnt_exist'));
+        $this->assertNotInstanceOf(CarbonInterval::class, $request->interval('as_null'));
+        $this->assertNotInstanceOf(CarbonInterval::class, $request->interval('as_empty'));
+        $this->assertNotInstanceOf(CarbonInterval::class, $request->interval('doesnt_exist'));
 
         $interval = $request->interval('as_iso');
         $this->assertInstanceOf(CarbonInterval::class, $interval);
@@ -909,25 +909,25 @@ class HttpRequestTest extends TestCase
             ],
         ]);
 
-        $this->assertNull($request->enum('doesnt_exist', TestEnumBacked::class));
+        $this->assertNotInstanceOf(TestEnumBacked::class, $request->enum('doesnt_exist', TestEnumBacked::class));
 
         $this->assertEquals(TestEnumBacked::test, $request->enum('invalid_enum_value', TestEnumBacked::class, TestEnumBacked::test));
         $this->assertEquals(TestEnumBacked::test, $request->enum('missing_key', TestEnumBacked::class, TestEnumBacked::test));
 
         $this->assertEquals(TestEnumBacked::test, $request->enum('valid_enum_value', TestEnumBacked::class));
 
-        $this->assertNull($request->enum('invalid_enum_value', TestEnumBacked::class));
-        $this->assertNull($request->enum('empty_value_request', TestEnumBacked::class));
-        $this->assertNull($request->enum('valid_enum_value', TestEnum::class));
+        $this->assertNotInstanceOf(TestEnumBacked::class, $request->enum('invalid_enum_value', TestEnumBacked::class));
+        $this->assertNotInstanceOf(TestEnumBacked::class, $request->enum('empty_value_request', TestEnumBacked::class));
+        $this->assertNotInstanceOf(\BackedEnum::class, $request->enum('valid_enum_value', TestEnum::class));
 
         $this->assertEquals(TestIntegerEnumBacked::minus_1, $request->enum('string.minus_1', TestIntegerEnumBacked::class));
         $this->assertEquals(TestIntegerEnumBacked::zero, $request->enum('string.0', TestIntegerEnumBacked::class));
         $this->assertEquals(TestIntegerEnumBacked::plus_1, $request->enum('string.plus_1', TestIntegerEnumBacked::class));
-        $this->assertNull($request->enum('string.doesnt_exist', TestIntegerEnumBacked::class));
+        $this->assertNotInstanceOf(TestIntegerEnumBacked::class, $request->enum('string.doesnt_exist', TestIntegerEnumBacked::class));
         $this->assertEquals(TestIntegerEnumBacked::minus_1, $request->enum('int.minus_1', TestIntegerEnumBacked::class));
         $this->assertEquals(TestIntegerEnumBacked::zero, $request->enum('int.0', TestIntegerEnumBacked::class));
         $this->assertEquals(TestIntegerEnumBacked::plus_1, $request->enum('int.plus_1', TestIntegerEnumBacked::class));
-        $this->assertNull($request->enum('int.doesnt_exist', TestIntegerEnumBacked::class));
+        $this->assertNotInstanceOf(TestIntegerEnumBacked::class, $request->enum('int.doesnt_exist', TestIntegerEnumBacked::class));
     }
 
     public function testEnumsMethod()
@@ -981,20 +981,20 @@ class HttpRequestTest extends TestCase
             return $route;
         });
 
-        $this->assertFalse(isset($request['non-existent']));
+        $this->assertArrayNotHasKey('non-existent', $request);
         $this->assertNull($request['non-existent']);
 
-        $this->assertTrue(isset($request['name']));
+        $this->assertArrayHasKey('name', $request);
         $this->assertNull($request['name']);
 
         $this->assertNotSame('Taylor', $request['name']);
 
-        $this->assertTrue(isset($request['foo.bar']));
+        $this->assertArrayHasKey('foo.bar', $request);
         $this->assertNull($request['foo.bar']);
-        $this->assertTrue(isset($request['foo.baz']));
+        $this->assertArrayHasKey('foo.baz', $request);
         $this->assertSame('', $request['foo.baz']);
 
-        $this->assertTrue(isset($request['id']));
+        $this->assertArrayHasKey('id', $request);
         $this->assertSame('foo', $request['id']);
     }
 
@@ -1002,10 +1002,10 @@ class HttpRequestTest extends TestCase
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor']);
 
-        $this->assertFalse(isset($request['non-existent']));
+        $this->assertArrayNotHasKey('non-existent', $request);
         $this->assertNull($request['non-existent']);
 
-        $this->assertTrue(isset($request['name']));
+        $this->assertArrayHasKey('name', $request);
         $this->assertSame('Taylor', $request['name']);
     }
 
@@ -1719,7 +1719,7 @@ class HttpRequestTest extends TestCase
             return $route;
         });
 
-        $this->assertEquals(40, mb_strlen($request->fingerprint()));
+        $this->assertSame(40, mb_strlen($request->fingerprint()));
     }
 
     public function testFingerprintWithoutRoute()
@@ -1925,7 +1925,7 @@ class HttpRequestTest extends TestCase
 
         Request::create('', 'GET')->json();
 
-        $this->assertTrue(json_last_error() === JSON_ERROR_NONE);
+        $this->assertSame(JSON_ERROR_NONE, json_last_error());
     }
 
     public function testItClampsValues()
@@ -1935,7 +1935,7 @@ class HttpRequestTest extends TestCase
         $this->assertSame(10, $request->clamp('per_page', -10, 10));
         $this->assertSame(25, $request->clamp('per_page_2', 25, 100, 1));
         $this->assertSame(100, $request->clamp('per_page', 1, 250, 99));
-        $this->assertSame(22.4, $request->clamp('per_page', 1.11, 22.4, 2));
-        $this->assertSame(9.24, $request->clamp('float', 1, 10));
+        $this->assertEqualsWithDelta(22.4, $request->clamp('per_page', 1.11, 22.4, 2), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(9.24, $request->clamp('float', 1, 10), PHP_FLOAT_EPSILON);
     }
 }

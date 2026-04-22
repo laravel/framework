@@ -105,6 +105,7 @@ class RendererTest extends TestCase
         $this->app->instance(Dispatcher::class, m::mock(Dispatcher::class));
 
         $provider = $this->app->getProvider(FoundationServiceProvider::class);
+        $this->assertInstanceOf(\Illuminate\Support\ServiceProvider::class, $provider);
         $provider->boot();
     }
 
@@ -130,6 +131,7 @@ class RendererTest extends TestCase
         $this->app->instance(Dispatcher::class, m::mock(Dispatcher::class));
 
         $provider = $this->app->getProvider(FoundationServiceProvider::class);
+        $this->assertInstanceOf(\Illuminate\Support\ServiceProvider::class, $provider);
         $provider->boot();
     }
 
@@ -146,6 +148,7 @@ class RendererTest extends TestCase
         $this->app->instance(Dispatcher::class, m::mock(Dispatcher::class));
 
         $provider = $this->app->getProvider(FoundationServiceProvider::class);
+        $this->assertInstanceOf(\Illuminate\Support\ServiceProvider::class, $provider);
         $provider->boot();
     }
 

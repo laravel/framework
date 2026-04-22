@@ -32,8 +32,8 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) use ($uuid, $displayNameStartsWith, $jobStartsWith) {
             $payload = json_decode($array['payload'], true);
             $this->assertSame($uuid, $payload['uuid']);
-            $this->assertStringContainsString($displayNameStartsWith, $payload['displayName']);
-            $this->assertStringContainsString($jobStartsWith, $payload['job']);
+            $this->assertStringContainsString($displayNameStartsWith, (string) $payload['displayName']);
+            $this->assertStringContainsString($jobStartsWith, (string) $payload['job']);
 
             $this->assertSame('default', $array['queue']);
             $this->assertEquals(0, $array['attempts']);

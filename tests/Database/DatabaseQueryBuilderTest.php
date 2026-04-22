@@ -5600,7 +5600,7 @@ SQL;
         $builder = $this->getBuilder();
         $builder->wheres = ['foo'];
         $builder->mergeWheres(['wheres'], [12 => 'foo', 13 => 'bar']);
-        $this->assertEquals(['foo', 'wheres'], $builder->wheres);
+        $this->assertSame(['foo', 'wheres'], $builder->wheres);
         $this->assertEquals(['foo', 'bar'], $builder->getBindings());
     }
 

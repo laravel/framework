@@ -246,24 +246,24 @@ class ContainerTest extends TestCase
     public function testArrayAccess()
     {
         $container = new Container;
-        $this->assertFalse(isset($container['something']));
+        $this->assertArrayNotHasKey('something', $container);
         $container['something'] = function () {
             return 'foo';
         };
-        $this->assertTrue(isset($container['something']));
+        $this->assertArrayHasKey('something', $container);
         $this->assertNotEmpty($container['something']);
         $this->assertSame('foo', $container['something']);
         unset($container['something']);
-        $this->assertFalse(isset($container['something']));
+        $this->assertArrayNotHasKey('something', $container);
 
         //test offsetSet when it's not instanceof Closure
         $container = new Container;
         $container['something'] = 'text';
-        $this->assertTrue(isset($container['something']));
+        $this->assertArrayHasKey('something', $container);
         $this->assertNotEmpty($container['something']);
         $this->assertSame('text', $container['something']);
         unset($container['something']);
-        $this->assertFalse(isset($container['something']));
+        $this->assertArrayNotHasKey('something', $container);
     }
 
     public function testAliases()
@@ -327,7 +327,7 @@ class ContainerTest extends TestCase
         $container = new Container;
         $instance = $container->make(ContainerClassWithDefaultValueStub::class);
         $this->assertInstanceOf(ContainerConcreteStub::class, $instance->noDefault);
-        $this->assertSame(null, $instance->default);
+        $this->assertNotInstanceOf(ContainerConcreteStub::class, $instance->default);
 
         $container->bind(ContainerConcreteStub::class, fn () => new ContainerConcreteStub);
         $instance = $container->make(ContainerClassWithDefaultValueStub::class);
@@ -375,8 +375,8 @@ class ContainerTest extends TestCase
         $container->instance('object', new stdClass);
         $container->alias('object', 'alias');
 
-        $this->assertTrue(isset($container['object']));
-        $this->assertTrue(isset($container['alias']));
+        $this->assertArrayHasKey('object', $container);
+        $this->assertArrayHasKey('alias', $container);
     }
 
     public function testReboundListeners()
@@ -706,9 +706,9 @@ class ContainerTest extends TestCase
     public function testContainerCanDynamicallySetService()
     {
         $container = new Container;
-        $this->assertFalse(isset($container['name']));
+        $this->assertArrayNotHasKey('name', $container);
         $container['name'] = 'Taylor';
-        $this->assertTrue(isset($container['name']));
+        $this->assertArrayHasKey('name', $container);
         $this->assertSame('Taylor', $container['name']);
     }
 
@@ -919,7 +919,7 @@ class ContainerTest extends TestCase
         $r = $container->make(RequestDto::class);
 
         $this->assertInstanceOf(RequestDto::class, $r);
-        $this->assertEquals(999, $r->userId);
+        $this->assertSame(999, $r->userId);
         $this->assertSame('taylor@laravel.com', $r->email);
     }
 

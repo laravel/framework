@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
+use Illuminate\Bus\Batch;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\DynamoBatchRepository;
 use Illuminate\Bus\Queueable;
@@ -75,7 +76,7 @@ class DynamoBatchTest extends TestCase
         /** @var DynamoBatchRepository */
         $repo = app(DynamoBatchRepository::class);
         $retrieved = $repo->find(Str::orderedUuid());
-        $this->assertNull($retrieved);
+        $this->assertNotInstanceOf(Batch::class, $retrieved);
     }
 
     public function test_delete_batch_by_id()
@@ -87,10 +88,10 @@ class DynamoBatchTest extends TestCase
         /** @var DynamoBatchRepository */
         $repo = app(DynamoBatchRepository::class);
         $retrieved = $repo->find($batch->id);
-        $this->assertNotNull($retrieved);
+        $this->assertInstanceOf(Batch::class, $retrieved);
         $repo->delete($retrieved->id);
         $retrieved = $repo->find($batch->id);
-        $this->assertNull($retrieved);
+        $this->assertNotInstanceOf(Batch::class, $retrieved);
     }
 
     public function test_delete_non_existent_batch()

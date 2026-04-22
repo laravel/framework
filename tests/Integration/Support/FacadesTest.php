@@ -25,24 +25,24 @@ class FacadesTest extends TestCase
             $_SERVER['__laravel.authResolved'] = true;
         });
 
-        $this->assertFalse(isset($_SERVER['__laravel.authResolved']));
+        $this->assertArrayNotHasKey('__laravel.authResolved', $_SERVER);
 
         $this->app->make('auth');
 
-        $this->assertTrue(isset($_SERVER['__laravel.authResolved']));
+        $this->assertArrayHasKey('__laravel.authResolved', $_SERVER);
     }
 
     public function testFacadeResolvedCanResolveCallbackAfterAccessRootHasBeenResolved()
     {
         $this->app->make('auth');
 
-        $this->assertFalse(isset($_SERVER['__laravel.authResolved']));
+        $this->assertArrayNotHasKey('__laravel.authResolved', $_SERVER);
 
         Auth::resolved(function (AuthManager $auth, Application $app) {
             $_SERVER['__laravel.authResolved'] = true;
         });
 
-        $this->assertTrue(isset($_SERVER['__laravel.authResolved']));
+        $this->assertArrayHasKey('__laravel.authResolved', $_SERVER);
     }
 
     public function testDefaultAliases()

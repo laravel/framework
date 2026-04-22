@@ -145,7 +145,7 @@ class DatabaseMySqlSchemaStateTest extends TestCase
             new Exception('column-statistics')
         );
 
-        $mockOutput = $this->createMock(\stdClass::class);
+        $mockOutput = $this->createStub(\stdClass::class);
         $mockVariables = [];
 
         $schemaState = $this->getMockBuilder(MySqlSchemaState::class)

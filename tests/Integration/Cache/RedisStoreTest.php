@@ -20,17 +20,14 @@ class RedisStoreTest extends TestCase
     use InteractsWithRedis;
 
     /** {@inheritdoc} */
-    #[\Override]
     protected function setUp(): void
     {
         $this->afterApplicationCreated(function () {
             $this->setUpRedis();
         });
-
         $this->beforeApplicationDestroyed(function () {
             $this->tearDownRedis();
         });
-
         parent::setUp();
     }
 
@@ -47,7 +44,7 @@ class RedisStoreTest extends TestCase
         $putAt = microtime(true);
 
         Sleep::for(600)->milliseconds();
-        $this->assertTrue((microtime(true) - $putAt) < 1);
+        $this->assertLessThan(1, microtime(true) - $putAt);
         $this->assertSame('world', $store->get('hello'));
 
         // Although this key expires after exactly 1 second, Redis has a
@@ -114,7 +111,7 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->tags(['people', 'author'])->flush();
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
-        $this->assertEquals(0, count($keyCount));
+        $this->assertCount(0, $keyCount);
     }
 
     public function testTagEntriesCanBeStoredForever()
@@ -130,7 +127,7 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->tags(['people', 'author'])->flush();
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
-        $this->assertEquals(0, count($keyCount));
+        $this->assertCount(0, $keyCount);
     }
 
     public function testTagEntriesCanBeIncremented()
@@ -162,7 +159,7 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->tags(['votes'])->flushStale();
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
-        $this->assertEquals(0, count($keyCount));
+        $this->assertCount(0, $keyCount);
     }
 
     public function testPastTtlTagEntriesAreNotAdded()
@@ -175,7 +172,7 @@ class RedisStoreTest extends TestCase
         $this->assertNull($value);
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
-        $this->assertEquals(0, count($keyCount));
+        $this->assertCount(0, $keyCount);
     }
 
     public function testPutPastTtlTagEntriesProperlyTurnStale()
@@ -186,7 +183,7 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->tags(['votes'])->flushStale();
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
-        $this->assertEquals(0, count($keyCount));
+        $this->assertCount(0, $keyCount);
     }
 
     public function testTagsCanBeFlushedBySingleKey()
@@ -202,7 +199,7 @@ class RedisStoreTest extends TestCase
         $this->assertNull(Cache::store('redis')->tags(['people', 'artist'])->get('person-2'));
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
-        $this->assertEquals(3, count($keyCount)); // Sets for people, authors, and actual entry for Sally
+        $this->assertCount(3, $keyCount); // Sets for people, authors, and actual entry for Sally
     }
 
     public function testStaleEntriesCanBeFlushed()
@@ -220,7 +217,7 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->tags(['people'])->flushStale();
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
-        $this->assertEquals(4, count($keyCount)); // Sets for people, authors, and artists + individual entry for Jennifer
+        $this->assertCount(4, $keyCount); // Sets for people, authors, and artists + individual entry for Jennifer
     }
 
     public function testMultipleItemsCanBeSetAndRetrieved()

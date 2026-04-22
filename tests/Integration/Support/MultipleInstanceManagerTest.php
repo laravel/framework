@@ -24,9 +24,9 @@ class MultipleInstanceManagerTest extends TestCase
         $duplicateFooInstance = $manager->instance('foo');
         $duplicateBarInstance = $manager->instance('bar');
         $duplicateMysqlInstance = $manager->instance('mysql_database-connection');
-        $this->assertEquals(spl_object_hash($fooInstance), spl_object_hash($duplicateFooInstance));
-        $this->assertEquals(spl_object_hash($barInstance), spl_object_hash($duplicateBarInstance));
-        $this->assertEquals(spl_object_hash($mysqlInstance), spl_object_hash($duplicateMysqlInstance));
+        $this->assertSame(spl_object_hash($fooInstance), spl_object_hash($duplicateFooInstance));
+        $this->assertSame(spl_object_hash($barInstance), spl_object_hash($duplicateBarInstance));
+        $this->assertSame(spl_object_hash($mysqlInstance), spl_object_hash($duplicateMysqlInstance));
     }
 
     public function test_unresolvable_instances_throw_errors()

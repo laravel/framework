@@ -254,7 +254,7 @@ class DatabaseConnectionTest extends TestCase
 
     public function testBeganTransactionFiresEventsIfSet()
     {
-        $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
+        $pdo = $this->createStub(DatabaseConnectionTestMockPDO::class);
         $connection = $this->getMockConnection(['getName'], $pdo);
         $connection->method('getName')->willReturn('name');
         $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
@@ -264,7 +264,7 @@ class DatabaseConnectionTest extends TestCase
 
     public function testCommittedFiresEventsIfSet()
     {
-        $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
+        $pdo = $this->createStub(DatabaseConnectionTestMockPDO::class);
         $connection = $this->getMockConnection(['getName'], $pdo);
         $connection->method('getName')->willReturn('name');
         $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
@@ -274,7 +274,7 @@ class DatabaseConnectionTest extends TestCase
 
     public function testCommittingFiresEventsIfSet()
     {
-        $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
+        $pdo = $this->createStub(DatabaseConnectionTestMockPDO::class);
         $connection = $this->getMockConnection(['getName', 'transactionLevel'], $pdo);
         $connection->method('getName')->willReturn('name');
         $connection->method('transactionLevel')->willReturn(1);
@@ -286,7 +286,7 @@ class DatabaseConnectionTest extends TestCase
 
     public function testRollBackedFiresEventsIfSet()
     {
-        $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
+        $pdo = $this->createStub(DatabaseConnectionTestMockPDO::class);
         $connection = $this->getMockConnection(['getName'], $pdo);
         $connection->method('getName')->willReturn('name');
         $connection->beginTransaction();
@@ -297,7 +297,7 @@ class DatabaseConnectionTest extends TestCase
 
     public function testRedundantRollBackFiresNoEvent()
     {
-        $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
+        $pdo = $this->createStub(DatabaseConnectionTestMockPDO::class);
         $connection = $this->getMockConnection(['getName'], $pdo);
         $connection->method('getName')->willReturn('name');
         $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
@@ -429,7 +429,7 @@ class DatabaseConnectionTest extends TestCase
     {
         $method = (new ReflectionClass(Connection::class))->getMethod('run');
 
-        $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
+        $pdo = $this->createStub(DatabaseConnectionTestMockPDO::class);
         $mock = $this->getMockConnection(['tryAgainIfCausedByLostConnection'], $pdo);
         $mock->expects($this->once())->method('tryAgainIfCausedByLostConnection');
 
@@ -553,7 +553,7 @@ class DatabaseConnectionTest extends TestCase
         $log = $mock->getRawQueryLog();
 
         $this->assertSame("select * from tbl where col = 'foo'", $log[0]['raw_query']);
-        $this->assertSame(1.23, $log[0]['time']);
+        $this->assertEqualsWithDelta(1.23, $log[0]['time'], PHP_FLOAT_EPSILON);
     }
 
     public function testQueryExceptionContainsReadConnectionDetailsWhenUsingReadPdo()

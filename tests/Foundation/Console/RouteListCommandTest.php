@@ -86,7 +86,7 @@ class RouteListCommandTest extends TestCase
 
         foreach ($routes as $route) {
             $this->assertArrayHasKey('path', $route);
-            $this->assertStringContainsString('RouteListCommandTest.php:', $route['path']);
+            $this->assertStringContainsString('RouteListCommandTest.php:', (string) $route['path']);
         }
     }
 
@@ -104,7 +104,7 @@ class RouteListCommandTest extends TestCase
 
         foreach ($routes as $route) {
             $this->assertArrayHasKey('path', $route);
-            $this->assertStringContainsString('RouteListCommandTest.php:', $route['path']);
+            $this->assertStringContainsString('RouteListCommandTest.php:', (string) $route['path']);
         }
     }
 
@@ -122,7 +122,7 @@ class RouteListCommandTest extends TestCase
 
         foreach ($routes as $route) {
             $this->assertArrayHasKey('path', $route);
-            $this->assertStringContainsString('RouteListCommandTest.php:', $route['path']);
+            $this->assertStringContainsString('RouteListCommandTest.php:', (string) $route['path']);
         }
     }
 
@@ -140,7 +140,7 @@ class RouteListCommandTest extends TestCase
 
         foreach ($routes as $route) {
             $this->assertArrayHasKey('path', $route);
-            $this->assertStringContainsString('RouteListCommandTest.php:', $route['path']);
+            $this->assertStringContainsString('RouteListCommandTest.php:', (string) $route['path']);
         }
     }
 
@@ -234,7 +234,7 @@ class RouteListCommandTest extends TestCase
         $this->assertCount(1, $routes);
         $this->assertSame('example-group', $routes[0]['uri']);
         $this->assertEquals(['web', 'auth'], $routes[0]['middleware']);
-        $this->assertStringContainsString('RouteListCommandTest.php:', $routes[0]['path']);
+        $this->assertStringContainsString('RouteListCommandTest.php:', (string) $routes[0]['path']);
     }
 
     public function testClosureRouteShowsPathInCli()

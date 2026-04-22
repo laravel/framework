@@ -34,7 +34,7 @@ class HtmlDumperTest extends TestCase
 
         $expected = "string</span>\"<span style=\"color: #A0A0A0;\"> // app/routes/console.php:18</span>\n</pre>";
 
-        $this->assertStringContainsString($expected, $output);
+        $this->assertStringContainsString($expected, (string) $output);
     }
 
     public function testInteger()
@@ -43,7 +43,7 @@ class HtmlDumperTest extends TestCase
 
         $expected = "1</span><span style=\"color: #A0A0A0;\"> // app/routes/console.php:18</span>\n</pre>";
 
-        $this->assertStringContainsString($expected, $output);
+        $this->assertStringContainsString($expected, (string) $output);
     }
 
     public function testFloat()
@@ -52,7 +52,7 @@ class HtmlDumperTest extends TestCase
 
         $expected = "1.1</span><span style=\"color: #A0A0A0;\"> // app/routes/console.php:18</span>\n</pre>";
 
-        $this->assertStringContainsString($expected, $output);
+        $this->assertStringContainsString($expected, (string) $output);
     }
 
     public function testArray()
@@ -61,7 +61,7 @@ class HtmlDumperTest extends TestCase
 
         $expected = '<samp data-depth=1 class=sf-dump-expanded><span style="color: #A0A0A0;"> // app/routes/console.php:18</span>';
 
-        $this->assertStringContainsString($expected, $output);
+        $this->assertStringContainsString($expected, (string) $output);
     }
 
     public function testBoolean()
@@ -70,7 +70,7 @@ class HtmlDumperTest extends TestCase
 
         $expected = "true</span><span style=\"color: #A0A0A0;\"> // app/routes/console.php:18</span>\n</pre>";
 
-        $this->assertStringContainsString($expected, $output);
+        $this->assertStringContainsString($expected, (string) $output);
     }
 
     public function testObject()
@@ -82,7 +82,7 @@ class HtmlDumperTest extends TestCase
 
         $expected = '<samp data-depth=1 class=sf-dump-expanded><span style="color: #A0A0A0;"> // app/routes/console.php:18</span>';
 
-        $this->assertStringContainsString($expected, $output);
+        $this->assertStringContainsString($expected, (string) $output);
     }
 
     public function testNull()
@@ -91,7 +91,7 @@ class HtmlDumperTest extends TestCase
 
         $expected = "null</span><span style=\"color: #A0A0A0;\"> // app/routes/console.php:18</span>\n</pre>";
 
-        $this->assertStringContainsString($expected, $output);
+        $this->assertStringContainsString($expected, (string) $output);
     }
 
     public function testUnresolvableSource()
@@ -102,7 +102,7 @@ class HtmlDumperTest extends TestCase
 
         $expected = "string</span>\"\n</pre>";
 
-        $this->assertStringContainsString($expected, $output);
+        $this->assertStringContainsString($expected, (string) $output);
     }
 
     public function testWhenIsFileViewIsNotViewCompiled()
@@ -183,7 +183,7 @@ class HtmlDumperTest extends TestCase
 
         $expected = "hey from view</span>\"<span style=\"color: #A0A0A0;\"> // resources/views/welcome.blade.php</span>\n</pre>";
 
-        $this->assertStringContainsString($expected, $output);
+        $this->assertStringContainsString($expected, (string) $output);
     }
 
     public function testHref()

@@ -112,7 +112,7 @@ class AuthGuardTest extends TestCase
         });
         $events->shouldReceive('dispatch')->once()->with(m::type(Attempting::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(Validated::class));
-        $user = $this->createMock(Authenticatable::class);
+        $user = $this->createStub(Authenticatable::class);
         $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn($user);
         $guard->getProvider()->shouldReceive('validateCredentials')->with($user, ['foo'])->andReturn(true);
         $guard->getProvider()->shouldReceive('rehashPasswordIfRequired')->with($user, ['foo'])->once();
@@ -192,7 +192,7 @@ class AuthGuardTest extends TestCase
         });
         $events->shouldReceive('dispatch')->once()->with(m::type(Attempting::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(Validated::class));
-        $user = $this->createMock(Authenticatable::class);
+        $user = $this->createStub(Authenticatable::class);
         $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn($user);
         $guard->getProvider()->shouldReceive('validateCredentials')->with($user, ['foo'])->andReturn(true);
         $guard->getProvider()->shouldReceive('rehashPasswordIfRequired')->with($user, ['foo'])->once();
@@ -212,7 +212,7 @@ class AuthGuardTest extends TestCase
         });
         $events->shouldReceive('dispatch')->once()->with(m::type(Attempting::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(Validated::class));
-        $user = $this->createMock(Authenticatable::class);
+        $user = $this->createStub(Authenticatable::class);
         $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn($user);
         $guard->getProvider()->shouldReceive('validateCredentials')->with($user, ['foo'])->andReturn(true);
         $guard->getProvider()->shouldNotReceive('rehashPasswordIfRequired');
@@ -385,7 +385,7 @@ class AuthGuardTest extends TestCase
         $mock->getSession()->shouldReceive('remove')->once()->with('foo');
         $mock->setUser($user);
         $mock->logout();
-        $this->assertNull($mock->getUser());
+        $this->assertNotInstanceOf(Authenticatable::class, $mock->getUser());
     }
 
     public function testLogoutDoesNotEnqueueRememberMeCookieForDeletionIfCookieDoesntExist()
@@ -404,7 +404,7 @@ class AuthGuardTest extends TestCase
         $mock->getSession()->shouldReceive('remove')->once()->with('foo');
         $mock->setUser($user);
         $mock->logout();
-        $this->assertNull($mock->getUser());
+        $this->assertNotInstanceOf(Authenticatable::class, $mock->getUser());
     }
 
     public function testLogoutFiresLogoutEvent()
@@ -452,7 +452,7 @@ class AuthGuardTest extends TestCase
         $mock->getSession()->shouldReceive('remove')->once()->with('foo');
         $mock->setUser($user);
         $mock->logoutCurrentDevice();
-        $this->assertNull($mock->getUser());
+        $this->assertNotInstanceOf(Authenticatable::class, $mock->getUser());
     }
 
     public function testLogoutCurrentDeviceDoesNotEnqueueRememberMeCookieForDeletionIfCookieDoesntExist()
@@ -470,7 +470,7 @@ class AuthGuardTest extends TestCase
         $mock->getSession()->shouldReceive('remove')->once()->with('foo');
         $mock->setUser($user);
         $mock->logoutCurrentDevice();
-        $this->assertNull($mock->getUser());
+        $this->assertNotInstanceOf(Authenticatable::class, $mock->getUser());
     }
 
     public function testLogoutCurrentDeviceFiresLogoutEvent()

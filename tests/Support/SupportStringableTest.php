@@ -609,7 +609,7 @@ class SupportStringableTest extends TestCase
     {
         $nbsp = chr(0xC2).chr(0xA0);
         $this->assertSame(' ', (string) $this->stringable(' ')->words());
-        $this->assertEquals($nbsp, (string) $this->stringable($nbsp)->words());
+        $this->assertSame($nbsp, (string) $this->stringable($nbsp)->words());
     }
 
     public function testAscii()
@@ -1502,14 +1502,14 @@ class SupportStringableTest extends TestCase
 
     public function testToFloat()
     {
-        $this->assertSame(1.23, $this->stringable('1.23')->toFloat());
-        $this->assertSame(45.6, $this->stringable(45.6)->toFloat());
-        $this->assertSame(.6, $this->stringable('.6')->toFloat());
-        $this->assertSame(0.78, $this->stringable('0.78')->toFloat());
-        $this->assertSame(90.1, $this->stringable(' 90.1')->toFloat());
-        $this->assertSame(0.0, $this->stringable('nan')->toFloat());
-        $this->assertSame(1.0, $this->stringable('1.ab')->toFloat());
-        $this->assertSame(1e3, $this->stringable('1e3')->toFloat());
+        $this->assertEqualsWithDelta(1.23, $this->stringable('1.23')->toFloat(), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(45.6, $this->stringable(45.6)->toFloat(), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(.6, $this->stringable('.6')->toFloat(), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(0.78, $this->stringable('0.78')->toFloat(), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(90.1, $this->stringable(' 90.1')->toFloat(), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(0.0, $this->stringable('nan')->toFloat(), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(1.0, $this->stringable('1.ab')->toFloat(), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(1e3, $this->stringable('1e3')->toFloat(), PHP_FLOAT_EPSILON);
     }
 
     public function testBooleanMethod()
@@ -1565,8 +1565,8 @@ class SupportStringableTest extends TestCase
         $str = $this->stringable('my string');
         $this->assertSame('m', $str[0]);
         $this->assertSame('t', $str[4]);
-        $this->assertTrue(isset($str[2]));
-        $this->assertFalse(isset($str[10]));
+        $this->assertArrayHasKey(2, $str);
+        $this->assertArrayNotHasKey(10, $str);
     }
 
     public function testToBase64()

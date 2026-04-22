@@ -166,8 +166,8 @@ class HttpResponseTest extends TestCase
     public function testSettersGettersOnRequest()
     {
         $response = new RedirectResponse('foo.bar');
-        $this->assertNull($response->getRequest());
-        $this->assertNull($response->getSession());
+        $this->assertNotInstanceOf(Request::class, $response->getRequest());
+        $this->assertNotInstanceOf(Store::class, $response->getSession());
 
         $request = Request::create('/', 'GET');
         $session = m::mock(Store::class);

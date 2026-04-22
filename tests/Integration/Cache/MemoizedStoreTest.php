@@ -29,7 +29,6 @@ class MemoizedStoreTest extends TestCase
     use InteractsWithRedis;
 
     /** {@inheritdoc} */
-    #[\Override]
     protected function setUp(): void
     {
         $this->afterApplicationCreated(function () {
@@ -38,11 +37,9 @@ class MemoizedStoreTest extends TestCase
             Redis::connection(Config::get('cache.stores.redis.connection'))->flushDb();
             Redis::connection(Config::get('cache.stores.redis.lock_connection'))->flushDb();
         });
-
         $this->beforeApplicationDestroyed(function () {
             $this->tearDownRedis();
         });
-
         parent::setUp();
     }
 

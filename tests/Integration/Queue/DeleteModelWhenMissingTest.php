@@ -35,11 +35,9 @@ class DeleteModelWhenMissingTest extends QueueTestCase
         Schema::dropIfExists('delete_model_test_models');
     }
 
-    #[\Override]
     protected function tearDown(): void
     {
         DeleteMissingModelJob::$handled = false;
-
         parent::tearDown();
     }
 

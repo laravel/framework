@@ -119,8 +119,9 @@ class QueueFake extends QueueManager implements Fake, Queue
             return $this->assertPushedTimes($job, $callback);
         }
 
-        PHPUnit::assertTrue(
-            $this->pushed($job, $callback)->count() > 0,
+        PHPUnit::assertGreaterThan(
+            0,
+            $this->pushed($job, $callback)->count(),
             "The expected [{$job}] job was not pushed."
         );
     }

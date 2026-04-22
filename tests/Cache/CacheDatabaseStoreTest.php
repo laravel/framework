@@ -190,7 +190,7 @@ class CacheDatabaseStoreTest extends TestCase
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
         $table->shouldReceive('update')->once()->with(['value' => serialize(3)]);
-        $this->assertEquals(3, $store->increment('foo'));
+        $this->assertSame(3, $store->increment('foo'));
     }
 
     public function testDecrementReturnsCorrectValues()

@@ -18,11 +18,11 @@ class AfterResolvingAttributeCallbackTest extends TestCase
 
         $hasTenantA = $container->make(ContainerTestHasTenantImplPropertyWithTenantA::class);
         $this->assertInstanceOf(HasTenantImpl::class, $hasTenantA->property);
-        $this->assertEquals(Tenant::TenantA, $hasTenantA->property->tenant);
+        $this->assertSame(Tenant::TenantA, $hasTenantA->property->tenant);
 
         $hasTenantB = $container->make(ContainerTestHasTenantImplPropertyWithTenantB::class);
         $this->assertInstanceOf(HasTenantImpl::class, $hasTenantB->property);
-        $this->assertEquals(Tenant::TenantB, $hasTenantB->property->tenant);
+        $this->assertSame(Tenant::TenantB, $hasTenantB->property->tenant);
     }
 
     public function testCallbackIsCalledAfterClassWithAttributeIsResolved()

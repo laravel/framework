@@ -68,7 +68,7 @@ class BusBatchTest extends TestCase
             })->byDefault();
 
             $dispatcher->shouldReceive('chain')->zeroOrMoreTimes()->andReturnUsing(function ($jobs) {
-                $pendingChain = m::mock(PendingChain::class, [$jobs, \stdClass::class]);
+                $pendingChain = m::mock(PendingChain::class, [$jobs, stdClass::class]);
                 $pendingChain->shouldReceive('dispatch')->zeroOrMoreTimes()->andReturn(m::mock(Batch::class));
 
                 return $pendingChain;
@@ -388,7 +388,7 @@ class BusBatchTest extends TestCase
         $batch->recordFailedJob('test-id', new RuntimeException('Something else went wrong.'));
 
         $this->assertInstanceOf(Batch::class, $_SERVER['__finally.batch']);
-        $this->assertFalse(isset($_SERVER['__then.batch']));
+        $this->assertArrayNotHasKey('__then.batch', $_SERVER);
 
         $batch = $batch->fresh();
         $this->assertEquals(2, $batch->pendingJobs);
@@ -430,7 +430,7 @@ class BusBatchTest extends TestCase
         $batch->recordFailedJob('test-id', new RuntimeException('Something else went wrong.'));
 
         // While allowing failures this batch never actually completes...
-        $this->assertFalse(isset($_SERVER['__then.batch']));
+        $this->assertArrayNotHasKey('__then.batch', $_SERVER);
 
         $batch = $batch->fresh();
         $this->assertEquals(2, $batch->pendingJobs);
@@ -749,7 +749,7 @@ class BusBatchTest extends TestCase
         $factory->shouldReceive('make')
             ->withSomeOfArgs($batch, '', '', '', '', '', '', $options);
 
-        $batch->find(1);
+        $batch->find('1');
     }
 
     /**

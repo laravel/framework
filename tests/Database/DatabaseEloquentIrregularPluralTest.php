@@ -93,6 +93,7 @@ class DatabaseEloquentIrregularPluralTest extends TestCase
         $tokenIds = IrregularPluralToken::pluck('id');
 
         Carbon::setTestNow('2018-05-01 15:16:17');
+        $this->assertInstanceOf(IrregularPluralHuman::class, $human);
 
         $human->irregularPluralTokens()->sync($tokenIds);
 

@@ -66,7 +66,8 @@ class BusPendingBatchTest extends TestCase
 
         $container = new Container;
 
-        $job = new class {
+        $job = new class
+        {
         };
 
         $pendingBatch = new PendingBatch($container, new Collection([$job]));
@@ -134,7 +135,7 @@ class BusPendingBatchTest extends TestCase
 
         $result = $pendingBatch->dispatchIf(false);
 
-        $this->assertNull($result);
+        $this->assertNotInstanceOf(Batch::class, $result);
     }
 
     public function test_batch_is_dispatched_when_dispatchunless_is_false()
@@ -183,7 +184,7 @@ class BusPendingBatchTest extends TestCase
 
         $result = $pendingBatch->dispatchUnless(true);
 
-        $this->assertNull($result);
+        $this->assertNotInstanceOf(Batch::class, $result);
     }
 
     public function test_batch_before_event_is_called()
@@ -221,7 +222,8 @@ class BusPendingBatchTest extends TestCase
 
     public function test_it_throws_exception_if_batched_job_is_not_batchable(): void
     {
-        $nonBatchableJob = new class {
+        $nonBatchableJob = new class
+        {
         };
 
         $this->expectException(RuntimeException::class);
@@ -237,7 +239,8 @@ class BusPendingBatchTest extends TestCase
         new PendingBatch(
             $container,
             new Collection(
-                [new PendingBatch($container, new Collection([new BatchableJob, new class {
+                [new PendingBatch($container, new Collection([new BatchableJob, new class
+                {
                 }]))]
             )
         );

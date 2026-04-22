@@ -18,19 +18,15 @@ class ConfigPublishCommandTest extends TestCase
         'config-stubs/*.php',
     ];
 
-    #[\Override]
     protected function setUp(): void
     {
         $files = new Filesystem();
-
         $this->afterApplicationCreated(function () use ($files) {
             $files->ensureDirectoryExists($this->app->basePath('config-stubs'));
         });
-
         $this->beforeApplicationDestroyed(function () use ($files) {
             $files->deleteDirectory($this->app->basePath('config-stubs'));
         });
-
         parent::setUp();
     }
 
@@ -57,7 +53,7 @@ class ConfigPublishCommandTest extends TestCase
         ] as $file) {
             $this->assertFilenameExists("config-stubs/{$file}.php");
             $this->assertStringContainsString(
-                file_get_contents(package_path(['config', "{$file}.php"])), file_get_contents(config_path("{$file}.php"))
+                file_get_contents(package_path(['config', "{$file}.php"])), (string) file_get_contents(config_path("{$file}.php"))
             );
         }
 

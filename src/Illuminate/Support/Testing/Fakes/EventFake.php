@@ -141,8 +141,9 @@ class EventFake implements Dispatcher, Fake
             return $this->assertDispatchedTimes($event, $callback);
         }
 
-        PHPUnit::assertTrue(
-            $this->dispatched($event, $callback)->count() > 0,
+        PHPUnit::assertGreaterThan(
+            0,
+            $this->dispatched($event, $callback)->count(),
             "The expected [{$event}] event was not dispatched."
         );
     }

@@ -242,6 +242,7 @@ class DatabaseEloquentHasOneThroughOfManyTest extends TestCase
         $latestLogin = $user->intermediates->first()->logins()->create();
 
         $user = HasOneThroughOfManyTestUser::with('latest_login')->first();
+        $this->assertInstanceOf(HasOneThroughOfManyTestUser::class, $user);
 
         $this->assertTrue($user->relationLoaded('latest_login'));
         $this->assertSame($latestLogin->id, $user->latest_login->id);

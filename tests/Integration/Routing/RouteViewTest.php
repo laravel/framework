@@ -14,7 +14,7 @@ class RouteViewTest extends TestCase
 
         View::addLocation(__DIR__.'/Fixtures');
 
-        $this->assertStringContainsString('Test bar', $this->get('/route')->getContent());
+        $this->assertStringContainsString('Test bar', (string) $this->get('/route')->getContent());
         $this->assertSame(200, $this->get('/route')->status());
     }
 
@@ -24,8 +24,8 @@ class RouteViewTest extends TestCase
 
         View::addLocation(__DIR__.'/Fixtures');
 
-        $this->assertStringContainsString('Test bar', $this->get('/route/value1/value2')->getContent());
-        $this->assertStringContainsString('Test bar', $this->get('/route/value1')->getContent());
+        $this->assertStringContainsString('Test bar', (string) $this->get('/route/value1/value2')->getContent());
+        $this->assertStringContainsString('Test bar', (string) $this->get('/route/value1')->getContent());
 
         tap($this->get('/route/value1/value2'), function ($response) {
             $this->assertSame('value1', $response->viewData('param'));

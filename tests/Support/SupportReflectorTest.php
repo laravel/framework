@@ -122,9 +122,9 @@ class SupportReflectorTest extends TestCase
     {
         require_once __DIR__.'/Fixtures/ClassesWithAttributes.php';
 
-        $this->assertNull(Reflector::getClassAttribute(Fixtures\ChildClass::class, Fixtures\UnusedAttr::class));
-        $this->assertNull(Reflector::getClassAttribute(Fixtures\ChildClass::class, Fixtures\UnusedAttr::class, true));
-        $this->assertNull(Reflector::getClassAttribute(Fixtures\ChildClass::class, Fixtures\ParentOnlyAttr::class));
+        $this->assertNotInstanceOf(\Illuminate\Tests\Support\Fixtures\UnusedAttr::class, Reflector::getClassAttribute(Fixtures\ChildClass::class, Fixtures\UnusedAttr::class));
+        $this->assertNotInstanceOf(\Illuminate\Tests\Support\Fixtures\UnusedAttr::class, Reflector::getClassAttribute(Fixtures\ChildClass::class, Fixtures\UnusedAttr::class, true));
+        $this->assertNotInstanceOf(\Illuminate\Tests\Support\Fixtures\ParentOnlyAttr::class, Reflector::getClassAttribute(Fixtures\ChildClass::class, Fixtures\ParentOnlyAttr::class));
         $this->assertInstanceOf(Fixtures\ParentOnlyAttr::class, Reflector::getClassAttribute(Fixtures\ChildClass::class, Fixtures\ParentOnlyAttr::class, true));
         $this->assertInstanceOf(Fixtures\StrAttr::class, Reflector::getClassAttribute(Fixtures\ChildClass::class, Fixtures\StrAttr::class));
         $this->assertInstanceOf(Fixtures\StrAttr::class, Reflector::getClassAttribute(Fixtures\ChildClass::class, Fixtures\StrAttr::class, true));

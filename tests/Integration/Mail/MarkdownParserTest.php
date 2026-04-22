@@ -11,12 +11,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 class MarkdownParserTest extends TestCase
 {
     /** {@inheritdoc} */
-    #[\Override]
     protected function tearDown(): void
     {
         Markdown::flushState();
         EncodedHtmlString::flushState();
-
         parent::tearDown();
     }
 

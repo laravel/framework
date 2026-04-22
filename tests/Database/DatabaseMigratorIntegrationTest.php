@@ -92,8 +92,8 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertTrue($this->db::schema()->hasTable('users'));
         $this->assertTrue($this->db::schema()->hasTable('password_resets'));
 
-        $this->assertTrue(str_contains($ran[0], 'users'));
-        $this->assertTrue(str_contains($ran[1], 'password_resets'));
+        $this->assertStringContainsString('users', (string) $ran[0]);
+        $this->assertStringContainsString('password_resets', (string) $ran[1]);
     }
 
     public function testMigrationsDefaultConnectionCanBeChanged()
@@ -154,8 +154,8 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertFalse($this->db::schema()->hasTable('users'));
         $this->assertFalse($this->db::schema()->hasTable('password_resets'));
 
-        $this->assertTrue(str_contains($rolledBack[0], 'password_resets'));
-        $this->assertTrue(str_contains($rolledBack[1], 'users'));
+        $this->assertStringContainsString('password_resets', (string) $rolledBack[0]);
+        $this->assertStringContainsString('users', (string) $rolledBack[1]);
     }
 
     public function testMigrationsCanBeResetUsingAnString()
@@ -167,8 +167,8 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertFalse($this->db::schema()->hasTable('users'));
         $this->assertFalse($this->db::schema()->hasTable('password_resets'));
 
-        $this->assertTrue(str_contains($rolledBack[0], 'password_resets'));
-        $this->assertTrue(str_contains($rolledBack[1], 'users'));
+        $this->assertStringContainsString('password_resets', (string) $rolledBack[0]);
+        $this->assertStringContainsString('users', (string) $rolledBack[1]);
     }
 
     public function testMigrationsCanBeResetUsingAnArray()
@@ -180,8 +180,8 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertFalse($this->db::schema()->hasTable('users'));
         $this->assertFalse($this->db::schema()->hasTable('password_resets'));
 
-        $this->assertTrue(str_contains($rolledBack[0], 'password_resets'));
-        $this->assertTrue(str_contains($rolledBack[1], 'users'));
+        $this->assertStringContainsString('password_resets', (string) $rolledBack[0]);
+        $this->assertStringContainsString('users', (string) $rolledBack[1]);
     }
 
     public function testNoErrorIsThrownWhenNoOutstandingMigrationsExist()

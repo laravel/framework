@@ -96,7 +96,7 @@ class SkipMiddlewareTest extends TestCase
             'command' => serialize($class),
         ]);
 
-        $this->assertEquals($expectedHandledValue, $class::$handled);
+        $this->assertSame($expectedHandledValue, $class::$handled);
     }
 }
 

@@ -17,20 +17,16 @@ use function Orchestra\Testbench\default_skeleton_path;
 class MigrateFreshCommandWithJournalModeWalTest extends DatabaseTestCase
 {
     /** {@inheritDoc} */
-    #[\Override]
     protected function setUp(): void
     {
         $files = new Filesystem;
-
         $files->copy(
             join_paths(__DIR__, 'stubs', 'database-journal-mode-wal.sqlite'),
             join_paths(default_skeleton_path(), 'database', 'database.sqlite')
         );
-
         $this->beforeApplicationDestroyed(function () use ($files) {
             $files->delete(database_path('database.sqlite'));
         });
-
         parent::setUp();
     }
 

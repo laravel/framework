@@ -122,8 +122,8 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
             $iterations++;
         });
 
-        $this->assertEquals(2, $iterations);
-        $this->assertEquals(3, $count);
+        $this->assertSame(2, $iterations);
+        $this->assertSame(3, $count);
     }
 
     /**

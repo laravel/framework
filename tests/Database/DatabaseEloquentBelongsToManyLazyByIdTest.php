@@ -54,6 +54,7 @@ class DatabaseEloquentBelongsToManyLazyByIdTest extends TestCase
 
         $user = BelongsToManyLazyByIdTestTestUser::query()->first();
         $i = 0;
+        $this->assertInstanceOf(BelongsToManyLazyByIdTestTestUser::class, $user);
 
         $user->articles()->lazyById(1)->each(function ($model) use (&$i) {
             $i++;

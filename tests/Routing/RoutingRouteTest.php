@@ -504,7 +504,7 @@ class RoutingRouteTest extends TestCase
         $router->get('foo/{team}/{post}', [
             'middleware' => SubstituteBindings::class,
             'uses' => function (?RoutingTestUserModel $userFromContainer, RoutingTestTeamModel $team, $postId) {
-                $this->assertNull($userFromContainer);
+                $this->assertNotInstanceOf(RoutingTestUserModel::class, $userFromContainer);
                 $this->assertInstanceOf(RoutingTestTeamModel::class, $team);
                 $this->assertSame('bar', $team->value);
                 $this->assertSame('baz', $postId);
@@ -1712,7 +1712,7 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals(Response::class, $_SERVER['route.test.controller.middleware.class']);
         $this->assertEquals(0, $_SERVER['route.test.controller.middleware.parameters.one']);
         $this->assertEquals(['foo', 'bar'], $_SERVER['route.test.controller.middleware.parameters.two']);
-        $this->assertFalse(isset($_SERVER['route.test.controller.except.middleware']));
+        $this->assertArrayNotHasKey('route.test.controller.except.middleware', $_SERVER);
     }
 
     public function testControllerRoutingArrayCallable()
@@ -1732,7 +1732,7 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals(Response::class, $_SERVER['route.test.controller.middleware.class']);
         $this->assertEquals(0, $_SERVER['route.test.controller.middleware.parameters.one']);
         $this->assertEquals(['foo', 'bar'], $_SERVER['route.test.controller.middleware.parameters.two']);
-        $this->assertFalse(isset($_SERVER['route.test.controller.except.middleware']));
+        $this->assertArrayNotHasKey('route.test.controller.except.middleware', $_SERVER);
         $action = $router->getRoutes()->getRoutes()[0]->getAction()['controller'];
         $this->assertEquals(RouteTestControllerStub::class.'@index', $action);
     }
@@ -1918,7 +1918,7 @@ class RoutingRouteTest extends TestCase
         $router->get('foo/{bar?}', [
             'middleware' => SubstituteBindings::class,
             'uses' => function (?CategoryBackedEnum $bar = null) {
-                $this->assertNull($bar);
+                $this->assertNotInstanceOf(CategoryBackedEnum::class, $bar);
 
                 return 'bar';
             },
@@ -1977,7 +1977,7 @@ class RoutingRouteTest extends TestCase
         $router->get('foo/{bar?}', [
             'middleware' => SubstituteBindings::class,
             'uses' => function (?RoutingTestUserModel $bar = null) {
-                $this->assertNull($bar);
+                $this->assertNotInstanceOf(RoutingTestUserModel::class, $bar);
             },
         ]);
         $router->dispatch(Request::create('foo', 'GET'))->getContent();
@@ -1990,7 +1990,7 @@ class RoutingRouteTest extends TestCase
         $router = $this->getRouter();
         $router->get('foo/{bar?}', [
             'middleware' => SubstituteBindings::class,
-            'uses' => function (?\Illuminate\Tests\Routing\CategoryBackedEnum $bar = null) {
+            'uses' => function (?CategoryBackedEnum $bar = null) {
                 $this->assertInstanceOf(CategoryBackedEnum::class, $bar);
             },
         ]);

@@ -19,11 +19,9 @@ use function Orchestra\Testbench\phpunit_version_compare;
 class BladeTest extends TestCase
 {
     /** {@inheritdoc} */
-    #[\Override]
     protected function tearDown(): void
     {
         artisan($this, 'view:clear');
-
         parent::tearDown();
     }
 

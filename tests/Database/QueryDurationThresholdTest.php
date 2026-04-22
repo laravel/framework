@@ -174,12 +174,12 @@ class QueryDurationThresholdTest extends TestCase
         $connection->setEventDispatcher(new Dispatcher());
 
         $connection->logQuery('xxxx', [], 1.1);
-        $this->assertSame(1.1, $connection->totalQueryDuration());
+        $this->assertEqualsWithDelta(1.1, $connection->totalQueryDuration(), PHP_FLOAT_EPSILON);
         $connection->logQuery('xxxx', [], 1.1);
-        $this->assertSame(2.2, $connection->totalQueryDuration());
+        $this->assertEqualsWithDelta(2.2, $connection->totalQueryDuration(), PHP_FLOAT_EPSILON);
 
         $connection->resetTotalQueryDuration();
-        $this->assertSame(0.0, $connection->totalQueryDuration());
+        $this->assertEqualsWithDelta(0.0, $connection->totalQueryDuration(), PHP_FLOAT_EPSILON);
     }
 
     public function testItCanRestoreAlreadyRunHandlers()

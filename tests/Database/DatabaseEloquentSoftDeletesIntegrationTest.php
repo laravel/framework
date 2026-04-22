@@ -148,7 +148,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $query->chunk(2, function ($user) use (&$count) {
             $count += count($user);
         });
-        $this->assertEquals(1, $count);
+        $this->assertSame(1, $count);
 
         $query = SoftDeletesTestUser::query();
         $this->assertCount(1, $query->pluck('email')->all());
@@ -311,6 +311,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
     {
         $this->createUsers();
         $taylor = SoftDeletesTestUser::withTrashed()->find(1);
+        $this->assertInstanceOf(SoftDeletesTestUser::class, $taylor);
 
         $this->assertTrue($taylor->trashed());
 

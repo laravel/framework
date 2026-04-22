@@ -54,6 +54,7 @@ class EloquentModelLoadMissingTest extends DatabaseTestCase
         $post = Post::with('comments')->first();
 
         DB::enableQueryLog();
+        $this->assertInstanceOf(Post::class, $post);
 
         $post->loadMissing('comments.parent');
 

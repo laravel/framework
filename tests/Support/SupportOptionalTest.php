@@ -78,7 +78,7 @@ class SupportOptionalTest extends TestCase
 
         $optional = new Optional($targetArr);
 
-        $this->assertTrue(isset($optional['item']));
+        $this->assertArrayHasKey('item', $optional);
         $this->assertTrue(isset($optional->item));
     }
 
@@ -88,7 +88,7 @@ class SupportOptionalTest extends TestCase
 
         $optional = new Optional($targetArr);
 
-        $this->assertFalse(isset($optional['item']));
+        $this->assertArrayNotHasKey('item', $optional);
         $this->assertFalse(isset($optional->item));
     }
 

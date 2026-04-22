@@ -101,7 +101,7 @@ class ScheduleListCommandTest extends TestCase
         $this->assertNull($data[0]['repeat_seconds']);
         $this->assertSame('php artisan foo:command', $data[0]['command']);
         $this->assertSame('This is the description of the command.', $data[0]['description']);
-        $this->assertStringContainsString('2023-04-01 00:00:00', $data[0]['next_due_date']);
+        $this->assertStringContainsString('2023-04-01 00:00:00', (string) $data[0]['next_due_date']);
         $this->assertSame('3 months from now', $data[0]['next_due_date_human']);
         $this->assertFalse($data[0]['has_mutex']);
         $this->assertIsArray($data[0]['environments']);
@@ -116,8 +116,8 @@ class ScheduleListCommandTest extends TestCase
 
         $this->assertSame('foo-named-job', $data[5]['command']);
 
-        $this->assertStringContainsString('Closure at:', $data[8]['command']);
-        $this->assertStringContainsString('ScheduleListCommandTest.php', $data[8]['command']);
+        $this->assertStringContainsString('Closure at:', (string) $data[8]['command']);
+        $this->assertStringContainsString('ScheduleListCommandTest.php', (string) $data[8]['command']);
     }
 
     public function testDisplayScheduleAsJsonWithSpecificEnvironment()
@@ -185,7 +185,7 @@ class ScheduleListCommandTest extends TestCase
         $this->assertIsArray($data);
         $this->assertCount(1, $data);
         $this->assertSame('America/Chicago', $data[0]['timezone']);
-        $this->assertStringContainsString('-06:00', $data[0]['next_due_date']);
+        $this->assertStringContainsString('-06:00', (string) $data[0]['next_due_date']);
         $this->assertSame('php artisan inspire', $data[0]['command']);
     }
 
@@ -330,8 +330,8 @@ class ScheduleListCommandTest extends TestCase
         $this->assertSame('* * * * *', $data[1]['expression']);
         $this->assertSame(Application::phpBinary().' '.Application::artisanBinary().' inspire', $data[1]['command']);
 
-        $this->assertStringContainsString('Closure at:', $data[2]['command']);
-        $this->assertStringContainsString('ScheduleListCommandTest.php', $data[2]['command']);
+        $this->assertStringContainsString('Closure at:', (string) $data[2]['command']);
+        $this->assertStringContainsString('ScheduleListCommandTest.php', (string) $data[2]['command']);
     }
 
     public function testDisplayScheduleWithSort()

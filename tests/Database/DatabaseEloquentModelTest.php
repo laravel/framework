@@ -91,7 +91,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         // test mutation
         $model->list_items = ['name' => 'taylor'];
-        $this->assertEquals(['name' => 'taylor'], $model->list_items);
+        $this->assertSame(['name' => 'taylor'], $model->list_items);
         $attributes = $model->getAttributes();
         $this->assertSame(json_encode(['name' => 'taylor']), $attributes['list_items']);
     }
@@ -631,13 +631,13 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub(['attributes' => 1, 'connection' => 2, 'table' => 3]);
         unset($model['table']);
 
-        $this->assertTrue(isset($model['attributes']));
+        $this->assertArrayHasKey('attributes', $model);
         $this->assertEquals(1, $model['attributes']);
-        $this->assertTrue(isset($model['connection']));
+        $this->assertArrayHasKey('connection', $model);
         $this->assertEquals(2, $model['connection']);
-        $this->assertFalse(isset($model['table']));
+        $this->assertArrayNotHasKey('table', $model);
         $this->assertEquals(null, $model['table']);
-        $this->assertFalse(isset($model['with']));
+        $this->assertArrayNotHasKey('with', $model);
     }
 
     public function testOnly()
@@ -1209,7 +1209,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testInsertOrIgnoreThrowsOnExistingModel()
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
 
         $model = new EloquentModelStub;
         $model->exists = true;
@@ -1460,7 +1460,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('abby', $array['partner']['name']);
         $this->assertNull($array['group']);
         $this->assertSame([], $array['multi']);
-        $this->assertFalse(isset($array['password']));
+        $this->assertArrayNotHasKey('password', $array);
 
         $model->setAppends(['appendable']);
         $array = $model->toArray();
@@ -2681,7 +2681,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isDirty());
 
         $model->publicIncrement('foo', 1, ['category' => 1]);
-        $this->assertEquals(4, $model->foo);
+        $this->assertSame(4, $model->foo);
         $this->assertEquals(1, $model->category);
         $this->assertTrue($model->isDirty('category'));
     }
@@ -2708,7 +2708,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isDirty());
 
         $model->publicIncrementQuietly('foo', 1, ['category' => 1]);
-        $this->assertEquals(4, $model->foo);
+        $this->assertSame(4, $model->foo);
         $this->assertEquals(1, $model->category);
         $this->assertTrue($model->isDirty('category'));
     }
@@ -2735,7 +2735,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isDirty());
 
         $model->publicDecrementQuietly('foo', 1, ['category' => 1]);
-        $this->assertEquals(2, $model->foo);
+        $this->assertSame(2, $model->foo);
         $this->assertEquals(1, $model->category);
         $this->assertTrue($model->isDirty('category'));
     }
@@ -2756,8 +2756,8 @@ class DatabaseEloquentModelTest extends TestCase
         $result = $model->publicIncrementEach(['foo' => 1, 'bar' => 2]);
 
         $this->assertEquals(1, $result);
-        $this->assertEquals(3, $model->foo);
-        $this->assertEquals(7, $model->bar);
+        $this->assertSame(3, $model->foo);
+        $this->assertSame(7, $model->bar);
     }
 
     public function testDecrementEachOnExistingModelScopesQueryToModelKey()
@@ -2776,8 +2776,8 @@ class DatabaseEloquentModelTest extends TestCase
         $result = $model->publicDecrementEach(['foo' => 3, 'bar' => 2]);
 
         $this->assertEquals(1, $result);
-        $this->assertEquals(7, $model->foo);
-        $this->assertEquals(3, $model->bar);
+        $this->assertSame(7, $model->foo);
+        $this->assertSame(3, $model->bar);
     }
 
     public function testIncrementEachWithExtraColumnsOnExistingModel()
@@ -2795,7 +2795,7 @@ class DatabaseEloquentModelTest extends TestCase
         $result = $model->publicIncrementEach(['foo' => 5], ['category' => 'test']);
 
         $this->assertEquals(1, $result);
-        $this->assertEquals(7, $model->foo);
+        $this->assertSame(7, $model->foo);
         $this->assertSame('test', $model->category);
     }
 
@@ -2836,7 +2836,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($result);
         // Note: attributes are set before the event fires, matching increment() behavior.
         // The in-memory value changes but the database is not updated.
-        $this->assertEquals(2, $model->foo);
+        $this->assertSame(2, $model->foo);
     }
 
     public function testIncrementEachOnNonExistingModelForwardsToQueryBuilder()
@@ -2918,9 +2918,9 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->booleanAttribute);
         $this->assertEquals($obj, $model->objectAttribute);
         $this->assertEquals(['foo' => 'bar'], $model->arrayAttribute);
-        $this->assertEquals(['foo' => 'bar'], $model->jsonAttribute);
+        $this->assertSame(['foo' => 'bar'], $model->jsonAttribute);
         $this->assertSame('{"foo":"bar"}', $model->jsonAttributeValue());
-        $this->assertEquals(['こんにちは' => '世界'], $model->jsonAttributeWithUnicode);
+        $this->assertSame(['こんにちは' => '世界'], $model->jsonAttributeWithUnicode);
         $this->assertSame('{"こんにちは":"世界"}', $model->jsonAttributeWithUnicodeValue());
         $this->assertInstanceOf(Carbon::class, $model->dateAttribute);
         $this->assertInstanceOf(Carbon::class, $model->datetimeAttribute);
@@ -2945,9 +2945,9 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($arr['boolAttribute']);
         $this->assertFalse($arr['booleanAttribute']);
         $this->assertEquals($obj, $arr['objectAttribute']);
-        $this->assertEquals(['foo' => 'bar'], $arr['arrayAttribute']);
-        $this->assertEquals(['foo' => 'bar'], $arr['jsonAttribute']);
-        $this->assertEquals(['こんにちは' => '世界'], $arr['jsonAttributeWithUnicode']);
+        $this->assertSame(['foo' => 'bar'], $arr['arrayAttribute']);
+        $this->assertSame(['foo' => 'bar'], $arr['jsonAttribute']);
+        $this->assertSame(['こんにちは' => '世界'], $arr['jsonAttributeWithUnicode']);
         $this->assertSame('1969-07-20 00:00:00', $arr['dateAttribute']);
         $this->assertSame('1969-07-20 22:56:00', $arr['datetimeAttribute']);
         $this->assertEquals(-14173440, $arr['timestampAttribute']);
@@ -3083,7 +3083,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelCastingStub;
 
         $model->floatAttribute = 0;
-        $this->assertSame(0.0, $model->floatAttribute);
+        $this->assertEqualsWithDelta(0.0, $model->floatAttribute, PHP_FLOAT_EPSILON);
 
         $model->floatAttribute = 'Infinity';
         $this->assertSame(INF, $model->floatAttribute);
@@ -3189,7 +3189,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model = m::mock(EloquentModelStub::class.'[delete]');
         $model->delete = 123;
-        $this->assertEquals(123, $model->delete);
+        $this->assertSame(123, $model->delete);
     }
 
     public function testIntKeyTypePreserved()
@@ -3361,7 +3361,7 @@ class DatabaseEloquentModelTest extends TestCase
 
             // Primitive castables, enum castable
             $expectedExceptionCount = count($primitiveCasts) + 1;
-            $this->assertEquals($expectedExceptionCount, $exceptionCount);
+            $this->assertSame($expectedExceptionCount, $exceptionCount);
         } finally {
             Model::preventAccessingMissingAttributes($originalMode);
         }
@@ -3548,13 +3548,13 @@ class DatabaseEloquentModelTest extends TestCase
         ]);
 
         $this->assertIsInt($model->getOriginal('intAttribute'));
-        $this->assertEquals(1, $model->getOriginal('intAttribute'));
-        $this->assertEquals(2, $model->intAttribute);
+        $this->assertSame(1, $model->getOriginal('intAttribute'));
+        $this->assertSame(2, $model->intAttribute);
         $this->assertEquals(2, $model->getAttribute('intAttribute'));
 
         $this->assertIsFloat($model->getOriginal('floatAttribute'));
-        $this->assertSame(0.1234, $model->getOriginal('floatAttribute'));
-        $this->assertSame(0.443, $model->floatAttribute);
+        $this->assertEqualsWithDelta(0.1234, $model->getOriginal('floatAttribute'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(0.443, $model->floatAttribute, PHP_FLOAT_EPSILON);
 
         $this->assertIsString($model->getOriginal('stringAttribute'));
         $this->assertSame('432', $model->getOriginal('stringAttribute'));
@@ -3595,7 +3595,7 @@ class DatabaseEloquentModelTest extends TestCase
         ], true);
 
         $this->assertIsInt($model->duplicatedAttribute);
-        $this->assertEquals(1, $model->duplicatedAttribute);
+        $this->assertSame(1, $model->duplicatedAttribute);
         $this->assertEquals(1, $model->getAttribute('duplicatedAttribute'));
     }
 
@@ -3609,7 +3609,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = unserialize(serialize($model));
 
         $this->assertIsInt($model->duplicatedAttribute);
-        $this->assertEquals(1, $model->duplicatedAttribute);
+        $this->assertSame(1, $model->duplicatedAttribute);
         $this->assertEquals(1, $model->getAttribute('duplicatedAttribute'));
     }
 
@@ -3716,7 +3716,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         // Simulate a JSON error
         json_decode('{');
-        $this->assertTrue(json_last_error() !== JSON_ERROR_NONE);
+        $this->assertNotSame(JSON_ERROR_NONE, json_last_error());
 
         $this->assertSame('{"name":"Mateus"}', $user->toJson(JSON_THROW_ON_ERROR));
     }
@@ -3827,7 +3827,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelWithUseEloquentBuilderAttributeStub();
 
-        $query = $this->createMock(\Illuminate\Database\Query\Builder::class);
+        $query = $this->createStub(BaseBuilder::class);
         $eloquentBuilder = $model->newEloquentBuilder($query);
 
         $this->assertInstanceOf(CustomBuilder::class, $eloquentBuilder);
@@ -3837,7 +3837,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelWithoutUseEloquentBuilderAttributeStub();
 
-        $query = $this->createMock(\Illuminate\Database\Query\Builder::class);
+        $query = $this->createStub(BaseBuilder::class);
         $eloquentBuilder = $model->newEloquentBuilder($query);
 
         $this->assertNotInstanceOf(CustomBuilder::class, $eloquentBuilder);

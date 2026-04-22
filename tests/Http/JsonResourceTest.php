@@ -12,7 +12,8 @@ class JsonResourceTest extends TestCase
 {
     public function testJsonResourceNullAttributes()
     {
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
         };
 
         $model->setAttribute('relation_sum_column', null);
@@ -32,7 +33,8 @@ class JsonResourceTest extends TestCase
 
     public function testJsonResourceToJsonSucceedsWithPriorErrors(): void
     {
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
         };
 
         $resource = m::mock(JsonResource::class, ['resource' => $model])
@@ -42,14 +44,15 @@ class JsonResourceTest extends TestCase
 
         // Simulate a JSON error
         json_decode('{');
-        $this->assertTrue(json_last_error() !== JSON_ERROR_NONE);
+        $this->assertNotSame(JSON_ERROR_NONE, json_last_error());
 
         $this->assertSame('{"foo":"bar"}', $resource->toJson(JSON_THROW_ON_ERROR));
     }
 
     public function testJsonResourceToPrettyPrint(): void
     {
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
         };
 
         $resource = m::mock(JsonResource::class, ['resource' => $model])
@@ -62,12 +65,12 @@ class JsonResourceTest extends TestCase
 
         $this->assertJsonStringEqualsJsonString($expected, $results);
         $this->assertSame($expected, $results);
-        $this->assertStringContainsString("\n", $results);
-        $this->assertStringContainsString('    ', $results);
+        $this->assertStringContainsString("\n", (string) $results);
+        $this->assertStringContainsString('    ', (string) $results);
 
         $results = $resource->toPrettyJson(JSON_NUMERIC_CHECK);
-        $this->assertStringContainsString("\n", $results);
-        $this->assertStringContainsString('    ', $results);
-        $this->assertStringContainsString('"number": 123', $results);
+        $this->assertStringContainsString("\n", (string) $results);
+        $this->assertStringContainsString('    ', (string) $results);
+        $this->assertStringContainsString('"number": 123', (string) $results);
     }
 }

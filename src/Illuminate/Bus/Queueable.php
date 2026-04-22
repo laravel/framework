@@ -375,8 +375,9 @@ trait Queueable
             $chain = (new Collection($this->chained))->map(fn ($job) => get_class(unserialize($job)))->all();
         }
 
-        PHPUnit::assertTrue(
-            $expectedChain === ($chain ?? $this->chained),
+        PHPUnit::assertSame(
+            $chain ?? $this->chained,
+            $expectedChain,
             'The job does not have the expected chain.'
         );
     }

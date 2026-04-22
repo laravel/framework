@@ -62,7 +62,7 @@ class DebouncedJobTest extends QueueTestCase
         $this->runQueueWorkerCommand(['--once' => true], 2);
 
         // Only the second (latest) dispatch should have executed.
-        $this->assertEquals(1, DebouncedTestJob::$handleCount);
+        $this->assertSame(1, DebouncedTestJob::$handleCount);
     }
 
     public function testTokenPersistsAfterSuccessfulExecution()
@@ -114,7 +114,7 @@ class DebouncedJobTest extends QueueTestCase
         $this->travelTo(Carbon::now()->addSeconds(31));
         $this->runQueueWorkerCommand(['--once' => true], 2);
 
-        $this->assertEquals(1, $firedCount);
+        $this->assertSame(1, $firedCount);
     }
 
     public function testDebouncedAndUniqueThrowsLogicException()
@@ -148,7 +148,7 @@ class DebouncedJobTest extends QueueTestCase
         $this->runQueueWorkerCommand(['--once' => true], 2);
 
         // Both should execute — different identities.
-        $this->assertEquals(2, DebouncedTestJob::$handleCount);
+        $this->assertSame(2, DebouncedTestJob::$handleCount);
     }
 
     public function testDebounceLockKeyFormat()
@@ -246,7 +246,7 @@ class DebouncedJobTest extends QueueTestCase
         $this->runQueueWorkerCommand(['--once' => true], 3);
 
         // Only the second dispatch should have executed.
-        $this->assertEquals(1, DebouncedTestJob::$handleCount);
+        $this->assertSame(1, DebouncedTestJob::$handleCount);
 
         // Chain from superseded job should NOT have been dispatched.
         $this->assertFalse(ChainReceiverJob::$handled);
@@ -411,7 +411,7 @@ class DebouncedWithCustomCacheJob implements ShouldQueue
         return $this->entityId;
     }
 
-    public function debounceVia(): \Illuminate\Contracts\Cache\Repository
+    public function debounceVia(): Cache
     {
         return \Illuminate\Container\Container::getInstance()
             ->make(\Illuminate\Contracts\Cache\Factory::class)

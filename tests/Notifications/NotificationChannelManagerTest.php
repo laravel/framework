@@ -193,7 +193,7 @@ class NotificationChannelManagerTest extends TestCase
                 public function send($notifiable, Notification $notification)
                 {
                     if ($this->count > 1) {
-                        throw new \Exception();
+                        throw new Exception();
                     }
 
                     $this->count++;

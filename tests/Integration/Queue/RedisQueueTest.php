@@ -34,17 +34,14 @@ class RedisQueueTest extends TestCase
     private $container;
 
     /** {@inheritdoc} */
-    #[\Override]
     protected function setUp(): void
     {
         $this->afterApplicationCreated(function () {
             $this->setUpRedis();
         });
-
         $this->beforeApplicationDestroyed(function () {
             $this->tearDownRedis();
         });
-
         parent::setUp();
     }
 
@@ -91,7 +88,7 @@ class RedisQueueTest extends TestCase
         $this->assertEquals($jobs[2], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
         $this->assertEquals($jobs[1], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
         $this->assertEquals($jobs[3], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
-        $this->assertNull($this->queue->pop());
+        $this->assertNotInstanceOf(\Illuminate\Contracts\Queue\Job::class, $this->queue->pop());
 
         $redisKey = $this->getQueueRedisKey($default);
         $this->assertEquals(1, $this->redis[$driver]->connection()->zcard("$redisKey:delayed"));
@@ -409,7 +406,7 @@ class RedisQueueTest extends TestCase
         $this->assertEquals($job, unserialize($decoded->data->command));
 
         // check if the queue has no ready item yet
-        $this->assertNull($this->queue->pop());
+        $this->assertNotInstanceOf(\Illuminate\Contracts\Queue\Job::class, $this->queue->pop());
     }
 
     /**
@@ -452,7 +449,7 @@ class RedisQueueTest extends TestCase
         $this->assertEquals(0, $this->redis[$driver]->connection()->zcard("$redisKey:reserved"));
         $this->assertEquals(0, $this->redis[$driver]->connection()->llen("$redisKey"));
 
-        $this->assertNull($this->queue->pop());
+        $this->assertNotInstanceOf(\Illuminate\Contracts\Queue\Job::class, $this->queue->pop());
     }
 
     /**
@@ -493,6 +490,7 @@ class RedisQueueTest extends TestCase
         $this->assertEquals(3, $this->queue->size());
         $job = $this->queue->pop();
         $this->assertEquals(3, $this->queue->size());
+        $this->assertInstanceOf(\Illuminate\Contracts\Queue\Job::class, $job);
         $job->delete();
         $this->assertEquals(2, $this->queue->size());
     }
@@ -592,7 +590,7 @@ class RedisQueueTest extends TestCase
             // With the bug, this would fail because the payload is double-serialized
             $poppedJob = $this->queue->pop();
 
-            $this->assertNotNull($poppedJob, 'Delayed job should be retrievable after delay expires');
+            $this->assertInstanceOf(\Illuminate\Contracts\Queue\Job::class, $poppedJob, 'Delayed job should be retrievable after delay expires');
 
             // Verify the job payload can be decoded correctly
             $rawBody = $poppedJob->getRawBody();

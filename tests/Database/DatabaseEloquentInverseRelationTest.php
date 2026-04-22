@@ -163,7 +163,7 @@ class DatabaseEloquentInverseRelationTest extends TestCase
 
         $relation = (new HasInverseRelationStub($builder, new HasInverseRelationParentStub, 'test_id'));
 
-        $this->assertTrue(in_array('test', $relation->exposeGetPossibleInverseRelations()));
+        $this->assertContains('test', $relation->exposeGetPossibleInverseRelations());
     }
 
     public function testProvidesPossibleRecursiveRelationsIfRelatedIsTheSameClassAsParent()
@@ -173,7 +173,7 @@ class DatabaseEloquentInverseRelationTest extends TestCase
 
         $relation = (new HasInverseRelationStub($builder, new HasInverseRelationParentStub));
 
-        $this->assertTrue(in_array('parent', $relation->exposeGetPossibleInverseRelations()));
+        $this->assertContains('parent', $relation->exposeGetPossibleInverseRelations());
     }
 
     #[DataProvider('guessedParentRelationsDataProvider')]
@@ -283,7 +283,8 @@ class DatabaseEloquentInverseRelationTest extends TestCase
             [],
             new HasInverseRelationRelatedStub(),
             'foo',
-            new class() {
+            new class()
+            {
             },
             new HasInverseRelationRelatedStub(),
         ]);

@@ -287,7 +287,7 @@ class CacheFileStoreTest extends TestCase
         $files->expects($this->once())->method('put')->with($filePath, $valueAfterIncrement);
         $result = $store->increment('foo');
         $this->assertIsInt($result);
-        $this->assertEquals(1, $result);
+        $this->assertSame(1, $result);
     }
 
     public function testIncrementDoesNotExtendCacheLife()

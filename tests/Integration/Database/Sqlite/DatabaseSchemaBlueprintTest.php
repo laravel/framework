@@ -221,7 +221,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'alter table "__temp__users" rename to "users"',
         ];
 
-        $this->assertEquals($expected, $getSql('SQLite'));
+        $this->assertSame($expected, $getSql('SQLite'));
     }
 
     public function testChangingPrimaryAutoincrementColumnsToNonAutoincrementColumnsWork()
@@ -243,7 +243,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'alter table "__temp__users" rename to "users"',
         ];
 
-        $this->assertEquals($expected, $getSql('SQLite'));
+        $this->assertSame($expected, $getSql('SQLite'));
     }
 
     public function testChangingDoubleColumnsWork()
@@ -265,7 +265,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'alter table "__temp__products" rename to "products"',
         ];
 
-        $this->assertEquals($expected, $getSql('SQLite'));
+        $this->assertSame($expected, $getSql('SQLite'));
     }
 
     public function testChangingColumnsWithDefaultWorks()
@@ -290,7 +290,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'alter table "__temp__products" rename to "products"',
         ];
 
-        $this->assertEquals($expected, $getSql('SQLite'));
+        $this->assertSame($expected, $getSql('SQLite'));
     }
 
     public function testRenameIndexWorks()
@@ -314,25 +314,25 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'create index "index2" on "users" ("name")',
         ];
 
-        $this->assertEquals($expected, $getSql('SQLite'));
+        $this->assertSame($expected, $getSql('SQLite'));
 
         $expected = [
             'sp_rename N\'"users"."index1"\', "index2", N\'INDEX\'',
         ];
 
-        $this->assertEquals($expected, $getSql('SqlServer'));
+        $this->assertSame($expected, $getSql('SqlServer'));
 
         $expected = [
             'alter table `users` rename index `index1` to `index2`',
         ];
 
-        $this->assertEquals($expected, $getSql('MySql'));
+        $this->assertSame($expected, $getSql('MySql'));
 
         $expected = [
             'alter index "index1" rename to "index2"',
         ];
 
-        $this->assertEquals($expected, $getSql('Postgres'));
+        $this->assertSame($expected, $getSql('Postgres'));
     }
 
     public function testAddUniqueIndexWithoutNameWorks()
@@ -352,7 +352,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'alter table `users` add unique `users_name_unique`(`name`)',
         ];
 
-        $this->assertEquals($expected, $getSql('MySql'));
+        $this->assertSame($expected, $getSql('MySql'));
 
         $expected = [
             'alter table "users" alter column "name" type varchar(255), alter column "name" drop not null, alter column "name" drop default, alter column "name" drop identity if exists',
@@ -360,7 +360,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'comment on column "users"."name" is NULL',
         ];
 
-        $this->assertEquals($expected, $getSql('Postgres'));
+        $this->assertSame($expected, $getSql('Postgres'));
 
         $expected = [
             'create table "__temp__users" ("name" varchar)',
@@ -370,7 +370,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'create unique index "users_name_unique" on "users" ("name")',
         ];
 
-        $this->assertEquals($expected, $getSql('SQLite'));
+        $this->assertSame($expected, $getSql('SQLite'));
 
         $expected = [
             "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE \"users\" DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID(N'\"users\"') AND [name] in ('name') AND [default_object_id] <> 0;EXEC(@sql)",
@@ -378,7 +378,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'create unique index "users_name_unique" on "users" ("name")',
         ];
 
-        $this->assertEquals($expected, $getSql('SqlServer'));
+        $this->assertSame($expected, $getSql('SqlServer'));
     }
 
     public function testAddUniqueIndexWithNameWorks()
@@ -398,7 +398,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'alter table `users` add unique `index1`(`name`)',
         ];
 
-        $this->assertEquals($expected, $getSql('MySql'));
+        $this->assertSame($expected, $getSql('MySql'));
 
         $expected = [
             'alter table "users" alter column "name" type integer, alter column "name" drop not null, alter column "name" drop default, alter column "name" drop identity if exists',
@@ -406,7 +406,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'comment on column "users"."name" is NULL',
         ];
 
-        $this->assertEquals($expected, $getSql('Postgres'));
+        $this->assertSame($expected, $getSql('Postgres'));
 
         $expected = [
             'create table "__temp__users" ("name" integer)',
@@ -416,7 +416,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'create unique index "index1" on "users" ("name")',
         ];
 
-        $this->assertEquals($expected, $getSql('SQLite'));
+        $this->assertSame($expected, $getSql('SQLite'));
 
         $expected = [
             "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE \"users\" DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID(N'\"users\"') AND [name] in ('name') AND [default_object_id] <> 0;EXEC(@sql)",
@@ -424,7 +424,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'create unique index "index1" on "users" ("name")',
         ];
 
-        $this->assertEquals($expected, $getSql('SqlServer'));
+        $this->assertSame($expected, $getSql('SqlServer'));
     }
 
     public function testAddColumnNamedCreateWorks()

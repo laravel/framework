@@ -219,11 +219,11 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $response = $this->handler->render($this->request, new Exception('My custom error message'))->getContent();
 
-        $this->assertStringNotContainsString('<!DOCTYPE html>', $response);
-        $this->assertStringContainsString('"message": "My custom error message"', $response);
-        $this->assertStringContainsString('"file":', $response);
-        $this->assertStringContainsString('"line":', $response);
-        $this->assertStringContainsString('"trace":', $response);
+        $this->assertStringNotContainsString('<!DOCTYPE html>', (string) $response);
+        $this->assertStringContainsString('"message": "My custom error message"', (string) $response);
+        $this->assertStringContainsString('"file":', (string) $response);
+        $this->assertStringContainsString('"line":', (string) $response);
+        $this->assertStringContainsString('"trace":', (string) $response);
     }
 
     public function testReturnsCustomResponseFromRenderableCallback()
@@ -278,12 +278,12 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $response = $this->handler->render($this->request, new Exception('This error message should not be visible'))->getContent();
 
-        $this->assertStringContainsString('"message": "Server Error"', $response);
-        $this->assertStringNotContainsString('<!DOCTYPE html>', $response);
-        $this->assertStringNotContainsString('This error message should not be visible', $response);
-        $this->assertStringNotContainsString('"file":', $response);
-        $this->assertStringNotContainsString('"line":', $response);
-        $this->assertStringNotContainsString('"trace":', $response);
+        $this->assertStringContainsString('"message": "Server Error"', (string) $response);
+        $this->assertStringNotContainsString('<!DOCTYPE html>', (string) $response);
+        $this->assertStringNotContainsString('This error message should not be visible', (string) $response);
+        $this->assertStringNotContainsString('"file":', (string) $response);
+        $this->assertStringNotContainsString('"line":', (string) $response);
+        $this->assertStringNotContainsString('"trace":', (string) $response);
     }
 
     public function testReturnsJsonWithoutStackTraceWhenAjaxRequestAndDebugFalseAndHttpExceptionErrorIsShown()
@@ -293,12 +293,12 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $response = $this->handler->render($this->request, new HttpException(403, 'My custom error message'))->getContent();
 
-        $this->assertStringContainsString('"message": "My custom error message"', $response);
-        $this->assertStringNotContainsString('<!DOCTYPE html>', $response);
-        $this->assertStringNotContainsString('"message": "Server Error"', $response);
-        $this->assertStringNotContainsString('"file":', $response);
-        $this->assertStringNotContainsString('"line":', $response);
-        $this->assertStringNotContainsString('"trace":', $response);
+        $this->assertStringContainsString('"message": "My custom error message"', (string) $response);
+        $this->assertStringNotContainsString('<!DOCTYPE html>', (string) $response);
+        $this->assertStringNotContainsString('"message": "Server Error"', (string) $response);
+        $this->assertStringNotContainsString('"file":', (string) $response);
+        $this->assertStringNotContainsString('"line":', (string) $response);
+        $this->assertStringNotContainsString('"trace":', (string) $response);
     }
 
     public function testReturnsJsonWithoutStackTraceWhenAjaxRequestAndDebugFalseAndAccessDeniedHttpExceptionErrorIsShown()
@@ -308,12 +308,12 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $response = $this->handler->render($this->request, new AccessDeniedHttpException('My custom error message'))->getContent();
 
-        $this->assertStringContainsString('"message": "My custom error message"', $response);
-        $this->assertStringNotContainsString('<!DOCTYPE html>', $response);
-        $this->assertStringNotContainsString('"message": "Server Error"', $response);
-        $this->assertStringNotContainsString('"file":', $response);
-        $this->assertStringNotContainsString('"line":', $response);
-        $this->assertStringNotContainsString('"trace":', $response);
+        $this->assertStringContainsString('"message": "My custom error message"', (string) $response);
+        $this->assertStringNotContainsString('<!DOCTYPE html>', (string) $response);
+        $this->assertStringNotContainsString('"message": "Server Error"', (string) $response);
+        $this->assertStringNotContainsString('"file":', (string) $response);
+        $this->assertStringNotContainsString('"line":', (string) $response);
+        $this->assertStringNotContainsString('"trace":', (string) $response);
     }
 
     public function testValidateFileMethod()
@@ -367,7 +367,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $response = $this->handler->render($this->request, new SuspiciousOperationException('Invalid method override "__CONSTRUCT"'));
 
         $this->assertEquals(400, $response->getStatusCode());
-        $this->assertStringContainsString('"message": "Bad request."', $response->getContent());
+        $this->assertStringContainsString('"message": "Bad request."', (string) $response->getContent());
 
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
@@ -384,7 +384,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $response = $this->handler->render($this->request, new RecordsNotFoundException);
 
         $this->assertEquals(404, $response->getStatusCode());
-        $this->assertStringContainsString('"message": "Not found."', $response->getContent());
+        $this->assertStringContainsString('"message": "Not found."', (string) $response->getContent());
 
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
@@ -482,7 +482,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         // When debug is true, it is OK to bubble the exception thrown while rendering
         // the error view as the debug handler should handle this gracefully.
 
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Rendering this view throws an exception');
         $this->executeScenarioWhereErrorViewThrowsWhileRenderingAndDebugIs(true);
     }

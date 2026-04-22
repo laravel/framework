@@ -433,8 +433,8 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
     public function testGetTableConnectionNameFromModel()
     {
-        $this->assertSame(null, $this->getTableConnection(ProductStub::class));
-        $this->assertSame(null, $this->getTableConnection(new ProductStub));
+        $this->assertNull($this->getTableConnection(ProductStub::class));
+        $this->assertNull($this->getTableConnection(new ProductStub));
         $this->assertSame('mysql', $this->getTableConnection((new ProductStub)->setConnection('mysql')));
     }
 

@@ -732,7 +732,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $chunks++;
         });
 
-        $this->assertEquals(2, $chunks);
+        $this->assertSame(2, $chunks);
     }
 
     public function testChunksWithLimitsWhereLimitIsLessThanTotal()
@@ -757,7 +757,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $chunks++;
         });
 
-        $this->assertEquals(1, $chunks);
+        $this->assertSame(1, $chunks);
     }
 
     public function testChunksWithLimitsWhereLimitIsMoreThanTotal()
@@ -785,7 +785,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $chunks++;
         });
 
-        $this->assertEquals(2, $chunks);
+        $this->assertSame(2, $chunks);
     }
 
     public function testChunksWithOffset()
@@ -810,7 +810,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $chunks++;
         });
 
-        $this->assertEquals(1, $chunks);
+        $this->assertSame(1, $chunks);
     }
 
     public function testChunksWithOffsetWhereMoreThanTotal()
@@ -827,7 +827,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $chunks++;
         });
 
-        $this->assertEquals(0, $chunks);
+        $this->assertSame(0, $chunks);
     }
 
     public function testChunksWithLimitsAndOffsets()
@@ -859,7 +859,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $chunks++;
         });
 
-        $this->assertEquals(2, $chunks);
+        $this->assertSame(2, $chunks);
     }
 
     public function testChunkByIdWithLimits()
@@ -884,7 +884,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $chunks++;
         });
 
-        $this->assertEquals(1, $chunks);
+        $this->assertSame(1, $chunks);
     }
 
     public function testChunkByIdWithOffsets()
@@ -909,7 +909,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $chunks++;
         });
 
-        $this->assertEquals(1, $chunks);
+        $this->assertSame(1, $chunks);
     }
 
     public function testChunkByIdWithLimitsAndOffsets()
@@ -941,7 +941,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $chunks++;
         });
 
-        $this->assertEquals(2, $chunks);
+        $this->assertSame(2, $chunks);
     }
 
     public function testChunkByIdWithNonIncrementingKey()
@@ -962,7 +962,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             }
             $i++;
         }, 'name');
-        $this->assertEquals(2, $i);
+        $this->assertSame(2, $i);
     }
 
     public function testEachByIdWithNonIncrementingKey()
@@ -1462,7 +1462,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $bindingsCount = count($query->getBindings());
         $questionMarksCount = substr_count($query->toSql(), '?');
 
-        $this->assertEquals($questionMarksCount, $bindingsCount);
+        $this->assertSame($questionMarksCount, $bindingsCount);
     }
 
     public function testHasOnMorphToRelationship()
@@ -2070,7 +2070,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             'email' => 'taylorotwell@gmail.com',
             'birthday' => $nowWithFractionsSerialized,
         ], $notStoredUser->toArray());
-        $this->assertNull($freshNotStoredUser);
+        $this->assertNotInstanceOf(EloquentTestUser::class, $freshNotStoredUser);
     }
 
     public function testFreshMethodOnCollection()

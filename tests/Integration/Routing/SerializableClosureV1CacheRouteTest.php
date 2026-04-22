@@ -28,11 +28,9 @@ class SerializableClosureV1CacheRouteTest extends TestCase
     }
 
     /** {@inheritDoc} */
-    #[\Override]
     protected function setUp(): void
     {
         $_ENV['APP_ROUTES_CACHE'] = realpath(join_paths(__DIR__, 'stubs', 'serializable-closure-v1', 'routes-v7.php'));
-
         parent::setUp();
     }
 

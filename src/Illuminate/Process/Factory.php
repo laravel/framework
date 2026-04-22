@@ -184,10 +184,11 @@ class Factory
     {
         $callback = is_string($callback) ? fn ($process) => $process->command === $callback : $callback;
 
-        PHPUnit::assertTrue(
+        PHPUnit::assertGreaterThan(
+            0,
             (new Collection($this->recorded))->filter(function ($pair) use ($callback) {
                 return $callback($pair[0], $pair[1]);
-            })->count() > 0,
+            })->count(),
             'An expected process was not invoked.'
         );
 
@@ -227,10 +228,11 @@ class Factory
     {
         $callback = is_string($callback) ? fn ($process) => $process->command === $callback : $callback;
 
-        PHPUnit::assertTrue(
+        PHPUnit::assertCount(
+            0,
             (new Collection($this->recorded))->filter(function ($pair) use ($callback) {
                 return $callback($pair[0], $pair[1]);
-            })->count() === 0,
+            }),
             'An unexpected process was invoked.'
         );
 

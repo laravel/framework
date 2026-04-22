@@ -283,7 +283,7 @@ class TranslationTranslatorTest extends TestCase
             $t->get('test', ['date' => $date])
         );
 
-        $t->stringable(function (\Illuminate\Support\Carbon $carbon) {
+        $t->stringable(function (Carbon $carbon) {
             return $carbon->format('jS M Y');
         });
         $this->assertSame(

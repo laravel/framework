@@ -158,8 +158,8 @@ class DatabaseTransactionsManagerTest extends TestCase
         $manager->commit('default', 1, 0);
 
         $this->assertCount(2, $callbacks);
-        $this->assertEquals(['default', 2], $callbacks[0]);
-        $this->assertEquals(['default', 1], $callbacks[1]);
+        $this->assertSame(['default', 2], $callbacks[0]);
+        $this->assertSame(['default', 1], $callbacks[1]);
     }
 
     public function testCommittingExecutesOnlyCallbacksOfTheConnection()
@@ -185,7 +185,7 @@ class DatabaseTransactionsManagerTest extends TestCase
         $manager->commit('default', 1, 0);
 
         $this->assertCount(1, $callbacks);
-        $this->assertEquals(['default', 1], $callbacks[0]);
+        $this->assertSame(['default', 1], $callbacks[0]);
     }
 
     public function testCallbackIsExecutedIfNoTransactions()
@@ -199,7 +199,7 @@ class DatabaseTransactionsManagerTest extends TestCase
         });
 
         $this->assertCount(1, $callbacks);
-        $this->assertEquals(['default', 1], $callbacks[0]);
+        $this->assertSame(['default', 1], $callbacks[0]);
     }
 
     public function testCallbacksForRollbackAreAddedToTheCurrentTransaction()
@@ -249,8 +249,8 @@ class DatabaseTransactionsManagerTest extends TestCase
         $manager->rollback('default', 0);
 
         $this->assertCount(2, $callbacks);
-        $this->assertEquals(['default', 2], $callbacks[0]);
-        $this->assertEquals(['default', 1], $callbacks[1]);
+        $this->assertSame(['default', 2], $callbacks[0]);
+        $this->assertSame(['default', 1], $callbacks[1]);
     }
 
     public function testRollbackExecutesOnlyCallbacksOfTheConnection()
@@ -276,7 +276,7 @@ class DatabaseTransactionsManagerTest extends TestCase
         $manager->rollback('default', 0);
 
         $this->assertCount(1, $callbacks);
-        $this->assertEquals(['default', 1], $callbacks[0]);
+        $this->assertSame(['default', 1], $callbacks[0]);
     }
 
     public function testCallbackForRollbackIsNotExecutedIfNoTransactions()

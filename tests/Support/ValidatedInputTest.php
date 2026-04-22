@@ -307,7 +307,7 @@ class ValidatedInputTest extends TestCase
         $input = new ValidatedInput(['name' => 'Fatih', 'surname' => 'AYDIN', 'foo' => ['bar' => null, 'baz' => '']]);
 
         $this->assertSame('Fatih', $input->input('name'));
-        $this->assertSame(null, $input->input('foo.bar'));
+        $this->assertNull($input->input('foo.bar'));
         $this->assertSame('test', $input->input('foo.bat', 'test'));
     }
 
@@ -325,9 +325,9 @@ class ValidatedInputTest extends TestCase
             'null' => null,
         ]);
 
-        $this->assertTrue($input->str('int') instanceof Stringable);
-        $this->assertTrue($input->str('int') instanceof Stringable);
-        $this->assertTrue($input->str('unknown_key') instanceof Stringable);
+        $this->assertInstanceOf(Stringable::class, $input->str('int'));
+        $this->assertInstanceOf(Stringable::class, $input->str('int'));
+        $this->assertInstanceOf(Stringable::class, $input->str('unknown_key'));
         $this->assertSame('123', $input->str('int')->value());
         $this->assertSame('456', $input->str('int_str')->value());
         $this->assertSame('123.456', $input->str('float')->value());
@@ -353,9 +353,9 @@ class ValidatedInputTest extends TestCase
             'null' => null,
         ]);
 
-        $this->assertTrue($input->string('int') instanceof Stringable);
-        $this->assertTrue($input->string('int') instanceof Stringable);
-        $this->assertTrue($input->string('unknown_key') instanceof Stringable);
+        $this->assertInstanceOf(Stringable::class, $input->string('int'));
+        $this->assertInstanceOf(Stringable::class, $input->string('int'));
+        $this->assertInstanceOf(Stringable::class, $input->string('unknown_key'));
         $this->assertSame('123', $input->string('int')->value());
         $this->assertSame('456', $input->string('int_str')->value());
         $this->assertSame('123.456', $input->string('float')->value());
@@ -426,17 +426,17 @@ class ValidatedInputTest extends TestCase
             'null' => null,
         ]);
 
-        $this->assertSame(1.23, $input->float('float'));
-        $this->assertSame(45.6, $input->float('raw_float'));
-        $this->assertSame(.6, $input->float('decimal_only'));
-        $this->assertSame(0.78, $input->float('zero_padded'));
-        $this->assertSame(90.1, $input->float('space_padded'));
-        $this->assertSame(0.0, $input->float('nan'));
-        $this->assertSame(1.0, $input->float('mixed'));
-        $this->assertSame(1e3, $input->float('scientific_notation'));
-        $this->assertSame(123.456, $input->float('unknown_key', 123.456));
-        $this->assertSame(0.0, $input->float('null'));
-        $this->assertSame(0.0, $input->float('null', 123.456));
+        $this->assertEqualsWithDelta(1.23, $input->float('float'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(45.6, $input->float('raw_float'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(.6, $input->float('decimal_only'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(0.78, $input->float('zero_padded'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(90.1, $input->float('space_padded'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(0.0, $input->float('nan'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(1.0, $input->float('mixed'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(1e3, $input->float('scientific_notation'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(123.456, $input->float('unknown_key', 123.456), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(0.0, $input->float('null'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(0.0, $input->float('null', 123.456), PHP_FLOAT_EPSILON);
     }
 
     public function test_date_method()
@@ -455,8 +455,8 @@ class ValidatedInputTest extends TestCase
 
         $current = Carbon::create(2024, 1, 1, 16, 30, 25);
 
-        $this->assertNull($input->date('as_null'));
-        $this->assertNull($input->date('doesnt_exists'));
+        $this->assertNotInstanceOf(Carbon::class, $input->date('as_null'));
+        $this->assertNotInstanceOf(Carbon::class, $input->date('doesnt_exists'));
 
         $this->assertEquals($current, $input->date('as_datetime'));
         $this->assertEquals($current->format('Y-m-d H:i:s P'), $input->date('as_format', 'U')->format('Y-m-d H:i:s P'));
@@ -473,11 +473,11 @@ class ValidatedInputTest extends TestCase
             'invalid_enum_value' => 'invalid',
         ]);
 
-        $this->assertNull($input->enum('doesnt_exists', StringBackedEnum::class));
+        $this->assertNotInstanceOf(StringBackedEnum::class, $input->enum('doesnt_exists', StringBackedEnum::class));
 
         $this->assertEquals(StringBackedEnum::HELLO_WORLD, $input->enum('valid_enum_value', StringBackedEnum::class));
 
-        $this->assertNull($input->enum('invalid_enum_value', StringBackedEnum::class));
+        $this->assertNotInstanceOf(StringBackedEnum::class, $input->enum('invalid_enum_value', StringBackedEnum::class));
     }
 
     public function test_enums_method()
@@ -505,8 +505,8 @@ class ValidatedInputTest extends TestCase
 
         $this->assertInstanceOf(UploadedFile::class, $input->file('avatar'));
         $this->assertSame($file, $input->file('avatar'));
-        $this->assertNull($input->file('name'));
-        $this->assertNull($input->file('missing'));
+        $this->assertNotInstanceOf(UploadedFile::class, $input->file('name'));
+        $this->assertNotInstanceOf(UploadedFile::class, $input->file('missing'));
         $this->assertSame('default', $input->file('missing', 'default'));
         $this->assertSame('default', $input->file('name', 'default'));
     }

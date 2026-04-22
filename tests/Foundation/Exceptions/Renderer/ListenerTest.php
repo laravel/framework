@@ -35,7 +35,7 @@ class ListenerTest extends TestCase
         $this->assertArrayHasKey('bindings', $query);
 
         $this->assertSame('testing', $query['connectionName']);
-        $this->assertSame(5.2, $query['time']);
+        $this->assertEqualsWithDelta(5.2, $query['time'], PHP_FLOAT_EPSILON);
         $this->assertSame('select * from users where id = ?', $query['sql']);
         $this->assertEquals(['foo'], $query['bindings']);
     }

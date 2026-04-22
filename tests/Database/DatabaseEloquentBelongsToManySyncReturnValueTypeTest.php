@@ -84,6 +84,7 @@ class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
 
         $user = BelongsToManySyncTestTestUser::query()->first();
         $articleIDs = BelongsToManySyncTestTestArticle::all()->pluck('id')->toArray();
+        $this->assertInstanceOf(BelongsToManySyncTestTestUser::class, $user);
 
         $changes = $user->articles()->sync($articleIDs);
 
@@ -102,6 +103,7 @@ class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
 
         $user = BelongsToManySyncTestTestUser::query()->first();
         $articleIDs = BelongsToManySyncTestTestArticle::all()->pluck('id')->toArray();
+        $this->assertInstanceOf(BelongsToManySyncTestTestUser::class, $user);
 
         $changes = $user->articles()->syncWithPivotValues($articleIDs, ['visible' => true]);
 

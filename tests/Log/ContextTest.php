@@ -22,11 +22,9 @@ class ContextTest extends TestCase
 {
     use LazilyRefreshDatabase;
 
-    #[\Override]
     protected function tearDown(): void
     {
         MyAddContextProcessor::$wasConstructed = false;
-
         parent::tearDown();
     }
 
@@ -166,10 +164,10 @@ class ContextTest extends TestCase
         Context::hydrate($dehydrated);
 
         $this->assertSame('string', Context::get('string'));
-        $this->assertSame(false, Context::get('bool'));
+        $this->assertFalse(Context::get('bool'));
         $this->assertSame(5, Context::get('int'));
-        $this->assertSame(5.5, Context::get('float'));
-        $this->assertSame(null, Context::get('null'));
+        $this->assertEqualsWithDelta(5.5, Context::get('float'), PHP_FLOAT_EPSILON);
+        $this->assertNull(Context::get('null'));
         $this->assertSame([1, 2, 3], Context::get('array'));
         $this->assertSame(['foo' => 'bar'], Context::get('hash'));
         $this->assertEquals(Context::get('object'), (object) ['foo' => 'bar']);

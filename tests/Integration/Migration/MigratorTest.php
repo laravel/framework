@@ -152,14 +152,14 @@ class MigratorTest extends TestCase
             // Returns an empty array because we are in pretend mode.
             $tablesEmpty = DB::select("SELECT name FROM sqlite_master WHERE type='table'");
 
-            $this->assertTrue([] === $tablesEmpty);
+            $this->assertSame([], $tablesEmpty);
 
             // Returns an array with two tables because we ignore pretend mode.
             $tablesList = DB::withoutPretending(function (): array {
                 return DB::select("SELECT name FROM sqlite_master WHERE type='table'");
             });
 
-            $this->assertTrue([] !== $tablesList);
+            $this->assertNotSame([], $tablesList);
 
             // The following would not be possible in pretend mode, if the
             // method DB::withoutPretending() would not exists,
@@ -171,13 +171,13 @@ class MigratorTest extends TestCase
 
                 $columnsEmpty = DB::select("PRAGMA table_info($table->name)");
 
-                $this->assertTrue([] === $columnsEmpty);
+                $this->assertSame([], $columnsEmpty);
 
                 $columnsList = DB::withoutPretending(function () use ($table): array {
                     return DB::select("PRAGMA table_info($table->name)");
                 });
 
-                $this->assertTrue([] !== $columnsList);
+                $this->assertNotSame([], $columnsList);
                 $this->assertCount(2, $columnsList);
 
                 // Confirm that we are still in pretend mode. This column should

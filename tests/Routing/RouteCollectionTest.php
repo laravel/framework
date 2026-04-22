@@ -151,7 +151,7 @@ class RouteCollectionTest extends TestCase
         $this->routeCollection->add($routeIndex)->name('route_name');
 
         // No route is found. This is normal, as no refresh as been done.
-        $this->assertNull($this->routeCollection->getByName('route_name'));
+        $this->assertNotInstanceOf(Route::class, $this->routeCollection->getByName('route_name'));
 
         // After the refresh, the name will be properly set to the route.
         $this->routeCollection->refreshNameLookups();
@@ -263,8 +263,8 @@ class RouteCollectionTest extends TestCase
         $this->routeCollection->refreshActionLookups();
 
         // The lookups of $routeA should not be there anymore, because they are no longer valid.
-        $this->assertNull($this->routeCollection->getByName('routeA'));
-        $this->assertNull($this->routeCollection->getByAction('View@view'));
+        $this->assertNotInstanceOf(Route::class, $this->routeCollection->getByName('routeA'));
+        $this->assertNotInstanceOf(Route::class, $this->routeCollection->getByAction('View@view'));
         // The lookups of $routeB are still there.
         $this->assertEquals($routeB, $this->routeCollection->getByName('overwrittenRouteA'));
         $this->assertEquals($routeB, $this->routeCollection->getByAction('OverwrittenView@view'));

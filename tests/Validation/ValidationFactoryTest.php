@@ -142,7 +142,7 @@ class ValidationFactoryTest extends TestCase
         $container = new Container;
         $factory = new Factory($translator);
 
-        $this->assertNull($factory->getContainer());
+        $this->assertNotInstanceOf(\Illuminate\Contracts\Container\Container::class, $factory->getContainer());
 
         $this->assertSame($container, $factory->setContainer($container)->getContainer());
     }

@@ -301,7 +301,7 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
 
         $model->non_enum_status = StringStatus::pending;
 
-        $this->assertEquals(StringStatus::pending, $model->non_enum_status);
+        $this->assertSame(StringStatus::pending, $model->non_enum_status);
     }
 
     public function testCreateOrFirst()

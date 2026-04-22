@@ -33,10 +33,10 @@ class QueryingWithEnumsTest extends DatabaseTestCase
         $record3 = DB::table('enum_casts')->whereIn('integer_status', [IntegerStatus::pending])->first();
         $record4 = DB::table('enum_casts')->where('non_backed_status', NonBackedStatus::pending)->first();
 
-        $this->assertNotNull($record);
-        $this->assertNotNull($record2);
-        $this->assertNotNull($record3);
-        $this->assertNotNull($record4);
+        $this->assertInstanceOf(\stdClass::class, $record);
+        $this->assertInstanceOf(\stdClass::class, $record2);
+        $this->assertInstanceOf(\stdClass::class, $record3);
+        $this->assertInstanceOf(\stdClass::class, $record4);
         $this->assertSame('pending', $record->string_status);
         $this->assertEquals(1, $record2->integer_status);
         $this->assertSame('pending', $record4->non_backed_status);
@@ -52,7 +52,7 @@ class QueryingWithEnumsTest extends DatabaseTestCase
 
         $record = DB::table('enum_casts')->where('string_status', StringStatus::pending)->first();
 
-        $this->assertNotNull($record);
+        $this->assertInstanceOf(\stdClass::class, $record);
         $this->assertSame('pending', $record->string_status);
         $this->assertEquals(1, $record->integer_status);
         $this->assertSame('pending', $record->non_backed_status);

@@ -125,8 +125,8 @@ class CacheRateLimiterTest extends TestCase
         $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
         $rateLimiter = new RateLimiter($cache);
 
-        $this->assertTrue($rateLimiter->availableIn('key:timer') >= 0);
-        $this->assertTrue($rateLimiter->availableIn('key:timer') >= 0);
+        $this->assertGreaterThanOrEqual(0, $rateLimiter->availableIn('key:timer'));
+        $this->assertGreaterThanOrEqual(0, $rateLimiter->availableIn('key:timer'));
     }
 
     public function testAttemptsCallbackReturnsTrue()
@@ -163,7 +163,7 @@ class CacheRateLimiterTest extends TestCase
             return 'foo';
         }, 1));
 
-        $this->assertSame(false, $rateLimiter->attempt('key', 1, function () {
+        $this->assertFalse($rateLimiter->attempt('key', 1, function () {
             return false;
         }, 1));
 
@@ -175,9 +175,9 @@ class CacheRateLimiterTest extends TestCase
             return 0;
         }, 1));
 
-        $this->assertSame(0.0, $rateLimiter->attempt('key', 1, function () {
+        $this->assertEqualsWithDelta(0.0, $rateLimiter->attempt('key', 1, function () {
             return 0.0;
-        }, 1));
+        }, 1), PHP_FLOAT_EPSILON);
 
         $this->assertSame('', $rateLimiter->attempt('key', 1, function () {
             return '';

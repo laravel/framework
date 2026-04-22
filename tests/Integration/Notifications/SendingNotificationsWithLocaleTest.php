@@ -60,7 +60,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         NotificationFacade::send($user, new GreetingMailNotification);
 
         $this->assertStringContainsString('hello',
-            app('mailer')->getSymfonyTransport()->messages()[0]->toString()
+            (string) app('mailer')->getSymfonyTransport()->messages()[0]->toString()
         );
     }
 
@@ -74,7 +74,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         NotificationFacade::locale('fr')->send($user, new GreetingMailNotification);
 
         $this->assertStringContainsString('bonjour',
-            app('mailer')->getSymfonyTransport()->messages()[0]->toString()
+            (string) app('mailer')->getSymfonyTransport()->messages()[0]->toString()
         );
     }
 
@@ -94,11 +94,11 @@ class SendingNotificationsWithLocaleTest extends TestCase
         NotificationFacade::send($users, (new GreetingMailNotification)->locale('fr'));
 
         $this->assertStringContainsString('bonjour',
-            app('mailer')->getSymfonyTransport()->messages()[0]->toString()
+            (string) app('mailer')->getSymfonyTransport()->messages()[0]->toString()
         );
 
         $this->assertStringContainsString('bonjour',
-            app('mailer')->getSymfonyTransport()->messages()[1]->toString()
+            (string) app('mailer')->getSymfonyTransport()->messages()[1]->toString()
         );
     }
 
@@ -112,7 +112,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         NotificationFacade::locale('fr')->send($user, new GreetingMailNotificationWithMailable);
 
         $this->assertStringContainsString('bonjour',
-            app('mailer')->getSymfonyTransport()->messages()[0]->toString()
+            (string) app('mailer')->getSymfonyTransport()->messages()[0]->toString()
         );
     }
 
@@ -132,7 +132,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         $user->notify((new GreetingMailNotification)->locale('fr'));
 
         $this->assertStringContainsString('bonjour',
-            app('mailer')->getSymfonyTransport()->messages()[0]->toString()
+            (string) app('mailer')->getSymfonyTransport()->messages()[0]->toString()
         );
 
         Assert::assertMatchesRegularExpression('/dans (1|un) jour/',
@@ -156,7 +156,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         $recipient->notify(new GreetingMailNotification);
 
         $this->assertStringContainsString('bonjour',
-            app('mailer')->getSymfonyTransport()->messages()[0]->toString()
+            (string) app('mailer')->getSymfonyTransport()->messages()[0]->toString()
         );
     }
 
@@ -181,13 +181,13 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
 
         $this->assertStringContainsString('bonjour',
-            app('mailer')->getSymfonyTransport()->messages()[0]->toString()
+            (string) app('mailer')->getSymfonyTransport()->messages()[0]->toString()
         );
         $this->assertStringContainsString('hola',
-            app('mailer')->getSymfonyTransport()->messages()[1]->toString()
+            (string) app('mailer')->getSymfonyTransport()->messages()[1]->toString()
         );
         $this->assertStringContainsString('hello',
-            app('mailer')->getSymfonyTransport()->messages()[2]->toString()
+            (string) app('mailer')->getSymfonyTransport()->messages()[2]->toString()
         );
     }
 
@@ -203,7 +203,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
 
         $this->assertStringContainsString('bonjour',
-            app('mailer')->getSymfonyTransport()->messages()[0]->toString()
+            (string) app('mailer')->getSymfonyTransport()->messages()[0]->toString()
         );
     }
 
@@ -219,7 +219,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
 
         $this->assertStringContainsString('bonjour',
-            app('mailer')->getSymfonyTransport()->messages()[0]->toString()
+            (string) app('mailer')->getSymfonyTransport()->messages()[0]->toString()
         );
     }
 }

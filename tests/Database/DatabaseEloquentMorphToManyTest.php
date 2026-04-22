@@ -131,7 +131,18 @@ class DatabaseEloquentMorphToManyTest extends TestCase
             m::mock(stdClass::class, ['getGrammar' => $grammar])
         );
 
-        return [$builder, $parent, 'taggable', 'taggables', 'taggable_id', 'tag_id', 'id', 'id', 'relation_name', false];
+        return [
+            $builder,
+            $parent,
+            'taggable',
+            'taggables',
+            'taggable_id',
+            'tag_id',
+            'id',
+            'id',
+            'relation_name',
+            false,
+        ];
     }
 }
 

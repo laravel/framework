@@ -523,7 +523,7 @@ class SupportLazyCollectionTest extends TestCase
 
         $keysWithoutPreserve = array_keys($collection->random(2)->all());
 
-        $this->assertEquals([0, 1], $keysWithoutPreserve);
+        $this->assertSame([0, 1], $keysWithoutPreserve);
 
         $keysWithPreserve = array_keys($collection->random(2, true)->all());
 

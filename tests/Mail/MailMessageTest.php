@@ -170,9 +170,9 @@ class MailMessageTest extends TestCase
         $headers = $attachment->getPreparedHeaders()->toArray();
         $this->assertSame('bar', $attachment->getBody());
         $this->assertSame($contentId, $attachment->getContentId());
-        $this->assertStringContainsString('Content-Type: image/jpeg', $headers[0]);
+        $this->assertStringContainsString('Content-Type: image/jpeg', (string) $headers[0]);
         $this->assertSame('Content-Transfer-Encoding: base64', $headers[1]);
-        $this->assertStringContainsString('Content-Disposition: inline', $headers[2]);
+        $this->assertStringContainsString('Content-Disposition: inline', (string) $headers[2]);
 
         unlink($path);
     }
@@ -235,9 +235,9 @@ class MailMessageTest extends TestCase
         $this->assertSame($contentId, $attachment->getContentId());
         $headers = $attachment->getPreparedHeaders()->toArray();
         $this->assertSame('bar', $attachment->getBody());
-        $this->assertStringContainsString('Content-Type: image/jpeg', $headers[0]);
+        $this->assertStringContainsString('Content-Type: image/jpeg', (string) $headers[0]);
         $this->assertSame('Content-Transfer-Encoding: base64', $headers[1]);
-        $this->assertStringContainsString('Content-Disposition: inline', $headers[2]);
+        $this->assertStringContainsString('Content-Disposition: inline', (string) $headers[2]);
 
         unlink($path);
     }

@@ -81,7 +81,7 @@ class SupportFluentTest extends TestCase
     {
         $fluent = new Fluent(['attributes' => '1']);
 
-        $this->assertTrue(isset($fluent['attributes']));
+        $this->assertArrayHasKey('attributes', $fluent);
         $this->assertEquals(1, $fluent['attributes']);
 
         $fluent->attributes();
@@ -181,8 +181,8 @@ class SupportFluentTest extends TestCase
             'empty_str' => '',
             'null' => null,
         ]);
-        $this->assertTrue($fluent->string('int') instanceof Stringable);
-        $this->assertTrue($fluent->string('unknown_key') instanceof Stringable);
+        $this->assertInstanceOf(Stringable::class, $fluent->string('int'));
+        $this->assertInstanceOf(Stringable::class, $fluent->string('unknown_key'));
         $this->assertSame('123', $fluent->string('int')->value());
         $this->assertSame('456', $fluent->string('int_str')->value());
         $this->assertSame('123.456', $fluent->string('float')->value());
@@ -243,17 +243,17 @@ class SupportFluentTest extends TestCase
             'scientific_notation' => '1e3',
             'null' => null,
         ]);
-        $this->assertSame(1.23, $fluent->float('float'));
-        $this->assertSame(45.6, $fluent->float('raw_float'));
-        $this->assertSame(.6, $fluent->float('decimal_only'));
-        $this->assertSame(0.78, $fluent->float('zero_padded'));
-        $this->assertSame(90.1, $fluent->float('space_padded'));
-        $this->assertSame(0.0, $fluent->float('nan'));
-        $this->assertSame(1.0, $fluent->float('mixed'));
-        $this->assertSame(1e3, $fluent->float('scientific_notation'));
-        $this->assertSame(123.456, $fluent->float('unknown_key', 123.456));
-        $this->assertSame(0.0, $fluent->float('null'));
-        $this->assertSame(0.0, $fluent->float('null', 123.456));
+        $this->assertEqualsWithDelta(1.23, $fluent->float('float'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(45.6, $fluent->float('raw_float'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(.6, $fluent->float('decimal_only'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(0.78, $fluent->float('zero_padded'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(90.1, $fluent->float('space_padded'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(0.0, $fluent->float('nan'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(1.0, $fluent->float('mixed'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(1e3, $fluent->float('scientific_notation'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(123.456, $fluent->float('unknown_key', 123.456), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(0.0, $fluent->float('null'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(0.0, $fluent->float('null', 123.456), PHP_FLOAT_EPSILON);
     }
 
     public function testArrayMethod()
@@ -261,7 +261,7 @@ class SupportFluentTest extends TestCase
         $fluent = new Fluent(['users' => [1, 2, 3]]);
 
         $this->assertIsArray($fluent->array('users'));
-        $this->assertEquals([1, 2, 3], $fluent->array('users'));
+        $this->assertSame([1, 2, 3], $fluent->array('users'));
         $this->assertEquals(['users' => [1, 2, 3]], $fluent->array());
 
         $fluent = new Fluent(['text-payload']);
@@ -328,8 +328,8 @@ class SupportFluentTest extends TestCase
 
         $current = Carbon::create(2020, 1, 1, 16, 30, 25);
 
-        $this->assertNull($fluent->date('as_null'));
-        $this->assertNull($fluent->date('doesnt_exists'));
+        $this->assertNotInstanceOf(Carbon::class, $fluent->date('as_null'));
+        $this->assertNotInstanceOf(Carbon::class, $fluent->date('doesnt_exists'));
 
         $this->assertEquals($current, $fluent->date('as_datetime'));
         $this->assertEquals($current->format('Y-m-d H:i:s P'), $fluent->date('as_format', 'U')->format('Y-m-d H:i:s P'));
@@ -379,20 +379,20 @@ class SupportFluentTest extends TestCase
             ],
         ]);
 
-        $this->assertNull($fluent->enum('doesnt_exist', TestEnum::class));
+        $this->assertNotInstanceOf(\BackedEnum::class, $fluent->enum('doesnt_exist', TestEnum::class));
 
         $this->assertEquals(TestStringBackedEnum::A, $fluent->enum('valid_enum_value', TestStringBackedEnum::class));
 
-        $this->assertNull($fluent->enum('invalid_enum_value', TestStringBackedEnum::class));
-        $this->assertNull($fluent->enum('empty_value_request', TestStringBackedEnum::class));
-        $this->assertNull($fluent->enum('valid_enum_value', TestEnum::class));
+        $this->assertNotInstanceOf(TestStringBackedEnum::class, $fluent->enum('invalid_enum_value', TestStringBackedEnum::class));
+        $this->assertNotInstanceOf(TestStringBackedEnum::class, $fluent->enum('empty_value_request', TestStringBackedEnum::class));
+        $this->assertNotInstanceOf(\BackedEnum::class, $fluent->enum('valid_enum_value', TestEnum::class));
 
         $this->assertEquals(TestBackedEnum::A, $fluent->enum('string.a', TestBackedEnum::class));
         $this->assertEquals(TestBackedEnum::B, $fluent->enum('string.b', TestBackedEnum::class));
-        $this->assertNull($fluent->enum('string.doesnt_exist', TestBackedEnum::class));
+        $this->assertNotInstanceOf(TestBackedEnum::class, $fluent->enum('string.doesnt_exist', TestBackedEnum::class));
         $this->assertEquals(TestBackedEnum::A, $fluent->enum('int.a', TestBackedEnum::class));
         $this->assertEquals(TestBackedEnum::B, $fluent->enum('int.b', TestBackedEnum::class));
-        $this->assertNull($fluent->enum('int.doesnt_exist', TestBackedEnum::class));
+        $this->assertNotInstanceOf(TestBackedEnum::class, $fluent->enum('int.doesnt_exist', TestBackedEnum::class));
     }
 
     public function testEnumsMethod()

@@ -128,7 +128,7 @@ class CommandSchedulingTest extends TestCase
     {
         $log = trim($this->fs->get($this->logfile));
 
-        $this->assertEquals(implode("\n", $messages), $log);
+        $this->assertSame(implode("\n", $messages), $log);
     }
 
     protected function writeArtisanScript()

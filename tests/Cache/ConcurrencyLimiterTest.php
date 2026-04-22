@@ -46,7 +46,7 @@ class ConcurrencyLimiterTest extends TestCase
             $store[] = 4;
         });
 
-        $this->assertEquals([1, 2, 4], $store);
+        $this->assertSame([1, 2, 4], $store);
     }
 
     public function testItReleasesLockAfterTaskFinishes()
@@ -59,7 +59,7 @@ class ConcurrencyLimiterTest extends TestCase
             });
         }
 
-        $this->assertEquals([1, 2, 3, 4], $store);
+        $this->assertSame([1, 2, 3, 4], $store);
     }
 
     public function testItReleasesLockIfTaskTookTooLong()
@@ -86,7 +86,7 @@ class ConcurrencyLimiterTest extends TestCase
             $store[] = 3;
         });
 
-        $this->assertEquals([1, 3], $store);
+        $this->assertSame([1, 3], $store);
     }
 
     public function testItFailsImmediatelyOrRetriesForAWhileBasedOnAGivenTimeout()
@@ -111,7 +111,7 @@ class ConcurrencyLimiterTest extends TestCase
             $store[] = 3;
         });
 
-        $this->assertEquals([1, 3], $store);
+        $this->assertSame([1, 3], $store);
     }
 
     public function testItFailsAfterRetryTimeout()
@@ -132,7 +132,7 @@ class ConcurrencyLimiterTest extends TestCase
             $this->assertInstanceOf(LimiterTimeoutException::class, $e);
         }
 
-        $this->assertEquals([1], $store);
+        $this->assertSame([1], $store);
     }
 
     public function testItReleasesIfErrorIsThrown()
@@ -153,7 +153,7 @@ class ConcurrencyLimiterTest extends TestCase
             $store[] = 1;
         });
 
-        $this->assertEquals([1], $store);
+        $this->assertSame([1], $store);
     }
 
     public function testFunnelMethodOnRepository()
@@ -170,7 +170,7 @@ class ConcurrencyLimiterTest extends TestCase
                 return 'ok';
             });
 
-        $this->assertEquals([1], $store);
+        $this->assertSame([1], $store);
         $this->assertSame('ok', $result);
     }
 
@@ -188,7 +188,7 @@ class ConcurrencyLimiterTest extends TestCase
                 return 'ok';
             });
 
-        $this->assertEquals([1], $store);
+        $this->assertSame([1], $store);
         $this->assertSame('ok', $result);
     }
 
@@ -206,7 +206,7 @@ class ConcurrencyLimiterTest extends TestCase
                 return 'ok';
             });
 
-        $this->assertEquals([1], $store);
+        $this->assertSame([1], $store);
         $this->assertSame('ok', $result);
     }
 
@@ -237,7 +237,7 @@ class ConcurrencyLimiterTest extends TestCase
 
     public function testFunnelThrowsExceptionWhenStoreDoesNotSupportLocks()
     {
-        $store = $this->createMock(Store::class);
+        $store = $this->createStub(Store::class);
         $repository = new Repository($store);
 
         $this->assertNotInstanceOf(LockProvider::class, $store);
@@ -276,7 +276,7 @@ class ConcurrencyLimiterTest extends TestCase
                 }
             );
 
-        $this->assertEquals([1, 2, 'failed'], $store);
+        $this->assertSame([1, 2, 'failed'], $store);
         $this->assertSame('failure-result', $result);
     }
 }

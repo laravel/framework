@@ -65,7 +65,7 @@ class SendingMarkdownMailTest extends TestCase
         Content-Disposition: inline; name=$filename;\r
          filename=$filename\r
         Content-ID: <$cid>\r
-        EOT, $email);
+        EOT, (string) $email);
     }
 
     public function testEmbedData()
@@ -81,7 +81,7 @@ class SendingMarkdownMailTest extends TestCase
         Content-Type: image/png; name=foo.jpg\r
         Content-Transfer-Encoding: base64\r
         Content-Disposition: inline; name=foo.jpg; filename=foo.jpg\r
-        EOT, $email);
+        EOT, (string) $email);
     }
 
     public function testEmbedMultilineImage()
@@ -102,8 +102,8 @@ class SendingMarkdownMailTest extends TestCase
             'image' => __DIR__.'/Fixtures/empty_image.jpg',
         ]);
 
-        $this->assertStringContainsString('src="data:image/jpeg;base64,', $html);
-        $this->assertStringNotContainsString('src="cid:', $html);
+        $this->assertStringContainsString('src="data:image/jpeg;base64,', (string) $html);
+        $this->assertStringNotContainsString('src="cid:', (string) $html);
     }
 
     public function testMessageAsPublicPropertyMayBeDefinedAsViewData()
@@ -116,7 +116,7 @@ class SendingMarkdownMailTest extends TestCase
 
         $email = app('mailer')->getSymfonyTransport()->messages()[0]->getOriginalMessage()->toString();
 
-        $this->assertStringContainsString('My message is: My message.', $email);
+        $this->assertStringContainsString('My message is: My message.', (string) $email);
     }
 
     public function testMessageAsWithNamedParameterMayBeDefinedAsViewData()
@@ -129,7 +129,7 @@ class SendingMarkdownMailTest extends TestCase
 
         $email = app('mailer')->getSymfonyTransport()->messages()[0]->getOriginalMessage()->toString();
 
-        $this->assertStringContainsString('My message is: My message.', $email);
+        $this->assertStringContainsString('My message is: My message.', (string) $email);
     }
 
     public function testTheme()

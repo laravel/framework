@@ -72,7 +72,7 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
 
         $model->address->lineOne = '117 Spencer St.';
 
-        $this->assertFalse(isset($model->toArray()['address']));
+        $this->assertArrayNotHasKey('address', $model->toArray());
         $this->assertSame('117 Spencer St.', $model->toArray()['address_line_one']);
         $this->assertSame('My Childhood House', $model->toArray()['address_line_two']);
 
@@ -85,12 +85,12 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
         $this->assertNull($model->toArray()['address_line_two']);
 
         $model->options = ['foo' => 'bar'];
-        $this->assertEquals(['foo' => 'bar'], $model->options);
-        $this->assertEquals(['foo' => 'bar'], $model->options);
+        $this->assertSame(['foo' => 'bar'], $model->options);
+        $this->assertSame(['foo' => 'bar'], $model->options);
         $model->options = ['foo' => 'bar'];
         $model->options = ['foo' => 'bar'];
-        $this->assertEquals(['foo' => 'bar'], $model->options);
-        $this->assertEquals(['foo' => 'bar'], $model->options);
+        $this->assertSame(['foo' => 'bar'], $model->options);
+        $this->assertSame(['foo' => 'bar'], $model->options);
 
         $this->assertSame(json_encode(['foo' => 'bar']), $model->getAttributes()['options']);
 
@@ -152,17 +152,17 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
 
         $model->password = 'secret';
 
-        $this->assertEquals(hash('sha256', 'secret'), $model->password);
+        $this->assertSame(hash('sha256', 'secret'), $model->password);
         $this->assertEquals(hash('sha256', 'secret'), $model->getAttributes()['password']);
         $this->assertEquals(hash('sha256', 'secret'), $model->getAttributes()['password']);
-        $this->assertEquals(hash('sha256', 'secret'), $model->password);
+        $this->assertSame(hash('sha256', 'secret'), $model->password);
 
         $model->password = 'secret2';
 
-        $this->assertEquals(hash('sha256', 'secret2'), $model->password);
+        $this->assertSame(hash('sha256', 'secret2'), $model->password);
         $this->assertEquals(hash('sha256', 'secret2'), $model->getAttributes()['password']);
         $this->assertEquals(hash('sha256', 'secret2'), $model->getAttributes()['password']);
-        $this->assertEquals(hash('sha256', 'secret2'), $model->password);
+        $this->assertSame(hash('sha256', 'secret2'), $model->password);
     }
 
     public function testSettingRawAttributesClearsTheCastCache()

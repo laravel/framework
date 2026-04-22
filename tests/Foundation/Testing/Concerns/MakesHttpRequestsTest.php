@@ -224,7 +224,7 @@ class MakesHttpRequestsTest extends TestCase
 
         $this->followingRedirects()->get('from');
 
-        $this->assertEquals(['from', 'to'], $callOrder);
+        $this->assertSame(['from', 'to'], $callOrder);
     }
 
     public function testWithPrecognition()

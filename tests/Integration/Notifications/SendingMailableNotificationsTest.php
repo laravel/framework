@@ -67,7 +67,7 @@ class SendingMailableNotificationsTest extends TestCase
         Content-Disposition: inline; name=$filename;\r
          filename=$filename\r
         Content-ID: <$cid>\r
-        EOT, $email);
+        EOT, (string) $email);
     }
 
     public function testCanSetTheme()
@@ -80,13 +80,13 @@ class SendingMailableNotificationsTest extends TestCase
         $mailTransport = app('mailer')->getSymfonyTransport();
 
         $contents = $mailTransport->messages()[0]->getOriginalMessage()->toString();
-        $this->assertStringContainsString('<body style=3D"color: test;">', $contents);
+        $this->assertStringContainsString('<body style=3D"color: test;">', (string) $contents);
 
         // confirm passing no theme resets to the app's default theme
         $user->notify(new MarkdownNotification());
 
         $contents = $mailTransport->messages()[1]->getOriginalMessage()->toString();
-        $this->assertStringNotContainsString('<body style=3D"color: test;">', $contents);
+        $this->assertStringNotContainsString('<body style=3D"color: test;">', (string) $contents);
     }
 }
 

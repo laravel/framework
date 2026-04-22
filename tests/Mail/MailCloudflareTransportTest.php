@@ -76,7 +76,7 @@ class MailCloudflareTransportTest extends TestCase
 
         $transport->send($message);
 
-        $this->assertStringContainsString('test-account-id', $requestUrl);
+        $this->assertStringContainsString('test-account-id', (string) $requestUrl);
         $this->assertSame('https://api.cloudflare.com/client/v4/accounts/test-account-id/email/sending/send', $requestUrl);
         $this->assertSame('sender@example.com', $requestBody['from']);
         $this->assertSame(['me@example.com'], $requestBody['to']);

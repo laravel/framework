@@ -33,7 +33,7 @@ class CookieTest extends TestCase
 
         $c3 = $cookie->forget('color');
         $this->assertNull($c3->getValue());
-        $this->assertTrue($c3->getExpiresTime() < time());
+        $this->assertLessThan(time(), $c3->getExpiresTime());
     }
 
     public function testCookiesAreCreatedWithProperOptionsUsingDefaultPathAndDomain(): void
@@ -166,7 +166,7 @@ class CookieTest extends TestCase
         $this->assertEquals(null, $cookie->getValue());
         $this->assertSame('/path', $cookie->getPath());
         $this->assertSame('/domain', $cookie->getDomain());
-        $this->assertTrue($cookie->getExpiresTime() < time());
+        $this->assertLessThan(time(), $cookie->getExpiresTime());
         $this->assertCount(1, $cookieJar->getQueuedCookies());
     }
 

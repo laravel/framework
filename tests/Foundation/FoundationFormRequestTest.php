@@ -200,8 +200,8 @@ class FoundationFormRequestTest extends TestCase
             }
         };
         $request->setContainer($container = new Container);
-        $container->instance(\Illuminate\Contracts\Validation\Factory::class, (new \Illuminate\Validation\Factory(
-            new \Illuminate\Translation\Translator(new \Illuminate\Translation\ArrayLoader(), 'en')
+        $container->instance(ValidationFactoryContract::class, (new ValidationFactory(
+            new TranslatorConcrete(new ArrayLoader(), 'en')
         ))->setContainer($container));
         $container->instance(InjectedDependency::class, new InjectedDependency('value-from-dependency'));
 

@@ -62,8 +62,10 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
 
         $model->array_object_json['age'] = 34;
         $model->array_object_json['meta']['title'] = 'Developer';
+        $this->assertInstanceOf(TestEloquentModelWithCustomCasts::class, $model);
 
         $model->save();
+        $this->assertInstanceOf(TestEloquentModelWithCustomCasts::class, $model);
 
         $model = $model->fresh();
 
@@ -132,8 +134,10 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $model->array_object_json = ['name' => 'John'];
         $model->array_object_json['name'] = 'Taylor';
         $model->array_object_json['meta']['title'] = 'Developer';
+        $this->assertInstanceOf(TestEloquentModelWithCustomCastsNullable::class, $model);
 
         $model->save();
+        $this->assertInstanceOf(TestEloquentModelWithCustomCastsNullable::class, $model);
 
         $model = $model->fresh();
 

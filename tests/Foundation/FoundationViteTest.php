@@ -220,7 +220,7 @@ class FoundationViteTest extends TestCase
 
         $result = app(Vite::class)->reactRefresh();
 
-        $this->assertStringNotContainsString('nonce', $result);
+        $this->assertStringNotContainsString('nonce', (string) $result);
     }
 
     public function testReactRefreshNonce()
@@ -230,7 +230,7 @@ class FoundationViteTest extends TestCase
         $nonce = ViteFacade::useCspNonce('expected-nonce');
         $result = app(Vite::class)->reactRefresh();
 
-        $this->assertStringContainsString(sprintf('nonce="%s"', $nonce), $result);
+        $this->assertStringContainsString(sprintf('nonce="%s"', $nonce), (string) $result);
     }
 
     public function testItCanInjectIntegrityWhenPresentInManifest()

@@ -52,10 +52,10 @@ class TranslatorTest extends TestCase
         });
 
         $this->assertFalse($this->app['translator']->has('Foo Bar'));
-        $this->assertFalse(isset($_SERVER['__missing_translation_key']));
+        $this->assertArrayNotHasKey('__missing_translation_key', $_SERVER);
 
         $this->assertFalse($this->app['translator']->hasForLocale('Foo Bar', 'nl'));
-        $this->assertFalse(isset($_SERVER['__missing_translation_key']));
+        $this->assertArrayNotHasKey('__missing_translation_key', $_SERVER);
     }
 
     public function testItCanHandleMissingKeysUsingCallback()

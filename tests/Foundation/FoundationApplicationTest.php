@@ -303,7 +303,7 @@ class FoundationApplicationTest extends TestCase
 
         $app->terminate();
 
-        $this->assertEquals([1, 2, 3], $result);
+        $this->assertSame([1, 2, 3], $result);
     }
 
     public function testAfterBootstrappingAddsClosure()
@@ -346,7 +346,7 @@ class FoundationApplicationTest extends TestCase
 
         $application->boot();
 
-        $this->assertEquals(2, $counter);
+        $this->assertSame(2, $counter);
     }
 
     public function testBootedCallbacks()
@@ -374,11 +374,11 @@ class FoundationApplicationTest extends TestCase
         $application->booted($closure2);
         $application->boot();
 
-        $this->assertEquals(3, $counter);
+        $this->assertSame(3, $counter);
 
         $application->booted($closure3);
 
-        $this->assertEquals(4, $counter);
+        $this->assertSame(4, $counter);
     }
 
     public function testGetNamespace()

@@ -86,8 +86,9 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
             return $this->assertSentToTimes($notifiable, $notification, $callback);
         }
 
-        PHPUnit::assertTrue(
-            $this->sent($notifiable, $notification, $callback)->count() > 0,
+        PHPUnit::assertGreaterThan(
+            0,
+            $this->sent($notifiable, $notification, $callback)->count(),
             "The expected [{$notification}] notification was not sent."
         );
     }

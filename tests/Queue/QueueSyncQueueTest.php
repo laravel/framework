@@ -67,9 +67,9 @@ class QueueSyncQueueTest extends TestCase
 
         $sync = new SyncQueue;
         $container = new Container;
-        $container->bind(\Illuminate\Contracts\Events\Dispatcher::class, \Illuminate\Events\Dispatcher::class);
+        $container->bind(Dispatcher::class, \Illuminate\Events\Dispatcher::class);
         $container->bind(\Illuminate\Contracts\Bus\Dispatcher::class, \Illuminate\Bus\Dispatcher::class);
-        $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
+        $container->bind(\Illuminate\Contracts\Container\Container::class, Container::class);
         $sync->setContainer($container);
 
         SyncQueue::createPayloadUsing(function ($connection, $queue, $payload) {
@@ -87,9 +87,9 @@ class QueueSyncQueueTest extends TestCase
     {
         $sync = new SyncQueue;
         $container = new Container;
-        $container->bind(\Illuminate\Contracts\Events\Dispatcher::class, \Illuminate\Events\Dispatcher::class);
+        $container->bind(Dispatcher::class, \Illuminate\Events\Dispatcher::class);
         $container->bind(\Illuminate\Contracts\Bus\Dispatcher::class, \Illuminate\Bus\Dispatcher::class);
-        $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
+        $container->bind(\Illuminate\Contracts\Container\Container::class, Container::class);
         $sync->setContainer($container);
 
         SyncQueue::createPayloadUsing(function ($connection, $queue, $payload) {
@@ -107,7 +107,7 @@ class QueueSyncQueueTest extends TestCase
     {
         $sync = new SyncQueue;
         $container = new Container;
-        $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
+        $container->bind(\Illuminate\Contracts\Container\Container::class, Container::class);
         $transactionManager = m::mock(DatabaseTransactionsManager::class);
         $transactionManager->shouldReceive('addCallback')->once()->andReturn(null);
         $transactionManager->shouldNotReceive('addCallbackForRollback');
@@ -121,7 +121,7 @@ class QueueSyncQueueTest extends TestCase
     {
         $sync = new SyncQueue;
         $container = new Container;
-        $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
+        $container->bind(\Illuminate\Contracts\Container\Container::class, Container::class);
         $transactionManager = m::mock(DatabaseTransactionsManager::class);
         $transactionManager->shouldReceive('addCallback')->once()->andReturn(null);
         $transactionManager->shouldNotReceive('addCallbackForRollback');
@@ -135,7 +135,7 @@ class QueueSyncQueueTest extends TestCase
     {
         $sync = new SyncQueue;
         $container = new Container;
-        $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
+        $container->bind(\Illuminate\Contracts\Container\Container::class, Container::class);
         $transactionManager = m::mock(DatabaseTransactionsManager::class);
         $transactionManager->shouldReceive('addCallback')->once()->andReturn(null);
         $transactionManager->shouldReceive('addCallbackForRollback')->once()->andReturn(null);
@@ -149,7 +149,7 @@ class QueueSyncQueueTest extends TestCase
     {
         $sync = new SyncQueue;
         $container = new Container;
-        $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
+        $container->bind(\Illuminate\Contracts\Container\Container::class, Container::class);
         $transactionManager = m::mock(DatabaseTransactionsManager::class);
         $transactionManager->shouldReceive('addCallback')->once()->andReturn(null);
         $transactionManager->shouldReceive('addCallbackForRollback')->once()->andReturn(null);

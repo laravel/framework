@@ -33,6 +33,7 @@ class MailMailerTest extends TestCase
         $sentMessage = $mailer->send('foo', ['data'], function (Message $message) {
             $message->to('taylor@laravel.com')->from('hello@laravel.com');
         });
+        $this->assertInstanceOf(\Illuminate\Mail\SentMessage::class, $sentMessage);
 
         $this->assertStringContainsString('rendered.view', $sentMessage->toString());
     }
@@ -51,6 +52,7 @@ class MailMailerTest extends TestCase
                 ->bcc('james@laravel.com')
                 ->from('hello@laravel.com');
         });
+        $this->assertInstanceOf(\Illuminate\Mail\SentMessage::class, $sentMessage);
 
         $recipients = collect($sentMessage->getEnvelope()->getRecipients())->map(function ($recipient) {
             return $recipient->getAddress();
@@ -76,6 +78,7 @@ class MailMailerTest extends TestCase
                 $message->to('taylor@laravel.com')->from('hello@laravel.com');
             }
         );
+        $this->assertInstanceOf(\Illuminate\Mail\SentMessage::class, $sentMessage);
 
         $this->assertStringContainsString('<p>Hello Laravel</p>', $sentMessage->toString());
         $this->assertStringContainsString('Hello World', $sentMessage->toString());
@@ -106,6 +109,7 @@ class MailMailerTest extends TestCase
                 $message->to('taylor@laravel.com')->from('hello@laravel.com');
             }
         );
+        $this->assertInstanceOf(\Illuminate\Mail\SentMessage::class, $sentMessage);
 
         $this->assertStringContainsString('<p>Hello Laravel</p>', $sentMessage->toString());
         $this->assertStringContainsString('Hello World', $sentMessage->toString());
@@ -121,6 +125,7 @@ class MailMailerTest extends TestCase
         $sentMessage = $mailer->html('<p>Hello World</p>', function (Message $message) {
             $message->to('taylor@laravel.com')->from('hello@laravel.com');
         });
+        $this->assertInstanceOf(\Illuminate\Mail\SentMessage::class, $sentMessage);
 
         $this->assertStringContainsString('<p>Hello World</p>', $sentMessage->toString());
     }
@@ -144,6 +149,7 @@ class MailMailerTest extends TestCase
         \r
         rendered.view
         Text;
+        $this->assertInstanceOf(\Illuminate\Mail\SentMessage::class, $sentMessage);
 
         $this->assertStringContainsString($expected, $sentMessage->toString());
 
@@ -176,6 +182,7 @@ class MailMailerTest extends TestCase
         \r
         rendered.view
         Text;
+        $this->assertInstanceOf(\Illuminate\Mail\SentMessage::class, $sentMessage);
 
         $this->assertStringContainsString($expected, $sentMessage->toString());
 
@@ -197,6 +204,7 @@ class MailMailerTest extends TestCase
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
         $sentMessage = $mailer->to('taylor@laravel.com', 'Taylor Otwell')->send(new TestMail());
+        $this->assertInstanceOf(\Illuminate\Mail\SentMessage::class, $sentMessage);
 
         $recipients = $sentMessage->getEnvelope()->getRecipients();
         $this->assertCount(1, $recipients);
@@ -215,6 +223,7 @@ class MailMailerTest extends TestCase
         $sentMessage = $mailer->send('foo', ['data'], function (Message $message) {
             $message->to('taylor@laravel.com');
         });
+        $this->assertInstanceOf(\Illuminate\Mail\SentMessage::class, $sentMessage);
 
         $this->assertSame('taylor@laravel.com', $sentMessage->getEnvelope()->getRecipients()[0]->getAddress());
         $this->assertSame('hello@laravel.com', $sentMessage->getEnvelope()->getSender()->getAddress());
@@ -231,6 +240,7 @@ class MailMailerTest extends TestCase
         $sentMessage = $mailer->send('foo', ['data'], function (Message $message) {
             $message->to('dries@laravel.com')->from('hello@laravel.com');
         });
+        $this->assertInstanceOf(\Illuminate\Mail\SentMessage::class, $sentMessage);
 
         $this->assertSame('dries@laravel.com', $sentMessage->getEnvelope()->getRecipients()[0]->getAddress());
         $this->assertStringContainsString('Reply-To: Taylor Otwell <taylor@laravel.com>', $sentMessage->toString());
@@ -250,6 +260,7 @@ class MailMailerTest extends TestCase
             $message->cc('dries@laravel.com');
             $message->bcc('james@laravel.com');
         });
+        $this->assertInstanceOf(\Illuminate\Mail\SentMessage::class, $sentMessage);
 
         $recipients = collect($sentMessage->getEnvelope()->getRecipients())->map(function ($recipient) {
             return $recipient->getAddress();
@@ -278,6 +289,7 @@ class MailMailerTest extends TestCase
         $sentMessage = $mailer->send('foo', ['data'], function (Message $message) {
             $message->to('taylor@laravel.com')->from('hello@laravel.com');
         });
+        $this->assertInstanceOf(\Illuminate\Mail\SentMessage::class, $sentMessage);
 
         $this->assertStringContainsString('Return-Path: <taylorotwell@gmail.com>', $sentMessage->toString());
     }

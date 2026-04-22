@@ -122,7 +122,7 @@ class FileSessionHandlerTest extends TestCase
         // act:
         $count = $session->gc(5);
 
-        $this->assertEquals(2, $count);
+        $this->assertSame(2, $count);
 
         unlink(__DIR__.'/tmp/a1');
         unlink(__DIR__.'/tmp/a2');

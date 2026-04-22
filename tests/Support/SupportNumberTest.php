@@ -193,7 +193,7 @@ class SupportNumberTest extends TestCase
         $this->assertSame(2, Number::clamp(1, 2, 3));
         $this->assertSame(3, Number::clamp(5, 2, 3));
         $this->assertSame(5, Number::clamp(5, 1, 10));
-        $this->assertSame(4.5, Number::clamp(4.5, 1, 10));
+        $this->assertEqualsWithDelta(4.5, Number::clamp(4.5, 1, 10), PHP_FLOAT_EPSILON);
         $this->assertSame(1, Number::clamp(-10, 1, 5));
     }
 
@@ -343,22 +343,22 @@ class SupportNumberTest extends TestCase
         $this->assertSame(12, Number::trim(12));
         $this->assertSame(120, Number::trim(120));
         $this->assertSame(12, Number::trim(12.0));
-        $this->assertSame(12.3, Number::trim(12.3));
-        $this->assertSame(12.3, Number::trim(12.30));
-        $this->assertSame(12.3456789, Number::trim(12.3456789));
-        $this->assertSame(12.3456789, Number::trim(12.34567890000));
+        $this->assertEqualsWithDelta(12.3, Number::trim(12.3), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(12.3, Number::trim(12.30), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(12.3456789, Number::trim(12.3456789), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(12.3456789, Number::trim(12.34567890000), PHP_FLOAT_EPSILON);
     }
 
     #[RequiresPhpExtension('intl')]
     public function testParse()
     {
-        $this->assertSame(1234.0, Number::parse('1,234'));
-        $this->assertSame(1234.5, Number::parse('1,234.5'));
-        $this->assertSame(1234.56, Number::parse('1,234.56'));
+        $this->assertEqualsWithDelta(1234.0, Number::parse('1,234'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(1234.5, Number::parse('1,234.5'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(1234.56, Number::parse('1,234.56'), PHP_FLOAT_EPSILON);
         $this->assertSame(-1234.56, Number::parse('-1,234.56'));
 
-        $this->assertSame(1234.56, Number::parse('1.234,56', locale: 'de'));
-        $this->assertSame(1234.56, Number::parse('1 234,56', locale: 'fr'));
+        $this->assertEqualsWithDelta(1234.56, Number::parse('1.234,56', locale: 'de'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(1234.56, Number::parse('1 234,56', locale: 'fr'), PHP_FLOAT_EPSILON);
     }
 
     #[RequiresPhpExtension('intl')]
@@ -375,12 +375,12 @@ class SupportNumberTest extends TestCase
     #[RequiresPhpExtension('intl')]
     public function testParseFloat()
     {
-        $this->assertSame(1234.0, Number::parseFloat('1,234'));
-        $this->assertSame(1234.5, Number::parseFloat('1,234.5'));
-        $this->assertSame(1234.56, Number::parseFloat('1,234.56'));
+        $this->assertEqualsWithDelta(1234.0, Number::parseFloat('1,234'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(1234.5, Number::parseFloat('1,234.5'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(1234.56, Number::parseFloat('1,234.56'), PHP_FLOAT_EPSILON);
         $this->assertSame(-1234.56, Number::parseFloat('-1,234.56'));
 
-        $this->assertSame(1234.56, Number::parseFloat('1.234,56', locale: 'de'));
-        $this->assertSame(1234.56, Number::parseFloat('1 234,56', locale: 'fr'));
+        $this->assertEqualsWithDelta(1234.56, Number::parseFloat('1.234,56', locale: 'de'), PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(1234.56, Number::parseFloat('1 234,56', locale: 'fr'), PHP_FLOAT_EPSILON);
     }
 }

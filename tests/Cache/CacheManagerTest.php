@@ -121,7 +121,7 @@ class CacheManagerTest extends TestCase
         $cacheManager = new CacheManager($app);
         $repo = $cacheManager->repository($theStore = new NullStore);
 
-        $this->assertNull($repo->getEventDispatcher());
+        $this->assertNotInstanceOf(Dispatcher::class, $repo->getEventDispatcher());
         $this->assertSame($theStore, $repo->getStore());
 
         // binding dispatcher after the repo's birth will have no effect.
@@ -133,7 +133,7 @@ class CacheManagerTest extends TestCase
         $cacheManager = new CacheManager($app);
         $repo = $cacheManager->repository(new NullStore);
         // now that the $app has a Dispatcher, the newly born repository will also have one.
-        $this->assertNotNull($repo->getEventDispatcher());
+        $this->assertInstanceOf(Dispatcher::class, $repo->getEventDispatcher());
     }
 
     public function testItRefreshesDispatcherOnAllStores()

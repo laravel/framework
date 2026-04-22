@@ -35,7 +35,7 @@ class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
             'anothertestchannel' => 'enzo@deepblue.com',
         ])->notify(new TestMailNotificationForAnonymousNotifiable());
 
-        $this->assertEquals([
+        $this->assertSame([
             'enzo', 'enzo@deepblue.com',
         ], $_SERVER['__notifiable.route']);
     }

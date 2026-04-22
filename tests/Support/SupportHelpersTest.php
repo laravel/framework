@@ -51,7 +51,7 @@ class SupportHelpersTest extends TestCase
 
         $html = m::mock(Htmlable::class);
         $html->shouldReceive('toHtml')->andReturn($str);
-        $this->assertEquals($str, e($html));
+        $this->assertSame($str, e($html));
     }
 
     public function testEWithInvalidCodePoints()
@@ -976,9 +976,9 @@ class SupportHelpersTest extends TestCase
 
     public function testOptionalDeterminesWhetherKeyIsSet()
     {
-        $this->assertTrue(isset(optional(['foo' => 'bar'])['foo']));
-        $this->assertFalse(isset(optional(['foo' => 'bar'])['bar']));
-        $this->assertFalse(isset(optional()['bar']));
+        $this->assertArrayHasKey('foo', optional(['foo' => 'bar']));
+        $this->assertArrayNotHasKey('bar', optional(['foo' => 'bar']));
+        $this->assertArrayNotHasKey('bar', optional());
     }
 
     public function testOptionalAllowsToSetKey()
@@ -989,20 +989,20 @@ class SupportHelpersTest extends TestCase
 
         $optional = optional(null);
         $optional['foo'] = 'bar';
-        $this->assertFalse(isset($optional['foo']));
+        $this->assertArrayNotHasKey('foo', $optional);
     }
 
     public function testOptionalAllowToUnsetKey()
     {
         $optional = optional(['foo' => 'bar']);
-        $this->assertTrue(isset($optional['foo']));
+        $this->assertArrayHasKey('foo', $optional);
         unset($optional['foo']);
-        $this->assertFalse(isset($optional['foo']));
+        $this->assertArrayNotHasKey('foo', $optional);
 
         $optional = optional((object) ['foo' => 'bar']);
-        $this->assertFalse(isset($optional['foo']));
+        $this->assertArrayNotHasKey('foo', $optional);
         $optional['foo'] = 'bar';
-        $this->assertFalse(isset($optional['foo']));
+        $this->assertArrayNotHasKey('foo', $optional);
     }
 
     public function testOptionalIsMacroable()

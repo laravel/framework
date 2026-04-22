@@ -480,8 +480,8 @@ class ViewFactoryTest extends TestCase
             new ReflectionFunction($composers[0]),
             new ReflectionFunction($composers[1]),
         ];
-        $this->assertEquals(['class' => 'foo', 'method' => 'compose'], $reflections[0]->getStaticVariables());
-        $this->assertEquals(['class' => 'baz', 'method' => 'baz'], $reflections[1]->getStaticVariables());
+        $this->assertSame(['class' => 'foo', 'method' => 'compose'], $reflections[0]->getStaticVariables());
+        $this->assertSame(['class' => 'baz', 'method' => 'baz'], $reflections[1]->getStaticVariables());
     }
 
     public function testClassCallbacks()

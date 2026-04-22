@@ -128,17 +128,17 @@ class FilesystemTest extends TestCase
         // Test replacing non-existent file.
         $filesystem->replace($tempFile, 'Hello World');
         $this->assertStringEqualsFile($tempFile, 'Hello World');
-        $this->assertEquals($umask, 0777 - $this->getFilePermissions($tempFile));
+        $this->assertSame($umask, 0777 - $this->getFilePermissions($tempFile));
 
         // Test replacing existing file.
         $filesystem->replace($tempFile, 'Something Else');
         $this->assertStringEqualsFile($tempFile, 'Something Else');
-        $this->assertEquals($umask, 0777 - $this->getFilePermissions($tempFile));
+        $this->assertSame($umask, 0777 - $this->getFilePermissions($tempFile));
 
         // Test replacing symlinked file.
         $filesystem->replace($symlink, 'Yet Something Else Again');
         $this->assertStringEqualsFile($tempFile, 'Yet Something Else Again');
-        $this->assertEquals($umask, 0777 - $this->getFilePermissions($tempFile));
+        $this->assertSame($umask, 0777 - $this->getFilePermissions($tempFile));
 
         umask($originalUmask);
 
@@ -604,7 +604,7 @@ class FilesystemTest extends TestCase
         file_put_contents(self::$tempDir.'/text/foo.txt', $data);
         $filesystem->copy(self::$tempDir.'/text/foo.txt', self::$tempDir.'/text/foo2.txt');
         $this->assertFileExists(self::$tempDir.'/text/foo2.txt');
-        $this->assertEquals($data, file_get_contents(self::$tempDir.'/text/foo2.txt'));
+        $this->assertSame($data, file_get_contents(self::$tempDir.'/text/foo2.txt'));
     }
 
     public function testHasSameHashChecksFileHashes()

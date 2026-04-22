@@ -181,7 +181,7 @@ class JobDispatchingTest extends QueueTestCase
         $this->assertCount(1, $events);
         $this->assertInstanceOf(JobQueued::class, $events[0]);
         $this->assertSame('custom name', $events[0]->job->name);
-        $this->assertStringContainsString('custom name', $events[0]->job->displayName());
+        $this->assertStringContainsString('custom name', (string) $events[0]->job->displayName());
     }
 
     public function testCanDisableDispatchingAfterResponse()

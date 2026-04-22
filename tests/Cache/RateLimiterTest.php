@@ -28,7 +28,7 @@ class RateLimiterTest extends TestCase
     {
         $reflectedLimitersProperty = new ReflectionProperty(RateLimiter::class, 'limiters');
 
-        $rateLimiter = new RateLimiter($this->createMock(Cache::class));
+        $rateLimiter = new RateLimiter($this->createStub(Cache::class));
         $rateLimiter->for($name, fn () => Limit::perMinute(100));
 
         $limiters = $reflectedLimitersProperty->getValue($rateLimiter);
@@ -37,7 +37,7 @@ class RateLimiterTest extends TestCase
 
         $limiterClosure = $rateLimiter->limiter($name);
 
-        $this->assertNotNull($limiterClosure);
+        $this->assertInstanceOf(\Closure::class, $limiterClosure);
     }
 
     public function testShouldUseOriginKeyAsPrefixWhenMultipleLimiterWithSameKey()

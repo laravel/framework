@@ -73,7 +73,7 @@ class DatabaseEloquentWithAttributesTest extends TestCase
 
         $model = $query->make();
 
-        $this->assertSame(true, $model->is_admin);
+        $this->assertTrue($model->is_admin);
         $this->assertSame('First', $model->first_name);
         $this->assertSame('Last', $model->last_name);
         $this->assertSame(WithAttributesEnum::internal, $model->type);
@@ -102,7 +102,7 @@ class DatabaseEloquentWithAttributesTest extends TestCase
 
         $model = WithAttributesModel::first();
 
-        $this->assertSame(true, $model->is_admin);
+        $this->assertTrue($model->is_admin);
         $this->assertSame('First', $model->first_name);
         $this->assertSame('Last', $model->last_name);
         $this->assertSame(WithAttributesEnum::internal, $model->type);

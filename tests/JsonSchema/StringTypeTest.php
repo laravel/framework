@@ -11,9 +11,9 @@ class StringTypeTest extends TestCase
     {
         $type = (new StringType)->min(5);
 
-        $this->assertEquals([
-            'type' => 'string',
+        $this->assertSame([
             'minLength' => 5,
+            'type' => 'string',
         ], $type->toArray());
     }
 
@@ -21,10 +21,10 @@ class StringTypeTest extends TestCase
     {
         $type = (new StringType)->description('User handle')->max(10);
 
-        $this->assertEquals([
-            'type' => 'string',
+        $this->assertSame([
             'description' => 'User handle',
             'maxLength' => 10,
+            'type' => 'string',
         ], $type->toArray());
     }
 
@@ -32,10 +32,10 @@ class StringTypeTest extends TestCase
     {
         $type = (new StringType)->default('foo')->pattern('^foo.*$');
 
-        $this->assertEquals([
-            'type' => 'string',
+        $this->assertSame([
             'default' => 'foo',
             'pattern' => '^foo.*$',
+            'type' => 'string',
         ], $type->toArray());
     }
 
@@ -43,10 +43,10 @@ class StringTypeTest extends TestCase
     {
         $type = (new StringType)->default('foo')->format('date');
 
-        $this->assertEquals([
-            'type' => 'string',
+        $this->assertSame([
             'default' => 'foo',
             'format' => 'date',
+            'type' => 'string',
         ], $type->toArray());
     }
 
@@ -54,9 +54,9 @@ class StringTypeTest extends TestCase
     {
         $type = (new StringType)->enum(['draft', 'published']);
 
-        $this->assertEquals([
-            'type' => 'string',
+        $this->assertSame([
             'enum' => ['draft', 'published'],
+            'type' => 'string',
         ], $type->toArray());
     }
 }

@@ -346,27 +346,27 @@ class TrustProxiesTest extends TestCase
             $this->assertEquals($request->getTrustedHeaderSet(), $this->headerAll,
                 'Assert trusted proxy used all "X-Forwarded-*" header');
 
-            $this->assertEquals(['192.168.1.1', '192.168.1.2'], $request->getTrustedProxies(),
+            $this->assertSame(['192.168.1.1', '192.168.1.2'], $request->getTrustedProxies(),
                 'Assert trusted proxy using proxies as string separated by comma.');
         });
 
         // or, if your proxy instead uses the "Forwarded" header
         $trustedProxy = $this->createTrustedProxy('HEADER_FORWARDED', '192.168.1.1, 192.168.1.2');
         $trustedProxy->handle($request, function (Request $request) {
-            $this->assertEquals(Request::HEADER_FORWARDED, $request->getTrustedHeaderSet(),
+            $this->assertSame(Request::HEADER_FORWARDED, $request->getTrustedHeaderSet(),
                 'Assert trusted proxy used forwarded header');
 
-            $this->assertEquals(['192.168.1.1', '192.168.1.2'], $request->getTrustedProxies(),
+            $this->assertSame(['192.168.1.1', '192.168.1.2'], $request->getTrustedProxies(),
                 'Assert trusted proxy using proxies as string separated by comma.');
         });
 
         // or, if you're using AWS ELB
         $trustedProxy = $this->createTrustedProxy('HEADER_X_FORWARDED_AWS_ELB', '192.168.1.1, 192.168.1.2');
         $trustedProxy->handle($request, function (Request $request) {
-            $this->assertEquals(Request::HEADER_X_FORWARDED_AWS_ELB, $request->getTrustedHeaderSet(),
+            $this->assertSame(Request::HEADER_X_FORWARDED_AWS_ELB, $request->getTrustedHeaderSet(),
                 'Assert trusted proxy used AWS ELB header');
 
-            $this->assertEquals(['192.168.1.1', '192.168.1.2'], $request->getTrustedProxies(),
+            $this->assertSame(['192.168.1.1', '192.168.1.2'], $request->getTrustedProxies(),
                 'Assert trusted proxy using proxies as string separated by comma.');
         });
     }

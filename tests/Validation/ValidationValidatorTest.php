@@ -1103,7 +1103,8 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['name' => ''], ['name' => 'required']);
 
-        $exception = new class($v) extends ValidationException {
+        $exception = new class($v) extends ValidationException
+        {
         };
         $v->setException($exception);
 
@@ -8923,7 +8924,7 @@ class ValidationValidatorTest extends TestCase
         $v->validated();
 
         $this->assertEquals(['first' => 'john', 'preferred' => 'john'], $data);
-        $this->assertEquals(1, $validateCount);
+        $this->assertSame(1, $validateCount);
     }
 
     public function testMultiplePassesCalls()

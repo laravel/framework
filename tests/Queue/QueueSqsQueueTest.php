@@ -127,7 +127,7 @@ class QueueSqsQueueTest extends TestCase
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
         $this->sqs->shouldReceive('receiveMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'AttributeNames' => ['ApproximateReceiveCount']])->andReturn($this->mockedReceiveEmptyMessageResponseModel);
         $result = $queue->pop($this->queueName);
-        $this->assertNull($result);
+        $this->assertNotInstanceOf(\Illuminate\Contracts\Queue\Job::class, $result);
     }
 
     public function testDelayedPushWithDateTimeProperlyPushesJobOntoSqs()

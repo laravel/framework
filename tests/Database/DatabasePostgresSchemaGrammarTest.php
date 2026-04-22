@@ -1347,7 +1347,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $statement = $connection->getSchemaGrammar()->compileColumns('public', 'table');
 
-        $this->assertStringContainsString("where c.relname = 'table' and n.nspname = 'public'", $statement);
+        $this->assertStringContainsString("where c.relname = 'table' and n.nspname = 'public'", (string) $statement);
     }
 
     protected function getConnection(

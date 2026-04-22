@@ -707,21 +707,21 @@ class CacheRepositoryTest extends TestCase
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(1.5);
-        $this->assertSame(1.5, $repo->float('foo'));
+        $this->assertEqualsWithDelta(1.5, $repo->float('foo'), PHP_FLOAT_EPSILON);
     }
 
     public function testItGetsAsFloatWithDefault()
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(null);
-        $this->assertSame(2.5, $repo->float('foo', 2.5));
+        $this->assertEqualsWithDelta(2.5, $repo->float('foo', 2.5), PHP_FLOAT_EPSILON);
     }
 
     public function testItGetsAsFloatFromNumericString()
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('1.5');
-        $this->assertSame(1.5, $repo->float('foo'));
+        $this->assertEqualsWithDelta(1.5, $repo->float('foo'), PHP_FLOAT_EPSILON);
     }
 
     public function testItThrowsExceptionWhenGettingNonFloatAsFloat()

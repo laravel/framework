@@ -379,7 +379,7 @@ class SchemaBuilderTest extends DatabaseTestCase
         $columns = Schema::getColumns('foo');
 
         $this->assertCount(1, $columns);
-        $this->assertTrue($columns[0]['name'] === 'bar');
+        $this->assertSame('bar', $columns[0]['name']);
     }
 
     public function testGetIndexes()
@@ -611,7 +611,7 @@ class SchemaBuilderTest extends DatabaseTestCase
             $table->integer('stored_price_changed')->storedAs('price - 7')->change();
         });
 
-        $this->assertEquals(
+        $this->assertSame(
             ['price' => 100, 'virtual_price' => 98, 'stored_price' => 96, 'virtual_price_changed' => 95, 'stored_price_changed' => 93],
             (array) DB::table('test')->first()
         );

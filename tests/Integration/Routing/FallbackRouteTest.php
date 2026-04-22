@@ -17,8 +17,8 @@ class FallbackRouteTest extends TestCase
             return 'one';
         });
 
-        $this->assertStringContainsString('one', $this->get('/one')->getContent());
-        $this->assertStringContainsString('fallback', $this->get('/non-existing')->getContent());
+        $this->assertStringContainsString('one', (string) $this->get('/one')->getContent());
+        $this->assertStringContainsString('fallback', (string) $this->get('/non-existing')->getContent());
         $this->assertEquals(404, $this->get('/non-existing')->getStatusCode());
     }
 
@@ -34,10 +34,10 @@ class FallbackRouteTest extends TestCase
             });
         });
 
-        $this->assertStringContainsString('one', $this->get('/prefix/one')->getContent());
-        $this->assertStringContainsString('fallback', $this->get('/prefix/non-existing')->getContent());
-        $this->assertStringContainsString('fallback', $this->get('/prefix/non-existing/with/multiple/segments')->getContent());
-        $this->assertStringContainsString('Not Found', $this->get('/non-existing')->getContent());
+        $this->assertStringContainsString('one', (string) $this->get('/prefix/one')->getContent());
+        $this->assertStringContainsString('fallback', (string) $this->get('/prefix/non-existing')->getContent());
+        $this->assertStringContainsString('fallback', (string) $this->get('/prefix/non-existing/with/multiple/segments')->getContent());
+        $this->assertStringContainsString('Not Found', (string) $this->get('/non-existing')->getContent());
     }
 
     public function testFallbackWithWildcards()
@@ -54,11 +54,11 @@ class FallbackRouteTest extends TestCase
             return 'wildcard';
         })->where('any', '.*');
 
-        $this->assertStringContainsString('one', $this->get('/one')->getContent());
+        $this->assertStringContainsString('one', (string) $this->get('/one')->getContent());
 
         tap($this->get('/non-existing'), function ($response) {
-            $this->assertStringContainsString('wildcard', $response->getContent());
-            $this->assertEquals(200, $response->getStatusCode());
+            $this->assertStringContainsString('wildcard', (string) $response->getContent());
+            $this->assertSame(200, $response->getStatusCode());
 
             $this->assertSame('non-existing', $response->baseRequest->route('any'));
         });
@@ -70,7 +70,7 @@ class FallbackRouteTest extends TestCase
             return response('fallback', 404);
         });
 
-        $this->assertStringContainsString('fallback', $this->get('/non-existing')->getContent());
+        $this->assertStringContainsString('fallback', (string) $this->get('/non-existing')->getContent());
         $this->assertEquals(404, $this->get('/non-existing')->getStatusCode());
     }
 
@@ -84,8 +84,8 @@ class FallbackRouteTest extends TestCase
             return Route::respondWithRoute('testFallbackRoute');
         });
 
-        $this->assertStringContainsString('fallback', $this->get('/non-existing')->getContent());
-        $this->assertStringContainsString('fallback', $this->get('/one')->getContent());
+        $this->assertStringContainsString('fallback', (string) $this->get('/non-existing')->getContent());
+        $this->assertStringContainsString('fallback', (string) $this->get('/one')->getContent());
     }
 
     public function testNoFallbacks()
@@ -94,7 +94,7 @@ class FallbackRouteTest extends TestCase
             return 'one';
         });
 
-        $this->assertStringContainsString('one', $this->get('/one')->getContent());
+        $this->assertStringContainsString('one', (string) $this->get('/one')->getContent());
         $this->assertEquals(200, $this->get('/one')->getStatusCode());
     }
 }

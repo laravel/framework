@@ -28,7 +28,6 @@ abstract class QueueTestCase extends TestCase
         $this->driver = $app['config']->get('queue.default', 'sync');
     }
 
-    #[\Override]
     protected function setUp(): void
     {
         $this->afterApplicationCreated(function () {
@@ -36,13 +35,11 @@ abstract class QueueTestCase extends TestCase
                 $this->setUpRedis();
             }
         });
-
         $this->beforeApplicationDestroyed(function () {
             if ($this->getQueueDriver() === 'redis') {
                 $this->tearDownRedis();
             }
         });
-
         parent::setUp();
     }
 

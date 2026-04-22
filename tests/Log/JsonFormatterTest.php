@@ -18,11 +18,9 @@ use Throwable;
 
 final class JsonFormatterTest extends TestCase
 {
-    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
-
         config(['logging.default' => 'testing']);
         config(['logging.channels' => [
             'testing' => [

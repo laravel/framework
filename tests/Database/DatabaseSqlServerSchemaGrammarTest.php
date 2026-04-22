@@ -119,21 +119,21 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertStringContainsString('alter table "users" drop column "foo"', $statements[0]);
+        $this->assertStringContainsString('alter table "users" drop column "foo"', (string) $statements[0]);
 
         $blueprint = new Blueprint($this->getConnection(), 'users');
         $blueprint->dropColumn(['foo', 'bar']);
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertStringContainsString('alter table "users" drop column "foo", "bar"', $statements[0]);
+        $this->assertStringContainsString('alter table "users" drop column "foo", "bar"', (string) $statements[0]);
 
         $blueprint = new Blueprint($this->getConnection(), 'users');
         $blueprint->dropColumn('foo', 'bar');
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertStringContainsString('alter table "users" drop column "foo", "bar"', $statements[0]);
+        $this->assertStringContainsString('alter table "users" drop column "foo", "bar"', (string) $statements[0]);
     }
 
     public function testDropColumnDropsCreatesSqlToDropDefaultConstraints()
@@ -214,7 +214,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertStringContainsString('alter table "users" drop column "created_at", "updated_at"', $statements[0]);
+        $this->assertStringContainsString('alter table "users" drop column "created_at", "updated_at"', (string) $statements[0]);
     }
 
     public function testDropTimestampsTz()
@@ -224,7 +224,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertStringContainsString('alter table "users" drop column "created_at", "updated_at"', $statements[0]);
+        $this->assertStringContainsString('alter table "users" drop column "created_at", "updated_at"', (string) $statements[0]);
     }
 
     public function testDropMorphs()
@@ -235,7 +235,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
         $this->assertCount(2, $statements);
         $this->assertSame('drop index "photos_imageable_type_imageable_id_index" on "photos"', $statements[0]);
-        $this->assertStringContainsString('alter table "photos" drop column "imageable_type", "imageable_id"', $statements[1]);
+        $this->assertStringContainsString('alter table "photos" drop column "imageable_type", "imageable_id"', (string) $statements[1]);
     }
 
     public function testRenameTable()

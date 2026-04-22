@@ -161,7 +161,7 @@ class MiddlewareTest extends TestCase
             '192.168.1.3',
             '192.168.1.4',
         ]);
-        $this->assertEquals([
+        $this->assertSame([
             '192.168.1.3',
             '192.168.1.4',
         ], $method->invoke($middleware));

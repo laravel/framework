@@ -256,10 +256,10 @@ class FilesystemAdapterTest extends TestCase
         $filesystemAdapter->copy('/foo/foo.txt', '/foo/foo2.txt');
 
         $this->assertFileExists($this->tempDir.'/foo/foo.txt');
-        $this->assertEquals($data, file_get_contents($this->tempDir.'/foo/foo.txt'));
+        $this->assertSame($data, file_get_contents($this->tempDir.'/foo/foo.txt'));
 
         $this->assertFileExists($this->tempDir.'/foo/foo2.txt');
-        $this->assertEquals($data, file_get_contents($this->tempDir.'/foo/foo2.txt'));
+        $this->assertSame($data, file_get_contents($this->tempDir.'/foo/foo2.txt'));
     }
 
     public function testMove()
@@ -274,7 +274,7 @@ class FilesystemAdapterTest extends TestCase
         Assert::assertFileDoesNotExist($this->tempDir.'/foo/foo.txt');
 
         $this->assertFileExists($this->tempDir.'/foo/foo2.txt');
-        $this->assertEquals($data, file_get_contents($this->tempDir.'/foo/foo2.txt'));
+        $this->assertSame($data, file_get_contents($this->tempDir.'/foo/foo2.txt'));
     }
 
     public function testStream()

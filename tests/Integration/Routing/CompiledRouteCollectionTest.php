@@ -91,6 +91,7 @@ class CompiledRouteCollectionTest extends TestCase
         $route = $this->collection()->getByAction('FooController@index');
 
         $this->assertSame($action, Arr::except($routeIndex->getAction(), 'as'));
+        $this->assertInstanceOf(Route::class, $route);
         $this->assertSame($action, Arr::except($route->getAction(), 'as'));
     }
 
@@ -297,8 +298,8 @@ class CompiledRouteCollectionTest extends TestCase
         $routes = $this->collection();
 
         // The lookups of $routeA should not be there anymore, because they are no longer valid.
-        $this->assertNull($routes->getByName('routeA'));
-        $this->assertNull($routes->getByAction('View@view'));
+        $this->assertNotInstanceOf(Route::class, $routes->getByName('routeA'));
+        $this->assertNotInstanceOf(Route::class, $routes->getByAction('View@view'));
         // The lookups of $routeB are still there.
         $this->assertEquals($routeB, $routes->getByName('overwrittenRouteA'));
         $this->assertEquals($routeB, $routes->getByAction('OverwrittenView@view'));
@@ -431,6 +432,7 @@ class CompiledRouteCollectionTest extends TestCase
         $this->routeCollection->add($this->newRoute('GET', 'foo/bar', ['uses' => 'FooController@index', 'prefix' => '/']));
 
         $route = $this->collection()->getByAction('FooController@index');
+        $this->assertInstanceOf(Route::class, $route);
 
         $this->assertSame('foo/bar', $route->uri());
     }
@@ -440,6 +442,7 @@ class CompiledRouteCollectionTest extends TestCase
         $this->routeCollection->add($this->newRoute('GET', 'foo/bar', ['controller' => '\App\FooController']));
 
         $route = $this->collection()->getByAction('App\FooController');
+        $this->assertInstanceOf(Route::class, $route);
 
         $this->assertSame('foo/bar', $route->uri());
     }
@@ -449,6 +452,7 @@ class CompiledRouteCollectionTest extends TestCase
         $this->routeCollection->add($this->newRoute('GET', 'foo/bar', ['uses' => 'FooController@index', 'prefix' => '{locale}'])->prefix('pre'));
 
         $route = $this->collection()->getByAction('FooController@index');
+        $this->assertInstanceOf(Route::class, $route);
 
         $this->assertSame('pre/{locale}', $route->getPrefix());
     }
@@ -472,6 +476,7 @@ class CompiledRouteCollectionTest extends TestCase
         ]));
 
         $route = $this->collection()->getByName('foo');
+        $this->assertInstanceOf(Route::class, $route);
 
         $this->assertSame('profile/{user}/posts/{post}/show', $route->uri());
         $this->assertSame(['user' => 'username', 'post' => 'slug'], $route->bindingFields());

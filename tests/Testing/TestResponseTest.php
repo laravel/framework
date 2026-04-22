@@ -2953,10 +2953,10 @@ EOT
             $this->fail('xxxx');
         } catch (AssertionFailedError $e) {
             $diff = $e->getComparisonFailure()->getDiff();
-            $this->assertStringContainsString('wrong1', $diff);
-            $this->assertStringContainsString('wrong2', $diff);
-            $this->assertStringContainsString('apple', $diff);
-            $this->assertStringContainsString('banana', $diff);
+            $this->assertStringContainsString('wrong1', (string) $diff);
+            $this->assertStringContainsString('wrong2', (string) $diff);
+            $this->assertStringContainsString('apple', (string) $diff);
+            $this->assertStringContainsString('banana', (string) $diff);
         }
     }
 
@@ -3103,8 +3103,8 @@ EOT
         $cookie = $response->getCookie($cookieName);
 
         $this->assertInstanceOf(Cookie::class, $cookie);
-        $this->assertEquals($cookieName, $cookie->getName());
-        $this->assertEquals($cookieValue, $cookie->getValue());
+        $this->assertSame($cookieName, $cookie->getName());
+        $this->assertSame($cookieValue, $cookie->getValue());
     }
 
     public function testHandledExceptionIsIncludedInAssertionFailure(): void

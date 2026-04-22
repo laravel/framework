@@ -589,6 +589,7 @@ class MailMailableTest extends TestCase
         $mailable->priority(1);
 
         $sentMessage = $mailer->send($mailable);
+        $this->assertInstanceOf(\Illuminate\Mail\SentMessage::class, $sentMessage);
 
         $this->assertSame('hello@laravel.com', $sentMessage->getEnvelope()->getRecipients()[0]->getAddress());
         $this->assertStringContainsString('X-Priority: 1 (Highest)', $sentMessage->toString());
@@ -659,6 +660,7 @@ class MailMailableTest extends TestCase
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
         $sentMessage = $mailer->send($mailable);
+        $this->assertInstanceOf(\Illuminate\Mail\SentMessage::class, $sentMessage);
         $this->assertStringContainsString('X-Metadata-template_id: external-template-id', $sentMessage->toString());
         $this->assertStringContainsString('X-Metadata-customer_id: 101', $sentMessage->toString());
         $this->assertStringContainsString('X-Metadata-order_id: 1000', $sentMessage->toString());
@@ -1179,6 +1181,7 @@ class MailMailableTest extends TestCase
         $mailable->html('test content');
 
         $sentMessage = $mailer->send($mailable);
+        $this->assertInstanceOf(\Illuminate\Mail\SentMessage::class, $sentMessage);
 
         $this->assertSame('custom-message-id@example.com', $sentMessage->getMessageId());
 

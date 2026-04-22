@@ -49,7 +49,7 @@ class EloquentTransactionWithAfterCommitUsingRefreshDatabaseOnMultipleConnection
             });
         });
 
-        $this->assertEquals([
+        $this->assertSame([
             'second transaction callback',
             'first transaction callback',
         ], $calls);

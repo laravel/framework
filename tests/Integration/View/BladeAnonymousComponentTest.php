@@ -16,9 +16,9 @@ class BladeAnonymousComponentTest extends TestCase
 
         $view = View::make('page')->render();
 
-        $this->assertTrue(str_contains($view, 'Panel content.'));
-        $this->assertTrue(str_contains($view, 'class="app-layout"'));
-        $this->assertTrue(str_contains($view, 'class="danger-button"'));
+        $this->assertStringContainsString('Panel content.', $view);
+        $this->assertStringContainsString('class="app-layout"', $view);
+        $this->assertStringContainsString('class="danger-button"', $view);
     }
 
     public function test_anonymous_components_with_custom_paths_cant_be_rendered_as_normal_views()

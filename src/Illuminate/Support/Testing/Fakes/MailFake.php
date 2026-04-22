@@ -80,8 +80,9 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
             foreach (Arr::wrap($callback) as $address) {
                 $callback = fn ($mail) => $mail->hasTo($address);
 
-                PHPUnit::assertTrue(
-                    $this->sent($mailable, $callback)->count() > 0,
+                PHPUnit::assertGreaterThan(
+                    0,
+                    $this->sent($mailable, $callback)->count(),
                     "The expected [{$mailable}] mailable was not sent to address [{$address}].".$suggestion
                 );
             }
@@ -89,8 +90,9 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
             return;
         }
 
-        PHPUnit::assertTrue(
-            $this->sent($mailable, $callback)->count() > 0,
+        PHPUnit::assertGreaterThan(
+            0,
+            $this->sent($mailable, $callback)->count(),
             "The expected [{$mailable}] mailable was not sent.".$suggestion
         );
     }
@@ -203,8 +205,9 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
             foreach (Arr::wrap($callback) as $address) {
                 $callback = fn ($mail) => $mail->hasTo($address);
 
-                PHPUnit::assertTrue(
-                    $this->queued($mailable, $callback)->count() > 0,
+                PHPUnit::assertGreaterThan(
+                    0,
+                    $this->queued($mailable, $callback)->count(),
                     "The expected [{$mailable}] mailable was not queued to address [{$address}]."
                 );
             }
@@ -212,8 +215,9 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
             return;
         }
 
-        PHPUnit::assertTrue(
-            $this->queued($mailable, $callback)->count() > 0,
+        PHPUnit::assertGreaterThan(
+            0,
+            $this->queued($mailable, $callback)->count(),
             "The expected [{$mailable}] mailable was not queued."
         );
     }

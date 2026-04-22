@@ -69,22 +69,16 @@ class QueryBuilderTest extends DatabaseTestCase
         $rows = DB::table('accounting')->get();
 
         $this->assertCount(2, $rows);
-        // other rows are not affected.
-        $this->assertEquals([
-            'id' => 1,
-            'wallet_1' => 100,
-            'wallet_2' => 200,
-            'user_id' => 1,
-            'name' => 'Taylor',
-        ], (array) $rows[0]);
-
-        $this->assertEquals([
-            'id' => 2,
-            'wallet_1' => 15 + 10,
-            'wallet_2' => 300 - 20,
-            'user_id' => 2,
-            'name' => 'foo',
-        ], (array) $rows[1]);
+        $this->assertSame(1, $rows[0]->id);
+        $this->assertSame(100.0, $rows[0]->wallet_1);
+        $this->assertSame(200.0, $rows[0]->wallet_2);
+        $this->assertSame(1, $rows[0]->user_id);
+        $this->assertSame('Taylor', $rows[0]->name);
+        $this->assertSame(2, $rows[1]->id);
+        $this->assertSame(25.0, $rows[1]->wallet_1);
+        $this->assertSame(280.0, $rows[1]->wallet_2);
+        $this->assertSame(2, $rows[1]->user_id);
+        $this->assertSame('foo', $rows[1]->name);
 
         // without the second argument.
         $affectedRowsCount = DB::table('accounting')->where('user_id', 2)->incrementEach([
@@ -95,14 +89,11 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertEquals(1, $affectedRowsCount);
 
         $rows = DB::table('accounting')->get();
-
-        $this->assertEquals([
-            'id' => 2,
-            'wallet_1' => 15 + (10 + 20),
-            'wallet_2' => 300 + (-20 + 20),
-            'user_id' => 2,
-            'name' => 'foo',
-        ], (array) $rows[1]);
+        $this->assertSame(2, $rows[1]->id);
+        $this->assertSame(45.0, $rows[1]->wallet_1);
+        $this->assertSame(300.0, $rows[1]->wallet_2);
+        $this->assertSame(2, $rows[1]->user_id);
+        $this->assertSame('foo', $rows[1]->name);
 
         // Test Can affect multiple rows at once.
         $affectedRowsCount = DB::table('accounting')->incrementEach([
@@ -113,21 +104,16 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertEquals(2, $affectedRowsCount);
 
         $rows = DB::table('accounting')->get();
-        $this->assertEquals([
-            'id' => 1,
-            'wallet_1' => 100 + 31.5,
-            'wallet_2' => 200 - 32.5,
-            'user_id' => 1,
-            'name' => 'Taylor',
-        ], (array) $rows[0]);
-
-        $this->assertEquals([
-            'id' => 2,
-            'wallet_1' => 15 + (10 + 20 + 31.5),
-            'wallet_2' => 300 + (-20 + 20 - 32.5),
-            'user_id' => 2,
-            'name' => 'foo',
-        ], (array) $rows[1]);
+        $this->assertSame(1, $rows[0]->id);
+        $this->assertEqualsWithDelta(131.5, $rows[0]->wallet_1, PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(167.5, $rows[0]->wallet_2, PHP_FLOAT_EPSILON);
+        $this->assertSame(1, $rows[0]->user_id);
+        $this->assertSame('Taylor', $rows[0]->name);
+        $this->assertSame(2, $rows[1]->id);
+        $this->assertEqualsWithDelta(76.5, $rows[1]->wallet_1, PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(267.5, $rows[1]->wallet_2, PHP_FLOAT_EPSILON);
+        $this->assertSame(2, $rows[1]->user_id);
+        $this->assertSame('foo', $rows[1]->name);
 
         // In case of a conflict, the second argument wins and sets a fixed value:
         $affectedRowsCount = DB::table('accounting')->incrementEach([
@@ -138,28 +124,28 @@ class QueryBuilderTest extends DatabaseTestCase
 
         $rows = DB::table('accounting')->get();
 
-        $this->assertSame(1.5, (float) $rows[0]->wallet_1);
-        $this->assertSame(1.5, (float) $rows[1]->wallet_1);
+        $this->assertEqualsWithDelta(1.5, (float) $rows[0]->wallet_1, PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(1.5, (float) $rows[1]->wallet_1, PHP_FLOAT_EPSILON);
 
         Schema::drop('accounting');
     }
 
     public function testSole()
     {
-        $expected = ['id' => '1', 'title' => 'Foo Post'];
+        $expected = ['id' => 1, 'title' => 'Foo Post'];
 
-        $this->assertEquals($expected, (array) DB::table('posts')->where('title', 'Foo Post')->select('id', 'title')->sole());
+        $this->assertSame($expected, (array) DB::table('posts')->where('title', 'Foo Post')->select('id', 'title')->sole());
     }
 
     public function testSoleWithParameters()
     {
-        $expected = ['id' => '1'];
+        $expected = ['id' => 1];
 
-        $this->assertEquals($expected, (array) DB::table('posts')->where('title', 'Foo Post')->sole('id'));
-        $this->assertEquals($expected, (array) DB::table('posts')->where('title', 'Foo Post')->sole(['id']));
+        $this->assertSame($expected, (array) DB::table('posts')->where('title', 'Foo Post')->sole('id'));
+        $this->assertSame($expected, (array) DB::table('posts')->where('title', 'Foo Post')->sole(['id']));
 
-        $expected = ['id' => '1', 'title' => 'Foo Post'];
-        $this->assertEquals($expected, (array) DB::table('posts')->where('title', 'Foo Post')->sole(['id', 'title']));
+        $expected = ['id' => 1, 'title' => 'Foo Post'];
+        $this->assertSame($expected, (array) DB::table('posts')->where('title', 'Foo Post')->sole(['id', 'title']));
     }
 
     public function testSoleFailsForMultipleRecords()
@@ -182,26 +168,26 @@ class QueryBuilderTest extends DatabaseTestCase
 
     public function testSelect()
     {
-        $expected = ['id' => '1', 'title' => 'Foo Post'];
+        $expected = ['id' => 1, 'title' => 'Foo Post'];
 
-        $this->assertEquals($expected, (array) DB::table('posts')->select('id', 'title')->first());
-        $this->assertEquals($expected, (array) DB::table('posts')->select(['id', 'title'])->first());
+        $this->assertSame($expected, (array) DB::table('posts')->select('id', 'title')->first());
+        $this->assertSame($expected, (array) DB::table('posts')->select(['id', 'title'])->first());
 
         $this->assertCount(4, (array) DB::table('posts')->select()->first());
     }
 
     public function testSelectReplacesExistingSelects()
     {
-        $this->assertEquals(
-            ['id' => '1', 'title' => 'Foo Post'],
+        $this->assertSame(
+            ['id' => 1, 'title' => 'Foo Post'],
             (array) DB::table('posts')->select('content')->select(['id', 'title'])->first()
         );
     }
 
     public function testSelectWithSubQuery()
     {
-        $this->assertEquals(
-            ['id' => '1', 'title' => 'Foo Post', 'foo' => 'Lorem Ipsum.'],
+        $this->assertSame(
+            ['id' => 1, 'title' => 'Foo Post', 'foo' => 'Lorem Ipsum.'],
             (array) DB::table('posts')->select(['id', 'title', 'foo' => function ($query) {
                 $query->select('content');
             }])->first()
@@ -210,20 +196,20 @@ class QueryBuilderTest extends DatabaseTestCase
 
     public function testAddSelect()
     {
-        $expected = ['id' => '1', 'title' => 'Foo Post', 'content' => 'Lorem Ipsum.'];
+        $expected = ['id' => 1, 'title' => 'Foo Post', 'content' => 'Lorem Ipsum.'];
 
-        $this->assertEquals($expected, (array) DB::table('posts')->select('id')->addSelect('title', 'content')->first());
-        $this->assertEquals($expected, (array) DB::table('posts')->select('id')->addSelect(['title', 'content'])->first());
-        $this->assertEquals($expected, (array) DB::table('posts')->addSelect(['id', 'title', 'content'])->first());
+        $this->assertSame($expected, (array) DB::table('posts')->select('id')->addSelect('title', 'content')->first());
+        $this->assertSame($expected, (array) DB::table('posts')->select('id')->addSelect(['title', 'content'])->first());
+        $this->assertSame($expected, (array) DB::table('posts')->addSelect(['id', 'title', 'content'])->first());
 
         $this->assertCount(4, (array) DB::table('posts')->addSelect([])->first());
-        $this->assertEquals(['id' => '1'], (array) DB::table('posts')->select('id')->addSelect([])->first());
+        $this->assertSame(['id' => 1], (array) DB::table('posts')->select('id')->addSelect([])->first());
     }
 
     public function testAddSelectWithSubQuery()
     {
-        $this->assertEquals(
-            ['id' => '1', 'title' => 'Foo Post', 'foo' => 'Lorem Ipsum.'],
+        $this->assertSame(
+            ['id' => 1, 'title' => 'Foo Post', 'foo' => 'Lorem Ipsum.'],
             (array) DB::table('posts')->addSelect(['id', 'title', 'foo' => function ($query) {
                 $query->select('content');
             }])->first()

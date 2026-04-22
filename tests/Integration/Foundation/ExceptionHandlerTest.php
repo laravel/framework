@@ -62,7 +62,7 @@ class ExceptionHandlerTest extends TestCase
             $reported[] = $e;
         });
 
-        $exception = new class extends \Exception implements ShouldntReport, Responsable
+        $exception = new class extends Exception implements ShouldntReport, Responsable
         {
             public function toResponse($request)
             {
@@ -223,7 +223,7 @@ EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
 
         $this->assertCount(1, $reported);
         $this->assertSame('Undefined variable $foo (View: '.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'MalformedErrorViews'.DIRECTORY_SEPARATOR.'errors'.DIRECTORY_SEPARATOR.'404.blade.php)', $reported[0]->getMessage());
-        $this->assertNotNull($response);
+        $this->assertInstanceOf(\Illuminate\Testing\TestResponse::class, $response);
         $response->assertStatus(404);
     }
 
@@ -244,7 +244,7 @@ EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
 
         $this->assertCount(1, $reported);
         $this->assertSame('Undefined variable $foo (View: '.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'MalformedErrorViews'.DIRECTORY_SEPARATOR.'errors'.DIRECTORY_SEPARATOR.'404.blade.php)', $reported[0]->getMessage());
-        $this->assertNotNull($response);
+        $this->assertInstanceOf(\Illuminate\Testing\TestResponse::class, $response);
         $response->assertStatus(500);
     }
 
@@ -334,6 +334,6 @@ EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
 
         $recordedLogs = Log::getLogger()->getHandlers()[0]->getRecords();
         $this->assertCount(1, $recordedLogs);
-        $this->assertStringContainsString('a really (truncated...)', $recordedLogs[0]['message']);
+        $this->assertStringContainsString('a really (truncated...)', (string) $recordedLogs[0]['message']);
     }
 }

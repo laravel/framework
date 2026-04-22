@@ -143,7 +143,10 @@ class EloquentWhereHasTest extends DatabaseTestCase
                 $builder->selectRaw('id')->where('public', $value);
             };
 
-            return [$callbackEloquent, $callbackQuery];
+            return [
+                $callbackEloquent,
+                $callbackQuery,
+            ];
         };
 
         return [

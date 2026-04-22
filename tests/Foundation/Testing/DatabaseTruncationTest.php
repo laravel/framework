@@ -53,7 +53,7 @@ class DatabaseTruncationTest extends TestCase
 
         $this->truncateTablesForConnection($connection, 'test');
 
-        $this->assertEquals(['foo', 'bar'], $truncatedTables);
+        $this->assertSame(['foo', 'bar'], $truncatedTables);
     }
 
     public function testTruncateTablesWithTablesToTruncateProperty()
@@ -69,7 +69,7 @@ class DatabaseTruncationTest extends TestCase
 
         $this->truncateTablesForConnection($connection, 'test');
 
-        $this->assertEquals(['foo', 'bar'], $truncatedTables);
+        $this->assertSame(['foo', 'bar'], $truncatedTables);
     }
 
     public function testTruncateTablesWithExceptTablesProperty()
@@ -85,7 +85,7 @@ class DatabaseTruncationTest extends TestCase
 
         $this->truncateTablesForConnection($connection, 'test');
 
-        $this->assertEquals(['foo', 'bar'], $truncatedTables);
+        $this->assertSame(['foo', 'bar'], $truncatedTables);
     }
 
     public function testTruncateTablesWithSchema()
@@ -101,7 +101,7 @@ class DatabaseTruncationTest extends TestCase
 
         $this->truncateTablesForConnection($connection, 'test');
 
-        $this->assertEquals(['public.foo', 'public.bar', 'private.foo', 'private.baz'], $truncatedTables);
+        $this->assertSame(['public.foo', 'public.bar', 'private.foo', 'private.baz'], $truncatedTables);
     }
 
     public function testTruncateTablesWithSchemaTablesToTruncateProperty()
@@ -120,7 +120,7 @@ class DatabaseTruncationTest extends TestCase
 
         $this->truncateTablesForConnection($connection, 'test');
 
-        $this->assertEquals(['public.foo', 'public.bar', 'private.foo'], $truncatedTables);
+        $this->assertSame(['public.foo', 'public.bar', 'private.foo'], $truncatedTables);
     }
 
     public function testTruncateTablesWithSchemaAndExceptTablesProperty()
@@ -139,7 +139,7 @@ class DatabaseTruncationTest extends TestCase
 
         $this->truncateTablesForConnection($connection, 'test');
 
-        $this->assertEquals(['public.baz', 'private.bar'], $truncatedTables);
+        $this->assertSame(['public.baz', 'private.bar'], $truncatedTables);
     }
 
     public function testTruncateTablesWithConnectionPrefix()
@@ -154,7 +154,7 @@ class DatabaseTruncationTest extends TestCase
 
         $this->truncateTablesForConnection($connection, 'test');
 
-        $this->assertEquals(['public.my_foo', 'public.my_baz', 'private.my_foo'], $truncatedTables);
+        $this->assertSame(['public.my_foo', 'public.my_baz', 'private.my_foo'], $truncatedTables);
     }
 
     public function testTruncateTablesOnPgsqlWithSearchPath()
@@ -172,7 +172,7 @@ class DatabaseTruncationTest extends TestCase
 
         $this->truncateTablesForConnection($connection, 'test');
 
-        $this->assertEquals(['public.foo', 'public.bar', 'my_schema.foo', 'my_schema.baz'], $truncatedTables);
+        $this->assertSame(['public.foo', 'public.bar', 'my_schema.foo', 'my_schema.baz'], $truncatedTables);
     }
 
     private function arrangeConnection(

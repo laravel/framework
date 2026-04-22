@@ -56,6 +56,7 @@ class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
 
         $user = BelongsToManyChunkByIdTestTestUser::query()->first();
         $i = 0;
+        $this->assertInstanceOf(BelongsToManyChunkByIdTestTestUser::class, $user);
 
         $user->articles()->chunkById(1, function (Collection $collection) use (&$i) {
             $i++;
@@ -71,6 +72,7 @@ class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
 
         $user = BelongsToManyChunkByIdTestTestUser::query()->first();
         $i = 0;
+        $this->assertInstanceOf(BelongsToManyChunkByIdTestTestUser::class, $user);
 
         $user->articles()->chunkByIdDesc(1, function (Collection $collection) use (&$i) {
             $this->assertEquals(3 - $i, $collection->first()->id);

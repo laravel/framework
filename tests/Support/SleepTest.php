@@ -48,7 +48,7 @@ class SleepTest extends TestCase
             return array_shift($results);
         })->then(fn () => 100);
 
-        $this->assertEquals(3, $_SERVER['__sleep.while']);
+        $this->assertSame(3, $_SERVER['__sleep.while']);
         $this->assertEquals(100, $result);
 
         unset($_SERVER['__sleep.while']);
@@ -80,7 +80,7 @@ class SleepTest extends TestCase
 
         $sleep = Sleep::for(1.5)->minutes();
 
-        $this->assertSame(90_000_000.0, (float) $sleep->duration->totalMicroseconds);
+        $this->assertEqualsWithDelta(90_000_000.0, (float) $sleep->duration->totalMicroseconds, PHP_FLOAT_EPSILON);
     }
 
     public function testItCanSpecifyMinute()
@@ -89,7 +89,7 @@ class SleepTest extends TestCase
 
         $sleep = Sleep::for(1)->minute();
 
-        $this->assertSame(60_000_000.0, (float) $sleep->duration->totalMicroseconds);
+        $this->assertEqualsWithDelta(60_000_000.0, (float) $sleep->duration->totalMicroseconds, PHP_FLOAT_EPSILON);
     }
 
     public function testItCanSpecifySeconds()
@@ -98,7 +98,7 @@ class SleepTest extends TestCase
 
         $sleep = Sleep::for(1.5)->seconds();
 
-        $this->assertSame(1_500_000.0, (float) $sleep->duration->totalMicroseconds);
+        $this->assertEqualsWithDelta(1_500_000.0, (float) $sleep->duration->totalMicroseconds, PHP_FLOAT_EPSILON);
     }
 
     public function testItCanSpecifySecond()
@@ -107,7 +107,7 @@ class SleepTest extends TestCase
 
         $sleep = Sleep::for(1)->second();
 
-        $this->assertSame(1_000_000.0, (float) $sleep->duration->totalMicroseconds);
+        $this->assertEqualsWithDelta(1_000_000.0, (float) $sleep->duration->totalMicroseconds, PHP_FLOAT_EPSILON);
     }
 
     public function testItCanSpecifyMilliseconds()
@@ -116,7 +116,7 @@ class SleepTest extends TestCase
 
         $sleep = Sleep::for(1.5)->milliseconds();
 
-        $this->assertSame(1_500.0, (float) $sleep->duration->totalMicroseconds);
+        $this->assertEqualsWithDelta(1_500.0, (float) $sleep->duration->totalMicroseconds, PHP_FLOAT_EPSILON);
     }
 
     public function testItCanSpecifyMillisecond()
@@ -125,7 +125,7 @@ class SleepTest extends TestCase
 
         $sleep = Sleep::for(1)->millisecond();
 
-        $this->assertSame(1_000.0, (float) $sleep->duration->totalMicroseconds);
+        $this->assertEqualsWithDelta(1_000.0, (float) $sleep->duration->totalMicroseconds, PHP_FLOAT_EPSILON);
     }
 
     public function testItCanSpecifyMicroseconds()
@@ -135,7 +135,7 @@ class SleepTest extends TestCase
         $sleep = Sleep::for(1.5)->microseconds();
 
         // rounded as microseconds is the smallest unit supported...
-        $this->assertSame(1.0, (float) $sleep->duration->totalMicroseconds);
+        $this->assertEqualsWithDelta(1.0, (float) $sleep->duration->totalMicroseconds, PHP_FLOAT_EPSILON);
     }
 
     public function testItCanSpecifyMicrosecond()
@@ -144,7 +144,7 @@ class SleepTest extends TestCase
 
         $sleep = Sleep::for(1)->microsecond();
 
-        $this->assertSame(1.0, (float) $sleep->duration->totalMicroseconds);
+        $this->assertEqualsWithDelta(1.0, (float) $sleep->duration->totalMicroseconds, PHP_FLOAT_EPSILON);
     }
 
     public function testItCanChainDurations()
@@ -154,7 +154,7 @@ class SleepTest extends TestCase
         $sleep = Sleep::for(1)->second()
             ->and(500)->microseconds();
 
-        $this->assertSame(1000500.0, (float) $sleep->duration->totalMicroseconds);
+        $this->assertEqualsWithDelta(1000500.0, (float) $sleep->duration->totalMicroseconds, PHP_FLOAT_EPSILON);
     }
 
     public function testItCanUseDateInterval()
@@ -163,7 +163,7 @@ class SleepTest extends TestCase
 
         $sleep = Sleep::for(CarbonInterval::seconds(1)->addMilliseconds(5));
 
-        $this->assertSame(1_005_000.0, (float) $sleep->duration->totalMicroseconds);
+        $this->assertEqualsWithDelta(1_005_000.0, (float) $sleep->duration->totalMicroseconds, PHP_FLOAT_EPSILON);
     }
 
     public function testItThrowsForUnknownTimeUnit()
@@ -486,15 +486,15 @@ class SleepTest extends TestCase
 
         // A static macro can be referenced
         $sleep = Sleep::forSomeConfiguredAmountOfTime();
-        $this->assertSame(3000000.0, (float) $sleep->duration->totalMicroseconds);
+        $this->assertEqualsWithDelta(3000000.0, (float) $sleep->duration->totalMicroseconds, PHP_FLOAT_EPSILON);
 
         // A macro can specify a new duration
         $sleep = $sleep->useSomeOtherAmountOfTime();
-        $this->assertSame(1234000.0, (float) $sleep->duration->totalMicroseconds);
+        $this->assertEqualsWithDelta(1234000.0, (float) $sleep->duration->totalMicroseconds, PHP_FLOAT_EPSILON);
 
         // A macro can supplement an existing duration
         $sleep = $sleep->andSomeMoreGranularControl();
-        $this->assertSame(1234567.0, (float) $sleep->duration->totalMicroseconds);
+        $this->assertEqualsWithDelta(1234567.0, (float) $sleep->duration->totalMicroseconds, PHP_FLOAT_EPSILON);
     }
 
     public function testItCanReplacePreviouslyDefinedDurations()
@@ -506,13 +506,13 @@ class SleepTest extends TestCase
         });
 
         $sleep = Sleep::for(1)->second();
-        $this->assertSame(1000000.0, (float) $sleep->duration->totalMicroseconds);
+        $this->assertEqualsWithDelta(1000000.0, (float) $sleep->duration->totalMicroseconds, PHP_FLOAT_EPSILON);
 
         $sleep->setDuration(2)->second();
-        $this->assertSame(2000000.0, (float) $sleep->duration->totalMicroseconds);
+        $this->assertEqualsWithDelta(2000000.0, (float) $sleep->duration->totalMicroseconds, PHP_FLOAT_EPSILON);
 
         $sleep->setDuration(500)->milliseconds();
-        $this->assertSame(500000.0, (float) $sleep->duration->totalMicroseconds);
+        $this->assertEqualsWithDelta(500000.0, (float) $sleep->duration->totalMicroseconds, PHP_FLOAT_EPSILON);
     }
 
     public function testItCanSleepConditionallyWhen()
@@ -573,8 +573,8 @@ class SleepTest extends TestCase
             Sleep::for(2)->millisecond(),
         ]);
 
-        $this->assertSame(3.0, (float) $countA);
-        $this->assertSame(3.0, (float) $countB);
+        $this->assertEqualsWithDelta(3.0, (float) $countA, PHP_FLOAT_EPSILON);
+        $this->assertEqualsWithDelta(3.0, (float) $countB, PHP_FLOAT_EPSILON);
     }
 
     public function testItDoesntRunCallbacksWhenNotFaking()

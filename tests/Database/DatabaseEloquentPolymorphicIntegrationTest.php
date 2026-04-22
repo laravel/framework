@@ -112,6 +112,7 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
         $this->seedData();
 
         $like = TestLike::with('likeable.owner')->first();
+        $this->assertInstanceOf(TestLike::class, $like);
 
         $this->assertTrue($like->relationLoaded('likeable'));
         $this->assertTrue($like->likeable->relationLoaded('owner'));

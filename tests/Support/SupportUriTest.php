@@ -33,7 +33,7 @@ class SupportUriTest extends TestCase
         $this->assertSame('', (string) $uri->query());
         $this->assertSame('', $uri->query()->decode());
         $this->assertNull($uri->fragment());
-        $this->assertEquals($originalUri, (string) $uri);
+        $this->assertSame($originalUri, (string) $uri);
 
         $uri = Uri::of('https://taylor:password@laravel.com/docs/installation?version=1#hello');
 
@@ -124,9 +124,9 @@ class SupportUriTest extends TestCase
 
         $expected = 'https://taylor:password@laravel.com:80/docs/installation?version=1#hello';
 
-        $this->assertEquals($expected, (string) $uri);
-        $this->assertEquals($expected, $uri->value());
-        $this->assertEquals($expected, $uri->toString());
+        $this->assertSame($expected, (string) $uri);
+        $this->assertSame($expected, $uri->value());
+        $this->assertSame($expected, $uri->toString());
     }
 
     public function test_complicated_query_string_manipulation()
@@ -268,15 +268,15 @@ class SupportUriTest extends TestCase
 
         $uri = Uri::of('https://laravel.com/one/two/three?foo=bar');
 
-        $this->assertEquals(3, $uri->pathSegments()->count());
+        $this->assertCount(3, $uri->pathSegments());
 
         $uri = Uri::of('https://laravel.com/one/two/three/?foo=bar');
 
-        $this->assertEquals(3, $uri->pathSegments()->count());
+        $this->assertCount(3, $uri->pathSegments());
 
         $uri = Uri::of('https://laravel.com/one/two/three/#foo=bar');
 
-        $this->assertEquals(3, $uri->pathSegments()->count());
+        $this->assertCount(3, $uri->pathSegments());
     }
 
     public function test_macroable()

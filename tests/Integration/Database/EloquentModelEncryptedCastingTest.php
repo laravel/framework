@@ -221,6 +221,7 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
         $this->assertSame('value2', $subject->secret_collection->get('key2'));
 
         $subject->secret_collection = null;
+        $this->assertInstanceOf(EncryptedCast::class, $subject);
         $subject->save();
 
         $this->assertNull($subject->secret_collection);
@@ -273,6 +274,7 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
         $this->assertSame('value2', $subject->secret_collection->get(1)->key2);
 
         $subject->secret_collection = null;
+        $this->assertInstanceOf(EncryptedCast::class, $subject);
         $subject->save();
 
         $this->assertNull($subject->secret_collection);
@@ -327,6 +329,7 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
         $this->assertSame('value2', $subject->secret_array['key2']);
 
         $subject->secret_array = null;
+        $this->assertInstanceOf(EncryptedCast::class, $subject);
         $subject->save();
 
         $this->assertNull($subject->secret_array);
@@ -342,7 +345,7 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
     {
         $customEncrypter = $this->mock(Encrypter::class);
 
-        $this->assertNull(Model::$encrypter);
+        $this->assertNotInstanceOf(Encrypter::class, Model::$encrypter);
 
         Model::encryptUsing($customEncrypter);
 

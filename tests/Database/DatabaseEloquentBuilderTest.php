@@ -928,7 +928,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->with(['orders', 'orders.lines']);
         $eagers = $builder->getEagerLoads();
 
-        $this->assertEquals(['orders', 'orders.lines'], array_keys($eagers));
+        $this->assertSame(['orders', 'orders.lines'], array_keys($eagers));
         $this->assertInstanceOf(Closure::class, $eagers['orders']);
         $this->assertInstanceOf(Closure::class, $eagers['orders.lines']);
 
@@ -936,7 +936,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->with('orders', 'orders.lines');
         $eagers = $builder->getEagerLoads();
 
-        $this->assertEquals(['orders', 'orders.lines'], array_keys($eagers));
+        $this->assertSame(['orders', 'orders.lines'], array_keys($eagers));
         $this->assertInstanceOf(Closure::class, $eagers['orders']);
         $this->assertInstanceOf(Closure::class, $eagers['orders.lines']);
 
@@ -944,7 +944,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->with(['orders.lines']);
         $eagers = $builder->getEagerLoads();
 
-        $this->assertEquals(['orders', 'orders.lines'], array_keys($eagers));
+        $this->assertSame(['orders', 'orders.lines'], array_keys($eagers));
         $this->assertInstanceOf(Closure::class, $eagers['orders']);
         $this->assertInstanceOf(Closure::class, $eagers['orders.lines']);
 
@@ -1833,7 +1833,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $sql = preg_replace($aliasRegex, $alias, $sql);
 
-        $this->assertStringContainsString('"self_alias_hash"."id" = "self_related_stubs"."parent_id"', $sql);
+        $this->assertStringContainsString('"self_alias_hash"."id" = "self_related_stubs"."parent_id"', (string) $sql);
     }
 
     public function testDoesntHave()

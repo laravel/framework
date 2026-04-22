@@ -167,7 +167,9 @@ class MailManagerTest extends TestCase
     public static function emptyTransportConfigDataProvider()
     {
         return [
-            [null], [''], [' '],
+            [null],
+            [''],
+            [' '],
         ];
     }
 }

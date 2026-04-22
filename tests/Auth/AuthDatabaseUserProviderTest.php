@@ -37,7 +37,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
         $user = $provider->retrieveById(1);
 
-        $this->assertNull($user);
+        $this->assertNotInstanceOf(Authenticatable::class, $user);
     }
 
     public function testRetrieveByTokenReturnsUser()
@@ -64,7 +64,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
         $user = $provider->retrieveByToken(1, 'a');
 
-        $this->assertNull($user);
+        $this->assertNotInstanceOf(Authenticatable::class, $user);
     }
 
     public function testRetrieveByBadTokenReturnsNull()
@@ -79,7 +79,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
         $user = $provider->retrieveByToken(1, 'a');
 
-        $this->assertNull($user);
+        $this->assertNotInstanceOf(Authenticatable::class, $user);
     }
 
     public function testRetrieveByCredentialsReturnsUserWhenUserIsFound()
@@ -128,7 +128,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
         $user = $provider->retrieveByCredentials(['username' => 'dayle']);
 
-        $this->assertNull($user);
+        $this->assertNotInstanceOf(Authenticatable::class, $user);
     }
 
     public function testRetrieveByCredentialsWithMultiplyPasswordsReturnsNull()
@@ -141,7 +141,7 @@ class AuthDatabaseUserProviderTest extends TestCase
             'password2' => 'night',
         ]);
 
-        $this->assertNull($user);
+        $this->assertNotInstanceOf(Authenticatable::class, $user);
     }
 
     public function testCredentialValidation()

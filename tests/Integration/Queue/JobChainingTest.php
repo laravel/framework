@@ -284,8 +284,8 @@ class JobChainingTest extends QueueTestCase
 
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
-        $this->assertNotNull(JobChainAddingAddedJob::$ranAt);
-        $this->assertNotNull(JobChainAddingExistingJob::$ranAt);
+        $this->assertInstanceOf(Carbon::class, JobChainAddingAddedJob::$ranAt);
+        $this->assertInstanceOf(Carbon::class, JobChainAddingExistingJob::$ranAt);
         $this->assertTrue(JobChainAddingAddedJob::$ranAt->isBefore(JobChainAddingExistingJob::$ranAt));
     }
 
@@ -295,7 +295,7 @@ class JobChainingTest extends QueueTestCase
 
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
-        $this->assertNotNull(JobChainAddingAddedJob::$ranAt);
+        $this->assertInstanceOf(Carbon::class, JobChainAddingAddedJob::$ranAt);
     }
 
     public function testChainJobsCanBeAppended()
@@ -304,8 +304,8 @@ class JobChainingTest extends QueueTestCase
 
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
-        $this->assertNotNull(JobChainAddingAddedJob::$ranAt);
-        $this->assertNotNull(JobChainAddingExistingJob::$ranAt);
+        $this->assertInstanceOf(Carbon::class, JobChainAddingAddedJob::$ranAt);
+        $this->assertInstanceOf(Carbon::class, JobChainAddingExistingJob::$ranAt);
         $this->assertTrue(JobChainAddingAddedJob::$ranAt->isAfter(JobChainAddingExistingJob::$ranAt));
     }
 
@@ -339,7 +339,7 @@ class JobChainingTest extends QueueTestCase
 
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
-        $this->assertNotNull(JobChainAddingAddedJob::$ranAt);
+        $this->assertInstanceOf(Carbon::class, JobChainAddingAddedJob::$ranAt);
     }
 
     public function testChainCanBeAppended()
@@ -671,6 +671,7 @@ class JobChainingTest extends QueueTestCase
             ->when(true, function (PendingBatch $batch) {
                 $batch->onConnection('sync2');
             });
+        $this->assertInstanceOf(PendingBatch::class, $batch);
 
         $this->assertSame('sync2', $batch->connection());
         $batch = Bus::batch([])
@@ -678,6 +679,7 @@ class JobChainingTest extends QueueTestCase
             ->when(false, function (PendingBatch $batch) {
                 $batch->onConnection('sync2');
             });
+        $this->assertInstanceOf(PendingBatch::class, $batch);
 
         $this->assertSame('sync1', $batch->connection());
     }

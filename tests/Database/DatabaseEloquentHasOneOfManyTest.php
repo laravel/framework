@@ -239,6 +239,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $latestLogin = $user->logins()->create();
 
         $user = HasOneOfManyTestUser::with('latest_login')->first();
+        $this->assertInstanceOf(HasOneOfManyTestUser::class, $user);
 
         $this->assertTrue($user->relationLoaded('latest_login'));
         $this->assertSame($latestLogin->id, $user->latest_login->id);

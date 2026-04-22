@@ -193,7 +193,7 @@ class ContextualBindingTest extends TestCase
         $container->instance(IContainerContextContractStub::class, new ContainerImplementationStub);
         $container->instance(ContainerTestContextInjectInstantiations::class, new ContainerTestContextInjectInstantiations);
 
-        $this->assertEquals(1, ContainerTestContextInjectInstantiations::$instantiations);
+        $this->assertSame(1, ContainerTestContextInjectInstantiations::$instantiations);
 
         $container->when(ContainerTestContextInjectOne::class)->needs(IContainerContextContractStub::class)->give(ContainerTestContextInjectInstantiations::class);
 
@@ -202,7 +202,7 @@ class ContextualBindingTest extends TestCase
         $container->make(ContainerTestContextInjectOne::class);
         $container->make(ContainerTestContextInjectOne::class);
 
-        $this->assertEquals(1, ContainerTestContextInjectInstantiations::$instantiations);
+        $this->assertSame(1, ContainerTestContextInjectInstantiations::$instantiations);
     }
 
     public function testContainerCanInjectSimpleVariable()

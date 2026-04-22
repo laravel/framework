@@ -55,6 +55,7 @@ class DatabaseEloquentBelongsToManyEachByIdTest extends TestCase
 
         $user = BelongsToManyEachByIdTestTestUser::query()->first();
         $i = 0;
+        $this->assertInstanceOf(BelongsToManyEachByIdTestTestUser::class, $user);
 
         $user->articles()->eachById(function (BelongsToManyEachByIdTestTestArticle $model) use (&$i) {
             $i++;

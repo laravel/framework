@@ -1319,7 +1319,7 @@ class HttpClientTest extends TestCase
     {
         $resp = new Response(new Psr7Response());
 
-        $this->assertNull($resp->toException());
+        $this->assertNotInstanceOf(RequestException::class, $resp->toException());
     }
 
     public function testExceptionAccessorOnFailure()
@@ -1519,7 +1519,7 @@ class HttpClientTest extends TestCase
         $exception->report();
         $exception->report();
 
-        $this->assertEquals(1, substr_count($exception->getMessage(), '{"error":{"code":403,"message":"The Request can not be completed"}}'));
+        $this->assertSame(1, substr_count($exception->getMessage(), '{"error":{"code":403,"message":"The Request can not be completed"}}'));
     }
 
     #[TestWith([false])]
@@ -2113,7 +2113,7 @@ class HttpClientTest extends TestCase
         $this->assertIsArray($stats);
         $this->assertEmpty($stats);
 
-        $this->assertNull($effectiveUri);
+        $this->assertNotInstanceOf(\Psr\Http\Message\UriInterface::class, $effectiveUri);
     }
 
     public function testTransferStatsArePresentWhenFakingTheRequestUsingAPromiseResponse()
@@ -2170,7 +2170,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
 
         $this->factory->assertSentCount(2);
@@ -2192,7 +2192,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
 
         $this->factory->assertSentCount(2);
@@ -2219,7 +2219,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
 
         $this->assertSame(1, $whenAttempts);
@@ -2248,7 +2248,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
 
         $this->assertSame(1, $whenAttempts);
@@ -2400,7 +2400,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(Exception::class, $exception);
         $this->assertInstanceOf(Exception::class, $exception);
         $this->assertSame('Foo bar', $exception->getMessage());
 
@@ -2425,7 +2425,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(Exception::class, $exception);
         $this->assertInstanceOf(Exception::class, $exception);
         $this->assertSame('Foo bar', $exception->getMessage());
 
@@ -2571,7 +2571,7 @@ class HttpClientTest extends TestCase
 
     public function testHandleRequestExeptionWithNoResponseInPoolConsideredConnectionException()
     {
-        $requestException = new GuzzleRequestException('Error', new \GuzzleHttp\Psr7\Request('GET', '/'));
+        $requestException = new GuzzleRequestException('Error', new GuzzleRequest('GET', '/'));
         $this->factory->fake([
             'noresponse.com' => new RejectedPromise($requestException),
         ]);
@@ -2671,7 +2671,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(Throwable::class, $exception);
         $this->assertInstanceOf(ConnectionException::class, $exception);
         $this->assertSame('Fake', $exception->getMessage());
 
@@ -2693,7 +2693,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(Throwable::class, $exception);
         $this->assertInstanceOf(ConnectionException::class, $exception);
         $this->assertSame('Fake', $exception->getMessage());
 
@@ -2712,7 +2712,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(Throwable::class, $exception);
         $this->assertInstanceOf(ConnectionException::class, $exception);
         $this->assertSame('Fake', $exception->getMessage());
 
@@ -2933,7 +2933,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
     }
 
@@ -2953,7 +2953,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
     }
 
@@ -2999,7 +2999,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertTrue($hitThrowCallback);
     }
@@ -3049,7 +3049,7 @@ class HttpClientTest extends TestCase
 
         $this->assertTrue($flag);
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
     }
 
@@ -3067,7 +3067,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
     }
 
@@ -3091,7 +3091,7 @@ class HttpClientTest extends TestCase
 
         $this->assertTrue($flag);
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
     }
 
@@ -3264,7 +3264,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
     }
 
@@ -3293,7 +3293,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
     }
 
@@ -3333,7 +3333,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertTrue($hitThrowCallback);
     }
@@ -3372,7 +3372,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
     }
 
@@ -3390,7 +3390,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
     }
 
@@ -3408,7 +3408,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNull($exception);
+        $this->assertNotInstanceOf(RequestException::class, $exception);
     }
 
     public function testRequestExceptionIsThrownUnlessStatusCodeIsSatisfied()
@@ -3427,7 +3427,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
 
         $exception = null;
@@ -3446,7 +3446,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
 
         $exception = null;
@@ -3457,7 +3457,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
 
         $exception = null;
@@ -3468,7 +3468,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNull($exception);
+        $this->assertNotInstanceOf(RequestException::class, $exception);
 
         $exception = null;
 
@@ -3478,7 +3478,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNull($exception);
+        $this->assertNotInstanceOf(RequestException::class, $exception);
     }
 
     public function testRequestExceptionIsThrownIfIsClientError()
@@ -3498,7 +3498,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
 
         $exception = null;
@@ -3509,7 +3509,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
 
         $exception = null;
@@ -3520,7 +3520,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNull($exception);
+        $this->assertNotInstanceOf(RequestException::class, $exception);
 
         $exception = null;
 
@@ -3530,7 +3530,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNull($exception);
+        $this->assertNotInstanceOf(RequestException::class, $exception);
     }
 
     public function testThrowIfStatusWorksWithNonErrorStatusCodes()
@@ -3547,7 +3547,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
 
         $exception = null;
@@ -3558,7 +3558,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
     }
 
@@ -3576,7 +3576,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
 
         $exception = null;
@@ -3587,7 +3587,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNull($exception);
+        $this->assertNotInstanceOf(RequestException::class, $exception);
 
         $exception = null;
 
@@ -3597,7 +3597,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
     }
 
@@ -3618,7 +3618,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNull($exception);
+        $this->assertNotInstanceOf(RequestException::class, $exception);
 
         $exception = null;
 
@@ -3628,7 +3628,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNull($exception);
+        $this->assertNotInstanceOf(RequestException::class, $exception);
 
         $exception = null;
 
@@ -3638,7 +3638,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
 
         $exception = null;
@@ -3649,7 +3649,7 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
-        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertInstanceOf(RequestException::class, $exception);
     }
 

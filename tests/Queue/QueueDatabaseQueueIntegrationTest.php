@@ -127,7 +127,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
 
         $popped_job = $this->queue->pop($mock_queue_name);
 
-        $this->assertNotNull($popped_job);
+        $this->assertInstanceOf(\Illuminate\Contracts\Queue\Job::class, $popped_job);
     }
 
     /**
@@ -152,6 +152,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
         $database_record = $this->connection()->table('jobs')->find($job['id']);
 
         $this->assertEquals(1, $database_record->attempts, 'Job attempts not updated in the database!');
+        $this->assertInstanceOf(\Illuminate\Contracts\Queue\Job::class, $popped_job);
         $this->assertEquals(1, $popped_job->attempts(), 'The "attempts" attribute of the Job object was not updated by pop!');
     }
 
@@ -203,7 +204,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
 
         $popped_job = $this->queue->pop($mock_queue_name);
 
-        $this->assertNull($popped_job);
+        $this->assertNotInstanceOf(\Illuminate\Contracts\Queue\Job::class, $popped_job);
     }
 
     /**
@@ -225,7 +226,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
 
         $popped_job = $this->queue->pop($mock_queue_name);
 
-        $this->assertNotNull($popped_job);
+        $this->assertInstanceOf(\Illuminate\Contracts\Queue\Job::class, $popped_job);
     }
 
     /**
@@ -247,7 +248,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
 
         $popped_job = $this->queue->pop($mock_queue_name);
 
-        $this->assertNull($popped_job);
+        $this->assertNotInstanceOf(\Illuminate\Contracts\Queue\Job::class, $popped_job);
     }
 
     public function testJobPayloadIsAvailableOnEvents()

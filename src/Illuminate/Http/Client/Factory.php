@@ -392,8 +392,9 @@ class Factory
      */
     public function assertSent($callback)
     {
-        PHPUnit::assertTrue(
-            $this->recorded($callback)->count() > 0,
+        PHPUnit::assertGreaterThan(
+            0,
+            $this->recorded($callback)->count(),
             'An expected request was not recorded.'
         );
     }
@@ -428,8 +429,9 @@ class Factory
      */
     public function assertNotSent($callback)
     {
-        PHPUnit::assertFalse(
-            $this->recorded($callback)->count() > 0,
+        PHPUnit::assertLessThanOrEqual(
+            0,
+            $this->recorded($callback)->count(),
             'Unexpected request was recorded.'
         );
     }

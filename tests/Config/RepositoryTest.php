@@ -230,13 +230,13 @@ class RepositoryTest extends TestCase
         ];
         $this->repository->set($data);
 
-        $this->assertTrue(isset($this->repository['foo']));
-        $this->assertFalse(isset($this->repository['not-exist']));
-        $this->assertTrue(isset($this->repository['null_value']));
-        $this->assertTrue(isset($this->repository['empty_string']));
-        $this->assertTrue(isset($this->repository['numeric_value']));
-        $this->assertFalse(isset($this->repository[-1]));
-        $this->assertFalse(isset($this->repository['non_numeric']));
+        $this->assertArrayHasKey('foo', $this->repository);
+        $this->assertArrayNotHasKey('not-exist', $this->repository);
+        $this->assertArrayHasKey('null_value', $this->repository);
+        $this->assertArrayHasKey('empty_string', $this->repository);
+        $this->assertArrayHasKey('numeric_value', $this->repository);
+        $this->assertArrayNotHasKey(-1, $this->repository);
+        $this->assertArrayNotHasKey('non_numeric', $this->repository);
     }
 
     public function testOffsetGet()
@@ -360,9 +360,7 @@ class RepositoryTest extends TestCase
 
     public function testItGetsAsFloat(): void
     {
-        $this->assertSame(
-            1.1, $this->repository->float('float')
-        );
+        $this->assertEqualsWithDelta(1.1, $this->repository->float('float'), PHP_FLOAT_EPSILON);
     }
 
     public function testItThrowsAnExceptionWhenTryingToGetNonFloatValueAsFloat(): void

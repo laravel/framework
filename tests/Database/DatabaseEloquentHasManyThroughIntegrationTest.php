@@ -302,7 +302,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
     {
         $this->seedData();
         $post = HasManyThroughTestCountry::first()->posts()->first();
-        $this->assertEquals([
+        $this->assertSame([
             'id',
             'user_id',
             'title',
@@ -319,7 +319,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->seedData();
         $post = HasManyThroughTestCountry::first()->posts()->first(['title', 'body']);
 
-        $this->assertEquals([
+        $this->assertSame([
             'title',
             'body',
             'laravel_through_key',
@@ -334,7 +334,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 
         $country->posts()->chunk(10, function ($postsChunk) {
             $post = $postsChunk->first();
-            $this->assertEquals([
+            $this->assertSame([
                 'id',
                 'user_id',
                 'title',
@@ -361,8 +361,8 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
             $count += $collection->count();
         });
 
-        $this->assertEquals(3, $i);
-        $this->assertEquals(6, $count);
+        $this->assertSame(3, $i);
+        $this->assertSame(6, $count);
     }
 
     public function testCursorReturnsCorrectModels()
@@ -376,7 +376,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->assertInstanceOf(LazyCollection::class, $posts);
 
         foreach ($posts as $post) {
-            $this->assertEquals([
+            $this->assertSame([
                 'id',
                 'user_id',
                 'title',
@@ -396,7 +396,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $country = HasManyThroughTestCountry::find(2);
 
         $country->posts()->each(function ($post) {
-            $this->assertEquals([
+            $this->assertSame([
                 'id',
                 'user_id',
                 'title',
@@ -416,7 +416,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $country = HasManyThroughTestCountry::find(2);
 
         $country->posts()->eachById(function ($post) {
-            $this->assertEquals([
+            $this->assertSame([
                 'id',
                 'user_id',
                 'title',
@@ -436,7 +436,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $country = HasManyThroughTestCountry::find(2);
 
         $country->posts()->lazy(10)->each(function ($post) {
-            $this->assertEquals([
+            $this->assertSame([
                 'id',
                 'user_id',
                 'title',
@@ -460,7 +460,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $country->posts()->lazyById(2)->each(function ($post) use (&$i, &$count) {
             $i++;
 
-            $this->assertEquals([
+            $this->assertSame([
                 'id',
                 'user_id',
                 'title',
@@ -472,7 +472,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
             ], array_keys($post->getAttributes()));
         });
 
-        $this->assertEquals(6, $i);
+        $this->assertSame(6, $i);
     }
 
     public function testIntermediateSoftDeletesAreIgnored()
