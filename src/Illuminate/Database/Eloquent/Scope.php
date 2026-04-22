@@ -10,7 +10,7 @@ interface Scope
     /**
      * Apply the scope to a given Eloquent query builder.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $builder
+     * @param  \Illuminate\Database\Eloquent\Builder<covariant TModel>  $builder
      * @param  TModel  $model
      * @return void
      */
