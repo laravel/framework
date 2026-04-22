@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Log;
 
 use Exception;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Log\Formatters\JsonFormatter;
