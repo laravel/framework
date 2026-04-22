@@ -311,6 +311,27 @@ class DebouncedJobTest extends QueueTestCase
 
         $this->assertEquals(30, $job2->delay);
     }
+
+    public function testChildDebouncedJobInheritsFromParent()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['sync', 'beanstalkd']);
+
+        ChildOfDebouncedTestJob::$handleCount = 0;
+
+        // Dispatch two jobs with the same debounce identity.
+        // The second dispatch supersedes the first.
+        dispatch(new ChildOfDebouncedTestJob('entity-1'));
+        dispatch(new ChildOfDebouncedTestJob('entity-1'));
+
+        // Advance time past the debounce window so jobs become available.
+        $this->travelTo(Carbon::now()->addSeconds(31));
+
+        // Process both jobs from the queue.
+        $this->runQueueWorkerCommand(['--once' => true], 2);
+
+        // Only the second (latest) dispatch should have executed.
+        $this->assertEquals(1, ChildOfDebouncedTestJob::$handleCount);
+    }
 }
 
 #[DebounceFor(30)]
@@ -426,6 +447,27 @@ class DebouncedWithCustomCacheJob implements ShouldQueue
 
 #[DebounceFor(30, maxWait: 60)]
 class DebouncedWithMaxWaitJob implements ShouldQueue
+{
+    use InteractsWithQueue, Queueable, Dispatchable;
+
+    public static $handleCount = 0;
+
+    public function __construct(public string $entityId)
+    {
+    }
+
+    public function debounceId(): string
+    {
+        return $this->entityId;
+    }
+
+    public function handle()
+    {
+        static::$handleCount++;
+    }
+}
+
+class ChildOfDebouncedTestJob extends DebouncedTestJob implements ShouldQueue
 {
     use InteractsWithQueue, Queueable, Dispatchable;
 

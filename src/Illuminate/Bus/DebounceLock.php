@@ -7,7 +7,6 @@ use Illuminate\Queue\Attributes\DebounceFor;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
-use ReflectionClass;
 
 class DebounceLock
 {
@@ -147,11 +146,7 @@ class DebounceLock
      */
     public function getMaxDebounceWait($job)
     {
-        $attributes = (new ReflectionClass($job))->getAttributes(DebounceFor::class);
-
-        return $attributes !== []
-            ? $attributes[0]->newInstance()->maxWait
-            : null;
+        return $this->getAttributeInstance($job, DebounceFor::class)?->maxWait ?? null;
     }
 
     /**
