@@ -58,6 +58,18 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a "where null safe equals" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereNullSafeEquals(Builder $query, $where)
+    {
+        return $this->wrap($where['column']).' <=> '.$this->parameter($where['value']);
+    }
+
+    /**
      * Add a "where null" clause to the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

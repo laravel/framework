@@ -676,7 +676,9 @@ trait QueriesRelationships
                 $model = array_search($model, $morphMap, true);
             }
 
-            return $this->whereNot($relation->qualifyColumn($relation->getMorphType()), '<=>', $model, $boolean);
+            return $this->whereNot(fn ($query) => $query->whereNullSafeEquals(
+                $relation->qualifyColumn($relation->getMorphType()), $model
+            ), null, null, $boolean);
         }
 
         $models = BaseCollection::wrap($model);
@@ -688,7 +690,7 @@ trait QueriesRelationships
         return $this->whereNot(function ($query) use ($relation, $models) {
             $models->groupBy(fn ($model) => $model->getMorphClass())->each(function ($models) use ($query, $relation) {
                 $query->orWhere(function ($query) use ($relation, $models) {
-                    $query->where($relation->qualifyColumn($relation->getMorphType()), '<=>', $models->first()->getMorphClass())
+                    $query->whereNullSafeEquals($relation->qualifyColumn($relation->getMorphType()), $models->first()->getMorphClass())
                         ->whereIn($relation->qualifyColumn($relation->getForeignKeyName()), $models->map->getKey());
                 });
             });

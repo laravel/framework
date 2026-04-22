@@ -130,6 +130,15 @@ class ComponentsTest extends TestCase
         $this->assertStringContainsString('Second', $result);
     }
 
+    public function testTwoColumnDetailPreservesTrailingPunctuationInValue()
+    {
+        $output = new BufferedOutput();
+
+        (new Components\TwoColumnDetail($output))->render('Key', 'value!');
+        $result = $output->fetch();
+        $this->assertStringContainsString('value!', $result);
+    }
+
     public function testWarn()
     {
         $output = new BufferedOutput();

@@ -974,7 +974,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register a handler for custom directives.
      *
      * @param  string  $name
-     * @param  callable  $handler
+     * @param  ($bind is true ? \Closure : callable)  $handler
      * @param  bool  $bind
      * @return void
      *

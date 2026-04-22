@@ -7,8 +7,10 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException as GuzzleRequestException;
 use GuzzleHttp\Exception\TooManyRedirectsException;
 use GuzzleHttp\Middleware;
+use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Promise\RejectedPromise;
+use GuzzleHttp\Psr7\NoSeekStream;
 use GuzzleHttp\Psr7\Request as GuzzleRequest;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use GuzzleHttp\Psr7\Utils;
@@ -42,6 +44,7 @@ use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -1417,8 +1420,12 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
+        // Ensure the exception message is truncated according to the request level truncation setting.
+        $this->assertEquals("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
+
         $exception->report();
 
+        // Ensure that the truncation level is not changed when reporting the exception.
         $this->assertEquals("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
 
         $this->assertEquals(60, RequestException::$truncateAt);
@@ -1513,6 +1520,43 @@ class HttpClientTest extends TestCase
         $exception->report();
 
         $this->assertEquals(1, substr_count($exception->getMessage(), '{"error":{"code":403,"message":"The Request can not be completed"}}'));
+    }
+
+    #[TestWith([false])]
+    #[TestWith([120])]
+    public function testStreamingResponseExceptionMessageIsNotSummarizedWhenBodyIsNotSeekable(int|false $truncateAt)
+    {
+        RequestException::$truncateAt = $truncateAt;
+
+        $this->factory->fake([
+            '*' => Create::promiseFor(
+                new Psr7Response(
+                    400,
+                    ['Content-Type' => 'application/json'],
+                    new NoSeekStream(Utils::streamFor(json_encode(['hello' => 'world'])))
+                )
+            ),
+        ]);
+
+        $throwCallbackCalled = false;
+
+        try {
+            $this->factory
+                ->withOptions(['stream' => true])
+                ->throw(function (Response $response, RequestException $exception) use (&$throwCallbackCalled) {
+                    $throwCallbackCalled = true;
+
+                    $this->assertNotNull($response->json());
+                    $this->assertSame('HTTP request returned status code 400', $exception->getMessage());
+                })
+                ->get('http://example.com');
+
+            $this->fail('RequestException was not thrown.');
+        } catch (RequestException $exception) {
+            $this->assertSame('HTTP request returned status code 400', $exception->getMessage());
+        }
+
+        $this->assertTrue($throwCallbackCalled);
     }
 
     public function testOnErrorDoesntCallClosureOnInformational()
@@ -1826,7 +1870,8 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('http://200.com')->dump();
 
-        $this->assertSame('hello', $dumped[0]);
+        $this->assertSame('"GET http://200.com" 200', $dumped[0]);
+        $this->assertSame('hello', $dumped[1]);
 
         VarDumper::setHandler(null);
     }
@@ -1845,7 +1890,8 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('http://200.com')->dump('hello');
 
-        $this->assertSame('world', $dumped[0]);
+        $this->assertSame('"GET http://200.com" 200', $dumped[0]);
+        $this->assertSame('world', $dumped[1]);
 
         VarDumper::setHandler(null);
     }

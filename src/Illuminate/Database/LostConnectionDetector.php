@@ -84,12 +84,23 @@ class LostConnectionDetector implements LostConnectionDetectorContract
             'Connection lost',
             'Broken pipe',
             'SQLSTATE[25006]: Read only sql transaction: 7',
+
+            // PlanetScale MySQL / Vitess related things...
             'vtgate connection error: no healthy endpoints',
             'primary is not serving, there may be a reparent operation in progress',
             'current keyspace is being resharded',
             'no healthy tablet available',
             'transaction pool connection limit exceeded',
             'SSL operation failed with code 5',
+
+            // PlanetScale PostgreSQL / pg_bouncer related things...
+            'no primary available for branch',
+            'no replica available for branch',
+            'no running members available for branch',
+            'failed to connect to upstream',
+            'failed to send startup message',
+            'failed to read startup message',
+            'canceling statement due to conflict with recovery',
         ]);
     }
 }

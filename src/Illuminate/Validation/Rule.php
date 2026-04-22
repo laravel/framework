@@ -13,6 +13,7 @@ use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\Email;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\ExcludeIf;
+use Illuminate\Validation\Rules\ExcludeUnless;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\Rules\ImageFile;
@@ -20,7 +21,10 @@ use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\Numeric;
 use Illuminate\Validation\Rules\ProhibitedIf;
+use Illuminate\Validation\Rules\ProhibitedUnless;
 use Illuminate\Validation\Rules\RequiredIf;
+use Illuminate\Validation\Rules\RequiredUnless;
+use Illuminate\Validation\Rules\StringRule;
 use Illuminate\Validation\Rules\Unique;
 
 class Rule
@@ -153,6 +157,17 @@ class Rule
     }
 
     /**
+     * Get a required_unless rule builder instance.
+     *
+     * @param  (\Closure(): bool)|bool  $callback
+     * @return \Illuminate\Validation\Rules\RequiredUnless
+     */
+    public static function requiredUnless($callback)
+    {
+        return new RequiredUnless($callback);
+    }
+
+    /**
      * Get a exclude_if rule builder instance.
      *
      * @param  (\Closure(): bool)|bool  $callback
@@ -164,6 +179,17 @@ class Rule
     }
 
     /**
+     * Get a exclude_unless rule builder instance.
+     *
+     * @param  (\Closure(): bool)|bool  $callback
+     * @return \Illuminate\Validation\Rules\ExcludeUnless
+     */
+    public static function excludeUnless($callback)
+    {
+        return new ExcludeUnless($callback);
+    }
+
+    /**
      * Get a prohibited_if rule builder instance.
      *
      * @param  (\Closure(): bool)|bool  $callback
@@ -172,6 +198,17 @@ class Rule
     public static function prohibitedIf($callback)
     {
         return new ProhibitedIf($callback);
+    }
+
+    /**
+     * Get a prohibited_unless rule builder instance.
+     *
+     * @param  (\Closure(): bool)|bool  $callback
+     * @return \Illuminate\Validation\Rules\ProhibitedUnless
+     */
+    public static function prohibitedUnless($callback)
+    {
+        return new ProhibitedUnless($callback);
     }
 
     /**
@@ -243,6 +280,16 @@ class Rule
     public static function dimensions(array $constraints = [])
     {
         return new Dimensions($constraints);
+    }
+
+    /**
+     * Get a string rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\StringRule
+     */
+    public static function string()
+    {
+        return new StringRule;
     }
 
     /**

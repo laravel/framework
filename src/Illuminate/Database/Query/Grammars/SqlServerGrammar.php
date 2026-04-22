@@ -146,6 +146,18 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a "where null safe equals" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereNullSafeEquals(Builder $query, $where)
+    {
+        return 'exists (select '.$this->wrap($where['column']).' intersect select '.$this->parameter($where['value']).')';
+    }
+
+    /**
      * Compile a "where date" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

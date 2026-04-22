@@ -51,6 +51,36 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "embeddings" add column "embedding" vector(384) not null', $statements[0]);
     }
 
+    public function testAddingTsvectorColumn()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'test');
+        $blueprint->tsvector('search_vector');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "test" add column "search_vector" tsvector not null', $statements[0]);
+    }
+
+    public function testAddingNullableTsvectorColumn()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'test');
+        $blueprint->tsvector('search_vector')->nullable();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "test" add column "search_vector" tsvector null', $statements[0]);
+    }
+
+    public function testAddingTsvectorColumnWithStoredAs()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'test');
+        $blueprint->tsvector('search_vector')->nullable()->storedAs("to_tsvector('english', coalesce(name, ''))");
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "test" add column "search_vector" tsvector null generated always as (to_tsvector(\'english\', coalesce(name, \'\'))) stored', $statements[0]);
+    }
+
     public function testCreateTableWithAutoIncrementStartingValue()
     {
         $connection = $this->getConnection();

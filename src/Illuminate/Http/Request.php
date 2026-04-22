@@ -588,6 +588,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \Symfony\Component\HttpFoundation\Exception\SessionNotFoundException
      */
     #[\Override]
     public function getSession(): SessionInterface

@@ -90,6 +90,19 @@ class SupportStrTest extends TestCase
         $this->assertSame('Orwell 1984', Str::headline(' orwell_- 1984 '));
     }
 
+    public function testStringInitials()
+    {
+        $this->assertSame('jb', Str::initials('james bond'));
+        $this->assertSame('jb', Str::initials(' james bond'));
+        $this->assertSame('jb', Str::initials('james  bond'));
+
+        $this->assertSame('JB', Str::initials('James Bond'));
+
+        $this->assertSame('JB', Str::initials('james bond', true));
+
+        $this->assertSame('JBLL', Str::initials('james bond loves laravel', true));
+    }
+
     public function testStringApa()
     {
         $this->assertSame('Tom and Jerry', Str::apa('tom and jerry'));
@@ -691,6 +704,9 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::isUrl('http://sub.domain.com'));
         $this->assertTrue(Str::isUrl('http://my-site.com'));
         $this->assertTrue(Str::isUrl('https://example.com:8080/path?q=1#frag'));
+        $this->assertTrue(Str::isUrl('https://xn--e1afmkfd.xn--p1ai'));
+        $this->assertTrue(Str::isUrl('https://xn--e1afmkfd.xn--e1afmkfd.xn--p1ai'));
+        $this->assertTrue(Str::isUrl('https://1.xn--e1afmkfd.xn--p1ai'));
         $this->assertFalse(Str::isUrl('invalid url'));
         $this->assertFalse(Str::isUrl('http://.'));
         $this->assertFalse(Str::isUrl('http://...'));
@@ -1409,8 +1425,11 @@ class SupportStrTest extends TestCase
         $this->assertEquals(2, Str::wordCount('Hello, world!'));
         $this->assertEquals(10, Str::wordCount('Hi, this is my first contribution to the Laravel framework.'));
 
-        $this->assertEquals(0, Str::wordCount('мама'));
-        $this->assertEquals(0, Str::wordCount('мама мыла раму'));
+        // str_word_count() without $characters does not reliably handle multibyte
+        // strings — results depend on the system locale's isalpha() behavior
+        // (e.g. macOS 15+ changed LC_CTYPE defaults). See php/php-src#19828.
+        $this->assertEquals(str_word_count('мама'), Str::wordCount('мама'));
+        $this->assertEquals(str_word_count('мама мыла раму'), Str::wordCount('мама мыла раму'));
 
         $this->assertEquals(1, Str::wordCount('мама', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
         $this->assertEquals(3, Str::wordCount('мама мыла раму', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));

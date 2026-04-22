@@ -486,7 +486,7 @@ abstract class Relation implements BuilderContract
     /**
      * Builds a table-keyed array from model class names.
      *
-     * @param  list<class-string<\Illuminate\Database\Eloquent\Model>>|null  $models
+     * @param  array<array-key, class-string<\Illuminate\Database\Eloquent\Model>>|null  $models
      * @return array<string, class-string<\Illuminate\Database\Eloquent\Model>>|null
      */
     protected static function buildMorphMapFromModels(?array $models = null)
