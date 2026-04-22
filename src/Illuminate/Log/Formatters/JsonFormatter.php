@@ -47,7 +47,11 @@ class JsonFormatter extends MonologJsonFormatter
             return [];
         }
 
-        $exceptionContext = $this->normalize($e->context(), $depth + 1);
+        try {
+            $exceptionContext = $this->normalize($e->context(), $depth + 1);
+        } catch (Throwable) {
+            return [];
+        }
 
         return is_array($exceptionContext) ? $exceptionContext : [];
     }
