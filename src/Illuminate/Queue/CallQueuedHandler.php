@@ -39,6 +39,13 @@ class CallQueuedHandler
     protected $container;
 
     /**
+     * The command currently being processed.
+     *
+     * @var mixed
+     */
+    protected $runningCommand;
+
+    /**
      * Create a new handler instance.
      *
      * @param  \Illuminate\Contracts\Bus\Dispatcher  $dispatcher
@@ -71,7 +78,11 @@ class CallQueuedHandler
             return $this->deleteDebouncedJob($job, $command);
         }
 
+        $this->runningCommand = $command;
+
         $this->dispatchThroughMiddleware($job, $command);
+
+        $this->runningCommand = null;
 
         if (! $job->isReleased() && ! $this->commandShouldBeUniqueUntilProcessing($command)) {
             $this->ensureUniqueJobLockIsReleased($command);
@@ -106,6 +117,16 @@ class CallQueuedHandler
         }
 
         throw new RuntimeException('Unable to extract job payload.');
+    }
+
+    /**
+     * Get the command currently being processed.
+     *
+     * @return mixed
+     */
+    public function getRunningCommand()
+    {
+        return $this->runningCommand;
     }
 
     /**
