@@ -22,6 +22,11 @@ return [
         'key' => env('RESEND_KEY'),
     ],
 
+    'lettermint' => [
+        'key' => env('LETTERMINT_TOKEN'),
+        'route' => env('LETTERMINT_ROUTE'),
+    ],
+
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
