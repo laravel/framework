@@ -182,26 +182,6 @@ final class JsonFormatterTest extends TestCase
         $this->assertSame('callback_value', $exceptionData['callback_key']);
     }
 
-    public function testGracefulFallbackWhenContainerCannotResolveHandler()
-    {
-        Container::setInstance(new Container());
-
-        $handler = new TestHandler();
-        $monolog = new Monolog('test', [$handler]);
-        $handler->setFormatter(new JsonFormatter());
-
-        $exception = new ContextProvidingException('No handler bound');
-
-        $monolog->error('fail', ['exception' => $exception]);
-
-        $formatted = $this->getFormattedJson($handler);
-        $exceptionData = $formatted['context']['exception'];
-
-        $this->assertSame(ContextProvidingException::class, $exceptionData['class']);
-        $this->assertSame('No handler bound', $exceptionData['message']);
-        $this->assertArrayNotHasKey('foo', $exceptionData);
-    }
-
     public function testNonScalarContextValuesAreNormalized()
     {
         $exception = new ObjectContextException('Has objects in context');
@@ -290,6 +270,20 @@ final class JsonFormatterTest extends TestCase
         $this->assertArrayHasKey('previous', $exceptionData);
         $this->assertArrayNotHasKey('foo', $exceptionData['previous']);
         $this->assertSame(ContextProvidingException::class, $exceptionData['previous']['class']);
+    }
+
+    public function testNoHandlerSet_mergesExceptionContext()
+    {
+        $this->app->bind(ExceptionHandlerContract::class, function () {
+            throw new Exception('this never works');
+        });
+        Log::warning('fail', ['exception' => new ContextProvidingException('Oh no!')]);
+
+        $formatted = $this->getFormattedJson();
+
+        $exceptionData = $formatted['context']['exception'];
+        $this->assertSame('bar', $exceptionData['foo']);
+        $this->assertSame(ContextProvidingException::class, $exceptionData['class']);
     }
 
     private function getFormattedJson(?TestHandler $handler = null): array
