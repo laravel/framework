@@ -49,4 +49,16 @@ interface ExceptionHandler
      * @internal This method is not meant to be used or overwritten outside the framework.
      */
     public function renderForConsole($output, Throwable $e);
+
+    /**
+     * Determine if a given exception is being reported.
+     */
+    public function isReporting(Throwable $e): bool;
+
+    /**
+     * Creates the context for an exception.
+     *
+     * @return array<array-key, mixed>
+     */
+    public function buildContextForException(Throwable $e);
 }
