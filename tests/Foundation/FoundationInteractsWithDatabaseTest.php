@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Foundation;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
 use Illuminate\Foundation\Testing\TestCase as TestingTestCase;
