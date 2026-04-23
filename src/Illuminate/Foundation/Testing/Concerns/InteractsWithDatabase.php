@@ -253,16 +253,17 @@ trait InteractsWithDatabase
      *
      * @param  int  $expected
      * @param  string|null  $connection
+     * @param  (Closure(QueryEvent): bool)|null  $filter
      * @return $this
      */
-    public function expectsDatabaseQueryCount($expected, $connection = null)
+    public function expectsDatabaseQueryCount($expected, $connection = null, $filter = null)
     {
         $connectionInstance = $this->getConnection($connection);
 
         $actual = 0;
 
-        $connectionInstance->listen(function (QueryExecuted $event) use (&$actual, $connectionInstance, $connection) {
-            if (is_null($connection) || $connectionInstance === $event->connection) {
+        $connectionInstance->listen(function (QueryExecuted $event) use (&$actual, $connectionInstance, $connection, $filter) {
+            if (is_null($connection) || $connectionInstance === $event->connection || $filter === null || $filter($event)) {
                 $actual++;
             }
         });
