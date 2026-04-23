@@ -9,11 +9,13 @@ use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Foundation\Queue\InteractsWithUniqueJobs;
+use Illuminate\Queue\Attributes\DebounceFor;
+use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use LogicException;
 
 class PendingDispatch
 {
-    use InteractsWithUniqueJobs;
+    use InteractsWithUniqueJobs, ReadsQueueAttributes;
 
     /**
      * The job.
@@ -220,13 +222,13 @@ class PendingDispatch
      */
     protected function acquireDebounceLock()
     {
-        $lock = new DebounceLock(Container::getInstance()->make(Cache::class));
-
-        $debounceFor = $lock->getDebounceDelay($this->job);
+        $debounceFor = $this->getAttributeValue($this->job, DebounceFor::class, 'debounceFor');
 
         if ($debounceFor === null) {
             return;
         }
+
+        $lock = new DebounceLock(Container::getInstance()->make(Cache::class));
 
         if ($this->job instanceof ShouldBeUnique) {
             throw new LogicException('A debounced job cannot also implement ShouldBeUnique.');
