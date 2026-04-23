@@ -661,7 +661,7 @@ class Router implements BindingRegistrar, RegistrarContract
             return $class;
         }
 
-        if (str_contains($class, '\\') && class_exists($class)) {
+        if (str_contains($class, '\\') && class_exists($class)){
             return $class;
         }
 
