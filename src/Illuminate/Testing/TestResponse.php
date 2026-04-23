@@ -878,13 +878,10 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the expected values and types exist at the given paths in the response.
      *
-     * @param  array  $paths
      * @return $this
      */
     public function assertJsonPaths(array $paths)
     {
-        PHPUnit::withResponse($this)->assertNotEmpty($paths, 'No JSON paths were provided.');
-
         foreach ($paths as $path => $expected) {
             $this->assertJsonPath($path, $expected);
         }
@@ -1003,15 +1000,10 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the response does not contain the given paths.
      *
-     * @param  array|string  $paths
      * @return $this
      */
-    public function assertJsonMissingPaths($paths)
+    public function assertJsonMissingPaths(array $paths)
     {
-        $paths = Arr::wrap($paths);
-
-        PHPUnit::withResponse($this)->assertNotEmpty($paths, 'No JSON missing paths were provided.');
-
         foreach ($paths as $path) {
             $this->assertJsonMissingPath($path);
         }

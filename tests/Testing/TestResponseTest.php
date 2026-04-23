@@ -1625,16 +1625,6 @@ EOT
         ]);
     }
 
-    public function testAssertJsonPathsCanFailWhenPathsAreEmpty(): void
-    {
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('No JSON paths were provided.');
-
-        $response = TestResponse::fromBaseResponse(new Response([]));
-
-        $response->assertJsonPaths([]);
-    }
-
     public function testAssertJsonFragment(): void
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
@@ -1900,7 +1890,6 @@ EOT
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
 
-        $response->assertJsonMissingPaths('missing');
         $response->assertJsonMissingPaths([
             'foobar.missing',
             'numeric_keys.0',
@@ -1917,16 +1906,6 @@ EOT
             'foo',
             'foobar.missing',
         ]);
-    }
-
-    public function testAssertJsonMissingPathsCanFailWhenPathsAreEmpty(): void
-    {
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('No JSON missing paths were provided.');
-
-        $response = TestResponse::fromBaseResponse(new Response([]));
-
-        $response->assertJsonMissingPaths([]);
     }
 
     public function testAssertJsonValidationErrors(): void
