@@ -5,8 +5,11 @@ namespace Illuminate\Tests\Queue;
 use Aws\Result;
 use Aws\Sqs\SqsClient;
 use Illuminate\Bus\Dispatcher;
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Cache\Repository as CacheRepositoryContract;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Queue\QueueRoutes;
 use Illuminate\Queue\SqsQueue;
@@ -290,6 +293,7 @@ class QueueSqsQueueTest extends TestCase
 
         $dispatcher = new Dispatcher($container, fn () => $queue);
         app()->instance(DispatcherContract::class, $dispatcher);
+        app()->instance(CacheRepositoryContract::class, new CacheRepository(new ArrayStore));
 
         // Destroy object to trigger dispatch.
         unset($pendingDispatch);
@@ -323,6 +327,7 @@ class QueueSqsQueueTest extends TestCase
 
         $dispatcher = new Dispatcher($container, fn () => $queue);
         app()->instance(DispatcherContract::class, $dispatcher);
+        app()->instance(CacheRepositoryContract::class, new CacheRepository(new ArrayStore));
 
         // Destroy object to trigger dispatch.
         unset($pendingDispatch);
@@ -493,6 +498,7 @@ class QueueSqsQueueTest extends TestCase
 
         $dispatcher = new Dispatcher($container, fn () => $queue);
         app()->instance(DispatcherContract::class, $dispatcher);
+        app()->instance(CacheRepositoryContract::class, new CacheRepository(new ArrayStore));
 
         // Destroy object to trigger dispatch.
         unset($pendingDispatch);
@@ -521,6 +527,7 @@ class QueueSqsQueueTest extends TestCase
 
         $dispatcher = new Dispatcher($container, fn () => $queue);
         app()->instance(DispatcherContract::class, $dispatcher);
+        app()->instance(CacheRepositoryContract::class, new CacheRepository(new ArrayStore));
 
         // Destroy object to trigger dispatch.
         unset($pendingDispatch);
@@ -558,6 +565,7 @@ class QueueSqsQueueTest extends TestCase
 
         $dispatcher = new Dispatcher($container, fn () => $queue);
         app()->instance(DispatcherContract::class, $dispatcher);
+        app()->instance(CacheRepositoryContract::class, new CacheRepository(new ArrayStore));
 
         // Destroy object to trigger dispatch.
         unset($pendingDispatch);
@@ -596,6 +604,7 @@ class QueueSqsQueueTest extends TestCase
 
         $dispatcher = new Dispatcher($container, fn () => $queue);
         app()->instance(DispatcherContract::class, $dispatcher);
+        app()->instance(CacheRepositoryContract::class, new CacheRepository(new ArrayStore));
 
         // Destroy object to trigger dispatch.
         unset($pendingDispatch);
@@ -668,6 +677,7 @@ class QueueSqsQueueTest extends TestCase
 
         $dispatcher = new Dispatcher($container, fn () => $queue);
         app()->instance(DispatcherContract::class, $dispatcher);
+        app()->instance(CacheRepositoryContract::class, new CacheRepository(new ArrayStore));
 
         // Destroy object to trigger dispatch.
         unset($pendingDispatch);
