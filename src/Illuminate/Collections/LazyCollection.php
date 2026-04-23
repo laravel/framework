@@ -589,10 +589,10 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     public function has($key)
     {
         $keys = array_flip(is_array($key) ? $key : func_get_args());
-        $count = count($keys);
 
         foreach ($this as $key => $value) {
-            if (array_key_exists($key, $keys) && --$count == 0) {
+            unset($keys[$key]);
+            if (empty($keys)) {
                 return true;
             }
         }

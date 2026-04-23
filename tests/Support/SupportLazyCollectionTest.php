@@ -531,4 +531,17 @@ class SupportLazyCollectionTest extends TestCase
             $this->assertContains($key, ['first', 'second', 'third']);
         }
     }
+
+    public function testHasDoesNotCountDuplicateKeys()
+    {
+        $collection = LazyCollection::make(function () {
+            yield 'a' => 1;
+            yield 'a' => 2;
+            yield 'c' => 3;
+        });
+
+        $this->assertFalse($collection->has('a', 'b'));
+        $this->assertFalse($collection->has(['a', 'b']));
+        $this->assertTrue($collection->has('a'));
+    }
 }
