@@ -7,7 +7,41 @@ use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 
 class JsonApiRequestTest extends TestCase
 {
-    public function testItCanResolveSparseFields()
+    /**
+     * Test that when no sparse fields are requested, the method returns null for any type.
+     *
+     * @return void
+     */
+    public function testItReturnsNullWhenNoSparseFieldsAreRequested(): void
+    {
+        $request = JsonApiRequest::create(uri: '/');
+
+        $this->assertNull($request->sparseFields('users'));
+        $this->assertNull($request->sparseFields('teams'));
+        $this->assertNull($request->sparseFields('posts'));
+    }
+
+    /**
+     * Test that when an empty sparse fieldset is requested, the method returns an empty array for that type.
+     *
+     * @return void
+     */
+    public function testItReturnsEmptyArrayWhenEmptySparseFieldsetIsRequested(): void
+    {
+        $request = JsonApiRequest::create(uri: '/?fields[users]=');
+
+        $this->assertSame([], $request->sparseFields('users'));
+        // Other types not present in query should return null
+        $this->assertNull($request->sparseFields('teams'));
+        $this->assertNull($request->sparseFields('posts'));
+    }
+
+    /**
+     * Test that when sparse fields are requested, the method returns an array of the requested fields for that type.
+     *
+     * @return void
+     */
+    public function testItReturnsFieldListWhenSparseFieldsAreRequested(): void
     {
         $request = JsonApiRequest::create(uri: '/?'.http_build_query([
             'fields' => [
@@ -18,19 +52,16 @@ class JsonApiRequestTest extends TestCase
 
         $this->assertSame(['name', 'email'], $request->sparseFields('users'));
         $this->assertSame(['name'], $request->sparseFields('teams'));
-        $this->assertSame([], $request->sparseFields('posts'));
+        $this->assertNull($request->sparseFields('posts'));
     }
 
-    public function testItCanResolveEmptySparseFields()
-    {
-        $request = JsonApiRequest::create(uri: '/');
-
-        $this->assertSame([], $request->sparseFields('users'));
-        $this->assertSame([], $request->sparseFields('teams'));
-        $this->assertSame([], $request->sparseFields('posts'));
-    }
-
-    public function testItCanResolveSparseIncluded()
+    /**
+     * Test that when sparse included relationships are requested,
+     * the method returns an array of the requested relationships for that type.
+     *
+     * @return void
+     */
+    public function testItCanResolveSparseIncluded(): void
     {
         $request = JsonApiRequest::create(uri: '/?'.http_build_query([
             'include' => 'teams,posts.author,posts.comments,profile.user.profile',
@@ -42,7 +73,14 @@ class JsonApiRequestTest extends TestCase
         $this->assertSame(['user.profile'], $request->sparseIncluded('profile'));
     }
 
-    public function testItCanREsolveSparseIncludedWithMaxRelationshipNesting()
+    /**
+     * Test that when sparse included relationships are requested with max relationship nesting,
+     * the method returns an array of the requested relationships for that type,
+     * but only up to the max relationship depth.
+     *
+     * @return void
+     */
+    public function testItCanResolveSparseIncludedWithMaxRelationshipNesting(): void
     {
         JsonApiResource::maxRelationshipDepth(2);
 
@@ -56,7 +94,12 @@ class JsonApiRequestTest extends TestCase
         $this->assertSame(['user'], $request->sparseIncluded('profile'));
     }
 
-    public function testItCanResolveEmptySparseIncluded()
+    /**
+     * Test that when no sparse included relationships are requested, the method returns an empty array.
+     *
+     * @return void
+     */
+    public function testItCanResolveEmptySparseIncluded(): void
     {
         $request = JsonApiRequest::create(uri: '/');
 

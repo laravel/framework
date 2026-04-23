@@ -143,16 +143,25 @@ trait ResolvesJsonApiElements
             $data = $data->jsonSerialize();
         }
 
-        $sparseFieldset = match ($this->usesRequestQueryString) {
-            true => $request->sparseFields($resourceType),
-            default => [],
-        };
+        $sparseFieldset = $this->usesRequestQueryString
+            ? $request->sparseFields($resourceType)
+            : null;
 
-        $data = (new Collection($data))
-            ->mapWithKeys(fn ($value, $key) => is_int($key) ? [$value => $this->resource->{$value}] : [$key => $value])
-            ->when(! empty($sparseFieldset), fn ($attributes) => $attributes->only($sparseFieldset))
-            ->transform(fn ($value) => value($value, $request))
-            ->all();
+        if ($sparseFieldset === []) {
+            // Client sent an empty sparse fieldset, so we return an empty attributes object.
+            $data = [];
+        } elseif (! empty($sparseFieldset)) {
+            // Client sent a sparse fieldset, so we filter the attributes to only those in the sparse fieldset.
+            $data = (new Collection($data))
+                ->only($sparseFieldset)
+                ->transform(fn ($value) => value($value, $request))
+                ->all();
+        } else {
+            // Client sent no sparse fieldset, so we return all attributes.
+            $data = (new Collection($data))
+                ->transform(fn ($value) => value($value, $request))
+                ->all();
+        }
 
         return $this->filter($data);
     }

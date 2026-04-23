@@ -21,15 +21,27 @@ class JsonApiRequest extends Request
     /**
      * Get the request's included fields.
      */
-    public function sparseFields(string $key): array
+    public function sparseFields(string $key): ?array
     {
         if (is_null($this->cachedSparseFields)) {
             $this->cachedSparseFields = (new Collection($this->array('fields')))
-                ->transform(fn ($fieldsets) => empty($fieldsets) ? [] : explode(',', $fieldsets))
+                ->map(function ($fieldsets) {
+                    // If the client sent no fields, return null.
+                    if ($fieldsets === null) {
+                        return null;
+                    }
+
+                    // If the client sent an empty string, return an empty array.
+                    if ($fieldsets === '' || (is_array($fieldsets) && empty($fieldsets))) {
+                        return [];
+                    }
+
+                    return explode(',', $fieldsets);
+                })
                 ->all();
         }
 
-        return $this->cachedSparseFields[$key] ?? [];
+        return $this->cachedSparseFields[$key] ?? null;
     }
 
     /**
