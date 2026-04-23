@@ -248,6 +248,51 @@ class EloquentWhereHasTest extends DatabaseTestCase
 
         $this->assertEquals([1], $users->pluck('id')->all());
     }
+
+
+
+    public function testWhereHasCount()
+    {
+        
+        $users = User::whereHasCount('posts', '>=', 1)->get();
+
+        $this->assertEquals([1, 2], $users->pluck('id')->all());
+    }
+
+    public function testWhereHasCountWithHigherCount()
+    {
+    
+        $users = User::whereHasCount('posts', '>=', 2)->get();
+
+        $this->assertEmpty($users);
+    }
+
+    public function testWhereHasCountWithCallback()
+    {
+
+        $users = User::whereHasCount('posts', '>=', 1, function ($query) {
+            $query->where('public', true);
+        })->get();
+
+        $this->assertEquals([1], $users->pluck('id')->all());
+    }
+
+    public function testOrWhereHasCount()
+    {
+
+        $users = User::whereHasCount('posts', '>=', 1, function ($query) {
+            $query->where('public', true);
+        })->orWhereHasCount('posts', '>=', 1, function ($query) {
+            $query->where('public', false);
+        })->get();
+
+        $this->assertEquals([1, 2], $users->pluck('id')->all());
+    }
+
+
+
+
+
 }
 
 class Comment extends Model

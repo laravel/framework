@@ -233,6 +233,43 @@ trait QueriesRelationships
         return $this->doesntHave($relation, 'or', $callback);
     }
 
+
+
+
+
+
+        /**
+         * Add a relationship count condition to the query.
+         *
+         * @param  string  $relation
+         * @param  string  $operator
+         * @param  int  $count
+         * @param  \Closure|null  $callback
+         * @return $this
+         */
+        public function whereHasCount(string $relation, string $operator = '>=', int $count = 1, ?\Closure $callback = null): static
+        {
+            return $this->has($relation, $operator, $count, 'and', $callback);
+        }
+
+        /**
+         * Add an "or where has count" condition to the query.
+         *
+         * @param  string  $relation
+         * @param  string  $operator
+         * @param  int  $count
+         * @param  \Closure|null  $callback
+         * @return $this
+         */
+        public function orWhereHasCount(string $relation, string $operator = '>=', int $count = 1, ?\Closure $callback = null): static
+        {
+            return $this->has($relation, $operator, $count, 'or', $callback);
+        }
+
+
+
+
+
     /**
      * Add a polymorphic relationship count / exists condition to the query.
      *
