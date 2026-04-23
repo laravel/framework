@@ -563,6 +563,29 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $case->setUp();
         $case->testExpectsDatabaseQueryCount();
         $case->tearDown();
+
+        $case = new class('foo') extends TestingTestCase
+        {
+            use CreatesApplication;
+
+            public function testExpectsDatabaseQueryCount()
+            {
+                $this->expectsDatabaseQueryCount(4);
+                // Expect only non-write queries
+                $this->expectsDatabaseQueryCount(3, fn (QueryExecuted $event) => preg_match('/\bSELECT\b/', $event->sql) === 1);
+
+                DB::pretend(function ($db) {
+                    $db->table('foo')->count();
+                    $db->table('foo')->count();
+                    $db->table('foo')->count();
+                    $db->table('foo')->insert(['bar' => 'baz']);
+                });
+            }
+        };
+
+        $case->setUp();
+        $case->testExpectsDatabaseQueryCount();
+        $case->tearDown();
     }
 
     protected function mockCountBuilder($existsResult, $deletedAtColumn = 'deleted_at', $countResult = null)
