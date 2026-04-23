@@ -8,7 +8,6 @@ use Carbon\CarbonImmutable as BaseCarbonImmutable;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
-use ValueError;
 
 class SupportCarbonTest extends TestCase
 {
@@ -188,12 +187,11 @@ class SupportCarbonTest extends TestCase
         $this->assertTrue($carbon->isSameAs('Y-m-d', Carbon::parse('2020-01-01')));
     }
 
-    public function testClampThrowsValueErrorWhenMinGreaterThanMax(): void
+    public function testClampSwapMinIfGreaterThanMax(): void
     {
-        $this->expectException(ValueError::class);
-        $this->expectExceptionMessage('Illuminate\Support\Carbon::clamp(): Argument #1 ($min) must be less than or equal to Argument #2 ($max)');
+        $result = Carbon::parse('2025-05-31')->clamp('2030-12-31', '2020-01-01');
 
-        Carbon::parse('2023-06-15')->clamp('2025-01-01', '2023-01-01');
+        $this->assertTrue($result->isSameAs('Y-m-d', Carbon::parse('2025-05-31')));
     }
 
     public function testClampWorksWithCarbonInstances(): void

@@ -9,7 +9,6 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Dumpable;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Uid\Ulid;
-use ValueError;
 
 class Carbon extends BaseCarbon
 {
@@ -42,20 +41,13 @@ class Carbon extends BaseCarbon
      * @param  \DateTimeInterface|string  $min
      * @param  \DateTimeInterface|string  $max
      * @return static
-     *
-     * @throws \ValueError
      */
     public function clamp(DateTimeInterface|string $min, DateTimeInterface|string $max): static
     {
         $min = self::parse($min);
         $max = self::parse($max);
 
-        if ($min->greaterThan($max)) {
-            throw new ValueError(sprintf(
-                '%s(): Argument #1 ($min) must be less than or equal to Argument #2 ($max)',
-                __METHOD__
-            ));
-        }
+        [$min, $max] = $min->lte($max) ? [$min, $max] : [$max, $min];
 
         return match (true) {
             $this->lessThan($min) => $min->copy(),
