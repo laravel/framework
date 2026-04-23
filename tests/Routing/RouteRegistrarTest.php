@@ -912,36 +912,33 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware(RouteRegistrarMiddlewareStub::class);
     }
 
-    public function testCanSetMiddlewareCanOnGroups()
+    public function testCannotSetMiddlewareCanOnGroups()
     {
+        $this->expectException(\Exception::class);
+
         $this->router->can('test')->group(function ($router) {
             $router->get('/');
         });
-
-        $this->seeMiddleware('can:test');
     }
 
-    public function testCanSetMiddlewareCanWithModelsOnGroups()
+    public function testCannotSetMiddlewareCanWithModelsOnGroups()
     {
+        $this->expectException(\Exception::class);
+
         $this->router->can('view', 'post')->group(function ($router) {
             $router->get('/post/{post}');
         });
-
-        $this->seeMiddleware('can:view,post');
     }
 
-    public function testCanSetMiddlewareCanNestedOnGroups()
+    public function testCannotSetMiddlewareCanNestedOnGroups()
     {
+        $this->expectException(\Exception::class);
+
         $this->router->can('access-admin')->group(function ($router) {
             $router->can('edit', 'post')->group(function ($router) {
                 $router->get('/post/{post}/edit');
             });
         });
-
-        $this->assertEquals([
-            'can:access-admin',
-            'can:edit,post',
-        ], $this->getRoute()->middleware());
     }
 
     public function testCanSetMiddlewareForSpecifiedMethodsOnRegisteredResource()
