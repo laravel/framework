@@ -42,6 +42,7 @@ class LoadEnvironmentVariables
     {
         if ($app->runningInConsole() && ($input = new ArgvInput)->hasParameterOption('--env')) {                                           
             $envName = $input->getParameterOption('--env');
+
             $file = $app->environmentFile().'.'.$envName;                                    
                                                                        
             if ($this->setEnvironmentFilePath($app, $file)) {                                
