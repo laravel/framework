@@ -8,13 +8,11 @@ use Carbon\CarbonImmutable as BaseCarbonImmutable;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
+use ValueError;
 
 class SupportCarbonTest extends TestCase
 {
-    /**
-     * @var \Illuminate\Support\Carbon
-     */
-    protected $now;
+    protected Carbon $now;
 
     protected function setUp(): void
     {
@@ -158,5 +156,50 @@ class SupportCarbonTest extends TestCase
 
         $carbon = Carbon::parse('2026-05-31');
         $this->assertSame('2026-04-30', $carbon->minus(months: 1, overflow: false)->toDateString());
+    }
+
+    public function testClampReturnsSelfWhenWithinRange(): void
+    {
+        $carbon = Carbon::parse('2023-06-15');
+        $result = $carbon->clamp('2023-01-01', '2024-12-31');
+
+        $this->assertTrue($result->isSameAs('Y-m-d', $carbon));
+    }
+
+    public function testClampReturnsMinWhenBefore(): void
+    {
+        $result = Carbon::parse('2020-01-01')->clamp('2023-01-01', '2024-12-31');
+
+        $this->assertTrue($result->isSameAs('Y-m-d', Carbon::parse('2023-01-01')));
+    }
+
+    public function testClampReturnsMaxWhenAfter(): void
+    {
+        $result = Carbon::parse('2025-09-01')->clamp('2023-01-01', '2024-12-31');
+
+        $this->assertTrue($result->isSameAs('Y-m-d', Carbon::parse('2024-12-31')));
+    }
+
+    public function testClampDoesNotMutateOriginal(): void
+    {
+        $carbon = Carbon::parse('2020-01-01');
+        $carbon->clamp('2023-01-01', '2024-12-31');
+
+        $this->assertTrue($carbon->isSameAs('Y-m-d', Carbon::parse('2020-01-01')));
+    }
+
+    public function testClampThrowsValueErrorWhenMinGreaterThanMax(): void
+    {
+        $this->expectException(ValueError::class);
+        $this->expectExceptionMessage('Illuminate\Support\Carbon::clamp(): Argument #1 ($min) must be less than or equal to Argument #2 ($max)');
+
+        Carbon::parse('2023-06-15')->clamp('2025-01-01', '2023-01-01');
+    }
+
+    public function testClampWorksWithCarbonInstances(): void
+    {
+        $result = Carbon::parse('2020-01-01')->clamp(Carbon::parse('2023-01-01'), Carbon::parse('2024-12-31'));
+
+        $this->assertTrue($result->isSameAs('Y-m-d', Carbon::parse('2023-01-01')));
     }
 }

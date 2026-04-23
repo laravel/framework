@@ -4,10 +4,12 @@ namespace Illuminate\Support;
 
 use Carbon\Carbon as BaseCarbon;
 use Carbon\CarbonImmutable as BaseCarbonImmutable;
+use DateTimeInterface;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Dumpable;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Uid\Ulid;
+use ValueError;
 
 class Carbon extends BaseCarbon
 {
@@ -32,6 +34,34 @@ class Carbon extends BaseCarbon
         }
 
         return static::createFromInterface($id->getDateTime());
+    }
+
+    /**
+     * Clamp the date to be within the given range.
+     *
+     * @param  \DateTimeInterface|string  $min
+     * @param  \DateTimeInterface|string  $max
+     * @return static
+     *
+     * @throws \ValueError
+     */
+    public function clamp(DateTimeInterface|string $min, DateTimeInterface|string $max): static
+    {
+        $min = self::parse($min);
+        $max = self::parse($max);
+
+        if ($min->greaterThan($max)) {
+            throw new ValueError(sprintf(
+                '%s(): Argument #1 ($min) must be less than or equal to Argument #2 ($max)',
+                __METHOD__
+            ));
+        }
+
+        return match (true) {
+            $this->lessThan($min) => $min->copy(),
+            $this->greaterThan($max) => $max->copy(),
+            default => $this->copy(),
+        };
     }
 
     /**
