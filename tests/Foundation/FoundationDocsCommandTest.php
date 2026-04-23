@@ -174,8 +174,7 @@ class FoundationDocsCommandTest extends TestCase
     {
         putenv('ARTISAN_DOCS_ASK_STRATEGY='.__DIR__.'/fixtures/exception-throwing-strategy.php');
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('strategy failed');
+        $this->expectExceptionObject(new RuntimeException('strategy failed'));
 
         $this->artisan('docs');
     }

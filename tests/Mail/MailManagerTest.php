@@ -23,8 +23,7 @@ class MailManagerTest extends TestCase
             'timeout' => null,
         ]);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("Unsupported mail transport [{$transport}]");
+        $this->expectExceptionObject(new InvalidArgumentException("Unsupported mail transport [{$transport}]"));
         $this->app['mail.manager']->mailer('custom_smtp');
     }
 

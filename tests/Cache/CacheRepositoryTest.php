@@ -654,8 +654,7 @@ class CacheRepositoryTest extends TestCase
 
     public function testItThrowsExceptionWhenGettingNonStringAsString()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cache value for key [foo] must be a string, integer given.');
+        $this->expectExceptionObject(new InvalidArgumentException('Cache value for key [foo] must be a string, integer given.'));
 
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(123);
@@ -685,8 +684,7 @@ class CacheRepositoryTest extends TestCase
 
     public function testItThrowsExceptionWhenGettingNonIntegerAsInteger()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cache value for key [foo] must be an integer, string given.');
+        $this->expectExceptionObject(new InvalidArgumentException('Cache value for key [foo] must be an integer, string given.'));
 
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('bar');
@@ -695,8 +693,7 @@ class CacheRepositoryTest extends TestCase
 
     public function testItThrowsExceptionWhenGettingFloatStringAsInteger()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cache value for key [foo] must be an integer, string given.');
+        $this->expectExceptionObject(new InvalidArgumentException('Cache value for key [foo] must be an integer, string given.'));
 
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('1.5');
@@ -726,8 +723,7 @@ class CacheRepositoryTest extends TestCase
 
     public function testItThrowsExceptionWhenGettingNonFloatAsFloat()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cache value for key [foo] must be a float, string given.');
+        $this->expectExceptionObject(new InvalidArgumentException('Cache value for key [foo] must be a float, string given.'));
 
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('bar');
@@ -750,8 +746,7 @@ class CacheRepositoryTest extends TestCase
 
     public function testItThrowsExceptionWhenGettingNonBooleanAsBoolean()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cache value for key [foo] must be a boolean, string given.');
+        $this->expectExceptionObject(new InvalidArgumentException('Cache value for key [foo] must be a boolean, string given.'));
 
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('bar');
@@ -774,8 +769,7 @@ class CacheRepositoryTest extends TestCase
 
     public function testItThrowsExceptionWhenGettingNonArrayAsArray()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cache value for key [foo] must be an array, string given.');
+        $this->expectExceptionObject(new InvalidArgumentException('Cache value for key [foo] must be an array, string given.'));
 
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('bar');

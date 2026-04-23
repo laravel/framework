@@ -119,8 +119,7 @@ class DebouncedJobTest extends QueueTestCase
 
     public function testDebouncedAndUniqueThrowsLogicException()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('debounced job cannot also implement ShouldBeUnique');
+        $this->expectExceptionObject(new LogicException('debounced job cannot also implement ShouldBeUnique'));
 
         DebouncedAndUniqueTestJob::dispatch('entity-1');
     }

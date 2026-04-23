@@ -104,8 +104,7 @@ class FoundationHelpersTest extends TestCase
 
     public function testMixMissingManifestThrowsException()
     {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Mix manifest not found');
+        $this->expectExceptionObject(new Exception('Mix manifest not found'));
 
         mix('unversioned.css', 'missing');
     }

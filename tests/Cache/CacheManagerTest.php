@@ -279,8 +279,7 @@ class CacheManagerTest extends TestCase
 
     public function testThrowExceptionWhenUnknownDriverIsUsed()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Driver [unknown_taxi_driver] is not supported.');
+        $this->expectExceptionObject(new InvalidArgumentException('Driver [unknown_taxi_driver] is not supported.'));
 
         $userConfig = [
             'cache' => [
@@ -301,8 +300,7 @@ class CacheManagerTest extends TestCase
 
     public function testThrowExceptionWhenUnknownStoreIsUsed()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cache store [alien_store] is not defined.');
+        $this->expectExceptionObject(new InvalidArgumentException('Cache store [alien_store] is not defined.'));
 
         $userConfig = [
             'cache' => [

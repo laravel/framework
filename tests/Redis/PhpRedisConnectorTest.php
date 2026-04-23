@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Redis;
 
 use Illuminate\Redis\Connectors\PhpRedisConnector;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class PhpRedisConnectorTest extends TestCase
@@ -221,8 +222,7 @@ class PhpRedisConnectorTest extends TestCase
     {
         $connector = new TestablePhpRedisConnector;
 
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Algorithm [bogus] is not a valid PhpRedis backoff algorithm.');
+        $this->expectExceptionObject(new InvalidArgumentException('Algorithm [bogus] is not a valid PhpRedis backoff algorithm.'));
 
         $connector->testParseBackoffAlgorithm('bogus');
     }

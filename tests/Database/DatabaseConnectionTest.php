@@ -490,8 +490,7 @@ class DatabaseConnectionTest extends TestCase
 
     public function testBeforeExecutingHooksCanBeRegistered()
     {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('The callback was fired');
+        $this->expectExceptionObject(new Exception('The callback was fired'));
 
         $connection = $this->getMockConnection();
         $connection->beforeExecuting(function () {
@@ -502,8 +501,7 @@ class DatabaseConnectionTest extends TestCase
 
     public function testBeforeStartingTransactionHooksCanBeRegistered()
     {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('The callback was fired');
+        $this->expectExceptionObject(new Exception('The callback was fired'));
 
         $connection = $this->getMockConnection();
         $connection->beforeStartingTransaction(function () {

@@ -155,8 +155,7 @@ class SupportTestingMailFakeTest extends TestCase
 
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
 
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('The unexpected ['.MailableStub::class.'] mailable was sent to address [taylor@laravel.com].');
+        $this->expectExceptionObject(new ExpectationFailedException('The unexpected ['.MailableStub::class.'] mailable was sent to address [taylor@laravel.com].'));
 
         $this->fake->assertNotSent(MailableStub::class, 'taylor@laravel.com');
     }
@@ -167,8 +166,7 @@ class SupportTestingMailFakeTest extends TestCase
 
         $this->fake->to('dries@laravel.com')->send($this->mailable);
 
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('The unexpected ['.MailableStub::class.'] mailable was sent to address [dries@laravel.com].');
+        $this->expectExceptionObject(new ExpectationFailedException('The unexpected ['.MailableStub::class.'] mailable was sent to address [dries@laravel.com].'));
 
         $this->fake->assertNotSent(MailableStub::class, ['taylor@laravel.com', 'dries@laravel.com']);
     }
@@ -266,8 +264,7 @@ class SupportTestingMailFakeTest extends TestCase
 
         $this->fake->to('taylor@laravel.com')->queue($this->mailable);
 
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('The unexpected ['.MailableStub::class.'] mailable was queued to address [taylor@laravel.com].');
+        $this->expectExceptionObject(new ExpectationFailedException('The unexpected ['.MailableStub::class.'] mailable was queued to address [taylor@laravel.com].'));
 
         $this->fake->assertNotQueued(MailableStub::class, 'taylor@laravel.com');
     }
@@ -278,8 +275,7 @@ class SupportTestingMailFakeTest extends TestCase
 
         $this->fake->to('dries@laravel.com')->queue($this->mailable);
 
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('The unexpected ['.MailableStub::class.'] mailable was queued to address [dries@laravel.com].');
+        $this->expectExceptionObject(new ExpectationFailedException('The unexpected ['.MailableStub::class.'] mailable was queued to address [dries@laravel.com].'));
 
         $this->fake->assertNotQueued(MailableStub::class, ['taylor@laravel.com', 'dries@laravel.com']);
     }

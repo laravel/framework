@@ -864,8 +864,7 @@ class ViewFactoryTest extends TestCase
 
     public function testExceptionsInSectionsAreThrown()
     {
-        $this->expectException(ErrorException::class);
-        $this->expectExceptionMessage('section exception message');
+        $this->expectExceptionObject(new ErrorException('section exception message'));
 
         $engine = new CompilerEngine(m::mock(CompilerInterface::class), new Filesystem);
         $engine->getCompiler()->shouldReceive('getCompiledPath')->andReturnUsing(function ($path) {
@@ -883,8 +882,7 @@ class ViewFactoryTest extends TestCase
 
     public function testExtraStopSectionCallThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot end a section without first starting one.');
+        $this->expectExceptionObject(new InvalidArgumentException('Cannot end a section without first starting one.'));
 
         $factory = $this->getFactory();
         $factory->startSection('foo');
@@ -895,8 +893,7 @@ class ViewFactoryTest extends TestCase
 
     public function testExtraAppendSectionCallThrowsException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot end a section without first starting one.');
+        $this->expectExceptionObject(new InvalidArgumentException('Cannot end a section without first starting one.'));
 
         $factory = $this->getFactory();
         $factory->startSection('foo');

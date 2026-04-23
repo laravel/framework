@@ -582,8 +582,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testAbortThrowsNotFoundHttpException()
     {
-        $this->expectException(NotFoundHttpException::class);
-        $this->expectExceptionMessage('Page was not found');
+        $this->expectExceptionObject(new NotFoundHttpException('Page was not found'));
 
         $app = new Application();
         $app->abort(404, 'Page was not found');

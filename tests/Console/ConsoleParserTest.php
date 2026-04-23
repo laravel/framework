@@ -148,16 +148,14 @@ class ConsoleParserTest extends TestCase
 
     public function testNameIsSpacesException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unable to determine command name from signature.');
+        $this->expectExceptionObject(new InvalidArgumentException('Unable to determine command name from signature.'));
 
         Parser::parse(" \t\n\r\x0B\f");
     }
 
     public function testNameInEmptyException()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unable to determine command name from signature.');
+        $this->expectExceptionObject(new InvalidArgumentException('Unable to determine command name from signature.'));
 
         Parser::parse('');
     }
