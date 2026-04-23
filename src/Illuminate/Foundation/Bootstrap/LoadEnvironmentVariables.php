@@ -40,11 +40,18 @@ class LoadEnvironmentVariables
      */
     protected function checkForSpecificEnvironmentFile($app)
     {
-        if ($app->runningInConsole() &&
-            ($input = new ArgvInput)->hasParameterOption('--env') &&
-            $this->setEnvironmentFilePath($app, $app->environmentFile().'.'.$input->getParameterOption('--env'))) {
-            return;
-        }
+        if ($app->runningInConsole() && ($input = new ArgvInput)->hasParameterOption('--env')) {                                           
+            $envName = $input->getParameterOption('--env');
+            $file = $app->environmentFile().'.'.$envName;                                    
+                                                                       
+            if ($this->setEnvironmentFilePath($app, $file)) {                                
+                return;
+            }                                                                                
+                                                                       
+            throw new RuntimeException(
+                "The environment file [{$file}] requested by --env={$envName} does not exist."                                                                              
+            ); 
+        }  
 
         $environment = Env::get('APP_ENV');
 
