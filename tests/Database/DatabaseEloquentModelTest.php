@@ -15,7 +15,9 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Attributes\CollectedBy;
+use Illuminate\Database\Eloquent\Attributes\Connection as EloquentAttributeConnection;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
@@ -1446,7 +1448,8 @@ class DatabaseEloquentModelTest extends TestCase
         $model->password = 'password1';
         $model->setHidden(['password']);
         $model->setRelation('names', new BaseCollection([
-            new EloquentModelStub(['bar' => 'baz']), new EloquentModelStub(['bam' => 'boom']),
+            new EloquentModelStub(['bar' => 'baz']),
+            new EloquentModelStub(['bam' => 'boom']),
         ]));
         $model->setRelation('partner', new EloquentModelStub(['name' => 'abby']));
         $model->setRelation('group', null);
@@ -1582,7 +1585,8 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelStub;
         $model->setRelation('namesList', new BaseCollection([
-            new EloquentModelStub(['bar' => 'baz']), new EloquentModelStub(['bam' => 'boom']),
+            new EloquentModelStub(['bar' => 'baz']),
+            new EloquentModelStub(['bam' => 'boom']),
         ]));
         $array = $model->toArray();
 
@@ -1591,7 +1595,8 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model = new EloquentModelCamelStub;
         $model->setRelation('namesList', new BaseCollection([
-            new EloquentModelStub(['bar' => 'baz']), new EloquentModelStub(['bam' => 'boom']),
+            new EloquentModelStub(['bar' => 'baz']),
+            new EloquentModelStub(['bam' => 'boom']),
         ]));
         $array = $model->toArray();
 
@@ -3842,6 +3847,22 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertNotInstanceOf(CustomBuilder::class, $eloquentBuilder);
     }
+
+    public function testEloquentClassAttributeInheritanceOverrides()
+    {
+        $childTable = new EloquentChildModelWithTableAttributeStub;
+        $this->assertSame('children', $childTable->getTable());
+
+        $childConnection = new EloquentChildModelWithConnectionAttributeStub;
+        $this->assertSame('child_db', $childConnection->getConnectionName());
+
+        $childKey = new EloquentChildModelWithKeyAttributeStub;
+        $this->assertSame('child_id', $childKey->getKeyName());
+        $this->assertSame('string', $childKey->getKeyType());
+
+        $childPriority = new EloquentChildModelWithAttributeAndPropertyStub;
+        $this->assertSame('priority_property', $childPriority->getTable());
+    }
 }
 
 class CustomBuilder extends Builder
@@ -4785,4 +4806,41 @@ enum ConnectionNameBacked: string
 {
     case Foo = 'Foo';
     case Bar = 'Bar';
+}
+
+class EloquentParentModelWithTableStub extends Model
+{
+    protected $table = 'parents';
+}
+
+#[Table(name: 'children')]
+class EloquentChildModelWithTableAttributeStub extends EloquentParentModelWithTableStub
+{
+}
+
+class EloquentParentModelWithConnectionStub extends Model
+{
+    protected $connection = 'parent_db';
+}
+
+#[EloquentAttributeConnection('child_db')]
+class EloquentChildModelWithConnectionAttributeStub extends EloquentParentModelWithConnectionStub
+{
+}
+
+class EloquentParentModelWithPrimaryKeyStub extends Model
+{
+    protected $primaryKey = 'legacy_id';
+    protected $keyType = 'string';
+}
+
+#[Table(key: 'child_id', keyType: 'string')]
+class EloquentChildModelWithKeyAttributeStub extends EloquentParentModelWithPrimaryKeyStub
+{
+}
+
+#[Table(name: 'priority_attribute')]
+class EloquentChildModelWithAttributeAndPropertyStub extends Model
+{
+    protected $table = 'priority_property';
 }

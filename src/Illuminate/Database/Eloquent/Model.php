@@ -396,17 +396,21 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $conventionalInitMethods = array_map(static fn ($trait) => 'initialize'.class_basename($trait), $uses);
 
         foreach ((new ReflectionClass($class))->getMethods() as $method) {
-            if (! in_array($method->getName(), $booted) &&
+            if (
+                ! in_array($method->getName(), $booted) &&
                 $method->isStatic() &&
                 (in_array($method->getName(), $conventionalBootMethods) ||
-                $method->getAttributes(Boot::class) !== [])) {
+                    $method->getAttributes(Boot::class) !== [])
+            ) {
                 $method->invoke(null);
 
                 $booted[] = $method->getName();
             }
 
-            if (in_array($method->getName(), $conventionalInitMethods) ||
-                $method->getAttributes(Initialize::class) !== []) {
+            if (
+                in_array($method->getName(), $conventionalInitMethods) ||
+                $method->getAttributes(Initialize::class) !== []
+            ) {
                 static::$traitInitializers[$class][] = $method->getName();
             }
         }
@@ -433,26 +437,35 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function initializeModelAttributes()
     {
-        $table = static::resolveClassAttribute(Table::class);
-
         $reflection = new ReflectionClass(static::class);
 
-        $declaresTable = $reflection->hasProperty('table')
-            && $reflection->getProperty('table')->getDeclaringClass()->getName() === static::class;
+        $table = static::resolveClassAttribute(Table::class);
 
-        if (! $declaresTable && $reflection->getAttributes(Table::class) !== []) {
-            $this->table = $table->name ?? null;
+        if (! $this->classOwnsDeclaredProperty($reflection, 'table')) {
+            $this->table = $table->name ?? $this->table;
         } else {
             $this->table ??= $table->name ?? null;
         }
 
-        $this->connection ??= static::resolveClassAttribute(Connection::class, 'name');
+        $connectionAttribute = static::resolveClassAttribute(Connection::class, 'name');
 
-        if ($this->primaryKey === 'id' && $table && $table->key !== null) {
+        if (! $this->classOwnsDeclaredProperty($reflection, 'connection')) {
+            $this->connection = $connectionAttribute ?? $this->connection;
+        } else {
+            $this->connection ??= $connectionAttribute;
+        }
+
+        if (
+            (! $this->classOwnsDeclaredProperty($reflection, 'primaryKey') || $this->primaryKey === 'id') &&
+            $table && $table->key !== null
+        ) {
             $this->primaryKey = $table->key;
         }
 
-        if ($this->keyType === 'int' && $table && $table->keyType !== null) {
+        if (
+            (! $this->classOwnsDeclaredProperty($reflection, 'keyType') || $this->keyType === 'int') &&
+            $table && $table->keyType !== null
+        ) {
             $this->keyType = $table->keyType;
         }
 
@@ -461,6 +474,19 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         } elseif ($table && $table->incrementing !== null) {
             $this->incrementing = $table->incrementing;
         }
+    }
+
+    /**
+     * Determine if the given property is declared directly on the current class (not inherited).
+     *
+     * @param  \ReflectionClass  $reflection
+     * @param  string  $property
+     * @return bool
+     */
+    protected function classOwnsDeclaredProperty(ReflectionClass $reflection, string $property): bool
+    {
+        return $reflection->hasProperty($property)
+            && $reflection->getProperty($property)->getDeclaringClass()->getName() === static::class;
     }
 
     /**
@@ -693,14 +719,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                 } else {
                     throw new MassAssignmentException(sprintf(
                         'Add [%s] to fillable property to allow mass assignment on [%s].',
-                        $key, get_class($this)
+                        $key,
+                        get_class($this)
                     ));
                 }
             }
         }
 
-        if (count($attributes) !== count($fillable) &&
-            static::preventsSilentlyDiscardingAttributes()) {
+        if (
+            count($attributes) !== count($fillable) &&
+            static::preventsSilentlyDiscardingAttributes()
+        ) {
             $keys = array_diff(array_keys($attributes), array_keys($fillable));
 
             if (isset(static::$discardedAttributeViolationCallback)) {
@@ -1379,8 +1408,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         else {
             $saved = $this->performInsert($query);
 
-            if (! $this->getConnectionName() &&
-                $connection = $query->getConnection()) {
+            if (
+                ! $this->getConnectionName() &&
+                $connection = $query->getConnection()
+            ) {
                 $this->setConnection($connection->getName());
             }
         }
@@ -1418,8 +1449,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $saved = $this->performInsertOrIgnore($query, $uniqueBy);
 
-        if (! $this->getConnectionName() &&
-            $connection = $query->getConnection()) {
+        if (
+            ! $this->getConnectionName() &&
+            $connection = $query->getConnection()
+        ) {
             $this->setConnection($connection->getName());
         }
 
@@ -2087,7 +2120,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $this->load((new BaseCollection($this->relations))->reject(
             fn ($relation) => $relation instanceof Pivot
-                || (is_object($relation) && isset(class_uses_recursive($relation)[AsPivot::class]))
+            || (is_object($relation) && isset(class_uses_recursive($relation)[AsPivot::class]))
         )->keys()->all());
 
         $this->syncOriginal();
@@ -2112,7 +2145,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         ]));
 
         $attributes = Arr::except(
-            $this->getAttributes(), $except ? array_unique(array_merge($except, $defaults)) : $defaults
+            $this->getAttributes(),
+            $except ? array_unique(array_merge($except, $defaults)) : $defaults
         );
 
         return tap(new static, function ($instance) use ($attributes) {
@@ -2485,8 +2519,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $field = $field ?: $relationship->getRelated()->getRouteKeyName();
 
-        if ($relationship instanceof HasManyThrough ||
-            $relationship instanceof BelongsToMany) {
+        if (
+            $relationship instanceof HasManyThrough ||
+            $relationship instanceof BelongsToMany
+        ) {
             $field = $relationship->getRelated()->qualifyColumn($field);
         }
 
@@ -2795,8 +2831,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return $resolver($this);
         }
 
-        if (Str::startsWith($method, 'through') &&
-            method_exists($this, $relationMethod = (new SupportStringable($method))->after('through')->lcfirst()->toString())) {
+        if (
+            Str::startsWith($method, 'through') &&
+            method_exists($this, $relationMethod = (new SupportStringable($method))->after('through')->lcfirst()->toString())
+        ) {
             return $this->through($relationMethod);
         }
 
