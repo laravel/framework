@@ -592,6 +592,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
 
         foreach ($this as $key => $value) {
             unset($keys[$key]);
+
             if (empty($keys)) {
                 return true;
             }
