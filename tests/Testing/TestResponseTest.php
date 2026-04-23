@@ -1593,6 +1593,38 @@ EOT
         $response->assertJsonPathCanonicalizing('*.foo', ['foo 0', 'foo 2', 'foo 3']);
     }
 
+    public function testAssertJsonPaths(): void
+    {
+        $response = TestResponse::fromBaseResponse(new Response([
+            'data' => [
+                'id' => 1,
+                'name' => 'Taylor',
+            ],
+            'meta' => [
+                'count' => 3,
+            ],
+        ]));
+
+        $response->assertJsonPaths([
+            'data.id' => 1,
+            'data.name' => fn ($value) => $value === 'Taylor',
+            'meta.count' => 3,
+        ]);
+    }
+
+    public function testAssertJsonPathsCanFail(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that 10 is identical to 11.');
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+
+        $response->assertJsonPaths([
+            '0.id' => 11,
+            '1.id' => 20,
+        ]);
+    }
+
     public function testAssertJsonFragment(): void
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
@@ -1852,6 +1884,28 @@ EOT
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
 
         $response->assertJsonMissingPath('numeric_keys.3');
+    }
+
+    public function testAssertJsonMissingPaths(): void
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonMissingPaths([
+            'foobar.missing',
+            'numeric_keys.0',
+        ]);
+    }
+
+    public function testAssertJsonMissingPathsCanFail(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonMissingPaths([
+            'foo',
+            'foobar.missing',
+        ]);
     }
 
     public function testAssertJsonValidationErrors(): void
