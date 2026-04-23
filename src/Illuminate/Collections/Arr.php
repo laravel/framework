@@ -895,6 +895,34 @@ class Arr
     }
 
     /**
+     * Get the mode of a given key.
+     *
+     * @param  array  $array
+     * @param  string|array|null  $key
+     * @return array|null
+     */
+    public static function mode($array, $key = null)
+    {
+        if (count($array) === 0) {
+            return null;
+        }
+
+        $values = isset($key) ? array_map(fn ($item) => data_get($item, $key), $array) : $array;
+
+        $counts = [];
+
+        foreach ($values as $value) {
+            $counts[$value] = isset($counts[$value]) ? $counts[$value] + 1 : 1;
+        }
+
+        arsort($counts);
+
+        $highestCount = reset($counts);
+
+        return array_keys(array_filter($counts, fn ($count) => $count == $highestCount));
+    }
+
+    /**
      * Push an item onto the beginning of an array.
      *
      * @param  array  $array

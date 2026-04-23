@@ -1145,6 +1145,16 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['1-a-0', '2-b-1'], $result);
     }
 
+    public function testMode()
+    {
+        $this->assertEquals([2], Arr::mode([1, 2, 2, 3]));
+        $this->assertEquals([1, 2, 3], Arr::mode([1, 2, 3]));
+        $this->assertNull(Arr::mode([]));
+        $this->assertEquals([2, 4], Arr::mode([1, 2, 2, 3, 4, 4]));
+        $this->assertEquals([1], Arr::mode([['foo' => 1], ['foo' => 1], ['foo' => 2]], 'foo'));
+        $this->assertEquals([2], Arr::mode([['foo' => 1], ['foo' => 2], ['foo' => 2]], 'foo'));
+    }
+
     #[IgnoreDeprecations]
     public function testPrepend()
     {
