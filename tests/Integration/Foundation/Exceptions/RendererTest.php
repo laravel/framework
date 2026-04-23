@@ -28,7 +28,7 @@ class RendererTest extends TestCase
         });
     }
 
-    #[WithConfig('app.debug', true)]
+    #[WithConfig('app.debug', true, defer: false)]
     public function testItCanRenderExceptionPage()
     {
         $this->assertTrue($this->app->bound(Renderer::class));
@@ -39,7 +39,7 @@ class RendererTest extends TestCase
             ->assertSee('Bad route!');
     }
 
-    #[WithConfig('app.debug', false)]
+    #[WithConfig('app.debug', false, defer: false)]
     public function testItCanRenderExceptionPageUsingSymfonyIfRendererIsNotDefined()
     {
         config(['app.debug' => true]);
@@ -52,7 +52,7 @@ class RendererTest extends TestCase
             ->assertSee('Bad route!');
     }
 
-    #[WithConfig('app.debug', true)]
+    #[WithConfig('app.debug', true, defer: false)]
     public function testItCanRenderExceptionPageWithRendererWhenDebugEnabled()
     {
         $this->app->singleton(ExceptionRenderer::class, function () {
@@ -72,7 +72,7 @@ class RendererTest extends TestCase
             ->assertSee('Custom Exception Renderer: Bad route!');
     }
 
-    #[WithConfig('app.debug', false)]
+    #[WithConfig('app.debug', false, defer: false)]
     public function testItDoesNotRenderExceptionPageWithRendererWhenDebugDisabled()
     {
         $this->app->singleton(ExceptionRenderer::class, function () {
@@ -92,7 +92,7 @@ class RendererTest extends TestCase
             ->assertDontSee('Custom Exception Renderer: Bad route!');
     }
 
-    #[WithConfig('app.debug', false)]
+    #[WithConfig('app.debug', false, defer: false)]
     public function testItDoesNotRegisterListenersWhenDebugDisabled()
     {
         $this->app->forgetInstance(ExceptionRenderer::class);
@@ -108,7 +108,7 @@ class RendererTest extends TestCase
         $provider->boot();
     }
 
-    #[WithConfig('app.debug', true)]
+    #[WithConfig('app.debug', true, defer: false)]
     public function testItDoesNotRegisterListenersWhenRendererBound()
     {
         $this->app->singleton(ExceptionRenderer::class, function () {
@@ -133,7 +133,7 @@ class RendererTest extends TestCase
         $provider->boot();
     }
 
-    #[WithConfig('app.debug', true)]
+    #[WithConfig('app.debug', true, defer: false)]
     public function testItRegistersListenersWhenRendererNotBound()
     {
         $this->app->forgetInstance(ExceptionRenderer::class);
@@ -149,7 +149,7 @@ class RendererTest extends TestCase
         $provider->boot();
     }
 
-    #[WithConfig('app.debug', true)]
+    #[WithConfig('app.debug', true, defer: false)]
     public function testItRendersPreviousExceptions()
     {
         $this->assertTrue($this->app->bound(Renderer::class));
@@ -165,7 +165,7 @@ class RendererTest extends TestCase
             ]);
     }
 
-    #[WithConfig('app.debug', true)]
+    #[WithConfig('app.debug', true, defer: false)]
     public function testItExcludesDecorativeAsciiArtInNonBrowserContexts()
     {
         $this->get('/failed')

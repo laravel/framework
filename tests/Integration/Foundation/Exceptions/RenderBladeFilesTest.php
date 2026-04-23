@@ -8,7 +8,7 @@ use Orchestra\Testbench\TestCase;
 use function Orchestra\Testbench\after_resolving;
 use function Orchestra\Testbench\package_path;
 
-#[WithConfig('app.debug', true)]
+#[WithConfig('app.debug', true, defer: false)]
 class RenderBladeFilesTest extends TestCase
 {
     protected function defineEnvironment($app)

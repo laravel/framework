@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
-#[WithConfig('filesystems.disks.local.serve', true)]
+#[WithConfig('filesystems.disks.local.serve', true, defer: false)]
 class ServeFileTest extends TestCase
 {
     protected function setUp(): void
