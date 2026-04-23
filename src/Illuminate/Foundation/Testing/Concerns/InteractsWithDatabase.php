@@ -263,7 +263,7 @@ trait InteractsWithDatabase
         $actual = 0;
 
         $connectionInstance->listen(function (QueryExecuted $event) use (&$actual, $connectionInstance, $connection, $filter) {
-            if (is_null($connection) || $connectionInstance === $event->connection || $filter === null || $filter($event)) {
+            if ((is_null($connection) || $connectionInstance === $event->connection) && ($filter === null || $filter($event))) {
                 $actual++;
             }
         });
