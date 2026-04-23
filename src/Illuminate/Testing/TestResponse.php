@@ -876,6 +876,23 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the expected values and types exist at the given paths in the response.
+     *
+     * @param  array  $paths
+     * @return $this
+     */
+    public function assertJsonPaths(array $paths)
+    {
+        PHPUnit::withResponse($this)->assertNotEmpty($paths, 'No JSON paths were provided.');
+
+        foreach ($paths as $path => $expected) {
+            $this->assertJsonPath($path, $expected);
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the given path in the response contains all of the expected values without looking at the order.
      *
      * @param  string  $path
@@ -979,6 +996,25 @@ class TestResponse implements ArrayAccess
     public function assertJsonMissingPath(string $path)
     {
         $this->decodeResponseJson()->assertMissingPath($path);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response does not contain the given paths.
+     *
+     * @param  array|string  $paths
+     * @return $this
+     */
+    public function assertJsonMissingPaths($paths)
+    {
+        $paths = Arr::wrap($paths);
+
+        PHPUnit::withResponse($this)->assertNotEmpty($paths, 'No JSON missing paths were provided.');
+
+        foreach ($paths as $path) {
+            $this->assertJsonMissingPath($path);
+        }
 
         return $this;
     }
