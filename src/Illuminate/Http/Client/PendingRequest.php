@@ -1139,7 +1139,7 @@ class PendingRequest
 
             return $result;
         });
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->circuitBreaker?->recordFailure();
 
             throw $e;

@@ -15,10 +15,15 @@ use GuzzleHttp\Psr7\Request as GuzzleRequest;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\TransferStats;
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\Repository as CacheRepository;
+use Illuminate\Contracts\Cache\Repository as CacheRepositoryContract;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Batch;
 use Illuminate\Http\Client\BatchInProgressException;
+use Illuminate\Http\Client\CircuitBreaker;
+use Illuminate\Http\Client\CircuitOpenException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
@@ -4476,7 +4481,7 @@ class HttpClientTest extends TestCase
             '*' => $this->factory::response(['error'], 500),
         ]);
 
-        $breaker = new \Illuminate\Http\Client\CircuitBreaker($this->makeCircuitCache(), 'api', failureThreshold: 3, resetTimeout: 30);
+        $breaker = new CircuitBreaker($this->makeCircuitCache(), 'api', failureThreshold: 3, resetTimeout: 30);
 
         for ($i = 0; $i < 3; $i++) {
             $this->factory->circuitBreaker($breaker)->get('http://foo.com/get');
@@ -4488,7 +4493,7 @@ class HttpClientTest extends TestCase
         try {
             $this->factory->circuitBreaker($breaker)->get('http://foo.com/get');
             $this->fail('Expected CircuitOpenException was not thrown.');
-        } catch (\Illuminate\Http\Client\CircuitOpenException $e) {
+        } catch (CircuitOpenException $e) {
             $this->assertSame('api', $e->circuitKey);
             $this->assertGreaterThan(0, $e->retryAfter);
         }
@@ -4505,7 +4510,7 @@ class HttpClientTest extends TestCase
             ->push(['error'], 500)
             ->push(['error'], 500);
 
-        $breaker = new \Illuminate\Http\Client\CircuitBreaker($this->makeCircuitCache(), 'api', failureThreshold: 3, resetTimeout: 30);
+        $breaker = new CircuitBreaker($this->makeCircuitCache(), 'api', failureThreshold: 3, resetTimeout: 30);
 
         for ($i = 0; $i < 5; $i++) {
             $this->factory->circuitBreaker($breaker)->get('http://foo.com/get');
@@ -4522,14 +4527,14 @@ class HttpClientTest extends TestCase
             ->push(['ok'], 200);
 
         $cache = $this->makeCircuitCache();
-        $breaker = new \Illuminate\Http\Client\CircuitBreaker($cache, 'api', failureThreshold: 2, resetTimeout: 30);
+        $breaker = new CircuitBreaker($cache, 'api', failureThreshold: 2, resetTimeout: 30);
 
         $this->factory->circuitBreaker($breaker)->get('http://foo.com/get');
         $this->factory->circuitBreaker($breaker)->get('http://foo.com/get');
 
         $this->assertTrue($breaker->isOpen());
 
-        $cache->put('illuminate:http:circuit_breaker:opened_at:api', \Illuminate\Support\Carbon::now()->getTimestamp() - 60, 600);
+        $cache->put('illuminate:http:circuit_breaker:opened_at:api', Carbon::now()->getTimestamp() - 60, 600);
 
         $response = $this->factory->circuitBreaker($breaker)->get('http://foo.com/get');
 
@@ -4541,7 +4546,7 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake(['*' => $this->factory::response(['error'], 400)]);
 
-        $breaker = new \Illuminate\Http\Client\CircuitBreaker($this->makeCircuitCache(), 'api', failureThreshold: 2, resetTimeout: 30);
+        $breaker = new CircuitBreaker($this->makeCircuitCache(), 'api', failureThreshold: 2, resetTimeout: 30);
 
         $failWhen = fn ($response) => $response->status() === 400;
 
@@ -4555,7 +4560,7 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake(['*' => $this->factory::response(['error'], 404)]);
 
-        $breaker = new \Illuminate\Http\Client\CircuitBreaker($this->makeCircuitCache(), 'api', failureThreshold: 2, resetTimeout: 30);
+        $breaker = new CircuitBreaker($this->makeCircuitCache(), 'api', failureThreshold: 2, resetTimeout: 30);
 
         $this->factory->circuitBreaker($breaker)->get('http://foo.com/get');
         $this->factory->circuitBreaker($breaker)->get('http://foo.com/get');
@@ -4565,9 +4570,9 @@ class HttpClientTest extends TestCase
         $this->factory->assertSentCount(3);
     }
 
-    protected function makeCircuitCache(): \Illuminate\Contracts\Cache\Repository
+    protected function makeCircuitCache(): CacheRepositoryContract
     {
-        return new \Illuminate\Cache\Repository(new \Illuminate\Cache\ArrayStore);
+        return new CacheRepository(new ArrayStore);
     }
 }
 
