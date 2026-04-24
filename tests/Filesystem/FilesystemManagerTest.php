@@ -287,6 +287,32 @@ class FilesystemManagerTest extends TestCase
     //         rmdir(__DIR__.'/../../to-be-scoped');
     //     }
     // }
+    public function testPurgeAndForgetDiskAcceptsUnitEnum()
+    {
+        $app = new Application;
+        $app["config"] = [
+            "filesystems.default" => "local",
+            "filesystems.disks.local" => ["driver" => "local", "root" => __DIR__],
+        ];
+
+        $manager = new FilesystemManager($app);
+
+        $manager->disk(FakeDiskName::Local);
+
+        $property = new \ReflectionProperty($manager, "disks");
+
+        $this->assertCount(1, $property->getValue($manager));
+
+        $manager->forgetDisk(FakeDiskName::Local);
+        $this->assertCount(0, $property->getValue($manager));
+
+        $manager->disk(FakeDiskName::Local);
+        $this->assertCount(1, $property->getValue($manager));
+
+        $manager->purge(FakeDiskName::Local);
+        $this->assertCount(0, $property->getValue($manager));
+    }
+
 }
 
 class CustomFilesystemDriver
@@ -299,4 +325,9 @@ class CustomFilesystemDriver
     {
         return $this->driver;
     }
+}
+
+enum FakeDiskName: string
+{
+    case Local = "local";
 }

@@ -413,6 +413,8 @@ class FilesystemManager implements FactoryContract
     public function forgetDisk($disk)
     {
         foreach ((array) $disk as $diskName) {
+            $diskName = enum_value($diskName);
+
             unset($this->disks[$diskName]);
         }
 
@@ -422,12 +424,12 @@ class FilesystemManager implements FactoryContract
     /**
      * Disconnect the given disk and remove from local cache.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return void
      */
     public function purge($name = null)
     {
-        $name ??= $this->getDefaultDriver();
+        $name = enum_value($name) ?: $this->getDefaultDriver();
 
         unset($this->disks[$name]);
     }
