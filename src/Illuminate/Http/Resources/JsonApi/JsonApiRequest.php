@@ -33,6 +33,18 @@ class JsonApiRequest extends Request
     }
 
     /**
+     * Determine if a sparse fieldset was provided for the given resource type.
+     */
+    public function hasSparseFieldset(string $key): bool
+    {
+        if (is_null($this->cachedSparseFields)) {
+            $this->sparseFields($key);
+        }
+
+        return array_key_exists($key, $this->cachedSparseFields);
+    }
+
+    /**
      * Get the request's included relationships.
      */
     public function sparseIncluded(?string $key = null): ?array
