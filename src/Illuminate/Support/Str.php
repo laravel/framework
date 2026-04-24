@@ -550,6 +550,28 @@ class Str
     }
 
     /**
+     * Determine if the given string is empty.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isEmpty($value)
+    {
+        return $value === '';
+    }
+
+    /**
+     * Determine if the given string is not empty.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isNotEmpty($value)
+    {
+        return ! static::isEmpty($value);
+    }
+
+    /**
      * Determine if a given string is 7 bit ASCII.
      *
      * @param  string  $value

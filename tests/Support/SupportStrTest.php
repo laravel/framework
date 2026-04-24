@@ -693,6 +693,22 @@ class SupportStrTest extends TestCase
         PATTERN, $multilineValue));
     }
 
+    public function testIsEmpty()
+    {
+        $this->assertTrue(Str::isEmpty(''));
+        $this->assertFalse(Str::isEmpty(' '));
+        $this->assertFalse(Str::isEmpty('a'));
+        $this->assertFalse(Str::isEmpty('0'));
+    }
+
+    public function testIsNotEmpty()
+    {
+        $this->assertFalse(Str::isNotEmpty(''));
+        $this->assertTrue(Str::isNotEmpty(' '));
+        $this->assertTrue(Str::isNotEmpty('a'));
+        $this->assertTrue(Str::isNotEmpty('0'));
+    }
+
     public function testIsUrl()
     {
         $this->assertTrue(Str::isUrl('https://laravel.com'));
