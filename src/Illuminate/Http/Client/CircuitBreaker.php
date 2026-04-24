@@ -134,16 +134,25 @@ class CircuitBreaker
         return $this->key;
     }
 
+    /**
+     * Get the cache key used to track consecutive failures.
+     */
     protected function failuresKey(): string
     {
         return "illuminate:http:circuit_breaker:failures:{$this->key}";
     }
 
+    /**
+     * Get the cache key used to track when the circuit opened.
+     */
     protected function openedAtKey(): string
     {
         return "illuminate:http:circuit_breaker:opened_at:{$this->key}";
     }
 
+    /**
+     * Get the cache key used to reserve the half-open probe slot.
+     */
     protected function probeKey(): string
     {
         return "illuminate:http:circuit_breaker:probe:{$this->key}";
