@@ -14,6 +14,7 @@ use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\UriTemplate\UriTemplate;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\ConnectionFailed;
 use Illuminate\Http\Client\Events\RequestSending;
@@ -157,6 +158,20 @@ class PendingRequest
      * @var (callable(\Throwable, static, string|null): bool)|null
      */
     protected $retryWhenCallback = null;
+
+    /**
+     * The circuit breaker guarding the request.
+     *
+     * @var \Illuminate\Http\Client\CircuitBreaker|null
+     */
+    protected $circuitBreaker = null;
+
+    /**
+     * The callback that decides whether a response should count as a circuit breaker failure.
+     *
+     * @var (callable(\Illuminate\Http\Client\Response): bool)|null
+     */
+    protected $circuitFailWhen = null;
 
     /**
      * The callbacks that should execute before the request is sent.
@@ -667,6 +682,29 @@ class PendingRequest
     }
 
     /**
+     * Guard the request with a circuit breaker identified by the given key.
+     *
+     * @param  \Illuminate\Http\Client\CircuitBreaker|string  $key
+     * @param  int  $failureThreshold
+     * @param  int  $resetTimeout
+     * @param  (callable(\Illuminate\Http\Client\Response): bool)|null  $failWhen
+     * @return $this
+     */
+    public function circuitBreaker($key, int $failureThreshold = 5, int $resetTimeout = 30, ?callable $failWhen = null)
+    {
+        if ($key instanceof CircuitBreaker) {
+            $this->circuitBreaker = $key;
+        } else {
+            $cache = Container::getInstance()->make('cache')->store();
+            $this->circuitBreaker = new CircuitBreaker($cache, $key, $failureThreshold, $resetTimeout);
+        }
+
+        $this->circuitFailWhen = $failWhen;
+
+        return $this;
+    }
+
+    /**
      * Replace the specified options on the request.
      *
      * @param  array  $options
@@ -1036,9 +1074,12 @@ class PendingRequest
             );
         }
 
+        $this->circuitBreaker?->guard();
+
         $shouldRetry = null;
 
-        return retry($this->tries ?? 1, function ($attempt) use ($method, $url, $options, &$shouldRetry) {
+        try {
+            $response = retry($this->tries ?? 1, function ($attempt) use ($method, $url, $options, &$shouldRetry) {
             try {
                 return tap($this->newResponse($this->sendRequest($method, $url, $options)), function (&$response) use ($attempt, &$shouldRetry) {
                     $this->populateResponse($response);
@@ -1098,6 +1139,23 @@ class PendingRequest
 
             return $result;
         });
+        } catch (\Throwable $e) {
+            $this->circuitBreaker?->recordFailure();
+
+            throw $e;
+        }
+
+        if ($this->circuitBreaker) {
+            $isFailure = $this->circuitFailWhen
+                ? (bool) call_user_func($this->circuitFailWhen, $response)
+                : $response->serverError();
+
+            $isFailure
+                ? $this->circuitBreaker->recordFailure()
+                : $this->circuitBreaker->recordSuccess();
+        }
+
+        return $response;
     }
 
     /**

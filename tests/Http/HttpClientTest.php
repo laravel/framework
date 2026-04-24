@@ -4469,6 +4469,106 @@ class HttpClientTest extends TestCase
         $response->json();
         $this->assertSame(3, $response->bodyCallCount);
     }
+
+    public function testCircuitBreakerTripsAfterReachingFailureThreshold()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response(['error'], 500),
+        ]);
+
+        $breaker = new \Illuminate\Http\Client\CircuitBreaker($this->makeCircuitCache(), 'api', failureThreshold: 3, resetTimeout: 30);
+
+        for ($i = 0; $i < 3; $i++) {
+            $this->factory->circuitBreaker($breaker)->get('http://foo.com/get');
+        }
+
+        $this->assertTrue($breaker->isOpen());
+        $this->factory->assertSentCount(3);
+
+        try {
+            $this->factory->circuitBreaker($breaker)->get('http://foo.com/get');
+            $this->fail('Expected CircuitOpenException was not thrown.');
+        } catch (\Illuminate\Http\Client\CircuitOpenException $e) {
+            $this->assertSame('api', $e->circuitKey);
+            $this->assertGreaterThan(0, $e->retryAfter);
+        }
+
+        $this->factory->assertSentCount(3);
+    }
+
+    public function testCircuitBreakerResetsFailureCountAfterSuccess()
+    {
+        $this->factory->fakeSequence()
+            ->push(['error'], 500)
+            ->push(['error'], 500)
+            ->push(['ok'], 200)
+            ->push(['error'], 500)
+            ->push(['error'], 500);
+
+        $breaker = new \Illuminate\Http\Client\CircuitBreaker($this->makeCircuitCache(), 'api', failureThreshold: 3, resetTimeout: 30);
+
+        for ($i = 0; $i < 5; $i++) {
+            $this->factory->circuitBreaker($breaker)->get('http://foo.com/get');
+        }
+
+        $this->assertFalse($breaker->isOpen());
+    }
+
+    public function testCircuitBreakerTransitionsToHalfOpenAfterResetTimeout()
+    {
+        $this->factory->fakeSequence()
+            ->push(['error'], 500)
+            ->push(['error'], 500)
+            ->push(['ok'], 200);
+
+        $cache = $this->makeCircuitCache();
+        $breaker = new \Illuminate\Http\Client\CircuitBreaker($cache, 'api', failureThreshold: 2, resetTimeout: 30);
+
+        $this->factory->circuitBreaker($breaker)->get('http://foo.com/get');
+        $this->factory->circuitBreaker($breaker)->get('http://foo.com/get');
+
+        $this->assertTrue($breaker->isOpen());
+
+        $cache->put('illuminate:http:circuit_breaker:opened_at:api', \Illuminate\Support\Carbon::now()->getTimestamp() - 60, 600);
+
+        $response = $this->factory->circuitBreaker($breaker)->get('http://foo.com/get');
+
+        $this->assertTrue($response->ok());
+        $this->assertFalse($breaker->isOpen());
+    }
+
+    public function testCircuitBreakerHonorsCustomFailWhenCallback()
+    {
+        $this->factory->fake(['*' => $this->factory::response(['error'], 400)]);
+
+        $breaker = new \Illuminate\Http\Client\CircuitBreaker($this->makeCircuitCache(), 'api', failureThreshold: 2, resetTimeout: 30);
+
+        $failWhen = fn ($response) => $response->status() === 400;
+
+        $this->factory->circuitBreaker($breaker, failWhen: $failWhen)->get('http://foo.com/get');
+        $this->factory->circuitBreaker($breaker, failWhen: $failWhen)->get('http://foo.com/get');
+
+        $this->assertTrue($breaker->isOpen());
+    }
+
+    public function testCircuitBreakerDoesNotCountClientErrorsByDefault()
+    {
+        $this->factory->fake(['*' => $this->factory::response(['error'], 404)]);
+
+        $breaker = new \Illuminate\Http\Client\CircuitBreaker($this->makeCircuitCache(), 'api', failureThreshold: 2, resetTimeout: 30);
+
+        $this->factory->circuitBreaker($breaker)->get('http://foo.com/get');
+        $this->factory->circuitBreaker($breaker)->get('http://foo.com/get');
+        $this->factory->circuitBreaker($breaker)->get('http://foo.com/get');
+
+        $this->assertFalse($breaker->isOpen());
+        $this->factory->assertSentCount(3);
+    }
+
+    protected function makeCircuitCache(): \Illuminate\Contracts\Cache\Repository
+    {
+        return new \Illuminate\Cache\Repository(new \Illuminate\Cache\ArrayStore);
+    }
 }
 
 class CustomFactory extends Factory
