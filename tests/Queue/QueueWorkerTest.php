@@ -15,6 +15,7 @@ use Illuminate\Queue\Events\JobPopping;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobReleasedAfterException;
+use Illuminate\Queue\Events\WorkerInterrupted;
 use Illuminate\Queue\Events\WorkerStarting;
 use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Queue\MaxAttemptsExceededException;
@@ -509,6 +510,19 @@ class QueueWorkerTest extends TestCase
         }))->once();
     }
 
+    public function testWorkerInterruptedEventIsDispatchedOnSignal()
+    {
+        $worker = $this->getWorker('default', ['queue' => []]);
+        $worker->receiveSignal(15, 'default', 'default');
+
+        $this->events->shouldHaveReceived('dispatch')->with(m::on(function ($event) {
+            return $event instanceof WorkerInterrupted
+                && $event->signal === 15
+                && $event->connectionName === 'default'
+                && $event->queue === 'default';
+        }))->once();
+    }
+
     public function testInterruptibleJobIsNotifiedOnSignal()
     {
         $interruptible = new class implements Interruptible
@@ -579,6 +593,15 @@ class InsomniacWorker extends Worker
     public function sleep($seconds)
     {
         $this->sleptFor = $seconds;
+    }
+
+    public function receiveSignal(int $signal, ?string $connectionName = null, ?string $queue = null): void
+    {
+        $this->shouldQuit = true;
+
+        $this->events->dispatch(new WorkerInterrupted($signal, $connectionName, $queue));
+
+        $this->notifyJobOfSignal($signal);
     }
 
     public function notifyJobOfSignal(int $signal): void
