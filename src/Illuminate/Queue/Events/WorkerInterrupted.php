@@ -15,5 +15,6 @@ class WorkerInterrupted
         public int $signal,
         public ?string $connectionName = null,
         public ?string $queue = null,
-    ) {}
+    ) {
+    }
 }
