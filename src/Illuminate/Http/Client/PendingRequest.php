@@ -1080,65 +1080,65 @@ class PendingRequest
 
         try {
             $response = retry($this->tries ?? 1, function ($attempt) use ($method, $url, $options, &$shouldRetry) {
-            try {
-                return tap($this->newResponse($this->sendRequest($method, $url, $options)), function (&$response) use ($attempt, &$shouldRetry) {
-                    $this->populateResponse($response);
+                try {
+                    return tap($this->newResponse($this->sendRequest($method, $url, $options)), function (&$response) use ($attempt, &$shouldRetry) {
+                        $this->populateResponse($response);
 
-                    $this->dispatchResponseReceivedEvent($response);
-                    $response = $this->runAfterResponseCallbacks($response);
+                        $this->dispatchResponseReceivedEvent($response);
+                        $response = $this->runAfterResponseCallbacks($response);
 
-                    if ($response->successful()) {
-                        return;
+                        if ($response->successful()) {
+                            return;
+                        }
+
+                        try {
+                            $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this, $this->request->toPsrRequest()->getMethod()) : true;
+                        } catch (Exception $exception) {
+                            $shouldRetry = false;
+
+                            throw $exception;
+                        }
+
+                        if ($this->throwCallback &&
+                            ($this->throwIfCallback === null ||
+                             call_user_func($this->throwIfCallback, $response))) {
+                            $response->throw($this->throwCallback);
+                        }
+
+                        $potentialTries = is_array($this->tries)
+                            ? count($this->tries) + 1
+                            : $this->tries;
+
+                        if ($attempt < $potentialTries && $shouldRetry) {
+                            $response->throw();
+                        }
+
+                        if ($potentialTries > 1 && $this->retryThrow) {
+                            $response->throw();
+                        }
+                    });
+                } catch (TransferException $e) {
+                    if ($e instanceof ConnectException) {
+                        $this->marshalConnectionException($e);
                     }
 
-                    try {
-                        $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this, $this->request->toPsrRequest()->getMethod()) : true;
-                    } catch (Exception $exception) {
-                        $shouldRetry = false;
-
-                        throw $exception;
+                    if ($e instanceof RequestException && ! $e->hasResponse()) {
+                        $this->marshalRequestExceptionWithoutResponse($e);
                     }
 
-                    if ($this->throwCallback &&
-                        ($this->throwIfCallback === null ||
-                         call_user_func($this->throwIfCallback, $response))) {
-                        $response->throw($this->throwCallback);
+                    if ($e instanceof RequestException && $e->hasResponse()) {
+                        $this->marshalRequestExceptionWithResponse($e);
                     }
 
-                    $potentialTries = is_array($this->tries)
-                        ? count($this->tries) + 1
-                        : $this->tries;
-
-                    if ($attempt < $potentialTries && $shouldRetry) {
-                        $response->throw();
-                    }
-
-                    if ($potentialTries > 1 && $this->retryThrow) {
-                        $response->throw();
-                    }
-                });
-            } catch (TransferException $e) {
-                if ($e instanceof ConnectException) {
-                    $this->marshalConnectionException($e);
+                    throw $e;
                 }
+            }, $this->retryDelay ?? 100, function ($exception) use (&$shouldRetry) {
+                $result = $shouldRetry !== null ? $shouldRetry : ($this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $exception, $this, $this->request?->toPsrRequest()->getMethod()) : true);
 
-                if ($e instanceof RequestException && ! $e->hasResponse()) {
-                    $this->marshalRequestExceptionWithoutResponse($e);
-                }
+                $shouldRetry = null;
 
-                if ($e instanceof RequestException && $e->hasResponse()) {
-                    $this->marshalRequestExceptionWithResponse($e);
-                }
-
-                throw $e;
-            }
-        }, $this->retryDelay ?? 100, function ($exception) use (&$shouldRetry) {
-            $result = $shouldRetry !== null ? $shouldRetry : ($this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $exception, $this, $this->request?->toPsrRequest()->getMethod()) : true);
-
-            $shouldRetry = null;
-
-            return $result;
-        });
+                return $result;
+            });
         } catch (Throwable $e) {
             $this->circuitBreaker?->recordFailure();
 
