@@ -1145,6 +1145,18 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['1-a-0', '2-b-1'], $result);
     }
 
+    public function testAvg()
+    {
+        $this->assertEquals(2, Arr::avg([1, 2, 3]));
+        $this->assertSame(1.5, Arr::avg([1, 2]));
+        $this->assertNull(Arr::avg([]));
+        $this->assertNull(Arr::avg([null, null]));
+        $this->assertEquals(2, Arr::avg([1, null, 3]));
+        $this->assertEquals(2, Arr::avg([['foo' => 1], ['foo' => 2], ['foo' => 3]], 'foo'));
+        $this->assertEquals(2, Arr::avg([['foo' => 1], ['foo' => null], ['foo' => 3]], 'foo'));
+        $this->assertEquals(2, Arr::avg([1, 2, 3], fn ($v) => $v));
+    }
+
     #[IgnoreDeprecations]
     public function testPrepend()
     {

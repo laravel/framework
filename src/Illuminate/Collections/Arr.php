@@ -643,7 +643,6 @@ class Arr
      *
      * An array is "associative" if it doesn't have sequential numerical keys beginning with zero.
      *
-     * @param  array  $array
      * @return ($array is list ? false : true)
      */
     public static function isAssoc(array $array)
@@ -829,8 +828,6 @@ class Arr
     /**
      * Run a map over each of the items in the array.
      *
-     * @param  array  $array
-     * @param  callable  $callback
      * @return array
      */
     public static function map(array $array, callable $callback)
@@ -892,6 +889,32 @@ class Arr
 
             return $callback(...$chunk);
         });
+    }
+
+    /**
+     * Get the average value of a given key.
+     *
+     * @param  array  $array
+     * @param  (callable(mixed): mixed)|string|null  $callback
+     * @return float|int|null
+     */
+    public static function avg($array, $callback = null)
+    {
+        $count = 0;
+        $total = 0;
+
+        $callback = is_null($callback)
+            ? fn ($value) => $value
+            : (is_callable($callback) ? $callback : fn ($item) => data_get($item, $callback));
+
+        foreach ($array as $key => $value) {
+            if (! is_null($resolved = $callback($value, $key))) {
+                $total += $resolved;
+                $count++;
+            }
+        }
+
+        return $count ? $total / $count : null;
     }
 
     /**
@@ -1030,11 +1053,6 @@ class Arr
 
     /**
      * Push an item into an array using "dot" notation.
-     *
-     * @param  \ArrayAccess|array  $array
-     * @param  string|int|null  $key
-     * @param  mixed  $values
-     * @return array
      */
     public static function push(ArrayAccess|array &$array, string|int|null $key, mixed ...$values): array
     {
