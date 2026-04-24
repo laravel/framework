@@ -160,6 +160,13 @@ abstract class Factory
     protected static $cachedModelAttributes = [];
 
     /**
+     * The model attributes that should be included in HTTP payloads.
+     *
+     * @var array<int, string>
+     */
+    protected $payloadAttributes = [];
+
+    /**
      * Create a new factory instance.
      *
      * @param  int|null  $count
@@ -1118,6 +1125,27 @@ abstract class Factory
         static::$factoryNameResolver = null;
         static::$namespace = 'Database\\Factories\\';
         static::$expandRelationshipsByDefault = true;
+    }
+
+    /**
+     * Get an HTTP payload array for the model.
+     *
+     * @param  array<string, mixed>  $overrides
+     * @param  \Illuminate\Database\Eloquent\Model|null  $parent
+     * @return array<string, mixed>
+     */
+    public function payload(array $overrides = [], ?Model $parent = null)
+    {
+        if (empty($this->payloadAttributes)) {
+            return $overrides;
+        }
+
+        $filtered = array_intersect_key(
+            $this->count(null)->raw([], $parent),
+            array_flip($this->payloadAttributes)
+        );
+
+        return array_merge($filtered, $overrides);
     }
 
     /**

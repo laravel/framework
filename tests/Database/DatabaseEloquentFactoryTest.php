@@ -235,6 +235,61 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame('Taylor Otwell', $user['name']);
     }
 
+    public function test_payload_returns_empty_when_payload_attributes_not_declared()
+    {
+        $payload = FactoryTestUserFactory::new()->payload();
+
+        $this->assertSame([], $payload);
+    }
+
+    public function test_payload_returns_only_overrides_when_payload_attributes_not_declared()
+    {
+        $payload = FactoryTestUserFactory::new()->payload(['foo' => 'bar']);
+
+        $this->assertSame(['foo' => 'bar'], $payload);
+    }
+
+    public function test_payload_filters_raw_attributes_by_whitelist()
+    {
+        $payload = FactoryTestUserWithPayloadFactory::new()->payload();
+
+        $this->assertArrayHasKey('name', $payload);
+        $this->assertArrayNotHasKey('options', $payload);
+    }
+
+    public function test_payload_overrides_merge_with_filtered_attributes()
+    {
+        $payload = FactoryTestUserWithPayloadFactory::new()->payload(['name' => 'Taylor Otwell']);
+
+        $this->assertSame('Taylor Otwell', $payload['name']);
+    }
+
+    public function test_payload_overrides_bypass_whitelist()
+    {
+        $payload = FactoryTestUserWithPayloadFactory::new()->payload(['password_confirmation' => 'secret']);
+
+        $this->assertArrayHasKey('name', $payload);
+        $this->assertSame('secret', $payload['password_confirmation']);
+        $this->assertArrayNotHasKey('options', $payload);
+    }
+
+    public function test_payload_returns_single_array_even_with_count()
+    {
+        $payload = FactoryTestUserWithPayloadFactory::new()->count(3)->payload();
+
+        $this->assertArrayHasKey('name', $payload);
+        $this->assertIsString($payload['name']);
+    }
+
+    public function test_payload_works_with_state()
+    {
+        $payload = FactoryTestUserWithPayloadFactory::new()
+            ->state(['name' => 'Taylor'])
+            ->payload();
+
+        $this->assertSame('Taylor', $payload['name']);
+    }
+
     public function test_expanded_model_attributes_can_be_created()
     {
         $post = FactoryTestPostFactory::new()->raw();
@@ -1154,6 +1209,21 @@ class FactoryTestUserFactory extends Factory
         return [
             'name' => $this->faker->name(),
             'options' => null,
+        ];
+    }
+}
+
+class FactoryTestUserWithPayloadFactory extends Factory
+{
+    protected $model = FactoryTestUser::class;
+
+    protected $payloadAttributes = ['name'];
+
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->name(),
+            'options' => 'secret-value',
         ];
     }
 }
