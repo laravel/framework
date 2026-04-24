@@ -80,9 +80,11 @@ class CallQueuedHandler
 
         $this->runningCommand = $command;
 
-        $this->dispatchThroughMiddleware($job, $command);
-
-        $this->runningCommand = null;
+        try {
+            $this->dispatchThroughMiddleware($job, $command);
+        } finally {
+            $this->runningCommand = null;
+        }
 
         if (! $job->isReleased() && ! $this->commandShouldBeUniqueUntilProcessing($command)) {
             $this->ensureUniqueJobLockIsReleased($command);
