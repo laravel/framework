@@ -643,7 +643,6 @@ class Arr
      *
      * An array is "associative" if it doesn't have sequential numerical keys beginning with zero.
      *
-     * @param  array  $array
      * @return ($array is list ? false : true)
      */
     public static function isAssoc(array $array)
@@ -829,8 +828,6 @@ class Arr
     /**
      * Run a map over each of the items in the array.
      *
-     * @param  array  $array
-     * @param  callable  $callback
      * @return array
      */
     public static function map(array $array, callable $callback)
@@ -892,6 +889,26 @@ class Arr
 
             return $callback(...$chunk);
         });
+    }
+
+    /**
+     * Get the sum of the given values.
+     *
+     * @param  array  $array
+     * @param  (callable(mixed): mixed)|string|null  $callback
+     * @return int|float
+     */
+    public static function sum($array, $callback = null)
+    {
+        $callback = is_null($callback)
+            ? fn ($value) => $value
+            : (is_callable($callback) ? $callback : fn ($item) => data_get($item, $callback));
+
+        return array_reduce(
+            array_keys($array),
+            fn ($result, $key) => $result + $callback($array[$key], $key),
+            0
+        );
     }
 
     /**
@@ -1030,11 +1047,6 @@ class Arr
 
     /**
      * Push an item into an array using "dot" notation.
-     *
-     * @param  \ArrayAccess|array  $array
-     * @param  string|int|null  $key
-     * @param  mixed  $values
-     * @return array
      */
     public static function push(ArrayAccess|array &$array, string|int|null $key, mixed ...$values): array
     {

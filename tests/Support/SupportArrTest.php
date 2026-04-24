@@ -1145,6 +1145,16 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['1-a-0', '2-b-1'], $result);
     }
 
+    public function testSum()
+    {
+        $this->assertEquals(6, Arr::sum([1, 2, 3]));
+        $this->assertEquals(0, Arr::sum([]));
+        $this->assertEquals(6, Arr::sum([['foo' => 1], ['foo' => 2], ['foo' => 3]], 'foo'));
+        $this->assertEquals(6, Arr::sum([1, 2, 3], fn ($v) => $v));
+        $this->assertEquals(12, Arr::sum([1, 2, 3], fn ($v) => $v * 2));
+        $this->assertEquals(3, Arr::sum([['item' => ['price' => 1]], ['item' => ['price' => 2]]], 'item.price'));
+    }
+
     #[IgnoreDeprecations]
     public function testPrepend()
     {
