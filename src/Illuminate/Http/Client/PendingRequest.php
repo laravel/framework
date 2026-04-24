@@ -164,14 +164,14 @@ class PendingRequest
      *
      * @var \Illuminate\Http\Client\CircuitBreaker|null
      */
-    protected $circuitBreaker = null;
+    protected $circuitBreaker;
 
     /**
      * The callback that decides whether a response should count as a circuit breaker failure.
      *
-     * @var (callable(\Illuminate\Http\Client\Response): bool)|null
+     * @var callable|null
      */
-    protected $circuitFailWhen = null;
+    protected $circuitFailWhen;
 
     /**
      * The callbacks that should execute before the request is sent.
