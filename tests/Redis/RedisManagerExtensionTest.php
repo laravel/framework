@@ -84,6 +84,26 @@ class RedisManagerExtensionTest extends TestCase
 
         $redis->resolve($name);
     }
+
+    public function testPurgeAcceptsUnitEnum()
+    {
+        $redis = new RedisManager(new Application, "my_custom_driver", [
+            "default" => [
+                "host" => "some-host",
+                "port" => "some-port",
+                "database" => 5,
+                "timeout" => 0.5,
+            ],
+        ]);
+
+        $property = new \ReflectionProperty($redis, "connections");
+        $property->setValue($redis, ["default" => "fake-connection"]);
+
+        $this->assertCount(1, $redis->connections());
+
+        $redis->purge(FakeRedisConnectionName::Default);
+        $this->assertCount(0, $redis->connections());
+    }
 }
 
 class FakeRedisConnector implements Connector
@@ -112,4 +132,9 @@ class FakeRedisConnector implements Connector
     {
         return 'my-redis-cluster-connection';
     }
+}
+
+enum FakeRedisConnectionName: string
+{
+    case Default = 'default';
 }
