@@ -9,6 +9,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Factories\Attributes\UseModel;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
@@ -724,7 +725,7 @@ abstract class Factory
      */
     public function hasAttached($factory, $pivot = [], $relationship = null)
     {
-        if (is_array($pivot) && $pivot !== [] && array_all($pivot, fn ($p) => is_array($p))) {
+        if (is_array($pivot) && $pivot !== [] && !Arr::isAssoc($pivot) && array_all($pivot, fn ($p) => is_array($p))) {
             $factory = $factory instanceof Factory && $factory->count === null
                 ? $factory->count(count($pivot))
                 : $factory;
