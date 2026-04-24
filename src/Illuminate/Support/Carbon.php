@@ -44,16 +44,12 @@ class Carbon extends BaseCarbon
      */
     public function clamp(DateTimeInterface|string $min, DateTimeInterface|string $max): static
     {
-        $min = self::parse($min);
-        $max = self::parse($max);
+        $min = $this->resolveCarbon($min);
+        $max = $this->resolveCarbon($max);
 
-        [$min, $max] = $min->lte($max) ? [$min, $max] : [$max, $min];
+        [$min, $max] = $min <= $max ? [$min, $max] : [$max, $min];
 
-        return match (true) {
-            $this->lessThan($min) => $min->copy(),
-            $this->greaterThan($max) => $max->copy(),
-            default => $this->copy(),
-        };
+        return $this->min($max)->max($min)->copy();
     }
 
     /**
