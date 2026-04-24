@@ -107,6 +107,10 @@ class AuthenticateSession implements AuthenticatesSessions
      */
     protected function validatePasswordHash($passwordHash, $storedValue)
     {
+        if (! is_string($passwordHash) || ! is_string($storedValue)) {
+            return false;
+        }
+
         try {
             // Try new HMAC format first, then fall back to raw password hash format for backward compatibility
             return hash_equals($this->guard()->hashPasswordForCookie($passwordHash), $storedValue)
