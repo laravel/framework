@@ -80,18 +80,18 @@ class Worker
     protected $resetScope;
 
     /**
-     * Indicates if the worker should exit.
-     *
-     * @var bool
-     */
-    public $shouldQuit = false;
-
-    /**
      * The job currently being processed.
      *
      * @var \Illuminate\Contracts\Queue\Job|null
      */
     public $currentJob = null;
+
+    /**
+     * Indicates if the worker should exit.
+     *
+     * @var bool
+     */
+    public $shouldQuit = false;
 
     /**
      * Indicates if the worker lost its connection.

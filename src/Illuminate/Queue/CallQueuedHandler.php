@@ -122,16 +122,6 @@ class CallQueuedHandler
     }
 
     /**
-     * Get the command currently being processed.
-     *
-     * @return mixed
-     */
-    public function getRunningCommand()
-    {
-        return $this->runningCommand;
-    }
-
-    /**
      * Dispatch the given job / command through its specified middleware.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
@@ -450,5 +440,15 @@ class CallQueuedHandler
         if (method_exists($command, 'invokeChainCatchCallbacks')) {
             $command->invokeChainCatchCallbacks($e);
         }
+    }
+
+    /**
+     * Get the command currently being processed.
+     *
+     * @return mixed
+     */
+    public function getRunningCommand()
+    {
+        return $this->runningCommand;
     }
 }
