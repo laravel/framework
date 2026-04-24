@@ -17,6 +17,7 @@ use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Events\JobTimedOut;
 use Illuminate\Queue\Events\Looping;
+use Illuminate\Queue\Events\WorkerInterrupted;
 use Illuminate\Queue\Events\WorkerStarting;
 use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Support\Carbon;
@@ -176,7 +177,7 @@ class Worker
     public function daemon($connectionName, $queue, WorkerOptions $options)
     {
         if ($supportsAsyncSignals = $this->supportsAsyncSignals()) {
-            $this->listenForSignals();
+            $this->listenForSignals($connectionName, $queue);
         }
 
         $lastRestart = $this->getTimestampOfLastQueueRestart();
@@ -814,15 +815,19 @@ class Worker
     /**
      * Enable async signals for the process.
      *
+     * @param  string|null  $connectionName
+     * @param  string|null  $queue
      * @return void
      */
-    protected function listenForSignals()
+    protected function listenForSignals($connectionName = null, $queue = null)
     {
         pcntl_async_signals(true);
 
         foreach ([SIGQUIT, SIGTERM, SIGINT] as $signal) {
-            pcntl_signal($signal, function (int $signal) {
+            pcntl_signal($signal, function (int $signal) use ($connectionName, $queue) {
                 $this->shouldQuit = true;
+
+                $this->events->dispatch(new WorkerInterrupted($signal, $connectionName, $queue));
 
                 $this->notifyJobOfSignal($signal);
             });
