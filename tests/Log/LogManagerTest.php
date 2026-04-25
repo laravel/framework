@@ -784,6 +784,14 @@ class LogManagerTest extends TestCase
 
         $this->assertSame($logger1, $logger2);
     }
+
+    public function testSetDefaultDriverAcceptsBackedEnum()
+    {
+        $manager = new LogManager($this->app);
+        $manager->setDefaultDriver(LogChannelName::Single);
+
+        $this->assertSame('single', $this->app['config']['logging.default']);
+    }
 }
 
 class CustomizeFormatter
