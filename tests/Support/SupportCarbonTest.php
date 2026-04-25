@@ -160,8 +160,7 @@ class SupportCarbonTest extends TestCase
 
     public function testClampReturnsSelfWhenWithinRange(): void
     {
-        $carbon = Carbon::parse('2025-06-15');
-        $result = $carbon->clamp(
+        $result = Carbon::parse('2025-06-15')->clamp(
             min: '2020-01-01',
             max: '2030-12-31',
         );
