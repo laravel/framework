@@ -311,6 +311,34 @@ class HttpClientTest extends TestCase
         $this->assertFalse($response->tooManyRequests());
     }
 
+    public function testInternalServerErrorResponse()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', 500),
+            'forge.laravel.com' => $this->factory::response('', 200),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->internalServerError());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->internalServerError());
+    }
+
+    public function testServiceUnavailableResponse()
+    {
+        $this->factory->fake([
+            'vapor.laravel.com' => $this->factory::response('', 503),
+            'forge.laravel.com' => $this->factory::response('', 200),
+        ]);
+
+        $response = $this->factory->post('http://vapor.laravel.com');
+        $this->assertTrue($response->serviceUnavailable());
+
+        $response = $this->factory->post('http://forge.laravel.com');
+        $this->assertFalse($response->serviceUnavailable());
+    }
+
     public function testUnauthorizedRequest()
     {
         $this->factory->fake([
