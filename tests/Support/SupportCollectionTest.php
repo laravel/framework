@@ -2531,6 +2531,27 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testPluckWithEnumKeys($collection)
+    {
+        $data = new $collection([
+            ['status' => TestBackedEnum::A, 'name' => 'foo'],
+            ['status' => TestBackedEnum::B, 'name' => 'bar'],
+        ]);
+        $this->assertEquals([1 => 'foo', 2 => 'bar'], $data->pluck('name', 'status')->all());
+
+        $data = new $collection([
+            ['status' => TestStringBackedEnum::A, 'name' => 'foo'],
+            ['status' => TestStringBackedEnum::B, 'name' => 'bar'],
+        ]);
+        $this->assertEquals(['A' => 'foo', 'B' => 'bar'], $data->pluck('name', 'status')->all());
+
+        $data = new $collection([
+            ['status' => TestEnum::A, 'name' => 'foo'],
+        ]);
+        $this->assertEquals(['A' => 'foo'], $data->pluck('name', 'status')->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testHas($collection)
     {
         $data = new $collection(['id' => 1, 'first' => 'Hello', 'second' => 'World']);

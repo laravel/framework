@@ -691,7 +691,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * Determine if the collection contains a single item.
      *
      * @param  (callable(TValue, TKey): bool)|null  $callback
-     * @return bool
      *
      * @deprecated 12.49.0 Use the `hasSole()` method instead.
      */
@@ -703,7 +702,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Determine if the collection contains multiple items.
      *
-     * @return bool
      *
      * @deprecated 12.50.0 Use the `hasMany()` method instead.
      */
@@ -784,7 +782,9 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
                         ? $key($item)
                         : data_get($item, $key);
 
-                    if (is_object($itemKey) && method_exists($itemKey, '__toString')) {
+                    if ($itemKey instanceof \UnitEnum) {
+                        $itemKey = enum_value($itemKey);
+                    } elseif (is_object($itemKey) && method_exists($itemKey, '__toString')) {
                         $itemKey = (string) $itemKey;
                     }
 
@@ -861,7 +861,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Multiply the items in the collection by the multiplier.
      *
-     * @param  int  $multiplier
      * @return static
      */
     public function multiply(int $multiplier)
@@ -1350,7 +1349,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * @param  (callable(TValue, TKey): bool)|string|null  $key
      * @param  mixed  $operator
      * @param  mixed  $value
-     * @return bool
      */
     public function hasSole($key = null, $operator = null, $value = null): bool
     {
@@ -1619,7 +1617,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Take items in the collection until a given point in time, with an optional callback on timeout.
      *
-     * @param  \DateTimeInterface  $timeout
      * @param  callable(TValue|null, TKey|null): mixed|null  $callback
      * @return static<TKey, TValue>
      */
@@ -1863,7 +1860,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Count the number of items in the collection.
      *
-     * @return int
      */
     public function count(): int
     {

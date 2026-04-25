@@ -1037,6 +1037,29 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['2017-07-25 00:00:00' => '2017-07-30 00:00:00'], $array);
     }
 
+    public function testPluckWithEnumKeys()
+    {
+        $array = [
+            ['status' => TestBackedEnum::A, 'name' => 'foo'],
+            ['status' => TestBackedEnum::B, 'name' => 'bar'],
+        ];
+
+        $this->assertEquals([1 => 'foo', 2 => 'bar'], Arr::pluck($array, 'name', 'status'));
+
+        $array = [
+            ['status' => TestStringBackedEnum::A, 'name' => 'foo'],
+            ['status' => TestStringBackedEnum::B, 'name' => 'bar'],
+        ];
+
+        $this->assertEquals(['A' => 'foo', 'B' => 'bar'], Arr::pluck($array, 'name', 'status'));
+
+        $array = [
+            ['status' => TestEnum::A, 'name' => 'foo'],
+        ];
+
+        $this->assertEquals(['A' => 'foo'], Arr::pluck($array, 'name', 'status'));
+    }
+
     public function testArrayPluckWithArrayAndObjectValues()
     {
         $array = [(object) ['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']];
