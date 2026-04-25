@@ -310,7 +310,7 @@ class Number
      */
     public static function clamp(int|float $number, int|float $min, int|float $max)
     {
-        return min(max($number, $min), $max);
+        return clamp($number, $min, $max);
     }
 
     /**
