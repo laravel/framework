@@ -208,7 +208,6 @@ class SupportCarbonTest extends TestCase
         );
 
         $this->assertCarbonIs($result, '2025-06-15');
-
     }
 
     public function testClampWorksWithCarbonInstances(): void
