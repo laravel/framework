@@ -1043,20 +1043,17 @@ class SupportArrTest extends TestCase
             ['status' => TestBackedEnum::A, 'name' => 'foo'],
             ['status' => TestBackedEnum::B, 'name' => 'bar'],
         ];
-
         $this->assertEquals([1 => 'foo', 2 => 'bar'], Arr::pluck($array, 'name', 'status'));
 
         $array = [
             ['status' => TestStringBackedEnum::A, 'name' => 'foo'],
             ['status' => TestStringBackedEnum::B, 'name' => 'bar'],
         ];
-
         $this->assertEquals(['A' => 'foo', 'B' => 'bar'], Arr::pluck($array, 'name', 'status'));
 
         $array = [
             ['status' => TestEnum::A, 'name' => 'foo'],
         ];
-
         $this->assertEquals(['A' => 'foo'], Arr::pluck($array, 'name', 'status'));
     }
 
@@ -1736,8 +1733,7 @@ class SupportArrTest extends TestCase
         $this->assertSame($subject, Arr::from($items));
 
         $items = new WeakMap;
-        $items[$temp = new class
-        {
+        $items[$temp = new class {
         }] = 'bar';
         $this->assertSame(['bar'], Arr::from($items));
 
