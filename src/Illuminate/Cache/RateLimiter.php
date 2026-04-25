@@ -120,7 +120,7 @@ class RateLimiter
     /**
      * Determine if the given key has been "accessed" too many times.
      *
-     * @param  string  $key
+     * @param  \UnitEnum|string  $key
      * @param  int  $maxAttempts
      * @return bool
      */
@@ -152,7 +152,7 @@ class RateLimiter
     /**
      * Increment the counter for a given key for a given decay time by a given amount.
      *
-     * @param  string  $key
+     * @param  \UnitEnum|string  $key
      * @param  \DateTimeInterface|\DateInterval|int  $decaySeconds
      * @param  int  $amount
      * @return int
@@ -196,7 +196,7 @@ class RateLimiter
     /**
      * Get the number of attempts for the given key.
      *
-     * @param  string  $key
+     * @param  \UnitEnum|string  $key
      * @return mixed
      */
     public function attempts($key)
@@ -209,7 +209,7 @@ class RateLimiter
     /**
      * Reset the number of attempts for the given key.
      *
-     * @param  string  $key
+     * @param  \UnitEnum|string  $key
      * @return bool
      */
     public function resetAttempts($key)
@@ -222,7 +222,7 @@ class RateLimiter
     /**
      * Get the number of retries left for the given key.
      *
-     * @param  string  $key
+     * @param  \UnitEnum|string  $key
      * @param  int  $maxAttempts
      * @return int
      */
@@ -250,7 +250,7 @@ class RateLimiter
     /**
      * Clear the hits and lockout timer for the given key.
      *
-     * @param  string  $key
+     * @param  \UnitEnum|string  $key
      * @return void
      */
     public function clear($key)
@@ -265,7 +265,7 @@ class RateLimiter
     /**
      * Get the number of seconds until the "key" is accessible again.
      *
-     * @param  string  $key
+     * @param  \UnitEnum|string  $key
      * @return int
      */
     public function availableIn($key)
@@ -278,11 +278,13 @@ class RateLimiter
     /**
      * Clean the rate limiter key from unicode characters.
      *
-     * @param  string  $key
+     * @param  \UnitEnum|string  $key
      * @return string
      */
     public function cleanRateLimiterKey($key)
     {
+        $key = (string) enum_value($key);
+
         return preg_replace('/&([a-z])[a-z]+;/i', '$1', htmlentities($key));
     }
 

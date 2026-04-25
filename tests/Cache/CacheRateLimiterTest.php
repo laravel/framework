@@ -228,4 +228,41 @@ class CacheRateLimiterTest extends TestCase
 
         $this->assertTrue($rateLimiter->tooManyAttempts($key, 1));
     }
+
+    public function testKeysCanBeEnums()
+    {
+        $cache = m::mock(Cache::class);
+        $rateLimiter = new RateLimiter($cache);
+
+        $this->assertSame('Basic', $rateLimiter->cleanRateLimiterKey(RateLimiterTestEnum::Basic));
+
+        $this->assertSame('backed_key', $rateLimiter->cleanRateLimiterKey(RateLimiterTestBackedEnum::Basic));
+
+        $this->assertSame('john', $rateLimiter->cleanRateLimiterKey(RateLimiterTestBackedEnum::Unicode));
+    }
+
+    public function testHitProperlyHandlesEnumKeys()
+    {
+        $cache = m::mock(Cache::class);
+
+        $cache->shouldReceive('add')->once()->with('backed_key:timer', m::type('int'), 1)->andReturn(true);
+        $cache->shouldReceive('add')->once()->with('backed_key', 0, 1)->andReturn(true);
+        $cache->shouldReceive('increment')->once()->with('backed_key', 1)->andReturn(1);
+        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
+
+        $rateLimiter = new RateLimiter($cache);
+
+        $rateLimiter->hit(RateLimiterTestBackedEnum::Basic, 1);
+    }
+}
+
+enum RateLimiterTestEnum
+{
+    case Basic;
+}
+
+enum RateLimiterTestBackedEnum: string
+{
+    case Basic = 'backed_key';
+    case Unicode = 'jôhn';
 }
