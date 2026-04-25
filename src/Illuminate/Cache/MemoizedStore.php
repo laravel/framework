@@ -106,7 +106,6 @@ class MemoizedStore implements CanFlushLocks, LockProvider, Store
     /**
      * Store multiple items in the cache for a given number of seconds.
      *
-     * @param  array  $values
      * @param  int  $seconds
      * @return bool
      */
@@ -201,8 +200,6 @@ class MemoizedStore implements CanFlushLocks, LockProvider, Store
     /**
      * Flush all locks managed by the store.
      *
-     * @return bool
-     *
      * @throws \BadMethodCallException
      */
     public function flushLocks(): bool
@@ -218,8 +215,6 @@ class MemoizedStore implements CanFlushLocks, LockProvider, Store
 
     /**
      * Determine if the lock store is separate from the cache store.
-     *
-     * @return bool
      */
     public function hasSeparateLockStore(): bool
     {

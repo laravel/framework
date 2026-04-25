@@ -96,8 +96,6 @@ class NullStore extends TaggableStore implements CanFlushLocks, LockProvider
 
     /**
      * Flush all locks managed by the store.
-     *
-     * @return bool
      */
     public function flushLocks(): bool
     {
@@ -106,8 +104,6 @@ class NullStore extends TaggableStore implements CanFlushLocks, LockProvider
 
     /**
      * Determine if the lock store is separate from the cache store.
-     *
-     * @return bool
      */
     public function hasSeparateLockStore(): bool
     {
