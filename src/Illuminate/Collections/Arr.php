@@ -1029,7 +1029,6 @@ class Arr
 
     /**
      * Push an item into an array using "dot" notation.
-     *
      */
     public static function push(ArrayAccess|array &$array, string|int|null $key, mixed ...$values): array
     {

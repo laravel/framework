@@ -1859,7 +1859,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
 
     /**
      * Count the number of items in the collection.
-     *
      */
     public function count(): int
     {
