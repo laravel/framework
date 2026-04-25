@@ -378,10 +378,10 @@ trait ValidatesAttributes
         }
 
         if (isset($parameters[0]) && $parameters[0] === 'ascii') {
-            return preg_match('/\A[a-zA-Z0-9_-]+\z/u', $value) > 0;
+            return preg_match('/\A[a-zA-Z0-9_-]+\z/u', (string) $value) > 0;
         }
 
-        return preg_match('/\A[\pL\pM\pN_-]+\z/u', $value) > 0;
+        return preg_match('/\A[\pL\pM\pN_-]+\z/u', (string) $value) > 0;
     }
 
     /**
@@ -400,10 +400,10 @@ trait ValidatesAttributes
         }
 
         if (isset($parameters[0]) && $parameters[0] === 'ascii') {
-            return preg_match('/\A[a-zA-Z0-9]+\z/u', $value) > 0;
+            return preg_match('/\A[a-zA-Z0-9]+\z/u', (string) $value) > 0;
         }
 
-        return preg_match('/\A[\pL\pM\pN]+\z/u', $value) > 0;
+        return preg_match('/\A[\pL\pM\pN]+\z/u', (string) $value) > 0;
     }
 
     /**
@@ -725,7 +725,7 @@ trait ValidatesAttributes
         $this->requireParameterCount(1, $parameters, 'digits');
 
         return (is_numeric($value) || is_string($value)) &&
-            ! preg_match('/[^0-9]/', $value) &&
+            ! preg_match('/[^0-9]/', (string) $value) &&
             strlen((string) $value) == $parameters[0];
     }
 
@@ -747,7 +747,7 @@ trait ValidatesAttributes
 
         $length = strlen((string) $value);
 
-        return ! preg_match('/[^0-9]/', $value)
+        return ! preg_match('/[^0-9]/', (string) $value)
                     && $length >= $parameters[0] && $length <= $parameters[1];
     }
 
@@ -2099,7 +2099,7 @@ trait ValidatesAttributes
 
         $this->requireParameterCount(1, $parameters, 'regex');
 
-        return preg_match($parameters[0], $value) > 0;
+        return preg_match($parameters[0], (string) $value) > 0;
     }
 
     /**
@@ -2118,7 +2118,7 @@ trait ValidatesAttributes
 
         $this->requireParameterCount(1, $parameters, 'not_regex');
 
-        return preg_match($parameters[0], $value) < 1;
+        return preg_match($parameters[0], (string) $value) < 1;
     }
 
     /**
