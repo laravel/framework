@@ -966,6 +966,23 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertTrue($url3->hasValidSignature($secondRequest));
     }
 
+    public function testSignedUrlWithArrayExpiresReturnsFalse()
+    {
+        $url = new UrlGenerator(
+            new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        // ?expires[]=99999999999 is truthy but comparing timestamp > array is always false,
+        // so without the guard the URL would never appear expired.
+        $request = Request::create('http://www.foo.com/foo?expires[]=99999999999');
+
+        $this->assertFalse($url->signatureHasNotExpired($request));
+    }
+
     public function testMissingNamedRouteResolution()
     {
         $url = new UrlGenerator(
