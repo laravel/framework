@@ -17,6 +17,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use SortDirection;
 
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
@@ -1076,7 +1077,7 @@ class BelongsToMany extends Relation
      */
     public function chunkByIdDesc($count, callable $callback, $column = null, $alias = null)
     {
-        return $this->orderedChunkById($count, $callback, $column, $alias, descending: true);
+        return $this->orderedChunkById($count, $callback, $column, $alias, descending: SortDirection::Descending);
     }
 
     /**
@@ -1106,7 +1107,7 @@ class BelongsToMany extends Relation
      * @param  callable  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
-     * @param  bool  $descending
+     * @param  SortDirection|bool  $descending
      * @return bool
      */
     public function orderedChunkById($count, callable $callback, $column = null, $alias = null, $descending = false)
