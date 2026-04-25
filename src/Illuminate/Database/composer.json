@@ -30,7 +30,8 @@
         "illuminate/support": "^13.0",
         "laravel/serializable-closure": "^2.0.10",
         "symfony/polyfill-php84": "^1.36",
-        "symfony/polyfill-php85": "^1.36"
+        "symfony/polyfill-php85": "^1.36",
+        "symfony/polyfill-php86": "^1.36"
     },
     "suggest": {
         "ext-filter": "Required to use the Postgres database driver.",
