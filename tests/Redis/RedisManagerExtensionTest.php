@@ -87,17 +87,17 @@ class RedisManagerExtensionTest extends TestCase
 
     public function testPurgeAcceptsUnitEnum()
     {
-        $redis = new RedisManager(new Application, "my_custom_driver", [
+        $redis = new RedisManager(new Application, 'my_custom_driver', [
             "default" => [
-                "host" => "some-host",
-                "port" => "some-port",
-                "database" => 5,
-                "timeout" => 0.5,
+                'host' => 'some-host',
+                'port' => 'some-port',
+                'database' => 5,
+                'timeout' => 0.5,
             ],
         ]);
 
-        $property = new \ReflectionProperty($redis, "connections");
-        $property->setValue($redis, ["default" => "fake-connection"]);
+        $property = new \ReflectionProperty($redis, 'connections');
+        $property->setValue($redis, ["default" => 'fake-connection']);
 
         $this->assertCount(1, $redis->connections());
 
