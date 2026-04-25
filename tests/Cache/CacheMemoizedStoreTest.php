@@ -7,7 +7,9 @@ use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\MemoizedStore;
 use Illuminate\Cache\NullStore;
 use Illuminate\Cache\Repository;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Carbon;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class CacheMemoizedStoreTest extends TestCase
@@ -36,63 +38,13 @@ class CacheMemoizedStoreTest extends TestCase
     {
         $this->expectException(BadMethodCallException::class);
 
-        $stub = new class implements \Illuminate\Contracts\Cache\LockProvider, \Illuminate\Contracts\Cache\Store
-        {
-            public function get($key)
-            {
-            return null;
-            }
-            public function many(array $keys)
-            {
-            return [];
-            }
-            public function put($key, $value, $seconds)
-            {
-            return true;
-            }
-            public function putMany(array $values, $seconds)
-            {
-            return true;
-            }
-            public function increment($key, $value = 1)
-            {
-            return false;
-            }
-            public function decrement($key, $value = 1)
-            {
-            return false;
-            }
-            public function forever($key, $value)
-            {
-            return true;
-            }
-            public function forget($key)
-            {
-            return true;
-            }
-            public function flush()
-            {
-            return true;
-            }
-            public function touch($key, $seconds)
-            {
-            return true;
-            }
-            public function getPrefix()
-            {
-            return '';
-            }
-            public function lock($name, $seconds = 0, $owner = null)
-            {
-            return new \Illuminate\Cache\NoLock($name, $seconds, $owner);
-            }
-            public function restoreLock($name, $owner)
-            {
-            return $this->lock($name, 0, $owner);
-            }
-        };
-
+        $stub = m::mock(Store::class);
         (new MemoizedStore('test', new Repository($stub)))->flushLocks();
+    }
+
+    protected function tearDown(): void
+    {
+        m::close();
     }
 
     public function testHasSeparateLockStoreDelegatestoUnderlyingStore(): void
