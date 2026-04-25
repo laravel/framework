@@ -96,7 +96,7 @@ class RateLimiter
     /**
      * Attempts to execute a callback if it's not limited.
      *
-     * @param  string  $key
+     * @param  \UnitEnum|string  $key
      * @param  int  $maxAttempts
      * @param  \Closure  $callback
      * @param  \DateTimeInterface|\DateInterval|int  $decaySeconds
@@ -140,7 +140,7 @@ class RateLimiter
     /**
      * Increment (by 1) the counter for a given key for a given decay time.
      *
-     * @param  string  $key
+     * @param  \UnitEnum|string  $key
      * @param  \DateTimeInterface|\DateInterval|int  $decaySeconds
      * @return int
      */
@@ -183,7 +183,7 @@ class RateLimiter
     /**
      * Decrement the counter for a given key for a given decay time by a given amount.
      *
-     * @param  string  $key
+     * @param  \UnitEnum|string  $key
      * @param  \DateTimeInterface|\DateInterval|int  $decaySeconds
      * @param  int  $amount
      * @return int
@@ -238,7 +238,7 @@ class RateLimiter
     /**
      * Get the number of retries left for the given key.
      *
-     * @param  string  $key
+     * @param  \UnitEnum|string  $key
      * @param  int  $maxAttempts
      * @return int
      */
