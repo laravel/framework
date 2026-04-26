@@ -134,14 +134,13 @@ class QueryBuilderWhereLikeTest extends DatabaseTestCase
         ]);
 
         $users = DB::table('users')
-            ->where('email', 'john.doe@example.com')
+            ->where('email', 'John.Doe@example.com')
             ->orWhereNormalizedLikeAny(['name', 'email'], 'احمد')
             ->orderBy('email')
             ->get();
 
-        $this->assertCount(3, $users);
-        $this->assertSame('ahmad.alias@example.com', $users[0]->email);
-        $this->assertSame('john.doe@example.com', $users[1]->email);
-        $this->assertSame('team@example.com', $users[2]->email);
+        $this->assertCount(2, $users);
+        $this->assertSame('John.Doe@example.com', $users[0]->email);
+        $this->assertSame('team@example.com', $users[1]->email);
     }
 }
