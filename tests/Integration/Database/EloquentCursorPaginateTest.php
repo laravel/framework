@@ -7,6 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Pagination\Cursor;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use SortDirection;
 
 class EloquentCursorPaginateTest extends DatabaseTestCase
 {
@@ -196,7 +197,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $result = $table1->toBase()
             ->union($table2->toBase())
             ->union($table3->toBase())
-            ->orderBy('id', 'asc')
+            ->orderBy('id', SortDirection::Ascending)
             ->cursorPaginate(1, $columns, $cursorName, $cursor);
 
         $this->assertSame(['id'], $result->getOptions()['parameters']);
@@ -226,7 +227,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
 
         $result = $table1->toBase()
             ->union($table2->toBase())
-            ->orderBy('alias', 'asc')
+            ->orderBy('alias', SortDirection::Ascending)
             ->cursorPaginate(1, $columns, $cursorName, $cursor);
 
         $this->assertSame(['alias'], $result->getOptions()['parameters']);

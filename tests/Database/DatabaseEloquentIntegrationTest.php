@@ -29,6 +29,7 @@ use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\Fixtures\Post;
 use Illuminate\Tests\Integration\Database\Fixtures\User;
 use PHPUnit\Framework\TestCase;
+use SortDirection;
 
 class DatabaseEloquentIntegrationTest extends TestCase
 {
@@ -719,7 +720,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $chunks = 0;
 
-        EloquentTestUser::query()->orderBy('id', 'asc')->chunk(2, function (Collection $users, $page) use (&$chunks) {
+        EloquentTestUser::query()->orderBy('id', SortDirection::Ascending)->chunk(2, function (Collection $users, $page) use (&$chunks) {
             if ($page == 1) {
                 $this->assertCount(2, $users);
                 $this->assertSame('First', $users[0]->name);
@@ -745,7 +746,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $chunks = 0;
 
-        EloquentTestUser::query()->orderBy('id', 'asc')->limit(2)->chunk(2, function (Collection $users, $page) use (&$chunks) {
+        EloquentTestUser::query()->orderBy('id', SortDirection::Ascending)->limit(2)->chunk(2, function (Collection $users, $page) use (&$chunks) {
             if ($page == 1) {
                 $this->assertCount(2, $users);
                 $this->assertSame('First', $users[0]->name);
@@ -770,7 +771,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $chunks = 0;
 
-        EloquentTestUser::query()->orderBy('id', 'asc')->limit(10)->chunk(2, function (Collection $users, $page) use (&$chunks) {
+        EloquentTestUser::query()->orderBy('id', SortDirection::Ascending)->limit(10)->chunk(2, function (Collection $users, $page) use (&$chunks) {
             if ($page == 1) {
                 $this->assertCount(2, $users);
                 $this->assertSame('First', $users[0]->name);
@@ -798,7 +799,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $chunks = 0;
 
-        EloquentTestUser::query()->orderBy('id', 'asc')->offset(1)->chunk(2, function (Collection $users, $page) use (&$chunks) {
+        EloquentTestUser::query()->orderBy('id', SortDirection::Ascending)->offset(1)->chunk(2, function (Collection $users, $page) use (&$chunks) {
             if ($page == 1) {
                 $this->assertCount(2, $users);
                 $this->assertSame('Second', $users[0]->name);
@@ -823,7 +824,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $chunks = 0;
 
-        EloquentTestUser::query()->orderBy('id', 'asc')->offset(3)->chunk(2, function () use (&$chunks) {
+        EloquentTestUser::query()->orderBy('id', SortDirection::Ascending)->offset(3)->chunk(2, function () use (&$chunks) {
             $chunks++;
         });
 
@@ -844,7 +845,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $chunks = 0;
 
-        EloquentTestUser::query()->orderBy('id', 'asc')->offset(2)->limit(3)->chunk(2, function (Collection $users, $page) use (&$chunks) {
+        EloquentTestUser::query()->orderBy('id', SortDirection::Ascending)->offset(2)->limit(3)->chunk(2, function (Collection $users, $page) use (&$chunks) {
             if ($page == 1) {
                 $this->assertCount(2, $users);
                 $this->assertSame('Third', $users[0]->name);

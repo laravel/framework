@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
+use SortDirection;
 
 class EloquentBelongsToManyTest extends DatabaseTestCase
 {
@@ -1363,10 +1364,10 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             ['post_id' => $post->id, 'tag_id' => $tag4->id, 'flag' => 'foo2'],
         ]);
 
-        $relationTag1 = $post->tagsWithCustomExtraPivot()->orderByPivot('flag', 'asc')->first();
+        $relationTag1 = $post->tagsWithCustomExtraPivot()->orderByPivot('flag', SortDirection::Ascending)->first();
         $this->assertEquals($relationTag1->getAttributes(), $tag2->getAttributes());
 
-        $relationTag2 = $post->tagsWithCustomExtraPivot()->orderByPivot('flag', 'desc')->first();
+        $relationTag2 = $post->tagsWithCustomExtraPivot()->orderByPivot('flag', SortDirection::Descending)->first();
         $this->assertEquals($relationTag2->getAttributes(), $tag3->getAttributes());
     }
 
