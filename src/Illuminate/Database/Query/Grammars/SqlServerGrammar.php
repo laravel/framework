@@ -158,6 +158,25 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the given expression with Arabic normalization replacements.
+     *
+     * SQL Server requires Unicode string literals to be prefixed with "N" or
+     * the Arabic replacement characters will be coerced through the connection
+     * code page and the normalization chain becomes ineffective.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileNormalizedExpression($expression)
+    {
+        foreach ($this->normalizedLikeReplacements() as [$from, $to]) {
+            $expression = "REPLACE($expression, N'$from', N'$to')";
+        }
+
+        return $expression;
+    }
+
+    /**
      * Compile a "where date" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

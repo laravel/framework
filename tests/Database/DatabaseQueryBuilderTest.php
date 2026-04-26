@@ -952,6 +952,15 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => '%احمد%'], $builder->getBindings());
     }
 
+    public function testWhereNormalizedLikeClauseSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereNormalizedLike('name', 'أحمد');
+
+        $this->assertSame('select * from [users] where REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE([name], N\'أ\', N\'ا\'), N\'إ\', N\'ا\'), N\'آ\', N\'ا\'), N\'ٱ\', N\'ا\'), N\'ى\', N\'ي\'), N\'ئ\', N\'ي\'), N\'ة\', N\'ه\'), N\'ؤ\', N\'و\'), N\'ّ\', N\'\'), N\'َ\', N\'\'), N\'ِ\', N\'\'), N\'ُ\', N\'\'), N\'ْ\', N\'\'), N\'ً\', N\'\'), N\'ٍ\', N\'\'), N\'ٌ\', N\'\'), N\'ـ\', N\'\') like ?', $builder->toSql());
+        $this->assertEquals([0 => '%احمد%'], $builder->getBindings());
+    }
+
     public function testWhereNormalizedLikeAnyClauseSqlite()
     {
         $builder = $this->getSQLiteBuilder();
