@@ -130,21 +130,22 @@ class QueryBuilderWhereLikeTest extends DatabaseTestCase
     public function testOrWhereNormalizedLikeAny()
     {
         DB::table('users')->insert([
-            ['name' => 'أحمد علي', 'email' => 'team@example.com'],
-            ['name' => 'محمد', 'email' => 'ahmad.alias@example.com'],
-            ['name' => 'سارة', 'email' => 'sara@example.com'],
-        ]);
+        ['name' => 'John Doe',  'email' => 'John.Doe@example.com'],
+        ['name' => 'أحمد علي', 'email' => 'team@example.com'],
+        ['name' => 'محمد',     'email' => 'ahmad.alias@example.com'],
+        ['name' => 'سارة',     'email' => 'sara@example.com'],
+    ]);
 
-        $users = DB::table('users')
-            ->where('email', 'John.Doe@example.com')
-            ->orWhereNormalizedLikeAny(['name', 'email'], 'احمد')
-            ->orderBy('email')
-            ->get();
+    $users = DB::table('users')
+        ->where('email', 'John.Doe@example.com')
+        ->orWhereNormalizedLikeAny(['name', 'email'], 'احمد')
+        ->orderBy('email')
+        ->get();
 
-        $this->assertCount(2, $users);
-        $this->assertEqualsCanonicalizing([
-            'John.Doe@example.com',
-            'team@example.com',
-        ], $users->pluck('email')->all());
+    $this->assertCount(2, $users);
+    $this->assertEqualsCanonicalizing([
+        'John.Doe@example.com',
+        'team@example.com',
+    ], $users->pluck('email')->all());
     }
 }
