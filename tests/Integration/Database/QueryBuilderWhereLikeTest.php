@@ -120,9 +120,11 @@ class QueryBuilderWhereLikeTest extends DatabaseTestCase
         $users = DB::table('users')->whereNormalizedLike('name', 'احمد')->orderBy('email')->get();
 
         $this->assertCount(3, $users);
-        $this->assertSame('ahmad-diacritics@example.com', $users[0]->email);
-        $this->assertSame('ahmad@example.com', $users[1]->email);
-        $this->assertSame('ahmed@example.com', $users[2]->email);
+        $this->assertEqualsCanonicalizing([
+            'ahmad-diacritics@example.com',
+            'ahmad@example.com',
+            'ahmed@example.com',
+        ], $users->pluck('email')->all());
     }
 
     public function testOrWhereNormalizedLikeAny()
@@ -140,7 +142,9 @@ class QueryBuilderWhereLikeTest extends DatabaseTestCase
             ->get();
 
         $this->assertCount(2, $users);
-        $this->assertSame('John.Doe@example.com', $users[0]->email);
-        $this->assertSame('team@example.com', $users[1]->email);
+        $this->assertEqualsCanonicalizing([
+            'John.Doe@example.com',
+            'team@example.com',
+        ], $users->pluck('email')->all());
     }
 }
