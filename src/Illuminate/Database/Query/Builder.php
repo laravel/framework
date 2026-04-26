@@ -1344,6 +1344,72 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where normalized like" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNormalizedLike($column, $value, $boolean = 'and')
+    {
+        $type = 'NormalizedLike';
+
+        if (method_exists($this->grammar, 'prepareWhereNormalizedLikeBinding')) {
+            $value = $this->grammar->prepareWhereNormalizedLikeBinding($value);
+        }
+
+        $this->wheres[] = compact('type', 'column', 'value', 'boolean');
+
+        $this->addBinding($value);
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where normalized like" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string  $value
+     * @return $this
+     */
+    public function orWhereNormalizedLike($column, $value)
+    {
+        return $this->whereNormalizedLike($column, $value, 'or');
+    }
+
+    /**
+     * Add a "where normalized like" clause to the query for multiple columns with "or" conditions between them.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  string  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNormalizedLikeAny($columns, $value, $boolean = 'and')
+    {
+        $this->whereNested(function ($query) use ($columns, $value) {
+            foreach ($columns as $column) {
+                $query->whereNormalizedLike($column, $value, 'or');
+            }
+        }, $boolean);
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where normalized like" clause to the query for multiple columns with "or" conditions between them.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
+     * @param  string  $value
+     * @return $this
+     */
+    public function orWhereNormalizedLikeAny($columns, $value)
+    {
+        return $this->whereNormalizedLikeAny($columns, $value, 'or');
+    }
+
+    /**
      * Add a "where not like" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column

@@ -100,6 +100,29 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a "where normalized like" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereNormalizedLike(Builder $query, $where)
+    {
+        return $this->compileWhereNormalizedLike($where['column']).' ilike '.$this->parameter($where['value']);
+    }
+
+    /**
+     * Compile the normalized column expression for a like clause.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @return string
+     */
+    protected function compileWhereNormalizedLike($column)
+    {
+        return $this->compileNormalizedExpression($this->wrap($column).'::text');
+    }
+
+    /**
      * Compile a "where date" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

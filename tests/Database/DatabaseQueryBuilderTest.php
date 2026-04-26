@@ -934,6 +934,33 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => '1'], $builder->getBindings());
     }
 
+    public function testWhereNormalizedLikeClausePostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereNormalizedLike('name', 'أحمد');
+
+        $this->assertSame('select * from "users" where REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE("name"::text, \'أ\', \'ا\'), \'إ\', \'ا\'), \'آ\', \'ا\'), \'ٱ\', \'ا\'), \'ى\', \'ي\'), \'ئ\', \'ي\'), \'ة\', \'ه\'), \'ؤ\', \'و\'), \'ّ\', \'\'), \'َ\', \'\'), \'ِ\', \'\'), \'ُ\', \'\'), \'ْ\', \'\'), \'ً\', \'\'), \'ٍ\', \'\'), \'ٌ\', \'\'), \'ـ\', \'\') ilike ?', $builder->toSql());
+        $this->assertEquals([0 => '%احمد%'], $builder->getBindings());
+    }
+
+    public function testWhereNormalizedLikeClauseMysql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereNormalizedLike('name', 'أحمد');
+
+        $this->assertSame('select * from `users` where REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(`name`, \'أ\', \'ا\'), \'إ\', \'ا\'), \'آ\', \'ا\'), \'ٱ\', \'ا\'), \'ى\', \'ي\'), \'ئ\', \'ي\'), \'ة\', \'ه\'), \'ؤ\', \'و\'), \'ّ\', \'\'), \'َ\', \'\'), \'ِ\', \'\'), \'ُ\', \'\'), \'ْ\', \'\'), \'ً\', \'\'), \'ٍ\', \'\'), \'ٌ\', \'\'), \'ـ\', \'\') like ?', $builder->toSql());
+        $this->assertEquals([0 => '%احمد%'], $builder->getBindings());
+    }
+
+    public function testWhereNormalizedLikeAnyClauseSqlite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->where('active', 1)->orWhereNormalizedLikeAny(['first_name', 'last_name'], 'أحمد');
+
+        $this->assertSame('select * from "users" where "active" = ? or (REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE("first_name", \'أ\', \'ا\'), \'إ\', \'ا\'), \'آ\', \'ا\'), \'ٱ\', \'ا\'), \'ى\', \'ي\'), \'ئ\', \'ي\'), \'ة\', \'ه\'), \'ؤ\', \'و\'), \'ّ\', \'\'), \'َ\', \'\'), \'ِ\', \'\'), \'ُ\', \'\'), \'ْ\', \'\'), \'ً\', \'\'), \'ٍ\', \'\'), \'ٌ\', \'\'), \'ـ\', \'\') like ? or REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE("last_name", \'أ\', \'ا\'), \'إ\', \'ا\'), \'آ\', \'ا\'), \'ٱ\', \'ا\'), \'ى\', \'ي\'), \'ئ\', \'ي\'), \'ة\', \'ه\'), \'ؤ\', \'و\'), \'ّ\', \'\'), \'َ\', \'\'), \'ِ\', \'\'), \'ُ\', \'\'), \'ْ\', \'\'), \'ً\', \'\'), \'ٍ\', \'\'), \'ٌ\', \'\'), \'ـ\', \'\') like ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '%احمد%', 2 => '%احمد%'], $builder->getBindings());
+    }
+
     public function testWhereDateSqlite()
     {
         $builder = $this->getSQLiteBuilder();

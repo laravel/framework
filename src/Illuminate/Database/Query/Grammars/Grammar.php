@@ -344,6 +344,98 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "where normalized like" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereNormalizedLike(Builder $query, $where)
+    {
+        return $this->compileWhereNormalizedLike($where['column']).' like '.$this->parameter($where['value']);
+    }
+
+    /**
+     * Prepare the binding for a normalized like clause.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function prepareWhereNormalizedLikeBinding($value)
+    {
+        return '%'.$this->normalizeLikeValue($value).'%';
+    }
+
+    /**
+     * Compile the normalized column expression for a like clause.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @return string
+     */
+    protected function compileWhereNormalizedLike($column)
+    {
+        return $this->compileNormalizedExpression($this->wrap($column));
+    }
+
+    /**
+     * Compile the given expression with Arabic normalization replacements.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileNormalizedExpression($expression)
+    {
+        foreach ($this->normalizedLikeReplacements() as [$from, $to]) {
+            $expression = "REPLACE($expression, '$from', '$to')";
+        }
+
+        return $expression;
+    }
+
+    /**
+     * Normalize the given value for Arabic like comparisons.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function normalizeLikeValue($value)
+    {
+        return str_replace(
+            array_column($this->normalizedLikeReplacements(), 0),
+            array_column($this->normalizedLikeReplacements(), 1),
+            $value,
+        );
+    }
+
+    /**
+     * Get the replacement pairs used for Arabic normalization.
+     *
+     * @return list<array{string, string}>
+     */
+    protected function normalizedLikeReplacements()
+    {
+        return [
+            ['أ', 'ا'],
+            ['إ', 'ا'],
+            ['آ', 'ا'],
+            ['ٱ', 'ا'],
+            ['ى', 'ي'],
+            ['ئ', 'ي'],
+            ['ة', 'ه'],
+            ['ؤ', 'و'],
+            ['ّ', ''],
+            ['َ', ''],
+            ['ِ', ''],
+            ['ُ', ''],
+            ['ْ', ''],
+            ['ً', ''],
+            ['ٍ', ''],
+            ['ٌ', ''],
+            ['ـ', ''],
+        ];
+    }
+
+    /**
      * Compile a "where null safe equals" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

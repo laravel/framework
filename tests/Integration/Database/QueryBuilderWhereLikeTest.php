@@ -107,4 +107,41 @@ class QueryBuilderWhereLikeTest extends DatabaseTestCase
         $this->assertSame('Earl.Smith@example.com', $users[0]->email);
         $this->assertSame('tim.smith@example.com', $users[1]->email);
     }
+
+    public function testWhereNormalizedLike()
+    {
+        DB::table('users')->insert([
+            ['name' => 'أحمد', 'email' => 'ahmad@example.com'],
+            ['name' => 'احمد', 'email' => 'ahmed@example.com'],
+            ['name' => 'أَحْمَد', 'email' => 'ahmad-diacritics@example.com'],
+            ['name' => 'محمد', 'email' => 'mohamed@example.com'],
+        ]);
+
+        $users = DB::table('users')->whereNormalizedLike('name', 'احمد')->orderBy('email')->get();
+
+        $this->assertCount(3, $users);
+        $this->assertSame('ahmad-diacritics@example.com', $users[0]->email);
+        $this->assertSame('ahmad@example.com', $users[1]->email);
+        $this->assertSame('ahmed@example.com', $users[2]->email);
+    }
+
+    public function testOrWhereNormalizedLikeAny()
+    {
+        DB::table('users')->insert([
+            ['name' => 'أحمد علي', 'email' => 'team@example.com'],
+            ['name' => 'محمد', 'email' => 'ahmad.alias@example.com'],
+            ['name' => 'سارة', 'email' => 'sara@example.com'],
+        ]);
+
+        $users = DB::table('users')
+            ->where('email', 'john.doe@example.com')
+            ->orWhereNormalizedLikeAny(['name', 'email'], 'احمد')
+            ->orderBy('email')
+            ->get();
+
+        $this->assertCount(3, $users);
+        $this->assertSame('ahmad.alias@example.com', $users[0]->email);
+        $this->assertSame('john.doe@example.com', $users[1]->email);
+        $this->assertSame('team@example.com', $users[2]->email);
+    }
 }
