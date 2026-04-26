@@ -121,6 +121,7 @@ class Cloud
     {
         if ((int) ($_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES'] ?? 0) === 1) {
             Worker::$restartable = false;
+            Worker::$pausable = false;
 
             $app['config']->set(
                 'queue.connections.sqs.credentials',
