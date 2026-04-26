@@ -464,7 +464,10 @@ trait BuildsQueries
 
                     $secondBuilder->where(
                         Str::contains($originalColumn, ['(', ')']) ? new Expression($originalColumn) : $originalColumn,
-                        $direction === 'asc' ? '>' : '<',
+                        match ($direction) {
+                            'asc' => '>',
+                            'desc' => '<',
+                        },
                         $cursor->parameter($column)
                     );
 
@@ -481,7 +484,10 @@ trait BuildsQueries
                         $unionBuilder->where(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions, $originalColumn, $unionWheres) {
                             $unionBuilder->where(
                                 $originalColumn,
-                                $direction === 'asc' ? '>' : '<',
+                                match ($direction) {
+                                    'asc' => '>',
+                                    'desc' => '<',
+                                },
                                 $cursor->parameter($column)
                             );
 

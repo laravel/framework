@@ -3672,7 +3672,10 @@ class Builder implements BuilderContract
                 return $order;
             }
 
-            $order['direction'] = $order['direction'] === 'asc' ? 'desc' : 'asc';
+            $order['direction'] = match ($order['direction']) {
+                'asc' => 'desc',
+                'desc' => 'asc',
+            };
 
             return $order;
         };
