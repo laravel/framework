@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Migrations;
 
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use SortDirection;
 
 class DatabaseMigrationRepository implements MigrationRepositoryInterface
 {
@@ -47,8 +48,8 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     public function getRan()
     {
         return $this->table()
-            ->orderBy('batch', 'asc')
-            ->orderBy('migration', 'asc')
+            ->orderBy('batch', SortDirection::Ascending)
+            ->orderBy('migration', SortDirection::Ascending)
             ->pluck('migration')->all();
     }
 
@@ -62,8 +63,8 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     {
         $query = $this->table()->where('batch', '>=', '1');
 
-        return $query->orderBy('batch', 'desc')
-            ->orderBy('migration', 'desc')
+        return $query->orderBy('batch', SortDirection::Descending)
+            ->orderBy('migration', SortDirection::Descending)
             ->limit($steps)
             ->get()
             ->all();
@@ -79,7 +80,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     {
         return $this->table()
             ->where('batch', $batch)
-            ->orderBy('migration', 'desc')
+            ->orderBy('migration', SortDirection::Descending)
             ->get()
             ->all();
     }
@@ -93,7 +94,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     {
         $query = $this->table()->where('batch', $this->getLastBatchNumber());
 
-        return $query->orderBy('migration', 'desc')->get()->all();
+        return $query->orderBy('migration', SortDirection::Descending)->get()->all();
     }
 
     /**
@@ -104,8 +105,8 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     public function getMigrationBatches()
     {
         return $this->table()
-            ->orderBy('batch', 'asc')
-            ->orderBy('migration', 'asc')
+            ->orderBy('batch', SortDirection::Ascending)
+            ->orderBy('migration', SortDirection::Ascending)
             ->pluck('batch', 'migration')->all();
     }
 

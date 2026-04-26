@@ -9,6 +9,7 @@ use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 use Illuminate\Support\Collection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use SortDirection;
 use stdClass;
 
 class DatabaseMigrationRepositoryTest extends TestCase
@@ -20,8 +21,8 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $connectionMock = m::mock(Connection::class);
         $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
         $repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
-        $query->shouldReceive('orderBy')->once()->with('batch', 'asc')->andReturn($query);
-        $query->shouldReceive('orderBy')->once()->with('migration', 'asc')->andReturn($query);
+        $query->shouldReceive('orderBy')->once()->with('batch', SortDirection::Ascending)->andReturn($query);
+        $query->shouldReceive('orderBy')->once()->with('migration', SortDirection::Ascending)->andReturn($query);
         $query->shouldReceive('pluck')->once()->with('migration')->andReturn(new Collection(['bar']));
         $query->shouldReceive('useWritePdo')->once()->andReturn($query);
 
@@ -39,7 +40,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
         $repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
         $query->shouldReceive('where')->once()->with('batch', 1)->andReturn($query);
-        $query->shouldReceive('orderBy')->once()->with('migration', 'desc')->andReturn($query);
+        $query->shouldReceive('orderBy')->once()->with('migration', SortDirection::Descending)->andReturn($query);
         $query->shouldReceive('get')->once()->andReturn(new Collection(['foo']));
         $query->shouldReceive('useWritePdo')->once()->andReturn($query);
 
