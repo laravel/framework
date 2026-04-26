@@ -1,6 +1,10 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.57.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.58.0...12.x)
+
+## [v12.58.0](https://github.com/laravel/framework/compare/v12.57.0...v12.58.0) - 2026-04-26
+
+* [12.x] Memoize credentials in SqsConnector by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/59867
 
 ## [v12.57.0](https://github.com/laravel/framework/compare/v12.56.0...v12.57.0) - 2026-04-22
 
