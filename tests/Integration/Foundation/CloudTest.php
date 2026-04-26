@@ -69,6 +69,21 @@ class CloudTest extends TestCase
         }
     }
 
+    public function test_it_disables_queue_pause_polling_for_managed_queues()
+    {
+        Worker::$pausable = true;
+        $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES'] = '1';
+
+        try {
+            Cloud::configureManagedQueues($this->app);
+
+            $this->assertFalse(Worker::$pausable);
+        } finally {
+            unset($_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES']);
+            Worker::$pausable = true;
+        }
+    }
+
     #[WithConfig('queue.connections.sqs', ['driver' => 'sqs', 'region' => 'us-east-1', 'queue' => 'default'])]
     public function test_it_configures_managed_queue_credentials()
     {
