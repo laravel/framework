@@ -29,6 +29,7 @@ use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
+use SortDirection;
 use UnitEnum;
 
 use function Illuminate\Support\enum_value;
@@ -2962,12 +2963,12 @@ class Builder implements BuilderContract
      * Add an "order by" clause to the query.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  string  $direction
+     * @param  SortDirection|'asc'|'desc'  $direction
      * @return $this
      *
      * @throws \InvalidArgumentException
      */
-    public function orderBy($column, $direction = 'asc')
+    public function orderBy($column, $direction = SortDirection::Ascending)
     {
         if ($this->isQueryable($column)) {
             [$query, $bindings] = $this->createSub($column);
@@ -2977,11 +2978,15 @@ class Builder implements BuilderContract
             $this->addBinding($bindings, $this->unions ? 'unionOrder' : 'order');
         }
 
-        $direction = strtolower($direction);
-
-        if (! in_array($direction, ['asc', 'desc'], true)) {
-            throw new InvalidArgumentException('Order direction must be "asc" or "desc".');
-        }
+        $direction = match (true) {
+            $direction instanceof SortDirection => match ($direction) {
+                SortDirection::Ascending => 'asc',
+                SortDirection::Descending => 'desc',
+            },
+            strtolower($direction) === 'asc' => 'asc',
+            strtolower($direction) === 'desc' => 'desc',
+            default => throw new InvalidArgumentException('Order direction must be a SortDirection, "asc" or "desc".'),
+        };
 
         $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
             'column' => $column,
@@ -2999,7 +3004,7 @@ class Builder implements BuilderContract
      */
     public function orderByDesc($column)
     {
-        return $this->orderBy($column, 'desc');
+        return $this->orderBy($column, SortDirection::Descending);
     }
 
     /**
@@ -3010,7 +3015,7 @@ class Builder implements BuilderContract
      */
     public function latest($column = 'created_at')
     {
-        return $this->orderBy($column, 'desc');
+        return $this->orderBy($column, SortDirection::Descending);
     }
 
     /**
@@ -3021,7 +3026,7 @@ class Builder implements BuilderContract
      */
     public function oldest($column = 'created_at')
     {
-        return $this->orderBy($column, 'asc');
+        return $this->orderBy($column, SortDirection::Ascending);
     }
 
     /**
@@ -3216,7 +3221,7 @@ class Builder implements BuilderContract
             $this->where($column, '<', $lastId);
         }
 
-        return $this->orderBy($column, 'desc')
+        return $this->orderBy($column, SortDirection::Descending)
             ->limit($perPage);
     }
 
@@ -3238,7 +3243,7 @@ class Builder implements BuilderContract
             $this->where($column, '>', $lastId);
         }
 
-        return $this->orderBy($column, 'asc')
+        return $this->orderBy($column, SortDirection::Ascending)
             ->limit($perPage);
     }
 
@@ -3246,10 +3251,10 @@ class Builder implements BuilderContract
      * Remove all existing orders and optionally add a new order.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string|null  $column
-     * @param  string  $direction
+     * @param  SortDirection|'asc'|'desc'  $direction
      * @return $this
      */
-    public function reorder($column = null, $direction = 'asc')
+    public function reorder($column = null, $direction = SortDirection::Ascending)
     {
         $this->orders = null;
         $this->unionOrders = null;
@@ -3271,7 +3276,7 @@ class Builder implements BuilderContract
      */
     public function reorderDesc($column)
     {
-        return $this->reorder($column, 'desc');
+        return $this->reorder($column, SortDirection::Descending);
     }
 
     /**

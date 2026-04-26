@@ -9,6 +9,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Mockery\Adapter\Phpunit\MockeryTestCase as TestCase;
 use Mockery as m;
+use SortDirection;
 use stdClass;
 
 class DatabaseEloquentMorphToManyTest extends TestCase
@@ -90,7 +91,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $builder->shouldReceive('whereNull')->with($column, 'and', false)->once()->andReturnSelf();
         $relation->wherePivotNull($column);
 
-        $builder->shouldReceive('orderBy')->with($column, 'asc')->once()->andReturnSelf();
+        $builder->shouldReceive('orderBy')->with($column, SortDirection::Ascending)->once()->andReturnSelf();
         $relation->orderByPivot($column);
     }
 
