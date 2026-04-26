@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Contracts\Queue\Resumable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Pipeline\Pipeline;
@@ -123,18 +124,38 @@ class Dispatcher implements QueueingDispatcher
             $command->setJob(new SyncJob($this->container, json_encode([]), 'sync', 'sync'));
         }
 
+        // Here?
         if ($handler || $handler = $this->getCommandHandler($command)) {
             $callback = function ($command) use ($handler) {
                 $method = method_exists($handler, 'handle') ? 'handle' : '__invoke';
 
                 return $handler->{$method}($command);
             };
-        } else {
+        } else if ($command instanceof Resumable) {
+            $repository = $this->container->make(ResumeStateRepository::class);
+            // this is going to assume that we have a job on the command
+            /** @var \Illuminate\Contracts\Queue\Job $job */
+            $job = $command->job;
+
+            $command->setCheckpointData($repository->getResumeState($job));
+        }else {
             $callback = function ($command) {
                 $method = method_exists($command, 'handle') ? 'handle' : '__invoke';
 
                 return $this->container->call([$command, $method]);
             };
+        }
+
+        $pipes = $this->pipes;
+        if ($command instanceof Resumable) {
+            array_unshift($pipes, function (Resumable $command) {
+                $repository = $this->container->make(ResumeStateRepository::class);
+                // this is going to assume that we have a job on the command
+                /** @var \Illuminate\Contracts\Queue\Job $job */
+                $job = $command->job;
+
+                $command->setCheckpointData($repository->getResumeState($job));
+            });
         }
 
         return $this->pipeline->send($command)->through($this->pipes)->then($callback);
