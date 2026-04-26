@@ -18,6 +18,8 @@ use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Events\JobTimedOut;
 use Illuminate\Queue\Events\Looping;
 use Illuminate\Queue\Events\WorkerInterrupted;
+use Illuminate\Queue\Events\WorkerPausing;
+use Illuminate\Queue\Events\WorkerResuming;
 use Illuminate\Queue\Events\WorkerStarting;
 use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Support\Carbon;
@@ -833,8 +835,17 @@ class Worker
             });
         }
 
-        pcntl_signal(SIGUSR2, fn () => $this->paused = true);
-        pcntl_signal(SIGCONT, fn () => $this->paused = false);
+        pcntl_signal(SIGUSR2, function () {
+            $this->paused = true;
+
+            $this->events->dispatch(new WorkerPausing($connectionName, $queue));
+        });
+
+        pcntl_signal(SIGCONT, function () {
+            $this->paused = false;
+
+            $this->events->dispatch(new WorkerResuming($connectionName, $queue));
+        });
     }
 
     /**
