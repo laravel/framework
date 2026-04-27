@@ -161,6 +161,50 @@ class QueuePauseResumeTest extends TestCase
         $this->assertSame('notifications', $dispatchedEvent->queue);
     }
 
+    public function testAliasesResolves()
+    {
+        $this->manager->alias('mail', ['mail-high', 'mail-low']);
+
+        $this->manager->pause('redis', 'mail');
+
+        $this->assertTrue($this->manager->isPaused('redis', 'mail-high'));
+        $this->assertTrue($this->manager->isPaused('redis', 'mail-low'));
+
+        $this->manager->resume('redis', 'mail');
+
+        $this->assertFalse($this->manager->isPaused('redis', 'mail-high'));
+        $this->assertFalse($this->manager->isPaused('redis', 'mail-low'));
+    }
+
+    public function testAliasesQueuesExpireWithPauseFor()
+    {
+        Carbon::setTestNow();
+
+        $this->manager->alias('mail', ['mail-high', 'mail-low']);
+
+        $this->manager->pauseFor('redis', 'mail', 30);
+
+        $this->assertTrue($this->manager->isPaused('redis', 'mail-high'));
+
+        Carbon::setTestNow(Carbon::now()->addMinute());
+
+        $this->assertFalse($this->manager->isPaused('redis', 'mail-high'));
+    }
+
+    public function testAliasesEventsFire()
+    {
+        $this->manager->alias('mail', ['mail-high', 'mail-low']);
+
+        $paused = [];
+        $this->manager->getApplication()['events']->listen(QueuePaused::class, function ($event) use (&$paused) {
+            $paused[] = $event->queue;
+        });
+
+        $this->manager->pause('redis', 'mail');
+
+        $this->assertSame(['mail-high', 'mail-low'], $paused);
+    }
+
     public function testParsingQueueString()
     {
         $parser = new class()
