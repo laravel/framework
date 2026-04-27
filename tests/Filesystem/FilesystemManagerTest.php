@@ -290,7 +290,7 @@ class FilesystemManagerTest extends TestCase
     public function testPurgeAndForgetDiskAcceptsUnitEnum()
     {
         $app = new Application;
-        $app["config"] = [
+        $app['config'] = [
             'filesystems.default' => 'local',
             'filesystems.disks.local' => ['driver' => 'local', 'root' => __DIR__],
         ];
