@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -90,6 +91,7 @@ class DatabaseEloquentFactoryTest extends TestCase
             $table->foreignId('role_id');
             $table->foreignId('user_id');
             $table->string('admin')->default('N');
+            $table->json('meta')->nullable();
         });
     }
 
@@ -556,15 +558,26 @@ class DatabaseEloquentFactoryTest extends TestCase
         unset($_SERVER['__test.role.creating-role']);
     }
 
+    public function test_belongs_to_many_relationship_with_pivot_json_column()
+    {
+        $user = FactoryTestUserFactory::new()
+            ->hasAttached(FactoryTestRoleFactory::new(), ['meta' => ['foo' => 'bar']])
+            ->create();
+
+        $this->assertCount(1, $user->factoryTestRoles);
+        $this->assertSame(['foo' => 'bar'], $user->factoryTestRoles[0]->pivot->meta);
+    }
+
     public function test_belongs_to_many_relationship_with_pivot_arrays()
     {
         $user = FactoryTestUserFactory::new()
-            ->hasAttached(FactoryTestRoleFactory::new(), [['admin' => 'Y'], ['admin' => 'N']])
+            ->hasAttached(FactoryTestRoleFactory::new(), [['admin' => 'Y'], ['admin' => 'N', 'meta' => ['foo' => 'bar']]])
             ->create();
 
         $this->assertCount(2, $user->factoryTestRoles);
         $this->assertSame('Y', $user->factoryTestRoles[0]->pivot->admin);
         $this->assertSame('N', $user->factoryTestRoles[1]->pivot->admin);
+        $this->assertSame(['foo' => 'bar'], $user->factoryTestRoles[1]->pivot->meta);
     }
 
     public function test_sequences()
@@ -1194,7 +1207,7 @@ class FactoryTestUser extends Eloquent
 
     public function factoryTestRoles()
     {
-        return $this->belongsToMany(FactoryTestRole::class, 'role_user', 'user_id', 'role_id')->withPivot('admin');
+        return $this->belongsToMany(FactoryTestRole::class, 'role_user', 'user_id', 'role_id')->using(FactoryTestUserRolePivot::class)->withPivot(['admin', 'meta']);
     }
 }
 
@@ -1354,6 +1367,15 @@ class FactoryTestUserWithArray extends Eloquent
     {
         return ['options' => 'array'];
     }
+}
+
+class FactoryTestUserRolePivot extends Pivot
+{
+    protected $table = 'role_user';
+
+    public $timestamps = false;
+
+    protected $casts = ['meta' => 'array'];
 }
 
 class FactoryTestUserWithArrayFactory extends Factory
