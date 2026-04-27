@@ -135,6 +135,10 @@ class DebounceLock
      */
     public function getDebounceDelay($job)
     {
+        if (method_exists($job, 'debounceFor')) {
+            return $job->debounceFor();
+        }
+
         return $this->getAttributeValue($job, DebounceFor::class, 'debounceFor');
     }
 

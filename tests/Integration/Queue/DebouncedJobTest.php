@@ -312,6 +312,62 @@ class DebouncedJobTest extends QueueTestCase
         $this->assertEquals(30, $job2->delay);
     }
 
+    public function testFluentDebounceForOnPlainJob()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
+        $job = new PlainDebounceableJob('entity-1');
+        $pending = dispatch($job)->debounceFor(30);
+        unset($pending);
+
+        $this->assertEquals(30, $job->delay);
+    }
+
+    public function testFluentDebounceForOverridesAttribute()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
+        $job = new DebouncedTestJob('entity-1');
+        $pending = dispatch($job)->debounceFor(10);
+        unset($pending);
+
+        $this->assertEquals(10, $job->delay);
+    }
+
+    public function testJobDebounceForMethodOverridesAttribute()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
+        $highPriorityJob = new DebouncedWithMethodJob('entity-1', 'high');
+        $pending = dispatch($highPriorityJob);
+        unset($pending);
+
+        $this->assertEquals(5, $highPriorityJob->delay);
+
+        $normalJob = new DebouncedWithMethodJob('entity-2', 'normal');
+        $pending = dispatch($normalJob);
+        unset($pending);
+
+        $this->assertEquals(30, $normalJob->delay);
+    }
+
+    public function testFluentMaxDebounceWaitOverridesAttribute()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['beanstalkd']);
+
+        $job = new PlainDebounceableJob('entity-1');
+        $pending = dispatch($job)->debounceFor(30)->maxDebounceWait(20);
+        unset($pending);
+
+        $this->travelTo(Carbon::now()->addSeconds(21));
+
+        $job2 = new PlainDebounceableJob('entity-1');
+        $pending2 = dispatch($job2)->debounceFor(30)->maxDebounceWait(20);
+        unset($pending2);
+
+        $this->assertEquals(0, $job2->delay);
+    }
+
     public function testChildDebouncedJobInheritsFromParent()
     {
         $this->markTestSkippedWhenUsingQueueDrivers(['sync', 'beanstalkd']);
@@ -464,6 +520,51 @@ class DebouncedWithMaxWaitJob implements ShouldQueue
     public function handle()
     {
         static::$handleCount++;
+    }
+}
+
+class PlainDebounceableJob implements ShouldQueue
+{
+    use InteractsWithQueue, Queueable, Dispatchable;
+
+    public static $handled = false;
+
+    public function __construct(public string $entityId)
+    {
+    }
+
+    public function debounceId(): string
+    {
+        return $this->entityId;
+    }
+
+    public function handle()
+    {
+        static::$handled = true;
+    }
+}
+
+#[DebounceFor(30)]
+class DebouncedWithMethodJob implements ShouldQueue
+{
+    use InteractsWithQueue, Queueable, Dispatchable;
+
+    public function __construct(public string $entityId, public string $priority = 'normal')
+    {
+    }
+
+    public function debounceId(): string
+    {
+        return $this->entityId;
+    }
+
+    public function debounceFor(): int
+    {
+        return $this->priority === 'high' ? 5 : 30;
+    }
+
+    public function handle()
+    {
     }
 }
 

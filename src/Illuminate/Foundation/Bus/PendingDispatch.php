@@ -33,6 +33,20 @@ class PendingDispatch
     protected $afterResponse = false;
 
     /**
+     * The number of seconds the job should be debounced for.
+     *
+     * @var int|null
+     */
+    protected $debounceFor = null;
+
+    /**
+     * The maximum number of seconds a debounced job may be deferred before it must run.
+     *
+     * @var int|null
+     */
+    protected $maxDebounceWait = null;
+
+    /**
      * Create a new pending job dispatch.
      *
      * @param  mixed  $job
@@ -187,6 +201,32 @@ class PendingDispatch
     }
 
     /**
+     * Debounce the job for the given number of seconds.
+     *
+     * @param  int  $seconds
+     * @return $this
+     */
+    public function debounceFor(int $seconds)
+    {
+        $this->debounceFor = $seconds;
+
+        return $this;
+    }
+
+    /**
+     * Set the maximum number of seconds a debounced job may be deferred before it must run.
+     *
+     * @param  int  $seconds
+     * @return $this
+     */
+    public function maxDebounceWait(int $seconds)
+    {
+        $this->maxDebounceWait = $seconds;
+
+        return $this;
+    }
+
+    /**
      * Indicate that the job should be dispatched after the response is sent to the browser.
      *
      * @param  bool  $afterResponse
@@ -223,20 +263,22 @@ class PendingDispatch
      */
     protected function acquireDebounceLock()
     {
-        $debounceFor = $this->getAttributeValue($this->job, DebounceFor::class, 'debounceFor');
+        $debounceFor = $this->debounceFor
+            ?? (method_exists($this->job, 'debounceFor') ? $this->job->debounceFor() : null)
+            ?? $this->getAttributeValue($this->job, DebounceFor::class, 'debounceFor');
 
         if ($debounceFor === null) {
             return;
         }
 
-        $lock = new DebounceLock(Container::getInstance()->make(Cache::class));
-
         if ($this->job instanceof ShouldBeUnique) {
             throw new LogicException('A debounced job cannot also implement ShouldBeUnique.');
         }
 
+        $lock = new DebounceLock(Container::getInstance()->make(Cache::class));
+
         $result = $lock->acquire(
-            $this->job, $debounceFor
+            $this->job, $debounceFor, $this->maxDebounceWait
         );
 
         $this->job->debounceOwner = $result['owner'];
