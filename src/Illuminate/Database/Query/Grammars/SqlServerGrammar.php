@@ -171,7 +171,7 @@ class SqlServerGrammar extends Grammar
     {
         $expression = 'LOWER(cast('.$expression.' as nvarchar(max)) collate Latin1_General_100_BIN2)';
 
-        foreach ($this->normalizedLikeReplacements() as [$from, $to]) {
+        foreach ($this->normalizedLikeReplacements() as $from => $to) {
             $expression = "REPLACE($expression, N'$from', N'$to')";
         }
 
