@@ -375,8 +375,7 @@ class Grammar extends BaseGrammar
      */
     protected function compileWhereNormalizedLike($column)
     {
-        // Add LOWER() to the column so it matches our lowercased binding
-        return $this->compileNormalizedExpression('LOWER('.$this->wrap($column).')');
+        return $this->compileNormalizedExpression($this->wrap($column));
     }
 
     /**
