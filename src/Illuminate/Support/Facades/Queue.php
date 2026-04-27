@@ -24,7 +24,7 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static void extend(string $driver, \Closure $resolver)
  * @method static void addConnector(string $driver, \Closure $resolver)
  * @method static string getDefaultDriver()
- * @method static void setDefaultDriver(string $name)
+ * @method static void setDefaultDriver(\UnitEnum|string $name)
  * @method static string getName(string|null $connection = null)
  * @method static \Illuminate\Contracts\Foundation\Application getApplication()
  * @method static \Illuminate\Queue\QueueManager setApplication(\Illuminate\Contracts\Foundation\Application $app)
