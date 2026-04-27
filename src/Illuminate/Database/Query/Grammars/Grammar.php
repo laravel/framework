@@ -415,7 +415,6 @@ class Grammar extends BaseGrammar
         return strtr($value, Str::getNormalizationMap());
     }
 
-
     /**
      * Compile a "where null safe equals" clause.
      *

@@ -940,7 +940,6 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder->select('*')->from('users')->whereNormalizedLike('name', 'أَحْمَدُ');
 
-
         $this->assertStringContainsString('REPLACE(REPLACE(REPLACE', $builder->toSql());
         $this->assertEquals([0 => '%احمد%'], $builder->getBindings());
 
