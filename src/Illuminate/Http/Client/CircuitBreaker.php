@@ -24,21 +24,21 @@ class CircuitBreaker
     /**
      * The number of consecutive failures that will open the circuit.
      *
-     * @var int
+     * @var positive-int
      */
     protected $failureThreshold;
 
     /**
      * The number of seconds the circuit stays open before a probe is allowed.
      *
-     * @var int
+     * @var positive-int
      */
     protected $resetTimeout;
 
     /**
      * The number of seconds failure and state entries persist in the cache.
      *
-     * @var int
+     * @var positive-int
      */
     protected $cacheTtl;
 
