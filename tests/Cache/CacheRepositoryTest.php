@@ -508,6 +508,15 @@ class CacheRepositoryTest extends TestCase
         $this->assertTrue($repo->touch($key, DateInterval::createFromDateString("$ttl seconds")));
     }
 
+    public function testTouchWorksWithEnumKey(): void
+    {
+        $ttl = 60;
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('touch')->once()->with('foo', $ttl)->andReturn(true);
+        $this->assertTrue($repo->touch(TestCacheKey::FOO, $ttl));
+    }
+
     public function testAtomicExecutesCallbackAndReturnsResult()
     {
         $repo = new Repository(new ArrayStore);

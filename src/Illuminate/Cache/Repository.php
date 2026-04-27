@@ -662,12 +662,14 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Set the expiration of a cached item.
      *
-     * @param  string  $key
+     * @param  \UnitEnum|string  $key
      * @param  \DateTimeInterface|\DateInterval|int  $ttl
      * @return bool
      */
     public function touch($key, $ttl)
     {
+        $key = enum_value($key);
+
         return $this->store->touch($this->itemKey($key), $this->getSeconds($ttl));
     }
 
