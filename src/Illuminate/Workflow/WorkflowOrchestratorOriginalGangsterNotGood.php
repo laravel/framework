@@ -17,7 +17,7 @@ use function array_values;
 use function class_basename;
 use function usort;
 
-class WorkflowOrchestrator
+class WorkflowOrchestratorOriginalGangsterNotGood
 {
     /**
      * @var \Fiber<mixed, mixed, mixed, mixed>

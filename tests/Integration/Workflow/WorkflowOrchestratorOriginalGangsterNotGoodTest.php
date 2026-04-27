@@ -12,13 +12,13 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Illuminate\Workflow\WorkflowName;
-use Illuminate\Workflow\WorkflowOrchestrator;
+use Illuminate\Workflow\WorkflowOrchestratorOriginalGangsterNotGood;
 use Illuminate\Workflow\WorkflowStep;
 use PHPUnit\Framework\Attributes\Test;
 
 use function array_column;
 
-final class WorkflowOrchestratorTest extends DatabaseTestCase
+final class WorkflowOrchestratorOriginalGangsterNotGoodTest extends DatabaseTestCase
 {
     protected function afterRefreshingDatabase()
     {
@@ -49,7 +49,7 @@ final class WorkflowOrchestratorTest extends DatabaseTestCase
         $snapshots = [];
 
         // Given a workflow that has already fetched the model and completed the first HTTP call.
-        $orchestrator = WorkflowOrchestrator::make(
+        $orchestrator = WorkflowOrchestratorOriginalGangsterNotGood::make(
             new SyncCustomerWorkflow($customer->id),
             persistState: function (array $snapshot) use (&$snapshots): void {
                 $snapshots[] = $snapshot;
@@ -69,7 +69,7 @@ final class WorkflowOrchestratorTest extends DatabaseTestCase
         Http::assertSent(fn (Request $request): bool => $request->url() === 'https://example.com/profiles/cus_123');
 
         // When a later process rebuilds the orchestrator from persisted workflow state.
-        $orchestrator = WorkflowOrchestrator::make(
+        $orchestrator = WorkflowOrchestratorOriginalGangsterNotGood::make(
             new SyncCustomerWorkflow($customer->id),
             state: $secondSnapshot['state'],
         );
@@ -95,7 +95,7 @@ final class WorkflowOrchestratorTest extends DatabaseTestCase
     /**
      * @return list<array{status: string, workflow: string, step: string|null, payload: mixed, state: array<string, mixed>}>
      */
-    private function runUntilComplete(WorkflowOrchestrator $orchestrator): array
+    private function runUntilComplete(WorkflowOrchestratorOriginalGangsterNotGood $orchestrator): array
     {
         $snapshots = [];
 
