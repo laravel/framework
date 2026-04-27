@@ -42,11 +42,6 @@ class CacheMemoizedStoreTest extends TestCase
         (new MemoizedStore('test', new Repository($stub)))->flushLocks();
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testHasSeparateLockStoreDelegatestoUnderlyingStore(): void
     {
         $withSeparate = new MemoizedStore('test', new Repository(new ArrayStore));
