@@ -2,8 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Session;
 
+use Illuminate\Database\QueryException;
 use Illuminate\Session\DatabaseSessionHandler;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Orchestra\Testbench\Attributes\WithMigration;
 
@@ -110,5 +112,19 @@ class DatabaseSessionHandlerTest extends DatabaseTestCase
         $this->assertNull($session->user_agent);
         $this->assertNull($session->ip_address);
         $this->assertNull($session->user_id);
+    }
+
+    public function test_write_does_not_swallow_non_unique_constraint_errors()
+    {
+        Schema::table('sessions', function ($table) {
+            $table->string('required_column');
+        });
+
+        $connection = $this->app['db']->connection();
+        $handler = new DatabaseSessionHandler($connection, 'sessions', 1);
+
+        $this->expectException(QueryException::class);
+
+        $handler->write('session_id', 'some data');
     }
 }
