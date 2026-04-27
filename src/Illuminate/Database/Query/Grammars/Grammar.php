@@ -10,6 +10,7 @@ use Illuminate\Database\Query\JoinClause;
 use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use RuntimeException;
 
 class Grammar extends BaseGrammar
@@ -374,7 +375,8 @@ class Grammar extends BaseGrammar
      */
     protected function compileWhereNormalizedLike($column)
     {
-        return $this->compileNormalizedExpression($this->wrap($column));
+        // Add LOWER() to the column so it matches our lowercased binding
+        return $this->compileNormalizedExpression('LOWER('.$this->wrap($column).')');
     }
 
     /**
@@ -385,7 +387,11 @@ class Grammar extends BaseGrammar
      */
     protected function compileNormalizedExpression($expression)
     {
-        foreach ($this->normalizedLikeReplacements() as [$from, $to]) {
+    
+        $expression = "LOWER($expression)";
+
+        foreach ($this->normalizedCharacterMap() as $from => $to) {
+            
             $expression = "REPLACE($expression, '$from', '$to')";
         }
 
@@ -400,11 +406,18 @@ class Grammar extends BaseGrammar
      */
     protected function normalizeLikeValue($value)
     {
-        return str_replace(
-            array_column($this->normalizedLikeReplacements(), 0),
-            array_column($this->normalizedLikeReplacements(), 1),
-            $value,
-        );
+        $value = mb_strtolower($value, 'UTF-8');
+
+        if (class_exists(\Normalizer::class)) {
+            
+            $value = \Normalizer::normalize($value, \Normalizer::FORM_D);
+
+            
+            $value = preg_replace('/\p{Mn}/u', '', $value);
+        }
+
+        
+        return strtr($value, $this->normalizedCharacterMap());
     }
 
     /**
@@ -412,26 +425,23 @@ class Grammar extends BaseGrammar
      *
      * @return list<array{string, string}>
      */
-    protected function normalizedLikeReplacements()
+    protected function normalizedCharacterMap()
     {
         return [
-            ['أ', 'ا'],
-            ['إ', 'ا'],
-            ['آ', 'ا'],
-            ['ٱ', 'ا'],
-            ['ى', 'ي'],
-            ['ئ', 'ي'],
-            ['ة', 'ه'],
-            ['ؤ', 'و'],
-            ['ّ', ''],
-            ['َ', ''],
-            ['ِ', ''],
-            ['ُ', ''],
-            ['ْ', ''],
-            ['ً', ''],
-            ['ٍ', ''],
-            ['ٌ', ''],
-            ['ـ', ''],
+            
+            'ß' => 'ss', 
+            'æ' => 'ae', 
+            'œ' => 'oe',
+            
+            
+            'أ' => 'ا', 'إ' => 'ا', 'آ' => 'ا', 'ٱ' => 'ا',
+            'ى' => 'ي', 'ئ' => 'ي', 'ة' => 'ه', 'ؤ' => 'و',
+            'ـ' => '', 
+            'ّ' => '', 'َ' => '', 'ً' => '', 'ُ' => '', 
+            'ٌ' => '', 'ِ' => '', 'ٍ' => '', 'ْ' => '',
+            
+            
+            'đ' => 'd', 'ø' => 'o', 'ñ' => 'n',
         ];
     }
 
