@@ -1034,12 +1034,12 @@ class Builder implements BuilderContract
      * @param  string  $method
      * @return $this
      */
-    protected function addArrayOfWheres($column, $boolean, $method = 'where')
+    protected function addArrayOfWheres($column, $boolean, $method = 'where', $nestedBoolean = null)
     {
-        return $this->whereNested(function ($query) use ($column, $method, $boolean) {
+        return $this->whereNested(function ($query) use ($column, $method, $boolean, $nestedBoolean) {
             foreach ($column as $key => $value) {
                 if (is_numeric($key) && is_array($value)) {
-                    $query->{$method}(...array_values($value), boolean: $boolean);
+                    $query->{$method}(...array_values($value), boolean: $nestedBoolean ?? $boolean);
                 } else {
                     $query->{$method}($key, '=', $value, $boolean);
                 }
@@ -1117,6 +1117,10 @@ class Builder implements BuilderContract
      */
     public function orWhere($column, $operator = null, $value = null)
     {
+        if (is_array($column) && array_is_list($column)) {
+            return $this->addArrayOfWheres($column, 'or', nestedBoolean: 'and');
+        }
+
         [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );

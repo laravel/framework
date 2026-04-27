@@ -391,6 +391,12 @@ class Builder implements BuilderContract
      */
     public function orWhere($column, $operator = null, $value = null)
     {
+        if (is_array($column) && array_is_list($column)) {
+            $this->query->orWhere($column);
+
+            return $this;
+        }
+
         [$value, $operator] = $this->query->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );

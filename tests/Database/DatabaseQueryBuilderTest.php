@@ -2807,7 +2807,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => 'foo'], $builder->getBindings());
     }
 
-    public function testOrWheresHaveConsistentResults()
+    public function testOrWhereArrayConditionsUseTheExpectedBooleanGrouping()
     {
         $queries = [];
         $builder = $this->getBuilder();
@@ -2820,7 +2820,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $this->assertSame([
             'select * from "users" where "xxxx" = ? or ("foo" = ? or "bar" = ?)',
-            'select * from "users" where "xxxx" = ? or ("foo" = ? or "bar" = ?)',
+            'select * from "users" where "xxxx" = ? or ("foo" = ? and "bar" = ?)',
         ], $queries);
 
         $queries = [];
@@ -3027,7 +3027,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhere([['foo', 1], ['bar', 2]]);
-        $this->assertSame('select * from "users" where "xxxx" = ? or ("foo" = ? or "bar" = ?)', $builder->toSql());
+        $this->assertSame('select * from "users" where "xxxx" = ? or ("foo" = ? and "bar" = ?)', $builder->toSql());
         $this->assertEquals([0 => 'xxxx', 1 => 1, 2 => 2], $builder->getBindings());
 
         $builder = $this->getBuilder();
@@ -3039,7 +3039,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhere([['foo', 1], ['bar', '<', 2]]);
-        $this->assertSame('select * from "users" where "xxxx" = ? or ("foo" = ? or "bar" < ?)', $builder->toSql());
+        $this->assertSame('select * from "users" where "xxxx" = ? or ("foo" = ? and "bar" < ?)', $builder->toSql());
         $this->assertEquals([0 => 'xxxx', 1 => 1, 2 => 2], $builder->getBindings());
 
         // where()->orWhereColumn(col1, col2)
@@ -3058,7 +3058,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhere([['foo', 1], ['bar', '<', 2]]);
-        $this->assertSame('select * from "users" where "xxxx" = ? or ("foo" = ? or "bar" < ?)', $builder->toSql());
+        $this->assertSame('select * from "users" where "xxxx" = ? or ("foo" = ? and "bar" < ?)', $builder->toSql());
         $this->assertEquals([0 => 'xxxx', 1 => 1, 2 => 2], $builder->getBindings());
 
         // where()->orWhereNot(key, value)

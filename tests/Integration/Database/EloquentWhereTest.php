@@ -62,6 +62,18 @@ class EloquentWhereTest extends DatabaseTestCase
                     ->first()
             )
         );
+
+        $this->assertTrue(
+            $secondUser->is(
+                UserWhereTest::where([
+                    ['name', '=', 'wrong-name'],
+                    ['email', '=', 'test-email1'],
+                ])->orWhere([
+                    ['name', '=', 'test-name1'],
+                    ['address', '=', 'test-address1'],
+                ])->first()
+            )
+        );
     }
 
     public function testWhereNot()
