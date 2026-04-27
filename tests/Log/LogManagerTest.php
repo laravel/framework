@@ -792,6 +792,19 @@ class LogManagerTest extends TestCase
 
         $this->assertSame('single', $this->app['config']['logging.default']);
     }
+
+    public function testForgetChannelAcceptsBackedEnum()
+    {
+        $manager = new LogManager($this->app);
+
+        $manager->channel('single')->getLogger();
+
+        $this->assertCount(1, $manager->getChannels());
+
+        $manager->forgetChannel(LogChannelName::Single);
+
+        $this->assertEmpty($manager->getChannels());
+    }
 }
 
 class CustomizeFormatter

@@ -617,12 +617,12 @@ class LogManager implements LoggerInterface
     /**
      * Unset the given channel instance.
      *
-     * @param  string|null  $driver
+     * @param  \UnitEnum|string|null  $driver
      * @return void
      */
     public function forgetChannel($driver = null)
     {
-        $driver = $this->parseDriver($driver);
+        $driver = $this->parseDriver(enum_value($driver));
 
         if (isset($this->channels[$driver])) {
             unset($this->channels[$driver]);
