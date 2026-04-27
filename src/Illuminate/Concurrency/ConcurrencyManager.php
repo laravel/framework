@@ -80,11 +80,13 @@ class ConcurrencyManager extends MultipleInstanceManager
     /**
      * Set the default instance name.
      *
-     * @param  string  $name
+     * @param  \UnitEnum|string  $name
      * @return void
      */
     public function setDefaultInstance($name)
     {
+        $name = enum_value($name);
+
         $this->app['config']['concurrency.default'] = $name;
         $this->app['config']['concurrency.driver'] = $name;
     }

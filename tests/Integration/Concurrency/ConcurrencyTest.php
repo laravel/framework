@@ -97,6 +97,14 @@ PHP);
         );
     }
 
+    public function testSetDefaultInstanceAcceptsBackedEnum()
+    {
+        Concurrency::setDefaultInstance(ConcurrencyDriverEnum::Sync);
+
+        $this->assertSame('sync', config('concurrency.default'));
+        $this->assertSame('sync', config('concurrency.driver'));
+    }
+
     public function testRunHandlerProcessErrorWithDefaultExceptionWithoutParam()
     {
         $this->expectException(Exception::class);
