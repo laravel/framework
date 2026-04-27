@@ -161,7 +161,7 @@ class QueuePauseResumeTest extends TestCase
         $this->assertSame('notifications', $dispatchedEvent->queue);
     }
 
-    public function testAliasesResolves()
+    public function testAliasesPauseAndResume()
     {
         $this->manager->alias('mail', ['mail-high', 'mail-low']);
 
@@ -176,7 +176,7 @@ class QueuePauseResumeTest extends TestCase
         $this->assertFalse($this->manager->isPaused('redis', 'mail-low'));
     }
 
-    public function testAliasesQueuesExpireWithPauseFor()
+    public function testAliasesPauseFor()
     {
         Carbon::setTestNow();
 
