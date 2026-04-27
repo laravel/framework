@@ -129,6 +129,20 @@ class RateLimitedWithRedisTest extends TestCase
         // $this->assertInstanceOf(Connection::class, $fetch('redis'));
     }
 
+    public function testConnectionAcceptsBackedEnum()
+    {
+        $rateLimited = new RateLimitedWithRedis('limiterName', RedisRateLimitedConnection::Default);
+
+        $fetch = (function (string $name) {
+            return $this->{$name};
+        })->bindTo($rateLimited, RateLimitedWithRedis::class);
+
+        $this->assertSame('default', $fetch('connectionName'));
+
+        $rateLimited->connection(RedisRateLimitedConnection::Cache);
+        $this->assertSame('cache', $fetch('connectionName'));
+    }
+
     protected function assertJobRanSuccessfully($testJob)
     {
         $testJob::$handled = false;
@@ -233,4 +247,10 @@ class RedisRateLimitedDontReleaseTestJob extends RedisRateLimitedTestJob
     {
         return [(new RateLimitedWithRedis($this->key))->dontRelease()];
     }
+}
+
+enum RedisRateLimitedConnection: string
+{
+    case Default = 'default';
+    case Cache = 'cache';
 }

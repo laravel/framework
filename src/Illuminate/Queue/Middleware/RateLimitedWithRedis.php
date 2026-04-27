@@ -7,6 +7,8 @@ use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Redis\Limiters\DurationLimiter;
 use Illuminate\Support\InteractsWithTime;
 
+use function Illuminate\Support\enum_value;
+
 class RateLimitedWithRedis extends RateLimited
 {
     use InteractsWithTime;
@@ -29,12 +31,13 @@ class RateLimitedWithRedis extends RateLimited
      * Create a new middleware instance.
      *
      * @param  \UnitEnum|string  $limiterName
+     * @param  \UnitEnum|string|null  $connection
      */
-    public function __construct($limiterName, ?string $connection = null)
+    public function __construct($limiterName, $connection = null)
     {
         parent::__construct($limiterName);
 
-        $this->connectionName = $connection;
+        $this->connectionName = enum_value($connection);
     }
 
     /**
@@ -95,12 +98,12 @@ class RateLimitedWithRedis extends RateLimited
     /**
      * Specify the Redis connection that should be used.
      *
-     * @param  string  $name
+     * @param  \UnitEnum|string  $name
      * @return $this
      */
-    public function connection(string $name)
+    public function connection($name)
     {
-        $this->connectionName = $name;
+        $this->connectionName = enum_value($name);
 
         return $this;
     }
