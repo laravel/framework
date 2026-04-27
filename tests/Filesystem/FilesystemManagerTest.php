@@ -291,15 +291,15 @@ class FilesystemManagerTest extends TestCase
     {
         $app = new Application;
         $app["config"] = [
-            "filesystems.default" => "local",
-            "filesystems.disks.local" => ["driver" => "local", "root" => __DIR__],
+            'filesystems.default' => 'local',
+            'filesystems.disks.local' => ['driver' => 'local', 'root' => __DIR__],
         ];
 
         $manager = new FilesystemManager($app);
 
         $manager->disk(FakeDiskName::Local);
 
-        $property = new \ReflectionProperty($manager, "disks");
+        $property = new \ReflectionProperty($manager, 'disks');
 
         $this->assertCount(1, $property->getValue($manager));
 
@@ -329,5 +329,5 @@ class CustomFilesystemDriver
 
 enum FakeDiskName: string
 {
-    case Local = "local";
+    case Local = 'local';
 }
