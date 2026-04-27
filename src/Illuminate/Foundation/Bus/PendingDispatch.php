@@ -7,6 +7,7 @@ use Illuminate\Bus\UniqueLock;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Contracts\Queue\Preparable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Foundation\Queue\InteractsWithUniqueJobs;
 use Illuminate\Queue\Attributes\DebounceFor;
@@ -206,6 +207,10 @@ class PendingDispatch
      */
     protected function shouldDispatch()
     {
+        if ($this->job instanceof Preparable && $this->job->prepare() === false) {
+            return false;
+        }
+
         if (! $this->job instanceof ShouldBeUnique) {
             return true;
         }
