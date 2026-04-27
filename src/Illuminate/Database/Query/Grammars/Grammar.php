@@ -10,7 +10,6 @@ use Illuminate\Database\Query\JoinClause;
 use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use RuntimeException;
 
 class Grammar extends BaseGrammar
