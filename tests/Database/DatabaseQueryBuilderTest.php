@@ -966,7 +966,6 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $sql = $builder->toSql();
         
-        
         $this->assertStringContainsString('REPLACE', $sql);
         $this->assertStringContainsString('first_name', $sql);
         $this->assertEquals([0 => '%muller%', 1 => '%muller%'], $builder->getBindings());

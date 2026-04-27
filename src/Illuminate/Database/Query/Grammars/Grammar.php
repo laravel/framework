@@ -386,11 +386,9 @@ class Grammar extends BaseGrammar
      */
     protected function compileNormalizedExpression($expression)
     {
-    
         $expression = "LOWER($expression)";
 
         foreach ($this->normalizedCharacterMap() as $from => $to) {
-            
             $expression = "REPLACE($expression, '$from', '$to')";
         }
 
@@ -408,14 +406,11 @@ class Grammar extends BaseGrammar
         $value = mb_strtolower($value, 'UTF-8');
 
         if (class_exists(\Normalizer::class)) {
-            
             $value = \Normalizer::normalize($value, \Normalizer::FORM_D);
 
-            
             $value = preg_replace('/\p{Mn}/u', '', $value);
         }
 
-        
         return strtr($value, $this->normalizedCharacterMap());
     }
 
@@ -427,19 +422,14 @@ class Grammar extends BaseGrammar
     protected function normalizedCharacterMap()
     {
         return [
-            
             'ß' => 'ss', 
             'æ' => 'ae', 
             'œ' => 'oe',
-            
-            
             'أ' => 'ا', 'إ' => 'ا', 'آ' => 'ا', 'ٱ' => 'ا',
             'ى' => 'ي', 'ئ' => 'ي', 'ة' => 'ه', 'ؤ' => 'و',
             'ـ' => '', 
             'ّ' => '', 'َ' => '', 'ً' => '', 'ُ' => '', 
             'ٌ' => '', 'ِ' => '', 'ٍ' => '', 'ْ' => '',
-            
-            
             'đ' => 'd', 'ø' => 'o', 'ñ' => 'n',
         ];
     }
