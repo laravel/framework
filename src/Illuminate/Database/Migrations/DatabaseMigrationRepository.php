@@ -23,7 +23,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     /**
      * The name of the database connection to use.
      *
-     * @var string
+     * @var string|null
      */
     protected $connection;
 
