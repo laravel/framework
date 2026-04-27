@@ -53,7 +53,7 @@ interface MigrationRepositoryInterface
     /**
      * Remove a migration from the log.
      *
-     * @param  objectt{id?: int, migration: string, batch?: int}  $migration
+     * @param  object{id?: int, migration: string, batch?: int}  $migration
      * @return void
      */
     public function delete($migration);
