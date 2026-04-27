@@ -581,6 +581,7 @@ class InsomniacWorker extends Worker
         $this->sleptFor = $seconds;
     }
 
+
     public function notifyJobOfSignal(int $signal): void
     {
         parent::notifyJobOfSignal($signal);
