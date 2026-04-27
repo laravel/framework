@@ -835,13 +835,13 @@ class Worker
             });
         }
 
-        pcntl_signal(SIGUSR2, function () {
+        pcntl_signal(SIGUSR2, function () use ($queue, $connectionName) {
             $this->paused = true;
 
             $this->events->dispatch(new WorkerPausing($connectionName, $queue));
         });
 
-        pcntl_signal(SIGCONT, function () {
+        pcntl_signal(SIGCONT, function () use ($connectionName, $queue) {
             $this->paused = false;
 
             $this->events->dispatch(new WorkerResuming($connectionName, $queue));
