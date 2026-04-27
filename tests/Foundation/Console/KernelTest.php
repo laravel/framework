@@ -6,11 +6,42 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Console\Kernel;
 use Illuminate\Foundation\Events\Terminating;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StringInput;
 
+use function Illuminate\Support\artisan_binary;
+
 class KernelTest extends TestCase
 {
+    #[RunInSeparateProcess]
+    public function testItUsesTheInvokedArtisanScriptAsTheArtisanBinary()
+    {
+        $_SERVER['argv'][0] = '/home/laravel/artisan';
+
+        $app = new Application;
+        $events = new Dispatcher($app);
+        $app->instance('events', $events);
+
+        new Kernel($app, $events);
+
+        $this->assertSame('/home/laravel/artisan', artisan_binary());
+    }
+
+    #[RunInSeparateProcess]
+    public function testItFallsBackToArtisanWhenArgvIsUnavailable()
+    {
+        unset($_SERVER['argv']);
+
+        $app = new Application;
+        $events = new Dispatcher($app);
+        $app->instance('events', $events);
+
+        new Kernel($app, $events);
+
+        $this->assertSame('artisan', artisan_binary());
+    }
+
     public function testItDispatchesTerminatingEvent()
     {
         $called = [];

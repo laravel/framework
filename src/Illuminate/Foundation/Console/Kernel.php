@@ -136,7 +136,7 @@ class Kernel implements KernelContract
     public function __construct(Application $app, Dispatcher $events)
     {
         if (! defined('ARTISAN_BINARY')) {
-            define('ARTISAN_BINARY', 'artisan');
+            define('ARTISAN_BINARY', $_SERVER['argv'][0] ?? 'artisan');
         }
 
         $this->app = $app;
