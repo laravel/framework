@@ -10,6 +10,7 @@ use Illuminate\Database\Query\JoinClause;
 use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use RuntimeException;
 
 class Grammar extends BaseGrammar
@@ -363,7 +364,7 @@ class Grammar extends BaseGrammar
      */
     public function prepareWhereNormalizedLikeBinding($value)
     {
-        return '%'.$this->normalizeLikeValue($value).'%';
+        return '%'.Str::normalizeForSearch($value).'%';
     }
 
     /**
@@ -388,7 +389,7 @@ class Grammar extends BaseGrammar
     {
         $expression = "LOWER($expression)";
 
-        foreach ($this->normalizedCharacterMap() as $from => $to) {
+        foreach (Str::getNormalizationMap() as $from => $to) {
             $expression = "REPLACE($expression, '$from', '$to')";
         }
 
@@ -411,28 +412,9 @@ class Grammar extends BaseGrammar
             $value = preg_replace('/\p{Mn}/u', '', $value);
         }
 
-        return strtr($value, $this->normalizedCharacterMap());
+        return strtr($value, Str::getNormalizationMap());
     }
 
-    /**
-     * Get the replacement pairs used for Arabic normalization.
-     *
-     * @return list<array{string, string}>
-     */
-    protected function normalizedCharacterMap()
-    {
-        return [
-            'ß' => 'ss', 
-            'æ' => 'ae', 
-            'œ' => 'oe',
-            'أ' => 'ا', 'إ' => 'ا', 'آ' => 'ا', 'ٱ' => 'ا',
-            'ى' => 'ي', 'ئ' => 'ي', 'ة' => 'ه', 'ؤ' => 'و',
-            'ـ' => '', 
-            'ّ' => '', 'َ' => '', 'ً' => '', 'ُ' => '', 
-            'ٌ' => '', 'ِ' => '', 'ٍ' => '', 'ْ' => '',
-            'đ' => 'd', 'ø' => 'o', 'ñ' => 'n',
-        ];
-    }
 
     /**
      * Compile a "where null safe equals" clause.

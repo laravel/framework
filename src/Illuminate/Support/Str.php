@@ -936,6 +936,58 @@ class Str
     }
 
     /**
+     * Normalize the string for search by removing diacritics and collapsing characters.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function normalizeForSearch($value)
+    {
+        $value = mb_strtolower($value, 'UTF-8');
+
+        if (class_exists(\Normalizer::class)) {
+            $value = \Normalizer::normalize($value, \Normalizer::FORM_D);
+            $value = preg_replace('/\p{Mn}/u', '', $value);
+        }
+
+        return strtr($value, static::getNormalizationMap());
+    }
+
+    /**
+     * Get the global character mapping for search normalization.
+     *
+     * @return array<string, string>
+     */
+    public static function getNormalizationMap()
+    {
+        return [
+            'ß' => 'ss',
+            'æ' => 'ae',
+            'œ' => 'oe',
+            'أ' => 'ا',
+            'إ' => 'ا',
+            'آ' => 'ا',
+            'ٱ' => 'ا',
+            'ى' => 'ي',
+            'ئ' => 'ي',
+            'ة' => 'ه',
+            'ؤ' => 'و',
+            'ـ' => '',
+            'ّ' => '',
+            'َ' => '',
+            'ً' => '',
+            'ُ' => '',
+            'ٌ' => '',
+            'ِ' => '',
+            'ٍ' => '',
+            'ْ' => '',
+            'đ' => 'd',
+            'ø' => 'o',
+            'ñ' => 'n',
+        ];
+    }
+
+    /**
      * Pad both sides of a string with another.
      *
      * @param  string  $value
