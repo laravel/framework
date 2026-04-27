@@ -312,7 +312,6 @@ class FilesystemManagerTest extends TestCase
         $manager->purge(FakeDiskName::Local);
         $this->assertCount(0, $property->getValue($manager));
     }
-
 }
 
 class CustomFilesystemDriver
