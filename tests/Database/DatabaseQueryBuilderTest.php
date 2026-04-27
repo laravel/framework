@@ -937,7 +937,9 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testWhereNormalizedLikeClausePostgres()
     {
         $builder = $this->getPostgresBuilder();
+
         $builder->select('*')->from('users')->whereNormalizedLike('name', 'أَحْمَدُ');
+
 
         $this->assertStringContainsString('REPLACE(REPLACE(REPLACE', $builder->toSql());
         $this->assertEquals([0 => '%احمد%'], $builder->getBindings());
@@ -950,6 +952,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testWhereNormalizedLikeClauseMysql()
     {
         $builder = $this->getMySqlBuilder();
+
         $builder->select('*')->from('users')->whereNormalizedLike('name', 'Hôtel');
 
         $this->assertEquals([0 => '%hotel%'], $builder->getBindings());
@@ -958,9 +961,11 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testWhereNormalizedLikeAnyClauseSqlite()
     {
         $builder = $this->getSQLiteBuilder();
+
         $builder->select('*')->from('users')->whereNormalizedLikeAny(['first_name', 'last_name'], 'Müller');
 
         $sql = $builder->toSql();
+
         $this->assertStringContainsString('REPLACE', $sql);
         $this->assertStringContainsString('first_name', $sql);
         $this->assertEquals([0 => '%muller%', 1 => '%muller%'], $builder->getBindings());
