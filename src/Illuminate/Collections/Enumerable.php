@@ -34,9 +34,11 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Create a new instance by invoking the callback a given amount of times.
      *
+     * @template TTimesValue
+     *
      * @param  int  $number
-     * @param  callable|null  $callback
-     * @return static
+     * @param  (callable(int): TTimesValue)|null  $callback
+     * @return static<int, TTimesValue>
      */
     public static function times($number, ?callable $callback = null);
 
@@ -46,7 +48,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @param  int  $from
      * @param  int  $to
      * @param  int  $step
-     * @return static
+     * @return static<int, int>
      */
     public static function range($from, $to, $step = 1);
 
@@ -81,7 +83,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Get all items in the enumerable.
      *
-     * @return array
+     * @return array<TKey, TValue>
      */
     public function all();
 
