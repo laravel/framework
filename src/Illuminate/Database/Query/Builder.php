@@ -3457,11 +3457,12 @@ class Builder implements BuilderContract
      *
      * @param  int|string  $id
      * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
+     * @param  string  $qualifiedKeyName
      * @return \stdClass|null
      */
-    public function find($id, $columns = ['*'])
+    public function find($id, $columns = ['*'], $qualifiedKeyName = 'id')
     {
-        return $this->where('id', '=', $id)->first($columns);
+        return $this->where($qualifiedKeyName, '=', $id)->first($columns);
     }
 
     /**
@@ -3472,9 +3473,10 @@ class Builder implements BuilderContract
      * @param  mixed  $id
      * @param  (\Closure(): TValue)|string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
      * @param  (\Closure(): TValue)|null  $callback
+     * @param string $qualifiedKeyName
      * @return \stdClass|TValue
      */
-    public function findOr($id, $columns = ['*'], ?Closure $callback = null)
+    public function findOr($id, $columns = ['*'], ?Closure $callback = null, $qualifiedKeyName = 'id')
     {
         if ($columns instanceof Closure) {
             $callback = $columns;
@@ -3482,7 +3484,7 @@ class Builder implements BuilderContract
             $columns = ['*'];
         }
 
-        if (! is_null($data = $this->find($id, $columns))) {
+        if (! is_null($data = $this->find($id, $columns, $qualifiedKeyName))) {
             return $data;
         }
 
