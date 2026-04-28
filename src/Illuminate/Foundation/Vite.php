@@ -102,7 +102,7 @@ class Vite implements Htmlable
      *
      * @var \Illuminate\Foundation\ViteFonts|null
      */
-    protected $viteFonts = null;
+    protected $fonts = null;
 
     /**
      * The name of the font manifest file.
@@ -1031,26 +1031,6 @@ class Vite implements Htmlable
     }
 
     /**
-     * Determine if the HMR server is running.
-     *
-     * @return bool
-     */
-    public function isRunningHot()
-    {
-        return is_file($this->hotFile());
-    }
-
-    /**
-     * Get the Vite tag content as a string of HTML.
-     *
-     * @return string
-     */
-    public function toHtml()
-    {
-        return $this->__invoke($this->entryPoints)->toHtml();
-    }
-
-    /**
      * Render font preload links and inline styles.
      *
      * @param  list<string>|string|null  $aliases
@@ -1062,7 +1042,7 @@ class Vite implements Htmlable
     {
         $isHot = $this->isRunningHot();
 
-        $fonts = $this->viteFonts();
+        $fonts = $this->fonts();
 
         $manifest = $fonts->manifest($isHot, $this->buildDirectory, $this->fontsManifestFilename, $this->hotFile());
 
@@ -1075,8 +1055,12 @@ class Vite implements Htmlable
         $preloads = $manifest['preloads'] ?? [];
 
         if ($aliases !== null) {
-            $aliases = is_string($aliases) ? [$aliases] : $aliases;
+            $aliases = is_string($aliases)
+                ? [$aliases]
+                : $aliases;
+
             $fonts->ensureValidFamilies($aliases, $manifest);
+
             $preloads = array_filter($preloads, fn ($preload) => in_array($preload['alias'] ?? null, $aliases, true));
         }
 
@@ -1085,12 +1069,10 @@ class Vite implements Htmlable
         $preloadsHtml = $this->renderFontPreloads($preloads);
         $styleHtml = $this->renderFontStyle($manifest, $aliases);
 
-        $html = match (true) {
+        return new HtmlString(match (true) {
             $preloadsHtml !== '' && $styleHtml !== '' => $preloadsHtml."\n".$styleHtml,
             default => $preloadsHtml.$styleHtml,
-        };
-
-        return new HtmlString($html);
+        });
     }
 
     /**
@@ -1164,7 +1146,7 @@ class Vite implements Htmlable
      */
     protected function renderFontStyle($manifest, $aliases)
     {
-        $css = $this->viteFonts()->resolveStyleContent($manifest, $aliases, $this->buildDirectory);
+        $css = $this->fonts()->resolveStyleContent($manifest, $aliases, $this->buildDirectory);
 
         if ($css === '') {
             return '';
@@ -1184,9 +1166,9 @@ class Vite implements Htmlable
      *
      * @return \Illuminate\Foundation\ViteFonts
      */
-    protected function viteFonts()
+    protected function fonts()
     {
-        return $this->viteFonts ??= new ViteFonts;
+        return $this->fonts ??= new ViteFonts;
     }
 
     /**
@@ -1203,6 +1185,26 @@ class Vite implements Htmlable
     }
 
     /**
+     * Determine if the HMR server is running.
+     *
+     * @return bool
+     */
+    public function isRunningHot()
+    {
+        return is_file($this->hotFile());
+    }
+
+    /**
+     * Get the Vite tag content as a string of HTML.
+     *
+     * @return string
+     */
+    public function toHtml()
+    {
+        return $this->__invoke($this->entryPoints)->toHtml();
+    }
+
+    /**
      * Flush state.
      *
      * @return void
@@ -1211,8 +1213,8 @@ class Vite implements Htmlable
     {
         $this->preloadedAssets = [];
 
-        $this->viteFonts?->flush();
+        $this->fonts?->flush();
 
-        $this->viteFonts = null;
+        $this->fonts = null;
     }
 }

@@ -32,6 +32,35 @@ class ViteFonts
     }
 
     /**
+     * Read and decode a manifest file.
+     *
+     * @param  string  $path
+     * @return array<string, mixed>|null
+     *
+     * @throws \Illuminate\Foundation\ViteException
+     */
+    protected function readManifest(string $path)
+    {
+        if (isset(static::$manifests[$path])) {
+            return static::$manifests[$path];
+        }
+
+        if (! is_file($path)) {
+            return null;
+        }
+
+        $contents = file_get_contents($path);
+
+        $manifest = json_decode($contents, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new ViteException("The font manifest at [{$path}] is not valid JSON.");
+        }
+
+        return static::$manifests[$path] = $manifest;
+    }
+
+    /**
      * Resolve the CSS content from the manifest.
      *
      * @param  array<string, mixed>  $manifest
@@ -206,35 +235,6 @@ class ViteFonts
                 throw new ViteException("Font manifest preload entry [{$index}] for alias [{$preload['alias']}] is missing the [{$urlKey}] key.");
             }
         }
-    }
-
-    /**
-     * Read and decode a manifest file.
-     *
-     * @param  string  $path
-     * @return array<string, mixed>|null
-     *
-     * @throws \Illuminate\Foundation\ViteException
-     */
-    protected function readManifest(string $path)
-    {
-        if (isset(static::$manifests[$path])) {
-            return static::$manifests[$path];
-        }
-
-        if (! is_file($path)) {
-            return null;
-        }
-
-        $contents = file_get_contents($path);
-
-        $manifest = json_decode($contents, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new ViteException("The font manifest at [{$path}] is not valid JSON.");
-        }
-
-        return static::$manifests[$path] = $manifest;
     }
 
     /**
