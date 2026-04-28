@@ -3473,7 +3473,7 @@ class Builder implements BuilderContract
      * @param  mixed  $id
      * @param  (\Closure(): TValue)|string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
      * @param  (\Closure(): TValue)|null  $callback
-     * @param string $qualifiedKeyName
+     * @param  string  $qualifiedKeyName
      * @return \stdClass|TValue
      */
     public function findOr($id, $columns = ['*'], ?Closure $callback = null, $qualifiedKeyName = 'id')
