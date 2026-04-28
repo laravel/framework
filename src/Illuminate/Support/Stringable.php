@@ -1060,9 +1060,9 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * @param  string|null  $characters
      * @return static
      */
-    public function trim($characters = null)
+    public function trim(...$args)
     {
-        return new static(Str::trim(...array_merge([$this->value], func_get_args())));
+        return new static(Str::trim($this->value, ...$args));
     }
 
     /**
@@ -1071,9 +1071,9 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * @param  string|null  $characters
      * @return static
      */
-    public function ltrim($characters = null)
+    public function ltrim(...$args)
     {
-        return new static(Str::ltrim(...array_merge([$this->value], func_get_args())));
+        return new static(Str::ltrim($this->value, ...$args));
     }
 
     /**
@@ -1082,9 +1082,9 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * @param  string|null  $characters
      * @return static
      */
-    public function rtrim($characters = null)
+    public function rtrim(...$args)
     {
-        return new static(Str::rtrim(...array_merge([$this->value], func_get_args())));
+        return new static(Str::rtrim($this->value, ...$args));
     }
 
     /**
