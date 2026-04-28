@@ -1046,7 +1046,7 @@ class PendingRequest
                     $this->dispatchResponseReceivedEvent($response);
                     $response = $this->runAfterResponseCallbacks($response);
 
-                    if ($response->successful()) {
+                    if (! $response->failed()) {
                         return;
                     }
 
@@ -1229,7 +1229,7 @@ class PendingRequest
      */
     protected function handlePromiseResponse(Response|Throwable $response, $method, $url, $options, $attempt)
     {
-        if ($response instanceof Response && $response->successful()) {
+        if ($response instanceof Response && ! $response->failed()) {
             return $response;
         }
 

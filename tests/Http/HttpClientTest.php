@@ -2332,6 +2332,28 @@ class HttpClientTest extends TestCase
         $this->factory->assertSentCount(1);
     }
 
+    public function testRetryCallbackIsNotCalledForRedirectResponses()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('', HttpResponse::HTTP_FOUND),
+        ]);
+
+        $whenAttempts = 0;
+
+        $response = $this->factory
+            ->retry(2, 1000, function (Throwable $exception) use (&$whenAttempts) {
+                $whenAttempts++;
+
+                return true;
+            }, false)
+            ->get('http://foo.com/get');
+
+        $this->assertSame(HttpResponse::HTTP_FOUND, $response->status());
+        $this->assertSame(0, $whenAttempts);
+
+        $this->factory->assertSentCount(1);
+    }
+
     public function testRequestCanBeModifiedInRetryCallback()
     {
         $this->factory->fake([
@@ -2540,6 +2562,29 @@ class HttpClientTest extends TestCase
         $this->assertTrue($response->failed());
 
         $this->assertCount(1, $whenAttempts);
+
+        $this->factory->assertSentCount(1);
+    }
+
+    public function testRetryCallbackIsNotCalledForRedirectResponsesInPool()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('', HttpResponse::HTTP_FOUND),
+        ]);
+
+        $whenAttempts = collect();
+
+        [$response] = $this->factory->pool(fn ($pool) => [
+            $pool->retry(2, 1000, function (Throwable $exception) use ($whenAttempts) {
+                $whenAttempts->push($exception);
+
+                return true;
+            }, false)->get('http://foo.com/get'),
+        ]);
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertSame(HttpResponse::HTTP_FOUND, $response->status());
+        $this->assertCount(0, $whenAttempts);
 
         $this->factory->assertSentCount(1);
     }
