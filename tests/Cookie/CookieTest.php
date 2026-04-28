@@ -82,7 +82,7 @@ class CookieTest extends TestCase
         $cookie = $this->getCreator();
         $cookie->queue($cookie->make('foo', ''));
         $this->assertTrue($cookie->hasQueued('foo'));
-        $this->assertEquals('', $cookie->queued('foo')->getValue());
+        $this->assertSame('', $cookie->queued('foo')->getValue());
     }
 
     public function testQueuedCookiesWithRepeatedValue(): void
@@ -90,7 +90,7 @@ class CookieTest extends TestCase
         $cookie = $this->getCreator();
         $cookie->queue($cookie->make('foo', 'newBar'));
         $this->assertTrue($cookie->hasQueued('foo'));
-        $this->assertEquals('newBar', $cookie->queued('foo')->getValue());
+        $this->assertSame('newBar', $cookie->queued('foo')->getValue());
 
         $this->expectException(ArgumentCountError::class);
         $cookie->queue('invalidCookie');

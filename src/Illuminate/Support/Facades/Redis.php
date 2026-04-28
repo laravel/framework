@@ -9,7 +9,7 @@ namespace Illuminate\Support\Facades;
  * @method static void enableEvents()
  * @method static void disableEvents()
  * @method static void setDriver(string $driver)
- * @method static void purge(string|null $name = null)
+ * @method static void purge(\UnitEnum|string|null $name = null)
  * @method static \Illuminate\Redis\RedisManager extend(string $driver, \Closure $callback)
  * @method static void createSubscription(array|string $channels, \Closure $callback, string $method = 'subscribe')
  * @method static \Illuminate\Redis\Limiters\ConcurrencyLimiterBuilder funnel(string $name)

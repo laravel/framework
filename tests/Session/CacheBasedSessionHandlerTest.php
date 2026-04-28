@@ -37,7 +37,7 @@ class CacheBasedSessionHandlerTest extends TestCase
         $this->cacheMock->shouldReceive('get')->once()->with('session_id', '')->andReturn('session_data');
 
         $data = $this->sessionHandler->read(sessionId: 'session_id');
-        $this->assertEquals('session_data', $data);
+        $this->assertSame('session_data', $data);
     }
 
     public function test_read_returns_empty_string_if_no_data()
@@ -45,7 +45,7 @@ class CacheBasedSessionHandlerTest extends TestCase
         $this->cacheMock->shouldReceive('get')->once()->with('some_id', '')->andReturn('');
 
         $data = $this->sessionHandler->read(sessionId: 'some_id');
-        $this->assertEquals('', $data);
+        $this->assertSame('', $data);
     }
 
     public function test_write_stores_data_in_cache()

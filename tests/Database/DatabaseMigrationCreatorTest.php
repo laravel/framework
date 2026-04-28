@@ -47,7 +47,7 @@ class DatabaseMigrationCreatorTest extends TestCase
         $creator->create('create_bar', 'foo', $table);
 
         $this->assertEquals($_SERVER['__migration.creator.table'], $table);
-        $this->assertEquals('foo/foo_create_bar.php', $_SERVER['__migration.creator.path']);
+        $this->assertSame('foo/foo_create_bar.php', $_SERVER['__migration.creator.path']);
 
         unset($_SERVER['__migration.creator.table'], $_SERVER['__migration.creator.path']);
     }

@@ -53,11 +53,11 @@ class CacheMemcachedStoreTest extends TestCase
     {
         Carbon::setTestNow($now = Carbon::now());
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['set'])->getMock();
-        $memcache->expects($this->once())->method('set')->with('foo', 'bar', $now->timestamp + 60)->willReturn(true);
+        $memcache->expects($this->once())->method('set')->with('foo', 'bar', $now->addMinute()->getTimestamp())->willReturn(true);
         $store = new MemcachedStore($memcache);
         $result = $store->put('foo', 'bar', 60);
         $this->assertTrue($result);
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
     }
 
     public function testTouchMethodProperlyCallsMemcache(): void

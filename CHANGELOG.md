@@ -1,6 +1,46 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.5.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.6.0...13.x)
+
+## [v13.6.0](https://github.com/laravel/framework/compare/v13.5.0...v13.6.0) - 2026-04-21
+
+* [13.x] Use `version_compare` function by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/59687
+* [13.x] Flip misordered assertions arguments by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/59691
+* [13.x] Remove unused variable in `catch()` by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/59689
+* [13.x] Fix number abbreviation rollover between unit tiers by [@Button99](https://github.com/Button99) in https://github.com/laravel/framework/pull/59692
+* [13.x ]Use Null and Isset coalescing when possible by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/59690
+* [13.x] Change `count` array comparison to empty array comparison to improve performance by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/59688
+* [13.x] testsuite by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/59702
+* [13.x] Enforce static calls by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/59704
+* [13.x] Allow Table Attribute on child to override parent by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59701
+* [13.x] Return null from Cursor::fromEncoded for malformed payloads by [@bipinks](https://github.com/bipinks) in https://github.com/laravel/framework/pull/59699
+* [13.x] Port forward rate limiter fix by [@paulandroshchuk](https://github.com/paulandroshchuk) in https://github.com/laravel/framework/pull/59706
+* [13.x] Add debounceable queued jobs by [@matthewnessworthy](https://github.com/matthewnessworthy) in https://github.com/laravel/framework/pull/59507
+* [13.x] Support JSON responses for the built-in health route by [@WendellAdriel](https://github.com/WendellAdriel) in https://github.com/laravel/framework/pull/59710
+* [13.x] Ensure Queue::route string defaults to queue only by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59711
+* [13.x] Fix failOnUnknownFields query parameter handling by [@cyrodjohn](https://github.com/cyrodjohn) in https://github.com/laravel/framework/pull/59728
+* [13.x] Fix flaky QueueWorkerTest by freezing time before computing retryUntil by [@bipinks](https://github.com/bipinks) in https://github.com/laravel/framework/pull/59727
+* [13.x]  Allow array of pivot arrays to be passed to hasAttached by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59723
+* [13.x] Fix TypeError in digits_between validation rule on non-string values by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59717
+* [13.x] Add enum support to PasswordBrokerManager by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59714
+* [13.x] Add enum support to BroadcastManager by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59713
+* Change attempts column type from tiny to small integer by [@ju-gow](https://github.com/ju-gow) in https://github.com/laravel/framework/pull/59718
+* [13.x] Get rid of useless Mockery::close by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/59730
+* [13.x] Fix Vite CSS not loaded from nested chunk imports by [@karim1999](https://github.com/karim1999) in https://github.com/laravel/framework/pull/59662
+* [13.x] Support named credential providers for SQS queue connections by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/59733
+* [13.x] Enforce stricter assertions by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/59749
+* [13.x] Cast to string before preg_match in decimal, max_digits, and min_digits rules by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59739
+* [13.x] Ignore PHPUnit security advisory GHSA-qrr6-mg7r-m243 by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59761
+* [13.x] Allow assertDatabase has & missing to accept arrays by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59752
+* [13.x ] Normalize Carbon by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/59750
+* [13.x] Implement CanFlushLocks on FailoverStore by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59738
+* [13.x] Validate MAC across all decryption keys by [@ma32kc](https://github.com/ma32kc) in https://github.com/laravel/framework/pull/59742
+* [13.x] Use generic TModel in additional places in Factory class by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/59780
+* [13.x] Ensure assertModelMissing and assertModelExists dont silently pass by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59772
+* [13.x] Introduce `JsonFormatter` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/59756
+* [13.x] Add prefersJsonResponses() to the application builder by [@WendellAdriel](https://github.com/WendellAdriel) in https://github.com/laravel/framework/pull/59753
+* [13.x] Add support for Cloudflare Email Service by [@dwightwatson](https://github.com/dwightwatson) in https://github.com/laravel/framework/pull/59735
+* [13.x] Add enum support to NotificationChannelManager channel and driver methods by [@yousefkadah](https://github.com/yousefkadah) in https://github.com/laravel/framework/pull/59783
 
 ## [v13.5.0](https://github.com/laravel/framework/compare/v13.4.0...v13.5.0) - 2026-04-14
 

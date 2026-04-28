@@ -26,7 +26,7 @@ class UtilTest extends TestCase
         $this->assertEquals(['a'], Util::arrayWrap($string));
         $this->assertEquals($array, Util::arrayWrap($array));
         $this->assertEquals([$object], Util::arrayWrap($object));
-        $this->assertEquals([], Util::arrayWrap(null));
+        $this->assertSame([], Util::arrayWrap(null));
         $this->assertEquals([null], Util::arrayWrap([null]));
         $this->assertEquals([null, null], Util::arrayWrap([null, null]));
         $this->assertEquals([''], Util::arrayWrap(''));

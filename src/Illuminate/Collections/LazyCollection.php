@@ -567,6 +567,10 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             foreach ($this as $key => $item) {
                 $resolvedKey = $keyBy($item, $key);
 
+                if ($resolvedKey instanceof \UnitEnum) {
+                    $resolvedKey = enum_value($resolvedKey);
+                }
+
                 if (is_object($resolvedKey)) {
                     $resolvedKey = (string) $resolvedKey;
                 }
@@ -585,10 +589,11 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     public function has($key)
     {
         $keys = array_flip(is_array($key) ? $key : func_get_args());
-        $count = count($keys);
 
         foreach ($this as $key => $value) {
-            if (array_key_exists($key, $keys) && --$count == 0) {
+            unset($keys[$key]);
+
+            if (empty($keys)) {
                 return true;
             }
         }
@@ -1937,7 +1942,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     protected function now()
     {
         return class_exists(Carbon::class)
-            ? Carbon::now()->timestamp
+            ? Carbon::now()->getTimestamp()
             : time();
     }
 

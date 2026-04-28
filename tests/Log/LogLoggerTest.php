@@ -80,7 +80,7 @@ class LogLoggerTest extends TestCase
         $this->assertSame('foo', $_SERVER['__log.message']);
         unset($_SERVER['__log.message']);
         $this->assertTrue(isset($_SERVER['__log.context']));
-        $this->assertEquals([], $_SERVER['__log.context']);
+        $this->assertSame([], $_SERVER['__log.context']);
         unset($_SERVER['__log.context']);
     }
 

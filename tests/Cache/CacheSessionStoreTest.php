@@ -13,7 +13,7 @@ class CacheSessionStoreTest extends TestCase
 {
     protected function tearDown(): void
     {
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
 
         parent::tearDown();
     }
@@ -207,7 +207,7 @@ class CacheSessionStoreTest extends TestCase
     public function testItemKey()
     {
         $store = new SessionStore(self::getSession(), 'custom_prefix');
-        $this->assertEquals('custom_prefix.foo', $store->itemKey('foo'));
+        $this->assertSame('custom_prefix.foo', $store->itemKey('foo'));
     }
 
     public function testValuesAreStoredByReference()

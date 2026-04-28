@@ -39,6 +39,13 @@ class CallQueuedHandler
     protected $container;
 
     /**
+     * The command currently being processed.
+     *
+     * @var mixed
+     */
+    protected $runningCommand;
+
+    /**
      * Create a new handler instance.
      *
      * @param  \Illuminate\Contracts\Bus\Dispatcher  $dispatcher
@@ -71,7 +78,13 @@ class CallQueuedHandler
             return $this->deleteDebouncedJob($job, $command);
         }
 
-        $this->dispatchThroughMiddleware($job, $command);
+        $this->runningCommand = $command;
+
+        try {
+            $this->dispatchThroughMiddleware($job, $command);
+        } finally {
+            $this->runningCommand = null;
+        }
 
         if (! $job->isReleased() && ! $this->commandShouldBeUniqueUntilProcessing($command)) {
             $this->ensureUniqueJobLockIsReleased($command);
@@ -427,5 +440,15 @@ class CallQueuedHandler
         if (method_exists($command, 'invokeChainCatchCallbacks')) {
             $command->invokeChainCatchCallbacks($e);
         }
+    }
+
+    /**
+     * Get the command currently being processed.
+     *
+     * @return mixed
+     */
+    public function getRunningCommand()
+    {
+        return $this->runningCommand;
     }
 }

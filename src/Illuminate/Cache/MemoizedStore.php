@@ -3,10 +3,11 @@
 namespace Illuminate\Cache;
 
 use BadMethodCallException;
+use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 
-class MemoizedStore implements LockProvider, Store
+class MemoizedStore implements CanFlushLocks, LockProvider, Store
 {
     /**
      * The memoized cache values.
@@ -105,7 +106,6 @@ class MemoizedStore implements LockProvider, Store
     /**
      * Store multiple items in the cache for a given number of seconds.
      *
-     * @param  array  $values
      * @param  int  $seconds
      * @return bool
      */
@@ -195,6 +195,32 @@ class MemoizedStore implements LockProvider, Store
         }
 
         return $this->repository->getStore()->restoreLock(...func_get_args());
+    }
+
+    /**
+     * Flush all locks managed by the store.
+     *
+     * @throws \BadMethodCallException
+     */
+    public function flushLocks(): bool
+    {
+        $store = $this->repository->getStore();
+
+        if (! $store instanceof CanFlushLocks) {
+            throw new BadMethodCallException('This cache store does not support flushing locks.');
+        }
+
+        return $store->flushLocks();
+    }
+
+    /**
+     * Determine if the lock store is separate from the cache store.
+     */
+    public function hasSeparateLockStore(): bool
+    {
+        $store = $this->repository->getStore();
+
+        return $store instanceof CanFlushLocks && $store->hasSeparateLockStore();
     }
 
     /**

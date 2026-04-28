@@ -530,7 +530,7 @@ class DatabaseEloquentBuilderCreateOrFirstTest extends TestCase
 
         $result = $model->newQuery()->updateOrCreate(['attr' => 'foo'], fn () => ['val' => 'baz']);
         $this->assertFalse($result->wasRecentlyCreated);
-        $this->assertEquals('baz', $result->val);
+        $this->assertSame('baz', $result->val);
     }
 
     public function testUpdateOrCreateInvokesClosureExactlyOnceWhenCreating(): void

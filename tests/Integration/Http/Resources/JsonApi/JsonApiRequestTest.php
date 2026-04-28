@@ -30,6 +30,18 @@ class JsonApiRequestTest extends TestCase
         $this->assertSame([], $request->sparseFields('posts'));
     }
 
+    public function testItCanDetermineIfSparseFieldsetWasProvided()
+    {
+        $request = JsonApiRequest::create(uri: '/?'.http_build_query([
+            'fields' => [
+                'users' => '',
+            ],
+        ]));
+
+        $this->assertTrue($request->hasSparseFieldset('users'));
+        $this->assertFalse($request->hasSparseFieldset('posts'));
+    }
+
     public function testItCanResolveSparseIncluded()
     {
         $request = JsonApiRequest::create(uri: '/?'.http_build_query([

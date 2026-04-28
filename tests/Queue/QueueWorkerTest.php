@@ -6,7 +6,9 @@ use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Queue\Interruptible;
 use Illuminate\Contracts\Queue\Job as QueueJobContract;
+use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobPopped;
 use Illuminate\Queue\Events\JobPopping;
@@ -507,6 +509,31 @@ class QueueWorkerTest extends TestCase
         }))->once();
     }
 
+    public function testInterruptibleJobIsNotifiedOnSignal()
+    {
+        $interruptible = new class implements Interruptible
+        {
+            public ?int $receivedSignal = null;
+
+            public function interrupted(int $signal): void
+            {
+                $this->receivedSignal = $signal;
+            }
+        };
+
+        $handler = m::mock(CallQueuedHandler::class);
+        $handler->shouldReceive('getRunningCommand')->andReturn($interruptible);
+
+        $worker = $this->getWorker('default', ['queue' => []]);
+        $job = new WorkerFakeJob;
+        $job->resolvedJob = $handler;
+
+        $worker->currentJob = $job;
+        $worker->notifyJobOfSignal(15);
+
+        $this->assertSame(15, $interruptible->receivedSignal);
+    }
+
     /**
      * Helpers...
      */
@@ -552,6 +579,11 @@ class InsomniacWorker extends Worker
     public function sleep($seconds)
     {
         $this->sleptFor = $seconds;
+    }
+
+    public function notifyJobOfSignal(int $signal): void
+    {
+        parent::notifyJobOfSignal($signal);
     }
 
     public function stop($status = 0, $options = null, $reason = null)
@@ -649,6 +681,7 @@ class WorkerFakeJob implements QueueJobContract
     public $connectionName = '';
     public $queue = '';
     public $rawBody = '';
+    public $resolvedJob = null;
 
     public function __construct($callback = null)
     {
@@ -787,6 +820,11 @@ class WorkerFakeJob implements QueueJobContract
     public function resolveQueuedJobClass()
     {
         return 'WorkerFakeJob';
+    }
+
+    public function getResolvedJob()
+    {
+        return $this->resolvedJob;
     }
 }
 

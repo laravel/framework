@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Concurrency;
 
 use Exception;
 use Illuminate\Concurrency\ProcessDriver;
+use Illuminate\Concurrency\SyncDriver;
 use Illuminate\Foundation\Application;
 use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Support\Facades\Concurrency;
@@ -88,6 +89,14 @@ PHP);
         // $this->assertEquals(4, $forkOutput['second']);
     }
 
+    public function testDriverCanBeResolvedUsingBackedEnum()
+    {
+        $this->assertInstanceOf(
+            SyncDriver::class,
+            Concurrency::driver(ConcurrencyDriverEnum::Sync),
+        );
+    }
+
     public function testRunHandlerProcessErrorWithDefaultExceptionWithoutParam()
     {
         $this->expectException(Exception::class);
@@ -154,10 +163,15 @@ PHP);
             },
         ]);
 
-        $this->assertEquals('first', $first);
-        $this->assertEquals('second', $second);
-        $this->assertEquals('third', $third);
+        $this->assertSame('first', $first);
+        $this->assertSame('second', $second);
+        $this->assertSame('third', $third);
     }
+}
+
+enum ConcurrencyDriverEnum: string
+{
+    case Sync = 'sync';
 }
 
 class ExceptionWithoutParam extends Exception
