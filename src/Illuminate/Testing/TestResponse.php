@@ -707,6 +707,8 @@ class TestResponse implements ArrayAccess
 
         $values = $escape ? array_map(e(...), $value) : $value;
 
+        $this->ensureValuesAreNotEmpty($values);
+
         foreach ($values as $value) {
             PHPUnit::withResponse($this)->assertStringContainsString((string) $value, $this->getContent());
         }
@@ -735,6 +737,8 @@ class TestResponse implements ArrayAccess
     public function assertSeeInOrder(array $values, $escape = true)
     {
         $values = $escape ? array_map(e(...), $values) : $values;
+
+        $this->ensureValuesAreNotEmpty($values);
 
         PHPUnit::withResponse($this)->assertThat($values, new SeeInOrder($this->getContent()));
 
@@ -765,6 +769,8 @@ class TestResponse implements ArrayAccess
 
         $values = $escape ? array_map(e(...), $value) : $value;
 
+        $this->ensureValuesAreNotEmpty($values);
+
         PHPUnit::withResponse($this)->assertThat($values, new SeeInHtml($this->getContent()));
 
         return $this;
@@ -780,6 +786,8 @@ class TestResponse implements ArrayAccess
     public function assertSeeTextInOrder(array $values, $escape = true)
     {
         $values = $escape ? array_map(e(...), $values) : $values;
+
+        $this->ensureValuesAreNotEmpty($values);
 
         PHPUnit::withResponse($this)->assertThat($values, new SeeInHtml($this->getContent(), true));
 
@@ -798,6 +806,8 @@ class TestResponse implements ArrayAccess
         $value = Arr::wrap($value);
 
         $values = $escape ? array_map(e(...), $value) : $value;
+
+        $this->ensureValuesAreNotEmpty($values);
 
         foreach ($values as $value) {
             PHPUnit::withResponse($this)->assertStringNotContainsString((string) $value, $this->getContent());
@@ -829,6 +839,8 @@ class TestResponse implements ArrayAccess
         $value = Arr::wrap($value);
 
         $values = $escape ? array_map(e(...), $value) : $value;
+
+        $this->ensureValuesAreNotEmpty($values);
 
         PHPUnit::withResponse($this)->assertThat($values, new SeeInHtml($this->getContent(), negate: true));
 
@@ -1406,6 +1418,19 @@ class TestResponse implements ArrayAccess
         }
 
         return $this;
+    }
+
+    /**
+     * Ensure the given values are not empty before asserting against them.
+     *
+     * @param  array  $values
+     * @return void
+     */
+    protected function ensureValuesAreNotEmpty(array $values)
+    {
+        PHPUnit::withResponse($this)->assertNotEmpty(
+            $values, 'No values were provided to assert against.'
+        );
     }
 
     /**

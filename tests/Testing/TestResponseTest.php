@@ -697,6 +697,24 @@ EOT
         $response->assertSeeTextInOrder(['foobar', 'qux', 'baz']);
     }
 
+    #[TestWith(['assertSee'])]
+    #[TestWith(['assertSeeText'])]
+    #[TestWith(['assertSeeInOrder'])]
+    #[TestWith(['assertSeeTextInOrder'])]
+    #[TestWith(['assertDontSee'])]
+    #[TestWith(['assertDontSeeText'])]
+    public function testAssertSeeMethodsFailWhenGivenEmptyArray(string $method): void
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('No values were provided to assert against.');
+
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li></ul>',
+        ]);
+
+        $response->{$method}([]);
+    }
+
     public function testAssertDontSee(): void
     {
         $response = $this->makeMockResponse([
