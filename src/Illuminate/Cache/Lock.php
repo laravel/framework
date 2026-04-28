@@ -76,7 +76,7 @@ abstract class Lock implements LockContract
     /**
      * Returns the owner value written into the driver for this lock.
      *
-     * @return string
+     * @return string|null
      */
     abstract protected function getCurrentOwner();
 
