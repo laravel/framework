@@ -291,3 +291,16 @@ if (! function_exists('when')) {
         return value($default, $condition);
     }
 }
+
+if (! function_exists('is_collection')) {
+    /**
+     * Finds whether a variable is a collection.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    function is_collection($value)
+    {
+        return $value instanceof Collection;
+    }
+}
