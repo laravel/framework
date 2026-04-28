@@ -133,7 +133,7 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
-     * Register a queue alias.
+     * Register a queue group.
      *
      * @param  string  $group
      * @param  array|string  $queues
@@ -362,7 +362,7 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
-     * Resolve a queue name from its alias.
+     * Resolve a queue name from its group.
      *
      * @param  string  $queue
      * @return array
