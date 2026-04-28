@@ -20,14 +20,14 @@ class RequestDurationThresholdTest extends TestCase
         $response = new Response();
         $called = false;
         $kernel = $this->app[Kernel::class];
-        $kernel->whenRequestLifecycleIsLongerThan(CarbonInterval::seconds(1), function () use (&$called) {
+        $kernel->whenRequestLifecycleIsLongerThan(CarbonInterval::second(), function () use (&$called) {
             $called = true;
         });
 
         Carbon::setTestNow(Carbon::now());
         $kernel->handle($request);
 
-        Carbon::setTestNow(Carbon::now()->addSecond()->addMilliseconds(1));
+        Carbon::setTestNow(Carbon::now()->addSecond()->addMillisecond());
         $kernel->terminate($request, $response);
 
         $this->assertTrue($called);
@@ -40,7 +40,7 @@ class RequestDurationThresholdTest extends TestCase
         $response = new Response();
         $called = false;
         $kernel = $this->app[Kernel::class];
-        $kernel->whenRequestLifecycleIsLongerThan(CarbonInterval::seconds(1), function () use (&$called) {
+        $kernel->whenRequestLifecycleIsLongerThan(CarbonInterval::second(), function () use (&$called) {
             $called = true;
         });
 
@@ -60,7 +60,7 @@ class RequestDurationThresholdTest extends TestCase
         $response = new Response();
         $url = null;
         $kernel = $this->app[Kernel::class];
-        $kernel->whenRequestLifecycleIsLongerThan(CarbonInterval::seconds(1), function ($startedAt, $request) use (&$url) {
+        $kernel->whenRequestLifecycleIsLongerThan(CarbonInterval::second(), function ($startedAt, $request) use (&$url) {
             $url = $request->url();
         });
 
@@ -79,7 +79,7 @@ class RequestDurationThresholdTest extends TestCase
         Route::get('test-route', fn () => 'ok');
         $kernel = $this->app[Kernel::class];
         $startedAt = null;
-        $kernel->whenRequestLifecycleIsLongerThan(CarbonInterval::seconds(1), function ($started) use (&$startedAt) {
+        $kernel->whenRequestLifecycleIsLongerThan(CarbonInterval::second(), function ($started) use (&$startedAt) {
             $startedAt = $started;
         });
 
@@ -106,7 +106,7 @@ class RequestDurationThresholdTest extends TestCase
         Carbon::setTestNow(Carbon::now());
         $kernel->handle($request);
 
-        Carbon::setTestNow(Carbon::now()->addSecond()->addMilliseconds(1));
+        Carbon::setTestNow(Carbon::now()->addSecond()->addMillisecond());
         $kernel->terminate($request, $response);
 
         $this->assertTrue($called);
@@ -146,7 +146,7 @@ class RequestDurationThresholdTest extends TestCase
         Carbon::setTestNow(Carbon::now());
         $kernel->handle($request);
 
-        Carbon::setTestNow(Carbon::now()->addSecond()->addMilliseconds(1));
+        Carbon::setTestNow(Carbon::now()->addSecond()->addMillisecond());
         $kernel->terminate($request, $response);
 
         $this->assertTrue($called);
