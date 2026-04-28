@@ -102,7 +102,7 @@ class Processor
      * Process the results of a types query.
      *
      * @param  list<array<string, mixed>>  $results
-     * @return list<array{name: string, schema: string, type: string, type: string, category: string, implicit: bool}>
+     * @return list<array{name: string, schema: string, schema_qualified_name: string, type: string, category: string, implicit: bool}>
      */
     public function processTypes($results)
     {

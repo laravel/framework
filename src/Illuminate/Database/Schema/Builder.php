@@ -251,7 +251,7 @@ class Builder
      * Get the user-defined types that belong to the connection.
      *
      * @param  string|string[]|null  $schema
-     * @return list<array{name: string, schema: string, type: string, type: string, category: string, implicit: bool}>
+     * @return list<array{name: string, schema: string, schema_qualified_name: string, type: string, category: string, implicit: bool}>
      */
     public function getTypes($schema = null)
     {
