@@ -163,6 +163,10 @@ class RouteUrlGenerator
      */
     protected function addPortToDomain($domain)
     {
+        if (! is_null(parse_url($domain, PHP_URL_PORT))) {
+            return $domain;
+        }
+        
         $secure = $this->request->isSecure();
 
         $port = (int) $this->request->getPort();
