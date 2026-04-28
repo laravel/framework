@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Database\Schema\Blueprint;
@@ -165,6 +166,48 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals(1, PostTagPivot::count());
         $this->assertEquals(1, PostTagPivot::first()->post_id);
         $this->assertEquals(2, PostTagPivot::first()->tag_id);
+    }
+
+    public function testPivotRelationsCanBeEagerLoadedOnBelongsToManyRelation()
+    {
+        $user = User::create(['name' => Str::random()]);
+        $matchingPost = Post::create(['title' => 'A title']);
+        $mismatchingPost = Post::create(['title' => 'Another title']);
+
+        $user->postsWithCustomPivot()->attach($matchingPost);
+        $user->postsWithCustomPivot()->attach($mismatchingPost);
+
+        $user = User::query()->with([
+            'postsWithCustomPivot' => function ($query) {
+                $query->eagerPivot([
+                    'user',
+                    'post' => function (BelongsTo $query) {
+                        $query->where('title', 'A title');
+                    },
+                ]);
+            },
+        ])->first();
+
+        DB::enableQueryLog();
+
+        $pivots = $user->postsWithCustomPivot->pluck('pivot');
+
+        $this->assertTrue($pivots->every->relationLoaded('user'));
+        $this->assertTrue($pivots->every->relationLoaded('post'));
+        $this->assertTrue($pivots->every(fn ($pivot) => $pivot->user->is($user)));
+        $this->assertSame(
+            [$matchingPost->id],
+            $pivots->pluck('post')->filter()->pluck('id')->all()
+        );
+
+        $pivots->each(function ($pivot) {
+            $pivot->user;
+            $pivot->post;
+        });
+
+        $this->assertEmpty(DB::getQueryLog());
+
+        DB::disableQueryLog();
     }
 
     public function testCustomPivotClassUsingSync()
@@ -1643,6 +1686,16 @@ class TagWithCustomPivot extends Model
 class UserPostPivot extends Pivot
 {
     protected $table = 'users_posts';
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+    }
+
+    public function post(): BelongsTo
+    {
+        return $this->belongsTo(Post::class, 'post_uuid', 'uuid');
+    }
 }
 
 class PostTagPivot extends Pivot

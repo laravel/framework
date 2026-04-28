@@ -145,6 +145,13 @@ class BelongsToMany extends Relation
     protected $accessor = 'pivot';
 
     /**
+     * The pivot relationships that should be eager loaded.
+     *
+     * @var array
+     */
+    protected $pivotEagerLoad = [];
+
+    /**
      * Create a new belongs to many relationship instance.
      *
      * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>  $query
@@ -919,6 +926,28 @@ class BelongsToMany extends Relation
             : $this->related->newCollection();
     }
 
+    /**
+     * Specify pivot relationships that should be eager loaded.
+     *
+     * @param  array<array-key, array|(\Closure(\Illuminate\Database\Eloquent\Relations\Relation<*,*,*>): mixed)|string>|string  $relations
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Relations\Relation<*,*,*>): mixed)|string|null  $callback
+     * @return $this
+     */
+    public function eagerPivot($relations, $callback = null)
+    {
+        $query = $this->newExistingPivot()->newQueryWithoutRelationships();
+
+        if ($callback instanceof Closure) {
+            $query->with($relations, $callback);
+        } else {
+            $query->with(is_string($relations) ? func_get_args() : $relations);
+        }
+
+        $this->pivotEagerLoad = array_merge($this->pivotEagerLoad, $query->getEagerLoads());
+
+        return $this;
+    }
+
     /** @inheritDoc */
     public function get($columns = ['*'])
     {
@@ -1243,6 +1272,26 @@ class BelongsToMany extends Relation
                 $this->migratePivotAttributes($model)
             ));
         }
+
+        $this->eagerLoadPivotRelations($models);
+    }
+
+    /**
+     * Eager load relationships on the pivot models.
+     *
+     * @param  array<int, TRelatedModel>  $models
+     * @return void
+     */
+    protected function eagerLoadPivotRelations(array $models)
+    {
+        if ($this->pivotEagerLoad === [] || $models === []) {
+            return;
+        }
+
+        (new EloquentCollection(array_map(
+            fn ($model) => $model->getRelation($this->accessor),
+            $models,
+        )))->load($this->pivotEagerLoad);
     }
 
     /**
