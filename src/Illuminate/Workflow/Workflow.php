@@ -27,24 +27,11 @@ class Workflow
     public array $stepNameToCallback = [];
 
     /**
-     * This is the order of operations to execute. If null, then the step itself must call the workflow
-     * to tell it what to perform next.
+     * The current step being worked.
      *
-     * @var array<int, string>|null
+     * @var string
      */
-    public ?array $orderOfOperations = null;
-
-    /**
-     * @var (callable(static): void)|null
-     */
-    public mixed $persistenceCallback = null;
-
-    /**
-     * The next step to perform.
-     *
-     * @var string|null
-     */
-    public ?string $next = null;
+    public string $working;
 
     public function __construct(
         protected Container $container,
@@ -58,16 +45,13 @@ class Workflow
         return $this;
     }
 
-    public function withStep(string $stepName, callable $step): self
+    public function withStep(string $stepName, callable $step, bool $replace = true): self
     {
+        if (isset($this->stepNameToCallback[$stepName]) && $replace === false) {
+            throw new \RuntimeException(sprintf('The step [%s] already exists.', $stepName));
+        }
+
         $this->stepNameToCallback[$stepName] = $step;
-
-        return $this;
-    }
-
-    public function withPersistence(?callable $persistenceCallback = null): self
-    {
-        $this->persistenceCallback = $persistenceCallback;
 
         return $this;
     }
@@ -75,27 +59,22 @@ class Workflow
     /**
      * @throws \LogicException
      */
-    public function handle(): void
+    public function handle(string $step): void
     {
-        if ($this->next === null && empty($this->orderOfOperations)) {
-            throw new \LogicException('You must specify the operation to execute');
+        $this->working = $step;
+
+        if (! isset($this->stepNameToCallback[$step])) {
+            throw new \InvalidArgumentException(sprintf('The operation [%s] does not exist', $step));
         }
 
-        $next = $this->next ?? array_pop($this->orderOfOperations);
-
-        if (! isset($this->stepNameToCallback[$next])) {
-            throw new \InvalidArgumentException(sprintf('The operation [%s] does not exist', $next));
-        }
-
-        $newState = $this->container->call($this->stepNameToCallback[$next], [&$this->state, $this]);
+        $newState = $this->container->call(
+            $this->stepNameToCallback[$step],
+            // @todo this needs some kind of trait that determines the types I guess? Or to pass named parameters or whatever
+            ['state' => &$this->state, $this]
+        );
 
         if ($newState !== null) {
             $this->state = $newState;
-        }
-
-        // Should the workflow be responsible for persisting state?
-        if ($this->persistenceCallback !== null) {
-            call_user_func($this->persistenceCallback, $newState);
         }
     }
 }
