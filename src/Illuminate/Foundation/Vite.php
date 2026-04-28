@@ -1042,7 +1042,7 @@ class Vite implements Htmlable
     {
         $isHot = $this->isRunningHot();
 
-        $fonts = $this->fonts();
+        $fonts = $this->viteFonts();
 
         $manifest = $fonts->manifest($isHot, $this->buildDirectory, $this->fontsManifestFilename, $this->hotFile());
 
@@ -1146,7 +1146,7 @@ class Vite implements Htmlable
      */
     protected function renderFontStyle($manifest, $aliases)
     {
-        $css = $this->fonts()->resolveStyleContent($manifest, $aliases, $this->buildDirectory);
+        $css = $this->viteFonts()->resolveStyleContent($manifest, $aliases, $this->buildDirectory);
 
         if ($css === '') {
             return '';
@@ -1166,7 +1166,7 @@ class Vite implements Htmlable
      *
      * @return \Illuminate\Foundation\ViteFonts
      */
-    protected function fonts()
+    protected function viteFonts()
     {
         return $this->fonts ??= new ViteFonts;
     }
