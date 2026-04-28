@@ -38,7 +38,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
         $model = $this->getMockModel();
-        $builder->setModel( $model);
+        $builder->setModel($model);
         $model->shouldReceive('getKeyType')->once()->andReturn('int');
         $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
         $builder->shouldReceive('first')->with(['column'])->andReturn('baz');
