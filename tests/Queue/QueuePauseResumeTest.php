@@ -161,9 +161,9 @@ class QueuePauseResumeTest extends TestCase
         $this->assertSame('notifications', $dispatchedEvent->queue);
     }
 
-    public function testAliasesPauseAndResume()
+    public function testGroupsPauseAndResume()
     {
-        $this->manager->alias('mail', ['mail-high', 'mail-low']);
+        $this->manager->group('mail', ['mail-high', 'mail-low']);
 
         $this->manager->pause('redis', 'mail');
 
@@ -176,11 +176,11 @@ class QueuePauseResumeTest extends TestCase
         $this->assertFalse($this->manager->isPaused('redis', 'mail-low'));
     }
 
-    public function testAliasesPauseFor()
+    public function testGroupsPauseFor()
     {
         Carbon::setTestNow();
 
-        $this->manager->alias('mail', ['mail-high', 'mail-low']);
+        $this->manager->group('mail', ['mail-high', 'mail-low']);
 
         $this->manager->pauseFor('redis', 'mail', 30);
 
@@ -191,9 +191,9 @@ class QueuePauseResumeTest extends TestCase
         $this->assertFalse($this->manager->isPaused('redis', 'mail-high'));
     }
 
-    public function testAliasesEventsFire()
+    public function testGroupsEventsFire()
     {
-        $this->manager->alias('mail', ['mail-high', 'mail-low']);
+        $this->manager->group('mail', ['mail-high', 'mail-low']);
 
         $paused = [];
         $this->manager->getApplication()['events']->listen(QueuePaused::class, function ($event) use (&$paused) {

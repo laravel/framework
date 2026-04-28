@@ -39,11 +39,11 @@ class QueueManager implements FactoryContract, MonitorContract
     protected $connectors = [];
 
     /**
-     * The queue aliases that have been registered.
+     * The queue groups that have been registered.
      *
      * @var array
      */
-    protected $aliases = [];
+    protected $groups = [];
 
     /**
      * Create a new queue manager instance.
@@ -135,13 +135,13 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Register a queue alias.
      *
-     * @param  string  $alias
+     * @param  string  $group
      * @param  array|string  $queues
      * @return void
      */
-    public function alias($alias, $queues)
+    public function group($group, $queues)
     {
-        $this->aliases[$alias] = (array) $queues;
+        $this->groups[$group] = (array) $queues;
     }
 
     /**
@@ -243,7 +243,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function pause($connection, $queue)
     {
-        foreach ($this->resolveQueueAlias($queue) as $resolvedQueue) {
+        foreach ($this->resolveQueueGroups($queue) as $resolvedQueue) {
             $this->app['cache']
                 ->store()
                 ->forever("illuminate:queue:paused:{$connection}:{$resolvedQueue}", true);
@@ -264,7 +264,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function pauseFor($connection, $queue, $ttl)
     {
-        foreach ($this->resolveQueueAlias($queue) as $resolvedQueue) {
+        foreach ($this->resolveQueueGroups($queue) as $resolvedQueue) {
             $this->app['cache']
                 ->store()
                 ->put("illuminate:queue:paused:{$connection}:{$resolvedQueue}", true, $ttl);
@@ -284,7 +284,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function resume($connection, $queue)
     {
-        foreach ($this->resolveQueueAlias($queue) as $resolvedQueue) {
+        foreach ($this->resolveQueueGroups($queue) as $resolvedQueue) {
             $this->app['cache']
                 ->store()
                 ->forget("illuminate:queue:paused:{$connection}:{$resolvedQueue}");
@@ -367,9 +367,9 @@ class QueueManager implements FactoryContract, MonitorContract
      * @param  string  $queue
      * @return array
      */
-    protected function resolveQueueAlias($queue)
+    protected function resolveQueueGroups($queue)
     {
-        return $this->aliases[$queue] ?? [$queue];
+        return $this->groups[$queue] ?? [$queue];
     }
 
     /**
