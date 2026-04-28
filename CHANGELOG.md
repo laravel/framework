@@ -1,6 +1,54 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.6.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.7.0...13.x)
+
+## [v13.7.0](https://github.com/laravel/framework/compare/v13.6.0...v13.7.0) - 2026-04-28
+
+* [13.x] Apply rector fixes by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/59787
+* Support enum in LazyCollection -> keyBy() by [@Back1ng](https://github.com/Back1ng) in https://github.com/laravel/framework/pull/59809
+* [13.x] Add enum support to ConcurrencyManager driver method by [@maherelgamil](https://github.com/maherelgamil) in https://github.com/laravel/framework/pull/59801
+* [13.x] Allow arrays for assertSoftDeleted & assertNotSoftDeleted by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59796
+* [13.x] Extract exception context in `JsonFormatter` when `ExceptionHandler` is not bound by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/59799
+* [13.x] Add isLocked to the Lock class by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59791
+* Fix route registration for domain-scoped routes by [@Bottelet](https://github.com/Bottelet) in https://github.com/laravel/framework/pull/59793
+* [13.x] Mark `Scope@apply` builder parameter as having covariant template by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/59790
+* [13.x] Allowing `DebounceFor` attribute to be inherited by [@TWithers](https://github.com/TWithers) in https://github.com/laravel/framework/pull/59795
+* [13.x] Fix PendingDispatch resolving Cache for every dispatched job by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59821
+* [13.x] Add bulk JSON path assertions to TestResponse by [@cyrodjohn](https://github.com/cyrodjohn) in https://github.com/laravel/framework/pull/59829
+* [13.x] Fix false positives in LazyCollection::has() for duplicate keys by [@Button99](https://github.com/Button99) in https://github.com/laravel/framework/pull/59832
+* [13.x] Add UnitEnum type support for $limiterName on RateLimitedWithRedis by [@trippo](https://github.com/trippo) in https://github.com/laravel/framework/pull/59841
+* [13.x] Allow jobs to react to worker signals by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59833
+* [13.x] Honor empty JSON:API sparse fieldsets by [@prateekbhujel](https://github.com/prateekbhujel) in https://github.com/laravel/framework/pull/59813
+* [13.x] Fix flaky DynamoBatchTest timing assertions by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59844
+* [13.x] Memoize credentials in SqsConnector by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/59866
+* [13.x] Disable pausing on managed queue workers by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/59870
+* [13.x] Fix getMigrationBatches return type annotation by [@mahfuz-rahman007](https://github.com/mahfuz-rahman007) in https://github.com/laravel/framework/pull/59876
+* [13.x] Fix PHPDoc typo in MigrationRepositoryInterface by [@mahfuz-rahman007](https://github.com/mahfuz-rahman007) in https://github.com/laravel/framework/pull/59875
+* [13.x] Add UnitEnum support to Cache Repository touch method by [@shane-zeng](https://github.com/shane-zeng) in https://github.com/laravel/framework/pull/59864
+* [13.x] Prevent array query params from bypassing signed URL validation by [@maherelgamil](https://github.com/maherelgamil) in https://github.com/laravel/framework/pull/59860
+* [13.x] Add enum support to setDefaultDriver in QueueManager, LogManager, and SessionManager by [@maherelgamil](https://github.com/maherelgamil) in https://github.com/laravel/framework/pull/59861
+* [13.x] Add enum support to RedisManager purge method by [@genius-asif-hub](https://github.com/genius-asif-hub) in https://github.com/laravel/framework/pull/59857
+* [13.x] Fix factory hasAttached method pivot JSON attribute handling by [@rmd974](https://github.com/rmd974) in https://github.com/laravel/framework/pull/59856
+* [13.x] Implement CanFlushLocks on NullStore and MemoizedStore by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/59850
+* [13.x] Introduce WorkerInterrupted event by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59848
+* [13.x] Fix MigrationRepositoryInterface return type docblocks (object vs array) by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59887
+* int argument for Collection::sortBy() by [@lorenzolosa](https://github.com/lorenzolosa) in https://github.com/laravel/framework/pull/59894
+* [13.x] Add detailed [@return](https://github.com/return) shape to Schema\Builder::getForeignKeys by [@maherelgamil](https://github.com/maherelgamil) in https://github.com/laravel/framework/pull/59903
+* [13.x] Fix EloquentModelDecimalCastingTest assertion across brick/math versions by [@maherelgamil](https://github.com/maherelgamil) in https://github.com/laravel/framework/pull/59904
+* [13.x] Correct Lock getCurrentOwner [@return](https://github.com/return) type to string|null by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59890
+* [13.x] Correct Batch fresh and add [@return](https://github.com/return) to self|null by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59891
+* [13.x] Align Mailable::cc [@return](https://github.com/return) with sibling fluent methods by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59892
+* [13.x] Add support for `SortDirection` enum to collections and Arr by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/59859
+* Add [@fonts](https://github.com/fonts) Blade directive and Vite font optimization runtime by [@WendellAdriel](https://github.com/WendellAdriel) in https://github.com/laravel/framework/pull/59584
+* [13.x] Refactor: add `match` by [@alipowerful7](https://github.com/alipowerful7) in https://github.com/laravel/framework/pull/59914
+* [13.x] Refactor: remove unnecessary call function by [@alipowerful7](https://github.com/alipowerful7) in https://github.com/laravel/framework/pull/59915
+* [13.x] Refactor: improve tests by [@alipowerful7](https://github.com/alipowerful7) in https://github.com/laravel/framework/pull/59912
+* Align Enumerable all, times and range [@return](https://github.com/return) with implementations by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59911
+* Align Enumerable search and flatten [@return](https://github.com/return) with implementations by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59910
+* Specify Translation Loader namespaces shape by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59913
+* Fix duplicate type key in getTypes/processTypes return shape by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59909
+* int argument for sortByDesc and Enumerable sort methods by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59907
+* Match processForeignKeys return shape to Builder::getForeignKeys by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59908
 
 ## [v13.6.0](https://github.com/laravel/framework/compare/v13.5.0...v13.6.0) - 2026-04-21
 
