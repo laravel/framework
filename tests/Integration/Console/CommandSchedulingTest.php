@@ -83,7 +83,7 @@ class CommandSchedulingTest extends TestCase
 
         // We'll trigger the scheduler three times to simulate multiple servers
         $this->app->instance(Schedule::class, clone $schedule);
-        $this->artisan('schedule:run' );
+        $this->artisan('schedule:run');
         $this->app->instance(Schedule::class, clone $schedule);
         $this->artisan('schedule:run');
         $this->app->instance(Schedule::class, clone $schedule);
