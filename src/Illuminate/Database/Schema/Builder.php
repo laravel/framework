@@ -469,7 +469,7 @@ class Builder
      * Get the foreign keys for a given table.
      *
      * @param  string  $table
-     * @return array
+     * @return list<array{name: string|null, columns: list<string>, foreign_schema: string|null, foreign_table: string, foreign_columns: list<string>, on_update: string|null, on_delete: string|null}>
      */
     public function getForeignKeys($table)
     {
