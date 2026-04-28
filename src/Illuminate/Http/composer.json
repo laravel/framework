@@ -26,7 +26,7 @@
         "symfony/http-foundation": "^7.4.0 || ^8.0.0",
         "symfony/http-kernel": "^7.4.0 || ^8.0.0",
         "symfony/mime": "^7.4.0 || ^8.0.0",
-        "symfony/polyfill-php85": "^1.33"
+        "symfony/polyfill-php85": "^1.36"
     },
     "suggest": {
         "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image()."
