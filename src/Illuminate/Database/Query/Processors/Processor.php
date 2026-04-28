@@ -135,7 +135,7 @@ class Processor
      * Process the results of a foreign keys query.
      *
      * @param  list<array<string, mixed>>  $results
-     * @return list<array{name: string, columns: list<string>, foreign_schema: string, foreign_table: string, foreign_columns: list<string>, on_update: string, on_delete: string}>
+     * @return list<array{name: string|null, columns: list<string>, foreign_schema: string|null, foreign_table: string, foreign_columns: list<string>, on_update: string|null, on_delete: string|null}>
      */
     public function processForeignKeys($results)
     {
