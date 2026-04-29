@@ -5,14 +5,12 @@ namespace Illuminate\Tests\Integration\Queue;
 use Illuminate\Bus\Workflow\ResumeState;
 use Illuminate\Bus\Workflow\Workflow;
 use Illuminate\Cache\ArrayStore;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Queue\Factory;
 use Illuminate\Contracts\Queue\Resumable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\Queue;
 use Illuminate\Queue\ResumableTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -95,12 +93,20 @@ class ResumableJobTest extends QueueTestCase
     public function testRepeatingStep()
     {
         TestRepeatingStepResumableJob::dispatch();
-        dd(StateHolder::$data);
+
+        $this->assertCount(3, StateHolder::$data);
+        $this->assertSame(0, StateHolder::$data[0]->stepIndex);
+        $this->assertSame([], StateHolder::$data[0]->data);
+        $this->assertSame(1, StateHolder::$data[1]->stepIndex);
+        $this->assertSame(['abc' => 123, 'xyz' => 456], StateHolder::$data[1]->data);
+        $this->assertSame(2, StateHolder::$data[2]->stepIndex);
+        $this->assertSame(['abc' => 123, 'xyz' => 456], StateHolder::$data[2]->data);
     }
 }
 
 class StateHolder
 {
+    /** @var list<ResumeState> */
     public static array $data;
 }
 

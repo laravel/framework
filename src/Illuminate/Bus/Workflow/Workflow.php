@@ -25,7 +25,7 @@ class Workflow
 
     public function isComplete(): bool
     {
-        return count($this->steps) <= $this->state->stepIndex;
+        return count($this->orderedSteps) <= $this->state->stepIndex;
     }
 
     protected function buildStepName(): string
