@@ -3,6 +3,8 @@
 namespace Illuminate\Bus;
 
 use Closure;
+use Illuminate\Bus\Workflow\ResumeState;
+use Illuminate\Bus\Workflow\Workflow;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
@@ -131,16 +133,40 @@ class Dispatcher implements QueueingDispatcher
 
                 return $handler->{$method}($command);
             };
-        } else if ($command instanceof Resumable) {
+        } elseif ($command instanceof Resumable) {
             $repository = $this->container->make(ResumeStateRepository::class);
             // this is going to assume that we have a job on the command
-            /** @var \Illuminate\Contracts\Queue\Job $job */
-            $job = $command->job;
 
-            $command->setCheckpointData($repository->getResumeState($job));
+            $resumeState = $repository->getResumeState($resumeStateKey = $command->resumeStateKey());
+            $resumeStateTtl = $command->getResumeStateTtl();
+            $workflow = $this->container->make(Workflow::class)
+                ->withState($resumeState ?? new ResumeState)
+                ->persistenceCallback(
+                    static fn (ResumeState $resumeState) => $repository->saveCheckpoint(
+                        $resumeStateKey,
+                        $resumeState,
+                        $resumeStateTtl
+                    )
+                )->clearStateCallback(static fn () => $repository->clearResumeState($resumeStateKey));
+            $command->setWorkflow($workflow);
+
+            $command->setResumeState($resumeState); // @todo is this even needed?
+
+            $callback = function (Resumable $command) {
+                $method = method_exists($command, 'handle') ? 'handle' : '__invoke';
+
+                $commandReturned = $this->container->call([$command, $method]);
+
+                $workflow = $command->getWorkflow();
+                if ($workflow->isComplete()) {
+                    return $commandReturned;
+                }
+
+                return $workflow->execute();
+            };
         }
 
-        if (!isset($callback)) {
+        if (! isset($callback)) {
             $callback = function ($command) {
                 $method = method_exists($command, 'handle') ? 'handle' : '__invoke';
 

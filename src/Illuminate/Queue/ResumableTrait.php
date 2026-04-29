@@ -2,37 +2,41 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Bus\Workflow\ResumeState;
+use Illuminate\Bus\Workflow\Workflow;
+
 trait ResumableTrait
 {
-    /**
-     * @var array<string, mixed>
-     */
-    public array $checkpointData = [];
+    protected ?ResumeState $resumeState;
 
-    /**
-     * @var array<string, \Closure>
-     */
-    public array $stepToCallback = [];
+    protected Workflow $workflow;
 
-    /**
-     * @param  array<string, mixed>  $checkpointData
-     * @return $this
-     */
-    public function setCheckpointData(array $checkpointData): static
+    public function setResumeState(?ResumeState $resumeState): static
     {
-        $this->checkpointData = $checkpointData;
+        $this->resumeState = $resumeState;
 
         return $this;
     }
 
-    public function withStep(string $stepName, \Closure $callback): static
+    public function resumeStateKey(): string
     {
-        if (isset($this->stepNameToCallback[$stepName])) {
-            throw new \InvalidArgumentException("Step name [$stepName] already defined.");
-        }
+        return 'workflow:'.$this->job->getJobId();
+    }
 
-        $this->stepToCallback[$stepName] = $callback;
+    public function setWorkflow(Workflow $workflow): static
+    {
+        $this->workflow = $workflow;
 
         return $this;
+    }
+
+    public function getWorkflow(): Workflow
+    {
+        return $this->workflow;
+    }
+
+    public function getResumeStateTtl()
+    {
+        return 500;
     }
 }

@@ -3,17 +3,20 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Workflow\ResumeState;
-use Illuminate\Bus\ResumeStateRepository;
+use Illuminate\Bus\Workflow\Workflow;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Mail\Mailable;
+use Illuminate\Contracts\Queue\Factory;
 use Illuminate\Contracts\Queue\Resumable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Pipeline\Pipeline;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Queue;
 use Illuminate\Queue\ResumableTrait;
-use Illuminate\Bus\Workflow\Workflow;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Orchestra\Testbench\Attributes\WithMigration;
 
 #[WithMigration]
@@ -29,16 +32,22 @@ class ResumableJobTest extends QueueTestCase
         //$app['config']->set('queue.default', 'database');
     }
 
+    protected function setUp(): void
+    {
+        StateHolder::$data = [];
+        parent::setUp();
+    }
+
     public function test_workflow()
     {
         // @todo move this to a unit test
         $workflow = $this->app->make(Workflow::class);
         $store = new ArrayStore();
-        $workflow->addStep(function (ResumeState $state) {
+        $workflow->step(function (ResumeState $state) {
             $state->data['hello'] = 'world';
-        })->addStep(function (ResumeState $state) {
+        })->step(function (ResumeState $state) {
             $state->data['name'] = 'luke';
-        }, 'step2')->addStep(function (ResumeState $state) {
+        }, 'step2')->step(function (ResumeState $state) {
             $state->data['name'] = 'taylor';
         });
         $workflow->persistenceCallback(fn (ResumeState $state) => $store->put('resume', $state, 100));
@@ -46,7 +55,7 @@ class ResumableJobTest extends QueueTestCase
             $this->assertEquals([
                 'hello' => 'world',
                 'name' => 'taylor',
-            ], $state->stateData);
+            ], $state->data);
             $this->assertEquals(3, $state->stepIndex);
             $store->forget('resume');
         });
@@ -68,26 +77,145 @@ class ResumableJobTest extends QueueTestCase
          *
          */
     }
+
+    public function test_dispatchedJob()
+    {
+        TestResumableJob::dispatch();
+        $this->assertCount(2, StateHolder::$data);
+        [$resumeState1, $resumeState2] = StateHolder::$data;
+        $this->assertInstanceOf(ResumeState::class, $resumeState1);
+        $this->assertSame(0, $resumeState1->stepIndex);
+        $this->assertSame([], $resumeState1->data);
+        $this->assertInstanceOf(ResumeState::class, $resumeState2);
+        $this->assertSame(1, $resumeState2->stepIndex);
+        $this->assertSame(['abc' => 123, 'xyz' => 456], $resumeState2->data);
+        $this->assertEmpty(DB::table('cache')->get());
+    }
+
+    public function testRepeatingStep()
+    {
+        TestRepeatingStepResumableJob::dispatch();
+        dd(StateHolder::$data);
+    }
 }
 
-class TestResumableJob implements Resumable, ShouldQueue
+class StateHolder
+{
+    public static array $data;
+}
+
+class TestResumableJob implements ShouldQueue, Resumable
 {
     use InteractsWithQueue;
-    use Dispatchable;
     use ResumableTrait;
-
-    private array $called = [];
+    use Dispatchable;
 
     public function handle()
     {
-        $this->withStep('step1', $this->step1(...));
-        $this->withStep('step2', function () {
-            $this->called['anonymous'] = true;
-        });
+        $this->workflow
+            ->step(function (ResumeState $state) {
+                StateHolder::$data[$state->stepIndex] = clone $state;
+                $state->data['abc'] = 123;
+            })->step(function (ResumeState $state) {
+                $state->data['xyz'] = 456;
+                StateHolder::$data[$state->stepIndex] = clone $state;
+            }, 'step2');
+    }
+}
+
+class TestRepeatingStepResumableJob extends TestResumableJob
+{
+    public function handle(): void
+    {
+        parent::handle();
+        $this->workflow->step(name: 'step2');
+    }
+}
+
+class CheckForUpdate implements ShouldQueue, Resumable
+{
+    use InteractsWithQueue;
+    use ResumableTrait;
+    use Dispatchable;
+
+    public function handle(): void
+    {
+        $this->workflow
+            // The state of the job is persisted in cache after each step
+            // if there's a failure or an interrupt, the job will requeue
+            // and start from the failure.
+            ->step($this->getData(...))
+            ->step($this->persistData(...))
+            ->step($this->sendEmail(...));
     }
 
-    private function step1()
+    private function getData(ResumeState $resumeState): void
     {
-        $this->called['step'] = true;
+        $resumeState->data['response'] = Http::get('https://jobs.laravel.com/jobs/')->json();
+    }
+
+    private function persistData(ResumeState $resumeState): void
+    {
+        foreach($resumeState->data['response']['data'] as $jobData) {
+            DB::table('laravel_jobs')->insertGetId([
+                'id' => $jobData['id'],
+                'data' => json_encode($jobData),
+            ]);
+        }
+    }
+
+    private function sendEmail(ResumeState $resumeState): void
+    {
+        Mail::raw("New jobs\n", fn ($message) => $message
+            ->to('luke@kuzmish.com')
+            ->subject('Demo Email')
+        );
+    }
+}
+
+class LaravelJobNotification implements Mailable
+{
+    public function __construct($value)
+    {
+        $this->value = $value;
+    }
+    public function send($mailer)
+    {
+        // TODO: Implement send() method.
+    }
+
+    public function queue(Factory $queue)
+    {
+        // TODO: Implement queue() method.
+    }
+
+    public function later($delay, Factory $queue)
+    {
+        // TODO: Implement later() method.
+    }
+
+    public function cc($address, $name = null)
+    {
+        // TODO: Implement cc() method.
+    }
+
+    public function bcc($address, $name = null)
+    {
+        // TODO: Implement bcc() method.
+    }
+
+    public function to($address, $name = null)
+    {
+        // TODO: Implement to() method.
+    }
+
+    public function locale($locale)
+    {
+        // TODO: Implement locale() method.
+    }
+
+    public function mailer($mailer)
+    {
+        // TODO: Implement mailer() method.
     }
 }

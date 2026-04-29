@@ -13,7 +13,7 @@ class CacheResumeStateRepository implements ResumeStateRepository
      *
      * @var string|null
      */
-    public $store = null;
+    protected $store = null;
 
     /**
      * @param  Factory  $cache  The cache factory instance

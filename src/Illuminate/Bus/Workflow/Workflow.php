@@ -2,9 +2,10 @@
 
 namespace Illuminate\Bus\Workflow;
 
-use Illuminate\Bus\Workflow\ResumeState;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Pipeline\Pipeline;
+use InvalidArgumentException;
+use LogicException;
 
 class Workflow
 {
@@ -22,11 +23,20 @@ class Workflow
     ) {
     }
 
+    public function isComplete(): bool
+    {
+        return count($this->steps) <= $this->state->stepIndex;
+    }
+
     protected function buildStepName(): string
     {
         return 'workflow_step'.count($this->steps);
     }
 
+    /**
+     * @param  (\Closure(ResumeState): void)  $callback
+     * @return $this
+     */
     public function persistenceCallback(\Closure $callback): static
     {
         $this->persistenceCallback = $callback;
@@ -34,6 +44,10 @@ class Workflow
         return $this;
     }
 
+    /**
+     * @param  (\Closure(ResumeState): void)  $callback
+     * @return $this
+     */
     public function clearStateCallback(\Closure $callback): static
     {
         $this->clearStateCallback = $callback;
@@ -41,11 +55,22 @@ class Workflow
         return $this;
     }
 
-    public function addStep(\Closure $callback, ?string $name = null): static
+    /**
+     * @param  (\Closure(ResumeState): mixed)|null  $callback
+     * @return $this
+     * @throws \InvalidArgumentException
+     */
+    public function step(\Closure|null $callback = null, ?string $name = null): static
     {
+        if ($callback === null && $name === null) {
+            throw new InvalidArgumentException('Either callback or name is required.');
+        }
+
         $name ??= $this->buildStepName();
         $this->orderedSteps[] = $name;
-        $this->steps[$name] = $callback;
+        if ($callback) {
+            $this->steps[$name] = $callback;
+        }
 
         return $this;
     }
@@ -57,6 +82,10 @@ class Workflow
         return $this;
     }
 
+    /**
+     * @return ResumeState|mixed
+     * @throws \LogicException
+     */
     public function execute()
     {
         $this->state ??= new ResumeState();
@@ -68,8 +97,8 @@ class Workflow
         $remainingSteps = array_slice($this->orderedSteps, $this->state->stepIndex);
 
         if ($remainingSteps === []) {
-            // throw an exception? not sure
-            throw new \LogicException('There are no remaining steps.');
+            // This should never happen
+            throw new LogicException('There are no remaining steps.');
         }
 
         foreach ($remainingSteps as $stepName) {
