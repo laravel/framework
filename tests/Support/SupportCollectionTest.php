@@ -2069,6 +2069,24 @@ class SupportCollectionTest extends TestCase
             function ($x) {
                 return $x;
             },
+            descending: true);
+
+        $this->assertEquals(['taylor', 'dayle'], array_values($data->all()));
+
+        $data = new $collection(['dayle', 'taylor']);
+        $data = $data->sortBy(
+            function ($x) {
+                return $x;
+            },
+            direction: SortDirection::Descending);
+
+        $this->assertEquals(['taylor', 'dayle'], array_values($data->all()));
+
+        $data = new $collection(['dayle', 'taylor']);
+        $data = $data->sortBy(
+            function ($x) {
+                return $x;
+            },
             SORT_REGULAR,
             SortDirection::Descending);
 
@@ -2268,6 +2286,14 @@ class SupportCollectionTest extends TestCase
         $data = new $collection(['b' => 'dayle', 'a' => 'taylor']);
 
         $this->assertSame(['a' => 'taylor', 'b' => 'dayle'], $data->sortKeys()->all());
+
+        $data = new $collection(['a' => 'taylor', 'b' => 'dayle']);
+
+        $this->assertSame(['b' => 'dayle', 'a' => 'taylor'], $data->sortKeys(descending: true)->all());
+
+        $data = new $collection(['a' => 'taylor', 'b' => 'dayle']);
+
+        $this->assertSame(['b' => 'dayle', 'a' => 'taylor'], $data->sortKeys(direction: SortDirection::Descending)->all());
     }
 
     #[DataProvider('collectionClassProvider')]

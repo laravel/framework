@@ -11,6 +11,7 @@ use Illuminate\Support\MultipleItemsFoundException;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
+use SortDirection;
 use stdClass;
 use WeakMap;
 
@@ -1521,6 +1522,19 @@ class SupportArrTest extends TestCase
         ];
 
         $this->assertEquals($expect, Arr::sortRecursive($array));
+
+        $array = [
+            10 => ['bar', 'foo'],
+            20 => [0, 1, 2],
+        ];
+
+        $expect = [
+            20 => [2, 1, 0],
+            10 => ['foo', 'bar'],
+        ];
+
+        $this->assertEquals($expect, Arr::sortRecursive($array, descending: true));
+        $this->assertEquals($expect, Arr::sortRecursive($array, direction: SortDirection::Descending));
     }
 
     public function testSortRecursiveDesc()
