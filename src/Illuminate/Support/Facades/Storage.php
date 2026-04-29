@@ -96,7 +96,7 @@ class Storage extends Facade
      *
      * @param  \UnitEnum|string|null  $disk
      * @param  array  $config
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     * @return \Illuminate\Filesystem\LocalFilesystemAdapter
      */
     public static function fake($disk = null, array $config = [])
     {
@@ -128,7 +128,7 @@ class Storage extends Facade
      *
      * @param  \UnitEnum|string|null  $disk
      * @param  array  $config
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     * @return \Illuminate\Filesystem\LocalFilesystemAdapter
      */
     public static function persistentFake($disk = null, array $config = [])
     {
