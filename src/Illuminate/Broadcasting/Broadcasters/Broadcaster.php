@@ -84,11 +84,11 @@ abstract class Broadcaster implements BroadcasterContract
      */
     public function channel($channel, $callback, $options = [])
     {
-        if ($channel instanceof HasBroadcastChannel) {
-            $channel = $channel->broadcastChannelRoute();
-        } elseif (is_string($channel) && class_exists($channel) && is_a($channel, HasBroadcastChannel::class, true)) {
-            $channel = (new $channel)->broadcastChannelRoute();
-        }
+        $channel = match (true) {
+            $channel instanceof HasBroadcastChannel => $channel->broadcastChannelRoute(),
+            is_string($channel) && class_exists($channel) && is_a($channel, HasBroadcastChannel::class, true) => (new $channel)->broadcastChannelRoute(),
+            default => $channel,
+        };
 
         $this->channels[$channel] = $callback;
 
@@ -158,13 +158,11 @@ abstract class Broadcaster implements BroadcasterContract
      */
     protected function extractParameters($callback)
     {
-        if (is_callable($callback)) {
-            return (new ReflectionFunction($callback))->getParameters();
-        } elseif (is_string($callback)) {
-            return $this->extractParametersFromClass($callback);
-        }
-
-        throw new Exception('Given channel handler is an unknown type.');
+        return match (true) {
+            is_callable($callback) => (new ReflectionFunction($callback))->getParameters(),
+            is_string($callback) => $this->extractParametersFromClass($callback),
+            default => throw new Exception('Given channel handler is an unknown type.'),
+        };
     }
 
     /**

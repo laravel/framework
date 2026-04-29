@@ -436,13 +436,11 @@ trait InteractsWithIO
     {
         $level ??= '';
 
-        if (isset($this->verbosityMap[$level])) {
-            $level = $this->verbosityMap[$level];
-        } elseif (! is_int($level)) {
-            $level = $this->verbosity;
-        }
-
-        return $level;
+        return match (true) {
+            isset($this->verbosityMap[$level]) => $this->verbosityMap[$level],
+            is_int($level) => $level,
+            default => $this->verbosity,
+        };
     }
 
     /**

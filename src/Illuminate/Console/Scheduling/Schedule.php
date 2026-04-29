@@ -379,21 +379,14 @@ class Schedule
      */
     public function compileArrayInput($key, $value)
     {
-        $value = (new Collection($value))->map(function ($value) {
-            return ProcessUtils::escapeArgument($value);
-        });
-
-        if (str_starts_with($key, '--')) {
-            $value = $value->map(function ($value) use ($key) {
-                return "{$key}={$value}";
-            });
-        } elseif (str_starts_with($key, '-')) {
-            $value = $value->map(function ($value) use ($key) {
-                return "{$key} {$value}";
-            });
-        }
-
-        return $value->implode(' ');
+        return (new Collection($value))
+            ->map(static fn ($subValue) => ProcessUtils::escapeArgument($subValue))
+            ->map(static fn ($subValue) => match (true) {
+                str_starts_with($key, '--') => "{$key}={$subValue}",
+                str_starts_with($key, '-') => "{$key} {$subValue}",
+                default => $subValue,
+            })
+            ->implode(' ');
     }
 
     /**

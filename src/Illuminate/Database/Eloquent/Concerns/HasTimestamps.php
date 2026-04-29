@@ -32,13 +32,12 @@ trait HasTimestamps
     #[Initialize]
     public function initializeHasTimestamps()
     {
-        if ($this->timestamps === true) {
-            if (static::resolveClassAttribute(WithoutTimestamps::class) !== null) {
-                $this->timestamps = false;
-            } elseif (($table = static::resolveClassAttribute(Table::class)) && $table->timestamps !== null) {
-                $this->timestamps = $table->timestamps;
-            }
-        }
+        $this->timestamps = match (true) {
+            $this->timestamps !== true => false,
+            static::resolveClassAttribute(WithoutTimestamps::class) !== null => false,
+            ($timestamps = static::resolveClassAttribute(Table::class)?->timestamps) !== null => $timestamps,
+            default => true,
+        };
     }
 
     /**

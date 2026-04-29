@@ -406,11 +406,11 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             return $this->newInstance($this->items);
         }
 
-        if ($keys instanceof Enumerable) {
-            $keys = $keys->all();
-        } elseif (! is_array($keys)) {
-            $keys = func_get_args();
-        }
+        $keys = match (true) {
+            $keys instanceof Enumerable => $keys->all(),
+            is_array($keys) => $keys,
+            default => func_get_args(),
+        };
 
         return $this->newInstance(Arr::except($this->items, $keys));
     }

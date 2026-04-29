@@ -322,13 +322,11 @@ class Container implements ArrayAccess, ContainerContract
             return $this->checkedForSingletonOrScopedAttributes[$className] = null;
         }
 
-        $type = null;
-
-        if (! empty($reflection->getAttributes(Singleton::class))) {
-            $type = 'singleton';
-        } elseif (! empty($reflection->getAttributes(Scoped::class))) {
-            $type = 'scoped';
-        }
+        $type = match (true) {
+            $reflection->getAttributes(Singleton::class) !== [] => 'singleton',
+            $reflection->getAttributes(Scoped::class) !== [] => 'scoped',
+            default => null,
+        };
 
         return $this->checkedForSingletonOrScopedAttributes[$className] = $type;
     }

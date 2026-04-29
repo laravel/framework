@@ -30,13 +30,11 @@ trait Conditionable
             return (new HigherOrderWhenProxy($this))->condition($value);
         }
 
-        if ($value) {
-            return $callback($this, $value) ?? $this;
-        } elseif ($default) {
-            return $default($this, $value) ?? $this;
-        }
-
-        return $this;
+        return match (true) {
+            (bool) $value => $callback($this, $value) ?? $this,
+            $default !== null => $default($this, $value) ?? $this,
+            default => $this,
+        };
     }
 
     /**
@@ -62,12 +60,10 @@ trait Conditionable
             return (new HigherOrderWhenProxy($this))->condition(! $value);
         }
 
-        if (! $value) {
-            return $callback($this, $value) ?? $this;
-        } elseif ($default) {
-            return $default($this, $value) ?? $this;
-        }
-
-        return $this;
+        return match (true) {
+            ! $value => $callback($this, $value) ?? $this,
+            $default !== null => $default($this, $value) ?? $this,
+            default => $this,
+        };
     }
 }
