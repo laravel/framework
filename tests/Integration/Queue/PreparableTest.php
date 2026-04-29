@@ -11,7 +11,7 @@ use Orchestra\Testbench\TestCase;
 
 class PreparableTest extends TestCase
 {
-    public function test_before_dispatch_is_false()
+    public function test_does_not_dispatch_when_prepare_returns_false()
     {
         Queue::fake();
 
@@ -20,7 +20,7 @@ class PreparableTest extends TestCase
         Queue::assertNotPushed(PreparableFalseJob::class);
     }
 
-    public function test_before_dispatch_is_void()
+    public function test_dispatches_when_prepare_returns_void()
     {
         Queue::fake();
 
