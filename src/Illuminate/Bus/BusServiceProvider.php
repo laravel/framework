@@ -86,6 +86,8 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
                 ttlAttribute: $app->config->get('queue.batching.ttl_attribute', 'ttl'),
             );
         });
+
+        $this->app->bind(ResumeStateRepository::class,CacheResumeStateRepository::class);
     }
 
     /**
