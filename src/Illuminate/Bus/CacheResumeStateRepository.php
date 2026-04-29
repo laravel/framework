@@ -2,9 +2,9 @@
 
 namespace Illuminate\Bus;
 
+use Illuminate\Bus\Workflow\ResumeState;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Contracts\Queue\Job;
 
 class CacheResumeStateRepository implements ResumeStateRepository
 {
@@ -23,32 +23,39 @@ class CacheResumeStateRepository implements ResumeStateRepository
     ) {
     }
 
+    #[\Override]
+    public function getResumeState(string $id): ?ResumeState
+    {
+        return $this->getCache()->get($id);
+    }
+
+    #[\Override]
+    public function saveCheckpoint(string $id, $resumeState, $ttl): void
+    {
+        $this->getCache()->put($id, $resumeState, $ttl);
+    }
+
+    #[\Override]
+    public function clearResumeState(string $id): void
+    {
+        $this->getCache()->forget($id);
+    }
+
     protected function getCache(): Repository
     {
         return $this->cache->store($this->store);
     }
 
-    protected function determineCacheKey(Job $job): string
+    public function setStore($store): static
     {
-        // @todo: this needs to receive the command, since that's where the job key will be saved
-        return 'workflow:'.$job->getJobId();
+        $this->store = $store;
+
+        return $this;
     }
 
-    #[\Override]
-    public function getResumeState(Job $job): array
+    protected function determineCacheKey(string $id): string
     {
-        return (array) $this->getCache()->get($this->determineCacheKey($job));
+        return 'workflow:'.$id;
     }
 
-    #[\Override]
-    public function saveCheckpoint($job, $checkpoint, $data): void
-    {
-        // TODO: Implement saveCheckpoint() method.
-    }
-
-    #[\Override]
-    public function clearResumeState($job): void
-    {
-        $this->getCache()->forget($this->determineCacheKey($job));
-    }
 }

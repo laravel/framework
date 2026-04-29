@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Illuminate\Bus\ResumeState;
+use Illuminate\Bus\Workflow\ResumeState;
 use Illuminate\Bus\ResumeStateRepository;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Contracts\Container\Container;
@@ -13,7 +13,7 @@ use Illuminate\Pipeline\Pipeline;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Queue;
 use Illuminate\Queue\ResumableTrait;
-use Illuminate\Workflow\Workflow;
+use Illuminate\Bus\Workflow\Workflow;
 use Orchestra\Testbench\Attributes\WithMigration;
 
 #[WithMigration]
@@ -31,6 +31,7 @@ class ResumableJobTest extends QueueTestCase
 
     public function test_workflow()
     {
+        // @todo move this to a unit test
         $workflow = $this->app->make(Workflow::class);
         $store = new ArrayStore();
         $workflow->addStep(function (ResumeState $state) {
