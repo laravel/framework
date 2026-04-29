@@ -102,6 +102,13 @@ class Worker
     public $lostConnection = false;
 
     /**
+     * The number of consecutive times the worker failed to retrieve a job.
+     *
+     * @var int
+     */
+    protected int $consecutiveGetNextJobFailures = 0;
+
+    /**
      * Indicates if the worker is paused.
      *
      * @var bool
@@ -400,6 +407,8 @@ class Worker
 
         $this->raiseBeforeJobPopEvent($connection->getConnectionName(), $queue);
 
+        $failed = false;
+
         try {
             if (isset(static::$popCallbacks[$this->name ?? ''])) {
                 if (! is_null($job = (static::$popCallbacks[$this->name ?? ''])($popJobCallback, $queue))) {
@@ -421,11 +430,21 @@ class Worker
                 }
             }
         } catch (Throwable $e) {
+            $failed = true;
+
             $this->exceptions->report($e);
 
             $this->stopWorkerIfLostConnection($e);
 
+            if (++$this->consecutiveGetNextJobFailures >= 100) {
+                $this->shouldQuit = true;
+            }
+
             $this->sleep(1);
+        } finally {
+            if (! $failed) {
+                $this->consecutiveGetNextJobFailures = 0;
+            }
         }
     }
 

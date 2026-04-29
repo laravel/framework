@@ -172,6 +172,55 @@ class QueueWorkerTest extends TestCase
         $this->exceptionHandler->shouldHaveReceived('report')->with($e);
     }
 
+    public function testWorkerQuitsAfterTooManyConsecutiveGetNextJobFailures()
+    {
+        $worker = new InsomniacWorker(
+            new WorkerFakeManager('default', new BrokenQueueConnection('default', new RuntimeException)),
+            $this->events,
+            $this->exceptionHandler,
+            function () {
+                return false;
+            }
+        );
+
+        for ($i = 0; $i < 99; $i++) {
+            $worker->runNextJob('default', 'queue', $this->workerOptions());
+            $this->assertFalse($worker->shouldQuit);
+        }
+
+        $worker->runNextJob('default', 'queue', $this->workerOptions());
+        $this->assertTrue($worker->shouldQuit);
+    }
+
+    public function testConsecutiveGetNextJobFailureCounterResetsOnSuccess()
+    {
+        $brokenConnection = new BrokenQueueConnection('default', new RuntimeException);
+        $worker = new InsomniacWorker(
+            new WorkerFakeManager('default', $brokenConnection),
+            $this->events,
+            $this->exceptionHandler,
+            function () {
+                return false;
+            }
+        );
+
+        for ($i = 0; $i < 50; $i++) {
+            $worker->runNextJob('default', 'queue', $this->workerOptions());
+        }
+
+        $this->assertFalse($worker->shouldQuit);
+
+        // Switch to a working connection — counter should reset
+        $worker->getManager()->connections['default'] = new WorkerFakeConnection('default', ['queue' => []]);
+        $worker->runNextJob('default', 'queue', $this->workerOptions());
+
+        // Now go back to broken — counter starts fresh so still under threshold
+        $worker->getManager()->connections['default'] = $brokenConnection;
+        $worker->runNextJob('default', 'queue', $this->workerOptions());
+
+        $this->assertFalse($worker->shouldQuit);
+    }
+
     public function testWorkerSleepsWhenQueueIsEmpty()
     {
         $worker = $this->getWorker('default', ['queue' => []]);
@@ -599,6 +648,11 @@ class InsomniacWorker extends Worker
     public function memoryExceeded($memoryLimit)
     {
         return $this->stopOnMemoryExceeded;
+    }
+
+    public function getManager()
+    {
+        return $this->manager;
     }
 }
 
