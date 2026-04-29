@@ -101,6 +101,9 @@ jobs:
           redis-server --daemonize yes --port 7000 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7000.conf
           redis-server --daemonize yes --port 7001 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7001.conf
           redis-server --daemonize yes --port 7002 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7002.conf
+          until redis-cli -p 7000 cluster info 2>/dev/null | grep -q 'cluster_enabled:1'; do sleep 0.1; done
+          until redis-cli -p 7001 cluster info 2>/dev/null | grep -q 'cluster_enabled:1'; do sleep 0.1; done
+          until redis-cli -p 7002 cluster info 2>/dev/null | grep -q 'cluster_enabled:1'; do sleep 0.1; done
           redis-cli --cluster create 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 --cluster-replicas 0 --cluster-yes
 
       - name: Check Redis Cluster is ready
