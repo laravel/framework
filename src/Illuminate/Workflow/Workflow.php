@@ -2,79 +2,94 @@
 
 namespace Illuminate\Workflow;
 
+use Illuminate\Bus\ResumeState;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Pipeline\Pipeline;
 
-/**
- * @template StateT
- */
 class Workflow
 {
-    /**
-     * The current state object. This could be an associative array, an object, or even an integer.
-     * This is what tells the workflow the current state of the workflow. It is available from
-     * step to step in the workflow. We would normally persist information from the workflow
-     * in that step.
-     *
-     * @var StateT
-     */
-    public mixed $state = null;
+    public array $steps = [];
+    public array $orderedSteps = [];
 
-    /**
-     * The mapping of step name to a callback.
-     *
-     * @var array<string, callable>
-     */
-    public array $stepNameToCallback = [];
+    public ResumeState $state;
 
-    /**
-     * The current step being worked.
-     *
-     * @var string
-     */
-    public string $working;
+    protected \Closure $persistenceCallback;
+
+    protected \Closure $clearStateCallback;
 
     public function __construct(
         protected Container $container,
     ) {
     }
 
-    public function withState($state): self
+    protected function buildStepName(): string
     {
-        $this->state = $state;
+        return 'workflow_step'.count($this->steps);
+    }
+
+    public function persistenceCallback(\Closure $callback): static
+    {
+        $this->persistenceCallback = $callback;
 
         return $this;
     }
 
-    public function withStep(string $stepName, callable $step, bool $replace = true): self
+    public function clearStateCallback(\Closure $callback): static
     {
-        if (isset($this->stepNameToCallback[$stepName]) && $replace === false) {
-            throw new \RuntimeException(sprintf('The step [%s] already exists.', $stepName));
-        }
-
-        $this->stepNameToCallback[$stepName] = $step;
+        $this->clearStateCallback = $callback;
 
         return $this;
     }
 
-    /**
-     * @throws \LogicException
-     */
-    public function handle(string $step): void
+    public function addStep(\Closure $callback, ?string $name = null): static
     {
-        $this->working = $step;
+        $name ??= $this->buildStepName();
+        $this->orderedSteps[] = $name;
+        $this->steps[$name] = $callback;
 
-        if (! isset($this->stepNameToCallback[$step])) {
-            throw new \InvalidArgumentException(sprintf('The operation [%s] does not exist', $step));
+        return $this;
+    }
+
+    public function withState(ResumeState $resumeState): static
+    {
+        $this->state = $resumeState;
+
+        return $this;
+    }
+
+    public function execute()
+    {
+        $this->state ??= new ResumeState();
+
+        $pipeline = new Pipeline($this->container);
+        $pipeline->send($this->state);
+
+        // Figure out which pipe we are on
+        $remainingSteps = array_slice($this->orderedSteps, $this->state->stepIndex);
+
+        if ($remainingSteps === []) {
+            // throw an exception? not sure
+            throw new \LogicException('There are no remaining steps.');
         }
 
-        $newState = $this->container->call(
-            $this->stepNameToCallback[$step],
-            // @todo this needs some kind of trait that determines the types I guess? Or to pass named parameters or whatever
-            ['state' => &$this->state, $this]
-        );
+        foreach ($remainingSteps as $stepName) {
+            $fn = $this->steps[$stepName];
 
-        if ($newState !== null) {
-            $this->state = $newState;
+            $pipeline->pipe(function (ResumeState $carry, $next) use ($fn) {
+                $fn($carry);
+                $carry->stepIndex++;
+
+                call_user_func($this->persistenceCallback, $carry);
+
+                return $next($carry);
+            });
         }
+
+        $result = $pipeline->thenReturn();
+
+        $state = $result instanceof ResumeState ? $result : $this->state;
+        call_user_func($this->clearStateCallback, $state);
+
+        return $result;
     }
 }

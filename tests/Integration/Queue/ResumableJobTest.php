@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\ResumeState;
 use Illuminate\Bus\ResumeStateRepository;
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Resumable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -11,6 +13,7 @@ use Illuminate\Pipeline\Pipeline;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Queue;
 use Illuminate\Queue\ResumableTrait;
+use Illuminate\Workflow\Workflow;
 use Orchestra\Testbench\Attributes\WithMigration;
 
 #[WithMigration]
@@ -28,7 +31,41 @@ class ResumableJobTest extends QueueTestCase
 
     public function test_workflow()
     {
-        TestResumableJob::dispatch();
+        $workflow = $this->app->make(Workflow::class);
+        $store = new ArrayStore();
+        $workflow->addStep(function (ResumeState $state) {
+            $state->data['hello'] = 'world';
+        })->addStep(function (ResumeState $state) {
+            $state->data['name'] = 'luke';
+        }, 'step2')->addStep(function (ResumeState $state) {
+            $state->data['name'] = 'taylor';
+        });
+        $workflow->persistenceCallback(fn (ResumeState $state) => $store->put('resume', $state, 100));
+        $workflow->clearStateCallback(function ($state) use ($store) {
+            $this->assertEquals([
+                'hello' => 'world',
+                'name' => 'taylor',
+            ], $state->stateData);
+            $this->assertEquals(3, $state->stepIndex);
+            $store->forget('resume');
+        });
+        $workflow->execute();
+
+        $this->assertEmpty($store->all());
+    }
+
+    public function test_job()
+    {
+        /*
+         * TODO:
+         * Container bindings for default persistence callbacks
+         * Figure out where ResumeState lives
+         * Does Workflows need to live in its own space? or would inside of Bus be better?
+         * Add a test where we set the state somewhere further down the line
+         * Figure out the API surface for a Workflow... how do they write the steps. Maybe we should just kill handle and execute that some other way
+         * Try a job on the queue where we push the job and then release it after every pipe. does it work at all?
+         *
+         */
     }
 }
 
@@ -51,96 +88,5 @@ class TestResumableJob implements Resumable, ShouldQueue
     private function step1()
     {
         $this->called['step'] = true;
-    }
-}
-
-class WorkflowTest implements ShouldQueue
-{
-    use Dispatchable;
-    use InteractsWithQueue;
-
-    public function handle(ResumeStateRepository $resumeStateRepository, Pipeline $pipeline): void
-    {
-        $pipeline = new Pipeline(app());
-
-    }
-}
-
-class WorkflowPipeline extends Pipeline
-{
-    protected \Closure $persistenceCallback;
-
-    public function persistCallback(\Closure $callback): static
-    {
-        $this->persistenceCallback = $callback;
-
-        return $this;
-    }
-
-    #[\Override]
-    protected function handleCarry(mixed $carry)
-    {
-        if (isset($this->persistenceCallback)) {
-            call_user_func($this->persistenceCallback, $carry);
-        }
-
-        return $carry;
-    }
-}
-
-class Workflow
-{
-    public array $steps = [];
-    public array $orderedSteps = [];
-
-    public ResumeState $state;
-
-    protected \Closure $persistenceCallback;
-
-    protected function buildStepName()
-    {
-        return 'workflow_step'.count($this->steps);
-    }
-
-    public function persistenceCallback(\Closure $callback): static
-    {
-        $this->persistenceCallback = $callback;
-
-        return $this;
-    }
-
-    public function addStep(\Closure $callback, ?string $name = null): static
-    {
-        $name ??= $this->buildStepName();
-        $this->state->orderedSteps[$name] = $name;
-        $this->orderedSteps[] = $name;
-        $this->steps[$name] = $callback;
-
-        return $this;
-    }
-
-    public function withState(ResumeState $resumeState): static
-    {
-        $this->state = $resumeState;
-
-        return $this;
-    }
-
-    public function execute()
-    {
-        $pipeline = new WorkflowPipeline(app());
-
-        $state = $this->state ?? new ResumeState();
-
-        $pipeline->persistCallback($this->persistenceCallback)->send($state);
-
-        // Figure out which pipe we are on
-        $remainingSteps = array_slice($this->orderedSteps, $this->state->stepIndex);
-
-        if ($remainingSteps === []) {
-            // throw an exception? not sure
-            throw new \Exception("how did this happen?");
-        }
-
     }
 }
