@@ -93,7 +93,7 @@ jobs:
           max_attempts: 5
           command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
-      - name: Create Redis Cluster
+      - name: Start Redis Cluster Nodes
         run: |
           sudo apt update
           sudo apt-get install -y --fix-missing redis-server
@@ -101,10 +101,15 @@ jobs:
           redis-server --daemonize yes --port 7000 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7000.conf
           redis-server --daemonize yes --port 7001 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7001.conf
           redis-server --daemonize yes --port 7002 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7002.conf
-          until redis-cli -p 7000 cluster info 2>/dev/null | grep -q 'cluster_enabled:1'; do sleep 0.1; done
-          until redis-cli -p 7001 cluster info 2>/dev/null | grep -q 'cluster_enabled:1'; do sleep 0.1; done
-          until redis-cli -p 7002 cluster info 2>/dev/null | grep -q 'cluster_enabled:1'; do sleep 0.1; done
-          redis-cli --cluster create 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 --cluster-replicas 0 --cluster-yes
+
+      - name: Create Redis Cluster
+        uses: nick-fields/retry@v4
+        with:
+          timeout_seconds: 30
+          max_attempts: 5
+          retry_wait_seconds: 2
+          retry_on: error
+          command: redis-cli --cluster create 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 --cluster-replicas 0 --cluster-yes
 
       - name: Check Redis Cluster is ready
         uses: nick-fields/retry@v4
