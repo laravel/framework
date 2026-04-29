@@ -174,18 +174,6 @@ class Dispatcher implements QueueingDispatcher
             };
         }
 
-        $pipes = $this->pipes;
-        if ($command instanceof Resumable) {
-            array_unshift($pipes, function (Resumable $command) {
-                $repository = $this->container->make(ResumeStateRepository::class);
-                // this is going to assume that we have a job on the command
-                /** @var \Illuminate\Contracts\Queue\Job $job */
-                $job = $command->job;
-
-                $command->setCheckpointData($repository->getResumeState($job));
-            });
-        }
-
         return $this->pipeline->send($command)->through($this->pipes)->then($callback);
     }
 
