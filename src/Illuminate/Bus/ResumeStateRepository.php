@@ -2,13 +2,19 @@
 
 namespace Illuminate\Bus;
 
-use Illuminate\Contracts\Queue\Job;
+use Illuminate\Bus\Workflow\ResumeState;
 
 interface ResumeStateRepository
 {
-    public function getResumeState(Job $job): array;
+    public function getResumeState(string $id): ?ResumeState;
 
-    public function saveCheckpoint($job, $checkpoint, $data): void;
+    /**
+     * @param  string  $id
+     * @param  ResumeState  $resumeState
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @return void
+     */
+    public function saveCheckpoint(string $id, $resumeState, $ttl): void;
 
-    public function clearResumeState($job): void;
+    public function clearResumeState(string $id): void;
 }

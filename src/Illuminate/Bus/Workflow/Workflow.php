@@ -1,8 +1,8 @@
 <?php
 
-namespace Illuminate\Workflow;
+namespace Illuminate\Bus\Workflow;
 
-use Illuminate\Bus\ResumeState;
+use Illuminate\Bus\Workflow\ResumeState;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Pipeline\Pipeline;
 

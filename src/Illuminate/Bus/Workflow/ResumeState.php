@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Bus;
+namespace Illuminate\Bus\Workflow;
 
 class ResumeState
 {
