@@ -138,7 +138,9 @@ class Dispatcher implements QueueingDispatcher
             $job = $command->job;
 
             $command->setCheckpointData($repository->getResumeState($job));
-        }else {
+        }
+
+        if (!isset($callback)) {
             $callback = function ($command) {
                 $method = method_exists($command, 'handle') ? 'handle' : '__invoke';
 
