@@ -157,6 +157,14 @@ class FileFailedJobProviderTest extends TestCase
         $this->assertCount(2, $failedJobs);
     }
 
+    public function testCorruptedPayloadReturnsNull()
+    {
+        $result = $this->provider->log('connection', 'queue', 'not-valid-json', new Exception('Something went wrong.'));
+
+        $this->assertNull($result);
+        $this->assertEmpty($this->provider->all());
+    }
+
     public function testEmptyFailedJobsByDefault()
     {
         $failedJobs = $this->provider->all();

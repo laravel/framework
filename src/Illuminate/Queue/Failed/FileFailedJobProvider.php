@@ -56,7 +56,11 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
     public function log($connection, $queue, $payload, $exception)
     {
         return $this->lock(function () use ($connection, $queue, $payload, $exception) {
-            $id = json_decode($payload, true)['uuid'];
+            $id = json_decode($payload, true)['uuid'] ?? null;
+
+            if ($id === null) {
+                return null;
+            }
 
             $jobs = $this->read();
 

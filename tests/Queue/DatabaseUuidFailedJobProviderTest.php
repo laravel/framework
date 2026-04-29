@@ -178,6 +178,15 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
         $this->assertSame(2, $provider->count('connection-2', 'queue-1'));
     }
 
+    public function testCorruptedPayloadReturnsNull()
+    {
+        $provider = $this->getFailedJobProvider();
+
+        $result = $provider->log('database', 'queue', 'not-valid-json', new RuntimeException('Something went wrong.'));
+
+        $this->assertNull($result);
+    }
+
     protected function getFailedJobProvider(string $database = 'default', string $table = 'failed_jobs')
     {
         $db = new DB;

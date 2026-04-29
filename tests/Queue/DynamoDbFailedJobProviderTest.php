@@ -170,4 +170,15 @@ class DynamoDbFailedJobProviderTest extends TestCase
 
         $provider->forget('id');
     }
+
+    public function testCorruptedPayloadReturnsNull()
+    {
+        $dynamoDbClient = m::mock(DynamoDbClient::class);
+
+        $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');
+
+        $result = $provider->log('connection', 'queue', 'not-valid-json', new Exception('Something went wrong.'));
+
+        $this->assertNull($result);
+    }
 }
