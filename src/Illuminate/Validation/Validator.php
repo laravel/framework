@@ -527,13 +527,11 @@ class Validator implements ValidatorContract
      */
     public function whenPasses(callable $callback, ?callable $default = null)
     {
-        if ($this->passes()) {
-            return $callback($this) ?? $this;
-        } elseif ($default) {
-            return $default($this) ?? $this;
-        }
-
-        return $this;
+        return match (true) {
+            $this->passes() => $callback($this) ?? $this,
+            $default !== null => $default($this) ?? $this,
+            default => $this,
+        };
     }
 
     /**

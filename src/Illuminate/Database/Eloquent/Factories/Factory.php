@@ -581,20 +581,13 @@ abstract class Factory
     protected function expandAttributes(array $definition)
     {
         return (new Collection($definition))
-            ->map($evaluateRelations = function ($attribute, $key) {
-                if (! $this->expandRelationships && $attribute instanceof self) {
-                    $attribute = null;
-                } elseif ($attribute instanceof self &&
-                    array_intersect([$attribute->modelName(), $key], $this->excludeRelationships)) {
-                    $attribute = null;
-                } elseif ($attribute instanceof self) {
-                    $attribute = $this->getRandomRecycledModel($attribute->modelName())?->getKey()
-                        ?? $attribute->recycle($this->recycle)->create()->getKey();
-                } elseif ($attribute instanceof Model) {
-                    $attribute = $attribute->getKey();
-                }
-
-                return $attribute;
+            ->map($evaluateRelations = fn ($attribute, $key) => match (true) {
+                ! $this->expandRelationships && $attribute instanceof self => null,
+                $attribute instanceof self && array_intersect([$attribute->modelName(), $key], $this->excludeRelationships) => null,
+                $attribute instanceof self => $this->getRandomRecycledModel($attribute->modelName())?->getKey()
+                    ?? $attribute->recycle($this->recycle)->create()->getKey(),
+                $attribute instanceof Model => $attribute->getKey(),
+                default => $attribute,
             })
             ->map(function ($attribute, $key) use (&$definition, $evaluateRelations) {
                 if (is_callable($attribute) && ! is_string($attribute) && ! is_array($attribute)) {

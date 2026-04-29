@@ -46,17 +46,14 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      */
     public function __construct($source = null)
     {
-        if ($source instanceof Closure || $source instanceof self) {
-            $this->source = $source;
-        } elseif (is_null($source)) {
-            $this->source = static::empty();
-        } elseif ($source instanceof Generator) {
-            throw new InvalidArgumentException(
+        $this->source = match (true) {
+            $source instanceof Closure || $source instanceof self => $source,
+            $source === null => static::empty(),
+            $source instanceof Generator => throw new InvalidArgumentException(
                 'Generators should not be passed directly to LazyCollection. Instead, pass a generator function.'
-            );
-        } else {
-            $this->source = $this->getArrayableItems($source);
-        }
+            ),
+            default => $this->getArrayableItems($source),
+        };
     }
 
     /**
@@ -495,13 +492,11 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     {
         $instance = new static(function () use ($depth) {
             foreach ($this as $item) {
-                if (! is_array($item) && ! $item instanceof Enumerable) {
-                    yield $item;
-                } elseif ($depth === 1) {
-                    yield from $item;
-                } else {
-                    yield from (new static($item))->flatten($depth - 1);
-                }
+                yield from match (true) {
+                    ! is_array($item) && ! $item instanceof Enumerable => [$item],
+                    $depth === 1 => $item,
+                    default => (new static($item))->flatten($depth - 1),
+                };
             }
         });
 

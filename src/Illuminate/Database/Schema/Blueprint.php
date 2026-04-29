@@ -1537,13 +1537,11 @@ class Blueprint
      */
     public function morphs($name, $indexName = null, $after = null)
     {
-        if (Builder::$defaultMorphKeyType === 'uuid') {
-            $this->uuidMorphs($name, $indexName, $after);
-        } elseif (Builder::$defaultMorphKeyType === 'ulid') {
-            $this->ulidMorphs($name, $indexName, $after);
-        } else {
-            $this->numericMorphs($name, $indexName, $after);
-        }
+        match (Builder::$defaultMorphKeyType) {
+            'uuid' => $this->uuidMorphs($name, $indexName, $after),
+            'ulid' => $this->ulidMorphs($name, $indexName, $after),
+            default => $this->numericMorphs($name, $indexName, $after),
+        };
     }
 
     /**
@@ -1556,13 +1554,11 @@ class Blueprint
      */
     public function nullableMorphs($name, $indexName = null, $after = null)
     {
-        if (Builder::$defaultMorphKeyType === 'uuid') {
-            $this->nullableUuidMorphs($name, $indexName, $after);
-        } elseif (Builder::$defaultMorphKeyType === 'ulid') {
-            $this->nullableUlidMorphs($name, $indexName, $after);
-        } else {
-            $this->nullableNumericMorphs($name, $indexName, $after);
-        }
+        match (Builder::$defaultMorphKeyType) {
+            'uuid' => $this->nullableUuidMorphs($name, $indexName, $after),
+            'ulid' => $this->nullableUlidMorphs($name, $indexName, $after),
+            default => $this->nullableNumericMorphs($name, $indexName, $after),
+        };
     }
 
     /**

@@ -126,13 +126,11 @@ class EloquentUserProvider implements UserProvider
         $query = $this->newModelQuery();
 
         foreach ($credentials as $key => $value) {
-            if (is_array($value) || $value instanceof Arrayable) {
-                $query->whereIn($key, $value);
-            } elseif ($value instanceof Closure) {
-                $value($query);
-            } else {
-                $query->where($key, $value);
-            }
+            match (true) {
+                is_array($value) || $value instanceof Arrayable => $query->whereIn($key, $value),
+                $value instanceof Closure => $value($query),
+                default => $query->where($key, $value),
+            };
         }
 
         return $query->first();

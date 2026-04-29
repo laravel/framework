@@ -126,14 +126,10 @@ class ModelInspector
                     || $method->isAbstract()
                     || $method->getDeclaringClass()->getName() === Model::class
             )
-            ->mapWithKeys(function (ReflectionMethod $method) use ($model) {
-                if (preg_match('/^get(.+)Attribute$/', $method->getName(), $matches) === 1) {
-                    return [Str::snake($matches[1]) => 'accessor'];
-                } elseif ($model->hasAttributeMutator($method->getName())) {
-                    return [Str::snake($method->getName()) => 'attribute'];
-                } else {
-                    return [];
-                }
+            ->mapWithKeys(static fn (ReflectionMethod $method) => match (true) {
+                preg_match('/^get(.+)Attribute$/', $method->getName(), $matches) === 1 => [Str::snake($matches[1]) => 'accessor'],
+                $model->hasAttributeMutator($method->getName()) => [Str::snake($method->getName()) => 'attribute'],
+                default => [],
             })
             ->reject(fn ($cast, $name) => (new BaseCollection($columns))->contains('name', $name))
             ->map(fn ($cast, $name) => [

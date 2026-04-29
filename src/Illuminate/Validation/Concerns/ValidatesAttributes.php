@@ -2130,17 +2130,13 @@ trait ValidatesAttributes
      */
     public function validateRequired($attribute, $value)
     {
-        if (is_null($value)) {
-            return false;
-        } elseif (is_string($value) && trim($value) === '') {
-            return false;
-        } elseif (is_countable($value) && count($value) < 1) {
-            return false;
-        } elseif ($value instanceof File) {
-            return (string) $value->getPath() !== '';
-        }
-
-        return true;
+        return match (true) {
+            $value === null => false,
+            is_string($value) => trim($value) !== '',
+            is_countable($value) => count($value) > 0,
+            $value instanceof File => (string) $value->getPath() !== '',
+            default => true,
+        };
     }
 
     /**
@@ -2781,15 +2777,12 @@ trait ValidatesAttributes
         // return the proper size accordingly. If it is a number, then number itself
         // is the size. If it is a file, we take kilobytes, and for a string the
         // entire length of the string will be considered the attribute size.
-        if (is_numeric($value) && $hasNumeric) {
-            return (string) $this->ensureExponentWithinAllowedRange($attribute, $this->trim($value));
-        } elseif (is_array($value)) {
-            return count($value);
-        } elseif ($value instanceof File) {
-            return (string) ($value->getSize() / 1024);
-        }
-
-        return mb_strlen($value ?? '');
+        return match (true) {
+            is_numeric($value) && $hasNumeric => (string) $this->ensureExponentWithinAllowedRange($attribute, $this->trim($value)),
+            is_array($value) => count($value),
+            $value instanceof File => (string) ($value->getSize() / 1024),
+            default => mb_strlen($value ?? ''),
+        };
     }
 
     /**

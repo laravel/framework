@@ -887,13 +887,11 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $relations = $this->map->getQueueableRelations()->all();
 
-        if (count($relations) === 0 || $relations === [[]]) {
-            return [];
-        } elseif (count($relations) === 1) {
-            return reset($relations);
-        } else {
-            return array_intersect(...array_values($relations));
-        }
+        return match (true) {
+            $relations === [] || $relations === [[]] => [],
+            count($relations) === 1 => reset($relations),
+            default => array_intersect(...array_values($relations)),
+        };
     }
 
     /**

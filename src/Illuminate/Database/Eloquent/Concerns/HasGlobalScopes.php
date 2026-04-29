@@ -62,17 +62,13 @@ trait HasGlobalScopes
      */
     public static function addGlobalScope($scope, $implementation = null)
     {
-        if (is_string($scope) && ($implementation instanceof Closure || $implementation instanceof Scope)) {
-            return static::$globalScopes[static::class][$scope] = $implementation;
-        } elseif ($scope instanceof Closure) {
-            return static::$globalScopes[static::class][spl_object_hash($scope)] = $scope;
-        } elseif ($scope instanceof Scope) {
-            return static::$globalScopes[static::class][get_class($scope)] = $scope;
-        } elseif (is_string($scope) && class_exists($scope) && is_subclass_of($scope, Scope::class)) {
-            return static::$globalScopes[static::class][$scope] = new $scope;
-        }
-
-        throw new InvalidArgumentException('Global scope must be an instance of Closure or Scope or be a class name of a class extending '.Scope::class);
+        return match (true) {
+            is_string($scope) && ($implementation instanceof Closure || $implementation instanceof Scope) => static::$globalScopes[static::class][$scope] = $implementation,
+            $scope instanceof Closure => static::$globalScopes[static::class][spl_object_hash($scope)] = $scope,
+            $scope instanceof Scope => static::$globalScopes[static::class][get_class($scope)] = $scope,
+            is_string($scope) && class_exists($scope) && is_subclass_of($scope, Scope::class) => static::$globalScopes[static::class][$scope] = new $scope,
+            default => throw new InvalidArgumentException('Global scope must be an instance of Closure or Scope or be a class name of a class extending '.Scope::class),
+        };
     }
 
     /**
