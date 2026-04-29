@@ -34,9 +34,11 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Create a new instance by invoking the callback a given amount of times.
      *
+     * @template TTimesValue
+     *
      * @param  int  $number
-     * @param  callable|null  $callback
-     * @return static
+     * @param  (callable(int): TTimesValue)|null  $callback
+     * @return static<int, TTimesValue>
      */
     public static function times($number, ?callable $callback = null);
 
@@ -46,7 +48,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @param  int  $from
      * @param  int  $to
      * @param  int  $step
-     * @return static
+     * @return static<int, int>
      */
     public static function range($from, $to, $step = 1);
 
@@ -81,7 +83,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Get all items in the enumerable.
      *
-     * @return array
+     * @return array<TKey, TValue>
      */
     public function all();
 
@@ -494,7 +496,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Get a flattened array of the items in the collection.
      *
      * @param  int  $depth
-     * @return static
+     * @return static<int, mixed>
      */
     public function flatten($depth = INF);
 
@@ -924,7 +926,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * @param  TValue|callable(TValue,TKey): bool  $value
      * @param  bool  $strict
-     * @return TKey|bool
+     * @return TKey|false
      */
     public function search($value, $strict = false);
 
@@ -1071,7 +1073,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Sort the collection using the given callback.
      *
-     * @param  array<array-key, (callable(TValue, TValue): mixed)|(callable(TValue, TKey): mixed)|string|array{string, string}>|(callable(TValue, TKey): mixed)|string  $callback
+     * @param  array<array-key, (callable(TValue, TValue): mixed)|(callable(TValue, TKey): mixed)|string|array{string, string}>|(callable(TValue, TKey): mixed)|string|int  $callback
      * @param  int  $options
      * @param  bool  $descending
      * @return static
@@ -1081,7 +1083,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Sort the collection in descending order using the given callback.
      *
-     * @param  array<array-key, (callable(TValue, TValue): mixed)|(callable(TValue, TKey): mixed)|string|array{string, string}>|(callable(TValue, TKey): mixed)|string  $callback
+     * @param  array<array-key, (callable(TValue, TValue): mixed)|(callable(TValue, TKey): mixed)|string|array{string, string}>|(callable(TValue, TKey): mixed)|string|int  $callback
      * @param  int  $options
      * @return static
      */

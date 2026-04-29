@@ -34,9 +34,9 @@ class ListenerTest extends TestCase
         $this->assertArrayHasKey('sql', $query);
         $this->assertArrayHasKey('bindings', $query);
 
-        $this->assertEquals('testing', $query['connectionName']);
-        $this->assertEquals(5.2, $query['time']);
-        $this->assertEquals('select * from users where id = ?', $query['sql']);
+        $this->assertSame('testing', $query['connectionName']);
+        $this->assertSame(5.2, $query['time']);
+        $this->assertSame('select * from users where id = ?', $query['sql']);
         $this->assertEquals(['foo'], $query['bindings']);
     }
 
@@ -55,8 +55,8 @@ class ListenerTest extends TestCase
         }
 
         $this->assertCount(100, $listener->queries());
-        $this->assertEquals('select 0', $listener->queries()[0]['sql']);
-        $this->assertEquals('select 99', $listener->queries()[99]['sql']);
+        $this->assertSame('select 0', $listener->queries()[0]['sql']);
+        $this->assertSame('select 99', $listener->queries()[99]['sql']);
     }
 
     public function test_large_sql_is_truncated()
@@ -144,7 +144,7 @@ class ListenerTest extends TestCase
             new QueryExecuted('select count(*) from users', [], 1.0, $connection)
         );
 
-        $this->assertEquals('select count(*) from users', $listener->queries()[0]['sql']);
+        $this->assertSame('select count(*) from users', $listener->queries()[0]['sql']);
         $this->assertEmpty($listener->queries()[0]['bindings']);
     }
 

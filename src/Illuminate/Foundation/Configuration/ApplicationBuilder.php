@@ -13,6 +13,7 @@ use Illuminate\Foundation\Events\DiagnosingHealth;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as AppEventServiceProvider;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as AppRouteServiceProvider;
+use Illuminate\Http\Middleware\PrefersJsonResponses;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Broadcast;
@@ -457,6 +458,25 @@ class ApplicationBuilder
                 }
             }
         });
+    }
+
+    /**
+     * Globally prefer JSON responses when the incoming "Accept" header is broad.
+     *
+     * @param  bool  $prefer
+     * @return $this
+     */
+    public function prefersJsonResponses(bool $prefer = true)
+    {
+        if (! $prefer) {
+            return $this;
+        }
+
+        $this->app->booted(function () {
+            $this->app->make(HttpKernel::class)->prependMiddleware(PrefersJsonResponses::class);
+        });
+
+        return $this;
     }
 
     /**

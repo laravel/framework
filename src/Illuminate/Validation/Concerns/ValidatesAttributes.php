@@ -673,7 +673,7 @@ trait ValidatesAttributes
 
         $matches = [];
 
-        if (preg_match('/^[+-]?\d*\.?(\d*)$/', $value, $matches) !== 1) {
+        if (preg_match('/^[+-]?\d*\.?(\d*)$/', (string) $value, $matches) !== 1) {
             return false;
         }
 
@@ -740,6 +740,10 @@ trait ValidatesAttributes
     public function validateDigitsBetween($attribute, $value, $parameters)
     {
         $this->requireParameterCount(2, $parameters, 'digits_between');
+
+        if (! is_string($value) && ! is_numeric($value)) {
+            return false;
+        }
 
         $length = strlen((string) $value);
 
@@ -1699,7 +1703,7 @@ trait ValidatesAttributes
 
         $length = strlen((string) $value);
 
-        return ! preg_match('/[^0-9]/', $value) && $length <= $parameters[0];
+        return ! preg_match('/[^0-9]/', (string) $value) && $length <= $parameters[0];
     }
 
     /**
@@ -1809,7 +1813,7 @@ trait ValidatesAttributes
 
         $length = strlen((string) $value);
 
-        return ! preg_match('/[^0-9]/', $value) && $length >= $parameters[0];
+        return ! preg_match('/[^0-9]/', (string) $value) && $length >= $parameters[0];
     }
 
     /**

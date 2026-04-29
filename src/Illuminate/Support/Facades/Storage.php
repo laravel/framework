@@ -40,10 +40,10 @@ use function Illuminate\Support\enum_value;
  * @method static bool move(string $from, string $to)
  * @method static int size(string $path)
  * @method static int lastModified(string $path)
- * @method static array<string> files(string|null $directory = null, bool $recursive = false)
- * @method static array<string> allFiles(string|null $directory = null)
- * @method static array<string> directories(string|null $directory = null, bool $recursive = false)
- * @method static array<string> allDirectories(string|null $directory = null)
+ * @method static array files(string|null $directory = null, bool $recursive = false)
+ * @method static array allFiles(string|null $directory = null)
+ * @method static array directories(string|null $directory = null, bool $recursive = false)
+ * @method static array allDirectories(string|null $directory = null)
  * @method static bool makeDirectory(string $path)
  * @method static bool deleteDirectory(string $directory)
  * @method static \Illuminate\Filesystem\FilesystemAdapter assertExists(string|array $path, string|null $content = null)
@@ -81,7 +81,7 @@ use function Illuminate\Support\enum_value;
  * @method static mixed macroCall(string $method, array $parameters)
  * @method static bool has(string $location)
  * @method static string read(string $location)
- * @method static \League\Flysystem\DirectoryListing<\League\Flysystem\StorageAttributes> listContents(string $location, bool $deep = false)
+ * @method static \League\Flysystem\DirectoryListing listContents(string $location, bool $deep = false)
  * @method static int fileSize(string $path)
  * @method static string visibility(string $path)
  * @method static void write(string $location, string $contents, array $config = [])
@@ -96,7 +96,7 @@ class Storage extends Facade
      *
      * @param  \UnitEnum|string|null  $disk
      * @param  array  $config
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     * @return \Illuminate\Filesystem\LocalFilesystemAdapter
      */
     public static function fake($disk = null, array $config = [])
     {
@@ -128,7 +128,7 @@ class Storage extends Facade
      *
      * @param  \UnitEnum|string|null  $disk
      * @param  array  $config
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     * @return \Illuminate\Filesystem\LocalFilesystemAdapter
      */
     public static function persistentFake($disk = null, array $config = [])
     {

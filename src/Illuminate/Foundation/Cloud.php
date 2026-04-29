@@ -30,7 +30,7 @@ class Cloud
                 static::configureDisks($app);
                 static::configureUnpooledPostgresConnection($app);
                 static::ensureMigrationsUseUnpooledConnection($app);
-                static::configureManagedQueues();
+                static::configureManagedQueues($app);
             },
             HandleExceptions::class => function () use ($app) {
                 static::configureCloudLogging($app);
@@ -117,10 +117,23 @@ class Cloud
     /**
      * Configure managed queues if applicable.
      */
-    public static function configureManagedQueues(): void
+    public static function configureManagedQueues(Application $app): void
     {
         if ((int) ($_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES'] ?? 0) === 1) {
             Worker::$restartable = false;
+            Worker::$pausable = false;
+
+            $app['config']->set(
+                'queue.connections.sqs.credentials',
+                'ecs'
+            );
+
+            if (isset($_SERVER['LARAVEL_CLOUD_REGION'])) {
+                $app['config']->set(
+                    'queue.connections.sqs.region',
+                    $_SERVER['LARAVEL_CLOUD_REGION']
+                );
+            }
         }
     }
 

@@ -55,7 +55,7 @@ class AfterResolvingAttributeCallbackTest extends TestCase
         $instance = $container->make(ContainerTestHasSelfConfiguringAttributeAndConstructor::class);
 
         $this->assertInstanceOf(ContainerTestHasSelfConfiguringAttributeAndConstructor::class, $instance);
-        $this->assertEquals('the-right-value', $instance->value);
+        $this->assertSame('the-right-value', $instance->value);
     }
 
     public function testCallbackIsCalledOnAppCall()

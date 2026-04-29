@@ -190,7 +190,7 @@ class CacheManagerTest extends TestCase
 
         $cacheManager->setDefaultDriver('><((((@>');
 
-        $this->assertEquals('><((((@>', $app->get('config')->get('cache.default'));
+        $this->assertSame('><((((@>', $app->get('config')->get('cache.default'));
     }
 
     public function testItPurgesMemoizedStoreObjects()

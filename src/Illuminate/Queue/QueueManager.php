@@ -349,12 +349,12 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Set the name of the default queue connection.
      *
-     * @param  string  $name
+     * @param  \UnitEnum|string  $name
      * @return void
      */
     public function setDefaultDriver($name)
     {
-        $this->app['config']['queue.default'] = $name;
+        $this->app['config']['queue.default'] = enum_value($name);
     }
 
     /**

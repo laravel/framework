@@ -47,7 +47,7 @@ class LogManagerTest extends TestCase
         //we don't specify any channel name
         $manager->channel();
         $this->assertCount(1, $manager->getChannels());
-        $this->assertEquals('single', $manager->getDefaultDriver());
+        $this->assertSame('single', $manager->getDefaultDriver());
     }
 
     public function testStackChannel()
@@ -726,7 +726,7 @@ class LogManagerTest extends TestCase
 
         $format = new ReflectionProperty(get_class($formatter), 'format');
 
-        $this->assertEquals(
+        $this->assertSame(
             '[%datetime%] %channel%.%level_name%: %message% %context% %extra%',
             rtrim($format->getValue($formatter)));
     }
@@ -750,7 +750,7 @@ class LogManagerTest extends TestCase
 
         // Then
         $this->assertCount(1, $loggerSpy->logs);
-        $this->assertEquals('some alert', $loggerSpy->logs[0]['message']);
+        $this->assertSame('some alert', $loggerSpy->logs[0]['message']);
     }
 
     public function testCustomDriverClosureBoundObjectIsLogManager()
@@ -783,6 +783,14 @@ class LogManagerTest extends TestCase
         $logger2 = $manager->driver('single');
 
         $this->assertSame($logger1, $logger2);
+    }
+
+    public function testSetDefaultDriverAcceptsBackedEnum()
+    {
+        $manager = new LogManager($this->app);
+        $manager->setDefaultDriver(LogChannelName::Single);
+
+        $this->assertSame('single', $this->app['config']['logging.default']);
     }
 }
 

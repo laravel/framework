@@ -5,7 +5,7 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Concurrency\ConcurrencyManager;
 
 /**
- * @method static mixed driver(string|null $name = null)
+ * @method static mixed driver(\UnitEnum|string|null $name = null)
  * @method static \Illuminate\Concurrency\ProcessDriver createProcessDriver()
  * @method static \Illuminate\Concurrency\ForkDriver createForkDriver()
  * @method static \Illuminate\Concurrency\SyncDriver createSyncDriver()

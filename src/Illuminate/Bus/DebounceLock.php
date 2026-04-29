@@ -7,7 +7,6 @@ use Illuminate\Queue\Attributes\DebounceFor;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
-use ReflectionClass;
 
 class DebounceLock
 {
@@ -68,12 +67,12 @@ class DebounceLock
         $timestampKey = $key.':first_dispatched_at';
 
         if (! $cache->has($timestampKey)) {
-            $cache->put($timestampKey, Carbon::now()->timestamp, $ttl);
+            $cache->put($timestampKey, Carbon::now()->getTimestamp(), $ttl);
 
             return false;
         }
 
-        $elapsed = Carbon::now()->timestamp - $cache->get($timestampKey);
+        $elapsed = Carbon::now()->getTimestamp() - $cache->get($timestampKey);
 
         if ($elapsed >= $maxWait) {
             $cache->forget($timestampKey);
@@ -147,11 +146,7 @@ class DebounceLock
      */
     public function getMaxDebounceWait($job)
     {
-        $attributes = (new ReflectionClass($job))->getAttributes(DebounceFor::class);
-
-        return count($attributes) > 0
-            ? $attributes[0]->newInstance()->maxWait
-            : null;
+        return $this->getAttributeInstance($job, DebounceFor::class)?->maxWait ?? null;
     }
 
     /**

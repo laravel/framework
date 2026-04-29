@@ -44,7 +44,7 @@ class ValidationValidatorTest extends TestCase
 {
     protected function tearDown(): void
     {
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
 
         parent::tearDown();
     }
@@ -103,6 +103,27 @@ class ValidationValidatorTest extends TestCase
 
         $this->assertFalse($v->passes());
         $this->assertSame('post name is required', $v->errors()->all()[0]);
+    }
+
+    public function testWildcardArrayCustomMessagesHandleMissingRulesGracefullyWhenAnotherRuleFails()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            'users' => [
+                [
+                    'name' => 'Taylor',
+                ],
+            ],
+        ], [
+            'users.*.name' => ['required', 'in:Otwell'],
+        ], [
+            'users.*.name' => [
+                'required' => 'user name is required',
+            ],
+        ]);
+
+        $this->assertFalse($v->passes());
+        $this->assertSame('validation.in', $v->errors()->all()[0]);
     }
 
     public function testSometimesWorksOnNestedArrays()
@@ -3256,12 +3277,31 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => ['array']], ['x' => 'max_digits:5']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'max_digits:5']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 123456], ['x' => 'max_digits:5']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateMinDigitsDoesNotThrowOnNonStringValue()
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => ['array']], ['x' => 'min_digits:1']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'min_digits:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 1], ['x' => 'min_digits:2']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateDigitsBetweenDoesNotThrowOnNonStringValue()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => ['array']], ['x' => 'digits_between:1,10']);
         $this->assertFalse($v->passes());
     }
 
@@ -3718,6 +3758,12 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
         $v = new Validator($trans, ['foo' => '123.34'], ['foo' => 'Decimal:0,2']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 123], ['foo' => 'Decimal:0']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 1.23], ['foo' => 'Decimal:0,3']);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateInt()
@@ -3762,6 +3808,9 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => '+12.3'], ['foo' => 'digits_between:1,6']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['12345']], ['foo' => 'digits_between:1,6']);
         $this->assertFalse($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
@@ -4642,10 +4691,10 @@ class ValidationValidatorTest extends TestCase
         ]);
 
         $this->assertFalse($v->passes());
-        $this->assertEquals('The numeric field must be greater than 10.', $v->messages()->first('numeric'));
-        $this->assertEquals('The string field must be greater than 5 characters.', $v->messages()->first('string'));
-        $this->assertEquals('The file field must be greater than 9 kilobytes.', $v->messages()->first('file'));
-        $this->assertEquals('The array field must have more than 4 items.', $v->messages()->first('array'));
+        $this->assertSame('The numeric field must be greater than 10.', $v->messages()->first('numeric'));
+        $this->assertSame('The string field must be greater than 5 characters.', $v->messages()->first('string'));
+        $this->assertSame('The file field must be greater than 9 kilobytes.', $v->messages()->first('file'));
+        $this->assertSame('The array field must have more than 4 items.', $v->messages()->first('array'));
     }
 
     public function testValidateGteMessagesAreCorrect()
@@ -4682,10 +4731,10 @@ class ValidationValidatorTest extends TestCase
         ]);
 
         $this->assertFalse($v->passes());
-        $this->assertEquals('The numeric field must be greater than or equal to 10.', $v->messages()->first('numeric'));
-        $this->assertEquals('The string field must be greater than or equal to 5 characters.', $v->messages()->first('string'));
-        $this->assertEquals('The file field must be greater than or equal to 9 kilobytes.', $v->messages()->first('file'));
-        $this->assertEquals('The array field must have 4 items or more.', $v->messages()->first('array'));
+        $this->assertSame('The numeric field must be greater than or equal to 10.', $v->messages()->first('numeric'));
+        $this->assertSame('The string field must be greater than or equal to 5 characters.', $v->messages()->first('string'));
+        $this->assertSame('The file field must be greater than or equal to 9 kilobytes.', $v->messages()->first('file'));
+        $this->assertSame('The array field must have 4 items or more.', $v->messages()->first('array'));
     }
 
     public function testValidateLtMessagesAreCorrect()
@@ -4722,10 +4771,10 @@ class ValidationValidatorTest extends TestCase
         ]);
 
         $this->assertFalse($v->passes());
-        $this->assertEquals('The numeric field must be less than 5.', $v->messages()->first('numeric'));
-        $this->assertEquals('The string field must be less than 3 characters.', $v->messages()->first('string'));
-        $this->assertEquals('The file field must be less than 8 kilobytes.', $v->messages()->first('file'));
-        $this->assertEquals('The array field must have less than 2 items.', $v->messages()->first('array'));
+        $this->assertSame('The numeric field must be less than 5.', $v->messages()->first('numeric'));
+        $this->assertSame('The string field must be less than 3 characters.', $v->messages()->first('string'));
+        $this->assertSame('The file field must be less than 8 kilobytes.', $v->messages()->first('file'));
+        $this->assertSame('The array field must have less than 2 items.', $v->messages()->first('array'));
     }
 
     public function testValidateLteMessagesAreCorrect()
@@ -4762,10 +4811,10 @@ class ValidationValidatorTest extends TestCase
         ]);
 
         $this->assertFalse($v->passes());
-        $this->assertEquals('The numeric field must be less than or equal to 5.', $v->messages()->first('numeric'));
-        $this->assertEquals('The string field must be less than or equal to 3 characters.', $v->messages()->first('string'));
-        $this->assertEquals('The file field must be less than or equal to 8 kilobytes.', $v->messages()->first('file'));
-        $this->assertEquals('The array field must not have more than 2 items.', $v->messages()->first('array'));
+        $this->assertSame('The numeric field must be less than or equal to 5.', $v->messages()->first('numeric'));
+        $this->assertSame('The string field must be less than or equal to 3 characters.', $v->messages()->first('string'));
+        $this->assertSame('The file field must be less than or equal to 8 kilobytes.', $v->messages()->first('file'));
+        $this->assertSame('The array field must not have more than 2 items.', $v->messages()->first('array'));
     }
 
     public function testValidateIp()
@@ -6944,7 +6993,7 @@ class ValidationValidatorTest extends TestCase
         $v->sometimes(['users'], 'array', function ($i, $item) {
             return (bool) $item;
         });
-        $this->assertEquals([], $v->getRules());
+        $this->assertSame([], $v->getRules());
 
         // ['company.users'] -> if users is not empty it must be validated as array
         $trans = $this->getIlluminateArrayTranslator();

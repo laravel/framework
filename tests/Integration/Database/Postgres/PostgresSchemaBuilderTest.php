@@ -117,7 +117,7 @@ class PostgresSchemaBuilderTest extends PostgresTestCase
             $table->comment('This is a comment');
         });
 
-        $this->assertEquals('This is a comment', DB::selectOne("select obj_description('public.posts'::regclass, 'pg_class')")->obj_description);
+        $this->assertSame('This is a comment', DB::selectOne("select obj_description('public.posts'::regclass, 'pg_class')")->obj_description);
     }
 
     public function testAddTableCommentOnExistingTable()
@@ -131,7 +131,7 @@ class PostgresSchemaBuilderTest extends PostgresTestCase
             $table->comment('This is a new comment');
         });
 
-        $this->assertEquals('This is a new comment', DB::selectOne("select obj_description('public.posts'::regclass, 'pg_class')")->obj_description);
+        $this->assertSame('This is a new comment', DB::selectOne("select obj_description('public.posts'::regclass, 'pg_class')")->obj_description);
     }
 
     public function testGetTables()

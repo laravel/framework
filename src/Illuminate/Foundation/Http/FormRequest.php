@@ -231,7 +231,9 @@ class FormRequest extends Request implements ValidatesWhenResolved
     {
         $allowedKeys = array_keys($this->validationRules());
 
-        foreach (array_keys(Arr::dot($this->all())) as $inputKey) {
+        $input = $this->isJson() ? $this->json()->all() : $this->request->all();
+
+        foreach (array_keys(Arr::dot($input)) as $inputKey) {
             if (! $this->isKnownField($inputKey, $allowedKeys)) {
                 $validator->errors()->add($inputKey, trans('validation.prohibited', [
                     'attribute' => str_replace('_', ' ', $inputKey),
@@ -251,6 +253,11 @@ class FormRequest extends Request implements ValidatesWhenResolved
     {
         foreach ($allowedKeys as $ruleKey) {
             if ($ruleKey === $inputKey) {
+                return true;
+            }
+
+            if (str_ends_with($inputKey, '_confirmation') &&
+                $ruleKey === substr($inputKey, 0, -13)) {
                 return true;
             }
 
@@ -292,15 +299,12 @@ class FormRequest extends Request implements ValidatesWhenResolved
     {
         $url = $this->redirector->getUrlGenerator();
 
-        if ($this->redirect) {
-            return $url->to($this->redirect);
-        } elseif ($this->redirectRoute) {
-            return $url->route($this->redirectRoute);
-        } elseif ($this->redirectAction) {
-            return $url->action($this->redirectAction);
-        }
-
-        return $url->previous();
+        return match (true) {
+            ! empty($this->redirect) => $url->to($this->redirect),
+            ! empty($this->redirectRoute) => $url->route($this->redirectRoute),
+            ! empty($this->redirectAction) => $url->action($this->redirectAction),
+            default => $url->previous(),
+        };
     }
 
     /**

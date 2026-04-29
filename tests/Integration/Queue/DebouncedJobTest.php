@@ -12,6 +12,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\Attributes\DebounceFor;
 use Illuminate\Queue\Events\JobDebounced;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache as CacheFacade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -37,7 +38,7 @@ class DebouncedJobTest extends QueueTestCase
         DebouncedTestJob::$handled = false;
 
         dispatch(new DebouncedTestJob('entity-1'));
-        $this->travelTo(now()->addSeconds(31));
+        $this->travelTo(Carbon::now()->addSeconds(31));
         $this->runQueueWorkerCommand(['--once' => true]);
 
         $this->assertTrue(DebouncedTestJob::$handled);
@@ -55,7 +56,7 @@ class DebouncedJobTest extends QueueTestCase
         dispatch(new DebouncedTestJob('entity-1'));
 
         // Advance time past the debounce window so jobs become available.
-        $this->travelTo(now()->addSeconds(31));
+        $this->travelTo(Carbon::now()->addSeconds(31));
 
         // Process both jobs from the queue.
         $this->runQueueWorkerCommand(['--once' => true], 2);
@@ -71,7 +72,7 @@ class DebouncedJobTest extends QueueTestCase
         DebouncedTestJob::$handled = false;
 
         dispatch($job = new DebouncedTestJob('entity-1'));
-        $this->travelTo(now()->addSeconds(31));
+        $this->travelTo(Carbon::now()->addSeconds(31));
         $this->runQueueWorkerCommand(['--once' => true]);
 
         $this->assertTrue($job::$handled);
@@ -110,7 +111,7 @@ class DebouncedJobTest extends QueueTestCase
         dispatch(new DebouncedTestJob('entity-1'));
         dispatch(new DebouncedTestJob('entity-1'));
 
-        $this->travelTo(now()->addSeconds(31));
+        $this->travelTo(Carbon::now()->addSeconds(31));
         $this->runQueueWorkerCommand(['--once' => true], 2);
 
         $this->assertEquals(1, $firedCount);
@@ -131,7 +132,7 @@ class DebouncedJobTest extends QueueTestCase
 
         $restored = unserialize(serialize($job));
 
-        $this->assertEquals('test-owner-token-123', $restored->debounceOwner);
+        $this->assertSame('test-owner-token-123', $restored->debounceOwner);
     }
 
     public function testDifferentDebounceIdsDoNotInterfere()
@@ -143,7 +144,7 @@ class DebouncedJobTest extends QueueTestCase
         dispatch(new DebouncedTestJob('entity-1'));
         dispatch(new DebouncedTestJob('entity-2'));
 
-        $this->travelTo(now()->addSeconds(31));
+        $this->travelTo(Carbon::now()->addSeconds(31));
         $this->runQueueWorkerCommand(['--once' => true], 2);
 
         // Both should execute — different identities.
@@ -180,7 +181,7 @@ class DebouncedJobTest extends QueueTestCase
         // Simulate cache eviction by manually removing the debounce token.
         $this->app->get(Cache::class)->forget(DebounceLock::getKey($job));
 
-        $this->travelTo(now()->addSeconds(31));
+        $this->travelTo(Carbon::now()->addSeconds(31));
         $this->runQueueWorkerCommand(['--once' => true]);
 
         // Job should execute (fail-open) even though token was evicted.
@@ -221,7 +222,7 @@ class DebouncedJobTest extends QueueTestCase
         $this->assertNull($cache->get(DebounceLock::getKey($job).':first_dispatched_at'));
 
         // If timestamp cleanup worked, max wait should not appear exceeded.
-        $this->travelTo(now()->addSeconds(61));
+        $this->travelTo(Carbon::now()->addSeconds(61));
 
         $second = $lock->acquire($job);
 
@@ -241,7 +242,7 @@ class DebouncedJobTest extends QueueTestCase
         // Second dispatch supersedes the first (no chain).
         dispatch(new DebouncedTestJob('entity-1'));
 
-        $this->travelTo(now()->addSeconds(31));
+        $this->travelTo(Carbon::now()->addSeconds(31));
         $this->runQueueWorkerCommand(['--once' => true], 3);
 
         // Only the second dispatch should have executed.
@@ -278,11 +279,11 @@ class DebouncedJobTest extends QueueTestCase
         dispatch(new DebouncedWithMaxWaitJob('entity-1'));
 
         // Second dispatch at t=50 (within maxWait of 60s).
-        $this->travelTo(now()->addSeconds(50));
+        $this->travelTo(Carbon::now()->addSeconds(50));
         dispatch(new DebouncedWithMaxWaitJob('entity-1'));
 
         // Third dispatch at t=61 — exceeds maxWait.
-        $this->travelTo(now()->addSeconds(11));
+        $this->travelTo(Carbon::now()->addSeconds(11));
         $job = new DebouncedWithMaxWaitJob('entity-1');
         $pending = dispatch($job);
         unset($pending);
@@ -303,12 +304,33 @@ class DebouncedJobTest extends QueueTestCase
         $this->assertEquals(30, $job1->delay);
 
         // Dispatch again much later — still gets the full delay.
-        $this->travelTo(now()->addSeconds(600));
+        $this->travelTo(Carbon::now()->addMinutes(10));
         $job2 = new DebouncedTestJob('entity-1');
         $pending2 = dispatch($job2);
         unset($pending2);
 
         $this->assertEquals(30, $job2->delay);
+    }
+
+    public function testChildDebouncedJobInheritsFromParent()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['sync', 'beanstalkd']);
+
+        ChildOfDebouncedTestJob::$handleCount = 0;
+
+        // Dispatch two jobs with the same debounce identity.
+        // The second dispatch supersedes the first.
+        dispatch(new ChildOfDebouncedTestJob('entity-1'));
+        dispatch(new ChildOfDebouncedTestJob('entity-1'));
+
+        // Advance time past the debounce window so jobs become available.
+        $this->travelTo(Carbon::now()->addSeconds(31));
+
+        // Process both jobs from the queue.
+        $this->runQueueWorkerCommand(['--once' => true], 2);
+
+        // Only the second (latest) dispatch should have executed.
+        $this->assertEquals(1, ChildOfDebouncedTestJob::$handleCount);
     }
 }
 
@@ -425,6 +447,27 @@ class DebouncedWithCustomCacheJob implements ShouldQueue
 
 #[DebounceFor(30, maxWait: 60)]
 class DebouncedWithMaxWaitJob implements ShouldQueue
+{
+    use InteractsWithQueue, Queueable, Dispatchable;
+
+    public static $handleCount = 0;
+
+    public function __construct(public string $entityId)
+    {
+    }
+
+    public function debounceId(): string
+    {
+        return $this->entityId;
+    }
+
+    public function handle()
+    {
+        static::$handleCount++;
+    }
+}
+
+class ChildOfDebouncedTestJob extends DebouncedTestJob implements ShouldQueue
 {
     use InteractsWithQueue, Queueable, Dispatchable;
 

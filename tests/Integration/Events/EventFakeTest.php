@@ -183,7 +183,7 @@ class EventFakeTest extends TestCase
     {
         Event::macro('foo', fn () => 'bar');
 
-        $this->assertEquals('bar', Event::fake()->foo());
+        $this->assertSame('bar', Event::fake()->foo());
     }
 
     public function testShouldDispatchAfterCommitEventsAreNotDispatchedIfTransactionFails()

@@ -224,6 +224,77 @@ class BroadcastManagerTest extends TestCase
         }
     }
 
+    public function testBroadcastManagerCanResolveBackedEnumConnection(): void
+    {
+        $app = $this->getApp([
+            'broadcasting' => [
+                'connections' => [
+                    'log' => ['driver' => 'log'],
+                ],
+            ],
+        ]);
+
+        $driver = new stdClass;
+        $manager = new BroadcastManager($app);
+        $manager->extend('log', static fn () => $driver);
+
+        $this->assertSame($driver, $manager->connection(BroadcastConnectionName::Log));
+        $this->assertSame($manager->connection('log'), $manager->connection(BroadcastConnectionName::Log));
+    }
+
+    public function testBroadcastManagerCanResolveBackedEnumDriver(): void
+    {
+        $app = $this->getApp([
+            'broadcasting' => [
+                'connections' => [
+                    'log' => ['driver' => 'log'],
+                ],
+            ],
+        ]);
+
+        $driver = new stdClass;
+        $manager = new BroadcastManager($app);
+        $manager->extend('log', static fn () => $driver);
+
+        $this->assertSame($driver, $manager->driver(BroadcastConnectionName::Log));
+        $this->assertSame($manager->driver('log'), $manager->driver(BroadcastConnectionName::Log));
+    }
+
+    public function testSetDefaultDriverAcceptsBackedEnum(): void
+    {
+        $app = $this->getApp([
+            'broadcasting' => [
+                'default' => 'null',
+                'connections' => [],
+            ],
+        ]);
+
+        $manager = new BroadcastManager($app);
+        $manager->setDefaultDriver(BroadcastConnectionName::Log);
+
+        $this->assertSame('log', $app['config']['broadcasting.default']);
+    }
+
+    public function testPurgeAcceptsBackedEnum(): void
+    {
+        $app = $this->getApp([
+            'broadcasting' => [
+                'connections' => [
+                    'log' => ['driver' => 'log'],
+                ],
+            ],
+        ]);
+
+        $manager = new BroadcastManager($app);
+        $manager->extend('log', static fn () => new stdClass);
+
+        $instance1 = $manager->connection(BroadcastConnectionName::Log);
+        $manager->purge(BroadcastConnectionName::Log);
+        $instance2 = $manager->connection(BroadcastConnectionName::Log);
+
+        $this->assertNotSame($instance1, $instance2);
+    }
+
     protected function getApp(array $userConfig)
     {
         $app = new Container;
@@ -231,6 +302,11 @@ class BroadcastManagerTest extends TestCase
 
         return $app;
     }
+}
+
+enum BroadcastConnectionName: string
+{
+    case Log = 'log';
 }
 
 class TestEvent implements ShouldBroadcast

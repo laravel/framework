@@ -39,7 +39,7 @@ class CacheRepositoryTest extends TestCase
 
     protected function tearDown(): void
     {
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
         Repository::handleUnserializableClassUsing(null);
 
         parent::tearDown();
@@ -506,6 +506,15 @@ class CacheRepositoryTest extends TestCase
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('touch')->once()->with($key, $ttl)->andReturn(true);
         $this->assertTrue($repo->touch($key, DateInterval::createFromDateString("$ttl seconds")));
+    }
+
+    public function testTouchWorksWithEnumKey(): void
+    {
+        $ttl = 60;
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('touch')->once()->with('foo', $ttl)->andReturn(true);
+        $this->assertTrue($repo->touch(TestCacheKey::FOO, $ttl));
     }
 
     public function testAtomicExecutesCallbackAndReturnsResult()

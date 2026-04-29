@@ -55,8 +55,9 @@
         "symfony/http-kernel": "^7.4.0 || ^8.0.0",
         "symfony/mailer": "^7.4.0 || ^8.0.0",
         "symfony/mime": "^7.4.0 || ^8.0.0",
-        "symfony/polyfill-php84": "^1.33",
-        "symfony/polyfill-php85": "^1.33",
+        "symfony/polyfill-php84": "^1.34",
+        "symfony/polyfill-php85": "^1.34",
+        "symfony/polyfill-php86": "^1.36",
         "symfony/process": "^7.4.5 || ^8.0.5",
         "symfony/routing": "^7.4.0 || ^8.0.0",
         "symfony/uid": "^7.4.0 || ^8.0.0",
@@ -215,6 +216,7 @@
         },
         "audit": {
             "ignore": {
+                "GHSA-qrr6-mg7r-m243": "Ensure testing features are compatible with affected PHPUnit versions",
                 "GHSA-vvj3-c3rp-c85p": "Ensure testing features are compatible with affected PHPUnit versions"
             }
         },

@@ -1204,7 +1204,7 @@ class Str
     public static function replaceArray($search, $replace, $subject)
     {
         if ($replace instanceof Traversable) {
-            $replace = Arr::from($replace);
+            $replace = iterator_to_array($replace);
         }
 
         $segments = explode($search, $subject);
@@ -1246,15 +1246,15 @@ class Str
     public static function replace($search, $replace, $subject, $caseSensitive = true)
     {
         if ($search instanceof Traversable) {
-            $search = Arr::from($search);
+            $search = iterator_to_array($search);
         }
 
         if ($replace instanceof Traversable) {
-            $replace = Arr::from($replace);
+            $replace = iterator_to_array($replace);
         }
 
         if ($subject instanceof Traversable) {
-            $subject = Arr::from($subject);
+            $subject = iterator_to_array($subject);
         }
 
         return $caseSensitive
@@ -1387,7 +1387,7 @@ class Str
     public static function remove($search, $subject, $caseSensitive = true)
     {
         if ($search instanceof Traversable) {
-            $search = Arr::from($search);
+            $search = iterator_to_array($search);
         }
 
         return $caseSensitive

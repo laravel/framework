@@ -29,7 +29,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 {
     protected function tearDown(): void
     {
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
 
         parent::tearDown();
     }
@@ -141,6 +141,24 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
         $builder->shouldReceive('first')->with(['column'])->andReturn(null);
         $builder->findOrFail('bar', ['column']);
+    }
+
+    public function testFindOrFailMethodThrowsModelNotFoundExceptionWithBackedEnum()
+    {
+        $exception = new ModelNotFoundException;
+        $exception->setModel('Foo', EloquentBuilderTestBackedEnum::Bar);
+
+        $this->assertSame('No query results for model [Foo] bar', $exception->getMessage());
+        $this->assertSame(['bar'], $exception->getIds());
+    }
+
+    public function testFindOrFailMethodThrowsModelNotFoundExceptionWithUnitEnum()
+    {
+        $exception = new ModelNotFoundException;
+        $exception->setModel('Foo', EloquentBuilderTestUnitEnum::Baz);
+
+        $this->assertSame('No query results for model [Foo] Baz', $exception->getMessage());
+        $this->assertSame(['Baz'], $exception->getIds());
     }
 
     public function testFindOrFailMethodWithManyThrowsModelNotFoundException()
@@ -336,7 +354,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getModel()->shouldReceive('newCollection')->with([])->andReturn(new Collection([]));
 
         $results = $builder->get(['foo']);
-        $this->assertEquals([], $results->all());
+        $this->assertSame([], $results->all());
     }
 
     public function testValueMethodWithModelFound()
@@ -1107,7 +1125,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = new EloquentBuilderTestStub();
         $this->mockConnectionForModel($model, 'SQLite');
         $query = $model->newQuery()->whereNot('name', 'foo')->whereNot('name', '<>', 'bar');
-        $this->assertEquals('select * from "table" where not "name" = ? and not "name" <> ?', $query->toSql());
+        $this->assertSame('select * from "table" where not "name" = ? and not "name" <> ?', $query->toSql());
         $this->assertEquals(['foo', 'bar'], $query->getBindings());
     }
 
@@ -1137,7 +1155,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = new EloquentBuilderTestStub();
         $this->mockConnectionForModel($model, 'SQLite');
         $query = $model->newQuery()->orWhereNot('name', 'foo')->orWhereNot('name', '<>', 'bar');
-        $this->assertEquals('select * from "table" where not "name" = ? or not "name" <> ?', $query->toSql());
+        $this->assertSame('select * from "table" where not "name" = ? or not "name" <> ?', $query->toSql());
         $this->assertEquals(['foo', 'bar'], $query->getBindings());
     }
 
@@ -2679,7 +2697,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $result = $builder->from('table as alias')->update(['foo' => 'bar', 'alias.updated_at' => null]);
         $this->assertEquals(1, $result);
 
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
     }
 
     public function testUpsert()
@@ -3250,4 +3268,14 @@ class EloquentBuilderTestWhereBelongsToStub extends Model
     {
         return $this->belongsTo(self::class, 'parent_id', 'id', 'parent');
     }
+}
+
+enum EloquentBuilderTestBackedEnum: string
+{
+    case Bar = 'bar';
+}
+
+enum EloquentBuilderTestUnitEnum
+{
+    case Baz;
 }

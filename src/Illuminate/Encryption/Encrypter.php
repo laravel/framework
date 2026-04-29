@@ -162,16 +162,19 @@ class Encrypter implements EncrypterContract, StringEncrypter
             $tag = empty($payload['tag']) ? null : base64_decode($payload['tag'])
         );
 
-        $foundValidMac = false;
+        [$keys, $validKey] = [$this->getAllKeys(), null];
 
         // Here we will decrypt the value. If we are able to successfully decrypt it
         // we will then unserialize it and return it out to the caller. If we are
         // unable to decrypt this value we will throw out an exception message.
-        foreach ($this->getAllKeys() as $key) {
-            if (
-                $this->shouldValidateMac() &&
-                ! ($foundValidMac = $foundValidMac || $this->validMacForKey($payload, $key))
-            ) {
+        foreach ($keys as $key) {
+            if ($this->shouldValidateMac()) {
+                $validMac = $this->validMacForKey($payload, $key);
+
+                if ($validMac && $validKey === null) {
+                    $validKey = $key;
+                }
+
                 continue;
             }
 
@@ -184,8 +187,14 @@ class Encrypter implements EncrypterContract, StringEncrypter
             }
         }
 
-        if ($this->shouldValidateMac() && ! $foundValidMac) {
+        if ($this->shouldValidateMac() && $validKey === null) {
             throw new DecryptException('The MAC is invalid.');
+        }
+
+        if ($this->shouldValidateMac()) {
+            $decrypted = \openssl_decrypt(
+                $payload['value'], strtolower($this->cipher), $validKey, 0, $iv, $tag ?? ''
+            );
         }
 
         if (($decrypted ?? false) === false) {

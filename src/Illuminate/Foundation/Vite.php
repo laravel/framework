@@ -98,6 +98,20 @@ class Vite implements Htmlable
     protected static $manifests = [];
 
     /**
+     * The ViteFonts instance.
+     *
+     * @var \Illuminate\Foundation\ViteFonts|null
+     */
+    protected $fonts = null;
+
+    /**
+     * The name of the font manifest file.
+     *
+     * @var string
+     */
+    protected $fontsManifestFilename = 'fonts-manifest.json';
+
+    /**
      * The prefetching strategy to use.
      *
      * @var null|'waterfall'|'aggressive'
@@ -396,7 +410,7 @@ class Vite implements Htmlable
                 $manifest,
             ]);
 
-            foreach ($chunk['imports'] ?? [] as $import) {
+            foreach ($this->resolveImports($manifest, $chunk) as $import) {
                 $preloads->push([
                     $import,
                     $this->assetPath("{$buildDirectory}/{$manifest[$import]['file']}"),
@@ -985,6 +999,35 @@ class Vite implements Htmlable
     }
 
     /**
+     * Recursively resolve all imports for the given chunk.
+     *
+     * @param  array  $manifest
+     * @param  array  $chunk
+     * @param  array  $seen
+     * @return array
+     */
+    protected function resolveImports($manifest, $chunk, $seen = [])
+    {
+        $imports = [];
+
+        foreach ($chunk['imports'] ?? [] as $import) {
+            if (isset($seen[$import])) {
+                continue;
+            }
+
+            $seen[$import] = true;
+
+            $imports[] = $import;
+
+            if (isset($manifest[$import])) {
+                $imports = array_merge($imports, $this->resolveImports($manifest, $manifest[$import], $seen));
+            }
+        }
+
+        return $imports;
+    }
+
+    /**
      * Get the chunk for the given entry point / asset.
      *
      * @param  array  $manifest
@@ -1017,6 +1060,160 @@ class Vite implements Htmlable
     }
 
     /**
+     * Render font preload links and inline styles.
+     *
+     * @param  list<string>|string|null  $aliases
+     * @return \Illuminate\Support\HtmlString
+     *
+     * @throws \Illuminate\Foundation\ViteException
+     */
+    public function fonts($aliases = null)
+    {
+        $isHot = $this->isRunningHot();
+
+        $fonts = $this->viteFonts();
+
+        $manifest = $fonts->manifest($isHot, $this->buildDirectory, $this->fontsManifestFilename, $this->hotFile());
+
+        if ($manifest === null) {
+            return new HtmlString('');
+        }
+
+        $fonts->ensureValidManifest($manifest);
+
+        $preloads = $manifest['preloads'] ?? [];
+
+        if ($aliases !== null) {
+            $aliases = is_string($aliases)
+                ? [$aliases]
+                : $aliases;
+
+            $fonts->ensureValidFamilies($aliases, $manifest);
+
+            $preloads = array_filter($preloads, fn ($preload) => in_array($preload['alias'] ?? null, $aliases, true));
+        }
+
+        $fonts->ensureValidPreloads($preloads, $isHot);
+
+        $preloadsHtml = $this->renderFontPreloads($preloads);
+        $styleHtml = $this->renderFontStyle($manifest, $aliases);
+
+        return new HtmlString(match (true) {
+            $preloadsHtml !== '' && $styleHtml !== '' => $preloadsHtml."\n".$styleHtml,
+            default => $preloadsHtml.$styleHtml,
+        });
+    }
+
+    /**
+     * Render preload link tags for font entries.
+     *
+     * @param  list<array<string, string>>  $preloads
+     * @return string
+     */
+    protected function renderFontPreloads($preloads)
+    {
+        $tags = [];
+
+        foreach ($preloads as $preload) {
+            $url = $preload['url'] ?? $this->assetPath($this->buildDirectory.'/'.$preload['file']);
+
+            if (isset($this->preloadedAssets[$url])) {
+                continue;
+            }
+
+            $attributes = $this->resolveFontPreloadAttributes($url, $preload);
+
+            if ($attributes === false) {
+                continue;
+            }
+
+            $this->preloadedAssets[$url] = $this->parseAttributes(
+                (new Collection($attributes))->forget('href')->all()
+            );
+
+            $tags[] = '<link '.implode(' ', $this->parseAttributes($attributes)).' />';
+        }
+
+        return implode("\n", $tags);
+    }
+
+    /**
+     * Resolve the attributes for a font preload tag.
+     *
+     * @param  string  $url
+     * @param  array<string, string>  $preload
+     * @return array<string, string|false>|false
+     */
+    protected function resolveFontPreloadAttributes($url, $preload)
+    {
+        $attributes = [
+            'rel' => 'preload',
+            'as' => $preload['as'] ?? 'font',
+            'href' => $url,
+            'type' => $preload['type'] ?? false,
+            'crossorigin' => $preload['crossorigin'] ?? false,
+            'nonce' => $this->nonce ?? false,
+        ];
+
+        foreach ($this->preloadTagAttributesResolvers as $resolver) {
+            if (false === ($resolved = $resolver('fonts', $url, [], []))) {
+                return false;
+            }
+
+            $attributes = array_merge($attributes, $resolved);
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * Render the inline style block for the font manifest.
+     *
+     * @param  array<string, mixed>  $manifest
+     * @param  list<string>|null  $aliases
+     * @return string
+     */
+    protected function renderFontStyle($manifest, $aliases)
+    {
+        $css = $this->viteFonts()->resolveStyleContent($manifest, $aliases, $this->buildDirectory);
+
+        if ($css === '') {
+            return '';
+        }
+
+        $attributes = $this->parseAttributes([
+            'nonce' => $this->nonce ?? false,
+        ]);
+
+        $attributeString = $attributes ? ' '.implode(' ', $attributes) : '';
+
+        return "<style{$attributeString}>\n".trim($css, "\n")."\n</style>";
+    }
+
+    /**
+     * Get the ViteFonts instance.
+     *
+     * @return \Illuminate\Foundation\ViteFonts
+     */
+    protected function viteFonts()
+    {
+        return $this->fonts ??= new ViteFonts;
+    }
+
+    /**
+     * Set the font manifest filename.
+     *
+     * @param  string  $filename
+     * @return $this
+     */
+    public function useFontsManifestFilename($filename)
+    {
+        $this->fontsManifestFilename = $filename;
+
+        return $this;
+    }
+
+    /**
      * Determine if the HMR server is running.
      *
      * @return bool
@@ -1044,5 +1241,9 @@ class Vite implements Htmlable
     public function flush()
     {
         $this->preloadedAssets = [];
+
+        $this->fonts?->flush();
+
+        $this->fonts = null;
     }
 }

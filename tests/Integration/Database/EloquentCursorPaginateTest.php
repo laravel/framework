@@ -202,10 +202,10 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertSame(['id'], $result->getOptions()['parameters']);
 
         $postB = $table2->where('id', '>', 1)->first();
-        $this->assertEquals('Post B', $postB->title, 'Expect `Post B` is the result of the second query');
+        $this->assertSame('Post B', $postB->title, 'Expect `Post B` is the result of the second query');
 
         $this->assertCount(1, $result->items(), 'Expect cursor paginated query should have 1 result');
-        $this->assertEquals('Post B', current($result->items())->title, 'Expect the paginated query would return `Post B`');
+        $this->assertSame('Post B', current($result->items())->title, 'Expect the paginated query would return `Post B`');
     }
 
     public function testPaginationWithMultipleAliases()
@@ -232,7 +232,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertSame(['alias'], $result->getOptions()['parameters']);
 
         $this->assertCount(1, $result->items(), 'Expect cursor paginated query should have 1 result');
-        $this->assertEquals('B (post)', current($result->items())->alias, 'Expect the paginated query would return `B (post)`');
+        $this->assertSame('B (post)', current($result->items())->alias, 'Expect the paginated query would return `B (post)`');
     }
 
     public function testPaginationWithAliasedOrderBy()

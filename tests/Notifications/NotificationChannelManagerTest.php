@@ -49,6 +49,27 @@ class NotificationChannelManagerTest extends TestCase
         $manager->send(new NotificationChannelManagerTestNotifiable, new NotificationChannelManagerTestNotification);
     }
 
+    public function testChannelCanBeResolvedUsingBackedEnum()
+    {
+        $container = new Container;
+        $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
+
+        $manager = new ChannelManager($container);
+        $manager->extend('test', fn () => new NotificationChannelManagerTestCustomChannel);
+
+        $this->assertInstanceOf(NotificationChannelManagerTestCustomChannel::class, $manager->channel(NotificationChannelManagerTestChannelEnum::Test));
+    }
+
+    public function testDriverCanBeResolvedUsingBackedEnum()
+    {
+        $container = new Container;
+        $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
+
+        $manager = new ChannelManager($container);
+
+        $this->assertInstanceOf(NotificationChannelManagerTestCustomChannel::class, $manager->driver(NotificationChannelManagerTestChannelEnum::Custom));
+    }
+
     public function testNotificationNotSentOnHalt()
     {
         $container = new Container;
@@ -684,4 +705,14 @@ class NotificationChannelManagerWithAfterSendingMethodNotification extends Notif
         static::$afterSendingChannel = $channel;
         static::$afterSendingResponse = $response;
     }
+}
+
+enum NotificationChannelManagerTestChannelEnum: string
+{
+    case Test = 'test';
+    case Custom = NotificationChannelManagerTestCustomChannel::class;
+}
+
+class NotificationChannelManagerTestCustomChannel
+{
 }
