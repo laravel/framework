@@ -1578,14 +1578,22 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  array<array-key, (callable(TValue, TValue): mixed)|(callable(TValue, TKey): mixed)|string|array{string, string}>|(callable(TValue, TKey): mixed)|string|int  $callback
      * @param  int  $options
-     * @param  SortDirection|bool  $descending
+     * @param  SortDirection|bool  $direction
+     * @param  bool  $descending
      * @return static
      */
-    public function sortBy($callback, $options = SORT_REGULAR, $descending = false)
+    public function sortBy($callback, $options = SORT_REGULAR, $direction = SortDirection::Ascending, bool $descending = false)
     {
         if (is_array($callback) && ! is_callable($callback)) {
             return $this->sortByMany($callback, $options);
         }
+
+        $direction = match (true) {
+            $descending => SortDirection::Descending,
+            $direction instanceof SortDirection => $direction,
+            $direction => SortDirection::Descending,
+            ! $direction => SortDirection::Ascending,
+        };
 
         $results = [];
 
@@ -1598,9 +1606,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             $results[$key] = $callback($value, $key);
         }
 
-        match ($descending) {
-            false, SortDirection::Ascending => asort($results, $options),
-            true, SortDirection::Descending => arsort($results, $options),
+        match ($direction) {
+            SortDirection::Ascending => asort($results, $options),
+            SortDirection::Descending => arsort($results, $options),
         };
 
         // Once we have sorted all of the keys in the array, we will loop through them
@@ -1692,23 +1700,31 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             }
         }
 
-        return $this->sortBy($callback, $options, true);
+        return $this->sortBy($callback, $options, SortDirection::Descending);
     }
 
     /**
      * Sort the collection keys.
      *
      * @param  int  $options
-     * @param  SortDirection|bool  $descending
+     * @param  SortDirection|bool  $direction
+     * @param  bool  $descending
      * @return static
      */
-    public function sortKeys($options = SORT_REGULAR, $descending = false)
+    public function sortKeys($options = SORT_REGULAR, $direction = SortDirection::Ascending, bool $descending = false)
     {
+        $direction = match (true) {
+            $descending => SortDirection::Descending,
+            $direction instanceof SortDirection => $direction,
+            $direction => SortDirection::Descending,
+            ! $direction => SortDirection::Ascending,
+        };
+
         $items = $this->items;
 
-        match ($descending) {
-            false, SortDirection::Ascending => ksort($items, $options),
-            true, SortDirection::Descending => krsort($items, $options),
+        match ($direction) {
+            SortDirection::Ascending => ksort($items, $options),
+            SortDirection::Descending => krsort($items, $options),
         };
 
         return $this->newInstance($items);

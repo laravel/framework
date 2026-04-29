@@ -1123,26 +1123,34 @@ class Arr
      *
      * @param  array<TKey, TValue>  $array
      * @param  int-mask-of<SORT_REGULAR|SORT_NUMERIC|SORT_STRING|SORT_LOCALE_STRING|SORT_NATURAL|SORT_FLAG_CASE>  $options
-     * @param  SortDirection|bool  $descending
+     * @param  SortDirection|bool  $direction
+     * @param  bool  $descending
      * @return array<TKey, TValue>
      */
-    public static function sortRecursive($array, $options = SORT_REGULAR, $descending = false)
+    public static function sortRecursive($array, $options = SORT_REGULAR, $direction = SortDirection::Ascending, bool $descending = false)
     {
+        $direction = match (true) {
+            $descending => SortDirection::Descending,
+            $direction instanceof SortDirection => $direction,
+            $direction => SortDirection::Descending,
+            ! $direction => SortDirection::Ascending,
+        };
+
         foreach ($array as &$value) {
             if (is_array($value)) {
-                $value = static::sortRecursive($value, $options, $descending);
+                $value = static::sortRecursive($value, $options, $direction);
             }
         }
 
         if (! array_is_list($array)) {
-            match ($descending) {
-                false, SortDirection::Ascending => ksort($array, $options),
-                true, SortDirection::Descending => krsort($array, $options),
+            match ($direction) {
+                SortDirection::Ascending => ksort($array, $options),
+                SortDirection::Descending => krsort($array, $options),
             };
         } else {
-            match ($descending) {
-                false, SortDirection::Ascending => sort($array, $options),
-                true, SortDirection::Descending => rsort($array, $options),
+            match ($direction) {
+                SortDirection::Ascending => sort($array, $options),
+                SortDirection::Descending => rsort($array, $options),
             };
         }
 

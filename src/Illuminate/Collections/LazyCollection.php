@@ -13,6 +13,7 @@ use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use IteratorAggregate;
+use SortDirection;
 use stdClass;
 use Traversable;
 
@@ -1508,9 +1509,12 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
 
     /**
      * {@inheritDoc}
+     *
+     * @param  SortDirection|bool  $direction
+     * @param  bool  $descending
      */
     #[\Override]
-    public function sortBy($callback, $options = SORT_REGULAR, $descending = false)
+    public function sortBy($callback, $options = SORT_REGULAR, $direction = SortDirection::Ascending, bool $descending = false)
     {
         return $this->passthru(__FUNCTION__, func_get_args());
     }
@@ -1526,9 +1530,12 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
 
     /**
      * {@inheritDoc}
+     *
+     * @param  SortDirection|bool  $direction
+     * @param  bool  $descending
      */
     #[\Override]
-    public function sortKeys($options = SORT_REGULAR, $descending = false)
+    public function sortKeys($options = SORT_REGULAR, $direction = SortDirection::Ascending, bool $descending = false)
     {
         return $this->passthru(__FUNCTION__, func_get_args());
     }
