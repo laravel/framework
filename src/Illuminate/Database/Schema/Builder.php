@@ -394,7 +394,7 @@ class Builder
      * Get the columns for a given table.
      *
      * @param  string  $table
-     * @return list<array{name: string, type: string, type_name: string, nullable: bool, default: mixed, auto_increment: bool, comment: string|null, generation: array{type: string, expression: string|null}|null}>
+     * @return list<array{name: string, type: string, type_name: string, collation: string|null, nullable: bool, default: mixed, auto_increment: bool, comment: string|null, generation: array{type: string, expression: string|null}|null}>
      */
     public function getColumns($table)
     {
