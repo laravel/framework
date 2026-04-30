@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Bus;
 
 use Illuminate\Bus\Batch;
 use Illuminate\Bus\Batchable;
+use Illuminate\Bus\BatchNotFoundException;
 use Illuminate\Bus\BatchRepository;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Container\Container;
@@ -53,7 +54,7 @@ class BusPendingBatchTest extends TestCase
 
         $repository = m::mock(BatchRepository::class);
         $repository->shouldReceive('store')->once()->with($pendingBatch)->andReturn($batch = m::mock(stdClass::class));
-        $batch->shouldReceive('add')->once()->with(m::type(Collection::class))->andReturn($batch = m::mock(Batch::class));
+        $batch->shouldReceive('addOrFail')->once()->with(m::type(Collection::class))->andReturn($batch = m::mock(Batch::class));
 
         $container->instance(BatchRepository::class, $repository);
 
@@ -77,9 +78,38 @@ class BusPendingBatchTest extends TestCase
 
         $batch->id = 'test-id';
 
-        $batch->shouldReceive('add')->once()->andReturnUsing(function () {
+        $batch->shouldReceive('addOrFail')->once()->andReturnUsing(function () {
             throw new RuntimeException('Failed to add jobs...');
         });
+
+        $repository->shouldReceive('delete')->once()->with('test-id');
+
+        $container->instance(BatchRepository::class, $repository);
+
+        $pendingBatch->dispatch();
+    }
+
+    public function test_batch_is_deleted_from_storage_if_add_returns_null()
+    {
+        $this->expectException(BatchNotFoundException::class);
+        $this->expectExceptionMessage('Batch [test-id] was not found.');
+
+        $container = new Container;
+
+        $job = new class
+        {
+            use Batchable;
+        };
+
+        $pendingBatch = new PendingBatch($container, new Collection([$job]));
+
+        $repository = m::mock(BatchRepository::class);
+
+        $repository->shouldReceive('store')->once()->with($pendingBatch)->andReturn($batch = m::mock(stdClass::class));
+
+        $batch->id = 'test-id';
+
+        $batch->shouldReceive('addOrFail')->once()->andThrow(new BatchNotFoundException('test-id'));
 
         $repository->shouldReceive('delete')->once()->with('test-id');
 
@@ -105,7 +135,7 @@ class BusPendingBatchTest extends TestCase
 
         $repository = m::mock(BatchRepository::class);
         $repository->shouldReceive('store')->once()->andReturn($batch = m::mock(stdClass::class));
-        $batch->shouldReceive('add')->once()->andReturn($batch = m::mock(Batch::class));
+        $batch->shouldReceive('addOrFail')->once()->andReturn($batch = m::mock(Batch::class));
 
         $container->instance(BatchRepository::class, $repository);
 
@@ -154,7 +184,7 @@ class BusPendingBatchTest extends TestCase
 
         $repository = m::mock(BatchRepository::class);
         $repository->shouldReceive('store')->once()->andReturn($batch = m::mock(stdClass::class));
-        $batch->shouldReceive('add')->once()->andReturn($batch = m::mock(Batch::class));
+        $batch->shouldReceive('addOrFail')->once()->andReturn($batch = m::mock(Batch::class));
 
         $container->instance(BatchRepository::class, $repository);
 
@@ -210,7 +240,7 @@ class BusPendingBatchTest extends TestCase
 
         $repository = m::mock(BatchRepository::class);
         $repository->shouldReceive('store')->once()->with($pendingBatch)->andReturn($batch = m::mock(stdClass::class));
-        $batch->shouldReceive('add')->once()->with(m::type(Collection::class))->andReturn($batch = m::mock(Batch::class));
+        $batch->shouldReceive('addOrFail')->once()->with(m::type(Collection::class))->andReturn($batch = m::mock(Batch::class));
 
         $container->instance(BatchRepository::class, $repository);
 

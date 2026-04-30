@@ -373,7 +373,7 @@ class PendingBatch
         try {
             $batch = $this->store($repository);
 
-            $batch = $batch->add($this->jobs);
+            $batch = $batch->addOrFail($this->jobs);
         } catch (Throwable $e) {
             if (isset($batch)) {
                 $repository->delete($batch->id);
@@ -420,7 +420,7 @@ class PendingBatch
     protected function dispatchExistingBatch($batch)
     {
         try {
-            $batch = $batch->add($this->jobs);
+            $batch = $batch->addOrFail($this->jobs);
         } catch (Throwable $e) {
             $batch->delete();
 

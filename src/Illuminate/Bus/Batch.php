@@ -145,6 +145,19 @@ class Batch implements Arrayable, JsonSerializable
     }
 
     /**
+     * Add additional jobs to the batch or throw if the batch no longer exists.
+     *
+     * @param  \Illuminate\Support\Enumerable|object|array  $jobs
+     * @return self
+     *
+     * @throws \Illuminate\Bus\BatchNotFoundException
+     */
+    public function addOrFail($jobs): self
+    {
+        return $this->add($jobs) ?? throw new BatchNotFoundException($this->id);
+    }
+
+    /**
      * Add additional jobs to the batch.
      *
      * @param  \Illuminate\Support\Enumerable|object|array  $jobs
