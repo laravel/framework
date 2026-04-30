@@ -77,6 +77,18 @@ class DatabaseLockTest extends DatabaseTestCase
         $this->assertFalse($lock->isLocked());
     }
 
+    public function testExpiredLockIsNotLocked()
+    {
+        $lock = Cache::driver('database')->lock('foo');
+        $this->assertFalse($lock->isLocked());
+
+        $lock->get();
+        $this->assertTrue($lock->isLocked());
+
+        DB::table('cache_locks')->update(['expiration' => Carbon::now()->subDay()->getTimestamp()]);
+        $this->assertFalse($lock->isLocked());
+    }
+
     public function testOtherOwnerDoesNotOwnLockAfterRestore()
     {
         $firstLock = Cache::store('database')->lock('foo');
@@ -132,6 +144,7 @@ class DatabaseLockTest extends DatabaseTestCase
         $owner = 'owner-123';
 
         $selectBuilder->shouldReceive('where')->with('key', 'foo')->once()->andReturnSelf();
+        $selectBuilder->shouldReceive('where')->with('expiration', '>', m::any())->once()->andReturnSelf();
         $selectBuilder->shouldReceive('first')->once()->andReturn((object) ['owner' => $owner]);
 
         $deleteBuilder->shouldReceive('where')->with('key', 'foo')->once()->andReturnSelf();
