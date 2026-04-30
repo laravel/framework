@@ -1235,6 +1235,69 @@ class HttpRequestTest extends TestCase
         $this->assertNull($request->bearerToken());
     }
 
+    public function testCanRetrievePreferencesFromPreferHeader()
+    {
+        $request = Request::create('/', 'GET', [], [], [], [
+            'HTTP_PREFER' => 'respond-async, return=representation, timezone="America/Los_Angeles"',
+        ]);
+
+        $this->assertSame([
+            'respond-async' => true,
+            'return' => 'representation',
+            'timezone' => 'America/Los_Angeles',
+        ], $request->preferences());
+    }
+
+    public function testCanRetrieveSinglePreferenceFromPreferHeader()
+    {
+        $request = Request::create('/', 'GET', [], [], [], [
+            'HTTP_PREFER' => 'return=representation, timezone="America/Los_Angeles"',
+        ]);
+
+        $this->assertSame('America/Los_Angeles', $request->preference('timezone'));
+        $this->assertSame('representation', $request->preference('return'));
+    }
+
+    public function testCanDetermineIfPreferHeaderHasPreference()
+    {
+        $request = Request::create('/', 'GET', [], [], [], [
+            'HTTP_PREFER' => 'respond-async, return=representation',
+        ]);
+
+        $this->assertTrue($request->hasPreference('respond-async'));
+        $this->assertTrue($request->hasPreference('return'));
+        $this->assertFalse($request->hasPreference('missing'));
+    }
+
+    public function testPreferHeaderPreferenceLookupIsCaseInsensitive()
+    {
+        $request = Request::create('/', 'GET', [], [], [], [
+            'HTTP_PREFER' => 'Return=representation',
+        ]);
+
+        $this->assertSame('representation', $request->preference('RETURN'));
+        $this->assertTrue($request->hasPreference('RETURN'));
+    }
+
+    public function testPreferenceReturnsDefaultWhenMissing()
+    {
+        $request = Request::create('/', 'GET', [], [], [], [
+            'HTTP_PREFER' => 'respond-async',
+        ]);
+
+        $this->assertNull($request->preference('missing'));
+        $this->assertSame('fallback', $request->preference('missing', 'fallback'));
+    }
+
+    public function testMissingPreferHeaderReturnsEmptyPreferences()
+    {
+        $request = Request::create('/', 'GET');
+
+        $this->assertSame([], $request->preferences());
+        $this->assertFalse($request->hasPreference('respond-async'));
+        $this->assertNull($request->preference('respond-async'));
+    }
+
     public function testJSONMethod()
     {
         $payload = ['name' => 'taylor'];

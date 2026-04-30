@@ -68,6 +68,67 @@ trait InteractsWithInput
     }
 
     /**
+     * Get all preferences from the Prefer header.
+     *
+     * @return array<string, string|bool>
+     */
+    public function preferences()
+    {
+        $header = $this->header('Prefer', '');
+
+        if ($header === '' || $header === null) {
+            return [];
+        }
+
+        $preferences = [];
+
+        foreach (explode(',', $header) as $preference) {
+            $preference = trim($preference);
+
+            if ($preference === '') {
+                continue;
+            }
+
+            $parts = explode('=', $preference, 2);
+
+            $key = strtolower(trim($parts[0]));
+
+            if (! isset($parts[1])) {
+                $preferences[$key] = true;
+
+                continue;
+            }
+
+            $preferences[$key] = trim(trim($parts[1]), '"\'');
+        }
+
+        return $preferences;
+    }
+
+    /**
+     * Get a preference from the Prefer header.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function preference($key, $default = null)
+    {
+        return $this->preferences()[strtolower($key)] ?? $default;
+    }
+
+    /**
+     * Determine if the Prefer header contains the given preference.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasPreference($key)
+    {
+        return array_key_exists(strtolower($key), $this->preferences());
+    }
+
+    /**
      * Get the keys for all of the input and files.
      *
      * @return array
