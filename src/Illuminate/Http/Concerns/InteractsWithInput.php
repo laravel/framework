@@ -103,7 +103,9 @@ trait InteractsWithInput
                 continue;
             }
 
-            $preferences[$key] = trim(trim($parts[1]), '"\'');
+            $value = trim(trim($parts[1]), '"\'');
+
+            $preferences[$key] = $value === '' ? true : $value;
         }
 
         return $preferences;

@@ -1298,6 +1298,19 @@ class HttpRequestTest extends TestCase
         $this->assertNull($request->preference('respond-async'));
     }
 
+    public function testEmptyPreferenceValueIsTreatedAsToken()
+    {
+        $request = Request::create('/', 'GET', [], [], [], [
+            'HTTP_PREFER' => 'foo=, bar="", baz',
+        ]);
+
+        $this->assertSame([
+            'foo' => true,
+            'bar' => true,
+            'baz' => true,
+        ], $request->preferences());
+    }
+
     public function testDuplicatePreferencesUseTheFirstValue()
     {
         $request = Request::create('/', 'GET', [], [], [], [
