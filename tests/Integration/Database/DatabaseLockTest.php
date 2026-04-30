@@ -138,14 +138,9 @@ class DatabaseLockTest extends DatabaseTestCase
     public function testReleaseIgnoresConcurrencyException(string $message, int $code, bool $hasConcurrencyError)
     {
         $connection = m::mock(Connection::class);
-        $selectBuilder = m::mock(Builder::class);
         $deleteBuilder = m::mock(Builder::class);
 
         $owner = 'owner-123';
-
-        $selectBuilder->shouldReceive('where')->with('key', 'foo')->once()->andReturnSelf();
-        $selectBuilder->shouldReceive('where')->with('expiration', '>', m::any())->once()->andReturnSelf();
-        $selectBuilder->shouldReceive('first')->once()->andReturn((object) ['owner' => $owner]);
 
         $deleteBuilder->shouldReceive('where')->with('key', 'foo')->once()->andReturnSelf();
         $deleteBuilder->shouldReceive('where')->with('owner', $owner)->once()->andReturnSelf();
@@ -158,7 +153,7 @@ class DatabaseLockTest extends DatabaseTestCase
             )
         );
 
-        $connection->shouldReceive('table')->with('cache_locks')->andReturn($selectBuilder, $deleteBuilder);
+        $connection->shouldReceive('table')->with('cache_locks')->andReturn($deleteBuilder);
 
         $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 10, $owner); // same owner...
 
