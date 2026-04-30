@@ -93,6 +93,10 @@ trait InteractsWithInput
 
             $key = strtolower(trim($parts[0]));
 
+            if (array_key_exists($key, $preferences)) {
+                continue;
+            }
+
             if (! isset($parts[1])) {
                 $preferences[$key] = true;
 

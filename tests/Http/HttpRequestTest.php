@@ -1298,6 +1298,15 @@ class HttpRequestTest extends TestCase
         $this->assertNull($request->preference('respond-async'));
     }
 
+    public function testDuplicatePreferencesUseTheFirstValue()
+    {
+        $request = Request::create('/', 'GET', [], [], [], [
+            'HTTP_PREFER' => 'return=minimal, return=representation',
+        ]);
+
+        $this->assertSame('minimal', $request->preference('return'));
+    }
+
     public function testJSONMethod()
     {
         $payload = ['name' => 'taylor'];
