@@ -71,11 +71,9 @@ class SqlServerConnector extends Connector implements ConnectorInterface
             return $this->getOdbcDsn($config);
         }
 
-        if (in_array('sqlsrv', $this->getAvailableDrivers())) {
-            return $this->getSqlSrvDsn($config);
-        } else {
-            return $this->getDblibDsn($config);
-        }
+        return in_array('sqlsrv', $this->getAvailableDrivers())
+            ? $this->getSqlSrvDsn($config)
+            : $this->getDblibDsn($config);
     }
 
     /**

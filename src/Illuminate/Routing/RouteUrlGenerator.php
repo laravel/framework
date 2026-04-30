@@ -146,13 +146,11 @@ class RouteUrlGenerator
      */
     protected function getRouteScheme($route)
     {
-        if ($route->httpOnly()) {
-            return 'http://';
-        } elseif ($route->httpsOnly()) {
-            return 'https://';
-        }
-
-        return $this->url->formatScheme();
+        return match (true) {
+            $route->httpOnly() => 'http://',
+            $route->httpsOnly() => 'https://',
+            default => $this->url->formatScheme(),
+        };
     }
 
     /**

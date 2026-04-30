@@ -241,11 +241,9 @@ if (! function_exists('broadcast_if')) {
      */
     function broadcast_if($boolean, $event = null): PendingBroadcast
     {
-        if ($boolean) {
-            return app(BroadcastFactory::class)->event(value($event));
-        } else {
-            return new FakePendingBroadcast;
-        }
+        return $boolean
+            ? app(BroadcastFactory::class)->event(value($event))
+            : new FakePendingBroadcast;
     }
 }
 
@@ -258,11 +256,9 @@ if (! function_exists('broadcast_unless')) {
      */
     function broadcast_unless($boolean, $event = null): PendingBroadcast
     {
-        if (! $boolean) {
-            return app(BroadcastFactory::class)->event(value($event));
-        } else {
-            return new FakePendingBroadcast;
-        }
+        return ! $boolean
+            ? app(BroadcastFactory::class)->event(value($event))
+            : new FakePendingBroadcast;
     }
 }
 

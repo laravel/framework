@@ -168,13 +168,11 @@ class Composer
      */
     public function findComposer($composerBinary = null)
     {
-        if (! is_null($composerBinary) && $this->files->exists($composerBinary)) {
-            return [$this->phpBinary(), $composerBinary];
-        } elseif ($this->files->exists($this->workingPath.'/composer.phar')) {
-            return [$this->phpBinary(), 'composer.phar'];
-        }
-
-        return ['composer'];
+        return match (true) {
+            ! is_null($composerBinary) && $this->files->exists($composerBinary) => [$this->phpBinary(), $composerBinary],
+            $this->files->exists($this->workingPath.'/composer.phar') => [$this->phpBinary(), 'composer.phar'],
+            default => ['composer'],
+        };
     }
 
     /**

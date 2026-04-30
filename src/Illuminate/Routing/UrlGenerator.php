@@ -165,13 +165,11 @@ class UrlGenerator implements UrlGeneratorContract
 
         $url = $referrer ? $this->to($referrer) : $this->getPreviousUrlFromSession();
 
-        if ($url) {
-            return $url;
-        } elseif ($fallback) {
-            return $this->to($fallback);
-        }
-
-        return $this->to('/');
+        return match (true) {
+            (bool) $url => $url,
+            (bool) $fallback => $this->to($fallback),
+            default => $this->to('/'),
+        };
     }
 
     /**

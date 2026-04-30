@@ -341,13 +341,11 @@ class Mailable implements MailableContract, Renderable
             return $this->buildMarkdownView();
         }
 
-        if (isset($this->view, $this->textView)) {
-            return [$this->view, $this->textView];
-        } elseif (isset($this->textView)) {
-            return ['text' => $this->textView];
-        }
-
-        return $this->view;
+        return match (true) {
+            isset($this->view, $this->textView) => [$this->view, $this->textView],
+            isset($this->textView) => ['text' => $this->textView],
+            default => $this->view,
+        };
     }
 
     /**

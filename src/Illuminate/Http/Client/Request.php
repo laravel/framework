@@ -167,13 +167,11 @@ class Request implements ArrayAccess
      */
     public function data()
     {
-        if ($this->isForm()) {
-            return $this->parameters();
-        } elseif ($this->isJson()) {
-            return $this->json();
-        }
-
-        return $this->data ?? [];
+        return match (true) {
+            $this->isForm() => $this->parameters(),
+            $this->isJson() => $this->json(),
+            default => $this->data ?? [],
+        };
     }
 
     /**
