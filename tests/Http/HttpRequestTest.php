@@ -1298,6 +1298,18 @@ class HttpRequestTest extends TestCase
         $this->assertNull($request->preference('respond-async'));
     }
 
+    public function testMultiplePreferHeadersAreCombined()
+    {
+        $request = Request::create('/', 'GET');
+        $request->headers->set('Prefer', ['respond-async, wait=100', 'handling=lenient']);
+
+        $this->assertSame([
+            'respond-async' => true,
+            'wait' => '100',
+            'handling' => 'lenient',
+        ], $request->preferences());
+    }
+
     public function testPreferenceParametersAreIgnored()
     {
         $request = Request::create('/', 'GET', [], [], [], [

@@ -74,9 +74,9 @@ trait InteractsWithInput
      */
     public function preferences()
     {
-        $header = $this->header('Prefer', '');
+        $header = implode(',', $this->headers->all('Prefer'));
 
-        if ($header === '' || $header === null) {
+        if ($header === '') {
             return [];
         }
 
