@@ -126,6 +126,16 @@ class BroadcasterTest extends TestCase
         $this->broadcaster->extractAuthParameters('asd.{model}', 'asd.1', $callback);
     }
 
+    public function testTypeHintedNonUrlRoutableParameterThrowsHttpException()
+    {
+        $this->expectException(HttpException::class);
+
+        $callback = function ($user, BroadcasterTestNonRoutableStub $model) {
+            //
+        };
+        $this->broadcaster->extractAuthParameters('asd.{model}', 'asd.1', $callback);
+    }
+
     public function testCanRegisterChannelsWithoutOptions()
     {
         $this->broadcaster->channel('somechannel', function () {
@@ -433,6 +443,11 @@ class BroadcasterTestEloquentModelNotFoundStub extends Model
     {
         //
     }
+}
+
+class BroadcasterTestNonRoutableStub
+{
+    //
 }
 
 class DummyBroadcastingChannel

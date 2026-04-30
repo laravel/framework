@@ -248,17 +248,23 @@ abstract class Broadcaster implements BroadcasterContract
     protected function resolveImplicitBindingIfPossible($key, $value, $callbackParameters)
     {
         foreach ($callbackParameters as $parameter) {
-            if (! $this->isImplicitlyBindable($key, $parameter)) {
+            if ($parameter->getName() !== $key) {
                 continue;
             }
 
-            $className = Reflector::getParameterClassName($parameter);
+            if (Reflector::isParameterSubclassOf($parameter, UrlRoutable::class)) {
+                $className = Reflector::getParameterClassName($parameter);
 
-            if (is_null($model = (new $className)->resolveRouteBinding($value))) {
-                throw new AccessDeniedHttpException;
+                if (is_null($model = (new $className)->resolveRouteBinding($value))) {
+                    throw new AccessDeniedHttpException;
+                }
+
+                return $model;
             }
 
-            return $model;
+            if (Reflector::getParameterClassName($parameter) !== null) {
+                throw new AccessDeniedHttpException;
+            }
         }
 
         return $value;
