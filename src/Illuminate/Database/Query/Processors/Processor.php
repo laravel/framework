@@ -113,7 +113,7 @@ class Processor
      * Process the results of a columns query.
      *
      * @param  list<array<string, mixed>>  $results
-     * @return list<array{name: string, type: string, type_name: string, nullable: bool, default: mixed, auto_increment: bool, comment: string|null, generation: array{type: string, expression: string|null}|null}>
+     * @return list<array{name: string, type: string, type_name: string, collation: string|null, nullable: bool, default: mixed, auto_increment: bool, comment: string|null, generation: array{type: string, expression: string|null}|null}>
      */
     public function processColumns($results)
     {
