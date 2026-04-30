@@ -1122,21 +1122,19 @@ class Route
             $this->getControllerMethod(),
         ];
 
-        if (is_a($controllerClass, HasMiddleware::class, true)) {
-            return $this->staticallyProvidedControllerMiddleware(
-                $controllerClass, $controllerMethod
-            );
-        }
+        $attributeMiddleware = $this->attributeProvidedControllerMiddleware($controllerClass, $controllerMethod);
 
-        if (method_exists($controllerClass, 'getMiddleware')) {
-            return $this->controllerDispatcher()->getMiddleware(
-                $this->getController(), $controllerMethod
-            );
-        }
-
-        return $this->attributeProvidedControllerMiddleware(
-            $controllerClass, $controllerMethod
-        );
+        return match (true) {
+            is_a($controllerClass, HasMiddleware::class, true) => array_merge(
+                $this->staticallyProvidedControllerMiddleware($controllerClass, $controllerMethod),
+                $attributeMiddleware,
+            ),
+            method_exists($controllerClass, 'getMiddleware') => array_merge(
+                $this->controllerDispatcher()->getMiddleware($this->getController(), $controllerMethod),
+                $attributeMiddleware,
+            ),
+            default => $attributeMiddleware,
+        };
     }
 
     /**
