@@ -1298,6 +1298,18 @@ class HttpRequestTest extends TestCase
         $this->assertNull($request->preference('respond-async'));
     }
 
+    public function testPreferenceParametersAreIgnored()
+    {
+        $request = Request::create('/', 'GET', [], [], [], [
+            'HTTP_PREFER' => 'return=minimal; foo="some parameter", respond-async; priority=5',
+        ]);
+
+        $this->assertSame([
+            'return' => 'minimal',
+            'respond-async' => true,
+        ], $request->preferences());
+    }
+
     public function testEmptyPreferenceValueIsTreatedAsToken()
     {
         $request = Request::create('/', 'GET', [], [], [], [

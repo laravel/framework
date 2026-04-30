@@ -91,9 +91,9 @@ trait InteractsWithInput
 
             $parts = explode('=', $preference, 2);
 
-            $key = strtolower(trim($parts[0]));
+            $key = strtolower(trim(explode(';', $parts[0], 2)[0]));
 
-            if (array_key_exists($key, $preferences)) {
+            if ($key === '' || array_key_exists($key, $preferences)) {
                 continue;
             }
 
@@ -103,7 +103,8 @@ trait InteractsWithInput
                 continue;
             }
 
-            $value = trim(trim($parts[1]), '"\'');
+            $value = trim(explode(';', $parts[1], 2)[0]);
+            $value = trim($value, '"\'');
 
             $preferences[$key] = $value === '' ? true : $value;
         }
