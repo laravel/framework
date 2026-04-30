@@ -83,7 +83,7 @@ trait InteractsWithInput
         $preferences = [];
 
         foreach (explode(',', $header) as $preference) {
-            $preference = trim($preference);
+            $preference = trim(explode(';', $preference, 2)[0]);
 
             if ($preference === '') {
                 continue;
@@ -91,7 +91,7 @@ trait InteractsWithInput
 
             $parts = explode('=', $preference, 2);
 
-            $key = strtolower(trim(explode(';', $parts[0], 2)[0]));
+            $key = strtolower(trim($parts[0]));
 
             if ($key === '' || array_key_exists($key, $preferences)) {
                 continue;
@@ -103,8 +103,7 @@ trait InteractsWithInput
                 continue;
             }
 
-            $value = trim(explode(';', $parts[1], 2)[0]);
-            $value = trim($value, '"\'');
+            $value = trim(trim($parts[1]), '"\'');
 
             $preferences[$key] = $value === '' ? true : $value;
         }
