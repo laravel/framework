@@ -3,13 +3,13 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Bus\Workflow\ExecutionState;
-use Illuminate\Bus\Workflow\Workflow;
+use Illuminate\Bus\Workflow\JobSequence;
 
 trait ResumableTrait
 {
     protected ?ExecutionState $resumeState;
 
-    protected Workflow $workflow;
+    protected JobSequence $jobSequence;
 
     public function setResumeState(?ExecutionState $resumeState): static
     {
@@ -23,16 +23,16 @@ trait ResumableTrait
         return 'workflow:'.$this->job->getJobId();
     }
 
-    public function setWorkflow(Workflow $workflow): static
+    public function setJobSequence(JobSequence $jobSequence): static
     {
-        $this->workflow = $workflow;
+        $this->jobSequence = $jobSequence;
 
         return $this;
     }
 
-    public function getWorkflow(): Workflow
+    public function getJobSequence(): JobSequence
     {
-        return $this->workflow;
+        return $this->jobSequence;
     }
 
     public function getResumeStateTtl()

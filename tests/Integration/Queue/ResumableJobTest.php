@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Workflow\ExecutionState;
-use Illuminate\Bus\Workflow\Workflow;
+use Illuminate\Bus\Workflow\JobSequence;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Queue\Factory;
@@ -39,7 +39,7 @@ class ResumableJobTest extends QueueTestCase
     public function test_workflow()
     {
         // @todo move this to a unit test
-        $workflow = $this->app->make(Workflow::class);
+        $workflow = $this->app->make(JobSequence::class);
         $store = new ArrayStore();
         $workflow->step(function (ExecutionState $state) {
             $state->data['hello'] = 'world';
@@ -70,7 +70,7 @@ class ResumableJobTest extends QueueTestCase
          * Figure out where ExecutionState lives
          * Does Workflows need to live in its own space? or would inside of Bus be better?
          * Add a test where we set the state somewhere further down the line
-         * Figure out the API surface for a Workflow... how do they write the steps. Maybe we should just kill handle and execute that some other way
+         * Figure out the API surface for a JobSequence... how do they write the steps. Maybe we should just kill handle and execute that some other way
          * Try a job on the queue where we push the job and then release it after every pipe. does it work at all?
          *
          */
@@ -118,7 +118,7 @@ class TestResumableJob implements ShouldQueue, Resumable
 
     public function handle()
     {
-        $this->workflow
+        $this->jobSequence
             ->step(function (ExecutionState $state) {
                 StateHolder::$data[$state->stepIndex] = clone $state;
                 $state->data['abc'] = 123;
@@ -134,7 +134,7 @@ class TestRepeatingStepResumableJob extends TestResumableJob
     public function handle(): void
     {
         parent::handle();
-        $this->workflow->step(name: 'step2');
+        $this->jobSequence->step(name: 'step2');
     }
 }
 
@@ -146,7 +146,7 @@ class CheckForUpdate implements ShouldQueue, Resumable
 
     public function handle(): void
     {
-        $this->workflow
+        $this->jobSequence
             // The state of the job is persisted in cache after each step
             // if there's a failure or an interrupt, the job will requeue
             // and start from the failure.
