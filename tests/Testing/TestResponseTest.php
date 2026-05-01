@@ -3138,6 +3138,20 @@ EOT
         });
     }
 
+    public function testAssertSessionMissingInput(): void
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('_old_input', [
+            'foo' => 'value',
+        ]);
+
+        $response = TestResponse::fromBaseResponse(new Response());
+
+        $response->assertSessionMissingInput('bar');
+        $response->assertSessionMissingInput(['bar', 'baz']);
+    }
+
     public function testGetEncryptedCookie(): void
     {
         $container = Container::getInstance();
