@@ -178,71 +178,92 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run every two minutes.
      *
+     * @param  int<0, 1>  $offset
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
-    public function everyTwoMinutes()
+    public function everyTwoMinutes($offset = 0)
     {
-        return $this->spliceIntoPosition(1, '*/2');
+        return $this->minuteBasedSchedule($offset, 2);
     }
 
     /**
      * Schedule the event to run every three minutes.
      *
+     * @param  int<0, 2>  $offset
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
-    public function everyThreeMinutes()
+    public function everyThreeMinutes($offset = 0)
     {
-        return $this->spliceIntoPosition(1, '*/3');
+        return $this->minuteBasedSchedule($offset, 3);
     }
 
     /**
      * Schedule the event to run every four minutes.
      *
+     * @param  int<0, 3>  $offset
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
-    public function everyFourMinutes()
+    public function everyFourMinutes($offset = 0)
     {
-        return $this->spliceIntoPosition(1, '*/4');
+        return $this->minuteBasedSchedule($offset, 4);
     }
 
     /**
      * Schedule the event to run every five minutes.
      *
+     * @param  int<0, 4>  $offset
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
-    public function everyFiveMinutes()
+    public function everyFiveMinutes($offset = 0)
     {
-        return $this->spliceIntoPosition(1, '*/5');
+        return $this->minuteBasedSchedule($offset, 5);
     }
 
     /**
      * Schedule the event to run every ten minutes.
      *
+     * @param  int<0, 9>  $offset
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
-    public function everyTenMinutes()
+    public function everyTenMinutes($offset = 0)
     {
-        return $this->spliceIntoPosition(1, '*/10');
+        return $this->minuteBasedSchedule($offset, 10);
     }
 
     /**
      * Schedule the event to run every fifteen minutes.
      *
+     * @param  int<0, 14>  $offset
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
-    public function everyFifteenMinutes()
+    public function everyFifteenMinutes($offset = 0)
     {
-        return $this->spliceIntoPosition(1, '*/15');
+        return $this->minuteBasedSchedule($offset, 15);
     }
 
     /**
      * Schedule the event to run every thirty minutes.
      *
+     * @param  int<0, 29>  $offset
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
-    public function everyThirtyMinutes()
+    public function everyThirtyMinutes($offset = 0)
     {
-        return $this->spliceIntoPosition(1, '*/30');
+        return $this->minuteBasedSchedule($offset, 30);
     }
 
     /**
@@ -383,6 +404,28 @@ trait ManagesFrequencies
         $hours = $first.','.$second;
 
         return $this->hourBasedSchedule($offset, $hours);
+    }
+
+    /**
+     * Schedule the event to run every $step minutes, starting at the given offset.
+     *
+     * @param  int  $offset
+     * @param  int  $step
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function minuteBasedSchedule($offset, $step)
+    {
+        if ($offset < 0 || $offset >= $step) {
+            $max = $step - 1;
+
+            throw new InvalidArgumentException(
+                "Offset must be between 0 and {$max} for an every-{$step}-minutes schedule."
+            );
+        }
+
+        return $this->spliceIntoPosition(1, $offset === 0 ? "*/{$step}" : "{$offset}-59/{$step}");
     }
 
     /**

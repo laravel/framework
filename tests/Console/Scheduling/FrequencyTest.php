@@ -38,6 +38,36 @@ class FrequencyTest extends TestCase
         $this->assertSame('*/30 * * * *', $this->event->everyThirtyMinutes()->getExpression());
     }
 
+    public function testEveryXMinutesAcceptsOffset()
+    {
+        $this->assertSame('1-59/2 * * * *', $this->event->everyTwoMinutes(1)->getExpression());
+        $this->assertSame('2-59/3 * * * *', $this->event->everyThreeMinutes(2)->getExpression());
+        $this->assertSame('3-59/4 * * * *', $this->event->everyFourMinutes(3)->getExpression());
+        $this->assertSame('2-59/5 * * * *', $this->event->everyFiveMinutes(2)->getExpression());
+        $this->assertSame('7-59/10 * * * *', $this->event->everyTenMinutes(7)->getExpression());
+        $this->assertSame('5-59/15 * * * *', $this->event->everyFifteenMinutes(5)->getExpression());
+        $this->assertSame('15-59/30 * * * *', $this->event->everyThirtyMinutes(15)->getExpression());
+    }
+
+    public function testEveryFiveMinutesRejectsOffsetOutOfRange()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->event->everyFiveMinutes(5);
+    }
+
+    public function testEveryFiveMinutesRejectsNegativeOffset()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->event->everyFiveMinutes(-1);
+    }
+
+    public function testEveryThirtyMinutesRejectsOffsetEqualToStep()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Offset must be between 0 and 29 for an every-30-minutes schedule.');
+        $this->event->everyThirtyMinutes(30);
+    }
+
     public function testDaily()
     {
         $this->assertSame('0 0 * * *', $this->event->daily()->getExpression());
