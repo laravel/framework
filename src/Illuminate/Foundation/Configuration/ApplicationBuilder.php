@@ -147,6 +147,7 @@ class ApplicationBuilder
      * @param  string|null  $commands
      * @param  string|null  $channels
      * @param  string|null  $pages
+     * @param  string|null  $health
      * @param  string  $apiPrefix
      * @param  callable|null  $then
      * @return $this
