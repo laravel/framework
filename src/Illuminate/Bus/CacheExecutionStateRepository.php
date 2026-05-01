@@ -2,11 +2,11 @@
 
 namespace Illuminate\Bus;
 
-use Illuminate\Bus\Workflow\ResumeState;
+use Illuminate\Bus\Workflow\ExecutionState;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Cache\Repository;
 
-class CacheResumeStateRepository implements ResumeStateRepository
+class CacheExecutionStateRepository implements ExecutionStateRepository
 {
     /**
      * The cache store that should be used.
@@ -24,19 +24,19 @@ class CacheResumeStateRepository implements ResumeStateRepository
     }
 
     #[\Override]
-    public function getResumeState(string $id): ?ResumeState
+    public function getExecutionState(string $id): ?ExecutionState
     {
         return $this->getCache()->get($id);
     }
 
     #[\Override]
-    public function saveCheckpoint(string $id, $resumeState, $ttl): void
+    public function saveExecutionState(string $id, $executionState, $ttl): void
     {
-        $this->getCache()->put($id, $resumeState, $ttl);
+        $this->getCache()->put($id, $executionState, $ttl);
     }
 
     #[\Override]
-    public function clearResumeState(string $id): void
+    public function clearExecutionState(string $id): void
     {
         $this->getCache()->forget($id);
     }
@@ -57,5 +57,4 @@ class CacheResumeStateRepository implements ResumeStateRepository
     {
         return 'workflow:'.$id;
     }
-
 }

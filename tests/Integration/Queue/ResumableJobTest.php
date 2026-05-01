@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Illuminate\Bus\Workflow\ResumeState;
+use Illuminate\Bus\Workflow\ExecutionState;
 use Illuminate\Bus\Workflow\Workflow;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Contracts\Mail\Mailable;
@@ -41,14 +41,14 @@ class ResumableJobTest extends QueueTestCase
         // @todo move this to a unit test
         $workflow = $this->app->make(Workflow::class);
         $store = new ArrayStore();
-        $workflow->step(function (ResumeState $state) {
+        $workflow->step(function (ExecutionState $state) {
             $state->data['hello'] = 'world';
-        })->step(function (ResumeState $state) {
+        })->step(function (ExecutionState $state) {
             $state->data['name'] = 'luke';
-        }, 'step2')->step(function (ResumeState $state) {
+        }, 'step2')->step(function (ExecutionState $state) {
             $state->data['name'] = 'taylor';
         });
-        $workflow->persistenceCallback(fn (ResumeState $state) => $store->put('resume', $state, 100));
+        $workflow->persistenceCallback(fn (ExecutionState $state) => $store->put('resume', $state, 100));
         $workflow->clearStateCallback(function ($state) use ($store) {
             $this->assertEquals([
                 'hello' => 'world',
@@ -67,7 +67,7 @@ class ResumableJobTest extends QueueTestCase
         /*
          * TODO:
          * Container bindings for default persistence callbacks
-         * Figure out where ResumeState lives
+         * Figure out where ExecutionState lives
          * Does Workflows need to live in its own space? or would inside of Bus be better?
          * Add a test where we set the state somewhere further down the line
          * Figure out the API surface for a Workflow... how do they write the steps. Maybe we should just kill handle and execute that some other way
@@ -81,10 +81,10 @@ class ResumableJobTest extends QueueTestCase
         TestResumableJob::dispatch();
         $this->assertCount(2, StateHolder::$data);
         [$resumeState1, $resumeState2] = StateHolder::$data;
-        $this->assertInstanceOf(ResumeState::class, $resumeState1);
+        $this->assertInstanceOf(ExecutionState::class, $resumeState1);
         $this->assertSame(0, $resumeState1->stepIndex);
         $this->assertSame([], $resumeState1->data);
-        $this->assertInstanceOf(ResumeState::class, $resumeState2);
+        $this->assertInstanceOf(ExecutionState::class, $resumeState2);
         $this->assertSame(1, $resumeState2->stepIndex);
         $this->assertSame(['abc' => 123, 'xyz' => 456], $resumeState2->data);
         $this->assertEmpty(DB::table('cache')->get());
@@ -106,7 +106,7 @@ class ResumableJobTest extends QueueTestCase
 
 class StateHolder
 {
-    /** @var list<ResumeState> */
+    /** @var list<ExecutionState> */
     public static array $data;
 }
 
@@ -119,10 +119,10 @@ class TestResumableJob implements ShouldQueue, Resumable
     public function handle()
     {
         $this->workflow
-            ->step(function (ResumeState $state) {
+            ->step(function (ExecutionState $state) {
                 StateHolder::$data[$state->stepIndex] = clone $state;
                 $state->data['abc'] = 123;
-            })->step(function (ResumeState $state) {
+            })->step(function (ExecutionState $state) {
                 $state->data['xyz'] = 456;
                 StateHolder::$data[$state->stepIndex] = clone $state;
             }, 'step2');
@@ -155,12 +155,12 @@ class CheckForUpdate implements ShouldQueue, Resumable
             ->step($this->sendEmail(...));
     }
 
-    private function getData(ResumeState $resumeState): void
+    private function getData(ExecutionState $resumeState): void
     {
         $resumeState->data['response'] = Http::get('https://jobs.laravel.com/jobs/')->json();
     }
 
-    private function persistData(ResumeState $resumeState): void
+    private function persistData(ExecutionState $resumeState): void
     {
         foreach($resumeState->data['response']['data'] as $jobData) {
             DB::table('laravel_jobs')->insertGetId([
@@ -170,7 +170,7 @@ class CheckForUpdate implements ShouldQueue, Resumable
         }
     }
 
-    private function sendEmail(ResumeState $resumeState): void
+    private function sendEmail(ExecutionState $resumeState): void
     {
         Mail::raw("New jobs\n", fn ($message) => $message
             ->to('luke@kuzmish.com')

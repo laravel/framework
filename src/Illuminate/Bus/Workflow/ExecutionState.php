@@ -2,7 +2,7 @@
 
 namespace Illuminate\Bus\Workflow;
 
-class ResumeState
+class ExecutionState
 {
     public int $stepIndex = 0;
 
