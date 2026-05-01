@@ -87,7 +87,7 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
             );
         });
 
-        $this->app->bind(ResumeStateRepository::class, CacheResumeStateRepository::class);
+        $this->app->bind(ExecutionStateRepository::class, CacheExecutionStateRepository::class);
     }
 
     /**
@@ -103,7 +103,7 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
             QueueingDispatcherContract::class,
             BatchRepository::class,
             DatabaseBatchRepository::class,
-            ResumeStateRepository::class,
+            ExecutionStateRepository::class,
         ];
     }
 }

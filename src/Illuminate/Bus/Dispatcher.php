@@ -3,7 +3,7 @@
 namespace Illuminate\Bus;
 
 use Closure;
-use Illuminate\Bus\Workflow\ResumeState;
+use Illuminate\Bus\Workflow\ExecutionState;
 use Illuminate\Bus\Workflow\Workflow;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Container\Container;
@@ -134,20 +134,20 @@ class Dispatcher implements QueueingDispatcher
                 return $handler->{$method}($command);
             };
         } elseif ($command instanceof Resumable) {
-            $repository = $this->container->make(ResumeStateRepository::class);
+            $repository = $this->container->make(ExecutionStateRepository::class);
             // this is going to assume that we have a job on the command
 
-            $resumeState = $repository->getResumeState($resumeStateKey = $command->resumeStateKey());
+            $resumeState = $repository->getExecutionState($resumeStateKey = $command->resumeStateKey());
             $resumeStateTtl = $command->getResumeStateTtl();
             $workflow = $this->container->make(Workflow::class)
-                ->withState($resumeState ?? new ResumeState)
+                ->withState($resumeState ?? new ExecutionState)
                 ->persistenceCallback(
-                    static fn (ResumeState $resumeState) => $repository->saveCheckpoint(
+                    static fn (ExecutionState $resumeState) => $repository->saveExecutionState(
                         $resumeStateKey,
                         $resumeState,
                         $resumeStateTtl
                     )
-                )->clearStateCallback(static fn () => $repository->clearResumeState($resumeStateKey));
+                )->clearStateCallback(static fn () => $repository->clearExecutionState($resumeStateKey));
             $command->setWorkflow($workflow);
 
             $command->setResumeState($resumeState); // @todo is this even needed?

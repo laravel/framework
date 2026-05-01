@@ -2,16 +2,16 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Bus\Workflow\ResumeState;
+use Illuminate\Bus\Workflow\ExecutionState;
 use Illuminate\Bus\Workflow\Workflow;
 
 trait ResumableTrait
 {
-    protected ?ResumeState $resumeState;
+    protected ?ExecutionState $resumeState;
 
     protected Workflow $workflow;
 
-    public function setResumeState(?ResumeState $resumeState): static
+    public function setResumeState(?ExecutionState $resumeState): static
     {
         $this->resumeState = $resumeState;
 

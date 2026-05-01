@@ -12,7 +12,7 @@ class Workflow
     public array $steps = [];
     public array $orderedSteps = [];
 
-    public ResumeState $state;
+    public ExecutionState $state;
 
     protected \Closure $persistenceCallback;
 
@@ -34,7 +34,7 @@ class Workflow
     }
 
     /**
-     * @param  (\Closure(ResumeState): void)  $callback
+     * @param  (\Closure(ExecutionState): void)  $callback
      * @return $this
      */
     public function persistenceCallback(\Closure $callback): static
@@ -45,7 +45,7 @@ class Workflow
     }
 
     /**
-     * @param  (\Closure(ResumeState): void)  $callback
+     * @param  (\Closure(ExecutionState): void)  $callback
      * @return $this
      */
     public function clearStateCallback(\Closure $callback): static
@@ -56,7 +56,7 @@ class Workflow
     }
 
     /**
-     * @param  (\Closure(ResumeState): mixed)|null  $callback
+     * @param  (\Closure(ExecutionState): mixed)|null  $callback
      * @return $this
      * @throws \InvalidArgumentException
      */
@@ -75,7 +75,7 @@ class Workflow
         return $this;
     }
 
-    public function withState(ResumeState $resumeState): static
+    public function withState(ExecutionState $resumeState): static
     {
         $this->state = $resumeState;
 
@@ -83,12 +83,12 @@ class Workflow
     }
 
     /**
-     * @return ResumeState|mixed
+     * @return ExecutionState|mixed
      * @throws \LogicException
      */
     public function execute()
     {
-        $this->state ??= new ResumeState();
+        $this->state ??= new ExecutionState();
 
         $pipeline = new Pipeline($this->container);
         $pipeline->send($this->state);
@@ -104,7 +104,7 @@ class Workflow
         foreach ($remainingSteps as $stepName) {
             $fn = $this->steps[$stepName];
 
-            $pipeline->pipe(function (ResumeState $carry, $next) use ($fn) {
+            $pipeline->pipe(function (ExecutionState $carry, $next) use ($fn) {
                 $fn($carry);
                 $carry->stepIndex++;
 
@@ -116,7 +116,7 @@ class Workflow
 
         $result = $pipeline->thenReturn();
 
-        $state = $result instanceof ResumeState ? $result : $this->state;
+        $state = $result instanceof ExecutionState ? $result : $this->state;
         call_user_func($this->clearStateCallback, $state);
 
         return $result;

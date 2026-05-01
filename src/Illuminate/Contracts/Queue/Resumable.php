@@ -2,12 +2,12 @@
 
 namespace Illuminate\Contracts\Queue;
 
-use Illuminate\Bus\Workflow\ResumeState;
+use Illuminate\Bus\Workflow\ExecutionState;
 use Illuminate\Bus\Workflow\Workflow;
 
 interface Resumable
 {
-    public function setResumeState(?ResumeState $resumeState): static;
+    public function setResumeState(?ExecutionState $resumeState): static;
 
     public function resumeStateKey(): string;
 
