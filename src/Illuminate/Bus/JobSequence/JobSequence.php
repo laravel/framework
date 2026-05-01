@@ -12,10 +12,16 @@ class JobSequence
     public array $steps = [];
     public array $orderedSteps = [];
 
-    public ExecutionState $state;
+    public JobSequenceExecutionState $state;
 
+    /**
+     * @var (\Closure(\Illuminate\Bus\JobSequence\JobSequenceExecutionState): void)
+     */
     protected \Closure $persistenceCallback;
 
+    /**
+     * @var (\Closure(\Illuminate\Bus\JobSequence\JobSequenceExecutionState): void)
+     */
     protected \Closure $clearStateCallback;
 
     public function __construct(
@@ -34,7 +40,7 @@ class JobSequence
     }
 
     /**
-     * @param  (\Closure(ExecutionState): void)  $callback
+     * @param  (\Closure(\Illuminate\Bus\JobSequence\JobSequenceExecutionState): void)  $callback
      * @return $this
      */
     public function persistenceCallback(\Closure $callback): static
@@ -45,7 +51,7 @@ class JobSequence
     }
 
     /**
-     * @param  (\Closure(ExecutionState): void)  $callback
+     * @param  (\Closure(\Illuminate\Bus\JobSequence\JobSequenceExecutionState): void)  $callback
      * @return $this
      */
     public function clearStateCallback(\Closure $callback): static
@@ -56,7 +62,7 @@ class JobSequence
     }
 
     /**
-     * @param  (\Closure(ExecutionState): mixed)|null  $callback
+     * @param  (\Closure(\Illuminate\Bus\JobSequence\JobSequenceExecutionState): mixed)|null  $callback
      * @return $this
      * @throws \InvalidArgumentException
      */
@@ -75,7 +81,7 @@ class JobSequence
         return $this;
     }
 
-    public function withState(ExecutionState $resumeState): static
+    public function withState(JobSequenceExecutionState $resumeState): static
     {
         $this->state = $resumeState;
 
@@ -83,12 +89,12 @@ class JobSequence
     }
 
     /**
-     * @return ExecutionState|mixed
+     * @return JobSequenceExecutionState|mixed
      * @throws \LogicException
      */
     public function execute()
     {
-        $this->state ??= new ExecutionState();
+        $this->state ??= new JobSequenceExecutionState();
 
         $pipeline = new Pipeline($this->container);
         $pipeline->send($this->state);
@@ -104,7 +110,7 @@ class JobSequence
         foreach ($remainingSteps as $stepName) {
             $fn = $this->steps[$stepName];
 
-            $pipeline->pipe(function (ExecutionState $carry, $next) use ($fn) {
+            $pipeline->pipe(function (JobSequenceExecutionState $carry, $next) use ($fn) {
                 $fn($carry);
                 $carry->stepIndex++;
 
@@ -116,7 +122,7 @@ class JobSequence
 
         $result = $pipeline->thenReturn();
 
-        $state = $result instanceof ExecutionState ? $result : $this->state;
+        $state = $result instanceof JobSequenceExecutionState ? $result : $this->state;
         call_user_func($this->clearStateCallback, $state);
 
         return $result;

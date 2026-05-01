@@ -9,9 +9,9 @@ trait ResumableTrait
 {
     protected ?ExecutionState $resumeState;
 
-    protected JobSequence $jobSequence;
+    protected JobSequence $sequence;
 
-    public function setResumeState(?ExecutionState $resumeState): static
+    public function setExecutionState(?ExecutionState $resumeState): static
     {
         $this->resumeState = $resumeState;
 
@@ -20,19 +20,19 @@ trait ResumableTrait
 
     public function resumeStateKey(): string
     {
-        return 'workflow:'.$this->job->getJobId();
+        return 'resumable_job_execution_state:'.$this->job->getJobId();
     }
 
-    public function setJobSequence(JobSequence $jobSequence): static
+    public function setSequence(JobSequence $sequence): static
     {
-        $this->jobSequence = $jobSequence;
+        $this->sequence = $sequence;
 
         return $this;
     }
 
     public function getJobSequence(): JobSequence
     {
-        return $this->jobSequence;
+        return $this->sequence;
     }
 
     public function getResumeStateTtl()

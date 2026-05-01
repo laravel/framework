@@ -42,18 +42,18 @@ class ResumableJobTest extends QueueTestCase
         $workflow = $this->app->make(JobSequence::class);
         $store = new ArrayStore();
         $workflow->step(function (ExecutionState $state) {
-            $state->data['hello'] = 'world';
+            $state->set('hello', 'world');
         })->step(function (ExecutionState $state) {
-            $state->data['name'] = 'luke';
+            $state->name = 'luke';
         }, 'step2')->step(function (ExecutionState $state) {
-            $state->data['name'] = 'taylor';
+            $state->name = 'taylor';
         });
         $workflow->persistenceCallback(fn (ExecutionState $state) => $store->put('resume', $state, 100));
         $workflow->clearStateCallback(function ($state) use ($store) {
             $this->assertEquals([
                 'hello' => 'world',
                 'name' => 'taylor',
-            ], $state->data);
+            ], $state->data());
             $this->assertEquals(3, $state->stepIndex);
             $store->forget('resume');
         });
@@ -83,10 +83,10 @@ class ResumableJobTest extends QueueTestCase
         [$resumeState1, $resumeState2] = StateHolder::$data;
         $this->assertInstanceOf(ExecutionState::class, $resumeState1);
         $this->assertSame(0, $resumeState1->stepIndex);
-        $this->assertSame([], $resumeState1->data);
+        $this->assertSame([], $resumeState1->data());
         $this->assertInstanceOf(ExecutionState::class, $resumeState2);
         $this->assertSame(1, $resumeState2->stepIndex);
-        $this->assertSame(['abc' => 123, 'xyz' => 456], $resumeState2->data);
+        $this->assertSame(['abc' => 123, 'xyz' => 456], $resumeState2->data());
         $this->assertEmpty(DB::table('cache')->get());
     }
 
@@ -96,11 +96,11 @@ class ResumableJobTest extends QueueTestCase
 
         $this->assertCount(3, StateHolder::$data);
         $this->assertSame(0, StateHolder::$data[0]->stepIndex);
-        $this->assertSame([], StateHolder::$data[0]->data);
+        $this->assertSame([], StateHolder::$data[0]->data());
         $this->assertSame(1, StateHolder::$data[1]->stepIndex);
-        $this->assertSame(['abc' => 123, 'xyz' => 456], StateHolder::$data[1]->data);
+        $this->assertSame(['abc' => 123, 'xyz' => 456], StateHolder::$data[1]->data());
         $this->assertSame(2, StateHolder::$data[2]->stepIndex);
-        $this->assertSame(['abc' => 123, 'xyz' => 456], StateHolder::$data[2]->data);
+        $this->assertSame(['abc' => 123, 'xyz' => 456], StateHolder::$data[2]->data());
     }
 }
 
@@ -118,12 +118,12 @@ class TestResumableJob implements ShouldQueue, Resumable
 
     public function handle()
     {
-        $this->jobSequence
+        $this->sequence
             ->step(function (ExecutionState $state) {
                 StateHolder::$data[$state->stepIndex] = clone $state;
-                $state->data['abc'] = 123;
+                $state->set('abc',  123);
             })->step(function (ExecutionState $state) {
-                $state->data['xyz'] = 456;
+                $state->set('xyz', 456);
                 StateHolder::$data[$state->stepIndex] = clone $state;
             }, 'step2');
     }
@@ -134,7 +134,7 @@ class TestRepeatingStepResumableJob extends TestResumableJob
     public function handle(): void
     {
         parent::handle();
-        $this->jobSequence->step(name: 'step2');
+        $this->sequence->step(name: 'step2');
     }
 }
 
@@ -146,7 +146,7 @@ class CheckForUpdate implements ShouldQueue, Resumable
 
     public function handle(): void
     {
-        $this->jobSequence
+        $this->sequence
             // The state of the job is persisted in cache after each step
             // if there's a failure or an interrupt, the job will requeue
             // and start from the failure.
@@ -157,7 +157,7 @@ class CheckForUpdate implements ShouldQueue, Resumable
 
     private function getData(ExecutionState $resumeState): void
     {
-        $resumeState->data['response'] = Http::get('https://jobs.laravel.com/jobs/')->json();
+        $resumeState->data()['response'] = Http::get('https://jobs.laravel.com/jobs/')->json();
     }
 
     private function persistData(ExecutionState $resumeState): void

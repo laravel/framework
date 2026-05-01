@@ -5,6 +5,7 @@ namespace Illuminate\Bus;
 use Closure;
 use Illuminate\Bus\JobSequence\ExecutionState;
 use Illuminate\Bus\JobSequence\JobSequence;
+use Illuminate\Bus\JobSequence\JobSequenceExecutionState;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
@@ -135,13 +136,12 @@ class Dispatcher implements QueueingDispatcher
             };
         } elseif ($command instanceof Resumable) {
             $repository = $this->container->make(ExecutionStateRepository::class);
-            // this is going to assume that we have a job on the command
 
             $resumeState = $repository->getExecutionState($resumeStateKey = $command->resumeStateKey());
-            $resumeStateTtl = $command->getResumeStateTtl();
-            $command->setJobSequence(
+            $resumeStateTtl = $command->getResumeStateTtl() ?? $command->job->retryUntil();
+            $command->setSequence(
                 $this->container->make(JobSequence::class)
-                    ->withState($resumeState ?? new ExecutionState)
+                    ->withState($resumeState ?? new JobSequenceExecutionState($resumeStateKey))
                     ->persistenceCallback(
                         static fn (ExecutionState $resumeState) => $repository->saveExecutionState(
                             $resumeStateKey,
