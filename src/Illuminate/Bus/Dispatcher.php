@@ -3,8 +3,8 @@
 namespace Illuminate\Bus;
 
 use Closure;
-use Illuminate\Bus\Workflow\ExecutionState;
-use Illuminate\Bus\Workflow\JobSequence;
+use Illuminate\Bus\JobSequence\ExecutionState;
+use Illuminate\Bus\JobSequence\JobSequence;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue;

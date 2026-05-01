@@ -2,7 +2,7 @@
 
 namespace Illuminate\Bus;
 
-use Illuminate\Bus\Workflow\ExecutionState;
+use Illuminate\Bus\JobSequence\ExecutionState;
 
 interface ExecutionStateRepository
 {

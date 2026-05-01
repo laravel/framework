@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Illuminate\Bus\Workflow\ExecutionState;
-use Illuminate\Bus\Workflow\JobSequence;
+use Illuminate\Bus\JobSequence\ExecutionState;
+use Illuminate\Bus\JobSequence\JobSequence;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Queue\Factory;
