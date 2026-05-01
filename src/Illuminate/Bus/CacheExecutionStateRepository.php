@@ -2,7 +2,7 @@
 
 namespace Illuminate\Bus;
 
-use Illuminate\Bus\Workflow\ExecutionState;
+use Illuminate\Bus\JobSequence\ExecutionState;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Cache\Repository;
 

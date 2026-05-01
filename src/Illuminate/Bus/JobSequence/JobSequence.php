@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Bus\Workflow;
+namespace Illuminate\Bus\JobSequence;
 
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Pipeline\Pipeline;

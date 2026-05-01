@@ -2,8 +2,8 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Bus\Workflow\ExecutionState;
-use Illuminate\Bus\Workflow\JobSequence;
+use Illuminate\Bus\JobSequence\ExecutionState;
+use Illuminate\Bus\JobSequence\JobSequence;
 
 trait ResumableTrait
 {
