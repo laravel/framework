@@ -37,6 +37,7 @@ trait ResumableTrait
 
     public function getResumeStateTtl()
     {
+        // @todo
         return 500;
     }
 }
