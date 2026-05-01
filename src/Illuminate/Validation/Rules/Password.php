@@ -230,7 +230,7 @@ class Password implements DataAwareRule, ImplicitRule, IteratorAggregate, Rule, 
      * Set the minimum size of the password.
      *
      * @param  int  $size
-     * @return $this
+     * @return static
      */
     public static function min($size)
     {
