@@ -4,7 +4,7 @@ namespace Illuminate\Bus;
 
 use Closure;
 use Illuminate\Bus\Workflow\ExecutionState;
-use Illuminate\Bus\Workflow\Workflow;
+use Illuminate\Bus\Workflow\JobSequence;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
@@ -139,25 +139,24 @@ class Dispatcher implements QueueingDispatcher
 
             $resumeState = $repository->getExecutionState($resumeStateKey = $command->resumeStateKey());
             $resumeStateTtl = $command->getResumeStateTtl();
-            $workflow = $this->container->make(Workflow::class)
-                ->withState($resumeState ?? new ExecutionState)
-                ->persistenceCallback(
-                    static fn (ExecutionState $resumeState) => $repository->saveExecutionState(
-                        $resumeStateKey,
-                        $resumeState,
-                        $resumeStateTtl
-                    )
-                )->clearStateCallback(static fn () => $repository->clearExecutionState($resumeStateKey));
-            $command->setWorkflow($workflow);
-
-            $command->setResumeState($resumeState); // @todo is this even needed?
+            $command->setJobSequence(
+                $this->container->make(JobSequence::class)
+                    ->withState($resumeState ?? new ExecutionState)
+                    ->persistenceCallback(
+                        static fn (ExecutionState $resumeState) => $repository->saveExecutionState(
+                            $resumeStateKey,
+                            $resumeState,
+                            $resumeStateTtl
+                        )
+                    )->clearStateCallback(static fn () => $repository->clearExecutionState($resumeStateKey))
+            );
 
             $callback = function (Resumable $command) {
                 $method = method_exists($command, 'handle') ? 'handle' : '__invoke';
 
                 $commandReturned = $this->container->call([$command, $method]);
 
-                $workflow = $command->getWorkflow();
+                $workflow = $command->getJobSequence();
                 if ($workflow->isComplete()) {
                     return $commandReturned;
                 }

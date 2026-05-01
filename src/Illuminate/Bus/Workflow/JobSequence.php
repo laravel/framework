@@ -7,7 +7,7 @@ use Illuminate\Pipeline\Pipeline;
 use InvalidArgumentException;
 use LogicException;
 
-class Workflow
+class JobSequence
 {
     public array $steps = [];
     public array $orderedSteps = [];
