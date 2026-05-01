@@ -9,7 +9,7 @@ interface Resumable
 {
     public function resumeStateKey(): string;
 
-    public function setJobSequence(JobSequence $jobSequence): static;
+    public function setSequence(JobSequence $jobSequence): static;
 
     /**
      * @return \DateTimeInterface|\DateInterval|int|null
