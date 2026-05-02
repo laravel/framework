@@ -3,7 +3,6 @@
 namespace Illuminate\Bus\Events;
 
 use Illuminate\Bus\ExecutionContext\ExecutionState;
-use Illuminate\Bus\ExecutionContext\ExecutionState;
 
 class StepStarting
 {

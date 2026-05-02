@@ -43,6 +43,8 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
         $executionState = $id instanceof ExecutionState ? $id : new ExecutionState($id);
 
         $this->getCache()->put($this->determineCacheKey($id), $executionState, $ttl);
+
+        return $executionState;
     }
 
     #[\Override]
