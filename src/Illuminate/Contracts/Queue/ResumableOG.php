@@ -5,7 +5,7 @@ namespace Illuminate\Contracts\Queue;
 use Illuminate\Bus\JobSequence\ExecutionStateOG;
 use Illuminate\Bus\JobSequence\JobSequence;
 
-interface Resumable
+interface ResumableOG
 {
     public function resumeStateKey(): string;
 

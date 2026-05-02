@@ -7,7 +7,7 @@ use Illuminate\Bus\JobSequence\JobSequence;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Queue\Factory;
-use Illuminate\Contracts\Queue\Resumable;
+use Illuminate\Contracts\Queue\ResumableOG;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -78,7 +78,7 @@ class ResumableJobOGTest extends QueueTestCase
 
     public function test_dispatchedJob()
     {
-        TestResumableJob::dispatch();
+        TestResumableOGJob::dispatch();
         $this->assertCount(2, StateHolder::$data);
         [$resumeState1, $resumeState2] = StateHolder::$data;
         $this->assertInstanceOf(ExecutionStateOG::class, $resumeState1);
@@ -110,7 +110,7 @@ class StateHolder
     public static array $data;
 }
 
-class TestResumableJob implements ShouldQueue, Resumable
+class TestResumableOGJob implements ShouldQueue, ResumableOG
 {
     use InteractsWithQueue;
     use ResumableTrait;
@@ -129,7 +129,7 @@ class TestResumableJob implements ShouldQueue, Resumable
     }
 }
 
-class TestRepeatingStepResumableJob extends TestResumableJob
+class TestRepeatingStepResumableJob extends TestResumableOGJob
 {
     public function handle(): void
     {
@@ -138,7 +138,7 @@ class TestRepeatingStepResumableJob extends TestResumableJob
     }
 }
 
-class CheckForUpdate implements ShouldQueue, Resumable
+class CheckForUpdate implements ShouldQueue, ResumableOG
 {
     use InteractsWithQueue;
     use ResumableTrait;

@@ -7,7 +7,7 @@ use Illuminate\Bus\JobSequence\JobSequence;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Queue\Factory;
-use Illuminate\Contracts\Queue\Resumable;
+use Illuminate\Contracts\Queue\ResumableOG;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -45,7 +45,7 @@ class ResumableJobTest extends QueueTestCase
     }
 }
 
-class TestResumableJob implements ShouldQueue, Resumable
+class TestResumableOGJob implements ShouldQueue, ResumableOG
 {
     use InteractsWithQueue;
     use ResumableTrait;

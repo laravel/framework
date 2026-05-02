@@ -9,7 +9,7 @@ use Illuminate\Bus\JobSequence\JobSequenceExecutionStateOG;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
-use Illuminate\Contracts\Queue\Resumable;
+use Illuminate\Contracts\Queue\ResumableOG;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Pipeline\Pipeline;
@@ -134,7 +134,7 @@ class Dispatcher implements QueueingDispatcher
 
                 return $handler->{$method}($command);
             };
-        } elseif ($command instanceof Resumable) {
+        } elseif ($command instanceof ResumableOG) {
             $repository = $this->container->make(ExecutionStateRepository::class);
 
             $resumeState = $repository->getExecutionState($resumeStateKey = $command->resumeStateKey());
@@ -151,7 +151,7 @@ class Dispatcher implements QueueingDispatcher
                     )->clearStateCallback(static fn () => $repository->clearExecutionState($resumeStateKey))
             );
 
-            $callback = function (Resumable $command) {
+            $callback = function (ResumableOG $command) {
                 $method = method_exists($command, 'handle') ? 'handle' : '__invoke';
 
                 $commandReturned = $this->container->call([$command, $method]);
