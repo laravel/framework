@@ -27,7 +27,13 @@ class ExecutionContext
         }
     }
 
-    public function step(string $name, callable $callback): mixed
+    /**
+     * @param  string  $name
+     * @param  callable  $callback
+     * @param  array{ttl?:  \DateTimeInterface|\DateInterval|int|null}  $options
+     * @return mixed
+     */
+    public function step(string $name, callable $callback, array $options = []): mixed
     {
         if ($this->state->hasCompletedStep($name)) {
             return $this->state->resultFor($name);
@@ -41,7 +47,9 @@ class ExecutionContext
 
         $this->eventDispatcher?->dispatch(new StepCompleted($this->state, $name, $result, $completedAt));
 
-        $this->executionRepository->saveStep($this->state, $name);
+        $ttl = array_key_exists('ttl', $options) ? $options['ttl'] : null;
+
+        $this->executionRepository->saveStep($this->state, $name, $ttl);
 
         return $result;
     }

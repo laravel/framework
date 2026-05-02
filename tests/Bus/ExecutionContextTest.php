@@ -9,11 +9,12 @@ use Illuminate\Bus\ExecutionContext\ExecutionContext;
 use Illuminate\Bus\ExecutionContext\ExecutionState;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository as CacheRepository;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
-use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Contracts\Workflow\ExecutionRepository;
+use Illuminate\Events\Dispatcher as BaseEventDispatcher;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Testing\Fakes\EventFake;
 use PHPUnit\Framework\TestCase;
 
 class ExecutionContextTest extends TestCase
@@ -30,7 +31,7 @@ class ExecutionContextTest extends TestCase
     {
         Carbon::setTestNow($now = Carbon::parse('2026-04-01 21:53:00'));
 
-        $events = new ExecutionContextRecordingEventDispatcher;
+        $events = $this->fakeEvents();
         $repository = new ExecutionContextRecordingExecutionRepository;
         $state = new ExecutionState('execution-1');
         $context = new ExecutionContext($repository, $events, $state);
@@ -38,15 +39,16 @@ class ExecutionContextTest extends TestCase
         $result = $context->step('fetch-products', static fn () => ['product-1', 'product-2']);
 
         $this->assertSame(['product-1', 'product-2'], $result);
-        $this->assertCount(2, $events->events);
-        $this->assertInstanceOf(StepStarting::class, $events->events[0]);
-        $this->assertSame($state, $events->events[0]->state);
-        $this->assertSame('fetch-products', $events->events[0]->step);
-        $this->assertInstanceOf(StepCompleted::class, $events->events[1]);
-        $this->assertSame($state, $events->events[1]->state);
-        $this->assertSame('fetch-products', $events->events[1]->step);
-        $this->assertSame(['product-1', 'product-2'], $events->events[1]->result);
-        $this->assertSame($now->getTimestamp(), $events->events[1]->completedAt);
+        $events->assertDispatched(StepStarting::class, function (StepStarting $event) use ($state) {
+            return $event->state === $state
+                && $event->step === 'fetch-products';
+        });
+        $events->assertDispatched(StepCompleted::class, function (StepCompleted $event) use ($now, $state) {
+            return $event->state === $state
+                && $event->step === 'fetch-products'
+                && $event->result === ['product-1', 'product-2']
+                && $event->completedAt === $now->getTimestamp();
+        });
         $this->assertSame([
             ['state' => $state, 'name' => 'fetch-products', 'ttl' => null],
         ], $repository->savedSteps);
@@ -54,7 +56,7 @@ class ExecutionContextTest extends TestCase
 
     public function testStepReturnsStoredResultWhenAlreadyCompleted()
     {
-        $events = new ExecutionContextRecordingEventDispatcher;
+        $events = $this->fakeEvents();
         $repository = new ExecutionContextRecordingExecutionRepository;
         $state = new ExecutionState('execution-1');
         $context = new ExecutionContext($repository, $events, $state);
@@ -75,13 +77,14 @@ class ExecutionContextTest extends TestCase
         $this->assertSame('first-result', $firstResult);
         $this->assertSame('first-result', $secondResult);
         $this->assertSame(1, $runs);
-        $this->assertCount(2, $events->events);
+        $events->assertDispatchedTimes(StepStarting::class, 1);
+        $events->assertDispatchedTimes(StepCompleted::class, 1);
         $this->assertCount(1, $repository->savedSteps);
     }
 
     public function testStepUsesStateLoadedFromRepository()
     {
-        $events = new ExecutionContextRecordingEventDispatcher;
+        $events = $this->fakeEvents();
         $state = new ExecutionState('execution-1');
         $state->recordStepResult('fetch-products', 'stored-result', 123);
         $repository = new ExecutionContextRecordingExecutionRepository($state);
@@ -99,12 +102,12 @@ class ExecutionContextTest extends TestCase
         $this->assertSame(['execution-1'], $repository->finds);
         $this->assertSame([], $repository->creates);
         $this->assertSame([], $repository->savedSteps);
-        $this->assertSame([], $events->events);
+        $events->assertNothingDispatched();
     }
 
     public function testConstructorCreatesStateWhenRepositoryDoesNotFindOne()
     {
-        $events = new ExecutionContextRecordingEventDispatcher;
+        $events = $this->fakeEvents();
         $repository = new ExecutionContextRecordingExecutionRepository;
         $context = new ExecutionContext($repository, $events, 'execution-1');
 
@@ -141,6 +144,11 @@ class ExecutionContextTest extends TestCase
                 'result' => 'new-result',
             ],
         ], $stored->all());
+    }
+
+    protected function fakeEvents(): EventFake
+    {
+        return new EventFake(new BaseEventDispatcher(new Container));
     }
 }
 
@@ -207,54 +215,3 @@ class ExecutionContextRecordingExecutionRepository implements ExecutionRepositor
     }
 }
 
-class ExecutionContextRecordingEventDispatcher implements EventDispatcher
-{
-    public array $events = [];
-
-    public function listen($events, $listener = null)
-    {
-        //
-    }
-
-    public function hasListeners($eventName)
-    {
-        return false;
-    }
-
-    public function subscribe($subscriber)
-    {
-        //
-    }
-
-    public function until($event, $payload = [])
-    {
-        return null;
-    }
-
-    public function dispatch($event, $payload = [], $halt = false)
-    {
-        $this->events[] = $event;
-
-        return null;
-    }
-
-    public function push($event, $payload = [])
-    {
-        //
-    }
-
-    public function flush($event)
-    {
-        //
-    }
-
-    public function forget($event)
-    {
-        //
-    }
-
-    public function forgetPushed()
-    {
-        //
-    }
-}
