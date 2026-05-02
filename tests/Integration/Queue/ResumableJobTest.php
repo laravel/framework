@@ -10,9 +10,9 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\ResumableTrait;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Psr\Log\LoggerInterface;
 
@@ -23,9 +23,9 @@ class ResumableJobTest extends QueueTestCase
 {
     protected function defineEnvironment($app)
     {
-
         $app['config']->set('cache.default', 'database');
         $app['config']->set('queue.default', 'database');
+
         parent::defineEnvironment($app);
     }
 
@@ -33,6 +33,9 @@ class ResumableJobTest extends QueueTestCase
     {
         parent::setUp();
         TestResumableJob::flush();
+        Cache::put('getData', 0);
+        Cache::put('updateDatabase', 0);
+        Cache::put('sendEmail', 0);
     }
 
     public function test_job_sync_queued()
@@ -58,12 +61,13 @@ class ResumableJobTest extends QueueTestCase
 
     public function test_job_queued()
     {
+        $uuid = Str::freezeUuids();
         $this->travelTo('2025-06-29T00:00:01.000Z');
         Mail::fake();
         Event::fake();
         TestResumableJob::dispatch(1234);
         $this->runQueueWorkerCommand(['--once' => true]);
-        $executionState = Cache::get('execution:1');
+        $executionState = Cache::get('execution:'.$uuid);
 
         $this->assertInstanceof(ExecutionState::class, $executionState);
         $this->assertTrue($executionState->hasCompletedStep('get_data'));
@@ -73,13 +77,14 @@ class ResumableJobTest extends QueueTestCase
 
     public function test_resumes_with_job_failure()
     {
+        $uuid = Str::freezeUuids();
         $this->travelTo('2025-06-29T00:00:01.000Z');
         Mail::fake();
         Event::fake();
         TestResumableJob::dispatch(1234);
         Cache::put('throw_exception', true);
         $this->runQueueWorkerCommand(['--once' => true]);
-        $executionState = Cache::get('execution:1');
+        $executionState = Cache::get('execution:'.$uuid);
 
         $this->assertInstanceof(ExecutionState::class, $executionState);
         $this->assertTrue($executionState->hasCompletedStep('get_data'));
@@ -88,13 +93,15 @@ class ResumableJobTest extends QueueTestCase
         $this->assertNull(Cache::get('throw_exception'));
 
         $this->runQueueWorkerCommand(['--once' => true]);
-        //dd(DB::table('cache')->get());
-        $executionState = Cache::get('execution:2');
+        $executionState = Cache::get('execution:'.$uuid);
         $this->assertInstanceof(ExecutionState::class, $executionState);
 
         $this->assertTrue($executionState->hasCompletedStep('get_data'));
         $this->assertTrue($executionState->hasCompletedStep('update_database'));
         $this->assertTrue($executionState->hasCompletedStep('send_email'));
+        $this->assertEquals(1, Cache::get('getData'));
+        $this->assertEquals(2, Cache::get('updateDatabase'));
+        $this->assertEquals(1, Cache::get('sendEmail'));
     }
 }
 

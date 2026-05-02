@@ -13,7 +13,7 @@ trait ResumableTrait
      */
     public function executionContextId(): mixed
     {
-        return $this->job?->getJobId() ?? null; // @todo how is this supposed to work?
+        return $this->job?->uuid() ?? null;
     }
 
     public function setExecutionContext(ExecutionContext $context)
