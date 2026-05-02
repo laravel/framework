@@ -53,7 +53,7 @@ trait AsPivot
 
         // The pivot model is a "dynamic" model since we will set the tables dynamically
         // for the instance. This allows it work for any intermediate tables for the
-        // many to many relationship that are defined by this developer's classes.
+        // many-to-many relationship that are defined by this developer's classes.
         $instance->setConnection($parent->getConnectionName())
             ->setTable($table)
             ->forceFill($attributes)

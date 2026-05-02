@@ -56,7 +56,7 @@ trait HasRelationships
     protected $relationAutoloadContext = null;
 
     /**
-     * The many to many relationship methods.
+     * The many-to-many relationship methods.
      *
      * @var string[]
      */
