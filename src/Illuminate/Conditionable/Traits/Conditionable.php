@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support\Traits;
 
-use Closure;
 use Illuminate\Support\HigherOrderWhenProxy;
 
 trait Conditionable
