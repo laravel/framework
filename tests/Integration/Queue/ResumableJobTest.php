@@ -9,6 +9,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\ResumableTrait;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
@@ -39,7 +41,6 @@ class ResumableJobTest extends QueueTestCase
 
     public function test_job_sync_queued()
     {
-        $this->travelTo('2025-06-29T00:00:01.000Z');
         Mail::fake();
         Event::fake();
         TestResumableJob::dispatchSync(1234);
@@ -59,7 +60,6 @@ class ResumableJobTest extends QueueTestCase
     public function test_job_queued()
     {
         $uuid = Str::freezeUuids();
-        $this->travelTo('2025-06-29T00:00:01.000Z');
         Mail::fake();
         Event::fake();
         TestResumableJob::dispatch(1234);
@@ -72,10 +72,31 @@ class ResumableJobTest extends QueueTestCase
         $this->assertTrue($executionState->hasCompletedStep('send_email'));
     }
 
-    public function test_resumes_with_job_failure()
+    public function test_job_writes_completed_at_to_execution_state()
     {
         $uuid = Str::freezeUuids();
         $this->travelTo('2025-06-29T00:00:01.000Z');
+        Mail::fake();
+        Event::fake();
+
+        TestResumableJob::dispatch(1234);
+        $this->runQueueWorkerCommand(['--once' => true]);
+        $executionState = Cache::get('execution:'.$uuid);
+
+        $this->assertInstanceof(ExecutionState::class, $executionState);
+        $this->assertSame([
+            'get_data' => $now = Carbon::now()->getTimestamp(),
+            'update_database' => $now,
+            'send_email' => $now,
+        ], (new Collection($executionState->all()))->mapWithKeys(function ($value, $key) {
+                return [$key => $value['completed_at']];
+            })->all()
+        );
+    }
+
+    public function test_resumes_with_job_failure()
+    {
+        $uuid = Str::freezeUuids();
         Mail::fake();
         Event::fake();
         TestResumableJob::dispatch(1234);
@@ -103,7 +124,6 @@ class ResumableJobTest extends QueueTestCase
 
     public function test_job_can_define_custom_execution_context_id()
     {
-        $this->travelTo('2025-06-29T00:00:01.000Z');
         Mail::fake();
         Event::fake();
 
@@ -135,13 +155,12 @@ class ResumableJobTest extends QueueTestCase
 
     public function test_jobs_can_share_an_execution_context()
     {
-        $this->travelTo('2025-06-29T00:00:01.000Z');
         Mail::fake();
         Event::fake();
 
         Cache::put('execution:return-1234', new ExecutionState('return-1234', [
             'get_data' => [
-                'completed_at' => now()->getTimestamp(),
+                'completed_at' => 1,
                 'result' => [
                     'data' => [
                         [
