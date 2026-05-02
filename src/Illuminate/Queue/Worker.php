@@ -118,6 +118,13 @@ class Worker
     protected static $popCallbacks = [];
 
     /**
+     * The registered queue groups.
+     *
+     * @var array<string, array<int, string>>
+     */
+    protected static $groups = [];
+
+    /**
      * The custom exit code to be used when memory is exceeded.
      *
      * @var int|null
@@ -411,7 +418,13 @@ class Worker
                 return $job;
             }
 
-            foreach (explode(',', $queue) as $index => $queue) {
+            $queues = [];
+
+            foreach (explode(',', $queue) as $name) {
+                $queues = array_merge($queues, static::resolveGroup($name));
+            }
+
+            foreach ($queues as $index => $queue) {
                 if ($this->queuePaused($connection->getConnectionName(), $queue)) {
                     continue;
                 }
@@ -1005,6 +1018,39 @@ class Worker
         } else {
             static::$popCallbacks[$workerName] = $callback;
         }
+    }
+
+    /**
+     * Register a queue group for the worker.
+     *
+     * @param  string  $name
+     * @param  array  $queues
+     * @return void
+     */
+    public static function group($name, array $queues)
+    {
+        static::$groups[$name] = $queues;
+    }
+
+    /**
+     * Flush all registered queue groups.
+     *
+     * @return void
+     */
+    public static function flushGroups()
+    {
+        static::$groups = [];
+    }
+
+    /**
+     * Resolve the queues registered under the given group name.
+     *
+     * @param  string  $name
+     * @return array
+     */
+    public static function resolveGroup($name)
+    {
+        return static::$groups[$name] ?? [$name];
     }
 
     /**

@@ -30,6 +30,7 @@ class WorkCommandTest extends QueueTestCase
             FirstJob::$ran = false;
             SecondJob::$ran = false;
             ThirdJob::$ran = false;
+            Worker::flushGroups();
         });
 
         parent::setUp();
@@ -259,6 +260,28 @@ class WorkCommandTest extends QueueTestCase
         $this->withoutMockingConsoleOutput()->artisan('queue:work', ['--once' => true]);
         Exceptions::assertNotReported(UniqueConstraintViolationException::class);
         $this->assertSame(2, substr_count(Artisan::output(), JobWillFail::class));
+    }
+
+    public function testGroup()
+    {
+        Worker::group('critical', ['payments', 'notifications']);
+
+        Queue::push(new FirstJob, '', 'payments');
+        Queue::push(new SecondJob, '', 'notifications');
+        Queue::push(new ThirdJob, '', 'ignore-me-pls');
+
+        $this->artisan('queue:work', [
+            '--queue' => 'critical',
+            '--stop-when-empty' => true,
+            '--memory' => 1024,
+        ])->assertExitCode(0);
+
+        $this->assertTrue(FirstJob::$ran);
+        $this->assertTrue(SecondJob::$ran);
+        $this->assertFalse(ThirdJob::$ran);
+        $this->assertSame(0, Queue::size('payments'));
+        $this->assertSame(0, Queue::size('notifications'));
+        $this->assertSame(1, Queue::size('ignore-me-pls'));
     }
 }
 
