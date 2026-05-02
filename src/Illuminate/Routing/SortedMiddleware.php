@@ -2,6 +2,8 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Auth\Middleware\OptionalAuthenticate;
 use Illuminate\Support\Collection;
 
 class SortedMiddleware extends Collection
@@ -60,7 +62,140 @@ class SortedMiddleware extends Collection
             }
         }
 
+        $middlewares = $this->inheritOptionalAuthenticateGuards($middlewares);
+
+        $middlewares = $this->mergeRequiredAuthenticateWithOptional($middlewares);
+
         return Router::uniqueMiddleware($middlewares);
+    }
+
+    /**
+     * When optional authentication middleware omits guards, inherit them from the first
+     * required Authenticate middleware in the same stack (e.g. auth:sanctum group + optionalAuth).
+     *
+     * @param  array  $middlewares
+     * @return array
+     */
+    protected function inheritOptionalAuthenticateGuards(array $middlewares): array
+    {
+        $inheritParams = null;
+
+        foreach ($middlewares as $middleware) {
+            $parsed = $this->parseRequiredAuthenticateRouteMiddleware($middleware);
+
+            if ($parsed !== null && $parsed['rawParams'] !== '') {
+                $inheritParams = $parsed['rawParams'];
+
+                break;
+            }
+        }
+
+        if ($inheritParams === null) {
+            return $middlewares;
+        }
+
+        $result = [];
+
+        foreach ($middlewares as $middleware) {
+            $parsed = $this->parseOptionalAuthenticateRouteMiddleware($middleware);
+
+            if ($parsed !== null && $parsed['rawParams'] === '') {
+                $result[] = $parsed['class'].':'.$inheritParams;
+
+                continue;
+            }
+
+            $result[] = $middleware;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Remove required Authenticate entries when OptionalAuthenticate targets the same guards.
+     *
+     * @param  array  $middlewares
+     * @return array
+     */
+    protected function mergeRequiredAuthenticateWithOptional(array $middlewares): array
+    {
+        $optionalKeys = [];
+
+        foreach ($middlewares as $middleware) {
+            $parsed = $this->parseOptionalAuthenticateRouteMiddleware($middleware);
+
+            if ($parsed !== null) {
+                $optionalKeys[$parsed['key']] = true;
+            }
+        }
+
+        if ($optionalKeys === []) {
+            return $middlewares;
+        }
+
+        $result = [];
+
+        foreach ($middlewares as $middleware) {
+            $parsed = $this->parseRequiredAuthenticateRouteMiddleware($middleware);
+
+            if ($parsed !== null && isset($optionalKeys[$parsed['key']])) {
+                continue;
+            }
+
+            $result[] = $middleware;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param  mixed  $middleware
+     * @return array{class: class-string, key: string, rawParams: string}|null
+     */
+    protected function parseRequiredAuthenticateRouteMiddleware($middleware): ?array
+    {
+        if (! is_string($middleware)) {
+            return null;
+        }
+
+        [$class, $parameters] = array_pad(explode(':', $middleware, 2), 2, null);
+
+        if (! class_exists($class) || ($class !== Authenticate::class && ! is_subclass_of($class, Authenticate::class))) {
+            return null;
+        }
+
+        $rawParams = $parameters ?? '';
+
+        return [
+            'class' => $class,
+            'rawParams' => $rawParams,
+            'key' => $rawParams,
+        ];
+    }
+
+    /**
+     * @param  mixed  $middleware
+     * @return array{class: class-string, key: string, rawParams: string}|null
+     */
+    protected function parseOptionalAuthenticateRouteMiddleware($middleware): ?array
+    {
+        if (! is_string($middleware)) {
+            return null;
+        }
+
+        [$class, $parameters] = array_pad(explode(':', $middleware, 2), 2, null);
+
+        if (! class_exists($class) || ($class !== OptionalAuthenticate::class && ! is_subclass_of($class, OptionalAuthenticate::class))) {
+            return null;
+        }
+
+        $rawParams = $parameters ?? '';
+
+        return [
+            'class' => $class,
+            'rawParams' => $rawParams,
+            'key' => $rawParams,
+        ];
     }
 
     /**

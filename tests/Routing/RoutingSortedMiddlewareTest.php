@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Routing;
 
+use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Auth\Middleware\OptionalAuthenticate;
 use Illuminate\Routing\SortedMiddleware;
 use PHPUnit\Framework\TestCase;
 
@@ -95,6 +97,64 @@ class RoutingSortedMiddlewareTest extends TestCase
             'Otherthing',
             'Third:foo',
             'Third',
+        ];
+
+        $this->assertEquals($expected, (new SortedMiddleware($priority, $middleware))->all());
+    }
+
+    public function testItDropsRequiredAuthenticateWhenOptionalAuthenticateSharesGuards()
+    {
+        $priority = [
+            Authenticate::class,
+            OptionalAuthenticate::class,
+        ];
+
+        $middleware = [
+            Authenticate::class.':sanctum',
+            OptionalAuthenticate::class.':sanctum',
+        ];
+
+        $expected = [
+            OptionalAuthenticate::class.':sanctum',
+        ];
+
+        $this->assertEquals($expected, (new SortedMiddleware($priority, $middleware))->all());
+    }
+
+    public function testItInheritsGuardsForParameterlessOptionalAuthenticateAndDropsRequiredAuth()
+    {
+        $priority = [
+            Authenticate::class,
+            OptionalAuthenticate::class,
+        ];
+
+        $middleware = [
+            Authenticate::class.':sanctum',
+            OptionalAuthenticate::class,
+        ];
+
+        $expected = [
+            OptionalAuthenticate::class.':sanctum',
+        ];
+
+        $this->assertEquals($expected, (new SortedMiddleware($priority, $middleware))->all());
+    }
+
+    public function testItDoesNotDropRequiredAuthenticateWhenOptionalTargetsDifferentGuards()
+    {
+        $priority = [
+            Authenticate::class,
+            OptionalAuthenticate::class,
+        ];
+
+        $middleware = [
+            Authenticate::class.':web',
+            OptionalAuthenticate::class.':sanctum',
+        ];
+
+        $expected = [
+            Authenticate::class.':web',
+            OptionalAuthenticate::class.':sanctum',
         ];
 
         $this->assertEquals($expected, (new SortedMiddleware($priority, $middleware))->all());
