@@ -3,13 +3,11 @@
 namespace Illuminate\Bus;
 
 use Closure;
-use Illuminate\Bus\JobSequence\ExecutionStateOG;
-use Illuminate\Bus\JobSequence\JobSequence;
-use Illuminate\Bus\JobSequence\JobSequenceExecutionStateOG;
+use Illuminate\Bus\ExecutionContext\ExecutionContext;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
-use Illuminate\Contracts\Queue\ResumableOG;
+use Illuminate\Contracts\Queue\Resumable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Pipeline\Pipeline;
@@ -127,42 +125,18 @@ class Dispatcher implements QueueingDispatcher
             $command->setJob(new SyncJob($this->container, json_encode([]), 'sync', 'sync'));
         }
 
-        // Here?
         if ($handler || $handler = $this->getCommandHandler($command)) {
             $callback = function ($command) use ($handler) {
                 $method = method_exists($handler, 'handle') ? 'handle' : '__invoke';
 
                 return $handler->{$method}($command);
             };
-        } elseif ($command instanceof ResumableOG) {
-            $repository = $this->container->make(ExecutionStateRepository::class);
-
-            $resumeState = $repository->getExecutionState($resumeStateKey = $command->resumeStateKey());
-            $resumeStateTtl = $command->getResumeStateTtl() ?? $command->job->retryUntil();
-            $command->setSequence(
-                $this->container->make(JobSequence::class)
-                    ->withState($resumeState ?? new JobSequenceExecutionStateOG($resumeStateKey))
-                    ->persistenceCallback(
-                        static fn (ExecutionStateOG $resumeState) => $repository->saveExecutionState(
-                            $resumeStateKey,
-                            $resumeState,
-                            $resumeStateTtl
-                        )
-                    )->clearStateCallback(static fn () => $repository->clearExecutionState($resumeStateKey))
-            );
-
-            $callback = function (ResumableOG $command) {
-                $method = method_exists($command, 'handle') ? 'handle' : '__invoke';
-
-                $commandReturned = $this->container->call([$command, $method]);
-
-                $workflow = $command->getJobSequence();
-                if ($workflow->isComplete()) {
-                    return $commandReturned;
-                }
-
-                return $workflow->execute();
-            };
+        } elseif ($command instanceof Resumable) {
+            $executionContext = $this->container->make(ExecutionContext::class, [
+                'id' => $command->executionContextId(),
+                'options' => method_exists($command, 'executionContextOptions') ? $command->executionContextOptions() : [],
+            ]);
+            $command->setExecutionContext($executionContext);
         }
 
         if (! isset($callback)) {

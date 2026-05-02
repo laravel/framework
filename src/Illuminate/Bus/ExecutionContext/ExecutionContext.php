@@ -13,17 +13,24 @@ class ExecutionContext
 {
     protected ExecutionState $state;
 
+    /**
+     * @param  ExecutionRepositoryContract  $executionRepository
+     * @param  Dispatcher|null  $eventDispatcher
+     * @param  mixed|null  $id
+     * @param  array{ttl?: \DateTimeInterface|\DateInterval|int|null}  $options
+     */
     public function __construct(
         protected ExecutionRepositoryContract $executionRepository,
         protected ?Dispatcher $eventDispatcher = null,
-        mixed $stateId = null,
+        mixed $id = null,
+        protected array $options = [],
     ) {
-        if ($stateId instanceof ExecutionState) {
-            $this->state = $stateId;
+        if ($id instanceof ExecutionState) {
+            $this->state = $id;
         }
         else {
-            $this->state = $this->executionRepository->find($stateId)
-                ?? $this->executionRepository->create($stateId ?? Str::random(32));
+            $this->state = $this->executionRepository->find($id)
+                ?? $this->executionRepository->create($id ?? Str::random(32), $options['ttl'] ?? null);
         }
     }
 
@@ -47,10 +54,13 @@ class ExecutionContext
 
         $this->eventDispatcher?->dispatch(new StepCompleted($this->state, $name, $result, $completedAt));
 
-        $ttl = array_key_exists('ttl', $options) ? $options['ttl'] : null;
-
-        $this->executionRepository->saveStep($this->state, $name, $ttl);
+        $this->executionRepository->saveStep($this->state, $name, $options['ttl'] ?? null);
 
         return $result;
+    }
+
+    public function getState(): ExecutionState
+    {
+        return $this->state;
     }
 }

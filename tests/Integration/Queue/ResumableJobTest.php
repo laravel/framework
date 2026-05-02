@@ -2,18 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Illuminate\Bus\JobSequence\ExecutionStateOG;
-use Illuminate\Bus\JobSequence\JobSequence;
-use Illuminate\Cache\ArrayStore;
-use Illuminate\Contracts\Mail\Mailable;
-use Illuminate\Contracts\Queue\Factory;
-use Illuminate\Contracts\Queue\ResumableOG;
+use Illuminate\Contracts\Queue\Resumable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Mail\Mailable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\ResumableTrait;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Orchestra\Testbench\Attributes\WithMigration;
 
@@ -27,32 +21,99 @@ class ResumableJobTest extends QueueTestCase
         parent::defineEnvironment($app);
 
         $app['config']->set('cache.default', 'database');
-        //$app['config']->set('queue.default', 'database');
+        $app['config']->set('queue.default', 'database');
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        TestResumableJob::flush();
     }
 
     public function test_job()
     {
-        /*
-         * TODO:
-         * Container bindings for default persistence callbacks
-         * Figure out where ExecutionState lives
-         * Does Workflows need to live in its own space? or would inside of Bus be better?
-         * Add a test where we set the state somewhere further down the line
-         * Figure out the API surface for a JobSequence... how do they write the steps. Maybe we should just kill handle and execute that some other way
-         * Try a job on the queue where we push the job and then release it after every pipe. does it work at all?
-         *
-         */
+        Mail::fake();
+        TestResumableJob::$throwException = true;
+        TestResumableJob::dispatch(1234);
+
+
     }
 }
 
-class TestResumableOGJob implements ShouldQueue, ResumableOG
+class TestResumableJob implements Resumable, ShouldQueue
 {
     use InteractsWithQueue;
     use ResumableTrait;
     use Dispatchable;
 
+    public static bool $throwException = false;
+    public static array $timesCalled = [];
+
+    public static function flush(): void
+    {
+        self::$throwException = false;
+        self::$timesCalled = [];
+    }
+
+    public function __construct(
+        public int $userId
+    ) {
+
+    }
     public function handle()
     {
-        // @todo
+        $response = $this->step('get_data', $this->getData(...));
+        $this->step('update_database', $this->updateDatabase(...));
+
+        $emailsSent = $this->step('send_email', $this->sendEmail(...));
+
+        event('emails_sent', $emailsSent);
     }
+
+    private function getData()
+    {
+        self::$timesCalled['getData'] ??= 0;
+        self::$timesCalled['getData']++;
+
+        return [
+            'data' => [
+                [
+                    'id' => 9876,
+                    'email' => 'taylor@laravel.com',
+                ],
+                [
+                    'id' => 1002,
+                    'email' => 'abby@laravel.com',
+                ],
+            ],
+        ];
+    }
+
+    private function updateDatabase()
+    {
+        self::$timesCalled['updateDatabase'] ??= 0;
+        self::$timesCalled['updateDatabase']++;
+        if (self::$throwException) {
+            self::$throwException = false;
+
+            throw new \Exception('You asked me to throw this');
+        }
+
+    }
+
+    private function sendEmail(): int
+    {
+        self::$timesCalled['sendEmail'] ??= 0;
+        self::$timesCalled['sendEmail']++;
+        $emailsSent = 0;
+
+        $users = $this->context->getState()->resultFor('get_data')['data'];
+        foreach($users as $user) {
+            Mail::to($user['email'])->send((new Mailable)->subject('test email: '.$this->userId));
+            $emailsSent++;
+        }
+
+        return $emailsSent;
+    }
+
 }

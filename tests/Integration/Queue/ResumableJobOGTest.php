@@ -11,7 +11,7 @@ use Illuminate\Contracts\Queue\ResumableOG;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\ResumableTrait;
+use Illuminate\Queue\ResumableOGTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
@@ -113,7 +113,7 @@ class StateHolder
 class TestResumableOGJob implements ShouldQueue, ResumableOG
 {
     use InteractsWithQueue;
-    use ResumableTrait;
+    use ResumableOGTrait;
     use Dispatchable;
 
     public function handle()
@@ -141,7 +141,7 @@ class TestRepeatingStepResumableJob extends TestResumableOGJob
 class CheckForUpdate implements ShouldQueue, ResumableOG
 {
     use InteractsWithQueue;
-    use ResumableTrait;
+    use ResumableOGTrait;
     use Dispatchable;
 
     public function handle(): void

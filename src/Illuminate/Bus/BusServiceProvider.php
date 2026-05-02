@@ -3,11 +3,13 @@
 namespace Illuminate\Bus;
 
 use Aws\DynamoDb\DynamoDbClient;
+use Illuminate\Bus\ExecutionContext\CacheExecutionRepository;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Bus\QueueingDispatcher as QueueingDispatcherContract;
 use Illuminate\Contracts\Queue\Factory as QueueFactoryContract;
 use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Contracts\Workflow\ExecutionRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 
@@ -87,7 +89,7 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
             );
         });
 
-        $this->app->bind(ExecutionStateRepository::class, CacheExecutionStateRepository::class);
+        $this->app->bind(ExecutionRepository::class, CacheExecutionRepository::class);
     }
 
     /**

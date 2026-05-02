@@ -2,42 +2,29 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Bus\JobSequence\ExecutionStateOG;
-use Illuminate\Bus\JobSequence\JobSequence;
+use Illuminate\Bus\ExecutionContext\ExecutionContext;
 
 trait ResumableTrait
 {
-    protected ?ExecutionStateOG $resumeState;
+    protected ExecutionContext $context;
 
-    protected JobSequence $sequence;
-
-    public function setExecutionState(?ExecutionStateOG $resumeState): static
+    /**
+     * @return string|\Illuminate\Bus\ExecutionContext\ExecutionContext
+     */
+    public function executionContextId(): mixed
     {
-        $this->resumeState = $resumeState;
+        return $this->job?->getJobId() ?? null;
+    }
+
+    public function setExecutionContext(ExecutionContext $context)
+    {
+        $this->context = $context;
 
         return $this;
     }
 
-    public function resumeStateKey(): string
+    protected function step(string $name, callable $callback, array $options = []): mixed
     {
-        return 'resumable_job_execution_state:'.$this->job->getJobId();
-    }
-
-    public function setSequence(JobSequence $sequence): static
-    {
-        $this->sequence = $sequence;
-
-        return $this;
-    }
-
-    public function getJobSequence(): JobSequence
-    {
-        return $this->sequence;
-    }
-
-    public function getResumeStateTtl()
-    {
-        // @todo
-        return 500;
+        return $this->context->step($name, $callback, $options);
     }
 }

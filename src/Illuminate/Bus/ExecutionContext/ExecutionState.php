@@ -30,7 +30,7 @@ class ExecutionState
         return $this->data[$name]['result'];
     }
 
-    public function recordStepResult(string $name, mixed $result, int $completedAt): void
+    public function recordStepResult(string $name, mixed $result, $completedAt): void
     {
         $this->data[$name] = [
             'completed_at' => $completedAt,
