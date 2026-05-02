@@ -82,6 +82,20 @@ class ExecutionContextTest extends TestCase
         $this->assertCount(1, $repository->savedSteps);
     }
 
+    public function testStepPassesTtlOptionToRepository()
+    {
+        $repository = new ExecutionContextRecordingExecutionRepository;
+        $state = new ExecutionState('execution-1');
+        $context = new ExecutionContext($repository, null, $state);
+
+        $result = $context->step('fetch-products', static fn () => 'new-result', ['ttl' => 300]);
+
+        $this->assertSame('new-result', $result);
+        $this->assertSame([
+            ['state' => $state, 'name' => 'fetch-products', 'ttl' => 300],
+        ], $repository->savedSteps);
+    }
+
     public function testStepUsesStateLoadedFromRepository()
     {
         $events = $this->fakeEvents();
