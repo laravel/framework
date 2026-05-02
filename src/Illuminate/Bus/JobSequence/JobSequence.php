@@ -2,6 +2,7 @@
 
 namespace Illuminate\Bus\JobSequence;
 
+use Closure;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Pipeline\Pipeline;
 use InvalidArgumentException;
@@ -17,12 +18,12 @@ class JobSequence
     /**
      * @var (\Closure(\Illuminate\Bus\JobSequence\JobSequenceExecutionState): void)
      */
-    protected \Closure $persistenceCallback;
+    protected Closure $persistenceCallback;
 
     /**
      * @var (\Closure(\Illuminate\Bus\JobSequence\JobSequenceExecutionState): void)
      */
-    protected \Closure $clearStateCallback;
+    protected Closure $clearStateCallback;
 
     public function __construct(
         protected Container $container,
