@@ -32,7 +32,6 @@ class ResumableJobTest extends QueueTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        TestResumableJob::flush();
         Cache::put('getData', 0);
         Cache::put('updateDatabase', 0);
         Cache::put('sendEmail', 0);
@@ -45,11 +44,9 @@ class ResumableJobTest extends QueueTestCase
         Event::fake();
         TestResumableJob::dispatchSync(1234);
 
-        $this->assertSame([
-            'getData' => 1,
-            'updateDatabase' => 1,
-            'sendEmail' => 1,
-        ], TestResumableJob::$timesCalled);
+        $this->assertEquals(1, Cache::get('getData'));
+        $this->assertEquals(1, Cache::get('updateDatabase'));
+        $this->assertEquals(1, Cache::get('sendEmail'));
 
         Mail::assertSentCount(2);
         Event::assertDispatched('emails_sent', function ($_, $emailsSent) {
@@ -111,14 +108,6 @@ class TestResumableJob implements Resumable, ShouldQueue
     use ResumableTrait;
     use Dispatchable;
 
-    public static bool $throwException = false;
-    public static array $timesCalled = [];
-
-    public static function flush(): void
-    {
-        static::$timesCalled = [];
-    }
-
     public int $tries = 2;
 
     public function __construct(
@@ -140,8 +129,6 @@ class TestResumableJob implements Resumable, ShouldQueue
     private function getData()
     {
         Cache::increment('getData');
-        self::$timesCalled['getData'] ??= 0;
-        self::$timesCalled['getData']++;
 
         return [
             'data' => [
@@ -159,11 +146,10 @@ class TestResumableJob implements Resumable, ShouldQueue
 
     private function updateDatabase()
     {
-        self::$timesCalled['updateDatabase'] ??= 0;
-        self::$timesCalled['updateDatabase']++;
         Cache::increment('updateDatabase');
         if (Cache::get('throw_exception')) {
             Cache::forget('throw_exception');
+
             throw new \Exception('You asked me to throw this');
         }
     }
@@ -171,8 +157,6 @@ class TestResumableJob implements Resumable, ShouldQueue
     private function sendEmail(): array
     {
         Cache::increment('sendEmail');
-        self::$timesCalled['sendEmail'] ??= 0;
-        self::$timesCalled['sendEmail']++;
         $recipients = [];
 
         $users = $this->context->getState()->resultFor('get_data')['data'];
