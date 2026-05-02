@@ -2,7 +2,7 @@
 
 namespace Illuminate\Bus\JobSequence;
 
-class JobSequenceExecutionState extends ExecutionState
+class JobSequenceExecutionStateOG extends ExecutionStateOG
 {
     public int $stepIndex = 0;
 }

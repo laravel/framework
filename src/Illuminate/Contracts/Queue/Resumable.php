@@ -2,7 +2,7 @@
 
 namespace Illuminate\Contracts\Queue;
 
-use Illuminate\Bus\JobSequence\ExecutionState;
+use Illuminate\Bus\JobSequence\ExecutionStateOG;
 use Illuminate\Bus\JobSequence\JobSequence;
 
 interface Resumable

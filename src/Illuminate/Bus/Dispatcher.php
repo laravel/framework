@@ -3,9 +3,9 @@
 namespace Illuminate\Bus;
 
 use Closure;
-use Illuminate\Bus\JobSequence\ExecutionState;
+use Illuminate\Bus\JobSequence\ExecutionStateOG;
 use Illuminate\Bus\JobSequence\JobSequence;
-use Illuminate\Bus\JobSequence\JobSequenceExecutionState;
+use Illuminate\Bus\JobSequence\JobSequenceExecutionStateOG;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
@@ -141,9 +141,9 @@ class Dispatcher implements QueueingDispatcher
             $resumeStateTtl = $command->getResumeStateTtl() ?? $command->job->retryUntil();
             $command->setSequence(
                 $this->container->make(JobSequence::class)
-                    ->withState($resumeState ?? new JobSequenceExecutionState($resumeStateKey))
+                    ->withState($resumeState ?? new JobSequenceExecutionStateOG($resumeStateKey))
                     ->persistenceCallback(
-                        static fn (ExecutionState $resumeState) => $repository->saveExecutionState(
+                        static fn (ExecutionStateOG $resumeState) => $repository->saveExecutionState(
                             $resumeStateKey,
                             $resumeState,
                             $resumeStateTtl

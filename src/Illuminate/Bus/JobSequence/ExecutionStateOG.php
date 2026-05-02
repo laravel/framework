@@ -5,7 +5,7 @@ namespace Illuminate\Bus\JobSequence;
 use Exception;
 use Illuminate\Support\Str;
 
-class ExecutionState
+class ExecutionStateOG
 {
     protected string $_id;
 

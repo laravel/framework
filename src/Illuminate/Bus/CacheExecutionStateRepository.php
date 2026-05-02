@@ -2,7 +2,7 @@
 
 namespace Illuminate\Bus;
 
-use Illuminate\Bus\JobSequence\ExecutionState;
+use Illuminate\Bus\JobSequence\ExecutionStateOG;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Cache\Repository;
 
@@ -24,7 +24,7 @@ class CacheExecutionStateRepository implements ExecutionStateRepository
     }
 
     #[\Override]
-    public function getExecutionState(string $id): ?ExecutionState
+    public function getExecutionState(string $id): ?ExecutionStateOG
     {
         return $this->getCache()->get($id);
     }

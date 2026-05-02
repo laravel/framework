@@ -2,15 +2,15 @@
 
 namespace Illuminate\Bus;
 
-use Illuminate\Bus\JobSequence\ExecutionState;
+use Illuminate\Bus\JobSequence\ExecutionStateOG;
 
 interface ExecutionStateRepository
 {
-    public function getExecutionState(string $id): ?ExecutionState;
+    public function getExecutionState(string $id): ?ExecutionStateOG;
 
     /**
      * @param  string  $id
-     * @param  ExecutionState  $executionState
+     * @param  ExecutionStateOG  $executionState
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return void
      */

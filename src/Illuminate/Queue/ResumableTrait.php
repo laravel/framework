@@ -2,16 +2,16 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Bus\JobSequence\ExecutionState;
+use Illuminate\Bus\JobSequence\ExecutionStateOG;
 use Illuminate\Bus\JobSequence\JobSequence;
 
 trait ResumableTrait
 {
-    protected ?ExecutionState $resumeState;
+    protected ?ExecutionStateOG $resumeState;
 
     protected JobSequence $sequence;
 
-    public function setExecutionState(?ExecutionState $resumeState): static
+    public function setExecutionState(?ExecutionStateOG $resumeState): static
     {
         $this->resumeState = $resumeState;
 

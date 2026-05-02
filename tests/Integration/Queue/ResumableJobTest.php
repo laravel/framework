@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Illuminate\Bus\JobSequence\ExecutionState;
+use Illuminate\Bus\JobSequence\ExecutionStateOG;
 use Illuminate\Bus\JobSequence\JobSequence;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Contracts\Mail\Mailable;
@@ -41,14 +41,14 @@ class ResumableJobTest extends QueueTestCase
         // @todo move this to a unit test
         $workflow = $this->app->make(JobSequence::class);
         $store = new ArrayStore();
-        $workflow->step(function (ExecutionState $state) {
+        $workflow->step(function (ExecutionStateOG $state) {
             $state->set('hello', 'world');
-        })->step(function (ExecutionState $state) {
+        })->step(function (ExecutionStateOG $state) {
             $state->name = 'luke';
-        }, 'step2')->step(function (ExecutionState $state) {
+        }, 'step2')->step(function (ExecutionStateOG $state) {
             $state->name = 'taylor';
         });
-        $workflow->persistenceCallback(fn (ExecutionState $state) => $store->put('resume', $state, 100));
+        $workflow->persistenceCallback(fn (ExecutionStateOG $state) => $store->put('resume', $state, 100));
         $workflow->clearStateCallback(function ($state) use ($store) {
             $this->assertEquals([
                 'hello' => 'world',
@@ -81,10 +81,10 @@ class ResumableJobTest extends QueueTestCase
         TestResumableJob::dispatch();
         $this->assertCount(2, StateHolder::$data);
         [$resumeState1, $resumeState2] = StateHolder::$data;
-        $this->assertInstanceOf(ExecutionState::class, $resumeState1);
+        $this->assertInstanceOf(ExecutionStateOG::class, $resumeState1);
         $this->assertSame(0, $resumeState1->stepIndex);
         $this->assertSame([], $resumeState1->data());
-        $this->assertInstanceOf(ExecutionState::class, $resumeState2);
+        $this->assertInstanceOf(ExecutionStateOG::class, $resumeState2);
         $this->assertSame(1, $resumeState2->stepIndex);
         $this->assertSame(['abc' => 123, 'xyz' => 456], $resumeState2->data());
         $this->assertEmpty(DB::table('cache')->get());
@@ -106,7 +106,7 @@ class ResumableJobTest extends QueueTestCase
 
 class StateHolder
 {
-    /** @var list<ExecutionState> */
+    /** @var list<ExecutionStateOG> */
     public static array $data;
 }
 
@@ -119,10 +119,10 @@ class TestResumableJob implements ShouldQueue, Resumable
     public function handle()
     {
         $this->sequence
-            ->step(function (ExecutionState $state) {
+            ->step(function (ExecutionStateOG $state) {
                 StateHolder::$data[$state->stepIndex] = clone $state;
                 $state->set('abc',  123);
-            })->step(function (ExecutionState $state) {
+            })->step(function (ExecutionStateOG $state) {
                 $state->set('xyz', 456);
                 StateHolder::$data[$state->stepIndex] = clone $state;
             }, 'step2');
@@ -155,12 +155,12 @@ class CheckForUpdate implements ShouldQueue, Resumable
             ->step($this->sendEmail(...));
     }
 
-    private function getData(ExecutionState $resumeState): void
+    private function getData(ExecutionStateOG $resumeState): void
     {
         $resumeState->data()['response'] = Http::get('https://jobs.laravel.com/jobs/')->json();
     }
 
-    private function persistData(ExecutionState $resumeState): void
+    private function persistData(ExecutionStateOG $resumeState): void
     {
         foreach($resumeState->data['response']['data'] as $jobData) {
             DB::table('laravel_jobs')->insertGetId([
@@ -170,7 +170,7 @@ class CheckForUpdate implements ShouldQueue, Resumable
         }
     }
 
-    private function sendEmail(ExecutionState $resumeState): void
+    private function sendEmail(ExecutionStateOG $resumeState): void
     {
         Mail::raw("New jobs\n", fn ($message) => $message
             ->to('luke@kuzmish.com')
