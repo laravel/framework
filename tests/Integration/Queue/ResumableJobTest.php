@@ -100,6 +100,83 @@ class ResumableJobTest extends QueueTestCase
         $this->assertEquals(2, Cache::get('updateDatabase'));
         $this->assertEquals(1, Cache::get('sendEmail'));
     }
+
+    public function test_job_can_define_custom_execution_context_id()
+    {
+        $this->travelTo('2025-06-29T00:00:01.000Z');
+        Mail::fake();
+        Event::fake();
+
+        TestResumableJobWithCustomExecutionContext::dispatch('return-1234', 1234);
+        $this->runQueueWorkerCommand(['--once' => true]);
+        $executionState = Cache::get('execution:return-1234');
+
+        $this->assertInstanceof(ExecutionState::class, $executionState);
+        $this->assertTrue($executionState->hasCompletedStep('get_data'));
+        $this->assertTrue($executionState->hasCompletedStep('update_database'));
+        $this->assertTrue($executionState->hasCompletedStep('send_email'));
+    }
+
+    public function test_job_can_define_execution_context_options()
+    {
+        $this->travelTo('2025-06-29T00:00:01.000Z');
+        Mail::fake();
+        Event::fake();
+
+        TestResumableJobWithExecutionContextOptions::dispatch('return-1234', 1234);
+        $this->runQueueWorkerCommand(['--once' => true]);
+
+        $this->assertInstanceof(ExecutionState::class, Cache::get('execution:return-1234'));
+
+        $this->travelTo('2025-06-29T00:01:02.000Z');
+
+        $this->assertNull(Cache::get('execution:return-1234'));
+    }
+
+    public function test_jobs_can_share_an_execution_context()
+    {
+        $this->travelTo('2025-06-29T00:00:01.000Z');
+        Mail::fake();
+        Event::fake();
+
+        Cache::put('execution:return-1234', new ExecutionState('return-1234', [
+            'get_data' => [
+                'completed_at' => now()->getTimestamp(),
+                'result' => [
+                    'data' => [
+                        [
+                            'id' => 9876,
+                            'email' => 'taylor@laravel.com',
+                        ],
+                        [
+                            'id' => 1002,
+                            'email' => 'abby@laravel.com',
+                        ],
+                    ],
+                ],
+            ],
+        ]));
+
+        TestResumableJobWithCustomExecutionContext::dispatch('return-1234', 1234);
+        $this->runQueueWorkerCommand(['--once' => true]);
+
+        $this->assertEquals(0, Cache::get('getData'));
+        $this->assertEquals(1, Cache::get('updateDatabase'));
+        $this->assertEquals(1, Cache::get('sendEmail'));
+
+        TestResumableJobWithCustomExecutionContext::dispatch('return-1234', 1234);
+        $this->runQueueWorkerCommand(['--once' => true]);
+
+        $executionState = Cache::get('execution:return-1234');
+
+        $this->assertInstanceof(ExecutionState::class, $executionState);
+        $this->assertTrue($executionState->hasCompletedStep('get_data'));
+        $this->assertTrue($executionState->hasCompletedStep('update_database'));
+        $this->assertTrue($executionState->hasCompletedStep('send_email'));
+        $this->assertEquals(0, Cache::get('getData'));
+        $this->assertEquals(1, Cache::get('updateDatabase'));
+        $this->assertEquals(1, Cache::get('sendEmail'));
+    }
 }
 
 class TestResumableJob implements Resumable, ShouldQueue
@@ -166,5 +243,28 @@ class TestResumableJob implements Resumable, ShouldQueue
         }
 
         return $recipients;
+    }
+}
+
+class TestResumableJobWithCustomExecutionContext extends TestResumableJob
+{
+    public function __construct(
+        protected string $contextId,
+        int $userId,
+    ) {
+        parent::__construct($userId);
+    }
+
+    public function executionContextId(): mixed
+    {
+        return $this->contextId;
+    }
+}
+
+class TestResumableJobWithExecutionContextOptions extends TestResumableJobWithCustomExecutionContext
+{
+    public function executionContextOptions(): array
+    {
+        return ['ttl' => 60];
     }
 }
