@@ -167,6 +167,6 @@ class ResponseSequence
 
         $response = array_shift($this->responses);
 
-        return $response instanceof Closure ? $response($request) : $response;
+        return value($response, $request);
     }
 }
