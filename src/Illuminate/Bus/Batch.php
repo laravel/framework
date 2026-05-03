@@ -501,7 +501,13 @@ class Batch implements Arrayable, JsonSerializable
         $batch = $this->fresh();
 
         foreach ($this->options['interrupted'] as $handler) {
-            $handler($batch, $signal);
+            try {
+                $handler($batch, $signal);
+            } catch (Throwable $e) {
+                if (function_exists('report')) {
+                    report($e);
+                }
+            }
         }
     }
 
