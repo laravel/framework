@@ -161,6 +161,29 @@ class PendingBatch
     }
 
     /**
+     * Add a callback to be executed if any job in the batch is interrupted.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function interrupted($callback)
+    {
+        $this->registerCallback('interrupted', $callback);
+
+        return $this;
+    }
+
+    /**
+     * Get the "interrupted" callbacks that have been registered with the pending batch.
+     *
+     * @return array
+     */
+    public function interruptedCallbacks()
+    {
+        return $this->options['interrupted'] ?? [];
+    }
+
+    /**
      * Add a callback to be executed after all jobs in the batch have executed successfully.
      *
      * @param  callable  $callback

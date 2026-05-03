@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -870,6 +871,10 @@ class Worker
 
         if ($job instanceof Interruptible) {
             $job->interrupted($signal);
+        }
+
+        if (isset(class_uses_recursive($job)[Batchable::class])) {
+            $job->batch()?->interrupted($signal);
         }
     }
 

@@ -431,6 +431,16 @@ class Batch implements Arrayable, JsonSerializable
     }
 
     /**
+     * Determine if the batch has "interrupted" callbacks.
+     *
+     * @return bool
+     */
+    public function hasInterruptedCallbacks()
+    {
+        return isset($this->options['interrupted']) && ! empty($this->options['interrupted']);
+    }
+
+    /**
      * Cancel the batch.
      *
      * @param  \Throwable|null  $exception
@@ -475,6 +485,24 @@ class Batch implements Arrayable, JsonSerializable
     public function delete()
     {
         $this->repository->delete($this->id);
+    }
+
+    /**
+     * Handle the batch being interrupted.
+     * 
+     * @return void
+     */
+    public function interrupted(int $signal): void
+    {
+        if (! $this->hasInterruptedCallbacks()) {
+            return;
+        }
+
+        $batch = $this->fresh();
+
+        foreach ($this->options['interrupted'] as $handler) {
+            $handler($batch, $signal);
+        }
     }
 
     /**

@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\Interruptible;
 use Illuminate\Contracts\Queue\Job as QueueJobContract;
 use Illuminate\Queue\CallQueuedHandler;
@@ -532,6 +533,32 @@ class QueueWorkerTest extends TestCase
         $worker->notifyJobOfSignal(15);
 
         $this->assertSame(15, $interruptible->receivedSignal);
+    }
+
+    public function testBatchableJobBatchIsNotifiedOnSignal()
+    {
+        $batchable = new class
+        {
+            use Batchable;
+        };
+
+        [$batchable, $fakeBatch] = $batchable->withFakeBatch(options: [
+            'interrupted' => [function ($batch, $signal) use (&$receivedSignal) {
+                $receivedSignal = $signal;
+            }],
+        ]);
+
+        $handler = m::mock(CallQueuedHandler::class);
+        $handler->shouldReceive('getRunningCommand')->andReturn($batchable);
+
+        $worker = $this->getWorker('default', ['queue' => []]);
+        $job = new WorkerFakeJob;
+        $job->resolvedJob = $handler;
+
+        $worker->currentJob = $job;
+        $worker->notifyJobOfSignal(15);
+
+        $this->assertSame(15, $receivedSignal);
     }
 
     /**
