@@ -535,7 +535,7 @@ class QueueWorkerTest extends TestCase
         $this->assertSame(15, $interruptible->receivedSignal);
     }
 
-    public function testBatchableJobBatchIsNotifiedOnSignal()
+    public function testBatchIsNotifiedOnSignal()
     {
         $batchable = new class
         {
