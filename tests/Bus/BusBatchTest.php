@@ -636,11 +636,6 @@ class BusBatchTest extends TestCase
         $batch->options['then'] = [1];
         $this->assertTrue($batch->hasThenCallbacks());
 
-        $batch->options['interrupted'] = [];
-        $this->assertFalse($batch->hasInterruptedCallbacks());
-        $batch->options['interrupted'] = [1];
-        $this->assertTrue($batch->hasInterruptedCallbacks());
-
         $this->assertFalse($batch->allowsFailures());
         $batch->options['allowFailures'] = true;
         $this->assertTrue($batch->allowsFailures());

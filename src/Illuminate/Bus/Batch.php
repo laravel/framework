@@ -431,16 +431,6 @@ class Batch implements Arrayable, JsonSerializable
     }
 
     /**
-     * Determine if the batch has "interrupted" callbacks.
-     *
-     * @return bool
-     */
-    public function hasInterruptedCallbacks()
-    {
-        return isset($this->options['interrupted']) && ! empty($this->options['interrupted']);
-    }
-
-    /**
      * Cancel the batch.
      *
      * @param  \Throwable|null  $exception
