@@ -3,10 +3,10 @@
 namespace Illuminate\Tests\Queue;
 
 use Exception;
+use Illuminate\Bus\Batchable;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\Interruptible;
 use Illuminate\Contracts\Queue\Job as QueueJobContract;
 use Illuminate\Queue\CallQueuedHandler;
