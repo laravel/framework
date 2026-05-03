@@ -5818,8 +5818,6 @@ class SupportCollectionTest extends TestCase
         }));
     }
 
-
-
     #[DataProvider('collectionClassProvider')]
     public function testGetWithDefaultValue($collection)
     {
