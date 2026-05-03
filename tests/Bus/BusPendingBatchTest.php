@@ -40,6 +40,8 @@ class BusPendingBatchTest extends TestCase
             //
         })->catch(function () {
             //
+        })->interrupted(function () {
+            //
         })->allowFailures()->onConnection('test-connection')->onQueue('test-queue')->withOption('extra-option', 123);
 
         $this->assertSame('test-connection', $pendingBatch->connection());
@@ -48,6 +50,7 @@ class BusPendingBatchTest extends TestCase
         $this->assertCount(1, $pendingBatch->progressCallbacks());
         $this->assertCount(1, $pendingBatch->thenCallbacks());
         $this->assertCount(1, $pendingBatch->catchCallbacks());
+        $this->assertCount(1, $pendingBatch->interruptedCallbacks());
         $this->assertArrayHasKey('extra-option', $pendingBatch->options);
         $this->assertSame(123, $pendingBatch->options['extra-option']);
 

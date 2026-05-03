@@ -520,6 +520,58 @@ class BusBatchTest extends TestCase
         $this->assertEquals(2, $_SERVER['__failure3.param_count']);
     }
 
+    public function test_interrupted_callbacks_execute_correctly(): void
+    {
+        $queue = m::mock(Factory::class);
+
+        $repository = new DatabaseBatchRepository(new BatchFactory($queue), DB::connection(), 'job_batches');
+
+        $pendingBatch = (new PendingBatch(new Container, collect()))
+            ->interrupted(static fn (Batch $batch, int $signal): true => $_SERVER['__interrupted1.invoked'] = true)
+            ->interrupted(function (Batch $batch, int $signal) {
+                $_SERVER['__interrupted2.invoked'] = true;
+            })
+            ->interrupted(function (Batch $batch, int $signal) {
+                $_SERVER['__interrupted3.batch'] = $batch;
+                $_SERVER['__interrupted3.signal'] = $signal;
+                $_SERVER['__interrupted3.batch_id'] = $batch->id;
+                $_SERVER['__interrupted3.batch_class'] = get_class($batch);
+                $_SERVER['__interrupted3.param_count'] = func_num_args();
+            })
+            ->onConnection('test-connection')
+            ->onQueue('test-queue');
+
+        $batch = $repository->store($pendingBatch);
+
+        $job = new class
+        {
+            use Batchable;
+        };
+
+        $queue->shouldReceive('connection')->once()
+            ->with('test-connection')
+            ->andReturn($connection = m::mock(stdClass::class));
+
+        $connection->shouldReceive('bulk')->once();
+
+        $batch = $batch->add([$job]);
+
+        $_SERVER['__interrupted1.invoked'] = false;
+        $_SERVER['__interrupted2.invoked'] = false;
+        $_SERVER['__interrupted3.batch'] = null;
+        $_SERVER['__interrupted3.signal'] = null;
+
+        $batch->interrupted(15);
+
+        $this->assertTrue($_SERVER['__interrupted1.invoked']);
+        $this->assertTrue($_SERVER['__interrupted2.invoked']);
+        $this->assertInstanceOf(Batch::class, $_SERVER['__interrupted3.batch']);
+        $this->assertSame(15, $_SERVER['__interrupted3.signal']);
+        $this->assertSame($batch->id, $_SERVER['__interrupted3.batch_id']);
+        $this->assertSame(Batch::class, $_SERVER['__interrupted3.batch_class']);
+        $this->assertEquals(2, $_SERVER['__interrupted3.param_count']);
+    }
+
     public function test_batch_can_be_cancelled()
     {
         $queue = m::mock(Factory::class);
@@ -583,6 +635,11 @@ class BusBatchTest extends TestCase
         $this->assertFalse($batch->hasThenCallbacks());
         $batch->options['then'] = [1];
         $this->assertTrue($batch->hasThenCallbacks());
+
+        $batch->options['interrupted'] = [];
+        $this->assertFalse($batch->hasInterruptedCallbacks());
+        $batch->options['interrupted'] = [1];
+        $this->assertTrue($batch->hasInterruptedCallbacks());
 
         $this->assertFalse($batch->allowsFailures());
         $batch->options['allowFailures'] = true;
