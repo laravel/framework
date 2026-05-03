@@ -5802,6 +5802,25 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testGetWithNullKeyAndDefaultValue($collection)
+    {
+        $data = new $collection([1, 2, 3]);
+        $this->assertSame('fallback', $data->get(null, 'fallback'));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testGetWithNullKeyAndCallbackDefaultValue($collection)
+    {
+        $data = new $collection([1, 2, 3]);
+
+        $this->assertSame('fallback', $data->get(null, function () {
+            return 'fallback';
+        }));
+    }
+
+
+
+    #[DataProvider('collectionClassProvider')]
     public function testGetWithDefaultValue($collection)
     {
         $data = new $collection(['name' => 'taylor', 'framework' => 'laravel']);
