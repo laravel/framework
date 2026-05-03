@@ -489,18 +489,14 @@ class Batch implements Arrayable, JsonSerializable
 
     /**
      * Handle the batch being interrupted.
-     * 
+     *
      * @return void
      */
     public function interrupted(int $signal): void
     {
-        if (! $this->hasInterruptedCallbacks()) {
-            return;
-        }
-
         $batch = $this->fresh();
 
-        foreach ($this->options['interrupted'] as $handler) {
+        foreach ($this->options['interrupted'] ?? [] as $handler) {
             try {
                 $handler($batch, $signal);
             } catch (Throwable $e) {
