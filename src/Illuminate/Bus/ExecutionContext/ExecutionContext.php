@@ -23,7 +23,7 @@ class ExecutionContext
         protected ExecutionRepositoryContract $executionRepository,
         protected ?Dispatcher $eventDispatcher = null,
         mixed $id = null,
-        protected array $options = [],
+        protected $options = [],
     ) {
         if ($id instanceof ExecutionState) {
             $this->state = $id;
@@ -40,7 +40,7 @@ class ExecutionContext
      * @param  array{ttl?:  \DateTimeInterface|\DateInterval|int|null}  $options
      * @return mixed
      */
-    public function step(string $name, callable $callback, array $options = []): mixed
+    public function step(string $name, callable $callback, $options = []): mixed
     {
         if ($this->state->hasCompletedStep($name)) {
             return $this->state->resultFor($name);

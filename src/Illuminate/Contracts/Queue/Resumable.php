@@ -11,5 +11,9 @@ interface Resumable
      */
     public function executionContextId(): mixed;
 
+    /**
+     * @param  ExecutionContext  $context
+     * @return static
+     */
     public function setExecutionContext(ExecutionContext $context);
 }
