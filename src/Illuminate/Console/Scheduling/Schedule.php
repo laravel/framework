@@ -430,7 +430,7 @@ class Schedule
     }
 
     /**
-     * Get all of the events on the schedule which run on the provided environments.
+     * Get all of the events on the schedule which run on any of the provided environments.
      *
      * @param  list<string>  $environments
      * @return \Illuminate\Console\Scheduling\Event[]
