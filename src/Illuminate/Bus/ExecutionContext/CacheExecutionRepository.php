@@ -30,9 +30,9 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
     {
         $id = $id instanceof ExecutionState ? $id->id() : $id;
 
-        $steps = $this->getCache()->has($this->determineExecutionStepsCacheKey($id));
+        $metadata = $this->getExecutionMetadata($id);
 
-        return $steps === false ? null : new ExecutionState($id);
+        return $metadata === null ? null : new ExecutionState($id, ttl: $metadata['ttl'] ?? null);
     }
 
     /**
@@ -42,9 +42,13 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
     #[\Override]
     public function create($id, $ttl = null)
     {
-        $executionState = $id instanceof ExecutionState ? $id : new ExecutionState($id);
+        $executionState = $id instanceof ExecutionState ? $id : new ExecutionState($id, ttl: $ttl);
 
-        $this->saveExecutionSteps($executionState, [], $ttl);
+        $this->saveExecutionMetadata($executionState, [
+            'ttl' => $executionState->ttl(),
+        ], $executionState->ttl());
+
+        $this->saveExecutionSteps($executionState, []);
 
         return $executionState;
     }
@@ -58,12 +62,14 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
     #[\Override]
     public function saveStep($state, $stepResult, $ttl = null): void
     {
+        $ttl ??= $this->defaultTtl($state);
+
         $this->getCache()->put($this->determineStepCacheKey($state, $stepResult->name), $stepResult, $ttl);
 
         $currentSteps = $this->getExecutionSteps($state);
         if (! in_array($stepResult->name, $currentSteps, true)) {
             $currentSteps[] = $stepResult->name;
-            $this->saveExecutionSteps($state, $currentSteps, $ttl);
+            $this->saveExecutionSteps($state, $currentSteps);
         }
     }
 
@@ -87,6 +93,7 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
             $this->deleteSteps($id, $stepsToDelete);
         }
 
+        $this->getCache()->forget($this->determineCacheKey($id));
         $this->getCache()->forget($this->determineExecutionStepsCacheKey($id));
     }
 
@@ -108,9 +115,15 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
         $this->saveExecutionSteps($stateId, $remainingSteps);
     }
 
-    protected function saveExecutionSteps($stateId, array $steps, $ttl = null): void
+    protected function saveExecutionSteps($stateId, array $steps): void
     {
-        $this->getCache()->put($this->determineExecutionStepsCacheKey($stateId), $steps, $ttl);
+        $ttl = $this->defaultTtl($stateId);
+
+        $this->getCache()->put(
+            $this->determineExecutionStepsCacheKey($stateId),
+            array_values(array_unique($steps)),
+            $ttl,
+        );
     }
 
     /**
@@ -120,6 +133,25 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
     protected function getExecutionSteps($stateId): array
     {
         return (array) $this->getCache()->get($this->determineExecutionStepsCacheKey($stateId), []);
+    }
+
+    protected function getExecutionMetadata($stateId): ?array
+    {
+        return $this->getCache()->get($this->determineCacheKey($stateId));
+    }
+
+    protected function saveExecutionMetadata($stateId, array $metadata, $ttl = null): void
+    {
+        $this->getCache()->put($this->determineCacheKey($stateId), $metadata, $ttl);
+    }
+
+    protected function defaultTtl($stateId)
+    {
+        if ($stateId instanceof ExecutionState) {
+            return $stateId->ttl();
+        }
+
+        return $this->getExecutionMetadata($stateId)['ttl'] ?? null;
     }
 
     protected function determineExecutionStepsCacheKey($stateId): string

@@ -12,6 +12,7 @@ class ExecutionState
     public function __construct(
         protected mixed $id,
         protected array $data = [],
+        protected mixed $ttl = null,
     ) {
     }
 
@@ -23,6 +24,11 @@ class ExecutionState
     public function all(): array
     {
         return $this->data;
+    }
+
+    public function ttl(): mixed
+    {
+        return $this->ttl;
     }
 
     public function hasCompletedStep(string $name): bool
@@ -45,6 +51,7 @@ class ExecutionState
         return [
             'id' => $this->serializeValue($this->id),
             'data' => $this->serializeValue($this->data),
+            'ttl' => $this->serializeValue($this->ttl),
         ];
     }
 
@@ -52,6 +59,7 @@ class ExecutionState
     {
         $this->id = $this->restoreValue($values['id']);
         $this->data = $this->restoreValue($values['data']);
+        $this->ttl = $this->restoreValue($values['ttl'] ?? null);
     }
 
     protected function serializeValue(mixed $value): mixed

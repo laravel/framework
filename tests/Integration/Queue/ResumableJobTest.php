@@ -41,11 +41,21 @@ class ResumableJobTest extends QueueTestCase
 
     protected function assertExecutionHasCompletedSteps($id, array $steps): void
     {
-        $this->assertSame($steps, Cache::get('execution:'.$id.':steps'));
+        $this->assertSame($steps, $this->cachedExecutionSteps($id));
 
         foreach ($steps as $step) {
             $this->assertInstanceOf(ExecutionStepResult::class, $this->cachedStepResult($id, $step));
         }
+    }
+
+    protected function cachedExecutionMetadata($id): ?array
+    {
+        return Cache::get('execution:'.$id);
+    }
+
+    protected function cachedExecutionSteps($id): ?array
+    {
+        return Cache::get('execution:'.$id.':steps');
     }
 
     protected function cachedStepResult($id, string $step): ?ExecutionStepResult
@@ -95,7 +105,8 @@ class ResumableJobTest extends QueueTestCase
         $this->assertEquals(1, Cache::get('updateDatabase'));
         $this->assertEquals(1, Cache::get('sendEmail'));
         Mail::assertSentCount(2);
-        $this->assertNull(Cache::get('execution:'.$uuid.':steps'));
+        $this->assertNull($this->cachedExecutionMetadata($uuid));
+        $this->assertNull($this->cachedExecutionSteps($uuid));
         $this->assertNull($this->cachedStepResult($uuid, 'get_data'));
         $this->assertNull($this->cachedStepResult($uuid, 'update_database'));
         $this->assertNull($this->cachedStepResult($uuid, 'send_email'));
@@ -163,11 +174,18 @@ class ResumableJobTest extends QueueTestCase
         TestResumableJobWithExecutionContextOptions::dispatch('return-1234', 1234);
         $this->runQueueWorkerCommand(['--once' => true]);
 
-        $this->assertSame(['get_data', 'update_database', 'send_email'], Cache::get('execution:return-1234:steps'));
+        $this->assertSame([
+            'ttl' => 60,
+        ], $this->cachedExecutionMetadata('return-1234'));
+        $this->assertSame(['get_data', 'update_database', 'send_email'], $this->cachedExecutionSteps('return-1234'));
+        $this->assertInstanceOf(ExecutionStepResult::class, $this->cachedStepResult('return-1234', 'get_data'));
+        $this->assertInstanceOf(ExecutionStepResult::class, $this->cachedStepResult('return-1234', 'update_database'));
+        $this->assertInstanceOf(ExecutionStepResult::class, $this->cachedStepResult('return-1234', 'send_email'));
 
         $this->travelTo('2025-06-29T00:01:02.000Z');
 
-        $this->assertNull(Cache::get('execution:return-1234:steps'));
+        $this->assertNull($this->cachedExecutionMetadata('return-1234'));
+        $this->assertNull($this->cachedExecutionSteps('return-1234'));
         $this->assertNull($this->cachedStepResult('return-1234', 'get_data'));
         $this->assertNull($this->cachedStepResult('return-1234', 'update_database'));
         $this->assertNull($this->cachedStepResult('return-1234', 'send_email'));
@@ -178,6 +196,9 @@ class ResumableJobTest extends QueueTestCase
         Mail::fake();
         Event::fake();
 
+        Cache::put('execution:return-1234', [
+            'ttl' => null,
+        ]);
         Cache::put('execution:return-1234:steps', ['get_data']);
         Cache::put('execution:return-1234:step:get_data', new ExecutionStepResult('return-1234', 'get_data', 1, [
             'data' => [

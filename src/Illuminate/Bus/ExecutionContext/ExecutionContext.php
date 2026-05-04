@@ -67,7 +67,7 @@ class ExecutionContext
 
         $this->state->recordStepResult($stepResult);
 
-        $this->executionRepository->saveStep($this->state, $stepResult, $options['ttl'] ?? $this->options['ttl'] ?? null);
+        $this->executionRepository->saveStep($this->state, $stepResult, $options['ttl'] ?? null);
 
         $this->eventDispatcher?->dispatch(new StepCompleted($this->state, $name, $result, $stepResult->completedAt));
 
