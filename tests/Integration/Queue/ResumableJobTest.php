@@ -105,8 +105,8 @@ class ResumableJobTest extends QueueTestCase
             'update_database' => $now,
             'send_email' => $now,
         ], (new Collection($executionState->all()))->mapWithKeys(function ($value, $key) {
-                return [$key => $value['completed_at']];
-            })->all()
+            return [$key => $value['completed_at']];
+        })->all()
         );
     }
 
@@ -274,7 +274,7 @@ class TestResumableJob implements Resumable, ShouldQueue
         $recipients = [];
 
         $users = $this->context->getState()->resultFor('get_data')['data'];
-        foreach($users as $user) {
+        foreach ($users as $user) {
             Mail::to($user['email'])->send((new Mailable)->subject('test email: '.$this->userId));
             $recipients[] = $user['id'];
         }

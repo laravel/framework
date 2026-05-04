@@ -29,8 +29,7 @@ class ExecutionContext
     ) {
         if ($id instanceof ExecutionState) {
             $this->state = $id;
-        }
-        else {
+        } else {
             $this->state = $this->executionRepository->find($id)
                 ?? $this->executionRepository->create($id ?? Str::random(32), $options['ttl'] ?? null);
         }
@@ -41,6 +40,8 @@ class ExecutionContext
      * @param  callable  $callback
      * @param  array{ttl?:  \DateTimeInterface|\DateInterval|int|null}  $options
      * @return mixed
+     *
+     * @throws \Throwable
      */
     public function step(string $name, callable $callback, $options = []): mixed
     {
