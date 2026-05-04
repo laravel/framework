@@ -72,6 +72,22 @@ class ResumableJobTest extends QueueTestCase
         $this->assertTrue($executionState->hasCompletedStep('send_email'));
     }
 
+    public function test_job_deletes_execution_context_when_completed_successfully()
+    {
+        $uuid = Str::freezeUuids();
+        Mail::fake();
+        Event::fake();
+
+        TestResumableJobDeletingContextWhenCompleted::dispatch(1234);
+        $this->runQueueWorkerCommand(['--once' => true]);
+
+        $this->assertEquals(1, Cache::get('getData'));
+        $this->assertEquals(1, Cache::get('updateDatabase'));
+        $this->assertEquals(1, Cache::get('sendEmail'));
+        Mail::assertSentCount(2);
+        $this->assertNull(Cache::get('execution:'.$uuid));
+    }
+
     public function test_job_writes_completed_at_to_execution_state()
     {
         $uuid = Str::freezeUuids();
@@ -280,6 +296,11 @@ class TestResumableJobWithCustomExecutionContext extends TestResumableJob
     {
         return $this->contextId;
     }
+}
+
+class TestResumableJobDeletingContextWhenCompleted extends TestResumableJob
+{
+    public bool $deleteContextWhenCompleted = true;
 }
 
 class TestResumableJobWithExecutionContextOptions extends TestResumableJobWithCustomExecutionContext
