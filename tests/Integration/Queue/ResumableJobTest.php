@@ -175,7 +175,7 @@ class ResumableJobTest extends QueueTestCase
         $this->runQueueWorkerCommand(['--once' => true]);
 
         $this->assertSame([
-            'ttl' => 60,
+            'options' => ['ttl' => 60],
         ], $this->cachedExecutionMetadata('return-1234'));
         $this->assertSame(['get_data', 'update_database', 'send_email'], $this->cachedExecutionSteps('return-1234'));
         $this->assertInstanceOf(ExecutionStepResult::class, $this->cachedStepResult('return-1234', 'get_data'));
@@ -197,7 +197,7 @@ class ResumableJobTest extends QueueTestCase
         Event::fake();
 
         Cache::put('execution:return-1234', [
-            'ttl' => null,
+            'options' => ['ttl' => null],
         ]);
         Cache::put('execution:return-1234:steps', ['get_data']);
         Cache::put('execution:return-1234:step:get_data', new ExecutionStepResult('return-1234', 'get_data', 1, [

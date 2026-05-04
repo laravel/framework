@@ -15,10 +15,10 @@ interface ExecutionRepository
      * Store the ExecutionState.
      *
      * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $id
-     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  array  $options
      * @return \Illuminate\Bus\ExecutionContext\ExecutionState
      */
-    public function create($id, $ttl = null);
+    public function create($id, $options = []);
 
     /**
      * Get the result of an individual step if it exists.

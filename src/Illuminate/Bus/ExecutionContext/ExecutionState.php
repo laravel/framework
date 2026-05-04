@@ -2,17 +2,12 @@
 
 namespace Illuminate\Bus\ExecutionContext;
 
-use Illuminate\Queue\SerializesAndRestoresModelIdentifiers;
-use Illuminate\Support\Collection;
-
 class ExecutionState
 {
-    use SerializesAndRestoresModelIdentifiers;
-
     public function __construct(
         protected mixed $id,
         protected array $data = [],
-        protected mixed $ttl = null,
+        protected array $options = [],
     ) {
     }
 
@@ -26,9 +21,14 @@ class ExecutionState
         return $this->data;
     }
 
-    public function ttl(): mixed
+    public function options(): array
     {
-        return $this->ttl;
+        return $this->options;
+    }
+
+    public function option(string $key, mixed $default = null): mixed
+    {
+        return $this->options[$key] ?? $default;
     }
 
     public function hasCompletedStep(string $name): bool
@@ -49,54 +49,16 @@ class ExecutionState
     public function __serialize(): array
     {
         return [
-            'id' => $this->serializeValue($this->id),
-            'data' => $this->serializeValue($this->data),
-            'ttl' => $this->serializeValue($this->ttl),
+            'id' => $this->id,
+            'data' => $this->data,
+            'options' => $this->options,
         ];
     }
 
     public function __unserialize(array $values): void
     {
-        $this->id = $this->restoreValue($values['id']);
-        $this->data = $this->restoreValue($values['data']);
-        $this->ttl = $this->restoreValue($values['ttl'] ?? null);
-    }
-
-    protected function serializeValue(mixed $value): mixed
-    {
-        $value = $this->getSerializedPropertyValue($value);
-
-        if (is_array($value)) {
-            foreach ($value as $key => $nestedValue) {
-                $value[$key] = $this->serializeValue($nestedValue);
-            }
-
-            return $value;
-        }
-
-        if ($value instanceof Collection) {
-            return $value->map(fn ($nestedValue) => $this->serializeValue($nestedValue));
-        }
-
-        return $value;
-    }
-
-    protected function restoreValue(mixed $value): mixed
-    {
-        $value = $this->getRestoredPropertyValue($value);
-
-        if (is_array($value)) {
-            foreach ($value as $key => $nestedValue) {
-                $value[$key] = $this->restoreValue($nestedValue);
-            }
-
-            return $value;
-        }
-
-        if ($value instanceof Collection) {
-            return $value->map(fn ($nestedValue) => $this->restoreValue($nestedValue));
-        }
-
-        return $value;
+        $this->id = $values['id'];
+        $this->data = $values['data'];
+        $this->options = $values['options'] ?? [];
     }
 }

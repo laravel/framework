@@ -32,21 +32,21 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
 
         $metadata = $this->getExecutionMetadata($id);
 
-        return $metadata === null ? null : new ExecutionState($id, ttl: $metadata['ttl'] ?? null);
+        return $metadata === null ? null : new ExecutionState($id, options: $metadata['options'] ?? []);
     }
 
     /**
      * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $id
-     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  array  $options
      */
     #[\Override]
-    public function create($id, $ttl = null)
+    public function create($id, $options = [])
     {
-        $executionState = $id instanceof ExecutionState ? $id : new ExecutionState($id, ttl: $ttl);
+        $executionState = $id instanceof ExecutionState ? $id : new ExecutionState($id, options: $options);
 
         $this->saveExecutionMetadata($executionState, [
-            'ttl' => $executionState->ttl(),
-        ], $executionState->ttl());
+            'options' => $executionState->options(),
+        ], $executionState->option('ttl'));
 
         $this->saveExecutionSteps($executionState, []);
 
@@ -148,10 +148,10 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
     protected function defaultTtl($stateId)
     {
         if ($stateId instanceof ExecutionState) {
-            return $stateId->ttl();
+            return $stateId->option('ttl');
         }
 
-        return $this->getExecutionMetadata($stateId)['ttl'] ?? null;
+        return $this->getExecutionMetadata($stateId)['options']['ttl'] ?? null;
     }
 
     protected function determineExecutionStepsCacheKey($stateId): string

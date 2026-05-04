@@ -11,6 +11,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Throwable;
 
+use function array_key_exists;
+
 class ExecutionContext
 {
     protected ExecutionState $state;
@@ -27,11 +29,13 @@ class ExecutionContext
         mixed $id = null,
         protected $options = [],
     ) {
+        $this->options = $this->normalizeOptions($options);
+
         if ($id instanceof ExecutionState) {
             $this->state = $id;
         } else {
             $this->state = $this->executionRepository->find($id)
-                ?? $this->executionRepository->create($id ?? Str::random(32), value($options['ttl'] ?? null));
+                ?? $this->executionRepository->create($id ?? Str::random(32), $this->options);
         }
     }
 
@@ -67,9 +71,9 @@ class ExecutionContext
 
         $this->state->recordStepResult($stepResult);
 
-        $this->executionRepository->saveStep($this->state, $stepResult, $options['ttl'] ?? null);
+        $this->executionRepository->saveStep($this->state, $stepResult, value($options['ttl'] ?? null, $stepResult));
 
-        $this->eventDispatcher?->dispatch(new StepCompleted($this->state, $name, $result, $stepResult->completedAt));
+        $this->eventDispatcher?->dispatch(new StepCompleted($this->state, $name, $stepResult));
 
         return $result;
     }
@@ -98,5 +102,14 @@ class ExecutionContext
     public function getState(): ExecutionState
     {
         return $this->state;
+    }
+
+    protected function normalizeOptions(array $options): array
+    {
+        if (array_key_exists('ttl', $options)) {
+            $options['ttl'] = value($options['ttl']);
+        }
+
+        return $options;
     }
 }
