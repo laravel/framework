@@ -30,7 +30,7 @@ class WorkCommandTest extends QueueTestCase
             FirstJob::$ran = false;
             SecondJob::$ran = false;
             ThirdJob::$ran = false;
-            Worker::flushGroups();
+            Worker::flushQueueGroups();
         });
 
         parent::setUp();
@@ -262,9 +262,9 @@ class WorkCommandTest extends QueueTestCase
         $this->assertSame(2, substr_count(Artisan::output(), JobWillFail::class));
     }
 
-    public function testGroup()
+    public function testQueueGroup()
     {
-        Worker::group('critical', ['payments', 'notifications']);
+        Worker::queueGroup('critical', ['payments', 'notifications']);
 
         Queue::push(new FirstJob, '', 'payments');
         Queue::push(new SecondJob, '', 'notifications');

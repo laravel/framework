@@ -118,11 +118,11 @@ class Worker
     protected static $popCallbacks = [];
 
     /**
-     * The registered queue groups.
+     * The registered queue name groups.
      *
      * @var array<string, array<int, string>>
      */
-    protected static $groups = [];
+    protected static $queueGroups = [];
 
     /**
      * The custom exit code to be used when memory is exceeded.
@@ -421,7 +421,7 @@ class Worker
             $queues = [];
 
             foreach (explode(',', $queue) as $name) {
-                $queues = array_merge($queues, static::resolveGroup($name));
+                $queues = array_merge($queues, static::resolveQueueGroup($name));
             }
 
             foreach ($queues as $index => $queue) {
@@ -1021,15 +1021,15 @@ class Worker
     }
 
     /**
-     * Register a queue group for the worker.
+     * Register a named group of queues for the worker.
      *
      * @param  string  $name
      * @param  array  $queues
      * @return void
      */
-    public static function group($name, array $queues)
+    public static function queueGroup($name, array $queues)
     {
-        static::$groups[$name] = $queues;
+        static::$queueGroups[$name] = $queues;
     }
 
     /**
@@ -1037,9 +1037,9 @@ class Worker
      *
      * @return void
      */
-    public static function flushGroups()
+    public static function flushQueueGroups()
     {
-        static::$groups = [];
+        static::$queueGroups = [];
     }
 
     /**
@@ -1048,9 +1048,9 @@ class Worker
      * @param  string  $name
      * @return array
      */
-    public static function resolveGroup($name)
+    public static function resolveQueueGroup($name)
     {
-        return static::$groups[$name] ?? [$name];
+        return static::$queueGroups[$name] ?? [$name];
     }
 
     /**

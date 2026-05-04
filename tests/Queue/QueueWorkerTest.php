@@ -50,8 +50,6 @@ class QueueWorkerTest extends TestCase
 
         Container::setInstance();
 
-        Worker::flushGroups();
-
         parent::tearDown();
     }
 
