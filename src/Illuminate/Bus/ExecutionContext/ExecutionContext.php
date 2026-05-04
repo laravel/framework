@@ -40,15 +40,21 @@ class ExecutionContext
     }
 
     /**
+     * @template TReturn
+     *
      * @param  string  $name
-     * @param  callable  $callback
+     * @param  (callable(): TReturn)  $callback
      * @param  array{ttl?:  \DateTimeInterface|\DateInterval|int|null}  $options
-     * @return mixed
+     * @return TReturn
      *
      * @throws \Throwable
      */
     public function step(string $name, callable $callback, $options = []): mixed
     {
+        if ($this->state->hasCompletedStep($name)) {
+            return $this->state->resultFor($name);
+        }
+
         $stepResult = $this->executionRepository->getStep($this->state, $name);
 
         if ($stepResult !== null) {
@@ -58,7 +64,6 @@ class ExecutionContext
         }
 
         $this->eventDispatcher?->dispatch(new StepStarting($this->state, $name));
-
         try {
             $result = $callback();
         } catch (Throwable $e) {
@@ -70,7 +75,6 @@ class ExecutionContext
         $stepResult = new ExecutionStepResult($this->state->id(), $name, Carbon::now()->getTimestamp(), $result);
 
         $this->state->recordStepResult($stepResult);
-
         $this->executionRepository->saveStep($this->state, $stepResult, value($options['ttl'] ?? null, $stepResult));
 
         $this->eventDispatcher?->dispatch(new StepCompleted($this->state, $name, $stepResult));
@@ -78,13 +82,17 @@ class ExecutionContext
         return $result;
     }
 
+    /**
+     * Forget an individual step so it can be reassessed.
+     *
+     * @param  string  $name
+     * @return void
+     */
     public function forgetStep(string $name): void
     {
-        if ($this->executionRepository->getStep($this->state, $name) === null) {
-            return;
-        }
-
         $this->executionRepository->deleteStep($this->state, $name);
+
+        $this->state->forgetStep($name);
     }
 
     /**
@@ -94,9 +102,7 @@ class ExecutionContext
      */
     public function delete()
     {
-        // @todo get steps and delete
-
-        $this->executionRepository->delete($this->state->id());
+        $this->executionRepository->delete($this->state);
     }
 
     public function getState(): ExecutionState

@@ -87,6 +87,43 @@ class ExecutionContextTest extends TestCase
         $this->assertCount(1, $repository->savedSteps);
     }
 
+    public function testForgetStepAllowsStepToRunAgain()
+    {
+        $repository = new ExecutionContextRecordingExecutionRepository;
+        $state = new ExecutionState('execution-1');
+        $context = new ExecutionContext($repository, null, $state);
+        $runs = 0;
+
+        $firstResult = $context->step('fetch-products', static function () use (&$runs) {
+            $runs++;
+
+            return 'result-'.$runs;
+        });
+
+        $cachedResult = $context->step('fetch-products', static function () use (&$runs) {
+            $runs++;
+
+            return 'result-'.$runs;
+        });
+
+        $context->forgetStep('fetch-products');
+
+        $forgottenResult = $context->step('fetch-products', static function () use (&$runs) {
+            $runs++;
+
+            return 'result-'.$runs;
+        });
+
+        $this->assertSame('result-1', $firstResult);
+        $this->assertSame('result-1', $cachedResult);
+        $this->assertSame('result-2', $forgottenResult);
+        $this->assertSame(2, $runs);
+        $this->assertSame([
+            ['state' => $state, 'name' => 'fetch-products'],
+        ], $repository->deletedSteps);
+        $this->assertCount(2, $repository->savedSteps);
+    }
+
     public function testStepDispatchesFailedEventWhenCallbackThrows()
     {
         $events = $this->fakeEvents();
@@ -273,6 +310,8 @@ class ExecutionContextRecordingExecutionRepository implements ExecutionRepositor
 
     public array $deletes = [];
 
+    public array $deletedSteps = [];
+
     public array $finds = [];
 
     public array $savedSteps = [];
@@ -329,7 +368,11 @@ class ExecutionContextRecordingExecutionRepository implements ExecutionRepositor
 
     public function deleteStep($stateId, $name): void
     {
-        //
+        $this->deletedSteps[] = ['state' => $stateId, 'name' => $name];
+
+        if ($stateId instanceof ExecutionState) {
+            $stateId->forgetStep($name);
+        }
     }
 
     public function deleteSteps($stateId, $steps): void
