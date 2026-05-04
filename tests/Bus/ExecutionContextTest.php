@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Bus;
 
 use Illuminate\Bus\Events\StepCompleted;
+use Illuminate\Bus\Events\StepFailed;
 use Illuminate\Bus\Events\StepStarting;
 use Illuminate\Bus\ExecutionContext\CacheExecutionRepository;
 use Illuminate\Bus\ExecutionContext\ExecutionContext;
@@ -16,6 +17,7 @@ use Illuminate\Events\Dispatcher as BaseEventDispatcher;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class ExecutionContextTest extends TestCase
 {
@@ -80,6 +82,31 @@ class ExecutionContextTest extends TestCase
         $events->assertDispatchedTimes(StepStarting::class, 1);
         $events->assertDispatchedTimes(StepCompleted::class, 1);
         $this->assertCount(1, $repository->savedSteps);
+    }
+
+    public function testStepDispatchesFailedEventWhenCallbackThrows()
+    {
+        $events = $this->fakeEvents();
+        $repository = new ExecutionContextRecordingExecutionRepository;
+        $state = new ExecutionState('execution-1');
+        $context = new ExecutionContext($repository, $events, $state);
+        $exception = new RuntimeException('Unable to fetch products.');
+
+        try {
+            $context->step('fetch-products', static fn () => throw $exception);
+
+            $this->fail('The step callback exception was not thrown.');
+        } catch (RuntimeException $e) {
+            $this->assertSame($exception, $e);
+        }
+
+        $events->assertDispatched(StepFailed::class, function (StepFailed $event) use ($exception, $state) {
+            return $event->state === $state
+                && $event->step === 'fetch-products'
+                && $event->exception === $exception;
+        });
+        $events->assertNotDispatched(StepCompleted::class);
+        $this->assertSame([], $repository->savedSteps);
     }
 
     public function testStepPassesTtlOptionToRepository()
@@ -228,4 +255,3 @@ class ExecutionContextRecordingExecutionRepository implements ExecutionRepositor
         unset($this->states[$id instanceof ExecutionState ? $id->id() : $id]);
     }
 }
-

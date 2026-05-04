@@ -3,11 +3,13 @@
 namespace Illuminate\Bus\ExecutionContext;
 
 use Illuminate\Bus\Events\StepCompleted;
+use Illuminate\Bus\Events\StepFailed;
 use Illuminate\Bus\Events\StepStarting;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Workflow\ExecutionRepository as ExecutionRepositoryContract;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Throwable;
 
 class ExecutionContext
 {
@@ -48,7 +50,13 @@ class ExecutionContext
 
         $this->eventDispatcher?->dispatch(new StepStarting($this->state, $name));
 
-        $result = $callback();
+        try {
+            $result = $callback();
+        } catch (Throwable $e) {
+            $this->eventDispatcher?->dispatch(new StepFailed($this->state, $name, $e));
+
+            throw $e;
+        }
 
         $this->state->recordStepResult($name, $result, $completedAt = Carbon::now()->getTimestamp());
 
