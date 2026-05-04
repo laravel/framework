@@ -805,16 +805,20 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Get the min value of a given key.
      *
-     * @param  (callable(TValue):mixed)|string|null  $callback
-     * @return mixed
+     * @template TMinResult = mixed
+     *
+     * @param  (callable(TValue): TMinResult)|string|null  $callback
+     * @return ?TMinResult
      */
     public function min($callback = null);
 
     /**
      * Get the max value of a given key.
      *
-     * @param  (callable(TValue):mixed)|string|null  $callback
-     * @return mixed
+     * @template TMaxResult = mixed
+     *
+     * @param  (callable(TValue): TMaxResult)|string|null  $callback
+     * @return ?TMaxResult
      */
     public function max($callback = null);
 

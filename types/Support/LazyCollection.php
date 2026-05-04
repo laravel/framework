@@ -554,20 +554,20 @@ assertType('Illuminate\Support\LazyCollection<string, string>', $collection::mak
 assertType('mixed', $collection::make()->min());
 assertType('mixed', $collection::make([1])->min());
 assertType('mixed', $collection::make([1])->min('string'));
-assertType('mixed', $collection::make([1])->min(function ($int) {
+assertType('int|null', $collection::make([1])->min(function ($int) {
     assertType('int', $int);
 
-    return 1;
+    return $int;
 }));
 assertType('mixed', $collection::make([new User])->min('id'));
 
 assertType('mixed', $collection::make()->max());
 assertType('mixed', $collection::make([1])->max());
 assertType('mixed', $collection::make([1])->max('string'));
-assertType('mixed', $collection::make([1])->max(function ($int) {
+assertType('int|null', $collection::make([1])->max(function ($int) {
     assertType('int', $int);
 
-    return 1;
+    return $int;
 }));
 assertType('mixed', $collection::make([new User])->max('id'));
 
