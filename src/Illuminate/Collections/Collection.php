@@ -1619,10 +1619,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
                 $prop = $comparison[0];
 
-                $direction = match (Arr::get($comparison, 1, true)) {
-                    true, 'asc', SortDirection::Ascending => SortDirection::Ascending,
-                    false, 'desc', SortDirection::Descending => SortDirection::Descending,
-                    default => SortDirection::Descending, // for backwards compatibility
+                $direction = match (Arr::get($comparison, 1, SortDirection::Ascending)) {
+                    'asc', SortDirection::Ascending => SortDirection::Ascending,
+                    'desc', SortDirection::Descending => SortDirection::Descending,
                 };
 
                 if (! is_string($prop) && is_callable($prop)) {
