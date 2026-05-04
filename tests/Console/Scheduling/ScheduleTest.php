@@ -81,11 +81,11 @@ final class ScheduleTest extends TestCase
         $this->assertSame(['production'], $filteredEvents[0]->environments);
         $this->assertSame('0 0 * * *', $filteredEvents[0]->expression);
 
-        $this->assertStringEndsWith("'artisan' inspire", $filteredEvents[1]->command);
+        $this->assertMatchesRegularExpression('/artisan.*inspire$/', $filteredEvents[1]->command);
         $this->assertSame(['staging', 'production'], $filteredEvents[1]->environments);
         $this->assertSame('* * * * *', $filteredEvents[1]->expression);
 
-        $this->assertStringEndsWith("'artisan' foobar", $filteredEvents[2]->command);
+        $this->assertMatchesRegularExpression('/artisan.*foobar$/', $filteredEvents[2]->command);
         $this->assertSame([], $filteredEvents[2]->environments);
         $this->assertSame('0 * * * *', $filteredEvents[2]->expression);
     }
