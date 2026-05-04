@@ -663,20 +663,20 @@ assertType('null', $collection::make()->min());
 assertType('int|null', $collection::make([1])->min());
 assertType('mixed', $collection::make([1])->min('string'));
 assertType('mixed', $collection::make(['string' => 1])->min('string'));
-assertType('int|null', $collection::make([1])->min(function ($int) {
+assertType("'foo'|null", $collection::make([1])->min(function ($int) {
     assertType('int', $int);
 
-    return $int;
+    return 'foo';
 }));
 assertType('mixed', $collection::make([new User])->min('id'));
 
 assertType('null', $collection::make()->max());
 assertType('int|null', $collection::make([1])->max());
 assertType('mixed', $collection::make([1])->max('string'));
-assertType('int|null', $collection::make([1])->max(function ($int) {
+assertType("'foo'|null", $collection::make([1])->max(function ($int) {
     assertType('int', $int);
 
-    return $int;
+    return 'foo';
 }));
 assertType('mixed', $collection::make([new User])->max('id'));
 
