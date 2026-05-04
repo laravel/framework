@@ -59,6 +59,16 @@ class ExecutionContext
         return $result;
     }
 
+    /**
+     * Delete the ExecutionState.
+     *
+     * @return void
+     */
+    public function delete()
+    {
+        $this->executionRepository->delete($this->state->id());
+    }
+
     public function getState(): ExecutionState
     {
         return $this->state;

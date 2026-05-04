@@ -136,7 +136,25 @@ class Dispatcher implements QueueingDispatcher
                 'id' => $command->executionContextId(),
                 'options' => method_exists($command, 'executionContextOptions') ? $command->executionContextOptions() : [],
             ]);
+
             $command->setExecutionContext($executionContext);
+
+            $callback = function ($command) use ($executionContext) {
+                $method = method_exists($command, 'handle') ? 'handle' : '__invoke';
+
+                $result = $this->container->call([$command, $method]);
+
+                $deleteWhenCompleted = true;
+                if (property_exists($executionContext, 'deleteWhenCompleted')) {
+                    $deleteWhenCompleted = $executionContext->deleteWhenCompleted;
+                }
+
+                if ($deleteWhenCompleted && ! $command->job?->isReleased()) {
+                    $executionContext->delete();
+                }
+
+                return $result;
+            };
         }
 
         if (! isset($callback)) {
