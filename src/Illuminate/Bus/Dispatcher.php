@@ -145,8 +145,8 @@ class Dispatcher implements QueueingDispatcher
                 $result = $this->container->call([$command, $method]);
 
                 $deleteWhenCompleted = true;
-                if (property_exists($executionContext, 'deleteWhenCompleted')) {
-                    $deleteWhenCompleted = $executionContext->deleteWhenCompleted;
+                if (property_exists($command, 'deleteContextWhenCompleted')) {
+                    $deleteWhenCompleted = $command->deleteContextWhenCompleted;
                 }
 
                 if ($deleteWhenCompleted && ! $command->job?->isReleased()) {

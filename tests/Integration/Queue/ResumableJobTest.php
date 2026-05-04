@@ -206,6 +206,8 @@ class TestResumableJob implements Resumable, ShouldQueue
 
     public int $tries = 2;
 
+    public bool $deleteContextWhenCompleted = false;
+
     public function __construct(
         public int $userId
     ) {
