@@ -61,9 +61,9 @@ class ExecutionContext
 
         $this->state->recordStepResult($name, $result, $completedAt = Carbon::now()->getTimestamp());
 
-        $this->eventDispatcher?->dispatch(new StepCompleted($this->state, $name, $result, $completedAt));
-
         $this->executionRepository->saveStep($this->state, $name, $options['ttl'] ?? $this->options['ttl'] ?? null);
+
+        $this->eventDispatcher?->dispatch(new StepCompleted($this->state, $name, $result, $completedAt));
 
         return $result;
     }
