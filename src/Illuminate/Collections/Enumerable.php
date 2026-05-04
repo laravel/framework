@@ -808,7 +808,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @template TMinResult = mixed
      *
      * @param  (callable(TValue): TMinResult)|string|null  $callback
-     * @return ?TMinResult
+     * @return ($callback is callable ? ?TMinResult : ($callback is null ? ?TValue : mixed))
      */
     public function min($callback = null);
 
@@ -818,7 +818,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @template TMaxResult = mixed
      *
      * @param  (callable(TValue): TMaxResult)|string|null  $callback
-     * @return ?TMaxResult
+     * @return ($callback is callable ? ?TMaxResult : ($callback is null ? ?TValue : mixed))
      */
     public function max($callback = null);
 
