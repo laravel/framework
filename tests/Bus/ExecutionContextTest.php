@@ -242,9 +242,9 @@ class ExecutionContextRecordingExecutionRepository implements ExecutionRepositor
         return $state;
     }
 
-    public function saveStep($state, string $name, $ttl = null): void
+    public function saveStep($state, string $step, $ttl = null): void
     {
-        $this->savedSteps[] = ['state' => $state, 'name' => $name, 'ttl' => $ttl];
+        $this->savedSteps[] = ['state' => $state, 'name' => $step, 'ttl' => $ttl];
         $this->states[$state->id()] = $state;
     }
 

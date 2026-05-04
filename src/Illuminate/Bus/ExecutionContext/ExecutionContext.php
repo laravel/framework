@@ -68,6 +68,15 @@ class ExecutionContext
         return $result;
     }
 
+    public function forgetStep(string $name): void
+    {
+        if (! $this->state->hasCompletedStep($name)) {
+            return;
+        }
+
+        $this->executionRepository->deleteStep($this->state, $name);
+    }
+
     /**
      * Delete the ExecutionState.
      *
@@ -75,6 +84,8 @@ class ExecutionContext
      */
     public function delete()
     {
+        // @todo get steps and delete
+
         $this->executionRepository->delete($this->state->id());
     }
 

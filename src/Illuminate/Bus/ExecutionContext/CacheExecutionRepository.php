@@ -48,18 +48,71 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
     }
 
     #[\Override]
-    public function saveStep($state, string $name, $ttl = null): void
+    public function saveStep($state, string $step, $ttl = null): void
     {
+        $this->getCache()->put($this->determineCacheKey($state->id()), $step, $ttl);
+        $currentSteps = $this->getExecutionSteps($state);
+        if (! in_array($step, $currentSteps, true)) {
+            $currentSteps[] = $step;
+        }
+
         $this->getCache()->put($this->determineCacheKey($state->id()), $state, $ttl);
     }
 
+    #[\Override]
+    public function deleteStep($stateId, string $name): void
+    {
+        $this->deleteSteps($stateId, [$name]);
+    }
+
     /**
+     * Delete the step-list and steps.
+     *
      * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $id
      */
     #[\Override]
     public function delete($id): void
     {
-        $this->getCache()->forget($this->determineCacheKey($id));
+        $stepsToDelete = $this->getExecutionSteps($id);
+
+        if (! empty($stepsToDelete)) {
+            $this->deleteSteps($id, $stepsToDelete);
+        }
+
+        $this->getCache()->forget($this->getExecutionStepsCacheKey($id));
+    }
+
+    /**
+     * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $stateId
+     * @param  array<array-key, string>  $steps
+     * @return void
+     */
+    #[\Override]
+    public function deleteSteps($stateId, array $steps): void
+    {
+        $this->getCache()->deleteMultiple(array_map(
+            fn ($stepName) => $this->determineStepCacheKey($stateId, $stepName),
+            $steps)
+        );
+    }
+
+    public function saveExecutionSteps($stateId, array $steps): void
+    {
+        $this->getCache()->put($this->determineCacheKey($stateId), $steps, );
+    }
+
+    /**
+     * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $stateId
+     * @return array
+     */
+    protected function getExecutionSteps($stateId): array
+    {
+        return $this->getCache()->get($this->getExecutionStepsCacheKey($stateId), []);
+    }
+
+    protected function getExecutionStepsCacheKey($stateId): string
+    {
+        return $this->determineCacheKey($stateId).':steps';
     }
 
     protected function getCache(): Repository
@@ -83,5 +136,14 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
         $id = $id instanceof ExecutionState ? $id->id() : $id;
 
         return 'execution:'.$id;
+    }
+
+    /**
+     * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $stateId
+     * @param  string  $name
+     */
+    protected function determineStepCacheKey($stateId, $name): string
+    {
+        return $this->determineCacheKey($stateId).':'.$name;
     }
 }
