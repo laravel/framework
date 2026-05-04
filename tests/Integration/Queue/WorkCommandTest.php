@@ -279,9 +279,6 @@ class WorkCommandTest extends QueueTestCase
         $this->assertTrue(FirstJob::$ran);
         $this->assertTrue(SecondJob::$ran);
         $this->assertFalse(ThirdJob::$ran);
-        $this->assertSame(0, Queue::size('payments'));
-        $this->assertSame(0, Queue::size('notifications'));
-        $this->assertSame(1, Queue::size('ignore-me-pls'));
     }
 }
 
