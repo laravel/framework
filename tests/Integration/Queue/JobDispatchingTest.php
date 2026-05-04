@@ -7,6 +7,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Queue\InteractsWithQueue;
@@ -215,6 +216,26 @@ class JobDispatchingTest extends QueueTestCase
         $this->assertTrue(Job::$ran);
     }
 
+    public function testQueueAttributeWithEnumNormalizesToStringInJobQueuedEvent()
+    {
+        Config::set('queue.default', 'database');
+        $events = [];
+        $this->app['events']->listen(function (JobQueueing $e) use (&$events) {
+            $events[] = $e;
+        });
+        $this->app['events']->listen(function (JobQueued $e) use (&$events) {
+            $events[] = $e;
+        });
+
+        JobWithEnumQueueAttribute::dispatch();
+
+        $this->assertCount(2, $events);
+        $this->assertInstanceOf(JobQueueing::class, $events[0]);
+        $this->assertSame('default', $events[0]->queue);
+        $this->assertInstanceOf(JobQueued::class, $events[1]);
+        $this->assertSame('default', $events[1]->queue);
+    }
+
     /**
      * Helpers.
      */
@@ -260,6 +281,17 @@ class UniqueJob extends Job implements ShouldBeUnique
 }
 
 class MyTestDispatchableJob implements ShouldQueue
+{
+    use Dispatchable;
+}
+
+enum JobDispatchingTestQueueEnum: string
+{
+    case DEFAULT = 'default';
+}
+
+#[QueueAttribute(JobDispatchingTestQueueEnum::DEFAULT)]
+class JobWithEnumQueueAttribute implements ShouldQueue
 {
     use Dispatchable;
 }
