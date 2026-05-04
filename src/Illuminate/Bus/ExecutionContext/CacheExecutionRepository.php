@@ -94,7 +94,7 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
         }
 
         $this->getCache()->forget($this->determineCacheKey($id));
-        $this->getCache()->forget($this->determineExecutionStepsCacheKey($id));
+        $this->getCache()->forget($this->determineExecutionStepsSetCacheKey($id));
     }
 
     /**
@@ -105,9 +105,8 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
     #[\Override]
     public function deleteSteps($stateId, $steps)
     {
-        $this->getCache()->deleteMultiple(array_map(
-            fn ($stepName) => $this->determineStepCacheKey($stateId, $stepName),
-            (array) $steps)
+        $this->getCache()->deleteMultiple(
+            array_map(fn ($stepName) => $this->determineStepCacheKey($stateId, $stepName), (array) $steps)
         );
 
         $remainingSteps = array_values(array_diff($this->getExecutionSteps($stateId), (array) $steps));
@@ -117,34 +116,52 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
 
     protected function saveExecutionSteps($stateId, array $steps): void
     {
-        $ttl = $this->defaultTtl($stateId);
-
         $this->getCache()->put(
-            $this->determineExecutionStepsCacheKey($stateId),
+            $this->determineExecutionStepsSetCacheKey($stateId),
             array_values(array_unique($steps)),
-            $ttl,
+            $this->defaultTtl($stateId),
         );
     }
 
     /**
+     * Get the set of steps which have results.
+     *
      * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $stateId
      * @return array
      */
     protected function getExecutionSteps($stateId): array
     {
-        return (array) $this->getCache()->get($this->determineExecutionStepsCacheKey($stateId), []);
+        return (array) $this->getCache()->get($this->determineExecutionStepsSetCacheKey($stateId), []);
     }
 
+    /**
+     * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $stateId
+     * @return array{options?: array{ttl?: int}}|null
+     */
     protected function getExecutionMetadata($stateId): ?array
     {
         return $this->getCache()->get($this->determineCacheKey($stateId));
     }
 
+    /**
+     * Save the ExecutionState metadata.
+     *
+     * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $stateId
+     * @param  array<array-key, mixed>  $metadata
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @return void
+     */
     protected function saveExecutionMetadata($stateId, array $metadata, $ttl = null): void
     {
         $this->getCache()->put($this->determineCacheKey($stateId), $metadata, $ttl);
     }
 
+    /**
+     * Get the default cache expiration for the ExecutionState.
+     *
+     * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $stateId
+     * @return int|null
+     */
     protected function defaultTtl($stateId)
     {
         if ($stateId instanceof ExecutionState) {
@@ -152,11 +169,6 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
         }
 
         return $this->getExecutionMetadata($stateId)['options']['ttl'] ?? null;
-    }
-
-    protected function determineExecutionStepsCacheKey($stateId): string
-    {
-        return $this->determineCacheKey($stateId).':steps';
     }
 
     protected function getCache(): Repository
@@ -172,6 +184,8 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
     }
 
     /**
+     * Get the base cache key for the ExecutionState.
+     *
      * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $id
      * @return string
      */
@@ -183,6 +197,19 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
     }
 
     /**
+     * The cache key which stores the set of completed steps.
+     *
+     * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $stateId
+     * @return string
+     */
+    protected function determineExecutionStepsSetCacheKey($stateId): string
+    {
+        return $this->determineCacheKey($stateId).':steps';
+    }
+
+    /**
+     * The cache key for an individual step.
+     *
      * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $stateId
      * @param  string  $name
      */
