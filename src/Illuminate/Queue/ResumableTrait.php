@@ -23,7 +23,7 @@ trait ResumableTrait
         return $this;
     }
 
-    protected function step(string $name, callable $callback, array $options = []): mixed
+    protected function step(string $name, callable $callback, $options = []): mixed
     {
         return $this->context->step($name, $callback, $options);
     }
