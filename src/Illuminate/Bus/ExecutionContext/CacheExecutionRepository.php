@@ -30,14 +30,14 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
     {
         $id = $id instanceof ExecutionState ? $id->id() : $id;
 
-        $metadata = $this->getExecutionMetadata($id);
+        $metadata = $id === null ? null : $this->getExecutionMetadata($id);
 
         return $metadata === null ? null : new ExecutionState($id, options: $metadata['options'] ?? []);
     }
 
     /**
      * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $id
-     * @param  array  $options
+     * @param  array{ttl?: int}  $options
      */
     #[\Override]
     public function create($id, $options = [])
@@ -103,7 +103,7 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
      * @return void
      */
     #[\Override]
-    public function deleteSteps($stateId, $steps): void
+    public function deleteSteps($stateId, $steps)
     {
         $this->getCache()->deleteMultiple(array_map(
             fn ($stepName) => $this->determineStepCacheKey($stateId, $stepName),

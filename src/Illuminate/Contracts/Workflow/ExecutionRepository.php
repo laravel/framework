@@ -7,6 +7,7 @@ interface ExecutionRepository
     /**
      * Find the ExecutionState if it exists.
      *
+     * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string|null
      * @return \Illuminate\Bus\ExecutionContext\ExecutionState|null
      */
     public function find($id);
@@ -15,7 +16,7 @@ interface ExecutionRepository
      * Store the ExecutionState.
      *
      * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $id
-     * @param  array  $options
+     * @param  array{ttl?: int}  $options
      * @return \Illuminate\Bus\ExecutionContext\ExecutionState
      */
     public function create($id, $options = []);
@@ -29,6 +30,8 @@ interface ExecutionRepository
     public function getStep($state, $step);
 
     /**
+     * Store the result of a single-step.
+     *
      * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $state
      * @param  \Illuminate\Bus\ExecutionContext\ExecutionStepResult  $stepResult
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
@@ -36,18 +39,20 @@ interface ExecutionRepository
     public function saveStep($state, $stepResult, $ttl = null): void;
 
     /**
+     * Delete the ExecutionState and its steps.
+     *
      * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $id
      */
-    public function delete($id): void;
+    public function delete($id);
 
     /**
      * Delete a single step.
      *
      * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $stateId
-     * @param  string  $steps
+     * @param  string  $name
      * @return void
      */
-    public function deleteStep($stateId, $name): void;
+    public function deleteStep($stateId, $name);
 
     /**
      * Delete many steps.
@@ -56,5 +61,5 @@ interface ExecutionRepository
      * @param  array<array-key, string>  $steps
      * @return void
      */
-    public function deleteSteps($stateId, $steps): void;
+    public function deleteSteps($stateId, $steps);
 }
