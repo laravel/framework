@@ -13,6 +13,7 @@ use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Events\CallQueuedListener;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Queue\Attributes\AfterCommit;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\QueueManager;
@@ -225,6 +226,24 @@ class QueuedEventsTest extends TestCase
 
         $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
             return $job->tries === 5;
+        });
+    }
+
+    public function testQueuePropagatesAfterCommitAttribute()
+    {
+        $d = new Dispatcher;
+
+        $fakeQueue = new QueueFake(new Container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherAfterCommitAttribute::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
+            return $job->afterCommit === true;
         });
     }
 
@@ -678,6 +697,15 @@ class TestDispatcherOptions implements ShouldQueue
         return 5;
     }
 
+    public function handle()
+    {
+        //
+    }
+}
+
+#[AfterCommit]
+class TestDispatcherAfterCommitAttribute implements ShouldQueue
+{
     public function handle()
     {
         //

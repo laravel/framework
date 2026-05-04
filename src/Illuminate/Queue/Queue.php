@@ -12,6 +12,7 @@ use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
+use Illuminate\Queue\Attributes\AfterCommit;
 use Illuminate\Queue\Attributes\Backoff;
 use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use Illuminate\Queue\Attributes\FailOnTimeout;
@@ -413,6 +414,10 @@ abstract class Queue
 
         if (! $job instanceof Closure && is_object($job) && isset($job->afterCommit)) {
             return $job->afterCommit;
+        }
+
+        if (! $job instanceof Closure && is_object($job) && $this->getAttributeValue($job, AfterCommit::class, 'afterCommit')) {
+            return true;
         }
 
         return $this->dispatchAfterCommit ?? false;

@@ -7,6 +7,7 @@ use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Broadcasting\InteractsWithBroadcasting;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
+use Illuminate\Queue\Attributes\AfterCommit;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Throwable;
@@ -116,6 +117,13 @@ class BroadcastEventTest extends TestCase
 
         $job->failed($exception);
     }
+
+    public function testAfterCommitAttributeIsPropagated()
+    {
+        $job = new BroadcastEvent(new TestBroadcastEventWithAfterCommitAttribute);
+
+        $this->assertTrue($job->afterCommit);
+    }
 }
 
 class TestBroadcastEvent
@@ -142,6 +150,11 @@ class TestBroadcastEventWithManualData extends TestBroadcastEvent
     {
         return ['name' => 'Taylor'];
     }
+}
+
+#[AfterCommit]
+class TestBroadcastEventWithAfterCommitAttribute extends TestBroadcastEvent
+{
 }
 
 class TestBroadcastEventWithSpecificBroadcaster extends TestBroadcastEvent

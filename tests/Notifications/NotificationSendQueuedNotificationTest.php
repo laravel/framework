@@ -9,6 +9,7 @@ use Illuminate\Notifications\ChannelManager;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\SendQueuedNotifications;
+use Illuminate\Queue\Attributes\AfterCommit;
 use Illuminate\Support\Collection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -62,6 +63,13 @@ class NotificationSendQueuedNotificationTest extends TestCase
 
         $this->assertEquals(23, $job->maxExceptions);
     }
+
+    public function testNotificationCanSetAfterCommitUsingAttribute()
+    {
+        $job = new SendQueuedNotifications(new NotifiableUser, new AfterCommitNotification);
+
+        $this->assertTrue($job->afterCommit);
+    }
 }
 
 class NotifiableUser extends Model
@@ -73,5 +81,10 @@ class NotifiableUser extends Model
 }
 
 class TestNotification extends Notification
+{
+}
+
+#[AfterCommit]
+class AfterCommitNotification extends Notification
 {
 }

@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Queue\Attributes\AfterCommit;
 use Illuminate\Queue\Attributes\Backoff;
 use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use Illuminate\Queue\Attributes\MaxExceptions;
@@ -96,7 +97,7 @@ class SendQueuedNotifications implements ShouldQueue
         if ($notification instanceof ShouldQueueAfterCommit) {
             $this->afterCommit = true;
         } else {
-            $this->afterCommit = property_exists($notification, 'afterCommit') ? $notification->afterCommit : null;
+            $this->afterCommit = $this->getAttributeValue($notification, AfterCommit::class, 'afterCommit');
         }
 
         $this->shouldBeEncrypted = $notification instanceof ShouldBeEncrypted;

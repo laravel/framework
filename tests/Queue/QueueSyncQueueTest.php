@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Database\DatabaseTransactionsManager;
+use Illuminate\Queue\Attributes\AfterCommit;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Queue\SyncQueue;
@@ -131,6 +132,20 @@ class QueueSyncQueueTest extends TestCase
         $sync->push(new SyncQueueAfterCommitInterfaceJob());
     }
 
+    public function testItAddsATransactionCallbackForAttributeBasedAfterCommitJobs()
+    {
+        $sync = new SyncQueue;
+        $container = new Container;
+        $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
+        $transactionManager = m::mock(DatabaseTransactionsManager::class);
+        $transactionManager->shouldReceive('addCallback')->once()->andReturn(null);
+        $transactionManager->shouldNotReceive('addCallbackForRollback');
+        $container->instance('db.transactions', $transactionManager);
+
+        $sync->setContainer($container);
+        $sync->push(new SyncQueueAfterCommitAttributeJob());
+    }
+
     public function testItAddsATransactionCallbackForAfterCommitUniqueJobs()
     {
         $sync = new SyncQueue;
@@ -245,6 +260,16 @@ class SyncQueueAfterCommitJob
 }
 
 class SyncQueueAfterCommitInterfaceJob implements ShouldQueueAfterCommit
+{
+    use InteractsWithQueue;
+
+    public function handle()
+    {
+    }
+}
+
+#[AfterCommit]
+class SyncQueueAfterCommitAttributeJob
 {
     use InteractsWithQueue;
 

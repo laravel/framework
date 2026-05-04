@@ -11,6 +11,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailer;
 use Illuminate\Mail\SendQueuedMailable;
+use Illuminate\Queue\Attributes\AfterCommit;
 use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use Laravel\SerializableClosure\SerializableClosure;
@@ -180,6 +181,22 @@ class MailableQueuedTest extends TestCase
         $this->assertEquals(60, $pushedJob->delay);
     }
 
+    public function testQueuedMailableRespectsAfterCommitAttribute(): void
+    {
+        $job = new SendQueuedMailable(new MailableQueueableStubWithAfterCommitAttribute);
+
+        $this->assertTrue($job->afterCommit);
+    }
+
+    public function testQueuedMailableAfterCommitPropertyOverridesAttribute(): void
+    {
+        $mailable = (new MailableQueueableStubWithAfterCommitAttribute)->beforeCommit();
+
+        $job = new SendQueuedMailable($mailable);
+
+        $this->assertFalse($job->afterCommit);
+    }
+
     public function testQueuedMailableForwardsDeduplicationIdMethodToQueueJob(): void
     {
         $queueFake = new QueueFake(new Application);
@@ -241,6 +258,22 @@ class MailableQueueableStubWithMessageGroup extends Mailable implements ShouldQu
 
 #[Delay(30)]
 class MailableQueueableStubWithDelayAttribute extends Mailable implements ShouldQueue
+{
+    use Queueable;
+
+    public function build(): self
+    {
+        $this
+            ->subject('lorem ipsum')
+            ->html('foo bar baz')
+            ->to('foo@example.tld');
+
+        return $this;
+    }
+}
+
+#[AfterCommit]
+class MailableQueueableStubWithAfterCommitAttribute extends Mailable implements ShouldQueue
 {
     use Queueable;
 

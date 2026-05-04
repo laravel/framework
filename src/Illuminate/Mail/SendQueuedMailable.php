@@ -7,6 +7,7 @@ use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
+use Illuminate\Queue\Attributes\AfterCommit;
 use Illuminate\Queue\Attributes\Backoff;
 use Illuminate\Queue\Attributes\Connection;
 use Illuminate\Queue\Attributes\MaxExceptions;
@@ -67,7 +68,7 @@ class SendQueuedMailable
         if ($mailable instanceof ShouldQueueAfterCommit) {
             $this->afterCommit = true;
         } else {
-            $this->afterCommit = property_exists($mailable, 'afterCommit') ? $mailable->afterCommit : null;
+            $this->afterCommit = $this->getAttributeValue($mailable, AfterCommit::class, 'afterCommit');
         }
 
         $this->connection = $this->getAttributeValue($mailable, Connection::class, 'connection');
