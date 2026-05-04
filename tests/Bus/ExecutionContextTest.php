@@ -8,6 +8,7 @@ use Illuminate\Bus\Events\StepStarting;
 use Illuminate\Bus\ExecutionContext\CacheExecutionRepository;
 use Illuminate\Bus\ExecutionContext\ExecutionContext;
 use Illuminate\Bus\ExecutionContext\ExecutionState;
+use Illuminate\Bus\ExecutionContext\ExecutionStepResult;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Container\Container;
@@ -51,9 +52,11 @@ class ExecutionContextTest extends TestCase
                 && $event->result === ['product-1', 'product-2']
                 && $event->completedAt === $now->getTimestamp();
         });
-        $this->assertSame([
-            ['state' => $state, 'name' => 'fetch-products', 'ttl' => null],
-        ], $repository->savedSteps);
+        $this->assertSame($state, $repository->savedSteps[0]['state']);
+        $this->assertSame('fetch-products', $repository->savedSteps[0]['stepResult']->name);
+        $this->assertSame(['product-1', 'product-2'], $repository->savedSteps[0]['stepResult']->result);
+        $this->assertSame($now->getTimestamp(), $repository->savedSteps[0]['stepResult']->completedAt);
+        $this->assertNull($repository->savedSteps[0]['ttl']);
     }
 
     public function testStepReturnsStoredResultWhenAlreadyCompleted()
@@ -118,16 +121,17 @@ class ExecutionContextTest extends TestCase
         $result = $context->step('fetch-products', static fn () => 'new-result', ['ttl' => 300]);
 
         $this->assertSame('new-result', $result);
-        $this->assertSame([
-            ['state' => $state, 'name' => 'fetch-products', 'ttl' => 300],
-        ], $repository->savedSteps);
+        $this->assertSame($state, $repository->savedSteps[0]['state']);
+        $this->assertSame('fetch-products', $repository->savedSteps[0]['stepResult']->name);
+        $this->assertSame('new-result', $repository->savedSteps[0]['stepResult']->result);
+        $this->assertSame(300, $repository->savedSteps[0]['ttl']);
     }
 
     public function testStepUsesStateLoadedFromRepository()
     {
         $events = $this->fakeEvents();
         $state = new ExecutionState('execution-1');
-        $state->recordStepResult('fetch-products', 'stored-result', 123);
+        $state->recordStepResult(new ExecutionStepResult('execution-1', 'fetch-products', 123, 'stored-result'));
         $repository = new ExecutionContextRecordingExecutionRepository($state);
         $context = new ExecutionContext($repository, $events, 'execution-1');
         $runs = 0;
@@ -175,16 +179,16 @@ class ExecutionContextTest extends TestCase
 
         $result = $context->step('fetch-products', static fn () => 'new-result');
         $stored = $repository->find('execution-1');
+        $storedStep = $repository->getStep($stored, 'fetch-products');
 
         $this->assertSame('new-result', $result);
         $this->assertInstanceOf(ExecutionState::class, $stored);
         $this->assertSame('execution-1', $stored->id());
-        $this->assertSame([
-            'fetch-products' => [
-                'completed_at' => $now->getTimestamp(),
-                'result' => 'new-result',
-            ],
-        ], $stored->all());
+        $this->assertInstanceOf(ExecutionStepResult::class, $storedStep);
+        $this->assertSame('execution-1', $storedStep->id);
+        $this->assertSame('fetch-products', $storedStep->name);
+        $this->assertSame($now->getTimestamp(), $storedStep->completedAt);
+        $this->assertSame('new-result', $storedStep->result);
     }
 
     protected function fakeEvents(): EventFake
@@ -242,9 +246,20 @@ class ExecutionContextRecordingExecutionRepository implements ExecutionRepositor
         return $state;
     }
 
-    public function saveStep($state, string $step, $ttl = null): void
+    public function getStep($state, $step)
     {
-        $this->savedSteps[] = ['state' => $state, 'name' => $step, 'ttl' => $ttl];
+        $state = $state instanceof ExecutionState ? $state : ($this->states[$state] ?? null);
+
+        if ($state === null) {
+            return null;
+        }
+
+        return $state->all()[$step] ?? null;
+    }
+
+    public function saveStep($state, $stepResult, $ttl = null): void
+    {
+        $this->savedSteps[] = ['state' => $state, 'stepResult' => $stepResult, 'ttl' => $ttl];
         $this->states[$state->id()] = $state;
     }
 
@@ -253,5 +268,15 @@ class ExecutionContextRecordingExecutionRepository implements ExecutionRepositor
         $this->deletes[] = $id;
 
         unset($this->states[$id instanceof ExecutionState ? $id->id() : $id]);
+    }
+
+    public function deleteStep($stateId, $name): void
+    {
+        //
+    }
+
+    public function deleteSteps($stateId, $steps): void
+    {
+        //
     }
 }

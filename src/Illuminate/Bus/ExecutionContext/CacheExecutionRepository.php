@@ -26,11 +26,13 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
     }
 
     #[\Override]
-    public function find(mixed $id)
+    public function find($id)
     {
         $id = $id instanceof ExecutionState ? $id->id() : $id;
 
-        return $this->getCache()->get($this->determineCacheKey($id));
+        $steps = $this->getCache()->has($this->determineExecutionStepsCacheKey($id));
+
+        return $steps === false ? null : new ExecutionState($id);
     }
 
     /**
@@ -38,35 +40,41 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      */
     #[\Override]
-    public function create(mixed $id, $ttl = null)
+    public function create($id, $ttl = null)
     {
         $executionState = $id instanceof ExecutionState ? $id : new ExecutionState($id);
 
-        $this->getCache()->put($this->determineCacheKey($id), $executionState, $ttl);
+        $this->saveExecutionSteps($executionState, [], $ttl);
 
         return $executionState;
     }
 
     #[\Override]
-    public function saveStep($state, string $step, $ttl = null): void
+    public function getStep($state, $step)
     {
-        $this->getCache()->put($this->determineCacheKey($state->id()), $step, $ttl);
-        $currentSteps = $this->getExecutionSteps($state);
-        if (! in_array($step, $currentSteps, true)) {
-            $currentSteps[] = $step;
-        }
-
-        $this->getCache()->put($this->determineCacheKey($state->id()), $state, $ttl);
+        return $this->getCache()->get($this->determineStepCacheKey($state, $step));
     }
 
     #[\Override]
-    public function deleteStep($stateId, string $name): void
+    public function saveStep($state, $stepResult, $ttl = null): void
+    {
+        $this->getCache()->put($this->determineStepCacheKey($state, $stepResult->name), $stepResult, $ttl);
+
+        $currentSteps = $this->getExecutionSteps($state);
+        if (! in_array($stepResult->name, $currentSteps, true)) {
+            $currentSteps[] = $stepResult->name;
+            $this->saveExecutionSteps($state, $currentSteps, $ttl);
+        }
+    }
+
+    #[\Override]
+    public function deleteStep($stateId, $name): void
     {
         $this->deleteSteps($stateId, [$name]);
     }
 
     /**
-     * Delete the step-list and steps.
+     * Delete the ExecutionState and its associated steps.
      *
      * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $id
      */
@@ -79,7 +87,7 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
             $this->deleteSteps($id, $stepsToDelete);
         }
 
-        $this->getCache()->forget($this->getExecutionStepsCacheKey($id));
+        $this->getCache()->forget($this->determineExecutionStepsCacheKey($id));
     }
 
     /**
@@ -88,17 +96,21 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
      * @return void
      */
     #[\Override]
-    public function deleteSteps($stateId, array $steps): void
+    public function deleteSteps($stateId, $steps): void
     {
         $this->getCache()->deleteMultiple(array_map(
             fn ($stepName) => $this->determineStepCacheKey($stateId, $stepName),
-            $steps)
+            (array) $steps)
         );
+
+        $remainingSteps = array_values(array_diff($this->getExecutionSteps($stateId), (array) $steps));
+
+        $this->saveExecutionSteps($stateId, $remainingSteps);
     }
 
-    public function saveExecutionSteps($stateId, array $steps): void
+    protected function saveExecutionSteps($stateId, array $steps, $ttl = null): void
     {
-        $this->getCache()->put($this->determineCacheKey($stateId), $steps, );
+        $this->getCache()->put($this->determineExecutionStepsCacheKey($stateId), $steps, $ttl);
     }
 
     /**
@@ -107,10 +119,10 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
      */
     protected function getExecutionSteps($stateId): array
     {
-        return $this->getCache()->get($this->getExecutionStepsCacheKey($stateId), []);
+        return (array) $this->getCache()->get($this->determineExecutionStepsCacheKey($stateId), []);
     }
 
-    protected function getExecutionStepsCacheKey($stateId): string
+    protected function determineExecutionStepsCacheKey($stateId): string
     {
         return $this->determineCacheKey($stateId).':steps';
     }
@@ -144,6 +156,6 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
      */
     protected function determineStepCacheKey($stateId, $name): string
     {
-        return $this->determineCacheKey($stateId).':'.$name;
+        return $this->determineCacheKey($stateId).':step:'.$name;
     }
 }

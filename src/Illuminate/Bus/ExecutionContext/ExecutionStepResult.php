@@ -5,53 +5,34 @@ namespace Illuminate\Bus\ExecutionContext;
 use Illuminate\Queue\SerializesAndRestoresModelIdentifiers;
 use Illuminate\Support\Collection;
 
-class ExecutionState
+class ExecutionStepResult
 {
     use SerializesAndRestoresModelIdentifiers;
 
     public function __construct(
-        protected mixed $id,
-        protected array $data = [],
+        public mixed $id,
+        public string $name,
+        public int $completedAt,
+        public mixed $result,
     ) {
-    }
-
-    public function id(): mixed
-    {
-        return $this->id;
-    }
-
-    public function all(): array
-    {
-        return $this->data;
-    }
-
-    public function hasCompletedStep(string $name): bool
-    {
-        return isset($this->data[$name]);
-    }
-
-    public function resultFor(string $name): mixed
-    {
-        return $this->data[$name]->result;
-    }
-
-    public function recordStepResult(ExecutionStepResult $result): void
-    {
-        $this->data[$result->name] = $result;
     }
 
     public function __serialize(): array
     {
         return [
             'id' => $this->serializeValue($this->id),
-            'data' => $this->serializeValue($this->data),
+            'name' => $this->name,
+            'completedAt' => $this->completedAt,
+            'result' => $this->serializeValue($this->result),
         ];
     }
 
     public function __unserialize(array $values): void
     {
         $this->id = $this->restoreValue($values['id']);
-        $this->data = $this->restoreValue($values['data']);
+        $this->name = $values['name'];
+        $this->completedAt = $values['completedAt'];
+        $this->result = $this->restoreValue($values['result']);
     }
 
     protected function serializeValue(mixed $value): mixed

@@ -19,7 +19,7 @@ class ExecutionContext
      * @param  ExecutionRepositoryContract  $executionRepository
      * @param  Dispatcher|null  $eventDispatcher
      * @param  mixed|null  $id
-     * @param  array{ttl?: \DateTimeInterface|\DateInterval|int|null}  $options
+     * @param  array{ttl?: \DateTimeInterface|\DateInterval|int|null|(\Closure(): \DateTimeInterface|\DateInterval|int|null)}  $options
      */
     public function __construct(
         protected ExecutionRepositoryContract $executionRepository,
@@ -31,7 +31,7 @@ class ExecutionContext
             $this->state = $id;
         } else {
             $this->state = $this->executionRepository->find($id)
-                ?? $this->executionRepository->create($id ?? Str::random(32), $options['ttl'] ?? null);
+                ?? $this->executionRepository->create($id ?? Str::random(32), value($options['ttl'] ?? null));
         }
     }
 
@@ -45,8 +45,12 @@ class ExecutionContext
      */
     public function step(string $name, callable $callback, $options = []): mixed
     {
-        if ($this->state->hasCompletedStep($name)) {
-            return $this->state->resultFor($name);
+        $stepResult = $this->executionRepository->getStep($this->state, $name);
+
+        if ($stepResult !== null) {
+            $this->state->recordStepResult($stepResult);
+
+            return $stepResult->result;
         }
 
         $this->eventDispatcher?->dispatch(new StepStarting($this->state, $name));
@@ -59,18 +63,20 @@ class ExecutionContext
             throw $e;
         }
 
-        $this->state->recordStepResult($name, $result, $completedAt = Carbon::now()->getTimestamp());
+        $stepResult = new ExecutionStepResult($this->state->id(), $name, Carbon::now()->getTimestamp(), $result);
 
-        $this->executionRepository->saveStep($this->state, $name, $options['ttl'] ?? $this->options['ttl'] ?? null);
+        $this->state->recordStepResult($stepResult);
 
-        $this->eventDispatcher?->dispatch(new StepCompleted($this->state, $name, $result, $completedAt));
+        $this->executionRepository->saveStep($this->state, $stepResult, $options['ttl'] ?? $this->options['ttl'] ?? null);
+
+        $this->eventDispatcher?->dispatch(new StepCompleted($this->state, $name, $result, $stepResult->completedAt));
 
         return $result;
     }
 
     public function forgetStep(string $name): void
     {
-        if (! $this->state->hasCompletedStep($name)) {
+        if ($this->executionRepository->getStep($this->state, $name) === null) {
             return;
         }
 

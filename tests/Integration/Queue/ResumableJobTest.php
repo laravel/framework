@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Illuminate\Bus\ExecutionContext\ExecutionState;
+use Illuminate\Bus\ExecutionContext\ExecutionStepResult;
 use Illuminate\Contracts\Queue\Resumable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -39,6 +39,20 @@ class ResumableJobTest extends QueueTestCase
         Cache::put('sendEmail', 0);
     }
 
+    protected function assertExecutionHasCompletedSteps($id, array $steps): void
+    {
+        $this->assertSame($steps, Cache::get('execution:'.$id.':steps'));
+
+        foreach ($steps as $step) {
+            $this->assertInstanceOf(ExecutionStepResult::class, $this->cachedStepResult($id, $step));
+        }
+    }
+
+    protected function cachedStepResult($id, string $step): ?ExecutionStepResult
+    {
+        return Cache::get('execution:'.$id.':step:'.$step);
+    }
+
     public function test_job_sync_queued()
     {
         Mail::fake();
@@ -64,12 +78,8 @@ class ResumableJobTest extends QueueTestCase
         Event::fake();
         TestResumableJob::dispatch(1234);
         $this->runQueueWorkerCommand(['--once' => true]);
-        $executionState = Cache::get('execution:'.$uuid);
 
-        $this->assertInstanceof(ExecutionState::class, $executionState);
-        $this->assertTrue($executionState->hasCompletedStep('get_data'));
-        $this->assertTrue($executionState->hasCompletedStep('update_database'));
-        $this->assertTrue($executionState->hasCompletedStep('send_email'));
+        $this->assertExecutionHasCompletedSteps($uuid, ['get_data', 'update_database', 'send_email']);
     }
 
     public function test_job_deletes_execution_context_when_completed_successfully()
@@ -85,7 +95,10 @@ class ResumableJobTest extends QueueTestCase
         $this->assertEquals(1, Cache::get('updateDatabase'));
         $this->assertEquals(1, Cache::get('sendEmail'));
         Mail::assertSentCount(2);
-        $this->assertNull(Cache::get('execution:'.$uuid));
+        $this->assertNull(Cache::get('execution:'.$uuid.':steps'));
+        $this->assertNull($this->cachedStepResult($uuid, 'get_data'));
+        $this->assertNull($this->cachedStepResult($uuid, 'update_database'));
+        $this->assertNull($this->cachedStepResult($uuid, 'send_email'));
     }
 
     public function test_job_writes_completed_at_to_execution_state()
@@ -97,15 +110,13 @@ class ResumableJobTest extends QueueTestCase
 
         TestResumableJob::dispatch(1234);
         $this->runQueueWorkerCommand(['--once' => true]);
-        $executionState = Cache::get('execution:'.$uuid);
 
-        $this->assertInstanceof(ExecutionState::class, $executionState);
         $this->assertSame([
             'get_data' => $now = Carbon::now()->getTimestamp(),
             'update_database' => $now,
             'send_email' => $now,
-        ], (new Collection($executionState->all()))->mapWithKeys(function ($value, $key) {
-            return [$key => $value['completed_at']];
+        ], (new Collection(['get_data', 'update_database', 'send_email']))->mapWithKeys(function ($step) use ($uuid) {
+            return [$step => $this->cachedStepResult($uuid, $step)->completedAt];
         })->all()
         );
     }
@@ -118,21 +129,15 @@ class ResumableJobTest extends QueueTestCase
         TestResumableJob::dispatch(1234);
         Cache::put('throw_exception', true);
         $this->runQueueWorkerCommand(['--once' => true]);
-        $executionState = Cache::get('execution:'.$uuid);
 
-        $this->assertInstanceof(ExecutionState::class, $executionState);
-        $this->assertTrue($executionState->hasCompletedStep('get_data'));
-        $this->assertFalse($executionState->hasCompletedStep('update_database'));
-        $this->assertFalse($executionState->hasCompletedStep('send_email'));
+        $this->assertExecutionHasCompletedSteps($uuid, ['get_data']);
+        $this->assertNull($this->cachedStepResult($uuid, 'update_database'));
+        $this->assertNull($this->cachedStepResult($uuid, 'send_email'));
         $this->assertNull(Cache::get('throw_exception'));
 
         $this->runQueueWorkerCommand(['--once' => true]);
-        $executionState = Cache::get('execution:'.$uuid);
-        $this->assertInstanceof(ExecutionState::class, $executionState);
 
-        $this->assertTrue($executionState->hasCompletedStep('get_data'));
-        $this->assertTrue($executionState->hasCompletedStep('update_database'));
-        $this->assertTrue($executionState->hasCompletedStep('send_email'));
+        $this->assertExecutionHasCompletedSteps($uuid, ['get_data', 'update_database', 'send_email']);
         $this->assertEquals(1, Cache::get('getData'));
         $this->assertEquals(2, Cache::get('updateDatabase'));
         $this->assertEquals(1, Cache::get('sendEmail'));
@@ -145,12 +150,8 @@ class ResumableJobTest extends QueueTestCase
 
         TestResumableJobWithCustomExecutionContext::dispatch('return-1234', 1234);
         $this->runQueueWorkerCommand(['--once' => true]);
-        $executionState = Cache::get('execution:return-1234');
 
-        $this->assertInstanceof(ExecutionState::class, $executionState);
-        $this->assertTrue($executionState->hasCompletedStep('get_data'));
-        $this->assertTrue($executionState->hasCompletedStep('update_database'));
-        $this->assertTrue($executionState->hasCompletedStep('send_email'));
+        $this->assertExecutionHasCompletedSteps('return-1234', ['get_data', 'update_database', 'send_email']);
     }
 
     public function test_job_can_define_execution_context_options()
@@ -162,11 +163,14 @@ class ResumableJobTest extends QueueTestCase
         TestResumableJobWithExecutionContextOptions::dispatch('return-1234', 1234);
         $this->runQueueWorkerCommand(['--once' => true]);
 
-        $this->assertInstanceof(ExecutionState::class, Cache::get('execution:return-1234'));
+        $this->assertSame(['get_data', 'update_database', 'send_email'], Cache::get('execution:return-1234:steps'));
 
         $this->travelTo('2025-06-29T00:01:02.000Z');
 
-        $this->assertNull(Cache::get('execution:return-1234'));
+        $this->assertNull(Cache::get('execution:return-1234:steps'));
+        $this->assertNull($this->cachedStepResult('return-1234', 'get_data'));
+        $this->assertNull($this->cachedStepResult('return-1234', 'update_database'));
+        $this->assertNull($this->cachedStepResult('return-1234', 'send_email'));
     }
 
     public function test_jobs_can_share_an_execution_context()
@@ -174,20 +178,16 @@ class ResumableJobTest extends QueueTestCase
         Mail::fake();
         Event::fake();
 
-        Cache::put('execution:return-1234', new ExecutionState('return-1234', [
-            'get_data' => [
-                'completed_at' => 1,
-                'result' => [
-                    'data' => [
-                        [
-                            'id' => 9876,
-                            'email' => 'taylor@laravel.com',
-                        ],
-                        [
-                            'id' => 1002,
-                            'email' => 'abby@laravel.com',
-                        ],
-                    ],
+        Cache::put('execution:return-1234:steps', ['get_data']);
+        Cache::put('execution:return-1234:step:get_data', new ExecutionStepResult('return-1234', 'get_data', 1, [
+            'data' => [
+                [
+                    'id' => 9876,
+                    'email' => 'taylor@laravel.com',
+                ],
+                [
+                    'id' => 1002,
+                    'email' => 'abby@laravel.com',
                 ],
             ],
         ]));
@@ -202,12 +202,7 @@ class ResumableJobTest extends QueueTestCase
         TestResumableJobWithCustomExecutionContext::dispatch('return-1234', 1234);
         $this->runQueueWorkerCommand(['--once' => true]);
 
-        $executionState = Cache::get('execution:return-1234');
-
-        $this->assertInstanceof(ExecutionState::class, $executionState);
-        $this->assertTrue($executionState->hasCompletedStep('get_data'));
-        $this->assertTrue($executionState->hasCompletedStep('update_database'));
-        $this->assertTrue($executionState->hasCompletedStep('send_email'));
+        $this->assertExecutionHasCompletedSteps('return-1234', ['get_data', 'update_database', 'send_email']);
         $this->assertEquals(0, Cache::get('getData'));
         $this->assertEquals(1, Cache::get('updateDatabase'));
         $this->assertEquals(1, Cache::get('sendEmail'));

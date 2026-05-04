@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Bus;
 
 use Illuminate\Bus\ExecutionContext\ExecutionState;
+use Illuminate\Bus\ExecutionContext\ExecutionStepResult;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -29,7 +30,7 @@ class ExecutionStateSerializationTest extends TestCase
             'email' => 'before@example.com',
         ]);
         $state = new ExecutionState('execution-1');
-        $state->recordStepResult('fetch-user', $user, 123);
+        $state->recordStepResult(new ExecutionStepResult('execution-1', 'fetch-user', 123, $user));
 
         $serialized = serialize($state);
         $user->update(['email' => 'after@example.com']);
@@ -48,7 +49,7 @@ class ExecutionStateSerializationTest extends TestCase
             'email' => 'before@example.com',
         ]);
         $state = new ExecutionState('execution-1');
-        $state->recordStepResult('fetch-user', ['user' => $user], 123);
+        $state->recordStepResult(new ExecutionStepResult('execution-1', 'fetch-user', 123, ['user' => $user]));
 
         $serialized = serialize($state);
         $user->update(['email' => 'after@example.com']);
@@ -70,7 +71,7 @@ class ExecutionStateSerializationTest extends TestCase
             'email' => 'second-before@example.com',
         ]);
         $state = new ExecutionState('execution-1');
-        $state->recordStepResult('fetch-users', ExecutionStateSerializationTestUser::all(), 123);
+        $state->recordStepResult(new ExecutionStepResult('execution-1', 'fetch-users', 123, ExecutionStateSerializationTestUser::all()));
 
         $serialized = serialize($state);
         $firstUser->update(['email' => 'first-after@example.com']);

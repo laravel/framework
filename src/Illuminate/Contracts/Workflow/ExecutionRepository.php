@@ -5,21 +5,35 @@ namespace Illuminate\Contracts\Workflow;
 interface ExecutionRepository
 {
     /**
+     * Find the ExecutionState if it exists.
+     *
      * @return \Illuminate\Bus\ExecutionContext\ExecutionState|null
      */
-    public function find(mixed $id);
+    public function find($id);
 
     /**
+     * Store the ExecutionState.
+     *
+     * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $id
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return \Illuminate\Bus\ExecutionContext\ExecutionState
      */
-    public function create(mixed $id, $ttl = null);
+    public function create($id, $ttl = null);
 
     /**
-     * @param  \Illuminate\Bus\ExecutionContext\ExecutionState  $state
+     * Get the result of an individual step if it exists.
+     *
+     * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $state
+     * @return \Illuminate\Bus\ExecutionContext\ExecutionStepResult|null
+     */
+    public function getStep($state, $step);
+
+    /**
+     * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $state
+     * @param  \Illuminate\Bus\ExecutionContext\ExecutionStepResult  $stepResult
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      */
-    public function saveStep($state, string $step, $ttl = null): void;
+    public function saveStep($state, $stepResult, $ttl = null): void;
 
     /**
      * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $id
@@ -33,7 +47,7 @@ interface ExecutionRepository
      * @param  string  $steps
      * @return void
      */
-    public function deleteStep($stateId, string $name): void;
+    public function deleteStep($stateId, $name): void;
 
     /**
      * Delete many steps.
@@ -42,5 +56,5 @@ interface ExecutionRepository
      * @param  array<array-key, string>  $steps
      * @return void
      */
-    public function deleteSteps($stateId, array $steps): void;
+    public function deleteSteps($stateId, $steps): void;
 }
