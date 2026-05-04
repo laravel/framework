@@ -711,7 +711,8 @@ assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sortBy(f
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sortBy('string'));
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sortBy('string', 1, false));
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sortBy([
-    ['string', 'string'],
+    ['string', 'asc'],
+    ['foo', SortDirection::Descending],
 ]));
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sortBy([function ($user, $int) {
     // assertType('User', $user);
@@ -729,7 +730,8 @@ assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sortByDe
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sortByDesc('string'));
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sortByDesc('string', 1));
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sortByDesc([
-    ['string', 'string'],
+    ['string', 'asc'],
+    ['foo', SortDirection::Descending],
 ]));
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sortByDesc([function ($user, $int) {
     // assertType('User', $user);
