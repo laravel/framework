@@ -11,6 +11,7 @@ use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Attributes\Config;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
@@ -384,6 +385,21 @@ class RoutingRouteTest extends TestCase
         $this->assertTrue($_SERVER['__middleware.group']);
 
         unset($_SERVER['__middleware.group']);
+    }
+
+    public function testMiddlewareGroupsCannotReferenceItself()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('[web] middleware group is referencing itself.');
+
+        $router = $this->getRouter();
+        $router->get('foo/bar', ['middleware' => 'web', function () {
+            return 'hello';
+        }]);
+
+        $router->middlewareGroup('web', ['web']);
+
+        $router->dispatch(Request::create('foo/bar', 'GET'));
     }
 
     public function testFluentRouteNamingWithinAGroup()
