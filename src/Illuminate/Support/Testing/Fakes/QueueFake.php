@@ -461,7 +461,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      * Get the pending jobs for the given queue.
      *
      * @param  string|null  $queue
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
      */
     public function pendingJobs($queue = null): Collection
     {
@@ -503,7 +503,7 @@ class QueueFake extends QueueManager implements Fake, Queue
     /**
      * Get all pending jobs across every queue.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
      */
     public function allPendingJobs(): Collection
     {
