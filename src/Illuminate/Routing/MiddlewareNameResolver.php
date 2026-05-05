@@ -64,6 +64,7 @@ class MiddlewareNameResolver
             // reference other groups without needing to repeat all their middlewares.
             if (isset($middlewareGroups[$middleware])) {
                 throw_if($name === $middleware, new LogicException("[$name] middleware group is referencing itself."));
+
                 $results = array_merge($results, static::parseMiddlewareGroup(
                     $middleware, $map, $middlewareGroups
                 ));
