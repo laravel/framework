@@ -195,6 +195,10 @@ class SupportNumberTest extends TestCase
         $this->assertSame(5, Number::clamp(5, 1, 10));
         $this->assertSame(4.5, Number::clamp(4.5, 1, 10));
         $this->assertSame(1, Number::clamp(-10, 1, 5));
+        // Incorrect bounds always return 'max'
+        $this->assertSame(1, Number::clamp(-10, 5, 1));
+        $this->assertSame(1, Number::clamp(4, 5, 1));
+        $this->assertSame(1, Number::clamp(10, 5, 1));
     }
 
     public function testToHuman()
