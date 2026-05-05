@@ -849,9 +849,9 @@ class HttpClientTest extends TestCase
                 Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
                 $request[0]['name'] === 'name' &&
                 $request[0]['contents'] === 'Steve' &&
-                $request[1]['name'] === 'roles[]' &&
+                $request[1]['name'] === 'roles[0]' &&
                 $request[1]['contents'] === 'Network Administrator' &&
-                $request[2]['name'] === 'roles[]' &&
+                $request[2]['name'] === 'roles[1]' &&
                 $request[2]['contents'] === 'Janitor';
         });
     }
@@ -872,9 +872,9 @@ class HttpClientTest extends TestCase
                 Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
                 $request[0]['name'] === 'name' &&
                 $request[0]['contents'] === 'Steve' &&
-                $request[1]['name'] === 'roles[]' &&
+                $request[1]['name'] === 'roles[0]' &&
                 $request[1]['contents'] === 'Network Administrator' &&
-                $request[2]['name'] === 'roles[]' &&
+                $request[2]['name'] === 'roles[1]' &&
                 $request[2]['contents'] === 'Janitor' &&
                 $request[3]['name'] === 'attachment' &&
                 $request[3]['contents'] === 'photo_content' &&
