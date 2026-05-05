@@ -53,7 +53,7 @@ class SqsConnector implements ConnectorInterface
     {
         $credentials = $config['credentials'] ?? null;
 
-        $provider = is_string($credentials) ? $credentials : ($credentials['provider'] ?? null);
+        $provider = is_array($credentials) ? ($credentials['provider'] ?? null) : $credentials;
 
         if (!is_string($provider)) {
             return $provider;
