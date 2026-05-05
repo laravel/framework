@@ -130,12 +130,14 @@ class SupportTestingQueueFakeTest extends TestCase
 
         try {
             $this->fake->assertPushedOn('bar', JobStub::class);
+            $this->fake->assertPushedOn(QueueNameEnumStub::Bar, JobStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
             $this->assertStringContainsString('The expected [Illuminate\Tests\Support\JobStub] job was not pushed.', $e->getMessage());
         }
 
         $this->fake->assertPushedOn('foo', JobStub::class);
+        $this->fake->assertPushedOn(QueueNameEnumStub::Foo, JobStub::class);
     }
 
     public function testAssertPushedOnWithClosure()
@@ -532,6 +534,12 @@ class SupportTestingQueueFakeTest extends TestCase
         $pushedRaw = $this->fake->pushedRaw(fn ($payload, $queue, $options) => $options === []);
         $this->assertCount(0, $pushedRaw);
     }
+}
+
+enum QueueNameEnumStub: string
+{
+    case Foo = 'foo';
+    case Bar = 'bar';
 }
 
 class JobStub

@@ -17,6 +17,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
+use function Illuminate\Support\enum_value;
+
 /**
  * @phpstan-type RawPushType array{"payload": string, "queue": string|null, "options": array<array-key, mixed>}
  */
@@ -149,7 +151,7 @@ class QueueFake extends QueueManager implements Fake, Queue
     /**
      * Assert if a job was pushed based on a truth-test callback.
      *
-     * @param  string  $queue
+     * @param  \UnitEnum|string  $queue
      * @param  string|\Closure  $job
      * @param  callable|null  $callback
      * @return void
@@ -160,8 +162,10 @@ class QueueFake extends QueueManager implements Fake, Queue
             [$job, $callback] = [$this->firstClosureParameterType($job), $job];
         }
 
+        $queue = enum_value($queue);
+
         $this->assertPushed($job, function ($job, $pushedQueue) use ($callback, $queue) {
-            if ($pushedQueue !== $queue) {
+            if (enum_value($pushedQueue) !== $queue) {
                 return false;
             }
 
