@@ -22,6 +22,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use ReflectionClass;
 use ReflectionMethod;
+use SortDirection;
 
 /**
  * @template TModel of \Illuminate\Database\Eloquent\Model
@@ -1071,7 +1072,7 @@ class Builder implements BuilderContract
     protected function enforceOrderBy()
     {
         if (empty($this->query->orders) && empty($this->query->unionOrders)) {
-            $this->orderBy($this->model->getQualifiedKeyName(), 'asc');
+            $this->orderBy($this->model->getQualifiedKeyName(), SortDirection::Ascending);
         }
     }
 

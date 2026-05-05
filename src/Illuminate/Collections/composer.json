@@ -18,8 +18,8 @@
         "illuminate/conditionable": "^13.0",
         "illuminate/contracts": "^13.0",
         "illuminate/macroable": "^13.0",
-        "symfony/polyfill-php84": "^1.33",
-        "symfony/polyfill-php85": "^1.33",
+        "symfony/polyfill-php84": "^1.36",
+        "symfony/polyfill-php85": "^1.36",
         "symfony/polyfill-php86": "^1.36"
     },
     "suggest": {
