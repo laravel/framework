@@ -9,7 +9,7 @@ trait ResumableTrait
     protected ExecutionContext $context;
 
     /**
-     * @return string|\Illuminate\Bus\ExecutionContext\ExecutionContext
+     * @return string|\Illuminate\Bus\ExecutionContext\ExecutionContext|null
      */
     public function executionContextId(): mixed
     {
@@ -23,7 +23,15 @@ trait ResumableTrait
         return $this;
     }
 
-    protected function step(string $name, callable $callback, $options = []): mixed
+    /**
+     * @template TReturn
+     *
+     * @param  string  $name
+     * @param  callable(): TReturn  $callback
+     * @params array{ttl?:  \DateTimeInterface|\DateInterval|int|null|(\Closure(ExecutionStepResult): \DateTimeInterface|\DateInterval|int|null)}|\Illuminate\Contracts\Support\Arrayable  $options
+     * @return TReturn
+     */
+    protected function step($name, callable $callback, $options = []): mixed
     {
         return $this->context->step($name, $callback, $options);
     }
