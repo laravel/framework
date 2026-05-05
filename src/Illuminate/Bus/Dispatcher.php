@@ -132,10 +132,13 @@ class Dispatcher implements QueueingDispatcher
                 return $handler->{$method}($command);
             };
         } elseif ($command instanceof Resumable) {
-            $executionContext = $this->container->make(ExecutionContext::class, [
-                'id' => $command->executionContextId(),
-                'options' => method_exists($command, 'executionContextOptions') ? $command->executionContextOptions() : [],
-            ]);
+            $executionContextId = $command->executionContextId();
+            $executionContext = $executionContextId instanceof ExecutionContext
+                ? $executionContextId
+                : $this->container->make(ExecutionContext::class, [
+                    'id' => $executionContextId,
+                    'options' => method_exists($command, 'executionContextOptions') ? $command->executionContextOptions() : [],
+                ]);
 
             $command->setExecutionContext($executionContext);
 

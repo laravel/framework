@@ -6,6 +6,7 @@ use Illuminate\Bus\Events\StepCompleted;
 use Illuminate\Bus\Events\StepFailed;
 use Illuminate\Bus\Events\StepStarting;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Workflow\ExecutionRepository as ExecutionRepositoryContract;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -13,13 +14,16 @@ use Throwable;
 
 class ExecutionContext
 {
+    /**
+     * The context's state.
+     */
     protected ExecutionState $state;
 
     /**
      * @param  ExecutionRepositoryContract  $executionRepository
      * @param  Dispatcher|null  $eventDispatcher
      * @param  mixed|null  $id
-     * @param  array{ttl?: \DateTimeInterface|\DateInterval|int|null|(\Closure(): \DateTimeInterface|\DateInterval|int|null)}  $options
+     * @param  array{ttl?: \DateTimeInterface|\DateInterval|int|null|(\Closure(): \DateTimeInterface|\DateInterval|int|null)}|\Illuminate\Contracts\Support\Arrayable  $options
      */
     public function __construct(
         protected ExecutionRepositoryContract $executionRepository,
@@ -42,7 +46,7 @@ class ExecutionContext
      *
      * @param  string  $name
      * @param  (callable(): TReturn)  $callback
-     * @param  array{ttl?:  \DateTimeInterface|\DateInterval|int|null|(\Closure(ExecutionStepResult): \DateTimeInterface|\DateInterval|int|null)}  $options
+     * @param  array{ttl?:  \DateTimeInterface|\DateInterval|int|null|(\Closure(ExecutionStepResult): \DateTimeInterface|\DateInterval|int|null)}|\Illuminate\Contracts\Support\Arrayable  $options
      * @return TReturn
      *
      * @throws \Throwable
@@ -74,7 +78,6 @@ class ExecutionContext
 
         $this->state->recordStepResult($stepResult);
         $this->executionRepository->saveStep($this->state, $stepResult, $this->normalizeStepOptions($options, $stepResult));
-
         $this->eventDispatcher?->dispatch(new StepCompleted($this->state, $name, $stepResult));
 
         return $result;
@@ -103,13 +106,26 @@ class ExecutionContext
         $this->executionRepository->delete($this->state);
     }
 
+    /**
+     * Get the state of the ExecutionContext.
+     *
+     * @return ExecutionState
+     */
     public function getState(): ExecutionState
     {
         return $this->state;
     }
 
-    protected function normalizeOptions(array $options): array
+    /**
+     * @param  array<array-key, mixed>|\Illuminate\Contracts\Support\Arrayable  $options
+     * @return array<array-key, mixed>
+     */
+    protected function normalizeOptions($options): array
     {
+        if ($options instanceof Arrayable) {
+            $options = $options->toArray();
+        }
+
         if (array_key_exists('ttl', $options)) {
             $options['ttl'] = value($options['ttl']);
         }
@@ -117,8 +133,17 @@ class ExecutionContext
         return $options;
     }
 
-    protected function normalizeStepOptions(array $options, ExecutionStepResult $stepResult): array
+    /**
+     * @param  array<array-key, mixed>|\Illuminate\Contracts\Support\Arrayable  $options
+     * @param  ExecutionStepResult  $stepResult
+     * @return array
+     */
+    protected function normalizeStepOptions($options, ExecutionStepResult $stepResult): array
     {
+        if ($options instanceof Arrayable) {
+            $options = $options->toArray();
+        }
+
         if (array_key_exists('ttl', $options)) {
             $options['ttl'] = value($options['ttl'], $stepResult);
         }

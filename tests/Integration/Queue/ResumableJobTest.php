@@ -2,7 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
+use Illuminate\Bus\ExecutionContext\ExecutionContext;
+use Illuminate\Bus\ExecutionContext\ExecutionState;
 use Illuminate\Bus\ExecutionContext\ExecutionStepResult;
+use Illuminate\Contracts\Workflow\ExecutionRepository;
 use Illuminate\Contracts\Queue\Resumable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -228,6 +231,35 @@ class ResumableJobTest extends QueueTestCase
         $this->assertEquals(1, Cache::get('updateDatabase'));
         $this->assertEquals(1, Cache::get('sendEmail'));
     }
+
+    public function test_job_can_return_execution_context_instance()
+    {
+        Mail::fake();
+        Event::fake();
+        $state = new ExecutionState('return-1234');
+        $state->recordStepResult(new ExecutionStepResult('return-1234', 'get_data', 1, [
+            'data' => [
+                [
+                    'id' => 9876,
+                    'email' => 'taylor@laravel.com',
+                ],
+                [
+                    'id' => 1002,
+                    'email' => 'abby@laravel.com',
+                ],
+            ],
+        ]));
+        $context = new ExecutionContext($this->app->make(ExecutionRepository::class), null, $state);
+
+        TestResumableJobWithExecutionContextInstance::dispatchSync($context, 1234);
+
+        $this->assertEquals(0, Cache::get('getData'));
+        $this->assertEquals(1, Cache::get('updateDatabase'));
+        $this->assertEquals(1, Cache::get('sendEmail'));
+        $this->assertTrue($context->getState()->hasCompletedStep('get_data'));
+        $this->assertTrue($context->getState()->hasCompletedStep('update_database'));
+        $this->assertTrue($context->getState()->hasCompletedStep('send_email'));
+    }
 }
 
 class TestResumableJob implements Resumable, ShouldQueue
@@ -311,6 +343,21 @@ class TestResumableJobWithCustomExecutionContext extends TestResumableJob
     public function executionContextId(): mixed
     {
         return $this->contextId;
+    }
+}
+
+class TestResumableJobWithExecutionContextInstance extends TestResumableJob
+{
+    public function __construct(
+        protected ExecutionContext $executionContext,
+        int $userId,
+    ) {
+        parent::__construct($userId);
+    }
+
+    public function executionContextId(): mixed
+    {
+        return $this->executionContext;
     }
 }
 
