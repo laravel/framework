@@ -180,6 +180,47 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
+     * Get all pending jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
+     */
+    public function allPendingJobs(): Collection
+    {
+        return $this->database->table($this->table)
+            ->whereNull('reserved_at')
+            ->where('available_at', '<=', $this->currentTime())
+            ->get()
+            ->map(fn ($record) => InspectedJob::fromPayload($record->payload, $record->attempts));
+    }
+
+    /**
+     * Get all delayed jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
+     */
+    public function allDelayedJobs(): Collection
+    {
+        return $this->database->table($this->table)
+            ->whereNull('reserved_at')
+            ->where('available_at', '>', $this->currentTime())
+            ->get()
+            ->map(fn ($record) => InspectedJob::fromPayload($record->payload, $record->attempts));
+    }
+
+    /**
+     * Get all reserved jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
+     */
+    public function allReservedJobs(): Collection
+    {
+        return $this->database->table($this->table)
+            ->whereNotNull('reserved_at')
+            ->get()
+            ->map(fn ($record) => InspectedJob::fromPayload($record->payload, $record->attempts));
+    }
+
+    /**
      * Get the creation timestamp of the oldest pending job, excluding delayed jobs.
      *
      * @param  string|null  $queue

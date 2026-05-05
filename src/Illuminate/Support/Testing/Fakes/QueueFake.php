@@ -505,6 +505,45 @@ class QueueFake extends QueueManager implements Fake, Queue
     }
 
     /**
+     * Get all pending jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
+     */
+    public function allPendingJobs(): Collection
+    {
+        return (new Collection($this->jobs))
+            ->flatten(1)
+            ->map(fn ($data) => new InspectedJob(
+                uuid: null,
+                name: is_object($data['job'])
+                    ? (method_exists($data['job'], 'displayName') ? $data['job']->displayName() : get_class($data['job']))
+                    : $data['job'],
+                attempts: 0,
+                createdAt: null,
+            ));
+    }
+
+    /**
+     * Get all delayed jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function allDelayedJobs(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * Get all reserved jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function allReservedJobs(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
      * Get the creation timestamp of the oldest pending job, excluding delayed jobs.
      *
      * @param  string|null  $queue

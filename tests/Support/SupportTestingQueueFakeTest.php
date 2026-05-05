@@ -497,6 +497,19 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->assertSame(0, $pending->first()->attempts);
     }
 
+    public function testAllPendingJobs()
+    {
+        $this->fake->push($this->job, '', 'foo');
+        $this->fake->push(new JobToFakeStub, '', 'bar');
+
+        $pending = $this->fake->allPendingJobs();
+
+        $this->assertCount(2, $pending);
+        $this->assertInstanceOf(InspectedJob::class, $pending->first());
+        $this->assertTrue($pending->contains(fn ($job) => $job->name === JobStub::class));
+        $this->assertTrue($pending->contains(fn ($job) => $job->name === JobToFakeStub::class));
+    }
+
     public function testGetRawPushes()
     {
         $this->fake->pushRaw('some-payload', null, ['options' => 'yeah']);

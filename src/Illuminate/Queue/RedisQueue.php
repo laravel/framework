@@ -195,6 +195,55 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
+     * Get all pending jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
+     */
+    public function allPendingJobs(): Collection
+    {
+        return $this->allQueueNames()
+            ->flatMap(fn ($name) => $this->getConnection()->lrange($this->getQueueRedisKey($name), 0, -1))
+            ->map(fn ($payload) => InspectedJob::fromPayload($payload));
+    }
+
+    /**
+     * Get all delayed jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
+     */
+    public function allDelayedJobs(): Collection
+    {
+        return $this->allQueueNames()
+            ->flatMap(fn ($name) => $this->getConnection()->zrange($this->getQueueRedisKey($name).':delayed', 0, -1))
+            ->map(fn ($payload) => InspectedJob::fromPayload($payload));
+    }
+
+    /**
+     * Get all reserved jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
+     */
+    public function allReservedJobs(): Collection
+    {
+        return $this->allQueueNames()
+            ->flatMap(fn ($name) => $this->getConnection()->zrange($this->getQueueRedisKey($name).':reserved', 0, -1))
+            ->map(fn ($payload) => InspectedJob::fromPayload($payload));
+    }
+
+    /**
+     * Get the unique queue names.
+     *
+     * @return \Illuminate\Support\Collection<int, string>
+     */
+    protected function allQueueNames(): Collection
+    {
+        return (new Collection($this->getConnection()->keys('queues:*')))
+            ->map(fn ($key) => Str::between($key, 'queues:', ':'))
+            ->unique()
+            ->values();
+    }
+
+    /**
      * Get the creation timestamp of the oldest pending job, excluding delayed jobs.
      *
      * @param  string|null  $queue
