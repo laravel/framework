@@ -208,6 +208,32 @@ class HttpResponseTest extends TestCase
         $this->assertSame('TATA', $response->headers->get('titi'));
     }
 
+    public function testWithClearSiteData()
+    {
+        $response = new Response;
+
+        $result = $response->withClearSiteData(['cache', 'cookies', 'storage']);
+
+        $this->assertSame($response, $result);
+        $this->assertSame('"cache", "cookies", "storage"', $response->headers->get('Clear-Site-Data'));
+    }
+
+    public function testWithClearSiteDataAcceptsString()
+    {
+        $response = new Response;
+
+        $response->withClearSiteData('cache');
+
+        $this->assertSame('"cache"', $response->headers->get('Clear-Site-Data'));
+
+
+        $response = new Response;
+
+        $response->withClearSiteData();
+
+        $this->assertSame('"*"', $response->headers->get('Clear-Site-Data'));
+    }
+
     public function testWithoutHeader()
     {
         $response = new Response(null, 200, ['foo' => 'bar', 'baz' => 'qux', 'zal' => 'ter']);
