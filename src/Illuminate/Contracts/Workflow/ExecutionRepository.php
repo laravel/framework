@@ -34,9 +34,9 @@ interface ExecutionRepository
      *
      * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string  $state
      * @param  \Illuminate\Bus\ExecutionContext\ExecutionStepResult  $stepResult
-     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  array{ttl?: \DateTimeInterface|\DateInterval|int|null}  $options
      */
-    public function saveStep($state, $stepResult, $ttl = null): void;
+    public function saveStep($state, $stepResult, $options = []): void;
 
     /**
      * Delete the ExecutionState and its steps.

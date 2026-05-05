@@ -60,9 +60,9 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
     }
 
     #[\Override]
-    public function saveStep($state, $stepResult, $ttl = null): void
+    public function saveStep($state, $stepResult, $options = []): void
     {
-        $ttl ??= $this->defaultTtl($state);
+        $ttl = array_key_exists('ttl', $options) ? $options['ttl'] : $this->defaultTtl($state);
 
         $this->getCache()->put($this->determineStepCacheKey($state, $stepResult->name), $stepResult, $ttl);
 

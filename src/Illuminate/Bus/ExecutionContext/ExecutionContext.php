@@ -42,7 +42,7 @@ class ExecutionContext
      *
      * @param  string  $name
      * @param  (callable(): TReturn)  $callback
-     * @param  array{ttl?:  \DateTimeInterface|\DateInterval|int|null}  $options
+     * @param  array{ttl?:  \DateTimeInterface|\DateInterval|int|null|(\Closure(ExecutionStepResult): \DateTimeInterface|\DateInterval|int|null)}  $options
      * @return TReturn
      *
      * @throws \Throwable
@@ -73,7 +73,7 @@ class ExecutionContext
         $stepResult = new ExecutionStepResult($this->state->id(), $name, Carbon::now()->getTimestamp(), $result);
 
         $this->state->recordStepResult($stepResult);
-        $this->executionRepository->saveStep($this->state, $stepResult, value($options['ttl'] ?? null, $stepResult));
+        $this->executionRepository->saveStep($this->state, $stepResult, $this->normalizeStepOptions($options, $stepResult));
 
         $this->eventDispatcher?->dispatch(new StepCompleted($this->state, $name, $stepResult));
 
@@ -112,6 +112,15 @@ class ExecutionContext
     {
         if (array_key_exists('ttl', $options)) {
             $options['ttl'] = value($options['ttl']);
+        }
+
+        return $options;
+    }
+
+    protected function normalizeStepOptions(array $options, ExecutionStepResult $stepResult): array
+    {
+        if (array_key_exists('ttl', $options)) {
+            $options['ttl'] = value($options['ttl'], $stepResult);
         }
 
         return $options;

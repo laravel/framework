@@ -56,7 +56,7 @@ class ExecutionContextTest extends TestCase
         $this->assertSame('fetch-products', $repository->savedSteps[0]['stepResult']->name);
         $this->assertSame(['product-1', 'product-2'], $repository->savedSteps[0]['stepResult']->result);
         $this->assertSame($now->getTimestamp(), $repository->savedSteps[0]['stepResult']->completedAt);
-        $this->assertNull($repository->savedSteps[0]['ttl']);
+        $this->assertSame([], $repository->savedSteps[0]['options']);
     }
 
     public function testStepReturnsStoredResultWhenAlreadyCompleted()
@@ -161,7 +161,7 @@ class ExecutionContextTest extends TestCase
         $this->assertSame($state, $repository->savedSteps[0]['state']);
         $this->assertSame('fetch-products', $repository->savedSteps[0]['stepResult']->name);
         $this->assertSame('new-result', $repository->savedSteps[0]['stepResult']->result);
-        $this->assertSame(300, $repository->savedSteps[0]['ttl']);
+        $this->assertSame(['ttl' => 300], $repository->savedSteps[0]['options']);
     }
 
     public function testStepLeavesDefaultTtlForRepositoryFallback()
@@ -176,7 +176,7 @@ class ExecutionContextTest extends TestCase
         $this->assertSame($state, $repository->savedSteps[0]['state']);
         $this->assertSame('fetch-products', $repository->savedSteps[0]['stepResult']->name);
         $this->assertSame('new-result', $repository->savedSteps[0]['stepResult']->result);
-        $this->assertNull($repository->savedSteps[0]['ttl']);
+        $this->assertSame([], $repository->savedSteps[0]['options']);
     }
 
     public function testStepUsesStateLoadedFromRepository()
@@ -285,6 +285,23 @@ class ExecutionContextTest extends TestCase
         $this->assertNull($cache->get('execution:execution-1:step:fetch-products'));
     }
 
+    public function testNullStepTtlOverridesExecutionTtl()
+    {
+        Carbon::setTestNow(Carbon::parse('2026-04-01 21:53:00'));
+
+        $cache = new CacheRepository(new ArrayStore);
+        $repository = new CacheExecutionRepository(new ExecutionContextCacheFactory($cache));
+        $context = new ExecutionContext($repository, null, 'execution-1', ['ttl' => 60]);
+
+        $context->step('fetch-products', static fn () => 'new-result', ['ttl' => null]);
+
+        Carbon::setTestNow(Carbon::parse('2026-04-01 21:54:01'));
+
+        $this->assertNull($cache->get('execution:execution-1'));
+        $this->assertNull($cache->get('execution:execution-1:steps'));
+        $this->assertInstanceOf(ExecutionStepResult::class, $cache->get('execution:execution-1:step:fetch-products'));
+    }
+
     protected function fakeEvents(): EventFake
     {
         return new EventFake(new BaseEventDispatcher(new Container));
@@ -353,9 +370,9 @@ class ExecutionContextRecordingExecutionRepository implements ExecutionRepositor
         return $state->all()[$step] ?? null;
     }
 
-    public function saveStep($state, $stepResult, $ttl = null): void
+    public function saveStep($state, $stepResult, $options = []): void
     {
-        $this->savedSteps[] = ['state' => $state, 'stepResult' => $stepResult, 'ttl' => $ttl];
+        $this->savedSteps[] = ['state' => $state, 'stepResult' => $stepResult, 'options' => $options];
         $this->states[$state->id()] = $state;
     }
 
