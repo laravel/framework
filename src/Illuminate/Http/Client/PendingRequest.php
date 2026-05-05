@@ -1155,7 +1155,7 @@ class PendingRequest
     protected function parseMultipartBodyFormat(array $data)
     {
         return (new Collection($data))
-            ->flatMap(function ($value, $key) {
+            ->flatMap(function ($value, $rootKey) {
                 if (is_array($value)) {
                     // If the array has 'name' and 'contents' keys, it's already formatted for multipart...
                     if (isset($value['name'], $value['contents'])) {
@@ -1163,12 +1163,13 @@ class PendingRequest
                     }
 
                     // Otherwise, treat it as multiple values for the same field name...
-                    return (new Collection($value))->map(function ($item) use ($key) {
-                        return ['name' => $key.'[]', 'contents' => $item];
-                    });
+                    return (new Collection($value))
+                        ->mapWithKeys(function ($item, $key) use ($rootKey) {
+                            return ["{$rootKey}[$key]" => ['name' => "{$rootKey}[$key]", 'contents' => $item]];
+                        });
                 }
 
-                return [['name' => $key, 'contents' => $value]];
+                return [['name' => $rootKey, 'contents' => $value]];
             })
             ->values()
             ->all();

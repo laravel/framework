@@ -882,6 +882,25 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testCanSendMultipartDataWithKeyedArrayValues()
+    {
+        $this->factory->fake();
+
+        $this->factory->asMultipart()->post('http://foo.com/multipart', [
+            'user' => ['name' => 'foo'],
+            'admin' => ['name' => 'bar'],
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/multipart' &&
+                Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
+                $request[0]['name'] === 'user[name]' &&
+                $request[0]['contents'] === 'foo' &&
+                $request[1]['name'] === 'admin[name]' &&
+                $request[1]['contents'] === 'bar';
+        });
+    }
+
     public function testItCanSendToken()
     {
         $this->factory->fake();
