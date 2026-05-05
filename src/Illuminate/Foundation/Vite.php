@@ -1245,5 +1245,7 @@ class Vite implements Htmlable
         $this->fonts?->flush();
 
         $this->fonts = null;
+
+        $this->nonce = null;
     }
 }
