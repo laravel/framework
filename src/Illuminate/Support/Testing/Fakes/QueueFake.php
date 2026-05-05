@@ -461,7 +461,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      * Get the pending jobs for the given queue.
      *
      * @param  string|null  $queue
-     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
+     * @return \Illuminate\Support\Collection
      */
     public function pendingJobs($queue = null): Collection
     {
@@ -496,6 +496,45 @@ class QueueFake extends QueueManager implements Fake, Queue
      * @return \Illuminate\Support\Collection
      */
     public function reservedJobs($queue = null): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * Get all pending jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function allPendingJobs(): Collection
+    {
+        return (new Collection($this->jobs))
+            ->flatten(1)
+            ->map(fn ($data) => new InspectedJob(
+                uuid: null,
+                name: is_object($data['job'])
+                    ? (method_exists($data['job'], 'displayName') ? $data['job']->displayName() : get_class($data['job']))
+                    : $data['job'],
+                attempts: 0,
+                createdAt: null,
+            ));
+    }
+
+    /**
+     * Get all delayed jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function allDelayedJobs(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * Get all reserved jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function allReservedJobs(): Collection
     {
         return new Collection;
     }
