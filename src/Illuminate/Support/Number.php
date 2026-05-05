@@ -5,6 +5,7 @@ namespace Illuminate\Support;
 use Illuminate\Support\Traits\Macroable;
 use NumberFormatter;
 use RuntimeException;
+use ValueError;
 
 class Number
 {
@@ -310,7 +311,13 @@ class Number
      */
     public static function clamp(int|float $number, int|float $min, int|float $max)
     {
-        return clamp($number, $min, $max);
+        try {
+            return clamp($number, $min, $max);
+        } catch (ValueError $e) {
+            trigger_error($e->getMessage(), E_USER_DEPRECATED);
+
+            return $max;
+        }
     }
 
     /**

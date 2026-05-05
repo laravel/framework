@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Number;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
@@ -195,9 +196,17 @@ class SupportNumberTest extends TestCase
         $this->assertSame(5, Number::clamp(5, 1, 10));
         $this->assertSame(4.5, Number::clamp(4.5, 1, 10));
         $this->assertSame(1, Number::clamp(-10, 1, 5));
+    }
+
+    #[IgnoreDeprecations]
+    public function testClampIncorrectBounds()
+    {
         // Incorrect bounds always return 'max'
+        $this->expectUserDeprecationMessage('clamp(): Argument #2 ($min) must be smaller than or equal to argument #3 ($max)');
         $this->assertSame(1, Number::clamp(-10, 5, 1));
+        $this->expectUserDeprecationMessage('clamp(): Argument #2 ($min) must be smaller than or equal to argument #3 ($max)');
         $this->assertSame(1, Number::clamp(4, 5, 1));
+        $this->expectUserDeprecationMessage('clamp(): Argument #2 ($min) must be smaller than or equal to argument #3 ($max)');
         $this->assertSame(1, Number::clamp(10, 5, 1));
     }
 
