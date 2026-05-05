@@ -64,4 +64,29 @@ final class ScheduleTest extends TestCase
         $this->assertSame(JobToTestWithSchedule::class, $scheduledJob->description);
         $this->assertFalse($this->container->resolved(JobToTestWithSchedule::class));
     }
+
+    public function testItCanFilterEventsByEnvironments(): void
+    {
+        $schedule = new Schedule();
+        $schedule->job(JobToTestWithSchedule::class)->environments('production')->daily();
+        $schedule->command('inspire')->environments(['staging', 'production'])->everyMinute();
+        $schedule->command('foobar', ['a' => 'b'])->environments(['local', 'uat'])->everyMinute();
+        $schedule->command('foobar')->hourly();
+
+        $filteredEvents = $schedule->eventsForEnvironments(['production', 'staging']);
+
+        $this->assertCount(3, $filteredEvents);
+
+        $this->assertSame(JobToTestWithSchedule::class, $filteredEvents[0]->description);
+        $this->assertSame(['production'], $filteredEvents[0]->environments);
+        $this->assertSame('0 0 * * *', $filteredEvents[0]->expression);
+
+        $this->assertMatchesRegularExpression('/artisan.*inspire$/', $filteredEvents[1]->command);
+        $this->assertSame(['staging', 'production'], $filteredEvents[1]->environments);
+        $this->assertSame('* * * * *', $filteredEvents[1]->expression);
+
+        $this->assertMatchesRegularExpression('/artisan.*foobar$/', $filteredEvents[2]->command);
+        $this->assertSame([], $filteredEvents[2]->environments);
+        $this->assertSame('0 * * * *', $filteredEvents[2]->expression);
+    }
 }
