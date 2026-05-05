@@ -104,6 +104,8 @@ class ExecutionContext
     public function delete()
     {
         $this->executionRepository->delete($this->state);
+
+        $this->state->clearSteps();
     }
 
     /**

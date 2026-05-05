@@ -124,6 +124,36 @@ class ExecutionContextTest extends TestCase
         $this->assertCount(2, $repository->savedSteps);
     }
 
+    public function testDeleteClearsRecordedSteps()
+    {
+        $repository = new ExecutionContextRecordingExecutionRepository;
+        $state = new ExecutionState('execution-1');
+        $context = new ExecutionContext($repository, null, $state);
+        $runs = 0;
+
+        $firstResult = $context->step('fetch-products', static function () use (&$runs) {
+            $runs++;
+
+            return 'result-'.$runs;
+        });
+
+        $context->delete();
+        $this->assertSame([], $state->all());
+
+        $secondResult = $context->step('fetch-products', static function () use (&$runs) {
+            $runs++;
+
+            return 'result-'.$runs;
+        });
+
+        $this->assertSame('result-1', $firstResult);
+        $this->assertSame('result-2', $secondResult);
+        $this->assertSame(2, $runs);
+        $this->assertSame('result-2', $state->resultFor('fetch-products'));
+        $this->assertSame([$state], $repository->deletes);
+        $this->assertCount(2, $repository->savedSteps);
+    }
+
     public function testStepDispatchesFailedEventWhenCallbackThrows()
     {
         $events = $this->fakeEvents();
