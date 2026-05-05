@@ -486,8 +486,10 @@ trait EnumeratesValues
     /**
      * Get the min value of a given key.
      *
-     * @param  (callable(TValue):mixed)|string|null  $callback
-     * @return mixed
+     * @template TMinResult = mixed
+     *
+     * @param  (callable(TValue): TMinResult)|string|null  $callback
+     * @return ($callback is callable ? ?TMinResult : ($callback is null ? ?TValue : mixed))
      */
     public function min($callback = null)
     {
@@ -501,8 +503,10 @@ trait EnumeratesValues
     /**
      * Get the max value of a given key.
      *
-     * @param  (callable(TValue):mixed)|string|null  $callback
-     * @return mixed
+     * @template TMaxResult = mixed
+     *
+     * @param  (callable(TValue): TMaxResult)|string|null  $callback
+     * @return ($callback is callable ? ?TMaxResult : ($callback is null ? ?TValue : mixed))
      */
     public function max($callback = null)
     {
