@@ -11,7 +11,6 @@ use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Attributes\Config;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
