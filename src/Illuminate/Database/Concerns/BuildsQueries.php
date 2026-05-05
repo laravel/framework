@@ -172,6 +172,25 @@ trait BuildsQueries
         do {
             $clone = clone $this;
 
+            // If the query has OR conditions at the root level, wrap them in a nested
+            // group to prevent SQL operator precedence issues when the cursor condition
+            // (AND id > $lastId) is appended by forPageAfterId / forPageBeforeId.
+            //
+            // Without this, a query like:
+            //   ->where('a')->orWhere('b')->chunkById(...)
+            // generates: WHERE a OR b AND id > X
+            // which MySQL evaluates as: WHERE a OR (b AND id > X)  ← wrong
+            // instead of: WHERE (a OR b) AND id > X  ← intended
+            $baseQuery = method_exists($clone, 'getQuery') ? $clone->getQuery() : $clone;
+
+            if (collect($baseQuery->wheres)->pluck('boolean')->contains(fn ($b) => str_contains($b, 'or'))) {
+                $nested = $baseQuery->forNestedWhere();
+                $nested->wheres = $baseQuery->wheres;
+                $baseQuery->wheres = [['type' => 'Nested', 'query' => $nested, 'boolean' => 'and']];
+                // Bindings intentionally stay on $baseQuery — Laravel always resolves
+                // bindings from the top-level query, not from nested query objects.
+            }
+
             if ($skip && $page > 1) {
                 $clone->offset(0);
             }

@@ -6142,6 +6142,31 @@ SQL;
         }, 'someIdField');
     }
 
+    public function testChunkByIdWrapsOrWhereToPreventSqlPrecedenceIssue()
+    {
+        $capturedSqls = [];
+
+        $builder = $this->getBuilder()->from('users')->where('id', 1)->orWhere('id', 5);
+        $builder->getConnection()->shouldReceive('select')->andReturnUsing(function ($sql, $bindings) use (&$capturedSqls) {
+            $capturedSqls[] = $sql;
+
+            return [];
+        });
+        $builder->getProcessor()->shouldReceive('processSelect')->andReturn([]);
+
+        $builder->chunkById(2, function () {
+        });
+
+        // Without the fix, the SQL was:
+        //   WHERE "id" = ? or "id" = ? and "id" > ?
+        // which MySQL evaluates as:
+        //   WHERE "id" = ? or ("id" = ? and "id" > ?)  ← AND binds tighter than OR
+        // With the fix, the OR conditions are wrapped in a nested group:
+        //   WHERE ("id" = ? or "id" = ?) and "id" > ?
+        $this->assertStringContainsString('("id" = ? or "id" = ?)', $capturedSqls[0]);
+        $this->assertStringNotContainsString('"id" = ? or "id" = ? and', $capturedSqls[0]);
+    }
+
     public function testPaginate()
     {
         $perPage = 16;

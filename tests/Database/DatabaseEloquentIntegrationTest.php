@@ -965,6 +965,58 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals(2, $i);
     }
 
+    public function testChunkByIdWithOrWhere()
+    {
+        EloquentTestUser::insert([
+            ['id' => 1, 'name' => 'First', 'email' => 'first@example.com'],
+            ['id' => 2, 'name' => 'Second', 'email' => 'second@example.com'],
+            ['id' => 3, 'name' => 'Third', 'email' => 'third@example.com'],
+            ['id' => 4, 'name' => 'Fourth', 'email' => 'fourth@example.com'],
+            ['id' => 5, 'name' => 'Fifth', 'email' => 'fifth@example.com'],
+        ]);
+
+        // Without the fix, the generated SQL was:
+        //   WHERE id = 1 OR id = 5 AND id > $lastId
+        // MySQL evaluated this as:
+        //   WHERE id = 1 OR (id = 5 AND id > $lastId)
+        // The first condition (id = 1) always matched regardless of $lastId,
+        // causing chunkById to loop infinitely on the same first chunk.
+        $collected = [];
+
+        EloquentTestUser::where('id', 1)
+            ->orWhere('id', 5)
+            ->chunkById(1, function (Collection $users) use (&$collected) {
+                foreach ($users as $user) {
+                    $collected[] = $user->id;
+                }
+            });
+
+        $this->assertSame([1, 5], $collected);
+    }
+
+    public function testChunkByIdDescWithOrWhere()
+    {
+        EloquentTestUser::insert([
+            ['id' => 1, 'name' => 'First', 'email' => 'first@example.com'],
+            ['id' => 2, 'name' => 'Second', 'email' => 'second@example.com'],
+            ['id' => 3, 'name' => 'Third', 'email' => 'third@example.com'],
+            ['id' => 4, 'name' => 'Fourth', 'email' => 'fourth@example.com'],
+            ['id' => 5, 'name' => 'Fifth', 'email' => 'fifth@example.com'],
+        ]);
+
+        $collected = [];
+
+        EloquentTestUser::where('id', 1)
+            ->orWhere('id', 5)
+            ->chunkByIdDesc(1, function (Collection $users) use (&$collected) {
+                foreach ($users as $user) {
+                    $collected[] = $user->id;
+                }
+            });
+
+        $this->assertSame([5, 1], $collected);
+    }
+
     public function testEachByIdWithNonIncrementingKey()
     {
         EloquentTestNonIncrementingSecond::insert([
