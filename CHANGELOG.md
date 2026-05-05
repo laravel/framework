@@ -1,6 +1,56 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.7.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.8.0...13.x)
+
+## [v13.8.0](https://github.com/laravel/framework/compare/v13.7.0...v13.8.0) - 2026-05-05
+
+* [12.x] `schedule:list` display expression in the correct timezone by [@xiCO2k](https://github.com/xiCO2k) in https://github.com/laravel/framework/pull/59307
+* [12.x] Fix validation wildcard array message type error by [@sadique-cws](https://github.com/sadique-cws) in https://github.com/laravel/framework/pull/59339
+* Preserve class type of mocked classes by [@AJenbo](https://github.com/AJenbo) in https://github.com/laravel/framework/pull/59353
+* Preserve types on partialMock() and spy() by [@AJenbo](https://github.com/AJenbo) in https://github.com/laravel/framework/pull/59384
+* Fix missing UnitEnum support in ModelNotFoundException by [@jtheuerkauf](https://github.com/jtheuerkauf) in https://github.com/laravel/framework/pull/59423
+* [12.x] Fix macros with static closures by [@FeBe95](https://github.com/FeBe95) in https://github.com/laravel/framework/pull/59449
+* Correct Storage::fake() return type by [@AJenbo](https://github.com/AJenbo) in https://github.com/laravel/framework/pull/59469
+* [12.x] Fix callable type for freezeTime, freezeSecond, and travelTo by [@nbayramberdiyev](https://github.com/nbayramberdiyev) in https://github.com/laravel/framework/pull/59466
+* [12.x] Support string abstract in mock/partialMock/spy PHPDoc by [@kayw-geek](https://github.com/kayw-geek) in https://github.com/laravel/framework/pull/59477
+* Document thrown exceptions in FilesystemAdapter by [@AJenbo](https://github.com/AJenbo) in https://github.com/laravel/framework/pull/59534
+* Hint \Redis `@mixin` on Connection by [@AJenbo](https://github.com/AJenbo) in https://github.com/laravel/framework/pull/59532
+* [12.x] Use PDO subclass polyfill by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/59640
+* [12.x] Fix infinite rate limiter TTL on custom increments by [@paulandroshchuk](https://github.com/paulandroshchuk) in https://github.com/laravel/framework/pull/59693
+* [12.x] Support named credential providers for SQS queue connections by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/59754
+* [12.x] Prevent array to string conversion in signature validation by [@alies-dev](https://github.com/alies-dev) in https://github.com/laravel/framework/pull/59778
+* [12.x] Memoize credentials in SqsConnector by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/59867
+* [12.x] Disable pausing on managed queue workers by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/59871
+* [DRAFT] Verify merging `12.x` branch by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/59929
+* [13.x] Exclude expired locks in DatabaseLock::isLock by [@JurianArie](https://github.com/JurianArie) in https://github.com/laravel/framework/pull/59948
+* [13.x] Merge attribute-provided middleware with existing middleware by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/59944
+* [13.x] Tighten getCurrentSchemaListing [@return](https://github.com/return) in MySQL and SQLite builders by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59942
+* [13.x] Correct Repository::setStore [@return](https://github.com/return) to $this by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59940
+* [13.x] Correct Limit::none() [@return](https://github.com/return) type to Unlimited by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59938
+* [13.x] Add collation to processColumns and getColumns return shape by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59937
+* [13.x] Mark processViews schema field nullable in [@return](https://github.com/return) shape by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59941
+* Improve docblock wording in AurthorizationException by [@Talha-74](https://github.com/Talha-74) in https://github.com/laravel/framework/pull/59930
+* [13.x] Add Worker Pausing/Resuming events by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59895
+* [13.x] Allow PHPStan to infer the pivot type when passing the pivot model directly by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/59959
+* [13.x] Document missing $health param on ApplicationBuilder::withRouting by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59968
+* [13.x] Correct Log\Context\Repository::handleUnserializeExceptionsUsing [@return](https://github.com/return) to $this by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59965
+* [13.x] Correct Attribute caching toggles [@return](https://github.com/return) to $this by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59962
+* [13.x] Correct Factory::configure [@return](https://github.com/return) to $this by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59963
+* [13.x] Correct Translator::handleMissingKeysUsing [@return](https://github.com/return) to $this by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59964
+* [13.x] Correct Password::min [@return](https://github.com/return) to static by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59967
+* [13.x] Mark processIndexes type field nullable in [@return](https://github.com/return) shape by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59961
+* Add `assertSessionMissingInput` by [@jasonmccreary](https://github.com/jasonmccreary) in https://github.com/laravel/framework/pull/59970
+* [13.x] Mark generation type field nullable in processColumns [@return](https://github.com/return) shape by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/59960
+* [13.x] Allow custom on delete/update by [@JurianArie](https://github.com/JurianArie) in https://github.com/laravel/framework/pull/59986
+* Allow mail default driver to accept enums by [@Tresor-Kasenda](https://github.com/Tresor-Kasenda) in https://github.com/laravel/framework/pull/59973
+* [13.x] LocalScope private recursion  by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59979
+* [13.x] Add an environment filter to the `schedule:list` command by [@m-fi](https://github.com/m-fi) in https://github.com/laravel/framework/pull/59993
+* [13.x] Add generic result type to collection min/max methods by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/59991
+* [13.x] Drop 12.x release notes and update heading by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/59987
+* [13.x] Add enum support to QueueFake assertPushedOn method by [@riesjart](https://github.com/riesjart) in https://github.com/laravel/framework/pull/59990
+* [13.x] Improvements to collection sort docblocks by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/59988
+* [13.x] Add all* queue inspection methods by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/59997
+* [13.x] Add support for `SortDirection` enum to query builder classes by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/59865
 
 ## [v13.7.0](https://github.com/laravel/framework/compare/v13.6.0...v13.7.0) - 2026-04-28
 
