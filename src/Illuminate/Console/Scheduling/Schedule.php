@@ -439,15 +439,7 @@ class Schedule
     {
         return array_values(array_filter(
             $this->events(),
-            function (Event $event) use ($environments) {
-                foreach ($environments as $environment) {
-                    if ($event->runsInEnvironment($environment)) {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
+            static fn (Event $event) => array_any($environments, $event->runsInEnvironment(...))
         ));
     }
 
