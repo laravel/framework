@@ -56,26 +56,65 @@ class ExecutionState
         return $this->options[$key] ?? $default;
     }
 
-    public function hasCompletedStep(string $name): bool
+    /**
+     * Whether the given step has been completed.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    public function hasCompletedStep($name): bool
     {
         return isset($this->data[$name]);
     }
 
-    public function resultFor(string $name): mixed
+    /**
+     * Get the result value for a step.
+     *
+     * @param  string  $name
+     * @return mixed
+     */
+    public function resultFor($name): mixed
     {
         return $this->data[$name]->result;
     }
 
+    /**
+     * Memoize the result of a step.
+     *
+     * @param  ExecutionStepResult  $result
+     * @return void
+     */
     public function recordStepResult(ExecutionStepResult $result): void
     {
         $this->data[$result->name] = $result;
     }
 
-    public function forgetStep(string $name): void
+    /**
+     * Forget the step's result.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public function forgetStep($name): void
     {
         unset($this->data[$name]);
     }
 
+    /**
+     * Clear all the underlying steps.
+     *
+     * @return void
+     */
+    public function clearSteps(): void
+    {
+        $this->data = [];
+    }
+
+    /**
+     * Serialize the state.
+     *
+     * @return array{id: mixed, data: array<string, ExecutionStepResult>, options: StateOptions}
+     */
     public function __serialize(): array
     {
         return [
@@ -85,6 +124,12 @@ class ExecutionState
         ];
     }
 
+    /**
+     * Restore the state.
+     *
+     * @param  array{id: mixed, data: array<string, ExecutionStepResult>, options: StateOptions}  $values
+     * @return void
+     */
     public function __unserialize(array $values): void
     {
         $this->id = $values['id'];
