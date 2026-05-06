@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Rector\CodeQuality\Rector\FuncCall\SortCallLikeNamedArgsRector;
 use Rector\CodeQuality\Rector\Identical\StrlenZeroToIdenticalEmptyStringRector;
 use Rector\CodingStyle\Rector\ArrowFunction\ArrowFunctionDelegatingCallToFirstClassCallableRector;
 use Rector\CodingStyle\Rector\Closure\ClosureDelegatingCallToFirstClassCallableRector;
@@ -123,6 +124,7 @@ return RectorConfig::configure()
     ->withRules([
         ...$testsuiteRules,
         CountArrayToEmptyArrayComparisonRector::class,
+        SortCallLikeNamedArgsRector::class,
         StrlenZeroToIdenticalEmptyStringRector::class,
     ])
     ->withPreparedSets(
