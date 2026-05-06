@@ -101,7 +101,7 @@ trait ResponseTrait
     /**
      * Add the Clear-Site-Data header to the response.
      *
-     * @param  array|string  $directives  Available directives: cache, clientHints, cookies, executionContexts, prefetchCache, prerenderCache, storage, *.
+     * @param  string[]|string  $directives  Available directives: cache, clientHints, cookies, executionContexts, prefetchCache, prerenderCache, storage, *.
      * @return $this
      */
     public function withClearSiteData($directives = '*')
