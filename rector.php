@@ -12,7 +12,6 @@ use Rector\Config\RectorConfig;
 use Rector\Php55\Rector\Class_\ClassConstantToSelfClassRector;
 use Rector\Php55\Rector\String_\StringClassNameToClassConstantRector;
 use Rector\Php56\Rector\FuncCall\PowToExpRector;
-use Rector\Php70\Rector\FuncCall\RandomFunctionRector;
 use Rector\Php70\Rector\If_\IfToSpaceshipRector;
 use Rector\Php70\Rector\MethodCall\ThisCallOnStaticMethodToStaticCallRector;
 use Rector\Php70\Rector\StaticCall\StaticCallOnNonStaticToInstanceCallRector;
@@ -110,7 +109,6 @@ return RectorConfig::configure()
         IfToSpaceshipRector::class,
         NullToStrictStringFuncCallArgRector::class,
         PowToExpRector::class,
-        RandomFunctionRector::class,
         ReadOnlyClassRector::class,
         ReadOnlyPropertyRector::class,
         RemoveExtraParametersRector::class,
