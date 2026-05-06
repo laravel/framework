@@ -473,11 +473,11 @@ class QueueFake extends QueueManager implements Fake, Queue
             ->flatten(1)
             ->filter(fn ($job) => $job['queue'] === $queue)
             ->map(fn ($data) => new InspectedJob(
+                uuid: null,
                 name: is_object($data['job'])
                     ? (method_exists($data['job'], 'displayName') ? $data['job']->displayName() : get_class($data['job']))
                     : $data['job'],
                 attempts: 0,
-                uuid: null,
                 createdAt: null,
             ));
     }
