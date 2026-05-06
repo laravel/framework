@@ -84,6 +84,8 @@ class SupportStrTest extends TestCase
 
         $this->assertSame('Sind Öde Und So', Str::headline('sindÖdeUndSo'));
 
+        $this->assertSame('❤ Multi Byte ☆', Str::headline('❤_multiByte-☆'));
+
         $this->assertSame('Orwell 1984', Str::headline('orwell 1984'));
         $this->assertSame('Orwell 1984', Str::headline('orwell   1984'));
         $this->assertSame('Orwell 1984', Str::headline('-orwell-1984 -'));
@@ -101,6 +103,8 @@ class SupportStrTest extends TestCase
         $this->assertSame('JB', Str::initials('james bond', true));
 
         $this->assertSame('JBLL', Str::initials('james bond loves laravel', true));
+
+        $this->assertSame('❤M☆', Str::initials('❤ MULTIByte ☆'));
     }
 
     public function testStringApa()
@@ -144,6 +148,8 @@ class SupportStrTest extends TestCase
         $this->assertSame('Устное Слово – Не Воробей. Как Только Он Вылетит, Его Не Поймаешь.', Str::apa('устное слово – не воробей. как только он вылетит, его не поймаешь.'));
         $this->assertSame('Устное Слово – Не Воробей. Как Только Он Вылетит, Его Не Поймаешь.', Str::apa('Устное Слово – Не Воробей. Как Только Он Вылетит, Его Не Поймаешь.'));
         $this->assertSame('Устное Слово – Не Воробей. Как Только Он Вылетит, Его Не Поймаешь.', Str::apa('УСТНОЕ СЛОВО – НЕ ВОРОБЕЙ. КАК ТОЛЬКО ОН ВЫЛЕТИТ, ЕГО НЕ ПОЙМАЕШЬ.'));
+
+        $this->assertSame('❤ Multibyte ☆', Str::apa('❤ MULTIByte ☆'));
 
         $this->assertSame('', Str::apa(''));
         $this->assertSame('   ', Str::apa('   '));
@@ -1154,6 +1160,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('FooBarBaz', Str::studly('foo-bar_baz'));
 
         $this->assertSame('ÖffentlicheÜberraschungen', Str::studly('öffentliche-überraschungen'));
+        $this->assertSame('❤MultiByte☆', Str::studly('❤ multi-byte☆'));
     }
 
     public function testPascal()
