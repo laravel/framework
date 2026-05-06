@@ -25,6 +25,13 @@ class CacheExecutionRepository implements ExecutionRepositoryContract
     ) {
     }
 
+    /**
+     *  Find the ExecutionState if it exists.
+     *
+     * @param  \Illuminate\Bus\ExecutionContext\ExecutionState|string|null  $id
+     * @return \Illuminate\Bus\ExecutionContext\ExecutionState|null
+     * @phpstan-return ($id is null ? null : \Illuminate\Bus\ExecutionContext\ExecutionState)
+     */
     #[\Override]
     public function find($id)
     {
