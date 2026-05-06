@@ -119,7 +119,7 @@ class ScheduleGroupTest extends TestCase
             'runInBackground' => ['runInBackground', true],
             'evenInMaintenanceMode' => ['evenInMaintenanceMode', true],
             'evenWhenPaused' => ['evenWhenPaused', true],
-            'withoutOverlapping' => ['withoutOverlapping', rand(1000, 1400)],
+            'withoutOverlapping' => ['withoutOverlapping', mt_rand(1000, 1400)],
         ];
     }
 

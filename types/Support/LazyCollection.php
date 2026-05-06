@@ -750,7 +750,7 @@ assertType('mixed', $collection::make([1])->sum('string'));
 assertType('int<1, 2>', $collection::make(['string'])->sum(function ($string) {
     assertType('string', $string);
 
-    return rand(1, 2);
+    return mt_rand(1, 2);
 }));
 
 assertType('Illuminate\Support\LazyCollection<int, int>', $collection::make([1])->take(1));
