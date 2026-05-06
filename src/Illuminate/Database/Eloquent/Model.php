@@ -435,12 +435,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $table = static::resolveClassAttribute(Table::class);
 
-        $reflection = new ReflectionClass(static::class);
-
-        $declaresTable = $reflection->hasProperty('table')
-            && $reflection->getProperty('table')->getDeclaringClass()->getName() === static::class;
-
-        if (! $declaresTable && $reflection->getAttributes(Table::class) !== []) {
+        if (static::tableAttributeOverridesProperty()) {
             $this->table = $table->name ?? null;
         } else {
             $this->table ??= $table->name ?? null;
@@ -461,6 +456,29 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         } elseif ($table && $table->incrementing !== null) {
             $this->incrementing = $table->incrementing;
         }
+    }
+
+    /**
+     * Determine whether a #[Table] attribute on this class should override
+     * an inherited $table property declaration. Cached per class.
+     *
+     * @return bool
+     */
+    protected static function tableAttributeOverridesProperty()
+    {
+        $cacheKey = static::class.'@__tableAttributeOverride';
+
+        if (array_key_exists($cacheKey, static::$classAttributes)) {
+            return static::$classAttributes[$cacheKey];
+        }
+
+        $reflection = new ReflectionClass(static::class);
+
+        $declaresTable = $reflection->hasProperty('table')
+            && $reflection->getProperty('table')->getDeclaringClass()->getName() === static::class;
+
+        return static::$classAttributes[$cacheKey]
+            = (! $declaresTable && $reflection->getAttributes(Table::class) !== []);
     }
 
     /**

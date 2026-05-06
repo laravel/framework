@@ -75,6 +75,30 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertSame('child_prop', $model->getTable());
     }
 
+    public function test_table_attribute_override_is_cached_per_class(): void
+    {
+        Model::clearBootedModels();
+
+        $first = new ChildModelWithTableAttribute;
+        $this->assertSame('child_attr', $first->getTable());
+
+        // The cache should now be populated for this class.
+        $reflection = new \ReflectionClass(Model::class);
+        $classAttributes = $reflection->getStaticPropertyValue('classAttributes');
+
+        $this->assertArrayHasKey(
+            ChildModelWithTableAttribute::class.'@__tableAttributeOverride',
+            $classAttributes
+        );
+        $this->assertTrue(
+            $classAttributes[ChildModelWithTableAttribute::class.'@__tableAttributeOverride']
+        );
+
+        // A second instance reuses the cached result; behavior is identical.
+        $second = new ChildModelWithTableAttribute;
+        $this->assertSame('child_attr', $second->getTable());
+    }
+
     public function test_primary_key_attribute(): void
     {
         $model = new ModelWithPrimaryKeyAttribute;
