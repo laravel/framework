@@ -3,41 +3,41 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\Preparable;
+use Illuminate\Contracts\Queue\PreparesForDispatch;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\TestCase;
 
-class PreparableTest extends TestCase
+class PreparesForDispatchTest extends TestCase
 {
     public function test_does_not_dispatch_when_prepare_returns_false()
     {
         Queue::fake();
 
-        PreparableFalseJob::dispatch();
+        PreparesForDispatchFalseJob::dispatch();
 
-        Queue::assertNotPushed(PreparableFalseJob::class);
+        Queue::assertNotPushed(PreparesForDispatchFalseJob::class);
     }
 
     public function test_dispatches_when_prepare_returns_void()
     {
         Queue::fake();
 
-        PreparableVoidJob::$ran = false;
+        PreparesForDispatchVoidJob::$ran = false;
 
-        PreparableVoidJob::dispatch();
+        PreparesForDispatchVoidJob::dispatch();
 
-        $this->assertTrue(PreparableVoidJob::$ran);
-        Queue::assertPushed(PreparableVoidJob::class);
+        $this->assertTrue(PreparesForDispatchVoidJob::$ran);
+        Queue::assertPushed(PreparesForDispatchVoidJob::class);
     }
 }
 
-class PreparableFalseJob implements Preparable, ShouldQueue
+class PreparesForDispatchFalseJob implements PreparesForDispatch, ShouldQueue
 {
     use Dispatchable, Queueable;
 
-    public function prepare(): bool
+    public function prepareForDispatch(): bool
     {
         return false;
     }
@@ -47,13 +47,13 @@ class PreparableFalseJob implements Preparable, ShouldQueue
     }
 }
 
-class PreparableVoidJob implements Preparable, ShouldQueue
+class PreparesForDispatchVoidJob implements PreparesForDispatch, ShouldQueue
 {
     use Dispatchable, Queueable;
 
     public static bool $ran = false;
 
-    public function prepare(): void
+    public function prepareForDispatch(): void
     {
         static::$ran = true;
     }
