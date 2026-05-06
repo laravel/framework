@@ -2599,10 +2599,12 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testImplodeModels($collection)
     {
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
         };
         $model->setAttribute('email', 'foo');
-        $modelTwo = new class extends Model {
+        $modelTwo = new class extends Model
+        {
         };
         $modelTwo->setAttribute('email', 'bar');
         $data = new $collection([$model, $modelTwo]);
@@ -3574,10 +3576,10 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection([['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1'], ['rating' => 2, 'url' => '2']]);
 
-        $result = $data->groupBy([$this, 'sortByRating']);
+        $result = $data->groupBy($this->sortByRating(...));
         $this->assertEquals([1 => [['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1']], 2 => [['rating' => 2, 'url' => '2']]], $result->toArray());
 
-        $result = $data->groupBy([$this, 'sortByUrl']);
+        $result = $data->groupBy($this->sortByUrl(...));
         $this->assertEquals([1 => [['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1']], 2 => [['rating' => 2, 'url' => '2']]], $result->toArray());
     }
 

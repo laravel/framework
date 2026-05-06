@@ -40,7 +40,7 @@ class CommandTest extends TestCase
         $application->shouldReceive('make')->with(OutputStyle::class, ['input' => $input, 'output' => $output])->andReturn($outputStyle);
         $application->shouldReceive('make')->with(Factory::class, ['output' => $outputStyle])->andReturn(m::mock(Factory::class));
 
-        $application->shouldReceive('call')->with([$command, 'handle'])->andReturnUsing(function () use ($command, $application) {
+        $application->shouldReceive('call')->with($command->handle(...))->andReturnUsing(function () use ($command, $application) {
             $commandCalled = m::mock(Command::class);
 
             $application->shouldReceive('make')->once()->with(Command::class)->andReturn($commandCalled);

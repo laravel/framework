@@ -66,7 +66,8 @@ class BusPendingBatchTest extends TestCase
 
         $container = new Container;
 
-        $job = new class {
+        $job = new class
+        {
         };
 
         $pendingBatch = new PendingBatch($container, new Collection([$job]));
@@ -221,7 +222,8 @@ class BusPendingBatchTest extends TestCase
 
     public function test_it_throws_exception_if_batched_job_is_not_batchable(): void
     {
-        $nonBatchableJob = new class {
+        $nonBatchableJob = new class
+        {
         };
 
         $this->expectException(RuntimeException::class);
@@ -237,7 +239,8 @@ class BusPendingBatchTest extends TestCase
         new PendingBatch(
             $container,
             new Collection(
-                [new PendingBatch($container, new Collection([new BatchableJob, new class {
+                [new PendingBatch($container, new Collection([new BatchableJob, new class
+                {
                 }]))]
             )
         );
@@ -306,7 +309,7 @@ class BusPendingBatchTest extends TestCase
         $result = $batch->allowFailures([
             static fn (): true => true,
             'strlen',
-            [$batch, 'failureCallbacks'],
+            $batch->failureCallbacks(...),
             strlen(...),
         ]);
 
@@ -323,7 +326,7 @@ class BusPendingBatchTest extends TestCase
             // 3 valid
             static fn (): true => true,
             'strlen',
-            [$batch, 'failureCallbacks'],
+            $batch->failureCallbacks(...),
             // 5 invalid
             'invalid_function_name',
             123,
@@ -376,7 +379,7 @@ class BusPendingBatchTest extends TestCase
 
         $freshBatch->allowFailures([
             'strlen',
-            [$freshBatch, 'failureCallbacks'],
+            $freshBatch->failureCallbacks(...),
         ]);
 
         $this->assertCount(2, $freshBatch->failureCallbacks());

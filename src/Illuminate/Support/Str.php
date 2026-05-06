@@ -1721,7 +1721,7 @@ class Str
 
         $words = preg_split('/\s+/', static::replace(['-', '_'], ' ', $value), -1, PREG_SPLIT_NO_EMPTY);
 
-        $studlyWords = array_map(fn ($word) => static::ucfirst($word), $words);
+        $studlyWords = array_map(static::ucfirst(...), $words);
 
         return static::$studlyCache[$key] = implode('', $studlyWords);
     }

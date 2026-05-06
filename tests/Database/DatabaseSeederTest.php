@@ -69,7 +69,7 @@ class DatabaseSeederTest extends TestCase
 
         $seeder->__invoke();
 
-        $container->shouldHaveReceived('call')->once()->with([$seeder, 'run'], []);
+        $container->shouldHaveReceived('call')->once()->with($seeder->run(...), []);
     }
 
     public function testSendParamsOnCallMethodWithDeps()
@@ -82,6 +82,6 @@ class DatabaseSeederTest extends TestCase
 
         $seeder->__invoke(['test1', 'test2']);
 
-        $container->shouldHaveReceived('call')->once()->with([$seeder, 'run'], ['test1', 'test2']);
+        $container->shouldHaveReceived('call')->once()->with($seeder->run(...), ['test1', 'test2']);
     }
 }

@@ -45,7 +45,7 @@ class ContainerCallTest extends TestCase
     {
         $container = new Container;
         $stub = new ContainerTestCallStub;
-        $result = $container->call([$stub, 'work'], ['foo', 'bar']);
+        $result = $container->call($stub->work(...), ['foo', 'bar']);
         $this->assertEquals(['foo', 'bar'], $result);
     }
 

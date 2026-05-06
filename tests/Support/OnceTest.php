@@ -185,7 +185,7 @@ class OnceTest extends TestCase
         {
             public function rand()
             {
-                return once([MyClass::class, 'staticRand']);
+                return once(MyClass::staticRand(...));
             }
         };
 

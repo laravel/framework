@@ -59,7 +59,7 @@ class AuthAccessGateTest extends TestCase
             //
         });
 
-        $gate->before([AccessGateTestBeforeCallback::class, 'allowEverythingStatically']);
+        $gate->before(AccessGateTestBeforeCallback::allowEverythingStatically(...));
 
         $this->assertTrue($gate->check('anything'));
     }
@@ -504,7 +504,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', [AccessGateTestStaticClass::class, 'foo']);
+        $gate->define('foo', AccessGateTestStaticClass::foo(...));
 
         $this->assertTrue($gate->check('foo'));
     }
@@ -1187,7 +1187,7 @@ class AuthAccessGateTest extends TestCase
 
         $gate->define('foo', AccessGateTestClassForGuest::class.'@foo');
         $gate->define('obj_foo', [new AccessGateTestClassForGuest, 'foo']);
-        $gate->define('static_foo', [AccessGateTestClassForGuest::class, 'staticFoo']);
+        $gate->define('static_foo', AccessGateTestClassForGuest::staticFoo(...));
         $gate->define('static_@foo', AccessGateTestClassForGuest::class.'@staticFoo');
         $gate->define('bar', AccessGateTestClassForGuest::class.'@bar');
         $gate->define('invokable', AccessGateTestGuestInvokableClass::class);

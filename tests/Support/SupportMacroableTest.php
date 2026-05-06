@@ -218,9 +218,7 @@ class TestMixin
 {
     public function methodOne()
     {
-        return function ($value) {
-            return $this->methodTwo($value);
-        };
+        return $this->methodTwo(...);
     }
 
     protected function methodTwo()

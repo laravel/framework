@@ -55,7 +55,7 @@ class Serializer
             } else {
                 $required = array_keys(array_filter(
                     $attributes['properties'],
-                    static fn (Types\Type $property) => static::isRequired($property),
+                    static::isRequired(...),
                 ));
 
                 if ($required !== []) {
@@ -63,7 +63,7 @@ class Serializer
                 }
 
                 $attributes['properties'] = array_map(
-                    static fn (Types\Type $property) => static::serialize($property),
+                    static::serialize(...),
                     $attributes['properties'],
                 );
             }
