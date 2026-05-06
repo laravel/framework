@@ -9,7 +9,7 @@ on:
 
 jobs:
   redis:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     services:
       redis:
@@ -62,7 +62,7 @@ jobs:
           QUEUE_CONNECTION: redis
 
   redis-cluster:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     strategy:
       fail-fast: true
