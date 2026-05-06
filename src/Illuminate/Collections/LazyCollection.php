@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Support;
+namespace Illuminate\Collections;
 
 use ArrayIterator;
 use Closure;
