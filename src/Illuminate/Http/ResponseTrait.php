@@ -106,8 +106,26 @@ trait ResponseTrait
      */
     public function withClearSiteData($directives = '*')
     {
-        $directives = array_map(fn($directive) => '"'.trim($directive, '"').'"', is_array($directives) ? $directives : [$directives]);
-        return $this->header('Clear-Site-Data', implode(', ', $directives));
+        $directives = collect($directives)
+            ->map(fn ($directive) => trim($directive))
+            ->intersect([
+                '*',
+                'cache',
+                'clientHints',
+                'cookies',
+                'executionContexts',
+                'prefetchCache',
+                'prerenderCache',
+                'storage',
+            ])
+            ->when(
+                fn ($c) => $c->contains('*'),
+                fn ($c) => $c->intersect(['*']),
+                fn ($c) => $c->diff(['*'])
+            )
+            ->map(fn ($directive) => '"'.$directive.'"');
+
+        return $this->header('Clear-Site-Data', $directives->implode(', '));
     }
 
     /**

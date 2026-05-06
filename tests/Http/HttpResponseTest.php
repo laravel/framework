@@ -234,6 +234,24 @@ class HttpResponseTest extends TestCase
         $this->assertSame('"*"', $response->headers->get('Clear-Site-Data'));
     }
 
+    public function testWithClearSiteDataOnlyAllowsDocumentedDirectives()
+    {
+        $response = new Response;
+
+        $response->withClearSiteData(['cache', 'invalid', 'clientHints', 'storage']);
+
+        $this->assertSame('"cache", "clientHints", "storage"', $response->headers->get('Clear-Site-Data'));
+    }
+
+    public function testWithClearSiteDataOnlyUsesWildcardWhenPresent()
+    {
+        $response = new Response;
+
+        $response->withClearSiteData(['cache', '*', 'storage']);
+
+        $this->assertSame('"*"', $response->headers->get('Clear-Site-Data'));
+    }
+
     public function testWithoutHeader()
     {
         $response = new Response(null, 200, ['foo' => 'bar', 'baz' => 'qux', 'zal' => 'ter']);
