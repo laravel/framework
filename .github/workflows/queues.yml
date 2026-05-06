@@ -11,9 +11,6 @@ jobs:
   sync:
     runs-on: ubuntu-24.04
 
-    strategy:
-      fail-fast: true
-
     name: Sync Driver
 
     steps:
@@ -45,9 +42,6 @@ jobs:
 
   database:
     runs-on: ubuntu-24.04
-
-    strategy:
-      fail-fast: true
 
     name: Database Driver
 
