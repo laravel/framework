@@ -1154,24 +1154,60 @@ class PendingRequest
      */
     protected function parseMultipartBodyFormat(array $data)
     {
-        return (new Collection($data))
-            ->flatMap(function ($value, $key) {
-                if (is_array($value)) {
-                    // If the array has 'name' and 'contents' keys, it's already formatted for multipart...
-                    if (isset($value['name'], $value['contents'])) {
-                        return [$value];
-                    }
+        $result = [];
 
-                    // Otherwise, treat it as multiple values for the same field name...
-                    return (new Collection($value))->map(function ($item) use ($key) {
-                        return ['name' => $key.'[]', 'contents' => $item];
-                    });
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                // If the array has 'name' and 'contents' keys, it's already formatted for multipart...
+                if (isset($value['name'], $value['contents'])) {
+                    $result[] = $value;
+                    continue;
                 }
 
-                return [['name' => $key, 'contents' => $value]];
-            })
-            ->values()
-            ->all();
+                // Otherwise, recursively expand nested arrays using bracket notation...
+                foreach ($this->expandMultipartArrayValue($key, $value) as $entry) {
+                    $result[] = $entry;
+                }
+                continue;
+            }
+
+            $result[] = ['name' => $key, 'contents' => $value];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Recursively expand a multipart array value into a flat list using bracket notation.
+     *
+     * @param  string|int  $name
+     * @param  array  $value
+     * @return array[]
+     */
+    protected function expandMultipartArrayValue($name, array $value)
+    {
+        $result = [];
+
+        foreach ($value as $key => $item) {
+            $fieldName = is_int($key) ? $name.'[]' : $name.'['.$key.']';
+
+            if (is_array($item)) {
+                // Preserve passthrough for already-formatted multipart entries...
+                if (isset($item['name'], $item['contents'])) {
+                    $result[] = $item;
+                    continue;
+                }
+
+                foreach ($this->expandMultipartArrayValue($fieldName, $item) as $entry) {
+                    $result[] = $entry;
+                }
+                continue;
+            }
+
+            $result[] = ['name' => $fieldName, 'contents' => $item];
+        }
+
+        return $result;
     }
 
     /**

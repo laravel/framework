@@ -882,6 +882,69 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testCanSendMultipartDataWithNestedArrayValues()
+    {
+        $this->factory->fake();
+
+        $this->factory->asMultipart()->post('http://foo.com/multipart', [
+            'user' => [
+                'name' => 'foo',
+                'email' => 'bar@baz.com',
+            ],
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/multipart' &&
+                Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
+                $request[0]['name'] === 'user[name]' &&
+                $request[0]['contents'] === 'foo' &&
+                $request[1]['name'] === 'user[email]' &&
+                $request[1]['contents'] === 'bar@baz.com';
+        });
+    }
+
+    public function testCanSendMultipartDataWithMultipleNestedArraysWithoutKeyCollision()
+    {
+        $this->factory->fake();
+
+        $this->factory->asMultipart()->post('http://foo.com/multipart', [
+            'users' => ['a' => 3, 'b' => 7],
+            'admins' => ['b' => 5, 'c' => 6],
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/multipart' &&
+                Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
+                $request[0]['name'] === 'users[a]' && $request[0]['contents'] === 3 &&
+                $request[1]['name'] === 'users[b]' && $request[1]['contents'] === 7 &&
+                $request[2]['name'] === 'admins[b]' && $request[2]['contents'] === 5 &&
+                $request[3]['name'] === 'admins[c]' && $request[3]['contents'] === 6;
+        });
+    }
+
+    public function testCanSendMultipartDataWithDeeplyNestedArrayValues()
+    {
+        $this->factory->fake();
+
+        $this->factory->asMultipart()->post('http://foo.com/multipart', [
+            'user' => [
+                'address' => [
+                    'city' => 'NYC',
+                    'zip' => '10001',
+                ],
+            ],
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/multipart' &&
+                Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
+                $request[0]['name'] === 'user[address][city]' &&
+                $request[0]['contents'] === 'NYC' &&
+                $request[1]['name'] === 'user[address][zip]' &&
+                $request[1]['contents'] === '10001';
+        });
+    }
+
     public function testItCanSendToken()
     {
         $this->factory->fake();
