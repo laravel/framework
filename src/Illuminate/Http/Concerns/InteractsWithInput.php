@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Concerns;
 
+use Illuminate\Foundation\Image\Image;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
@@ -248,6 +249,20 @@ trait InteractsWithInput
     public function file($key = null, $default = null)
     {
         return data_get($this->allFiles(), $key, $default);
+    }
+
+    /**
+     * Retrieve a file from the request as an image instance.
+     */
+    public function image(string $key): ?Image
+    {
+        $file = $this->file($key);
+
+        if (! $file instanceof UploadedFile) {
+            return null;
+        }
+
+        return new Image(fn () => $file->getContent(), $file);
     }
 
     /**
