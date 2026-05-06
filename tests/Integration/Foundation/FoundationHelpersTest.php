@@ -124,10 +124,10 @@ class FoundationHelpersTest extends TestCase
 
     public function testFakeUsesLocale()
     {
-        mt_srand(12345, MT_RAND_PHP);
+        mt_srand(12345);
 
         // Should fallback to en_US
-        $this->assertSame('Arkansas', fake()->state());
+        $this->assertSame('New Jersey', fake()->state());
         $this->assertContains(fake('de_DE')->state(), [
             'Baden-Württemberg', 'Bayern', 'Berlin', 'Brandenburg', 'Bremen', 'Hamburg', 'Hessen', 'Mecklenburg-Vorpommern', 'Niedersachsen', 'Nordrhein-Westfalen', 'Rheinland-Pfalz', 'Saarland', 'Sachsen', 'Sachsen-Anhalt', 'Schleswig-Holstein', 'Thüringen',
         ]);
@@ -138,10 +138,10 @@ class FoundationHelpersTest extends TestCase
         ]);
 
         config(['app.faker_locale' => 'en_AU']);
-        mt_srand(4, MT_RAND_PHP);
+        mt_srand(4);
 
         // Should fallback to en_US
-        $this->assertSame('Australian Capital Territory', fake()->state());
+        $this->assertSame('Northern Territory', fake()->state());
     }
 
     protected function makeManifest($directory = '')
