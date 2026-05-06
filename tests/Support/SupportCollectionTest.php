@@ -2043,13 +2043,7 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testSortWithCallback($collection)
     {
-        $data = (new $collection([5, 3, 1, 2, 4]))->sort(function ($a, $b) {
-            if ($a === $b) {
-                return 0;
-            }
-
-            return ($a < $b) ? -1 : 1;
-        });
+        $data = (new $collection([5, 3, 1, 2, 4]))->sort(fn ($a, $b) => $a <=> $b);
 
         $this->assertEquals(range(1, 5), array_values($data->all()));
     }
