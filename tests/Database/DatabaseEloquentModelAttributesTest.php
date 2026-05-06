@@ -347,6 +347,50 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertSame(['password', 'secret', 'api_key'], $model->getHidden());
     }
 
+    public function test_merge_fillable_with_empty_array_is_noop(): void
+    {
+        $model = new ModelWithFillableAttribute;
+        $original = $model->getFillable();
+
+        $result = $model->mergeFillable([]);
+
+        $this->assertSame($model, $result);
+        $this->assertSame($original, $model->getFillable());
+    }
+
+    public function test_merge_hidden_with_empty_array_is_noop(): void
+    {
+        $model = new ModelWithHiddenAttribute;
+        $original = $model->getHidden();
+
+        $result = $model->mergeHidden([]);
+
+        $this->assertSame($model, $result);
+        $this->assertSame($original, $model->getHidden());
+    }
+
+    public function test_merge_visible_with_empty_array_is_noop(): void
+    {
+        $model = new ModelWithVisibleAttribute;
+        $original = $model->getVisible();
+
+        $result = $model->mergeVisible([]);
+
+        $this->assertSame($model, $result);
+        $this->assertSame($original, $model->getVisible());
+    }
+
+    public function test_merge_appends_with_empty_array_is_noop(): void
+    {
+        $model = new ModelWithAppendsAttribute;
+        $original = $model->getAppends();
+
+        $result = $model->mergeAppends([]);
+
+        $this->assertSame($model, $result);
+        $this->assertSame($original, $model->getAppends());
+    }
+
     public function test_set_fillable_overrides_attribute(): void
     {
         $model = new ModelWithFillableAttribute;

@@ -87,6 +87,10 @@ trait GuardsAttributes
      */
     public function mergeFillable(array $fillable)
     {
+        if ($fillable === []) {
+            return $this;
+        }
+
         $this->fillable = array_values(array_unique(array_merge($this->fillable, $fillable)));
 
         return $this;

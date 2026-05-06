@@ -2484,6 +2484,10 @@ trait HasAttributes
      */
     public function mergeAppends(array $appends)
     {
+        if ($appends === []) {
+            return $this;
+        }
+
         $this->appends = array_values(array_unique(array_merge($this->appends, $appends)));
 
         return $this;
