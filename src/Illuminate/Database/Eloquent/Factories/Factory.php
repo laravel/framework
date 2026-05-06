@@ -230,7 +230,7 @@ abstract class Factory
     /**
      * Configure the factory.
      *
-     * @return $this
+     * @return static
      */
     public function configure()
     {
