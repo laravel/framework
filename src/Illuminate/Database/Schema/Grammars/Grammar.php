@@ -438,7 +438,7 @@ abstract class Grammar extends BaseGrammar
         });
     }
 
-    /*
+    /**
      * Determine if a command with a given name exists on the blueprint.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
