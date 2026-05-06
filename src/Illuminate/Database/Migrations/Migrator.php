@@ -9,6 +9,7 @@ use Illuminate\Console\View\Components\Task;
 use Illuminate\Console\View\Components\TwoColumnDetail;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Events\MigrationEnded;
 use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Events\MigrationSkipped;
@@ -183,7 +184,7 @@ class Migrator
         // First we will just make sure that there are any migrations to run. If there
         // aren't, we will just make a note of it to the developer so they're aware
         // that all of the migrations have been run against this database system.
-        if (count($migrations) === 0) {
+        if ($migrations === []) {
             $this->fireMigrationEvent(new NoPendingMigrations('up'));
 
             $this->write(Info::class, 'Nothing to migrate');
@@ -200,15 +201,19 @@ class Migrator
 
         $step = $options['step'] ?? false;
 
+        $markAsRan = $options['mark_as_ran'] ?? false;
+
+        $ignoreExistingTables = $options['ignore_existing_tables'] ?? false;
+
         $this->fireMigrationEvent(new MigrationsStarted('up', $options));
 
-        $this->write(Info::class, 'Running migrations.');
+        $this->write(Info::class, $markAsRan ? 'Marking migrations as ran.' : 'Running migrations.');
 
         // Once we have the array of migrations, we will spin through them and run the
         // migrations "up" so the changes are made to the databases. We'll then log
         // that the migration was run so we don't repeat it next time we execute.
         foreach ($migrations as $file) {
-            $this->runUp($file, $batch, $pretend);
+            $this->runUp($file, $batch, $pretend, $markAsRan, $ignoreExistingTables);
 
             if ($step) {
                 $batch++;
@@ -226,9 +231,11 @@ class Migrator
      * @param  string  $file
      * @param  int  $batch
      * @param  bool  $pretend
+     * @param  bool  $markAsRan
+     * @param  bool  $ignoreExistingTables
      * @return void
      */
-    protected function runUp($file, $batch, $pretend)
+    protected function runUp($file, $batch, $pretend, $markAsRan = false, $ignoreExistingTables = false)
     {
         // First we will resolve a "real" instance of the migration class from this
         // migration file name. Once we have the instances we can run the actual
@@ -249,14 +256,47 @@ class Migrator
             $this->fireMigrationEvent(new MigrationSkipped($name));
 
             $this->write(Task::class, $name, fn () => MigrationResult::Skipped->value);
+        } elseif ($markAsRan) {
+            $this->write(Task::class, $name, fn () => MigrationResult::Success->value);
+
+            $this->repository->log($name, $batch);
         } else {
-            $this->write(Task::class, $name, fn () => $this->runMigration($migration, 'up'));
+            $this->write(Task::class, $name, function () use ($migration, $ignoreExistingTables) {
+                try {
+                    $this->runMigration($migration, 'up');
+                } catch (QueryException $e) {
+                    if ($ignoreExistingTables && $this->isTableAlreadyExistsException($e)) {
+                        return;
+                    }
+
+                    throw $e;
+                }
+            });
 
             // Once we have run a migrations class, we will log that it was run in this
             // repository so that we don't try to run it next time we do a migration
             // in the application. A migration repository keeps the migrate order.
             $this->repository->log($name, $batch);
         }
+    }
+
+    /**
+     * Determine if the given exception was caused by a table that already exists.
+     *
+     * @param  \Illuminate\Database\QueryException  $e
+     * @return bool
+     */
+    protected function isTableAlreadyExistsException(QueryException $e): bool
+    {
+        $sqlState = $e->getCode();
+
+        // MySQL/MariaDB: 42S01, PostgreSQL: 42P07
+        if (in_array($sqlState, ['42S01', '42P07'])) {
+            return true;
+        }
+
+        // SQLite uses a generic SQLSTATE; match on the message instead
+        return str_contains($e->getMessage(), 'already exists');
     }
 
     /**
@@ -290,7 +330,7 @@ class Migrator
      * Get the migrations for a rollback operation.
      *
      * @param  array<string, mixed>  $options
-     * @return array{id: int, migration: string, batch: int}[]
+     * @return object{id: int, migration: string, batch: int}[]
      */
     protected function getMigrationsForRollback(array $options)
     {
@@ -362,7 +402,7 @@ class Migrator
         // the database back into its "empty" state ready for the migrations.
         $migrations = array_reverse($this->repository->getRan());
 
-        if (count($migrations) === 0) {
+        if ($migrations === []) {
             $this->write(Info::class, 'Nothing to rollback.');
 
             return [];
