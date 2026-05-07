@@ -1664,7 +1664,7 @@ trait ValidatesAttributes
         try {
             set_error_handler(static fn () => throw new Exception('Unable to load HTML'));
 
-            if (PHP_VERSION_ID >= 80400) {
+            if (version_compare(PHP_VERSION, '8.4.0', '>=')) {
                 HTMLDocument::createFromString($value, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD, 'utf-8');
             } else {
                 (new DOMDocument)->loadHTML($value, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
