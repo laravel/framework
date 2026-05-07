@@ -83,8 +83,10 @@ abstract class Lock implements LockContract
     /**
      * Attempt to acquire the lock.
      *
-     * @param  callable|null  $callback
-     * @return mixed
+     * @template TReturn of mixed
+     *
+     * @param  (callable(): TReturn)|null  $callback
+     * @return ($callback is null ? bool : TReturn|false)
      */
     public function get($callback = null)
     {
