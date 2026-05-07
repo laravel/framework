@@ -486,6 +486,24 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response does not offer a file download.
+     *
+     * @return $this
+     */
+    public function assertNotDownload()
+    {
+        $contentDisposition = explode(';', $this->headers->get('content-disposition', ''));
+
+        PHPUnit::withResponse($this)->assertNotSame(
+            'attachment',
+            trim($contentDisposition[0]),
+            'Response offers unexpected file download.'
+        );
+
+        return $this;
+    }
+
+    /**
      * Asserts that the response contains the given cookie and equals the optional value.
      *
      * @param  string  $cookieName
