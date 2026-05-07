@@ -8,6 +8,7 @@ use Brick\Math\Exception\MathException as BrickMathException;
 use DateTime;
 use DateTimeInterface;
 use DateTimeZone;
+use Dom\HTMLDocument;
 use Egulias\EmailValidator\EmailValidator;
 use Egulias\EmailValidator\Validation\DNSCheckValidation;
 use Egulias\EmailValidator\Validation\Extra\SpoofCheckValidation;
@@ -1640,6 +1641,39 @@ trait ValidatesAttributes
     public function validateMacAddress($attribute, $value)
     {
         return filter_var($value, FILTER_VALIDATE_MAC) !== false;
+    }
+
+    /**
+     * Validate that an attribute is a valid HTML string.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateHtml($attribute, $value, $parameters)
+    {
+        if (is_array($value) || is_null($value)) {
+            return false;
+        }
+
+        if (! is_scalar($value) && ! method_exists($value, '__toString')) {
+            return false;
+        }
+
+        try {
+            set_error_handler(static function (): never {
+                throw new Exception('Unable to load HTML');
+            });
+
+            HTMLDocument::createFromString($value, LIBXML_HTML_NOIMPLIED, 'utf-8'); // PHP 8.4 and not in symfony/polyfill-php84
+        } catch (Exception) {
+            return false;
+        } finally {
+            restore_error_handler();
+        }
+
+        return true;
     }
 
     /**
