@@ -2625,6 +2625,33 @@ EOT
         $files->deleteDirectory($tempDir);
     }
 
+    public function testAssertNotDownload(): void
+    {
+        $testResponse = TestResponse::fromBaseResponse(new Response(
+            'Hello World', 200, [
+                'Content-Disposition' => 'inline',
+            ]
+        ));
+        $testResponse->assertNotDownload();
+    }
+
+    public function testAssertNotDownloadWithNoContentDispositionHeader(): void
+    {
+        $testResponse = TestResponse::fromBaseResponse(new Response('Hello World'));
+        $testResponse->assertNotDownload();
+    }
+
+    public function testAssertNotDownloadFailsWhenResponseIsDownload(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+        $testResponse = TestResponse::fromBaseResponse(new Response(
+            'Hello World', 200, [
+                'Content-Disposition' => 'attachment; filename=file.txt',
+            ]
+        ));
+        $testResponse->assertNotDownload();
+    }
+
     public function testMacroable(): void
     {
         TestResponse::macro('foo', function () {
