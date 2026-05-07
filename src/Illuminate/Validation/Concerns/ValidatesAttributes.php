@@ -1644,14 +1644,13 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate that an attribute is a valid HTML string.
+     * Validate the attribute is a valid HTML string.
      *
      * @param  string  $attribute
      * @param  mixed  $value
-     * @param  array<int, int|string>  $parameters
      * @return bool
      */
-    public function validateHtml($attribute, $value, $parameters)
+    public function validateHtml($attribute, $value)
     {
         if (is_array($value) || is_null($value)) {
             return false;
