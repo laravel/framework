@@ -54,6 +54,35 @@ class CloudTest extends TestCase
         unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG']);
     }
 
+    public function test_it_can_configure_scoped_disks()
+    {
+        $_SERVER['LARAVEL_CLOUD_DISK_CONFIG'] = json_encode(
+            [
+                [
+                    'disk' => 'test-disk',
+                    'access_key_id' => 'test-access-key-id',
+                    'access_key_secret' => 'test-access-key-secret',
+                    'bucket' => 'test-bucket',
+                    'url' => 'test-url',
+                    'endpoint' => 'test-endpoint',
+                ],
+                [
+                    'disk' => 'test-disk-scoped',
+                    'scoped_disk' => 'test-disk',
+                    'prefix' => 'test/prefix/',
+                    'is_default' => true,
+                ],
+            ]
+        );
+
+        Cloud::configureDisks($this->app);
+
+        $this->assertSame('scoped', $this->app['config']->get('filesystems.disks.test-disk-scoped.driver'));
+        $this->assertSame('test-disk', $this->app['config']->get('filesystems.disks.test-disk-scoped.disk'));
+
+        unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG']);
+    }
+
     public function test_it_disables_queue_restart_polling_for_managed_queues()
     {
         Worker::$restartable = true;
