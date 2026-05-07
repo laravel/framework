@@ -175,7 +175,7 @@ namespace Illuminate\Support\Facades;
  * @method static float|int clamp(string $key, int|float $min, int|float $max, int|float $default = 0)
  * @method static \Illuminate\Support\Carbon|null date(string $key, string|null $format = null, \UnitEnum|string|null $tz = null)
  * @method static \Carbon\CarbonInterval|null interval(string $key, \Carbon\Unit|string|null $unit = null)
- * @method static \BackedEnum|(\BackedEnum|null enum(string $key, string $enumClass, \BackedEnum|null $default = null)
+ * @method static \BackedEnum|\BackedEnum|null enum(string $key, string $enumClass, \BackedEnum|null $default = null)
  * @method static \BackedEnum[] enums(string $key, string $enumClass)
  * @method static array array(array|string|null $key = null)
  * @method static \Illuminate\Support\Collection collect(array|string|null $key = null)
