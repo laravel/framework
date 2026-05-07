@@ -1452,10 +1452,9 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed  $value
-     * @param  array<int, int|string>  $parameters
      * @return bool
      */
-    public function validateLowercase($attribute, $value, $parameters)
+    public function validateLowercase($attribute, $value)
     {
         return is_string($value) && Str::lower($value) === $value;
     }
@@ -1465,10 +1464,9 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed  $value
-     * @param  array<int, int|string>  $parameters
      * @return bool
      */
-    public function validateUppercase($attribute, $value, $parameters)
+    public function validateUppercase($attribute, $value)
     {
         return is_string($value) && Str::upper($value) === $value;
     }
