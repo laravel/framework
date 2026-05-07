@@ -4,13 +4,16 @@ namespace Illuminate\Support\Traits;
 
 use BadMethodCallException;
 use Closure;
+use Illuminate\Support\RebindsCallbacksToSelf;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionMethod;
 use RuntimeException;
-use Throwable;
 
 trait Macroable
 {
+    use RebindsCallbacksToSelf;
+
     /**
      * The registered string macros.
      *
@@ -123,9 +126,9 @@ trait Macroable
 
         if ($macro instanceof Closure) {
             try {
-                $macro = $macro->bindTo($this, static::class) ?? throw new RuntimeException;
-            } catch (Throwable) {
-                $macro = $macro->bindTo(null, static::class);
+                $macro = $this->bindCallbackToSelf($macro) ?? throw new RuntimeException('Unable to bind macro');
+            } catch (ReflectionException $e) {
+                throw new RuntimeException('Unable to bind macro', previous: $e);
             }
         }
 
