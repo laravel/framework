@@ -122,6 +122,7 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
      *
      * Items not found in the cache will have a null value.
      *
+     * @param  array  $keys
      * @return array
      */
     public function many(array $keys)
