@@ -8,6 +8,7 @@ use Brick\Math\Exception\MathException as BrickMathException;
 use DateTime;
 use DateTimeInterface;
 use DateTimeZone;
+use DOMDocument;
 use Dom\HTMLDocument;
 use Egulias\EmailValidator\EmailValidator;
 use Egulias\EmailValidator\Validation\DNSCheckValidation;
@@ -1661,11 +1662,13 @@ trait ValidatesAttributes
         }
 
         try {
-            set_error_handler(static function (): never {
-                throw new Exception('Unable to load HTML');
-            });
+            set_error_handler(static fn () => throw new Exception('Unable to load HTML'));
 
-            HTMLDocument::createFromString($value, LIBXML_HTML_NOIMPLIED, 'utf-8'); // PHP 8.4 and not in symfony/polyfill-php84
+            if (PHP_VERSION_ID >= 80400) {
+                HTMLDocument::createFromString($value, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD, 'utf-8');
+            } else {
+                (new DOMDocument)->loadHTML($value, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+            }
         } catch (Exception) {
             return false;
         } finally {
