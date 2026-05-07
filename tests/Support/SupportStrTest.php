@@ -719,6 +719,69 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::isUrl('http:///path'));
     }
 
+    public function testCanonicalUrl()
+    {
+        // Already canonical input is returned unchanged.
+        $this->assertSame('https://example.com', Str::canonicalUrl('https://example.com'));
+
+        // Whitespace is trimmed, empty input returns an empty string.
+        $this->assertSame('', Str::canonicalUrl(''));
+        $this->assertSame('', Str::canonicalUrl('   '));
+        $this->assertSame('https://example.com', Str::canonicalUrl('  https://example.com  '));
+
+        // Missing scheme defaults to https.
+        $this->assertSame('https://example.com', Str::canonicalUrl('example.com'));
+        $this->assertSame('https://example.com', Str::canonicalUrl('www.example.com'));
+
+        // Leading "www." is stripped from the host.
+        $this->assertSame('https://example.com', Str::canonicalUrl('https://www.example.com'));
+        $this->assertSame('http://example.com', Str::canonicalUrl('http://www.example.com'));
+
+        // Host is lowercased; scheme is lowercased.
+        $this->assertSame('https://example.com', Str::canonicalUrl('HTTPS://EXAMPLE.COM'));
+        $this->assertSame('https://example.com', Str::canonicalUrl('Https://Example.Com'));
+
+        // Trailing slash is removed from a root path.
+        $this->assertSame('https://example.com', Str::canonicalUrl('https://example.com/'));
+
+        // A non-root trailing slash is stripped, but the path is otherwise preserved (including case).
+        $this->assertSame('https://example.com/Path', Str::canonicalUrl('https://example.com/Path/'));
+        $this->assertSame('https://example.com/path/to/resource', Str::canonicalUrl('https://example.com/path/to/resource'));
+
+        // Query string is preserved and its parameters are sorted.
+        $this->assertSame('https://example.com?q=1', Str::canonicalUrl('https://example.com/?q=1'));
+        $this->assertSame('https://example.com/path?q=1&r=2', Str::canonicalUrl('https://example.com/path?q=1&r=2'));
+        $this->assertSame('https://example.com/path?a=1&b=2', Str::canonicalUrl('https://example.com/path?b=2&a=1'));
+        $this->assertSame('https://example.com?a=1&b=2&c=3', Str::canonicalUrl('https://example.com?c=3&a=1&b=2'));
+
+        // Fragments are dropped entirely.
+        $this->assertSame('https://example.com', Str::canonicalUrl('https://example.com/#section'));
+        $this->assertSame('https://example.com/path?q=1', Str::canonicalUrl('https://www.example.com/path/?q=1#frag'));
+
+        // Default ports for http/https are stripped; non-default ports are preserved.
+        $this->assertSame('https://example.com', Str::canonicalUrl('https://example.com:443'));
+        $this->assertSame('http://example.com', Str::canonicalUrl('http://example.com:80'));
+        $this->assertSame('https://example.com:8080/path', Str::canonicalUrl('https://example.com:8080/path/'));
+        $this->assertSame('http://example.com:8443', Str::canonicalUrl('http://example.com:8443'));
+
+        // User info is preserved.
+        $this->assertSame('https://user:pass@example.com', Str::canonicalUrl('https://user:pass@www.example.com/'));
+
+        // IPv6 hosts are wrapped in brackets on output.
+        $this->assertSame('https://[::1]:8080/path', Str::canonicalUrl('https://[::1]:8080/path/'));
+        $this->assertSame('https://[2001:db8::1]', Str::canonicalUrl('https://[2001:db8::1]/'));
+
+        // Two URLs that differ only by www/trailing-slash/port/fragment noise canonicalize to the same string.
+        $this->assertSame(
+            Str::canonicalUrl('https://www.example.com/'),
+            Str::canonicalUrl('https://example.com')
+        );
+        $this->assertSame(
+            Str::canonicalUrl('https://example.com:443/path?b=2&a=1#frag'),
+            Str::canonicalUrl('https://www.example.com/path/?a=1&b=2')
+        );
+    }
+
     #[DataProvider('validUuidList')]
     public function testIsUuidWithValidUuid($uuid)
     {

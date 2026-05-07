@@ -634,6 +634,85 @@ class Str
     }
 
     /**
+     * Get a canonical form of the given URL suitable for equality comparison.
+     *
+     * Normalizes the scheme (defaults to https), lowercases the host, strips
+     * any leading "www." subdomain, drops the default port for the scheme
+     * (80/443), removes a trailing slash from the path, sorts query string
+     * parameters, and discards the fragment. The path is otherwise preserved
+     * verbatim, including case.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    public static function canonicalUrl($url)
+    {
+        $url = trim($url);
+
+        if ($url === '') {
+            return '';
+        }
+
+        if (! preg_match('#^[a-z][a-z0-9+\-.]*://#i', $url)) {
+            $url = 'https://'.$url;
+        }
+
+        $parts = parse_url($url);
+
+        if ($parts === false || ! isset($parts['host'])) {
+            return $url;
+        }
+
+        $scheme = strtolower($parts['scheme'] ?? 'https');
+        $host = strtolower($parts['host']);
+
+        if (str_starts_with($host, 'www.')) {
+            $host = substr($host, 4);
+        }
+
+        $host = trim($host, '[]');
+
+        if (str_contains($host, ':')) {
+            $host = '['.$host.']';
+        }
+
+        $port = '';
+
+        if (isset($parts['port'])) {
+            $isDefaultPort = ($scheme === 'https' && $parts['port'] === 443)
+                || ($scheme === 'http' && $parts['port'] === 80);
+
+            if (! $isDefaultPort) {
+                $port = ':'.$parts['port'];
+            }
+        }
+
+        $userInfo = '';
+
+        if (isset($parts['user'])) {
+            $userInfo = $parts['user'].(isset($parts['pass']) ? ':'.$parts['pass'] : '').'@';
+        }
+
+        $path = $parts['path'] ?? '';
+
+        if ($path === '' || $path === '/') {
+            $path = '';
+        } else {
+            $path = rtrim($path, '/');
+        }
+
+        $query = '';
+
+        if (isset($parts['query']) && $parts['query'] !== '') {
+            $pairs = explode('&', $parts['query']);
+            sort($pairs);
+            $query = '?'.implode('&', $pairs);
+        }
+
+        return $scheme.'://'.$userInfo.$host.$port.$path.$query;
+    }
+
+    /**
      * Determine if a given value is a valid UUID.
      *
      * @param  mixed  $value

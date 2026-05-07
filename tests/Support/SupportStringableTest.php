@@ -50,6 +50,21 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('https://laravel.com')->isUrl(['http']));
     }
 
+    public function testCanonicalUrl()
+    {
+        $canonical = $this->stringable('https://www.example.com/')->canonicalUrl();
+
+        $this->assertInstanceOf(Stringable::class, $canonical);
+        $this->assertSame('https://example.com', (string) $canonical);
+
+        $this->assertSame('https://example.com', (string) $this->stringable('  HTTPS://EXAMPLE.COM/  ')->canonicalUrl());
+        $this->assertSame('https://example.com/path?q=1', (string) $this->stringable('https://www.example.com/path/?q=1#frag')->canonicalUrl());
+        $this->assertSame('https://example.com/path?a=1&b=2', (string) $this->stringable('https://example.com/path?b=2&a=1')->canonicalUrl());
+        $this->assertSame('https://example.com', (string) $this->stringable('https://example.com:443')->canonicalUrl());
+        $this->assertSame('https://example.com', (string) $this->stringable('example.com')->canonicalUrl());
+        $this->assertSame('', (string) $this->stringable('')->canonicalUrl());
+    }
+
     public function testIsUuid()
     {
         $this->assertTrue($this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98e7b15')->isUuid());
