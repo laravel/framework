@@ -3358,7 +3358,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['foo' => new Stringable('Laravel')], ['foo' => 'json']);
+        $v = new Validator($trans, ['foo' => new Stringable('Laravel')], ['foo' => 'html']);
         $this->assertTrue($v->passes());
     }
 
