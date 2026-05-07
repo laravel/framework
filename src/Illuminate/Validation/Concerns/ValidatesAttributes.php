@@ -1665,7 +1665,7 @@ trait ValidatesAttributes
             set_error_handler(static fn () => throw new Exception('Unable to load HTML'));
 
             if (version_compare(PHP_VERSION, '8.4.0', '>=')) {
-                HTMLDocument::createFromString($value, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD, 'utf-8');
+                HTMLDocument::createFromString($value, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD, 'utf-8'); /** @phpstan-ignore staticMethod.notFound (PHP 8.3) */
             } else {
                 (new DOMDocument)->loadHTML($value, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
             }
