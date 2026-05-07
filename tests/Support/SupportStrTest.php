@@ -2011,4 +2011,20 @@ class SupportStrTest extends TestCase
 
         $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', $countable));
     }
+
+    public function testSingularStudly(): void
+    {
+        $this->assertSame('UserGroup', Str::singularStudly('UserGroups'));
+        $this->assertSame('ProductCategory', Str::singularStudly('ProductCategories'));
+        $this->assertSame('Person', Str::singularStudly('People'));
+        $this->assertSame('Child', Str::singularStudly('Children'));
+        $this->assertSame('User', Str::singularStudly('User'));
+    }
+
+    public function testSingularPascal(): void
+    {
+        $this->assertSame('UserGroup', Str::singularPascal('UserGroups'));
+        $this->assertSame('ProductCategory', Str::singularPascal('ProductCategories'));
+        $this->assertSame('Person', Str::singularPascal('People'));
+    }
 }

@@ -1043,6 +1043,32 @@ class Str
     }
 
     /**
+     * Singularize the last word of an English, studly caps case string.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function singularStudly($value)
+    {
+        $parts = preg_split('/(.)(?=[A-Z])/u', $value, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+        $lastWord = array_pop($parts);
+
+        return implode('', $parts).self::singular($lastWord);
+    }
+
+    /**
+     * Singularize the last word of an English, Pascal caps case string.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function singularPascal($value)
+    {
+        return static::singularStudly($value);
+    }
+
+    /**
      * Generate a random, secure password.
      *
      * @param  int  $length
