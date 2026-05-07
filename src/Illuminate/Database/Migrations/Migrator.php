@@ -62,7 +62,7 @@ class Migrator
     /**
      * The name of the default connection.
      *
-     * @var string
+     * @var string|null
      */
     protected $connection;
 
