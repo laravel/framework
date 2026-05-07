@@ -36,7 +36,7 @@ class PauseCommand extends Command
     {
         [$connection, $queue] = $this->parseQueue($this->argument('queue'));
 
-        if (!Worker::$pausable) {
+        if (! Worker::$pausable) {
             $this->components->error('Queue pausing is disabled by withoutInterruptionPolling().');
 
             return 1;
