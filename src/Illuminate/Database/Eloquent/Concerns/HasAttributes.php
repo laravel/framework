@@ -521,7 +521,7 @@ trait HasAttributes
             ! $this->wasRecentlyCreated &&
             static::preventsAccessingMissingAttributes()) {
             if (isset(static::$missingAttributeViolationCallback)) {
-                return call_user_func(static::$missingAttributeViolationCallback, $this, $key);
+                return (static::$missingAttributeViolationCallback)($this, $key);
             }
 
             throw new MissingAttributeException($this, $key);
@@ -614,7 +614,7 @@ trait HasAttributes
     protected function handleLazyLoadingViolation($key)
     {
         if (isset(static::$lazyLoadingViolationCallback)) {
-            return call_user_func(static::$lazyLoadingViolationCallback, $this, $key);
+            return (static::$lazyLoadingViolationCallback)($this, $key);
         }
 
         if (! $this->exists || $this->wasRecentlyCreated) {
@@ -748,9 +748,7 @@ trait HasAttributes
 
         $attribute = $this->{Str::camel($key)}();
 
-        $value = call_user_func($attribute->get ?: function ($value) {
-            return $value;
-        }, $value, $this->attributes);
+        $value = ($attribute->get ?: fn ($value) => $value)($value, $this->attributes);
 
         if ($attribute->withCaching || (is_object($value) && $attribute->withObjectCaching)) {
             $this->attributeCastCache[$key] = $value;

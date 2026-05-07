@@ -1034,7 +1034,7 @@ class Connection implements ConnectionInterface
     public function reconnect()
     {
         if (is_callable($this->reconnector)) {
-            return call_user_func($this->reconnector, $this);
+            return ($this->reconnector)($this);
         }
 
         throw new LostConnectionException('Lost connection and no reconnector available.');
@@ -1276,7 +1276,7 @@ class Connection implements ConnectionInterface
         $this->latestPdoTypeRetrieved = 'write';
 
         if ($this->pdo instanceof Closure) {
-            return $this->pdo = call_user_func($this->pdo);
+            return $this->pdo = ($this->pdo)();
         }
 
         return $this->pdo;
@@ -1311,7 +1311,7 @@ class Connection implements ConnectionInterface
         $this->latestPdoTypeRetrieved = 'read';
 
         if ($this->readPdo instanceof Closure) {
-            return $this->readPdo = call_user_func($this->readPdo);
+            return $this->readPdo = ($this->readPdo)();
         }
 
         return $this->readPdo ?: $this->getPdo();

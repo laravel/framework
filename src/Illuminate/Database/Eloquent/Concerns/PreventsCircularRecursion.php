@@ -29,21 +29,21 @@ trait PreventsCircularRecursion
         $onceable = Onceable::tryFromTrace($trace, $callback);
 
         if (is_null($onceable)) {
-            return call_user_func($callback);
+            return $callback();
         }
 
         $stack = static::getRecursiveCallStack($this);
 
         if (array_key_exists($onceable->hash, $stack)) {
             return is_callable($stack[$onceable->hash])
-                ? static::setRecursiveCallValue($this, $onceable->hash, call_user_func($stack[$onceable->hash]))
+                ? static::setRecursiveCallValue($this, $onceable->hash, ($stack[$onceable->hash])())
                 : $stack[$onceable->hash];
         }
 
         try {
             static::setRecursiveCallValue($this, $onceable->hash, $default);
 
-            return call_user_func($onceable->callable);
+            return ($onceable->callable)();
         } finally {
             static::clearRecursiveCallValue($this, $onceable->hash);
         }

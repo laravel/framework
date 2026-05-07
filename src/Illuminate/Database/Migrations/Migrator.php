@@ -700,8 +700,7 @@ class Migrator
     public function resolveConnection($connection)
     {
         if (static::$connectionResolverCallback) {
-            return call_user_func(
-                static::$connectionResolverCallback,
+            return (static::$connectionResolverCallback)(
                 $this->resolver,
                 $connection ?: $this->connection
             );

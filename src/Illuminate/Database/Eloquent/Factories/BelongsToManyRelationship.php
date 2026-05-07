@@ -59,7 +59,7 @@ class BelongsToManyRelationship
         Collection::wrap($factoryInstance ? $this->factory->prependState($relationship->getQuery()->pendingAttributes)->create([], $model) : $this->factory)->each(function ($attachable) use ($model) {
             $model->{$this->relationship}()->attach(
                 $attachable,
-                is_callable($this->pivot) ? call_user_func($this->pivot, $model) : $this->pivot
+                is_callable($this->pivot) ? ($this->pivot)($model) : $this->pivot
             );
         });
     }

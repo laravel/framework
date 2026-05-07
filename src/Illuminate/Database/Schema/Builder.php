@@ -702,7 +702,7 @@ class Builder
         $connection = $this->connection;
 
         if (isset($this->resolver)) {
-            return call_user_func($this->resolver, $connection, $table, $callback);
+            return ($this->resolver)($connection, $table, $callback);
         }
 
         return Container::getInstance()->make(Blueprint::class, compact('connection', 'table', 'callback'));

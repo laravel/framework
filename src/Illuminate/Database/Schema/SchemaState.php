@@ -90,7 +90,7 @@ abstract class SchemaState
      */
     public function makeProcess(...$arguments)
     {
-        return call_user_func($this->processFactory, ...$arguments);
+        return ($this->processFactory)(...$arguments);
     }
 
     /**

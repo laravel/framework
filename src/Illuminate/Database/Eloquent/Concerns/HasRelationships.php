@@ -183,7 +183,7 @@ trait HasRelationships
     {
         $tuples = array_merge([[$key, get_class($this)]], $tuples);
 
-        call_user_func($this->relationAutoloadCallback, $tuples);
+        ($this->relationAutoloadCallback)($tuples);
     }
 
     /**
