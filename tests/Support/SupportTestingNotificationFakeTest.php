@@ -107,6 +107,20 @@ class SupportTestingNotificationFakeTest extends TestCase
         }
     }
 
+    public function testAssertNotSentOnDemand()
+    {
+        $this->fake->assertNotSentOnDemand(NotificationStub::class);
+
+        $this->fake->send(new AnonymousNotifiable, new NotificationStub);
+
+        try {
+            $this->fake->assertNotSentOnDemand(NotificationStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The unexpected [Illuminate\Tests\Support\NotificationStub] notification was sent.', $e->getMessage());
+        }
+    }
+
     public function testAssertNothingSent()
     {
         $this->fake->assertNothingSent();

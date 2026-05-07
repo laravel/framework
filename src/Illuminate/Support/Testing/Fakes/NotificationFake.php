@@ -123,6 +123,20 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     }
 
     /**
+     * Assert if a notification was not sent on-demand based on a truth-test callback.
+     *
+     * @param  string|\Closure  $notification
+     * @param  callable|null  $callback
+     * @return void
+     *
+     * @throws \Exception
+     */
+    public function assertNotSentOnDemand($notification, $callback = null)
+    {
+        $this->assertNotSentTo(new AnonymousNotifiable, $notification, $callback);
+    }
+
+    /**
      * Determine if a notification was sent based on a truth-test callback.
      *
      * @param  mixed  $notifiable
