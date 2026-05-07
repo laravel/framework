@@ -699,8 +699,10 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Run a map over each nested chunk of items.
      *
-     * @param  callable  $callback
-     * @return static
+     * @template TMapSpreadValue
+     *
+     * @param  callable(mixed...): TMapSpreadValue  $callback
+     * @return static<TKey, TMapSpreadValue>
      */
     public function mapSpread(callable $callback);
 
