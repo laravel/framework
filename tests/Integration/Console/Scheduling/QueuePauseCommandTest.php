@@ -13,7 +13,7 @@ class QueuePauseCommandTest extends TestCase
     {
         Event::fake();
 
-        $this->artisan('queue:pause');
+        $this->artisan('queue:pause default');
 
         Event::assertDispatched(QueuePaused::class);
     }
@@ -24,7 +24,7 @@ class QueuePauseCommandTest extends TestCase
 
         Worker::$pausable = false;
 
-        $this->artisan('queue:pause');
+        $this->artisan('queue:pause default');
 
         Event::assertNotDispatched(QueuePaused::class);
 
