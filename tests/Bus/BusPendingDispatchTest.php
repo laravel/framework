@@ -109,7 +109,7 @@ class BusPendingDispatchTest extends TestCase
     }
 
     public function testWhenMethodOfConditionableTraitWithTrue()
-    {   
+    {
         $this->job->shouldReceive('delay')->once()->with(300);
 
         $this->pendingDispatch->when(true, fn ($pendingDispatch) => $pendingDispatch->delay(300));
@@ -117,14 +117,13 @@ class BusPendingDispatchTest extends TestCase
 
     public function testWhenMethodOfConditionableTraitWithFalse()
     {
-        
         $this->job->shouldReceive('delay')->never();
 
         $this->pendingDispatch->when(false, fn ($pendingDispatch) => $pendingDispatch->delay(300));
     }
 
     public function testUnlessMethodOfConditionableTraitWithTrue()
-    {   
+    {
         $this->job->shouldReceive('delay')->never();
 
         $this->pendingDispatch->unless(true, fn ($pendingDispatch) => $pendingDispatch->delay(300));
@@ -132,7 +131,6 @@ class BusPendingDispatchTest extends TestCase
 
     public function testUnlessMethodOfConditionableTraitWithFalse()
     {
-        
         $this->job->shouldReceive('delay')->once()->with(300);
 
         $this->pendingDispatch->unless(false, fn ($pendingDispatch) => $pendingDispatch->delay(300));
