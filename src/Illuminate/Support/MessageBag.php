@@ -434,7 +434,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     /**
      * Convert the object to pretty print formatted JSON.
      *
-     * @params int $options
+     * @param  int  $options
      *
      * @return string
      */

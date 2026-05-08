@@ -189,7 +189,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     /**
      * Convert the object to pretty print formatted JSON.
      *
-     * @params int $options
+     * @param  int  $options
      *
      * @return string
      */
