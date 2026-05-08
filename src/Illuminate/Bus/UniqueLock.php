@@ -11,6 +11,14 @@ class UniqueLock
     use ReadsQueueAttributes;
 
     /**
+     * Default TTL (seconds) for the per-dispatch "released" marker when a job
+     * does not declare a uniqueFor value. Long enough to cover any realistic
+     * retry chain; the marker is uuid-scoped so it cannot collide with future
+     * dispatches.
+     */
+    protected const DEFAULT_RELEASED_MARKER_TTL = 86400;
+
+    /**
      * The cache repository implementation.
      *
      * @var \Illuminate\Contracts\Cache\Repository
@@ -35,15 +43,9 @@ class UniqueLock
      */
     public function acquire($job)
     {
-        $uniqueFor = method_exists($job, 'uniqueFor')
-            ? $job->uniqueFor()
-            : ($this->getAttributeValue($job, UniqueFor::class, 'uniqueFor') ?? 0);
-
-        $cache = method_exists($job, 'uniqueVia')
-            ? ($job->uniqueVia() ?? $this->cache)
-            : $this->cache;
-
-        return (bool) $cache->lock(self::getKey($job), $uniqueFor)->get();
+        return (bool) $this->resolveCache($job)
+            ->lock(self::getKey($job), $this->resolveUniqueFor($job))
+            ->get();
     }
 
     /**
@@ -54,11 +56,77 @@ class UniqueLock
      */
     public function release($job)
     {
-        $cache = method_exists($job, 'uniqueVia')
+        $this->resolveCache($job)->lock(self::getKey($job))->forceRelease();
+    }
+
+    /**
+     * Record that the unique lock has been released by the given dispatch.
+     *
+     * Used to make subsequent attempts of the same dispatch idempotent so
+     * they do not force-release a lock that may now belong to a different
+     * dispatch.
+     *
+     * @param  mixed  $job
+     * @param  string  $owner
+     * @return void
+     */
+    public function recordReleasedBy($job, string $owner)
+    {
+        $this->resolveCache($job)->put(
+            self::getReleasedKey($job, $owner),
+            true,
+            $this->resolveUniqueFor($job) ?: self::DEFAULT_RELEASED_MARKER_TTL
+        );
+    }
+
+    /**
+     * Determine whether the unique lock was previously released by the given dispatch.
+     *
+     * @param  mixed  $job
+     * @param  string  $owner
+     * @return bool
+     */
+    public function wasReleasedBy($job, string $owner)
+    {
+        return (bool) $this->resolveCache($job)->get(self::getReleasedKey($job, $owner));
+    }
+
+    /**
+     * Forget the per-dispatch "released" marker for the given job.
+     *
+     * @param  mixed  $job
+     * @param  string  $owner
+     * @return void
+     */
+    public function forgetReleasedBy($job, string $owner)
+    {
+        $this->resolveCache($job)->forget(self::getReleasedKey($job, $owner));
+    }
+
+    /**
+     * Resolve the cache store for the given job.
+     *
+     * @param  mixed  $job
+     * @return \Illuminate\Contracts\Cache\Repository
+     */
+    protected function resolveCache($job)
+    {
+        return method_exists($job, 'uniqueVia')
             ? ($job->uniqueVia() ?? $this->cache)
             : $this->cache;
+    }
 
-        $cache->lock(self::getKey($job))->forceRelease();
+    /**
+     * Resolve the uniqueFor value (in seconds) for the given job.
+     *
+     * @param  mixed  $job
+     * @return int
+     */
+    protected function resolveUniqueFor($job)
+    {
+        return method_exists($job, 'uniqueFor')
+            ? $job->uniqueFor()
+            : ($this->getAttributeValue($job, UniqueFor::class, 'uniqueFor') ?? 0);
     }
 
     /**
@@ -78,5 +146,17 @@ class UniqueLock
             : get_class($job);
 
         return 'laravel_unique_job:'.$jobName.':'.$uniqueId;
+    }
+
+    /**
+     * Generate the per-dispatch "released" marker key for the given job.
+     *
+     * @param  mixed  $job
+     * @param  string  $owner
+     * @return string
+     */
+    public static function getReleasedKey($job, string $owner)
+    {
+        return self::getKey($job).':released:'.$owner;
     }
 }

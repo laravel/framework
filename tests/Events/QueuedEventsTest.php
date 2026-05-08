@@ -576,18 +576,23 @@ class QueuedEventsTest extends TestCase
         $listener->uniqueId = 'until-processing-id';
 
         $expectedKey = 'laravel_unique_job:'.hash('xxh128', TestDispatcherShouldBeUniqueUntilProcessing::class).':until-processing-id';
+        $jobUuid = 'job-uuid-1';
+        $releasedMarkerKey = $expectedKey.':released:'.$jobUuid;
 
         $cache->shouldReceive('lock')
             ->with($expectedKey)
             ->andReturn($lock);
         $lock->shouldReceive('forceRelease')->once();
+        $cache->shouldReceive('get')->with($releasedMarkerKey)->andReturn(null);
+        $cache->shouldReceive('put')->with($releasedMarkerKey, true, m::any())->once();
+        $cache->shouldReceive('forget')->with($releasedMarkerKey)->once();
 
         $job = m::mock(Job::class);
         $job->shouldReceive('hasFailed')->andReturn(false);
         $job->shouldReceive('isDeleted')->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
-        $job->shouldReceive('attempts')->andReturn(1);
+        $job->shouldReceive('uuid')->andReturn($jobUuid);
         $job->shouldReceive('delete')->once();
 
         $handler = new CallQueuedHandler(new BusDispatcher($container), $container);

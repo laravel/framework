@@ -86,8 +86,12 @@ class CallQueuedHandler
             $this->runningCommand = null;
         }
 
-        if (! $job->isReleased() && ! $this->commandShouldBeUniqueUntilProcessing($command)) {
-            $this->ensureUniqueJobLockIsReleased($command);
+        if (! $job->isReleased()) {
+            if ($this->commandShouldBeUniqueUntilProcessing($command)) {
+                $this->forgetUniqueUntilProcessingReleasedMarker($command, $job->uuid());
+            } else {
+                $this->ensureUniqueJobLockIsReleased($command);
+            }
         }
 
         if (! $job->hasFailed() && ! $job->isReleased()) {
@@ -138,14 +142,18 @@ class CallQueuedHandler
 
         return (new Pipeline($this->container))->send($command)
             ->through(array_merge(method_exists($command, 'middleware') ? $command->middleware() : [], $command->middleware ?? []))
-            ->finally(function ($command) use (&$lockReleased) {
-                if (! $lockReleased && $this->commandShouldBeUniqueUntilProcessing($command) && ! $command->job->isReleased() && $command->job->attempts() <= 1) {
-                    $this->ensureUniqueJobLockIsReleased($command);
+            ->finally(function ($command) use ($job, &$lockReleased) {
+                if (! $lockReleased
+                    && $this->commandShouldBeUniqueUntilProcessing($command)
+                    && ! $command->job->isReleased()
+                    && ! $this->uniqueUntilProcessingLockAlreadyReleased($command, $job->uuid())) {
+                    $this->releaseUniqueUntilProcessingLock($command, $job->uuid());
                 }
             })
             ->then(function ($command) use ($job, &$lockReleased) {
-                if ($this->commandShouldBeUniqueUntilProcessing($command) && $job->attempts() <= 1) {
-                    $this->ensureUniqueJobLockIsReleased($command);
+                if ($this->commandShouldBeUniqueUntilProcessing($command)
+                    && ! $this->uniqueUntilProcessingLockAlreadyReleased($command, $job->uuid())) {
+                    $this->releaseUniqueUntilProcessingLock($command, $job->uuid());
 
                     $lockReleased = true;
                 }
@@ -233,6 +241,62 @@ class CallQueuedHandler
         if ($this->commandShouldBeUnique($command)) {
             (new UniqueLock($this->container->make(Cache::class)))->release($command);
         }
+    }
+
+    /**
+     * Release the unique-until-processing lock and record that this dispatch
+     * released it so retries are idempotent.
+     *
+     * @param  mixed  $command
+     * @param  string  $uuid
+     * @return void
+     */
+    protected function releaseUniqueUntilProcessingLock($command, string $uuid)
+    {
+        if (! $this->commandShouldBeUnique($command)) {
+            return;
+        }
+
+        $lock = new UniqueLock($this->container->make(Cache::class));
+        $lock->release($command);
+        $lock->recordReleasedBy($command, $uuid);
+    }
+
+    /**
+     * Determine whether this dispatch already released the unique-until-processing
+     * lock on a prior attempt. Prevents a retry from force-releasing a lock that
+     * may now belong to a different dispatch.
+     *
+     * @param  mixed  $command
+     * @param  string  $uuid
+     * @return bool
+     */
+    protected function uniqueUntilProcessingLockAlreadyReleased($command, string $uuid)
+    {
+        if (! $this->commandShouldBeUnique($command)) {
+            return false;
+        }
+
+        return (new UniqueLock($this->container->make(Cache::class)))
+            ->wasReleasedBy($command, $uuid);
+    }
+
+    /**
+     * Forget the per-dispatch released marker. Called after the job is fully
+     * resolved so the marker does not linger in the cache.
+     *
+     * @param  mixed  $command
+     * @param  string  $uuid
+     * @return void
+     */
+    protected function forgetUniqueUntilProcessingReleasedMarker($command, string $uuid)
+    {
+        if (! $this->commandShouldBeUnique($command)) {
+            return;
+        }
+
+        (new UniqueLock($this->container->make(Cache::class)))
+            ->forgetReleasedBy($command, $uuid);
     }
 
     /**
@@ -392,7 +456,9 @@ class CallQueuedHandler
             $command = $this->setJobInstanceIfNecessary($job, $command);
         }
 
-        if (! $this->commandShouldBeUniqueUntilProcessing($command)) {
+        if ($this->commandShouldBeUniqueUntilProcessing($command)) {
+            $this->forgetUniqueUntilProcessingReleasedMarker($command, $uuid);
+        } else {
             $this->ensureUniqueJobLockIsReleased($command);
         }
 
