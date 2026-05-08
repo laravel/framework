@@ -3,7 +3,8 @@
 namespace Illuminate\Database\Eloquent;
 
 /**
- * @implements \Illuminate\Database\Eloquent\Scope<\Illuminate\Database\Eloquent\Model>
+ * @template TModel of \Illuminate\Database\Eloquent\Model
+ * @implements \Illuminate\Database\Eloquent\Scope<TModel>
  */
 class SoftDeletingScope implements Scope
 {
@@ -14,6 +15,13 @@ class SoftDeletingScope implements Scope
      */
     protected $extensions = ['Restore', 'RestoreOrCreate', 'CreateOrRestore', 'WithTrashed', 'WithoutTrashed', 'OnlyTrashed'];
 
+    /**
+     * Apply the scope to a given Eloquent query builder.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $builder
+     * @param  TModel  $model
+     * @return void
+     */
     public function apply(Builder $builder, Model $model)
     {
         $builder->whereNull($model->getQualifiedDeletedAtColumn());
