@@ -12,12 +12,12 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Foundation\Queue\InteractsWithUniqueJobs;
 use Illuminate\Queue\Attributes\DebounceFor;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
+use Illuminate\Support\Traits\Conditionable;
 use LogicException;
 
 class PendingDispatch
 {
-    use InteractsWithUniqueJobs;
-    use ReadsQueueAttributes;
+    use Conditionable, InteractsWithUniqueJobs, ReadsQueueAttributes;
 
     /**
      * The job.
