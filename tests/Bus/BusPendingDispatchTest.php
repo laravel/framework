@@ -139,6 +139,6 @@ class BusPendingDispatchTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
-        parent::tearDown();                                                                                                                                                                                                                                                               
+        parent::tearDown();
     }
 }
