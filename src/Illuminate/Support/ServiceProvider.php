@@ -600,15 +600,21 @@ abstract class ServiceProvider
             ->merge([$provider])
             ->unique()
             ->sort()
-            ->values()
-            ->map(fn ($p) => '    '.$p.'::class,')
-            ->implode(PHP_EOL);
+            ->values();
 
-        $content = '<?php
+        $content = '<?php'.PHP_EOL.PHP_EOL;
 
-return [
-'.$providers.'
-];';
+        foreach ($providers as $provider) {
+            $content .= 'use '.$provider.';'.PHP_EOL;
+        }
+
+        $content .= PHP_EOL.'return ['.PHP_EOL;
+
+        foreach ($providers as $provider) {
+            $content .= '    '.class_basename($provider).'::class,'.PHP_EOL;
+        }
+
+        $content .= '];';
 
         file_put_contents($path, $content.PHP_EOL);
 
