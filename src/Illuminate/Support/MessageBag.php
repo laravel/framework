@@ -435,7 +435,6 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
      * Convert the object to pretty print formatted JSON.
      *
      * @param  int  $options
-     *
      * @return string
      */
     public function toPrettyJson(int $options = 0)
