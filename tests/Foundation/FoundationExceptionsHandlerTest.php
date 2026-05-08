@@ -22,6 +22,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\ResponseFactory;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Lottery;
 use Illuminate\Support\MessageBag;
 use Illuminate\Testing\Assert;
@@ -748,7 +749,7 @@ class FoundationExceptionsHandlerTest extends TestCase
             $handler->report(new RuntimeException("RuntimeException {$i}"));
         }
 
-        [$runtimeExceptions, $baseExceptions] = collect($reported)->partition(fn ($e) => $e instanceof RuntimeException);
+        [$runtimeExceptions, $baseExceptions] = (new Collection($reported))->partition(fn ($e) => $e instanceof RuntimeException)->all();
         $this->assertCount(10, $baseExceptions);
         $this->assertCount(2, $runtimeExceptions);
     }

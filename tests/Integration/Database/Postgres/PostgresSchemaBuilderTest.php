@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Database\Postgres;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\Attributes\RequiresDatabase;
@@ -203,7 +204,7 @@ class PostgresSchemaBuilderTest extends PostgresTestCase
 
         $indexes = Schema::getIndexes('public.table');
 
-        $this->assertSame([], collect($indexes)->firstWhere('name', 'table_raw_index')['columns']);
+        $this->assertSame([], (new Collection($indexes))->firstWhere('name', 'table_raw_index')['columns']);
     }
 
     public function testCreateIndexesOnline()
@@ -221,7 +222,7 @@ class PostgresSchemaBuilderTest extends PostgresTestCase
         });
 
         $indexes = Schema::getIndexes('public.table');
-        $indexNames = collect($indexes)->pluck('name');
+        $indexNames = (new Collection($indexes))->pluck('name');
 
         $this->assertContains('public_table_title_unique', $indexNames);
         $this->assertContains('public_table_created_at_index', $indexNames);

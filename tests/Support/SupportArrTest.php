@@ -115,7 +115,7 @@ class SupportArrTest extends TestCase
         $this->assertEquals([1, 2, 'foo', 'bar'], Arr::collapse($mixedArray));
 
         // Case including collections and arrays
-        $collection = collect(['baz', 'boom']);
+        $collection = new Collection(['baz', 'boom']);
         $mixedArray = [[1], [2], [3], ['foo', 'bar'], $collection];
         $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], Arr::collapse($mixedArray));
     }
@@ -1713,7 +1713,8 @@ class SupportArrTest extends TestCase
         $this->assertSame($subject, Arr::from($items));
 
         $items = new WeakMap;
-        $items[$temp = new class {
+        $items[$temp = new class
+        {
         }] = 'bar';
         $this->assertSame(['bar'], Arr::from($items));
 

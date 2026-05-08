@@ -335,7 +335,7 @@ class ModelSerializationTest extends TestCase
     public function testItSerializesAnEmptyCollection()
     {
         $serialized = serialize(new CollectionSerializationTestClass(
-            new Collection([])
+            new Collection
         ));
 
         unserialize($serialized);

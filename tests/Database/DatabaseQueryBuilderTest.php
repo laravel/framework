@@ -1165,14 +1165,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([Carbon::now()->startOfDay(), Carbon::now()->addDays(5)->startOfDay()], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->whereBetween('id', collect([1, 2]));
+        $builder->select('*')->from('users')->whereBetween('id', new Collection([1, 2]));
         $this->assertSame('select * from "users" where "id" between ? and ?', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
 
         $subqueryBuilder = $this->getBuilder();
         $subqueryBuilder->select('id')->from('posts')->where('status', 'published')->orderByDesc('created_at')->limit(1);
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->whereBetween($subqueryBuilder, collect([1, 2]));
+        $builder->select('*')->from('users')->whereBetween($subqueryBuilder, new Collection([1, 2]));
         $this->assertSame('select * from "users" where (select "id" from "posts" where "status" = ? order by "created_at" desc limit 1) between ? and ?', $builder->toSql());
         $this->assertEquals([0 => 'published', 1 => 1, 2 => 2], $builder->getBindings());
     }
@@ -1200,7 +1200,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => 4, 2 => 6], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereBetween('id', collect([3, 4]));
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereBetween('id', new Collection([3, 4]));
         $this->assertSame('select * from "users" where "id" = ? or "id" between ? and ?', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 3, 2 => 4], $builder->getBindings());
 
@@ -1233,7 +1233,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => 4, 2 => 6], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereNotBetween('id', collect([3, 4]));
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereNotBetween('id', new Collection([3, 4]));
         $this->assertSame('select * from "users" where "id" = ? or "id" not between ? and ?', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 3, 2 => 4], $builder->getBindings());
 
@@ -5937,9 +5937,9 @@ SQL;
         $builder = $this->getMockQueryBuilder();
         $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
 
-        $chunk1 = collect(['foo1', 'foo2']);
-        $chunk2 = collect(['foo3', 'foo4']);
-        $chunk3 = collect([]);
+        $chunk1 = new Collection(['foo1', 'foo2']);
+        $chunk2 = new Collection(['foo3', 'foo4']);
+        $chunk3 = new Collection;
 
         $builder->shouldReceive('getOffset')->once()->andReturnNull();
         $builder->shouldReceive('getLimit')->once()->andReturnNull();
@@ -5964,8 +5964,8 @@ SQL;
         $builder = $this->getMockQueryBuilder();
         $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
 
-        $chunk1 = collect(['foo1', 'foo2']);
-        $chunk2 = collect(['foo3']);
+        $chunk1 = new Collection(['foo1', 'foo2']);
+        $chunk2 = new Collection(['foo3']);
 
         $builder->shouldReceive('getOffset')->once()->andReturnNull();
         $builder->shouldReceive('getLimit')->once()->andReturnNull();
@@ -5988,8 +5988,8 @@ SQL;
         $builder = $this->getMockQueryBuilder();
         $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
 
-        $chunk1 = collect(['foo1', 'foo2']);
-        $chunk2 = collect(['foo3']);
+        $chunk1 = new Collection(['foo1', 'foo2']);
+        $chunk2 = new Collection(['foo3']);
         $builder->shouldReceive('getOffset')->once()->andReturnNull();
         $builder->shouldReceive('getLimit')->once()->andReturnNull();
         $builder->shouldReceive('offset')->once()->with(0)->andReturnSelf();
@@ -6028,9 +6028,9 @@ SQL;
         $builder = $this->getMockQueryBuilder();
         $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
 
-        $chunk1 = collect([['someIdField' => 1], ['someIdField' => 2]]);
-        $chunk2 = collect([['someIdField' => 10], ['someIdField' => 11]]);
-        $chunk3 = collect([]);
+        $chunk1 = new Collection([['someIdField' => 1], ['someIdField' => 2]]);
+        $chunk2 = new Collection([['someIdField' => 10], ['someIdField' => 11]]);
+        $chunk3 = new Collection;
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 11, 'someIdField')->andReturnSelf();
@@ -6051,9 +6051,9 @@ SQL;
         $builder = $this->getMockQueryBuilder();
         $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
 
-        $chunk1 = collect([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
-        $chunk2 = collect([(object) ['someIdField' => 10], (object) ['someIdField' => 11]]);
-        $chunk3 = collect([]);
+        $chunk1 = new Collection([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
+        $chunk2 = new Collection([(object) ['someIdField' => 10], (object) ['someIdField' => 11]]);
+        $chunk3 = new Collection;
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 11, 'someIdField')->andReturnSelf();
@@ -6074,8 +6074,8 @@ SQL;
         $builder = $this->getMockQueryBuilder();
         $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
 
-        $chunk1 = collect([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
-        $chunk2 = collect([(object) ['someIdField' => 10]]);
+        $chunk1 = new Collection([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
+        $chunk2 = new Collection([(object) ['someIdField' => 10]]);
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
@@ -6107,8 +6107,8 @@ SQL;
         $builder = $this->getMockQueryBuilder();
         $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
 
-        $chunk1 = collect([(object) ['table_id' => 1], (object) ['table_id' => 10]]);
-        $chunk2 = collect([]);
+        $chunk1 = new Collection([(object) ['table_id' => 1], (object) ['table_id' => 10]]);
+        $chunk2 = new Collection;
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'table.id')->andReturnSelf();
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 10, 'table.id')->andReturnSelf();
         $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
@@ -6127,8 +6127,8 @@ SQL;
         $builder = $this->getMockQueryBuilder();
         $builder->orders[] = ['column' => 'foobar', 'direction' => 'desc'];
 
-        $chunk1 = collect([(object) ['someIdField' => 10], (object) ['someIdField' => 1]]);
-        $chunk2 = collect([]);
+        $chunk1 = new Collection([(object) ['someIdField' => 10], (object) ['someIdField' => 1]]);
+        $chunk2 = new Collection;
         $builder->shouldReceive('forPageBeforeId')->once()->with(2, 0, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('forPageBeforeId')->once()->with(2, 1, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
@@ -6151,7 +6151,7 @@ SQL;
         $builder = $this->getMockQueryBuilder();
         $path = 'http://foo.bar?page=3';
 
-        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+        $results = new Collection([['test' => 'foo'], ['test' => 'bar']]);
 
         $builder->shouldReceive('getCountForPagination')->once()->andReturn(2);
         $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
@@ -6177,7 +6177,7 @@ SQL;
         $builder = $this->getMockQueryBuilder();
         $path = 'http://foo.bar?page=3';
 
-        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+        $results = new Collection([['test' => 'foo'], ['test' => 'bar']]);
 
         $builder->shouldReceive('getCountForPagination')->once()->andReturn(2);
         $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
@@ -6238,7 +6238,7 @@ SQL;
         $builder = $this->getMockQueryBuilder();
         $path = 'http://foo.bar?page=3';
 
-        $results = collect([['id' => 3, 'name' => 'Taylor'], ['id' => 5, 'name' => 'Mohamed']]);
+        $results = new Collection([['id' => 3, 'name' => 'Taylor'], ['id' => 5, 'name' => 'Mohamed']]);
 
         $builder->shouldReceive('getCountForPagination')->once()->andReturn(2);
         $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
@@ -6265,7 +6265,7 @@ SQL;
         $builder = $this->getMockQueryBuilder();
         $path = 'http://foo.bar?page=3';
 
-        $results = collect([['id' => 3, 'name' => 'Taylor'], ['id' => 5, 'name' => 'Mohamed']]);
+        $results = new Collection([['id' => 3, 'name' => 'Taylor'], ['id' => 5, 'name' => 'Mohamed']]);
 
         $builder->shouldReceive('getCountForPagination')->never();
         $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
@@ -6294,7 +6294,7 @@ SQL;
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
-        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+        $results = new Collection([['test' => 'foo'], ['test' => 'bar']]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
             $this->assertSame(
@@ -6332,7 +6332,7 @@ SQL;
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
-        $results = collect([['test' => 'foo', 'another' => 1], ['test' => 'bar', 'another' => 2]]);
+        $results = new Collection([['test' => 'foo', 'another' => 1], ['test' => 'bar', 'another' => 2]]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
             $this->assertSame(
@@ -6370,7 +6370,7 @@ SQL;
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
-        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+        $results = new Collection([['test' => 'foo'], ['test' => 'bar']]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
             $this->assertSame(
@@ -6440,7 +6440,7 @@ SQL;
 
         $path = 'http://foo.bar?cursor=3';
 
-        $results = collect([['id' => 3, 'name' => 'Taylor'], ['id' => 5, 'name' => 'Mohamed']]);
+        $results = new Collection([['id' => 3, 'name' => 'Taylor'], ['id' => 5, 'name' => 'Mohamed']]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
             $this->assertSame(
@@ -6478,7 +6478,7 @@ SQL;
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
-        $results = collect([['foo' => 1, 'bar' => 2, 'baz' => 4], ['foo' => 1, 'bar' => 1, 'baz' => 1]]);
+        $results = new Collection([['foo' => 1, 'bar' => 2, 'baz' => 4], ['foo' => 1, 'bar' => 1, 'baz' => 1]]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
             $this->assertSame(
@@ -6516,7 +6516,7 @@ SQL;
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
-        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+        $results = new Collection([['test' => 'foo'], ['test' => 'bar']]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
             $this->assertSame(
@@ -6557,7 +6557,7 @@ SQL;
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
-        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+        $results = new Collection([['test' => 'foo'], ['test' => 'bar']]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
             $this->assertSame(
@@ -6598,7 +6598,7 @@ SQL;
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
-        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+        $results = new Collection([['test' => 'foo'], ['test' => 'bar']]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
             $this->assertSame(
@@ -6645,7 +6645,7 @@ SQL;
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
-        $results = collect([
+        $results = new Collection([
             ['id' => 1, 'created_at' => Carbon::now(), 'type' => 'video'],
             ['id' => 2, 'created_at' => Carbon::now(), 'type' => 'news'],
         ]);
@@ -6693,7 +6693,7 @@ SQL;
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
-        $results = collect([
+        $results = new Collection([
             ['id' => 1, 'created_at' => Carbon::now(), 'type' => 'video'],
             ['id' => 2, 'created_at' => Carbon::now(), 'type' => 'news'],
             ['id' => 3, 'created_at' => Carbon::now(), 'type' => 'podcasts'],
@@ -6742,7 +6742,7 @@ SQL;
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
-        $results = collect([
+        $results = new Collection([
             ['id' => 1, 'created_at' => Carbon::now()->addDay(), 'type' => 'video'],
             ['id' => 1, 'created_at' => Carbon::now(), 'type' => 'news'],
             ['id' => 1, 'created_at' => Carbon::now(), 'type' => 'podcast'],
@@ -6791,7 +6791,7 @@ SQL;
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
-        $results = collect([
+        $results = new Collection([
             ['id' => 1, 'created_at' => Carbon::now(), 'type' => 'video', 'is_published' => true],
             ['id' => 2, 'created_at' => Carbon::now(), 'type' => 'news', 'is_published' => true],
         ]);
@@ -6838,7 +6838,7 @@ SQL;
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
-        $results = collect([
+        $results = new Collection([
             ['id' => 1, 'created_at' => Carbon::now(), 'type' => 'video'],
             ['id' => 2, 'created_at' => Carbon::now(), 'type' => 'news'],
         ]);
@@ -6885,7 +6885,7 @@ SQL;
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
-        $results = collect([
+        $results = new Collection([
             ['id' => 1, 'created_at' => Carbon::now(), 'type' => 'video'],
             ['id' => 2, 'created_at' => Carbon::now(), 'type' => 'news'],
         ]);
@@ -6933,7 +6933,7 @@ SQL;
 
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
-        $results = collect([
+        $results = new Collection([
             ['id' => 1, 'created_at' => Carbon::now(), 'type' => 'video'],
             ['id' => 2, 'created_at' => Carbon::now(), 'type' => 'news'],
             ['id' => 3, 'created_at' => Carbon::now(), 'type' => 'podcast'],

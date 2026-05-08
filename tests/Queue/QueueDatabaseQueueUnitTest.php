@@ -9,6 +9,7 @@ use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Queue\Jobs\InspectedJob;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -209,7 +210,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $query->shouldReceive('where')->with('queue', 'default')->andReturnSelf();
         $query->shouldReceive('whereNull')->with('reserved_at')->andReturnSelf();
         $query->shouldReceive('where')->with('available_at', '<=', m::any())->andReturnSelf();
-        $query->shouldReceive('get')->andReturn(collect([(object) ['id' => 1, 'queue' => 'default', 'payload' => $payload, 'attempts' => 0, 'reserved_at' => null]]));
+        $query->shouldReceive('get')->andReturn(new Collection([(object) ['id' => 1, 'queue' => 'default', 'payload' => $payload, 'attempts' => 0, 'reserved_at' => null]]));
 
         $jobs = $queue->pendingJobs();
 
@@ -233,7 +234,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $query->shouldReceive('where')->with('queue', 'default')->andReturnSelf();
         $query->shouldReceive('whereNull')->with('reserved_at')->andReturnSelf();
         $query->shouldReceive('where')->with('available_at', '>', m::any())->andReturnSelf();
-        $query->shouldReceive('get')->andReturn(collect([(object) ['id' => 2, 'queue' => 'default', 'payload' => $payload, 'attempts' => 0, 'reserved_at' => null]]));
+        $query->shouldReceive('get')->andReturn(new Collection([(object) ['id' => 2, 'queue' => 'default', 'payload' => $payload, 'attempts' => 0, 'reserved_at' => null]]));
 
         $jobs = $queue->delayedJobs();
 
@@ -256,7 +257,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('where')->with('queue', 'default')->andReturnSelf();
         $query->shouldReceive('whereNotNull')->with('reserved_at')->andReturnSelf();
-        $query->shouldReceive('get')->andReturn(collect([(object) ['id' => 1, 'queue' => 'default', 'payload' => $payload, 'attempts' => 1, 'reserved_at' => Carbon::now()->getTimestamp()]]));
+        $query->shouldReceive('get')->andReturn(new Collection([(object) ['id' => 1, 'queue' => 'default', 'payload' => $payload, 'attempts' => 1, 'reserved_at' => Carbon::now()->getTimestamp()]]));
 
         $jobs = $queue->reservedJobs();
 
@@ -280,7 +281,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('whereNull')->with('reserved_at')->andReturnSelf();
         $query->shouldReceive('where')->with('available_at', '<=', m::any())->andReturnSelf();
-        $query->shouldReceive('get')->andReturn(collect([
+        $query->shouldReceive('get')->andReturn(new Collection([
             (object) ['id' => 1, 'queue' => 'default', 'payload' => $payload1, 'attempts' => 0, 'reserved_at' => null],
             (object) ['id' => 2, 'queue' => 'emails', 'payload' => $payload2, 'attempts' => 0, 'reserved_at' => null],
         ]));
@@ -309,7 +310,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('whereNull')->with('reserved_at')->andReturnSelf();
         $query->shouldReceive('where')->with('available_at', '>', m::any())->andReturnSelf();
-        $query->shouldReceive('get')->andReturn(collect([
+        $query->shouldReceive('get')->andReturn(new Collection([
             (object) ['id' => 1, 'queue' => 'default', 'payload' => $payload1, 'attempts' => 0, 'reserved_at' => null],
             (object) ['id' => 2, 'queue' => 'emails', 'payload' => $payload2, 'attempts' => 0, 'reserved_at' => null],
         ]));
@@ -337,7 +338,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
 
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('whereNotNull')->with('reserved_at')->andReturnSelf();
-        $query->shouldReceive('get')->andReturn(collect([
+        $query->shouldReceive('get')->andReturn(new Collection([
             (object) ['id' => 1, 'queue' => 'default', 'payload' => $payload1, 'attempts' => 1, 'reserved_at' => 1000005],
             (object) ['id' => 2, 'queue' => 'emails', 'payload' => $payload2, 'attempts' => 2, 'reserved_at' => 1000006],
         ]));

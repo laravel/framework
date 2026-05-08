@@ -19,6 +19,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Collection as BaseCollection;
 use Mockery as m;
 use PDO;
@@ -93,7 +94,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->shouldNotReceive('whereIn');
         $builder->shouldNotReceive('get');
 
-        $result = $builder->findMany(collect(), ['column']);
+        $result = $builder->findMany(new Collection, ['column']);
         $this->assertSame('emptycollection', $result);
     }
 
@@ -289,7 +290,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testFindWithManyUsingCollection()
     {
-        $ids = collect([1, 2]);
+        $ids = new Collection([1, 2]);
         $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
         $model = $this->getMockModel();
         $model->shouldReceive('getKeyType')->andReturn('int');
@@ -351,7 +352,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->shouldReceive('getModels')->with(['foo'])->andReturn([]);
         $builder->shouldReceive('eagerLoadRelations')->never();
         $builder->setModel($this->getMockModel());
-        $builder->getModel()->shouldReceive('newCollection')->with([])->andReturn(new Collection([]));
+        $builder->getModel()->shouldReceive('newCollection')->with([])->andReturn(new Collection);
 
         $results = $builder->get(['foo']);
         $this->assertSame([], $results->all());
@@ -405,7 +406,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $chunk1 = new Collection(['foo1', 'foo2']);
         $chunk2 = new Collection(['foo3', 'foo4']);
-        $chunk3 = new Collection([]);
+        $chunk3 = new Collection;
 
         $builder->shouldReceive('getOffset')->once()->andReturn(null);
         $builder->shouldReceive('getLimit')->once()->andReturn(null);
@@ -496,7 +497,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $chunk1 = new Collection([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
         $chunk2 = new Collection([(object) ['someIdField' => 10], (object) ['someIdField' => 11]]);
-        $chunk3 = new Collection([]);
+        $chunk3 = new Collection;
         $builder->shouldReceive('getOffset')->andReturnNull();
         $builder->shouldReceive('getLimit')->andReturnNull();
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturnSelf();
@@ -565,7 +566,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->shouldReceive('get')->times(3)->andReturn(
             new Collection(['foo1', 'foo2']),
             new Collection(['foo3', 'foo4']),
-            new Collection([])
+            new Collection
         );
 
         $this->assertEquals(
@@ -610,7 +611,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $chunk1 = new Collection([(object) ['someIdField' => 1], (object) ['someIdField' => 2]]);
         $chunk2 = new Collection([(object) ['someIdField' => 10], (object) ['someIdField' => 11]]);
-        $chunk3 = new Collection([]);
+        $chunk3 = new Collection;
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 0, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 11, 'someIdField')->andReturnSelf();

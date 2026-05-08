@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Illuminate\Support\Collection;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rule;
@@ -23,7 +24,7 @@ class ValidationRuleDoesntContainTest extends TestCase
         $rule = Rule::doesntContain(['Taylor', 'Abigail']);
         $this->assertSame('doesnt_contain:"Taylor","Abigail"', (string) $rule);
 
-        $rule = Rule::doesntContain(collect(['Taylor', 'Abigail']));
+        $rule = Rule::doesntContain(new Collection(['Taylor', 'Abigail']));
         $this->assertSame('doesnt_contain:"Taylor","Abigail"', (string) $rule);
 
         $rule = Rule::doesntContain([ArrayKeys::key_1, ArrayKeys::key_2]);

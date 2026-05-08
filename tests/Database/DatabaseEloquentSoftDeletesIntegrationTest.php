@@ -12,6 +12,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Mockery as m;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
@@ -286,7 +287,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
     public function testForceDestroyDeletesRecordsFromCollection()
     {
         $this->createUsers();
-        $deleted = SoftDeletesTestUser::forceDestroy(collect([1, 2]));
+        $deleted = SoftDeletesTestUser::forceDestroy(new Collection([1, 2]));
 
         $this->assertSame(2, $deleted);
 

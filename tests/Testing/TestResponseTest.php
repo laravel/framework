@@ -2668,7 +2668,7 @@ EOT
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
 
         $this->assertInstanceOf(Collection::class, $response->collect());
-        $this->assertEquals(collect([
+        $this->assertEquals(new Collection([
             'foo' => 'bar',
             'foobar' => [
                 'foobar_foo' => 'foo',
@@ -2695,9 +2695,9 @@ EOT
                 4 => ['bar' => 'foo 2', 'foo' => 'bar 2'],
             ],
         ]), $response->collect());
-        $this->assertEquals(collect(['foobar_foo' => 'foo', 'foobar_bar' => 'bar']), $response->collect('foobar'));
-        $this->assertEquals(collect(['bar']), $response->collect('foobar.foobar_bar'));
-        $this->assertEquals(collect(), $response->collect('missing_key'));
+        $this->assertEquals(new Collection(['foobar_foo' => 'foo', 'foobar_bar' => 'bar']), $response->collect('foobar'));
+        $this->assertEquals(new Collection(['bar']), $response->collect('foobar.foobar_bar'));
+        $this->assertEquals(new Collection, $response->collect('missing_key'));
     }
 
     public function testItCanBeTapped(): void
@@ -3178,7 +3178,7 @@ EOT
     public function testHandledExceptionIsIncludedInAssertionFailure(): void
     {
         $response = TestResponse::fromBaseResponse(new Response('', 500))
-            ->withExceptions(collect([new Exception('Unexpected exception.')]));
+            ->withExceptions(new Collection([new Exception('Unexpected exception.')]));
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessageMatches('/Expected response status code \[200\] but received 500.*Exception: Unexpected exception/s');

@@ -9,6 +9,7 @@ use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Mail\Mailer;
 use Illuminate\Mail\Message;
 use Illuminate\Mail\Transport\ArrayTransport;
+use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -52,7 +53,7 @@ class MailMailerTest extends TestCase
                 ->from('hello@laravel.com');
         });
 
-        $recipients = collect($sentMessage->getEnvelope()->getRecipients())->map(function ($recipient) {
+        $recipients = (new Collection($sentMessage->getEnvelope()->getRecipients()))->map(function ($recipient) {
             return $recipient->getAddress();
         });
 
@@ -251,7 +252,7 @@ class MailMailerTest extends TestCase
             $message->bcc('james@laravel.com');
         });
 
-        $recipients = collect($sentMessage->getEnvelope()->getRecipients())->map(function ($recipient) {
+        $recipients = (new Collection($sentMessage->getEnvelope()->getRecipients()))->map(function ($recipient) {
             return $recipient->getAddress();
         });
 

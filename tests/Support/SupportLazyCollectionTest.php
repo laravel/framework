@@ -476,7 +476,7 @@ class SupportLazyCollectionTest extends TestCase
 
         Carbon::setTestNow($start);
 
-        $output = new Collection();
+        $output = new Collection;
 
         $numbers = LazyCollection::range(1, 10)
 

@@ -10,6 +10,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -191,7 +192,7 @@ class DatabaseConnectionsTest extends DatabaseTestCase
                 'database' => $writePath,
             ],
         ]);
-        $events = collect();
+        $events = new Collection;
         DB::listen($events->push(...));
 
         try {
@@ -242,7 +243,7 @@ class DatabaseConnectionsTest extends DatabaseTestCase
             'driver' => 'sqlite',
             'database' => $writePath,
         ]);
-        $events = collect();
+        $events = new Collection;
         DB::listen($events->push(...));
 
         try {
@@ -331,7 +332,7 @@ class DatabaseConnectionsTest extends DatabaseTestCase
                 'database' => $writePath,
             ],
         ]);
-        $events = collect();
+        $events = new Collection;
         DB::listen($events->push(...));
 
         try {

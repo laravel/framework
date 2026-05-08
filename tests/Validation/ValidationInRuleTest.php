@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Illuminate\Support\Collection;
 use Illuminate\Tests\Validation\fixtures\Values;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
@@ -20,7 +21,7 @@ class ValidationInRuleTest extends TestCase
 
         $this->assertSame('in:"Laravel","Framework","PHP"', (string) $rule);
 
-        $rule = new In(collect(['Taylor', 'Michael', 'Tim']));
+        $rule = new In(new Collection(['Taylor', 'Michael', 'Tim']));
 
         $this->assertSame('in:"Taylor","Michael","Tim"', (string) $rule);
 
@@ -28,11 +29,11 @@ class ValidationInRuleTest extends TestCase
 
         $this->assertSame('in:"Life, the Universe and Everything","this is a ""quote"""', (string) $rule);
 
-        $rule = Rule::in(collect([1, 2, 3, 4]));
+        $rule = Rule::in(new Collection([1, 2, 3, 4]));
 
         $this->assertSame('in:"1","2","3","4"', (string) $rule);
 
-        $rule = Rule::in(collect([1, 2, 3, 4]));
+        $rule = Rule::in(new Collection([1, 2, 3, 4]));
 
         $this->assertSame('in:"1","2","3","4"', (string) $rule);
 
@@ -44,7 +45,7 @@ class ValidationInRuleTest extends TestCase
 
         $this->assertSame('in:"1","2","3","4"', (string) $rule);
 
-        $rule = Rule::in(collect([1, 2, 3, 4]));
+        $rule = Rule::in(new Collection([1, 2, 3, 4]));
 
         $this->assertSame('in:"1","2","3","4"', (string) $rule);
 

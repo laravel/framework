@@ -6,6 +6,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Relations\Pivot as EloquentPivot;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManySyncTouchesParentTest extends TestCase
@@ -90,8 +91,8 @@ class DatabaseEloquentBelongsToManySyncTouchesParentTest extends TestCase
 
         Carbon::setTestNow('2021-07-20 19:13:14');
         $result = $article->users()->sync([1, 2]);
-        $this->assertCount(1, collect($result['detached']));
-        $this->assertSame('3', (string) collect($result['detached'])->first());
+        $this->assertCount(1, new Collection($result['detached']));
+        $this->assertSame('3', (string) (new Collection($result['detached']))->first());
 
         $article->refresh();
         $this->assertSame('2021-07-20 19:13:14', $article->updated_at->format('Y-m-d H:i:s'));

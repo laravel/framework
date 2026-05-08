@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Support\Collection;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
@@ -87,7 +88,7 @@ class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
 
         $changes = $user->articles()->sync($articleIDs);
 
-        collect($changes['attached'])->map(function ($id) {
+        (new Collection($changes['attached']))->map(function ($id) {
             $this->assertSame(gettype($id), (new BelongsToManySyncTestTestArticle)->getKeyType());
         });
 
@@ -105,7 +106,7 @@ class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
 
         $changes = $user->articles()->syncWithPivotValues($articleIDs, ['visible' => true]);
 
-        collect($changes['attached'])->each(function ($id) {
+        (new Collection($changes['attached']))->each(function ($id) {
             $this->assertSame(gettype($id), (new BelongsToManySyncTestTestArticle)->getKeyType());
         });
 

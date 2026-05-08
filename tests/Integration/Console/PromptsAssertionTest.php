@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Support\Collection;
 use Orchestra\Testbench\TestCase;
 
 use function Laravel\Prompts\confirm;
@@ -307,7 +308,7 @@ class PromptsAssertionTest extends TestCase
 
                 public function handle()
                 {
-                    $options = collect(['John', 'Jane', 'Sally', 'Jack']);
+                    $options = new Collection(['John', 'Jane', 'Sally', 'Jack']);
 
                     $name = search(
                         label: 'What is your name?',
@@ -336,7 +337,7 @@ class PromptsAssertionTest extends TestCase
 
                 public function handle()
                 {
-                    $options = collect(['John', 'Jane', 'Sally', 'Jack']);
+                    $options = new Collection(['John', 'Jane', 'Sally', 'Jack']);
 
                     $names = multisearch(
                         label: 'Which names do you like?',
@@ -379,7 +380,7 @@ class PromptsAssertionTest extends TestCase
                         options: ['John', 'Jane']
                     );
 
-                    $titles = collect(['Mr', 'Mrs', 'Ms', 'Dr']);
+                    $titles = new Collection(['Mr', 'Mrs', 'Ms', 'Dr']);
                     $title = multisearch(
                         label: 'What is your title?',
                         options: fn (string $value) => $value !== ''

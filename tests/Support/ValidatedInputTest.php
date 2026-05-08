@@ -536,7 +536,7 @@ class ValidatedInputTest extends TestCase
         $this->assertTrue($input->collect(['roles'])->isNotEmpty());
         $this->assertEquals(['roles' => [4, 5, 6]], $input->collect(['roles'])->all());
         $this->assertEquals(['users' => [1, 2, 3], 'email' => 'test@example.com'], $input->collect(['users', 'email'])->all());
-        $this->assertEquals(collect(['roles' => [4, 5, 6], 'foo' => ['bar', 'baz']]), $input->collect(['roles', 'foo']));
+        $this->assertEquals(new Collection(['roles' => [4, 5, 6], 'foo' => ['bar', 'baz']]), $input->collect(['roles', 'foo']));
         $this->assertEquals(['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com'], $input->collect()->all());
     }
 

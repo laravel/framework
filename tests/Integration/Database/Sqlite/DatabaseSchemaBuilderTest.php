@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database\Sqlite;
 
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\Attributes\RequiresDatabase;
@@ -97,7 +98,7 @@ class DatabaseSchemaBuilderTest extends TestCase
             $table->foreignId('moderator_id')->constrained('table1');
         });
 
-        $foreignKeys = collect($schema->getForeignKeys('table2'));
+        $foreignKeys = new Collection($schema->getForeignKeys('table2'));
 
         $this->assertTrue($foreignKeys->contains(
             fn ($fk) => $fk['foreign_table'] === 'example_table1' &&
@@ -123,7 +124,7 @@ class DatabaseSchemaBuilderTest extends TestCase
             $table->foreignId('item_id')->nullable()->constrained('items');
         });
 
-        $this->assertTrue(collect(Schema::getForeignKeys('items'))->contains(
+        $this->assertTrue((new Collection(Schema::getForeignKeys('items')))->contains(
             fn ($fk) => $fk['foreign_table'] === 'items' &&
                 $fk['foreign_columns'] === ['id'] &&
                 $fk['columns'] === ['item_id']
@@ -131,10 +132,10 @@ class DatabaseSchemaBuilderTest extends TestCase
 
         $columns = Schema::getColumns('items');
 
-        $this->assertTrue(collect($columns)->contains(
+        $this->assertTrue((new Collection($columns))->contains(
             fn ($column) => $column['name'] === 'flags' && $column['default'] === 'JSON_ARRAY()'
         ));
 
-        $this->assertTrue(collect($columns)->contains(fn ($column) => $column['name'] === 'item_id' && $column['nullable']));
+        $this->assertTrue((new Collection($columns))->contains(fn ($column) => $column['name'] === 'item_id' && $column['nullable']));
     }
 }

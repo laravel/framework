@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\View;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\View;
@@ -222,7 +223,7 @@ class BladeTest extends TestCase
         $this->artisan('view:cache');
 
         $compiledFiles = Finder::create()->in(Config::get('view.compiled'))->files();
-        $found = collect($compiledFiles)
+        $found = (new Collection($compiledFiles))
             ->contains(fn (SplFileInfo $file) => str_contains($file->getContents(), 'echo "<?php echo e($scriptMessage); ?>" > output.log'));
         $this->assertTrue($found);
     }

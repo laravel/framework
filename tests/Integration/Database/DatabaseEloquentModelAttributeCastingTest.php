@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -416,7 +417,7 @@ class TestEloquentModelWithAttributeCast extends Model
     {
         return new Attribute(
             function () {
-                return collect();
+                return new Collection;
             }
         );
     }

@@ -9,7 +9,7 @@ trait CountsEnumerations
 {
     protected function makeGeneratorFunctionWithRecorder($numbers = 10)
     {
-        $recorder = new Collection();
+        $recorder = new Collection;
 
         $generatorFunction = function () use ($numbers, $recorder) {
             for ($i = 1; $i <= $numbers; $i++) {

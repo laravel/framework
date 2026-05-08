@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use ValueError;
@@ -152,7 +153,7 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status_collection' => json_encode([1, 2]),
             'integer_status_array' => json_encode([1, 2]),
             'arrayable_status' => 'pending',
-        ], collect(DB::table('enum_casts')->where('id', $model->id)->first())->map(function ($value) {
+        ], (new Collection(DB::table('enum_casts')->where('id', $model->id)->first()))->map(function ($value) {
             return str_replace(', ', ',', $value);
         })->all());
     }
@@ -180,7 +181,7 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status_collection' => json_encode([1, 2]),
             'integer_status_array' => json_encode([1, 2]),
             'arrayable_status' => 'pending',
-        ], collect(DB::table('enum_casts')->where('id', $model->id)->first())->map(function ($value) {
+        ], (new Collection(DB::table('enum_casts')->where('id', $model->id)->first()))->map(function ($value) {
             return str_replace(', ', ',', $value);
         })->all());
     }

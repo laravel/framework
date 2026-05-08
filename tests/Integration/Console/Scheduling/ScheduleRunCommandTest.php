@@ -9,6 +9,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Orchestra\Testbench\TestCase;
 use ReflectionMethod;
@@ -235,7 +236,7 @@ class ScheduleRunCommandTest extends TestCase
 
         // Set test time past the minute boundary so the while loop exits immediately
         Carbon::setTestNow('2026-03-25 12:01:01');
-        $reflection->invoke($command, collect());
+        $reflection->invoke($command, new Collection);
 
         // startedAt should not have been mutated to end of minute
         $startedAtAfter = (new ReflectionProperty($command, 'startedAt'))->getValue($command);

@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
+use Illuminate\Support\Collection;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -66,10 +67,10 @@ class LoadConfigurationTest extends TestCase
 
         $this->assertEqualsCanonicalizing(
             array_keys($app['config']->all()),
-            collect((new Filesystem)->files([
+            (new Collection((new Filesystem)->files([
                 $baseConfigPath,
                 $customConfigPath,
-            ]))->map(fn ($file) => $file->getBaseName('.php'))->unique()->values()->toArray()
+            ])))->map(fn ($file) => $file->getBaseName('.php'))->unique()->values()->toArray()
         );
     }
 }

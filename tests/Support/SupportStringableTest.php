@@ -642,7 +642,7 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($this->stringable('jason')->startsWith('jason'));
         $this->assertTrue($this->stringable('jason')->startsWith(['jas']));
         $this->assertTrue($this->stringable('jason')->startsWith(['day', 'jas']));
-        $this->assertTrue($this->stringable('jason')->startsWith(collect(['day', 'jas'])));
+        $this->assertTrue($this->stringable('jason')->startsWith(new Collection(['day', 'jas'])));
         $this->assertFalse($this->stringable('jason')->startsWith('day'));
         $this->assertFalse($this->stringable('jason')->startsWith(['day']));
         $this->assertFalse($this->stringable('jason')->startsWith(null));
@@ -672,7 +672,7 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('jason')->doesntStartWith('jason'));
         $this->assertFalse($this->stringable('jason')->doesntStartWith(['jas']));
         $this->assertFalse($this->stringable('jason')->doesntStartWith(['day', 'jas']));
-        $this->assertFalse($this->stringable('jason')->doesntStartWith(collect(['day', 'jas'])));
+        $this->assertFalse($this->stringable('jason')->doesntStartWith(new Collection(['day', 'jas'])));
         $this->assertTrue($this->stringable('jason')->doesntStartWith('day'));
         $this->assertTrue($this->stringable('jason')->doesntStartWith(['day']));
         $this->assertTrue($this->stringable('jason')->doesntStartWith(null));
@@ -702,7 +702,7 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($this->stringable('jason')->endsWith('jason'));
         $this->assertTrue($this->stringable('jason')->endsWith(['on']));
         $this->assertTrue($this->stringable('jason')->endsWith(['no', 'on']));
-        $this->assertTrue($this->stringable('jason')->endsWith(collect(['no', 'on'])));
+        $this->assertTrue($this->stringable('jason')->endsWith(new Collection(['no', 'on'])));
         $this->assertFalse($this->stringable('jason')->endsWith('no'));
         $this->assertFalse($this->stringable('jason')->endsWith(['no']));
         $this->assertFalse($this->stringable('jason')->endsWith(''));
@@ -730,7 +730,7 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('jason')->doesntEndWith('jason'));
         $this->assertFalse($this->stringable('jason')->doesntEndWith(['on']));
         $this->assertFalse($this->stringable('jason')->doesntEndWith(['no', 'on']));
-        $this->assertFalse($this->stringable('jason')->doesntEndWith(collect(['no', 'on'])));
+        $this->assertFalse($this->stringable('jason')->doesntEndWith(new Collection(['no', 'on'])));
         $this->assertTrue($this->stringable('jason')->doesntEndWith('no'));
         $this->assertTrue($this->stringable('jason')->doesntEndWith(['no']));
         $this->assertTrue($this->stringable('jason')->doesntEndWith(''));
@@ -844,7 +844,7 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($this->stringable('taylor')->contains('taylor'));
         $this->assertTrue($this->stringable('taylor')->contains(['ylo']));
         $this->assertTrue($this->stringable('taylor')->contains(['xxx', 'ylo']));
-        $this->assertTrue($this->stringable('taylor')->contains(collect(['xxx', 'ylo'])));
+        $this->assertTrue($this->stringable('taylor')->contains(new Collection(['xxx', 'ylo'])));
         $this->assertTrue($this->stringable('taylor')->contains(['LOR'], true));
         $this->assertFalse($this->stringable('taylor')->contains('xxx'));
         $this->assertFalse($this->stringable('taylor')->contains(['xxx']));
@@ -855,7 +855,7 @@ class SupportStringableTest extends TestCase
     {
         $this->assertTrue($this->stringable('taylor otwell')->containsAll(['taylor', 'otwell']));
         $this->assertTrue($this->stringable('taylor otwell')->containsAll(['TAYLOR', 'OTWELL'], true));
-        $this->assertTrue($this->stringable('taylor otwell')->containsAll(collect(['taylor', 'otwell'])));
+        $this->assertTrue($this->stringable('taylor otwell')->containsAll(new Collection(['taylor', 'otwell'])));
         $this->assertTrue($this->stringable('taylor otwell')->containsAll(['taylor']));
         $this->assertFalse($this->stringable('taylor otwell')->containsAll(['taylor', 'xxx']));
     }
@@ -865,7 +865,7 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($this->stringable('taylor')->doesntContain('xxx'));
         $this->assertTrue($this->stringable('taylor')->doesntContain(['xxx']));
         $this->assertTrue($this->stringable('taylor')->doesntContain(['xxx', 'yyy']));
-        $this->assertTrue($this->stringable('taylor')->doesntContain(collect(['xxx', 'yyy'])));
+        $this->assertTrue($this->stringable('taylor')->doesntContain(new Collection(['xxx', 'yyy'])));
         $this->assertTrue($this->stringable('taylor')->doesntContain(''));
         $this->assertFalse($this->stringable('taylor')->doesntContain('ylo'));
         $this->assertFalse($this->stringable('taylor')->doesntContain('taylor'));
@@ -1051,7 +1051,7 @@ class SupportStringableTest extends TestCase
         $this->assertSame('?/?/?', (string) $this->stringable('? ? ?')->replace(' ', '/'));
         $this->assertSame('foo/bar/baz/bam', (string) $this->stringable('?1/?2/?3/?4')->replace(['?1', '?2', '?3', '?4'], ['foo', 'bar', 'baz', 'bam']));
         $this->assertSame('?1/?2/?3/?4', (string) $this->stringable('foo/bar/baz/bam')->replace(['Foo', 'BaR', 'BAZ', 'bAm'], ['?1', '?2', '?3', '?4'], false));
-        $this->assertSame('foo/bar/baz/bam', (string) $this->stringable('?1/?2/?3/?4')->replace(collect(['?1', '?2', '?3', '?4']), collect(['foo', 'bar', 'baz', 'bam'])));
+        $this->assertSame('foo/bar/baz/bam', (string) $this->stringable('?1/?2/?3/?4')->replace(new Collection(['?1', '?2', '?3', '?4']), new Collection(['foo', 'bar', 'baz', 'bam'])));
     }
 
     public function testReplaceArray()
@@ -1063,7 +1063,7 @@ class SupportStringableTest extends TestCase
         $this->assertSame('foo?/bar/baz', (string) $this->stringable('?/?/?')->replaceArray('?', ['foo?', 'bar', 'baz']));
         $this->assertSame('foo/bar', (string) $this->stringable('?/?')->replaceArray('?', [1 => 'foo', 2 => 'bar']));
         $this->assertSame('foo/bar', (string) $this->stringable('?/?')->replaceArray('?', ['x' => 'foo', 'y' => 'bar']));
-        $this->assertSame('foo/bar', (string) $this->stringable('?/?')->replaceArray('?', collect(['x' => 'foo', 'y' => 'bar'])));
+        $this->assertSame('foo/bar', (string) $this->stringable('?/?')->replaceArray('?', new Collection(['x' => 'foo', 'y' => 'bar'])));
     }
 
     public function testReplaceFirst()
@@ -1126,7 +1126,7 @@ class SupportStringableTest extends TestCase
         $this->assertSame('oobar', (string) $this->stringable('Foobar')->remove('f', false));
 
         $this->assertSame('Fbr', (string) $this->stringable('Foobar')->remove(['o', 'a']));
-        $this->assertSame('Fbr', (string) $this->stringable('Foobar')->remove(collect(['o', 'a'])));
+        $this->assertSame('Fbr', (string) $this->stringable('Foobar')->remove(new Collection(['o', 'a'])));
         $this->assertSame('Fooar', (string) $this->stringable('Foobar')->remove(['f', 'b']));
         $this->assertSame('ooar', (string) $this->stringable('Foobar')->remove(['f', 'b'], false));
         $this->assertSame('Foobar', (string) $this->stringable('Foo|bar')->remove(['f', '|']));

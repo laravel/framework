@@ -156,7 +156,7 @@ class NotificationChannelManagerTest extends TestCase
             $events->dispatch(new NotificationFailed($notifiable, $notification, 'test'));
             throw new Exception();
         });
-        $listeners = new Collection();
+        $listeners = new Collection;
         $events->shouldReceive('until')->with(m::type(NotificationSending::class))->andReturn(true);
         $events->shouldReceive('listen')->once()->andReturnUsing(function ($event, $callback) use ($listeners) {
             $listeners->push($callback);
@@ -200,7 +200,7 @@ class NotificationChannelManagerTest extends TestCase
                 }
             };
         });
-        $listeners = new Collection();
+        $listeners = new Collection;
         $events->shouldReceive('until')->with(m::type(NotificationSending::class))->andReturn(true);
         $events->shouldReceive('listen')->once()->andReturnUsing(function ($event, $callback) use ($listeners) {
             $listeners->push($callback);

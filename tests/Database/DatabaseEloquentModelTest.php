@@ -45,6 +45,7 @@ use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\HtmlString;
@@ -1307,7 +1308,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->name = 'taylor';
         $model->exists = false;
-        $model->setRelation('relationMany', new Collection([]));
+        $model->setRelation('relationMany', new Collection);
 
         $this->assertTrue($model->push());
         $this->assertEquals(1, $model->id);
@@ -1359,7 +1360,7 @@ class DatabaseEloquentModelTest extends TestCase
         $lastId = $parent->id;
         $parent->setRelation('self', $parent);
 
-        $children = new Collection();
+        $children = new Collection;
         for ($count = 0; $count < 2; $count++) {
             $child = new EloquentModelWithRecursiveRelationshipsStub(['id' => ++$lastId, 'parent_id' => $parent->id]);
             $child->setRelation('parent', $parent);
@@ -1473,7 +1474,7 @@ class DatabaseEloquentModelTest extends TestCase
         $lastId = $parent->id;
         $parent->setRelation('self', $parent);
 
-        $children = new Collection();
+        $children = new Collection;
         for ($count = 0; $count < 2; $count++) {
             $child = new EloquentModelWithRecursiveRelationshipsStub(['id' => ++$lastId, 'parent_id' => $parent->id]);
             $child->setRelation('parent', $parent);
@@ -1516,7 +1517,7 @@ class DatabaseEloquentModelTest extends TestCase
         $lastId = $parent->id;
         $parent->setRelation('self', $parent);
 
-        $children = new Collection();
+        $children = new Collection;
         for ($count = 0; $count < 2; $count++) {
             $child = new EloquentModelWithRecursiveRelationshipsStub(['id' => ++$lastId, 'parent_id' => $parent->id]);
             $child->setRelation('parent', $parent);
@@ -3520,7 +3521,7 @@ class DatabaseEloquentModelTest extends TestCase
         $array = [
             'foo' => 'bar',
         ];
-        $collection = collect($array);
+        $collection = new Collection($array);
         $model->arrayAttribute = $array;
         $model->jsonAttribute = $array;
         $model->jsonAttributeWithUnicode = $array;
@@ -3543,7 +3544,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->jsonAttributeWithUnicode = [
             'foo' => 'bar2',
         ];
-        $model->collectionAttribute = collect([
+        $model->collectionAttribute = new Collection([
             'foo' => 'bar2',
         ]);
 

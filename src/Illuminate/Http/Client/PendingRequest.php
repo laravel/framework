@@ -276,7 +276,7 @@ class PendingRequest
             $pendingRequest->dispatchRequestSendingEvent();
         }]);
 
-        $this->afterResponseCallbacks = new Collection();
+        $this->afterResponseCallbacks = new Collection;
     }
 
     /**

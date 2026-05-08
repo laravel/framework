@@ -1054,7 +1054,7 @@ class Str
      */
     public static function password($length = 32, $letters = true, $numbers = true, $symbols = true, $spaces = false)
     {
-        $password = new Collection();
+        $password = new Collection;
 
         $options = (new Collection([
             'letters' => $letters === true ? [

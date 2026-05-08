@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Testing\Concerns;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Facade;
 use Mockery as m;
@@ -31,7 +32,7 @@ class InteractsWithDatabaseTest extends TestCase
         $this->assertEquals(<<<'TEXT'
         '["foo","bar"]'
         TEXT,
-            $this->castAsJson(collect(['foo', 'bar']), $grammar)
+            $this->castAsJson(new Collection(['foo', 'bar']), $grammar)
         );
 
         $this->assertEquals(<<<'TEXT'
@@ -54,7 +55,7 @@ class InteractsWithDatabaseTest extends TestCase
         $this->assertEquals(<<<'TEXT'
         '["foo","bar"]'
         TEXT,
-            $this->castAsJson(collect(['foo', 'bar']), $grammar)
+            $this->castAsJson(new Collection(['foo', 'bar']), $grammar)
         );
 
         $this->assertEquals(<<<'TEXT'
@@ -77,7 +78,7 @@ class InteractsWithDatabaseTest extends TestCase
         $this->assertEquals(<<<'TEXT'
         json_query('["foo","bar"]')
         TEXT,
-            $this->castAsJson(collect(['foo', 'bar']), $grammar)
+            $this->castAsJson(new Collection(['foo', 'bar']), $grammar)
         );
 
         $this->assertEquals(<<<'TEXT'
@@ -100,7 +101,7 @@ class InteractsWithDatabaseTest extends TestCase
         $this->assertEquals(<<<'TEXT'
         cast('["foo","bar"]' as json)
         TEXT,
-            $this->castAsJson(collect(['foo', 'bar']), $grammar)
+            $this->castAsJson(new Collection(['foo', 'bar']), $grammar)
         );
 
         $this->assertEquals(<<<'TEXT'
@@ -123,7 +124,7 @@ class InteractsWithDatabaseTest extends TestCase
         $this->assertEquals(<<<'TEXT'
         json_query('["foo","bar"]', '$')
         TEXT,
-            $this->castAsJson(collect(['foo', 'bar']), $grammar)
+            $this->castAsJson(new Collection(['foo', 'bar']), $grammar)
         );
 
         $this->assertEquals(<<<'TEXT'
