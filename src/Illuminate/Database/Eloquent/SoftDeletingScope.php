@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent;
 
 /**
  * @template TModel of \Illuminate\Database\Eloquent\Model
+ *
  * @implements \Illuminate\Database\Eloquent\Scope<TModel>
  */
 class SoftDeletingScope implements Scope
