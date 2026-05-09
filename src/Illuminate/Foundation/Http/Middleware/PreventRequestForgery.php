@@ -187,7 +187,7 @@ class PreventRequestForgery
 
         $tokenName = config('session.csrf_token_name', 'XSRF-TOKEN');
 
-        if (! $token && $header = $request->header('X-' . $tokenName)) {
+        if (! $token && $header = $request->header('X-'.$tokenName)) {
             try {
                 $token = CookieValuePrefix::remove($this->encrypter->decrypt($header, static::serialized()));
             } catch (DecryptException) {
@@ -308,6 +308,7 @@ class PreventRequestForgery
     public static function serialized()
     {
         $tokenName = config('session.csrf_token_name', 'XSRF-TOKEN');
+
         return EncryptCookies::serialized($tokenName);
     }
 
