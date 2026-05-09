@@ -90,6 +90,8 @@ class SupportStrTest extends TestCase
         $this->assertSame('Orwell 1984', Str::headline('orwell   1984'));
         $this->assertSame('Orwell 1984', Str::headline('-orwell-1984 -'));
         $this->assertSame('Orwell 1984', Str::headline(' orwell_- 1984 '));
+
+        $this->assertSame('Laravel Rocks!', Str::headline('laravel rocks!'));
     }
 
     public function testStringInitials()
@@ -105,6 +107,9 @@ class SupportStrTest extends TestCase
         $this->assertSame('JBLL', Str::initials('james bond loves laravel', true));
 
         $this->assertSame('❤M☆', Str::initials('❤ MULTIByte ☆'));
+
+        $this->assertSame('lr', Str::initials('laravel rocks!'));
+        $this->assertSame('LR', Str::initials('laravel rocks!', true));
     }
 
     public function testStringApa()
@@ -150,6 +155,10 @@ class SupportStrTest extends TestCase
         $this->assertSame('Устное Слово – Не Воробей. Как Только Он Вылетит, Его Не Поймаешь.', Str::apa('УСТНОЕ СЛОВО – НЕ ВОРОБЕЙ. КАК ТОЛЬКО ОН ВЫЛЕТИТ, ЕГО НЕ ПОЙМАЕШЬ.'));
 
         $this->assertSame('❤ Multibyte ☆', Str::apa('❤ MULTIByte ☆'));
+
+        $this->assertSame('Laravel Rocks!', Str::apa('Laravel Rocks!'));
+        $this->assertSame('Laravel Rocks!', Str::apa('Laravel rocks!'));
+        $this->assertSame('Laravel Rocks!', Str::apa('LARAVEL ROCKS!'));
 
         $this->assertSame('', Str::apa(''));
         $this->assertSame('   ', Str::apa('   '));
@@ -1161,6 +1170,8 @@ class SupportStrTest extends TestCase
 
         $this->assertSame('ÖffentlicheÜberraschungen', Str::studly('öffentliche-überraschungen'));
         $this->assertSame('❤MultiByte☆', Str::studly('❤ multi-byte☆'));
+
+        $this->assertSame('LaravelRocks!', Str::studly('laravel rocks!'));
     }
 
     public function testPascal()
