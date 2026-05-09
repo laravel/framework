@@ -182,9 +182,12 @@ class PreventRequestForgery
      */
     protected function getTokenFromRequest($request)
     {
-        $token = $request->input('_token') ?: $request->header('X-CSRF-TOKEN');
+        $csrfHeaderName = config('session.csrf_header_name', 'X-CSRF-TOKEN');
+        $token = $request->input('_token') ?: $request->header($csrfHeaderName);
 
-        if (! $token && $header = $request->header('X-XSRF-TOKEN')) {
+        $tokenName = config('session.csrf_token_name', 'XSRF-TOKEN');
+
+        if (! $token && $header = $request->header('X-' . $tokenName)) {
             try {
                 $token = CookieValuePrefix::remove($this->encrypter->decrypt($header, static::serialized()));
             } catch (DecryptException) {
@@ -239,7 +242,7 @@ class PreventRequestForgery
     protected function newCookie($request, $config)
     {
         return new Cookie(
-            'XSRF-TOKEN',
+            config('session.csrf_token_name', 'XSRF-TOKEN'),
             $request->session()->token(),
             $this->availableAt(60 * $config['lifetime']),
             $config['path'],
@@ -304,7 +307,8 @@ class PreventRequestForgery
      */
     public static function serialized()
     {
-        return EncryptCookies::serialized('XSRF-TOKEN');
+        $tokenName = config('session.csrf_token_name', 'XSRF-TOKEN');
+        return EncryptCookies::serialized($tokenName);
     }
 
     /**

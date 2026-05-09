@@ -134,6 +134,32 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | CSRF Token Header Name
+    |--------------------------------------------------------------------------
+    |
+    | Here you may change the name of the CSRF Token Header that is used by
+    | the PreventRequestForgery class. Typically, you should not need
+    | to change this value, but if necessary you can change it.
+    |
+    */
+
+    'csrf_header_name' => 'X-CSRF-TOKEN',
+
+    /*
+    |--------------------------------------------------------------------------
+    | CSRF Token Name
+    |--------------------------------------------------------------------------
+    |
+    | Here you may change the name of the CSRF Token that is used by
+    | the PreventRequestForgery class. Typically, you should not need
+    | to change this value, but if necessary you can change it.
+    |
+    */
+
+    'csrf_token_name' => 'XSRF-TOKEN',
+
+    /*
+    |--------------------------------------------------------------------------
     | Session Cookie Path
     |--------------------------------------------------------------------------
     |
