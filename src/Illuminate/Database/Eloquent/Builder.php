@@ -940,7 +940,66 @@ class Builder implements BuilderContract
 
         $relation->addEagerConstraints($models);
 
+        $query = null;
+        $originalWheres = [];
+        $originalWhereBindings = [];
+        $originalJoins = [];
+        $originalJoinBindings = [];
+
+        $isOneOfMany = method_exists($relation, 'isOneOfMany') && $relation->isOneOfMany();
+
+        if ($isOneOfMany) {
+            $query = $relation->getQuery()->getQuery();
+
+            $originalWheres = $query->wheres ?? [];
+            $originalWhereBindings = $query->bindings['where'] ?? [];
+            $originalJoins = $query->joins ?? [];
+            $originalJoinBindings = $query->bindings['join'] ?? [];
+        }
+
         $constraints($relation);
+
+        $subQueries = $isOneOfMany && method_exists($relation, 'getOneOfManySubQueries')
+        ? $relation->getOneOfManySubQueries()
+        : [];
+
+        if ($query && $subQueries) {
+            $currentWheres = $query->wheres ?? [];
+            $currentWhereBindings = $query->bindings['where'] ?? [];
+            $currentJoins = $query->joins ?? [];
+            $currentJoinBindings = $query->bindings['join'] ?? [];
+
+            $newJoins = array_slice($currentJoins, count($originalJoins));
+            $newJoinBindings = array_slice($currentJoinBindings, count($originalJoinBindings));
+            $newWheres = array_slice($currentWheres, count($originalWheres));
+            $newWhereBindings = array_slice($currentWhereBindings, count($originalWhereBindings));
+
+            foreach ($subQueries as $subQuery) {
+                if ($newJoins) {
+                    $subQuery->getQuery()->joins = array_merge(
+                        $subQuery->getQuery()->joins ?? [],
+                        $newJoins
+                    );
+
+                    $subQuery->getQuery()->bindings['join'] = array_merge(
+                        $subQuery->getQuery()->bindings['join'] ?? [],
+                        $newJoinBindings
+                    );
+                }
+
+                if ($newWheres) {
+                    $subQuery->getQuery()->wheres = array_merge(
+                        $subQuery->getQuery()->wheres ?? [],
+                        $newWheres
+                    );
+
+                    $subQuery->getQuery()->bindings['where'] = array_merge(
+                        $subQuery->getQuery()->bindings['where'] ?? [],
+                        $newWhereBindings
+                    );
+                }
+            }
+        }
 
         // Once we have the results, we just match those back up to their parent models
         // using the relationship instance. Then we just return the finished arrays
