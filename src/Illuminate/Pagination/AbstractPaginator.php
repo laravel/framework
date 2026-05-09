@@ -179,7 +179,7 @@ abstract class AbstractPaginator implements CanBeEscapedWhenCastToString, Htmlab
      * @param  int  $page
      * @return string
      */
-    public function url($page)
+    public function url($page): string
     {
         if ($page <= 0) {
             $page = 1;
