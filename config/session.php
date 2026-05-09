@@ -143,7 +143,7 @@ return [
     |
     */
 
-    'csrf_header_name' => 'X-CSRF-TOKEN',
+    'csrf_header_name' => env('CSRF_HEADER_NAME', 'X-CSRF-TOKEN'),
 
     /*
     |--------------------------------------------------------------------------
@@ -156,7 +156,7 @@ return [
     |
     */
 
-    'csrf_token_name' => 'XSRF-TOKEN',
+    'csrf_token_name' => env('CSRF_TOKEN_NAME', 'XSRF-TOKEN'),
 
     /*
     |--------------------------------------------------------------------------
