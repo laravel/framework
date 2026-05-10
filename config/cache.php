@@ -108,6 +108,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Serializable Classes
+    |--------------------------------------------------------------------------
+    |
+    | This option controls which classes may be unserialized by cache stores
+    | that support restricted unserialization. Set this value to an array of
+    | class names to restrict which classes may be restored from cache. When
+    | null, PHP's default unserialization behavior will be used.
+    |
+    */
+
+    'serializable_classes' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Cache Key Prefix
     |--------------------------------------------------------------------------
     |
