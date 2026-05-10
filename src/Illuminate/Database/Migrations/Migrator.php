@@ -250,7 +250,7 @@ class Migrator
 
             $this->write(Task::class, $name, fn () => MigrationResult::Skipped->value);
         } else {
-            $this->write(Task::class, $name, fn () => $this->runMigration($migration, 'up'));
+            $this->write(Task::class, $name, fn () => $this->runMigration($migration, 'up', $name));
 
             // Once we have run a migrations class, we will log that it was run in this
             // repository so that we don't try to run it next time we do a migration
@@ -414,7 +414,7 @@ class Migrator
             return $this->pretendToRun($instance, 'down');
         }
 
-        $this->write(Task::class, $name, fn () => $this->runMigration($instance, 'down'));
+        $this->write(Task::class, $name, fn () => $this->runMigration($instance, 'down', $name));
 
         // Once we have successfully run the migration "down" we will remove it from
         // the migration repository so it will be considered to have not been run
@@ -429,19 +429,19 @@ class Migrator
      * @param  string  $method
      * @return void
      */
-    protected function runMigration($migration, $method)
+    protected function runMigration($migration, $method, $name = null)
     {
         $connection = $this->resolveConnection(
             $migration->getConnection()
         );
 
-        $callback = function () use ($connection, $migration, $method) {
+        $callback = function () use ($connection, $migration, $method, $name) {
             if (method_exists($migration, $method)) {
-                $this->fireMigrationEvent(new MigrationStarted($migration, $method));
+                $this->fireMigrationEvent(new MigrationStarted($migration, $method, $name));
 
                 $this->runMethod($connection, $migration, $method);
 
-                $this->fireMigrationEvent(new MigrationEnded($migration, $method));
+                $this->fireMigrationEvent(new MigrationEnded($migration, $method, $name));
             }
         };
 
