@@ -34,10 +34,8 @@ class WorkCommand extends Command
                             {connection? : The name of the queue connection to work}
                             {--name=default : The name of the worker}
                             {--queue= : The names of the queues to work}
-                            {--daemon : Run the worker in daemon mode (Deprecated)}
                             {--once : Only process the next job on the queue}
                             {--stop-when-empty : Stop when the queue is empty}
-                            {--delay=0 : The number of seconds to delay failed jobs (Deprecated)}
                             {--backoff=0 : The number of seconds to wait before retrying a job that encountered an uncaught exception}
                             {--max-jobs=0 : The number of jobs to process before stopping}
                             {--max-time=0 : The maximum number of seconds the worker should run}

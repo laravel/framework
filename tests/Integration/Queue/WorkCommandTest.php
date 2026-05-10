@@ -99,7 +99,6 @@ class WorkCommandTest extends QueueTestCase
         Queue::push(new SecondJob);
 
         $this->artisan('queue:work', [
-            '--daemon' => true,
             '--stop-when-empty' => true,
             '--memory' => 1024,
         ])->assertExitCode(0);
@@ -115,7 +114,6 @@ class WorkCommandTest extends QueueTestCase
         Queue::push(new SecondJob);
 
         $this->artisan('queue:work', [
-            '--daemon' => true,
             '--stop-when-empty' => true,
             '--memory' => 0.1,
         ])->assertExitCode(12);
@@ -134,7 +132,6 @@ class WorkCommandTest extends QueueTestCase
         Queue::push(new SecondJob);
 
         $this->artisan('queue:work', [
-            '--daemon' => true,
             '--stop-when-empty' => true,
             '--max-jobs' => 1,
         ]);
@@ -154,7 +151,6 @@ class WorkCommandTest extends QueueTestCase
         Queue::push(new SecondJob);
 
         $this->artisan('queue:work', [
-            '--daemon' => true,
             '--stop-when-empty' => true,
             '--max-time' => 1,
         ]);
