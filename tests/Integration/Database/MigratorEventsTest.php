@@ -158,7 +158,7 @@ class MigratorEventsTest extends TestCase
         ]);
 
         Event::assertDispatched(MigrationSkipped::class, function ($event) {
-            return $event->migrationName === '2014_10_13_000000_skipped_migration';
+            return $event->name === '2014_10_13_000000_skipped_migration';
         });
     }
 }
