@@ -4,7 +4,9 @@ namespace Illuminate\Process;
 
 use Carbon\CarbonInterval;
 use Closure;
+use DateTimeInterface;
 use Illuminate\Process\Exceptions\ProcessTimedOutException;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
@@ -139,6 +141,19 @@ class PendingProcess
     public function timeout(CarbonInterval|int $timeout)
     {
         $this->timeout = $timeout instanceof CarbonInterval ? (int) $timeout->totalSeconds : $timeout;
+
+        return $this;
+    }
+
+    /**
+     * Specify the date and time at which the process should timeout.
+     *
+     * @param  \DateTimeInterface  $deadline
+     * @return $this
+     */
+    public function timeoutUntil(DateTimeInterface $deadline)
+    {
+        $this->timeout = max(0, (int) ceil(Carbon::now()->diffInSeconds($deadline, false)));
 
         return $this;
     }

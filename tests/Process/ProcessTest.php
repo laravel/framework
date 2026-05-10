@@ -7,6 +7,7 @@ use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Process\Exceptions\ProcessFailedException;
 use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Process\Factory;
+use Illuminate\Support\Carbon;
 use OutOfBoundsException;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
@@ -652,6 +653,44 @@ class ProcessTest extends TestCase
         $result = $factory->timeout($timeout)->path(__DIR__)->run('sleep 2; exit 1;');
 
         $result->throw();
+    }
+
+    public function testTimeoutCanBeSetUntilAGivenDeadline()
+    {
+        Carbon::setTestNow('2026-05-11 12:00:00');
+
+        try {
+            $factory = new Factory;
+
+            $factory->fake();
+
+            $factory->timeoutUntil(Carbon::now()->addSeconds(15))->run('ls -la');
+
+            $factory->assertRan(function ($process) {
+                return $process->command === 'ls -la' && $process->timeout === 15;
+            });
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
+    public function testTimeoutUntilPastDeadlineTimesOutImmediately()
+    {
+        Carbon::setTestNow('2026-05-11 12:00:00');
+
+        try {
+            $factory = new Factory;
+
+            $factory->fake();
+
+            $factory->timeoutUntil(Carbon::now()->subSecond())->run('ls -la');
+
+            $factory->assertRan(function ($process) {
+                return $process->command === 'ls -la' && $process->timeout === 0;
+            });
+        } finally {
+            Carbon::setTestNow();
+        }
     }
 
     #[RequiresOperatingSystem('Linux|DAR')]
