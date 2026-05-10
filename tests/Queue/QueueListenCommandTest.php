@@ -45,6 +45,14 @@ class QueueListenCommandTest extends TestCase
         return $listener;
     }
 
+    protected function createCommand(Listener $listener, array $queueConfig = []): ListenCommand
+    {
+        $command = new ListenCommand($listener);
+        $command->setLaravel($this->createApplication($queueConfig));
+
+        return $command;
+    }
+
     protected function runCommand(ListenCommand $command, array $input = [], $output = null): void
     {
         // The --env option is normally added by the Artisan console application globally.
@@ -62,9 +70,7 @@ class QueueListenCommandTest extends TestCase
             ->once()
             ->with('redis', 'default', m::type(ListenerOptions::class));
 
-        $command = new ListenCommand($listener);
-        $command->setLaravel($this->createApplication());
-        $this->runCommand($command, ['connection' => 'redis']);
+        $this->runCommand($this->createCommand($listener), ['connection' => 'redis']);
     }
 
     public function testHandleUsesDefaultConnectionFromConfigWhenNotSpecified()
@@ -74,9 +80,7 @@ class QueueListenCommandTest extends TestCase
             ->once()
             ->with(null, 'default', m::type(ListenerOptions::class));
 
-        $command = new ListenCommand($listener);
-        $command->setLaravel($this->createApplication());
-        $this->runCommand($command);
+        $this->runCommand($this->createCommand($listener));
     }
 
     public function testHandleResolvesQueueFromConnectionConfig()
@@ -86,9 +90,7 @@ class QueueListenCommandTest extends TestCase
             ->once()
             ->with('sqs', 'sqs-queue', m::type(ListenerOptions::class));
 
-        $command = new ListenCommand($listener);
-        $command->setLaravel($this->createApplication());
-        $this->runCommand($command, ['connection' => 'sqs']);
+        $this->runCommand($this->createCommand($listener), ['connection' => 'sqs']);
     }
 
     public function testHandleUsesQueueOptionOverConnectionConfig()
@@ -98,9 +100,7 @@ class QueueListenCommandTest extends TestCase
             ->once()
             ->with('sqs', 'custom-queue', m::type(ListenerOptions::class));
 
-        $command = new ListenCommand($listener);
-        $command->setLaravel($this->createApplication());
-        $this->runCommand($command, ['connection' => 'sqs', '--queue' => 'custom-queue']);
+        $this->runCommand($this->createCommand($listener), ['connection' => 'sqs', '--queue' => 'custom-queue']);
     }
 
     public function testHandleDefaultsQueueToDefaultWhenNotInConnectionConfig()
@@ -110,13 +110,10 @@ class QueueListenCommandTest extends TestCase
             ->once()
             ->with('database', 'default', m::type(ListenerOptions::class));
 
-        $app = $this->createApplication([
-            'connections' => ['database' => ['driver' => 'database']],
-        ]);
-
-        $command = new ListenCommand($listener);
-        $command->setLaravel($app);
-        $this->runCommand($command, ['connection' => 'database']);
+        $this->runCommand(
+            $this->createCommand($listener, ['connections' => ['database' => ['driver' => 'database']]]),
+            ['connection' => 'database']
+        );
     }
 
     public function testGatherOptionsBuildsListenerOptionsWithCommandOptions()
@@ -132,9 +129,7 @@ class QueueListenCommandTest extends TestCase
                 return true;
             }));
 
-        $command = new ListenCommand($listener);
-        $command->setLaravel($this->createApplication());
-        $this->runCommand($command, [
+        $this->runCommand($this->createCommand($listener), [
             '--name' => 'my-worker',
             '--backoff' => '5',
             '--memory' => '256',
@@ -169,9 +164,7 @@ class QueueListenCommandTest extends TestCase
                 return true;
             }));
 
-        $command = new ListenCommand($listener);
-        $command->setLaravel($this->createApplication());
-        $this->runCommand($command, ['--backoff' => '7']);
+        $this->runCommand($this->createCommand($listener), ['--backoff' => '7']);
 
         $this->assertSame('7', $capturedOptions->backoff);
     }
@@ -192,9 +185,7 @@ class QueueListenCommandTest extends TestCase
 
         $buffered = new BufferedOutput;
 
-        $command = new ListenCommand($listener);
-        $command->setLaravel($this->createApplication());
-        $this->runCommand($command, [], $buffered);
+        $this->runCommand($this->createCommand($listener), [], $buffered);
 
         $this->assertIsCallable($capturedHandler);
         $capturedHandler(null, 'hello from listener');
