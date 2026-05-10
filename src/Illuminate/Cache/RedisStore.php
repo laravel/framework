@@ -333,7 +333,7 @@ class RedisStore extends TaggableStore implements CanFlushLocks, LockProvider
     /**
      * Begin executing a new tags operation.
      *
-     * @param  mixed  $names
+     * @param  \UnitEnum|array|string  $names
      * @return \Illuminate\Cache\RedisTaggedCache
      */
     public function tags($names)

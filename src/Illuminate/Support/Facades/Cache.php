@@ -50,7 +50,7 @@ use Mockery;
  * @method static bool deleteMultiple(iterable $keys)
  * @method static bool clear()
  * @method static bool flushLocks()
- * @method static \Illuminate\Cache\TaggedCache tags(mixed $names)
+ * @method static \Illuminate\Cache\TaggedCache tags(\UnitEnum|array|string $names)
  * @method static string|null getName()
  * @method static bool supportsTags()
  * @method static bool supportsFlushingLocks()

@@ -4,6 +4,8 @@ namespace Illuminate\Cache;
 
 use Illuminate\Contracts\Cache\Store;
 
+use function Illuminate\Support\enum_value;
+
 class TagSet
 {
     /**
@@ -29,7 +31,7 @@ class TagSet
     public function __construct(Store $store, array $names = [])
     {
         $this->store = $store;
-        $this->names = $names;
+        $this->names = array_map(enum_value(...), $names);
     }
 
     /**

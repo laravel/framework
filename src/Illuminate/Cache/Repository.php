@@ -802,7 +802,7 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Begin executing a new tags operation if the store supports it.
      *
-     * @param  mixed  $names
+     * @param  \UnitEnum|array|string  $names
      * @return \Illuminate\Cache\TaggedCache
      *
      * @throws \BadMethodCallException

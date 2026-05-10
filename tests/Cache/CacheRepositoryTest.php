@@ -402,6 +402,18 @@ class CacheRepositoryTest extends TestCase
 
         $store = $repo->tags('r1', 'r2', 'r3');
         $this->assertEquals(['r1', 'r2', 'r3'], $store->getTags()->getNames());
+
+        $store = $repo->tags(TestCacheTag::User, TestUnitCacheTag::Admin);
+        $this->assertEquals(['user', 'Admin'], $store->getTags()->getNames());
+    }
+
+    public function testTaggedCacheWorksWithEnumTags()
+    {
+        $cache = new Repository(new ArrayStore());
+
+        $cache->tags(TestCacheTag::User)->put('profile', 'taylor', 10);
+
+        $this->assertSame('taylor', $cache->tags('user')->get('profile'));
     }
 
     public function testEventDispatcherIsPassedToStoreFromRepository()
@@ -795,4 +807,14 @@ class CacheRepositoryTest extends TestCase
 enum TestCacheKey: string
 {
     case FOO = 'foo';
+}
+
+enum TestCacheTag: string
+{
+    case User = 'user';
+}
+
+enum TestUnitCacheTag
+{
+    case Admin;
 }
