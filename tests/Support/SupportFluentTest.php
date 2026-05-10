@@ -145,6 +145,22 @@ class SupportFluentTest extends TestCase
         $this->assertStringContainsString('    ', $results);
     }
 
+    public function testToPrettyJsonWithOptions()
+    {
+        $fluent = new Fluent(['baz' => '123']);
+
+        $results = $fluent->toPrettyJson();
+        $this->assertStringContainsString("\n", $results);
+        $this->assertStringContainsString('    ', $results);
+        $this->assertStringContainsString('"123"', $results);
+
+        $results = $fluent->toPrettyJson(JSON_NUMERIC_CHECK);
+        $this->assertStringContainsString("\n", $results);
+        $this->assertStringContainsString('    ', $results);
+        $this->assertStringContainsString('123', $results);
+        $this->assertStringNotContainsString('"123"', $results);
+    }
+
     public function testScope()
     {
         $fluent = new Fluent(['user' => ['name' => 'taylor']]);
