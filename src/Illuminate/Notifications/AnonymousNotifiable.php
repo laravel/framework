@@ -5,6 +5,8 @@ namespace Illuminate\Notifications;
 use Illuminate\Contracts\Notifications\Dispatcher;
 use InvalidArgumentException;
 
+use function Illuminate\Support\enum_value;
+
 class AnonymousNotifiable
 {
     /**
@@ -17,7 +19,7 @@ class AnonymousNotifiable
     /**
      * Add routing information to the target.
      *
-     * @param  string  $channel
+     * @param  \UnitEnum|string  $channel
      * @param  mixed  $route
      * @return $this
      *
@@ -25,6 +27,8 @@ class AnonymousNotifiable
      */
     public function route($channel, $route)
     {
+        $channel = enum_value($channel);
+
         if ($channel === 'database') {
             throw new InvalidArgumentException('The database channel does not support on-demand notifications.');
         }
@@ -59,11 +63,13 @@ class AnonymousNotifiable
     /**
      * Get the notification routing information for the given driver.
      *
-     * @param  string  $driver
+     * @param  \UnitEnum|string  $driver
      * @return mixed
      */
     public function routeNotificationFor($driver)
     {
+        $driver = enum_value($driver);
+
         return $this->routes[$driver] ?? null;
     }
 

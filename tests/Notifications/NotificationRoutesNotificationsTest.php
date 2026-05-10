@@ -61,6 +61,37 @@ class NotificationRoutesNotificationsTest extends TestCase
 
         Notification::route('database', 'foo');
     }
+
+    public function testOnDemandNotificationsCanUseEnumChannels()
+    {
+        $notifiable = Notification::route(NotificationRouteChannel::Mail, 'taylor@laravel.com')
+            ->route(UnitEnumNotificationRouteChannel::Slack, '#general');
+
+        $this->assertSame('taylor@laravel.com', $notifiable->routeNotificationFor('mail'));
+        $this->assertSame('taylor@laravel.com', $notifiable->routeNotificationFor(NotificationRouteChannel::Mail));
+        $this->assertSame('#general', $notifiable->routeNotificationFor('Slack'));
+        $this->assertSame('#general', $notifiable->routeNotificationFor(UnitEnumNotificationRouteChannel::Slack));
+    }
+
+    public function testOnDemandNotificationsCannotUseDatabaseEnumChannel()
+    {
+        $this->expectExceptionObject(
+            new InvalidArgumentException('The database channel does not support on-demand notifications.')
+        );
+
+        Notification::route(NotificationRouteChannel::Database, 'foo');
+    }
+}
+
+enum NotificationRouteChannel: string
+{
+    case Mail = 'mail';
+    case Database = 'database';
+}
+
+enum UnitEnumNotificationRouteChannel
+{
+    case Slack;
 }
 
 class RoutesNotificationsTestInstance
