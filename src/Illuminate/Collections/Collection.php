@@ -9,6 +9,7 @@ use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\TransformsToResourceCollection;
 use InvalidArgumentException;
+use SortDirection;
 use stdClass;
 use Traversable;
 
@@ -1566,7 +1567,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  array<array-key, (callable(TValue, TValue): mixed)|(callable(TValue, TKey): mixed)|string|array{string, string}>|(callable(TValue, TKey): mixed)|string  $callback
      * @param  int  $options
-     * @param  bool  $descending
+     * @param  SortDirection|bool  $descending
      * @return static
      */
     public function sortBy($callback, $options = SORT_REGULAR, $descending = false)
@@ -1586,8 +1587,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             $results[$key] = $callback($value, $key);
         }
 
-        $descending ? arsort($results, $options)
-            : asort($results, $options);
+        match ($descending) {
+            false, SortDirection::Ascending => asort($results, $options),
+            true, SortDirection::Descending => arsort($results, $options),
+        };
 
         // Once we have sorted all of the keys in the array, we will loop through them
         // and grab the corresponding model so we can set the underlying items list
@@ -1616,15 +1619,17 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
                 $prop = $comparison[0];
 
-                $ascending = Arr::get($comparison, 1, true) === true ||
-                             Arr::get($comparison, 1, true) === 'asc';
+                $direction = match (Arr::get($comparison, 1, SortDirection::Ascending)) {
+                    'asc', SortDirection::Ascending => SortDirection::Ascending,
+                    'desc', SortDirection::Descending => SortDirection::Descending,
+                };
 
                 if (! is_string($prop) && is_callable($prop)) {
                     $result = $prop($a, $b);
                 } else {
                     $values = [data_get($a, $prop), data_get($b, $prop)];
 
-                    if (! $ascending) {
+                    if ($direction === SortDirection::Descending) {
                         $values = array_reverse($values);
                     }
 
@@ -1669,7 +1674,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             foreach ($callback as $index => $key) {
                 $comparison = Arr::wrap($key);
 
-                $comparison[1] = 'desc';
+                $comparison[1] = SortDirection::Descending;
 
                 $callback[$index] = $comparison;
             }
@@ -1682,14 +1687,17 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * Sort the collection keys.
      *
      * @param  int  $options
-     * @param  bool  $descending
+     * @param  SortDirection|bool  $descending
      * @return static
      */
     public function sortKeys($options = SORT_REGULAR, $descending = false)
     {
         $items = $this->items;
 
-        $descending ? krsort($items, $options) : ksort($items, $options);
+        match ($descending) {
+            false, SortDirection::Ascending => ksort($items, $options),
+            true, SortDirection::Descending => krsort($items, $options),
+        };
 
         return new static($items);
     }
@@ -1702,7 +1710,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function sortKeysDesc($options = SORT_REGULAR)
     {
-        return $this->sortKeys($options, true);
+        return $this->sortKeys($options, SortDirection::Descending);
     }
 
     /**

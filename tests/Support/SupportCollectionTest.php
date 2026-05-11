@@ -23,6 +23,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use SortDirection;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
 use UnexpectedValueException;
@@ -2064,6 +2065,16 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['dayle', 'taylor'], array_values($data->all()));
 
         $data = new $collection(['dayle', 'taylor']);
+        $data = $data->sortBy(
+            function ($x) {
+                return $x;
+            },
+            SORT_REGULAR,
+            SortDirection::Descending);
+
+        $this->assertEquals(['taylor', 'dayle'], array_values($data->all()));
+
+        $data = new $collection(['dayle', 'taylor']);
         $data = $data->sortByDesc(function ($x) {
             return $x;
         });
@@ -2151,6 +2162,14 @@ class SupportCollectionTest extends TestCase
 
         rsort($expected);
         $data = $data->sortBy([['item', 'desc']]);
+        $this->assertEquals($data->pluck('item')->toArray(), $expected);
+
+        rsort($expected);
+        $data = $data->sortBy([['item', false]]);
+        $this->assertEquals($data->pluck('item')->toArray(), $expected);
+
+        rsort($expected);
+        $data = $data->sortBy([['item', SortDirection::Descending]]);
         $this->assertEquals($data->pluck('item')->toArray(), $expected);
 
         sort($expected, SORT_STRING);

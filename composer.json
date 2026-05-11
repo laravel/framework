@@ -56,6 +56,7 @@
         "symfony/mime": "^8.0.0",
         "symfony/polyfill-php84": "^1.33",
         "symfony/polyfill-php85": "^1.33",
+        "symfony/polyfill-php86": "^1.36",
         "symfony/process": "^7.4.5 || ^8.0.5",
         "symfony/routing": "^8.0.0",
         "symfony/uid": "^8.0.0",
