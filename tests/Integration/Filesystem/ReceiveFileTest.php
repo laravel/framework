@@ -14,6 +14,7 @@ class ReceiveFileTest extends TestCase
     {
         $this->beforeApplicationDestroyed(function () {
             Storage::delete('receive-file-test.txt');
+            Storage::delete('receive file test.txt');
         });
 
         parent::setUp();
@@ -72,5 +73,15 @@ class ReceiveFileTest extends TestCase
         $response = $this->get($uploadUrl['url']);
 
         $response->assertForbidden();
+    }
+
+    public function testItCanReceiveAFileWithSpecialCharacters()
+    {
+        $result = Storage::temporaryUploadUrl('receive file test.txt', Carbon::now()->addMinute());
+
+        $response = $this->call('PUT', $result['url'], [], [], [], [], 'Hello World');
+
+        $response->assertNoContent();
+        Storage::assertExists('receive file test.txt', 'Hello World');
     }
 }

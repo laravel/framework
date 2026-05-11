@@ -51,4 +51,17 @@ class ServeFileTest extends TestCase
 
         $response->assertForbidden();
     }
+
+    public function testItCanServeAFileWithSpecialCharacters()
+    {
+        Storage::put('serve file test.txt', 'Hello World');
+
+        $url = Storage::temporaryUrl('serve file test.txt', Carbon::now()->addMinute());
+
+        $response = $this->get($url);
+
+        $this->assertSame('Hello World', $response->streamedContent());
+
+        Storage::delete('serve file test.txt');
+    }
 }
