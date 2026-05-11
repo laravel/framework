@@ -6,11 +6,26 @@ use Aws\Sqs\SqsClient;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Queue\Jobs\SqsJob;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class SqsQueue extends Queue implements QueueContract, ClearableQueue
 {
+    /**
+     * The maximum SQS payload size in bytes (1 MB).
+     *
+     * @var int
+     */
+    const MAX_SQS_PAYLOAD_SIZE = 1048576;
+
+    /**
+     * The cache key prefix for extended SQS payloads.
+     *
+     * @var string
+     */
+    const EXTENDED_PAYLOAD_CACHE_PREFIX = 'laravel:sqs-payloads:';
+
     /**
      * The Amazon SQS instance.
      *
@@ -40,6 +55,13 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     protected $suffix;
 
     /**
+     * The overflow storage options for large payload offloading.
+     *
+     * @var array
+     */
+    protected $overflowStorage = [];
+
+    /**
      * Create a new Amazon SQS queue instance.
      *
      * @param  \Aws\Sqs\SqsClient  $sqs
@@ -47,6 +69,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string  $prefix
      * @param  string  $suffix
      * @param  bool  $dispatchAfterCommit
+     * @param  array  $overflowStorage
      */
     public function __construct(
         SqsClient $sqs,
@@ -54,12 +77,14 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
         $prefix = '',
         $suffix = '',
         $dispatchAfterCommit = false,
+        array $overflowStorage = [],
     ) {
         $this->sqs = $sqs;
         $this->prefix = $prefix;
         $this->default = $default;
         $this->suffix = $suffix;
         $this->dispatchAfterCommit = $dispatchAfterCommit;
+        $this->overflowStorage = $overflowStorage;
     }
 
     /**
@@ -242,6 +267,10 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
+        if ($this->willOverflow($payload)) {
+            $payload = $this->overflow($payload);
+        }
+
         return $this->sqs->sendMessage([
             'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload, ...$options,
         ])->get('MessageId');
@@ -351,6 +380,45 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
+     * Determine if the payload should be stored in cache.
+     *
+     * @param  string  $payload
+     * @return bool
+     */
+    protected function willOverflow($payload)
+    {
+        if (! Arr::get($this->overflowStorage, 'enabled', false)) {
+            return false;
+        }
+
+        return Arr::get($this->overflowStorage, 'always', false)
+            || strlen($payload) >= static::MAX_SQS_PAYLOAD_SIZE;
+    }
+
+    /**
+     * Store the payload in cache and return a pointer payload.
+     *
+     * @param  string  $payload
+     * @return string
+     */
+    protected function overflow($payload)
+    {
+        $decoded = json_decode($payload);
+
+        $uuid = is_object($decoded) && isset($decoded->uuid)
+            ? $decoded->uuid
+            : (string) Str::uuid();
+
+        $this->container->make('cache')->store(
+            Arr::get($this->overflowStorage, 'store')
+        )->put(
+            $path = static::EXTENDED_PAYLOAD_CACHE_PREFIX.$uuid, $payload
+        );
+
+        return json_encode(['@pointer' => $path]);
+    }
+
+    /**
      * Pop the next job off of the queue.
      *
      * @param  string|null  $queue
@@ -366,7 +434,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
         if (! is_null($response['Messages']) && count($response['Messages']) > 0) {
             return new SqsJob(
                 $this->container, $this->sqs, $response['Messages'][0],
-                $this->connectionName, $queue
+                $this->connectionName, $queue, $this->overflowStorage
             );
         }
     }

@@ -7,6 +7,8 @@ use Aws\Sqs\SqsClient;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Cache\Factory as CacheFactory;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Queue\QueueRoutes;
 use Illuminate\Queue\SqsQueue;
@@ -675,5 +677,143 @@ class QueueSqsQueueTest extends TestCase
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
         Str::createUuidsNormally();
+    }
+
+    public function testPushRawStoresPayloadToCacheWhenExceedingThreshold()
+    {
+        $uuid = 'test-uuid-1234';
+        $largePayload = json_encode(['uuid' => $uuid, 'job' => 'App\\Jobs\\TestJob', 'data' => str_repeat('x', SqsQueue::MAX_SQS_PAYLOAD_SIZE)]);
+        $expectedPath = 'laravel:sqs-payloads:'.$uuid;
+        $expectedPointer = json_encode(['@pointer' => $expectedPath]);
+
+        $store = m::mock(CacheRepository::class);
+        $store->shouldReceive('put')->once()->with($expectedPath, $largePayload);
+
+        $cache = m::mock(CacheFactory::class);
+        $cache->shouldReceive('store')->with('database')->andReturn($store);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('cache')->andReturn($cache);
+
+        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix, '', false, [
+            'enabled' => true,
+            'store' => 'database',
+            'always' => false,
+            'delete_after_processing' => true,
+        ]);
+        $queue->setContainer($container);
+
+        $this->sqs->shouldReceive('sendMessage')->once()->withArgs(function ($args) use ($expectedPointer) {
+            return $args['MessageBody'] === $expectedPointer;
+        })->andReturn($this->mockedSendMessageResponseModel);
+
+        $queue->pushRaw($largePayload, $this->queueName);
+    }
+
+    public function testPushRawDoesNotStoreToCacheWhenBelowThreshold()
+    {
+        $smallPayload = json_encode(['uuid' => 'test-uuid', 'job' => 'App\\Jobs\\TestJob', 'data' => 'small']);
+
+        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix, '', false, [
+            'enabled' => true,
+            'store' => 'database',
+            'always' => false,
+            'delete_after_processing' => true,
+        ]);
+        $queue->setContainer(m::mock(Container::class));
+
+        $this->sqs->shouldReceive('sendMessage')->once()->withArgs(function ($args) use ($smallPayload) {
+            return $args['MessageBody'] === $smallPayload;
+        })->andReturn($this->mockedSendMessageResponseModel);
+
+        $queue->pushRaw($smallPayload, $this->queueName);
+    }
+
+    public function testPushRawAlwaysStoresToCacheWhenAlwaysIsTrue()
+    {
+        $uuid = 'test-uuid-always';
+        $smallPayload = json_encode(['uuid' => $uuid, 'job' => 'App\\Jobs\\TestJob', 'data' => 'small']);
+        $expectedPath = 'laravel:sqs-payloads:'.$uuid;
+        $expectedPointer = json_encode(['@pointer' => $expectedPath]);
+
+        $store = m::mock(CacheRepository::class);
+        $store->shouldReceive('put')->once()->with($expectedPath, $smallPayload);
+
+        $cache = m::mock(CacheFactory::class);
+        $cache->shouldReceive('store')->with('database')->andReturn($store);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('cache')->andReturn($cache);
+
+        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix, '', false, [
+            'enabled' => true,
+            'store' => 'database',
+            'always' => true,
+            'delete_after_processing' => true,
+        ]);
+        $queue->setContainer($container);
+
+        $this->sqs->shouldReceive('sendMessage')->once()->withArgs(function ($args) use ($expectedPointer) {
+            return $args['MessageBody'] === $expectedPointer;
+        })->andReturn($this->mockedSendMessageResponseModel);
+
+        $queue->pushRaw($smallPayload, $this->queueName);
+    }
+
+    public function testPushRawDoesNotStoreToCacheWhenNotEnabled()
+    {
+        $largePayload = json_encode(['uuid' => 'test-uuid', 'job' => 'App\\Jobs\\TestJob', 'data' => str_repeat('x', SqsQueue::MAX_SQS_PAYLOAD_SIZE)]);
+
+        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix);
+        $queue->setContainer(m::mock(Container::class));
+
+        $this->sqs->shouldReceive('sendMessage')->once()->withArgs(function ($args) use ($largePayload) {
+            return $args['MessageBody'] === $largePayload;
+        })->andReturn($this->mockedSendMessageResponseModel);
+
+        $queue->pushRaw($largePayload, $this->queueName);
+    }
+
+    public function testClearDoesNotFlushCacheStore()
+    {
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue', 'size'])
+            ->setConstructorArgs([$this->sqs, $this->queueName, $this->prefix, '', false, [
+                'enabled' => true,
+                'store' => 'database',
+                'always' => false,
+                'delete_after_processing' => true,
+            ]])
+            ->getMock();
+        $queue->setContainer(m::mock(Container::class));
+        $queue->expects($this->once())->method('getQueue')->willReturn($this->queueUrl);
+        $queue->expects($this->once())->method('size')->willReturn(5);
+
+        $this->sqs->shouldReceive('purgeQueue')->once();
+
+        $queue->clear($this->queueName);
+    }
+
+    public function testPopPassesOverflowStorageOptionsToJob()
+    {
+        $overflowStorage = [
+            'enabled' => true,
+            'store' => 'database',
+            'always' => false,
+            'delete_after_processing' => true,
+        ];
+
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue'])
+            ->setConstructorArgs([$this->sqs, $this->queueName, $this->account, '', false, $overflowStorage])
+            ->getMock();
+        $queue->setContainer(m::mock(Container::class));
+        $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
+
+        $this->sqs->shouldReceive('receiveMessage')->once()->andReturn($this->mockedReceiveMessageResponseModel);
+
+        $job = $queue->pop($this->queueName);
+
+        $this->assertInstanceOf(SqsJob::class, $job);
     }
 }
