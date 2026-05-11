@@ -62,12 +62,11 @@ return [
             'suffix' => env('SQS_SUFFIX'),
             'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
             'after_commit' => false,
-            'extended_store_options' => [
-                'enabled' => env('SQS_STORE_ENABLED', false),
-                'disk' => env('SQS_STORE_DISK', 's3'),
-                'prefix' => env('SQS_STORE_PREFIX', ''),
+            'overflow' => [
+                'enabled' => env('SQS_OVERFLOW_ENABLED', false),
+                'store' => env('SQS_OVERFLOW_STORE'),
                 'always' => false,
-                'cleanup' => true,
+                'delete_after_processing' => true,
             ],
         ],
 

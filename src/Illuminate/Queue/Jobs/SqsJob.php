@@ -24,11 +24,11 @@ class SqsJob extends Job implements JobContract
     protected $job;
 
     /**
-     * The extended store options for large payload offloading.
+     * The overflow storage options for large payload offloading.
      *
      * @var array
      */
-    protected $extendedStoreOptions = [];
+    protected $overflowStorage = [];
 
     /**
      * The cached raw body of the job.
@@ -45,16 +45,16 @@ class SqsJob extends Job implements JobContract
      * @param  array  $job
      * @param  string  $connectionName
      * @param  string  $queue
-     * @param  array  $extendedStoreOptions
+     * @param  array  $overflowStorage
      */
-    public function __construct(Container $container, SqsClient $sqs, array $job, $connectionName, $queue, array $extendedStoreOptions = [])
+    public function __construct(Container $container, SqsClient $sqs, array $job, $connectionName, $queue, array $overflowStorage = [])
     {
         $this->sqs = $sqs;
         $this->job = $job;
         $this->queue = $queue;
         $this->container = $container;
         $this->connectionName = $connectionName;
-        $this->extendedStoreOptions = $extendedStoreOptions;
+        $this->overflowStorage = $overflowStorage;
     }
 
     /**
@@ -87,8 +87,8 @@ class SqsJob extends Job implements JobContract
             'QueueUrl' => $this->queue, 'ReceiptHandle' => $this->job['ReceiptHandle'],
         ]);
 
-        if (Arr::get($this->extendedStoreOptions, 'cleanup') && $pointer = $this->resolvePointer()) {
-            $this->resolveDisk()->delete($pointer);
+        if (Arr::get($this->overflowStorage, 'delete_after_processing') && $pointer = $this->resolvePointer()) {
+            $this->resolveStore()->forget($pointer);
         }
     }
 
@@ -124,7 +124,7 @@ class SqsJob extends Job implements JobContract
         }
 
         if ($pointer = $this->resolvePointer()) {
-            return $this->cachedRawBody = $this->resolveDisk()->get($pointer);
+            return $this->cachedRawBody = $this->resolveStore()->get($pointer);
         }
 
         return $this->job['Body'];
@@ -157,6 +157,10 @@ class SqsJob extends Job implements JobContract
      */
     protected function resolvePointer()
     {
+        if (! Arr::get($this->overflowStorage, 'enabled', false)) {
+            return null;
+        }
+
         $body = $this->job['Body'] ?? null;
 
         if (! is_string($body) || $body === '') {
@@ -173,14 +177,14 @@ class SqsJob extends Job implements JobContract
     }
 
     /**
-     * Resolve the configured filesystem disk for extended storage.
+     * Resolve the configured cache store for extended storage.
      *
-     * @return \Illuminate\Filesystem\FilesystemAdapter
+     * @return \Illuminate\Contracts\Cache\Repository
      */
-    protected function resolveDisk()
+    protected function resolveStore()
     {
-        return $this->container->make('filesystem')->disk(
-            Arr::get($this->extendedStoreOptions, 'disk')
+        return $this->container->make('cache')->store(
+            Arr::get($this->overflowStorage, 'store')
         );
     }
 }

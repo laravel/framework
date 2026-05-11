@@ -20,6 +20,13 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     const MAX_SQS_PAYLOAD_SIZE = 1048576;
 
     /**
+     * The cache key prefix for extended SQS payloads.
+     *
+     * @var string
+     */
+    const EXTENDED_PAYLOAD_CACHE_PREFIX = 'laravel:sqs-payloads:';
+
+    /**
      * The Amazon SQS instance.
      *
      * @var \Aws\Sqs\SqsClient
@@ -48,11 +55,11 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     protected $suffix;
 
     /**
-     * The extended store options for large payload offloading.
+     * The overflow storage options for large payload offloading.
      *
      * @var array
      */
-    protected $extendedStoreOptions = [];
+    protected $overflowStorage = [];
 
     /**
      * Create a new Amazon SQS queue instance.
@@ -62,7 +69,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string  $prefix
      * @param  string  $suffix
      * @param  bool  $dispatchAfterCommit
-     * @param  array  $extendedStoreOptions
+     * @param  array  $overflowStorage
      */
     public function __construct(
         SqsClient $sqs,
@@ -70,14 +77,14 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
         $prefix = '',
         $suffix = '',
         $dispatchAfterCommit = false,
-        array $extendedStoreOptions = [],
+        array $overflowStorage = [],
     ) {
         $this->sqs = $sqs;
         $this->prefix = $prefix;
         $this->default = $default;
         $this->suffix = $suffix;
         $this->dispatchAfterCommit = $dispatchAfterCommit;
-        $this->extendedStoreOptions = $extendedStoreOptions;
+        $this->overflowStorage = $overflowStorage;
     }
 
     /**
@@ -230,8 +237,8 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        if ($this->shouldStoreToDisk($payload)) {
-            $payload = $this->storeToDisk($payload);
+        if ($this->shouldStoreInCache($payload)) {
+            $payload = $this->storeInCache($payload);
         }
 
         return $this->sqs->sendMessage([
@@ -358,7 +365,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
         if (! is_null($response['Messages']) && count($response['Messages']) > 0) {
             return new SqsJob(
                 $this->container, $this->sqs, $response['Messages'][0],
-                $this->connectionName, $queue, $this->extendedStoreOptions
+                $this->connectionName, $queue, $this->overflowStorage
             );
         }
     }
@@ -375,10 +382,6 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             $this->sqs->purgeQueue([
                 'QueueUrl' => $this->getQueue($queue),
             ]);
-
-            if (Arr::get($this->extendedStoreOptions, 'cleanup') && Arr::get($this->extendedStoreOptions, 'prefix')) {
-                $this->resolveDisk()->deleteDirectory(Arr::get($this->extendedStoreOptions, 'prefix'));
-            }
         });
     }
 
@@ -416,51 +419,49 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Determine if the payload should be stored on disk.
+     * Determine if the payload should be stored in cache.
      *
      * @param  string  $payload
      * @return bool
      */
-    protected function shouldStoreToDisk($payload)
+    protected function shouldStoreInCache($payload)
     {
-        if (! Arr::get($this->extendedStoreOptions, 'enabled', false)) {
+        if (! Arr::get($this->overflowStorage, 'enabled', false)) {
             return false;
         }
 
-        return Arr::get($this->extendedStoreOptions, 'always', false)
+        return Arr::get($this->overflowStorage, 'always', false)
             || strlen($payload) >= static::MAX_SQS_PAYLOAD_SIZE;
     }
 
     /**
-     * Store the payload on disk and return a pointer payload.
+     * Store the payload in cache and return a pointer payload.
      *
      * @param  string  $payload
      * @return string
      */
-    protected function storeToDisk($payload)
+    protected function storeInCache($payload)
     {
         $decoded = json_decode($payload);
 
-        $uuid = $decoded->uuid ?? (string) Str::uuid();
+        $uuid = is_object($decoded) && isset($decoded->uuid) ? $decoded->uuid : (string) Str::uuid();
 
-        $prefix = Arr::get($this->extendedStoreOptions, 'prefix', '');
+        $path = static::EXTENDED_PAYLOAD_CACHE_PREFIX.$uuid;
 
-        $path = ltrim($prefix.'/'.$uuid.'.json', '/');
-
-        $this->resolveDisk()->put($path, $payload);
+        $this->resolveStore()->put($path, $payload);
 
         return json_encode(['@pointer' => $path]);
     }
 
     /**
-     * Resolve the configured filesystem disk for extended storage.
+     * Resolve the configured cache store for extended storage.
      *
-     * @return \Illuminate\Filesystem\FilesystemAdapter
+     * @return \Illuminate\Contracts\Cache\Repository
      */
-    protected function resolveDisk()
+    protected function resolveStore()
     {
-        return $this->container->make('filesystem')->disk(
-            Arr::get($this->extendedStoreOptions, 'disk')
+        return $this->container->make('cache')->store(
+            Arr::get($this->overflowStorage, 'store')
         );
     }
 
