@@ -87,8 +87,9 @@ class SqsJob extends Job implements JobContract
             'QueueUrl' => $this->queue, 'ReceiptHandle' => $this->job['ReceiptHandle'],
         ]);
 
-        if (Arr::get($this->overflowStorage, 'delete_after_processing') && $pointer = $this->resolvePointer()) {
-            $this->resolveStore()->forget($pointer);
+        if (Arr::get($this->overflowStorage, 'delete_after_processing') &&
+            $pointer = $this->overflowPointer()) {
+            $this->overflowStore()->forget($pointer);
         }
     }
 
@@ -123,31 +124,11 @@ class SqsJob extends Job implements JobContract
             return $this->cachedRawBody;
         }
 
-        if ($pointer = $this->resolvePointer()) {
-            return $this->cachedRawBody = $this->resolveStore()->get($pointer);
+        if ($pointer = $this->overflowPointer()) {
+            return $this->cachedRawBody = $this->overflowStore()->get($pointer);
         }
 
         return $this->job['Body'];
-    }
-
-    /**
-     * Get the underlying SQS client instance.
-     *
-     * @return \Aws\Sqs\SqsClient
-     */
-    public function getSqs()
-    {
-        return $this->sqs;
-    }
-
-    /**
-     * Get the underlying raw SQS job.
-     *
-     * @return array
-     */
-    public function getSqsJob()
-    {
-        return $this->job;
     }
 
     /**
@@ -155,7 +136,7 @@ class SqsJob extends Job implements JobContract
      *
      * @return string|null
      */
-    protected function resolvePointer()
+    protected function overflowPointer()
     {
         if (! Arr::get($this->overflowStorage, 'enabled', false)) {
             return null;
@@ -181,10 +162,30 @@ class SqsJob extends Job implements JobContract
      *
      * @return \Illuminate\Contracts\Cache\Repository
      */
-    protected function resolveStore()
+    protected function overflowStore()
     {
         return $this->container->make('cache')->store(
             Arr::get($this->overflowStorage, 'store')
         );
+    }
+
+    /**
+     * Get the underlying SQS client instance.
+     *
+     * @return \Aws\Sqs\SqsClient
+     */
+    public function getSqs()
+    {
+        return $this->sqs;
+    }
+
+    /**
+     * Get the underlying raw SQS job.
+     *
+     * @return array
+     */
+    public function getSqsJob()
+    {
+        return $this->job;
     }
 }

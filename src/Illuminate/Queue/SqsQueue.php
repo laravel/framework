@@ -237,8 +237,8 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        if ($this->shouldStoreInCache($payload)) {
-            $payload = $this->storeInCache($payload);
+        if ($this->willOverflow($payload)) {
+            $payload = $this->overflow($payload);
         }
 
         return $this->sqs->sendMessage([
@@ -350,6 +350,45 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
+     * Determine if the payload should be stored in cache.
+     *
+     * @param  string  $payload
+     * @return bool
+     */
+    protected function willOverflow($payload)
+    {
+        if (! Arr::get($this->overflowStorage, 'enabled', false)) {
+            return false;
+        }
+
+        return Arr::get($this->overflowStorage, 'always', false)
+            || strlen($payload) >= static::MAX_SQS_PAYLOAD_SIZE;
+    }
+
+    /**
+     * Store the payload in cache and return a pointer payload.
+     *
+     * @param  string  $payload
+     * @return string
+     */
+    protected function overflow($payload)
+    {
+        $decoded = json_decode($payload);
+
+        $uuid = is_object($decoded) && isset($decoded->uuid)
+            ? $decoded->uuid
+            : (string) Str::uuid();
+
+        $this->container->make('cache')->store(
+            Arr::get($this->overflowStorage, 'store')
+        )->put(
+            $path = static::EXTENDED_PAYLOAD_CACHE_PREFIX.$uuid, $payload
+        );
+
+        return json_encode(['@pointer' => $path]);
+    }
+
+    /**
      * Pop the next job off of the queue.
      *
      * @param  string|null  $queue
@@ -416,53 +455,6 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
         }
 
         return rtrim($this->prefix, '/').'/'.Str::finish($queue, $this->suffix);
-    }
-
-    /**
-     * Determine if the payload should be stored in cache.
-     *
-     * @param  string  $payload
-     * @return bool
-     */
-    protected function shouldStoreInCache($payload)
-    {
-        if (! Arr::get($this->overflowStorage, 'enabled', false)) {
-            return false;
-        }
-
-        return Arr::get($this->overflowStorage, 'always', false)
-            || strlen($payload) >= static::MAX_SQS_PAYLOAD_SIZE;
-    }
-
-    /**
-     * Store the payload in cache and return a pointer payload.
-     *
-     * @param  string  $payload
-     * @return string
-     */
-    protected function storeInCache($payload)
-    {
-        $decoded = json_decode($payload);
-
-        $uuid = is_object($decoded) && isset($decoded->uuid) ? $decoded->uuid : (string) Str::uuid();
-
-        $path = static::EXTENDED_PAYLOAD_CACHE_PREFIX.$uuid;
-
-        $this->resolveStore()->put($path, $payload);
-
-        return json_encode(['@pointer' => $path]);
-    }
-
-    /**
-     * Resolve the configured cache store for extended storage.
-     *
-     * @return \Illuminate\Contracts\Cache\Repository
-     */
-    protected function resolveStore()
-    {
-        return $this->container->make('cache')->store(
-            Arr::get($this->overflowStorage, 'store')
-        );
     }
 
     /**
