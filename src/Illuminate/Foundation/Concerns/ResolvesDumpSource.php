@@ -138,7 +138,7 @@ trait ResolvesDumpSource
      */
     protected function getOriginalFileForCompiledView($file)
     {
-        preg_match('/\/\*\*PATH\s(.*)\sENDPATH/', file_get_contents($file), $matches);
+        preg_match('/\/\*\*PATH\s(.*)\sENDPATH/u', file_get_contents($file), $matches);
 
         if (isset($matches[1])) {
             $file = $matches[1];
