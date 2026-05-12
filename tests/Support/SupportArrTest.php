@@ -467,28 +467,28 @@ class SupportArrTest extends TestCase
         $this->assertEquals(200, $value5);
     }
 
-    public function testNext(): void
+    public function testAfter(): void
     {
         // Returns next value
-        $this->assertSame('b', Arr::next(['a', 'b', 'c'], 'a'));
+        $this->assertSame('b', Arr::after(['a', 'b', 'c'], 'a'));
 
         // Wraps around from last element
-        $this->assertSame('a', Arr::next(['a', 'b', 'c'], 'c'));
+        $this->assertSame('a', Arr::after(['a', 'b', 'c'], 'c'));
 
         // Value not found returns null
-        $this->assertNull(Arr::next(['a', 'b', 'c'], 'z'));
+        $this->assertNull(Arr::after(['a', 'b', 'c'], 'z'));
 
         // Empty array returns null
-        $this->assertNull(Arr::next([], 'a'));
+        $this->assertNull(Arr::after([], 'a'));
 
         // Strict type check (no loose comparison)
-        $this->assertNull(Arr::next([1, 2, 3], '1'));
+        $this->assertNull(Arr::after([1, 2, 3], '1'));
 
         // Works with associative arrays
-        $this->assertSame('b', Arr::next(['x' => 'a', 'y' => 'b'], 'a'));
+        $this->assertSame('b', Arr::after(['x' => 'a', 'y' => 'b'], 'a'));
 
         // Single element wraps to itself
-        $this->assertSame('a', Arr::next(['a'], 'a'));
+        $this->assertSame('a', Arr::after(['a'], 'a'));
     }
 
     public function testFlatten()

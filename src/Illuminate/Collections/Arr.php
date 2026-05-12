@@ -335,7 +335,7 @@ class Arr
     }
 
     /**
-     * Retrieve the next value in the array based on the current value.
+     * Retrieve the value after the given value in the array.
      *
      * @template TKey of array-key
      * @template TValue
@@ -344,7 +344,7 @@ class Arr
      * @param  TValue  $value
      * @return TValue|null
      */
-    public static function next(array $array, mixed $value): mixed
+    public static function after(array $array, mixed $value): mixed
     {
         if (empty($array)) {
             return null;
