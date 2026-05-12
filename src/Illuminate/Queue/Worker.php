@@ -410,7 +410,7 @@ class Worker
     }
 
     /**
-     * Get the paused queues from the given queues.
+     * Determine which of the given queues are currently paused.
      *
      * @param  string  $connectionName
      * @param  array  $queues
