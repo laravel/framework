@@ -337,6 +337,34 @@ class Arr
     }
 
     /**
+     * Retrieve the next value in the array based on the current value.
+     *
+     * @template TKey of array-key
+     * @template TValue
+     *
+     * @param  array<TKey, TValue>  $array
+     * @param  TValue  $value
+     * @return TValue|null
+     */
+    public static function next(array $array, mixed $value): mixed
+    {
+        if (empty($array)) {
+            return null;
+        }
+
+        $values = array_values($array);
+        $index = array_search($value, $values, true);
+
+        if ($index === false) {
+            return null;
+        }
+
+        $nextIndex = ($index + 1) % count($values);
+
+        return $values[$nextIndex] ?? null;
+    }
+
+    /**
      * Take the first or last {$limit} items from an array.
      *
      * @param  array  $array
