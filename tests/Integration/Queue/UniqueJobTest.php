@@ -170,6 +170,48 @@ class UniqueJobTest extends QueueTestCase
         $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
     }
 
+    public function testUniqueUntilProcessingLockIsReleasedAfterMiddlewareReleasedRetry()
+    {
+        $this->markTestSkippedWhenUsingSyncQueueDriver();
+
+        UniqueUntilProcessingWithoutOverlapJob::$handled = 0;
+
+        $cache = $this->app->get(Cache::class);
+
+        // Pre-acquire the WithoutOverlapping lock so attempt 1 will be released by
+        // the middleware before reaching handle(). This simulates the original
+        // user-reported scenario where another instance of the job is already
+        // processing while this one is dequeued.
+        $overlapKey = 'laravel-queue-overlap:'.UniqueUntilProcessingWithoutOverlapJob::class.':';
+        $overlapLock = $cache->lock($overlapKey, 60);
+        $this->assertTrue($overlapLock->get());
+
+        dispatch($job = new UniqueUntilProcessingWithoutOverlapJob);
+
+        // SBUUP lock acquired at dispatch time.
+        $this->assertFalse($cache->lock($this->getLockKey($job), 10)->get());
+
+        // Attempt 1: WithoutOverlapping releases the job because the overlap lock
+        // is already held. handle() must not run, and the SBUUP lock must remain
+        // held for the upcoming retry.
+        $this->runQueueWorkerCommand(['--once' => true]);
+
+        $this->assertSame(0, UniqueUntilProcessingWithoutOverlapJob::$handled);
+        $this->assertFalse($cache->lock($this->getLockKey($job), 10)->get());
+
+        // Free the overlap lock so attempt 2 can run handle().
+        $overlapLock->release();
+
+        $this->runQueueWorkerCommand(['--once' => true]);
+
+        $this->assertSame(1, UniqueUntilProcessingWithoutOverlapJob::$handled);
+
+        // Regression: the SBUUP lock must be released after the successful
+        // attempt 2, even though attempts() > 1. Otherwise future dispatches for
+        // the same key are silently dropped forever.
+        $this->assertTrue($cache->lock($this->getLockKey($job), 10)->get());
+    }
+
     public function testLockIsReleasedOnModelNotFoundException()
     {
         UniqueTestSerializesModelsJob::$handled = false;
@@ -342,6 +384,25 @@ class UniqueUntilProcessingRetryJob implements ShouldQueue, ShouldBeUniqueUntilP
         if ($this->attempts() === 1) {
             throw new Exception('First attempt failure.');
         }
+    }
+}
+
+class UniqueUntilProcessingWithoutOverlapJob implements ShouldQueue, ShouldBeUniqueUntilProcessing
+{
+    use InteractsWithQueue, Queueable, Dispatchable;
+
+    public $tries = 3;
+
+    public static int $handled = 0;
+
+    public function middleware()
+    {
+        return [new WithoutOverlapping];
+    }
+
+    public function handle()
+    {
+        static::$handled++;
     }
 }
 
