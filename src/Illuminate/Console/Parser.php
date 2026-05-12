@@ -97,7 +97,7 @@ class Parser
     {
         [$token, $description] = static::extractDescription($token);
 
-        $matches = preg_split('/\s*\|\s*/', $token, 2);
+        $matches = preg_split('/\s*\|\s*/u', $token, 2);
 
         $shortcut = null;
 
@@ -123,7 +123,7 @@ class Parser
      */
     protected static function extractDescription(string $token)
     {
-        $parts = preg_split('/\s+:\s+/', trim($token), 2);
+        $parts = preg_split('/\s+:\s+/u', trim($token), 2);
 
         return count($parts) === 2 ? $parts : [$token, ''];
     }
