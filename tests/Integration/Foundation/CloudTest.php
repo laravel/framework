@@ -52,4 +52,23 @@ class CloudTest extends TestCase
 
         unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG']);
     }
+
+    public function test_it_respects_log_levels()
+    {
+        if (isset($_SERVER['LOG_LEVEL'])) {
+            $logLevelBackup = $_SERVER['LOG_LEVEL'];
+        }
+
+        $_SERVER['LOG_LEVEL'] = 'notice';
+
+        Cloud::configureCloudLogging($this->app);
+
+        $this->assertEquals('notice', $this->app['config']->get('logging.channels.laravel-cloud-socket.level'));
+
+        unset($_SERVER['LOG_LEVEL']);
+
+        if (isset($logLevelBackup)) {
+            $_SERVER['LOG_LEVEL'] = $logLevelBackup;
+        }
+    }
 }

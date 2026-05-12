@@ -3,8 +3,13 @@
 namespace Illuminate\Foundation;
 
 use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Foundation\Bootstrap\BootProviders;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
+use Illuminate\Foundation\Cloud\Events;
+use Illuminate\Foundation\Cloud\FailedJobProvider;
+use Illuminate\Foundation\Cloud\QueueConnector;
+use Illuminate\Queue\Connectors\SqsConnector;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\SocketHandler;
 use PDO;
@@ -32,6 +37,9 @@ class Cloud
             },
             HandleExceptions::class => function () use ($app) {
                 static::configureCloudLogging($app);
+            },
+            BootProviders::class => function () use ($app) {
+                static::bootManagedQueues($app);
             },
             default => fn () => true,
         })();
@@ -113,6 +121,44 @@ class Cloud
     }
 
     /**
+     * Configure managed queues if applicable.
+     */
+    public static function configureManagedQueues(Application $app): void
+    {
+        if (! Cloud::managedQueuesAreActive()) {
+            return;
+        }
+
+        $app['config']->set('queue.connections.sqs.credentials', 'ecs');
+
+        if (isset($_SERVER['LARAVEL_CLOUD_REGION'])) {
+            $app['config']->set('queue.connections.sqs.region', $_SERVER['LARAVEL_CLOUD_REGION']);
+        }
+    }
+
+    /**
+     * Boot managed queues if applicable.
+     */
+    public static function bootManagedQueues(Application $app): void
+    {
+        if (! Cloud::managedQueuesAreActive()) {
+            return;
+        }
+
+        $app->singleton(Events::class, fn () => new Events(Cloud::socket()));
+        $app->bind(QueueConnector::class, fn ($app) => new QueueConnector(new SqsConnector, $app));
+
+        $app['queue']->addConnector('sqs', $app->factory(QueueConnector::class));
+
+        $failer = $app['queue.failer'];
+        unset($app['queue.failer']);
+
+        $app->singleton('queue.failer', fn ($app) => new FailedJobProvider(
+            $failer, $app[Events::class], $app['encrypter'],
+        ));
+    }
+
+    /**
      * Configure the Laravel Cloud log channels.
      */
     public static function configureCloudLogging(Application $app): void
@@ -129,11 +175,27 @@ class Cloud
                 'includeStacktraces' => true,
             ],
             'with' => [
-                'connectionString' => $_ENV['LARAVEL_CLOUD_LOG_SOCKET'] ??
-                                      $_SERVER['LARAVEL_CLOUD_LOG_SOCKET'] ??
-                                      'unix:///tmp/cloud-init.sock',
+                'connectionString' => Cloud::socket(),
                 'persistent' => true,
             ],
         ]);
+    }
+
+    /**
+     * The cloud socket address.
+     */
+    protected static function socket(): string
+    {
+        return $_ENV['LARAVEL_CLOUD_LOG_SOCKET'] ??
+            $_SERVER['LARAVEL_CLOUD_LOG_SOCKET'] ??
+                'unix:///tmp/cloud-init.sock';
+    }
+
+    /**
+     * Determine if managed queues are active.
+     */
+    protected static function managedQueuesAreActive(): bool
+    {
+        return ($_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES'] ?? null) === '1';
     }
 }
