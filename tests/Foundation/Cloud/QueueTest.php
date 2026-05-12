@@ -7,7 +7,9 @@ use Illuminate\Foundation\Cloud;
 use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\Cloud\FailedJobProvider;
 use Illuminate\Foundation\Cloud\Queue;
+use Illuminate\Foundation\Cloud\QueueConnector;
 use Illuminate\Http\Client\RequestException;
+use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Failed\FileFailedJobProvider;
 use Illuminate\Queue\Jobs\FakeJob;
 use Illuminate\Queue\SqsQueue;
@@ -135,6 +137,14 @@ class QueueTest extends TestCase
         Cloud::configureManagedQueues($this->app);
 
         $this->assertSame('eu-central-1', Config::get('queue.connections.sqs.region'));
+    }
+
+    public function testItBindsQueueConnectorAndNewsUpSqsConnector()
+    {
+        $this->app->bind(SqsConnector::class, fn () => throw new RuntimeException('Should not be resolved'));
+        Cloud::bootManagedQueues($this->app);
+
+        $this->app[QueueConnector::class];
     }
 
     public function testItBindsCloudQueue()
