@@ -471,6 +471,30 @@ class Arr
     }
 
     /**
+     * Get the given array as newline-delimited JSON.
+     *
+     * @param  iterable  $array
+     * @param  int  $options
+     * @param  string  $separator
+     * @return string
+     */
+    public static function toNdJson($array, int $options = 0, string $separator = "\n"): string
+    {
+        $lines = [];
+
+        foreach ($array as $value) {
+            $lines[] = json_encode(match (true) {
+                $value instanceof JsonSerializable => $value->jsonSerialize(),
+                $value instanceof Jsonable => json_decode($value->toJson(), true),
+                $value instanceof Arrayable => $value->toArray(),
+                default => $value,
+            }, $options);
+        }
+
+        return implode($separator, $lines);
+    }
+
+    /**
      * Get an item from an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array

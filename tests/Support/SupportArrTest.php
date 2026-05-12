@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\MultipleItemsFoundException;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -1720,6 +1721,35 @@ class SupportArrTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Items cannot be represented by a scalar value.');
         Arr::from(123);
+    }
+
+    #[DataProvider('toNdJsonProvider')]
+    public function testToNdJson($array)
+    {
+        $this->assertSame('{"name":"Taylor"}'."\n".'{"name":"Abigail"}', Arr::toNdJson($array));
+    }
+
+    public static function toNdJsonProvider()
+    {
+        return [
+            'array' => [[['name' => 'Taylor'], ['name' => 'Abigail']]],
+            'collection' => [new Collection([['name' => 'Taylor'], ['name' => 'Abigail']])],
+            'generator' => [(function () {
+                yield ['name' => 'Taylor'];
+                yield ['name' => 'Abigail'];
+            })()],
+        ];
+    }
+
+    public function testToNdJsonWithOptionsAndSeparator()
+    {
+        $this->assertSame(
+            '{"url":"https://laravel.com"}|{"url":"https://laravel.com/docs"}',
+            Arr::toNdJson([
+                ['url' => 'https://laravel.com'],
+                ['url' => 'https://laravel.com/docs'],
+            ], JSON_UNESCAPED_SLASHES, '|')
+        );
     }
 
     public function testWrap()
