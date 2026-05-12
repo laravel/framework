@@ -387,10 +387,10 @@ class Worker
 
             $queues = explode(',', $queue);
 
-            $paused = $this->getPausedQueues($connection->getConnectionName(), $queues);
+            $paused = array_flip($this->getPausedQueues($connection->getConnectionName(), $queues));
 
             foreach ($queues as $index => $queue) {
-                if (in_array($queue, $paused)) {
+                if (isset($paused[$queue])) {
                     continue;
                 }
 
