@@ -192,7 +192,7 @@ trait InteractsWithTestCaseLifecycle
         HandleExceptions::flushState($this);
         JsonApiResource::flushState();
         JsonResource::flushState();
-        Lottery::determineResultsNormally()
+        Lottery::determineResultsNormally();
         Markdown::flushState();
         Migrator::withoutMigrations([]);
         Once::flush();
