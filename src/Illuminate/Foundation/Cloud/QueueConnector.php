@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Cloud;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Queue\Connectors\ConnectorInterface;
+use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerStopReason;
@@ -32,6 +33,8 @@ class QueueConnector implements ConnectorInterface
     {
         $queue = new Queue($this->connector->connect($config), $this->app[Events::class]);
 
+        $this->configureQueue($queue);
+
         if (! $this->app->runningConsoleCommand('queue:work')) {
             return $queue;
         }
@@ -40,6 +43,16 @@ class QueueConnector implements ConnectorInterface
         $this->configureFailedJobProvider($queue);
 
         return $queue;
+    }
+
+    /**
+     * Configure the queue.
+     */
+    protected function configureQueue(Queue $queue): void
+    {
+        $this->app['events']->listen(fn (JobQueued $event) => $event->connectionName === $queue->getConnectionName()
+            ? $queue->finishQueueingJob($event->queue)
+            : null);
     }
 
     /**
