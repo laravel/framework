@@ -385,8 +385,12 @@ class Worker
                 return $job;
             }
 
-            foreach (explode(',', $queue) as $index => $queue) {
-                if ($this->queuePaused($connection->getConnectionName(), $queue)) {
+            $queues = explode(',', $queue);
+
+            $paused = $this->getPausedQueues($connection->getConnectionName(), $queues);
+
+            foreach ($queues as $index => $queue) {
+                if (in_array($queue, $paused)) {
                     continue;
                 }
 
@@ -406,19 +410,22 @@ class Worker
     }
 
     /**
-     * Determine if a given connection and queue is paused.
-     *
+     * Get the paused queues from the given queues.
      * @param  string  $connectionName
-     * @param  string  $queue
-     * @return bool
+     * @param  array  $queues
+     * @return array
      */
-    protected function queuePaused($connectionName, $queue)
+    protected function getPausedQueues($connectionName, array $queues)
     {
         if (! static::$pausable) {
-            return false;
+            return [];
         }
 
-        return $this->cache && $this->manager->isPaused($connectionName, $queue);
+        if ($this->cache === null) {
+            return [];
+        }
+
+        return $this->manager->getPausedQueues($connectionName, $queues);
     }
 
     /**
