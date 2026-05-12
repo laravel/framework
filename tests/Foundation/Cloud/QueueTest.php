@@ -2,13 +2,17 @@
 
 namespace Tests\Tests\Foundation;
 
+use Aws\Result;
+use Aws\Sqs\SqsClient;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Foundation\Cloud;
 use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\Cloud\FailedJobProvider;
 use Illuminate\Foundation\Cloud\Queue;
 use Illuminate\Foundation\Cloud\QueueConnector;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\Client\RequestException;
+use Illuminate\Queue\Connectors\ConnectorInterface;
 use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Failed\FileFailedJobProvider;
 use Illuminate\Queue\Jobs\FakeJob;
@@ -17,17 +21,24 @@ use Illuminate\Queue\Worker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\QueueFake;
+use Mockery\MockInterface;
 use Orchestra\Testbench\Attributes\WithConfig;
+use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 use Ramsey\Uuid\Uuid;
 use RuntimeException;
 use Throwable;
 
+#[WithMigration]
+#[WithMigration('laravel', 'queue')]
 class QueueTest extends TestCase
 {
+    use DatabaseMigrations;
+
     protected function defineEnvironment($app)
     {
         $app['config']->set('app.key', Str::random(32));
@@ -372,9 +383,12 @@ class QueueTest extends TestCase
     public function testItEmitsJobQueuedEvent()
     {
         $this->travelTo('2000-01-02 03:04:05.060708');
+        Cloud::configureManagedQueues($this->app);
+        Cloud::bootManagedQueues($this->app);
         $eventsFake = $this->fakeEvents();
-        $queueFake = $this->fakeQueue();
-        $queue = new Queue($queueFake, $eventsFake);
+        $client = $this->fakeConnector();
+        $queue = $this->app['queue']->connection('sqs');
+        $client->shouldReceive('sendMessage')->times(7)->andReturn(new Result());
 
         $queue->push(new FakeJob, queue: '1');
         $queue->pushOn('2', new FakeJob);
@@ -429,17 +443,73 @@ class QueueTest extends TestCase
         ], $eventsFake->emitted);
     }
 
-    public function testTimestampsAreTheSameForBulkPush()
+    public function testItRespectsDispatchAfterTransaction()
     {
+        $this->travelTo('2000-01-02 03:04:05.060708');
+        Cloud::configureManagedQueues($this->app);
+        Cloud::bootManagedQueues($this->app);
         $eventsFake = $this->fakeEvents();
-        $queueFake = $this->fakeQueue();
-        $queue = new Queue($queueFake, $eventsFake);
+        $client = $this->fakeConnector();
+        $this->app['config']->set('queue.connections.sqs.after_commit', true);
+        $queue = $this->app['queue']->connection('sqs');
+        $client->shouldReceive('sendMessage')->times(7)->andReturn(new Result());
 
-        $queue->bulk([new FakeJob, new FakeJob]);
+        DB::beginTransaction();
 
-        $this->assertCount(2, $eventsFake->emitted);
-        // IMPORTANT: Do not freeze time to fix this test.
-        $this->assertSame($eventsFake->emitted[0]['timestamp'], $eventsFake->emitted[1]['timestamp']);
+        $queue->push(new FakeJob, queue: '1');
+        $queue->pushOn('2', new FakeJob);
+        $queue->pushRaw('', queue: '3');
+        $queue->later(1, new FakeJob, queue: '4');
+        $queue->laterOn('5', 1, new FakeJob);
+        $queue->bulk([new FakeJob, new FakeJob], queue: '6');
+
+        $this->travel(10)->minutes();
+        DB::commit();
+
+        $this->assertSame([
+            [
+                '_cloud_event' => 'queue',
+                'timestamp' => '2000-01-02 03:04:05.060708',
+                'type' => 'queued',
+                'queue' => '3',
+            ],
+            [
+                '_cloud_event' => 'queue',
+                'timestamp' => '2000-01-02 03:14:05.060708',
+                'type' => 'queued',
+                'queue' => '1',
+            ],
+            [
+                '_cloud_event' => 'queue',
+                'timestamp' => '2000-01-02 03:14:05.060708',
+                'type' => 'queued',
+                'queue' => '2',
+            ],
+            [
+                '_cloud_event' => 'queue',
+                'timestamp' => '2000-01-02 03:14:05.060708',
+                'type' => 'queued',
+                'queue' => '4',
+            ],
+            [
+                '_cloud_event' => 'queue',
+                'timestamp' => '2000-01-02 03:14:05.060708',
+                'type' => 'queued',
+                'queue' => '5',
+            ],
+            [
+                '_cloud_event' => 'queue',
+                'timestamp' => '2000-01-02 03:14:05.060708',
+                'type' => 'queued',
+                'queue' => '6',
+            ],
+            [
+                '_cloud_event' => 'queue',
+                'timestamp' => '2000-01-02 03:14:05.060708',
+                'type' => 'queued',
+                'queue' => '6',
+            ],
+        ], $eventsFake->emitted);
     }
 
     public function testItCapturesDurationForMultipleJobs()
@@ -619,20 +689,50 @@ class QueueTest extends TestCase
         $this->assertEmpty($eventsFake->emitted);
     }
 
+    /**
+     * @return MockInterface<SqsClient>
+     */
+    private function fakeConnector()
+    {
+        $client = $this->mock(SqsClient::class);
+
+        $this->app->instance(QueueConnector::class, new QueueConnector(new class($client) implements ConnectorInterface
+        {
+            public function __construct(private $client)
+            {
+                //
+            }
+
+            public function connect($config)
+            {
+                return new SqsQueue(
+                    $this->client,
+                    $config['queue'],
+                    $config['prefix'] ?? '',
+                    $config['suffix'] ?? '',
+                    $config['after_commit'] ?? null,
+                    $config['overflow'] ?? [],
+                );
+            }
+            }, $this->app));
+
+        return $client;
+    }
+
     private function fakeEvents()
     {
-        return new class('test-socket') extends Events
+        return $this->app->instance(Events::class, new class('test-socket') extends Events
         {
-            public array $emitted = [];
+                public array $emitted = [];
 
-            public function emitMany(array $payloads): void
-            {
-                $this->emitted = [
-                    ...$this->emitted,
-                    ...$payloads,
-                ];
-            }
-        };
+                public function emitMany(array $payloads): void
+                {
+                    $this->emitted = [
+                        ...$this->emitted,
+                        ...$payloads,
+                    ];
+                }
+            });
     }
 
     private function fakeQueue()
@@ -658,5 +758,13 @@ class QueueTest extends TestCase
     private function fakeFailer()
     {
         return new FileFailedJobProvider(tempnam(sys_get_temp_dir(), 'cloud_failed_job_test_'));
+    }
+}
+
+class MyJob
+{
+    public function fire()
+    {
+        //
     }
 }
