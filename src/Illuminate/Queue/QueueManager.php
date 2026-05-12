@@ -283,6 +283,23 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Get the paused queues from the given queues.
+     * @param  string  $connection
+     * @param  array  $queues
+     * @return array
+     */
+    public function getPausedQueues($connection, array $queues)
+    {
+        $keys = array_map(fn ($queue) => "illuminate:queue:paused:{$connection}:{$queue}", $queues);
+
+        $states = $this->app['cache']->store()->many($keys);
+
+        return array_values(array_filter(
+            $queues, fn ($queue) => $states["illuminate:queue:paused:{$connection}:{$queue}"] ?? false
+        ));
+    }
+
+    /**
      * Indicate that queue workers should not poll for restart or pause signals.
      *
      * This prevents the workers from hitting the application cache to determine if they need to pause or restart.
