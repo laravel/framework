@@ -2,8 +2,11 @@
 
 namespace Illuminate\Queue\Middleware;
 
+use Illuminate\Bus\UniqueLock;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
+use Illuminate\Queue\CallQueuedListener;
 use Illuminate\Support\InteractsWithTime;
 
 class WithoutOverlapping
@@ -68,7 +71,9 @@ class WithoutOverlapping
      */
     public function handle($job, $next)
     {
-        $lock = Container::getInstance()->make(Cache::class)->lock(
+        $cache = Container::getInstance()->make(Cache::class);
+
+        $lock = $cache->lock(
             $this->getLockKey($job), $this->expiresAfter
         );
 
@@ -77,6 +82,7 @@ class WithoutOverlapping
                 $next($job);
             } finally {
                 $lock->release();
+                $this->ensureUniqueJobLockIsReleased($cache, $job);
             }
         } elseif (! is_null($this->releaseAfter)) {
             $job->release($this->releaseAfter);
@@ -163,5 +169,24 @@ class WithoutOverlapping
             : get_class($job);
 
         return $this->prefix.$jobName.':'.$this->key;
+    }
+
+    /**
+     * Determine if the given job should be unique until processing begins.
+     */
+    protected function jobShouldBeUniqueUntilProcessing(mixed $job): bool
+    {
+        return $job instanceof ShouldBeUniqueUntilProcessing ||
+            ($job instanceof CallQueuedListener && $job->shouldBeUniqueUntilProcessing());
+    }
+
+    /**
+     * Ensure the lock for a unique job is released.
+     */
+    protected function ensureUniqueJobLockIsReleased(Cache $cache, mixed $job): void
+    {
+        if ($this->jobShouldBeUniqueUntilProcessing($job)) {
+            (new UniqueLock($cache))->release($job);
+        }
     }
 }
