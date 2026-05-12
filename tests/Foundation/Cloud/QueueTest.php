@@ -714,7 +714,7 @@ class QueueTest extends TestCase
                     $config['overflow'] ?? [],
                 );
             }
-            }, $this->app));
+        }, $this->app));
 
         return $client;
     }
@@ -723,16 +723,16 @@ class QueueTest extends TestCase
     {
         return $this->app->instance(Events::class, new class('test-socket') extends Events
         {
-                public array $emitted = [];
+            public array $emitted = [];
 
-                public function emitMany(array $payloads): void
-                {
-                    $this->emitted = [
-                        ...$this->emitted,
-                        ...$payloads,
-                    ];
-                }
-            });
+            public function emitMany(array $payloads): void
+            {
+                $this->emitted = [
+                    ...$this->emitted,
+                    ...$payloads,
+                ];
+            }
+        });
     }
 
     private function fakeQueue()
