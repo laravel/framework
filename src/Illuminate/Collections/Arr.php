@@ -480,10 +480,13 @@ class Arr
      */
     public static function jsonLines($array, int $options = 0, string $separator = "\n"): string
     {
-        $lines = [];
+        $result = '';
+        $firstLine = true;
 
         foreach ($array as $value) {
-            $lines[] = json_encode(match (true) {
+            $result .= $firstLine ? '' : $separator;
+            $firstLine = false;
+            $result .= json_encode(match (true) {
                 $value instanceof JsonSerializable => $value->jsonSerialize(),
                 $value instanceof Jsonable => json_decode($value->toJson(), true),
                 $value instanceof Arrayable => $value->toArray(),
@@ -491,7 +494,7 @@ class Arr
             }, $options);
         }
 
-        return implode($separator, $lines);
+        return $result;
     }
 
     /**
