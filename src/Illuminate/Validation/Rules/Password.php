@@ -179,7 +179,7 @@ class Password implements DataAwareRule, ImplicitRule, IteratorAggregate, Rule, 
      */
     public static function required()
     {
-        $password = static::default();
+        $password = clone static::default();
 
         $password->required = true;
 
@@ -193,7 +193,7 @@ class Password implements DataAwareRule, ImplicitRule, IteratorAggregate, Rule, 
      */
     public static function sometimes()
     {
-        $password = static::default();
+        $password = clone static::default();
 
         $password->sometimes = true;
 

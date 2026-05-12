@@ -443,6 +443,32 @@ class ValidationPasswordRuleTest extends TestCase
         $this->passes([Password::sometimes()], ['Password123', 'password123']);
     }
 
+    public function testRequiredDoesNotMutateDefaultRuleInstance()
+    {
+        Password::defaults(Password::min(6)->letters());
+
+        $required = Password::required();
+        $this->assertContains('required', [...$required]);
+        $this->assertContains('min:6', [...$required]);
+
+        $default = Password::default();
+        $this->assertNotContains('required', [...$default]);
+        $this->assertContains('min:6', [...$default]);
+    }
+
+    public function testSometimesDoesNotMutateDefaultRuleInstance()
+    {
+        Password::defaults(Password::min(6)->letters());
+
+        $sometimes = Password::sometimes();
+        $this->assertContains('sometimes', [...$sometimes]);
+        $this->assertContains('min:6', [...$sometimes]);
+
+        $default = Password::default();
+        $this->assertNotContains('sometimes', [...$default]);
+        $this->assertContains('min:6', [...$default]);
+    }
+
     public function testRequiredWithMissingValue()
     {
         $v = new Validator(
