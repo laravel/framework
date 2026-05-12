@@ -80,9 +80,9 @@ class WithoutOverlapping
         if ($lock->get()) {
             try {
                 $next($job);
+                $this->ensureUniqueJobLockIsReleased($cache, $job);
             } finally {
                 $lock->release();
-                $this->ensureUniqueJobLockIsReleased($cache, $job);
             }
         } elseif (! is_null($this->releaseAfter)) {
             $job->release($this->releaseAfter);
