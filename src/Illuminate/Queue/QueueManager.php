@@ -289,7 +289,7 @@ class QueueManager implements FactoryContract, MonitorContract
      * @param  array  $queues
      * @return array
      */
-    public function getPausedQueues($connection, array $queues)
+    public function getPausedQueues($connection, $queues)
     {
         $keys = array_map(fn ($queue) => "illuminate:queue:paused:{$connection}:{$queue}", $queues);
 

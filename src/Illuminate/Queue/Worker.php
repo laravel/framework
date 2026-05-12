@@ -416,7 +416,7 @@ class Worker
      * @param  array  $queues
      * @return array
      */
-    protected function getPausedQueues($connectionName, array $queues)
+    protected function getPausedQueues($connectionName, $queues)
     {
         if (! static::$pausable) {
             return [];
