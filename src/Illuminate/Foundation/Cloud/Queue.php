@@ -27,13 +27,6 @@ class Queue implements QueueContract, ClearableQueue
     protected $processingQueue = null;
 
     /**
-     * The date the last job was pushed.
-     *
-     * @var \Carbon\CarbonImmutable|null
-     */
-    protected $lastJobPushedAt = null;
-
-    /**
      * The date the last job started processing.
      *
      * @var \Carbon\CarbonImmutable
@@ -115,13 +108,7 @@ class Queue implements QueueContract, ClearableQueue
      */
     public function push($job, $data = '', $queue = null)
     {
-        $this->beforeJobPushed();
-
-        $result = $this->queue->push(...func_get_args());
-
-        $this->afterJobPushed($queue);
-
-        return $result;
+        return $this->queue->push(...func_get_args());
     }
 
     /**
@@ -134,13 +121,7 @@ class Queue implements QueueContract, ClearableQueue
      */
     public function pushOn($queue, $job, $data = '')
     {
-        $this->beforeJobPushed();
-
-        $result = $this->queue->pushOn(...func_get_args());
-
-        $this->afterJobPushed($queue);
-
-        return $result;
+        return $this->queue->pushOn(...func_get_args());
     }
 
     /**
@@ -152,11 +133,9 @@ class Queue implements QueueContract, ClearableQueue
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        $this->beforeJobPushed();
-
         $result = $this->queue->pushRaw(...func_get_args());
 
-        $this->afterJobPushed($queue);
+        $this->finishQueueingJob($queue);
 
         return $result;
     }
@@ -172,13 +151,7 @@ class Queue implements QueueContract, ClearableQueue
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
-        $this->beforeJobPushed();
-
-        $result = $this->queue->later(...func_get_args());
-
-        $this->afterJobPushed($queue);
-
-        return $result;
+        return $this->queue->later(...func_get_args());
     }
 
     /**
@@ -192,13 +165,7 @@ class Queue implements QueueContract, ClearableQueue
      */
     public function laterOn($queue, $delay, $job, $data = '')
     {
-        $this->beforeJobPushed();
-
-        $result = $this->queue->laterOn(...func_get_args());
-
-        $this->afterJobPushed($queue);
-
-        return $result;
+        return $this->queue->laterOn(...func_get_args());
     }
 
     /**
@@ -211,13 +178,7 @@ class Queue implements QueueContract, ClearableQueue
      */
     public function bulk($jobs, $data = '', $queue = null)
     {
-        $this->beforeJobPushed();
-
-        $result = $this->queue->bulk(...func_get_args());
-
-        $this->afterJobsPushed(count($jobs), $queue);
-
-        return $result;
+        return $this->queue->bulk(...func_get_args());
     }
 
     /**
@@ -350,42 +311,18 @@ class Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Handle before a job is pushed.
+     * Handle jobs finishing being queued.
      *
-     * @return void
+     * @param  string  $queue
      */
-    protected function beforeJobPushed()
+    public function finishQueueingJob($queue)
     {
-        $this->lastJobPushedAt = CarbonImmutable::now('UTC');
-    }
-
-    /**
-     * Handle after a job is pushed.
-     *
-     * @param  string|null  $queue
-     * @return void
-     */
-    protected function afterJobPushed($queue)
-    {
-        $this->afterJobsPushed(1, $queue);
-    }
-
-    /**
-     * Handle jobs being pushed.
-     *
-     * @param  int  $count
-     * @param  string|null  $queue
-     */
-    protected function afterJobsPushed($count, $queue)
-    {
-        $this->events->emitMany(array_fill(0, $count, [
+        $this->events->emit([
             '_cloud_event' => 'queue',
-            'timestamp' => $this->lastJobPushedAt->toDateTimeString('microsecond'),
+            'timestamp' => CarbonImmutable::now('UTC')->toDateTimeString('microsecond'),
             'type' => 'queued',
             'queue' => $this->normalizeQueue($queue),
-        ]));
-
-        $this->lastJobPushedAt = null;
+        ]);
     }
 
     /**
