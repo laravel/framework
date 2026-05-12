@@ -56,6 +56,7 @@ class QueueConnector implements ConnectorInterface
         });
 
         static::$reservedMemory = str_repeat('x', 32768);
+
         register_shutdown_function(function () use ($queue) {
             static::$reservedMemory = null;
 

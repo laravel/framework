@@ -302,6 +302,13 @@ class Queue implements QueueContract, ClearableQueue
         return $this->queue->getQueueableOptions(...func_get_args());
     }
 
+    /**
+     * Finish processing the current job and emit a queue event.
+     *
+     * @param  string  $default
+     * @param  \Carbon\CarbonImmutable|null  $timestamp
+     * @return void
+     */
     public function finishProcessingJob($default = 'processed', $timestamp = null)
     {
         if (! $this->processingJob) {
