@@ -283,7 +283,7 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
-     * Get the paused queues from the given queues.
+     * Determine which of the given queues are currently paused.
      *
      * @param  string  $connection
      * @param  array  $queues
