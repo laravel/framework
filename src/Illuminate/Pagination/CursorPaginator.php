@@ -28,7 +28,7 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
     /**
      * Indicates whether there are more items in the data source.
      *
-     * @return bool
+     * @var bool
      */
     protected $hasMore;
 
