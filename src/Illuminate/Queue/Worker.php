@@ -411,6 +411,7 @@ class Worker
 
     /**
      * Get the paused queues from the given queues.
+     *
      * @param  string  $connectionName
      * @param  array  $queues
      * @return array
