@@ -1072,6 +1072,24 @@ class Blueprint
     }
 
     /**
+     * Create a foreign UUID column for the given model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $model
+     * @param  string|null  $column
+     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
+     */
+    public function foreignUuidFor($model, $column = null)
+    {
+        if (is_string($model)) {
+            $model = new $model;
+        }
+
+        return $this->foreignUuid($column ?: $model->getForeignKey())
+            ->table($model->getTable())
+            ->referencesModelColumn($model->getKeyName());
+    }
+
+    /**
      * Create a new float column on the table.
      *
      * @param  string  $column

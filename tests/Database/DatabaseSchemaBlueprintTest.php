@@ -453,6 +453,19 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $getSql('MySql'));
     }
 
+    public function testGenerateUuidRelationshipColumnWithUuidModel()
+    {
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'posts', function ($table) {
+                $table->foreignUuidFor(Fixtures\Models\EloquentModelUsingUuid::class);
+            })->toSql();
+        };
+
+        $this->assertEquals([
+            'alter table `posts` add `model_using_uuid_id` char(36) not null',
+        ], $getSql('MySql'));
+    }
+
     public function testGenerateRelationshipColumnWithUlidModel()
     {
         $getSql = function ($grammar) {
@@ -481,6 +494,20 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals([
             'alter table `posts` add `user_id` bigint unsigned not null',
             'alter table `posts` add constraint `posts_user_id_foreign` foreign key (`user_id`) references `users` (`id`)',
+        ], $getSql('MySql'));
+    }
+
+    public function testGenerateUuidRelationshipConstrainedColumn()
+    {
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'posts', function ($table) {
+                $table->foreignUuidFor(Fixtures\Models\EloquentModelUsingUuid::class)->constrained();
+            })->toSql();
+        };
+
+        $this->assertEquals([
+            'alter table `posts` add `model_using_uuid_id` char(36) not null',
+            'alter table `posts` add constraint `posts_model_using_uuid_id_foreign` foreign key (`model_using_uuid_id`) references `model` (`id`)',
         ], $getSql('MySql'));
     }
 
