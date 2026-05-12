@@ -478,7 +478,7 @@ class Arr
      * @param  string  $separator
      * @return string
      */
-    public static function toNdJson($array, int $options = 0, string $separator = "\n"): string
+    public static function jsonLines($array, int $options = 0, string $separator = "\n"): string
     {
         $lines = [];
 

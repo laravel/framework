@@ -1723,13 +1723,13 @@ class SupportArrTest extends TestCase
         Arr::from(123);
     }
 
-    #[DataProvider('toNdJsonProvider')]
-    public function testToNdJson($array)
+    #[DataProvider('jsonLinesProvider')]
+    public function testJsonLines($array)
     {
-        $this->assertSame('{"name":"Taylor"}'."\n".'{"name":"Abigail"}', Arr::toNdJson($array));
+        $this->assertSame('{"name":"Taylor"}'."\n".'{"name":"Abigail"}', Arr::jsonLines($array));
     }
 
-    public static function toNdJsonProvider()
+    public static function jsonLinesProvider()
     {
         return [
             'array' => [[['name' => 'Taylor'], ['name' => 'Abigail']]],
@@ -1741,11 +1741,11 @@ class SupportArrTest extends TestCase
         ];
     }
 
-    public function testToNdJsonWithOptionsAndSeparator()
+    public function testJsonLinesWithOptionsAndSeparator()
     {
         $this->assertSame(
             '{"url":"https://laravel.com"}|{"url":"https://laravel.com/docs"}',
-            Arr::toNdJson([
+            Arr::jsonLines([
                 ['url' => 'https://laravel.com'],
                 ['url' => 'https://laravel.com/docs'],
             ], JSON_UNESCAPED_SLASHES, '|')
