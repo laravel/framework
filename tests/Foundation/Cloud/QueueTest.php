@@ -18,6 +18,7 @@ use Illuminate\Queue\Failed\FileFailedJobProvider;
 use Illuminate\Queue\Jobs\FakeJob;
 use Illuminate\Queue\SqsQueue;
 use Illuminate\Queue\Worker;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Crypt;
@@ -49,17 +50,20 @@ class QueueTest extends TestCase
         Worker::$restartable = true;
         Worker::$pausable = true;
         $_SERVER['LARAVEL_CLOUD'] = $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES'] = '1';
-        $_SERVER['SQS_PREFIX'] = 'https://sqs.us-east-2.amazonaws.com/1234567';
-        $_SERVER['SQS_SUFFIX'] = '-env-8280cf2c-2081-47e8-a1f1-9cdfcba8618f';
 
         parent::setUp();
+
+        $this->app['config']->set([
+            'queue.connections.sqs.prefix' => 'https://sqs.us-east-2.amazonaws.com/1234567',
+            'queue.connections.sqs.suffix' => '-env-8280cf2c-2081-47e8-a1f1-9cdfcba8618f',
+        ]);
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
 
-        unset($_SERVER['LARAVEL_CLOUD'], $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES'], $_SERVER['SQS_PREFIX'], $_SERVER['SQS_SUFFIX'], $_SERVER['LARAVEL_CLOUD_REGION']);
+        unset($_SERVER['LARAVEL_CLOUD'], $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES'], $_SERVER['LARAVEL_CLOUD_REGION']);
         Worker::$restartable = true;
         Worker::$pausable = true;
     }
@@ -193,7 +197,7 @@ class QueueTest extends TestCase
     {
         $eventsFake = $this->fakeEvents();
         $queueFake = $this->fakeQueue();
-        $queue = new Queue($queueFake, $eventsFake);
+        $queue = new Queue($queueFake, $eventsFake, []);
 
         $queue->pop();
 
@@ -205,7 +209,7 @@ class QueueTest extends TestCase
         $this->travelTo('2000-01-02 03:04:05.060708');
         $eventsFake = $this->fakeEvents();
         $queueFake = $this->fakeQueue();
-        $queue = new Queue($queueFake, $eventsFake);
+        $queue = new Queue($queueFake, $eventsFake, $this->app['config']->get('queue.connections.sqs'));
 
         $queueFake->jobsToPop[] = new FakeJob;
         $queue->pop();
@@ -223,7 +227,7 @@ class QueueTest extends TestCase
         $this->travelTo('2000-01-02 03:04:05.060708');
         $eventsFake = $this->fakeEvents();
         $queueFake = $this->fakeQueue();
-        $queue = new Queue($queueFake, $eventsFake);
+        $queue = new Queue($queueFake, $eventsFake, $this->app['config']->get('queue.connections.sqs'));
 
         $queueFake->jobsToPop[] = new FakeJob;
         $queue->pop();
@@ -252,7 +256,7 @@ class QueueTest extends TestCase
         $this->travelTo('2000-01-02 03:04:05.060708');
         $eventsFake = $this->fakeEvents();
         $queueFake = $this->fakeQueue();
-        $queue = new Queue($queueFake, $eventsFake);
+        $queue = new Queue($queueFake, $eventsFake, $this->app['config']->get('queue.connections.sqs'));
 
         $queueFake->jobsToPop[] = new FakeJob;
         $queue->pop();
@@ -268,7 +272,7 @@ class QueueTest extends TestCase
         $this->travelTo('2000-01-02 03:04:05.060708');
         $eventsFake = $this->fakeEvents();
         $queueFake = $this->fakeQueue();
-        $queue = new Queue($queueFake, $eventsFake);
+        $queue = new Queue($queueFake, $eventsFake, $this->app['config']->get('queue.connections.sqs'));
 
         $queueFake->jobsToPop = [new FakeJob, new FakeJob];
         $queue->pop('first');
@@ -309,7 +313,7 @@ class QueueTest extends TestCase
         $this->travelTo('2000-01-02 03:04:05.060708');
         $eventsFake = $this->fakeEvents();
         $queueFake = $this->fakeQueue();
-        $queue = new Queue($queueFake, $eventsFake);
+        $queue = new Queue($queueFake, $eventsFake, $this->app['config']->get('queue.connections.sqs'));
         $failerFake = $this->fakeFailer();
         $failedJobProvider = new FailedJobProvider($failerFake, $eventsFake, $this->app['encrypter']);
         $failedJobProvider->setQueue($queue);
@@ -356,7 +360,7 @@ class QueueTest extends TestCase
         $this->travelTo('2000-01-02 03:04:05.060708');
         $eventsFake = $this->fakeEvents();
         $queueFake = $this->fakeQueue();
-        $queue = new Queue($queueFake, $eventsFake);
+        $queue = new Queue($queueFake, $eventsFake, $this->app['config']->get('queue.connections.sqs'));
 
         $queueFake->jobsToPop[] = $jobFake = new FakeJob;
         $queue->pop();
@@ -386,8 +390,7 @@ class QueueTest extends TestCase
         Cloud::configureManagedQueues($this->app);
         Cloud::bootManagedQueues($this->app);
         $eventsFake = $this->fakeEvents();
-        $client = $this->fakeConnector();
-        $queue = $this->app['queue']->connection('sqs');
+        [$queue, $client] = $this->mockedQueue();
         $client->shouldReceive('sendMessage')->times(7)->andReturn(new Result());
 
         $queue->push(new FakeJob, queue: '1');
@@ -449,9 +452,8 @@ class QueueTest extends TestCase
         Cloud::configureManagedQueues($this->app);
         Cloud::bootManagedQueues($this->app);
         $eventsFake = $this->fakeEvents();
-        $client = $this->fakeConnector();
         $this->app['config']->set('queue.connections.sqs.after_commit', true);
-        $queue = $this->app['queue']->connection('sqs');
+        [$queue, $client] = $this->mockedQueue();
         $client->shouldReceive('sendMessage')->times(7)->andReturn(new Result());
 
         DB::beginTransaction();
@@ -517,7 +519,7 @@ class QueueTest extends TestCase
         $this->travelTo('2000-01-02 03:04:05.060708');
         $eventsFake = $this->fakeEvents();
         $queueFake = $this->fakeQueue();
-        $queue = new Queue($queueFake, $eventsFake);
+        $queue = new Queue($queueFake, $eventsFake, $this->app['config']->get('queue.connections.sqs'));
 
         $queueFake->jobsToPop = [new FakeJob, new FakeJob];
         $queue->pop();
@@ -536,7 +538,7 @@ class QueueTest extends TestCase
         $this->travelTo(Carbon::parse('2000-01-02 03:04:05.060708', 'Australia/Melbourne'));
         $eventsFake = $this->fakeEvents();
         $queueFake = $this->fakeQueue();
-        $queue = new Queue($queueFake, $eventsFake);
+        $queue = new Queue($queueFake, $eventsFake, $this->app['config']->get('queue.connections.sqs'));
 
         $queueFake->jobsToPop[] = new FakeJob;
         $queue->pop();
@@ -689,10 +691,41 @@ class QueueTest extends TestCase
         $this->assertEmpty($eventsFake->emitted);
     }
 
+    public function testItUsesConfigValuesToNormalizeQueueName()
+    {
+        Cloud::configureManagedQueues($this->app);
+        Cloud::bootManagedQueues($this->app);
+        $eventsFake = $this->fakeEvents();
+        [$queue, $client] = $this->mockedQueue();
+        $client->shouldReceive('sendMessage')->times(1)->andReturn(new Result());
+
+        unset($_SERVER['SQS_PREFIX'], $_SERVER['SQS_SUFFIX']);
+
+        $queue->push(new FakeJob, queue: 'https://sqs.us-east-2.amazonaws.com/1234567/my-queue-env-8280cf2c-2081-47e8-a1f1-9cdfcba8618f');
+
+        $this->assertSame('my-queue', $eventsFake->emitted[0]['queue']);
+    }
+
+    public function testItHandlesMissingPrefixAndSuffixConfig()
+    {
+        Cloud::configureManagedQueues($this->app);
+        Cloud::bootManagedQueues($this->app);
+        $eventsFake = $this->fakeEvents();
+        $this->app['config']->set('queue.connections.sqs', Arr::except($this->app['config']->get('queue.connections.sqs'), ['prefix', 'suffix']));
+        [$queue, $client] = $this->mockedQueue();
+        $client->shouldReceive('sendMessage')->times(1)->andReturn(new Result());
+
+        unset($_SERVER['SQS_PREFIX'], $_SERVER['SQS_SUFFIX']);
+
+        $queue->push(new FakeJob, queue: 'https://sqs.us-east-2.amazonaws.com/1234567/my-queue-env-8280cf2c-2081-47e8-a1f1-9cdfcba8618f');
+
+        $this->assertSame('https://sqs.us-east-2.amazonaws.com/1234567/my-queue-env-8280cf2c-2081-47e8-a1f1-9cdfcba8618f', $eventsFake->emitted[0]['queue']);
+    }
+
     /**
-     * @return MockInterface<SqsClient>
+     * @return array{Queue, MockInterface<SqsClient>}
      */
-    private function fakeConnector()
+    private function mockedQueue()
     {
         $client = $this->mock(SqsClient::class);
 
@@ -716,7 +749,7 @@ class QueueTest extends TestCase
             }
             }, $this->app));
 
-        return $client;
+        return [$this->app['queue']->connection('sqs'), $client];
     }
 
     private function fakeEvents()
@@ -750,7 +783,7 @@ class QueueTest extends TestCase
             {
                 $queue ??= 'default';
 
-                return $_SERVER['SQS_PREFIX'].'/'.$queue.$_SERVER['SQS_SUFFIX'];
+                return config('queue.connections.sqs.prefix').'/'.$queue.config('queue.connections.sqs.suffix');
             }
         };
     }
