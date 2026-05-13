@@ -145,6 +145,18 @@ class ContextualAttributeBindingTest extends TestCase
 
                 return $guard;
             });
+            $manager->shouldReceive('guard')->with(AuthGuardUnitEnum::unit)->andReturnUsing(function () {
+                $guard = m::mock(GuardContract::class);
+                $guard->shouldReceive('user')->andReturn(m:mock(AuthenticatableContract::class));
+
+                return $guard;
+            });
+            $manager->shouldReceive('guard')->with(AuthGuardBackedEnum::Backed)->andReturnUsing(function () {
+                $guard = m::mock(GuardContract::class);
+                $guard->shouldReceive('user')->andReturn(m:mock(AuthenticatableContract::class));
+
+                return $guard;
+            });
 
             return $manager;
         });
@@ -159,6 +171,8 @@ class ContextualAttributeBindingTest extends TestCase
             $manager = m::mock(CacheManager::class);
             $manager->shouldReceive('store')->with('foo')->andReturn(m::mock(CacheRepository::class));
             $manager->shouldReceive('store')->with('bar')->andReturn(m::mock(CacheRepository::class));
+            $manager->shouldReceive('store')->with(CacheStoreUnitEnum::unit)->andReturn(m::mock(CacheRepository::class));
+            $manager->shouldReceive('store')->with(CacheStoreBackedEnum::Backed)->andReturn(m::mock(CacheRepository::class));
 
             return $manager;
         });
@@ -201,6 +215,8 @@ class ContextualAttributeBindingTest extends TestCase
             $manager = m::mock(AuthManager::class);
             $manager->shouldReceive('guard')->with('foo')->andReturn(m::mock(GuardContract::class));
             $manager->shouldReceive('guard')->with('bar')->andReturn(m::mock(GuardContract::class));
+            $manager->shouldReceive('guard')->with(AuthGuardUnitEnum::unit)->andReturn(m::mock(GuardContract::class));
+            $manager->shouldReceive('guard')->with(AuthGuardBackedEnum::Backed)->andReturn(m::mock(GuardContract::class));
 
             return $manager;
         });
@@ -372,6 +388,26 @@ enum StorageDiskBackedEnum: string
     case Backed = 'backed';
 }
 
+enum AuthGuardUnitEnum
+{
+    case unit;
+}
+
+enum AuthGuardBackedEnum: string
+{
+    case Backed = 'backed';
+}
+
+enum CacheStoreUnitEnum
+{
+    case unit;
+}
+
+enum CacheStoreBackedEnum: string
+{
+    case Backed = 'backed';
+}
+
 interface ContainerTestContract
 {
 }
@@ -479,15 +515,23 @@ final class ComplexDependency implements ContainerTestContract
 
 final class AuthedTest
 {
-    public function __construct(#[Authenticated('foo')] AuthenticatableContract $foo, #[CurrentUser('bar')] AuthenticatableContract $bar)
-    {
+    public function __construct(
+        #[Authenticated('foo')] AuthenticatableContract $foo,
+        #[CurrentUser('bar')] AuthenticatableContract $bar,
+        #[Authenticated(AuthGuardUnitEnum::unit)] AuthenticatableContract $unit,
+        #[CurrentUser(AuthGuardBackedEnum::Backed)] AuthenticatableContract $backed,
+    ) {
     }
 }
 
 final class CacheTest
 {
-    public function __construct(#[Cache('foo')] CacheRepository $foo, #[Cache('bar')] CacheRepository $bar)
-    {
+    public function __construct(
+        #[Cache('foo')] CacheRepository $foo,
+        #[Cache('bar')] CacheRepository $bar,
+        #[Cache(CacheStoreUnitEnum::unit)] CacheRepository $unit,
+        #[Cache(CacheStoreBackedEnum::Backed)] CacheRepository $backed,
+    ) {
     }
 }
 
@@ -521,8 +565,12 @@ final class DatabaseTest
 
 final class GuardTest
 {
-    public function __construct(#[Auth('foo')] GuardContract $foo, #[Auth('bar')] GuardContract $bar)
-    {
+    public function __construct(
+        #[Auth('foo')] GuardContract $foo,
+        #[Auth('bar')] GuardContract $bar,
+        #[Auth(AuthGuardUnitEnum::unit)] GuardContract $unit,
+        #[Auth(AuthGuardBackedEnum::Backed)] GuardContract $backed,
+    ) {
     }
 }
 
