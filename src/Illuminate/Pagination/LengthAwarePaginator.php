@@ -108,7 +108,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     /**
      * Get the paginator links as a collection (for JSON responses).
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, array{url: string|null, label: string, active: bool, page?: int|null}>
      */
     public function linkCollection()
     {
