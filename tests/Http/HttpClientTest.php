@@ -362,6 +362,18 @@ class HttpClientTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $response['result']);
     }
 
+    public function testJsonDefaultIsRespectedWhenBodyIsEmpty()
+    {
+        $this->factory->fake([
+            '*' => Factory::response('', 200),
+        ]);
+
+        $response = $this->factory->get('http://foo.com/api');
+
+        $this->assertSame([], $response->json(default: []));
+        $this->assertSame('fallback', $response->json(default: 'fallback'));
+    }
+
     public function testResponseObjectAsArray()
     {
         $this->factory->fake([

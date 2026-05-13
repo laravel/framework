@@ -110,7 +110,7 @@ class Response implements ArrayAccess, Stringable
         }
 
         if (is_null($key)) {
-            return $this->decoded;
+            return $this->decoded ?? $default;
         }
 
         return data_get($this->decoded, $key, $default);
