@@ -28,18 +28,6 @@ jobs:
           tools: composer:v2
           coverage: none
 
-      - name: Remove Composer `github-oauth` credentials (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          rm -f ~/.composer/auth.json
-          rm -f ~/.config/composer/auth.json
-
-      - name: Remove Composer `github-oauth` credentials (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Remove-Item -Force -ErrorAction SilentlyContinue "$env:APPDATA\Composer\auth.json"
-
       - name: Set Framework version
         run: composer config version "11.x-dev"
 
@@ -74,18 +62,6 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
-
-      - name: Remove Composer `github-oauth` credentials (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          rm -f ~/.composer/auth.json
-          rm -f ~/.config/composer/auth.json
-
-      - name: Remove Composer `github-oauth` credentials (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Remove-Item -Force -ErrorAction SilentlyContinue "$env:APPDATA\Composer\auth.json"
 
       - name: Set Framework version
         run: composer config version "11.x-dev"
@@ -135,18 +111,6 @@ jobs:
           tools: composer:v2
           coverage: none
 
-      - name: Remove Composer `github-oauth` credentials (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          rm -f ~/.composer/auth.json
-          rm -f ~/.config/composer/auth.json
-
-      - name: Remove Composer `github-oauth` credentials (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Remove-Item -Force -ErrorAction SilentlyContinue "$env:APPDATA\Composer\auth.json"
-
       - name: Set Framework version
         run: composer config version "11.x-dev"
 
@@ -184,18 +148,6 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
-
-      - name: Remove Composer `github-oauth` credentials (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          rm -f ~/.composer/auth.json
-          rm -f ~/.config/composer/auth.json
-
-      - name: Remove Composer `github-oauth` credentials (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Remove-Item -Force -ErrorAction SilentlyContinue "$env:APPDATA\Composer\auth.json"
 
       - name: Set Framework version
         run: composer config version "11.x-dev"
@@ -246,18 +198,6 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
-
-      - name: Remove Composer `github-oauth` credentials (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          rm -f ~/.composer/auth.json
-          rm -f ~/.config/composer/auth.json
-
-      - name: Remove Composer `github-oauth` credentials (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Remove-Item -Force -ErrorAction SilentlyContinue "$env:APPDATA\Composer\auth.json"
 
       - name: Set Framework version
         run: composer config version "11.x-dev"
