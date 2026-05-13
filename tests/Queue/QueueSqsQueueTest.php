@@ -9,6 +9,8 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Queue\QueueRoutes;
 use Illuminate\Queue\SqsQueue;
@@ -799,6 +801,200 @@ class QueueSqsQueueTest extends TestCase
         $overflowStorage = [
             'enabled' => true,
             'store' => 'database',
+            'always' => false,
+            'delete_after_processing' => true,
+        ];
+
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue'])
+            ->setConstructorArgs([$this->sqs, $this->queueName, $this->account, '', false, $overflowStorage])
+            ->getMock();
+        $queue->setContainer(m::mock(Container::class));
+        $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
+
+        $this->sqs->shouldReceive('receiveMessage')->once()->andReturn($this->mockedReceiveMessageResponseModel);
+
+        $job = $queue->pop($this->queueName);
+
+        $this->assertInstanceOf(SqsJob::class, $job);
+    }
+
+    public function testPushRawStoresPayloadToFilesystemWhenExceedingThreshold()
+    {
+        $uuid = 'test-uuid-1234';
+        $largePayload = json_encode(['uuid' => $uuid, 'job' => 'App\\Jobs\\TestJob', 'data' => str_repeat('x', SqsQueue::MAX_SQS_PAYLOAD_SIZE)]);
+        $expectedPath = 'laravel/sqs-payloads/'.$uuid.'.json';
+        $expectedPointer = json_encode(['@pointer' => $expectedPath]);
+
+        $disk = m::mock(Filesystem::class);
+        $disk->shouldReceive('put')->once()->with($expectedPath, $largePayload);
+
+        $filesystem = m::mock(FilesystemFactory::class);
+        $filesystem->shouldReceive('disk')->with('s3')->andReturn($disk);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('filesystem')->andReturn($filesystem);
+
+        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix, '', false, [
+            'enabled' => true,
+            'driver' => 'filesystem',
+            'disk' => 's3',
+            'always' => false,
+            'delete_after_processing' => true,
+        ]);
+        $queue->setContainer($container);
+
+        $this->sqs->shouldReceive('sendMessage')->once()->withArgs(function ($args) use ($expectedPointer) {
+            return $args['MessageBody'] === $expectedPointer;
+        })->andReturn($this->mockedSendMessageResponseModel);
+
+        $queue->pushRaw($largePayload, $this->queueName);
+    }
+
+    public function testPushRawAlwaysStoresToFilesystemWhenAlwaysIsTrue()
+    {
+        $uuid = 'test-uuid-always';
+        $smallPayload = json_encode(['uuid' => $uuid, 'job' => 'App\\Jobs\\TestJob', 'data' => 'small']);
+        $expectedPath = 'laravel/sqs-payloads/'.$uuid.'.json';
+        $expectedPointer = json_encode(['@pointer' => $expectedPath]);
+
+        $disk = m::mock(Filesystem::class);
+        $disk->shouldReceive('put')->once()->with($expectedPath, $smallPayload);
+
+        $filesystem = m::mock(FilesystemFactory::class);
+        $filesystem->shouldReceive('disk')->with('s3')->andReturn($disk);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('filesystem')->andReturn($filesystem);
+
+        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix, '', false, [
+            'enabled' => true,
+            'driver' => 'filesystem',
+            'disk' => 's3',
+            'always' => true,
+            'delete_after_processing' => true,
+        ]);
+        $queue->setContainer($container);
+
+        $this->sqs->shouldReceive('sendMessage')->once()->withArgs(function ($args) use ($expectedPointer) {
+            return $args['MessageBody'] === $expectedPointer;
+        })->andReturn($this->mockedSendMessageResponseModel);
+
+        $queue->pushRaw($smallPayload, $this->queueName);
+    }
+
+    public function testPushRawHonorsCustomFilesystemPrefix()
+    {
+        $uuid = 'test-uuid-prefix';
+        $smallPayload = json_encode(['uuid' => $uuid, 'job' => 'App\\Jobs\\TestJob', 'data' => 'small']);
+        $expectedPath = 'custom/path/'.$uuid.'.json';
+        $expectedPointer = json_encode(['@pointer' => $expectedPath]);
+
+        $disk = m::mock(Filesystem::class);
+        $disk->shouldReceive('put')->once()->with($expectedPath, $smallPayload);
+
+        $filesystem = m::mock(FilesystemFactory::class);
+        $filesystem->shouldReceive('disk')->with('s3')->andReturn($disk);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('filesystem')->andReturn($filesystem);
+
+        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix, '', false, [
+            'enabled' => true,
+            'driver' => 'filesystem',
+            'disk' => 's3',
+            'prefix' => 'custom/path',
+            'always' => true,
+            'delete_after_processing' => true,
+        ]);
+        $queue->setContainer($container);
+
+        $this->sqs->shouldReceive('sendMessage')->once()->withArgs(function ($args) use ($expectedPointer) {
+            return $args['MessageBody'] === $expectedPointer;
+        })->andReturn($this->mockedSendMessageResponseModel);
+
+        $queue->pushRaw($smallPayload, $this->queueName);
+    }
+
+    public function testPushRawDoesNotStoreToFilesystemWhenBelowThreshold()
+    {
+        $smallPayload = json_encode(['uuid' => 'test-uuid', 'job' => 'App\\Jobs\\TestJob', 'data' => 'small']);
+
+        $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix, '', false, [
+            'enabled' => true,
+            'driver' => 'filesystem',
+            'disk' => 's3',
+            'always' => false,
+            'delete_after_processing' => true,
+        ]);
+        $queue->setContainer(m::mock(Container::class));
+
+        $this->sqs->shouldReceive('sendMessage')->once()->withArgs(function ($args) use ($smallPayload) {
+            return $args['MessageBody'] === $smallPayload;
+        })->andReturn($this->mockedSendMessageResponseModel);
+
+        $queue->pushRaw($smallPayload, $this->queueName);
+    }
+
+    public function testClearDeletesOverflowDirectoryForFilesystemDriver()
+    {
+        $disk = m::mock(Filesystem::class);
+        $disk->shouldReceive('deleteDirectory')->once()->with('laravel/sqs-payloads');
+
+        $filesystem = m::mock(FilesystemFactory::class);
+        $filesystem->shouldReceive('disk')->with('s3')->andReturn($disk);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('filesystem')->andReturn($filesystem);
+
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue', 'size'])
+            ->setConstructorArgs([$this->sqs, $this->queueName, $this->prefix, '', false, [
+                'enabled' => true,
+                'driver' => 'filesystem',
+                'disk' => 's3',
+                'prefix' => 'laravel/sqs-payloads',
+                'always' => false,
+                'delete_after_processing' => true,
+            ]])
+            ->getMock();
+        $queue->setContainer($container);
+        $queue->expects($this->once())->method('getQueue')->willReturn($this->queueUrl);
+        $queue->expects($this->once())->method('size')->willReturn(5);
+
+        $this->sqs->shouldReceive('purgeQueue')->once();
+
+        $queue->clear($this->queueName);
+    }
+
+    public function testClearDoesNotDeleteDirectoryForFilesystemWhenCleanupDisabled()
+    {
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue', 'size'])
+            ->setConstructorArgs([$this->sqs, $this->queueName, $this->prefix, '', false, [
+                'enabled' => true,
+                'driver' => 'filesystem',
+                'disk' => 's3',
+                'prefix' => 'laravel/sqs-payloads',
+                'always' => false,
+                'delete_after_processing' => false,
+            ]])
+            ->getMock();
+        $queue->setContainer(m::mock(Container::class));
+        $queue->expects($this->once())->method('getQueue')->willReturn($this->queueUrl);
+        $queue->expects($this->once())->method('size')->willReturn(5);
+
+        $this->sqs->shouldReceive('purgeQueue')->once();
+
+        $queue->clear($this->queueName);
+    }
+
+    public function testPopPassesFilesystemOverflowStorageOptionsToJob()
+    {
+        $overflowStorage = [
+            'enabled' => true,
+            'driver' => 'filesystem',
+            'disk' => 's3',
             'always' => false,
             'delete_after_processing' => true,
         ];
