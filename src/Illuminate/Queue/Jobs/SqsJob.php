@@ -89,7 +89,15 @@ class SqsJob extends Job implements JobContract
 
         if (Arr::get($this->overflowStorage, 'delete_after_processing') &&
             $pointer = $this->overflowPointer()) {
-            $this->overflowStore()->forget($pointer);
+            if ($this->overflowDriverIsFilesystem()) {
+                $this->container->make('filesystem')->disk(
+                    Arr::get($this->overflowStorage, 'disk')
+                )->delete($pointer);
+            } else {
+                $this->container->make('cache')->store(
+                    Arr::get($this->overflowStorage, 'store')
+                )->forget($pointer);
+            }
         }
     }
 
@@ -125,7 +133,9 @@ class SqsJob extends Job implements JobContract
         }
 
         if ($pointer = $this->overflowPointer()) {
-            return $this->cachedRawBody = $this->overflowStore()->get($pointer);
+            return $this->cachedRawBody = $this->overflowDriverIsFilesystem()
+                ? $this->container->make('filesystem')->disk(Arr::get($this->overflowStorage, 'disk'))->get($pointer)
+                : $this->container->make('cache')->store(Arr::get($this->overflowStorage, 'store'))->get($pointer);
         }
 
         return $this->job['Body'];
@@ -158,15 +168,13 @@ class SqsJob extends Job implements JobContract
     }
 
     /**
-     * Resolve the configured cache store for extended storage.
+     * Determine if the overflow driver is the filesystem driver.
      *
-     * @return \Illuminate\Contracts\Cache\Repository
+     * @return bool
      */
-    protected function overflowStore()
+    protected function overflowDriverIsFilesystem()
     {
-        return $this->container->make('cache')->store(
-            Arr::get($this->overflowStorage, 'store')
-        );
+        return Arr::get($this->overflowStorage, 'driver', 'cache') === 'filesystem';
     }
 
     /**
