@@ -64,7 +64,10 @@ return [
             'after_commit' => false,
             'overflow' => [
                 'enabled' => env('SQS_OVERFLOW_ENABLED', false),
+                'driver' => env('SQS_OVERFLOW_DRIVER', 'cache'),
                 'store' => env('SQS_OVERFLOW_STORE'),
+                'disk' => env('SQS_OVERFLOW_DISK'),
+                'prefix' => env('SQS_OVERFLOW_PREFIX'),
                 'always' => false,
                 'delete_after_processing' => true,
             ],
