@@ -3235,12 +3235,50 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => ['array', 'value']], ['x' => 'starts_with:arr']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'starts_with:1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'starts_with:2']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateEndsWithDoesNotThrowOnNonStringValue()
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => ['array', 'value']], ['x' => 'ends_with:ue']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'ends_with:3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'ends_with:2']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateDoesntStartWithDoesNotThrowOnNonStringValue()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => ['array', 'value']], ['x' => 'doesnt_start_with:arr']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'doesnt_start_with:0']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'doesnt_start_with:1']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateDoesntEndWithDoesNotThrowOnNonStringValue()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => ['array', 'value']], ['x' => 'doesnt_end_with:ue']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'doesnt_end_with:0']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'doesnt_end_with:3']);
         $this->assertFalse($v->passes());
     }
 
