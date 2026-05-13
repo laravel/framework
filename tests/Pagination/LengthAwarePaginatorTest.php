@@ -58,6 +58,21 @@ class LengthAwarePaginatorTest extends TestCase
         $this->assertEmpty($paginator->items());
     }
 
+    public function testLengthAwarePaginatorRetainsRequestedPageWhenDatasetShrinks()
+    {
+        $beforeDatasetChange = new LengthAwarePaginator(['item16'], 16, 15, 2);
+
+        $this->assertSame(2, $beforeDatasetChange->currentPage());
+        $this->assertSame(2, $beforeDatasetChange->lastPage());
+        $this->assertCount(1, $beforeDatasetChange->items());
+
+        $afterDatasetChange = new LengthAwarePaginator([], 15, 15, 2);
+
+        $this->assertSame(2, $afterDatasetChange->currentPage());
+        $this->assertSame(1, $afterDatasetChange->lastPage());
+        $this->assertEmpty($afterDatasetChange->items());
+    }
+
     public function testLengthAwarePaginatorOnFirstAndLastPage()
     {
         $paginator = new LengthAwarePaginator(['1', '2', '3', '4'], 4, 2, 2);
