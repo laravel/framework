@@ -36,9 +36,6 @@ jobs:
           tools: composer:v2
           coverage: none
 
-      - name: Set Framework version
-        run: composer config version "13.x-dev" --quiet
-
       - name: Install dependencies
         uses: nick-fields/retry@v4
         with:
@@ -80,9 +77,6 @@ jobs:
           tools: composer:v2
           coverage: none
 
-      - name: Set Framework version
-        run: composer config version "13.x-dev" --quiet
-
       - name: Install dependencies
         uses: nick-fields/retry@v4
         with:
@@ -122,9 +116,6 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
-
-      - name: Set Framework version
-        run: composer config version "13.x-dev" --quiet
 
       - name: Install dependencies
         uses: nick-fields/retry@v4
@@ -166,9 +157,6 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, :php-psr
           tools: composer:v2
           coverage: none
-
-      - name: Set Framework version
-        run: composer config version "13.x-dev" --quiet
 
       - name: Install dependencies
         uses: nick-fields/retry@v4
@@ -213,9 +201,6 @@ jobs:
           tools: composer:v2
           coverage: none
 
-      - name: Set Framework version
-        run: composer config version "13.x-dev" --quiet
-
       - name: Install dependencies
         uses: nick-fields/retry@v4
         with:
@@ -259,9 +244,6 @@ jobs:
           tools: composer:v2
           coverage: none
 
-      - name: Set Framework version
-        run: composer config version "13.x-dev" --quiet
-
       - name: Install dependencies
         uses: nick-fields/retry@v4
         with:
@@ -302,9 +284,6 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
           tools: composer:v2
           coverage: none
-
-      - name: Set Framework version
-        run: composer config version "13.x-dev" --quiet
 
       - name: Install dependencies
         uses: nick-fields/retry@v4
@@ -348,9 +327,6 @@ jobs:
           tools: composer:v2
           coverage: none
 
-      - name: Set Framework version
-        run: composer config version "13.x-dev" --quiet
-
       - name: Install dependencies
         uses: nick-fields/retry@v4
         with:
@@ -383,9 +359,6 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
           tools: composer:v2
           coverage: none
-
-      - name: Set Framework version
-        run: composer config version "13.x-dev" --quiet
 
       - name: Install dependencies
         uses: nick-fields/retry@v4
