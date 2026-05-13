@@ -46,7 +46,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          Remove-Item -Force -ErrorAction SilentlyContinue "$APPDATA\Composer\auth.json"
+          Remove-Item -Force -ErrorAction SilentlyContinue "%APPDATA%\Composer\auth.json"
 
       - name: Set Framework version
         run: composer config version "13.x-dev"
@@ -102,7 +102,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          Remove-Item -Force -ErrorAction SilentlyContinue "$APPDATA\Composer\auth.json"
+          Remove-Item -Force -ErrorAction SilentlyContinue "%APPDATA%\Composer\auth.json"
 
       - name: Set Framework version
         run: composer config version "13.x-dev"
@@ -157,7 +157,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          Remove-Item -Force -ErrorAction SilentlyContinue "$APPDATA\Composer\auth.json"
+          Remove-Item -Force -ErrorAction SilentlyContinue "%APPDATA%\Composer\auth.json"
 
       - name: Set Framework version
         run: composer config version "13.x-dev"
@@ -213,7 +213,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          Remove-Item -Force -ErrorAction SilentlyContinue "$APPDATA\Composer\auth.json"
+          Remove-Item -Force -ErrorAction SilentlyContinue "%APPDATA%\Composer\auth.json"
 
       - name: Set Framework version
         run: composer config version "13.x-dev"
@@ -271,7 +271,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          Remove-Item -Force -ErrorAction SilentlyContinue "$APPDATA\Composer\auth.json"
+          Remove-Item -Force -ErrorAction SilentlyContinue "%APPDATA%\Composer\auth.json"
 
       - name: Set Framework version
         run: composer config version "13.x-dev"
@@ -329,7 +329,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          Remove-Item -Force -ErrorAction SilentlyContinue "$APPDATA\Composer\auth.json"
+          Remove-Item -Force -ErrorAction SilentlyContinue "%APPDATA%\Composer\auth.json"
 
       - name: Set Framework version
         run: composer config version "13.x-dev"
@@ -385,7 +385,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          Remove-Item -Force -ErrorAction SilentlyContinue "$APPDATA\Composer\auth.json"
+          Remove-Item -Force -ErrorAction SilentlyContinue "%APPDATA%\Composer\auth.json"
 
       - name: Set Framework version
         run: composer config version "13.x-dev"
@@ -442,7 +442,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          Remove-Item -Force -ErrorAction SilentlyContinue "$APPDATA\Composer\auth.json"
+          Remove-Item -Force -ErrorAction SilentlyContinue "%APPDATA%\Composer\auth.json"
 
       - name: Set Framework version
         run: composer config version "13.x-dev"
@@ -490,7 +490,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          Remove-Item -Force -ErrorAction SilentlyContinue "$APPDATA\Composer\auth.json"
+          Remove-Item -Force -ErrorAction SilentlyContinue "%APPDATA%\Composer\auth.json"
 
       - name: Set Framework version
         run: composer config version "13.x-dev"
