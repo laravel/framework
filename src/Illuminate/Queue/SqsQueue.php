@@ -380,7 +380,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Determine if the payload should be stored in cache.
+     * Determine if the payload should be sent to overflow storage.
      *
      * @param  string  $payload
      * @return bool
@@ -396,7 +396,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Store the payload in cache and return a pointer payload.
+     * Store the payload in overflow storage and return a pointer payload.
      *
      * @param  string  $payload
      * @return string
@@ -409,13 +409,46 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             ? $decoded->uuid
             : (string) Str::uuid();
 
-        $this->container->make('cache')->store(
-            Arr::get($this->overflowStorage, 'store')
-        )->put(
-            $path = static::EXTENDED_PAYLOAD_CACHE_PREFIX.$uuid, $payload
-        );
+        $path = $this->overflowPath($uuid);
+
+        if ($this->overflowDriverIsFilesystem()) {
+            $this->container->make('filesystem')->disk(
+                Arr::get($this->overflowStorage, 'disk')
+            )->put($path, $payload);
+        } else {
+            $this->container->make('cache')->store(
+                Arr::get($this->overflowStorage, 'store')
+            )->put($path, $payload);
+        }
 
         return json_encode(['@pointer' => $path]);
+    }
+
+    /**
+     * Determine if the overflow driver is the filesystem driver.
+     *
+     * @return bool
+     */
+    protected function overflowDriverIsFilesystem()
+    {
+        return Arr::get($this->overflowStorage, 'driver', 'cache') === 'filesystem';
+    }
+
+    /**
+     * Build the overflow storage path or cache key for the given uuid.
+     *
+     * @param  string  $uuid
+     * @return string
+     */
+    protected function overflowPath($uuid)
+    {
+        $prefix = Arr::get($this->overflowStorage, 'prefix');
+
+        if ($this->overflowDriverIsFilesystem()) {
+            return ltrim(($prefix ?: 'laravel/sqs-payloads') . '/' . $uuid . '.json', '/');
+        }
+
+        return ($prefix ? rtrim($prefix, ':') . ':' : static::EXTENDED_PAYLOAD_CACHE_PREFIX) . $uuid;
     }
 
     /**
@@ -451,6 +484,14 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             $this->sqs->purgeQueue([
                 'QueueUrl' => $this->getQueue($queue),
             ]);
+
+            if ($this->overflowDriverIsFilesystem() &&
+                Arr::get($this->overflowStorage, 'delete_after_processing') &&
+                $prefix = Arr::get($this->overflowStorage, 'prefix')) {
+                $this->container->make('filesystem')->disk(
+                    Arr::get($this->overflowStorage, 'disk')
+                )->deleteDirectory($prefix);
+            }
         });
     }
 
