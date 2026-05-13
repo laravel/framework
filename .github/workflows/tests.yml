@@ -65,6 +65,8 @@ jobs:
           REDIS_LIBS: liblz4-dev, liblzf-dev, libzstd-dev
 
       - name: Configures Composer
+         uses: laravel/.github/.github/workflows/setup-composer@main
+      - name: Configures Composer
         uses: laravel/.github/.github/workflows/setup-composer.yml@main
 
       - name: Set Framework version
@@ -127,6 +129,8 @@ jobs:
           tools: composer:v2
           coverage: none
 
+      - name: Configures Composer
+         uses: laravel/.github/.github/workflows/setup-composer@main
       - name: Configures Composer
         uses: laravel/.github/.github/workflows/setup-composer.yml@main
 
