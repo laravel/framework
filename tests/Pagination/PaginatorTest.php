@@ -35,21 +35,21 @@ class PaginatorTest extends TestCase
 
     public function testSimplePaginatorRetainsRequestedPageWhenDatasetShrinks()
     {
-         // Initial paginator state
-    $paginator = new Paginator(['item16'], 15, 2);
+        // Initial paginator state
+        $paginator = new Paginator(['item16'], 15, 2);
 
-    $this->assertSame(2, $paginator->currentPage());
-    $this->assertSame(['item16'], $paginator->items());
-    $this->assertFalse($paginator->hasMorePages());
-    $this->assertSame(15, $paginator->perPage());
+        $this->assertSame(2, $paginator->currentPage());
+        $this->assertSame(['item16'], $paginator->items());
+        $this->assertFalse($paginator->hasMorePages());
+        $this->assertSame(15, $paginator->perPage());
 
-    // Simulated "new request" with empty dataset (not mutation, just new instance)
-    $paginatorAfter = new Paginator([], 15, 2);
+        // Simulated "new request" with empty dataset (not mutation, just new instance)
+        $paginatorAfter = new Paginator([], 15, 2);
 
-    $this->assertSame(2, $paginatorAfter->currentPage());
-    $this->assertSame([], $paginatorAfter->items());
-    $this->assertFalse($paginatorAfter->hasMorePages());
-    $this->assertSame(15, $paginatorAfter->perPage());
+        $this->assertSame(2, $paginatorAfter->currentPage());
+        $this->assertSame([], $paginatorAfter->items());
+        $this->assertFalse($paginatorAfter->hasMorePages());
+        $this->assertSame(15, $paginatorAfter->perPage());
     }
 
     public function testPaginatorRemovesTrailingSlashes()
