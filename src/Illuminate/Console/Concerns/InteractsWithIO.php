@@ -464,4 +464,17 @@ trait InteractsWithIO
     {
         return $this->components;
     }
+
+    /**
+     * Get the console component factory bound to the error output.
+     *
+     * Useful when the command's primary output is being piped or redirected,
+     * and auxiliary output (progress, tasks, prompts) should go to stderr.
+     *
+     * @return \Illuminate\Console\View\Components\Factory
+     */
+    public function errorComponents(): \Illuminate\Console\View\Components\Factory
+    {
+        return $this->components->withErrorOutput();
+    }
 }

@@ -3,6 +3,7 @@
 namespace Illuminate\Console\View\Components;
 
 use InvalidArgumentException;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * @method void alert(string $string, int $verbosity = \Symfony\Component\Console\Output\OutputInterface::VERBOSITY_NORMAL)
@@ -37,6 +38,20 @@ class Factory
     public function __construct($output)
     {
         $this->output = $output;
+    }
+
+    /**
+     * Get a factory instance that writes to the error output.
+     *
+     * @return static
+     */
+    public function withErrorOutput(): static
+    {
+        $errorOutput = $this->output instanceof SymfonyStyle
+            ? $this->output->getErrorStyle()
+            : $this->output;
+
+        return new static($errorOutput);
     }
 
     /**
