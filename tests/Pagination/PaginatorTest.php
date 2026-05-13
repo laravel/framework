@@ -33,6 +33,21 @@ class PaginatorTest extends TestCase
         $this->assertEquals($pageInfo, $p->toArray());
     }
 
+    public function testSimplePaginatorRetainsRequestedPageWhenDatasetShrinks()
+    {
+        $beforeDatasetChange = new Paginator(['item16'], 15, 2);
+
+        $this->assertSame(2, $beforeDatasetChange->currentPage());
+        $this->assertSame(['item16'], $beforeDatasetChange->items());
+        $this->assertFalse($beforeDatasetChange->hasMorePages());
+
+        $afterDatasetChange = new Paginator([], 15, 2);
+
+        $this->assertSame(2, $afterDatasetChange->currentPage());
+        $this->assertSame([], $afterDatasetChange->items());
+        $this->assertFalse($afterDatasetChange->hasMorePages());
+    }
+
     public function testPaginatorRemovesTrailingSlashes()
     {
         $p = new Paginator(['item1', 'item2', 'item3'], 2, 2, ['path' => 'http://website.com/test/']);
