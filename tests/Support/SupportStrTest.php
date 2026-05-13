@@ -822,6 +822,10 @@ class SupportStrTest extends TestCase
         $this->assertSame('这是一...', Str::limit($nonAsciiString, 6, preserveWords: true));
         $this->assertSame('这是一', Str::limit($nonAsciiString, 6, ''));
         $this->assertSame('这是一', Str::limit($nonAsciiString, 6, '', true));
+
+        // Test with Unicode whitespace (non-breaking space) when preserveWords is true
+        $unicodeWhitespaceString = 'Laravel PHP Framework'; // Non-breaking spaces (U+00A0)
+        $this->assertSame('Laravel...', Str::limit($unicodeWhitespaceString, 15, '...', true));
     }
 
     public function testLength()
