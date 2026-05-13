@@ -30,7 +30,7 @@ jobs:
           coverage: none
 
       - name: Configure Composer
-          uses: laravel/.github/.github/workflows/setup-composer.yml@main
+        uses: laravel/.github/.github/workflows/setup-composer.yml@main
 
       - name: Install dependencies
         uses: nick-fields/retry@v4
