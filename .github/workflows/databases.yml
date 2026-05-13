@@ -35,9 +35,11 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
-
       - name: Configures Composer
         uses: laravel/.github/.github/workflows/setup-composer.yml@main
+
+      - name: Set Framework version
+        run: composer config version "13.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v4
@@ -79,9 +81,11 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
-
       - name: Configures Composer
         uses: laravel/.github/.github/workflows/setup-composer.yml@main
+
+      - name: Set Framework version
+        run: composer config version "13.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v4
@@ -122,9 +126,11 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
-
       - name: Configures Composer
         uses: laravel/.github/.github/workflows/setup-composer.yml@main
+
+      - name: Set Framework version
+        run: composer config version "13.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v4
@@ -166,9 +172,11 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, :php-psr
           tools: composer:v2
           coverage: none
-
       - name: Configures Composer
         uses: laravel/.github/.github/workflows/setup-composer.yml@main
+
+      - name: Set Framework version
+        run: composer config version "13.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v4
@@ -212,9 +220,11 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, :php-psr
           tools: composer:v2
           coverage: none
-
       - name: Configures Composer
         uses: laravel/.github/.github/workflows/setup-composer.yml@main
+
+      - name: Set Framework version
+        run: composer config version "13.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v4
@@ -258,9 +268,11 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, :php-psr
           tools: composer:v2
           coverage: none
-
       - name: Configures Composer
         uses: laravel/.github/.github/workflows/setup-composer.yml@main
+
+      - name: Set Framework version
+        run: composer config version "13.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v4
@@ -302,9 +314,11 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
           tools: composer:v2
           coverage: none
-
       - name: Configures Composer
         uses: laravel/.github/.github/workflows/setup-composer.yml@main
+
+      - name: Set Framework version
+        run: composer config version "13.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v4
@@ -347,9 +361,11 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
           tools: composer:v2
           coverage: none
-
       - name: Configures Composer
         uses: laravel/.github/.github/workflows/setup-composer.yml@main
+
+      - name: Set Framework version
+        run: composer config version "13.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v4
@@ -383,9 +399,11 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
           tools: composer:v2
           coverage: none
-
       - name: Configures Composer
         uses: laravel/.github/.github/workflows/setup-composer.yml@main
+
+      - name: Set Framework version
+        run: composer config version "13.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v4
