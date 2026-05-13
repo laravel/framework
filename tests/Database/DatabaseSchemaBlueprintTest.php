@@ -511,6 +511,32 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $getSql('MySql'));
     }
 
+    public function testGenerateUuidRelationshipColumnAcceptsModelInstance()
+    {
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'posts', function ($table) {
+                $table->foreignUuidFor(new Fixtures\Models\EloquentModelUsingUuid);
+            })->toSql();
+        };
+
+        $this->assertEquals([
+            'alter table `posts` add `model_using_uuid_id` char(36) not null',
+        ], $getSql('MySql'));
+    }
+
+    public function testGenerateUuidRelationshipColumnWithCustomColumnName()
+    {
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'posts', function ($table) {
+                $table->foreignUuidFor(Fixtures\Models\EloquentModelUsingUuid::class, 'uuid_col');
+            })->toSql();
+        };
+
+        $this->assertEquals([
+            'alter table `posts` add `uuid_col` char(36) not null',
+        ], $getSql('MySql'));
+    }
+
     public function testGenerateRelationshipForModelWithNonStandardPrimaryKeyName()
     {
         $getSql = function ($grammar) {
