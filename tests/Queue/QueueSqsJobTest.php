@@ -6,6 +6,8 @@ use Aws\Sqs\SqsClient;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Queue\SqsQueue;
 use Mockery as m;
@@ -228,6 +230,115 @@ class QueueSqsJobTest extends TestCase
             'enabled' => true,
             'store' => 'database',
             'delete_after_processing' => true,
+        ]);
+
+        $job->delete();
+    }
+
+    public function testGetRawBodyResolvesPointerFromFilesystem()
+    {
+        $fullPayload = json_encode(['job' => 'foo', 'data' => ['key' => 'value']]);
+        $pointerPath = 'laravel/sqs-payloads/some-uuid.json';
+        $pointerBody = json_encode(['@pointer' => $pointerPath]);
+
+        $disk = m::mock(Filesystem::class);
+        $disk->shouldReceive('get')->once()->with($pointerPath)->andReturn($fullPayload);
+
+        $filesystem = m::mock(FilesystemFactory::class);
+        $filesystem->shouldReceive('disk')->with('s3')->andReturn($disk);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('filesystem')->andReturn($filesystem);
+
+        $jobData = $this->mockedJobData;
+        $jobData['Body'] = $pointerBody;
+
+        $job = new SqsJob($container, $this->mockedSqsClient, $jobData, 'connection-name', $this->queueUrl, [
+            'enabled' => true,
+            'driver' => 'filesystem',
+            'disk' => 's3',
+            'delete_after_processing' => true,
+        ]);
+
+        $this->assertEquals($fullPayload, $job->getRawBody());
+    }
+
+    public function testGetRawBodyCachesFilesystemResult()
+    {
+        $fullPayload = json_encode(['job' => 'foo', 'data' => ['key' => 'value']]);
+        $pointerPath = 'laravel/sqs-payloads/some-uuid.json';
+        $pointerBody = json_encode(['@pointer' => $pointerPath]);
+
+        $disk = m::mock(Filesystem::class);
+        $disk->shouldReceive('get')->once()->with($pointerPath)->andReturn($fullPayload);
+
+        $filesystem = m::mock(FilesystemFactory::class);
+        $filesystem->shouldReceive('disk')->with('s3')->andReturn($disk);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('filesystem')->andReturn($filesystem);
+
+        $jobData = $this->mockedJobData;
+        $jobData['Body'] = $pointerBody;
+
+        $job = new SqsJob($container, $this->mockedSqsClient, $jobData, 'connection-name', $this->queueUrl, [
+            'enabled' => true,
+            'driver' => 'filesystem',
+            'disk' => 's3',
+            'delete_after_processing' => true,
+        ]);
+
+        // Call twice; disk should only be hit once.
+        $job->getRawBody();
+        $this->assertEquals($fullPayload, $job->getRawBody());
+    }
+
+    public function testDeleteCleansUpFilesystemFileWhenCleanupEnabled()
+    {
+        $pointerPath = 'laravel/sqs-payloads/some-uuid.json';
+        $pointerBody = json_encode(['@pointer' => $pointerPath]);
+
+        $disk = m::mock(Filesystem::class);
+        $disk->shouldReceive('delete')->once()->with($pointerPath);
+
+        $filesystem = m::mock(FilesystemFactory::class);
+        $filesystem->shouldReceive('disk')->with('s3')->andReturn($disk);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('filesystem')->andReturn($filesystem);
+
+        $jobData = $this->mockedJobData;
+        $jobData['Body'] = $pointerBody;
+
+        $sqsClient = m::mock(SqsClient::class)->makePartial();
+        $sqsClient->shouldReceive('deleteMessage')->once();
+
+        $job = new SqsJob($container, $sqsClient, $jobData, 'connection-name', $this->queueUrl, [
+            'enabled' => true,
+            'driver' => 'filesystem',
+            'disk' => 's3',
+            'delete_after_processing' => true,
+        ]);
+
+        $job->delete();
+    }
+
+    public function testDeleteDoesNotCleanUpFilesystemWhenCleanupDisabled()
+    {
+        $pointerPath = 'laravel/sqs-payloads/some-uuid.json';
+        $pointerBody = json_encode(['@pointer' => $pointerPath]);
+
+        $jobData = $this->mockedJobData;
+        $jobData['Body'] = $pointerBody;
+
+        $sqsClient = m::mock(SqsClient::class)->makePartial();
+        $sqsClient->shouldReceive('deleteMessage')->once();
+
+        $job = new SqsJob($this->mockedContainer, $sqsClient, $jobData, 'connection-name', $this->queueUrl, [
+            'enabled' => true,
+            'driver' => 'filesystem',
+            'disk' => 's3',
+            'delete_after_processing' => false,
         ]);
 
         $job->delete();
