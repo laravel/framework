@@ -1931,7 +1931,7 @@ trait HasAttributes
     }
 
     /**
-     * Merge the a cast class and attribute cast attribute back into the model.
+     * Merge the cast class and attribute cast attribute back into the model.
      *
      * @return void
      */
