@@ -445,10 +445,10 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
         $prefix = Arr::get($this->overflowStorage, 'prefix');
 
         if ($this->overflowDriverIsFilesystem()) {
-            return ltrim(($prefix ?: 'laravel/sqs-payloads') . '/' . $uuid . '.json', '/');
+            return ltrim(($prefix ?: 'laravel/sqs-payloads').'/'.$uuid.'.json', '/');
         }
 
-        return ($prefix ? rtrim($prefix, ':') . ':' : static::EXTENDED_PAYLOAD_CACHE_PREFIX) . $uuid;
+        return ($prefix ? rtrim($prefix, ':').':' : static::EXTENDED_PAYLOAD_CACHE_PREFIX).$uuid;
     }
 
     /**
