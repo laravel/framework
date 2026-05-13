@@ -26,9 +26,9 @@ use JsonSerializable;
 class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, JsonSerializable, PaginatorContract
 {
     /**
-     * Determine if there are more items in the data source.
+     * Indicates if there are more items in the data source.
      *
-     * @return bool
+     * @var bool
      */
     protected $hasMore;
 
