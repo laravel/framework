@@ -32,13 +32,13 @@ jobs:
           tools: composer:v2
           coverage: none
 
-    - name: Remove Composer `github-oauth` credentials
-      uses: mdmush/remove-files@v1.0.1
-      with:
-        file-paths: |
-          ~/.composer/auth.json
-          ~/.config/composer/auth.json
-          "$APPDATA/Composer/auth.json"
+      - name: Remove Composer `github-oauth` credentials
+        uses: mdmush/remove-files@v1.0.1
+        with:
+          file-paths: |
+            ~/.composer/auth.json
+            ~/.config/composer/auth.json
+            "$APPDATA/Composer/auth.json"
 
       - name: Set Framework version
         run: composer config version "13.x-dev"
@@ -83,13 +83,13 @@ jobs:
           tools: composer:v2
           coverage: none
 
-    - name: Remove Composer `github-oauth` credentials
-      uses: mdmush/remove-files@v1.0.1
-      with:
-        file-paths: |
-          ~/.composer/auth.json
-          ~/.config/composer/auth.json
-          "$APPDATA/Composer/auth.json"
+      - name: Remove Composer `github-oauth` credentials
+        uses: mdmush/remove-files@v1.0.1
+        with:
+          file-paths: |
+            ~/.composer/auth.json
+            ~/.config/composer/auth.json
+            "$APPDATA/Composer/auth.json"
 
       - name: Set Framework version
         run: composer config version "13.x-dev"
