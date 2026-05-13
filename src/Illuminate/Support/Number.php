@@ -437,6 +437,17 @@ class Number
     }
 
     /**
+     * Flush the state of the Number class.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$locale = 'en';
+        static::$currency = 'USD';
+    }
+
+    /**
      * Ensure the "intl" PHP extension is installed.
      *
      * @return void

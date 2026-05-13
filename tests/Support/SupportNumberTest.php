@@ -18,6 +18,20 @@ class SupportNumberTest extends TestCase
         $this->assertSame('USD', Number::defaultCurrency());
     }
 
+    public function testFlushState()
+    {
+        Number::useLocale('de');
+        Number::useCurrency('EUR');
+
+        $this->assertSame('de', Number::defaultLocale());
+        $this->assertSame('EUR', Number::defaultCurrency());
+
+        Number::flushState();
+
+        $this->assertSame('en', Number::defaultLocale());
+        $this->assertSame('USD', Number::defaultCurrency());
+    }
+
     #[RequiresPhpExtension('intl')]
     public function testFormat()
     {
