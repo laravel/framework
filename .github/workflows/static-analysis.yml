@@ -28,6 +28,7 @@ jobs:
           php-version: 8.3
           tools: composer:v2
           coverage: none
+
       - name: Configures Composer
         uses: laravel/.github/.github/workflows/setup-composer.yml@main
 

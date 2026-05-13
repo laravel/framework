@@ -35,6 +35,7 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
+
       - name: Configures Composer
         uses: laravel/.github/.github/workflows/setup-composer.yml@main
 
@@ -81,6 +82,7 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
+
       - name: Configures Composer
         uses: laravel/.github/.github/workflows/setup-composer.yml@main
 
@@ -126,6 +128,7 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
+
       - name: Configures Composer
         uses: laravel/.github/.github/workflows/setup-composer.yml@main
 
@@ -172,6 +175,7 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, :php-psr
           tools: composer:v2
           coverage: none
+
       - name: Configures Composer
         uses: laravel/.github/.github/workflows/setup-composer.yml@main
 
@@ -220,6 +224,7 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, :php-psr
           tools: composer:v2
           coverage: none
+
       - name: Configures Composer
         uses: laravel/.github/.github/workflows/setup-composer.yml@main
 
@@ -268,6 +273,7 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, :php-psr
           tools: composer:v2
           coverage: none
+
       - name: Configures Composer
         uses: laravel/.github/.github/workflows/setup-composer.yml@main
 
@@ -314,6 +320,7 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
           tools: composer:v2
           coverage: none
+
       - name: Configures Composer
         uses: laravel/.github/.github/workflows/setup-composer.yml@main
 
@@ -361,6 +368,7 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
           tools: composer:v2
           coverage: none
+
       - name: Configures Composer
         uses: laravel/.github/.github/workflows/setup-composer.yml@main
 
@@ -399,6 +407,7 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
           tools: composer:v2
           coverage: none
+
       - name: Configures Composer
         uses: laravel/.github/.github/workflows/setup-composer.yml@main
 
