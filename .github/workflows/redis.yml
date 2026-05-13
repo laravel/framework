@@ -38,8 +38,6 @@ jobs:
           coverage: none
       - name: Configures Composer
          uses: laravel/.github/.github/workflows/setup-composer@main
-      - name: Configures Composer
-        uses: laravel/.github/.github/workflows/setup-composer.yml@main
 
       - name: Set Framework version
         run: composer config version "13.x-dev"
@@ -89,8 +87,6 @@ jobs:
 
       - name: Configures Composer
          uses: laravel/.github/.github/workflows/setup-composer@main
-      - name: Configures Composer
-        uses: laravel/.github/.github/workflows/setup-composer.yml@main
 
       - name: Set Framework version
         run: composer config version "13.x-dev"
