@@ -11,6 +11,7 @@ use Illuminate\Support\Collection as BaseCollection;
  * @method static \Illuminate\Database\Eloquent\Builder<static> withoutTrashed()
  * @method static static restoreOrCreate(array<string, mixed> $attributes = [], array<string, mixed> $values = [])
  * @method static static createOrRestore(array<string, mixed> $attributes = [], array<string, mixed> $values = [])
+ * @method static \Illuminate\Pagination\LengthAwarePaginator paginateOrFallback(int|null|\Closure $perPage = null, array|string $columns = ['*'], string $pageName = 'page', int|null $page = null, \Closure|int|null $total = null)
  */
 trait SoftDeletes
 {

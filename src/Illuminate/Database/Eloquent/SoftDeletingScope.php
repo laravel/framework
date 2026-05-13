@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Illuminate\Pagination\Paginator;
+
 /**
  * @template TModel of \Illuminate\Database\Eloquent\Model
  *
@@ -14,7 +16,7 @@ class SoftDeletingScope implements Scope
      *
      * @var string[]
      */
-    protected $extensions = ['Restore', 'RestoreOrCreate', 'CreateOrRestore', 'WithTrashed', 'WithoutTrashed', 'OnlyTrashed'];
+    protected $extensions = ['Restore', 'RestoreOrCreate', 'CreateOrRestore', 'WithTrashed', 'WithoutTrashed', 'OnlyTrashed', 'PaginateOrFallback'];
 
     /**
      * Apply the scope to a given Eloquent query builder.
@@ -165,6 +167,33 @@ class SoftDeletingScope implements Scope
             );
 
             return $builder;
+        });
+    }
+
+    /**
+     * Add the paginate-or-fallback extension to the builder.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<*>  $builder
+     * @return void
+     */
+    protected function addPaginateOrFallback(Builder $builder)
+    {
+        $builder->macro('paginateOrFallback', function (Builder $builder, $perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $total = null) {
+            $page = $page ?: Paginator::resolveCurrentPage($pageName);
+
+            $total = value($total);
+
+            if ($total === null) {
+                $total = $builder->toBase()->getCountForPagination();
+            }
+
+            $perPage = value($perPage, $total) ?: $builder->getModel()->getPerPage();
+
+            $lastPage = $total > 0 ? (int) ceil($total / $perPage) : 1;
+
+            $page = max(1, min((int) $page, $lastPage));
+
+            return $builder->paginate($perPage, $columns, $pageName, $page, $total);
         });
     }
 }

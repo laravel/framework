@@ -174,6 +174,69 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertEquals(0, SoftDeletesTestUser::where('email', 'taylorotwell@gmail.com')->decrement('id'));
     }
 
+    public function testPaginateOrFallbackReturnsLastValidPageAfterSoftDeletingLastRecordOnRequestedPage()
+    {
+        $this->createPosts(16, 2);
+
+        SoftDeletesTestPost::query()->latest('id')->first()->delete();
+
+        $paginator = SoftDeletesTestPost::query()->orderBy('id')->paginateOrFallback(15, ['*'], 'page', 2);
+
+        $this->assertFalse($paginator->isEmpty());
+        $this->assertCount(15, $paginator->items());
+        $this->assertSame(15, $paginator->total());
+        $this->assertSame(1, $paginator->currentPage());
+        $this->assertSame(1, $paginator->lastPage());
+    }
+
+    public function testPaginateOrFallbackDoesNotChangePageWhenRequestedPageHasRecords()
+    {
+        $this->createPosts(30, 2);
+
+        $paginator = SoftDeletesTestPost::query()->orderBy('id')->paginateOrFallback(15, ['*'], 'page', 2);
+
+        $this->assertFalse($paginator->isEmpty());
+        $this->assertCount(15, $paginator->items());
+        $this->assertSame(30, $paginator->total());
+        $this->assertSame(2, $paginator->currentPage());
+        $this->assertSame(2, $paginator->lastPage());
+    }
+
+    public function testPaginateOrFallbackReturnsEmptyFirstPageWhenAllRecordsAreSoftDeleted()
+    {
+        $this->createPosts(5, 2);
+
+        SoftDeletesTestPost::query()->delete();
+
+        $paginator = SoftDeletesTestPost::query()->orderBy('id')->paginateOrFallback(15, ['*'], 'page', 2);
+
+        $this->assertTrue($paginator->isEmpty());
+        $this->assertCount(0, $paginator->items());
+        $this->assertSame(0, $paginator->total());
+        $this->assertSame(1, $paginator->currentPage());
+        $this->assertSame(1, $paginator->lastPage());
+    }
+
+    public function testPaginateOrFallbackRespectsWhereConstraints()
+    {
+        $this->createPosts(16, 2, 1);
+        $this->createPosts(14, 2, 0, 16);
+
+        SoftDeletesTestPost::query()->where('priority', 1)->latest('id')->first()->delete();
+
+        $paginator = SoftDeletesTestPost::query()
+            ->where('priority', 1)
+            ->orderBy('id')
+            ->paginateOrFallback(15, ['*'], 'page', 2);
+
+        $this->assertFalse($paginator->isEmpty());
+        $this->assertCount(15, $paginator->items());
+        $this->assertSame(15, $paginator->total());
+        $this->assertSame(1, $paginator->currentPage());
+        $this->assertSame(1, $paginator->lastPage());
+        $this->assertSame([1], collect($paginator->items())->pluck('priority')->unique()->all());
+    }
+
     public function testWithTrashedReturnsAllRecords()
     {
         $this->createUsers();
@@ -982,6 +1045,17 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $taylor->delete();
 
         return [$taylor, $abigail];
+    }
+
+    protected function createPosts(int $count, int $userId, int $priority = 0, int $existingCount = 0)
+    {
+        for ($i = 1; $i <= $count; $i++) {
+            SoftDeletesTestPost::create([
+                'title' => 'Post #'.($existingCount + $i),
+                'user_id' => $userId,
+                'priority' => $priority,
+            ]);
+        }
     }
 
     /**
