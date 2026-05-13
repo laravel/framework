@@ -49,6 +49,10 @@ class EventMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
+        if ($this->option('broadcast')) {
+            return $this->resolveStubPath('/stubs/broadcast-event.stub');
+        }
+
         return $this->resolveStubPath('/stubs/event.stub');
     }
 
@@ -85,6 +89,7 @@ class EventMakeCommand extends GeneratorCommand
     {
         return [
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the event already exists'],
+            ['broadcast', 'b', InputOption::VALUE_NONE, 'Create a new event class for broadcasting'],
         ];
     }
 }
