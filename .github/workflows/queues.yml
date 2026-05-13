@@ -26,7 +26,7 @@ jobs:
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "13.x-dev"
+        run: composer config version "13.x-dev" --quiet
 
       - name: Install dependencies
         uses: nick-fields/retry@v4
@@ -58,7 +58,7 @@ jobs:
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "13.x-dev"
+        run: composer config version "13.x-dev" --quiet
 
       - name: Install dependencies
         uses: nick-fields/retry@v4
@@ -110,7 +110,7 @@ jobs:
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "13.x-dev"
+        run: composer config version "13.x-dev" --quiet
 
       - name: Install dependencies
         uses: nick-fields/retry@v4
