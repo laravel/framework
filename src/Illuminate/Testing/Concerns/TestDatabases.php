@@ -2,10 +2,12 @@
 
 namespace Illuminate\Testing\Concerns;
 
+use Illuminate\Cache\RateLimiter;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Facades\Schema;
@@ -172,6 +174,15 @@ trait TestDatabases
     protected function switchToDatabase($database)
     {
         DB::purge();
+
+        // Forget cached stores and resolved singletons holding references to
+        // the previous connection, which would otherwise reconnect against
+        // the new database config and silently swap the active PDO.
+        Cache::forgetDriver();
+
+        if (app()->resolved(RateLimiter::class)) {
+            app()->forgetInstance(RateLimiter::class);
+        }
 
         $default = config('database.default');
 

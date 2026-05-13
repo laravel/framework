@@ -2,8 +2,10 @@
 
 namespace Illuminate\Tests\Testing\Concerns;
 
+use Illuminate\Cache\RateLimiter;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Concerns\TestDatabases;
 use Mockery as m;
@@ -34,6 +36,7 @@ class TestDatabasesTest extends TestCase
     public function testSwitchToDatabaseWithoutUrl()
     {
         DB::shouldReceive('purge')->once();
+        Cache::shouldReceive('forgetDriver')->once();
 
         config()->shouldReceive('get')
             ->once()
@@ -51,6 +54,7 @@ class TestDatabasesTest extends TestCase
     public function testSwitchToDatabaseWithUrl($testDatabase, $url, $testUrl)
     {
         DB::shouldReceive('purge')->once();
+        Cache::shouldReceive('forgetDriver')->once();
 
         config()->shouldReceive('get')
             ->once()
@@ -62,6 +66,53 @@ class TestDatabasesTest extends TestCase
             ->with('database.connections.mysql.url', $testUrl);
 
         $this->switchToDatabase($testDatabase);
+    }
+
+    public function testSwitchToDatabaseForgetsResolvedRateLimiterSingleton()
+    {
+        $container = Container::getInstance();
+        $container->instance(RateLimiter::class, m::mock(RateLimiter::class));
+
+        DB::shouldReceive('purge')->once();
+        Cache::shouldReceive('forgetDriver')->once();
+
+        config()->shouldReceive('get')
+            ->once()
+            ->with('database.connections.mysql.url', false)
+            ->andReturn(false);
+
+        config()->shouldReceive('set')
+            ->once()
+            ->with('database.connections.mysql.database', 'my_database_test_1');
+
+        $this->assertTrue($container->resolved(RateLimiter::class));
+
+        $this->switchToDatabase('my_database_test_1');
+
+        $this->assertFalse($container->resolved(RateLimiter::class));
+    }
+
+    public function testSwitchToDatabaseDoesNotResolveRateLimiterIfUnresolved()
+    {
+        $container = Container::getInstance();
+
+        DB::shouldReceive('purge')->once();
+        Cache::shouldReceive('forgetDriver')->once();
+
+        config()->shouldReceive('get')
+            ->once()
+            ->with('database.connections.mysql.url', false)
+            ->andReturn(false);
+
+        config()->shouldReceive('set')
+            ->once()
+            ->with('database.connections.mysql.database', 'my_database_test_1');
+
+        $this->assertFalse($container->resolved(RateLimiter::class));
+
+        $this->switchToDatabase('my_database_test_1');
+
+        $this->assertFalse($container->resolved(RateLimiter::class));
     }
 
     public function switchToDatabase($database)
@@ -99,6 +150,8 @@ class TestDatabasesTest extends TestCase
     protected function tearDown(): void
     {
         Container::setInstance(null);
+        Cache::clearResolvedInstance('cache');
+        Cache::setFacadeApplication(null);
         DB::clearResolvedInstance();
         DB::setFacadeApplication(null);
 
