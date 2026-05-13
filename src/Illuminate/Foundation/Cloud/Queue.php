@@ -34,13 +34,32 @@ class Queue implements QueueContract, ClearableQueue
     protected $processingJobStartedAt = null;
 
     /**
+     * The queue prefix.
+     *
+     * @var string
+     */
+    protected $prefix;
+
+    /**
+     * The queue suffix.
+     *
+     * @var string
+     */
+    protected $suffix;
+
+    /**
      * Create a new Queue instance.
      */
     public function __construct(
         protected QueueContract $queue,
         protected Events $events,
+        protected array $config,
     ) {
-        //
+        $this->prefix = array_key_exists('prefix', $config) && is_string($config['prefix'])
+            ? $config['prefix'].'/'
+            : '';
+
+        $this->suffix = $config['suffix'] ?? '';
     }
 
     /**
@@ -359,8 +378,8 @@ class Queue implements QueueContract, ClearableQueue
     protected function normalizeQueue($queue)
     {
         return Str::of($this->queue->getQueue($queue))
-            ->chopStart($_SERVER['SQS_PREFIX'].'/')
-            ->chopEnd($_SERVER['SQS_SUFFIX'])
+            ->chopStart($this->prefix)
+            ->chopEnd($this->suffix)
             ->toString();
     }
 
