@@ -49,8 +49,6 @@ class QueueTest extends TestCase
 
     protected function setUp(): void
     {
-        Worker::$restartable = true;
-        Worker::$pausable = true;
         $_SERVER['LARAVEL_CLOUD'] = $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES'] = '1';
 
         parent::setUp();
@@ -66,8 +64,6 @@ class QueueTest extends TestCase
         parent::tearDown();
 
         unset($_SERVER['LARAVEL_CLOUD'], $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES'], $_SERVER['LARAVEL_CLOUD_REGION']);
-        Worker::$restartable = true;
-        Worker::$pausable = true;
     }
 
     public function testItDisablesQueueRestartPollingForManagedQueues()
