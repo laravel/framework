@@ -280,7 +280,7 @@ if (! function_exists('optional')) {
 
 if (! function_exists('preg_replace_array')) {
     /**
-     * Replace a given pattern with each value in the array in sequentially.
+     * Replace a given pattern with each value in the array sequentially.
      *
      * @param  string  $pattern
      * @param  array  $replacements
