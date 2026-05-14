@@ -186,7 +186,7 @@ class Worker
     public function daemon($connectionName, $queue, WorkerOptions $options)
     {
         if ($supportsAsyncSignals = $this->supportsAsyncSignals()) {
-            $this->listenForSignals($connectionName, $queue);
+            $this->listenForSignals($connectionName, $queue, $options);
         }
 
         $lastRestart = $this->getTimestampOfLastQueueRestart();
@@ -836,30 +836,30 @@ class Worker
      * @param  string|null  $queue
      * @return void
      */
-    protected function listenForSignals($connectionName = null, $queue = null)
+    protected function listenForSignals($connectionName = null, $queue = null, $options = null)
     {
         pcntl_async_signals(true);
 
         foreach ([SIGQUIT, SIGTERM, SIGINT] as $signal) {
-            pcntl_signal($signal, function (int $signal) use ($connectionName, $queue) {
+            pcntl_signal($signal, function (int $signal) use ($connectionName, $queue, $options) {
                 $this->shouldQuit = true;
 
-                $this->events->dispatch(new WorkerInterrupted($signal, $connectionName, $queue));
+                $this->events->dispatch(new WorkerInterrupted($signal, $connectionName, $queue, $options));
 
                 $this->notifyJobOfSignal($signal);
             });
         }
 
-        pcntl_signal(SIGUSR2, function () use ($queue, $connectionName) {
+        pcntl_signal(SIGUSR2, function () use ($queue, $connectionName, $options) {
             $this->paused = true;
 
-            $this->events->dispatch(new WorkerPausing($connectionName, $queue));
+            $this->events->dispatch(new WorkerPausing($connectionName, $queue, $options));
         });
 
-        pcntl_signal(SIGCONT, function () use ($connectionName, $queue) {
+        pcntl_signal(SIGCONT, function () use ($connectionName, $queue, $options) {
             $this->paused = false;
 
-            $this->events->dispatch(new WorkerResuming($connectionName, $queue));
+            $this->events->dispatch(new WorkerResuming($connectionName, $queue, $options));
         });
     }
 
