@@ -17,6 +17,7 @@ use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Events\JobTimedOut;
 use Illuminate\Queue\Events\Looping;
+use Illuminate\Queue\Events\WorkerIdle;
 use Illuminate\Queue\Events\WorkerInterrupted;
 use Illuminate\Queue\Events\WorkerPausing;
 use Illuminate\Queue\Events\WorkerResuming;
@@ -236,6 +237,8 @@ class Worker
                     $this->sleep($options->rest);
                 }
             } else {
+                $this->events->dispatch(new WorkerIdle($connectionName, $queue));
+
                 $this->sleep($options->sleep);
             }
 
