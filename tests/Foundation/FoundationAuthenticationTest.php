@@ -21,7 +21,7 @@ class FoundationAuthenticationTest extends TestCase
     protected $app;
 
     /**
-     * @return array
+     * @var array
      */
     protected $credentials = [
         'email' => 'someone@laravel.com',
