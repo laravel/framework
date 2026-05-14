@@ -1,6 +1,16 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.58.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.59.0...12.x)
+
+## [v12.59.0](https://github.com/laravel/framework/compare/v12.58.0...v12.59.0) - 2026-05-14
+
+* [12.x] Disable pausing on managed queue workers by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/59871
+* [12.x] Fix infinite recursion when defining model scope with attribute as private by [@noefleury](https://github.com/noefleury) in https://github.com/laravel/framework/pull/59958
+* [12.x] Fix infinite recursion when middleware group referencing itself by [@noefleury](https://github.com/noefleury) in https://github.com/laravel/framework/pull/60002
+* [12.x] Backport #60000 to 12.x by [@iWader](https://github.com/iWader) in https://github.com/laravel/framework/pull/60006
+* [12.x] Narrow attachment url scheme by [@benbjurstrom](https://github.com/benbjurstrom) in https://github.com/laravel/framework/pull/60035
+* [12.x] backport #60045 to 12.x by [@levikl](https://github.com/levikl) in https://github.com/laravel/framework/pull/60052
+* [12.x] Back port cloud queues by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/60122
 
 ## [v12.58.0](https://github.com/laravel/framework/compare/v12.57.0...v12.58.0) - 2026-04-26
 
