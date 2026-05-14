@@ -237,7 +237,7 @@ class Worker
                     $this->sleep($options->rest);
                 }
             } else {
-                $this->events->dispatch(new WorkerIdle($connectionName, $queue));
+                $this->events->dispatch(new WorkerIdle($connectionName, $queue, $this->name));
 
                 $this->sleep($options->sleep);
             }
