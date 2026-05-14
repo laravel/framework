@@ -378,8 +378,8 @@ class Queue implements QueueContract, ClearableQueue
     protected function normalizeQueue($queue)
     {
         return Str::of($this->queue->getQueue($queue))
-            ->chopStart($this->prefix)
-            ->chopEnd($this->suffix)
+            ->when($this->prefix)->chopStart($this->prefix)
+            ->when($this->suffix)->chopEnd($this->suffix)
             ->toString();
     }
 
