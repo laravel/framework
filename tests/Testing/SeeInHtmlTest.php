@@ -40,7 +40,7 @@ class SeeInHtmlTest extends TestCase
     {
         $constraint = new SeeInHtml('Hello World');
 
-        $this->assertTrue($constraint->matches(["<p>Hello   World</p>"]));
+        $this->assertTrue($constraint->matches(['<p>Hello   World</p>']));
         $this->assertTrue($constraint->matches(["<p>Hello\tWorld</p>"]));
         $this->assertTrue($constraint->matches(["<p>Hello\nWorld</p>"]));
         $this->assertTrue($constraint->matches(["<p>Hello \t\n World</p>"]));
