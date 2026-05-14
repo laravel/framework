@@ -60,13 +60,15 @@ class SqsConnector implements ConnectorInterface
 
         $options = is_array($credentials) ? Arr::except($credentials, ['provider']) : [];
 
-        return match ($provider) {
+        $resolved = match ($provider) {
             'ecs' => CredentialProvider::ecsCredentials($options),
             'instance' => CredentialProvider::instanceProfile($options),
             default => throw new InvalidArgumentException(
                 "Invalid credential provider [{$provider}]."
             ),
         };
+
+        return CredentialProvider::memoize($resolved);
     }
 
     /**
