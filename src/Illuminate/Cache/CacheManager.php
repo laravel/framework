@@ -303,6 +303,22 @@ class CacheManager implements FactoryContract
     }
 
     /**
+     * Create an instance of the storage cache driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Cache\Repository
+     */
+    protected function createStorageDriver(array $config)
+    {
+        return $this->repository(new StorageStore(
+            $this->app['filesystem']->disk($config['disk'] ?? null),
+            $config['path'] ?? '',
+            $this->getPrefix($config),
+            $this->getSerializableClasses($config),
+        ), $config);
+    }
+
+    /**
      * Create an instance of the Memcached cache driver.
      *
      * @param  array  $config
