@@ -34,6 +34,7 @@ class Cloud
                 static::configureDisks($app);
                 static::configureUnpooledPostgresConnection($app);
                 static::ensureMigrationsUseUnpooledConnection($app);
+                static::configureManagedQueues($app);
             },
             HandleExceptions::class => function () use ($app) {
                 static::configureCloudLogging($app);
