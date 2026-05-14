@@ -175,13 +175,13 @@ trait TestDatabases
     {
         DB::purge();
 
-        // Forget cached stores and resolved singletons holding references to
-        // the previous connection, which would otherwise reconnect against
-        // the new database config and silently swap the active PDO.
+        // Forget cached stores and refresh resolved singletons that hold a
+        // reference to the previous connection, which would otherwise reconnect
+        // against the new database config and silently swap the active PDO.
         Cache::forgetDriver();
 
         if (app()->resolved(RateLimiter::class)) {
-            app()->forgetInstance(RateLimiter::class);
+            app(RateLimiter::class)->setCache(Cache::driver());
         }
 
         $default = config('database.default');

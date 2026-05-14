@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Testing\Concerns;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Concerns\TestDatabases;
@@ -68,13 +69,16 @@ class TestDatabasesTest extends TestCase
         $this->switchToDatabase($testDatabase);
     }
 
-    public function testSwitchToDatabaseForgetsResolvedRateLimiterSingleton()
+    public function testSwitchToDatabaseRefreshesResolvedRateLimiterCache()
     {
         $container = Container::getInstance();
-        $container->instance(RateLimiter::class, m::mock(RateLimiter::class));
+        $rateLimiter = m::mock(RateLimiter::class);
+        $rateLimiter->shouldReceive('setCache')->once();
+        $container->instance(RateLimiter::class, $rateLimiter);
 
         DB::shouldReceive('purge')->once();
         Cache::shouldReceive('forgetDriver')->once();
+        Cache::shouldReceive('driver')->once()->andReturn(m::mock(Repository::class));
 
         config()->shouldReceive('get')
             ->once()
@@ -89,7 +93,34 @@ class TestDatabasesTest extends TestCase
 
         $this->switchToDatabase('my_database_test_1');
 
-        $this->assertFalse($container->resolved(RateLimiter::class));
+        $this->assertTrue($container->resolved(RateLimiter::class));
+    }
+
+    public function testSwitchToDatabasePreservesRegisteredRateLimiters()
+    {
+        $container = Container::getInstance();
+        $container->instance(RateLimiter::class, new RateLimiter(m::mock(Repository::class)));
+
+        $limiter = app(RateLimiter::class);
+        $limiter->for('login', fn () => null);
+
+        DB::shouldReceive('purge')->once();
+        Cache::shouldReceive('forgetDriver')->once();
+        Cache::shouldReceive('driver')->once()->andReturn(m::mock(Repository::class));
+
+        config()->shouldReceive('get')
+            ->once()
+            ->with('database.connections.mysql.url', false)
+            ->andReturn(false);
+
+        config()->shouldReceive('set')
+            ->once()
+            ->with('database.connections.mysql.database', 'my_database_test_1');
+
+        $this->switchToDatabase('my_database_test_1');
+
+        $this->assertSame($limiter, app(RateLimiter::class));
+        $this->assertNotNull(app(RateLimiter::class)->limiter('login'));
     }
 
     public function testSwitchToDatabaseDoesNotResolveRateLimiterIfUnresolved()

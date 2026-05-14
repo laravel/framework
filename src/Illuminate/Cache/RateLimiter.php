@@ -39,6 +39,19 @@ class RateLimiter
     }
 
     /**
+     * Set the cache store implementation.
+     *
+     * @param  \Illuminate\Contracts\Cache\Repository  $cache
+     * @return $this
+     */
+    public function setCache(Cache $cache)
+    {
+        $this->cache = $cache;
+
+        return $this;
+    }
+
+    /**
      * Register a named rate limiter configuration.
      *
      * @param  \UnitEnum|string  $name
