@@ -1214,6 +1214,33 @@ class SupportArrTest extends TestCase
         $this->assertSame([1 => 'Second'], $array);
     }
 
+    public function testGetOrPut()
+    {
+        $array = ['name' => 'Desk', 'meta' => ['count' => null]];
+
+        $this->assertSame('Desk', Arr::getOrPut($array, 'name', 'Table'));
+        $this->assertSame('Desk', $array['name']);
+
+        $this->assertNull(Arr::getOrPut($array, 'meta.count', 100));
+        $this->assertNull($array['meta']['count']);
+
+        $this->assertSame(100, Arr::getOrPut($array, 'price', 100));
+        $this->assertSame(100, $array['price']);
+
+        $this->assertSame('dark', Arr::getOrPut($array, 'settings.theme', fn () => 'dark'));
+        $this->assertSame('dark', $array['settings']['theme']);
+
+        $called = false;
+        Arr::getOrPut($array, 'price', function () use (&$called) {
+            $called = true;
+
+            return 200;
+        });
+
+        $this->assertFalse($called);
+        $this->assertSame(100, $array['price']);
+    }
+
     public function testQuery()
     {
         $this->assertSame('', Arr::query([]));

@@ -932,6 +932,27 @@ class Arr
     }
 
     /**
+     * Get an item from an array or set the default value.
+     *
+     * @param  array  $array
+     * @param  string|int  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public static function getOrPut(&$array, $key, $default = null)
+    {
+        if (static::has($array, $key)) {
+            return static::get($array, $key);
+        }
+
+        $value = value($default);
+
+        static::set($array, $key, $value);
+
+        return $value;
+    }
+
+    /**
      * Convert the array into a query string.
      *
      * @param  array  $array
