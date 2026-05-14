@@ -451,15 +451,14 @@ class QueueWorkerTest extends TestCase
         $workerOptions->stopWhenEmpty = true;
 
         $worker = $this->getWorker('default', ['queue' => []]);
-        $worker->setName('my-worker');
 
         $worker->daemon('default', 'queue', $workerOptions);
 
-        $this->events->shouldHaveReceived('dispatch')->with(m::on(function ($event) {
+        $this->events->shouldHaveReceived('dispatch')->with(m::on(function ($event) use ($workerOptions) {
             return $event instanceof WorkerIdle
                 && $event->connectionName === 'default'
                 && $event->queue === 'queue'
-                && $event->name === 'my-worker';
+                && $event->workerOptions === $workerOptions;
         }))->once();
     }
 
