@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Integration\Foundation;
 
 use Illuminate\Foundation\Cloud;
-use Illuminate\Queue\Worker;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
@@ -52,73 +51,6 @@ class CloudTest extends TestCase
         $this->assertEquals('test-access-key-id', $this->app['config']->get('filesystems.disks.test-disk.key'));
 
         unset($_SERVER['LARAVEL_CLOUD_DISK_CONFIG']);
-    }
-
-    public function test_it_disables_queue_restart_polling_for_managed_queues()
-    {
-        Worker::$restartable = true;
-        $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES'] = '1';
-
-        try {
-            Cloud::configureManagedQueues($this->app);
-
-            $this->assertFalse(Worker::$restartable);
-        } finally {
-            unset($_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES']);
-            Worker::$restartable = true;
-        }
-    }
-
-    public function test_it_disables_queue_pause_polling_for_managed_queues()
-    {
-        Worker::$pausable = true;
-        $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES'] = '1';
-
-        try {
-            Cloud::configureManagedQueues($this->app);
-
-            $this->assertFalse(Worker::$pausable);
-        } finally {
-            unset($_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES']);
-            Worker::$pausable = true;
-        }
-    }
-
-    #[WithConfig('queue.connections.sqs', ['driver' => 'sqs', 'region' => 'us-east-1', 'queue' => 'default'])]
-    public function test_it_configures_managed_queue_credentials()
-    {
-        $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES'] = '1';
-
-        try {
-            Cloud::configureManagedQueues($this->app);
-
-            $this->assertEquals('ecs', $this->app['config']->get('queue.connections.sqs.credentials'));
-        } finally {
-            unset($_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES']);
-        }
-    }
-
-    #[WithConfig('queue.connections.sqs', ['driver' => 'sqs', 'region' => 'us-east-1', 'queue' => 'default'])]
-    public function test_it_does_not_configure_managed_queues_when_not_enabled()
-    {
-        Cloud::configureManagedQueues($this->app);
-
-        $this->assertNull($this->app['config']->get('queue.connections.sqs.credentials'));
-    }
-
-    #[WithConfig('queue.connections.sqs', ['driver' => 'sqs', 'region' => 'us-east-1', 'queue' => 'default'])]
-    public function test_it_configures_managed_queue_region()
-    {
-        $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES'] = '1';
-        $_SERVER['LARAVEL_CLOUD_REGION'] = 'us-west-2';
-
-        try {
-            Cloud::configureManagedQueues($this->app);
-
-            $this->assertEquals('us-west-2', $this->app['config']->get('queue.connections.sqs.region'));
-        } finally {
-            unset($_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES'], $_SERVER['LARAVEL_CLOUD_REGION']);
-        }
     }
 
     public function test_it_respects_log_levels()
