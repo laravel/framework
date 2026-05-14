@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\ArrayBackedJsonApiResource;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
+use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\PostWithLazyLoadedCommentsResource;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\User;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\UserResource;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\UserWithArrayRelationshipResource;
@@ -49,6 +50,14 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
         $router->get('posts/{postId}', function ($postId) {
             return Post::find($postId)->toResource();
+        });
+
+        $router->get('posts/{postId}/with-eager-comment-users', function ($postId) {
+            return Post::with('comments.commenter')->find($postId)->toResource();
+        });
+
+        $router->get('posts/{postId}/with-lazy-comment-resources', function ($postId) {
+            return new PostWithLazyLoadedCommentsResource(Post::find($postId));
         });
 
         $router->get('things/{id}', function ($id) {

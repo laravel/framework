@@ -421,6 +421,95 @@ class JsonApiResourceTest extends TestCase
             ->assertJsonMissing(['jsonapi']);
     }
 
+    public function testItCanResolveRelationshipFromResourceCollectionClosure()
+    {
+        $user = User::factory()->create();
+
+        $post = Post::factory()->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        $comment = Comment::factory()->create([
+            'post_id' => $post->getKey(),
+            'user_id' => $user->getKey(),
+            'content' => 'Public comment',
+        ]);
+
+        $this->getJson("/posts/{$post->getKey()}/with-lazy-comment-resources?".http_build_query(['include' => 'comments']))
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertExactJson([
+                'data' => [
+                    'attributes' => [
+                        'content' => $post->content,
+                        'title' => $post->title,
+                    ],
+                    'type' => 'posts',
+                    'id' => (string) $post->getKey(),
+                    'relationships' => [
+                        'comments' => [
+                            'data' => [
+                                ['id' => (string) $comment->getKey(), 'type' => 'public_comments'],
+                            ],
+                        ],
+                    ],
+                ],
+                'included' => [
+                    [
+                        'attributes' => [
+                            'content' => 'Public comment',
+                        ],
+                        'id' => (string) $comment->getKey(),
+                        'type' => 'public_comments',
+                    ],
+                ],
+            ])
+            ->assertJsonMissing(['jsonapi']);
+    }
+
+    public function testItDoesNotResolveUnrequestedEagerLoadedNestedRelationships()
+    {
+        $user = User::factory()->create();
+
+        $post = Post::factory()->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        $comment = Comment::factory()->create([
+            'post_id' => $post->getKey(),
+            'user_id' => $user->getKey(),
+        ]);
+
+        $this->getJson("/posts/{$post->getKey()}/with-eager-comment-users?".http_build_query(['include' => 'comments']))
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertExactJson([
+                'data' => [
+                    'attributes' => [
+                        'content' => $post->content,
+                        'title' => $post->title,
+                    ],
+                    'type' => 'posts',
+                    'id' => (string) $post->getKey(),
+                    'relationships' => [
+                        'comments' => [
+                            'data' => [
+                                ['id' => (string) $comment->getKey(), 'type' => 'comments'],
+                            ],
+                        ],
+                    ],
+                ],
+                'included' => [
+                    [
+                        'attributes' => [
+                            'content' => $comment->content,
+                        ],
+                        'id' => (string) $comment->getKey(),
+                        'type' => 'comments',
+                    ],
+                ],
+            ])
+            ->assertJsonMissing(['jsonapi']);
+    }
+
     public function testItCanResolveRelationshipWithRecursiveNestedRelationship()
     {
         $now = $this->freezeSecond();

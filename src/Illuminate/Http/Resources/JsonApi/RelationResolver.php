@@ -14,7 +14,7 @@ class RelationResolver
     /**
      * The relation resolver.
      *
-     * @var \Closure(mixed):(\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|null)
+     * @var \Closure(mixed):(\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|\Illuminate\Http\Resources\JsonApi\AnonymousResourceCollection|null)
      */
     public Closure $relationResolver;
 
@@ -28,7 +28,7 @@ class RelationResolver
     /**
      * Construct a new resource relationship resolver.
      *
-     * @param  \Closure(mixed):(\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|null)|class-string<\Illuminate\Http\Resources\JsonApi\JsonApiResource>|null  $resolver
+     * @param  \Closure(mixed):(\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|\Illuminate\Http\Resources\JsonApi\AnonymousResourceCollection|null)|class-string<\Illuminate\Http\Resources\JsonApi\JsonApiResource>|null  $resolver
      */
     public function __construct(public string $relationName, Closure|string|null $resolver = null)
     {
@@ -45,9 +45,15 @@ class RelationResolver
     /**
      * Resolve the relation for a resource.
      */
-    public function handle(mixed $resource): Collection|Model|null
+    public function handle(mixed $resource): Collection|Model|AnonymousResourceCollection|null
     {
-        return value($this->relationResolver, $resource);
+        $related = value($this->relationResolver, $resource);
+
+        if ($related instanceof AnonymousResourceCollection) {
+            $this->relationResourceClass ??= $related->collects;
+        }
+
+        return $related;
     }
 
     /**
