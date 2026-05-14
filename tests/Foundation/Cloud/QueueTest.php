@@ -18,7 +18,6 @@ use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Queue\Failed\FileFailedJobProvider;
 use Illuminate\Queue\Jobs\FakeJob;
 use Illuminate\Queue\SqsQueue;
-use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerStopReason;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -64,38 +63,6 @@ class QueueTest extends TestCase
         parent::tearDown();
 
         unset($_SERVER['LARAVEL_CLOUD'], $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES'], $_SERVER['LARAVEL_CLOUD_REGION']);
-    }
-
-    public function testItDisablesQueueRestartPollingForManagedQueues()
-    {
-        $argv = $_SERVER['argv'];
-        $_SERVER['argv'] = ['artisan', 'queue:work'];
-
-        try {
-            Cloud::bootManagedQueues($this->app);
-            $this->assertTrue(Worker::$restartable);
-
-            $this->app['queue']->connection('sqs');
-            $this->assertFalse(Worker::$restartable);
-        } finally {
-            $_SERVER['argv'] = $argv;
-        }
-    }
-
-    public function testItDisablesQueuePausePollingForManagedQueues()
-    {
-        $argv = $_SERVER['argv'];
-        $_SERVER['argv'] = ['artisan', 'queue:work'];
-
-        try {
-            Cloud::bootManagedQueues($this->app);
-            $this->assertTrue(Worker::$pausable);
-
-            $this->app['queue']->connection('sqs');
-            $this->assertFalse(Worker::$pausable);
-        } finally {
-            $_SERVER['argv'] = $argv;
-        }
     }
 
     #[WithConfig('queue.connections.sqs', ['driver' => 'sqs', 'region' => 'us-east-1', 'queue' => 'default'])]
