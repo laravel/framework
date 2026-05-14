@@ -86,6 +86,13 @@ class Worker
     public $shouldQuit = false;
 
     /**
+     * Indicates if the worker lost its connection.
+     *
+     * @var bool
+     */
+    public $lostConnection = false;
+
+    /**
      * Indicates if the worker is paused.
      *
      * @var bool
@@ -327,6 +334,7 @@ class Worker
     protected function stopIfNecessary(WorkerOptions $options, $lastRestart, $startTime = 0, $jobsProcessed = 0, $job = null)
     {
         return match (true) {
+            $this->lostConnection => [static::EXIT_SUCCESS, WorkerStopReason::LostConnection],
             $this->shouldQuit => [static::EXIT_SUCCESS, WorkerStopReason::Interrupted],
             $this->memoryExceeded($options->memory) => [static::$memoryExceededExitCode ?? static::EXIT_MEMORY_LIMIT, WorkerStopReason::MaxMemoryExceeded],
             $this->queueShouldRestart($lastRestart) => [static::EXIT_SUCCESS, WorkerStopReason::ReceivedRestartSignal],
@@ -449,7 +457,7 @@ class Worker
     protected function stopWorkerIfLostConnection($e)
     {
         if ($this->causedByLostConnection($e)) {
-            $this->shouldQuit = true;
+            $this->lostConnection = true;
         }
     }
 
