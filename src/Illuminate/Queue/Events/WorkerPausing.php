@@ -2,6 +2,8 @@
 
 namespace Illuminate\Queue\Events;
 
+use Illuminate\Queue\WorkerOptions;
+
 class WorkerPausing
 {
     /**
@@ -9,12 +11,12 @@ class WorkerPausing
      *
      * @param  string|null  $connectionName
      * @param  string|null  $queue
-     * @param  \Illuminate\Queue\WorkerOptions|null  $workerOptions
+     * @param  WorkerOptions|null  $workerOptions
      */
     public function __construct(
         public ?string $connectionName = null,
         public ?string $queue = null,
-        public $workerOptions = null,
+        public ?WorkerOptions $workerOptions = null,
     ) {
     }
 }
