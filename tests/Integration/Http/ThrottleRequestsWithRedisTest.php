@@ -92,4 +92,37 @@ class ThrottleRequestsWithRedisTest extends TestCase
             $this->get('/')->assertTooManyRequests()->assertContent('ah ah ah');
         });
     }
+
+    public function testKeyPrefixIsPrependedToRedisKeys()
+    {
+        $this->ifRedisAvailable(function () {
+            Route::get('/', function () {
+                return 'yes';
+            })->middleware(ThrottleRequestsWithRedis::class.':2,1');
+
+            // Set a key prefix on the middleware
+            $this->app->resolving(ThrottleRequestsWithRedis::class, function ($middleware) {
+                $middleware->setKeyPrefix('throttle:');
+            });
+
+            $response = $this->withoutExceptionHandling()->get('/');
+            $this->assertSame('yes', $response->getContent());
+
+            // Verify the middleware works correctly with the prefix
+            $response = $this->withoutExceptionHandling()->get('/');
+            $this->assertSame('yes', $response->getContent());
+            $this->assertEquals(0, $response->headers->get('X-RateLimit-Remaining'));
+        });
+    }
+
+    public function testSetKeyPrefixReturnsSelf()
+    {
+        $limiter = $this->app->make(\Illuminate\Cache\RateLimiter::class);
+        $redis = $this->app->make(\Illuminate\Contracts\Redis\Factory::class);
+        $middleware = new ThrottleRequestsWithRedis($limiter, $redis);
+
+        $result = $middleware->setKeyPrefix('throttle:');
+
+        $this->assertSame($middleware, $result);
+    }
 }
