@@ -402,8 +402,7 @@ class ProcessTest extends TestCase
 
     public function testStrayProcessesCanBePreventedWithStringCommand()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Attempted process [');
+        $this->expectExceptionObject(new RuntimeException('Attempted process ['));
         $this->expectExceptionMessage('cat composer.json');
         $this->expectExceptionMessage('] without a matching fake.');
 
@@ -420,8 +419,7 @@ class ProcessTest extends TestCase
 
     public function testStrayProcessesCanBePreventedWithArrayCommand()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Attempted process [');
+        $this->expectExceptionObject(new RuntimeException('Attempted process ['));
         $this->expectExceptionMessage('cat composer.json');
         $this->expectExceptionMessage('] without a matching fake.');
 
@@ -450,12 +448,11 @@ class ProcessTest extends TestCase
 
     public function testProcessFakeThrowShorthand()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('fake exception message');
+        $this->expectExceptionObject(new RuntimeException('fake exception message'));
 
         $factory = new Factory;
 
-        $factory->fake(['cat me' => new \RuntimeException('fake exception message')]);
+        $factory->fake(['cat me' => new RuntimeException('fake exception message')]);
 
         $factory->run('cat me');
     }

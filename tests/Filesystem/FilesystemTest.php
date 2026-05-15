@@ -79,8 +79,7 @@ class FilesystemTest extends TestCase
 
     public function testLinesThrowsExceptionNonexisitingFile()
     {
-        $this->expectException(FileNotFoundException::class);
-        $this->expectExceptionMessage('File does not exist at path '.__DIR__.'/unknown-file.txt.');
+        $this->expectExceptionObject(new FileNotFoundException('File does not exist at path '.__DIR__.'/unknown-file.txt.'));
 
         (new Filesystem)->lines(__DIR__.'/unknown-file.txt');
     }
@@ -332,8 +331,7 @@ class FilesystemTest extends TestCase
 
     public function testGetThrowsExceptionNonexisitingFile()
     {
-        $this->expectException(FileNotFoundException::class);
-        $this->expectExceptionMessage('File does not exist at path '.self::$tempDir.'/unknown-file.txt.');
+        $this->expectExceptionObject(new FileNotFoundException('File does not exist at path '.self::$tempDir.'/unknown-file.txt.'));
 
         (new Filesystem)->get(self::$tempDir.'/unknown-file.txt');
     }
@@ -347,8 +345,7 @@ class FilesystemTest extends TestCase
 
     public function testGetRequireThrowsExceptionNonExistingFile()
     {
-        $this->expectException(FileNotFoundException::class);
-        $this->expectExceptionMessage('File does not exist at path '.self::$tempDir.'/unknown-file.txt.');
+        $this->expectExceptionObject(new FileNotFoundException('File does not exist at path '.self::$tempDir.'/unknown-file.txt.'));
 
         (new Filesystem)->getRequire(self::$tempDir.'/unknown-file.txt');
     }
@@ -590,8 +587,7 @@ class FilesystemTest extends TestCase
 
     public function testRequireOnceThrowsExceptionNonexisitingFile()
     {
-        $this->expectException(FileNotFoundException::class);
-        $this->expectExceptionMessage('File does not exist at path '.__DIR__.'/unknown-file.txt.');
+        $this->expectExceptionObject(new FileNotFoundException('File does not exist at path '.__DIR__.'/unknown-file.txt.'));
 
         (new Filesystem)->requireOnce(__DIR__.'/unknown-file.txt');
     }

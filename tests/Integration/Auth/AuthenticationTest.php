@@ -220,8 +220,7 @@ class AuthenticationTest extends TestCase
 
     public function testPasswordMustBeValidToLogOutOtherDevices()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('current password');
+        $this->expectExceptionObject(new InvalidArgumentException('current password'));
 
         $this->app['auth']->loginUsingId(1);
 

@@ -8,6 +8,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Stringable;
@@ -520,8 +521,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testRegisteringNonApprovedAttributesThrows()
     {
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Method Illuminate\Routing\RouteRegistrar::unsupportedMethod does not exist.');
+        $this->expectExceptionObject(new BadMethodCallException('Method Illuminate\Routing\RouteRegistrar::unsupportedMethod does not exist.'));
 
         $this->router->domain('foo')->unsupportedMethod('bar')->group(function ($router) {
             //
@@ -1272,7 +1272,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCannotSetRouteNameUsingIntegerBackedEnum()
     {
-        $this->expectExceptionObject(new \InvalidArgumentException('Attribute [name] expects a string backed enum.'));
+        $this->expectExceptionObject(new InvalidArgumentException('Attribute [name] expects a string backed enum.'));
 
         $this->router->name(IntegerEnum::One)->get('users', fn () => 'all-users');
     }
@@ -1286,7 +1286,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCannotSetRouteDomainUsingIntegerBackedEnum()
     {
-        $this->expectExceptionObject(new \InvalidArgumentException('Attribute [domain] expects a string backed enum.'));
+        $this->expectExceptionObject(new InvalidArgumentException('Attribute [domain] expects a string backed enum.'));
 
         $this->router->domain(IntegerEnum::One)->get('users', fn () => 'all-users');
     }

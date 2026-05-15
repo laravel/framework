@@ -67,16 +67,14 @@ class SupportBinaryCodecTest extends TestCase
 
     public function testEncodeThrowsOnInvalidFormat()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Format [invalid] is invalid.');
+        $this->expectExceptionObject(new InvalidArgumentException('Format [invalid] is invalid.'));
 
         BinaryCodec::encode('value', 'invalid');
     }
 
     public function testDecodeThrowsOnInvalidFormat()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Format [invalid] is invalid.');
+        $this->expectExceptionObject(new InvalidArgumentException('Format [invalid] is invalid.'));
 
         BinaryCodec::decode('value', 'invalid');
     }

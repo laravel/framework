@@ -10,6 +10,7 @@ use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class ValidationPasswordRuleTest extends TestCase
@@ -249,8 +250,7 @@ class ValidationPasswordRuleTest extends TestCase
 
     public function testItCannotSetDefaultUsingGivenString()
     {
-        $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage('given callback should be callable');
+        $this->expectExceptionObject(new InvalidArgumentException('given callback should be callable'));
 
         Password::defaults('required|password');
     }

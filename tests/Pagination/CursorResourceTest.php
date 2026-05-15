@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Pagination;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Tests\Pagination\Fixtures\Models\CursorResourceTestModel;
+use LogicException;
 use PHPUnit\Framework\TestCase;
 
 class CursorResourceTest extends TestCase
@@ -22,8 +23,7 @@ class CursorResourceTest extends TestCase
 
     public function testItThrowsExceptionWhenResourceCannotBeFound()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Failed to find resource class for model [Illuminate\Tests\Pagination\Fixtures\Models\CursorResourceTestModel].');
+        $this->expectExceptionObject(new LogicException('Failed to find resource class for model [Illuminate\Tests\Pagination\Fixtures\Models\CursorResourceTestModel].'));
 
         $paginator = new CursorResourceTestPaginator([
             new CursorResourceTestModel(),

@@ -201,8 +201,7 @@ class ContainerCallTest extends TestCase
 
     public function testCallWithoutRequiredParamsThrowsException()
     {
-        $this->expectException(BindingResolutionException::class);
-        $this->expectExceptionMessage('Unable to resolve dependency [Parameter #0 [ <required> $foo ]] in class Illuminate\Tests\Container\ContainerTestCallStub');
+        $this->expectExceptionObject(new BindingResolutionException('Unable to resolve dependency [Parameter #0 [ <required> $foo ]] in class Illuminate\Tests\Container\ContainerTestCallStub'));
 
         $container = new Container;
         $container->call(ContainerTestCallStub::class.'@unresolvable');
@@ -210,8 +209,7 @@ class ContainerCallTest extends TestCase
 
     public function testCallWithUnnamedParametersThrowsException()
     {
-        $this->expectException(BindingResolutionException::class);
-        $this->expectExceptionMessage('Unable to resolve dependency [Parameter #0 [ <required> $foo ]] in class Illuminate\Tests\Container\ContainerTestCallStub');
+        $this->expectExceptionObject(new BindingResolutionException('Unable to resolve dependency [Parameter #0 [ <required> $foo ]] in class Illuminate\Tests\Container\ContainerTestCallStub'));
 
         $container = new Container;
         $container->call([new ContainerTestCallStub, 'unresolvable'], ['foo', 'bar']);
@@ -219,8 +217,7 @@ class ContainerCallTest extends TestCase
 
     public function testCallWithoutRequiredParamsOnClosureThrowsException()
     {
-        $this->expectException(BindingResolutionException::class);
-        $this->expectExceptionMessage('Unable to resolve dependency [Parameter #0 [ <required> $foo ]] in class Illuminate\Tests\Container\ContainerCallTest');
+        $this->expectExceptionObject(new BindingResolutionException('Unable to resolve dependency [Parameter #0 [ <required> $foo ]] in class Illuminate\Tests\Container\ContainerCallTest'));
 
         $container = new Container;
         $container->call(function ($foo, $bar = 'default') {

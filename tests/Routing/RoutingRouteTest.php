@@ -316,8 +316,7 @@ class RoutingRouteTest extends TestCase
 
     public function testFluentRouting()
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Route for [foo/bar] has no action.');
+        $this->expectExceptionObject(new LogicException('Route for [foo/bar] has no action.'));
 
         $router = $this->getRouter();
         $router->get('foo/bar')->uses(function () {
@@ -1052,8 +1051,7 @@ class RoutingRouteTest extends TestCase
 
     public function testModelBindingWithNullReturn()
     {
-        $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Routing\RouteModelBindingNullStub].');
+        $this->expectExceptionObject(new ModelNotFoundException('No query results for model [Illuminate\Tests\Routing\RouteModelBindingNullStub].'));
 
         $router = $this->getRouter();
         $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
@@ -1417,8 +1415,7 @@ class RoutingRouteTest extends TestCase
 
     public function testInvalidActionException()
     {
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('Invalid route action: [Illuminate\Tests\Routing\RouteTestControllerStub].');
+        $this->expectExceptionObject(new UnexpectedValueException('Invalid route action: [Illuminate\Tests\Routing\RouteTestControllerStub].'));
 
         $router = $this->getRouter();
         $router->get('/', ['uses' => RouteTestControllerStub::class]);
@@ -2147,8 +2144,7 @@ class RoutingRouteTest extends TestCase
 
     public function testRouteRedirectExceptionWhenMissingExpectedParameters()
     {
-        $this->expectException(UrlGenerationException::class);
-        $this->expectExceptionMessage('Missing required parameter for [Route: laravel_route_redirect_destination] [URI: users/{user}] [Missing parameter: user].');
+        $this->expectExceptionObject(new UrlGenerationException('Missing required parameter for [Route: laravel_route_redirect_destination] [URI: users/{user}] [Missing parameter: user].'));
 
         $container = new Container;
         $router = new Router(new Dispatcher, $container);

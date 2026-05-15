@@ -2792,16 +2792,14 @@ class HttpClientTest extends TestCase
             );
         });
 
-        $this->expectException(ConnectionException::class);
-        $this->expectExceptionMessage('cURL error 60: SSL certificate problem: unable to get local issuer certificate');
+        $this->expectExceptionObject(new ConnectionException('cURL error 60: SSL certificate problem: unable to get local issuer certificate'));
 
         $this->factory->head('https://ssl-error.laravel.example');
     }
 
     public function testConnectExceptionIsConvertedToConnectionExceptionEvenWhenWithoutFactory()
     {
-        $this->expectException(ConnectionException::class);
-        $this->expectExceptionMessage('cURL error 60: SSL certificate problem');
+        $this->expectExceptionObject(new ConnectionException('cURL error 60: SSL certificate problem'));
 
         $pendingRequest = new PendingRequest();
 
@@ -2817,8 +2815,7 @@ class HttpClientTest extends TestCase
 
     public function testRequestExceptionWithoutResponseIsConvertedToConnectionExceptionEvenWhenWithoutFactory()
     {
-        $this->expectException(ConnectionException::class);
-        $this->expectExceptionMessage('cURL error 28: Operation timed out');
+        $this->expectExceptionObject(new ConnectionException('cURL error 28: Operation timed out'));
 
         $pendingRequest = new PendingRequest();
 
@@ -2834,8 +2831,7 @@ class HttpClientTest extends TestCase
 
     public function testRequestExceptionWithResponseIsConvertedToConnectionExceptionEvenWhenWithoutFactory()
     {
-        $this->expectException(ConnectionException::class);
-        $this->expectExceptionMessage('cURL error 28: Operation timed out');
+        $this->expectExceptionObject(new ConnectionException('cURL error 28: Operation timed out'));
 
         $pendingRequest = new PendingRequest();
 
@@ -2852,8 +2848,7 @@ class HttpClientTest extends TestCase
 
     public function testTooManyRedirectsExceptionIsConvertedToConnectionExceptionEvenWhenWithoutFactory()
     {
-        $this->expectException(ConnectionException::class);
-        $this->expectExceptionMessage('Maximum number of redirects (5) exceeded');
+        $this->expectExceptionObject(new ConnectionException('Maximum number of redirects (5) exceeded'));
 
         $pendingRequest = new PendingRequest();
 
@@ -2881,8 +2876,7 @@ class HttpClientTest extends TestCase
             );
         });
 
-        $this->expectException(ConnectionException::class);
-        $this->expectExceptionMessage('Maximum number of redirects (5) exceeded');
+        $this->expectExceptionObject(new ConnectionException('Maximum number of redirects (5) exceeded'));
 
         $this->factory->maxRedirects(5)->get('https://redirect.laravel.example');
     }
