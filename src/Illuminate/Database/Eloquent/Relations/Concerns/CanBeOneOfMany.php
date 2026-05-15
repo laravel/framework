@@ -33,6 +33,13 @@ trait CanBeOneOfMany
     protected $oneOfManySubQuery;
 
     /**
+     * The one of many inner join subselect query builder instances.
+     *
+     * @var array<int, \Illuminate\Database\Eloquent\Builder<*>>
+     */
+    protected $oneOfManySubQueries = [];
+
+    /**
      * Add constraints for inner join subselect for one of many relationships.
      *
      * @param  \Illuminate\Database\Eloquent\Builder<*>  $query
@@ -70,6 +77,8 @@ trait CanBeOneOfMany
     public function ofMany($column = 'id', $aggregate = 'MAX', $relation = null)
     {
         $this->isOneOfMany = true;
+        $this->oneOfManySubQuery = null;
+        $this->oneOfManySubQueries = [];
 
         $this->relationName = $relation ?: $this->getDefaultOneOfManyJoinAlias(
             $this->guessRelationship()
@@ -100,6 +109,8 @@ trait CanBeOneOfMany
                 array_merge([$column], $previous['columns'] ?? []),
                 $aggregate,
             );
+
+            $this->oneOfManySubQueries[] = $subQuery;
 
             if (isset($previous)) {
                 $this->addOneOfManyJoinSubQuery(
@@ -276,6 +287,16 @@ trait CanBeOneOfMany
     public function getOneOfManySubQuery()
     {
         return $this->oneOfManySubQuery;
+    }
+
+    /**
+     * Get all of the one of many inner join subselect builder instances.
+     *
+     * @return array<int, \Illuminate\Database\Eloquent\Builder<*>>
+     */
+    public function getOneOfManySubQueries()
+    {
+        return $this->oneOfManySubQueries;
     }
 
     /**

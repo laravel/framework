@@ -47,6 +47,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
             $table->string('state');
             $table->string('type');
             $table->foreignId('user_id');
+            $table->foreignId('login_id')->nullable();
             $table->timestamps();
         });
 
@@ -241,6 +242,75 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
 
         $this->assertTrue($user->relationLoaded('latest_login'));
         $this->assertSame($latestLogin->id, $user->latest_login->id);
+    }
+
+    public function testEagerLoadConstraintsAreAppliedToOneOfManySubQuery()
+    {
+        $user = HasOneOfManyTestUser::create();
+
+        $expectedLogin = $user->logins()->create();
+
+        $user->logins()->create();
+
+        $user = HasOneOfManyTestUser::with([
+            'latest_login' => function ($query) use ($expectedLogin) {
+                $query->whereKey($expectedLogin->getKey());
+            },
+        ])->first();
+
+        $this->assertTrue($user->relationLoaded('latest_login'));
+        $this->assertNotNull($user->latest_login);
+        $this->assertSame($expectedLogin->id, $user->latest_login->id);
+    }
+
+    public function testEagerLoadConstraintsAreAppliedToMultiColumnOneOfManySubQueries()
+    {
+        $user = HasOneOfManyTestUser::create();
+
+        $expectedPrice = $user->prices()->create([
+            'published_at' => '2021-05-01 00:00:00',
+        ]);
+
+        $user->prices()->create([
+            'published_at' => '2021-05-01 00:00:00',
+        ]);
+
+        $user = HasOneOfManyTestUser::with([
+            'price_with_shortcut' => function ($query) use ($expectedPrice) {
+                $query->whereKey($expectedPrice->getKey());
+            },
+        ])->first();
+
+        $this->assertTrue($user->relationLoaded('price_with_shortcut'));
+        $this->assertNotNull($user->price_with_shortcut);
+        $this->assertSame($expectedPrice->id, $user->price_with_shortcut->id);
+    }
+
+    public function testEagerLoadConstraintsWithJoinsAreAppliedToOneOfManySubQueries()
+    {
+        $user = HasOneOfManyTestUser::create();
+
+        $expectedLogin = $user->logins()->create();
+
+        $user->logins()->create();
+
+        $user->states()->create([
+            'type' => 'foo',
+            'state' => 'active',
+            'login_id' => $expectedLogin->id,
+        ]);
+
+        $user = HasOneOfManyTestUser::with([
+            'latest_login' => function ($query) {
+                $query
+                    ->join('states', 'states.login_id', '=', 'logins.id')
+                    ->where('states.type', 'foo');
+            },
+        ])->first();
+
+        $this->assertTrue($user->relationLoaded('latest_login'));
+        $this->assertNotNull($user->latest_login);
+        $this->assertSame($expectedLogin->id, $user->latest_login->id);
     }
 
     public function testItJoinsOtherTableInSubQuery()
@@ -690,7 +760,7 @@ class HasOneOfManyTestState extends Eloquent
     protected $table = 'states';
     protected $guarded = [];
     public $timestamps = true;
-    protected $fillable = ['type', 'state', 'updated_at'];
+    protected $fillable = ['type', 'state', 'updated_at', 'login_id'];
 }
 
 class HasOneOfManyTestPrice extends Eloquent
