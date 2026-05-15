@@ -76,6 +76,37 @@ class DatabaseLockTest extends DatabaseTestCase
         $this->assertFalse($secondLock->isOwnedByCurrentProcess());
     }
 
+    public function testLockCanBeRefreshed()
+    {
+        $lock = Cache::driver('database')->lock('foo', 10);
+        $this->assertTrue($lock->get());
+
+        // Refresh the lock for another 20 seconds
+        $this->assertTrue($lock->refresh(20));
+
+        // Lock should still be held
+        $this->assertFalse(Cache::driver('database')->lock('foo', 10)->get());
+
+        $lock->release();
+    }
+
+    public function testLockCannotBeRefreshedByAnotherOwner()
+    {
+        $firstLock = Cache::driver('database')->lock('foo', 10);
+        $this->assertTrue($firstLock->get());
+
+        // Create a new lock with a different owner
+        $secondLock = Cache::store('database')->restoreLock('foo', 'other_owner');
+
+        // Second lock should not be able to refresh
+        $this->assertFalse($secondLock->refresh(20));
+
+        // Original lock should still be able to refresh
+        $this->assertTrue($firstLock->refresh(20));
+
+        $firstLock->release();
+    }
+
     #[TestWith(['Deadlock found when trying to get lock', 1213, true])]
     #[TestWith(['Table does not exist', 1146, false])]
     public function testIgnoresConcurrencyException(string $message, int $code, bool $hasConcurrenyError)

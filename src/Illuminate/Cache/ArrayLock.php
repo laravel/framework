@@ -102,4 +102,23 @@ class ArrayLock extends Lock
     {
         unset($this->store->locks[$this->name]);
     }
+
+    /**
+     * Attempt to refresh the lock for the given number of seconds.
+     *
+     * @param  int|null  $seconds
+     * @return bool
+     */
+    public function refresh($seconds = null)
+    {
+        if (! $this->isOwnedByCurrentProcess()) {
+            return false;
+        }
+
+        $seconds ??= $this->seconds;
+
+        $this->store->locks[$this->name]['expiresAt'] = $seconds === 0 ? null : Carbon::now()->addSeconds($seconds);
+
+        return true;
+    }
 }

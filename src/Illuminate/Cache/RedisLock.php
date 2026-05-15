@@ -71,6 +71,21 @@ class RedisLock extends Lock
     }
 
     /**
+     * Attempt to refresh the lock for the given number of seconds.
+     *
+     * @param  int|null  $seconds
+     * @return bool
+     */
+    public function refresh($seconds = null)
+    {
+        $seconds ??= $this->seconds;
+
+        return (bool) $this->redis->eval(
+            LuaScripts::refreshLock(), 1, $this->name, $this->owner, $seconds
+        );
+    }
+
+    /**
      * Get the name of the Redis connection being used to manage the lock.
      *
      * @return string
