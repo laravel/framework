@@ -14,10 +14,14 @@ class ServeFileTest extends TestCase
     {
         $this->afterApplicationCreated(function () {
             Storage::put('serve-file-test.txt', 'Hello World');
+            Storage::put('serve-file-test.txt?pad=x', 'Hello Question');
         });
 
         $this->beforeApplicationDestroyed(function () {
-            Storage::delete('serve-file-test.txt');
+            Storage::delete([
+                'serve-file-test.txt',
+                'serve-file-test.txt?pad=x',
+            ]);
         });
 
         parent::setUp();
@@ -46,6 +50,24 @@ class ServeFileTest extends TestCase
         $url = Storage::temporaryUrl('serve-file-test.txt', Carbon::now()->addMinute());
 
         $url = $url.'c';
+
+        $response = $this->get($url);
+
+        $response->assertForbidden();
+    }
+
+    public function testItCanServeAFileWithUriDelimitersInThePath()
+    {
+        $url = Storage::temporaryUrl('serve-file-test.txt?pad=x', Carbon::now()->addMinute());
+
+        $response = $this->get($url);
+
+        $this->assertSame('Hello Question', $response->streamedContent());
+    }
+
+    public function testUriDelimitersInThePathCannotHideAnExpiredUrl()
+    {
+        $url = Storage::temporaryUrl('serve-file-test.txt?pad=x', Carbon::now()->subMinute());
 
         $response = $this->get($url);
 
