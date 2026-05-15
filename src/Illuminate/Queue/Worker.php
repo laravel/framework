@@ -17,6 +17,7 @@ use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Events\JobTimedOut;
 use Illuminate\Queue\Events\Looping;
+use Illuminate\Queue\Events\QueueBusy;
 use Illuminate\Queue\Events\WorkerIdle;
 use Illuminate\Queue\Events\WorkerInterrupted;
 use Illuminate\Queue\Events\WorkerPausing;
@@ -154,6 +155,13 @@ class Worker
     public static $pausable = true;
 
     /**
+     * When the worker last checked whether to dispatch a QueueBusy event.
+     *
+     * @var bool
+     */
+    protected int $lastBusyCheck = 0;
+
+    /**
      * Create a new queue worker.
      *
      * @param  \Illuminate\Contracts\Queue\Factory  $manager
@@ -240,6 +248,17 @@ class Worker
                 $this->events->dispatch(new WorkerIdle($connectionName, $queue, $options));
 
                 $this->sleep($options->sleep);
+            }
+
+            // If a busy threshold has been defined, and it's been at
+            // least a minute (could be longer if the job is slow)
+            // check whether the queue size is considered busy.
+            if ($options->maxBusy > 0 && (time() - $this->lastBusyCheck) >= 60) {
+                $this->lastBusyCheck = time();
+
+                if (($size = $this->manager->connection($connectionName)->size($queue)) >= $options->maxBusy) {
+                    $this->events->dispatch(new QueueBusy($connectionName, $queue, $size));
+                }
             }
 
             if ($supportsAsyncSignals) {

@@ -45,6 +45,7 @@ class WorkCommand extends Command
                             {--memory=128 : The memory limit in megabytes}
                             {--sleep=3 : The number of seconds to sleep when no job is available}
                             {--rest=0 : The number of seconds to rest between jobs}
+                            {--max-busy=0 : Dispatch QueueBusy if queue size exceeds this (0=disabled)}
                             {--timeout=60 : The number of seconds a child process can run}
                             {--tries=1 : The number of times to attempt a job before logging it failed}
                             {--json : Output the queue worker information as JSON}';
@@ -168,6 +169,7 @@ class WorkCommand extends Command
             $this->option('stop-when-empty'),
             $this->option('max-jobs'),
             $this->option('max-time'),
+            $this->option('max-busy'),
             $this->option('rest'),
         );
     }

@@ -82,6 +82,11 @@ class WorkerOptions
     public $maxTime;
 
     /**
+     * The max queue size before dispatching QueueBusy.
+     */
+    public int $maxBusy = 0;
+
+    /**
      * Create a new worker options instance.
      *
      * @param  string  $name
@@ -94,6 +99,7 @@ class WorkerOptions
      * @param  bool  $stopWhenEmpty
      * @param  int  $maxJobs
      * @param  int  $maxTime
+     * @param  int  $maxBusy
      * @param  int  $rest
      */
     public function __construct(
@@ -107,6 +113,7 @@ class WorkerOptions
         $stopWhenEmpty = false,
         $maxJobs = 0,
         $maxTime = 0,
+        $maxBusy = 0,
         $rest = 0,
     ) {
         $this->name = $name;
@@ -120,5 +127,6 @@ class WorkerOptions
         $this->stopWhenEmpty = $stopWhenEmpty;
         $this->maxJobs = $maxJobs;
         $this->maxTime = $maxTime;
+        $this->maxBusy = $maxBusy;
     }
 }
