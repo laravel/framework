@@ -2003,31 +2003,31 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testUnionAggregate()
     {
-        $expected = 'select count(*) as aggregate from ((select * from `posts`) union (select * from `videos`)) as `temp_table`';
+        $expected = 'select count(*) as `aggregate` from ((select * from `posts`) union (select * from `videos`)) as `temp_table`';
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true, []);
         $builder->getProcessor()->shouldReceive('processSelect')->once();
         $builder->from('posts')->union($this->getMySqlBuilder()->from('videos'))->count();
 
-        $expected = 'select count(*) as aggregate from ((select `id` from `posts`) union (select `id` from `videos`)) as `temp_table`';
+        $expected = 'select count(*) as `aggregate` from ((select `id` from `posts`) union (select `id` from `videos`)) as `temp_table`';
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true, []);
         $builder->getProcessor()->shouldReceive('processSelect')->once();
         $builder->from('posts')->select('id')->union($this->getMySqlBuilder()->from('videos')->select('id'))->count();
 
-        $expected = 'select count(*) as aggregate from ((select * from "posts") union (select * from "videos")) as "temp_table"';
+        $expected = 'select count(*) as "aggregate" from ((select * from "posts") union (select * from "videos")) as "temp_table"';
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true, []);
         $builder->getProcessor()->shouldReceive('processSelect')->once();
         $builder->from('posts')->union($this->getPostgresBuilder()->from('videos'))->count();
 
-        $expected = 'select count(*) as aggregate from (select * from (select * from "posts") union select * from (select * from "videos")) as "temp_table"';
+        $expected = 'select count(*) as "aggregate" from (select * from (select * from "posts") union select * from (select * from "videos")) as "temp_table"';
         $builder = $this->getSQLiteBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true, []);
         $builder->getProcessor()->shouldReceive('processSelect')->once();
         $builder->from('posts')->union($this->getSQLiteBuilder()->from('videos'))->count();
 
-        $expected = 'select count(*) as aggregate from (select * from (select * from [posts]) as [temp_table] union select * from (select * from [videos]) as [temp_table]) as [temp_table]';
+        $expected = 'select count(*) as [aggregate] from (select * from (select * from [posts]) as [temp_table] union select * from (select * from [videos]) as [temp_table]) as [temp_table]';
         $builder = $this->getSqlServerBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with($expected, [], true, []);
         $builder->getProcessor()->shouldReceive('processSelect')->once();
@@ -2036,7 +2036,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testHavingAggregate()
     {
-        $expected = 'select count(*) as aggregate from (select (select `count(*)` from `videos` where `posts`.`id` = `videos`.`post_id`) as `videos_count` from `posts` having `videos_count` > ?) as `temp_table`';
+        $expected = 'select count(*) as `aggregate` from (select (select `count(*)` from `videos` where `posts`.`id` = `videos`.`post_id`) as `videos_count` from `posts` having `videos_count` > ?) as `temp_table`';
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('getDatabaseName');
         $builder->getConnection()->shouldReceive('select')->once()->with($expected, [0 => 1], true, [])->andReturn([['aggregate' => 1]]);
@@ -2732,7 +2732,7 @@ class DatabaseQueryBuilderTest extends TestCase
             $q->select('body')->from('posts')->where('id', 4);
         }, 'post');
 
-        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as "aggregate" from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
             return $results;
         });
@@ -2748,7 +2748,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $columns = ['body as post_body', 'teaser', 'posts.created as published'];
         $builder->from('posts')->select($columns);
 
-        $builder->getConnection()->shouldReceive('select')->once()->with('select count("body", "teaser", "posts"."created") as aggregate from "posts"', [], true, [])->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count("body", "teaser", "posts"."created") as "aggregate" from "posts"', [], true, [])->andReturn([['aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
             return $results;
         });
@@ -2762,7 +2762,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->from('posts')->select('id')->union($this->getBuilder()->from('videos')->select('id'));
 
-        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from ((select "id" from "posts") union (select "id" from "videos")) as "temp_table"', [], true, [])->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as "aggregate" from ((select "id" from "posts") union (select "id" from "videos")) as "temp_table"', [], true, [])->andReturn([['aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
             return $results;
         });
@@ -2776,7 +2776,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->from('posts')->select('id')->union($this->getBuilder()->from('videos')->select('id'))->latest();
 
-        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from ((select "id" from "posts") union (select "id" from "videos")) as "temp_table"', [], true, [])->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as "aggregate" from ((select "id" from "posts") union (select "id" from "videos")) as "temp_table"', [], true, [])->andReturn([['aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
             return $results;
         });
@@ -2790,7 +2790,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->from('posts')->select('id')->union($this->getBuilder()->from('videos')->select('id'))->limit(15)->offset(1);
 
-        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from ((select "id" from "posts") union (select "id" from "videos")) as "temp_table"', [], true, [])->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as "aggregate" from ((select "id" from "posts") union (select "id" from "videos")) as "temp_table"', [], true, [])->andReturn([['aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
             return $results;
         });
@@ -3916,7 +3916,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testAggregateFunctions()
     {
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as "aggregate" from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
             return $results;
         });
@@ -3934,7 +3934,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertTrue($results);
 
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select max("id") as aggregate from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select max("id") as "aggregate" from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
             return $results;
         });
@@ -3942,7 +3942,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(1, $results);
 
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select min("id") as aggregate from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select min("id") as "aggregate" from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
             return $results;
         });
@@ -3950,7 +3950,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(1, $results);
 
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select sum("id") as aggregate from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select sum("id") as "aggregate" from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
             return $results;
         });
@@ -3958,7 +3958,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(1, $results);
 
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select avg("id") as aggregate from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select avg("id") as "aggregate" from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
             return $results;
         });
@@ -3966,7 +3966,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(1, $results);
 
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select avg("id") as aggregate from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select avg("id") as "aggregate" from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
             return $results;
         });
@@ -4017,8 +4017,8 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testAggregateResetFollowedByGet()
     {
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
-        $builder->getConnection()->shouldReceive('select')->once()->with('select sum("id") as aggregate from "users"', [], true, [])->andReturn([['aggregate' => 2]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as "aggregate" from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select sum("id") as "aggregate" from "users"', [], true, [])->andReturn([['aggregate' => 2]]);
         $builder->getConnection()->shouldReceive('select')->once()->with('select "column1", "column2" from "users"', [], true, [])->andReturn([['column1' => 'foo', 'column2' => 'bar']]);
         $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) {
             return $results;
@@ -4035,7 +4035,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testAggregateResetFollowedBySelectGet()
     {
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select count("column1") as aggregate from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count("column1") as "aggregate" from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
         $builder->getConnection()->shouldReceive('select')->once()->with('select "column2", "column3" from "users"', [], true, [])->andReturn([['column2' => 'foo', 'column3' => 'bar']]);
         $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) {
             return $results;
@@ -4050,7 +4050,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testAggregateResetFollowedByGetWithColumns()
     {
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select count("column1") as aggregate from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count("column1") as "aggregate" from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
         $builder->getConnection()->shouldReceive('select')->once()->with('select "column2", "column3" from "users"', [], true, [])->andReturn([['column2' => 'foo', 'column3' => 'bar']]);
         $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(function ($builder, $results) {
             return $results;
@@ -4065,7 +4065,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testAggregateWithSubSelect()
     {
         $builder = $this->getBuilder();
-        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
+        $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as "aggregate" from "users"', [], true, [])->andReturn([['aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
             return $results;
         });
