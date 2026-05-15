@@ -129,6 +129,13 @@ class Handler implements ExceptionHandlerContract
     protected $shouldRenderJsonWhenCallback;
 
     /**
+     * The callback that determines if the exception handler response should be Markdown.
+     *
+     * @var callable|null
+     */
+    protected $shouldRenderMarkdownWhenCallback;
+
+    /**
      * The callback that prepares responses to be returned to the browser.
      *
      * @var callable|null
@@ -769,9 +776,11 @@ class Handler implements ExceptionHandlerContract
      */
     protected function renderExceptionResponse($request, Throwable $e)
     {
-        return $this->shouldReturnJson($request, $e)
-            ? $this->prepareJsonResponse($request, $e)
-            : $this->prepareResponse($request, $e);
+        return match (true) {
+            $this->shouldReturnJson($request, $e) => $this->prepareJsonResponse($request, $e),
+            $this->shouldReturnMarkdown($request, $e) => $this->prepareMarkdownResponse($request, $e),
+            default => $this->prepareResponse($request, $e),
+        };
     }
 
     /**
@@ -868,6 +877,71 @@ class Handler implements ExceptionHandlerContract
         $this->shouldRenderJsonWhenCallback = $callback;
 
         return $this;
+    }
+
+    /**
+     * Determine if the exception handler response should be Markdown.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Throwable  $e
+     * @return bool
+     */
+    protected function shouldReturnMarkdown($request, Throwable $e)
+    {
+        return $this->shouldRenderMarkdownWhenCallback
+            ? call_user_func($this->shouldRenderMarkdownWhenCallback, $request, $e)
+            : $request->wantsMarkdown();
+    }
+
+    /**
+     * Register the callable that determines if the exception handler response should be Markdown.
+     *
+     * @param  callable(\Illuminate\Http\Request $request, \Throwable): bool  $callback
+     * @return $this
+     */
+    public function shouldRenderMarkdownWhen($callback)
+    {
+        $this->shouldRenderMarkdownWhenCallback = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Prepare a Markdown response for the given exception.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Throwable  $e
+     * @return \Illuminate\Http\Response
+     */
+    protected function prepareMarkdownResponse($request, Throwable $e)
+    {
+        $status = $this->isHttpException($e) ? $e->getStatusCode() : 500;
+        $headers = $this->isHttpException($e) ? $e->getHeaders() : [];
+
+        return response($this->renderExceptionAsMarkdown($e), $status, array_merge($headers, [
+            'Content-Type' => 'text/markdown; charset=UTF-8',
+        ]))->withException($e);
+    }
+
+    /**
+     * Render the given exception as a markdown string.
+     *
+     * @param  \Throwable  $e
+     * @return string
+     */
+    protected function renderExceptionAsMarkdown(Throwable $e)
+    {
+        if (
+            config('app.debug')
+            && $this->container->bound(Renderer::class)
+            && ! app()->has(ExceptionRenderer::class)
+        ) {
+            return $this->container->make(Renderer::class)->renderMarkdown(request(), $e);
+        }
+
+        $message = $this->isHttpException($e) ? $e->getMessage() : 'Server Error';
+
+        return "# {$message}\n";
     }
 
     /**
