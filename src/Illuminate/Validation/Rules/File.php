@@ -14,7 +14,46 @@ use InvalidArgumentException;
 
 class File implements Rule, DataAwareRule, ValidatorAwareRule
 {
-    use Conditionable, Macroable;
+    use Conditionable, Macroable {
+        Macroable::__call as macroCall;
+        Macroable::__callStatic as macroCallStatic;
+    }
+
+    /**
+     * Handle dynamic calls to the object.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     *
+     * @throws \BadMethodCallException
+     */
+    public function __call($method, $parameters)
+    {
+        if ($method === 'types') {
+            return $this->setTypes(...$parameters);
+        }
+
+        return $this->macroCall($method, $parameters);
+    }
+
+    /**
+     * Handle dynamic, static calls to the object.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     *
+     * @throws \BadMethodCallException
+     */
+    public static function __callStatic($method, $parameters)
+    {
+        if ($method === 'types') {
+            return (new static())->setTypes(...$parameters);
+        }
+
+        return static::macroCallStatic($method, $parameters);
+    }
 
     /**
      * The MIME types that the given file should match. This array may also contain file extensions.
@@ -137,12 +176,18 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Limit the uploaded file to the given MIME types or file extensions.
      *
+     * This method can be called both statically (as a factory) and on an instance.
+     * When called statically, a new File instance is created.
+     * When called on an instance, the current instance is modified and returned.
+     *
      * @param  string|array<int, string>  $mimetypes
-     * @return static
+     * @return $this
      */
-    public static function types($mimetypes)
+    public function setTypes($mimetypes)
     {
-        return tap(new static(), fn ($file) => $file->allowedMimetypes = (array) $mimetypes);
+        $this->allowedMimetypes = (array) $mimetypes;
+
+        return $this;
     }
 
     /**

@@ -135,6 +135,31 @@ class ValidationFileRuleTest extends TestCase
         );
     }
 
+    public function testTypesPreservesChainConfiguration()
+    {
+        // When types() is called on an existing instance, it should preserve
+        // prior configuration like max() instead of creating a new instance.
+        $this->fails(
+            File::image()->max(1)->types(['jpg', 'jpeg']),
+            UploadedFile::fake()->image('photo.jpg', 800, 600),
+            ['validation.max.file'],
+        );
+
+        // When types() is called statically, it should still work as a factory.
+        $this->fails(
+            File::types('text/plain'),
+            UploadedFile::fake()->createWithContent('foo.png', file_get_contents(__DIR__.'/fixtures/image.png')),
+            ['validation.mimetypes'],
+        );
+
+        // When types() is called before max(), the max constraint should also work.
+        $this->fails(
+            File::default()->types(['jpg', 'jpeg'])->max(1),
+            UploadedFile::fake()->image('photo.jpg', 800, 600),
+            ['validation.max.file'],
+        );
+    }
+
     public function testSingleExtension()
     {
         $this->fails(
