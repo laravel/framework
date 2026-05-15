@@ -36,6 +36,7 @@ class WorkCommand extends Command
                             {--queue= : The names of the queues to work}
                             {--once : Only process the next job on the queue}
                             {--stop-when-empty : Stop when the queue is empty}
+                            {--delay=0 : The number of seconds to delay failed jobs (Deprecated)}
                             {--backoff=0 : The number of seconds to wait before retrying a job that encountered an uncaught exception}
                             {--max-jobs=0 : The number of jobs to process before stopping}
                             {--max-time=0 : The maximum number of seconds the worker should run}
@@ -157,7 +158,7 @@ class WorkCommand extends Command
     {
         return new WorkerOptions(
             $this->option('name'),
-            $this->option('backoff'),
+            max($this->option('backoff'), $this->option('delay')),
             $this->option('memory'),
             $this->option('timeout'),
             $this->option('sleep'),
