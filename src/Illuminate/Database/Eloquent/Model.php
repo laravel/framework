@@ -252,6 +252,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $isBroadcasting = true;
 
     /**
+     * Indicates if query exceptions during implicit route model binding should be reported.
+     */
+    protected static bool $reportRouteModelBindingExceptions = true;
+
+    /**
      * The Eloquent query builder class to use for the model.
      *
      * @var class-string<\Illuminate\Database\Eloquent\Builder<*>>
@@ -646,6 +651,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function handleMissingAttributeViolationUsing(?callable $callback)
     {
         static::$missingAttributeViolationCallback = $callback;
+    }
+
+    /**
+     * Report query exceptions during implicit route model binding.
+     */
+    public static function reportRouteModelBindingExceptions(bool $value = true): void
+    {
+        static::$reportRouteModelBindingExceptions = $value;
     }
 
     /**
@@ -2618,6 +2631,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function preventsAccessingMissingAttributes()
     {
         return static::$modelsShouldPreventAccessingMissingAttributes;
+    }
+
+    /**
+     * Determine if query exceptions during implicit route model binding should be reported.
+     */
+    public static function reportsRouteModelBindingExceptions(): bool
+    {
+        return static::$reportRouteModelBindingExceptions;
     }
 
     /**
