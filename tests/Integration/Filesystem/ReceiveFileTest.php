@@ -13,7 +13,10 @@ class ReceiveFileTest extends TestCase
     protected function setUp(): void
     {
         $this->beforeApplicationDestroyed(function () {
-            Storage::delete('receive-file-test.txt');
+            Storage::delete([
+                'receive-file-test.txt',
+                'receive-file-test.txt?pad=x',
+            ]);
         });
 
         parent::setUp();
@@ -72,5 +75,27 @@ class ReceiveFileTest extends TestCase
         $response = $this->get($uploadUrl['url']);
 
         $response->assertForbidden();
+    }
+
+    public function testItCanReceiveAFileWithUriDelimitersInThePath()
+    {
+        $result = Storage::temporaryUploadUrl('receive-file-test.txt?pad=x', Carbon::now()->addMinute());
+
+        $response = $this->call('PUT', $result['url'], [], [], [], [], 'Hello Question');
+
+        $response->assertNoContent();
+        Storage::assertExists('receive-file-test.txt?pad=x', 'Hello Question');
+        Storage::assertMissing('receive-file-test.txt');
+    }
+
+    public function testUriDelimitersInThePathCannotHideAnExpiredUploadUrl()
+    {
+        $result = Storage::temporaryUploadUrl('receive-file-test.txt?pad=x', Carbon::now()->subMinute());
+
+        $response = $this->call('PUT', $result['url'], [], [], [], [], 'Hello Question');
+
+        $response->assertForbidden();
+        Storage::assertMissing('receive-file-test.txt');
+        Storage::assertMissing('receive-file-test.txt?pad=x');
     }
 }
