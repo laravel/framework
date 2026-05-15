@@ -15,6 +15,7 @@ use Illuminate\Queue\Events\JobPopping;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobReleasedAfterException;
+use Illuminate\Queue\Events\WorkerIdle;
 use Illuminate\Queue\Events\WorkerStarting;
 use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Queue\MaxAttemptsExceededException;
@@ -442,6 +443,23 @@ class QueueWorkerTest extends TestCase
         $this->assertTrue($secondJob->fired);
 
         $this->events->shouldHaveReceived('dispatch')->with(m::type(WorkerStarting::class))->once();
+    }
+
+    public function testWorkerIdleIsDispatched()
+    {
+        $workerOptions = new WorkerOptions();
+        $workerOptions->stopWhenEmpty = true;
+
+        $worker = $this->getWorker('default', ['queue' => []]);
+
+        $worker->daemon('default', 'queue', $workerOptions);
+
+        $this->events->shouldHaveReceived('dispatch')->with(m::on(function ($event) use ($workerOptions) {
+            return $event instanceof WorkerIdle
+                && $event->connectionName === 'default'
+                && $event->queue === 'queue'
+                && $event->workerOptions === $workerOptions;
+        }))->once();
     }
 
     public function testWorkerStoppingIsDispatched()
