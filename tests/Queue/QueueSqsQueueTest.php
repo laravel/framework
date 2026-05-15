@@ -774,8 +774,17 @@ class QueueSqsQueueTest extends TestCase
         $queue->pushRaw($largePayload, $this->queueName);
     }
 
-    public function testClearDoesNotFlushCacheStore()
+    public function testClearFlushesOverflowStoreWhenFlushOnClearEnabled()
     {
+        $store = m::mock(CacheRepository::class);
+        $store->shouldReceive('flush')->once();
+
+        $cache = m::mock(CacheFactory::class);
+        $cache->shouldReceive('store')->once()->with('database')->andReturn($store);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->once()->with('cache')->andReturn($cache);
+
         $queue = $this->getMockBuilder(SqsQueue::class)
             ->onlyMethods(['getQueue', 'size'])
             ->setConstructorArgs([$this->sqs, $this->queueName, $this->prefix, '', false, [
@@ -783,9 +792,88 @@ class QueueSqsQueueTest extends TestCase
                 'store' => 'database',
                 'always' => false,
                 'delete_after_processing' => true,
+                'flush_on_clear' => true,
             ]])
             ->getMock();
-        $queue->setContainer(m::mock(Container::class));
+        $queue->setContainer($container);
+        $queue->expects($this->once())->method('getQueue')->willReturn($this->queueUrl);
+        $queue->expects($this->once())->method('size')->willReturn(5);
+
+        $this->sqs->shouldReceive('purgeQueue')->once();
+
+        $queue->clear($this->queueName);
+    }
+
+    public function testClearDoesNotFlushOverflowStoreWhenFlushOnClearDisabled()
+    {
+        $container = m::mock(Container::class);
+        $container->shouldNotReceive('make');
+
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue', 'size'])
+            ->setConstructorArgs([$this->sqs, $this->queueName, $this->prefix, '', false, [
+                'enabled' => true,
+                'store' => 'database',
+                'always' => false,
+                'delete_after_processing' => true,
+                'flush_on_clear' => false,
+            ]])
+            ->getMock();
+        $queue->setContainer($container);
+        $queue->expects($this->once())->method('getQueue')->willReturn($this->queueUrl);
+        $queue->expects($this->once())->method('size')->willReturn(5);
+
+        $this->sqs->shouldReceive('purgeQueue')->once();
+
+        $queue->clear($this->queueName);
+    }
+
+    public function testClearDoesNotFlushOverflowStoreWhenOverflowDisabled()
+    {
+        $container = m::mock(Container::class);
+        $container->shouldNotReceive('make');
+
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue', 'size'])
+            ->setConstructorArgs([$this->sqs, $this->queueName, $this->prefix, '', false, [
+                'enabled' => false,
+                'store' => 'database',
+                'always' => false,
+                'delete_after_processing' => true,
+                'flush_on_clear' => true,
+            ]])
+            ->getMock();
+        $queue->setContainer($container);
+        $queue->expects($this->once())->method('getQueue')->willReturn($this->queueUrl);
+        $queue->expects($this->once())->method('size')->willReturn(5);
+
+        $this->sqs->shouldReceive('purgeQueue')->once();
+
+        $queue->clear($this->queueName);
+    }
+
+    public function testClearForwardsConfiguredStoreNameToFactory()
+    {
+        $store = m::mock(CacheRepository::class);
+        $store->shouldReceive('flush')->once();
+
+        $cache = m::mock(CacheFactory::class);
+        $cache->shouldReceive('store')->once()->with('redis')->andReturn($store);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->once()->with('cache')->andReturn($cache);
+
+        $queue = $this->getMockBuilder(SqsQueue::class)
+            ->onlyMethods(['getQueue', 'size'])
+            ->setConstructorArgs([$this->sqs, $this->queueName, $this->prefix, '', false, [
+                'enabled' => true,
+                'store' => 'redis',
+                'always' => false,
+                'delete_after_processing' => true,
+                'flush_on_clear' => true,
+            ]])
+            ->getMock();
+        $queue->setContainer($container);
         $queue->expects($this->once())->method('getQueue')->willReturn($this->queueUrl);
         $queue->expects($this->once())->method('size')->willReturn(5);
 
