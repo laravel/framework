@@ -9,7 +9,7 @@ on:
 
 jobs:
   sync:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     name: Sync Driver
 
@@ -41,7 +41,7 @@ jobs:
           QUEUE_CONNECTION: sync
 
   database:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     name: Database Driver
 
@@ -77,7 +77,7 @@ jobs:
           QUEUE_CONNECTION: database
 
   beanstalkd:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     strategy:
       fail-fast: true

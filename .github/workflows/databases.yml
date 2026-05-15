@@ -9,7 +9,7 @@ on:
 
 jobs:
   mysql_57:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
 
     services:
@@ -53,7 +53,7 @@ jobs:
           DB_COLLATION: utf8mb4_unicode_ci
 
   mysql_8:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
 
     services:
@@ -96,7 +96,7 @@ jobs:
           DB_CONNECTION: mysql
 
   mariadb:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
 
     services:
@@ -139,7 +139,7 @@ jobs:
           DB_CONNECTION: mariadb
 
   pgsql_18:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
 
     services:
@@ -185,7 +185,7 @@ jobs:
           DB_PASSWORD: password
 
   pgsql_14:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
 
     services:
@@ -231,7 +231,7 @@ jobs:
           DB_PASSWORD: password
 
   pgsql_10:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
 
     services:
@@ -367,7 +367,7 @@ jobs:
           DB_PASSWORD: Forge123
 
   sqlite:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
 
     name: SQLite
