@@ -481,7 +481,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function getRawPlaceholder($replace)
     {
-        return str_replace('#', $replace, '@__raw_block_#__@');
+        return str_replace('#', $replace, '@__raw_block_#__');
     }
 
     /**

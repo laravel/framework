@@ -101,4 +101,11 @@ class BladeVerbatimTest extends AbstractBladeTestCase
         $expected = "<?php echo e(1); ?>\n\nhello world\n";
         $this->assertSame($expected, $this->compiler->compileString($string));
     }
+
+    public function testVerbatimBlockFollowedImmediatelyByEchoIsCompiled()
+    {
+        $string = '@verbatim {{ literal }} @endverbatim{{ $value }}';
+        $expected = ' {{ literal }} <?php echo e($value); ?>';
+        $this->assertSame($expected, $this->compiler->compileString($string));
+    }
 }

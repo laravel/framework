@@ -178,4 +178,32 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
         $template = "<a @class(['k\' => ()])></a>";
         $this->assertEquals($template, $this->compiler->compileString($template));
     }
+
+    public function testPhpBlockFollowedImmediatelyByRegularEchoIsCompiled()
+    {
+        $string = '@php $x = 1; @endphp{{ $x }}';
+        $expected = '<?php $x = 1; ?><?php echo e($x); ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testPhpBlockFollowedImmediatelyByRawEchoIsCompiled()
+    {
+        $string = '@php $x = 1; @endphp{!! $x !!}';
+        $expected = '<?php $x = 1; ?><?php echo $x; ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testPhpBlockFollowedImmediatelyByLegacyEscapedEchoIsCompiled()
+    {
+        $string = '@php $x = 1; @endphp{{{ $x }}}';
+        $expected = '<?php $x = 1; ?><?php echo e($x); ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testAdjacentPhpBlocksAreCompiled()
+    {
+        $string = '@php $x = 1; @endphp@php $y = $x; @endphp';
+        $expected = '<?php $x = 1; ?><?php $y = $x; ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
