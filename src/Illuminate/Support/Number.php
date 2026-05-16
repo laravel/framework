@@ -209,7 +209,7 @@ class Number
 
         $unitCount = count($units);
 
-        for ($i = 0; ($bytes / 1024) > 0.9 && ($i < $unitCount - 1); $i++) {
+        for ($i = 0; (abs($bytes) / 1024) > 0.9 && ($i < $unitCount - 1); $i++) {
             $bytes /= 1024;
         }
 
