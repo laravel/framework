@@ -1291,6 +1291,43 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Execute the given callback if the string is a valid URL.
+     *
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return static
+     */
+    public function whenIsUrl($callback, $default = null)
+    {
+        return $this->when($this->isUrl(), $callback, $default);
+    }
+
+    /**
+     * Execute the given callback if the string is valid JSON.
+     *
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return static
+     */
+    public function whenIsJson($callback, $default = null)
+    {
+        return $this->when($this->isJson(), $callback, $default);
+    }
+
+    /**
+     * Execute the given callback if the string matches the given regex pattern.
+     *
+     * @param  string|iterable<string>  $pattern
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return static
+     */
+    public function whenIsMatch($pattern, $callback, $default = null)
+    {
+        return $this->when($this->isMatch($pattern), $callback, $default);
+    }
+
+    /**
      * Execute the given callback if the string starts with a given substring.
      *
      * @param  string|iterable<string>  $needles

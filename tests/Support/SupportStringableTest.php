@@ -436,6 +436,63 @@ class SupportStringableTest extends TestCase
         }));
     }
 
+    public function testWhenIsUrl()
+    {
+        $this->assertSame('Url: https://laravel.com', (string) $this->stringable('https://laravel.com')->whenIsUrl(function ($stringable) {
+            return $stringable->prepend('Url: ');
+        }, function ($stringable) {
+            return $stringable->prepend('Not Url: ');
+        }));
+
+        $this->assertSame('not-a-url', (string) $this->stringable('not-a-url')->whenIsUrl(function ($stringable) {
+            return $stringable->prepend('Url: ');
+        }));
+
+        $this->assertSame('Not Url: not-a-url', (string) $this->stringable('not-a-url')->whenIsUrl(function ($stringable) {
+            return $stringable->prepend('Url: ');
+        }, function ($stringable) {
+            return $stringable->prepend('Not Url: ');
+        }));
+    }
+
+    public function testWhenIsJson()
+    {
+        $this->assertSame('Json: {"foo":"bar"}', (string) $this->stringable('{"foo":"bar"}')->whenIsJson(function ($stringable) {
+            return $stringable->prepend('Json: ');
+        }, function ($stringable) {
+            return $stringable->prepend('Not Json: ');
+        }));
+
+        $this->assertSame('not-json', (string) $this->stringable('not-json')->whenIsJson(function ($stringable) {
+            return $stringable->prepend('Json: ');
+        }));
+
+        $this->assertSame('Not Json: not-json', (string) $this->stringable('not-json')->whenIsJson(function ($stringable) {
+            return $stringable->prepend('Json: ');
+        }, function ($stringable) {
+            return $stringable->prepend('Not Json: ');
+        }));
+    }
+
+    public function testWhenIsMatch()
+    {
+        $this->assertSame('Match: foo123', (string) $this->stringable('foo123')->whenIsMatch('/foo\d+/', function ($stringable) {
+            return $stringable->prepend('Match: ');
+        }, function ($stringable) {
+            return $stringable->prepend('No Match: ');
+        }));
+
+        $this->assertSame('bar', (string) $this->stringable('bar')->whenIsMatch('/foo\d+/', function ($stringable) {
+            return $stringable->prepend('Match: ');
+        }));
+
+        $this->assertSame('No Match: bar', (string) $this->stringable('bar')->whenIsMatch('/foo\d+/', function ($stringable) {
+            return $stringable->prepend('Match: ');
+        }, function ($stringable) {
+            return $stringable->prepend('No Match: ');
+        }));
+    }
+
     public function testWhenTest()
     {
         $this->assertSame('Winner: foo bar', (string) $this->stringable('foo bar')->whenTest('/bar/', function ($stringable) {
