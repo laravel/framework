@@ -282,9 +282,7 @@ class Event
 
         $eventParameterType = Arr::get($parameters, 'event');
 
-        if ($eventParameterType === null ||
-            ! is_a($eventParameterType, Event::class, true) ||
-            ! is_a($this, $eventParameterType)) {
+        if ($eventParameterType === null || ! is_a($this, $eventParameterType)) {
             return [];
         }
 
