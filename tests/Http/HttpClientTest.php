@@ -1678,6 +1678,77 @@ class HttpClientTest extends TestCase
         $this->assertSame(json_encode(['page' => 'foo']), stream_get_contents($resource));
     }
 
+    public function testStreamMethodSetsGuzzleStreamOption()
+    {
+        $request = $this->factory->stream();
+
+        $this->assertTrue($request->getOptions()['stream']);
+    }
+
+    public function testStreamMethodIsChainable()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('ok'),
+        ]);
+
+        $response = $this->factory->stream()->get('http://example.com');
+
+        $this->assertTrue($response->successful());
+    }
+
+    public function testResponseLinesYieldsEachLineOfTheBody()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response("first\nsecond\nthird"),
+        ]);
+
+        $response = $this->factory->stream()->get('http://example.com');
+
+        $this->assertSame(
+            ['first', 'second', 'third'],
+            iterator_to_array($response->lines(), false),
+        );
+    }
+
+    public function testResponseLinesHandlesMixedLineEndings()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response("alpha\r\nbeta\ngamma\r\ndelta"),
+        ]);
+
+        $response = $this->factory->stream()->get('http://example.com');
+
+        $this->assertSame(
+            ['alpha', 'beta', 'gamma', 'delta'],
+            iterator_to_array($response->lines(), false),
+        );
+    }
+
+    public function testResponseLinesPreservesBlankLinesBetweenContent()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response("one\n\ntwo\n\nthree\n"),
+        ]);
+
+        $response = $this->factory->stream()->get('http://example.com');
+
+        $this->assertSame(
+            ['one', '', 'two', '', 'three'],
+            iterator_to_array($response->lines(), false),
+        );
+    }
+
+    public function testResponseLinesReturnsEmptyGeneratorForEmptyBody()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response(''),
+        ]);
+
+        $response = $this->factory->stream()->get('http://example.com');
+
+        $this->assertSame([], iterator_to_array($response->lines(), false));
+    }
+
     public function testCanAssertAgainstOrderOfHttpRequestsWithUrlStrings()
     {
         $this->factory->fake();

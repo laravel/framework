@@ -622,6 +622,18 @@ class PendingRequest
     }
 
     /**
+     * Indicate that the response body should be streamed instead of buffered in memory.
+     *
+     * @return $this
+     */
+    public function stream()
+    {
+        $this->options['stream'] = true;
+
+        return $this;
+    }
+
+    /**
      * Specify the timeout (in seconds) for the request.
      *
      * @param  int|float  $seconds
