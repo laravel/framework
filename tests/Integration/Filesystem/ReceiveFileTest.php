@@ -6,6 +6,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
 #[WithConfig('filesystems.disks.local.serve', true)]
 class ReceiveFileTest extends TestCase
@@ -77,6 +78,7 @@ class ReceiveFileTest extends TestCase
         $response->assertForbidden();
     }
 
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testItCanReceiveAFileWithUriDelimitersInThePath()
     {
         $result = Storage::temporaryUploadUrl('receive-file-test.txt?pad=x', Carbon::now()->addMinute());
@@ -88,6 +90,7 @@ class ReceiveFileTest extends TestCase
         Storage::assertMissing('receive-file-test.txt');
     }
 
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testUriDelimitersInThePathCannotHideAnExpiredUploadUrl()
     {
         $result = Storage::temporaryUploadUrl('receive-file-test.txt?pad=x', Carbon::now()->subMinute());

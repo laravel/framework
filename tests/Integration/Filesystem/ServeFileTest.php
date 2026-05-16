@@ -6,6 +6,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
 #[WithConfig('filesystems.disks.local.serve', true)]
 class ServeFileTest extends TestCase
@@ -56,6 +57,7 @@ class ServeFileTest extends TestCase
         $response->assertForbidden();
     }
 
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testItCanServeAFileWithUriDelimitersInThePath()
     {
         $url = Storage::temporaryUrl('serve-file-test.txt?pad=x', Carbon::now()->addMinute());
@@ -65,6 +67,7 @@ class ServeFileTest extends TestCase
         $this->assertSame('Hello Question', $response->streamedContent());
     }
 
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testUriDelimitersInThePathCannotHideAnExpiredUrl()
     {
         $url = Storage::temporaryUrl('serve-file-test.txt?pad=x', Carbon::now()->subMinute());
