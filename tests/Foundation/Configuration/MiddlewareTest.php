@@ -15,6 +15,7 @@ use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
+use Illuminate\Http\Middleware\HandleRouteCors;
 use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
@@ -345,5 +346,15 @@ class MiddlewareTest extends TestCase
 
         $this->assertNotNull($callback);
         $this->assertNull($callback(null));
+    }
+
+    public function testRouteCorsMiddlewareIsPrependedToWebAndApiGroups()
+    {
+        $configuration = new Middleware();
+
+        $groups = $configuration->getMiddlewareGroups();
+
+        $this->assertSame(HandleRouteCors::class, $groups['web'][0]);
+        $this->assertSame(HandleRouteCors::class, $groups['api'][0]);
     }
 }

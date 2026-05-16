@@ -2,16 +2,27 @@
 
 namespace Illuminate\Tests\Integration\Http\Middleware;
 
+use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\RateLimiter;
 use Orchestra\Testbench\TestCase;
 
 class HandleCorsTest extends TestCase
 {
     use ValidatesRequests;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        SpyMiddleware::$invocations = 0;
+    }
 
     protected function defineEnvironment($app)
     {
@@ -24,6 +35,11 @@ class HandleCorsTest extends TestCase
             'exposed_headers' => [],
             'max_age' => 0,
         ];
+
+        $app['config']->set('auth.defaults.guard', 'web');
+        $app['config']->set('auth.guards.web', ['driver' => 'handle-cors-null']);
+
+        $app['auth']->viaRequest('handle-cors-null', fn () => null);
 
         $kernel = $app->make(Kernel::class);
         $kernel->prependMiddleware(HandleCors::class);
@@ -245,6 +261,64 @@ class HandleCorsTest extends TestCase
         $this->assertEquals(302, $crawler->getStatusCode());
     }
 
+    public function testPreflightPassesThroughAuthMiddleware()
+    {
+        $crawler = $this->call('OPTIONS', 'api/protected', [], [], [], [
+            'HTTP_ORIGIN' => 'http://localhost',
+            'HTTP_ACCESS_CONTROL_REQUEST_METHOD' => 'POST',
+        ]);
+
+        $this->assertEquals(204, $crawler->getStatusCode());
+        $this->assertSame('http://localhost', $crawler->headers->get('Access-Control-Allow-Origin'));
+    }
+
+    public function testPreflightDoesNotInvokeDownstreamMiddleware()
+    {
+        $this->app['router']->post('api/spy', ['uses' => fn () => 'OK'])
+            ->middleware(SpyMiddleware::class);
+
+        $crawler = $this->call('OPTIONS', 'api/spy', [], [], [], [
+            'HTTP_ORIGIN' => 'http://localhost',
+            'HTTP_ACCESS_CONTROL_REQUEST_METHOD' => 'POST',
+        ]);
+
+        $this->assertEquals(204, $crawler->getStatusCode());
+        $this->assertSame('http://localhost', $crawler->headers->get('Access-Control-Allow-Origin'));
+        $this->assertSame(0, SpyMiddleware::$invocations, 'Downstream route middleware must not run on preflight requests.');
+    }
+
+    public function testPreflightPassesThroughThrottleMiddleware()
+    {
+        RateLimiter::for('cors-preflight', fn () => Limit::perMinute(1));
+
+        $this->app['router']->post('api/throttled', ['uses' => fn () => 'OK'])
+            ->middleware(ThrottleRequests::class.':cors-preflight');
+
+        $first = $this->call('OPTIONS', 'api/throttled', [], [], [], [
+            'HTTP_ORIGIN' => 'http://localhost',
+            'HTTP_ACCESS_CONTROL_REQUEST_METHOD' => 'POST',
+        ]);
+
+        $this->assertEquals(204, $first->getStatusCode());
+        $this->assertSame('http://localhost', $first->headers->get('Access-Control-Allow-Origin'));
+
+        $second = $this->call('OPTIONS', 'api/throttled', [], [], [], [
+            'HTTP_ORIGIN' => 'http://localhost',
+            'HTTP_ACCESS_CONTROL_REQUEST_METHOD' => 'POST',
+        ]);
+
+        $this->assertEquals(204, $second->getStatusCode());
+        $this->assertSame('http://localhost', $second->headers->get('Access-Control-Allow-Origin'));
+    }
+
+    public function testNonCorsOptionsReturnsAllowHeader()
+    {
+        $crawler = $this->call('OPTIONS', 'api/ping');
+
+        $this->assertEquals(200, $crawler->getStatusCode());
+        $this->assertSame('POST,PUT', $crawler->headers->get('Allow'));
+    }
+
     protected function addWebRoutes(Router $router)
     {
         $router->post('web/ping', [
@@ -283,5 +357,22 @@ class HandleCorsTest extends TestCase
                 return 'ok';
             },
         ]);
+
+        $router->post('api/protected', [
+            'middleware' => Authenticate::class.':web',
+            'uses' => fn () => 'PROTECTED',
+        ]);
+    }
+}
+
+class SpyMiddleware
+{
+    public static int $invocations = 0;
+
+    public function handle($request, \Closure $next)
+    {
+        self::$invocations++;
+
+        return $next($request);
     }
 }

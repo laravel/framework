@@ -483,6 +483,7 @@ class Middleware
     {
         $middleware = [
             'web' => array_values(array_filter([
+                \Illuminate\Http\Middleware\HandleRouteCors::class,
                 \Illuminate\Cookie\Middleware\EncryptCookies::class,
                 \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
                 \Illuminate\Session\Middleware\StartSession::class,
@@ -493,6 +494,7 @@ class Middleware
             ])),
 
             'api' => array_values(array_filter([
+                \Illuminate\Http\Middleware\HandleRouteCors::class,
                 $this->statefulApi ? \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class : null,
                 $this->apiLimiter ? 'throttle:'.$this->apiLimiter : null,
                 \Illuminate\Routing\Middleware\SubstituteBindings::class,

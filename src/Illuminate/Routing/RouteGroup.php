@@ -30,8 +30,12 @@ class RouteGroup
             'where' => static::formatWhere($new, $old),
         ]);
 
+        if (! isset($new['cors']) && isset($old['cors'])) {
+            $new['cors'] = $old['cors'];
+        }
+
         return array_merge_recursive(Arr::except(
-            $old, ['namespace', 'prefix', 'where', 'as']
+            $old, ['namespace', 'prefix', 'where', 'as', 'cors']
         ), $new);
     }
 

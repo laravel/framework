@@ -31,6 +31,7 @@ use InvalidArgumentException;
  * @method \Illuminate\Routing\RouteRegistrar where(array $where)
  * @method \Illuminate\Routing\RouteRegistrar withoutMiddleware(array|string $middleware)
  * @method \Illuminate\Routing\RouteRegistrar withoutScopedBindings()
+ * @method \Illuminate\Routing\RouteRegistrar cors(array $options)
  */
 class RouteRegistrar
 {
@@ -71,6 +72,7 @@ class RouteRegistrar
         'as',
         'can',
         'controller',
+        'cors',
         'domain',
         'middleware',
         'missing',

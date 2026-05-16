@@ -1107,6 +1107,65 @@ class Route
     }
 
     /**
+     * Set the CORS options for the route.
+     *
+     * @param  array  $options
+     * @return $this
+     */
+    public function cors(array $options)
+    {
+        $this->action['cors'] = $options;
+
+        return $this;
+    }
+
+    /**
+     * Get the effective CORS options for this route.
+     *
+     * Resolution order: method attribute > class attribute > route/group action.
+     *
+     * @return array|null
+     */
+    public function effectiveCorsOptions()
+    {
+        return $this->controllerCorsOptions()
+            ?? ($this->action['cors'] ?? null);
+    }
+
+    /**
+     * Get CORS options from controller attributes.
+     *
+     * @return array|null
+     */
+    protected function controllerCorsOptions()
+    {
+        if (! $this->isControllerAction()) {
+            return null;
+        }
+
+        try {
+            $reflectionClass = new ReflectionClass($this->getControllerClass());
+            $reflectionMethod = $reflectionClass->getMethod($this->getControllerMethod());
+        } catch (ReflectionException) {
+            return null;
+        }
+
+        $methodAttrs = $reflectionMethod->getAttributes(Attributes\Cors::class);
+
+        if (! empty($methodAttrs)) {
+            return $methodAttrs[0]->newInstance()->toArray();
+        }
+
+        $classAttrs = $reflectionClass->getAttributes(Attributes\Cors::class);
+
+        if (! empty($classAttrs)) {
+            return $classAttrs[0]->newInstance()->toArray();
+        }
+
+        return null;
+    }
+
+    /**
      * Get the middleware for the route's controller.
      *
      * @return array

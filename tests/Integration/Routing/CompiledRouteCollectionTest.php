@@ -571,6 +571,25 @@ class CompiledRouteCollectionTest extends TestCase
         ], $this->collection()->getRoutesByMethod());
     }
 
+    public function testCorsMetadataSurvivesCompiledRouteCollection()
+    {
+        $corsOptions = ['origins' => ['https://app.example.com'], 'methods' => ['GET']];
+
+        $this->routeCollection->add(
+            $this->newRoute('GET', 'api/cors-test', [
+                'uses' => 'CorsController@index',
+                'cors' => $corsOptions,
+            ])
+        );
+
+        $compiled = $this->collection();
+
+        $request = Request::create('http://localhost/api/cors-test', 'GET');
+        $route = $compiled->match($request);
+
+        $this->assertSame($corsOptions, $route->getAction()['cors']);
+    }
+
     /**
      * Create a new Route object.
      *

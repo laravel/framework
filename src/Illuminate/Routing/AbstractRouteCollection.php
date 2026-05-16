@@ -51,7 +51,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
      * Determine if any routes match on another HTTP verb.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return array
+     * @return array<string, \Illuminate\Routing\Route>
      */
     protected function checkForAlternateVerbs($request)
     {
@@ -60,11 +60,9 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
         // Here we will spin through all verbs except for the current request verb and
         // check to see if any routes respond to them. If they do, we will return a
         // proper error response with the correct headers on the response string.
-        return array_values(array_filter(
+        return array_filter(array_combine(
             $methods,
-            function ($method) use ($request) {
-                return ! is_null($this->matchAgainstRoutes($this->get($method), $request, false));
-            }
+            array_map(fn ($method) => $this->matchAgainstRoutes($this->get($method), $request, false), $methods)
         ));
     }
 
@@ -99,13 +97,15 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
      * Get a route (if necessary) that responds when other available methods are present.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  string[]  $methods
+     * @param  array<string, \Illuminate\Routing\Route>  $routes
      * @return \Illuminate\Routing\Route
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function getRouteForMethods($request, array $methods)
+    protected function getRouteForMethods($request, array $routes)
     {
+        $methods = array_keys($routes);
+
         if ($request->isMethod('OPTIONS')) {
             return (new Route('OPTIONS', $request->path(), function () use ($methods) {
                 return new Response('', 200, ['Allow' => implode(',', $methods)]);

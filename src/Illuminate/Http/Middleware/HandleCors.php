@@ -6,9 +6,14 @@ use Closure;
 use Fruitcake\Cors\CorsService;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class HandleCors
 {
+    public const ROUTE_CORS_HANDLED_ATTRIBUTE = '_laravel_route_cors_handled';
+
     /**
      * The container instance.
      *
@@ -51,17 +56,89 @@ class HandleCors
      */
     public function handle($request, Closure $next)
     {
-        foreach (static::$skipCallbacks as $callback) {
-            if ($callback($request)) {
-                return $next($request);
-            }
-        }
-
-        if (! $this->hasMatchingPath($request)) {
+        if ($this->shouldSkip($request) || ! $this->hasMatchingPath($request)) {
             return $next($request);
         }
 
-        $this->cors->setOptions($this->container['config']->get('cors', []));
+        if ($this->cors->isPreflightRequest($request)) {
+            $this->cors->setOptions($this->resolveOptionsForPreflight($request));
+
+            $response = $this->cors->handlePreflightRequest($request);
+
+            $this->cors->varyHeader($response, 'Access-Control-Request-Method');
+
+            return $response;
+        }
+
+        $response = $next($request);
+
+        if ($request->attributes->get(static::ROUTE_CORS_HANDLED_ATTRIBUTE)) {
+            return $response;
+        }
+
+        return $this->handleRequest($request, fn () => $response, $this->container['config']->get('cors', []));
+    }
+
+    /**
+     * Resolve the CORS options to use when answering a preflight request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    protected function resolveOptionsForPreflight(Request $request): array
+    {
+        $globalOptions = $this->container['config']->get('cors', []);
+
+        $intendedMethod = strtoupper((string) $request->headers->get('Access-Control-Request-Method'));
+
+        if ($intendedMethod === '') {
+            return $globalOptions;
+        }
+
+        try {
+            $probe = $request->duplicate();
+            $probe->setMethod($intendedMethod);
+
+            $route = $this->container['router']->getRoutes()->match($probe);
+        } catch (NotFoundHttpException|MethodNotAllowedHttpException) {
+            return $globalOptions;
+        }
+
+        if ($route instanceof Route && ($routeOptions = $route->effectiveCorsOptions()) !== null) {
+            return $this->normalizeCorsOptions($routeOptions);
+        }
+
+        return $globalOptions;
+    }
+
+    /**
+     * Determine whether the middleware should be skipped.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    protected function shouldSkip(Request $request): bool
+    {
+        foreach (static::$skipCallbacks as $callback) {
+            if ($callback($request)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Handle the request using the given CORS options.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @param  array  $options
+     * @return \Illuminate\Http\Response
+     */
+    protected function handleRequest(Request $request, Closure $next, array $options)
+    {
+        $this->cors->setOptions($options);
 
         if ($this->cors->isPreflightRequest($request)) {
             $response = $this->cors->handlePreflightRequest($request);
@@ -78,6 +155,25 @@ class HandleCors
         }
 
         return $this->cors->addActualRequestHeaders($response, $request);
+    }
+
+    /**
+     * Normalize short-form CORS options into the shape expected by CorsService.
+     *
+     * @param  array  $options
+     * @return array
+     */
+    protected function normalizeCorsOptions(array $options): array
+    {
+        return [
+            'allowed_origins' => $options['origins'] ?? ['*'],
+            'allowed_methods' => $options['methods'] ?? ['*'],
+            'allowed_headers' => $options['headers'] ?? ['*'],
+            'exposed_headers' => $options['exposed_headers'] ?? [],
+            'max_age' => $options['max_age'] ?? 0,
+            'supports_credentials' => $options['credentials'] ?? false,
+            'allowed_origins_patterns' => [],
+        ];
     }
 
     /**
