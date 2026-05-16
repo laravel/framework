@@ -238,7 +238,7 @@ class Event
     public function callBeforeCallbacks(Container $container)
     {
         foreach ($this->beforeCallbacks as $callback) {
-            $container->call($callback);
+            $this->callEventCallback($container, $callback);
         }
     }
 
@@ -251,8 +251,44 @@ class Event
     public function callAfterCallbacks(Container $container)
     {
         foreach ($this->afterCallbacks as $callback) {
-            $container->call($callback);
+            $this->callEventCallback($container, $callback);
         }
+    }
+
+    /**
+     * Call the given event callback.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  \Closure  $callback
+     * @param  array  $parameters
+     * @return mixed
+     */
+    protected function callEventCallback(Container $container, Closure $callback, array $parameters = [])
+    {
+        return $container->call($callback, array_merge(
+            $this->eventParametersForCallback($callback), $parameters
+        ));
+    }
+
+    /**
+     * Get the event parameters for the given callback.
+     *
+     * @param  \Closure  $callback
+     * @return array
+     */
+    protected function eventParametersForCallback(Closure $callback)
+    {
+        $parameters = $this->closureParameterTypes($callback);
+
+        $eventParameterType = Arr::get($parameters, 'event');
+
+        if ($eventParameterType === null ||
+            ! is_a($eventParameterType, Event::class, true) ||
+            ! is_a($this, $eventParameterType)) {
+            return [];
+        }
+
+        return ['event' => $this];
     }
 
     /**
@@ -339,13 +375,13 @@ class Event
         $this->lastChecked = Date::now();
 
         foreach ($this->filters as $callback) {
-            if (! $app->call($callback)) {
+            if (! $this->callEventCallback($app, $callback)) {
                 return false;
             }
         }
 
         foreach ($this->rejects as $callback) {
-            if ($app->call($callback)) {
+            if ($this->callEventCallback($app, $callback)) {
                 return false;
             }
         }
@@ -690,7 +726,7 @@ class Event
 
         return $this->then(function (Container $container) use ($callback) {
             if ($this->exitCode === 0) {
-                $container->call($callback);
+                $this->callEventCallback($container, $callback);
             }
         });
     }
@@ -725,7 +761,7 @@ class Event
 
         return $this->then(function (Container $container) use ($callback) {
             if ($this->exitCode !== 0) {
-                $container->call($callback);
+                $this->callEventCallback($container, $callback);
             }
         });
     }
@@ -758,7 +794,7 @@ class Event
 
             return $onlyIfOutputExists && empty($output)
                 ? null
-                : $container->call($callback, ['output' => new Stringable($output)]);
+                : $this->callEventCallback($container, $callback, ['output' => new Stringable($output)]);
         };
     }
 

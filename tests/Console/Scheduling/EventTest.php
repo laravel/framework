@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Console\Scheduling;
 
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
+use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
@@ -96,6 +97,52 @@ class EventTest extends TestCase
         });
 
         $this->assertSame('fancy-command-description', $event->mutexName());
+    }
+
+    public function testBeforeAndAfterCallbacksCanReceiveEvent()
+    {
+        $container = new Container;
+        $beforeEvent = null;
+        $afterEvent = null;
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+
+        $event->before(function (Event $event) use (&$beforeEvent) {
+            $beforeEvent = $event;
+        });
+
+        $event->after(function (Event $event) use (&$afterEvent) {
+            $afterEvent = $event;
+        });
+
+        $event->callBeforeCallbacks($container);
+        $event->callAfterCallbacks($container);
+
+        $this->assertSame($event, $beforeEvent);
+        $this->assertSame($event, $afterEvent);
+    }
+
+    public function testFilterCallbacksCanReceiveEvent()
+    {
+        $container = new Container;
+        $filterEvent = null;
+        $rejectEvent = null;
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+
+        $event->when(function (Event $event) use (&$filterEvent) {
+            $filterEvent = $event;
+
+            return true;
+        });
+
+        $event->skip(function (Event $event) use (&$rejectEvent) {
+            $rejectEvent = $event;
+
+            return false;
+        });
+
+        $this->assertTrue($event->filtersPass($container));
+        $this->assertSame($event, $filterEvent);
+        $this->assertSame($event, $rejectEvent);
     }
 
     public function testDaysOfMonthMethod()
