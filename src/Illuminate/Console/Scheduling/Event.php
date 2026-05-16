@@ -260,7 +260,7 @@ class Event
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @param  \Closure  $callback
-     * @param  array  $parameters
+     * @param  array<string, mixed>  $parameters
      * @return mixed
      */
     protected function callEventCallback(Container $container, Closure $callback, array $parameters = [])
