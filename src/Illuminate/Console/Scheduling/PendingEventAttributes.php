@@ -10,7 +10,36 @@ class PendingEventAttributes
     use ManagesAttributes, ManagesFrequencies;
 
     /**
-     * The recorded macro calls to replay on each event.
+     * Event lifecycle and output methods that should be deferred and replayed on each event in the group.
+     *
+     * @var array<int, string>
+     */
+    protected const DEFERRED_EVENT_METHODS = [
+        'before',
+        'after',
+        'then',
+        'thenWithOutput',
+        'onSuccess',
+        'onSuccessWithOutput',
+        'onFailure',
+        'onFailureWithOutput',
+        'pingBefore',
+        'pingBeforeIf',
+        'thenPing',
+        'thenPingIf',
+        'pingOnSuccess',
+        'pingOnSuccessIf',
+        'pingOnFailure',
+        'pingOnFailureIf',
+        'sendOutputTo',
+        'appendOutputTo',
+        'emailOutputTo',
+        'emailWrittenOutputTo',
+        'emailOutputOnFailure',
+    ];
+
+    /**
+     * The recorded macro and deferred method calls to replay on each event.
      *
      * @var array<int, array{string, array}>
      */
@@ -106,7 +135,7 @@ class PendingEventAttributes
      */
     public function __call(string $method, array $parameters): mixed
     {
-        if (Event::hasMacro($method)) {
+        if (Event::hasMacro($method) || in_array($method, static::DEFERRED_EVENT_METHODS, true)) {
             $this->macros[] = [$method, $parameters];
 
             return $this;
