@@ -451,6 +451,13 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             $this->sqs->purgeQueue([
                 'QueueUrl' => $this->getQueue($queue),
             ]);
+
+            if (Arr::get($this->overflowStorage, 'enabled')
+                && Arr::get($this->overflowStorage, 'flush_on_clear')) {
+                $this->container->make('cache')->store(
+                    Arr::get($this->overflowStorage, 'store')
+                )->flush();
+            }
         });
     }
 
