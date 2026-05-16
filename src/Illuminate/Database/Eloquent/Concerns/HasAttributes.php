@@ -672,17 +672,19 @@ trait HasAttributes
      */
     public function hasAttributeMutator($key)
     {
-        if (isset(static::$attributeMutatorCache[get_class($this)][$key])) {
-            return static::$attributeMutatorCache[get_class($this)][$key];
+        $normalizedKey = $this->normalizeAttributeMutatorKey($key);
+
+        if (isset(static::$attributeMutatorCache[get_class($this)][$normalizedKey])) {
+            return static::$attributeMutatorCache[get_class($this)][$normalizedKey];
         }
 
         if (! method_exists($this, $method = Str::camel($key))) {
-            return static::$attributeMutatorCache[get_class($this)][$key] = false;
+            return static::$attributeMutatorCache[get_class($this)][$normalizedKey] = false;
         }
 
         $returnType = (new ReflectionMethod($this, $method))->getReturnType();
 
-        return static::$attributeMutatorCache[get_class($this)][$key] =
+        return static::$attributeMutatorCache[get_class($this)][$normalizedKey] =
                     $returnType instanceof ReflectionNamedType &&
                     $returnType->getName() === Attribute::class;
     }
@@ -695,15 +697,17 @@ trait HasAttributes
      */
     public function hasAttributeGetMutator($key)
     {
-        if (isset(static::$getAttributeMutatorCache[get_class($this)][$key])) {
-            return static::$getAttributeMutatorCache[get_class($this)][$key];
+        $normalizedKey = $this->normalizeAttributeMutatorKey($key);
+
+        if (isset(static::$getAttributeMutatorCache[get_class($this)][$normalizedKey])) {
+            return static::$getAttributeMutatorCache[get_class($this)][$normalizedKey];
         }
 
         if (! $this->hasAttributeMutator($key)) {
-            return static::$getAttributeMutatorCache[get_class($this)][$key] = false;
+            return static::$getAttributeMutatorCache[get_class($this)][$normalizedKey] = false;
         }
 
-        return static::$getAttributeMutatorCache[get_class($this)][$key] = is_callable($this->{Str::camel($key)}()->get);
+        return static::$getAttributeMutatorCache[get_class($this)][$normalizedKey] = is_callable($this->{Str::camel($key)}()->get);
     }
 
     /**
@@ -770,10 +774,12 @@ trait HasAttributes
      */
     protected function mutateAttributeForArray($key, $value)
     {
+        $normalizedKey = $this->normalizeAttributeMutatorKey($key);
+
         if ($this->isClassCastable($key)) {
             $value = $this->getClassCastableAttributeValue($key, $value);
-        } elseif (isset(static::$getAttributeMutatorCache[get_class($this)][$key]) &&
-                  static::$getAttributeMutatorCache[get_class($this)][$key] === true) {
+        } elseif (isset(static::$getAttributeMutatorCache[get_class($this)][$normalizedKey]) &&
+                  static::$getAttributeMutatorCache[get_class($this)][$normalizedKey] === true) {
             $value = $this->mutateAttributeMarkedAttribute($key, $value);
 
             $value = $value instanceof DateTimeInterface
@@ -784,6 +790,24 @@ trait HasAttributes
         }
 
         return $value instanceof Arrayable ? $value->toArray() : $value;
+    }
+
+    /**
+     * Normalize an attribute key to match the format used in the mutator cache.
+     *
+     * This handles cases where multiple snake_case forms map to the same camelCase
+     * method (e.g., both "foo_1_bar" and "foo1_bar" map to "foo1Bar").
+     *
+     * @param  string  $key
+     * @return string
+     */
+    protected function normalizeAttributeMutatorKey($key)
+    {
+        if (! preg_match('/\d/', $key)) {
+            return $key;
+        }
+
+        return lcfirst(static::$snakeAttributes ? Str::snake(Str::camel($key)) : Str::camel($key));
     }
 
     /**
@@ -1153,18 +1177,19 @@ trait HasAttributes
     public function hasAttributeSetMutator($key)
     {
         $class = get_class($this);
+        $normalizedKey = $this->normalizeAttributeMutatorKey($key);
 
-        if (isset(static::$setAttributeMutatorCache[$class][$key])) {
-            return static::$setAttributeMutatorCache[$class][$key];
+        if (isset(static::$setAttributeMutatorCache[$class][$normalizedKey])) {
+            return static::$setAttributeMutatorCache[$class][$normalizedKey];
         }
 
         if (! method_exists($this, $method = Str::camel($key))) {
-            return static::$setAttributeMutatorCache[$class][$key] = false;
+            return static::$setAttributeMutatorCache[$class][$normalizedKey] = false;
         }
 
         $returnType = (new ReflectionMethod($this, $method))->getReturnType();
 
-        return static::$setAttributeMutatorCache[$class][$key] =
+        return static::$setAttributeMutatorCache[$class][$normalizedKey] =
                     $returnType instanceof ReflectionNamedType &&
                     $returnType->getName() === Attribute::class &&
                     is_callable($this->{$method}()->set);

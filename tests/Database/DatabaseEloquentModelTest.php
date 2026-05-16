@@ -3842,6 +3842,26 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertNotInstanceOf(CustomBuilder::class, $eloquentBuilder);
     }
+
+    public function testAccessorAttributeNameConversionWithAlternateSnakeCaseForm()
+    {
+        $model = new EloquentModelWithNumericAccessorStub;
+
+        // Both snake_case forms should resolve to the same camelCase method
+        $this->assertSame('yay', $model->foo1_bar);
+        $this->assertSame('yay', $model->foo_1_bar);
+
+        // Appending via the canonical snake form should work
+        $model->append('foo1_bar');
+        $array = $model->toArray();
+        $this->assertSame('yay', $array['foo1_bar']);
+
+        // Appending via the alternate snake form should also work
+        $model2 = new EloquentModelWithNumericAccessorStub;
+        $model2->append('foo_1_bar');
+        $array2 = $model2->toArray();
+        $this->assertSame('yay', $array2['foo_1_bar']);
+    }
 }
 
 class CustomBuilder extends Builder
@@ -4772,6 +4792,16 @@ class StringableCastBuilder implements NativeStringable
     public function __toString()
     {
         return $this->cast;
+    }
+}
+
+class EloquentModelWithNumericAccessorStub extends Model
+{
+    protected function foo1Bar(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => 'yay',
+        );
     }
 }
 
