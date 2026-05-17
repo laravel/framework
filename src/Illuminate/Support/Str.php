@@ -744,7 +744,7 @@ class Str
 
         $trimmed = rtrim(mb_strimwidth($value, 0, $limit, '', 'UTF-8'));
 
-        if (mb_substr($value, $limit, 1, 'UTF-8') === ' ') {
+        if (mb_substr($value, mb_strlen($trimmed), 1, 'UTF-8') === ' ') {
             return $trimmed.$end;
         }
 
