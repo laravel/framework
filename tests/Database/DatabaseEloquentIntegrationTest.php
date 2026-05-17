@@ -1721,6 +1721,31 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals(1, EloquentTestPost::count());
     }
 
+    public function testWasChangedIsResetAfterSaveWithoutChanges()
+    {
+        $user = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+
+        $user->email = 'foo@gmail.com';
+        $user->save();
+
+        $this->assertTrue($user->wasChanged('email'));
+        $this->assertSame(['email' => 'foo@gmail.com'], $user->getChanges());
+
+        // Saving again without any modifications should reset the recorded changes.
+        $user->save();
+
+        $this->assertFalse($user->wasChanged());
+        $this->assertFalse($user->wasChanged('email'));
+        $this->assertSame([], $user->getChanges());
+
+        // Setting an attribute to its current value is not a change either.
+        $user->email = 'foo@gmail.com';
+        $user->save();
+
+        $this->assertFalse($user->wasChanged('email'));
+        $this->assertSame([], $user->getChanges());
+    }
+
     public function testSavingJSONFields()
     {
         $model = EloquentTestWithJSON::create(['json' => ['x' => 0]]);
