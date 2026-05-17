@@ -145,6 +145,41 @@ class EventTest extends TestCase
         $this->assertSame($event, $rejectEvent);
     }
 
+    public function testFilterCallbacksMayBeInvokableObjects()
+    {
+        $container = new Container;
+        $filter = new class
+        {
+            public int $calls = 0;
+
+            public function __invoke(): bool
+            {
+                $this->calls++;
+
+                return true;
+            }
+        };
+        $reject = new class
+        {
+            public int $calls = 0;
+
+            public function __invoke(): bool
+            {
+                $this->calls++;
+
+                return false;
+            }
+        };
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+
+        $event->when($filter);
+        $event->skip($reject);
+
+        $this->assertTrue($event->filtersPass($container));
+        $this->assertSame(1, $filter->calls);
+        $this->assertSame(1, $reject->calls);
+    }
+
     public function testDaysOfMonthMethod()
     {
         $event = new Event(m::mock(EventMutex::class), 'php -i');
