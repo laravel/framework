@@ -10,8 +10,10 @@ use Illuminate\Mail\Mailer;
 use Illuminate\Mail\Message;
 use Illuminate\Mail\Transport\ArrayTransport;
 use Illuminate\Support\HtmlString;
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mime\Address;
 
 class MailMailerTest extends TestCase
 {
@@ -202,6 +204,36 @@ class MailMailerTest extends TestCase
         $this->assertCount(1, $recipients);
         $this->assertSame('taylor@laravel.com', $recipients[0]->getAddress());
         $this->assertSame('Taylor Otwell', $recipients[0]->getName());
+    }
+
+    public function testMailerRejectsAddressesContainingLineBreaks(): void
+    {
+        $view = m::mock(Factory::class);
+        $view->shouldReceive('make')->once()->andReturn($view);
+        $view->shouldReceive('render')->once()->andReturn('rendered.view');
+        $mailer = new Mailer('array', $view, new ArrayTransport);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Email addresses may not contain line break characters.');
+
+        $mailer->send('foo', ['data'], function (Message $message) {
+            $message->to("\"foo\r\nBcc: victim@example.com\"@example.com")->from('hello@laravel.com');
+        });
+    }
+
+    public function testMailerRejectsSymfonyAddressesContainingLineBreaks(): void
+    {
+        $view = m::mock(Factory::class);
+        $view->shouldReceive('make')->once()->andReturn($view);
+        $view->shouldReceive('render')->once()->andReturn('rendered.view');
+        $mailer = new Mailer('array', $view, new ArrayTransport);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Email addresses may not contain line break characters.');
+
+        $mailer->send('foo', ['data'], function (Message $message) {
+            $message->to(new Address("\"foo\r\nBcc: victim@example.com\"@example.com"))->from('hello@laravel.com');
+        });
     }
 
     public function testGlobalFromIsRespectedOnAllMessages(): void

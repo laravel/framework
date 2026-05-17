@@ -943,6 +943,10 @@ trait ValidatesAttributes
             return false;
         }
 
+        if (preg_match('/[\r\n]/', (string) $value) > 0) {
+            return false;
+        }
+
         $validations = (new Collection($parameters))
             ->unique()
             ->map(fn ($validation) => match (true) {
