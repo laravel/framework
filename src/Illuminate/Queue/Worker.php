@@ -332,7 +332,7 @@ class Worker
     {
         return ! ((! $options->force && ($this->isDownForMaintenance)()) ||
             $this->paused ||
-            $this->events->until(new Looping($connectionName, $queue)) === false);
+            $this->events->until(new Looping($connectionName, $queue, $options)) === false);
     }
 
     /**
