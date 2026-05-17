@@ -149,6 +149,17 @@ class QueueFake extends QueueManager implements Fake, Queue
     }
 
     /**
+     * Assert if a job was pushed exactly once.
+     *
+     * @param  string  $job
+     * @return void
+     */
+    public function assertPushedOnce($job)
+    {
+        $this->assertPushedTimes($job, 1);
+    }
+
+    /**
      * Assert if a job was pushed based on a truth-test callback.
      *
      * @param  \UnitEnum|string  $queue
