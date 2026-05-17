@@ -56,6 +56,7 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static \Illuminate\Support\Testing\Fakes\QueueFake except(array|string $jobsToBeQueued)
  * @method static void assertPushed(string|\Closure $job, callable|int|null $callback = null)
  * @method static void assertPushedTimes(string $job, int $times = 1)
+ * @method static void assertPushedOnce(string $job)
  * @method static void assertPushedOn(\UnitEnum|string $queue, string|\Closure $job, callable|null $callback = null)
  * @method static void assertPushedWithChain(string $job, array $expectedChain = [], callable|null $callback = null)
  * @method static void assertPushedWithoutChain(string $job, callable|null $callback = null)
