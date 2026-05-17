@@ -53,10 +53,13 @@ class Serializer
             if (count($attributes['properties']) === 0) {
                 unset($attributes['properties']);
             } else {
-                $required = array_keys(array_filter(
-                    $attributes['properties'],
-                    static fn (Types\Type $property) => static::isRequired($property),
-                ));
+                $required = array_map(
+                    'strval',
+                    array_keys(array_filter(
+                        $attributes['properties'],
+                        static fn (Types\Type $property) => static::isRequired($property),
+                    ))
+                );
 
                 if ($required !== []) {
                     $attributes['required'] = $required;

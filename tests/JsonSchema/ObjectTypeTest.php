@@ -78,6 +78,20 @@ class ObjectTypeTest extends TestCase
         ], $type->toArray());
     }
 
+    public function test_numeric_string_property_names_remain_strings_in_required_array(): void
+    {
+        $type = JsonSchema::object([
+            '1' => JsonSchema::string()->required(),
+            '4' => JsonSchema::string()->required(),
+        ]);
+
+        $array = $type->toArray();
+
+        $this->assertSame(['1', '4'], $array['required']);
+        $this->assertIsString($array['required'][0]);
+        $this->assertIsString($array['required'][1]);
+    }
+
     public function test_it_may_disable_additional_properties(): void
     {
         $type = JsonSchema::object()->default(['age' => 1])->withoutAdditionalProperties();
