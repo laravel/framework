@@ -766,14 +766,18 @@ class Event
      * Call the given event callback.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
-     * @param  \Closure  $callback
+     * @param  callable  $callback
      * @param  array<string, mixed>  $parameters
      * @return mixed
      */
-    protected function callEventCallback(Container $container, Closure $callback, array $parameters = [])
+    protected function callEventCallback(Container $container, callable $callback, array $parameters = [])
     {
+        $eventParameters = $callback instanceof Closure
+            ? $this->eventParametersForCallback($callback)
+            : [];
+
         return $container->call($callback, array_merge(
-            $this->eventParametersForCallback($callback), $parameters
+            $eventParameters, $parameters
         ));
     }
 
