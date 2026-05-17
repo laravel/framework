@@ -186,6 +186,12 @@ class SupportNumberTest extends TestCase
         $this->assertSame('1 ZB', Number::fileSize(1024 ** 7));
         $this->assertSame('1 YB', Number::fileSize(1024 ** 8));
         $this->assertSame('1,024 YB', Number::fileSize(1024 ** 9));
+
+        $this->assertSame('-1 B', Number::fileSize(-1));
+        $this->assertSame('-2 KB', Number::fileSize(-2048));
+        $this->assertSame('-2.00 KB', Number::fileSize(-2048, precision: 2));
+        $this->assertSame('-1.23 KB', Number::fileSize(-1264, precision: 2));
+        $this->assertSame('-5 GB', Number::fileSize(-1024 * 1024 * 1024 * 5));
     }
 
     public function testClamp()
