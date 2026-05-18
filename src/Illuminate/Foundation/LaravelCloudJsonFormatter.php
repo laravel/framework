@@ -18,8 +18,7 @@ class LaravelCloudJsonFormatter extends JsonFormatter
         $app = Container::getInstance();
 
         if ($app->bound('request')) {
-            $request = $app->make('request');
-            $requestId = $request->header('X-Request-ID');
+            $requestId = $app->make('request')->header('X-Request-ID');
 
             if ($requestId !== null) {
                 $normalized['cloud_request_id'] = $requestId;
