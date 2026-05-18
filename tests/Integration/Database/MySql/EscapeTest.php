@@ -6,7 +6,7 @@ use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use RuntimeException;
 
-#[RequiresOperatingSystem('Linux|Darwin')]
+#[RequiresOperatingSystem('(?!Windows)')]
 #[RequiresPhpExtension('pdo_mysql')]
 class EscapeTest extends MySqlTestCase
 {

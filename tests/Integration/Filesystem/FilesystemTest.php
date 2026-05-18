@@ -8,7 +8,7 @@ use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use Symfony\Component\Process\Process;
 
-#[RequiresOperatingSystem('Linux|Darwin')]
+#[RequiresOperatingSystem('(?!Windows)')]
 class FilesystemTest extends TestCase
 {
     protected $stubFile;

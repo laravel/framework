@@ -14,7 +14,7 @@ use function Illuminate\Support\php_binary;
 
 class EventTest extends TestCase
 {
-    #[RequiresOperatingSystem('Linux|Darwin')]
+    #[RequiresOperatingSystem('(?!Windows)')]
     public function testBuildCommandUsingUnix()
     {
         $event = new Event(m::mock(EventMutex::class), 'php -i');
@@ -30,7 +30,7 @@ class EventTest extends TestCase
         $this->assertSame('php -i > "NUL" 2>&1', $event->buildCommand());
     }
 
-    #[RequiresOperatingSystem('Linux|Darwin')]
+    #[RequiresOperatingSystem('(?!Windows)')]
     public function testBuildCommandInBackgroundUsingUnix()
     {
         $event = new Event(m::mock(EventMutex::class), 'php -i');

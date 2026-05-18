@@ -78,7 +78,7 @@ class ReceiveFileTest extends TestCase
         $response->assertForbidden();
     }
 
-    #[RequiresOperatingSystem('Linux|Darwin')]
+    #[RequiresOperatingSystem('(?!Windows)')]
     public function testItCanReceiveAFileWithUriDelimitersInThePath()
     {
         $result = Storage::temporaryUploadUrl('receive-file-test.txt?pad=x', Carbon::now()->addMinute());
@@ -90,7 +90,7 @@ class ReceiveFileTest extends TestCase
         Storage::assertMissing('receive-file-test.txt');
     }
 
-    #[RequiresOperatingSystem('Linux|Darwin')]
+    #[RequiresOperatingSystem('(?!Windows)')]
     public function testUriDelimitersInThePathCannotHideAnExpiredUploadUrl()
     {
         $result = Storage::temporaryUploadUrl('receive-file-test.txt?pad=x', Carbon::now()->subMinute());

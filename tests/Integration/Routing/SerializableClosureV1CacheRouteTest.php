@@ -11,7 +11,7 @@ use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
 use function Illuminate\Filesystem\join_paths;
 
-#[RequiresOperatingSystem('Linux|Darwin')]
+#[RequiresOperatingSystem('(?!Windows)')]
 #[WithConfig('app.key', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF')]
 #[WithMigration]
 class SerializableClosureV1CacheRouteTest extends TestCase

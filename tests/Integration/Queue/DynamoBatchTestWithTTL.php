@@ -6,7 +6,7 @@ use Illuminate\Support\Env;
 use Orchestra\Testbench\Attributes\RequiresEnv;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
-#[RequiresOperatingSystem('Linux|Darwin')]
+#[RequiresOperatingSystem('(?!Windows)')]
 #[RequiresEnv('DYNAMODB_ENDPOINT')]
 class DynamoBatchTestWithTTL extends DynamoBatchTest
 {

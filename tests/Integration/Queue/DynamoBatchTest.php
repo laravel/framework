@@ -16,7 +16,7 @@ use Orchestra\Testbench\Attributes\RequiresEnv;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
-#[RequiresOperatingSystem('Linux|Darwin')]
+#[RequiresOperatingSystem('(?!Windows)')]
 #[RequiresEnv('DYNAMODB_ENDPOINT')]
 class DynamoBatchTest extends TestCase
 {

@@ -9,7 +9,7 @@ use Orchestra\Testbench\Attributes\RequiresDatabase;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
-#[RequiresOperatingSystem('Linux|Darwin')]
+#[RequiresOperatingSystem('(?!Windows)')]
 #[RequiresPhpExtension('pdo_mysql')]
 class DatabaseMySqlSchemaBuilderTest extends MySqlTestCase
 {

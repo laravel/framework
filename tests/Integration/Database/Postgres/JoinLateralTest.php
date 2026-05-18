@@ -10,7 +10,7 @@ use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
 #[RequiresPhpExtension('pdo_pgsql')]
-#[RequiresOperatingSystem('Linux|Darwin')]
+#[RequiresOperatingSystem('(?!Windows)')]
 class JoinLateralTest extends PostgresTestCase
 {
     protected function afterRefreshingDatabase()

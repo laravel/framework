@@ -33,7 +33,7 @@ class SchemaStateTest extends TestCase
         parent::tearDown();
     }
 
-    #[RequiresOperatingSystem('Linux|Darwin')]
+    #[RequiresOperatingSystem('(?!Windows)')]
     public function testSchemaDumpOnSqlite()
     {
         if ($this->usesSqliteInMemoryDatabaseConnection()) {

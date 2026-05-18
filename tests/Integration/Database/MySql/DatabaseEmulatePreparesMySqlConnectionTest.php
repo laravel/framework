@@ -6,7 +6,7 @@ use PDO;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
-#[RequiresOperatingSystem('Linux|Darwin')]
+#[RequiresOperatingSystem('(?!Windows)')]
 #[RequiresPhpExtension('pdo_mysql')]
 class DatabaseEmulatePreparesMySqlConnectionTest extends DatabaseMySqlConnectionTest
 {

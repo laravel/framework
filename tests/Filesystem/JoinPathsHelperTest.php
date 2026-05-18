@@ -10,7 +10,7 @@ use function Illuminate\Filesystem\join_paths;
 
 class JoinPathsHelperTest extends TestCase
 {
-    #[RequiresOperatingSystem('Linux|Darwin')]
+    #[RequiresOperatingSystem('(?!Windows)')]
     #[DataProvider('unixDataProvider')]
     public function testItCanMergePathsForUnix(string $expected, string $given)
     {

@@ -106,7 +106,7 @@ class FilesystemTest extends TestCase
         $this->assertStringEqualsFile($tempFile, 'Hello Taylor');
     }
 
-    #[RequiresOperatingSystem('Linux|Darwin')]
+    #[RequiresOperatingSystem('(?!Windows)')]
     public function testReplaceWhenUnixSymlinkExists()
     {
         $tempFile = self::$tempDir.'/file.txt';
@@ -547,7 +547,7 @@ class FilesystemTest extends TestCase
         $this->assertFileExists(self::$tempDir.'/created');
     }
 
-    #[RequiresOperatingSystem('Linux|Darwin')]
+    #[RequiresOperatingSystem('(?!Windows)')]
     #[RequiresPhpExtension('pcntl')]
     public function testSharedGet()
     {

@@ -57,7 +57,7 @@ class ServeFileTest extends TestCase
         $response->assertForbidden();
     }
 
-    #[RequiresOperatingSystem('Linux|Darwin')]
+    #[RequiresOperatingSystem('(?!Windows)')]
     public function testItCanServeAFileWithUriDelimitersInThePath()
     {
         $url = Storage::temporaryUrl('serve-file-test.txt?pad=x', Carbon::now()->addMinute());
@@ -67,7 +67,7 @@ class ServeFileTest extends TestCase
         $this->assertSame('Hello Question', $response->streamedContent());
     }
 
-    #[RequiresOperatingSystem('Linux|Darwin')]
+    #[RequiresOperatingSystem('(?!Windows)')]
     public function testUriDelimitersInThePathCannotHideAnExpiredUrl()
     {
         $url = Storage::temporaryUrl('serve-file-test.txt?pad=x', Carbon::now()->subMinute());
