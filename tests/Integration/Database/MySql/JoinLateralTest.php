@@ -6,11 +6,11 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
 #[RequiresPhpExtension('pdo_mysql')]
-#[RequiresOperatingSystemFamily('Linux|Darwin')]
+#[RequiresOperatingSystem('Linux|Darwin')]
 class JoinLateralTest extends MySqlTestCase
 {
     protected function afterRefreshingDatabase()
