@@ -496,7 +496,7 @@ class ProcessTest extends TestCase
         $this->assertTrue(true);
     }
 
-    #[RequiresOperatingSystem('Linux|DAR')]
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testRealProcessesCanHaveErrorOutput()
     {
         $factory = new Factory;
@@ -524,7 +524,7 @@ class ProcessTest extends TestCase
         $result->throw();
     }
 
-    #[RequiresOperatingSystem('Linux|DAR')]
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testRealProcessesCanThrowWithoutOutput()
     {
         $this->expectException(ProcessFailedException::class);
@@ -562,7 +562,7 @@ class ProcessTest extends TestCase
         $result->throw();
     }
 
-    #[RequiresOperatingSystem('Linux|DAR')]
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testRealProcessesCanThrowWithErrorOutput()
     {
         $this->expectException(ProcessFailedException::class);
@@ -604,7 +604,7 @@ class ProcessTest extends TestCase
         $result->throw();
     }
 
-    #[RequiresOperatingSystem('Linux|DAR')]
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testRealProcessesCanThrowWithOutput()
     {
         $this->expectException(ProcessFailedException::class);
@@ -625,7 +625,7 @@ class ProcessTest extends TestCase
         $result->throw();
     }
 
-    #[RequiresOperatingSystem('Linux|DAR')]
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testRealProcessesCanTimeout()
     {
         $this->expectException(ProcessTimedOutException::class);
@@ -639,7 +639,7 @@ class ProcessTest extends TestCase
         $result->throw();
     }
 
-    #[RequiresOperatingSystem('Linux|DAR')]
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testATimeoutCanBeSetWithACarbonInterval()
     {
         $this->expectException(ProcessTimedOutException::class);
@@ -654,7 +654,7 @@ class ProcessTest extends TestCase
         $result->throw();
     }
 
-    #[RequiresOperatingSystem('Linux|DAR')]
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testRealProcessesCanThrowIfTrue()
     {
         $this->expectException(ProcessFailedException::class);
@@ -665,7 +665,7 @@ class ProcessTest extends TestCase
         $result->throwIf(true);
     }
 
-    #[RequiresOperatingSystem('Linux|DAR')]
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testRealProcessesDoesntThrowIfFalse()
     {
         $factory = new Factory;
@@ -676,7 +676,7 @@ class ProcessTest extends TestCase
         $this->assertTrue(true);
     }
 
-    #[RequiresOperatingSystem('Linux|DAR')]
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testRealProcessesCanUseStandardInput()
     {
         $factory = new Factory();
@@ -685,7 +685,7 @@ class ProcessTest extends TestCase
         $this->assertSame('foobar', $result->output());
     }
 
-    #[RequiresOperatingSystem('Linux|DAR')]
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testProcessPipe()
     {
         $factory = new Factory;
@@ -701,7 +701,7 @@ class ProcessTest extends TestCase
         $this->assertSame("foo\n", $pipe->output());
     }
 
-    #[RequiresOperatingSystem('Linux|DAR')]
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testProcessPipeFailed()
     {
         $factory = new Factory;
@@ -717,7 +717,7 @@ class ProcessTest extends TestCase
         $this->assertTrue($pipe->failed());
     }
 
-    #[RequiresOperatingSystem('Linux|DAR')]
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testProcessSimplePipe()
     {
         $factory = new Factory;
@@ -733,7 +733,7 @@ class ProcessTest extends TestCase
         $this->assertSame("foo\n", $pipe->output());
     }
 
-    #[RequiresOperatingSystem('Linux|DAR')]
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testProcessSimplePipeFailed()
     {
         $factory = new Factory;
