@@ -11,6 +11,9 @@ class EnumMakeCommandTest extends TestCase
         'app/StatusEnum.php',
         'app/StringEnum.php',
         'app/*/OrderStatusEnum.php',
+        'app/Enums/Profile/HairColor.php',
+        'app/Enums/Profile/EyeColor.php',
+        'app/Enums/Profile/Admin/Author.php',
     ];
 
     public function testItCanGenerateEnumFile()
@@ -84,5 +87,51 @@ class EnumMakeCommandTest extends TestCase
         ], 'app/Enumerations/OrderStatusEnum.php');
 
         $files->deleteDirectory($enumerationsFolderPath);
+    }
+
+    public function testItDoesNotDoublePrefixWhenEnumsDirExistsAndNameIncludesPrefix()
+    {
+        /** @var \Illuminate\Filesystem\Filesystem $files */
+        $files = $this->app['files'];
+
+        // First call creates app/Enums/Profile/HairColor.php and the app/Enums directory.
+        $this->artisan('make:enum', ['name' => 'Enums/Profile/HairColor'])
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App\Enums\Profile;',
+            'enum HairColor',
+        ], 'app/Enums/Profile/HairColor.php');
+
+        // Second call: app/Enums/ now exists. Without the fix, the path would become
+        // app/Enums/Enums/Profile/EyeColor.php (double-prefixed).
+        $this->artisan('make:enum', ['name' => 'Enums/Profile/EyeColor'])
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App\Enums\Profile;',
+            'enum EyeColor',
+        ], 'app/Enums/Profile/EyeColor.php');
+
+        $files->deleteDirectory(app_path('Enums'));
+    }
+
+    public function testItHandlesDeeplyNestedPathWithExistingEnumsDir()
+    {
+        /** @var \Illuminate\Filesystem\Filesystem $files */
+        $files = $this->app['files'];
+
+        // Simulate app/Enums/ already existing (e.g. created by a prior make:enum run).
+        $files->ensureDirectoryExists(app_path('Enums'));
+
+        $this->artisan('make:enum', ['name' => 'Enums/Profile/Admin/Author'])
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App\Enums\Profile\Admin;',
+            'enum Author',
+        ], 'app/Enums/Profile/Admin/Author.php');
+
+        $files->deleteDirectory(app_path('Enums'));
     }
 }

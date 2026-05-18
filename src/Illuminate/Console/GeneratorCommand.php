@@ -215,9 +215,19 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
             return $name;
         }
 
-        return $this->qualifyClass(
-            $this->getDefaultNamespace(trim($rootNamespace, '\\')).'\\'.$name
-        );
+        $defaultNamespace = $this->getDefaultNamespace(trim($rootNamespace, '\\'));
+
+        // Prevent double-prefixing when the default namespace adds a sub-namespace
+        // and the name already starts with that sub-namespace. This can happen when
+        // the sub-namespace directory is created by a prior make command invocation
+        // and the user explicitly includes the prefix in the name (e.g. Enums/Foo).
+        $subNamespace = ltrim(Str::after($defaultNamespace, trim($rootNamespace, '\\')), '\\');
+
+        if ($subNamespace !== '' && Str::startsWith($name, $subNamespace.'\\')) {
+            return $this->qualifyClass($rootNamespace.$name);
+        }
+
+        return $this->qualifyClass($defaultNamespace.'\\'.$name);
     }
 
     /**
