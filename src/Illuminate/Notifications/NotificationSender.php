@@ -20,6 +20,8 @@ use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Throwable;
 
+use function Illuminate\Support\enum_value;
+
 class NotificationSender
 {
     use Localizable, ReadsQueueAttributes;
@@ -111,6 +113,8 @@ class NotificationSender
             if (empty($viaChannels = $channels ?: $original->via($notifiable))) {
                 continue;
             }
+
+            $viaChannels = $this->formatChannels($viaChannels);
 
             $this->withLocale($this->preferredLocale($notifiable, $original), function () use ($viaChannels, $notifiable, $original) {
                 $notificationId = (string) Str::uuid();
@@ -224,7 +228,7 @@ class NotificationSender
         foreach ($notifiables as $notifiable) {
             $notificationId = (string) Str::uuid();
 
-            foreach ((array) $original->via($notifiable) as $channel) {
+            foreach ($this->formatChannels($original->via($notifiable)) as $channel) {
                 $notification = clone $original;
 
                 if (! $notification->id) {
@@ -308,5 +312,16 @@ class NotificationSender
         }
 
         return $notifiables;
+    }
+
+    /**
+     * Format the channels into scalar channel names.
+     *
+     * @param  mixed  $channels
+     * @return array
+     */
+    protected function formatChannels($channels)
+    {
+        return array_map(enum_value(...), is_array($channels) ? $channels : [$channels]);
     }
 }

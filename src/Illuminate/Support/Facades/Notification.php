@@ -77,7 +77,7 @@ class Notification extends Facade
     /**
      * Begin sending a notification to an anonymous notifiable.
      *
-     * @param  string  $channel
+     * @param  \UnitEnum|string  $channel
      * @param  mixed  $route
      * @return \Illuminate\Notifications\AnonymousNotifiable
      */

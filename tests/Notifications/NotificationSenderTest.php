@@ -64,6 +64,50 @@ class NotificationSenderTest extends TestCase
         $sender->send($notifiable, new DummyQueuedNotificationWithArrayVia);
     }
 
+    public function test_it_can_send_queued_notifications_with_unit_enum_via()
+    {
+        $notifiable = m::mock(Notifiable::class);
+        $manager = m::mock(ChannelManager::class);
+        $manager->shouldReceive('getContainer')->andReturn(app());
+        $manager->shouldReceive('resolveQueueFromQueueRoute')->andReturn(null);
+        $manager->shouldReceive('resolveConnectionFromQueueRoute')->andReturn(null);
+        $bus = m::mock(BusDispatcher::class);
+        $bus->shouldReceive('dispatch')
+            ->once()
+            ->withArgs(function ($job) {
+                return $job->queue === 'admin_notifications' && $job->channels === ['mail'] && $job->connection === 'redis';
+            });
+        $bus->shouldReceive('dispatch')
+            ->once()
+            ->withArgs(function ($job) {
+                return $job->queue === 'dummy' && $job->channels === ['database'] && $job->connection === 'sync';
+            });
+
+        $events = m::mock(EventDispatcher::class);
+        $events->shouldReceive('listen')->once();
+
+        $sender = new NotificationSender($manager, $bus, $events);
+
+        $sender->send($notifiable, new DummyQueuedNotificationWithUnitEnumVia);
+    }
+
+    public function test_it_can_send_notifications_with_unit_enum_channels()
+    {
+        $notifiable = new AnonymousNotifiable;
+        $manager = m::mock(ChannelManager::class);
+        $manager->shouldReceive('driver')->once()->with('mail')->andReturn($driver = m::mock());
+        $driver->shouldReceive('send')->once();
+        $bus = m::mock(BusDispatcher::class);
+        $events = m::mock(EventDispatcher::class);
+        $events->shouldReceive('listen')->once();
+        $events->shouldReceive('until')->with(m::type(NotificationSending::class))->andReturn(true);
+        $events->shouldReceive('dispatch')->once();
+
+        $sender = new NotificationSender($manager, $bus, $events);
+
+        $sender->sendNow($notifiable, new DummyNotificationWithEmptyStringVia, [NotificationSenderChannel::Mail]);
+    }
+
     public function test_it_can_send_notifications_with_an_empty_string_via()
     {
         $notifiable = new AnonymousNotifiable;
@@ -91,6 +135,21 @@ class NotificationSenderTest extends TestCase
         $sender = new NotificationSender($manager, $bus, $events);
 
         $sender->sendNow($notifiable, new DummyNotificationWithDatabaseVia);
+    }
+
+    public function test_it_cannot_send_notifications_via_database_unit_enum_for_anonymous_notifiables()
+    {
+        $notifiable = new AnonymousNotifiable;
+        $manager = m::mock(ChannelManager::class);
+        $manager->shouldNotReceive('driver');
+        $bus = m::mock(BusDispatcher::class);
+        $bus->shouldNotReceive('dispatch');
+        $events = m::mock(EventDispatcher::class);
+        $events->shouldReceive('listen')->once();
+
+        $sender = new NotificationSender($manager, $bus, $events);
+
+        $sender->sendNow($notifiable, new DummyNotificationWithDatabaseUnitEnumVia);
     }
 
     public function test_it_can_send_queued_notifications_through_middleware()
@@ -405,6 +464,36 @@ class DummyQueuedNotificationWithArrayVia extends Notification implements Should
     }
 }
 
+class DummyQueuedNotificationWithUnitEnumVia extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    public function __construct()
+    {
+        $this->connection = 'redis';
+        $this->queue = 'dummy';
+    }
+
+    public function via($notifiable)
+    {
+        return [NotificationSenderChannel::Mail, NotificationSenderChannel::Database];
+    }
+
+    public function viaConnections()
+    {
+        return [
+            'database' => 'sync',
+        ];
+    }
+
+    public function viaQueues()
+    {
+        return [
+            'mail' => 'admin_notifications',
+        ];
+    }
+}
+
 class DummyNotificationWithEmptyStringVia extends Notification
 {
     use Queueable;
@@ -434,6 +523,16 @@ class DummyNotificationWithDatabaseVia extends Notification
     public function via($notifiable)
     {
         return 'database';
+    }
+}
+
+class DummyNotificationWithDatabaseUnitEnumVia extends Notification
+{
+    use Queueable;
+
+    public function via($notifiable)
+    {
+        return NotificationSenderChannel::Database;
     }
 }
 
@@ -557,4 +656,10 @@ class DummyNotificationWithViaMutation extends Notification
 
         return 'mail';
     }
+}
+
+enum NotificationSenderChannel: string
+{
+    case Mail = 'mail';
+    case Database = 'database';
 }

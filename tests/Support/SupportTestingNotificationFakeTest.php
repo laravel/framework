@@ -224,6 +224,17 @@ class SupportTestingNotificationFakeTest extends TestCase
         $this->fake->assertNotSentTo($user, NotificationWithFalsyShouldSendStub::class);
     }
 
+    public function testAssertSentToWithUnitEnumChannels()
+    {
+        $notification = new NotificationWithUnitEnumChannelStub;
+
+        $this->fake->send($this->user, $notification);
+
+        $this->fake->assertSentTo($this->user, NotificationWithUnitEnumChannelStub::class, function ($notification, $channels) {
+            return $channels === ['mail'] && $notification->channel === 'mail';
+        });
+    }
+
     public function testAssertItCanSerializeAndRestoreNotifications()
     {
         $this->fake->serializeAndRestore();
@@ -254,6 +265,28 @@ class NotificationWithFalsyShouldSendStub extends Notification
     {
         return false;
     }
+}
+
+class NotificationWithUnitEnumChannelStub extends Notification
+{
+    public $channel;
+
+    public function via($notifiable)
+    {
+        return [NotificationFakeChannel::Mail];
+    }
+
+    public function shouldSend($notifiable, $channel)
+    {
+        $this->channel = $channel;
+
+        return true;
+    }
+}
+
+enum NotificationFakeChannel: string
+{
+    case Mail = 'mail';
 }
 
 class UserStub extends User

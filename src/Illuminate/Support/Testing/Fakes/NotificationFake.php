@@ -15,6 +15,8 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
+use function Illuminate\Support\enum_value;
+
 class NotificationFake implements Fake, NotificationDispatcher, NotificationFactory
 {
     use Macroable, ReflectsClosures;
@@ -318,6 +320,15 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
             }
 
             $notifiableChannels = $channels ?: $notification->via($notifiable);
+
+            if (empty($notifiableChannels)) {
+                continue;
+            }
+
+            $notifiableChannels = array_map(
+                enum_value(...),
+                is_array($notifiableChannels) ? $notifiableChannels : [$notifiableChannels]
+            );
 
             if (method_exists($notification, 'shouldSend')) {
                 $notifiableChannels = array_filter(

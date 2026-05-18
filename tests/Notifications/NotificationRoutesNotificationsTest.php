@@ -53,6 +53,21 @@ class NotificationRoutesNotificationsTest extends TestCase
         $this->assertSame('taylor@laravel.com', $instance->routeNotificationFor('mail'));
     }
 
+    public function testNotificationOptionRoutingWithUnitEnum()
+    {
+        $instance = new RoutesNotificationsTestInstance;
+        $this->assertSame('bar', $instance->routeNotificationFor(RoutesNotificationsChannel::Foo));
+        $this->assertSame('taylor@laravel.com', $instance->routeNotificationFor(RoutesNotificationsChannel::Mail));
+    }
+
+    public function testOnDemandNotificationsCanRouteWithUnitEnum()
+    {
+        $notifiable = Notification::route(RoutesNotificationsChannel::Foo, 'bar');
+
+        $this->assertSame('bar', $notifiable->routeNotificationFor('foo'));
+        $this->assertSame('bar', $notifiable->routeNotificationFor(RoutesNotificationsChannel::Foo));
+    }
+
     public function testOnDemandNotificationsCannotUseDatabaseChannel()
     {
         $this->expectExceptionObject(
@@ -60,6 +75,15 @@ class NotificationRoutesNotificationsTest extends TestCase
         );
 
         Notification::route('database', 'foo');
+    }
+
+    public function testOnDemandNotificationsCannotUseDatabaseChannelWithUnitEnum()
+    {
+        $this->expectExceptionObject(
+            new InvalidArgumentException('The database channel does not support on-demand notifications.')
+        );
+
+        Notification::route(RoutesNotificationsChannel::Database, 'foo');
     }
 }
 
@@ -73,4 +97,11 @@ class RoutesNotificationsTestInstance
     {
         return 'bar';
     }
+}
+
+enum RoutesNotificationsChannel: string
+{
+    case Foo = 'foo';
+    case Mail = 'mail';
+    case Database = 'database';
 }
