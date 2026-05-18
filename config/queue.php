@@ -67,6 +67,7 @@ return [
                 'store' => env('SQS_OVERFLOW_STORE'),
                 'always' => false,
                 'delete_after_processing' => true,
+                'flush_on_clear' => env('SQS_OVERFLOW_FLUSH_ON_CLEAR', false),
             ],
         ],
 
