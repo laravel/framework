@@ -16,6 +16,8 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
+use function Illuminate\Support\enum_value;
+
 class MailFake implements Factory, Fake, Mailer, MailQueue
 {
     use ForwardsCalls, ReflectsClosures;
@@ -420,12 +422,12 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     /**
      * Get a mailer instance by name.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return \Illuminate\Contracts\Mail\Mailer
      */
     public function mailer($name = null)
     {
-        $this->currentMailer = $name;
+        $this->currentMailer = enum_value($name);
 
         return $this;
     }
@@ -433,7 +435,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     /**
      * Get a mailer driver instance.
      *
-     * @param  string|null  $driver
+     * @param  \UnitEnum|string|null  $driver
      * @return \Illuminate\Contracts\Mail\Mailer
      */
     public function driver($driver = null)

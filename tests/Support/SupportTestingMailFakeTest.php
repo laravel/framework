@@ -411,6 +411,15 @@ class SupportTestingMailFakeTest extends TestCase
         });
     }
 
+    public function testAssertMailerWithUnitEnum()
+    {
+        $this->fake->mailer(MailFakeMailer::Ses)->to('taylor@laravel.com')->send($this->mailable);
+
+        $this->fake->assertSent(MailableStub::class, function ($mail) {
+            return $mail->usesMailer('Ses');
+        });
+    }
+
     public function testDriverMethod()
     {
         $this->fake->driver('ses')->to('taylor@laravel.com')->send($this->mailable);
@@ -434,6 +443,21 @@ class SupportTestingMailFakeTest extends TestCase
                 $mail->usesMailer('mailjet');
         });
     }
+
+    public function testDriverMethodWithUnitEnum()
+    {
+        $this->fake->driver(MailFakeMailer::Mailjet)->to('taylor@laravel.com')->queue($this->mailable);
+
+        $this->fake->assertQueued(MailableStub::class, function ($mail) {
+            return $mail->usesMailer('Mailjet');
+        });
+    }
+}
+
+enum MailFakeMailer
+{
+    case Ses;
+    case Mailjet;
 }
 
 class MailableStub extends Mailable
