@@ -12,7 +12,7 @@ use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
-#[RequiresOperatingSystem('Linux|DAR')]
+#[RequiresOperatingSystem('Linux|Darwin')]
 class ConcurrencyTest extends TestCase
 {
     protected function setUp(): void
