@@ -1149,15 +1149,15 @@ trait QueriesRelationships
             return $result;
         }
 
+        if ($models->isEmpty()) {
+            return $result;
+        }
+
         $defaultValue = match ($function) {
             'count' => 0,
             'exists' => false,
             default => null,
         };
-
-        if ($models->isEmpty()) {
-            return $result;
-        }
 
         $keys = (new BaseCollection($models))
             ->map(fn ($model) => $model->getAttribute($localKey))
