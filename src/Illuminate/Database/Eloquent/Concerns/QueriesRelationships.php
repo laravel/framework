@@ -1195,7 +1195,7 @@ trait QueriesRelationships
 
         if ($function === 'exists') {
             $matched = array_fill_keys(array_map(
-                'strval',
+                strval(...),
                 $relatedQuery->select($relatedKey)->distinct()->pluck($relatedKey)->all()
             ), true);
 
