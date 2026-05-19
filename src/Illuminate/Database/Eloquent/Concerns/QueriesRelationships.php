@@ -1260,6 +1260,7 @@ trait QueriesRelationships
      *
      * @param  TResult  $result
      * @return \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model>|null
+     *
      * @phpstan-return ($result is \Illuminate\Database\Eloquent\Collection ? TResult : ($result is \Illuminate\Database\Eloquent\Model ? \Illuminate\Database\Eloquent\Collection<int, TResult> : null))
      */
     protected function collectModelsForAfterQuery($result)
