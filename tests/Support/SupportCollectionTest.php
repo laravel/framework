@@ -401,6 +401,27 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(new Collection(['baz', 'bar', 'foo']), (new Collection(['foo', 'bar', 'baz']))->pop(6));
     }
 
+    public function testPopReturnsEmptyCollectionWhenCountIsZero()
+    {
+        $data = new Collection(['foo', 'bar', 'baz']);
+
+        $this->assertEquals(new Collection([]), $data->pop(0));
+        $this->assertEquals(collect(['foo', 'bar', 'baz']), $data);
+    }
+
+    public function testPopThrowsExceptionWhenCountIsNegative()
+    {
+        $this->expectException('InvalidArgumentException');
+        (new Collection(['foo', 'bar', 'baz']))->pop(-1);
+    }
+
+    public function testPopReturnsNullOnEmptyCollection()
+    {
+        $c = new Collection();
+
+        $this->assertNull($c->pop());
+    }
+
     public function testShiftReturnsAndRemovesFirstItemInCollection()
     {
         $data = new Collection(['Taylor', 'Otwell']);

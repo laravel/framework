@@ -1017,21 +1017,27 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Get and remove the last N items from the collection.
      *
-     * @param  int  $count
+     * @param  int<0, max>  $count
      * @return ($count is 1 ? TValue|null : static<int, TValue>)
+     *
+     * @throws \InvalidArgumentException
      */
     public function pop($count = 1)
     {
-        if ($count < 1) {
+        if ($count < 0) {
+            throw new InvalidArgumentException('Number of popped items may not be less than zero.');
+        }
+
+        if ($this->isEmpty()) {
+            return null;
+        }
+
+        if ($count === 0) {
             return $this->newInstance();
         }
 
         if ($count === 1) {
             return array_pop($this->items);
-        }
-
-        if ($this->isEmpty()) {
-            return $this->newInstance();
         }
 
         $results = [];
