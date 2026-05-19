@@ -1,6 +1,13 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.59.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.60.0...12.x)
+
+## [v12.60.0](https://github.com/laravel/framework/compare/v12.59.0...v12.60.0) - 2026-05-19
+
+* [12.x] Fix Number::fileSize() handling of negative byte values by [@Amirhf1](https://github.com/Amirhf1) in https://github.com/laravel/framework/pull/60147
+* [12.x] Remove stale PHPStan ignore comments from type tests by [@jradtilbrook](https://github.com/jradtilbrook) in https://github.com/laravel/framework/pull/60167
+* [12.x] Output cloud request ID in logs by [@jradtilbrook](https://github.com/jradtilbrook) in https://github.com/laravel/framework/pull/60166
+* [12.x] Dedicated Cloud Queue by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/60181
 
 ## [v12.59.0](https://github.com/laravel/framework/compare/v12.58.0...v12.59.0) - 2026-05-14
 
