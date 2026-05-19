@@ -1359,7 +1359,8 @@ trait QueriesRelationships
      * @param  string  $boolean
      * @param  \Closure(array{self}&array<array-key, mixed>)|null  $callback
      * @return $this
-     * 
+     *
+     *
      * @phpstan-return ($operator is '>='|'<'
      *     ? ($count is 1
      *         ? $this
