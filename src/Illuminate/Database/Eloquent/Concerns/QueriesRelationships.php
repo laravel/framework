@@ -1520,8 +1520,29 @@ trait QueriesRelationships
     /**
      * Return the logical complement of a count comparison operator.
      *
-     * @param  string  $operator
+     * @template TOperator of string
+     *
+     * @param  TOperator  $operator
      * @return string
+     * @phpstan-return ($operator is '>='
+     *     ? '<'
+     *     : ($operator is '>'
+     *        ? '<='
+     *        : ($operator is '='|'==' ?
+     *            ? '!='
+     *            : ($operator is '<=' ?
+     *                ? '>'
+     *                : ($operator is '<'
+     *                    ? '>='
+     *                    : ($operator is '!='|'<>'
+     *                        ? '='
+     *                        : TOperator
+     *                    )
+     *                ) 
+     *            )
+     *        )
+     *     )
+     * )
      */
     protected function complementCrossConnectionCountOperator($operator)
     {
