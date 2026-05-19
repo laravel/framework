@@ -1067,7 +1067,7 @@ trait QueriesRelationships
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>  $relation
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  string|null  $function
-     * @param  \Closure|null  $constraints
+     * @param  \Closure(array{self}&array<array-key, mixed>)|null  $constraints
      * @param  string|null  $alias
      * @return void
      *
