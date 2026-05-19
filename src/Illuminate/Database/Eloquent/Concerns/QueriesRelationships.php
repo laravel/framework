@@ -1141,7 +1141,7 @@ trait QueriesRelationships
      * @param  string  $localKey
      * @param  \Closure(array{self}&array<array-key, mixed>)|null  $constraints
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  string  $function
+     * @param  'count'|'exists'|'min'|'max'|'sum'|'avg'  $function
      * @return TResult
      */
     protected function loadCrossConnectionAggregateValues($result, $alias, Relation $relation, $relatedKey, $localKey, $constraints, $column, $function)
