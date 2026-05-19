@@ -32,7 +32,7 @@ class QueueConnector implements ConnectorInterface
     public function connect(array $config): Queue
     {
         $queue = new Queue(
-            $this->connector->connect($config),
+            $this->connector->connect($config['connection']),
             $this->app[Events::class],
             $config,
         );
