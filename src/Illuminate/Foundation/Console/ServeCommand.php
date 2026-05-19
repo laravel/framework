@@ -210,7 +210,7 @@ class ServeCommand extends Command
     protected function shouldPassThroughEnvironmentVariable($key)
     {
         if (PHP_OS_FAMILY === 'Windows') {
-            return in_array(strtoupper($key), array_map('strtoupper', static::$passthroughVariables), true);
+            return in_array(strtoupper($key), array_map(strtoupper(...), static::$passthroughVariables), true);
         }
 
         return in_array($key, static::$passthroughVariables, true);
