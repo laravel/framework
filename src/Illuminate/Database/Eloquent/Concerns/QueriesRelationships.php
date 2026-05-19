@@ -1426,7 +1426,7 @@ trait QueriesRelationships
      * "doesntHave" with no related rows ⇒ all parents qualify (force it to true).
      *
      * @param  bool  $not
-     * @param  string  $boolean
+     * @param  'and'|'or'  $boolean
      * @return $this
      */
     protected function addEmptyCrossConnectionConstraint($not, $boolean)
