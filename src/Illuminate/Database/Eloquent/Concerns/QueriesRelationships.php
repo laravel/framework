@@ -1256,8 +1256,11 @@ trait QueriesRelationships
      * collection is discarded after the callback runs, but mutations to the
      * model itself are preserved by reference.
      *
-     * @param  mixed  $result
+     * @template TResult
+     *
+     * @param  TResult  $result
      * @return \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model>|null
+     * @phpstan-return ($result is \Illuminate\Database\Eloquent\Collection ? TResult : ($result is \Illuminate\Database\Eloquent\Model ? \Illuminate\Database\Eloquent\Collection<int, TResult> : null))
      */
     protected function collectModelsForAfterQuery($result)
     {
