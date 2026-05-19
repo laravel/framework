@@ -39,7 +39,7 @@ class LaravelCloudJsonFormatterTest extends TestCase
     {
         $app = Container::getInstance();
         $request = Request::create('/');
-        $request->headers->set('X-Request-ID', '550e8400-e29b-41d4-a716-446655440000');
+        $request->headers->set('Cloud-Request-ID', '550e8400-e29b-41d4-a716-446655440000');
         $app->instance('request', $request);
 
         $formatter = new LaravelCloudJsonFormatter;
@@ -75,7 +75,7 @@ class LaravelCloudJsonFormatterTest extends TestCase
     {
         $app = Container::getInstance();
         $request = Request::create('/');
-        $request->headers->set('X-Request-ID', '6ba7b810-9dad-11d1-80b4-00c04fd430c8');
+        $request->headers->set('Cloud-Request-ID', '6ba7b810-9dad-11d1-80b4-00c04fd430c8');
         $app->instance('request', $request);
 
         $record = new LogRecord(
