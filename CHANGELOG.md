@@ -1,6 +1,11 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.11.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.11.1...13.x)
+
+## [v13.11.1](https://github.com/laravel/framework/compare/v13.11.0...v13.11.1) - 2026-05-19
+
+* Normalize Windows env variable comparison in ServeCommand by [@wangchenxudev](https://github.com/wangchenxudev) in https://github.com/laravel/framework/pull/60183
+* [13.x] Rename X-Request-ID header to Cloud-Request-ID by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/60188
 
 ## [v13.11.0](https://github.com/laravel/framework/compare/v13.10.0...v13.11.0) - 2026-05-19
 
