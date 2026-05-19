@@ -10,7 +10,6 @@ use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\Cloud\FailedJobProvider;
 use Illuminate\Foundation\Cloud\QueueConnector;
 use Illuminate\Queue\Connectors\SqsConnector;
-use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\SocketHandler;
 use PDO;
 
@@ -172,7 +171,7 @@ class Cloud
             'driver' => 'monolog',
             'level' => $_ENV['LOG_LEVEL'] ?? $_SERVER['LOG_LEVEL'] ?? 'debug',
             'handler' => SocketHandler::class,
-            'formatter' => JsonFormatter::class,
+            'formatter' => LaravelCloudJsonFormatter::class,
             'formatter_with' => [
                 'includeStacktraces' => true,
             ],
