@@ -165,4 +165,64 @@ class DatabaseLockTest extends DatabaseTestCase
             $lock->release();
         }
     }
+
+    public function testAcquireRethrowsNonIntegrityConstraintQueryException()
+    {
+        $connection = m::mock(Connection::class);
+        $insertBuilder = m::mock(Builder::class);
+
+        $insertBuilder->shouldReceive('insert')->once()->andThrow(
+            $this->queryExceptionWithSqlState(
+                'insert into cache_locks (key, owner, expiration) values (?, ?, ?)',
+                ['foo', 'owner-123', 123],
+                'Data too long for column',
+                1406,
+                '22001'
+            )
+        );
+
+        $connection->shouldReceive('table')->with('cache_locks')->once()->andReturn($insertBuilder);
+
+        $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 10, 'owner-123');
+
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('Data too long for column');
+
+        $lock->acquire();
+    }
+
+    public function testAcquireUsesUpdateFallbackForIntegrityConstraintViolation()
+    {
+        $connection = m::mock(Connection::class);
+        $insertBuilder = m::mock(Builder::class);
+        $updateBuilder = m::mock(Builder::class);
+
+        $insertBuilder->shouldReceive('insert')->once()->andThrow(
+            $this->queryExceptionWithSqlState(
+                'insert into cache_locks (key, owner, expiration) values (?, ?, ?)',
+                ['foo', 'owner-123', 123],
+                'Duplicate entry',
+                1062,
+                '23000'
+            )
+        );
+
+        $updateBuilder->shouldReceive('where')->with('key', 'foo')->once()->andReturnSelf();
+        $updateBuilder->shouldReceive('where')->with(m::type('Closure'))->once()->andReturnSelf();
+        $updateBuilder->shouldReceive('update')->once()->andReturn(1);
+
+        $connection->shouldReceive('table')->with('cache_locks')->andReturn($insertBuilder, $updateBuilder);
+
+        $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 10, 'owner-123');
+
+        $this->assertTrue($lock->acquire());
+    }
+
+    protected function queryExceptionWithSqlState(string $sql, array $bindings, string $message, int $code, string $sqlState): QueryException
+    {
+        $previous = new PDOException($message, $code);
+        $previous->errorInfo = [$sqlState, $code, $message];
+
+        return new QueryException('mysql', $sql, $bindings, $previous);
+    }
 }

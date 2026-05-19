@@ -77,7 +77,13 @@ class DatabaseLock extends Lock
             ]);
 
             $acquired = true;
-        } catch (QueryException) {
+        } catch (QueryException $e) {
+            $sqlState = (string) ($e->errorInfo[0] ?? $e->getCode());
+
+            if (! str_starts_with($sqlState, '23')) {
+                throw $e;
+            }
+
             $updated = $this->connection->table($this->table)
                 ->where('key', $this->name)
                 ->where(function ($query) {
