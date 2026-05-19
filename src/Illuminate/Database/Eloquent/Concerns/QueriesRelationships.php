@@ -1499,7 +1499,28 @@ trait QueriesRelationships
      * @param  mixed  $count
      * @return bool
      *
-     * @phpstan ($count is numeric ? bool : false)
+     * @phpstan-return ($count is numeric
+     *    ? ($operator is '>='
+     *         ? ($count is non-positive-int ? true : false)
+     *         : ($operator is '>'
+     *            ? ($count is negative-int ? true : false)
+     *            : ($operator is '='|'==' ?
+     *                ? ($count is non-zero-int ? false : true)
+     *                : ($operator is '<=' ?
+     *                    ? ($count is non-negative-int ? true : false)
+     *                    : ($operator is '<'
+     *                        ? ($count is positive-int ? true : false)
+     *                        : ($operator is '!='|'<>'
+     *                            ? ($count is non-zero-int ? true : false)
+     *                            : false
+     *                        )
+     *                    )
+     *                )
+     *            )
+     *         )
+     *     )
+     *     : false
+     * )
      */
     protected function zeroCountSatisfiesCrossConnectionOperator($operator, $count)
     {
