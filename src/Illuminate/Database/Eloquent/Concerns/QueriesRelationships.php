@@ -6,9 +6,12 @@ use BadMethodCallException;
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
+use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -16,6 +19,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use RuntimeException;
 
 use function Illuminate\Support\enum_value;
 
@@ -50,6 +54,14 @@ trait QueriesRelationships
             return $this->hasMorph($relation, ['*'], $operator, $count, $boolean, $callback);
         }
 
+        $strategy = $this->relationCrossConnectionStrategy($relation);
+
+        if ($strategy === 'resolve') {
+            return $this->addCrossConnectionHasWhere(
+                $relation, $operator, $count, $boolean, $callback
+            );
+        }
+
         // If we only need to check for the existence of the relation, then we can optimize
         // the subquery to only run a "where exists" clause instead of this full "count"
         // clause. This will make these queries run much faster compared with a count.
@@ -60,6 +72,10 @@ trait QueriesRelationships
         $hasQuery = $relation->{$method}(
             $relation->getRelated()->newQueryWithoutRelationships(), $this
         );
+
+        if ($strategy === 'prefix') {
+            $this->applyCrossDatabasePrefixToHasQuery($hasQuery, $relation);
+        }
 
         // Next we will call any given callback as an "anonymous" scope so they can get the
         // proper logical grouping of the where clauses if needed by this Eloquent query
@@ -873,6 +889,18 @@ trait QueriesRelationships
 
             $relation = $this->getRelationWithoutConstraints($name);
 
+            // When the related model lives on a connection that cannot share a single
+            // SQL statement with the parent's connection, fall back to resolving the
+            // aggregate as a separate query and attaching the values to each model
+            // after the parent query has been executed.
+            if ($this->relationCrossConnectionStrategy($relation) === 'resolve') {
+                $this->addCrossConnectionAggregate(
+                    $name, $relation, $column, $function, $constraints, $alias ?? null
+                );
+
+                continue;
+            }
+
             if ($function) {
                 if ($this->getQuery()->getGrammar()->isExpression($column)) {
                     $aggregateColumn = $this->getQuery()->getGrammar()->getValue($column);
@@ -1024,6 +1052,484 @@ trait QueriesRelationships
     public function withExists($relation)
     {
         return $this->withAggregate($relation, '*', 'exists');
+    }
+
+    /**
+     * Register a deferred aggregate computation for a relation that lives on a
+     * different database connection than the parent.
+     *
+     * The aggregate is resolved after the parent query has been executed by
+     * running a single grouped query against the related connection, keyed
+     * by the parent's foreign key, and then attaching the resulting value
+     * to each hydrated model as the requested attribute alias.
+     *
+     * @param  string  $name
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>  $relation
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string|null  $function
+     * @param  \Closure|null  $constraints
+     * @param  string|null  $alias
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    protected function addCrossConnectionAggregate($name, Relation $relation, $column, $function, $constraints, $alias)
+    {
+        if (! ($relation instanceof HasOneOrMany || $relation instanceof BelongsTo)) {
+            throw new RuntimeException(sprintf(
+                'Cross-connection aggregate queries are not supported for the [%s] relation (type: [%s]). '
+                .'Supported relation types: HasOne, HasMany, MorphOne, MorphMany, BelongsTo.',
+                $name,
+                $relation::class,
+            ));
+        }
+
+        if (! in_array($function, ['count', 'exists', 'min', 'max', 'sum', 'avg'], true)) {
+            throw new RuntimeException(sprintf(
+                'Cross-connection aggregate function [%s] is not supported. '
+                .'Supported functions: count, exists, min, max, sum, avg.',
+                $function ?? 'null',
+            ));
+        }
+
+        if ($alias === null) {
+            $alias = Str::snake(preg_replace(
+                '/[^[:alnum:][:space:]_]/u',
+                '',
+                sprintf(
+                    '%s %s %s',
+                    $name,
+                    $function,
+                    strtolower($this->getQuery()->getGrammar()->getValue($column))
+                )
+            ));
+        }
+
+        if (is_null($this->query->columns)) {
+            $this->query->select([$this->query->from.'.*']);
+        }
+
+        $localKey = $relation instanceof BelongsTo
+            ? $relation->getForeignKeyName()
+            : $relation->getLocalKeyName();
+
+        $relatedKey = $relation instanceof BelongsTo
+            ? $relation->getOwnerKeyName()
+            : $relation->getForeignKeyName();
+
+        if ($function === 'exists') {
+            $this->withCasts([$alias => 'bool']);
+        }
+
+        $this->afterQuery(function ($result) use ($alias, $relation, $relatedKey, $localKey, $constraints, $column, $function) {
+            return $this->loadCrossConnectionAggregateValues(
+                $result, $alias, $relation, $relatedKey, $localKey, $constraints, $column, $function
+            );
+        });
+    }
+
+    /**
+     * Resolve aggregate values from the related connection and attach them to each parent model.
+     *
+     * @param  mixed  $result
+     * @param  string  $alias
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>  $relation
+     * @param  string  $relatedKey
+     * @param  string  $localKey
+     * @param  \Closure|null  $constraints
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string  $function
+     * @return mixed
+     */
+    protected function loadCrossConnectionAggregateValues($result, $alias, Relation $relation, $relatedKey, $localKey, $constraints, $column, $function)
+    {
+        $models = $this->collectModelsForAfterQuery($result);
+
+        if ($models === null) {
+            return $result;
+        }
+
+        $defaultValue = match ($function) {
+            'count' => 0,
+            'exists' => false,
+            default => null,
+        };
+
+        if ($models->isEmpty()) {
+            return $result;
+        }
+
+        $keys = (new BaseCollection($models))
+            ->map(fn ($model) => $model->getAttribute($localKey))
+            ->filter(fn ($value) => $value !== null)
+            ->unique()
+            ->values()
+            ->all();
+
+        if (empty($keys)) {
+            foreach ($models as $model) {
+                $model->setAttribute($alias, $defaultValue);
+            }
+
+            return $result;
+        }
+
+        $relatedQuery = $relation->getRelated()->newQueryWithoutRelationships();
+
+        if ($relation instanceof MorphOneOrMany) {
+            $relatedQuery->where(
+                $relation->getMorphType(),
+                '=',
+                $this->getModel()->getMorphClass()
+            );
+        }
+
+        if ($constraints instanceof Closure) {
+            $relatedQuery->callScope($constraints);
+        }
+
+        $relatedQuery->whereIn($relatedKey, $keys);
+
+        if ($function === 'exists') {
+            $matched = array_fill_keys(array_map(
+                'strval',
+                $relatedQuery->select($relatedKey)->distinct()->pluck($relatedKey)->all()
+            ), true);
+
+            foreach ($models as $model) {
+                $key = $model->getAttribute($localKey);
+
+                $model->setAttribute(
+                    $alias,
+                    $key !== null && isset($matched[(string) $key])
+                );
+            }
+
+            return $result;
+        }
+
+        $grammar = $relatedQuery->getQuery()->getGrammar();
+
+        if ($function === 'count') {
+            $aggregateSql = 'count(*)';
+        } elseif ($grammar->isExpression($column)) {
+            $aggregateSql = sprintf('%s(%s)', $function, $grammar->getValue($column));
+        } else {
+            $aggregateSql = sprintf('%s(%s)', $function, $grammar->wrap($column));
+        }
+
+        $rows = $relatedQuery
+            ->select($relatedKey)
+            ->selectRaw($aggregateSql.' as aggregate_value')
+            ->groupBy($relatedKey)
+            ->toBase()
+            ->get();
+
+        $map = [];
+
+        foreach ($rows as $row) {
+            $map[(string) $row->{$relatedKey}] = $row->aggregate_value;
+        }
+
+        foreach ($models as $model) {
+            $key = $model->getAttribute($localKey);
+
+            $model->setAttribute(
+                $alias,
+                $key !== null && array_key_exists((string) $key, $map)
+                    ? $map[(string) $key]
+                    : $defaultValue
+            );
+        }
+
+        return $result;
+    }
+
+    /**
+     * Normalize an after-query result into an EloquentCollection of models, or
+     * null when the result does not contain models we can attach values to.
+     *
+     * Single Model results are wrapped in a fresh collection. The wrapping
+     * collection is discarded after the callback runs, but mutations to the
+     * model itself are preserved by reference.
+     *
+     * @param  mixed  $result
+     * @return \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model>|null
+     */
+    protected function collectModelsForAfterQuery($result)
+    {
+        if ($result instanceof EloquentCollection) {
+            return $result;
+        }
+
+        if ($result instanceof Model) {
+            return $result->newCollection([$result]);
+        }
+
+        return null;
+    }
+
+    /**
+     * Determine the cross-connection strategy to use for a relation.
+     *
+     * Returns one of:
+     *  - "same":    parent and related share the same connection (no special handling).
+     *  - "prefix":  related lives on a different database but the same server, so
+     *               the existence subquery can stay on a single PDO connection by
+     *               qualifying the table with its database name.
+     *  - "resolve": related lives on a different server or driver; the existence
+     *               subquery must be resolved as a separate query and converted
+     *               into a "where in" / "where not in" clause on the parent.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>  $relation
+     * @return string
+     */
+    protected function relationCrossConnectionStrategy(Relation $relation)
+    {
+        $outer = $this->getModel()->getConnection();
+        $inner = $relation->getRelated()->getConnection();
+
+        if ($outer === $inner || $outer->getName() === $inner->getName()) {
+            return 'same';
+        }
+
+        if (! method_exists($outer, 'getDriverName') || ! method_exists($inner, 'getDriverName')) {
+            return 'resolve';
+        }
+
+        if ($outer->getDriverName() !== $inner->getDriverName()) {
+            return 'resolve';
+        }
+
+        if ($outer->getDriverName() === 'sqlite') {
+            return 'resolve';
+        }
+
+        $outerConfig = method_exists($outer, 'getConfig') ? $outer->getConfig() : [];
+        $innerConfig = method_exists($inner, 'getConfig') ? $inner->getConfig() : [];
+
+        $sameHost = ($outerConfig['host'] ?? null) === ($innerConfig['host'] ?? null);
+        $samePort = ($outerConfig['port'] ?? null) === ($innerConfig['port'] ?? null);
+
+        return ($sameHost && $samePort) ? 'prefix' : 'resolve';
+    }
+
+    /**
+     * Prefix the existence subquery's table with the related connection's database name.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<*>  $hasQuery
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>  $relation
+     * @return void
+     */
+    protected function applyCrossDatabasePrefixToHasQuery(Builder $hasQuery, Relation $relation)
+    {
+        $base = $hasQuery->getQuery();
+
+        if (! is_string($base->from)) {
+            return;
+        }
+
+        $databaseName = $relation->getRelated()->getConnection()->getDatabaseName();
+
+        if ($databaseName === null || $databaseName === '') {
+            return;
+        }
+
+        if (str_starts_with($base->from, $databaseName.'.') || str_contains($base->from, '.')) {
+            return;
+        }
+
+        $base->from($databaseName.'.'.$base->from);
+    }
+
+    /**
+     * Add a "has" condition for a relation whose related model is on a foreign connection.
+     *
+     * Executes the inner query against the related connection, collects the matching
+     * parent keys, and applies them as a "where in" / "where not in" clause on the
+     * outer query. This mirrors what Laravel already does for eager loads via "with",
+     * applied to relationship-existence checks.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>  $relation
+     * @param  string  $operator
+     * @param  \Illuminate\Contracts\Database\Query\Expression|int  $count
+     * @param  string  $boolean
+     * @param  \Closure|null  $callback
+     * @return $this
+     */
+    protected function addCrossConnectionHasWhere(Relation $relation, $operator, $count, $boolean, ?Closure $callback)
+    {
+        [$relatedKey, $parentColumn] = $this->resolveCrossConnectionKeyPair($relation);
+
+        $relatedQuery = $relation->getRelated()->newQueryWithoutRelationships();
+
+        if ($relation instanceof MorphOneOrMany) {
+            $relatedQuery->where(
+                $relation->getMorphType(),
+                '=',
+                $this->getModel()->getMorphClass()
+            );
+        }
+
+        if ($callback) {
+            $relatedQuery->callScope($callback);
+        }
+
+        $useExists = $this->canUseExistsForExistenceCheck($operator, $count);
+        $not = false;
+
+        if ($useExists) {
+            $not = ($operator === '<' && $count === 1);
+
+            $ids = $relatedQuery->distinct()->pluck($relatedKey)->all();
+        } else {
+            if ($count instanceof Expression) {
+                throw new RuntimeException(
+                    'Cross-connection relationship existence queries do not support '
+                    .'Expression count values. Use a literal integer count, or move the '
+                    .'relationship to a single connection.'
+                );
+            }
+
+            $zeroSatisfies = $this->zeroCountSatisfiesCrossConnectionOperator($operator, $count);
+            $effectiveOperator = $zeroSatisfies
+                ? $this->complementCrossConnectionCountOperator($operator)
+                : $operator;
+
+            $ids = $relatedQuery
+                ->select($relatedKey)
+                ->groupBy($relatedKey)
+                ->havingRaw('count(*) '.$effectiveOperator.' ?', [$count])
+                ->pluck($relatedKey)
+                ->all();
+
+            if ($zeroSatisfies) {
+                $not = true;
+            }
+        }
+
+        if (empty($ids)) {
+            return $this->addEmptyCrossConnectionConstraint($not, $boolean);
+        }
+
+        return $this->whereIn($parentColumn, $ids, $boolean, $not);
+    }
+
+    /**
+     * Apply the correct empty-result constraint when a cross-connection resolution
+     * returns no matching parent keys.
+     *
+     * "has" with no related rows ⇒ no parents qualify (force the clause to false).
+     * "doesntHave" with no related rows ⇒ all parents qualify (force it to true).
+     *
+     * @param  bool  $not
+     * @param  string  $boolean
+     * @return $this
+     */
+    protected function addEmptyCrossConnectionConstraint($not, $boolean)
+    {
+        if ($not) {
+            return $boolean === 'or'
+                ? $this->orWhereRaw('1 = 1')
+                : $this;
+        }
+
+        return $boolean === 'or'
+            ? $this->orWhereRaw('0 = 1')
+            : $this->whereRaw('0 = 1');
+    }
+
+    /**
+     * Resolve the [related column, parent column] pair used by cross-connection
+     * relationship existence queries.
+     *
+     * Cross-connection support currently covers HasOne, HasMany, MorphOne,
+     * MorphMany, and BelongsTo relations — the most common relationship types
+     * that span database boundaries in practice. Other relation types throw a
+     * descriptive exception so the developer can restructure their query or
+     * move the relationship to a single connection.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>  $relation
+     * @return array{0: string, 1: string}
+     *
+     * @throws \RuntimeException
+     */
+    protected function resolveCrossConnectionKeyPair(Relation $relation)
+    {
+        if ($relation instanceof BelongsTo) {
+            return [
+                $relation->getOwnerKeyName(),
+                $relation->getQualifiedForeignKeyName(),
+            ];
+        }
+
+        if ($relation instanceof HasOneOrMany) {
+            return [
+                $relation->getForeignKeyName(),
+                $relation->getQualifiedParentKeyName(),
+            ];
+        }
+
+        throw new RuntimeException(sprintf(
+            'Cross-connection relationship existence queries are not supported for [%s] '
+            .'(parent connection [%s], related connection [%s]). Supported relation types: '
+            .'HasOne, HasMany, MorphOne, MorphMany, BelongsTo. Move the relationship to a '
+            .'single connection, or use a connection that can address both databases.',
+            $relation::class,
+            $this->getModel()->getConnection()->getName(),
+            $relation->getRelated()->getConnection()->getName(),
+        ));
+    }
+
+    /**
+     * Determine whether a parent row with zero matching related rows satisfies
+     * the given count constraint.
+     *
+     * This is the signal we use to flip the cross-connection resolution from
+     * "select parents that match" (whereIn) to "select parents that do NOT
+     * match the complementary condition" (whereNotIn), so that parents with
+     * no related rows are included where the operator allows them to be.
+     *
+     * @param  string  $operator
+     * @param  mixed  $count
+     * @return bool
+     */
+    protected function zeroCountSatisfiesCrossConnectionOperator($operator, $count)
+    {
+        if (! is_numeric($count)) {
+            return false;
+        }
+
+        $count = (int) $count;
+
+        return match ($operator) {
+            '>=' => $count <= 0,
+            '>' => $count < 0,
+            '=', '==' => $count === 0,
+            '<=' => $count >= 0,
+            '<' => $count > 0,
+            '!=', '<>' => $count !== 0,
+            default => false,
+        };
+    }
+
+    /**
+     * Return the logical complement of a count comparison operator.
+     *
+     * @param  string  $operator
+     * @return string
+     */
+    protected function complementCrossConnectionCountOperator($operator)
+    {
+        return match ($operator) {
+            '>=' => '<',
+            '>' => '<=',
+            '=', '==' => '!=',
+            '<=' => '>',
+            '<' => '>=',
+            '!=', '<>' => '=',
+            default => $operator,
+        };
     }
 
     /**
