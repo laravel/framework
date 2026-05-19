@@ -1131,7 +1131,9 @@ trait QueriesRelationships
     /**
      * Resolve aggregate values from the related connection and attach them to each parent model.
      *
-     * @param  mixed  $result
+     * @template TResult
+     *
+     * @param  TResult  $result
      * @param  string  $alias
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>  $relation
      * @param  string  $relatedKey
@@ -1139,7 +1141,7 @@ trait QueriesRelationships
      * @param  \Closure|null  $constraints
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  string  $function
-     * @return mixed
+     * @return TResult
      */
     protected function loadCrossConnectionAggregateValues($result, $alias, Relation $relation, $relatedKey, $localKey, $constraints, $column, $function)
     {
