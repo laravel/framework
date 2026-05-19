@@ -1,6 +1,42 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.9.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.10.0...13.x)
+
+## [v13.10.0](https://github.com/laravel/framework/compare/v13.9.0...v13.10.0) - 2026-05-19
+
+* [13.x] Improve queue metric tests by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/60124
+* [13.x] Add tests for SeeInHtml constraint covering unicode whitespace by [@scabarcas17](https://github.com/scabarcas17) in https://github.com/laravel/framework/pull/60128
+* [13.x] Fix starts_with/ends_with rules rejecting numeric values by [@aydinfatih](https://github.com/aydinfatih) in https://github.com/laravel/framework/pull/60120
+* Fix typo in docblock for listManagementOptions method in SesV2Transport by [@daliendev](https://github.com/daliendev) in https://github.com/laravel/framework/pull/60115
+* [13.x] Fix typo in mergeAttributeFromCachedCasts() PHPDoc comment by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/60112
+* [13.x] Optimize Worker queue pause check by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60109
+* [13.x] Fix typo in preg_replace_array() PHPDoc comment by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/60111
+* Add storage store by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/60131
+* Fix typo in Builder::getRelation() comment by [@rpsohag](https://github.com/rpsohag) in https://github.com/laravel/framework/pull/60130
+* URL Encode Paths by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/60137
+* [13.x] Add WorkerIdle event by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60134
+* [13.x] Replace [@return](https://github.com/return) with [@var](https://github.com/var) on docblocks for properties in tests by [@scabarcas17](https://github.com/scabarcas17) in https://github.com/laravel/framework/pull/60132
+* [13.x] Pass WorkerOptions to Pausing/Resuming/Interrupted by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60135
+* [13.x] Switch force check in Worker by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60145
+* [13.x] Skip delimiter filesystem tests on Windows  by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60143
+* Delimit aggregate alias by [@willrowe](https://github.com/willrowe) in https://github.com/laravel/framework/pull/60140
+* [13.x] Allow lifecycle and output callbacks on Schedule::group() by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/60133
+* [13.x] Allow passing scheduled `Event` in callbacks by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/60144
+* Validate against line breaks in emails by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/60151
+* [13.x] Add `assertPushedOnce()` by [@weshooper](https://github.com/weshooper) in https://github.com/laravel/framework/pull/60150
+* [13.x] Fix callable usage in `Event@callEventCallback()` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/60148
+* [13.x] Fix numeric property names being cast to integers in JsonSchema requi… by [@irabbi360](https://github.com/irabbi360) in https://github.com/laravel/framework/pull/60149
+* [13.x] Pass worker options to Looping by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60153
+* [13.x] Support enum queue names in QueueFake by [@Tresor-Kasenda](https://github.com/Tresor-Kasenda) in https://github.com/laravel/framework/pull/60161
+* [13.x] Remove obsolete [@phpstan-ignore](https://github.com/phpstan-ignore) clauses by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/60164
+* [13.x] Consistent test OS attributes by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/60162
+* Output cloud request ID in logs by [@jradtilbrook](https://github.com/jradtilbrook) in https://github.com/laravel/framework/pull/60156
+* [13.x] Optionally flush the SQS overflow store on queue:clear by [@Orrison](https://github.com/Orrison) in https://github.com/laravel/framework/pull/60138
+* [13.x] Add JSON output option to ListFailedCommand and corresponding tests by [@Tresor-Kasenda](https://github.com/Tresor-Kasenda) in https://github.com/laravel/framework/pull/60168
+* [13.x] Add schema foreign key existence helper by [@Tresor-Kasenda](https://github.com/Tresor-Kasenda) in https://github.com/laravel/framework/pull/60169
+* Stop when empty for by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/60176
+* [13.x] Add initial value type to return of `reduce` and `reduceWithKeys` by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/60178
+* [13.x] Fix incorrect type hint in EncodedHtmlString::convert() docblock by [@rpsohag](https://github.com/rpsohag) in https://github.com/laravel/framework/pull/60186
 
 ## [v13.9.0](https://github.com/laravel/framework/compare/v13.8.0...v13.9.0) - 2026-05-13
 
