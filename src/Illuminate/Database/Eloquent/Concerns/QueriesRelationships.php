@@ -1139,7 +1139,7 @@ trait QueriesRelationships
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>  $relation
      * @param  string  $relatedKey
      * @param  string  $localKey
-     * @param  \Closure|null  $constraints
+     * @param  \Closure(array{self}&array<array-key, mixed>)|null  $constraints
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  string  $function
      * @return TResult
