@@ -468,4 +468,59 @@ class ScheduleGroupTest extends TestCase
         $events[1]->finish(app(), 1);
         $this->assertSame(['outer', 'outer', 'inner'], $calls);
     }
+
+    public function testGroupCanStartWithLifecycleCallbackWithoutFrequency()
+    {
+        $calls = [];
+
+        $schedule = new ScheduleClass;
+        $schedule
+            ->before(function () use (&$calls) {
+                $calls[] = 'before';
+            })
+            ->onSuccess(function () use (&$calls) {
+                $calls[] = 'success';
+            })
+            ->onFailure(function () use (&$calls) {
+                $calls[] = 'failure';
+            })
+            ->group(function ($schedule) {
+                $schedule->command('inspire')->daily();
+                $schedule->command('inspire')->weekly();
+            });
+
+        $events = $schedule->events();
+        $this->assertCount(2, $events);
+        $this->assertSame('0 0 * * *', $events[0]->expression);
+        $this->assertSame('0 0 * * 0', $events[1]->expression);
+
+        $events[0]->callBeforeCallbacks(app());
+        $events[0]->finish(app(), 0);
+        $events[1]->callBeforeCallbacks(app());
+        $events[1]->finish(app(), 1);
+
+        $this->assertSame(['before', 'success', 'before', 'failure'], $calls);
+    }
+
+    public function testGroupCanStartWithOutputCallbackWithoutFrequency()
+    {
+        $calls = [];
+
+        $schedule = new ScheduleClass;
+        $schedule
+            ->onFailureWithOutput(function (Event $event, \Illuminate\Support\Stringable $output) use (&$calls) {
+                $calls[] = 'failure:'.$output;
+            })
+            ->group(function ($schedule) {
+                $schedule->command('inspire')->daily();
+            });
+
+        $events = $schedule->events();
+        $this->assertCount(1, $events);
+        $this->assertSame('0 0 * * *', $events[0]->expression);
+
+        $events[0]->finish(app(), 1);
+
+        $this->assertCount(1, $calls);
+    }
 }
