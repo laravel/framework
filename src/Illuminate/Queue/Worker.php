@@ -385,16 +385,6 @@ class Worker
     }
 
     /**
-     * Get the current high-resolution timestamp.
-     *
-     * @return float
-     */
-    protected function currentTime()
-    {
-        return hrtime(true) / 1e9;
-    }
-
-    /**
      * Process the next job on the queue.
      *
      * @param  string  $connectionName
@@ -1065,5 +1055,15 @@ class Worker
     public function setManager(QueueManager $manager)
     {
         $this->manager = $manager;
+    }
+
+    /**
+     * Get the current high-resolution timestamp.
+     *
+     * @return float
+     */
+    protected function currentTime()
+    {
+        return hrtime(true) / 1e9;
     }
 }
