@@ -466,10 +466,10 @@ class Builder
     }
 
     /**
-     * Determine if the given table has a given foreign key.
+     * Determine if the table has a given foreign key.
      *
      * @param  string  $table
-     * @param  string|array  $foreignKey
+     * @param  array|string  $foreignKey
      * @return bool
      */
     public function hasForeignKey($table, $foreignKey)
