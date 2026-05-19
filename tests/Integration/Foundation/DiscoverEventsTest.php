@@ -79,7 +79,7 @@ class DiscoverEventsTest extends TestCase
         ], $events);
     }
 
-    public function testListenersImplementingShouldBeDiscoveredCanOptOut()
+    public function testListenersCanOptOutOfDiscovery()
     {
         class_alias(RegisteredListener::class, 'Tests\Integration\Foundation\Fixtures\EventDiscovery\ShouldBeDiscoveredListeners\RegisteredListener');
         class_alias(SkippedListener::class, 'Tests\Integration\Foundation\Fixtures\EventDiscovery\ShouldBeDiscoveredListeners\SkippedListener');
