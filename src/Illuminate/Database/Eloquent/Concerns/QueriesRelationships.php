@@ -1088,7 +1088,7 @@ trait QueriesRelationships
             throw new RuntimeException(sprintf(
                 'Cross-connection aggregate function [%s] is not supported. '
                 .'Supported functions: count, exists, min, max, sum, avg.',
-                $function ?? 'null',
+                is_string($function) ? $function : 'null',
             ));
         }
 
@@ -1538,7 +1538,7 @@ trait QueriesRelationships
      *                        ? '='
      *                        : TOperator
      *                    )
-     *                ) 
+     *                )
      *            )
      *        )
      *     )
