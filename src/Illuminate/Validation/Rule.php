@@ -20,6 +20,7 @@ use Illuminate\Validation\Rules\ImageFile;
 use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\Numeric;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\ProhibitedUnless;
 use Illuminate\Validation\Rules\RequiredIf;
@@ -237,6 +238,16 @@ class Rule
     public static function email()
     {
         return new Email;
+    }
+
+    /**
+     * Get a password rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Password
+     */
+    public static function password()
+    {
+        return Password::defaults();
     }
 
     /**
