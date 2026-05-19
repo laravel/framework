@@ -1064,7 +1064,7 @@ trait QueriesRelationships
      * to each hydrated model as the requested attribute alias.
      *
      * @param  string  $name
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>  $relation
+     * @param  \Illuminate\Database\Eloquent\Relations\HasOneOrMany<*, *, *> |\Illuminate\Database\Eloquent\Relations\BelongsTo<*, *, *>  $relation
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  'count'|'exists'|'min'|'max'|'sum'|'avg'|null  $function
      * @param  \Closure(array{self}&array<array-key, mixed>)|null  $constraints
