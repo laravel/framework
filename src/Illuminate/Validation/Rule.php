@@ -247,7 +247,7 @@ class Rule
      */
     public static function password()
     {
-        return Password::defaults();
+        return Password::default();
     }
 
     /**
