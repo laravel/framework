@@ -1359,6 +1359,19 @@ trait QueriesRelationships
      * @param  string  $boolean
      * @param  \Closure(array{self}&array<array-key, mixed>)|null  $callback
      * @return $this
+     * 
+     * @phpstan-return ($operator is '>='|'<'
+     *     ? ($count is 1
+     *         ? $this
+     *         : ($count is \Illuminate\Contracts\Database\Query\Expression
+     *             ? never
+     *             : $this
+     *         )
+     *     : ($count is \Illuminate\Contracts\Database\Query\Expression
+     *         ? never
+     *         : $this
+     *     )
+     * )
      */
     protected function addCrossConnectionHasWhere(Relation $relation, $operator, $count, $boolean, ?Closure $callback)
     {
