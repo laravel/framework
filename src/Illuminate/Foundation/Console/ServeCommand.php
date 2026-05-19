@@ -202,21 +202,6 @@ class ServeCommand extends Command
     }
 
     /**
-     * Determine if the environment variable should be passed to the PHP server process.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    protected function shouldPassThroughEnvironmentVariable($key)
-    {
-        if (PHP_OS_FAMILY === 'Windows') {
-            return in_array(strtoupper($key), array_map(strtoupper(...), static::$passthroughVariables), true);
-        }
-
-        return in_array($key, static::$passthroughVariables, true);
-    }
-
-    /**
      * Get the full server command.
      *
      * @return array
@@ -296,6 +281,21 @@ class ServeCommand extends Command
     {
         return is_null($this->input->getOption('port')) &&
             ($this->input->getOption('tries') > $this->portOffset);
+    }
+
+    /**
+     * Determine if the environment variable should be passed to the PHP server process.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function shouldPassThroughEnvironmentVariable($key)
+    {
+        if (PHP_OS_FAMILY === 'Windows') {
+            return in_array(strtoupper($key), array_map(strtoupper(...), static::$passthroughVariables), true);
+        }
+
+        return in_array($key, static::$passthroughVariables, true);
     }
 
     /**
