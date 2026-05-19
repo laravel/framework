@@ -1494,6 +1494,7 @@ trait QueriesRelationships
      * @param  string  $operator
      * @param  mixed  $count
      * @return bool
+     *
      * @phpstan ($count is numeric ? bool : false)
      */
     protected function zeroCountSatisfiesCrossConnectionOperator($operator, $count)
