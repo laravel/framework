@@ -1357,7 +1357,7 @@ trait QueriesRelationships
      * @param  string  $operator
      * @param  \Illuminate\Contracts\Database\Query\Expression|int  $count
      * @param  string  $boolean
-     * @param  \Closure|null  $callback
+     * @param  \Closure(array{self}&array<array-key, mixed>)|null  $callback
      * @return $this
      */
     protected function addCrossConnectionHasWhere(Relation $relation, $operator, $count, $boolean, ?Closure $callback)
