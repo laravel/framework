@@ -7,7 +7,7 @@ use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Events\Event
 
 class RegisteredListener implements ShouldBeDiscovered
 {
-    public function shouldBeDiscovered(): bool
+    public static function shouldBeDiscovered(): bool
     {
         return true;
     }

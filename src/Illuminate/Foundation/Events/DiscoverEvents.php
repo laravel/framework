@@ -79,7 +79,7 @@ class DiscoverEvents
             }
 
             if ($listener->implementsInterface(ShouldBeDiscovered::class) &&
-                $listener->newInstanceWithoutConstructor()->shouldBeDiscovered() === false) {
+                $listener->getName()::shouldBeDiscovered() === false) {
                 continue;
             }
 

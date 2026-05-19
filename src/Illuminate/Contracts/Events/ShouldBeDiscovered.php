@@ -7,5 +7,5 @@ interface ShouldBeDiscovered
     /**
      * Determine if the listener should be registered during event discovery.
      */
-    public function shouldBeDiscovered(): bool;
+    public static function shouldBeDiscovered(): bool;
 }

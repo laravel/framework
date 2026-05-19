@@ -7,7 +7,7 @@ use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Events\Event
 
 class SkippedListener implements ShouldBeDiscovered
 {
-    public function shouldBeDiscovered(): bool
+    public static function shouldBeDiscovered(): bool
     {
         return false;
     }
