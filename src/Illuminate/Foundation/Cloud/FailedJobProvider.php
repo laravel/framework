@@ -51,7 +51,7 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
      */
     public function log($connection, $queue, $payload, $exception)
     {
-        if ($connection !== 'sqs') {
+        if ($connection !== 'cloud') {
             return $this->failer->log(...func_get_args());
         }
 
