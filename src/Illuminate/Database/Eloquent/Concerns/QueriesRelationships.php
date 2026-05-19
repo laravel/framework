@@ -6,6 +6,7 @@ use BadMethodCallException;
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\CrossConnectionStrategy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -56,7 +57,7 @@ trait QueriesRelationships
 
         $strategy = $this->relationCrossConnectionStrategy($relation);
 
-        if ($strategy === 'resolve') {
+        if ($strategy === CrossConnectionStrategy::Resolve) {
             return $this->addCrossConnectionHasWhere(
                 $relation, $operator, $count, $boolean, $callback
             );
@@ -73,7 +74,7 @@ trait QueriesRelationships
             $relation->getRelated()->newQueryWithoutRelationships(), $this
         );
 
-        if ($strategy === 'prefix') {
+        if ($strategy === CrossConnectionStrategy::Prefix) {
             $this->applyCrossDatabasePrefixToHasQuery($hasQuery, $relation);
         }
 
@@ -893,7 +894,7 @@ trait QueriesRelationships
             // SQL statement with the parent's connection, fall back to resolving the
             // aggregate as a separate query and attaching the values to each model
             // after the parent query has been executed.
-            if ($this->relationCrossConnectionStrategy($relation) === 'resolve') {
+            if ($this->relationCrossConnectionStrategy($relation) === CrossConnectionStrategy::Resolve) {
                 $this->addCrossConnectionAggregate(
                     $name, $relation, $column, $function, $constraints, $alias ?? null
                 );
@@ -1274,17 +1275,11 @@ trait QueriesRelationships
     /**
      * Determine the cross-connection strategy to use for a relation.
      *
-     * Returns one of:
-     *  - "same":    parent and related share the same connection (no special handling).
-     *  - "prefix":  related lives on a different database but the same server, so
-     *               the existence subquery can stay on a single PDO connection by
-     *               qualifying the table with its database name.
-     *  - "resolve": related lives on a different server or driver; the existence
-     *               subquery must be resolved as a separate query and converted
-     *               into a "where in" / "where not in" clause on the parent.
+     * See {@see \Illuminate\Database\Eloquent\CrossConnectionStrategy} for the
+     * meaning of each strategy case.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>  $relation
-     * @return 'same'|'prefix'|'resolve'
+     * @return \Illuminate\Database\Eloquent\CrossConnectionStrategy
      */
     protected function relationCrossConnectionStrategy(Relation $relation)
     {
@@ -1292,19 +1287,19 @@ trait QueriesRelationships
         $inner = $relation->getRelated()->getConnection();
 
         if ($outer === $inner || $outer->getName() === $inner->getName()) {
-            return 'same';
+            return CrossConnectionStrategy::Same;
         }
 
         if (! method_exists($outer, 'getDriverName') || ! method_exists($inner, 'getDriverName')) {
-            return 'resolve';
+            return CrossConnectionStrategy::Resolve;
         }
 
         if ($outer->getDriverName() !== $inner->getDriverName()) {
-            return 'resolve';
+            return CrossConnectionStrategy::Resolve;
         }
 
         if ($outer->getDriverName() === 'sqlite') {
-            return 'resolve';
+            return CrossConnectionStrategy::Resolve;
         }
 
         $outerConfig = method_exists($outer, 'getConfig') ? $outer->getConfig() : [];
@@ -1313,7 +1308,9 @@ trait QueriesRelationships
         $sameHost = ($outerConfig['host'] ?? null) === ($innerConfig['host'] ?? null);
         $samePort = ($outerConfig['port'] ?? null) === ($innerConfig['port'] ?? null);
 
-        return ($sameHost && $samePort) ? 'prefix' : 'resolve';
+        return ($sameHost && $samePort)
+            ? CrossConnectionStrategy::Prefix
+            : CrossConnectionStrategy::Resolve;
     }
 
     /**
@@ -1453,6 +1450,7 @@ trait QueriesRelationships
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>  $relation
      * @return array{0: string, 1: string}
+     *
      * @phpstan-return ($relation is \Illuminate\Database\Eloquent\Relations\BelongsTo|\Illuminate\Database\Eloquent\Relations\HasOneOrMany ? array{0: string, 1: string} : never)
      *
      * @throws \RuntimeException
@@ -1524,6 +1522,7 @@ trait QueriesRelationships
      *
      * @param  TOperator  $operator
      * @return string
+     *
      * @phpstan-return ($operator is '>='
      *     ? '<'
      *     : ($operator is '>'
