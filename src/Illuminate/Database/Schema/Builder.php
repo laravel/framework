@@ -466,6 +466,24 @@ class Builder
     }
 
     /**
+     * Determine if the given table has a given foreign key.
+     *
+     * @param  string  $table
+     * @param  string|array  $foreignKey
+     * @return bool
+     */
+    public function hasForeignKey($table, $foreignKey)
+    {
+        foreach ($this->getForeignKeys($table) as $value) {
+            if ($value['name'] === $foreignKey || $value['columns'] === $foreignKey) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Get the foreign keys for a given table.
      *
      * @param  string  $table
