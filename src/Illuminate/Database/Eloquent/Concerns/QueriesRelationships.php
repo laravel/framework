@@ -1451,6 +1451,7 @@ trait QueriesRelationships
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>  $relation
      * @return array{0: string, 1: string}
+     * @phpstan-return ($relation is \Illuminate\Database\Eloquent\Relations\BelongsTo|\Illuminate\Database\Eloquent\Relations\HasOneOrMany ? array{0: string, 1: string} : never)
      *
      * @throws \RuntimeException
      */
