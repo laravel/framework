@@ -597,20 +597,52 @@ assertType('Illuminate\Support\LazyCollection<int, int|string>', $collection::ma
 assertType('Illuminate\Support\LazyCollection<int, int>|int', $collection::make([1])->random(2));
 assertType('Illuminate\Support\LazyCollection<int, string>|string', $collection::make(['string'])->random());
 
-assertType('1', $collection
+assertType('1|null', $collection
     ->reduce(function ($null, $user) {
         assertType('User', $user);
         assertType('1|null', $null);
 
         return 1;
     }));
-assertType('1', $collection
+assertType('0|1', $collection
     ->reduce(function ($int, $user) {
         assertType('User', $user);
         assertType('0|1', $int);
 
         return 1;
     }, 0));
+assertType('0|1', $collection
+    ->reduce(function ($int, $user, $key) {
+        assertType('User', $user);
+        assertType('0|1', $int);
+        assertType('int', $key);
+
+        return 1;
+    }, 0));
+
+assertType('1|null', $collection
+    ->reduceWithKeys(function ($null, $user) {
+        assertType('User', $user);
+        assertType('1|null', $null);
+
+        return 1;
+    }));
+assertType('0|1', $collection
+    ->reduceWithKeys(function ($int, $user) {
+        assertType('User', $user);
+        assertType('0|1', $int);
+
+        return 1;
+    }, 0));
+assertType('0|1', $collection
+    ->reduceWithKeys(function ($int, $user, $key) {
+        assertType('User', $user);
+        assertType('0|1', $int);
+        assertType('int', $key);
+
+        return 1;
+    }, 0));
+assertType("'bar'|'foo'", $collection->reduce(static fn(): string => 'foo', 'bar'));
 
 assertType('Illuminate\Support\LazyCollection<int, int>', $collection::make([1])->replace([1]));
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->replace([new User]));
