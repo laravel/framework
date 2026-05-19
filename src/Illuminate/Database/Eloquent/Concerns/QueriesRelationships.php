@@ -1284,7 +1284,7 @@ trait QueriesRelationships
      *               into a "where in" / "where not in" clause on the parent.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>  $relation
-     * @return string
+     * @return 'same'|'prefix'|'resolve'
      */
     protected function relationCrossConnectionStrategy(Relation $relation)
     {
