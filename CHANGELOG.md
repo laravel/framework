@@ -1,6 +1,10 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.60.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.60.2...12.x)
+
+## [v12.60.2](https://github.com/laravel/framework/compare/v12.60.1...v12.60.2) - 2026-05-20
+
+* [12.x] Boot managed queues before service providers boot by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/60199
 
 ## [v12.60.1](https://github.com/laravel/framework/compare/v12.60.0...v12.60.1) - 2026-05-19
 
