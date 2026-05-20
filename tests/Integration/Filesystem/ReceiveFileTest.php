@@ -17,6 +17,7 @@ class ReceiveFileTest extends TestCase
             Storage::delete([
                 'receive-file-test.txt',
                 'receive-file-test.txt?pad=x',
+                'nested/folder/receive-file-test.txt',
             ]);
         });
 
@@ -88,6 +89,14 @@ class ReceiveFileTest extends TestCase
         $response->assertNoContent();
         Storage::assertExists('receive-file-test.txt?pad=x', 'Hello Question');
         Storage::assertMissing('receive-file-test.txt');
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testTemporaryUploadUrlPreservesPathSeparatorsInNestedPaths()
+    {
+        $result = Storage::temporaryUploadUrl('nested/folder/receive-file-test.txt', Carbon::now()->addMinute());
+
+        $this->assertStringContainsString('nested/folder/receive-file-test.txt', $result['url']);
     }
 
     #[RequiresOperatingSystem('Linux|Darwin')]
