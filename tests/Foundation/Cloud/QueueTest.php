@@ -50,7 +50,6 @@ class QueueTest extends TestCase
         Worker::$restartable = true;
         Worker::$pausable = true;
         $_SERVER['LARAVEL_CLOUD'] = '1';
-        $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES'] = '1';
         $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES_CONFIG'] = json_encode([
             'driver' => 'cloud',
             'connection' => [
@@ -71,7 +70,7 @@ class QueueTest extends TestCase
     {
         parent::tearDown();
 
-        unset($_SERVER['LARAVEL_CLOUD'], $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES'], $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES_CONFIG']);
+        unset($_SERVER['LARAVEL_CLOUD'], $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES_CONFIG']);
         Worker::$restartable = true;
         Worker::$pausable = true;
     }
@@ -169,15 +168,26 @@ class QueueTest extends TestCase
         $this->assertInstanceOf(FailedJobProvider::class, $this->app['queue.failer']);
     }
 
-    public function testItDoesNotRegisterCloudConnectorWhenManagedQueuesIsInactive()
+    public function testItDoesNotRegisterCloudConnectorWhenCloudQueueConnectionIsNotConfigured()
     {
-        unset($_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES']);
+        $this->app['config']->set('queue.connections.cloud', null);
 
         Cloud::bootManagedQueues($this->app);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('No connector for [cloud]');
+        $this->expectExceptionMessage('The [cloud] queue connection has not been configured.');
         $this->app['queue']->connection('cloud');
+    }
+
+    public function testItDoesNotRegisterCloudConnectorWhenCloudQueueConnectionDriverIsNotCloud()
+    {
+        $this->app['config']->set('queue.connections.cloud.driver', 'sqs');
+        $originalFailer = $this->app['queue.failer'];
+
+        Cloud::bootManagedQueues($this->app);
+
+        $this->assertFalse($this->app->bound(Events::class));
+        $this->assertSame($originalFailer, $this->app['queue.failer']);
     }
 
     public function testItDoesNotEmitEventsWhilePoppingWhenNoJobsAreProcessingAndNoJobsAreAvailableToPop()
