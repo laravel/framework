@@ -145,6 +145,30 @@ class EventTest extends TestCase
         $this->assertSame($event, $rejectEvent);
     }
 
+    public function testEventCallbackResolvesByTypeRegardlessOfParameterName()
+    {
+        $container = new Container;
+        $beforeEvent = null;
+        $filterEvent = null;
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+
+        $event->before(function (Event $scheduledEvent) use (&$beforeEvent) {
+            $beforeEvent = $scheduledEvent;
+        });
+
+        $event->when(function (Event $scheduledEvent) use (&$filterEvent) {
+            $filterEvent = $scheduledEvent;
+
+            return true;
+        });
+
+        $event->callBeforeCallbacks($container);
+        $this->assertTrue($event->filtersPass($container));
+
+        $this->assertSame($event, $beforeEvent);
+        $this->assertSame($event, $filterEvent);
+    }
+
     public function testFilterCallbacksMayBeInvokableObjects()
     {
         $container = new Container;

@@ -791,13 +791,13 @@ class Event
     {
         $parameters = $this->closureParameterTypes($callback);
 
-        $eventParameterType = Arr::get($parameters, 'event');
-
-        if ($eventParameterType === null || ! is_a($this, $eventParameterType)) {
-            return [];
+        foreach ($parameters as $name => $type) {
+            if ($type !== null && is_a($this, $type)) {
+                return [$name => $this];
+            }
         }
 
-        return ['event' => $this];
+        return [];
     }
 
     /**
