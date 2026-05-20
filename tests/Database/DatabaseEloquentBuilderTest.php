@@ -2375,6 +2375,103 @@ class DatabaseEloquentBuilderTest extends TestCase
         });
     }
 
+    public function testOrWhereKeyMethodWithInt()
+    {
+        $model = $this->getMockModel();
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $int = 1;
+
+        $model->shouldReceive('getKeyType')->once()->andReturn('int');
+        $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '=', $int, 'or');
+
+        $builder->orWhereKey($int);
+    }
+
+    public function testOrWhereKeyMethodWithStringZero()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $int = 0;
+
+        $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '=', (string) $int, 'or');
+
+        $builder->orWhereKey($int);
+    }
+
+    public function testOrWhereKeyMethodWithStringNull()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '=', m::on(function ($argument) {
+            return $argument === null;
+        }), 'or');
+
+        $builder->orWhereKey(null);
+    }
+
+    public function testOrWhereKeyMethodWithArray()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->andReturn('int');
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $array = [1, 2, 3];
+
+        $builder->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with($keyName, $array, 'or');
+
+        $builder->orWhereKey($array);
+    }
+
+    public function testOrWhereKeyMethodWithArrayWithStringPrimaryKey()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $array = ['one', 'two', 'three'];
+
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with($keyName, $array, 'or');
+
+        $builder->orWhereKey($array);
+    }
+
+    public function testOrWhereKeyMethodWithCollection()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->andReturn('int');
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $collection = new Collection([1, 2, 3]);
+
+        $builder->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with($keyName, $collection, 'or');
+
+        $builder->orWhereKey($collection);
+    }
+
+    public function testOrWhereKeyMethodWithModel()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '=', m::on(function ($argument) {
+            return $argument === '1';
+        }), 'or');
+
+        $builder->orWhereKey(new class extends Model
+        {
+            protected $attributes = ['id' => 1];
+        });
+    }
+
     public function testWhereKeyNotMethodWithStringZero()
     {
         $model = new EloquentBuilderTestStubStringPrimaryKey;

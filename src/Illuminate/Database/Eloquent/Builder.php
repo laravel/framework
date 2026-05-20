@@ -276,15 +276,44 @@ class Builder implements BuilderContract
      */
     public function whereKey($id)
     {
+        return $this->addWhereKey($id);
+    }
+
+    /**
+     * Add an "or where" clause on the primary key to the query.
+     *
+     * @param  mixed  $id
+     * @return $this
+     */
+    public function orWhereKey($id)
+    {
+        return $this->addWhereKey($id, 'or');
+    }
+
+    /**
+     * Add a where clause on the primary key to the query.
+     *
+     * @param  mixed  $id
+     * @param  string  $boolean
+     * @return $this
+     */
+    protected function addWhereKey($id, $boolean = 'and')
+    {
         if ($id instanceof Model) {
             $id = $id->getKey();
         }
 
         if (is_array($id) || $id instanceof Arrayable) {
+            $arguments = [$this->model->getQualifiedKeyName(), $id];
+
+            if ($boolean !== 'and') {
+                $arguments[] = $boolean;
+            }
+
             if (in_array($this->model->getKeyType(), ['int', 'integer'])) {
-                $this->query->whereIntegerInRaw($this->model->getQualifiedKeyName(), $id);
+                $this->query->whereIntegerInRaw(...$arguments);
             } else {
-                $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
+                $this->query->whereIn(...$arguments);
             }
 
             return $this;
@@ -294,7 +323,13 @@ class Builder implements BuilderContract
             $id = (string) $id;
         }
 
-        return $this->where($this->model->getQualifiedKeyName(), '=', $id);
+        $arguments = [$this->model->getQualifiedKeyName(), '=', $id];
+
+        if ($boolean !== 'and') {
+            $arguments[] = $boolean;
+        }
+
+        return $this->where(...$arguments);
     }
 
     /**
