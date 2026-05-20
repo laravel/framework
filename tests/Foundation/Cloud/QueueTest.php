@@ -132,15 +132,26 @@ class QueueTest extends TestCase
         $this->assertInstanceOf(FailedJobProvider::class, $this->app['queue.failer']);
     }
 
-    public function testItDoesNotRegisterCloudConnectorWhenManagedQueuesIsInactive()
+    public function testItDoesNotRegisterCloudConnectorWhenCloudQueueConnectionIsNotConfigured()
     {
-        unset($_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES']);
+        $this->app['config']->set('queue.connections.cloud', null);
 
         Cloud::bootManagedQueues($this->app);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('No connector for [cloud]');
+        $this->expectExceptionMessage('The [cloud] queue connection has not been configured.');
         $this->app['queue']->connection('cloud');
+    }
+
+    public function testItDoesNotRegisterCloudConnectorWhenCloudQueueConnectionDriverIsNotCloud()
+    {
+        $this->app['config']->set('queue.connections.cloud.driver', 'sqs');
+        $originalFailer = $this->app['queue.failer'];
+
+        Cloud::bootManagedQueues($this->app);
+
+        $this->assertFalse($this->app->bound(Events::class));
+        $this->assertSame($originalFailer, $this->app['queue.failer']);
     }
 
     public function testItDoesNotEmitEventsWhilePoppingWhenNoJobsAreProcessingAndNoJobsAreAvailableToPop()

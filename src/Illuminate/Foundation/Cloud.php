@@ -21,7 +21,12 @@ class Cloud
      */
     public static function bootstrapperBootstrapping(Application $app, string $bootstrapper): void
     {
-        //
+        (match ($bootstrapper) {
+            BootProviders::class => function () use ($app) {
+                static::bootManagedQueues($app);
+            },
+            default => fn () => true,
+        })();
     }
 
     /**
@@ -38,9 +43,6 @@ class Cloud
             },
             HandleExceptions::class => function () use ($app) {
                 static::configureCloudLogging($app);
-            },
-            BootProviders::class => function () use ($app) {
-                static::bootManagedQueues($app);
             },
             default => fn () => true,
         })();
@@ -149,7 +151,7 @@ class Cloud
      */
     public static function bootManagedQueues(Application $app): void
     {
-        if (($_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES'] ?? '0') !== '1') {
+        if ($app['config']->get('queue.connections.cloud.driver') !== 'cloud') {
             return;
         }
 
