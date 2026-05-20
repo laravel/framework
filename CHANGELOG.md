@@ -1,6 +1,11 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.11.1...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.11.2...13.x)
+
+## [v13.11.2](https://github.com/laravel/framework/compare/v13.11.1...v13.11.2) - 2026-05-20
+
+* [13.x] Fix lifecycle deferred event methods by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/60190
+* [13.x] Boot managed queues before service providers boot by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/60198
 
 ## [v13.11.1](https://github.com/laravel/framework/compare/v13.11.0...v13.11.1) - 2026-05-19
 
