@@ -23,6 +23,13 @@ class SqsJob extends Job implements JobContract
     protected $job;
 
     /**
+     * The redrive policy from the queue, if configured.
+     *
+     * @var array|null
+     */
+    protected $redrivePolicy;
+
+    /**
      * Create a new job instance.
      *
      * @param  \Illuminate\Container\Container  $container
@@ -30,14 +37,16 @@ class SqsJob extends Job implements JobContract
      * @param  array  $job
      * @param  string  $connectionName
      * @param  string  $queue
+     * @param  array|null  $redrivePolicy
      */
-    public function __construct(Container $container, SqsClient $sqs, array $job, $connectionName, $queue)
+    public function __construct(Container $container, SqsClient $sqs, array $job, $connectionName, $queue, $redrivePolicy = null)
     {
         $this->sqs = $sqs;
         $this->job = $job;
         $this->queue = $queue;
         $this->container = $container;
         $this->connectionName = $connectionName;
+        $this->redrivePolicy = $redrivePolicy;
     }
 
     /**
@@ -66,9 +75,47 @@ class SqsJob extends Job implements JobContract
     {
         parent::delete();
 
-        $this->sqs->deleteMessage([
-            'QueueUrl' => $this->queue, 'ReceiptHandle' => $this->job['ReceiptHandle'],
-        ]);
+        if ($this->shouldDeleteFromSqs()) {
+            $this->sqs->deleteMessage([
+                'QueueUrl' => $this->queue, 'ReceiptHandle' => $this->job['ReceiptHandle'],
+            ]);
+        }
+    }
+
+    /**
+     * Determine if the message should be deleted from SQS.
+     *
+     * When the job has failed and the queue has a redrive policy configured,
+     * we should not delete the message so that SQS can handle moving it to
+     * the dead letter queue after the maxReceiveCount has been exceeded.
+     *
+     * @return bool
+     */
+    protected function shouldDeleteFromSqs()
+    {
+        if ($this->hasFailed() && ! is_null($this->redrivePolicy)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Get the number of times to attempt a job.
+     *
+     * When the queue has a redrive policy, the maxReceiveCount is used so
+     * that Laravel's retry mechanism is aligned with SQS's native dead
+     * letter queue routing.
+     *
+     * @return int|null
+     */
+    public function maxTries()
+    {
+        if (! is_null($this->redrivePolicy)) {
+            return (int) $this->redrivePolicy['maxReceiveCount'];
+        }
+
+        return parent::maxTries();
     }
 
     /**
