@@ -352,18 +352,18 @@ class ValidatedInputTest extends TestCase
             'null' => null,
         ]);
 
-        $this->assertTrue($input->string('int') instanceof Stringable);
-        $this->assertTrue($input->string('int') instanceof Stringable);
-        $this->assertTrue($input->string('unknown_key') instanceof Stringable);
-        $this->assertSame('123', $input->string('int')->value());
-        $this->assertSame('456', $input->string('int_str')->value());
-        $this->assertSame('123.456', $input->string('float')->value());
-        $this->assertSame('123.456', $input->string('float_str')->value());
-        $this->assertSame('0', $input->string('float_zero')->value());
-        $this->assertSame('0.000', $input->string('float_str_zero')->value());
-        $this->assertSame('', $input->string('empty_str')->value());
-        $this->assertSame('', $input->string('null')->value());
-        $this->assertSame('', $input->string('unknown_key')->value());
+        $this->assertIsString($input->string('int'));
+        $this->assertIsString($input->string('int'));
+        $this->assertIsString($input->string('unknown_key'));
+        $this->assertSame('123', $input->string('int'));
+        $this->assertSame('456', $input->string('int_str'));
+        $this->assertSame('123.456', $input->string('float'));
+        $this->assertSame('123.456', $input->string('float_str'));
+        $this->assertSame('0', $input->string('float_zero'));
+        $this->assertSame('0.000', $input->string('float_str_zero'));
+        $this->assertSame('', $input->string('empty_str'));
+        $this->assertSame('', $input->string('null'));
+        $this->assertSame('', $input->string('unknown_key'));
     }
 
     public function test_boolean_method()
