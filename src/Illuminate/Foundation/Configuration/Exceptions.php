@@ -202,6 +202,18 @@ class Exceptions
     }
 
     /**
+     * Register the callable that determines if the exception handler response should be JSON for API routes.
+     *
+     * @return $this
+     */
+    public function shouldRenderJsonForApiRoutes()
+    {
+        $this->handler->shouldRenderJsonForApiRoutes();
+
+        return $this;
+    }
+
+    /**
      * Indicate that the given exception class should not be ignored.
      *
      * @param  array<int, class-string<\Throwable>>|class-string<\Throwable>  $class

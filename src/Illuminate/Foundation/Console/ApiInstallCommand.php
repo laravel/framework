@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 use function Illuminate\Support\artisan_binary;
@@ -66,6 +67,8 @@ class ApiInstallCommand extends Command
             $this->uncommentApiRoutesFile();
         }
 
+        $this->configureExceptionHandlerForApiRoutes();
+
         if ($this->option('passport')) {
             Process::run([
                 php_binary(),
@@ -113,6 +116,43 @@ class ApiInstallCommand extends Command
 
             return;
         }
+    }
+
+    /**
+     * Configure the exception handler to render JSON for API routes.
+     *
+     * @return void
+     */
+    protected function configureExceptionHandlerForApiRoutes()
+    {
+        $appBootstrapPath = $this->laravel->bootstrapPath('app.php');
+
+        $content = file_get_contents($appBootstrapPath);
+
+        if (str_contains($content, '$exceptions->shouldRenderJsonForApiRoutes();')) {
+            return;
+        }
+
+        $exceptionConfigurationClosures = [
+            '->withExceptions(function (Exceptions $exceptions): void {',
+            '->withExceptions(function (Exceptions $exceptions) {',
+            '->withExceptions(function (\Illuminate\Foundation\Configuration\Exceptions $exceptions): void {',
+            '->withExceptions(function (\Illuminate\Foundation\Configuration\Exceptions $exceptions) {',
+        ];
+
+        foreach ($exceptionConfigurationClosures as $closure) {
+            if (str_contains($content, $closure)) {
+                file_put_contents($appBootstrapPath, Str::replaceFirst(
+                    $closure,
+                    $closure.PHP_EOL.'        $exceptions->shouldRenderJsonForApiRoutes();',
+                    $content
+                ));
+
+                return;
+            }
+        }
+
+        $this->components->warn("Unable to automatically configure exception JSON rendering for API routes in [{$appBootstrapPath}]. Please add it manually.");
     }
 
     /**

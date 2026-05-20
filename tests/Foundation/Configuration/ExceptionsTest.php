@@ -49,4 +49,17 @@ class ExceptionsTest extends TestCase
         $shouldReturnJson = (fn () => $this->shouldReturnJson(new Request, new Exception()))->call($exceptions->handler);
         $this->assertFalse($shouldReturnJson);
     }
+
+    public function testShouldRenderJsonForApiRoutes()
+    {
+        $exceptions = new Exceptions(new Handler(new Container));
+
+        $exceptions->shouldRenderJsonForApiRoutes();
+
+        $shouldReturnJson = (fn () => $this->shouldReturnJson(Request::create('/api/users'), new Exception()))->call($exceptions->handler);
+        $this->assertTrue($shouldReturnJson);
+
+        $shouldReturnJson = (fn () => $this->shouldReturnJson(Request::create('/users'), new Exception()))->call($exceptions->handler);
+        $this->assertFalse($shouldReturnJson);
+    }
 }

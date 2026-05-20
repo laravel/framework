@@ -14,3 +14,4 @@ $exceptions = new Exceptions(
 
 $exceptions->stopIgnoring(HttpException::class);
 $exceptions->stopIgnoring([ModelNotFoundException::class]);
+$exceptions->shouldRenderJsonForApiRoutes();

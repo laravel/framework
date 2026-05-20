@@ -212,6 +212,25 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertSame(6, Assert::getCount());
     }
 
+    public function testShouldReturnJsonForApiRoutes()
+    {
+        $this->handler->shouldRenderJsonForApiRoutes();
+
+        $apiRequest = m::mock(stdClass::class);
+        $apiRequest->shouldReceive('expectsJson')->never();
+        $apiRequest->shouldReceive('is')->once()->with('api/*')->andReturn(true);
+
+        $shouldReturnJson = (fn () => $this->shouldReturnJson($apiRequest, new Exception()))->call($this->handler);
+        $this->assertTrue($shouldReturnJson);
+
+        $webRequest = m::mock(stdClass::class);
+        $webRequest->shouldReceive('expectsJson')->never();
+        $webRequest->shouldReceive('is')->once()->with('api/*')->andReturn(false);
+
+        $shouldReturnJson = (fn () => $this->shouldReturnJson($webRequest, new Exception()))->call($this->handler);
+        $this->assertFalse($shouldReturnJson);
+    }
+
     public function testReturnsJsonWithStackTraceWhenAjaxRequestAndDebugTrue()
     {
         $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(true);

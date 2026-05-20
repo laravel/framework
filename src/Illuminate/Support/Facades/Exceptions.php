@@ -26,6 +26,7 @@ use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
  * @method static \Symfony\Component\HttpFoundation\Response render(\Illuminate\Http\Request $request, \Throwable $e)
  * @method static \Illuminate\Foundation\Exceptions\Handler respondUsing(callable $callback)
  * @method static \Illuminate\Foundation\Exceptions\Handler shouldRenderJsonWhen(callable $callback)
+ * @method static \Illuminate\Foundation\Exceptions\Handler shouldRenderJsonForApiRoutes()
  * @method static \Illuminate\Foundation\Exceptions\Handler dontReportDuplicates()
  * @method static \Illuminate\Contracts\Debug\ExceptionHandler handler()
  * @method static void assertReported(\Closure|string $exception)

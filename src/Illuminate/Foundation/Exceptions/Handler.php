@@ -871,6 +871,18 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
+     * Register the callable that determines if the exception handler response should be JSON for API routes.
+     *
+     * @return $this
+     */
+    public function shouldRenderJsonForApiRoutes()
+    {
+        return $this->shouldRenderJsonWhen(function ($request, $exception) {
+            return $request->is('api/*');
+        });
+    }
+
+    /**
      * Prepare a response for the given exception.
      *
      * @param  \Illuminate\Http\Request  $request
