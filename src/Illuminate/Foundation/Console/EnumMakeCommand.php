@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -74,6 +75,23 @@ class EnumMakeCommand extends GeneratorCommand
             is_dir(app_path('Enumerations')) => $rootNamespace.'\\Enumerations',
             default => $rootNamespace,
         };
+    }
+
+    /**
+     * Parse the class name and format according to the root namespace.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function qualifyClass($name)
+    {
+        $name = str_replace('/', '\\', ltrim($name, '\\/'));
+
+        if (Str::startsWith($name, ['Enums\\', 'Enumerations\\'])) {
+            return parent::qualifyClass($this->rootNamespace().$name);
+        }
+
+        return parent::qualifyClass($name);
     }
 
     /**
