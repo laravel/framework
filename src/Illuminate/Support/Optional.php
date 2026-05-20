@@ -100,7 +100,7 @@ class Optional implements ArrayAccess
     /**
      * Unset the item at a given offset.
      *
-     * @param  string  $offset
+     * @param  mixed  $offset
      * @return void
      */
     public function offsetUnset($offset): void
