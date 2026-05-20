@@ -6,6 +6,7 @@ use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Container\Container;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
@@ -167,6 +168,23 @@ class EventTest extends TestCase
 
         $this->assertSame($event, $beforeEvent);
         $this->assertSame($event, $filterEvent);
+    }
+
+    public function testEventCallbackDoesNotInjectIntoUnrelatedTypedParameters()
+    {
+        $container = new Container;
+        $stringValue = null;
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+
+        $container->instance(Stringable::class, Str::of('injected-string'));
+
+        $event->before(function (Stringable $value) use (&$stringValue) {
+            $stringValue = (string) $value;
+        });
+
+        $event->callBeforeCallbacks($container);
+
+        $this->assertSame('injected-string', $stringValue);
     }
 
     public function testFilterCallbacksMayBeInvokableObjects()
