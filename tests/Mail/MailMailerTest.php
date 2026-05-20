@@ -228,12 +228,18 @@ class MailMailerTest extends TestCase
         $view->shouldReceive('render')->once()->andReturn('rendered.view');
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Email addresses may not contain line break characters.');
+        try {
+            $mailer->send('foo', ['data'], function (Message $message) {
+                $message->to(new Address("\"foo\r\nBcc: victim@example.com\"@example.com"))->from('hello@laravel.com');
+            });
 
-        $mailer->send('foo', ['data'], function (Message $message) {
-            $message->to(new Address("\"foo\r\nBcc: victim@example.com\"@example.com"))->from('hello@laravel.com');
-        });
+            $this->fail('Expected InvalidArgumentException was not thrown.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertContains($e->getMessage(), [
+                'Email address contains control characters.',
+                'Email addresses may not contain line break characters.',
+            ]);
+        }
     }
 
     public function testGlobalFromIsRespectedOnAllMessages(): void
