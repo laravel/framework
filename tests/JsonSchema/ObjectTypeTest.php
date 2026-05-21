@@ -78,6 +78,37 @@ class ObjectTypeTest extends TestCase
         ], $type->toArray());
     }
 
+    public function test_it_may_have_a_minimum_number_of_properties(): void
+    {
+        $type = JsonSchema::object()->min(1);
+
+        $this->assertEquals([
+            'type' => 'object',
+            'minProperties' => 1,
+        ], $type->toArray());
+    }
+
+    public function test_it_may_have_a_maximum_number_of_properties(): void
+    {
+        $type = JsonSchema::object()->max(5);
+
+        $this->assertEquals([
+            'type' => 'object',
+            'maxProperties' => 5,
+        ], $type->toArray());
+    }
+
+    public function test_it_may_combine_min_and_max_properties(): void
+    {
+        $type = JsonSchema::object()->min(1)->max(5);
+
+        $this->assertEquals([
+            'type' => 'object',
+            'minProperties' => 1,
+            'maxProperties' => 5,
+        ], $type->toArray());
+    }
+
     public function test_it_may_disable_additional_properties(): void
     {
         $type = JsonSchema::object()->default(['age' => 1])->withoutAdditionalProperties();
