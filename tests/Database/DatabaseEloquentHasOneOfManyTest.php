@@ -437,6 +437,42 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame($user2Price->id, $users[1]->price->id);
     }
 
+    public function testEagerLoadConstraintsAppliedToOneOfManySubQuery()
+    {
+        $user = HasOneOfManyTestUser::create();
+
+        $user->states()->createMany([
+            ['type' => 'foo', 'state' => 'first'],
+            ['type' => 'bar', 'state' => 'absolute_latest_but_wrong_type'],
+            ['type' => 'foo', 'state' => 'latest_matching'],
+        ]);
+
+        $user = HasOneOfManyTestUser::with(['latest_state' => function ($query) {
+            $query->where('type', 'foo');
+        }])->first();
+
+        $this->assertNotNull($user->latest_state);
+        $this->assertSame('latest_matching', $user->latest_state->state);
+    }
+
+    public function testEagerLoadConstraintsAppliedToMultiColumnOneOfManySubQuery()
+    {
+        $user = HasOneOfManyTestUser::create();
+
+        $user->states()->createMany([
+            ['type' => 'foo', 'state' => 'old_foo', 'updated_at' => '2021-01-01', 'created_at' => '2021-01-01'],
+            ['type' => 'bar', 'state' => 'latest_bar', 'updated_at' => '2021-06-01', 'created_at' => '2021-06-01'],
+            ['type' => 'foo', 'state' => 'latest_foo', 'updated_at' => '2021-03-01', 'created_at' => '2021-03-01'],
+        ]);
+
+        $user = HasOneOfManyTestUser::with(['latest_updated_foo_state' => function ($query) {
+            $query->where('type', 'foo');
+        }])->first();
+
+        $this->assertNotNull($user->latest_updated_foo_state);
+        $this->assertSame('latest_foo', $user->latest_updated_foo_state->state);
+    }
+
     public function testWithExists()
     {
         $user = HasOneOfManyTestUser::create();
@@ -631,6 +667,19 @@ class HasOneOfManyTestUser extends Eloquent
         ], function ($q) {
             $q->where('published_at', '<', Carbon::now());
         });
+    }
+
+    public function latest_state()
+    {
+        return $this->hasOne(HasOneOfManyTestState::class, 'user_id')->latestOfMany();
+    }
+
+    public function latest_updated_foo_state()
+    {
+        return $this->hasOne(HasOneOfManyTestState::class, 'user_id')->ofMany([
+            'updated_at' => 'MAX',
+            'id' => 'MAX',
+        ]);
     }
 
     public function price_without_key_in_aggregates()
