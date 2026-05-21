@@ -150,12 +150,25 @@ class EventFake implements Dispatcher, Fake
     /**
      * Assert if an event was dispatched exactly once.
      *
-     * @param  string  $event
+     * @param  string|\Closure  $event
+     * @param  callable|null  $callback
      * @return void
      */
-    public function assertDispatchedOnce($event)
+    public function assertDispatchedOnce($event, $callback = null)
     {
-        $this->assertDispatchedTimes($event, 1);
+        if ($event instanceof Closure) {
+            [$event, $callback] = [$this->firstClosureParameterType($event), $event];
+        }
+
+        $count = $this->dispatched($event, $callback)->count();
+
+        PHPUnit::assertSame(
+            1, $count,
+            sprintf(
+                "The expected [{$event}] event was dispatched {$count} %s instead of 1 time.",
+                Str::plural('time', $count)
+            )
+        );
     }
 
     /**
