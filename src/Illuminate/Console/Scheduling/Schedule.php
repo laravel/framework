@@ -53,7 +53,7 @@ class Schedule
     public static $pausable = true;
 
     /**
-     * Indicates if the schedule should check for the restart signal in the cache.
+     * Indicates if the schedule should check for the interrupt signal in the cache.
      *
      * @var bool
      */
