@@ -22,6 +22,7 @@ use InvalidArgumentException;
  * @method \Illuminate\Routing\RouteRegistrar can(\UnitEnum|string  $ability, array|string $models = [])
  * @method \Illuminate\Routing\RouteRegistrar controller(string $controller)
  * @method \Illuminate\Routing\RouteRegistrar domain(\BackedEnum|string $value)
+ * @method \Illuminate\Routing\RouteRegistrar metadata(array $metadata)
  * @method \Illuminate\Routing\RouteRegistrar middleware(array|string|null $middleware)
  * @method \Illuminate\Routing\RouteRegistrar missing(\Closure $missing)
  * @method \Illuminate\Routing\RouteRegistrar name(\BackedEnum|string $value)
@@ -150,6 +151,22 @@ class RouteRegistrar
     }
 
     /**
+     * Add metadata to routes registered by the registrar.
+     *
+     * @param  array  $metadata
+     * @return $this
+     */
+    public function metadata(array $metadata)
+    {
+        $this->attributes['metadata'] = RouteGroup::mergeMetadata(
+            $this->attributes['metadata'] ?? [],
+            $metadata
+        );
+
+        return $this;
+    }
+
+    /**
      * Route a resource to a controller.
      *
      * @param  string  $name
@@ -272,7 +289,18 @@ class RouteRegistrar
             ];
         }
 
-        return array_merge($this->attributes, $action);
+        $metadata = RouteGroup::mergeMetadata(
+            $this->attributes['metadata'] ?? [],
+            $action['metadata'] ?? []
+        );
+
+        $action = array_merge($this->attributes, $action);
+
+        if ($metadata !== []) {
+            $action['metadata'] = $metadata;
+        }
+
+        return $action;
     }
 
     /**

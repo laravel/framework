@@ -656,6 +656,13 @@ class ResourceRegistrar
             $action['missing'] = $options['missing'];
         }
 
+        if (isset($options['metadata'])) {
+            $action['metadata'] = RouteGroup::mergeMetadata(
+                $action['metadata'] ?? [],
+                $options['metadata']
+            );
+        }
+
         return $action;
     }
 

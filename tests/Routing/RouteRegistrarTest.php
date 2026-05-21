@@ -572,6 +572,72 @@ class RouteRegistrarTest extends TestCase
         $this->assertTrue($route->enforcesScopedBindings());
     }
 
+    public function testCanSetRouteMetadata()
+    {
+        $route = $this->router
+            ->metadata(['head' => ['title' => 'Users']])
+            ->get('users', function () {
+                return 'all-users';
+            })
+            ->metadata(['head' => ['description' => 'All users.']]);
+
+        $this->assertSame([
+            'title' => 'Users',
+            'description' => 'All users.',
+        ], $route->getMetadata('head'));
+        $this->assertSame('Users', $route->getMetadata('head.title'));
+    }
+
+    public function testCanSetRouteMetadataOnGroup()
+    {
+        $this->router
+            ->metadata(['head' => ['robots' => ['noindex', 'nofollow']]])
+            ->group(function ($router) {
+                $router
+                    ->metadata(['head' => ['title' => 'Users']])
+                    ->get('users', function () {
+                        return 'all-users';
+                    });
+            });
+
+        $route = $this->router->getRoutes()->getRoutes()[0];
+
+        $this->assertSame([
+            'robots' => ['noindex', 'nofollow'],
+            'title' => 'Users',
+        ], $route->getMetadata('head'));
+    }
+
+    public function testRouteMetadataListValuesReplaceParentValues()
+    {
+        $this->router
+            ->metadata(['head' => ['robots' => ['index', 'follow']]])
+            ->group(function ($router) {
+                $router
+                    ->metadata(['head' => ['robots' => ['noindex']]])
+                    ->get('users', function () {
+                        return 'all-users';
+                    });
+            });
+
+        $route = $this->router->getRoutes()->getRoutes()[0];
+
+        $this->assertSame(['noindex'], $route->getMetadata('head.robots'));
+    }
+
+    public function testRouteMetadataDoesNotCollideWithRouteActions()
+    {
+        $route = $this->router
+            ->middleware('web')
+            ->metadata(['middleware' => 'metadata'])
+            ->get('users', function () {
+                return 'all-users';
+            });
+
+        $this->assertSame('metadata', $route->getMetadata('middleware'));
+        $this->assertSame(['web'], $route->getAction('middleware'));
+    }
+
     public function testCanRegisterResource()
     {
         $this->router->middleware('resource-middleware')
@@ -579,6 +645,29 @@ class RouteRegistrarTest extends TestCase
 
         $this->seeResponse('deleted', Request::create('users/1', 'DELETE'));
         $this->seeMiddleware('resource-middleware');
+    }
+
+    public function testCanSetRouteMetadataOnResource()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+            ->metadata(['head' => ['title' => 'Users']]);
+
+        $this->assertSame(
+            ['title' => 'Users'],
+            $this->router->getRoutes()->getByName('users.index')->getMetadata('head')
+        );
+    }
+
+    public function testCanSetRouteMetadataOnResourceGroup()
+    {
+        $this->router
+            ->metadata(['head' => ['title' => 'Users']])
+            ->resource('users', RouteRegistrarControllerStub::class);
+
+        $this->assertSame(
+            ['title' => 'Users'],
+            $this->router->getRoutes()->getByName('users.index')->getMetadata('head')
+        );
     }
 
     public function testCanRegisterResourcesWithExceptOption()
@@ -1348,6 +1437,17 @@ class RouteRegistrarTest extends TestCase
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.show'));
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.edit'));
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.update'));
+    }
+
+    public function testCanSetRouteMetadataOnSingleton()
+    {
+        $this->router->singleton('user', RouteRegistrarControllerStub::class)
+            ->metadata(['head' => ['title' => 'User']]);
+
+        $this->assertSame(
+            ['title' => 'User'],
+            $this->router->getRoutes()->getByName('user.show')->getMetadata('head')
+        );
     }
 
     public function testCanRegisterApiSingleton()

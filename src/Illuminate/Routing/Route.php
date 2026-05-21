@@ -994,6 +994,36 @@ class Route
     }
 
     /**
+     * Add metadata to the route.
+     *
+     * @param  array  $metadata
+     * @return $this
+     */
+    public function metadata(array $metadata)
+    {
+        $this->action['metadata'] = RouteGroup::mergeMetadata(
+            $this->action['metadata'] ?? [],
+            $metadata
+        );
+
+        return $this;
+    }
+
+    /**
+     * Get metadata for the route.
+     *
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function getMetadata($key = null, $default = null)
+    {
+        $metadata = $this->action['metadata'] ?? [];
+
+        return is_null($key) ? $metadata : Arr::get($metadata, $key, $default);
+    }
+
+    /**
      * Set the action array for the route.
      *
      * @param  array  $action

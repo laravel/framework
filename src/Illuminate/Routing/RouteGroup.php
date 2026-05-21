@@ -25,14 +25,68 @@ class RouteGroup
         }
 
         $new = array_merge(static::formatAs($new, $old), [
+            'metadata' => static::formatMetadata($new, $old),
             'namespace' => static::formatNamespace($new, $old),
             'prefix' => static::formatPrefix($new, $old, $prependExistingPrefix),
             'where' => static::formatWhere($new, $old),
         ]);
 
         return array_merge_recursive(Arr::except(
-            $old, ['namespace', 'prefix', 'where', 'as']
+            $old, ['metadata', 'namespace', 'prefix', 'where', 'as']
         ), $new);
+    }
+
+    /**
+     * Merge route metadata arrays.
+     *
+     * @param  array  ...$metadata
+     * @return array
+     */
+    public static function mergeMetadata(...$metadata)
+    {
+        $merged = [];
+
+        foreach ($metadata as $metadata) {
+            foreach ($metadata as $key => $value) {
+                if (isset($merged[$key]) && static::mergesMetadata($merged[$key], $value)) {
+                    $value = static::mergeMetadata($merged[$key], $value);
+                }
+
+                $merged[$key] = $value;
+            }
+        }
+
+        return $merged;
+    }
+
+    /**
+     * Determine if the given metadata values should be merged.
+     *
+     * @param  mixed  $old
+     * @param  mixed  $new
+     * @return bool
+     */
+    protected static function mergesMetadata($old, $new)
+    {
+        return is_array($old) &&
+            is_array($new) &&
+            Arr::isAssoc($old) &&
+            Arr::isAssoc($new);
+    }
+
+    /**
+     * Format the metadata for the new group attributes.
+     *
+     * @param  array  $new
+     * @param  array  $old
+     * @return array
+     */
+    protected static function formatMetadata($new, $old)
+    {
+        return static::mergeMetadata(
+            $old['metadata'] ?? [],
+            $new['metadata'] ?? []
+        );
     }
 
     /**
