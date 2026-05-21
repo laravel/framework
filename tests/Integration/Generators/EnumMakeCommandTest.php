@@ -11,6 +11,8 @@ class EnumMakeCommandTest extends TestCase
         'app/StatusEnum.php',
         'app/StringEnum.php',
         'app/*/OrderStatusEnum.php',
+        'app/Enums/Profile/HairColor.php',
+        'app/Enums/Profile/EyeColor.php',
     ];
 
     public function testItCanGenerateEnumFile()
@@ -84,5 +86,33 @@ class EnumMakeCommandTest extends TestCase
         ], 'app/Enumerations/OrderStatusEnum.php');
 
         $files->deleteDirectory($enumerationsFolderPath);
+    }
+
+    public function testItCanGenerateNestedEnumsWithoutPathDuplication()
+    {
+        /** @var \Illuminate\Filesystem\Filesystem $files */
+        $files = $this->app['files'];
+
+        $enumsFolderPath = app_path('Enums');
+
+        $files->ensureDirectoryExists($enumsFolderPath);
+
+        $this->artisan('make:enum', ['name' => 'Enums/Profile/HairColor'])
+            ->assertExitCode(0);
+
+        $this->artisan('make:enum', ['name' => 'Enums/Profile/EyeColor'])
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App\Enums\Profile;',
+            'enum HairColor',
+        ], 'app/Enums/Profile/HairColor.php');
+
+        $this->assertFileContains([
+            'namespace App\Enums\Profile;',
+            'enum EyeColor',
+        ], 'app/Enums/Profile/EyeColor.php');
+
+        $files->deleteDirectory($enumsFolderPath);
     }
 }
