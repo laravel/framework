@@ -290,6 +290,17 @@ class TypeTest extends TestCase
             [JsonSchema::array()->enum([[]]), []],
             [JsonSchema::array()->nullable(), null],
             [JsonSchema::array()->nullable(false), []],
+
+            // Composite types
+            [JsonSchema::oneOf([JsonSchema::string(), JsonSchema::integer()]), 'hello'],
+            [JsonSchema::oneOf([JsonSchema::string(), JsonSchema::integer()]), 10],
+            [JsonSchema::anyOf([JsonSchema::string()->min(3), JsonSchema::integer()->min(100)]), 'hello'],
+            [JsonSchema::anyOf([JsonSchema::string()->min(3), JsonSchema::integer()->min(100)]), 100],
+            [JsonSchema::allOf([JsonSchema::string()->min(3), JsonSchema::string()->max(5)]), 'hello'],
+            [JsonSchema::const('active'), 'active'],
+            [JsonSchema::const(null), null],
+            [JsonSchema::string()->const('active'), 'active'],
+            [JsonSchema::string()->nullable()->const(null), null],
         ];
     }
 
@@ -384,6 +395,15 @@ class TypeTest extends TestCase
             [JsonSchema::array()->enum([['a'], ['b']]), ['a', 'b']], // not equal to any enum member
             [JsonSchema::array()->items(JsonSchema::string()->max(1)), ['ab']], // item too long
             [JsonSchema::array()->nullable(false), null], // not nullable
+
+            // Composite types
+            [JsonSchema::oneOf([JsonSchema::string(), JsonSchema::integer()]), true],
+            [JsonSchema::anyOf([JsonSchema::string()->min(3), JsonSchema::integer()->min(100)]), 99],
+            [JsonSchema::allOf([JsonSchema::string()->min(3), JsonSchema::string()->max(5)]), 'too long'],
+            [JsonSchema::const('active'), 'inactive'],
+            [JsonSchema::const(null), 'active'],
+            [JsonSchema::string()->const('active'), 'inactive'],
+            [JsonSchema::string()->nullable()->const(null), 'active'],
         ];
     }
 
