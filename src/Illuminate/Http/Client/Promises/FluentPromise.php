@@ -74,7 +74,7 @@ class FluentPromise implements PromiseInterface
     }
 
     /**
-     * Proxy requests to the underlying promise interface and update the local promise.
+     * Proxy requests to the underlying promise interface, wrapping any returned promise.
      *
      * @param  string  $method
      * @param  array  $parameters
@@ -88,8 +88,10 @@ class FluentPromise implements PromiseInterface
             return $result;
         }
 
-        $this->guzzlePromise = $result;
+        if ($result === $this->guzzlePromise) {
+            return $this;
+        }
 
-        return $this;
+        return new static($result);
     }
 }
