@@ -442,9 +442,9 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $user = HasOneOfManyTestUser::create();
 
         $user->states()->createMany([
-            ['type' => 'foo', 'state' => 'first'],
-            ['type' => 'bar', 'state' => 'absolute_latest_but_wrong_type'],
+            ['type' => 'foo', 'state' => 'older_foo'],
             ['type' => 'foo', 'state' => 'latest_matching'],
+            ['type' => 'bar', 'state' => 'absolute_latest_but_wrong_type'],
         ]);
 
         $user = HasOneOfManyTestUser::with(['latest_state' => function ($query) {
