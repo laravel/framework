@@ -1931,6 +1931,39 @@ class HttpClientTest extends TestCase
         $this->assertSame($promise, $request->getPromise());
     }
 
+    public function testAsyncPromisesAreImmutableWhenChained()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('ok', 200),
+        ]);
+
+        $promise1 = $this->factory->async()->get('http://foo.com');
+        $promise2 = $promise1->then(fn () => ['one', 'two']);
+        $promise3 = $promise2->then(fn () => ['three', 'four']);
+
+        $this->assertNotSame($promise1, $promise2);
+        $this->assertNotSame($promise2, $promise3);
+
+        $this->assertSame(200, $promise1->wait()->status());
+        $this->assertSame(['one', 'two'], $promise2->wait());
+        $this->assertSame(['three', 'four'], $promise3->wait());
+    }
+
+    public function testAsyncPromisesAreImmutableWhenChainedInReverseWaitOrder()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('ok', 200),
+        ]);
+
+        $promise1 = $this->factory->async()->get('http://foo.com');
+        $promise2 = $promise1->then(fn () => 'one');
+        $promise3 = $promise2->then(fn () => 'two');
+
+        $this->assertSame('two', $promise3->wait());
+        $this->assertSame('one', $promise2->wait());
+        $this->assertSame(200, $promise1->wait()->status());
+    }
+
     public function testClientCanBeSet()
     {
         $client = $this->factory->buildClient();

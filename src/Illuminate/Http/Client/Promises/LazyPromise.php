@@ -4,23 +4,22 @@ namespace Illuminate\Http\Client\Promises;
 
 use Closure;
 use GuzzleHttp\Promise\PromiseInterface;
-use RuntimeException;
 
 class LazyPromise implements PromiseInterface
 {
-    /**
-     * The callbacks to execute after the Guzzle Promise has been built.
-     *
-     * @var list<callable>
-     */
-    protected array $pending = [];
-
     /**
      * The promise built by the creator.
      *
      * @var \GuzzleHttp\Promise\PromiseInterface
      */
     protected PromiseInterface $guzzlePromise;
+
+    /**
+     * Optional callback invoked with each new promise produced by chaining.
+     *
+     * @var (\Closure(\Illuminate\Http\Client\Promises\LazyPromise): void)|null
+     */
+    protected ?Closure $chainCallback = null;
 
     /**
      * Create a new lazy promise instance.
@@ -32,51 +31,62 @@ class LazyPromise implements PromiseInterface
     }
 
     /**
-     * Build the promise from the promise builder.
+     * Register a callback to be notified of chained promises produced from this instance.
+     *
+     * Used by PendingRequest so that fluent chains in pool builders are tracked.
+     *
+     * @param  (\Closure(\Illuminate\Http\Client\Promises\LazyPromise): void)|null  $callback
+     * @return $this
+     */
+    public function onChain(?Closure $callback): static
+    {
+        $this->chainCallback = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Build the promise from the promise builder, or return the already-built promise.
      *
      * @return \GuzzleHttp\Promise\PromiseInterface
-     *
-     * @throws \RuntimeException If the promise has already been built
      */
     public function buildPromise(): PromiseInterface
     {
         if (! $this->promiseNeedsBuilt()) {
-            throw new RuntimeException('Promise already built');
+            return $this->guzzlePromise;
         }
 
-        $this->guzzlePromise = call_user_func($this->promiseBuilder);
-
-        foreach ($this->pending as $pendingCallback) {
-            $pendingCallback($this->guzzlePromise);
-        }
-
-        $this->pending = [];
-
-        return $this->guzzlePromise;
+        return $this->guzzlePromise = call_user_func($this->promiseBuilder);
     }
 
     #[\Override]
     public function then(?callable $onFulfilled = null, ?callable $onRejected = null): PromiseInterface
     {
-        if ($this->promiseNeedsBuilt()) {
-            $this->pending[] = static fn (PromiseInterface $promise) => $promise->then($onFulfilled, $onRejected);
-
-            return $this;
-        }
-
-        return $this->guzzlePromise->then($onFulfilled, $onRejected);
+        return $this->chain(fn () => $this->buildPromise()->then($onFulfilled, $onRejected));
     }
 
     #[\Override]
     public function otherwise(callable $onRejected): PromiseInterface
     {
-        if ($this->promiseNeedsBuilt()) {
-            $this->pending[] = static fn (PromiseInterface $promise) => $promise->otherwise($onRejected);
+        return $this->chain(fn () => $this->buildPromise()->otherwise($onRejected));
+    }
 
-            return $this;
+    /**
+     * Produce a new chained LazyPromise that propagates the chain callback.
+     *
+     * @param  \Closure  $builder
+     * @return static
+     */
+    protected function chain(Closure $builder): static
+    {
+        $chained = new static($builder);
+        $chained->chainCallback = $this->chainCallback;
+
+        if ($this->chainCallback !== null) {
+            ($this->chainCallback)($chained);
         }
 
-        return $this->guzzlePromise->otherwise($onRejected);
+        return $chained;
     }
 
     #[\Override]

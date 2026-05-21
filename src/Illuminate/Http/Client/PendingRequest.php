@@ -1031,9 +1031,11 @@ class PendingRequest
         [$this->pendingBody, $this->pendingFiles] = [null, []];
 
         if ($this->async) {
-            return $this->promise = new LazyPromise(
+            return $this->promise = (new LazyPromise(
                 fn () => $this->makePromise($method, $url, $options)
-            );
+            ))->onChain(function (LazyPromise $chained) {
+                $this->promise = $chained;
+            });
         }
 
         $shouldRetry = null;
