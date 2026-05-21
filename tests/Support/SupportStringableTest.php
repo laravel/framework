@@ -242,6 +242,31 @@ class SupportStringableTest extends TestCase
         }));
     }
 
+    public function testWhenDoesntContain()
+    {
+        $this->assertSame('Tony Stark', (string) $this->stringable('stark')->whenDoesntContain('xxx', function ($stringable) {
+            return $stringable->prepend('Tony ')->title();
+        }, function ($stringable) {
+            return $stringable->prepend('Arno ')->title();
+        }));
+
+        $this->assertSame('stark', (string) $this->stringable('stark')->whenDoesntContain('tar', function ($stringable) {
+            return $stringable->prepend('Tony ')->title();
+        }));
+
+        $this->assertSame('Arno Stark', (string) $this->stringable('stark')->whenDoesntContain('tar', function ($stringable) {
+            return $stringable->prepend('Tony ')->title();
+        }, function ($stringable) {
+            return $stringable->prepend('Arno ')->title();
+        }));
+
+        $this->assertSame('Tony Stark', (string) $this->stringable('stark')->whenDoesntContain(['xxx', 'yyy'], function ($stringable) {
+            return $stringable->prepend('Tony ')->title();
+        }, function ($stringable) {
+            return $stringable->prepend('Arno ')->title();
+        }));
+    }
+
     public function testDedup()
     {
         $this->assertSame(' laravel php framework ', (string) $this->stringable(' laravel   php  framework ')->deduplicate());

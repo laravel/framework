@@ -1166,6 +1166,19 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Execute the given callback if the string doesn't contain a given substring.
+     *
+     * @param  string|iterable<string>  $needles
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return static
+     */
+    public function whenDoesntContain($needles, $callback, $default = null)
+    {
+        return $this->when($this->doesntContain($needles), $callback, $default);
+    }
+
+    /**
      * Execute the given callback if the string is empty.
      *
      * @param  callable  $callback
