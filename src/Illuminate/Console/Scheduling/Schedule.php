@@ -46,6 +46,20 @@ class Schedule
     const SATURDAY = 6;
 
     /**
+     * Indicates if the schedule should check for the paused signal in the cache.
+     *
+     * @var bool
+     */
+    public static $pausable = true;
+
+    /**
+     * Indicates if the schedule should check for the restart signal in the cache.
+     *
+     * @var bool
+     */
+    public static $interruptible = true;
+
+    /**
      * All of the events on the schedule.
      *
      * @var \Illuminate\Console\Scheduling\Event[]
