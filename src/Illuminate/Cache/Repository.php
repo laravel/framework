@@ -340,6 +340,20 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Retrieve a collection of items from the cache.
+     *
+     * @param  \UnitEnum|string  $key
+     * @param  (\Closure():(array<array-key, mixed>|null))|array<array-key, mixed>|null  $default
+     * @return \Illuminate\Support\Collection<array-key, mixed>
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function collection($key, $default = null): Collection
+    {
+        return new Collection($this->array($key, $default));
+    }
+
+    /**
      * Store an item in the cache.
      *
      * @param  \UnitEnum|array|string  $key

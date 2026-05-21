@@ -790,6 +790,30 @@ class CacheRepositoryTest extends TestCase
         $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('bar');
         $repo->array('foo');
     }
+
+    public function testItGetsAsCollection()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(['bar', 'baz']);
+        $this->assertEquals(collect(['bar', 'baz']), $repo->collection('foo'));
+    }
+
+    public function testItGetsAsCollectionWithDefault()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(null);
+        $this->assertEquals(collect(['default']), $repo->collection('foo', ['default']));
+    }
+
+    public function testItThrowsExceptionWhenGettingNonArrayAsCollection()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cache value for key [foo] must be an array, string given.');
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('bar');
+        $repo->collection('foo');
+    }
 }
 
 enum TestCacheKey: string

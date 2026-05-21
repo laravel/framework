@@ -30,6 +30,7 @@ use Mockery;
  * @method static float float(\UnitEnum|string $key, \Closure|float|null $default = null)
  * @method static bool boolean(\UnitEnum|string $key, \Closure|bool|null $default = null)
  * @method static array array(\UnitEnum|string $key, \Closure|array|null $default = null)
+ * @method static \Illuminate\Support\Collection collection(\UnitEnum|string $key, \Closure|array|null $default = null)
  * @method static bool put(\UnitEnum|array|string $key, mixed $value, \DateTimeInterface|\DateInterval|int|null $ttl = null)
  * @method static bool set(\UnitEnum|array|string $key, mixed $value, \DateTimeInterface|\DateInterval|int|null $ttl = null)
  * @method static bool putMany(array $values, \DateTimeInterface|\DateInterval|int|null $ttl = null)
