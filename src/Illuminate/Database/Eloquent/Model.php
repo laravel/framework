@@ -1892,7 +1892,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function newQueryForRestoration($ids)
     {
-        return $this->newQueryWithoutScopes()->whereKey($ids);
+        return $this->newQuery()->whereKey($ids);
     }
 
     /**

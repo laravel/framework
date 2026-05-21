@@ -69,6 +69,12 @@ class ModelSerializationTest extends TestCase
             $table->unsignedInteger('user_id');
             $table->unsignedInteger('role_id');
         });
+
+        Schema::create('posts', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('title');
+            $table->string('type')->default('article');
+        });
     }
 
     #[\Override]
@@ -556,6 +562,24 @@ class ModelSerializationTest extends TestCase
         $this->assertInstanceOf(Collection::class, $unserialized->users);
         $this->assertTrue($unserialized->users->sole()->is($user));
     }
+
+    #[WithConfig('database.default', 'testing')]
+    public function test_it_applies_global_scopes_during_model_restoration()
+    {
+        $post = Article::create([
+            'title' => 'Laravel Queues Guide',
+        ]);
+
+        $serialized = serialize(new ModelSerializationTestClass($post));
+
+        // Simulate the record being changed to no longer match the scope
+        \Illuminate\Support\Facades\DB::table('posts')->where('id', $post->id)->update(['type' => 'draft']);
+
+        // Global scope filters to type=article, so restoration should fail
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+
+        unserialize($serialized);
+    }
 }
 
 trait TraitBootsAndInitializersTest
@@ -849,5 +873,19 @@ class DataValueObject
 {
     public function __construct(public $value = 1)
     {
+    }
+}
+
+class Article extends Model
+{
+    public $table = 'posts';
+    public $guarded = [];
+    public $timestamps = false;
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope('article_type', function ($builder) {
+            $builder->where('type', 'article');
+        });
     }
 }
