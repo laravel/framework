@@ -890,6 +890,20 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the given paths in the response contain all of the expected values without looking at the order.
+     *
+     * @return $this
+     */
+    public function assertJsonPathsCanonicalizing(array $paths)
+    {
+        foreach ($paths as $path => $expected) {
+            $this->assertJsonPathCanonicalizing($path, $expected);
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the given path in the response contains all of the expected values without looking at the order.
      *
      * @param  string  $path
