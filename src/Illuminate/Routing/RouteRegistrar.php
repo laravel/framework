@@ -73,6 +73,7 @@ class RouteRegistrar
         'can',
         'controller',
         'domain',
+        'metadata',
         'middleware',
         'missing',
         'name',
@@ -129,6 +130,13 @@ class RouteRegistrar
             }
         }
 
+        if ($key === 'metadata') {
+            $value = RouteGroup::mergeMetadata(
+                $this->attributes['metadata'] ?? [],
+                is_array($value) ? $value : []
+            );
+        }
+
         $attributeKey = Arr::get($this->aliases, $key, $key);
 
         if ($key === 'withoutMiddleware') {
@@ -158,12 +166,7 @@ class RouteRegistrar
      */
     public function metadata(array $metadata)
     {
-        $this->attributes['metadata'] = RouteGroup::mergeMetadata(
-            $this->attributes['metadata'] ?? [],
-            $metadata
-        );
-
-        return $this;
+        return $this->attribute('metadata', $metadata);
     }
 
     /**

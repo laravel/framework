@@ -638,6 +638,44 @@ class RouteRegistrarTest extends TestCase
         $this->assertSame(['web'], $route->getAction('middleware'));
     }
 
+    public function testRouteMetadataMergesThroughDeeplyNestedGroups()
+    {
+        $this->router
+            ->metadata(['head' => ['title' => 'Outer', 'description' => 'Outer description']])
+            ->group(function ($router) {
+                $router
+                    ->metadata(['head' => ['title' => 'Middle', 'author' => 'Taylor']])
+                    ->group(function ($router) {
+                        $router
+                            ->metadata(['head' => ['title' => 'Inner']])
+                            ->get('users', function () {
+                                return 'all-users';
+                            });
+                    });
+            });
+
+        $route = $this->router->getRoutes()->getRoutes()[0];
+
+        $this->assertSame([
+            'title' => 'Inner',
+            'description' => 'Outer description',
+            'author' => 'Taylor',
+        ], $route->getMetadata('head'));
+    }
+
+    public function testSetMetadataReplacesExistingMetadata()
+    {
+        $route = $this->router
+            ->metadata(['head' => ['title' => 'Original', 'description' => 'Goes away']])
+            ->get('users', function () {
+                return 'all-users';
+            });
+
+        $route->setMetadata(['head' => ['title' => 'Replaced']]);
+
+        $this->assertSame(['head' => ['title' => 'Replaced']], $route->getMetadata());
+    }
+
     public function testCanRegisterResource()
     {
         $this->router->middleware('resource-middleware')
@@ -663,6 +701,17 @@ class RouteRegistrarTest extends TestCase
         $this->router
             ->metadata(['head' => ['title' => 'Users']])
             ->resource('users', RouteRegistrarControllerStub::class);
+
+        $this->assertSame(
+            ['title' => 'Users'],
+            $this->router->getRoutes()->getByName('users.index')->getMetadata('head')
+        );
+    }
+
+    public function testCanSetRouteMetadataOnApiResource()
+    {
+        $this->router->apiResource('users', RouteRegistrarControllerStub::class)
+            ->metadata(['head' => ['title' => 'Users']]);
 
         $this->assertSame(
             ['title' => 'Users'],
@@ -1458,6 +1507,17 @@ class RouteRegistrarTest extends TestCase
 
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.show'));
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.update'));
+    }
+
+    public function testCanSetRouteMetadataOnApiSingleton()
+    {
+        $this->router->apiSingleton('user', RouteRegistrarControllerStub::class)
+            ->metadata(['head' => ['title' => 'User']]);
+
+        $this->assertSame(
+            ['title' => 'User'],
+            $this->router->getRoutes()->getByName('user.show')->getMetadata('head')
+        );
     }
 
     public function testCanRegisterCreatableSingleton()

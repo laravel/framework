@@ -39,24 +39,21 @@ class RouteGroup
     /**
      * Merge route metadata arrays.
      *
-     * @param  array  ...$metadata
+     * @param  array  $old
+     * @param  array  $new
      * @return array
      */
-    public static function mergeMetadata(...$metadata)
+    public static function mergeMetadata(array $old, array $new)
     {
-        $merged = [];
-
-        foreach ($metadata as $metadata) {
-            foreach ($metadata as $key => $value) {
-                if (isset($merged[$key]) && static::mergesMetadata($merged[$key], $value)) {
-                    $value = static::mergeMetadata($merged[$key], $value);
-                }
-
-                $merged[$key] = $value;
+        foreach ($new as $key => $value) {
+            if (isset($old[$key]) && static::mergesMetadata($old[$key], $value)) {
+                $value = static::mergeMetadata($old[$key], $value);
             }
+
+            $old[$key] = $value;
         }
 
-        return $merged;
+        return $old;
     }
 
     /**

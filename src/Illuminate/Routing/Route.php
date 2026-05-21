@@ -1010,6 +1010,19 @@ class Route
     }
 
     /**
+     * Set the metadata for the route, replacing any existing metadata.
+     *
+     * @param  array  $metadata
+     * @return $this
+     */
+    public function setMetadata(array $metadata)
+    {
+        $this->action['metadata'] = $metadata;
+
+        return $this;
+    }
+
+    /**
      * Get metadata for the route.
      *
      * @param  string|null  $key
