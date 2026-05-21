@@ -136,7 +136,7 @@ trait CanBeOneOfMany
         $columns = $this->query->getQuery()->columns;
 
         if (is_null($columns) || $columns === ['*']) {
-            $this->query->select($this->query->qualifyColumn('*'));
+            $this->select([$this->qualifyColumn('*')]);
         }
 
         return $this;

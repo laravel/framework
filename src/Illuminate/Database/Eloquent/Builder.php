@@ -6,6 +6,7 @@ use BadMethodCallException;
 use Closure;
 use Exception;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
+use Illuminate\Contracts\Database\Eloquent\SupportsPartialRelations;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
@@ -946,7 +947,26 @@ class Builder implements BuilderContract
 
         $relation->addEagerConstraints($models);
 
-        $constraints($relation);
+        if ($relation instanceof SupportsPartialRelations && $relation->isOneOfMany()) {
+            $baseQuery = $relation->getQuery()->getQuery();
+            $wheresBefore = count($baseQuery->wheres);
+            $bindingsBefore = count($baseQuery->bindings['where'] ?? []);
+
+            $constraints($relation);
+
+            $newWheres = array_slice($baseQuery->wheres, $wheresBefore);
+            $newBindings = array_slice($baseQuery->bindings['where'] ?? [], $bindingsBefore);
+
+            if (! empty($newWheres)) {
+                $subQuery = $relation->getOneOfManySubQuery()->getQuery();
+                array_push($subQuery->wheres, ...$newWheres);
+                $subQuery->bindings['where'] = array_merge(
+                    $subQuery->bindings['where'] ?? [], $newBindings
+                );
+            }
+        } else {
+            $constraints($relation);
+        }
 
         // Once we have the results, we just match those back up to their parent models
         // using the relationship instance. Then we just return the finished arrays
