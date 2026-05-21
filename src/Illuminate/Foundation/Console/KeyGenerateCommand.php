@@ -4,13 +4,14 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
+use Illuminate\Console\Prohibitable;
 use Illuminate\Encryption\Encrypter;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'key:generate')]
 class KeyGenerateCommand extends Command
 {
-    use ConfirmableTrait;
+    use ConfirmableTrait, Prohibitable;
 
     /**
      * The name and signature of the console command.
@@ -35,6 +36,10 @@ class KeyGenerateCommand extends Command
      */
     public function handle()
     {
+        if($his->isProhibited()){
+            return;
+        }
+
         $key = $this->generateRandomKey();
 
         if ($this->option('show')) {
