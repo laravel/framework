@@ -360,9 +360,9 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     /**
      * Pipe the notifiction job through its middleware to determine if it would have been delivered.
      *
-     * @param object $notifiable
-     * @param Notification $notification
-     * @param string $channel
+     * @param  object  $notifiable
+     * @param  Notification  $notification
+     * @param  string  $channel
      * @return bool
      */
     protected function passesJobMiddleware(object $notifiable, Notification $notification, string $channel): bool
@@ -392,9 +392,9 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     /**
      * Gather the notification job's middleware.
      *
-     * @param object $notifiable
-     * @param Notification $notification
-     * @param string $channel
+     * @param  object  $notifiable
+     * @param  Notification  $notification
+     * @param  string  $channel
      * @return array
      */
     protected function gatherMiddleware(object $notifiable, Notification $notification, string $channel): array
