@@ -1172,6 +1172,14 @@ class SupportStrTest extends TestCase
         $this->assertSame('❤MultiByte☆', Str::studly('❤ multi-byte☆'));
 
         $this->assertSame('LaravelRocks!', Str::studly('laravel rocks!'));
+
+        // normalize: true — all-uppercase words (acronyms) are treated as single words
+        $this->assertSame('Cbor', Str::studly('CBOR', normalize: true));
+        $this->assertSame('Fmls', Str::studly('FMLS', normalize: true));
+        $this->assertSame('AllCaps', Str::studly('ALL_CAPS', normalize: true));
+        $this->assertSame('AllJersey', Str::studly('AllJersey', normalize: true));
+        $this->assertSame('AllJersey', Str::studly('all_jersey', normalize: true));
+        $this->assertSame('FooBar', Str::studly('foo_bar', normalize: true));
     }
 
     public function testPascal()
