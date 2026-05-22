@@ -379,7 +379,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
 
         $delivered = false;
 
-        new Pipeline(app())
+        (new Pipeline(app()))
             ->send(new SendQueuedNotifications($notifiable, $notification, [$channel]))
             ->through($middleware)
             ->then(function () use (&$delivered): void {
