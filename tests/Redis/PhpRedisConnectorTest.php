@@ -259,6 +259,41 @@ class PhpRedisConnectorTest extends TestCase
             'scheme' => 'tls',
         ]);
     }
+
+    public function testFormatHostAllowsCaseInsensitiveMatchingScheme()
+    {
+        $connector = new TestablePhpRedisConnector;
+
+        $this->assertSame('TLS://127.0.0.1', $connector->testFormatHost([
+            'host' => 'TLS://127.0.0.1',
+            'scheme' => 'tls',
+        ]));
+    }
+
+    public function testFormatHostThrowsWhenHostIsMissing()
+    {
+        $connector = new TestablePhpRedisConnector;
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Redis host must be a non-empty string.');
+
+        $connector->testFormatHost([
+            'scheme' => 'tls',
+        ]);
+    }
+
+    public function testFormatHostThrowsWhenHostIsNull()
+    {
+        $connector = new TestablePhpRedisConnector;
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Redis host must be a non-empty string.');
+
+        $connector->testFormatHost([
+            'host' => null,
+            'scheme' => 'tls',
+        ]);
+    }
 }
 
 class TestablePhpRedisConnector extends PhpRedisConnector
