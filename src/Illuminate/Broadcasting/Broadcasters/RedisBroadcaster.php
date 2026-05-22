@@ -122,10 +122,12 @@ class RedisBroadcaster extends Broadcaster
 
         $connection = $this->redis->connection($this->connection);
 
+        $socket = Arr::pull($payload, 'socket');
+
         $payload = json_encode([
             'event' => $event,
             'data' => $payload,
-            'socket' => Arr::pull($payload, 'socket'),
+            'socket' => $socket,
         ]);
 
         try {

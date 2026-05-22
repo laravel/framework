@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Broadcasting;
 use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Http\Request;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -139,6 +140,31 @@ class RedisBroadcasterTest extends TestCase
                 'c' => 'd',
             ])
         );
+    }
+
+    public function testBroadcastDoesNotIncludeSocketInPayloadData()
+    {
+        $redis = m::mock(Redis::class);
+        $connection = m::mock('stdClass');
+
+        $redis->shouldReceive('connection')->once()->with(null)->andReturn($connection);
+
+        $connection->shouldReceive('eval')->once()->withArgs(function ($script, $numberOfKeys, $payload, $channel) {
+            $payload = json_decode($payload, true);
+
+            $this->assertSame(0, $numberOfKeys);
+            $this->assertSame('orders', $channel);
+            $this->assertSame('OrderUpdated', $payload['event']);
+            $this->assertSame('123.456', $payload['socket']);
+            $this->assertSame(['id' => 1], $payload['data']);
+
+            return true;
+        });
+
+        (new RedisBroadcaster($redis))->broadcast(['orders'], 'OrderUpdated', [
+            'id' => 1,
+            'socket' => '123.456',
+        ]);
     }
 
     /**
