@@ -389,7 +389,7 @@ class Migrator
         $migrations = (new Collection($migrations))->map(fn ($m) => (object) ['migration' => $m])->all();
 
         return $this->rollbackMigrations(
-            $migrations, $paths, compact('pretend')
+            $migrations, $paths, ['pretend' => $pretend]
         );
     }
 

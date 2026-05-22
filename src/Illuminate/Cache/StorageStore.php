@@ -225,7 +225,7 @@ class StorageStore implements Store
 
         $time = $expire - $this->currentTime();
 
-        return compact('data', 'time');
+        return ['data' => $data, 'time' => $time];
     }
 
     /**

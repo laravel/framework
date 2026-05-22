@@ -723,7 +723,7 @@ class Builder
             return call_user_func($this->resolver, $connection, $table, $callback);
         }
 
-        return Container::getInstance()->make(Blueprint::class, compact('connection', 'table', 'callback'));
+        return Container::getInstance()->make(Blueprint::class, ['connection' => $connection, 'table' => $table, 'callback' => $callback]);
     }
 
     /**
