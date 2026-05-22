@@ -267,7 +267,13 @@ class PhpRedisConnector implements Connector
      */
     protected function formatHost(array $options)
     {
+        $hostScheme = parse_url($options['host'], PHP_URL_SCHEME);
+
         if (isset($options['scheme'])) {
+            if (is_string($hostScheme) && $hostScheme !== $options['scheme']) {
+                throw new InvalidArgumentException('The scheme configured in the Redis host option must match the scheme option.');
+            }
+
             return Str::start($options['host'], "{$options['scheme']}://");
         }
 
