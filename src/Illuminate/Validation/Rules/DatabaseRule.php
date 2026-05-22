@@ -102,7 +102,7 @@ trait DatabaseRule
 
         $value = enum_value($value);
 
-        $this->wheres[] = compact('column', 'value');
+        $this->wheres[] = ['column' => $column, 'value' => $value];
 
         return $this;
     }

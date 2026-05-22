@@ -549,9 +549,9 @@ trait BuildsQueries
      */
     protected function paginator($items, $total, $perPage, $currentPage, $options)
     {
-        return Container::getInstance()->makeWith(LengthAwarePaginator::class, compact(
-            'items', 'total', 'perPage', 'currentPage', 'options'
-        ));
+        return Container::getInstance()->makeWith(LengthAwarePaginator::class, [
+            'items' => $items, 'total' => $total, 'perPage' => $perPage, 'currentPage' => $currentPage, 'options' => $options,
+        ]);
     }
 
     /**
@@ -565,9 +565,9 @@ trait BuildsQueries
      */
     protected function simplePaginator($items, $perPage, $currentPage, $options)
     {
-        return Container::getInstance()->makeWith(Paginator::class, compact(
-            'items', 'perPage', 'currentPage', 'options'
-        ));
+        return Container::getInstance()->makeWith(Paginator::class, [
+            'items' => $items, 'perPage' => $perPage, 'currentPage' => $currentPage, 'options' => $options,
+        ]);
     }
 
     /**
@@ -581,9 +581,9 @@ trait BuildsQueries
      */
     protected function cursorPaginator($items, $perPage, $cursor, $options)
     {
-        return Container::getInstance()->makeWith(CursorPaginator::class, compact(
-            'items', 'perPage', 'cursor', 'options'
-        ));
+        return Container::getInstance()->makeWith(CursorPaginator::class, [
+            'items' => $items, 'perPage' => $perPage, 'cursor' => $cursor, 'options' => $options,
+        ]);
     }
 
     /**

@@ -381,7 +381,7 @@ class FileStore implements CanFlushLocks, LockProvider, Store
         // operation that may be performed on this cache on a later operation.
         $time = $expire - $this->currentTime();
 
-        return compact('data', 'time');
+        return ['data' => $data, 'time' => $time];
     }
 
     /**

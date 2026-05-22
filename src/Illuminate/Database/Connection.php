@@ -900,7 +900,7 @@ class Connection implements ConnectionInterface
             : $query;
 
         if ($this->loggingQueries) {
-            $this->queryLog[] = compact('query', 'bindings', 'time', 'readWriteType');
+            $this->queryLog[] = ['query' => $query, 'bindings' => $bindings, 'time' => $time, 'readWriteType' => $readWriteType];
         }
     }
 

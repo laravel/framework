@@ -103,7 +103,7 @@ class LogManager implements LoggerInterface
     public function stack(array $channels, $channel = null)
     {
         return (new Logger(
-            $this->createStackDriver(compact('channels', 'channel')),
+            $this->createStackDriver(['channels' => $channels, 'channel' => $channel]),
             $this->app['events']
         ))->withContext($this->sharedContext);
     }
