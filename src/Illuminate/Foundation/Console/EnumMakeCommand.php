@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -69,6 +70,18 @@ class EnumMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
+        if (is_dir(app_path('Enums')) && Str::startsWith($this->input->getArgument('name'), 'Enums/')) {
+            $this->argument['name'] = Str::after($this->input->getArgument('name'), 'Enums/');
+            
+            return $rootNamespace.'\\Enums';
+        }
+
+        if (is_dir(app_path('Enumerations')) && Str::startsWith($this->input->getArgument('name'), 'Enumerations/')) {
+            $this->argument['name'] = Str::after($this->input->getArgument('name'), 'Enumerations/');
+            
+            return $rootNamespace.'\\Enumerations';
+        }
+
         return match (true) {
             is_dir(app_path('Enums')) => $rootNamespace.'\\Enums',
             is_dir(app_path('Enumerations')) => $rootNamespace.'\\Enumerations',
