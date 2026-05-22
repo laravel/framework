@@ -1272,11 +1272,9 @@ class PendingRequest
      */
     protected function getMaximumAttempts()
     {
-        if (is_array($this->tries)) {
-            return count($this->tries) + 1;
-        }
-
-        return $this->tries ?? 1;
+        return is_array($this->tries)
+            ? count($this->tries) + 1
+            : ($this->tries ?? 1);
     }
 
     /**
@@ -1288,11 +1286,9 @@ class PendingRequest
      */
     protected function retryDelayInMilliseconds($attempt, $exception)
     {
-        if (is_array($this->tries)) {
-            return $this->tries[$attempt - 1] ?? 0;
-        }
-
-        return value($this->retryDelay ?? 100, $attempt, $exception);
+        return is_array($this->tries)
+            ? $this->tries[$attempt - 1] ?? 0
+            : value($this->retryDelay ?? 100, $attempt, $exception);
     }
 
     /**
