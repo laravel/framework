@@ -1240,12 +1240,10 @@ class PendingRequest
             return $exception;
         }
 
-        if ($attempt < $this->tries && $shouldRetry) {
-            $options['delay'] = value(
-                $this->retryDelay,
-                $attempt,
-                $response instanceof Response ? $response->toException() : $response
-            );
+        $exception = $response instanceof Response ? $response->toException() : $response;
+
+        if ($attempt < $this->getMaximumAttempts() && $shouldRetry) {
+            $options['delay'] = $this->retryDelayInMilliseconds($attempt, $exception);
 
             return $this->makePromise($method, $url, $options, $attempt + 1);
         }
@@ -1260,11 +1258,37 @@ class PendingRequest
             }
         }
 
-        if ($this->tries > 1 && $this->retryThrow) {
+        if ($this->getMaximumAttempts() > 1 && $this->retryThrow) {
             return $response instanceof Response ? $response->toException() : $response;
         }
 
         return $response;
+    }
+
+    /**
+     * Get the maximum number of attempts for the request.
+     *
+     * @return int
+     */
+    protected function getMaximumAttempts()
+    {
+        return is_array($this->tries)
+            ? count($this->tries) + 1
+            : ($this->tries ?? 1);
+    }
+
+    /**
+     * Get the delay in milliseconds before the next retry attempt.
+     *
+     * @param  int  $attempt
+     * @param  mixed  $exception
+     * @return int|float
+     */
+    protected function retryDelayInMilliseconds($attempt, $exception)
+    {
+        return is_array($this->tries)
+            ? $this->tries[$attempt - 1] ?? 0
+            : value($this->retryDelay ?? 100, $attempt, $exception);
     }
 
     /**
