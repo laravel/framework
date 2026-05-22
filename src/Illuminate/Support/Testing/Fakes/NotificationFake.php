@@ -9,6 +9,9 @@ use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Notifications\AnonymousNotifiable;
+use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\SendQueuedNotifications;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -330,6 +333,15 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
                 continue;
             }
 
+            $delivered = array_values(array_filter(
+                $notifiableChannels,
+                fn (string $channel): bool => $this->passesJobMiddleware($notifiable, $notification, $channel),
+            ));
+
+            if ($delivered === []) {
+                continue;
+            }
+
             $this->notifications[get_class($notifiable)][(string) $notifiable->getKey()][get_class($notification)][] = [
                 'notification' => $this->serializeAndRestore && $notification instanceof ShouldQueue
                     ? $this->serializeAndRestoreNotification($notification)
@@ -343,6 +355,60 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
                 }),
             ];
         }
+    }
+
+    /**
+     * Pipe the job through its middleware to determine if it would have been delivered.
+     *
+     * @param object $notifiable
+     * @param Notification $notification
+     * @param string $channel
+     * @return bool
+     */
+    protected function passesJobMiddleware(object $notifiable, Notification $notification, string $channel): bool
+    {
+        if (! $notification instanceof ShouldQueue) {
+            return true;
+        }
+
+        $middleware = $this->gatherMiddleware($notifiable, $notification, $channel);
+
+        if ($middleware === []) {
+            return true;
+        }
+
+        $delivered = false;
+
+        new Pipeline(app())
+            ->send(new SendQueuedNotifications($notifiable, $notification, [$channel]))
+            ->through($middleware)
+            ->then(function () use (&$delivered): void {
+                $delivered = true;
+            });
+
+        return $delivered;
+    }
+
+    /**
+     * Gather the job's middleware.
+     *
+     * @param object $notifiable
+     * @param Notification $notification
+     * @param string $channel
+     * @return array
+     */
+    protected function gatherMiddleware(object $notifiable, Notification $notification, string $channel): array
+    {
+        $middleware = $notification->middleware ?? [];
+
+        if (method_exists($notification, 'middleware')) {
+            $middleware = array_merge(
+                $notification->middleware($notifiable, $channel),
+                $middleware,
+            );
+        }
+
+        return $middleware;
     }
 
     /**
