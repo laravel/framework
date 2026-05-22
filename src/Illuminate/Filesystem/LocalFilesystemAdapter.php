@@ -80,8 +80,7 @@ class LocalFilesystemAdapter extends FilesystemAdapter
         return $url->to($url->temporarySignedRoute(
             'storage.'.$this->disk,
             $expiration,
-            ['path' => rawurldecode($path)],
-            absolute: false
+            ['path' => strtr(rawurlencode($path), ['%2F' => '/'])]
         ));
     }
 
