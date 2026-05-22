@@ -16,12 +16,14 @@ class ServeFileTest extends TestCase
         $this->afterApplicationCreated(function () {
             Storage::put('serve-file-test.txt', 'Hello World');
             Storage::put('serve-file-test.txt?pad=x', 'Hello Question');
+            Storage::put('nested/folder/serve-file-test.txt', 'Hello Nested');
         });
 
         $this->beforeApplicationDestroyed(function () {
             Storage::delete([
                 'serve-file-test.txt',
                 'serve-file-test.txt?pad=x',
+                'nested/folder/serve-file-test.txt',
             ]);
         });
 
@@ -65,6 +67,18 @@ class ServeFileTest extends TestCase
         $response = $this->get($url);
 
         $this->assertSame('Hello Question', $response->streamedContent());
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testTemporaryUrlPreservesPathSeparatorsInNestedPaths()
+    {
+        $url = Storage::temporaryUrl('nested/folder/serve-file-test.txt', Carbon::now()->addMinute());
+
+        $this->assertStringContainsString('nested/folder/serve-file-test.txt', $url);
+
+        $response = $this->get($url);
+
+        $this->assertSame('Hello Nested', $response->streamedContent());
     }
 
     #[RequiresOperatingSystem('Linux|Darwin')]
