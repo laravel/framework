@@ -36,7 +36,7 @@ class KeyGenerateCommand extends Command
      */
     public function handle()
     {
-        if($his->isProhibited()){
+        if($this->isProhibited()){
             return;
         }
 
