@@ -358,7 +358,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     }
 
     /**
-     * Pipe the job through its middleware to determine if it would have been delivered.
+     * Pipe the notifiction job through its middleware to determine if it would have been delivered.
      *
      * @param object $notifiable
      * @param Notification $notification
@@ -390,7 +390,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     }
 
     /**
-     * Gather the job's middleware.
+     * Gather the notification job's middleware.
      *
      * @param object $notifiable
      * @param Notification $notification
