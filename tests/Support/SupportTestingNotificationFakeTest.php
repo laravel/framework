@@ -224,6 +224,20 @@ class SupportTestingNotificationFakeTest extends TestCase
         $this->fake->assertNotSentTo($user, NotificationWithFalsyShouldSendStub::class);
     }
 
+    public function testAssertSentToWhenNotificationPassesJobMiddleware()
+    {
+        $this->fake->send($this->user, new NotificationWithMiddlewareStub(deliver: true));
+
+        $this->fake->assertSentTo($this->user, NotificationWithMiddlewareStub::class);
+    }
+
+    public function testAssertNotSentToWhenNotificationFailsJobMiddleware()
+    {
+        $this->fake->send($this->user, new NotificationWithMiddlewareStub(deliver: false));
+
+        $this->fake->assertNotSentTo($this->user, NotificationWithMiddlewareStub::class);
+    }
+
     public function testAssertItCanSerializeAndRestoreNotifications()
     {
         $this->fake->serializeAndRestore();
@@ -266,6 +280,34 @@ class LocalizedUserStub extends User implements HasLocalePreference
     public function preferredLocale()
     {
         return 'au';
+    }
+}
+
+class NotificationWithMiddlewareStub extends NotificationStub implements ShouldQueue
+{
+    use Queueable;
+
+    public function __construct(protected bool $deliver = true)
+    {
+    }
+
+    public function middleware($notifiable, $channel)
+    {
+        return [new NotificationDeliveryMiddlewareStub($this->deliver)];
+    }
+}
+
+class NotificationDeliveryMiddlewareStub
+{
+    public function __construct(protected bool $deliver)
+    {
+    }
+
+    public function handle($job, $next)
+    {
+        if ($this->deliver) {
+            $next($job);
+        }
     }
 }
 
