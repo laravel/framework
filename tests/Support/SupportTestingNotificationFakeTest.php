@@ -238,6 +238,15 @@ class SupportTestingNotificationFakeTest extends TestCase
         $this->fake->assertNotSentTo($this->user, NotificationWithMiddlewareStub::class);
     }
 
+    public function testAssertSentToRecordsOnlyChannelsThatPassJobMiddleware()
+    {
+        $this->fake->send($this->user, new NotificationWithPerChannelMiddlewareStub);
+
+        $this->fake->assertSentTo($this->user, NotificationWithPerChannelMiddlewareStub::class, function ($notification, $channels) {
+            return $channels === ['database'];
+        });
+    }
+
     public function testAssertItCanSerializeAndRestoreNotifications()
     {
         $this->fake->serializeAndRestore();
@@ -294,6 +303,21 @@ class NotificationWithMiddlewareStub extends NotificationStub implements ShouldQ
     public function middleware($notifiable, $channel)
     {
         return [new NotificationDeliveryMiddlewareStub($this->deliver)];
+    }
+}
+
+class NotificationWithPerChannelMiddlewareStub extends NotificationStub implements ShouldQueue
+{
+    use Queueable;
+
+    public function via($notifiable)
+    {
+        return ['mail', 'database'];
+    }
+
+    public function middleware($notifiable, $channel)
+    {
+        return [new NotificationDeliveryMiddlewareStub($channel === 'database')];
     }
 }
 
