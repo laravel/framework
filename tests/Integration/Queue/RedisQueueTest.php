@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Queue;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Queue\HasContext;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
@@ -726,6 +727,25 @@ class RedisQueueTest extends TestCase
         $this->assertSame(1, $reserved->first()->attempts);
         $this->assertNotNull($reserved->first()->uuid);
         $this->assertInstanceOf(Carbon::class, $reserved->first()->createdAt);
+    }
+
+    #[DataProvider('redisDriverProvider')]
+    public function testJobContext($driver)
+    {
+        $default = config('queue.connections.redis.queue', 'default');
+        $this->setQueue($driver, $default);
+
+        $this->queue->push(new RedisContextJob);
+
+        $this->assertSame(['task_id' => 42, 'type' => 'export'], $this->queue->pendingJobs()->first()->context);
+    }
+}
+
+class RedisContextJob implements HasContext
+{
+    public function context(): array
+    {
+        return ['task_id' => 42, 'type' => 'export'];
     }
 }
 

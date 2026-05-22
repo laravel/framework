@@ -9,6 +9,7 @@ use Illuminate\Bus\UniqueLock;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Contracts\Queue\HasContext;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
@@ -185,6 +186,7 @@ abstract class Queue
                 'command' => $job,
                 'batchId' => $job->batchId ?? null,
             ],
+            'context' => $this->getJobContext($job),
             'createdAt' => Carbon::now()->getTimestamp(),
         ]);
 
@@ -206,6 +208,17 @@ abstract class Queue
                 'command' => $command,
             ]),
         ]);
+    }
+
+    /**
+     * Get the context for the given job.
+     *
+     * @param  object  $job
+     * @return array|null
+     */
+    protected function getJobContext($job)
+    {
+        return $job instanceof HasContext ? $job->context() : null;
     }
 
     /**

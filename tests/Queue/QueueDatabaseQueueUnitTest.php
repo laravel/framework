@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Queue;
 
 use Illuminate\Bus\Batchable;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\HasContext;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Queue\Jobs\InspectedJob;
@@ -356,6 +357,20 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $this->assertSame(2, $jobs->last()->attempts);
     }
 
+    public function testJobContext()
+    {
+        $queue = new DatabaseQueue($database = m::mock(Connection::class), 'table', 'default');
+        $queue->setContainer(m::spy(Container::class));
+
+        $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
+            $payload = json_decode($array['payload'], true);
+            $this->assertSame(['task_id' => 42, 'type' => 'export'], $payload['context']);
+        });
+
+        $queue->push(new ContextJob);
+    }
+
     public function testGetLockForPoppingIsCached()
     {
         $database = m::mock(Connection::class);
@@ -389,4 +404,12 @@ class MyTestJob
 class MyBatchableJob
 {
     use Batchable;
+}
+
+class ContextJob implements HasContext
+{
+    public function context(): array
+    {
+        return ['task_id' => 42, 'type' => 'export'];
+    }
 }

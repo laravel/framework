@@ -89,6 +89,16 @@ abstract class Job
     }
 
     /**
+     * Get the job context.
+     *
+     * @return array|null
+     */
+    public function context()
+    {
+        return $this->payload()['context'] ?? null;
+    }
+
+    /**
      * Fire the job.
      *
      * @return void
