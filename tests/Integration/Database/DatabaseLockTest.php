@@ -133,6 +133,56 @@ class DatabaseLockTest extends DatabaseTestCase
         }
     }
 
+    public function testAcquireRethrowsNonIntegrityConstraintException()
+    {
+        $connection = m::mock(Connection::class);
+        $insertBuilder = m::mock(Builder::class);
+
+        $qe = new QueryException(
+            'mysql',
+            'insert into cache_locks (key, owner, expiration) values (?, ?, ?)',
+            ['foo', 'owner', 1234567890],
+            new PDOException('SQLSTATE[22001]: String data, right truncated', 22001)
+        );
+        $qe->errorInfo = ['22001', 1406, 'String data, right truncated'];
+
+        $insertBuilder->shouldReceive('insert')->once()->andThrow($qe);
+
+        $connection->shouldReceive('table')->with('cache_locks')->andReturn($insertBuilder);
+
+        $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 10);
+
+        $this->expectException(QueryException::class);
+        $lock->acquire();
+    }
+
+    public function testAcquireCatchesIntegrityConstraintException()
+    {
+        $connection = m::mock(Connection::class);
+        $insertBuilder = m::mock(Builder::class);
+        $updateBuilder = m::mock(Builder::class);
+
+        $qe = new QueryException(
+            'mysql',
+            'insert into cache_locks (key, owner, expiration) values (?, ?, ?)',
+            ['foo', 'owner', 1234567890],
+            new PDOException('SQLSTATE[23000]: Integrity constraint violation', 23000)
+        );
+        $qe->errorInfo = ['23000', 1062, 'Duplicate entry'];
+
+        $insertBuilder->shouldReceive('insert')->once()->andThrow($qe);
+
+        $updateBuilder->shouldReceive('where')->with('key', 'foo')->once()->andReturnSelf();
+        $updateBuilder->shouldReceive('where')->with(m::type('Closure'))->once()->andReturnSelf();
+        $updateBuilder->shouldReceive('update')->with(m::type('array'))->once()->andReturn(0);
+
+        $connection->shouldReceive('table')->with('cache_locks')->andReturn($insertBuilder, $updateBuilder);
+
+        $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 10);
+
+        $this->assertFalse($lock->acquire());
+    }
+
     #[TestWith(['Serialization failure: 1213 Deadlock', 40001, true])]
     #[TestWith(['Table does not exist', 1146, false])]
     public function testReleaseIgnoresConcurrencyException(string $message, int $code, bool $hasConcurrencyError)
