@@ -84,12 +84,10 @@ class FluentPromise implements PromiseInterface
     {
         $result = $this->forwardCallTo($this->guzzlePromise, $method, $parameters);
 
-        if (! $result instanceof PromiseInterface) {
-            return $result;
+        if ($result instanceof PromiseInterface) {
+            return new static($result);
         }
 
-        $this->guzzlePromise = $result;
-
-        return $this;
+        return $result;
     }
 }
