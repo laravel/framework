@@ -107,6 +107,35 @@ class TypeTest extends TestCase
         $this->assertInstanceOf(JsonSchema::class, $schema);
     }
 
+    public function test_required_may_be_unset(): void
+    {
+        $schema = JsonSchema::object([
+            'name' => JsonSchema::string()->required()->required(false),
+        ]);
+
+        $this->assertEquals([
+            'type' => 'object',
+            'properties' => [
+                'name' => [
+                    'type' => 'string',
+                ],
+            ],
+        ], $schema->toArray());
+
+        $this->assertValidOnJsonSchema($schema, (object) []);
+    }
+
+    public function test_nullable_may_be_unset(): void
+    {
+        $schema = JsonSchema::string()->nullable()->nullable(false);
+
+        $this->assertEquals([
+            'type' => 'string',
+        ], $schema->toArray());
+
+        $this->assertNotValidOnJsonSchema($schema, null);
+    }
+
     public function test_throws_with_invalid_enum_string(): void
     {
         $this->expectException(InvalidArgumentException::class);
