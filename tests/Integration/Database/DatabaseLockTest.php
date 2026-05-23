@@ -6,6 +6,7 @@ use Illuminate\Cache\DatabaseLock;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\QueryException;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -131,6 +132,55 @@ class DatabaseLockTest extends DatabaseTestCase
             $this->expectException(QueryException::class);
             $this->assertFalse($lock->acquire());
         }
+    }
+
+    public function testAcquireRethrowsNonUniqueConstraintQueryExceptions()
+    {
+        $connection = m::mock(Connection::class);
+        $insertBuilder = m::mock(Builder::class);
+
+        $insertBuilder->shouldReceive('insert')->once()->andThrow(
+            new QueryException(
+                'mysql',
+                'insert into cache_locks (key, owner, expiration) values (?, ?, ?)',
+                [],
+                new PDOException('SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column', 22001)
+            )
+        );
+
+        $connection->shouldReceive('table')->with('cache_locks')->andReturn($insertBuilder);
+
+        $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 10, lottery: null);
+
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('String data, right truncated');
+        $lock->acquire();
+    }
+
+    public function testAcquireFallsBackToUpdateOnUniqueConstraintViolation()
+    {
+        $connection = m::mock(Connection::class);
+        $insertBuilder = m::mock(Builder::class);
+        $updateBuilder = m::mock(Builder::class);
+
+        $insertBuilder->shouldReceive('insert')->once()->andThrow(
+            new UniqueConstraintViolationException(
+                'mysql',
+                'insert into cache_locks (key, owner, expiration) values (?, ?, ?)',
+                [],
+                new PDOException('SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry', 23000)
+            )
+        );
+
+        $updateBuilder->shouldReceive('where')->with('key', 'foo')->once()->andReturnSelf();
+        $updateBuilder->shouldReceive('where')->with(m::type(\Closure::class))->once()->andReturnSelf();
+        $updateBuilder->shouldReceive('update')->once()->andReturn(1);
+
+        $connection->shouldReceive('table')->with('cache_locks')->andReturn($insertBuilder, $updateBuilder);
+
+        $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 10, lottery: null);
+
+        $this->assertTrue($lock->acquire());
     }
 
     #[TestWith(['Serialization failure: 1213 Deadlock', 40001, true])]
