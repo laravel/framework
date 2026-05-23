@@ -340,11 +340,12 @@ class TrustProxiesTest extends TestCase
     {
         $request = $this->createProxiedRequest();
 
-        // trust *all* "X-Forwarded-*" headers
+        // unrecognized header strings fall back to the secure default headers
         $trustedProxy = $this->createTrustedProxy('HEADER_X_FORWARDED_ALL', '192.168.1.1, 192.168.1.2');
         $trustedProxy->handle($request, function (Request $request) {
-            $this->assertEquals($request->getTrustedHeaderSet(), $this->headerAll,
-                'Assert trusted proxy used all "X-Forwarded-*" header');
+            $this->assertEquals($request->getTrustedHeaderSet(),
+                Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_AWS_ELB,
+                'Assert unrecognized header string falls back to secure default headers');
 
             $this->assertEquals(['192.168.1.1', '192.168.1.2'], $request->getTrustedProxies(),
                 'Assert trusted proxy using proxies as string separated by comma.');
