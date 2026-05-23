@@ -530,12 +530,52 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         try {
             return parent::command($method, $parameters);
         } catch (RedisException $e) {
-            if (Str::contains($e->getMessage(), ['went away', 'socket', 'Error while reading', 'read error on connection', 'READONLY', 'Connection lost'])) {
-                $this->client = $this->connector ? call_user_func($this->connector) : $this->client;
+            if ($this->connector && $this->causedByLostConnection($e)) {
+                // Always rebuild the client so the next command starts fresh.
+                $this->client = call_user_func($this->connector);
+
+                // Only retry when it's safe. Transaction-control commands depend
+                // on server-side state (MULTI/WATCH) that the new connection does
+                // not have, so silently re-running them would break atomicity.
+                if (! $this->isTransactionControlCommand($method)) {
+                    return parent::command($method, $parameters);
+                }
             }
 
             throw $e;
         }
+    }
+
+    /**
+     * Determine if the given exception was caused by a lost connection.
+     *
+     * @param  \RedisException  $e
+     * @return bool
+     */
+    protected function causedByLostConnection(RedisException $e): bool
+    {
+        return Str::contains($e->getMessage(), [
+            'went away',
+            'socket',
+            'Error while reading',
+            'read error on connection',
+            'READONLY',
+            'Connection lost',
+        ]);
+    }
+
+    /**
+     * Determine if the given method controls a Redis transaction or pipeline.
+     *
+     * Retrying these on a freshly reconnected client would break atomicity:
+     * the new client has no MULTI/WATCH state from the previous connection.
+     *
+     * @param  string  $method
+     * @return bool
+     */
+    protected function isTransactionControlCommand(string $method): bool
+    {
+        return in_array(strtolower($method), ['multi', 'exec', 'discard', 'watch', 'unwatch'], true);
     }
 
     /**
