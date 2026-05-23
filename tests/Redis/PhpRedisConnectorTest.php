@@ -226,6 +226,74 @@ class PhpRedisConnectorTest extends TestCase
 
         $connector->testParseBackoffAlgorithm('bogus');
     }
+
+    public function testFormatHostPrefixesConfiguredSchemeWhenHostHasNoScheme()
+    {
+        $connector = new TestablePhpRedisConnector;
+
+        $this->assertSame('tls://127.0.0.1', $connector->testFormatHost([
+            'host' => '127.0.0.1',
+            'scheme' => 'tls',
+        ]));
+    }
+
+    public function testFormatHostDoesNotDuplicateMatchingScheme()
+    {
+        $connector = new TestablePhpRedisConnector;
+
+        $this->assertSame('tls://127.0.0.1', $connector->testFormatHost([
+            'host' => 'tls://127.0.0.1',
+            'scheme' => 'tls',
+        ]));
+    }
+
+    public function testFormatHostThrowsOnConflictingScheme()
+    {
+        $connector = new TestablePhpRedisConnector;
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The scheme configured in the Redis host option must match the scheme option.');
+
+        $connector->testFormatHost([
+            'host' => 'tcp://127.0.0.1',
+            'scheme' => 'tls',
+        ]);
+    }
+
+    public function testFormatHostAllowsCaseInsensitiveMatchingScheme()
+    {
+        $connector = new TestablePhpRedisConnector;
+
+        $this->assertSame('TLS://127.0.0.1', $connector->testFormatHost([
+            'host' => 'TLS://127.0.0.1',
+            'scheme' => 'tls',
+        ]));
+    }
+
+    public function testFormatHostThrowsWhenHostIsMissing()
+    {
+        $connector = new TestablePhpRedisConnector;
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Redis host must be a non-empty string.');
+
+        $connector->testFormatHost([
+            'scheme' => 'tls',
+        ]);
+    }
+
+    public function testFormatHostThrowsWhenHostIsNull()
+    {
+        $connector = new TestablePhpRedisConnector;
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Redis host must be a non-empty string.');
+
+        $connector->testFormatHost([
+            'host' => null,
+            'scheme' => 'tls',
+        ]);
+    }
 }
 
 class TestablePhpRedisConnector extends PhpRedisConnector
@@ -248,5 +316,10 @@ class TestablePhpRedisConnector extends PhpRedisConnector
     public function testParseBackoffAlgorithm(mixed $algorithm): int
     {
         return $this->parseBackoffAlgorithm($algorithm);
+    }
+
+    public function testFormatHost(array $options): string
+    {
+        return $this->formatHost($options);
     }
 }
