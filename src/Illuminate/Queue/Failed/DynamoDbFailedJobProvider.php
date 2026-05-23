@@ -57,7 +57,9 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
      */
     public function log($connection, $queue, $payload, $exception)
     {
-        $id = json_decode($payload, true)['uuid'];
+        $payloadData = json_decode($payload, true);
+
+        $id = $payloadData['uuid'] ?? null;
 
         $failedAt = Date::now();
 

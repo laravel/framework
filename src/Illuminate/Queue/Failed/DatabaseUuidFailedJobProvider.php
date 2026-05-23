@@ -55,7 +55,7 @@ class DatabaseUuidFailedJobProvider implements CountableFailedJobProvider, Faile
     public function log($connection, $queue, $payload, $exception)
     {
         $this->getTable()->insert([
-            'uuid' => $uuid = json_decode($payload, true)['uuid'],
+            'uuid' => $uuid = (json_decode($payload, true) ?? [])['uuid'] ?? null,
             'connection' => $connection,
             'queue' => $queue,
             'payload' => $payload,
