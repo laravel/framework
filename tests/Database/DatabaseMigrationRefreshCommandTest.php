@@ -74,6 +74,32 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $this->runCommand($command, ['--step' => 2]);
     }
 
+    public function testRefreshCommandForwardsSchemaPathToMigrateCommand()
+    {
+        $command = new RefreshCommand;
+
+        $app = new ApplicationDatabaseRefreshStub(['path.database' => __DIR__]);
+        $dispatcher = $app->instance(Dispatcher::class, $events = m::mock());
+        $console = m::mock(ConsoleApplication::class)->makePartial();
+        $console->__construct();
+        $command->setLaravel($app);
+        $command->setApplication($console);
+
+        $resetCommand = m::mock(ResetCommand::class);
+        $migrateCommand = m::mock(MigrateCommand::class);
+
+        $console->shouldReceive('find')->with('migrate:reset')->andReturn($resetCommand);
+        $console->shouldReceive('find')->with('migrate')->andReturn($migrateCommand);
+        $dispatcher->shouldReceive('dispatch')->once()->with(m::type(DatabaseRefreshed::class));
+
+        $schemaPath = __DIR__.'/stubs/schema.sql';
+        $quote = DIRECTORY_SEPARATOR === '\\' ? '"' : "'";
+        $resetCommand->shouldReceive('run')->with(new InputMatcher("--force=1 {$quote}migrate:reset{$quote}"), m::any());
+        $migrateCommand->shouldReceive('run')->with(new InputMatcher("--schema-path={$quote}{$schemaPath}{$quote} --force=1 migrate"), m::any());
+
+        $this->runCommand($command, ['--schema-path' => $schemaPath]);
+    }
+
     public function testRefreshCommandExitsWhenProhibited()
     {
         $command = new RefreshCommand;
