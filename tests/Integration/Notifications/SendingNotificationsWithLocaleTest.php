@@ -116,6 +116,38 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
     }
 
+    public function testMailableWithoutToIsAddressedToNotifiable()
+    {
+        $user = NotifiableLocalizedUser::forceCreate([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $user->notify(new GreetingMailNotificationWithMailableWithoutTo);
+
+        $message = app('mailer')->getSymfonyTransport()->messages()[0]->getOriginalMessage();
+
+        $this->assertSame(
+            'taylor@laravel.com',
+            $message->getTo()[0]->getAddress()
+        );
+    }
+
+    public function testMailableWithoutToIsAddressedToMultipleNotifiableRoutes()
+    {
+        $user = NotifiableLocalizedUserWithMultipleMailRoutes::forceCreate([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $user->notify(new GreetingMailNotificationWithMailableWithoutTo);
+
+        $message = app('mailer')->getSymfonyTransport()->messages()[0]->getOriginalMessage();
+
+        $this->assertEqualsCanonicalizing(
+            ['foo_taylor@laravel.com', 'bar_taylor@laravel.com'],
+            array_map(fn ($address) => $address->getAddress(), $message->getTo())
+        );
+    }
+
     public function testMailIsSentWithLocaleUpdatedListenersCalled()
     {
         Carbon::setTestNow('2018-07-25');
@@ -247,6 +279,17 @@ class NotifiableEmailLocalePreferredUser extends Model implements HasLocalePrefe
     }
 }
 
+class NotifiableLocalizedUserWithMultipleMailRoutes extends NotifiableLocalizedUser
+{
+    public function routeNotificationForMail($notification)
+    {
+        return [
+            'foo_'.$this->email,
+            'bar_'.$this->email,
+        ];
+    }
+}
+
 class GreetingMailNotification extends Notification
 {
     public function via($notifiable)
@@ -273,6 +316,19 @@ class GreetingMailNotificationWithMailable extends Notification
     {
         return (new GreetingMailable)
             ->to($notifiable->email);
+    }
+}
+
+class GreetingMailNotificationWithMailableWithoutTo extends Notification
+{
+    public function via($notifiable)
+    {
+        return [MailChannel::class];
+    }
+
+    public function toMail($notifiable)
+    {
+        return new GreetingMailable;
     }
 }
 
