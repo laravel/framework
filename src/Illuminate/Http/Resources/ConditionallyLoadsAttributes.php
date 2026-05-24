@@ -4,8 +4,8 @@ namespace Illuminate\Http\Resources;
 
 use Illuminate\Http\Resources\Attributes\PreserveKeys;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Attr;
 use Illuminate\Support\Stringable;
-use ReflectionClass;
 
 trait ConditionallyLoadsAttributes
 {
@@ -95,9 +95,7 @@ trait ConditionallyLoadsAttributes
         }
 
         if (! array_key_exists(static::class, static::$cachedPreserveKeysAttributes)) {
-            static::$cachedPreserveKeysAttributes[static::class] = count(
-                (new ReflectionClass($this))->getAttributes(PreserveKeys::class)
-            ) > 0;
+            static::$cachedPreserveKeysAttributes[static::class] = Attr::onClass($this)->has(PreserveKeys::class);
         }
 
         if (static::$cachedPreserveKeysAttributes[static::class]) {

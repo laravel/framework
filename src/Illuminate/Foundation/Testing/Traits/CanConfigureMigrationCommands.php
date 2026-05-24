@@ -4,7 +4,7 @@ namespace Illuminate\Foundation\Testing\Traits;
 
 use Illuminate\Foundation\Testing\Attributes\Seed;
 use Illuminate\Foundation\Testing\Attributes\Seeder;
-use ReflectionClass;
+use Illuminate\Support\Attr;
 
 trait CanConfigureMigrationCommands
 {
@@ -53,13 +53,9 @@ trait CanConfigureMigrationCommands
      */
     protected function shouldSeed()
     {
-        $class = new ReflectionClass($this);
-
-        do {
-            if (count($class->getAttributes(Seed::class)) > 0) {
-                return true;
-            }
-        } while ($class = $class->getParentClass());
+        if (Attr::onClass($this)->has(Seed::class, true)) {
+            return true;
+        }
 
         return property_exists($this, 'seed') ? $this->seed : false;
     }
@@ -71,15 +67,11 @@ trait CanConfigureMigrationCommands
      */
     protected function seeder()
     {
-        $class = new ReflectionClass($this);
+        $seeder = Attr::onClass($this)->recursive()->instance(Seeder::class)?->class;
 
-        do {
-            $seeder = $class->getAttributes(Seeder::class);
-
-            if (count($seeder) > 0) {
-                return $seeder[0]->newInstance()->class;
-            }
-        } while ($class = $class->getParentClass());
+        if ($seeder) {
+            return $seeder;
+        }
 
         return property_exists($this, 'seeder') ? $this->seeder : false;
     }

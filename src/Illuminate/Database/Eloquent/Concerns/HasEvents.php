@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Events\NullDispatcher;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Attr;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use ReflectionClass;

@@ -9,6 +9,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Factories\Attributes\UseModel;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Attr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
@@ -16,7 +17,6 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
-use ReflectionClass;
 use Throwable;
 use UnitEnum;
 
@@ -945,11 +945,8 @@ abstract class Factory
     public function modelName()
     {
         if (! array_key_exists(static::class, static::$cachedModelAttributes)) {
-            $attribute = (new ReflectionClass($this))->getAttributes(UseModel::class);
-
-            static::$cachedModelAttributes[static::class] = count($attribute) > 0
-                ? $attribute[0]->newInstance()->class
-                : false;
+            static::$cachedModelAttributes[static::class] = Attr::onClass($this)
+                ->instance(UseModel::class)?->class ?? false;
         }
 
         if (static::$cachedModelAttributes[static::class]) {

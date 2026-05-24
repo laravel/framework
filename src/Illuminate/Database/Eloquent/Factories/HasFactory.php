@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Factories;
 
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Support\Attr;
 
 /**
  * @template TFactory of \Illuminate\Database\Eloquent\Factories\Factory
@@ -42,17 +43,14 @@ trait HasFactory
     /**
      * Get the factory from the UseFactory class attribute.
      *
-     * @return TFactory|null
+     * @return TFactory|void
      */
     protected static function getUseFactoryAttribute()
     {
-        $attributes = (new \ReflectionClass(static::class))
-            ->getAttributes(UseFactory::class);
+        $factoryClass = Attr::onClass(static::class)->instance(UseFactory::class)?->factoryClass;
 
-        if ($attributes !== []) {
-            $useFactory = $attributes[0]->newInstance();
-
-            $factory = $useFactory->factoryClass::new();
+        if ($factoryClass) {
+            $factory = $factoryClass::new();
 
             $factory->guessModelNamesUsing(fn () => static::class);
 

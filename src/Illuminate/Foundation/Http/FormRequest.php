@@ -14,8 +14,8 @@ use Illuminate\Foundation\Http\Attributes\RedirectToRoute;
 use Illuminate\Foundation\Http\Attributes\StopOnFirstFailure;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Attr;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
-use ReflectionClass;
 
 class FormRequest extends Request implements ValidatesWhenResolved
 {
@@ -121,29 +121,15 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function configureFromAttributes()
     {
-        $reflection = new ReflectionClass($this);
+        $attr = Attr::onClass($this);
 
-        if (count($reflection->getAttributes(StopOnFirstFailure::class)) > 0) {
-            $this->stopOnFirstFailure = true;
-        }
+        $this->stopOnFirstFailure = $attr->has(StopOnFirstFailure::class);
 
-        $redirectTo = $reflection->getAttributes(RedirectTo::class);
+        $this->redirect = $attr->instance(RedirectTo::class)?->url;
 
-        if (count($redirectTo) > 0) {
-            $this->redirect = $redirectTo[0]->newInstance()->url;
-        }
+        $this->redirectRoute = $attr->instance(RedirectToRoute::class)?->route;
 
-        $redirectToRoute = $reflection->getAttributes(RedirectToRoute::class);
-
-        if (count($redirectToRoute) > 0) {
-            $this->redirectRoute = $redirectToRoute[0]->newInstance()->route;
-        }
-
-        $errorBag = $reflection->getAttributes(ErrorBag::class);
-
-        if (count($errorBag) > 0) {
-            $this->errorBag = $errorBag[0]->newInstance()->name;
-        }
+        $this->errorBag = $attr->instance(ErrorBag::class)?->name ?? $this->errorBag;
     }
 
     /**

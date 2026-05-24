@@ -13,9 +13,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Attributes\PreserveKeys;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Http\Resources\DelegatesToResource;
+use Illuminate\Support\Attr;
 use JsonException;
 use JsonSerializable;
-use ReflectionClass;
 
 class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutable
 {
@@ -89,9 +89,8 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     {
         return tap(static::newCollection($resource), function ($collection) {
             if (! array_key_exists(static::class, static::$cachedPreserveKeysAttributes)) {
-                static::$cachedPreserveKeysAttributes[static::class] = count(
-                    (new ReflectionClass(static::class))->getAttributes(PreserveKeys::class)
-                ) > 0;
+                static::$cachedPreserveKeysAttributes[static::class] = Attr::onClass(static::class)
+                    ->has(PreserveKeys::class);
             }
 
             if (static::$cachedPreserveKeysAttributes[static::class]) {

@@ -7,8 +7,8 @@ use Illuminate\Console\Events\ArtisanStarting;
 use Illuminate\Contracts\Console\Application as ApplicationContract;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\Attr;
 use Illuminate\Support\ProcessUtils;
-use ReflectionClass;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
@@ -255,11 +255,9 @@ class Application extends SymfonyApplication implements ApplicationContract
     public function resolve($command)
     {
         if (is_subclass_of($command, SymfonyCommand::class)) {
-            $attribute = (new ReflectionClass($command))->getAttributes(AsCommand::class);
+            $commandName = Attr::onClass($command)->instance(AsCommand::class)?->name;
 
-            $commandName = ! empty($attribute) ? $attribute[0]->newInstance()->name : null;
-
-            if (! is_null($commandName)) {
+            if ($commandName) {
                 foreach (explode('|', $commandName) as $name) {
                     $this->commandMap[$name] = $command;
                 }

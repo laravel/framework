@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Attributes\UseResource;
 use Illuminate\Database\Eloquent\Attributes\UseResourceCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Attr;
 use LogicException;
-use ReflectionClass;
 
 trait TransformsToResourceCollection
 {
@@ -93,11 +93,7 @@ trait TransformsToResourceCollection
             return null;
         }
 
-        $attributes = (new ReflectionClass($class))->getAttributes(UseResource::class);
-
-        return $attributes !== []
-            ? $attributes[0]->newInstance()->class
-            : null;
+        return Attr::onClass($class)->instance(UseResource::class)?->class;
     }
 
     /**
@@ -112,10 +108,6 @@ trait TransformsToResourceCollection
             return null;
         }
 
-        $attributes = (new ReflectionClass($class))->getAttributes(UseResourceCollection::class);
-
-        return $attributes !== []
-            ? $attributes[0]->newInstance()->class
-            : null;
+        return Attr::onClass($class)->instance(UseResourceCollection::class)?->class;
     }
 }
