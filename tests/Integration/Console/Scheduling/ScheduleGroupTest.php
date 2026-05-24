@@ -547,6 +547,31 @@ class ScheduleGroupTest extends TestCase
         $this->assertSame(['outer', 'outer', 'inner'], $calls);
     }
 
+    public function testNestedGroupInheritsLifecycleCallbacksOnce()
+    {
+        $calls = [];
+
+        $schedule = new ScheduleClass;
+        $schedule
+            ->after(function () use (&$calls) {
+                $calls[] = 'outer';
+            })
+            ->group(function ($schedule) use (&$calls) {
+                $schedule
+                    ->after(function () use (&$calls) {
+                        $calls[] = 'inner';
+                    })
+                    ->group(function ($schedule) {
+                        $schedule->command('inspire');
+                    });
+            });
+
+        $events = $schedule->events();
+        $events[0]->finish(app(), 0);
+
+        $this->assertSame(['outer', 'inner'], $calls);
+    }
+
     public function testGroupCanStartWithLifecycleCallbackWithoutFrequency()
     {
         $calls = [];
