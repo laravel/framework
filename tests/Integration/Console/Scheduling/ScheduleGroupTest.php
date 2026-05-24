@@ -88,6 +88,44 @@ class ScheduleGroupTest extends TestCase
         $this->assertSame('Asia/Dhaka', $events[1]->timezone);
     }
 
+    public function testGroupCanApplyAttributesToSchedules()
+    {
+        Schedule::withAttributes(['team' => 'platform'])->group(function () {
+            Schedule::command('inspire');
+        });
+
+        $events = Schedule::events();
+
+        $this->assertSame(['team' => 'platform'], $events[0]->attributes);
+    }
+
+    public function testGroupAttributesAreNotDuplicatedOnPendingSchedules()
+    {
+        Schedule::withAttributes(['team' => 'platform'])->group(function () {
+            Schedule::dailyAt('09:00')->command('inspire');
+        });
+
+        $events = Schedule::events();
+
+        $this->assertSame(['team' => 'platform'], $events[0]->attributes);
+        $this->assertSame('0 9 * * *', $events[0]->expression);
+    }
+
+    public function testGroupAttributesAreMergedWithPendingAttributes()
+    {
+        Schedule::withAttributes(['team' => 'platform'])->group(function () {
+            Schedule::withAttributes(['tagName' => 'import-premium-podcasts'])
+                ->command('audio:import-podcasts --only-premium');
+        });
+
+        $events = Schedule::events();
+
+        $this->assertSame([
+            'team' => 'platform',
+            'tagName' => 'import-premium-podcasts',
+        ], $events[0]->attributes);
+    }
+
     #[DataProvider('groupAttributes')]
     public function testGroupCanApplyAttributeToSchedules(string $property, mixed $value)
     {
@@ -329,6 +367,26 @@ class ScheduleGroupTest extends TestCase
         Event::flushMacros();
     }
 
+    public function testGroupAppliesEventMacrosOnceToPendingSchedules()
+    {
+        Event::macro('sentryMonitor', function () {
+            $this->sentryMonitored = ($this->sentryMonitored ?? 0) + 1;
+
+            return $this;
+        });
+
+        $schedule = new ScheduleClass;
+        $schedule->daily()->sentryMonitor()->group(function ($schedule) {
+            $schedule->at('09:00')->command('inspire');
+        });
+
+        $events = $schedule->events();
+        $this->assertSame(1, $events[0]->sentryMonitored);
+        $this->assertSame('0 9 * * *', $events[0]->expression);
+
+        Event::flushMacros();
+    }
+
     public function testGroupAppliesOnFailureCallbackToAllEvents()
     {
         $calls = [];
@@ -418,6 +476,26 @@ class ScheduleGroupTest extends TestCase
         $this->assertSame(['before', 'after', 'then'], $calls);
     }
 
+    public function testGroupAppliesAfterCallbackOnceToPendingSchedules()
+    {
+        $calls = [];
+
+        $schedule = new ScheduleClass;
+        $schedule
+            ->after(function () use (&$calls) {
+                $calls[] = 'after';
+            })
+            ->group(function ($schedule) {
+                $schedule->at('09:00')->command('inspire');
+            });
+
+        $events = $schedule->events();
+        $events[0]->finish(app(), 0);
+
+        $this->assertSame(['after'], $calls);
+        $this->assertSame('0 9 * * *', $events[0]->expression);
+    }
+
     public function testGroupCallbacksCombineWithEventLevelCallbacks()
     {
         $calls = [];
@@ -467,6 +545,31 @@ class ScheduleGroupTest extends TestCase
 
         $events[1]->finish(app(), 1);
         $this->assertSame(['outer', 'outer', 'inner'], $calls);
+    }
+
+    public function testNestedGroupInheritsLifecycleCallbacksOnce()
+    {
+        $calls = [];
+
+        $schedule = new ScheduleClass;
+        $schedule
+            ->after(function () use (&$calls) {
+                $calls[] = 'outer';
+            })
+            ->group(function ($schedule) use (&$calls) {
+                $schedule
+                    ->after(function () use (&$calls) {
+                        $calls[] = 'inner';
+                    })
+                    ->group(function ($schedule) {
+                        $schedule->command('inspire');
+                    });
+            });
+
+        $events = $schedule->events();
+        $events[0]->finish(app(), 0);
+
+        $this->assertSame(['outer', 'inner'], $calls);
     }
 
     public function testGroupCanStartWithLifecycleCallbackWithoutFrequency()

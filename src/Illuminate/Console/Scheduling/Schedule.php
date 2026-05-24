@@ -336,16 +336,18 @@ class Schedule
      */
     protected function mergePendingAttributes(Event $event)
     {
-        if (! empty($this->groupStack)) {
-            $group = array_last($this->groupStack);
-
-            $group->mergeAttributes($event);
-        }
-
         if (isset($this->attributes)) {
             $this->attributes->mergeAttributes($event);
 
             $this->attributes = null;
+
+            return;
+        }
+
+        if (! empty($this->groupStack)) {
+            $group = array_last($this->groupStack);
+
+            $group->mergeAttributes($event);
         }
     }
 
