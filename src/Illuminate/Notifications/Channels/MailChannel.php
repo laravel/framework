@@ -60,7 +60,8 @@ class MailChannel
         }
 
         if ($message instanceof Mailable) {
-            return $message->send($this->mailer);
+            return $this->populateMailableRecipients($message, $notifiable, $notification)
+                ->send($this->mailer);
         }
 
         return $this->mailer->mailer($message->mailer ?? null)->send(
@@ -213,7 +214,7 @@ class MailChannel
     {
         $this->addSender($mailMessage, $message);
 
-        $mailMessage->to($this->getRecipients($notifiable, $notification, $message));
+        $mailMessage->to($this->getRecipients($notifiable, $notification));
 
         if (! empty($message->cc)) {
             foreach ($message->cc as $cc) {
@@ -249,14 +250,34 @@ class MailChannel
     }
 
     /**
+     * Populate the mailable recipients using the notifiable's mail route.
+     *
+     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
+     * @param  mixed  $notifiable
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return \Illuminate\Contracts\Mail\Mailable
+     */
+    protected function populateMailableRecipients($mailable, $notifiable, $notification)
+    {
+        if (! empty($mailable->to)) {
+            return $mailable;
+        }
+
+        if (method_exists($mailable, 'envelope') && ! empty($mailable->envelope()->to)) {
+            return $mailable;
+        }
+
+        return $mailable->to($this->getRecipients($notifiable, $notification));
+    }
+
+    /**
      * Get the recipients of the given message.
      *
      * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
-     * @param  \Illuminate\Notifications\Messages\MailMessage  $message
      * @return mixed
      */
-    protected function getRecipients($notifiable, $notification, $message)
+    protected function getRecipients($notifiable, $notification)
     {
         if (is_string($recipients = $notifiable->routeNotificationFor('mail', $notification))) {
             $recipients = [$recipients];
