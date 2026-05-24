@@ -476,7 +476,7 @@ class Sleep
     }
 
     /**
-     * Assert that no sleeping occurred.
+     * Assert that all sleeping that occurred had a duration of zero.
      *
      * @return void
      */
@@ -546,6 +546,7 @@ class Sleep
     /**
      * Indicate that Carbon's "now" should be kept in sync when sleeping.
      *
+     * @param  bool  $value
      * @return void
      */
     public static function syncWithCarbon($value = true)
