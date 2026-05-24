@@ -6,8 +6,8 @@ use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\View\Components\Factory;
 use Illuminate\Contracts\Console\Isolatable;
+use Illuminate\Support\Attr;
 use Illuminate\Support\Traits\Macroable;
-use ReflectionClass;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -136,25 +136,12 @@ class Command extends SymfonyCommand
      */
     protected function configureFromAttributes()
     {
-        $reflection = new ReflectionClass($this);
+        $signature = Attr::onClass($this)->instance(Signature::class);
 
-        $signature = $reflection->getAttributes(Signature::class);
+        $this->signature = $signature?->signature;
+        $this->aliases = $signature?->aliases;
 
-        if (count($signature) > 0) {
-            $signatureInstance = $signature[0]->newInstance();
-
-            $this->signature = $signatureInstance->signature;
-
-            if ($signatureInstance->aliases !== null) {
-                $this->aliases = $signatureInstance->aliases;
-            }
-        }
-
-        $description = $reflection->getAttributes(Description::class);
-
-        if (count($description) > 0) {
-            $this->description = $description[0]->newInstance()->description;
-        }
+        $this->description = Attr::onClass($this)->instance(Description::class)->description ?? '';
     }
 
     /**

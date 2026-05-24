@@ -3,7 +3,7 @@
 namespace Illuminate\Database\Eloquent;
 
 use Illuminate\Database\Eloquent\Attributes\CollectedBy;
-use ReflectionClass;
+use Illuminate\Support\Attr;
 
 /**
  * @template TCollection of \Illuminate\Database\Eloquent\Collection
@@ -43,14 +43,6 @@ trait HasCollection
      */
     public function resolveCollectionFromAttribute()
     {
-        $reflectionClass = new ReflectionClass(static::class);
-
-        $attributes = $reflectionClass->getAttributes(CollectedBy::class);
-
-        if (! isset($attributes[0]) || ! isset($attributes[0]->getArguments()[0])) {
-            return;
-        }
-
-        return $attributes[0]->getArguments()[0];
+        return Attr::onClass(static::class)->instance(CollectedBy::class)?->collectionClass;
     }
 }

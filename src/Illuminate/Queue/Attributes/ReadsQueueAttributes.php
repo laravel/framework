@@ -3,7 +3,7 @@
 namespace Illuminate\Queue\Attributes;
 
 use Exception;
-use ReflectionClass;
+use Illuminate\Support\Attr;
 
 trait ReadsQueueAttributes
 {
@@ -19,15 +19,11 @@ trait ReadsQueueAttributes
     protected function getAttributeValue($job, string $attributeClass, ?string $property = null, $default = null)
     {
         try {
-            $reflection = new ReflectionClass($job);
+            $instance = Attr::onClass($job)->recursive()->instance($attributeClass);
 
-            do {
-                $attributes = $reflection->getAttributes($attributeClass);
-
-                if (count($attributes) > 0) {
-                    return $this->extractAttributeValue($attributes[0]->newInstance());
-                }
-            } while ($reflection = $reflection->getParentClass());
+            if ($instance) {
+                return $instance;
+            }
         } catch (Exception) {
             //
         }

@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Attr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable as SupportStringable;
@@ -33,7 +34,6 @@ use JsonException;
 use JsonSerializable;
 use LogicException;
 use ReflectionClass;
-use ReflectionMethod;
 use Stringable;
 
 use function Illuminate\Support\enum_value;
@@ -1836,12 +1836,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function resolveCustomBuilderClass()
     {
-        $attributes = (new ReflectionClass($this))
-            ->getAttributes(UseEloquentBuilder::class);
-
-        return ! empty($attributes)
-            ? $attributes[0]->newInstance()->builderClass
-            : false;
+        return Attr::onClass($this)->instance(UseEloquentBuilder::class)?->builderClass ?? false;
     }
 
     /**
@@ -1906,9 +1901,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected static function isScopeMethodWithAttribute(string $method)
     {
-        return method_exists(static::class, $method) &&
-            (new ReflectionMethod(static::class, $method))
-                ->getAttributes(LocalScope::class) !== [];
+        return method_exists(static::class, $method)
+            && Attr::onMethod(static::class, $method)->has(LocalScope::class);
     }
 
     /**
@@ -2574,17 +2568,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         }
 
         try {
-            $reflection = new ReflectionClass($class);
+            $instance = Attr::onClass($class)->instance($attributeClass, true);
 
-            do {
-                $attributes = $reflection->getAttributes($attributeClass);
-
-                if (count($attributes) > 0) {
-                    $instance = $attributes[0]->newInstance();
-
-                    return static::$classAttributes[$cacheKey] = $property ? $instance->{$property} : $instance;
-                }
-            } while ($reflection = $reflection->getParentClass());
+            if ($instance) {
+                return static::$classAttributes[$cacheKey] = $property ? $instance->{$property} : $instance;
+            }
         } catch (Exception) {
             //
         }

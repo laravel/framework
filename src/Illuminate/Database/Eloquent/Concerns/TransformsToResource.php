@@ -4,9 +4,9 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Database\Eloquent\Attributes\UseResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Attr;
 use Illuminate\Support\Str;
 use LogicException;
-use ReflectionClass;
 
 trait TransformsToResource
 {
@@ -90,10 +90,6 @@ trait TransformsToResource
             return null;
         }
 
-        $attributes = (new ReflectionClass($class))->getAttributes(UseResource::class);
-
-        return $attributes !== []
-            ? $attributes[0]->newInstance()->class
-            : null;
+        return Attr::onClass($class)->instance(UseResource::class)?->class;
     }
 }

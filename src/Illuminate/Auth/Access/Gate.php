@@ -10,6 +10,7 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Attr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -701,11 +702,7 @@ class Gate implements GateContract
             return null;
         }
 
-        $attributes = (new ReflectionClass($class))->getAttributes(UsePolicy::class);
-
-        return $attributes !== []
-            ? $attributes[0]->newInstance()->class
-            : null;
+        return Attr::onClass($class)->instance(UsePolicy::class)->class;
     }
 
     /**

@@ -6,6 +6,7 @@ use Illuminate\Http\Resources\Attributes\Collects;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Support\Attr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LogicException;
@@ -60,11 +61,8 @@ trait CollectsResources
         $collects = null;
 
         if (! array_key_exists(static::class, static::$cachedCollectsAttributes)) {
-            $attribute = (new ReflectionClass($this))->getAttributes(Collects::class);
-
-            static::$cachedCollectsAttributes[static::class] = count($attribute) > 0
-                ? $attribute[0]->newInstance()->class
-                : false;
+            static::$cachedCollectsAttributes[static::class] = Attr::onClass($this)->instance(Collects::class)?->class
+                ?? false;
         }
 
         if (static::$cachedCollectsAttributes[static::class]) {
