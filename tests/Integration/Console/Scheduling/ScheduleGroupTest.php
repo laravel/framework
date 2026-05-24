@@ -99,6 +99,33 @@ class ScheduleGroupTest extends TestCase
         $this->assertSame(['team' => 'platform'], $events[0]->attributes);
     }
 
+    public function testGroupAttributesAreNotDuplicatedOnPendingSchedules()
+    {
+        Schedule::withAttributes(['team' => 'platform'])->group(function () {
+            Schedule::dailyAt('09:00')->command('inspire');
+        });
+
+        $events = Schedule::events();
+
+        $this->assertSame(['team' => 'platform'], $events[0]->attributes);
+        $this->assertSame('0 9 * * *', $events[0]->expression);
+    }
+
+    public function testGroupAttributesAreMergedWithPendingAttributes()
+    {
+        Schedule::withAttributes(['team' => 'platform'])->group(function () {
+            Schedule::withAttributes(['tagName' => 'import-premium-podcasts'])
+                ->command('audio:import-podcasts --only-premium');
+        });
+
+        $events = Schedule::events();
+
+        $this->assertSame([
+            'team' => 'platform',
+            'tagName' => 'import-premium-podcasts',
+        ], $events[0]->attributes);
+    }
+
     #[DataProvider('groupAttributes')]
     public function testGroupCanApplyAttributeToSchedules(string $property, mixed $value)
     {
