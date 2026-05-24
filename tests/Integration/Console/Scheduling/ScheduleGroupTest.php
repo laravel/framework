@@ -367,6 +367,26 @@ class ScheduleGroupTest extends TestCase
         Event::flushMacros();
     }
 
+    public function testGroupAppliesEventMacrosOnceToPendingSchedules()
+    {
+        Event::macro('sentryMonitor', function () {
+            $this->sentryMonitored = ($this->sentryMonitored ?? 0) + 1;
+
+            return $this;
+        });
+
+        $schedule = new ScheduleClass;
+        $schedule->daily()->sentryMonitor()->group(function ($schedule) {
+            $schedule->at('09:00')->command('inspire');
+        });
+
+        $events = $schedule->events();
+        $this->assertSame(1, $events[0]->sentryMonitored);
+        $this->assertSame('0 9 * * *', $events[0]->expression);
+
+        Event::flushMacros();
+    }
+
     public function testGroupAppliesOnFailureCallbackToAllEvents()
     {
         $calls = [];
@@ -454,6 +474,26 @@ class ScheduleGroupTest extends TestCase
         $events[0]->finish(app(), 0);
 
         $this->assertSame(['before', 'after', 'then'], $calls);
+    }
+
+    public function testGroupAppliesAfterCallbackOnceToPendingSchedules()
+    {
+        $calls = [];
+
+        $schedule = new ScheduleClass;
+        $schedule
+            ->after(function () use (&$calls) {
+                $calls[] = 'after';
+            })
+            ->group(function ($schedule) {
+                $schedule->at('09:00')->command('inspire');
+            });
+
+        $events = $schedule->events();
+        $events[0]->finish(app(), 0);
+
+        $this->assertSame(['after'], $calls);
+        $this->assertSame('0 9 * * *', $events[0]->expression);
     }
 
     public function testGroupCallbacksCombineWithEventLevelCallbacks()
