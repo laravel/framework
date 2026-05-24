@@ -50,6 +50,10 @@ class Serializer
         }, ARRAY_FILTER_USE_BOTH);
 
         if ($type instanceof Types\ObjectType) {
+            if (isset($attributes['additionalProperties']) && $attributes['additionalProperties'] instanceof Types\Type) {
+                $attributes['additionalProperties'] = static::serialize($attributes['additionalProperties']);
+            }
+
             if (count($attributes['properties']) === 0) {
                 unset($attributes['properties']);
             } else {

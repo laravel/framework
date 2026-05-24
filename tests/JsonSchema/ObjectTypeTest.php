@@ -103,6 +103,57 @@ class ObjectTypeTest extends TestCase
         ], $type->toArray());
     }
 
+    public function test_it_may_explicitly_allow_additional_properties(): void
+    {
+        $type = JsonSchema::object()->additionalProperties(true);
+
+        $this->assertEquals([
+            'type' => 'object',
+        ], $type->toArray());
+    }
+
+    public function test_it_may_set_additional_properties_as_boolean_false(): void
+    {
+        $type = JsonSchema::object()->additionalProperties(false);
+
+        $this->assertEquals([
+            'type' => 'object',
+            'additionalProperties' => false,
+        ], $type->toArray());
+    }
+
+    public function test_it_may_set_additional_properties_as_schema(): void
+    {
+        $type = JsonSchema::object()->additionalProperties(JsonSchema::string());
+
+        $this->assertEquals([
+            'type' => 'object',
+            'additionalProperties' => [
+                'type' => 'string',
+            ],
+        ], $type->toArray());
+    }
+
+    public function test_it_may_set_additional_properties_schema_alongside_properties(): void
+    {
+        $type = JsonSchema::object([
+            'name' => JsonSchema::string()->required(),
+        ])->additionalProperties(JsonSchema::string());
+
+        $this->assertEquals([
+            'type' => 'object',
+            'properties' => [
+                'name' => [
+                    'type' => 'string',
+                ],
+            ],
+            'required' => ['name'],
+            'additionalProperties' => [
+                'type' => 'string',
+            ],
+        ], $type->toArray());
+    }
+
     public function test_it_may_set_enum(): void
     {
         $type = JsonSchema::object()->enum([

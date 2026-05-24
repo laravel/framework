@@ -300,6 +300,16 @@ class TypeTest extends TestCase
                 ]),
                 (object) ['age' => 0], // not nullable
             ],
+            [
+                JsonSchema::object([
+                    'name' => JsonSchema::string()->required(),
+                ])->additionalProperties(JsonSchema::string()),
+                (object) ['name' => 'Nuno', 'tag' => 'laravel'],
+            ],
+            [
+                JsonSchema::object()->additionalProperties(JsonSchema::integer()),
+                (object) ['count' => 1],
+            ],
 
             // ArrayType
             [JsonSchema::array(), []],
@@ -397,6 +407,20 @@ class TypeTest extends TestCase
             [JsonSchema::object(['name' => JsonSchema::string()->required()])->default(['name' => 'x']), (object) []], // default doesn't satisfy missing required
             [JsonSchema::object(['score' => JsonSchema::integer()->min(0)]), (object) ['score' => -1]], // below min
             [JsonSchema::object(['age' => JsonSchema::integer()->nullable(false)]), (object) ['age' => null]], // not nullable
+            [
+                JsonSchema::object([
+                    'name' => JsonSchema::string()->required(),
+                ])->additionalProperties(JsonSchema::string()),
+                (object) ['name' => 'Nuno', 'tag' => 1],
+            ],
+            [
+                JsonSchema::object()->additionalProperties(JsonSchema::integer()),
+                (object) ['count' => 'one'],
+            ],
+            [
+                JsonSchema::object()->additionalProperties(false),
+                (object) ['extra' => 'nope'],
+            ],
 
             // ArrayType
             [JsonSchema::array(), (object) []], // type mismatch

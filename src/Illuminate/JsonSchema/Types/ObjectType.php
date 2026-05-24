@@ -5,9 +5,9 @@ namespace Illuminate\JsonSchema\Types;
 class ObjectType extends Type
 {
     /**
-     * Whether additional properties are allowed.
+     * The additional properties constraint.
      */
-    protected ?bool $additionalProperties = null;
+    protected bool|Type|null $additionalProperties = null;
 
     /**
      * Create a new object type instance.
@@ -20,13 +20,21 @@ class ObjectType extends Type
     }
 
     /**
+     * Set the additional properties constraint.
+     */
+    public function additionalProperties(bool|Type $value = true): static
+    {
+        $this->additionalProperties = $value === true ? null : $value;
+
+        return $this;
+    }
+
+    /**
      * Disallow additional properties.
      */
     public function withoutAdditionalProperties(): static
     {
-        $this->additionalProperties = false;
-
-        return $this;
+        return $this->additionalProperties(false);
     }
 
     /**
