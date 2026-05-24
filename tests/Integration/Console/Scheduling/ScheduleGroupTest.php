@@ -88,6 +88,17 @@ class ScheduleGroupTest extends TestCase
         $this->assertSame('Asia/Dhaka', $events[1]->timezone);
     }
 
+    public function testGroupCanApplyAttributesToSchedules()
+    {
+        Schedule::withAttributes(['team' => 'platform'])->group(function () {
+            Schedule::command('inspire');
+        });
+
+        $events = Schedule::events();
+
+        $this->assertSame(['team' => 'platform'], $events[0]->attributes);
+    }
+
     #[DataProvider('groupAttributes')]
     public function testGroupCanApplyAttributeToSchedules(string $property, mixed $value)
     {

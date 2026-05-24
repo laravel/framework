@@ -85,6 +85,10 @@ class PendingEventAttributes
             $event->name($this->description);
         }
 
+        if ($this->attributes !== []) {
+            $event->withAttributes($this->attributes);
+        }
+
         if ($this->timezone !== null) {
             $event->timezone($this->timezone);
         }

@@ -89,4 +89,31 @@ final class ScheduleTest extends TestCase
         $this->assertSame([], $filteredEvents[2]->environments);
         $this->assertSame('0 * * * *', $filteredEvents[2]->expression);
     }
+
+    public function testItCanAddAttributesToEvents(): void
+    {
+        $schedule = new Schedule();
+
+        $event = $schedule->command('inspire')
+            ->withAttributes(['team' => 'platform'])
+            ->withAttributes(['labels' => ['maintenance']]);
+
+        $this->assertSame([
+            'team' => 'platform',
+            'labels' => ['maintenance'],
+        ], $event->attributes);
+    }
+
+    public function testItCanAddAttributesToPendingEvents(): void
+    {
+        $schedule = new Schedule();
+
+        $schedule->withAttributes(['team' => 'platform'])->command('inspire');
+        $schedule->command('queue:work');
+
+        $events = $schedule->events();
+
+        $this->assertSame(['team' => 'platform'], $events[0]->attributes);
+        $this->assertSame([], $events[1]->attributes);
+    }
 }
