@@ -46,7 +46,8 @@ class SQLiteConnector extends Connector implements ConnectorInterface
         // querying. In-memory databases shall be anonymous (:memory:) or named.
         if ($path === ':memory:' ||
             str_contains($path, '?mode=memory') ||
-            str_contains($path, '&mode=memory')
+            str_contains($path, '&mode=memory') ||
+            str_starts_with($path, 'file:')
         ) {
             return $path;
         }
