@@ -69,6 +69,10 @@ class Serializer
                     static fn (Types\Type $property) => static::serialize($property),
                     $attributes['properties'],
                 );
+
+                if (array_is_list($attributes['properties'])) {
+                    $attributes['properties'] = (object) $attributes['properties'];
+                }
             }
         }
 

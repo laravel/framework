@@ -92,6 +92,20 @@ class ObjectTypeTest extends TestCase
         $this->assertIsString($array['required'][1]);
     }
 
+    public function test_numeric_string_property_names_serialize_as_object(): void
+    {
+        $type = JsonSchema::object([
+            '0' => JsonSchema::string()->required(),
+            '1' => JsonSchema::string()->required(),
+            '2' => JsonSchema::string()->required(),
+        ]);
+
+        $json = json_encode($type->toArray());
+
+        $this->assertStringContainsString('"properties":{"0":', $json);
+        $this->assertStringNotContainsString('"properties":[', $json);
+    }
+
     public function test_it_may_disable_additional_properties(): void
     {
         $type = JsonSchema::object()->default(['age' => 1])->withoutAdditionalProperties();
