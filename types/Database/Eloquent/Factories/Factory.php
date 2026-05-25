@@ -192,3 +192,28 @@ UserFactory::new()->has(
             return ['user_id' => $user?->getKey()];
         }),
 );
+
+class TypeTestUser extends \Illuminate\Database\Eloquent\Model
+{
+    /** @use \Illuminate\Database\Eloquent\Factories\HasFactory<TypeTestUserFactory> */
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+}
+
+/** @extends Factory<TypeTestUser> */
+class TypeTestUserFactory extends Factory
+{
+    protected $model = TypeTestUser::class;
+
+    public function definition(): array
+    {
+        return [];
+    }
+}
+
+assertType('TypeTestUser|TypeTestUserFactory', TypeTestUser::randomOrFactory());
+assertType('TypeTestUser|TypeTestUserFactory', TypeTestUser::randomOrFactory(null, null, null));
+assertType('Illuminate\Database\Eloquent\Collection<int, TypeTestUser>|TypeTestUserFactory', TypeTestUser::randomOrFactory(null, null, 5));
+assertType('TypeTestUser', TypeTestUser::randomOrFactoryCreate());
+assertType('Illuminate\Database\Eloquent\Collection<int, TypeTestUser>', TypeTestUser::randomOrFactoryCreate(null, null, 3));
+assertType('TypeTestUser|TypeTestUserFactory', TypeTestUser::randomOrFactory(fn ($q) => $q->where('id', 1)));
+assertType('TypeTestUser', TypeTestUser::randomOrFactoryCreate(null, fn ($f) => $f->state([])));

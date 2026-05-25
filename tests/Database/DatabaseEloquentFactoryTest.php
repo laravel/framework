@@ -1137,6 +1137,114 @@ class DatabaseEloquentFactoryTest extends TestCase
         }
     }
 
+    public function test_random_or_factory_returns_factory_instance_when_no_records_exist()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model.'Factory';
+        });
+        DB::table('users')->delete();
+        $result = FactoryTestUser::randomOrFactory();
+        $this->assertInstanceOf(FactoryTestUserFactory::class, $result);
+    }
+
+    public function test_random_or_factory_returns_random_model_when_records_exist()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model.'Factory';
+        });
+        DB::table('users')->delete();
+        $user = FactoryTestUserFactory::new()->create(['name' => 'Taylor']);
+        $result = FactoryTestUser::randomOrFactory();
+        $this->assertInstanceOf(FactoryTestUser::class, $result);
+        $this->assertSame($user->id, $result->id);
+    }
+
+    public function test_random_or_factory_returns_factory_when_no_records_with_count()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model.'Factory';
+        });
+        DB::table('users')->delete();
+        $result = FactoryTestUser::randomOrFactory(null, null, 3);
+        $this->assertInstanceOf(FactoryTestUserFactory::class, $result);
+        $models = $result->make();
+        $this->assertCount(3, $models);
+    }
+
+    public function test_random_or_factory_returns_collection_when_records_exist_with_count()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model.'Factory';
+        });
+        DB::table('users')->delete();
+        FactoryTestUserFactory::new()->count(2)->create();
+        $result = FactoryTestUser::randomOrFactory(null, null, 2);
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertCount(2, $result);
+    }
+
+    public function test_random_or_factory_uses_query_closure_to_filter()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model.'Factory';
+        });
+        DB::table('users')->delete();
+        FactoryTestUserFactory::new()->create(['name' => 'foo']);
+        FactoryTestUserFactory::new()->create(['name' => 'bar']);
+        $result = FactoryTestUser::randomOrFactory(fn ($query) => $query->where('name', 'foo'));
+        $this->assertInstanceOf(FactoryTestUser::class, $result);
+        $this->assertSame('foo', $result->name);
+    }
+
+    public function test_random_or_factory_applies_factory_closure()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model.'Factory';
+        });
+        DB::table('users')->delete();
+        $result = FactoryTestUser::randomOrFactory(null, fn ($factory) => $factory->state(['name' => 'custom']));
+        $user = $result->create();
+        $this->assertSame('custom', $user->name);
+    }
+
+    public function test_random_or_factory_create_returns_model_and_creates_when_no_records()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model.'Factory';
+        });
+        DB::table('users')->delete();
+        $before = FactoryTestUser::count();
+        $result = FactoryTestUser::randomOrFactoryCreate();
+        $this->assertInstanceOf(FactoryTestUser::class, $result);
+        $this->assertSame($before + 1, FactoryTestUser::count());
+    }
+
+    public function test_random_or_factory_create_returns_existing_when_records_exist_without_creating()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model.'Factory';
+        });
+        DB::table('users')->delete();
+        $user = FactoryTestUserFactory::new()->create();
+        $before = FactoryTestUser::count();
+        $result = FactoryTestUser::randomOrFactoryCreate();
+        $this->assertInstanceOf(FactoryTestUser::class, $result);
+        $this->assertSame($user->id, $result->id);
+        $this->assertSame($before, FactoryTestUser::count());
+    }
+
+    public function test_random_or_factory_create_with_count_creates_many_when_no_records()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model.'Factory';
+        });
+        DB::table('users')->delete();
+        $result = FactoryTestUser::randomOrFactoryCreate(null, null, 2);
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertCount(2, $result);
+        $this->assertSame(2, FactoryTestUser::count());
+    }
+
     /**
      * Get a database connection instance.
      *
