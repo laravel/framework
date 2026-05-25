@@ -10,6 +10,16 @@ class ObjectType extends Type
     protected ?bool $additionalProperties = null;
 
     /**
+     * The minimum number of properties (inclusive).
+     */
+    protected ?int $minProperties = null;
+
+    /**
+     * The maximum number of properties (inclusive).
+     */
+    protected ?int $maxProperties = null;
+
+    /**
      * Create a new object type instance.
      *
      * @param  array<string, Type>  $properties
@@ -17,6 +27,26 @@ class ObjectType extends Type
     public function __construct(protected array $properties = [])
     {
         //
+    }
+
+    /**
+     * Set the minimum number of properties (inclusive).
+     */
+    public function min(int $value): static
+    {
+        $this->minProperties = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set the maximum number of properties (inclusive).
+     */
+    public function max(int $value): static
+    {
+        $this->maxProperties = $value;
+
+        return $this;
     }
 
     /**
