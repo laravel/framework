@@ -164,9 +164,15 @@ class View implements ArrayAccess, Htmlable, Stringable, ViewContract
             // Once we have the contents of the view, we will flush the sections if we are
             // done rendering all views so that there is nothing left hanging over when
             // another view gets rendered in the future by the application developer.
-            $this->factory->flushStateIfDoneRendering();
+            $contents = ! is_null($response) ? $response : $contents;
 
-            return ! is_null($response) ? $response : $contents;
+            if (is_string($contents)) {
+                $contents = $this->factory->flushStateIfDoneRendering($contents) ?: $contents;
+            } else {
+                $this->factory->flushStateIfDoneRendering();
+            }
+
+            return $contents;
         } catch (Throwable $e) {
             $this->factory->flushState();
 

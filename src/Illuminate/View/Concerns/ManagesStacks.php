@@ -28,6 +28,13 @@ trait ManagesStacks
     protected $pushStack = [];
 
     /**
+     * All deferred stack placeholders awaiting resolution.
+     *
+     * @var array
+     */
+    protected $deferredStacks = [];
+
+    /**
      * Start injecting content into a push section.
      *
      * @param  string  $section
@@ -148,6 +155,25 @@ trait ManagesStacks
      */
     public function yieldPushContent($section, $default = '')
     {
+        if ($this->renderCount > 0) {
+            $placeholder = '@@stack::'.$section.'::'.uniqid().'@@';
+            $this->deferredStacks[$placeholder] = [$section, $default];
+
+            return $placeholder;
+        }
+
+        return $this->resolvePushContent($section, $default);
+    }
+
+    /**
+     * Resolve the push content for a given section.
+     *
+     * @param  string  $section
+     * @param  string  $default
+     * @return string
+     */
+    protected function resolvePushContent($section, $default = '')
+    {
         if ($this->isStackEmpty($section)) {
             return $default;
         }
@@ -161,6 +187,27 @@ trait ManagesStacks
         if (isset($this->pushes[$section])) {
             $output .= implode('', $this->pushes[$section]);
         }
+
+        return $output;
+    }
+
+    /**
+     * Resolve all deferred stack placeholders in the given output.
+     *
+     * @param  string  $output
+     * @return string
+     */
+    public function resolveDeferredStacks(string $output): string
+    {
+        foreach ($this->deferredStacks as $placeholder => [$section, $default]) {
+            $output = str_replace(
+                $placeholder,
+                $this->resolvePushContent($section, $default),
+                $output
+            );
+        }
+
+        $this->deferredStacks = [];
 
         return $output;
     }
@@ -183,5 +230,6 @@ trait ManagesStacks
         $this->pushes = [];
         $this->prepends = [];
         $this->pushStack = [];
+        $this->deferredStacks = [];
     }
 }

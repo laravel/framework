@@ -520,11 +520,14 @@ class Factory implements FactoryContract
      *
      * @return void
      */
-    public function flushStateIfDoneRendering()
+    public function flushStateIfDoneRendering(string $output = ''): string
     {
         if ($this->doneRendering()) {
+            $output = $this->resolveDeferredStacks($output);
             $this->flushState();
         }
+
+        return $output;
     }
 
     /**
