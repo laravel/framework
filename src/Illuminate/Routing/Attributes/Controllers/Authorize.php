@@ -11,11 +11,11 @@ use UnitEnum;
 class Authorize extends Middleware
 {
     /**
-     * @param  array<string>|string|null  $models
+     * @param  array<\UnitEnum|string>|\UnitEnum|string|null  $models
      */
     public function __construct(
         UnitEnum|string $ability,
-        array|string|null $models = null,
+        array|UnitEnum|string|null $models = null,
         ?array $only = null,
         ?array $except = null,
     ) {

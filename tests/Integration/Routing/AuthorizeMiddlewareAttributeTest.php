@@ -21,6 +21,7 @@ class AuthorizeMiddlewareAttributeTest extends TestCase
         $this->assertEquals([
             'Illuminate\Auth\Middleware\Authorize:all',
             'Illuminate\Auth\Middleware\Authorize:except-index,a,b',
+            'Illuminate\Auth\Middleware\Authorize:view-related,post,comment',
         ], $route->controllerMiddleware());
     }
 }
@@ -28,6 +29,7 @@ class AuthorizeMiddlewareAttributeTest extends TestCase
 #[Authorize('all')]
 #[Authorize('only-index', 'a', only: ['index'])]
 #[Authorize('except-index', ['a', 'b'], except: ['index'])]
+#[Authorize(AuthorizeMiddlewareAttributeAbility::ViewRelated, [AuthorizeMiddlewareAttributeModel::Post, AuthorizeMiddlewareAttributeModel::Comment], except: ['index'])]
 class AuthorizeMiddlewareAttributeController
 {
     #[Authorize('also-index')]
@@ -40,4 +42,15 @@ class AuthorizeMiddlewareAttributeController
     {
         // ...
     }
+}
+
+enum AuthorizeMiddlewareAttributeAbility: string
+{
+    case ViewRelated = 'view-related';
+}
+
+enum AuthorizeMiddlewareAttributeModel: string
+{
+    case Post = 'post';
+    case Comment = 'comment';
 }

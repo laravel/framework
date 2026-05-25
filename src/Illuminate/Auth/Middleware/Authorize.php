@@ -32,12 +32,12 @@ class Authorize
      * Specify the ability and models for the middleware.
      *
      * @param  \UnitEnum|string  $ability
-     * @param  string  ...$models
+     * @param  \UnitEnum|string  ...$models
      * @return string
      */
     public static function using($ability, ...$models)
     {
-        return static::class.':'.implode(',', [enum_value($ability), ...$models]);
+        return static::class.':'.implode(',', [enum_value($ability), ...array_map(enum_value(...), $models)]);
     }
 
     /**

@@ -65,6 +65,9 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $signature = Authorize::using('ability', 'model', \App\Models\Comment::class);
         $this->assertSame('Illuminate\Auth\Middleware\Authorize:ability,model,App\Models\Comment', $signature);
+
+        $signature = Authorize::using(AbilitiesEnum::UPDATE, ModelsEnum::POST, ModelsEnum::COMMENT);
+        $this->assertSame('Illuminate\Auth\Middleware\Authorize:update,post,App\Models\Comment', $signature);
     }
 
     public function testSimpleAbilityUnauthorized()
