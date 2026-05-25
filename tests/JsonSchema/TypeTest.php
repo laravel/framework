@@ -300,6 +300,9 @@ class TypeTest extends TestCase
                 ]),
                 (object) ['age' => 0], // not nullable
             ],
+            [JsonSchema::object()->min(1), (object) ['a' => 1]],
+            [JsonSchema::object()->max(2), (object) ['a' => 1, 'b' => 2]],
+            [JsonSchema::object()->min(1)->max(2), (object) ['a' => 1]],
 
             // ArrayType
             [JsonSchema::array(), []],
@@ -397,6 +400,8 @@ class TypeTest extends TestCase
             [JsonSchema::object(['name' => JsonSchema::string()->required()])->default(['name' => 'x']), (object) []], // default doesn't satisfy missing required
             [JsonSchema::object(['score' => JsonSchema::integer()->min(0)]), (object) ['score' => -1]], // below min
             [JsonSchema::object(['age' => JsonSchema::integer()->nullable(false)]), (object) ['age' => null]], // not nullable
+            [JsonSchema::object()->min(2), (object) ['a' => 1]], // too few properties
+            [JsonSchema::object()->max(1), (object) ['a' => 1, 'b' => 2]], // too many properties
 
             // ArrayType
             [JsonSchema::array(), (object) []], // type mismatch

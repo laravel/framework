@@ -103,6 +103,47 @@ class ObjectTypeTest extends TestCase
         ], $type->toArray());
     }
 
+    public function test_it_may_set_min_properties(): void
+    {
+        $type = JsonSchema::object()->title('Payload')->min(1);
+
+        $this->assertEquals([
+            'type' => 'object',
+            'title' => 'Payload',
+            'minProperties' => 1,
+        ], $type->toArray());
+    }
+
+    public function test_it_may_set_max_properties(): void
+    {
+        $type = JsonSchema::object()->description('A record')->max(5);
+
+        $this->assertEquals([
+            'type' => 'object',
+            'description' => 'A record',
+            'maxProperties' => 5,
+        ], $type->toArray());
+    }
+
+    public function test_it_may_combine_min_and_max_properties(): void
+    {
+        $type = JsonSchema::object([
+            'name' => JsonSchema::string()->required(),
+        ])->min(1)->max(3);
+
+        $this->assertEquals([
+            'type' => 'object',
+            'properties' => [
+                'name' => [
+                    'type' => 'string',
+                ],
+            ],
+            'required' => ['name'],
+            'minProperties' => 1,
+            'maxProperties' => 3,
+        ], $type->toArray());
+    }
+
     public function test_it_may_set_enum(): void
     {
         $type = JsonSchema::object()->enum([
