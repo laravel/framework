@@ -136,7 +136,7 @@ class Number
      *
      * @param  int|float  $number
      * @param  string|null  $locale
-     * @return string
+     * @return string|false
      */
     public static function spellOrdinal(int|float $number, ?string $locale = null)
     {
