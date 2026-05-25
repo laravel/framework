@@ -6,6 +6,7 @@ use Illuminate\Cache\DatabaseLock;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\QueryException;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -99,6 +100,56 @@ class DatabaseLockTest extends DatabaseTestCase
         $secondLock = Cache::store('database')->restoreLock('foo', 'other_owner');
         $this->assertTrue($secondLock->isOwnedBy($firstLock->owner()));
         $this->assertFalse($secondLock->isOwnedByCurrentProcess());
+    }
+
+    public function testAcquireRethrowsInsertQueryExceptionsThatAreNotUniqueConstraintViolations()
+    {
+        $connection = m::mock(Connection::class);
+        $insertBuilder = m::mock(Builder::class);
+
+        $insertBuilder->shouldReceive('insert')->once()->andThrow(
+            new QueryException(
+                'mysql',
+                'insert into cache_locks (`key`, `owner`, `expiration`) values (?, ?, ?)',
+                ['foo', 'owner-123', 1],
+                new PDOException('Table does not exist', 1146)
+            )
+        );
+
+        $connection->shouldReceive('table')->with('cache_locks')->once()->andReturn($insertBuilder);
+
+        $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 10, 'owner-123', lottery: null);
+
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('Table does not exist');
+
+        $lock->acquire();
+    }
+
+    public function testAcquireFallsBackToUpdatingExistingLockAfterUniqueConstraintViolation()
+    {
+        $connection = m::mock(Connection::class);
+        $insertBuilder = m::mock(Builder::class);
+        $updateBuilder = m::mock(Builder::class);
+
+        $insertBuilder->shouldReceive('insert')->once()->andThrow(
+            new UniqueConstraintViolationException(
+                'mysql',
+                'insert into cache_locks (`key`, `owner`, `expiration`) values (?, ?, ?)',
+                ['foo', 'owner-123', 1],
+                new PDOException('Duplicate entry', 1062)
+            )
+        );
+
+        $updateBuilder->shouldReceive('where')->with('key', 'foo')->once()->andReturnSelf();
+        $updateBuilder->shouldReceive('where')->with(m::type('Closure'))->once()->andReturnSelf();
+        $updateBuilder->shouldReceive('update')->once()->andReturn(1);
+
+        $connection->shouldReceive('table')->with('cache_locks')->andReturn($insertBuilder, $updateBuilder);
+
+        $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 10, 'owner-123', lottery: null);
+
+        $this->assertTrue($lock->acquire());
     }
 
     #[TestWith(['Deadlock found when trying to get lock', 1213, true])]

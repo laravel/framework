@@ -4,7 +4,7 @@ namespace Illuminate\Cache;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\DetectsConcurrencyErrors;
-use Illuminate\Database\QueryException;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Throwable;
 
 class DatabaseLock extends Lock
@@ -77,7 +77,7 @@ class DatabaseLock extends Lock
             ]);
 
             $acquired = true;
-        } catch (QueryException) {
+        } catch (UniqueConstraintViolationException) {
             $updated = $this->connection->table($this->table)
                 ->where('key', $this->name)
                 ->where(function ($query) {
