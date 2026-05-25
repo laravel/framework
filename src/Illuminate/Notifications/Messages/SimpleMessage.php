@@ -174,6 +174,18 @@ class SimpleMessage
     }
 
     /**
+     * Add a line of text to the notification unless the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  mixed  $line
+     * @return $this
+     */
+    public function lineUnless($boolean, $line)
+    {
+        return $this->lineIf(! $boolean, $line);
+    }
+
+    /**
      * Add lines of text to the notification.
      *
      * @param  iterable  $lines
@@ -202,6 +214,18 @@ class SimpleMessage
         }
 
         return $this;
+    }
+
+    /**
+     * Add lines of text to the notification unless the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  iterable  $lines
+     * @return $this
+     */
+    public function linesUnless($boolean, $lines)
+    {
+        return $this->linesIf(! $boolean, $lines);
     }
 
     /**

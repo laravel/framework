@@ -185,6 +185,32 @@ class NotificationMailMessageTest extends TestCase
         $this->assertSame([$callback], $message->callbacks);
     }
 
+    public function testLineUnless()
+    {
+        $message = new MailMessage;
+        $message->lineUnless(false, 'Shown when condition is false');
+
+        $this->assertSame(['Shown when condition is false'], $message->introLines);
+
+        $message = new MailMessage;
+        $message->lineUnless(true, 'Hidden when condition is true');
+
+        $this->assertSame([], $message->introLines);
+    }
+
+    public function testLinesUnless()
+    {
+        $message = new MailMessage;
+        $message->linesUnless(false, ['First line', 'Second line']);
+
+        $this->assertSame(['First line', 'Second line'], $message->introLines);
+
+        $message = new MailMessage;
+        $message->linesUnless(true, ['First line', 'Second line']);
+
+        $this->assertSame([], $message->introLines);
+    }
+
     public function testWhenCallback()
     {
         $callback = function (MailMessage $mailMessage, $condition) {
