@@ -96,7 +96,7 @@ class Number
      * @param  string|null  $locale
      * @param  int|null  $after
      * @param  int|null  $until
-     * @return string
+     * @return string|false
      */
     public static function spell(int|float $number, ?string $locale = null, ?int $after = null, ?int $until = null)
     {
@@ -120,7 +120,7 @@ class Number
      *
      * @param  int|float  $number
      * @param  string|null  $locale
-     * @return string
+     * @return string|false
      */
     public static function ordinal(int|float $number, ?string $locale = null)
     {
@@ -136,7 +136,7 @@ class Number
      *
      * @param  int|float  $number
      * @param  string|null  $locale
-     * @return string
+     * @return string|false
      */
     public static function spellOrdinal(int|float $number, ?string $locale = null)
     {
