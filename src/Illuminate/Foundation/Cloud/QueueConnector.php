@@ -2,12 +2,17 @@
 
 namespace Illuminate\Foundation\Cloud;
 
+use Aws\CommandInterface;
+use Aws\Exception\AwsException;
+use Aws\Sqs\SqsClient;
 use Illuminate\Foundation\Application;
 use Illuminate\Queue\Connectors\ConnectorInterface;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\WorkerStopping;
+use Illuminate\Queue\SqsQueue;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerStopReason;
+use Psr\Http\Message\RequestInterface;
 
 class QueueConnector implements ConnectorInterface
 {
@@ -31,11 +36,17 @@ class QueueConnector implements ConnectorInterface
      */
     public function connect(array $config): Queue
     {
+        $underlying = $this->connector->connect($config['connection']);
+
         $queue = new Queue(
-            $this->connector->connect($config['connection']),
+            $underlying,
             $this->app[Events::class],
             $config,
         );
+
+        if ($underlying instanceof SqsQueue) {
+            $this->registerErrorHandling($underlying->getSqs(), $queue);
+        }
 
         $this->configureQueue($queue);
 
@@ -47,6 +58,30 @@ class QueueConnector implements ConnectorInterface
         $this->configureFailedJobProvider($queue);
 
         return $queue;
+    }
+
+    /**
+     * Register SQS client middleware that translates "queue does not exist"
+     * errors into a ManagedQueueNotFoundException with the queue name.
+     */
+    protected function registerErrorHandling(SqsClient $sqs, Queue $queue): void
+    {
+        $sqs->getHandlerList()->appendSign(function (callable $handler) use ($queue) {
+            return function (CommandInterface $command, RequestInterface $request) use ($handler, $queue) {
+                return $handler($command, $request)->otherwise(function ($reason) use ($command, $queue) {
+                    if ($reason instanceof AwsException &&
+                        $reason->getAwsErrorCode() === 'AWS.SimpleQueueService.NonExistentQueue') {
+                        $name = $queue->normalizeQueue($command['QueueUrl'] ?? null);
+
+                        throw new ManagedQueueNotFoundException(
+                            "Managed queue [{$name}] does not exist.", 0, $reason,
+                        );
+                    }
+
+                    throw $reason;
+                });
+            };
+        }, 'managed-queue-not-found');
     }
 
     /**
