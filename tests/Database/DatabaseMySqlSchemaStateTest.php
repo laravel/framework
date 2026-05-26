@@ -116,7 +116,7 @@ class DatabaseMySqlSchemaStateTest extends TestCase
                 'database' => 'forge',
                 'options' => [
                     defined('Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT')
-                                ? Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT
+                                ? Mysql::ATTR_SSL_VERIFY_SERVER_CERT
                                 : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
                 ],
             ],

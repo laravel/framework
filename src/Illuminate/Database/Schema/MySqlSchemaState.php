@@ -132,7 +132,7 @@ class MySqlSchemaState extends SchemaState
         }
 
         $sslVerifyConst = defined('Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT')
-            ? Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT
+            ? Mysql::ATTR_SSL_VERIFY_SERVER_CERT
             : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT;
 
         if (($config['options'][$sslVerifyConst] ?? null) === false) {
