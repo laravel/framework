@@ -50,7 +50,7 @@ class KeyGenerateCommand extends Command
         // automatically setup for this developer. This key gets generated using a
         // secure random byte generator and is later base64 encoded for storage.
         if (! $this->setKeyInEnvironmentFile($key)) {
-            return;
+            return Command::FAILURE;
         }
 
         $this->laravel['config']['app.key'] = $key;
