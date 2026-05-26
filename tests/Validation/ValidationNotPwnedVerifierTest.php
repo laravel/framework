@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Validation;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\Client\Response;
@@ -43,7 +44,7 @@ class ValidationNotPwnedVerifierTest extends TestCase
         $httpFactory
             ->shouldReceive('withHeaders')
             ->once()
-            ->with(['Add-Padding' => true])
+            ->with(['Add-Padding' => true, 'User-Agent' => 'Laravel/'.Application::VERSION])
             ->andReturn($httpFactory);
 
         $httpFactory
@@ -80,7 +81,7 @@ class ValidationNotPwnedVerifierTest extends TestCase
         $httpFactory
             ->shouldReceive('withHeaders')
             ->once()
-            ->with(['Add-Padding' => true])
+            ->with(['Add-Padding' => true, 'User-Agent' => 'Laravel/'.Application::VERSION])
             ->andReturn($httpFactory);
 
         $httpFactory
@@ -122,7 +123,7 @@ class ValidationNotPwnedVerifierTest extends TestCase
         $httpFactory
             ->shouldReceive('withHeaders')
             ->once()
-            ->with(['Add-Padding' => true])
+            ->with(['Add-Padding' => true, 'User-Agent' => 'Laravel/'.Application::VERSION])
             ->andReturn($httpFactory);
 
         $httpFactory
@@ -168,7 +169,7 @@ class ValidationNotPwnedVerifierTest extends TestCase
         $httpFactory
             ->shouldReceive('withHeaders')
             ->once()
-            ->with(['Add-Padding' => true])
+            ->with(['Add-Padding' => true, 'User-Agent' => 'Laravel/'.Application::VERSION])
             ->andReturn($httpFactory);
 
         $httpFactory
@@ -189,5 +190,64 @@ class ValidationNotPwnedVerifierTest extends TestCase
         ]));
 
         unset($container[ExceptionHandler::class]);
+    }
+
+    public function testSendsDefaultUserAgentHeader()
+    {
+        $httpFactory = m::mock(HttpFactory::class);
+        $response = m::mock(Response::class);
+
+        $httpFactory
+            ->shouldReceive('withHeaders')
+            ->once()
+            ->with(['Add-Padding' => true, 'User-Agent' => 'Laravel/'.Application::VERSION])
+            ->andReturn($httpFactory);
+
+        $httpFactory
+            ->shouldReceive('timeout')
+            ->once()
+            ->with(30)
+            ->andReturn($httpFactory);
+
+        $httpFactory->shouldReceive('get')->once()->andReturn($response);
+        $response->shouldReceive('successful')->once()->andReturn(true);
+        $response->shouldReceive('body')->once()->andReturn('');
+
+        $verifier = new NotPwnedVerifier($httpFactory);
+
+        $this->assertTrue($verifier->verify([
+            'value' => 123123123,
+            'threshold' => 0,
+        ]));
+    }
+
+    public function testWithUserAgentOverridesDefault()
+    {
+        $httpFactory = m::mock(HttpFactory::class);
+        $response = m::mock(Response::class);
+
+        $httpFactory
+            ->shouldReceive('withHeaders')
+            ->once()
+            ->with(['Add-Padding' => true, 'User-Agent' => 'MyApp/1.0 (security@example.com)'])
+            ->andReturn($httpFactory);
+
+        $httpFactory
+            ->shouldReceive('timeout')
+            ->once()
+            ->with(30)
+            ->andReturn($httpFactory);
+
+        $httpFactory->shouldReceive('get')->once()->andReturn($response);
+        $response->shouldReceive('successful')->once()->andReturn(true);
+        $response->shouldReceive('body')->once()->andReturn('');
+
+        $verifier = (new NotPwnedVerifier($httpFactory))
+            ->withUserAgent('MyApp/1.0 (security@example.com)');
+
+        $this->assertTrue($verifier->verify([
+            'value' => 123123123,
+            'threshold' => 0,
+        ]));
     }
 }

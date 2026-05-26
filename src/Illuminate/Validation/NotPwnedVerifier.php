@@ -4,6 +4,7 @@ namespace Illuminate\Validation;
 
 use Exception;
 use Illuminate\Contracts\Validation\UncompromisedVerifier;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Stringable;
 
 class NotPwnedVerifier implements UncompromisedVerifier
@@ -23,6 +24,13 @@ class NotPwnedVerifier implements UncompromisedVerifier
     protected $timeout;
 
     /**
+     * The User-Agent header sent with requests to the Have I Been Pwned API.
+     *
+     * @var string|null
+     */
+    protected $userAgent;
+
+    /**
      * Create a new uncompromised verifier.
      *
      * @param  \Illuminate\Http\Client\Factory  $factory
@@ -32,6 +40,19 @@ class NotPwnedVerifier implements UncompromisedVerifier
     {
         $this->factory = $factory;
         $this->timeout = $timeout ?? 30;
+    }
+
+    /**
+     * Set the User-Agent header sent with requests to the Have I Been Pwned API.
+     *
+     * @param  string  $userAgent
+     * @return $this
+     */
+    public function withUserAgent(string $userAgent)
+    {
+        $this->userAgent = $userAgent;
+
+        return $this;
     }
 
     /**
@@ -85,6 +106,7 @@ class NotPwnedVerifier implements UncompromisedVerifier
         try {
             $response = $this->factory->withHeaders([
                 'Add-Padding' => true,
+                'User-Agent' => $this->userAgent ?? $this->defaultUserAgent(),
             ])->timeout($this->timeout)->get(
                 'https://api.pwnedpasswords.com/range/'.$hashPrefix
             );
@@ -99,5 +121,20 @@ class NotPwnedVerifier implements UncompromisedVerifier
         return (new Stringable($body))->trim()->explode("\n")->filter(function ($line) {
             return str_contains($line, ':');
         });
+    }
+
+    /**
+     * Get the default User-Agent header sent with requests to the Have I Been Pwned API.
+     *
+     * @return string
+     */
+    protected function defaultUserAgent()
+    {
+        // App name intentionally omitted — leaking it to a third-party API requires explicit opt-in via withUserAgent().
+        if (class_exists(Application::class)) {
+            return 'Laravel/'.Application::VERSION;
+        }
+
+        return 'Laravel';
     }
 }
