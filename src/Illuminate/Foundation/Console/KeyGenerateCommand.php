@@ -37,7 +37,7 @@ class KeyGenerateCommand extends Command
     public function handle()
     {
         if ($this->isProhibited()) {
-            return;
+            return Command::FAILURE;
         }
 
         $key = $this->generateRandomKey();
