@@ -95,8 +95,6 @@ class ListFailedCommand extends Command
             return $payload['job'] ?? null;
         }
 
-        // Prefer the displayName set by Queue::createPayloadArray() so wrapper jobs
-        // (CallQueuedListener, SendQueuedMailable, etc.) show the underlying class.
         if (! empty($payload['displayName']) && is_string($payload['displayName'])) {
             return $payload['displayName'];
         }
