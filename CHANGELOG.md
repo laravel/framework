@@ -1,6 +1,36 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.11.2...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.12.0...13.x)
+
+## [v13.12.0](https://github.com/laravel/framework/compare/v13.11.2...v13.12.0) - 2026-05-26
+
+* [13.x] Accept Symfony's new control-characters exception message in mailer test by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/60202
+* [13.x] Ability to opt out of worker restart on lost connection by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60201
+* [13.x] Resolve scheduled event callback parameter by type rather than name by [@kayw-geek](https://github.com/kayw-geek) in https://github.com/laravel/framework/pull/60197
+* [13.x] default clear() queue driver param to null by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60192
+* [13.x] Fix path separator being encoded for LocalFilesystemAdapter by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60194
+* [13.x] feat: add factory to pivot stub by [@ludo237](https://github.com/ludo237) in https://github.com/laravel/framework/pull/60204
+* [13.x] Fix incorrect type hint in Optional::offsetUnset() docblock by [@rpsohag](https://github.com/rpsohag) in https://github.com/laravel/framework/pull/60207
+* [13.x] Make ClearCommand prohibitable by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60215
+* [13.x] Allow auto discovered listeners to opt out of discovery by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60209
+* [13.x] Ensure Up/Down commands report exceptions by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60232
+* [13.x] Fix path separator encoding in temporaryUrl on local disk by [@kayw-geek](https://github.com/kayw-geek) in https://github.com/laravel/framework/pull/60230
+* [13.x] Add assertJsonPathsCanonicalizing to TestResponse by [@Tresor-Kasenda](https://github.com/Tresor-Kasenda) in https://github.com/laravel/framework/pull/60225
+* [13.x] Add `normalize` parameter to `Str::studly()` and `Str::pascal()` by [@hotmeteor](https://github.com/hotmeteor) in https://github.com/laravel/framework/pull/60229
+* [13.x] Fix async HTTP retries when using array backoff values by [@LucasCavalheri](https://github.com/LucasCavalheri) in https://github.com/laravel/framework/pull/60214
+* [13.x] Replace compact with explicit arrays by [@parkourben99](https://github.com/parkourben99) in https://github.com/laravel/framework/pull/60234
+* [13.x] Add prohibited to KeyGenerateCommand by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60224
+* [13.x] remove last `compact()` call by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/60235
+* [13.x] Allow JsonSchema fluent boolean flags to be unset by [@LucasCavalheri](https://github.com/LucasCavalheri) in https://github.com/laravel/framework/pull/60239
+* [13.x] battle harden when scheme is present in the config by [@DGarbs51](https://github.com/DGarbs51) in https://github.com/laravel/framework/pull/60237
+* [13.x] Rector : Always convert `compact()` to variables by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/60236
+* [13.x] Add attributes to Scheduler by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/60255
+* [13.x] Guard base_path() call in SQLiteConnector for standalone usage by [@YoussefMansour9](https://github.com/YoussefMansour9) in https://github.com/laravel/framework/pull/60266
+* [13.x] Fix incorrect [@return](https://github.com/return) types in Number::spell(), ordinal(), and spellOrdinal() by [@AmdadulShakib](https://github.com/AmdadulShakib) in https://github.com/laravel/framework/pull/60263
+* [13.x] Supports using URI-based connection for SQLite using `file:` prefix by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/60261
+* [13.x] Add `Client\Request::uri()` by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/60282
+* [13.x] View\Factory::flushComponents() doesn't reset $slots / $slotStack by [@martinsoenen](https://github.com/martinsoenen) in https://github.com/laravel/framework/pull/60283
+* [13.x] Throw ManagedQueueNotFoundException when a managed queue is missing by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/60275
 
 ## [v13.11.2](https://github.com/laravel/framework/compare/v13.11.1...v13.11.2) - 2026-05-20
 
