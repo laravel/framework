@@ -61,8 +61,7 @@ class QueueConnector implements ConnectorInterface
     }
 
     /**
-     * Register SQS client middleware that translates "queue does not exist"
-     * errors into a ManagedQueueNotFoundException with the queue name.
+     * Register SQS client middleware that translates "queue does not exist" errors into ManagedQueueNotFoundExceptions.
      */
     protected function registerErrorHandling(SqsClient $sqs, Queue $queue): void
     {
