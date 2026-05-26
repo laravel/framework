@@ -2,12 +2,17 @@
 
 namespace Tests\Tests\Foundation;
 
+use Aws\CommandInterface;
+use Aws\Exception\AwsException;
+use Aws\HandlerList;
+use Aws\MockHandler;
 use Aws\Result;
 use Aws\Sqs\SqsClient;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Foundation\Cloud;
 use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\Cloud\FailedJobProvider;
+use Illuminate\Foundation\Cloud\ManagedQueueNotFoundException;
 use Illuminate\Foundation\Cloud\Queue;
 use Illuminate\Foundation\Cloud\QueueConnector;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -856,6 +861,56 @@ class QueueTest extends TestCase
         $this->assertEmpty($eventsFake->emitted);
     }
 
+    public function testItThrowsManagedQueueNotFoundExceptionWhenQueueDoesNotExist()
+    {
+        Cloud::configureManagedQueues($this->app);
+        Cloud::bootManagedQueues($this->app);
+        $this->fakeEvents();
+
+        $mock = new MockHandler();
+        $mock->append(fn (CommandInterface $cmd) => new AwsException('Queue does not exist.', $cmd, [
+            'code' => 'AWS.SimpleQueueService.NonExistentQueue',
+        ]));
+
+        $client = new SqsClient([
+            'region' => 'us-east-2',
+            'version' => 'latest',
+            'handler' => $mock,
+            'credentials' => false,
+        ]);
+
+        $this->app->instance(QueueConnector::class, new QueueConnector(new class($client) implements ConnectorInterface
+        {
+            public function __construct(private $client)
+            {
+            }
+
+            public function connect($config)
+            {
+                return new SqsQueue(
+                    $this->client,
+                    $config['queue'],
+                    $config['prefix'] ?? '',
+                    $config['suffix'] ?? '',
+                    $config['after_commit'] ?? null,
+                    $config['overflow'] ?? [],
+                );
+            }
+        }, $this->app));
+
+        $this->app['queue']->addConnector('cloud', $this->app->factory(QueueConnector::class));
+
+        $queue = $this->app['queue']->connection('cloud');
+
+        try {
+            $queue->push(new FakeJob, queue: 'missing-queue');
+            $this->fail('Expected ManagedQueueNotFoundException was not thrown.');
+        } catch (ManagedQueueNotFoundException $e) {
+            $this->assertSame('A managed queue does not exist with name [missing-queue].', $e->getMessage());
+            $this->assertInstanceOf(AwsException::class, $e->getPrevious());
+        }
+    }
+
     public function testItUsesConfigValuesToNormalizeQueueName()
     {
         Cloud::configureManagedQueues($this->app);
@@ -877,6 +932,7 @@ class QueueTest extends TestCase
     private function mockedQueue()
     {
         $client = $this->mock(SqsClient::class);
+        $client->shouldReceive('getHandlerList')->andReturn(new HandlerList());
 
         $this->app->instance(QueueConnector::class, new QueueConnector(new class($client) implements ConnectorInterface
         {
