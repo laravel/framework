@@ -1,6 +1,12 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.60.2...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.61.0...12.x)
+
+## [v12.61.0](https://github.com/laravel/framework/compare/v12.60.2...v12.61.0) - 2026-05-26
+
+* [12.x] Accept Symfony's new control-characters exception message in mailer test by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/60203
+* [12.x] Fix queue:failed command to show real class name by [@clementmas](https://github.com/clementmas) in https://github.com/laravel/framework/pull/60279
+* [12.x] Throw ManagedQueueNotFoundException when a managed queue is missing by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/60276
 
 ## [v12.60.2](https://github.com/laravel/framework/compare/v12.60.1...v12.60.2) - 2026-05-20
 
