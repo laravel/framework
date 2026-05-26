@@ -6,6 +6,7 @@ use Exception;
 use Generator;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\Schema\MySqlSchemaState;
+use PDO;
 use Pdo\Mysql;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -114,7 +115,9 @@ class DatabaseMySqlSchemaStateTest extends TestCase
                 'username' => 'root',
                 'database' => 'forge',
                 'options' => [
-                    Mysql::ATTR_SSL_VERIFY_SERVER_CERT => false,
+                    defined('Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT')
+                                ? Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT
+                                : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
                 ],
             ],
         ];

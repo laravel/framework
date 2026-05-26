@@ -5,6 +5,7 @@ namespace Database;
 use Generator;
 use Illuminate\Database\MariaDbConnection;
 use Illuminate\Database\Schema\MariaDbSchemaState;
+use PDO;
 use Pdo\Mysql;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -112,7 +113,7 @@ class DatabaseMariaDbSchemaStateTest extends TestCase
                 'username' => 'root',
                 'database' => 'forge',
                 'options' => [
-                    Mysql::ATTR_SSL_VERIFY_SERVER_CERT => false,
+                    defined('Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT') ? Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
                 ],
             ],
         ];
