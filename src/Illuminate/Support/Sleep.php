@@ -142,7 +142,7 @@ class Sleep
      */
     protected function duration($duration)
     {
-        if (! $duration instanceof DateInterval) {
+        if (!$duration instanceof DateInterval) {
             $this->duration = CarbonInterval::microsecond(0);
 
             $this->pending = $duration;
@@ -203,7 +203,6 @@ class Sleep
     {
         return $this->minutes();
     }
-
 
     /**
      * Sleep for the given number of seconds.
@@ -331,7 +330,7 @@ class Sleep
      */
     protected function goodnight()
     {
-        if ($this->alreadySlept || ! $this->shouldSleep) {
+        if ($this->alreadySlept || !$this->shouldSleep) {
             return;
         }
 
@@ -552,7 +551,7 @@ class Sleep
      */
     public function unless($condition)
     {
-        return $this->when(! value($condition, $this));
+        return $this->when(!value($condition, $this));
     }
 
     /**
