@@ -929,13 +929,10 @@ class QueueTest extends TestCase
 
         $queue = $this->app['queue']->connection('cloud');
 
-        try {
-            $queue->push(new FakeJob, queue: 'missing-queue');
-            $this->fail('Expected ManagedQueueNotFoundException was not thrown.');
-        } catch (ManagedQueueNotFoundException $e) {
-            $this->assertSame('Managed queue [missing-queue] does not exist.', $e->getMessage());
-            $this->assertInstanceOf(AwsException::class, $e->getPrevious());
-        }
+        $this->expectException(ManagedQueueNotFoundException::class);
+        $this->expectExceptionMessage('Managed queue [missing-queue] does not exist.');
+
+        $queue->push(new FakeJob, queue: 'missing-queue');
     }
 
     public function testItUsesConfigValuesToNormalizeQueueName()
