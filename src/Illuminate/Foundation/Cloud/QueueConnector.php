@@ -74,7 +74,7 @@ class QueueConnector implements ConnectorInterface
                         $name = $queue->normalizeQueue($command['QueueUrl'] ?? null);
 
                         throw new ManagedQueueNotFoundException(
-                            "A managed queue does not exist with name [{$name}].", 0, $reason,
+                            "Managed queue [{$name}] does not exist.", 0, $reason,
                         );
                     }
 
