@@ -5,6 +5,7 @@ namespace Illuminate\Database\Schema;
 use Exception;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Str;
+use PDO;
 use Pdo\Mysql;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -130,7 +131,11 @@ class MySqlSchemaState extends SchemaState
             $value .= ' --ssl-key="${:LARAVEL_LOAD_SSL_KEY}"';
         }
 
-        if (($config['options'][Mysql::ATTR_SSL_VERIFY_SERVER_CERT] ?? null) === false) {
+        $sslVerifyConst = defined('Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT')
+            ? Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT
+            : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT;
+
+        if (($config['options'][$sslVerifyConst] ?? null) === false) {
             if (version_compare($versionInfo['version'], '5.7.11', '>=') && ! $versionInfo['isMariaDb']) {
                 $value .= ' --ssl-mode=DISABLED';
             } else {
