@@ -38,6 +38,7 @@ use Illuminate\Support\Defer\DeferredCallback;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
+use Illuminate\Support\Uri;
 use Illuminate\Support\Stringable;
 use JsonSerializable;
 use Mockery as m;
@@ -1129,6 +1130,18 @@ class HttpClientTest extends TestCase
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'http://foo.com/get?foo=bar'
                 && $request['foo'] === 'bar';
+        });
+    }
+
+    public function testRequestUriMethod()
+    {
+        $this->factory->fake();
+
+        $this->factory->get('http://foo.com/get?foo=bar&page=1');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->uri() instanceof Uri
+                && (string) $request->uri() === 'http://foo.com/get?foo=bar&page=1';
         });
     }
 
