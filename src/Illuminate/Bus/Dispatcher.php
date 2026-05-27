@@ -256,17 +256,17 @@ class Dispatcher implements QueueingDispatcher
                 continue;
             }
 
-            $connectionName = $this->getAttributeValue($job, Connection::class, 'connection')
+            $connection = $this->getAttributeValue($job, Connection::class, 'connection')
                 ?? $this->resolveConnectionFromQueueRoute($job)
                 ?? null;
 
-            $queueName = $this->getAttributeValue($job, QueueAttribute::class, 'queue')
+            $queue = $this->getAttributeValue($job, QueueAttribute::class, 'queue')
                 ?? $this->resolveQueueFromQueueRoute($job)
                 ?? null;
 
-            $groups[$connectionName.':'.$queueName]['connection'] = $connectionName;
-            $groups[$connectionName.':'.$queueName]['queue'] = $queueName;
-            $groups[$connectionName.':'.$queueName]['jobs'][] = $job;
+            $groups[$connection.':'.$queue]['connection'] = $connection;
+            $groups[$connection.':'.$queue]['queue'] = $queue;
+            $groups[$connection.':'.$queue]['jobs'][] = $job;
         }
 
         foreach ($groups as $group) {
