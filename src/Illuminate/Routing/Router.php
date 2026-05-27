@@ -19,6 +19,7 @@ use Illuminate\Routing\Events\PreparingResponse;
 use Illuminate\Routing\Events\ResponsePrepared;
 use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Routing\Events\Routing;
+use Illuminate\Routing\Middleware\CacheStaticResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -813,7 +814,7 @@ class Router implements BindingRegistrar, RegistrarContract
         $shouldSkipMiddleware = $this->container->bound('middleware.disable') &&
                                 $this->container->make('middleware.disable') === true;
 
-        $middleware = $shouldSkipMiddleware ? [] : $this->gatherRouteMiddleware($route);
+        $middleware = $shouldSkipMiddleware ? [] : $this->gatherRouteMiddleware($route, $request);
 
         return (new Pipeline($this->container))
             ->send($request)
@@ -827,11 +828,57 @@ class Router implements BindingRegistrar, RegistrarContract
      * Gather the middleware for the given route with resolved class names.
      *
      * @param  \Illuminate\Routing\Route  $route
+     * @param  \Illuminate\Http\Request|null  $request
      * @return array
      */
-    public function gatherRouteMiddleware(Route $route)
+    public function gatherRouteMiddleware(Route $route, ?Request $request = null)
     {
-        return $this->resolveMiddleware($route->gatherMiddleware(), $route->excludedMiddleware());
+        $excluded = $route->excludedMiddleware();
+
+        if ($this->shouldExcludeStaticRouteMiddleware($route, $request)) {
+            $excluded = array_merge($excluded, $this->staticRouteExcludedMiddleware($route));
+        }
+
+        return $this->resolveMiddleware($route->gatherMiddleware(), $excluded);
+    }
+
+    /**
+     * Determine if static route middleware should be removed for this request.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @param  \Illuminate\Http\Request|null  $request
+     * @return bool
+     */
+    protected function shouldExcludeStaticRouteMiddleware(Route $route, ?Request $request = null)
+    {
+        return ! is_null($request) &&
+            array_key_exists('static_cache', $route->getAction()) &&
+            ! $request->headers->has('X-Inertia') &&
+            $request->isMethodCacheable();
+    }
+
+    /**
+     * Get the middleware that should be excluded for static routes.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return array
+     */
+    protected function staticRouteExcludedMiddleware(Route $route)
+    {
+        $defaults = CacheStaticResponse::defaultOptions();
+        $routeOptions = $route->getAction('static_cache') ?? [];
+
+        if (! is_array($routeOptions)) {
+            $routeOptions = [];
+        }
+
+        $config = $this->container->bound('config')
+            ? $this->container->make('config')->get('cache.static', [])
+            : [];
+
+        $options = array_replace($defaults, is_array($config) ? $config : [], $routeOptions);
+
+        return Arr::wrap($options['strip_middleware'] ?? []);
     }
 
     /**

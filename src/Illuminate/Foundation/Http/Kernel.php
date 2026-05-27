@@ -102,6 +102,7 @@ class Kernel implements KernelContract
      */
     protected $middlewarePriority = [
         \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
+        \Illuminate\Routing\Middleware\CacheStaticResponse::class,
         \Illuminate\Cookie\Middleware\EncryptCookies::class,
         \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
         \Illuminate\Session\Middleware\StartSession::class,
