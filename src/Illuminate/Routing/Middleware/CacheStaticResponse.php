@@ -5,7 +5,7 @@ namespace Illuminate\Routing\Middleware;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Routing\Route;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
@@ -29,7 +29,7 @@ class CacheStaticResponse
                 StartSession::class,
                 ShareErrorsFromSession::class,
                 AddQueuedCookiesToResponse::class,
-                PreventRequestForgery::class,
+                ValidateCsrfToken::class,
             ],
             'vary' => ['X-Inertia'],
             'cdn_cache_control' => true,
