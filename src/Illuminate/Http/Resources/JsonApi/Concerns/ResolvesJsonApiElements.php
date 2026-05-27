@@ -35,9 +35,24 @@ trait ResolvesJsonApiElements
     protected bool $includesPreviouslyLoadedRelationships = false;
 
     /**
+     * The sparse included to use when resolving this resource as a sub-resource.
+     */
+    protected ?array $resolutionSparseIncluded = null;
+
+    /**
+     * Set the sparse included for resolving this resource as a sub-resource.
+     */
+    public function setResolutionSparseIncluded(?array $sparseIncluded): static
+    {
+        $this->resolutionSparseIncluded = $sparseIncluded;
+
+        return $this;
+    }
+
+    /**
      * Cached loaded relationships map.
      *
-     * @var array<int, array{0: \Illuminate\Http\Resources\JsonApi\JsonApiResource, 1: string, 2: string, 3: bool}|null
+     * @var array<int, array{0: \Illuminate\Http\Resources\JsonApi\JsonApiResource, 1: string, 2: string, 3: bool, 4: string, 5: array}|null
      */
     public $loadedRelationshipsMap;
 
@@ -112,7 +127,7 @@ trait ResolvesJsonApiElements
         }
 
         if (static::class !== JsonApiResource::class) {
-            return Str::of(static::class)->classBasename()->basename('Resource')->snake()->pluralStudly();
+            return (string) Str::of(static::class)->classBasename()->basename('Resource')->snake()->pluralStudly();
         }
 
         if (! $this->resource instanceof Model) {
@@ -123,7 +138,7 @@ trait ResolvesJsonApiElements
 
         $morphMap = Relation::getMorphAlias($modelClassName);
 
-        return Str::of(
+        return (string) Str::of(
             $morphMap !== $modelClassName ? $morphMap : class_basename($modelClassName)
         )->snake()->pluralStudly();
     }
@@ -188,10 +203,13 @@ trait ResolvesJsonApiElements
             return;
         }
 
-        $sparseIncluded = match (true) {
-            $this->includesPreviouslyLoadedRelationships => array_keys($this->resource->getRelations()),
-            default => $request->sparseIncluded(),
-        };
+        if ($this->resolutionSparseIncluded !== null) {
+            $sparseIncluded = $this->resolutionSparseIncluded;
+        } elseif ($this->includesPreviouslyLoadedRelationships) {
+            $sparseIncluded = array_keys($this->resource->getRelations());
+        } else {
+            $sparseIncluded = $request->sparseIncluded();
+        }
 
         $resourceRelationships = (new Collection($this->toRelationships($request)))
             ->transform(fn ($value, $key) => is_int($key) ? new RelationResolver($value) : new RelationResolver($key, $value))
@@ -214,11 +232,14 @@ trait ResolvesJsonApiElements
                     }
                 }
 
+                $subIncludes = $request->sparseIncluded($relationName) ?? [];
+
                 yield from $this->compileResourceRelationshipUsingResolver(
                     $request,
                     $this->resource,
                     $relationResolver,
                     $relatedModels,
+                    $subIncludes,
                 );
             }
         }))->all();
@@ -231,7 +252,8 @@ trait ResolvesJsonApiElements
         JsonApiRequest $request,
         mixed $resource,
         RelationResolver $relationResolver,
-        Collection|Model|null $relatedModels
+        Collection|Model|null $relatedModels,
+        array $subIncludes = []
     ): Generator {
         $relationName = $relationResolver->relationName;
         $resourceClass = $relationResolver->resourceClass();
@@ -250,15 +272,15 @@ trait ResolvesJsonApiElements
 
             $isUnique = ! $relationship instanceof BelongsToMany;
 
-            yield $relationName => ['data' => $relatedModels->map(function ($relatedModel) use ($request, $resourceClass, $isUnique) {
+            yield $relationName => ['data' => $relatedModels->map(function ($relatedModel) use ($request, $resourceClass, $relationName, $isUnique, $subIncludes) {
                 $relatedResource = rescue(fn () => $relatedModel->toResource($resourceClass), new JsonApiResource($relatedModel));
 
                 return transform(
                     [$relatedResource->resolveResourceType($request), $relatedResource->resolveResourceIdentifier($request)],
-                    function ($uniqueKey) use ($request, $relatedModel, $relatedResource, $isUnique) {
-                        $this->loadedRelationshipsMap[] = [$relatedResource, ...$uniqueKey, $isUnique];
+                    function ($uniqueKey) use ($request, $relatedModel, $relatedResource, $relationName, $isUnique, $subIncludes) {
+                        $this->loadedRelationshipsMap[] = [$relatedResource, ...$uniqueKey, $isUnique, $relationName, $subIncludes];
 
-                        $this->compileIncludedNestedRelationshipsMap($request, $relatedModel, $relatedResource);
+                        $this->compileIncludedNestedRelationshipsMap($request, $relatedModel, $relatedResource, $relationName, $subIncludes);
 
                         return [
                             'id' => $uniqueKey[1],
@@ -289,10 +311,10 @@ trait ResolvesJsonApiElements
 
         yield $relationName => ['data' => transform(
             [$relatedResource->resolveResourceType($request), $relatedResource->resolveResourceIdentifier($request)],
-            function ($uniqueKey) use ($relatedModel, $relatedResource, $request) {
-                $this->loadedRelationshipsMap[] = [$relatedResource, ...$uniqueKey, true];
+            function ($uniqueKey) use ($relatedModel, $relatedResource, $request, $relationName, $subIncludes) {
+                $this->loadedRelationshipsMap[] = [$relatedResource, ...$uniqueKey, true, $relationName, $subIncludes];
 
-                $this->compileIncludedNestedRelationshipsMap($request, $relatedModel, $relatedResource);
+                $this->compileIncludedNestedRelationshipsMap($request, $relatedModel, $relatedResource, $relationName, $subIncludes);
 
                 return [
                     'id' => $uniqueKey[1],
@@ -305,15 +327,59 @@ trait ResolvesJsonApiElements
     /**
      * Compile included relationships map.
      */
-    protected function compileIncludedNestedRelationshipsMap(JsonApiRequest $request, Model $relation, JsonApiResource $resource): void
+    protected function compileIncludedNestedRelationshipsMap(JsonApiRequest $request, Model $relation, JsonApiResource $resource, ?string $parentRelationName = null, array $nestedIncludes = []): void
     {
-        (new Collection($resource->toRelationships($request)))
-            ->transform(fn ($value, $key) => is_int($key) ? new RelationResolver($value) : new RelationResolver($key, $value))
-            ->mapWithKeys(fn ($relationResolver) => [$relationResolver->relationName => $relationResolver])
-            ->filter(fn ($value, $key) => in_array($key, array_keys($relation->getRelations())))
-            ->each(function ($relationResolver, $key) use ($relation, $request) {
-                $this->compileResourceRelationshipUsingResolver($request, $relation, $relationResolver, $relation->getRelation($key));
-            });
+        if (empty($nestedIncludes) && $parentRelationName !== null) {
+            $nestedIncludes = $request->sparseIncluded($parentRelationName) ?? [];
+        }
+
+        foreach ($resource->toRelationships($request) as $key => $value) {
+            $relationResolver = is_int($key)
+                ? new RelationResolver($value)
+                : new RelationResolver($key, $value);
+
+            $subIncludes = $this->extractSubIncludes($relationResolver->relationName, $nestedIncludes);
+
+            if (empty($subIncludes)) {
+                continue;
+            }
+
+            foreach ($this->compileResourceRelationshipUsingResolver(
+                $request, $relation, $relationResolver, $relation->getRelation($relationResolver->relationName), $subIncludes
+            ) as $_);
+        }
+    }
+
+    /**
+     * Extract sub-includes for a specific relation from the nested includes list.
+     */
+    protected function extractSubIncludes(string $relationName, array $nestedIncludes): array
+    {
+        $subIncludes = [];
+
+        foreach ($nestedIncludes as $include) {
+            if ($include === $relationName) {
+                $subIncludes[] = $include;
+            } elseif (str_starts_with($include, $relationName.'.')) {
+                $subIncludes[] = substr($include, strlen($relationName) + 1);
+            }
+        }
+
+        return $subIncludes;
+    }
+
+    /**
+     * Determine if the given relation name is included in the sparse included list.
+     */
+    protected function relationInSparseIncluded(string $relationName, array $sparseIncluded): bool
+    {
+        foreach ($sparseIncluded as $include) {
+            if ($include === $relationName || str_starts_with($include, $relationName.'.')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -341,7 +407,13 @@ trait ResolvesJsonApiElements
         ];
 
         while ($index < count($this->loadedRelationshipsMap)) {
-            [$resourceInstance, $type, $id, $isUnique] = $this->loadedRelationshipsMap[$index];
+            $entry = $this->loadedRelationshipsMap[$index];
+            $resourceInstance = $entry[0];
+            $type = $entry[1];
+            $id = $entry[2];
+            $isUnique = $entry[3];
+            $relationName = $entry[4] ?? null;
+            $subIncludes = $entry[5] ?? [];
 
             $underlyingResource = $resourceInstance->resource;
 
@@ -360,11 +432,30 @@ trait ResolvesJsonApiElements
                 $resourceInstance = new JsonApiResource($resourceInstance->resource);
             }
 
+            // Set resolution sparse included to scope which relations the sub-resource
+            // should process based on the include query
+            $firstLevelIncludes = [];
+            foreach ($subIncludes as $include) {
+                $parts = explode('.', $include);
+                $firstLevelIncludes[] = $parts[0];
+            }
+            $resourceInstance->setResolutionSparseIncluded(
+                ! empty($firstLevelIncludes) ? array_unique($firstLevelIncludes) : []
+            );
+
             $relationsData = $resourceInstance
-                ->includePreviouslyLoadedRelationships()
                 ->resolve($request);
 
-            array_push($this->loadedRelationshipsMap, ...($resourceInstance->loadedRelationshipsMap ?? []));
+            // Only propagate entries that were actually requested via include
+            $filteredMap = [];
+            foreach ($resourceInstance->loadedRelationshipsMap ?? [] as $subEntry) {
+                $subRelationName = $subEntry[4] ?? null;
+                $subSubIncludes = $subEntry[5] ?? [];
+                if ($subRelationName !== null && $this->relationInSparseIncluded($subRelationName, $subIncludes)) {
+                    $filteredMap[] = $subEntry;
+                }
+            }
+            array_push($this->loadedRelationshipsMap, ...$filteredMap);
 
             $relations->push(array_filter([
                 'id' => $id,

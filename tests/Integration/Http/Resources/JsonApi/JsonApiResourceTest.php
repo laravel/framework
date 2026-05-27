@@ -421,6 +421,58 @@ class JsonApiResourceTest extends TestCase
             ->assertJsonMissing(['jsonapi']);
     }
 
+    public function testItDoesNotIncludeNestedEagerLoadedRelationshipsWhenNotRequested()
+    {
+        $now = $this->freezeSecond();
+
+        $user = User::factory()->create();
+
+        $profile = Profile::factory()->create([
+            'user_id' => $user->getKey(),
+            'date_of_birth' => '2011-06-09',
+            'timezone' => 'America/Chicago',
+        ]);
+
+        [$post1, $post2] = Post::factory()->times(2)->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        $comment = Comment::factory()->create([
+            'post_id' => $post1->getKey(),
+            'user_id' => $user->getKey(),
+        ]);
+
+        $this->getJson("/posts/{$post1->getKey()}/with-nested-eager-loading?".http_build_query(['include' => 'comments']))
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertExactJson([
+                'data' => [
+                    'attributes' => [
+                        'content' => $post1->content,
+                        'title' => $post1->title,
+                    ],
+                    'type' => 'posts',
+                    'id' => (string) $post1->getKey(),
+                    'relationships' => [
+                        'comments' => [
+                            'data' => [
+                                ['id' => (string) $comment->getKey(), 'type' => 'comments'],
+                            ],
+                        ],
+                    ],
+                ],
+                'included' => [
+                    [
+                        'attributes' => [
+                            'content' => $comment->content,
+                        ],
+                        'id' => (string) $comment->getKey(),
+                        'type' => 'comments',
+                    ],
+                ],
+            ])
+            ->assertJsonMissing(['jsonapi']);
+    }
+
     public function testItCanResolveRelationshipWithRecursiveNestedRelationship()
     {
         $now = $this->freezeSecond();
@@ -632,9 +684,6 @@ class JsonApiResourceTest extends TestCase
         // to automatically set the inverse 'author' relationship on each Post,
         // creating circular object references (User -> Post -> User same instance).
         // Without the fix, this would hang forever due to infinite loop.
-        // The same User model appears twice in included: once as "posts" (the Post)
-        // and once as "authors" (Post's author via chaperone) - this is correct
-        // because different resource types should not be deduplicated.
         $this->getJson("/users/{$user->getKey()}/with-chaperone-posts?".http_build_query(['include' => 'chaperonePosts']))
             ->assertHeader('Content-type', 'application/vnd.api+json')
             ->assertJsonPath('data.id', (string) $user->getKey())
@@ -642,8 +691,7 @@ class JsonApiResourceTest extends TestCase
             ->assertJsonPath('data.relationships.chaperonePosts.data.0.type', 'posts')
             ->assertJsonPath('data.relationships.chaperonePosts.data.0.id', (string) $post->getKey())
             ->assertJsonPath('included.0.type', 'posts')
-            ->assertJsonPath('included.1.type', 'authors')
-            ->assertJsonCount(2, 'included');
+            ->assertJsonCount(1, 'included');
     }
 
     public function testIncludedResourcesCanBeArrayBackedCustomResources()
