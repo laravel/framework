@@ -25,6 +25,7 @@ class NotificationMailMessageTest extends TestCase
 
         parent::tearDown();
     }
+
     public function testTemplate()
     {
         $message = new MailMessage;
