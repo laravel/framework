@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Http;
 
 use Exception;
+use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException as GuzzleRequestException;
 use GuzzleHttp\Exception\TooManyRedirectsException;
@@ -1955,6 +1956,30 @@ class HttpClientTest extends TestCase
         $request->setClient($client);
 
         $this->assertSame($client, $request->buildClient());
+    }
+
+    public function testClientCanBeUsedExternally()
+    {
+        $this->factory->fake([
+            '200.com' => $this->factory::response('hello', 200),
+        ]);
+
+        $apiClient = new class ($this->factory->buildClient())
+        {
+            public function __construct(
+                private GuzzleClient $client,
+            ) {
+            }
+
+            public function sendGetRequest()
+            {
+                return $this->client->sendRequest(new GuzzleRequest('GET', '200.com'));
+            }
+        };
+
+        $response = $apiClient->sendGetRequest();
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('hello', $response->getBody()->getContents());
     }
 
     public function testRequestsCanReplaceOptions()
