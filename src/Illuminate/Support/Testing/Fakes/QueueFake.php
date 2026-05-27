@@ -6,6 +6,7 @@ use BadMethodCallException;
 use Closure;
 use Illuminate\Bus\UniqueLock;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Contracts\Queue\HasContext;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Events\CallQueuedListener;
@@ -493,6 +494,7 @@ class QueueFake extends QueueManager implements Fake, Queue
                     ? (method_exists($data['job'], 'displayName') ? $data['job']->displayName() : get_class($data['job']))
                     : $data['job'],
                 attempts: 0,
+                context: $data['job'] instanceof HasContext ? $data['job']->context() : null,
                 createdAt: null,
             ));
     }
@@ -534,6 +536,7 @@ class QueueFake extends QueueManager implements Fake, Queue
                     ? (method_exists($data['job'], 'displayName') ? $data['job']->displayName() : get_class($data['job']))
                     : $data['job'],
                 attempts: 0,
+                context: $data['job'] instanceof HasContext ? $data['job']->context() : null,
                 createdAt: null,
             ));
     }

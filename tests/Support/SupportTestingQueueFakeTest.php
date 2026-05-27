@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use BadMethodCallException;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\HasContext;
 use Illuminate\Foundation\Application;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\Jobs\InspectedJob;
@@ -540,6 +541,13 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->assertTrue($pending->contains(fn ($job) => $job->name === JobToFakeStub::class));
     }
 
+    public function testContextIsIncluded()
+    {
+        $this->fake->push(new JobWithContextStub, '', 'foo');
+
+        $this->assertSame(['task_id' => 42, 'type' => 'export'], $this->fake->allPendingJobs()->first()->context);
+    }
+
     public function testGetRawPushes()
     {
         $this->fake->pushRaw('some-payload', null, ['options' => 'yeah']);
@@ -615,6 +623,19 @@ class JobToFakeStub
     public function handle()
     {
         //
+    }
+}
+
+class JobWithContextStub implements HasContext
+{
+    public function handle()
+    {
+        //
+    }
+
+    public function context(): array
+    {
+        return ['task_id' => 42, 'type' => 'export'];
     }
 }
 
