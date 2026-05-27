@@ -14,6 +14,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithExceptionHandling;
@@ -391,6 +392,15 @@ class FoundationExceptionsHandlerTest extends TestCase
         $logger->shouldNotReceive('log');
 
         $this->handler->report(new RecordsNotFoundException);
+    }
+
+    public function testMultipleRecordsFoundIsReported()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldReceive('error')->withArgs(['2 records were found.', m::hasKey('exception')])->once();
+
+        $this->handler->report(new MultipleRecordsFoundException(2));
     }
 
     public function testItReturnsSpecificErrorViewIfExists()

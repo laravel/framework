@@ -17,7 +17,6 @@ use Illuminate\Contracts\Debug\ShouldntReport;
 use Illuminate\Contracts\Foundation\ExceptionRenderer;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\RecordNotFoundException;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Foundation\Exceptions\Renderer\Renderer;
@@ -161,7 +160,6 @@ class Handler implements ExceptionHandlerContract
         HttpException::class,
         HttpResponseException::class,
         ModelNotFoundException::class,
-        MultipleRecordsFoundException::class,
         OriginMismatchException::class,
         RecordNotFoundException::class,
         RecordsNotFoundException::class,
