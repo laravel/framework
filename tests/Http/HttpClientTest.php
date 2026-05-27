@@ -1964,7 +1964,7 @@ class HttpClientTest extends TestCase
             '200.com' => $this->factory::response('hello', 200),
         ]);
 
-        $apiClient = new class ($this->factory->buildClient())
+        $apiClient = new class($this->factory->buildClient())
         {
             public function __construct(
                 private GuzzleClient $client,
