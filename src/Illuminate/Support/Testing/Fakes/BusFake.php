@@ -721,6 +721,19 @@ class BusFake implements Fake, QueueingDispatcher
     }
 
     /**
+     * Dispatch multiple commands to their appropriate handlers on the queue.
+     *
+     * @param  iterable  $jobs
+     * @return void
+     */
+    public function dispatchBulk($jobs)
+    {
+        foreach ($jobs as $job) {
+            $this->dispatch($job);
+        }
+    }
+
+    /**
      * Dispatch a command to its appropriate handler after the current process.
      *
      * @param  mixed  $command
