@@ -240,6 +240,43 @@ class Dispatcher implements QueueingDispatcher
     }
 
     /**
+     * Dispatch multiple commands to their appropriate handlers on the queue.
+     *
+     * @param  iterable  $jobs
+     * @return void
+     */
+    public function dispatchBulk($jobs)
+    {
+        $groups = [];
+
+        foreach ($jobs as $job) {
+            if (! $this->queueResolver || ! $this->commandShouldBeQueued($job)) {
+                $this->dispatchNow($job);
+
+                continue;
+            }
+
+            $connectionName = $this->getAttributeValue($job, Connection::class, 'connection')
+                ?? $this->resolveConnectionFromQueueRoute($job)
+                ?? null;
+
+            $queueName = $this->getAttributeValue($job, QueueAttribute::class, 'queue')
+                ?? $this->resolveQueueFromQueueRoute($job)
+                ?? null;
+
+            $groups[$connectionName.':'.$queueName]['connection'] = $connectionName;
+            $groups[$connectionName.':'.$queueName]['queue'] = $queueName;
+            $groups[$connectionName.':'.$queueName]['jobs'][] = $job;
+        }
+
+        foreach ($groups as $group) {
+            ($this->queueResolver)($group['connection'])->bulk(
+                $group['jobs'], '', $group['queue']
+            );
+        }
+    }
+
+    /**
      * Push the command onto the given queue instance.
      *
      * @param  \Illuminate\Contracts\Queue\Queue  $queue
