@@ -61,6 +61,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
 use Stringable as NativeStringable;
+use Symfony\Component\VarDumper\VarDumper;
 
 include_once 'Enums.php';
 
@@ -748,6 +749,36 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $count = EloquentModelEmptyDestroyStub::destroy([]);
         $this->assertSame(0, $count);
+    }
+
+    public function testDumpMethodDumpsModelInstanceAndReturnsIt()
+    {
+        $log = new BaseCollection;
+
+        VarDumper::setHandler(function ($value) use ($log) {
+            $log->add($value);
+        });
+
+        try {
+            $model = new EloquentModelStub;
+
+            $result = $model->dump('one', 'two');
+
+            $this->assertSame($model, $result);
+            $this->assertSame([$model, 'one', 'two'], $log->all());
+        } finally {
+            VarDumper::setHandler(null);
+        }
+    }
+
+    public function testDumpMethodCallsQueryBuilderCorrectly()
+    {
+        EloquentModelDumpStub::$arguments = [];
+
+        $result = EloquentModelDumpStub::dump('one', 'two');
+
+        $this->assertSame('foo', $result);
+        $this->assertSame(['one', 'two'], EloquentModelDumpStub::$arguments);
     }
 
     public function testWithMethodCallsQueryBuilderCorrectly()
@@ -4133,6 +4164,24 @@ class EloquentModelWithStub extends Model
         $mock->shouldReceive('with')->once()->with(['foo', 'bar'])->andReturn('foo');
 
         return $mock;
+    }
+}
+
+class EloquentModelDumpStub extends Model
+{
+    public static $arguments = [];
+
+    public function newQuery()
+    {
+        return new class
+        {
+            public function dump(...$arguments)
+            {
+                EloquentModelDumpStub::$arguments = $arguments;
+
+                return 'foo';
+            }
+        };
     }
 }
 
