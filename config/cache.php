@@ -108,6 +108,31 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Static Route Cache
+    |--------------------------------------------------------------------------
+    |
+    | These options control the default cache policy for routes that are marked
+    | as static. Static routes are intended for public, CDN-cacheable responses
+    | and should not depend on session state, cookies, or per-user content.
+    |
+    */
+
+    'static' => [
+        'ttl' => 3600,
+        'browser_ttl' => 0,
+        'strip_cookies' => null,
+        'strip_middleware' => [
+            \Illuminate\Session\Middleware\StartSession::class,
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class,
+        ],
+        'vary' => ['X-Inertia'],
+        'cdn_cache_control' => true,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Cache Key Prefix
     |--------------------------------------------------------------------------
     |
