@@ -210,8 +210,6 @@ class BusDispatcherTestSpecificQueueAndDelayCommand implements ShouldQueue
 
 class BusDispatcherTestSpecificQueueCommand implements ShouldQueue
 {
-    use Queueable;
-
     public $queue = 'high';
 }
 
