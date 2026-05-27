@@ -46,20 +46,6 @@ class Schedule
     const SATURDAY = 6;
 
     /**
-     * Indicates if the schedule should check for the paused signal in the cache.
-     *
-     * @var bool
-     */
-    public static $pausable = true;
-
-    /**
-     * Indicates if the schedule should check for the interrupt signal in the cache.
-     *
-     * @var bool
-     */
-    public static $interruptible = true;
-
-    /**
      * All of the events on the schedule.
      *
      * @var \Illuminate\Console\Scheduling\Event[]
@@ -116,17 +102,18 @@ class Schedule
     protected array $groupStack = [];
 
     /**
-     * Indicate that the scheduler should not poll for pause or interrupt signals.
+     * Indicates if the schedule should check for the paused signal in the cache.
      *
-     * This prevents the scheduler from hitting the application cache to determine if it needs to pause or interrupt.
-     *
-     * @return void
+     * @var bool
      */
-    public static function withoutInterruptionPolling()
-    {
-        static::$pausable = false;
-        static::$interruptible = false;
-    }
+    public static $pausable = true;
+
+    /**
+     * Indicates if the schedule should check for the interrupt signal in the cache.
+     *
+     * @var bool
+     */
+    public static $interruptible = true;
 
     /**
      * Create a new schedule instance.
@@ -512,6 +499,19 @@ class Schedule
         }
 
         return $this->dispatcher;
+    }
+
+    /**
+     * Indicate that the scheduler should not poll for pause or interrupt signals.
+     *
+     * This prevents the scheduler from hitting the application cache to determine if it needs to pause or interrupt.
+     *
+     * @return void
+     */
+    public static function withoutInterruptionPolling()
+    {
+        static::$pausable = false;
+        static::$interruptible = false;
     }
 
     /**
