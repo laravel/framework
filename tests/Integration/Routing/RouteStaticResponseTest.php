@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
+use Closure;
 use Illuminate\Http\Response;
 use Illuminate\Session\NullSessionHandler;
 use Illuminate\Support\Facades\Route;
@@ -57,6 +58,24 @@ class RouteStaticResponseTest extends TestCase
         ));
     }
 
+    public function testStaticRouteWinsOverLaterGlobalNoCacheMiddleware()
+    {
+        $this->app->make(\Illuminate\Contracts\Http\Kernel::class)
+            ->pushMiddleware(RouteStaticResponseTestNoStoreMiddleware::class);
+
+        $response = $this->get('static-page-with-late-no-store');
+
+        $response->assertOk();
+        $response->assertHeader('Cache-Control', 'max-age=0, public, s-maxage=3600');
+        $response->assertHeader('CDN-Cache-Control', 'public, max-age=3600');
+        $response->assertHeaderMissing('Pragma');
+        $response->assertHeaderMissing('Expires');
+
+        $this->assertStringNotContainsString('private', $response->headers->get('Cache-Control'));
+        $this->assertStringNotContainsString('no-store', $response->headers->get('Cache-Control'));
+        $this->assertSame([], $response->headers->getCookies());
+    }
+
     protected function defineEnvironment($app)
     {
         $app['config']->set('app.key', Str::random(32));
@@ -76,6 +95,27 @@ class RouteStaticResponseTest extends TestCase
         })->middleware('web')->static();
 
         Route::get('dynamic-page', fn () => 'dynamic')->middleware('web');
+
+        Route::get('static-page-with-late-no-store', fn () => 'static')
+            ->middleware('web')
+            ->static();
+    }
+}
+
+class RouteStaticResponseTestNoStoreMiddleware
+{
+    public function handle($request, Closure $next)
+    {
+        $response = $next($request);
+
+        if ($request->path() === 'static-page-with-late-no-store') {
+            $response->headers->set('Cache-Control', 'no-cache, must-revalidate, no-store, max-age=0, private');
+            $response->headers->set('Pragma', 'no-cache');
+            $response->headers->set('Expires', 'Fri, 01 Jan 1990 00:00:00 GMT');
+            $response->headers->setCookie(Cookie::create('late_cookie', 'value'));
+        }
+
+        return $response;
     }
 }
 

@@ -148,11 +148,17 @@ class CacheStaticResponseTest extends TestCase
     public function testItOverwritesPrivateCacheControlDirective()
     {
         $response = (new CacheStaticResponse)->handle($this->request(), function () {
-            return new Response('Laravel', 200, ['Cache-Control' => 'private']);
+            return new Response('Laravel', 200, [
+                'Cache-Control' => 'private',
+                'Expires' => 'Fri, 01 Jan 1990 00:00:00 GMT',
+                'Pragma' => 'no-cache',
+            ]);
         });
 
         $this->assertStringNotContainsString('private', $response->headers->get('Cache-Control'));
         $this->assertSame('max-age=0, public, s-maxage=3600', $response->headers->get('Cache-Control'));
+        $this->assertNull($response->headers->get('Expires'));
+        $this->assertNull($response->headers->get('Pragma'));
     }
 
     public function testItUsesConfiguredDefaults()
