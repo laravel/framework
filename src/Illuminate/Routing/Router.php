@@ -852,7 +852,7 @@ class Router implements BindingRegistrar, RegistrarContract
     protected function shouldExcludeStaticRouteMiddleware(Route $route, ?Request $request = null)
     {
         return ! is_null($request) &&
-            array_key_exists('static_cache', $route->getAction()) &&
+            CacheStaticResponse::routeIsStatic($route) &&
             ! $request->headers->has('X-Inertia') &&
             $request->isMethodCacheable();
     }

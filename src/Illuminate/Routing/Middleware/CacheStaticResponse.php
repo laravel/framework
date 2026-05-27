@@ -45,8 +45,18 @@ class CacheStaticResponse
      */
     public function handle($request, Closure $next)
     {
-        $response = $next($request);
+        return $this->cache($request, $next($request));
+    }
 
+    /**
+     * Apply static route caching to the given response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Symfony\Component\HttpFoundation\Response  $response
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function cache($request, Response $response)
+    {
         if ($this->shouldBypass($request, $response)) {
             return $response;
         }
@@ -54,11 +64,23 @@ class CacheStaticResponse
         $options = $this->resolveOptions($request);
 
         $this->stripCookies($response, $options['strip_cookies']);
+        $this->removeNoCacheHeaders($response);
         $this->setCacheControl($response, (int) $options['ttl'], (int) $options['browser_ttl']);
         $this->setCdnCacheControl($response, (int) $options['ttl'], (bool) $options['cdn_cache_control']);
         $this->setVary($response, $options['vary']);
 
         return $response;
+    }
+
+    /**
+     * Determine if the given route has static caching enabled.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return bool
+     */
+    public static function routeIsStatic(Route $route)
+    {
+        return array_key_exists('static_cache', $route->getAction());
     }
 
     /**
@@ -156,6 +178,18 @@ class CacheStaticResponse
         foreach ($cookies as $cookie) {
             $response->headers->removeCookie($cookie);
         }
+    }
+
+    /**
+     * Remove legacy no-cache headers from the response.
+     *
+     * @param  \Symfony\Component\HttpFoundation\Response  $response
+     * @return void
+     */
+    protected function removeNoCacheHeaders(Response $response)
+    {
+        $response->headers->remove('Pragma');
+        $response->headers->remove('Expires');
     }
 
     /**
