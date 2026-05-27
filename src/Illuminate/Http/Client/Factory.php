@@ -259,7 +259,7 @@ class Factory
                     $response = $response($request, $options);
                 }
 
-                if ($response instanceof PromiseInterface) {
+                if ($response instanceof PromiseInterface && ($options['on_stats'] ?? null) instanceof Closure) {
                     $options['on_stats'](new TransferStats(
                         $request->toPsrRequest(),
                         $response->wait(),
