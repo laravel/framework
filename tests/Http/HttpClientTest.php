@@ -41,6 +41,7 @@ use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Uri;
+use InvalidArgumentException;
 use JsonSerializable;
 use Mockery as m;
 use OutOfBoundsException;
@@ -51,6 +52,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
+use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
 use Throwable;
 
@@ -96,6 +98,32 @@ class HttpClientTest extends TestCase
 
         $response = $this->factory->post('http://forge.laravel.com');
         $this->assertFalse($response->created());
+    }
+
+    public function testFakeResponseHeaderValuesAreSerialized()
+    {
+        $response = $this->factory::response('OK', 200, [
+            'X-Int' => 123,
+            'X-False' => false,
+            'X-Empty' => [],
+            'X-Laravel-Stringable' => new Stringable('laravel stringable'),
+            'X-Multiple' => ['first', 123, true, false],
+        ])->wait();
+
+        $this->assertSame(['123'], $response->getHeader('X-Int'));
+        $this->assertSame([''], $response->getHeader('X-False'));
+        $this->assertSame([''], $response->getHeader('X-Empty'));
+        $this->assertSame(['laravel stringable'], $response->getHeader('X-Laravel-Stringable'));
+        $this->assertSame(['first', '123', '1', ''], $response->getHeader('X-Multiple'));
+    }
+
+    #[DataProvider('invalidFakeResponseHeaderValuesProvider')]
+    public function testInvalidFakeResponseHeaderValuesAreRejected($value)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('HTTP fake response header values must be scalar, Laravel Stringable, or arrays of scalar or Laravel Stringable values.');
+
+        $this->factory::response('OK', 200, ['X-Test' => $value]);
     }
 
     public function testStatusCodeShorthand()
@@ -676,6 +704,55 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testHeaderValuesAreSerialized()
+    {
+        $this->factory->fake();
+
+        $this->factory->withHeaders([
+            'X-Int' => 123,
+            'X-Float' => 1.5,
+            'X-True' => true,
+            'X-False' => false,
+            'X-Laravel-Stringable' => new Stringable('laravel stringable'),
+            'X-Multiple' => ['first', 123, true, false],
+            'X-Empty' => [],
+        ])->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->hasHeader('X-Int', '123')
+                && $request->hasHeader('X-Float', '1.5')
+                && $request->hasHeader('X-True', '1')
+                && $request->hasHeader('X-False', '')
+                && $request->hasHeader('X-Laravel-Stringable', 'laravel stringable')
+                && $request->hasHeader('X-Multiple', ['first', '123', '1', ''])
+                && $request->hasHeader('X-Empty', '');
+        });
+    }
+
+    #[DataProvider('invalidHeaderValuesProvider')]
+    public function testInvalidHeaderValuesAreRejected($value)
+    {
+        $this->factory->fake();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('HTTP header values must be scalar, Laravel Stringable, or arrays of scalar or Laravel Stringable values.');
+
+        $this->factory->withHeaders(['X-Test' => $value])->post('http://foo.com/json');
+    }
+
+    public function testHeaderValuesProvidedThroughOptionsAreSerialized()
+    {
+        $this->factory->fake();
+
+        $this->factory->withOptions([
+            'headers' => ['X-Test' => 123],
+        ])->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->hasHeader('X-Test', '123');
+        });
+    }
+
     public function testCanSendFormDataWithStringable()
     {
         $this->factory->fake();
@@ -795,6 +872,57 @@ class HttpClientTest extends TestCase
                    $request[0]['name'] === 'foo' &&
                    $request->hasFile('foo', 'data', 'file.txt');
         });
+    }
+
+    public function testAttachHeaderValuesAreSerialized()
+    {
+        $this->factory->fake();
+
+        $this->factory->attach('file', 'data', 'file.txt', ['X-Part' => 123])->post('http://foo.com/file');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request[0]['headers']['X-Part'] === '123';
+        });
+    }
+
+    public function testMultipartHeaderValuesAreSerialized()
+    {
+        $this->factory->fake();
+
+        $this->factory->asMultipart()->post('http://foo.com/multipart', [
+            [
+                'name' => 'file',
+                'contents' => 'data',
+                'headers' => [
+                    'X-Part' => 123,
+                    'X-Empty' => [],
+                    'X-Laravel-Stringable' => new Stringable('laravel stringable'),
+                ],
+            ],
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request[0]['headers']['X-Part'] === '123'
+                && $request[0]['headers']['X-Empty'] === ''
+                && $request[0]['headers']['X-Laravel-Stringable'] === 'laravel stringable';
+        });
+    }
+
+    #[DataProvider('invalidMultipartHeaderValuesProvider')]
+    public function testInvalidMultipartHeaderValuesAreRejected($value)
+    {
+        $this->factory->fake();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Multipart header values must be scalar or Laravel Stringable.');
+
+        $this->factory->asMultipart()->post('http://foo.com/multipart', [
+            [
+                'name' => 'file',
+                'contents' => 'data',
+                'headers' => ['X-Part' => $value],
+            ],
+        ]);
     }
 
     public function testCanSendMultipartDataWithSimplifiedParameters()
@@ -4417,6 +4545,42 @@ class HttpClientTest extends TestCase
             'put' => ['put'],
             'post' => ['post'],
             'delete' => ['delete'],
+        ];
+    }
+
+    public static function invalidHeaderValuesProvider()
+    {
+        return [
+            'null' => [null],
+            'object' => [new stdClass],
+            'resource' => [fopen('php://temp', 'r')],
+            'array with null' => [['valid', null]],
+            'array with object' => [['valid', new stdClass]],
+            'array with resource' => [['valid', fopen('php://temp', 'r')]],
+            'array with nested array' => [['valid', ['nested']]],
+        ];
+    }
+
+    public static function invalidMultipartHeaderValuesProvider()
+    {
+        return [
+            'null' => [null],
+            'array' => [['nested']],
+            'object' => [new stdClass],
+            'resource' => [fopen('php://temp', 'r')],
+        ];
+    }
+
+    public static function invalidFakeResponseHeaderValuesProvider()
+    {
+        return [
+            'null' => [null],
+            'object' => [new stdClass],
+            'resource' => [fopen('php://temp', 'r')],
+            'array with null' => [['valid', null]],
+            'array with object' => [['valid', new stdClass]],
+            'array with resource' => [['valid', fopen('php://temp', 'r')]],
+            'array with nested array' => [['valid', ['nested']]],
         ];
     }
 
