@@ -850,7 +850,7 @@ trait ValidatesAttributes
             [1, 1], array_filter(sscanf($parameters['min_ratio'], '%f/%d'))
         );
 
-        return ($width / $height) > ($minNumerator / $minDenominator);
+        return ($width / $height) < ($minNumerator / $minDenominator);
     }
 
     /**
@@ -871,7 +871,7 @@ trait ValidatesAttributes
             [1, 1], array_filter(sscanf($parameters['max_ratio'], '%f/%d'))
         );
 
-        return ($width / $height) < ($maxNumerator / $maxDenominator);
+        return ($width / $height) > ($maxNumerator / $maxDenominator);
     }
 
     /**
