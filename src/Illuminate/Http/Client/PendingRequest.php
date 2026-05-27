@@ -1499,7 +1499,7 @@ class PendingRequest
                 return $promise->then(function ($response) use ($request, $options) {
                     $this->factory?->recordRequestResponsePair(
                         (new Request($request))
-                            ->withData($options['laravel_data'])
+                            ->withData($options['laravel_data'] ?? [])
                             ->setRequestAttributes($this->attributes),
                         $this->newResponse($response)
                     );
@@ -1525,7 +1525,7 @@ class PendingRequest
                     ->map
                     ->__invoke(
                         (new Request($request))
-                            ->withData($options['laravel_data'])
+                            ->withData($options['laravel_data'] ?? [])
                             ->setRequestAttributes($this->attributes),
                         $options
                     )
@@ -1589,7 +1589,7 @@ class PendingRequest
                 $callbackResult = call_user_func(
                     $callback,
                     (new Request($request))
-                        ->withData($options['laravel_data'])
+                        ->withData($options['laravel_data'] ?? [])
                         ->setRequestAttributes($this->attributes),
                     $options,
                     $this
