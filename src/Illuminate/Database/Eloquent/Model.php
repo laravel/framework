@@ -29,6 +29,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable as SupportStringable;
+use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonException;
 use JsonSerializable;
@@ -54,6 +55,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         ForwardsCalls;
     /** @use HasCollection<\Illuminate\Database\Eloquent\Collection<array-key, static & self>> */
     use HasCollection;
+    use Dumpable {
+        dump as protected;
+        dd as protected;
+    }
 
     /**
      * The connection name for the model.
@@ -2791,7 +2796,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function __call($method, $parameters)
     {
-        if (in_array($method, ['increment', 'decrement', 'incrementQuietly', 'decrementQuietly', 'incrementEach', 'decrementEach'])) {
+        if (in_array($method, ['increment', 'decrement', 'incrementQuietly', 'decrementQuietly', 'incrementEach', 'decrementEach', 'dd', 'dump'])) {
             return $this->$method(...$parameters);
         }
 
@@ -2816,7 +2821,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public static function __callStatic($method, $parameters)
     {
-        if (static::isScopeMethodWithAttribute($method)) {
+        if (in_array($method, ['dd', 'dump']) || static::isScopeMethodWithAttribute($method)) {
             return static::query()->$method(...$parameters);
         }
 
