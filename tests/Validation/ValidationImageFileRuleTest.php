@@ -65,6 +65,11 @@ class ValidationImageFileRuleTest extends TestCase
             UploadedFile::fake()->image('foo.png', 100, 100),
         );
 
+        $this->passes(
+            File::image()->dimensions(Rule::dimensions()->minRatio(2 / 3)),
+            UploadedFile::fake()->image('foo.png', 200, 300),
+        );
+
         $this->fails(
             File::image()->dimensions(Rule::dimensions()->minRatio(1 / 2)),
             UploadedFile::fake()->image('foo.png', 100, 300),
@@ -78,6 +83,11 @@ class ValidationImageFileRuleTest extends TestCase
             File::image()->dimensions(Rule::dimensions()->maxRatio(1 / 2)),
             UploadedFile::fake()->image('foo.png', 100, 300),
             ['validation.dimensions'],
+        );
+
+        $this->passes(
+            File::image()->dimensions(Rule::dimensions()->maxRatio(1 / 3)),
+            UploadedFile::fake()->image('foo.png', 100, 300),
         );
 
         $this->fails(
