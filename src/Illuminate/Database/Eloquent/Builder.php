@@ -1114,16 +1114,17 @@ class Builder implements BuilderContract
      * @param  array|string  $columns
      * @param  string  $pageName
      * @param  int|null  $page
-     * @param  \Closure|int|null  $total
+     * @param  int|null|\Closure  $total
+     * @param  array|string  $countColumns
      * @return \Illuminate\Pagination\LengthAwarePaginator<int, TModel>
      *
      * @throws \InvalidArgumentException
      */
-    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $total = null)
+    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $total = null, $countColumns = ['*'])
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
-        $total = value($total) ?? $this->toBase()->getCountForPagination();
+        $total = value($total) ?? $this->toBase()->getCountForPagination($countColumns);
 
         $perPage = value($perPage, $total) ?: $this->model->getPerPage();
 

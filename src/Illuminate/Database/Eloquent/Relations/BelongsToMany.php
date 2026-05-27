@@ -989,13 +989,15 @@ class BelongsToMany extends Relation
      * @param  array  $columns
      * @param  string  $pageName
      * @param  int|null  $page
+     * @param  int|null|\Closure  $total
+     * @param  array  $countColumns
      * @return \Illuminate\Pagination\LengthAwarePaginator<int, TRelatedModel&object{pivot: TPivotModel}>
      */
-    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
+    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $total = null, $countColumns = ['*'])
     {
         $this->query->addSelect($this->shouldSelect($columns));
 
-        return tap($this->query->paginate($perPage, $columns, $pageName, $page), function ($paginator) {
+        return tap($this->query->paginate($perPage, $columns, $pageName, $page, $total, $countColumns), function ($paginator) {
             $this->hydratePivotRelation($paginator->items());
         });
     }

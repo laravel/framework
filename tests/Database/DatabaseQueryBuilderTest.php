@@ -6148,6 +6148,7 @@ SQL;
         $columns = ['test'];
         $pageName = 'page-name';
         $page = 1;
+        $countColumns = ['test'];
         $builder = $this->getMockQueryBuilder();
         $path = 'http://foo.bar?page=3';
 
@@ -6161,7 +6162,7 @@ SQL;
             return $path;
         });
 
-        $result = $builder->paginate($perPage, $columns, $pageName, $page);
+        $result = $builder->paginate($perPage, $columns, $pageName, $page, countColumns: $countColumns);
 
         $this->assertEquals(new LengthAwarePaginator($results, 2, $perPage, $page, [
             'path' => $path,
@@ -6235,6 +6236,7 @@ SQL;
         $columns = ['id', 'name'];
         $pageName = 'page-name';
         $page = 1;
+        $countColumns = ['id'];
         $builder = $this->getMockQueryBuilder();
         $path = 'http://foo.bar?page=3';
 
@@ -6248,7 +6250,7 @@ SQL;
             return $path;
         });
 
-        $result = $builder->paginate($perPage, $columns, $pageName, $page);
+        $result = $builder->paginate($perPage, $columns, $pageName, $page, countColumns: $countColumns);
 
         $this->assertEquals(new LengthAwarePaginator($results, 2, $perPage, $page, [
             'path' => $path,
@@ -6262,6 +6264,7 @@ SQL;
         $columns = ['id', 'name'];
         $pageName = 'page-name';
         $page = 1;
+        $countColumns = ['id'];
         $builder = $this->getMockQueryBuilder();
         $path = 'http://foo.bar?page=3';
 
@@ -6275,7 +6278,7 @@ SQL;
             return $path;
         });
 
-        $result = $builder->paginate($perPage, $columns, $pageName, $page, 10);
+        $result = $builder->paginate($perPage, $columns, $pageName, $page, 10, $countColumns);
 
         $this->assertEquals(10, $result->total());
     }
