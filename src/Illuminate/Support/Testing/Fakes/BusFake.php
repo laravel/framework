@@ -721,7 +721,7 @@ class BusFake implements Fake, QueueingDispatcher
     }
 
     /**
-     * Dispatch multiple commands to their appropriate handlers on the queue.
+     * Dispatch multiple commands in bulk to their appropriate handlers on the queue.
      *
      * @param  iterable  $jobs
      * @return void
