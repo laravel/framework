@@ -99,7 +99,7 @@ class DiscoverEvents
     }
 
     /**
-     * Resolve the collection class name from the CollectedBy attribute.
+     * Resolve if the listener should be discovered from its ShouldBeDiscovered attribute.
      *
      * @return bool
      */
