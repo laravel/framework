@@ -7,7 +7,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Traits\Macroable;
-use InvalidArgumentException;
 use JsonSerializable;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -25,7 +24,7 @@ class Response extends SymfonyResponse
      * @param  int  $status
      * @param  array  $headers
      *
-     * @throws \InvalidArgumentException
+     * @throws \JsonException
      */
     public function __construct($content = '', $status = 200, array $headers = [])
     {
@@ -51,7 +50,7 @@ class Response extends SymfonyResponse
      * @param  mixed  $content
      * @return $this
      *
-     * @throws \InvalidArgumentException
+     * @throws \JsonException
      */
     #[\Override]
     public function setContent(mixed $content): static
@@ -65,10 +64,6 @@ class Response extends SymfonyResponse
             $this->header('Content-Type', 'application/json');
 
             $content = $this->morphToJson($content);
-
-            if ($content === false) {
-                throw new InvalidArgumentException(json_last_error_msg());
-            }
         }
 
         // If this content implements the "Renderable" interface then we will call the
@@ -102,16 +97,16 @@ class Response extends SymfonyResponse
      * Morph the given content into JSON.
      *
      * @param  mixed  $content
-     * @return string|false
+     * @return string
+     *
+     * @throws \JsonException
      */
     protected function morphToJson($content)
     {
-        if ($content instanceof Jsonable) {
-            return $content->toJson();
-        } elseif ($content instanceof Arrayable) {
-            return json_encode($content->toArray());
-        }
-
-        return json_encode($content);
+        return match (true) {
+            $content instanceof Jsonable => $content->toJson(),
+            $content instanceof Arrayable => json_encode($content->toArray(), JSON_THROW_ON_ERROR),
+            default => json_encode($content, JSON_THROW_ON_ERROR),
+        };
     }
 }
