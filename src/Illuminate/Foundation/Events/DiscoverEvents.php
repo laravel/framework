@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Events;
 
 use Illuminate\Contracts\Events\ShouldBeDiscovered;
+use Illuminate\Events\Attributes\ShouldBeDiscovered as ShouldBeDiscoveredAttribute;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Reflector;
@@ -106,7 +107,7 @@ class DiscoverEvents
     public static function resolveDiscoveringFromAttribute(ReflectionClass $reflection)
     {
         do {
-            $attributes = $reflection->getAttributes(\Illuminate\Events\Attributes\ShouldBeDiscovered::class);
+            $attributes = $reflection->getAttributes(ShouldBeDiscoveredAttribute::class);
 
             if (isset($attributes[0], $attributes[0]->getArguments()[0])) {
                 return $attributes[0]->getArguments()[0];

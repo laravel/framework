@@ -10,7 +10,7 @@ class ShouldBeDiscovered
     /**
      * Create a new attribute instance.
      *
-     * @param bool $shouldBeDiscovered
+     * @param  bool  $shouldBeDiscovered
      */
     public function __construct(public bool $shouldBeDiscovered = true)
     {
