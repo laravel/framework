@@ -10,6 +10,7 @@ use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use JsonSerializable;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class Response extends SymfonyResponse
 {
@@ -26,9 +27,13 @@ class Response extends SymfonyResponse
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($content = '', int $status = 200, array $headers = [])
+    public function __construct($content = '', int $status = 200, array|ResponseHeaderBag $headers = [])
     {
-        parent::__construct('', $status, $headers);
+        parent::__construct(
+            '',
+            $status,
+            $headers instanceof ResponseHeaderBag ? $headers->all() : $headers,
+        );
 
         $this->setContent($content);
     }

@@ -36,6 +36,9 @@ class HttpResponseTest extends TestCase
         $this->assertSame('{"foo":"bar"}', $response->getContent());
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
 
+        $response = new Response(headers: new ResponseHeaderBag(['foo' => 'bar']));
+        $this->assertSame('bar', $response->headers->get('foo'));
+
         $response = new Response;
         $response->setContent(['foo' => 'bar']);
         $this->assertSame('{"foo":"bar"}', $response->getContent());
