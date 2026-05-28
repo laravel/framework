@@ -192,6 +192,9 @@ class TypeTest extends TestCase
             [JsonSchema::integer()->multipleOf(5), 10],
             [JsonSchema::integer()->multipleOf(3), 9],
             [JsonSchema::integer()->multipleOf(7), 0],
+            [JsonSchema::integer()->exclusiveMin(0), 1],
+            [JsonSchema::integer()->exclusiveMax(10), 9],
+            [JsonSchema::integer()->exclusiveMin(0)->exclusiveMax(10), 5],
             // additional IntegerType cases
             [JsonSchema::integer()->min(-5), -5], // negative boundary
             [JsonSchema::integer()->max(10), 9], // below max
@@ -211,6 +214,9 @@ class TypeTest extends TestCase
             [JsonSchema::number()->multipleOf(0.5), 2.5],
             [JsonSchema::number()->multipleOf(3), 9],
             [JsonSchema::number()->multipleOf(0.1), 0.3],
+            [JsonSchema::number()->exclusiveMin(0.0), 0.1],
+            [JsonSchema::number()->exclusiveMax(10.5), 10.4],
+            [JsonSchema::number()->exclusiveMin(0.0)->exclusiveMax(1.0), 0.5],
             // additional NumberType cases
             [JsonSchema::number()->min(-10.5), -10.5], // negative boundary
             [JsonSchema::number()->min(0)->max(1), 1.0], // boundary at max
@@ -352,6 +358,10 @@ class TypeTest extends TestCase
             // additional IntegerType cases
             [JsonSchema::integer()->min(0), -1], // below min boundary
             [JsonSchema::integer()->max(0), 1], // above max boundary
+            [JsonSchema::integer()->exclusiveMin(5), 5], // exactly at exclusiveMin boundary
+            [JsonSchema::integer()->exclusiveMin(5), 4], // below exclusiveMin
+            [JsonSchema::integer()->exclusiveMax(10), 10], // exactly at exclusiveMax boundary
+            [JsonSchema::integer()->exclusiveMax(10), 11], // above exclusiveMax
             [JsonSchema::integer(), 3.14], // not an integer
             [JsonSchema::integer()->enum([1, 2]), 2.5], // not in enum and not an integer
             [JsonSchema::integer()->enum(IntBackedEnum::class), 3], // integer backed enum cases mismatch
@@ -362,6 +372,10 @@ class TypeTest extends TestCase
             [JsonSchema::number(), '3.14'], // type mismatch
             [JsonSchema::number()->min(0.5), 0.4], // below min
             [JsonSchema::number()->max(1.5), 1.6], // above max
+            [JsonSchema::number()->exclusiveMin(0.0), 0.0], // exactly at exclusiveMin
+            [JsonSchema::number()->exclusiveMin(0.5), 0.49], // below exclusiveMin
+            [JsonSchema::number()->exclusiveMax(10.5), 10.5], // exactly at exclusiveMax
+            [JsonSchema::number()->exclusiveMax(10.5), 10.51], // above exclusiveMax
             [JsonSchema::number()->default(1.1), '1.1'], // wrong type
             [JsonSchema::number()->enum([1, 2.5, 3]), 4], // not in enum
             [JsonSchema::number()->multipleOf(0.5), 1.3], // not a multiple
