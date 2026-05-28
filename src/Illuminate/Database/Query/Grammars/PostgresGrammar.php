@@ -111,7 +111,7 @@ class PostgresGrammar extends Grammar
         $column = $this->wrap($where['column']);
         $value = $this->parameter($where['value']);
 
-        if ($this->isJsonSelector($where['column'])) {
+        if (is_string($where['column']) && $this->isJsonSelector($where['column'])) {
             $column = '('.$column.')';
         }
 
@@ -130,7 +130,7 @@ class PostgresGrammar extends Grammar
         $column = $this->wrap($where['column']);
         $value = $this->parameter($where['value']);
 
-        if ($this->isJsonSelector($where['column'])) {
+        if (is_string($where['column']) && $this->isJsonSelector($where['column'])) {
             $column = '('.$column.')';
         }
 
