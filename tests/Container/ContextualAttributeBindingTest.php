@@ -533,8 +533,8 @@ final class CacheTest
         #[Cache('bar')] CacheRepository $bar,
         #[Cache(CacheStoreUnitEnum::unit)] CacheRepository $unit,
         #[Cache(CacheStoreBackedEnum::Backed)] CacheRepository $backed,
-        #[Cache('foo', true)] CacheRepository $fooMemoized,
-        #[Cache('bar', true)] CacheRepository $barMemoized,
+        #[Cache('foo', memo: true)] CacheRepository $fooMemoized,
+        #[Cache('bar', memo: true)] CacheRepository $barMemoized,
     ) {
     }
 }

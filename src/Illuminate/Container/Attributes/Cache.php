@@ -15,7 +15,7 @@ class Cache implements ContextualAttribute
      */
     public function __construct(
         public UnitEnum|string|null $store = null,
-        public bool $memoized = false,
+        public bool $memo = false,
     ) {
     }
 
@@ -28,7 +28,7 @@ class Cache implements ContextualAttribute
      */
     public static function resolve(self $attribute, Container $container)
     {
-        return $attribute->memoized
+        return $attribute->memo
             ? $container->make('cache')->memo($attribute->store)
             : $container->make('cache')->store($attribute->store);
     }
