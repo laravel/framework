@@ -78,8 +78,9 @@ class DiscoverEvents
                 continue;
             }
 
-            if ($listener->implementsInterface(ShouldBeDiscovered::class) &&
-                $listener->getName()::shouldBeDiscovered() === false) {
+            if (self::resolveDiscoveringFromAttribute($listener) === false ||
+                ($listener->implementsInterface(ShouldBeDiscovered::class) &&
+                    $listener->getName()::shouldBeDiscovered() === false)) {
                 continue;
             }
 
@@ -95,6 +96,24 @@ class DiscoverEvents
         }
 
         return array_filter($listenerEvents);
+    }
+
+    /**
+     * Resolve the collection class name from the CollectedBy attribute.
+     *
+     * @return bool
+     */
+    public static function resolveDiscoveringFromAttribute(ReflectionClass $reflection)
+    {
+        do {
+            $attributes = $reflection->getAttributes(\Illuminate\Events\Attributes\ShouldBeDiscovered::class);
+
+            if (isset($attributes[0], $attributes[0]->getArguments()[0])) {
+                return $attributes[0]->getArguments()[0];
+            }
+        } while ($reflection = $reflection->getParentClass());
+
+        return true;
     }
 
     /**

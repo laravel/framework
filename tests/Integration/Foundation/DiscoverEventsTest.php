@@ -9,7 +9,9 @@ use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Events\Event
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\AbstractListener;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\Listener;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\ListenerInterface;
+use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\ShouldBeDiscoveredListeners\RegisteredByAttributeListener;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\ShouldBeDiscoveredListeners\RegisteredListener;
+use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\ShouldBeDiscoveredListeners\SkippedByAttributeListener;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\ShouldBeDiscoveredListeners\SkippedListener;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\UnionListeners\UnionListener;
 use Orchestra\Testbench\TestCase;
@@ -81,13 +83,16 @@ class DiscoverEventsTest extends TestCase
 
     public function testListenersCanOptOutOfDiscovery()
     {
+        class_alias(RegisteredByAttributeListener::class, 'Tests\Integration\Foundation\Fixtures\EventDiscovery\ShouldBeDiscoveredListeners\RegisteredByAttributeListener');
         class_alias(RegisteredListener::class, 'Tests\Integration\Foundation\Fixtures\EventDiscovery\ShouldBeDiscoveredListeners\RegisteredListener');
+        class_alias(SkippedByAttributeListener::class, 'Tests\Integration\Foundation\Fixtures\EventDiscovery\ShouldBeDiscoveredListeners\SkippedByAttributeListener');
         class_alias(SkippedListener::class, 'Tests\Integration\Foundation\Fixtures\EventDiscovery\ShouldBeDiscoveredListeners\SkippedListener');
 
         $events = DiscoverEvents::within(__DIR__.'/Fixtures/EventDiscovery/ShouldBeDiscoveredListeners', getcwd());
 
         $this->assertEquals([
             EventOne::class => [
+                RegisteredByAttributeListener::class.'@handle',
                 RegisteredListener::class.'@handle',
             ],
         ], $events);
