@@ -24,7 +24,7 @@ bar
 test
 @endPrependOnce';
 
-        $expected = '<?php if (! $__env->hasRenderedOnce(\'bar\')): $__env->markAsRenderedOnce(\'bar\');
+        $expected = '<?php if (! $__env->hasRenderedOnce(\'foo:bar\')): $__env->markAsRenderedOnce(\'foo:bar\');
 $__env->startPrepend(\'foo\'); ?>
 test
 <?php $__env->stopPrepend(); endif; ?>';
@@ -40,7 +40,7 @@ test
 test
 @endPrependOnce';
 
-        $expected = '<?php if (! $__env->hasRenderedOnce(\'e60e8f77-9ac3-4f71-9f8e-a044ef481d7f\')): $__env->markAsRenderedOnce(\'e60e8f77-9ac3-4f71-9f8e-a044ef481d7f\');
+        $expected = '<?php if (! $__env->hasRenderedOnce(\'foo:e60e8f77-9ac3-4f71-9f8e-a044ef481d7f\')): $__env->markAsRenderedOnce(\'foo:e60e8f77-9ac3-4f71-9f8e-a044ef481d7f\');
 $__env->startPrepend(\'foo\'); ?>
 test
 <?php $__env->stopPrepend(); endif; ?>';
