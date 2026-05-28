@@ -41,7 +41,7 @@ trait CompilesStacks
         [$stack, $id] = [$parts[0], $parts[1] ?? ''];
 
         $id = trim($id) ?: "'".(string) Str::uuid()."'";
-        $id = "$stack:$id";
+        $id = $stack.':'.$id;
 
         return '<?php if (! $__env->hasRenderedOnce('.$id.')): $__env->markAsRenderedOnce('.$id.');
 $__env->startPush('.$stack.'); ?>';
@@ -91,7 +91,7 @@ $__env->startPush('.$stack.'); ?>';
         [$stack, $id] = [$parts[0], $parts[1] ?? ''];
 
         $id = trim($id) ?: "'".(string) Str::uuid()."'";
-        $id = "$stack:$id";
+        $id = $stack.':'.$id;
 
         return '<?php if (! $__env->hasRenderedOnce('.$id.')): $__env->markAsRenderedOnce('.$id.');
 $__env->startPrepend('.$stack.'); ?>';
