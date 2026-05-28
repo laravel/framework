@@ -92,6 +92,13 @@ class Event
     public $exitCode;
 
     /**
+     * Whether the execution was skipped due to the mutex already being reserved.
+     *
+     * @var bool
+     */
+    public $skippedBecauseOverlapping;
+
+    /**
      * Create a new event instance.
      *
      * @param  \Illuminate\Console\Scheduling\EventMutex  $mutex
@@ -128,6 +135,8 @@ class Event
     public function run(Container $container)
     {
         if ($this->shouldSkipDueToOverlapping()) {
+            $this->skippedBecauseOverlapping = true;
+
             return;
         }
 
