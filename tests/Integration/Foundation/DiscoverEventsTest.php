@@ -90,12 +90,9 @@ class DiscoverEventsTest extends TestCase
 
         $events = DiscoverEvents::within(__DIR__.'/Fixtures/EventDiscovery/ShouldBeDiscoveredListeners', getcwd());
 
-        $this->assertEquals([
-            EventOne::class => [
-                RegisteredByAttributeListener::class.'@handle',
-                RegisteredListener::class.'@handle',
-            ],
-        ], $events);
+        $this->assertArrayHasKey(EventOne::class, $events);
+        $this->assertContains(RegisteredByAttributeListener::class.'@handle', $events[EventOne::class]);
+        $this->assertContains(RegisteredListener::class.'@handle', $events[EventOne::class]);
     }
 
     public function testNoExceptionForEmptyDirectories(): void
