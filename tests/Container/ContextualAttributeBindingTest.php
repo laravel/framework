@@ -173,6 +173,8 @@ class ContextualAttributeBindingTest extends TestCase
             $manager->shouldReceive('store')->with('bar')->andReturn(m::mock(CacheRepository::class));
             $manager->shouldReceive('store')->with(CacheStoreUnitEnum::unit)->andReturn(m::mock(CacheRepository::class));
             $manager->shouldReceive('store')->with(CacheStoreBackedEnum::Backed)->andReturn(m::mock(CacheRepository::class));
+            $manager->shouldReceive('memo')->with('foo')->andReturn(m::mock(CacheRepository::class));
+            $manager->shouldReceive('memo')->with('bar')->andReturn(m::mock(CacheRepository::class));
 
             return $manager;
         });
@@ -531,6 +533,8 @@ final class CacheTest
         #[Cache('bar')] CacheRepository $bar,
         #[Cache(CacheStoreUnitEnum::unit)] CacheRepository $unit,
         #[Cache(CacheStoreBackedEnum::Backed)] CacheRepository $backed,
+        #[Cache('foo', memo: true)] CacheRepository $fooMemoized,
+        #[Cache('bar', memo: true)] CacheRepository $barMemoized,
     ) {
     }
 }
