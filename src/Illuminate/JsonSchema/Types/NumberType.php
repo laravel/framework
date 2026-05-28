@@ -15,6 +15,16 @@ class NumberType extends Type
     protected int|float|null $maximum = null;
 
     /**
+     * The exclusive minimum value.
+     */
+    protected int|float|null $exclusiveMinimum = null;
+
+    /**
+     * The exclusive maximum value.
+     */
+    protected int|float|null $exclusiveMaximum = null;
+
+    /**
      * The number the value must be a multiple of.
      */
     protected int|float|null $multipleOf = null;
@@ -35,6 +45,26 @@ class NumberType extends Type
     public function max(int|float $value): static
     {
         $this->maximum = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set the exclusive minimum value.
+     */
+    public function exclusiveMin(int|float $value): static
+    {
+        $this->exclusiveMinimum = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set the exclusive maximum value.
+     */
+    public function exclusiveMax(int|float $value): static
+    {
+        $this->exclusiveMaximum = $value;
 
         return $this;
     }

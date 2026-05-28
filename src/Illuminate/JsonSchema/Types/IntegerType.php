@@ -15,6 +15,16 @@ class IntegerType extends Type
     protected ?int $maximum = null;
 
     /**
+     * The exclusive minimum value.
+     */
+    protected ?int $exclusiveMinimum = null;
+
+    /**
+     * The exclusive maximum value.
+     */
+    protected ?int $exclusiveMaximum = null;
+
+    /**
      * The number the value must be a multiple of.
      */
     protected ?int $multipleOf = null;
@@ -35,6 +45,26 @@ class IntegerType extends Type
     public function max(int $value): static
     {
         $this->maximum = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set the exclusive minimum value.
+     */
+    public function exclusiveMin(int $value): static
+    {
+        $this->exclusiveMinimum = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set the exclusive maximum value.
+     */
+    public function exclusiveMax(int $value): static
+    {
+        $this->exclusiveMaximum = $value;
 
         return $this;
     }
