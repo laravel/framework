@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\HigherOrderWhenProxy;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 
@@ -210,6 +211,38 @@ abstract class Relation implements BuilderContract
     public function get($columns = ['*'])
     {
         return $this->query->get($columns);
+    }
+
+    /**
+     * Apply the callback if the given "value" is (or resolves to) truthy.
+     *
+     * @template TWhenParameter
+     * @template TWhenReturnType
+     *
+     * @param  (\Closure($this): TWhenParameter)|TWhenParameter|null  $value
+     * @param  (callable($this, TWhenParameter): TWhenReturnType)|null  $callback
+     * @param  (callable($this, TWhenParameter): TWhenReturnType)|null  $default
+     * @return $this|TWhenReturnType
+     */
+    public function whenRelation($value = null, ?callable $callback = null, ?callable $default = null)
+    {
+        $value = $value instanceof Closure ? $value($this) : $value;
+
+        if (func_num_args() === 0) {
+            return new HigherOrderWhenProxy($this);
+        }
+
+        if (func_num_args() === 1) {
+            return (new HigherOrderWhenProxy($this))->condition($value);
+        }
+
+        if ($value) {
+            return $callback($this, $value) ?? $this;
+        } elseif ($default) {
+            return $default($this, $value) ?? $this;
+        }
+
+        return $this;
     }
 
     /**

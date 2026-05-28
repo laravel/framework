@@ -3,8 +3,10 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
@@ -78,6 +80,59 @@ class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
         });
 
         $this->assertSame(3, $i);
+    }
+
+    public function testWhenRelationReceivesRelationInstance()
+    {
+        $this->seedData();
+
+        $user = BelongsToManyChunkByIdTestTestUser::query()->first();
+
+        $articles = $user->articles()
+            ->whenRelation(true, function (BelongsToMany $relation, $value) {
+                $this->assertTrue($value);
+
+                return $relation->wherePivotIn('article_id', [1, 3]);
+            })
+            ->get();
+
+        $this->assertSame([1, 3], $articles->pluck('id')->all());
+    }
+
+    public function testWhenCallbackStillReceivesQueryBuilder()
+    {
+        $this->seedData();
+
+        $user = BelongsToManyChunkByIdTestTestUser::query()->first();
+
+        $articles = $user->articles()
+            ->when(true, function (Builder $query, $value) {
+                $this->assertTrue($value);
+
+                return $query->whereKey([1, 3]);
+            })
+            ->get();
+
+        $this->assertSame([1, 3], $articles->pluck('id')->all());
+    }
+
+    public function testWhenRelationDefaultReceivesRelationInstance()
+    {
+        $this->seedData();
+
+        $user = BelongsToManyChunkByIdTestTestUser::query()->first();
+
+        $articles = $user->articles()
+            ->whenRelation(false, function () {
+                $this->fail('The truthy callback should not be executed.');
+            }, function (BelongsToMany $relation, $value) {
+                $this->assertFalse($value);
+
+                return $relation->wherePivotIn('article_id', [2]);
+            })
+            ->get();
+
+        $this->assertSame([2], $articles->pluck('id')->all());
     }
 
     /**
