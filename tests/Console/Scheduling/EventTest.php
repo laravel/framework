@@ -222,6 +222,67 @@ class EventTest extends TestCase
         $this->assertSame(1, $reject->calls);
     }
 
+    public function testRunIndicatesWhenSkippedBecauseOverlapping()
+    {
+        $container = new Container;
+        $beforeCallbackCalled = false;
+        $mutex = m::mock(EventMutex::class);
+        $event = new class($mutex, 'php -i') extends Event
+        {
+            public $executed = false;
+
+            protected function execute($container)
+            {
+                $this->executed = true;
+
+                return 0;
+            }
+        };
+
+        $event->withoutOverlapping();
+        $event->before(function () use (&$beforeCallbackCalled) {
+            $beforeCallbackCalled = true;
+        });
+
+        $mutex->shouldReceive('create')->once()->with($event)->andReturn(false);
+
+        $event->run($container);
+
+        $this->assertTrue($event->skippedBecauseOverlapping);
+        $this->assertFalse($event->executed);
+        $this->assertFalse($beforeCallbackCalled);
+    }
+
+    public function testRunResetsSkippedBecauseOverlapping()
+    {
+        $container = new Container;
+        $mutex = m::mock(EventMutex::class);
+        $event = new class($mutex, 'php -i') extends Event
+        {
+            public $executions = 0;
+
+            protected function execute($container)
+            {
+                $this->executions++;
+
+                return 0;
+            }
+        };
+
+        $event->withoutOverlapping();
+
+        $mutex->shouldReceive('create')->twice()->with($event)->andReturn(false, true);
+        $mutex->shouldReceive('forget')->once()->with($event);
+
+        $event->run($container);
+        $this->assertTrue($event->skippedBecauseOverlapping);
+
+        $event->run($container);
+
+        $this->assertFalse($event->skippedBecauseOverlapping);
+        $this->assertSame(1, $event->executions);
+    }
+
     public function testDaysOfMonthMethod()
     {
         $event = new Event(m::mock(EventMutex::class), 'php -i');

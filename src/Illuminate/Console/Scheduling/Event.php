@@ -96,7 +96,7 @@ class Event
      *
      * @var bool
      */
-    public $skippedBecauseOverlapping;
+    public $skippedBecauseOverlapping = false;
 
     /**
      * Create a new event instance.
@@ -134,6 +134,8 @@ class Event
      */
     public function run(Container $container)
     {
+        $this->skippedBecauseOverlapping = false;
+
         if ($this->shouldSkipDueToOverlapping()) {
             $this->skippedBecauseOverlapping = true;
 
