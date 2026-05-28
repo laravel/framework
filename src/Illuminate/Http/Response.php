@@ -10,7 +10,6 @@ use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use JsonSerializable;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class Response extends SymfonyResponse
 {
@@ -27,13 +26,11 @@ class Response extends SymfonyResponse
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($content = '', $status = 200, array $headers = [])
+    public function __construct($content = '', int $status = 200, array $headers = [])
     {
-        $this->headers = new ResponseHeaderBag($headers);
+        parent::__construct('', $status, $headers);
 
         $this->setContent($content);
-        $this->setStatusCode($status);
-        $this->setProtocolVersion('1.0');
     }
 
     /**
@@ -46,10 +43,11 @@ class Response extends SymfonyResponse
     }
 
     /**
-     * Set the content on the response.
+     * {@inheritDoc}
+     *
+     * Override to allow for a broader range of content types.
      *
      * @param  mixed  $content
-     * @return $this
      *
      * @throws \InvalidArgumentException
      */
@@ -78,9 +76,7 @@ class Response extends SymfonyResponse
             $content = $content->render();
         }
 
-        parent::setContent($content);
-
-        return $this;
+        return parent::setContent($content);
     }
 
     /**
