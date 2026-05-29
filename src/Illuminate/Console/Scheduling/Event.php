@@ -92,7 +92,7 @@ class Event
     public $exitCode;
 
     /**
-     * Whether the execution was skipped due to the mutex already being reserved.
+     * Indicates whether the execution was skipped due to the mutex already being reserved.
      *
      * @var bool
      */
