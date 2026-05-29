@@ -366,7 +366,9 @@ class Queue implements QueueContract, ClearableQueue
 
         return Str::of($this->queue->getQueue($queue))
             ->when($prefix, fn ($str) => $str->chopStart($prefix.'/'))
-            ->when($suffix, fn ($str) => $str->chopEnd($suffix))
+            ->when($suffix, fn ($str) => $str->endsWith('.fifo')
+                ? $str->chopEnd('.fifo')->chopEnd($suffix)->append('.fifo')
+                : $str->chopEnd($suffix))
             ->toString();
     }
 
