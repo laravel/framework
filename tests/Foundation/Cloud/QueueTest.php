@@ -923,6 +923,22 @@ class QueueTest extends TestCase
         $this->assertSame('my-queue', $eventsFake->emitted[0]['queue']);
     }
 
+    public function testItNormalizesFifoQueueNamesWithoutLeakingTheSuffix()
+    {
+        Cloud::configureManagedQueues($this->app);
+        Cloud::bootManagedQueues($this->app);
+        $eventsFake = $this->fakeEvents();
+        [$queue, $client] = $this->mockedQueue();
+        $client->shouldReceive('sendMessage')->times(1)->andReturn(new Result());
+
+        $queue->push(new FakeJob, queue: 'orders.fifo');
+
+        // The suffix is injected before the ".fifo" extension on the real SQS
+        // queue name, so the normalized name must strip it back out and keep
+        // the ".fifo" terminal rather than reporting "orders-env-....fifo".
+        $this->assertSame('orders.fifo', $eventsFake->emitted[0]['queue']);
+    }
+
     /**
      * @return array{Queue, MockInterface<SqsClient>}
      */
