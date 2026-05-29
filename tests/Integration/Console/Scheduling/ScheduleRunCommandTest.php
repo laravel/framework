@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Console\Scheduling;
 use Illuminate\Console\Events\ScheduledTaskFailed;
 use Illuminate\Console\Events\ScheduledTaskFinished;
 use Illuminate\Console\Events\ScheduledTaskStarting;
+use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -183,6 +184,51 @@ class ScheduleRunCommandTest extends TestCase
         Event::assertDispatched(ScheduledTaskStarting::class);
         Event::assertDispatched(ScheduledTaskFinished::class);
         Event::assertNotDispatched(ScheduledTaskFailed::class);
+    }
+
+    public function test_overlapping_task_finished_event_indicates_skipped()
+    {
+        Event::fake([
+            ScheduledTaskStarting::class,
+            ScheduledTaskFinished::class,
+            ScheduledTaskFailed::class,
+        ]);
+
+        $this->app->instance(EventMutex::class, new class implements EventMutex
+        {
+            public function create(\Illuminate\Console\Scheduling\Event $event)
+            {
+                return false;
+            }
+
+            public function exists(\Illuminate\Console\Scheduling\Event $event)
+            {
+                return false;
+            }
+
+            public function forget(\Illuminate\Console\Scheduling\Event $event)
+            {
+                //
+            }
+        });
+
+        $ran = false;
+        $schedule = $this->app->make(Schedule::class);
+        $task = $schedule->call(function () use (&$ran) {
+            $ran = true;
+        })->name('test')->withoutOverlapping()->everyMinute();
+
+        $this->artisan('schedule:run');
+
+        Event::assertDispatched(ScheduledTaskStarting::class, function ($event) use ($task) {
+            return $event->task === $task;
+        });
+        Event::assertDispatched(ScheduledTaskFinished::class, function ($event) use ($task) {
+            return $event->task === $task &&
+                   $event->task->skippedBecauseOverlapping === true;
+        });
+        Event::assertNotDispatched(ScheduledTaskFailed::class);
+        $this->assertFalse($ran);
     }
 
     /**
