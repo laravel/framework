@@ -164,7 +164,7 @@ class BusDispatcherTest extends TestCase
 
         $dispatcher = new Dispatcher($container, fn () => $mock);
 
-        $dispatcher->dispatchBulk([
+        $dispatcher->bulk([
             new BusDispatcherQueueable,
             new BusDispatcherQueueable,
             new BusDispatcherTestSpecificQueueCommand,

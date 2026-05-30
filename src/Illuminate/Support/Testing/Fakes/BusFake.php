@@ -721,19 +721,6 @@ class BusFake implements Fake, QueueingDispatcher
     }
 
     /**
-     * Dispatch multiple commands in bulk to their appropriate handlers on the queue.
-     *
-     * @param  iterable  $jobs
-     * @return void
-     */
-    public function dispatchBulk($jobs)
-    {
-        foreach ($jobs as $job) {
-            $this->dispatch($job);
-        }
-    }
-
-    /**
      * Dispatch a command to its appropriate handler after the current process.
      *
      * @param  mixed  $command
@@ -746,6 +733,19 @@ class BusFake implements Fake, QueueingDispatcher
             $this->commandsAfterResponse[get_class($command)][] = $this->getCommandRepresentation($command);
         } else {
             $this->dispatcher->dispatchAfterResponse($command, $handler);
+        }
+    }
+
+    /**
+     * Dispatch multiple commands in bulk to their appropriate handlers on the queue.
+     *
+     * @param  iterable  $jobs
+     * @return void
+     */
+    public function bulk($jobs)
+    {
+        foreach ($jobs as $job) {
+            $this->dispatch($job);
         }
     }
 
