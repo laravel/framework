@@ -331,6 +331,20 @@ class SupportNumberTest extends TestCase
         $this->assertSame([[0.5, 2.5], [3.0, 5.0], [5.5, 7.5], [8.0, 10.0]], Number::pairs(10, 2.5, 0.5, 0.5));
     }
 
+    public function testPairsThrowsOnNonPositiveBy()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Number::pairs(100, 0);
+    }
+
+    public function testPairsThrowsOnNegativeBy()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Number::pairs(100, -10);
+    }
+
     public function testTrim()
     {
         $this->assertSame(12, Number::trim(12));
