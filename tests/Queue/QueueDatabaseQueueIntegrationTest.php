@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Queue\DatabaseQueue;
+use Illuminate\Queue\Queue;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Support\Carbon;
@@ -248,6 +249,21 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
         $popped_job = $this->queue->pop($mock_queue_name);
 
         $this->assertNull($popped_job);
+    }
+
+    public function testCustomPayloadIsExposedOnInspectedJob()
+    {
+        Queue::createPayloadUsing(function ($connection, $queue, $payload) {
+            return ['context' => ['tenant' => 'acme']];
+        });
+
+        $this->queue->push('MyJob', []);
+
+        $job = $this->queue->pendingJobs()->first();
+
+        $this->assertSame(['tenant' => 'acme'], $job->payload['context']);
+
+        Queue::createPayloadUsing(null);
     }
 
     public function testJobPayloadIsAvailableOnEvents()
