@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Queue;
 
 use Illuminate\Queue\Jobs\InspectedJob;
-use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 
 class InspectedJobTest extends TestCase

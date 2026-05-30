@@ -12,7 +12,7 @@ class InspectedJob
      * @param  string|null  $uuid  The unique identifier for the job.
      * @param  string|null  $name  The display name of the job.
      * @param  int  $attempts  The number of times the job has been attempted.
-     * @param array $payload
+     * @param  array  $payload
      * @param  \Illuminate\Support\Carbon|null  $createdAt  The date and time the job was created.
      */
     public function __construct(
