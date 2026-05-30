@@ -12,7 +12,9 @@ use Illuminate\Contracts\Queue\Factory as Queue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Queue\Attributes\Connection;
 use Illuminate\Queue\Attributes\Delay;
+use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Support\Collection;
 use Illuminate\Support\EncodedHtmlString;
 use Illuminate\Support\HtmlString;
@@ -232,15 +234,13 @@ class Mailable implements MailableContract, Renderable
             return $this->later($delay, $queue);
         }
 
-        $connection = property_exists($this, 'connection') ? $this->connection : null;
+        $connection = $this->getAttributeValue($this, Connection::class, 'connection');
 
         if (is_null($connection) && method_exists($queue, 'resolveConnectionFromQueueRoute')) {
             $connection = $queue->resolveConnectionFromQueueRoute($this);
         }
 
-        $queueName = property_exists($this, 'queue')
-            ? $this->queue
-            : null;
+        $queueName = $this->getAttributeValue($this, QueueAttribute::class, 'queue');
 
         if (is_null($queueName) && method_exists($queue, 'resolveQueueFromQueueRoute')) {
             $queueName = $queue->resolveQueueFromQueueRoute($this);
@@ -260,11 +260,9 @@ class Mailable implements MailableContract, Renderable
      */
     public function later($delay, Queue $queue)
     {
-        $connection = property_exists($this, 'connection') ? $this->connection : null;
+        $connection = $this->getAttributeValue($this, Connection::class, 'connection');
 
-        $queueName = property_exists($this, 'queue')
-            ? $this->queue
-            : null;
+        $queueName = $this->getAttributeValue($this, QueueAttribute::class, 'queue');
 
         if (is_null($connection) && method_exists($queue, 'resolveConnectionFromQueueRoute')) {
             $connection = $queue->resolveConnectionFromQueueRoute($this);
