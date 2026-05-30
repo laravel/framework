@@ -345,8 +345,12 @@ class Number
      * @param  int|float  $number
      * @return int|float
      */
-    public static function trim(int|float $number)
+    public static function trim(int|float $number): int|float
     {
+        if (is_nan($number) || is_infinite($number)) {
+            return $number;
+        }
+
         return json_decode(json_encode($number));
     }
 
