@@ -164,6 +164,40 @@ class MailCloudflareTransportTest extends TestCase
         $this->assertNotEmpty($requestBody['attachments'][0]['content']);
     }
 
+    public function testSendWithInlineAttachment(): void
+    {
+        $requestBody = null;
+
+        $client = new MockHttpClient(function ($method, $url, $options) use (&$requestBody) {
+            $requestBody = json_decode($options['body'], true);
+
+            return new MockResponse(json_encode([
+                'success' => true,
+                'errors' => [],
+                'messages' => [],
+                'result' => ['delivered' => ['me@example.com'], 'permanent_bounces' => [], 'queued' => []],
+            ]), ['http_code' => 200]);
+        });
+
+        $transport = new CloudflareTransport('test-account-id', 'test-key', $client);
+
+        $message = new Email();
+        $message->subject('With inline attachment');
+        $message->text('See image');
+        $message->sender('sender@example.com');
+        $message->to('me@example.com');
+        $message->embed('file contents', 'image.png', 'image/png');
+
+        $transport->send($message);
+
+        $this->assertCount(1, $requestBody['attachments']);
+        $this->assertSame('image.png', $requestBody['attachments'][0]['filename']);
+        $this->assertSame('image/png', $requestBody['attachments'][0]['type']);
+        $this->assertSame('inline', $requestBody['attachments'][0]['disposition']);
+        $this->assertSame('image.png', $requestBody['attachments'][0]['content_id']);
+        $this->assertNotEmpty($requestBody['attachments'][0]['content']);
+    }
+
     public function testSendThrowsOnApiFailure(): void
     {
         $client = new MockHttpClient(function () {
