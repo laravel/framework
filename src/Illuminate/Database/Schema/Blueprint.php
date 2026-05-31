@@ -9,6 +9,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
+use Illuminate\Database\Schema\Grammars\MariaDbGrammar;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
@@ -711,7 +712,16 @@ class Blueprint
      */
     public function vectorIndex($column, $name = null)
     {
-        return $this->indexCommand('vectorIndex', $column, $name, 'hnsw', 'vector_cosine_ops');
+        // Default algorithm and operatorClass are for Postgres like it is currently the case.
+        $algorithm = 'hnsw';
+        $operatorClass = 'vector_cosine_ops';
+        if ($this->grammar instanceof MariaDbGrammar) {
+            // Default value for M is currently 6
+            // Cosine for distance is best for semantic search
+            $algorithm = null;
+            $operatorClass = 'M=6 DISTANCE=cosine';
+        }
+        return $this->indexCommand('vectorIndex', $column, $name, $algorithm, $operatorClass);
     }
 
     /**
