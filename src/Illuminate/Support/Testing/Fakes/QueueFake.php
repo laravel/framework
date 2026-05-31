@@ -493,6 +493,7 @@ class QueueFake extends QueueManager implements Fake, Queue
                     ? (method_exists($data['job'], 'displayName') ? $data['job']->displayName() : get_class($data['job']))
                     : $data['job'],
                 attempts: 0,
+                payload: [],
                 createdAt: null,
             ));
     }
@@ -534,6 +535,7 @@ class QueueFake extends QueueManager implements Fake, Queue
                     ? (method_exists($data['job'], 'displayName') ? $data['job']->displayName() : get_class($data['job']))
                     : $data['job'],
                 attempts: 0,
+                payload: [],
                 createdAt: null,
             ));
     }
