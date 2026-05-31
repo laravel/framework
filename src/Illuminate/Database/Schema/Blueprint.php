@@ -721,6 +721,7 @@ class Blueprint
             $algorithm = null;
             $operatorClass = 'M=6 DISTANCE=cosine';
         }
+        
         return $this->indexCommand('vectorIndex', $column, $name, $algorithm, $operatorClass);
     }
 
