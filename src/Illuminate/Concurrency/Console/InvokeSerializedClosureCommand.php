@@ -3,7 +3,6 @@
 namespace Illuminate\Concurrency\Console;
 
 use Illuminate\Console\Command;
-use Laravel\SerializableClosure\SerializableClosure;
 use ReflectionClass;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Throwable;
@@ -45,10 +44,9 @@ class InvokeSerializedClosureCommand extends Command
             $this->output->write(json_encode([
                 'successful' => true,
                 'result' => serialize($this->laravel->call(match (true) {
-                    ! is_null($this->argument('code')) => unserialize($this->argument('code'), ['allowed_classes' => [SerializableClosure::class]]),
+                    ! is_null($this->argument('code')) => unserialize($this->argument('code')),
                     isset($_SERVER['LARAVEL_INVOKABLE_CLOSURE']) => unserialize(
-                        base64_decode($_SERVER['LARAVEL_INVOKABLE_CLOSURE']),
-                        ['allowed_classes' => [SerializableClosure::class]]
+                        base64_decode($_SERVER['LARAVEL_INVOKABLE_CLOSURE'])
                     ),
                     default => fn () => null,
                 })),
