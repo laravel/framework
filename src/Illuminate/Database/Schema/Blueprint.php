@@ -712,15 +712,9 @@ class Blueprint
      */
     public function vectorIndex($column, $name = null)
     {
-        // Default algorithm and operatorClass are for PostgreSQL like it is currently also the case.
-        $algorithm = 'hnsw';
-        $operatorClass = 'vector_cosine_ops';
-        if ($this->grammar instanceof MariaDbGrammar) {
-            // MariaDB default value for M is 6
-            // Cosine for distance is best for semantic search
-            $algorithm = null;
-            $operatorClass = 'M=6 DISTANCE=cosine';
-        }
+        [$algorithm, $operatorClass] = $this->grammar instanceof MariaDbGrammar
+            ? [null, 'M=6 DISTANCE=cosine']
+            : ['hnsw', 'vector_cosine_ops'];
 
         return $this->indexCommand('vectorIndex', $column, $name, $algorithm, $operatorClass);
     }

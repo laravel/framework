@@ -53,19 +53,6 @@ class MariaDbGrammar extends MySqlGrammar
     }
 
     /**
-     * Wrap the given JSON selector.
-     *
-     * @param  string  $value
-     * @return string
-     */
-    protected function wrapJsonSelector($value)
-    {
-        [$field, $path] = $this->wrapJsonFieldAndPath($value);
-
-        return 'json_value('.$field.$path.')';
-    }
-
-    /**
      * Compile a vector index key command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -83,5 +70,18 @@ class MariaDbGrammar extends MySqlGrammar
             $command->operatorClass ?? '',
             $command->lock ? ', lock='.$command->lock : ''
         );
+    }
+
+    /**
+     * Wrap the given JSON selector.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonSelector($value)
+    {
+        [$field, $path] = $this->wrapJsonFieldAndPath($value);
+
+        return 'json_value('.$field.$path.')';
     }
 }
