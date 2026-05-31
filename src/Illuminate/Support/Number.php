@@ -316,9 +316,11 @@ class Number
      */
     public static function pairs(int|float $to, int|float $by, int|float $start = 0, int|float $offset = 1)
     {
-        if ($by <= 0) {
-            throw new \InvalidArgumentException('The $by argument must be greater than 0.');
+        if ($by == 0) {
+            throw new \InvalidArgumentException('The $by argument must not be zero.');
         }
+
+        $by = abs($by);
 
         $output = [];
 
