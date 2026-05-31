@@ -81,7 +81,7 @@ class MariaDbGrammar extends MySqlGrammar
             $this->wrap($command->index),
             $this->columnize($command->columns),
             $command->operatorClass ?? '',
-            $command->lock ? ', lock=' . $command->lock : '',
+            $command->lock ? ', lock='.$command->lock : ''
         );
     }
 }
