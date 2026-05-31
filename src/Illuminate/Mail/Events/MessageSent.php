@@ -50,7 +50,7 @@ class MessageSent
         $this->sent = $data['sent'];
 
         $this->data = (($data['hasAttachments'] ?? false) === true)
-            ? unserialize(base64_decode($data['data']))
+            ? unserialize(base64_decode($data['data']), ['allowed_classes' => true])
             : $data['data'];
     }
 
