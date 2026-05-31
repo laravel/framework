@@ -524,6 +524,9 @@ assertType("'string'|User", $collection->value('string', fn () => 'string'));
 
 assertType('Illuminate\Support\Collection<string, int>', $collection::make(['string'])->flip());
 
+assertType('Illuminate\Support\Collection<string, Illuminate\Support\Collection<int, int>>', $collection::make(['string', 'string'])
+    ->flipGrouped());
+
 assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<int, User>>', $collection->groupBy('name'));
 assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<int, User>>', $collection->groupBy('name', true));
 assertType('Illuminate\Support\Collection<string, Illuminate\Support\Collection<int, User>>', $collection->groupBy(function ($user, $int) {

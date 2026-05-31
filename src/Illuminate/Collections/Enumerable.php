@@ -506,6 +506,13 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function flip();
 
     /**
+     * Group the collection's keys by their values.
+     *
+     * @return static<TValue, static<int, TKey>>
+     */
+    public function flipGrouped();
+
+    /**
      * Get an item from the collection by key.
      *
      * @template TGetDefault

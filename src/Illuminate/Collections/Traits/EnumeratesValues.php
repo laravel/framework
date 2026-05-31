@@ -428,6 +428,16 @@ trait EnumeratesValues
     }
 
     /**
+     * Group the collection's keys by their values.
+     *
+     * @return static<TValue, static<int, TKey>>
+     */
+    public function flipGrouped()
+    {
+        return $this->mapToGroups(fn ($value, $key) => [$value => $key]);
+    }
+
+    /**
      * Map a collection and flatten the result by a single level.
      *
      * @template TFlatMapKey of array-key

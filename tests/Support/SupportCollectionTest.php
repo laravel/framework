@@ -2117,6 +2117,18 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testFlipGrouped($collection)
+    {
+        $data = new $collection([1, 2, 3, 2, 1]);
+
+        $groups = $data->flipGrouped();
+
+        $this->assertInstanceOf($collection, $groups);
+        $this->assertEquals([1 => [0, 4], 2 => [1, 3], 3 => [2]], $groups->toArray());
+        $this->assertEquals([1, 2, 3, 2, 1], $data->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testChunk($collection)
     {
         $data = new $collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);

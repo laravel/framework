@@ -417,6 +417,9 @@ assertType('User|null', $collection->firstWhere('string', 'string', 'string'));
 
 assertType('Illuminate\Support\LazyCollection<string, int>', $collection::make(['string'])->flip());
 
+assertType('Illuminate\Support\LazyCollection<string, Illuminate\Support\LazyCollection<int, int>>', $collection::make(['string', 'string'])
+    ->flipGrouped());
+
 assertType('Illuminate\Support\LazyCollection<(int|string), Illuminate\Support\LazyCollection<int, User>>', $collection->groupBy('name'));
 assertType('Illuminate\Support\LazyCollection<(int|string), Illuminate\Support\LazyCollection<int, User>>', $collection->groupBy('name', true));
 assertType('Illuminate\Support\LazyCollection<string, Illuminate\Support\LazyCollection<int, User>>', $collection->groupBy(function ($user, $int) {
