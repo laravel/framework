@@ -12,7 +12,6 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use SessionHandlerInterface;
-use stdClass;
 use Symfony\Component\HttpFoundation\Request;
 
 class SessionStoreTest extends TestCase
