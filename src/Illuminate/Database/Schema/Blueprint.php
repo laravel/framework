@@ -204,6 +204,8 @@ class Blueprint
                 $this->commands
             );
 
+            $this->commands = $this->groupChangedColumns($this->commands);
+
             $this->addAlterCommands();
         }
     }
@@ -277,6 +279,40 @@ class Blueprint
                 $this->addCommand($commandName, ['column' => $column]);
             }
         }
+    }
+
+    /**
+     * Group consecutive change commands into batch commands when the grammar supports it.
+     *
+     * @param  array  $commands
+     * @return array
+     */
+    protected function groupChangedColumns(array $commands)
+    {
+        if (! $this->grammar->supportsChangeBatching()) {
+            return $commands;
+        }
+
+        $result = [];
+        $batch = [];
+
+        foreach ($commands as $command) {
+            if ($command->name === 'change') {
+                $batch[] = $command->column;
+            } else {
+                if ($batch) {
+                    $result[] = $this->createCommand('change', ['columns' => $batch]);
+                    $batch = [];
+                }
+                $result[] = $command;
+            }
+        }
+
+        if ($batch) {
+            $result[] = $this->createCommand('change', ['columns' => $batch]);
+        }
+
+        return $result;
     }
 
     /**

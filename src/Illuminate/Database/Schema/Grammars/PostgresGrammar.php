@@ -279,30 +279,35 @@ class PostgresGrammar extends Grammar
     }
 
     /** @inheritDoc */
+    public function supportsChangeBatching()
+    {
+        return true;
+    }
+
+    /** @inheritDoc */
     public function compileChange(Blueprint $blueprint, Fluent $command)
     {
-        $column = $command->column;
+        $parts = [];
 
-        $changes = ['type '.$this->getType($column).$this->modifyCollate($blueprint, $column)];
+        foreach ($command->columns as $column) {
+            $changes = ['type '.$this->getType($column).$this->modifyCollate($blueprint, $column)];
 
-        foreach ($this->modifiers as $modifier) {
-            if ($modifier === 'Collate') {
-                continue;
-            }
+            foreach ($this->modifiers as $modifier) {
+                if ($modifier === 'Collate') {
+                    continue;
+                }
 
-            if (method_exists($this, $method = "modify{$modifier}")) {
-                $constraints = (array) $this->{$method}($blueprint, $column);
-
-                foreach ($constraints as $constraint) {
-                    $changes[] = $constraint;
+                if (method_exists($this, $method = "modify{$modifier}")) {
+                    foreach ((array) $this->{$method}($blueprint, $column) as $constraint) {
+                        $changes[] = $constraint;
+                    }
                 }
             }
+
+            array_push($parts, ...$this->prefixArray('alter column '.$this->wrap($column), $changes));
         }
 
-        return sprintf('alter table %s %s',
-            $this->wrapTable($blueprint),
-            implode(', ', $this->prefixArray('alter column '.$this->wrap($column), $changes))
-        );
+        return sprintf('alter table %s %s', $this->wrapTable($blueprint), implode(', ', $parts));
     }
 
     /**

@@ -117,10 +117,7 @@ class SchemaBuilderTest extends DatabaseTestCase
         });
 
         $expected = [
-            'alter table `test` modify `not_null_column_to_not_null` text not null',
-            'alter table `test` modify `not_null_column_to_nullable` text null',
-            'alter table `test` modify `nullable_column_to_nullable` text null',
-            'alter table `test` modify `nullable_column_to_not_null` text not null',
+            'alter table `test` modify `not_null_column_to_not_null` text not null, modify `not_null_column_to_nullable` text null, modify `nullable_column_to_nullable` text null, modify `nullable_column_to_not_null` text not null',
         ];
 
         $this->assertEquals($expected, $blueprint->toSql());

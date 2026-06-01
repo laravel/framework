@@ -538,4 +538,14 @@ abstract class Grammar extends BaseGrammar
     {
         return $this->transactions;
     }
+
+    /**
+     * Check if this Grammar supports batching multiple column changes into one ALTER TABLE statement.
+     *
+     * @return bool
+     */
+    public function supportsChangeBatching()
+    {
+        return false;
+    }
 }

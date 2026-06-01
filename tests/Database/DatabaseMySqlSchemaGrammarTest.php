@@ -1649,6 +1649,46 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` modify `name` varchar(100) not null, lock=none', $statements[0]);
     }
 
+    public function testChangingMultipleColumnsProducesSingleAlterTableStatement()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'game_bets');
+        $blueprint->decimal('bet_amount', 16, 4)->change();
+        $blueprint->decimal('real_bet_amount', 16, 4)->default(0)->change();
+        $blueprint->decimal('win_amount', 16, 4)->default(0)->change();
+        $blueprint->decimal('odds', 10, 4)->change();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame(
+            'alter table `game_bets` modify `bet_amount` decimal(16, 4) not null, modify `real_bet_amount` decimal(16, 4) not null default \'0\', modify `win_amount` decimal(16, 4) not null default \'0\', modify `odds` decimal(10, 4) not null',
+            $statements[0]
+        );
+    }
+
+    public function testChangingColumnsWithInstantAreNotBatched()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->string('name', 100)->change()->instant();
+        $blueprint->string('email', 200)->change();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('alter table `users` modify `name` varchar(100) not null, algorithm=instant', $statements[0]);
+        $this->assertSame('alter table `users` modify `email` varchar(200) not null', $statements[1]);
+    }
+
+    public function testChangingColumnsWithLockAreNotBatched()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->string('name', 100)->change()->lock('none');
+        $blueprint->string('email', 200)->change();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('alter table `users` modify `name` varchar(100) not null, lock=none', $statements[0]);
+        $this->assertSame('alter table `users` modify `email` varchar(200) not null', $statements[1]);
+    }
+
     public function testDroppingColumnWithLock()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
