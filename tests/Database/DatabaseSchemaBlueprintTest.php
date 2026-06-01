@@ -289,12 +289,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         });
 
         $this->assertEquals([
-            'alter table `users` modify `amount` double null invisible after `name`',
-            'alter table `users` modify `added_at` timestamp(4) not null default CURRENT_TIMESTAMP(4) on update CURRENT_TIMESTAMP(4)',
-            "alter table `users` modify `difficulty` enum('easy', 'hard') character set utf8mb4 collate 'unicode' not null default 'easy'",
-            'alter table `users` modify `positions` multipolygon srid 1234 as (expression) stored',
-            'alter table `users` change `old_name` `new_name` varchar(50) not null',
-            "alter table `users` modify `id` bigint unsigned not null auto_increment comment 'my comment' first",
+            "alter table `users` modify `amount` double null invisible after `name`, modify `added_at` timestamp(4) not null default CURRENT_TIMESTAMP(4) on update CURRENT_TIMESTAMP(4), modify `difficulty` enum('easy', 'hard') character set utf8mb4 collate 'unicode' not null default 'easy', modify `positions` multipolygon srid 1234 as (expression) stored, change `old_name` `new_name` varchar(50) not null, modify `id` bigint unsigned not null auto_increment comment 'my comment' first",
             'alter table `users` auto_increment = 10',
         ], $blueprint->toSql());
     }

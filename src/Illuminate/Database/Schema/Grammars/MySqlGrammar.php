@@ -395,27 +395,64 @@ class MySqlGrammar extends Grammar
     /** @inheritDoc */
     public function compileChange(Blueprint $blueprint, Fluent $command)
     {
-        $column = $command->column;
+        // Columns with instant/lock carry table-level ALTER options that cannot be mixed
+        // into a multi-column statement, so they are flushed as their own ALTER TABLE.
+        $table = $this->wrapTable($blueprint);
+        $sql = [];
+        $batch = [];
 
-        $sql = sprintf('alter table %s %s %s%s %s',
-            $this->wrapTable($blueprint),
-            is_null($column->renameTo) ? 'modify' : 'change',
-            $this->wrap($column),
-            is_null($column->renameTo) ? '' : ' '.$this->wrap($column->renameTo),
-            $this->getType($column)
-        );
+        foreach ($command->columns as $column) {
+            if ($column->instant || $column->lock) {
+                if ($batch) {
+                    $sql[] = sprintf('alter table %s %s', $table, implode(', ', $batch));
+                    $batch = [];
+                }
 
-        $sql = $this->addModifiers($sql, $blueprint, $column);
+                $single = sprintf('alter table %s %s',
+                    $table,
+                    $this->compileChangeFragment($blueprint, $column));
 
-        if ($column->instant) {
-            $sql .= ', algorithm=instant';
+                if ($column->instant) {
+                    $single .= ', algorithm=instant';
+                }
+
+                if ($column->lock) {
+                    $single .= ', lock='.$column->lock;
+                }
+
+                $sql[] = $single;
+            } else {
+                $batch[] = $this->compileChangeFragment($blueprint, $column);
+            }
         }
 
-        if ($column->lock) {
-            $sql .= ', lock='.$column->lock;
+        if ($batch) {
+            $sql[] = sprintf('alter table %s %s', $table, implode(', ', $batch));
         }
 
         return $sql;
+    }
+
+    /**
+     * Compile the MODIFY / CHANGE fragment for a single column.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function compileChangeFragment(Blueprint $blueprint, Fluent $column)
+    {
+        if (is_null($column->renameTo)) {
+            $fragment = sprintf('modify %s %s', $this->wrap($column), $this->getType($column));
+        } else {
+            $fragment = sprintf('change %s %s %s',
+                $this->wrap($column),
+                $this->wrap($column->renameTo),
+                $this->getType($column)
+            );
+        }
+
+        return $this->addModifiers($fragment, $blueprint, $column);
     }
 
     /**
@@ -1418,6 +1455,12 @@ class MySqlGrammar extends Grammar
         }
 
         return $value;
+    }
+
+    /** @inheritDoc */
+    public function supportsChangeBatching()
+    {
+        return true;
     }
 
     /**

@@ -1407,6 +1407,21 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         return $result;
     }
 
+    public function testChangingMultipleColumnsProducesSingleAlterTableStatement()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'orders');
+        $blueprint->decimal('price', 16, 4)->change();
+        $blueprint->decimal('tax', 10, 4)->default(0)->change();
+        $statements = $blueprint->toSql();
+
+        // Both column alterations are batched into one ALTER TABLE statement;
+        // the remaining statements are per-column COMMENT updates (unavoidable in Postgres).
+        $alterStatements = array_values(array_filter($statements, fn ($s) => str_starts_with($s, 'alter table')));
+        $this->assertCount(1, $alterStatements);
+        $this->assertStringContainsString('alter column "price"', $alterStatements[0]);
+        $this->assertStringContainsString('alter column "tax"', $alterStatements[0]);
+    }
+
     public function testGrammarsAreMacroable()
     {
         // compileReplace macro.
