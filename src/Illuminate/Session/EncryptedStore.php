@@ -24,7 +24,7 @@ class EncryptedStore extends Store
      * @param  string|null  $id
      * @param  string  $serialization
      */
-    public function __construct($name, SessionHandlerInterface $handler, EncrypterContract $encrypter, $id = null, $serialization = 'php')
+    public function __construct($name, SessionHandlerInterface $handler, EncrypterContract $encrypter, $id = null, $serialization = 'json')
     {
         $this->encrypter = $encrypter;
 

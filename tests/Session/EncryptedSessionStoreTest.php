@@ -53,6 +53,7 @@ class EncryptedSessionStoreTest extends TestCase
             m::mock(SessionHandlerInterface::class),
             m::mock(Encrypter::class),
             $this->getSessionId(),
+            'php',
         ];
     }
 

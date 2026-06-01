@@ -12,13 +12,14 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use SessionHandlerInterface;
+use stdClass;
 use Symfony\Component\HttpFoundation\Request;
 
 class SessionStoreTest extends TestCase
 {
     public function testSessionIsLoadedFromHandler()
     {
-        $session = $this->getSession();
+        $session = $this->getSession('php');
         $session->getHandler()->shouldReceive('read')->once()->with($this->getSessionId())->andReturn(serialize(['foo' => 'bar', 'bagged' => ['name' => 'taylor'], '123' => 'bax']));
         $session->start();
 
@@ -95,7 +96,7 @@ class SessionStoreTest extends TestCase
 
     public function testBrandNewSessionIsProperlySaved()
     {
-        $session = $this->getSession();
+        $session = $this->getSession('php');
         $session->getHandler()->shouldReceive('read')->once()->andReturn(serialize([]));
         $session->start();
         $session->put('foo', 'bar');
@@ -120,7 +121,7 @@ class SessionStoreTest extends TestCase
 
     public function testSessionIsProperlyUpdated()
     {
-        $session = $this->getSession();
+        $session = $this->getSession('php');
         $session->getHandler()->shouldReceive('read')->once()->andReturn(serialize([
             '_token' => Str::random(40),
             'foo' => 'bar',
@@ -151,7 +152,7 @@ class SessionStoreTest extends TestCase
 
     public function testSessionIsReSavedWhenNothingHasChanged()
     {
-        $session = $this->getSession();
+        $session = $this->getSession('php');
         $session->getHandler()->shouldReceive('read')->once()->andReturn(serialize([
             '_token' => Str::random(40),
             'foo' => 'bar',
@@ -183,7 +184,7 @@ class SessionStoreTest extends TestCase
 
     public function testSessionIsReSavedWhenNothingHasChangedExceptSessionId()
     {
-        $session = $this->getSession();
+        $session = $this->getSession('php');
         $oldId = $session->getId();
         $token = Str::random(40);
         $session->getHandler()->shouldReceive('read')->once()->with($oldId)->andReturn(serialize([
@@ -832,7 +833,92 @@ class SessionStoreTest extends TestCase
         $this->assertSame('macroable', $this->getSession()->foo());
     }
 
-    public function getSession($serialization = 'php')
+    public function testDefaultSerializationIsJson()
+    {
+        $session = new Store('test', m::mock(SessionHandlerInterface::class));
+
+        $this->assertSame('json', $this->getSerializationProperty($session));
+    }
+
+    private function getSerializationProperty(Store $session): string
+    {
+        return (new ReflectionClass(Store::class))
+            ->getProperty('serialization')
+            ->getValue($session);
+    }
+
+    public function testJsonSerializationIsUsedByDefault()
+    {
+        $session = $this->getSession('json');
+        $session->getHandler()->shouldReceive('read')->once()->andReturn(json_encode(['foo' => 'bar']));
+        $session->start();
+
+        $this->assertSame('bar', $session->get('foo'));
+
+        $session->put('baz', 'boom');
+        $session->getHandler()->shouldReceive('write')->once()->with(
+            $this->getSessionId(),
+            \Mockery::on(function ($data) {
+                $decoded = json_decode($data, true);
+
+                return is_array($decoded)
+                    && $decoded['foo'] === 'bar'
+                    && $decoded['baz'] === 'boom';
+            })
+        );
+        $session->save();
+    }
+
+    public function testJsonSerializationRejectsMaliciousSerializedPayload()
+    {
+        $session = $this->getSession('json');
+
+        $maliciousPayload = 'O:12:"FakeMalicious":0:{}';
+
+        $session->getHandler()->shouldReceive('read')->once()->andReturn($maliciousPayload);
+        $session->start();
+
+        $this->assertFalse($session->has('foo'));
+        $this->assertTrue($session->has('_token'));
+        $this->assertNull($session->get('foo'));
+    }
+
+    public function testJsonSerializationRejectsObjectInjectionViaSerializedArray()
+    {
+        $session = $this->getSession('json');
+
+        $maliciousPayload = 'a:1:{s:3:"foo";O:12:"FakeMalicious":0:{}}';
+
+        $session->getHandler()->shouldReceive('read')->once()->andReturn($maliciousPayload);
+        $session->start();
+
+        $this->assertFalse($session->has('foo'));
+        $this->assertNull($session->get('foo'));
+    }
+
+    public function testPhpSerializationBackwardCompatibleWhenExplicitlySet()
+    {
+        $session = $this->getSession('php');
+        $session->getHandler()->shouldReceive('read')->once()->andReturn(serialize(['foo' => 'bar']));
+        $session->start();
+
+        $this->assertSame('bar', $session->get('foo'));
+
+        $session->put('baz', 'boom');
+        $session->getHandler()->shouldReceive('write')->once()->with(
+            $this->getSessionId(),
+            \Mockery::on(function ($data) {
+                $decoded = @unserialize($data);
+
+                return is_array($decoded)
+                    && $decoded['foo'] === 'bar'
+                    && $decoded['baz'] === 'boom';
+            })
+        );
+        $session->save();
+    }
+
+    public function getSession($serialization = 'json')
     {
         $reflection = new ReflectionClass(Store::class);
 

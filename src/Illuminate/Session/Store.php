@@ -65,7 +65,7 @@ class Store implements Session
      *
      * @var string
      */
-    protected $serialization = 'php';
+    protected $serialization = 'json';
 
     /**
      * Session store started status.
@@ -82,7 +82,7 @@ class Store implements Session
      * @param  string|null  $id
      * @param  string  $serialization
      */
-    public function __construct($name, SessionHandlerInterface $handler, $id = null, $serialization = 'php')
+    public function __construct($name, SessionHandlerInterface $handler, $id = null, $serialization = 'json')
     {
         $this->setId($id);
         $this->name = $name;
@@ -162,9 +162,15 @@ class Store implements Session
             return;
         }
 
+        $errors = $this->get('errors');
+
+        if ($errors instanceof ViewErrorBag) {
+            return;
+        }
+
         $errorBag = new ViewErrorBag;
 
-        foreach ($this->get('errors') as $key => $value) {
+        foreach ($errors as $key => $value) {
             $messageBag = new MessageBag($value['messages']);
 
             $errorBag->put($key, $messageBag->setFormat($value['format']));

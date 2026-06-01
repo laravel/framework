@@ -197,7 +197,7 @@ class SessionManager extends Manager
                 $this->config->get('session.cookie'),
                 $handler,
                 $id = null,
-                $this->config->get('session.serialization', 'php')
+                $this->config->get('session.serialization', 'json')
             );
     }
 
