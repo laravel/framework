@@ -32,8 +32,8 @@ class ValidationImageFileRuleTest extends TestCase
 
     public function testDimensionsWithCustomImageSizeMethod()
     {
-        $handle = tmpfile(); // To prevent PHP from deleting the temp file early.
-        $path = stream_get_meta_data($handle)['uri'];
+        $stream = tmpfile(); // To prevent PHP from deleting the temp file early.
+        $path = stream_get_meta_data($stream)['uri'];
 
         $this->fails(
             File::image()->dimensions(Rule::dimensions()->width(100)->height(100)),
