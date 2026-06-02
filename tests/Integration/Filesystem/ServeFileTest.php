@@ -27,7 +27,6 @@ class ServeFileTest extends TestCase
             ]);
         });
 
-
         parent::setUp();
     }
 
