@@ -1,6 +1,33 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.12.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.13.0...13.x)
+
+## [v13.13.0](https://github.com/laravel/framework/compare/v13.12.0...v13.13.0) - 2026-06-02
+
+* [13.x] Add stan ignore for MySqlSchemaState by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60284
+* [13.x] Add attachFromStorage helpers to notification MailMessage by [@LucasCavalheri](https://github.com/LucasCavalheri) in https://github.com/laravel/framework/pull/60268
+* [13.x] Allow Http Client to be used as PSR Client by [@willrowe](https://github.com/willrowe) in https://github.com/laravel/framework/pull/60295
+* [13.x] Normalize HTTP client header values by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/60292
+* [13.x] Report MultipleRecordsFoundException from sole() by [@PeteBishwhip](https://github.com/PeteBishwhip) in https://github.com/laravel/framework/pull/60294
+* [13.x] Hint unit in `UniqueFor` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/60289
+* [13.x] Fix inverted ratio comparison operators in image dimension validation by [@Button99](https://github.com/Button99) in https://github.com/laravel/framework/pull/60290
+* [13.x] Allow scheduler to opt out of pause and interrupt cache checks by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60226
+* [13.x] Enhance Cache attribute to support memoization by [@jenky](https://github.com/jenky) in https://github.com/laravel/framework/pull/60309
+* [13.x] Indicate an event was skipped by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/60311
+* [13.x] Fix `Illuminate\Http\Response` compatibility against Symfony 8.1 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/60318
+* fix: fix isUniqueConstraintError to catch SQL Server error 2627 by [@ErfanMomeniii](https://github.com/ErfanMomeniii) in https://github.com/laravel/framework/pull/60320
+* [13.x] Fix FIFO queue name normalization in Cloud managed queues by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/60315
+* fix: `whereDate` and `whereTime` crash when $column is an `Expression` by [@ahawlitschek](https://github.com/ahawlitschek) in https://github.com/laravel/framework/pull/60314
+* [13.x] Introduce Bus::bulk() by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60297
+* [13.x] Fix time-sensitive flaky test in NotificationDatabaseChannelTest by [@KentarouTakeda](https://github.com/KentarouTakeda) in https://github.com/laravel/framework/pull/60333
+* fix: Add content_id to inline attachment handling in CloudflareTransport by [@pablo-gonzalez-helpwan](https://github.com/pablo-gonzalez-helpwan) in https://github.com/laravel/framework/pull/60330
+* [13.x] Add payload to InspectedJob by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60326
+* Added MariaDB vector index capability by [@michielvaneerd](https://github.com/michielvaneerd) in https://github.com/laravel/framework/pull/60334
+* Fix [@theme](https://github.com/theme) directive collision in health check view by [@cathrinevaage](https://github.com/cathrinevaage) in https://github.com/laravel/framework/pull/60340
+* [13.x] Remove unused variables from tests by [@oliverquynh](https://github.com/oliverquynh) in https://github.com/laravel/framework/pull/60338
+* [13.x] fix: Queue and Connection attributes in Mailable::queue() and later() by [@irabbi360](https://github.com/irabbi360) in https://github.com/laravel/framework/pull/60328
+* [13.x] Fix ValidationImageFileRuleTest by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60348
+* [13.x] `schedule:pause` command should error when its disabled by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60347
 
 ## [v13.12.0](https://github.com/laravel/framework/compare/v13.11.2...v13.12.0) - 2026-05-26
 
