@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
@@ -91,12 +92,18 @@ class ConfigCacheCommand extends Command
      */
     protected function getFreshConfiguration()
     {
-        $app = require $this->laravel->bootstrapPath('app.php');
+        $originalContainer = Container::getInstance();
 
-        $app->useStoragePath($this->laravel->storagePath());
+        try {
+            $app = require $this->laravel->bootstrapPath('app.php');
 
-        $app->make(ConsoleKernelContract::class)->bootstrap();
+            $app->useStoragePath($this->laravel->storagePath());
 
-        return $app['config']->all();
+            $app->make(ConsoleKernelContract::class)->bootstrap();
+
+            return $app['config']->all();
+        } finally {
+            Container::setInstance($originalContainer);
+        }
     }
 }

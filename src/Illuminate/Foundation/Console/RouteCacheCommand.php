@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\RouteCollection;
@@ -90,9 +91,15 @@ class RouteCacheCommand extends Command
      */
     protected function getFreshApplication()
     {
-        return tap(require $this->laravel->bootstrapPath('app.php'), function ($app) {
-            $app->make(ConsoleKernelContract::class)->bootstrap();
-        });
+        $originalContainer = Container::getInstance();
+
+        try {
+            return tap(require $this->laravel->bootstrapPath('app.php'), function ($app) {
+                $app->make(ConsoleKernelContract::class)->bootstrap();
+            });
+        } finally {
+            Container::setInstance($originalContainer);
+        }
     }
 
     /**
