@@ -4730,6 +4730,63 @@ class HttpClientTest extends TestCase
         $response->json();
         $this->assertSame(3, $response->bodyCallCount);
     }
+
+    public function testJsonDecodingIsCachedForFalsyPayloads()
+    {
+        $payloads = [
+            '[]' => [],
+            'false' => false,
+            '0' => 0,
+            'null' => null,
+            '""' => '',
+        ];
+
+        foreach ($payloads as $body => $expected) {
+            $response = new BodyTrackingResponse(Factory::psr7Response($body));
+
+            // First call decodes and caches
+            $this->assertSame($expected, $response->json());
+            $this->assertSame(1, $response->bodyCallCount, "Failed for body: $body");
+
+            // Subsequent calls use cache (body() not called again)
+            $this->assertSame($expected, $response->json());
+            $this->assertSame(1, $response->bodyCallCount, "body() called again for falsy payload: $body");
+
+            // Third call to be sure
+            $this->assertSame($expected, $response->json());
+            $this->assertSame(1, $response->bodyCallCount, "body() called again for falsy payload: $body");
+        }
+    }
+
+    public function testJsonDecodingWithFalsyPayloadRespectsFlags()
+    {
+        $response = new BodyTrackingResponse(Factory::psr7Response('0'));
+
+        // First call decodes with default flags
+        $this->assertSame(0, $response->json());
+        $this->assertSame(1, $response->bodyCallCount);
+
+        // Different flags triggers re-decode
+        $response->json(flags: JSON_BIGINT_AS_STRING);
+        $this->assertSame(2, $response->bodyCallCount);
+
+        // Same flags uses cache
+        $response->json(flags: JSON_BIGINT_AS_STRING);
+        $this->assertSame(2, $response->bodyCallCount);
+    }
+
+    public function testJsonDecodingWithEmptyArrayRespectsKeyAccess()
+    {
+        $response = new BodyTrackingResponse(Factory::psr7Response('[]'));
+
+        // Accessing a key on an empty array returns default
+        $this->assertNull($response->json('missing'));
+        $this->assertSame('fallback', $response->json('missing', 'fallback'));
+
+        // body() should only be called once
+        $response->json();
+        $this->assertSame(1, $response->bodyCallCount);
+    }
 }
 
 class CustomFactory extends Factory
