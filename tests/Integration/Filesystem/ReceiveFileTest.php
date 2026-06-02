@@ -2,9 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Filesystem;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
 #[WithConfig('filesystems.disks.local.serve', true)]
 class ReceiveFileTest extends TestCase
@@ -12,7 +14,11 @@ class ReceiveFileTest extends TestCase
     protected function setUp(): void
     {
         $this->beforeApplicationDestroyed(function () {
-            Storage::delete('receive-file-test.txt');
+            Storage::delete([
+                'receive-file-test.txt',
+                'receive-file-test.txt?pad=x',
+                'nested/folder/receive-file-test.txt',
+            ]);
         });
 
         parent::setUp();
@@ -71,5 +77,37 @@ class ReceiveFileTest extends TestCase
         $response = $this->get($uploadUrl['url']);
 
         $response->assertForbidden();
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testItCanReceiveAFileWithUriDelimitersInThePath()
+    {
+        $result = Storage::temporaryUploadUrl('receive-file-test.txt?pad=x', Carbon::now()->addMinute());
+
+        $response = $this->call('PUT', $result['url'], [], [], [], [], 'Hello Question');
+
+        $response->assertNoContent();
+        Storage::assertExists('receive-file-test.txt?pad=x', 'Hello Question');
+        Storage::assertMissing('receive-file-test.txt');
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testTemporaryUploadUrlPreservesPathSeparatorsInNestedPaths()
+    {
+        $result = Storage::temporaryUploadUrl('nested/folder/receive-file-test.txt', Carbon::now()->addMinute());
+
+        $this->assertStringContainsString('nested/folder/receive-file-test.txt', $result['url']);
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testUriDelimitersInThePathCannotHideAnExpiredUploadUrl()
+    {
+        $result = Storage::temporaryUploadUrl('receive-file-test.txt?pad=x', Carbon::now()->subMinute());
+
+        $response = $this->call('PUT', $result['url'], [], [], [], [], 'Hello Question');
+
+        $response->assertForbidden();
+        Storage::assertMissing('receive-file-test.txt');
+        Storage::assertMissing('receive-file-test.txt?pad=x');
     }
 }

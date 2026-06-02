@@ -2,9 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Filesystem;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
 #[WithConfig('filesystems.disks.local.serve', true)]
 class ServeFileTest extends TestCase
@@ -13,10 +15,16 @@ class ServeFileTest extends TestCase
     {
         $this->afterApplicationCreated(function () {
             Storage::put('serve-file-test.txt', 'Hello World');
+            Storage::put('serve-file-test.txt?pad=x', 'Hello Question');
+            Storage::put('nested/folder/serve-file-test.txt', 'Hello Nested');
         });
 
         $this->beforeApplicationDestroyed(function () {
-            Storage::delete('serve-file-test.txt');
+            Storage::delete([
+                'serve-file-test.txt',
+                'serve-file-test.txt?pad=x',
+                'nested/folder/serve-file-test.txt',
+            ]);
         });
 
         parent::setUp();
@@ -45,6 +53,38 @@ class ServeFileTest extends TestCase
         $url = Storage::temporaryUrl('serve-file-test.txt', now()->addMinutes(1));
 
         $url = $url.'c';
+
+        $response = $this->get($url);
+
+        $response->assertForbidden();
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testItCanServeAFileWithUriDelimitersInThePath()
+    {
+        $url = Storage::temporaryUrl('serve-file-test.txt?pad=x', Carbon::now()->addMinute());
+
+        $response = $this->get($url);
+
+        $this->assertSame('Hello Question', $response->streamedContent());
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testTemporaryUrlPreservesPathSeparatorsInNestedPaths()
+    {
+        $url = Storage::temporaryUrl('nested/folder/serve-file-test.txt', Carbon::now()->addMinute());
+
+        $this->assertStringContainsString('nested/folder/serve-file-test.txt', $url);
+
+        $response = $this->get($url);
+
+        $this->assertSame('Hello Nested', $response->streamedContent());
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testUriDelimitersInThePathCannotHideAnExpiredUrl()
+    {
+        $url = Storage::temporaryUrl('serve-file-test.txt?pad=x', Carbon::now()->subMinute());
 
         $response = $this->get($url);
 
