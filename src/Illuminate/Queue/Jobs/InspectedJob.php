@@ -38,10 +38,12 @@ class InspectedJob
     {
         $decoded = json_decode($payload, true);
 
-        if (isset($decoded['data']['command'])) {
-            $decoded['data']['command'] = is_subclass_of($decoded['data']['commandName'] ?? '', ShouldBeEncrypted::class) && Container::getInstance()->bound(Encrypter::class)
-                ? unserialize(Container::getInstance()[Encrypter::class]->decrypt($decoded['data']['command']))
-                : unserialize($decoded['data']['command']);
+        if (isset($decoded['data']['commandName'], $decoded['data']['command'])) {
+            if (str_starts_with($decoded['data']['command'], 'O:')) {
+                $decoded['data']['command'] = unserialize($decoded['data']['command']);
+            } elseif (is_subclass_of($decoded['data']['commandName'], ShouldBeEncrypted::class) && Container::getInstance()->bound(Encrypter::class)) {
+                $decoded['data']['command'] = unserialize(Container::getInstance()[Encrypter::class]->decrypt($decoded['data']['command']));
+            }
         }
 
         return new static(
