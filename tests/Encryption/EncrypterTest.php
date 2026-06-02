@@ -7,6 +7,7 @@ use Illuminate\Encryption\Encrypter;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use stdClass;
 
 class EncrypterTest extends TestCase
 {
@@ -309,5 +310,94 @@ class EncrypterTest extends TestCase
         $this->assertFalse(Encrypter::appearsEncrypted(123));
         $this->assertFalse(Encrypter::appearsEncrypted(['foo' => 'bar']));
         $this->assertFalse(Encrypter::appearsEncrypted(null));
+    }
+
+    public function testDecryptWithAllowedClassesFalseHandlesAllStandardTypes()
+    {
+        $e = new Encrypter(str_repeat('a', 16));
+
+        $this->assertSame('foo', $e->decrypt($e->encrypt('foo')));
+        $this->assertSame(['key' => 'value'], $e->decrypt($e->encrypt(['key' => 'value'])));
+        $this->assertSame('', $e->decrypt($e->encrypt('')));
+        $this->assertSame(123, $e->decrypt($e->encrypt(123)));
+        $this->assertSame(null, $e->decrypt($e->encrypt(null)));
+    }
+
+    public function testDecryptWithAllowedClassesFalseHandlesAllStandardTypesWithGcm()
+    {
+        $e = new Encrypter(str_repeat('b', 32), 'AES-256-GCM');
+
+        $this->assertSame('foo', $e->decrypt($e->encrypt('foo')));
+        $this->assertSame(['key' => 'value'], $e->decrypt($e->encrypt(['key' => 'value'])));
+        $this->assertSame('', $e->decrypt($e->encrypt('')));
+        $this->assertSame(123, $e->decrypt($e->encrypt(123)));
+        $this->assertSame(null, $e->decrypt($e->encrypt(null)));
+    }
+
+    public function testDecryptWithAllowedClassesFalseConvertsObjectsToIncompleteClass()
+    {
+        $e = new Encrypter(str_repeat('a', 16));
+
+        $result = $e->decrypt($e->encrypt(new stdClass));
+
+        $this->assertInstanceOf(\__PHP_Incomplete_Class::class, $result);
+    }
+
+    public function testDecryptWithAllowedClassesFalsePreventsObjectInjection()
+    {
+        $e = new Encrypter(str_repeat('a', 16));
+
+        $spyFile = sys_get_temp_dir().'/'.uniqid('laravel-encrypt-test', true);
+
+        $malicious = new _EncrypterTestMalicious($spyFile);
+        $this->assertFileExists($spyFile);
+
+        $encrypted = $e->encrypt($malicious);
+
+        @unlink($spyFile);
+        $this->assertFileDoesNotExist($spyFile);
+
+        $result = $e->decrypt($encrypted);
+
+        $this->assertInstanceOf(\__PHP_Incomplete_Class::class, $result);
+        $this->assertFileDoesNotExist($spyFile);
+    }
+
+    public function testDecryptStringAndEncryptStringRoundTrip()
+    {
+        $e = new Encrypter(str_repeat('a', 16));
+
+        $this->assertSame('foo', $e->decryptString($e->encryptString('foo')));
+        $this->assertSame('', $e->decryptString($e->encryptString('')));
+        $this->assertSame('secret data', $e->decryptString($e->encryptString('secret data')));
+    }
+
+    public function testDecryptWithUnserializeFalseDoesNotCallUnserialize()
+    {
+        $e = new Encrypter(str_repeat('a', 16));
+
+        $encrypted = $e->encryptString('still encrypted');
+        $this->assertSame('still encrypted', $e->decrypt($encrypted, false));
+    }
+}
+
+class _EncrypterTestMalicious
+{
+    public string $path;
+
+    public function __construct($path)
+    {
+        $this->path = $path;
+        @touch($path);
+    }
+
+    public function __wakeup()
+    {
+        @touch($this->path);
+    }
+
+    public function __destruct()
+    {
+        @unlink($this->path);
     }
 }
