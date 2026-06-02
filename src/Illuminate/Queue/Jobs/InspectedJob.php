@@ -2,6 +2,9 @@
 
 namespace Illuminate\Queue\Jobs;
 
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Support\Carbon;
 
 class InspectedJob
@@ -34,6 +37,12 @@ class InspectedJob
     public static function fromPayload(string $payload, ?int $attempts = null): static
     {
         $decoded = json_decode($payload, true);
+
+        if (isset($decoded['data']['command'])) {
+            $decoded['data']['command'] = is_subclass_of($decoded['data']['commandName'] ?? '', ShouldBeEncrypted::class) && Container::getInstance()->bound(Encrypter::class)
+                ? unserialize(Container::getInstance()[Encrypter::class]->decrypt($decoded['data']['command']))
+                : unserialize($decoded['data']['command']);
+        }
 
         return new static(
             uuid: $decoded['uuid'] ?? null,

@@ -3,9 +3,12 @@
 namespace Illuminate\Tests\Queue;
 
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
+use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Queue\Events\JobQueued;
@@ -105,6 +108,8 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
     protected function tearDown(): void
     {
         $this->schema()->drop('jobs');
+
+        Container::setInstance(null);
 
         parent::tearDown();
     }
@@ -266,6 +271,30 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
         Queue::createPayloadUsing(null);
     }
 
+    public function testCommandIsUnserialisedOnInspectedJob()
+    {
+        $this->queue->push(new DatabaseQueueInspectedJob('hello'));
+
+        $job = $this->queue->pendingJobs()->first();
+
+        $this->assertInstanceOf(DatabaseQueueInspectedJob::class, $job->payload['data']['command']);
+        $this->assertSame('hello', $job->payload['data']['command']->data);
+    }
+
+    public function testEncryptedCommandIsDecryptedOnInspectedJob()
+    {
+        $this->container->instance(EncrypterContract::class, new Encrypter(str_repeat('a', 16)));
+
+        Container::setInstance($this->container);
+
+        $this->queue->push(new DatabaseQueueEncryptedInspectedJob('secret'));
+
+        $job = $this->queue->pendingJobs()->first();
+
+        $this->assertInstanceOf(DatabaseQueueEncryptedInspectedJob::class, $job->payload['data']['command']);
+        $this->assertSame('secret', $job->payload['data']['command']->data);
+    }
+
     public function testJobPayloadIsAvailableOnEvents()
     {
         $jobQueueingEvent = null;
@@ -289,5 +318,19 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
 
         $this->assertIsArray($jobQueuedEvent->payload());
         $this->assertSame('expected-job-uuid', $jobQueuedEvent->payload()['uuid']);
+    }
+}
+
+class DatabaseQueueInspectedJob
+{
+    public function __construct(public string $data)
+    {
+    }
+}
+
+class DatabaseQueueEncryptedInspectedJob implements ShouldBeEncrypted
+{
+    public function __construct(public string $data)
+    {
     }
 }
