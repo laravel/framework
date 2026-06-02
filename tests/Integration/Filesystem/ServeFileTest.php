@@ -58,6 +58,7 @@ class ServeFileTest extends TestCase
 
         $response->assertForbidden();
     }
+
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testItCanServeAFileWithUriDelimitersInThePath()
     {
