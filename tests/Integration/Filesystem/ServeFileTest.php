@@ -15,10 +15,6 @@ class ServeFileTest extends TestCase
     {
         $this->afterApplicationCreated(function () {
             Storage::put('serve-file-test.txt', 'Hello World');
-        });
-
-        $this->beforeApplicationDestroyed(function () {
-            Storage::delete('serve-file-test.txt');
             Storage::put('serve-file-test.txt?pad=x', 'Hello Question');
             Storage::put('nested/folder/serve-file-test.txt', 'Hello Nested');
         });
@@ -30,6 +26,7 @@ class ServeFileTest extends TestCase
                 'nested/folder/serve-file-test.txt',
             ]);
         });
+
 
         parent::setUp();
     }
