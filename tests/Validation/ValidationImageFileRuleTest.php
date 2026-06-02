@@ -32,22 +32,19 @@ class ValidationImageFileRuleTest extends TestCase
 
     public function testDimensionsWithCustomImageSizeMethod()
     {
-        $path1 = tempnam(sys_get_temp_dir(), 'laravel-test');
-        $path2 = tempnam(sys_get_temp_dir(), 'laravel-test');
+        $stream = tmpfile();
+        $path = stream_get_meta_data($stream)['uri'];
 
         $this->fails(
             File::image()->dimensions(Rule::dimensions()->width(100)->height(100)),
-            new UploadedFileWithCustomImageSizeMethod($path1, 'foo.png'),
+            new UploadedFileWithCustomImageSizeMethod($path, 'foo.png'),
             ['validation.dimensions'],
         );
 
         $this->passes(
             File::image()->dimensions(Rule::dimensions()->width(200)->height(200)),
-            new UploadedFileWithCustomImageSizeMethod($path2, 'foo.png'),
+            new UploadedFileWithCustomImageSizeMethod($path, 'foo.png'),
         );
-
-        @unlink($path1);
-        @unlink($path2);
     }
 
     public function testDimensionWithTheRatioMethod()
