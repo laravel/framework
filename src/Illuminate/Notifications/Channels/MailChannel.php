@@ -267,7 +267,9 @@ class MailChannel
             return $mailable;
         }
 
-        return $mailable->to($this->getRecipients($notifiable, $notification));
+        $recipients = $this->getRecipients($notifiable, $notification);
+
+        return $mailable->to(count($recipients) === 1 ? reset($recipients) : $recipients);
     }
 
     /**

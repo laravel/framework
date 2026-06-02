@@ -448,6 +448,7 @@ class TestMailNotificationWithMailable extends Notification
         $mailable = m::mock(Mailable::class);
 
         $mailable->shouldReceive('send')->once();
+        $mailable->shouldReceive('to')->once()->with('taylor@laravel.com')->andReturnSelf();
 
         return $mailable;
     }
