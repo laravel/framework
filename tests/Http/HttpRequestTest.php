@@ -1914,8 +1914,8 @@ class HttpRequestTest extends TestCase
             restore_error_handler();
         }
 
-        $relevantDeprecations = array_filter($deprecations, static fn (string $message) =>
-            str_contains($message, 'Directly setting property "request"') &&
+        $relevantDeprecations = array_filter($deprecations, static fn (string $message) => str_contains($message,
+            'Directly setting property "request"') &&
             str_contains($message, 'Symfony\\Component\\HttpFoundation\\Request')
         );
 
