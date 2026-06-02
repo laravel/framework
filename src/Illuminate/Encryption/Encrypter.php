@@ -201,7 +201,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
             throw new DecryptException('Could not decrypt the data.');
         }
 
-        return $unserialize ? unserialize($decrypted, ['allowed_classes' => false]) : $decrypted;
+        return $unserialize ? unserialize($decrypted) : $decrypted;
     }
 
     /**
