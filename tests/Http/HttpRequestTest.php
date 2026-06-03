@@ -1890,9 +1890,9 @@ class HttpRequestTest extends TestCase
 
     public function testCreatingJsonRequestFromBaseDoesNotTriggerRequestPropertyDeprecation()
     {
-        $base = SymfonyRequest::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json'], content: '{"hello":"world"}');
-
-        $request = Request::createFromBase($base);
+        $request = Request::createFromBase(
+            SymfonyRequest::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json'], content: '{"hello":"world"}')
+        );
 
         $this->assertTrue($request->isJson());
         $this->assertSame('world', $request->input('hello'));
