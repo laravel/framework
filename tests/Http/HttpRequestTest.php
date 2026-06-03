@@ -1888,6 +1888,16 @@ class HttpRequestTest extends TestCase
         $this->assertSame('world', $request->getPayload()->get('hello'));
     }
 
+    public function testCreatingJsonRequestFromBaseDoesNotTriggerRequestPropertyDeprecation()
+    {
+        $request = Request::createFromBase(
+            SymfonyRequest::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json'], content: '{"hello":"world"}')
+        );
+
+        $this->assertTrue($request->isJson());
+        $this->assertSame('world', $request->input('hello'));
+    }
+
     public function testJsonRequestsCanMergeDataIntoJsonRequest()
     {
         if (! method_exists(SymfonyRequest::class, 'getPayload')) {
