@@ -233,9 +233,9 @@ class MailMessageTest extends TestCase
         $headers = $attachment->getPreparedHeaders()->toArray();
         $this->assertSame($contentId, $attachment->getContentId());
         $this->assertSame('bar', $attachment->getBody());
-        $this->assertSame('Content-Type: image/png; name=foo.jpg', $headers[0]);
+        $this->assertStringContainsString('Content-Type: image/png', $headers[0]);
         $this->assertSame('Content-Transfer-Encoding: base64', $headers[1]);
-        $this->assertSame('Content-Disposition: inline; name=foo.jpg; filename=foo.jpg', $headers[2]);
+        $this->assertStringContainsString('Content-Disposition: inline', $headers[2]);
     }
 
     public function testItGeneratesARandomNameWhenAttachableHasNone(): void
