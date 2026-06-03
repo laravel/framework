@@ -8,6 +8,7 @@ use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\Cloud\FailedJobProvider;
+use Illuminate\Foundation\Cloud\JsonFormatter;
 use Illuminate\Foundation\Cloud\QueueConnector;
 use Illuminate\Queue\Connectors\SqsConnector;
 use Monolog\Handler\SocketHandler;
@@ -188,7 +189,7 @@ class Cloud
             'driver' => 'monolog',
             'level' => $_ENV['LOG_LEVEL'] ?? $_SERVER['LOG_LEVEL'] ?? 'debug',
             'handler' => SocketHandler::class,
-            'formatter' => LaravelCloudJsonFormatter::class,
+            'formatter' => JsonFormatter::class,
             'formatter_with' => [
                 'includeStacktraces' => true,
             ],

@@ -1,12 +1,12 @@
 <?php
 
-namespace Illuminate\Foundation;
+namespace Illuminate\Foundation\Cloud;
 
 use Illuminate\Container\Container;
-use Monolog\Formatter\JsonFormatter;
+use Monolog\Formatter\JsonFormatter as BaseFormatter;
 use Monolog\LogRecord;
 
-class LaravelCloudJsonFormatter extends JsonFormatter
+class JsonFormatter extends BaseFormatter
 {
     /**
      * {@inheritdoc}
