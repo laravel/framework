@@ -35,6 +35,13 @@ class Response implements ArrayAccess, Stringable
     protected $decoded;
 
     /**
+     * Indicates if the JSON response has been decoded.
+     *
+     * @var bool
+     */
+    protected bool $decodedJson = false;
+
+    /**
      * The flags that were used when decoding the JSON response.
      *
      * @var int-mask<JSON_BIGINT_AS_STRING, JSON_INVALID_UTF8_IGNORE, JSON_INVALID_UTF8_SUBSTITUTE, JSON_OBJECT_AS_ARRAY, JSON_THROW_ON_ERROR>
@@ -101,12 +108,13 @@ class Response implements ArrayAccess, Stringable
     {
         $flags ??= self::$defaultJsonDecodingFlags;
 
-        if (! $this->decoded || (isset($this->decodingFlags) && $this->decodingFlags !== $flags)) {
+        if (! $this->decodedJson || $this->decodingFlags !== $flags) {
             $this->decoded = json_decode(
                 $this->body(), true, flags: $flags
             );
 
             $this->decodingFlags = $flags;
+            $this->decodedJson = true;
         }
 
         if (is_null($key)) {
