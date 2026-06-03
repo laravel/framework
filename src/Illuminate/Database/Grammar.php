@@ -29,6 +29,16 @@ abstract class Grammar
     }
 
     /**
+     * Get the connection used by this grammar.
+     *
+     * @return \Illuminate\Database\Connection
+     */
+    public function getConnection(): Connection
+    {
+        return $this->connection;
+    }
+
+    /**
      * Wrap an array of values.
      *
      * @param  array<\Illuminate\Contracts\Database\Query\Expression|string>  $values

@@ -14,6 +14,7 @@ use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\Events\TransactionCommitting;
 use Illuminate\Database\Events\TransactionRolledBack;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Query\DialectExpression;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\Processor;
@@ -1136,6 +1137,23 @@ class Connection implements ConnectionInterface
     public function raw($value)
     {
         return new Expression($value);
+    }
+
+    /**
+     * Get a dialect-aware raw expression that resolves to the correct SQL
+     * for the active connection driver when the grammar compiles the query.
+     *
+     * Valid driver keys: 'mysql', 'mariadb', 'pgsql', 'sqlite', 'sqlsrv', 'default' for default SQL string.
+     *
+     * @param  array<string, string>  $dialects  Map of driver name => raw SQL string.
+     * @return \Illuminate\Database\Query\DialectExpression
+     *
+     * @throws \InvalidArgumentException For unknown driver keys or an empty map.
+     * @throws \RuntimeException For drivers with no mapping and no default.
+     */
+    public function rawDialect(array $dialects): DialectExpression
+    {
+        return new DialectExpression($dialects);
     }
 
     /**
