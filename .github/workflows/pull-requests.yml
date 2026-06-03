@@ -5,9 +5,8 @@ on:
     types: [opened]
 
 permissions:
-  contents: read
   pull-requests: write
 
 jobs:
   pull-requests:
-    uses: laravel/.github/.github/workflows/pull-requests.yml@dd86ce0a18475504e42fa809d7454c1cb1a88028 # main
+    uses: laravel/.github/.github/workflows/pull-requests.yml@ae831fb2746b4ad21f6751fde03da7d146822d61 # main
