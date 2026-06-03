@@ -1,15 +1,15 @@
 <?php
 
-namespace Illuminate\Tests\Foundation;
+namespace Illuminate\Tests\Foundation\Cloud;
 
 use Illuminate\Container\Container;
-use Illuminate\Foundation\LaravelCloudJsonFormatter;
+use Illuminate\Foundation\Cloud\JsonFormatter;
 use Illuminate\Http\Request;
 use Monolog\Level;
 use Monolog\LogRecord;
 use PHPUnit\Framework\TestCase;
 
-class LaravelCloudJsonFormatterTest extends TestCase
+class JsonFormatterTest extends TestCase
 {
     protected function setUp(): void
     {
@@ -42,7 +42,7 @@ class LaravelCloudJsonFormatterTest extends TestCase
         $request->headers->set('Cloud-Request-ID', '550e8400-e29b-41d4-a716-446655440000');
         $app->instance('request', $request);
 
-        $formatter = new LaravelCloudJsonFormatter;
+        $formatter = new JsonFormatter();
         $formatted = $formatter->format($this->createRecord());
         $decoded = json_decode($formatted, true);
 
@@ -51,7 +51,7 @@ class LaravelCloudJsonFormatterTest extends TestCase
 
     public function test_does_not_add_field_when_no_request_bound()
     {
-        $formatter = new LaravelCloudJsonFormatter;
+        $formatter = new JsonFormatter;
         $formatted = $formatter->format($this->createRecord());
         $decoded = json_decode($formatted, true);
 
@@ -64,7 +64,7 @@ class LaravelCloudJsonFormatterTest extends TestCase
         $request = Request::create('/');
         $app->instance('request', $request);
 
-        $formatter = new LaravelCloudJsonFormatter;
+        $formatter = new JsonFormatter;
         $formatted = $formatter->format($this->createRecord());
         $decoded = json_decode($formatted, true);
 
@@ -87,7 +87,7 @@ class LaravelCloudJsonFormatterTest extends TestCase
             context: ['context_field' => 'context_value'],
         );
 
-        $formatter = new LaravelCloudJsonFormatter;
+        $formatter = new JsonFormatter;
         $formatted = $formatter->format($record);
         $decoded = json_decode($formatted, true);
 
