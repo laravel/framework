@@ -689,8 +689,7 @@ class RedisQueueTest extends TestCase
         $this->assertSame(0, $pending->first()->attempts);
         $this->assertNotNull($pending->first()->uuid);
         $this->assertInstanceOf(Carbon::class, $pending->first()->createdAt);
-        $this->assertTrue($pending->contains(fn ($job) => $job->queue === $default));
-        $this->assertTrue($pending->contains(fn ($job) => $job->queue === 'emails'));
+        $this->assertSame([$default, 'emails'], $pending->pluck('queue')->sort()->values()->all());
     }
 
     #[DataProvider('redisDriverProvider')]
@@ -710,8 +709,7 @@ class RedisQueueTest extends TestCase
         $this->assertSame(0, $delayed->first()->attempts);
         $this->assertNotNull($delayed->first()->uuid);
         $this->assertInstanceOf(Carbon::class, $delayed->first()->createdAt);
-        $this->assertTrue($delayed->contains(fn ($job) => $job->queue === $default));
-        $this->assertTrue($delayed->contains(fn ($job) => $job->queue === 'emails'));
+        $this->assertSame([$default, 'emails'], $delayed->pluck('queue')->sort()->values()->all());
     }
 
     #[DataProvider('redisDriverProvider')]
@@ -733,8 +731,7 @@ class RedisQueueTest extends TestCase
         $this->assertSame(1, $reserved->first()->attempts);
         $this->assertNotNull($reserved->first()->uuid);
         $this->assertInstanceOf(Carbon::class, $reserved->first()->createdAt);
-        $this->assertTrue($reserved->contains(fn ($job) => $job->queue === $default));
-        $this->assertTrue($reserved->contains(fn ($job) => $job->queue === 'emails'));
+        $this->assertSame([$default, 'emails'], $reserved->pluck('queue')->sort()->values()->all());
     }
 }
 
