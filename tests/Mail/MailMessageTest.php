@@ -217,6 +217,27 @@ class MailMessageTest extends TestCase
         unlink($path);
     }
 
+    public function testItEmbedsFilesViaAttachableContractFromData(): void
+    {
+        $cid = $this->message->embed(new class() implements Attachable
+        {
+            public function toMailAttachment()
+            {
+                return Attachment::fromData(fn () => 'bar', 'foo.jpg')->withMime('image/png');
+            }
+        });
+
+        $this->assertStringStartsWith('cid:', $cid);
+        $contentId = Str::after($cid, 'cid:');
+        $attachment = $this->message->getSymfonyMessage()->getAttachments()[0];
+        $headers = $attachment->getPreparedHeaders()->toArray();
+        $this->assertSame($contentId, $attachment->getContentId());
+        $this->assertSame('bar', $attachment->getBody());
+        $this->assertSame('Content-Type: image/png; name=foo.jpg', $headers[0]);
+        $this->assertSame('Content-Transfer-Encoding: base64', $headers[1]);
+        $this->assertSame('Content-Disposition: inline; name=foo.jpg; filename=foo.jpg', $headers[2]);
+    }
+
     public function testItGeneratesARandomNameWhenAttachableHasNone(): void
     {
         file_put_contents($path = __DIR__.'/foo.jpg', 'bar');
