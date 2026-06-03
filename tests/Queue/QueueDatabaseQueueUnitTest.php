@@ -4,7 +4,13 @@ namespace Illuminate\Tests\Queue;
 
 use Illuminate\Bus\Batchable;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Connection;
+use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\FailOnTimeout;
+use Illuminate\Queue\Attributes\MaxExceptions;
+use Illuminate\Queue\Attributes\Timeout;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Queue\Jobs\InspectedJob;
 use Illuminate\Queue\Queue;
@@ -117,6 +123,46 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
         Str::createUuidsNormally();
+    }
+
+    public function testPushUsesPropertiesDeclaredOnChildClassOverInheritedAttributes()
+    {
+        $queue = new DatabaseQueue($database = m::mock(Connection::class), 'table', 'default');
+        $queue->setContainer($container = m::spy(Container::class));
+        $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
+            $payload = json_decode($array['payload'], true);
+
+            $this->assertSame(1700, $payload['timeout']);
+            $this->assertSame(7, $payload['maxTries']);
+            $this->assertSame('13', $payload['backoff']);
+            $this->assertSame(11, $payload['maxExceptions']);
+            $this->assertFalse($payload['failOnTimeout']);
+        });
+
+        $queue->push(new ChildJobWithPropertiesOverridingParentAttributes, ['data']);
+
+        $container->shouldHaveReceived('bound')->with('events')->twice();
+    }
+
+    public function testPushStillUsesAttributesDeclaredOnSameClassOverDefaultProperties()
+    {
+        $queue = new DatabaseQueue($database = m::mock(Connection::class), 'table', 'default');
+        $queue->setContainer($container = m::spy(Container::class));
+        $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
+            $payload = json_decode($array['payload'], true);
+
+            $this->assertSame(40, $payload['timeout']);
+            $this->assertSame(2, $payload['maxTries']);
+            $this->assertSame('9', $payload['backoff']);
+            $this->assertSame(3, $payload['maxExceptions']);
+            $this->assertTrue($payload['failOnTimeout']);
+        });
+
+        $queue->push(new JobWithAttributesAndDefaultProperties, ['data']);
+
+        $container->shouldHaveReceived('bound')->with('events')->twice();
     }
 
     public function testFailureToCreatePayloadFromObject()
@@ -389,4 +435,44 @@ class MyTestJob
 class MyBatchableJob
 {
     use Batchable;
+}
+
+#[Backoff(9)]
+#[FailOnTimeout]
+#[MaxExceptions(3)]
+#[Timeout(40)]
+#[Tries(2)]
+abstract class ParentJobWithAttributes implements ShouldQueue
+{
+}
+
+class ChildJobWithPropertiesOverridingParentAttributes extends ParentJobWithAttributes
+{
+    public $backoff = 13;
+
+    public $failOnTimeout = false;
+
+    public $maxExceptions = 11;
+
+    public $timeout = 1700;
+
+    public $tries = 7;
+}
+
+#[Backoff(9)]
+#[FailOnTimeout]
+#[MaxExceptions(3)]
+#[Timeout(40)]
+#[Tries(2)]
+class JobWithAttributesAndDefaultProperties implements ShouldQueue
+{
+    public $backoff = 13;
+
+    public $failOnTimeout = false;
+
+    public $maxExceptions = 11;
+
+    public $timeout = 1700;
+
+    public $tries = 7;
 }
