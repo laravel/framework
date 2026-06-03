@@ -409,7 +409,11 @@ trait ManagesFrequencies
      */
     public function weekdays()
     {
-        return $this->days(Schedule::MONDAY.'-'.Schedule::FRIDAY);
+        if (Schedule::getWeekendDays() === [Schedule::SATURDAY, Schedule::SUNDAY]) {
+            return $this->days(Schedule::MONDAY.'-'.Schedule::FRIDAY);
+        }
+
+        return $this->days(Schedule::getWeekDays());
     }
 
     /**
@@ -419,7 +423,7 @@ trait ManagesFrequencies
      */
     public function weekends()
     {
-        return $this->days(Schedule::SATURDAY.','.Schedule::SUNDAY);
+        return $this->days(Schedule::getWeekendDays());
     }
 
     /**

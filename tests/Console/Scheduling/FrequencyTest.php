@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Console\Scheduling;
 
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -19,6 +20,13 @@ class FrequencyTest extends TestCase
             m::mock(EventMutex::class),
             'php foo'
         );
+    }
+
+    protected function tearDown(): void
+    {
+        $this->resetWeekendDays();
+
+        parent::tearDown();
     }
 
     public function testEveryMinute()
@@ -154,12 +162,16 @@ class FrequencyTest extends TestCase
 
     public function testWeekdays()
     {
-        $this->assertSame('* * * * 1-5', $this->event->weekdays()->getExpression());
+        Schedule::setWeekendDays([Schedule::FRIDAY]);
+
+        $this->assertSame('* * * * 0,1,2,3,4,6', $this->event->weekdays()->getExpression());
     }
 
     public function testWeekends()
     {
-        $this->assertSame('* * * * 6,0', $this->event->weekends()->getExpression());
+        Schedule::setWeekendDays([Schedule::FRIDAY, Schedule::SATURDAY]);
+
+        $this->assertSame('* * * * 5,6', $this->event->weekends()->getExpression());
     }
 
     public function testSundays()
@@ -229,5 +241,10 @@ class FrequencyTest extends TestCase
         });
 
         $this->assertSame('*/6 * * * *', $this->event->everyXMinutes(6)->getExpression());
+    }
+
+    private function resetWeekendDays(): void
+    {
+        Schedule::setWeekendDays([Schedule::SATURDAY, Schedule::SUNDAY]);
     }
 }

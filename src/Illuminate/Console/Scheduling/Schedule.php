@@ -116,6 +116,11 @@ class Schedule
     public static $interruptible = true;
 
     /**
+     * @var array<int, int>
+     */
+    protected static array $weekends = [self::SATURDAY, self::SUNDAY];
+
+    /**
      * Create a new schedule instance.
      *
      * @param  \DateTimeZone|string|null  $timezone
@@ -514,6 +519,41 @@ class Schedule
     {
         static::$pausable = false;
         static::$interruptible = false;
+    }
+
+    /**
+     * Set the days of the week that should be treated as weekends.
+     *
+     * @param  list<int<0, 6>>  $days
+     */
+    public static function setWeekendDays(array $days): void
+    {
+        static::$weekends = $days;
+    }
+
+    /**
+     * Get the days of the week that are treated as weekends.
+     *
+     * @return list<int<0, 6>>
+     */
+    public static function getWeekendDays(): array
+    {
+        return static::$weekends;
+    }
+
+    /**
+     * Get the days of the week that are not treated as weekends.
+     *
+     * @return list<int<0, 6>>
+     */
+    public static function getWeekDays(): array
+    {
+        return array_values(
+            array_diff(
+                range(static::SUNDAY, static::SATURDAY),
+                static::$weekends
+            )
+        );
     }
 
     /**
