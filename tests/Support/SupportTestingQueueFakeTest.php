@@ -514,6 +514,7 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->assertInstanceOf(InspectedJob::class, $pending->first());
         $this->assertSame(JobStub::class, $pending->first()->name);
         $this->assertSame(0, $pending->first()->attempts);
+        $this->assertSame('foo', $pending->first()->queue);
     }
 
     public function testPendingJobsAcceptsUnitEnums()

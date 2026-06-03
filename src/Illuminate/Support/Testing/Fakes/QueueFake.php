@@ -494,6 +494,7 @@ class QueueFake extends QueueManager implements Fake, Queue
                     : $data['job'],
                 attempts: 0,
                 payload: [],
+                queue: $queue,
                 createdAt: null,
             ));
     }
@@ -536,6 +537,7 @@ class QueueFake extends QueueManager implements Fake, Queue
                     : $data['job'],
                 attempts: 0,
                 payload: [],
+                queue: $data['queue'],
                 createdAt: null,
             ));
     }

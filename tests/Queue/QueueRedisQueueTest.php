@@ -411,6 +411,14 @@ class QueueRedisQueueTest extends TestCase
         $this->assertTrue($queue->testIsClusterConnection());
         $this->assertTrue($queue->testIsClusterConnection());
     }
+
+    public function testAllQueueNamesStripsClusterBraces()
+    {
+        $queue = new TestableRedisQueue($redis = m::mock(Factory::class), 'default');
+        $redis->shouldReceive('connection->keys')->andReturn(['queues:{default}', 'queues:{default}:delayed', 'queues:{emails}']);
+
+        $this->assertSame(['default', 'emails'], $queue->testAllQueueNames()->all());
+    }
 }
 
 class TestableRedisQueue extends RedisQueue
@@ -423,5 +431,10 @@ class TestableRedisQueue extends RedisQueue
     public function testIsClusterConnection()
     {
         return $this->isClusterConnection();
+    }
+
+    public function testAllQueueNames()
+    {
+        return $this->allQueueNames();
     }
 }
