@@ -546,12 +546,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         $newRequest->content = $request->content;
 
         if ($newRequest->isJson()) {
-            return tap($newRequest->duplicate(
-                request: $newRequest->json()->all(),
-            ), function ($jsonRequest) use ($request) {
-                $jsonRequest->setJson($jsonRequest->request);
-                $jsonRequest->headers->replace($request->headers->all());
-            });
+            $newRequest->request->replace($newRequest->json()->all());
+            $newRequest->setJson($newRequest->request);
         }
 
         return $newRequest;
