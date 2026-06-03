@@ -232,6 +232,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     protected function allQueueNames(): Collection
     {
         return (new Collection($this->getConnection()->keys('queues:*')))
+            // Trim to ensure clusters get their braces removed...
             ->map(fn ($key) => trim(Str::between($key, 'queues:', ':'), '{}'))
             ->unique()
             ->values();
