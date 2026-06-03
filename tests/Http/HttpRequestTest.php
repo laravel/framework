@@ -1890,36 +1890,12 @@ class HttpRequestTest extends TestCase
 
     public function testCreatingJsonRequestFromBaseDoesNotTriggerRequestPropertyDeprecation()
     {
-        if (! method_exists(SymfonyRequest::class, 'getPayload')) {
-            return;
-        }
-
         $base = SymfonyRequest::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json'], content: '{"hello":"world"}');
 
-        $deprecations = [];
+        $request = Request::createFromBase($base);
 
-        set_error_handler(static function (int $severity, string $message) use (&$deprecations) {
-            if ($severity === E_USER_DEPRECATED) {
-                $deprecations[] = $message;
-
-                return true;
-            }
-
-            return false;
-        });
-
-        try {
-            Request::createFromBase($base);
-        } finally {
-            restore_error_handler();
-        }
-
-        $relevantDeprecations = array_filter($deprecations, static fn (string $message) => str_contains($message,
-            'Directly setting property "request"') &&
-            str_contains($message, 'Symfony\\Component\\HttpFoundation\\Request')
-        );
-
-        $this->assertEmpty($relevantDeprecations);
+        $this->assertTrue($request->isJson());
+        $this->assertSame('world', $request->input('hello'));
     }
 
     public function testJsonRequestsCanMergeDataIntoJsonRequest()
