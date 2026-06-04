@@ -1,6 +1,17 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.61.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.61.1...12.x)
+
+## [v12.61.1](https://github.com/laravel/framework/compare/v12.61.0...v12.61.1) - 2026-06-04
+
+* [12.x] Preserve empty HTTP attach contents by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/60291
+* Fix [@params](https://github.com/params) typo in Fluent and MessageBag toPrettyJson() docblocks by [@Amirhf1](https://github.com/Amirhf1) in https://github.com/laravel/framework/pull/60313
+* [12.x] Fix regex typo in Env::addVariableToEnvContents that prevented quotin… by [@Amirhf1](https://github.com/Amirhf1) in https://github.com/laravel/framework/pull/60312
+* [12.x] Fix Number::trim() returning null for INF and NAN values by [@Amirhf1](https://github.com/Amirhf1) in https://github.com/laravel/framework/pull/60322
+* [12.x] Fix FIFO queue name normalization in Cloud managed queues by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/60316
+* [12.x] Fix Number::pairs() infinite loop when $by is zero or negative by [@Amirhf1](https://github.com/Amirhf1) in https://github.com/laravel/framework/pull/60324
+* [12.x] Ensure path seperators aren't encoded in LocalFilesystemAdapter by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60350
+* [12.x] Ensure `config` is bound before trying to log deprecation notice by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/60376
 
 ## [v12.61.0](https://github.com/laravel/framework/compare/v12.60.2...v12.61.0) - 2026-05-26
 
