@@ -205,9 +205,10 @@ class Factory
 
                 foreach ($value as $key => $item) {
                     $value[$key] = match (true) {
+                        $item === null => '',
                         is_scalar($item) => (string) $item,
                         $item instanceof Stringable => $item->toString(),
-                        default => throw new InvalidArgumentException('HTTP fake response header values must be scalar, Laravel Stringable, or arrays of scalar or Laravel Stringable values.'),
+                        default => throw new InvalidArgumentException('HTTP fake response header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.'),
                     };
                 }
 
@@ -217,9 +218,10 @@ class Factory
             }
 
             $headers[$name] = match (true) {
+                $value === null => '',
                 is_scalar($value) => (string) $value,
                 $value instanceof Stringable => $value->toString(),
-                default => throw new InvalidArgumentException('HTTP fake response header values must be scalar, Laravel Stringable, or arrays of scalar or Laravel Stringable values.'),
+                default => throw new InvalidArgumentException('HTTP fake response header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.'),
             };
         }
 

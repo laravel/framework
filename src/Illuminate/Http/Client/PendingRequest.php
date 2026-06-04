@@ -1431,9 +1431,10 @@ class PendingRequest
 
             foreach ($value as $key => $item) {
                 $value[$key] = match (true) {
+                    $item === null => '',
                     is_scalar($item) => (string) $item,
                     $item instanceof Stringable => $item->toString(),
-                    default => throw new InvalidArgumentException('HTTP header values must be scalar, Laravel Stringable, or arrays of scalar or Laravel Stringable values.'),
+                    default => throw new InvalidArgumentException('HTTP header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.'),
                 };
             }
 
@@ -1441,9 +1442,10 @@ class PendingRequest
         }
 
         return match (true) {
+            $value === null => '',
             is_scalar($value) => (string) $value,
             $value instanceof Stringable => $value->toString(),
-            default => throw new InvalidArgumentException('HTTP header values must be scalar, Laravel Stringable, or arrays of scalar or Laravel Stringable values.'),
+            default => throw new InvalidArgumentException('HTTP header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.'),
         };
     }
 
@@ -1489,9 +1491,10 @@ class PendingRequest
                 foreach ($part['headers'] as $name => $value) {
                     $multipart[$index]['headers'][$name] = match (true) {
                         $value === [] => '',
+                        $value === null => '',
                         is_scalar($value) => (string) $value,
                         $value instanceof Stringable => $value->toString(),
-                        default => throw new InvalidArgumentException('Multipart header values must be scalar or Laravel Stringable.'),
+                        default => throw new InvalidArgumentException('Multipart header values must be scalar, null, or Laravel Stringable.'),
                     };
                 }
             }
