@@ -276,6 +276,24 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     }
 
     /**
+     * Determine if a given exception is being reported.
+     */
+    public function isReporting(Throwable $e): bool
+    {
+        return false;
+    }
+
+    /**
+     * Creates the context for an exception.
+     *
+     * @return array<array-key, mixed>
+     */
+    public function buildContextForException(Throwable $e)
+    {
+        return [];
+    }
+
+    /**
      * Handle dynamic method calls to the handler.
      *
      * @param  string  $method
