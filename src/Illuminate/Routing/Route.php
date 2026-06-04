@@ -241,7 +241,13 @@ class Route
         $callable = $this->action['uses'];
 
         if ($this->isSerializedClosure()) {
-            $callable = unserialize($this->action['uses'])->getClosure();
+            $callable = unserialize($this->action['uses'], ['allowed_classes' => [
+                SerializableClosure::class,
+                \Laravel\SerializableClosure\UnsignedSerializableClosure::class,
+                \Laravel\SerializableClosure\Serializers\Native::class,
+                \Laravel\SerializableClosure\Serializers\Signed::class,
+                \Laravel\SerializableClosure\Support\SelfReference::class,
+            ]])->getClosure();
         }
 
         return $this->container[CallableDispatcher::class]->dispatch($this, $callable);
@@ -1029,7 +1035,13 @@ class Route
             Str::startsWith($missing, [
                 'O:47:"Laravel\\SerializableClosure\\SerializableClosure',
                 'O:55:"Laravel\\SerializableClosure\\UnsignedSerializableClosure',
-            ]) ? unserialize($missing) : $missing;
+            ]) ? unserialize($missing, ['allowed_classes' => [
+                SerializableClosure::class,
+                \Laravel\SerializableClosure\UnsignedSerializableClosure::class,
+                \Laravel\SerializableClosure\Serializers\Native::class,
+                \Laravel\SerializableClosure\Serializers\Signed::class,
+                \Laravel\SerializableClosure\Support\SelfReference::class,
+            ]]) : $missing;
     }
 
     /**
