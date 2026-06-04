@@ -2277,6 +2277,33 @@ class RoutingRouteTest extends TestCase
 
         return $router;
     }
+
+    public function testRouteDeserializationAllowedClasses()
+    {
+        $badObject = new RouteTestInsecureDeserializationStub;
+        $closureWithUse = function () use ($badObject) {
+            return 'hello';
+        };
+
+        $serializedClosure = serialize(\Laravel\SerializableClosure\SerializableClosure::unsigned($closureWithUse));
+
+        RouteTestInsecureDeserializationStub::$instantiated = false;
+        unserialize($serializedClosure);
+        $this->assertTrue(RouteTestInsecureDeserializationStub::$instantiated);
+        $route = new Route(['GET'], 'foo', [
+            'uses' => $serializedClosure,
+        ]);
+
+        RouteTestInsecureDeserializationStub::$instantiated = false;
+
+        try {
+            $route->run();
+        } catch (\Throwable $e) {
+            //
+        }
+
+        $this->assertFalse(RouteTestInsecureDeserializationStub::$instantiated);
+    }
 }
 
 class RouteTestControllerStub extends Controller
@@ -2708,3 +2735,14 @@ final class RoutingTestHasTenantImpl
         $this->tenant = $tenant;
     }
 }
+
+class RouteTestInsecureDeserializationStub
+{
+    public static $instantiated = false;
+
+    public function __wakeup()
+    {
+        self::$instantiated = true;
+    }
+}
+
