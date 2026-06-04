@@ -31,7 +31,7 @@ class DeserializerTest extends TestCase
 
         $array = Serializer::serialize($type);
 
-        $rebuilt = JsonSchema::deserialize($array);
+        $rebuilt = JsonSchema::fromArray($array);
 
         $this->assertInstanceOf(ObjectType::class, $rebuilt);
         $this->assertSame($array, Serializer::serialize($rebuilt));
@@ -40,17 +40,17 @@ class DeserializerTest extends TestCase
 
     public function test_it_maps_every_supported_type(): void
     {
-        $this->assertInstanceOf(ObjectType::class, JsonSchema::deserialize(['type' => 'object']));
-        $this->assertInstanceOf(ArrayType::class, JsonSchema::deserialize(['type' => 'array']));
-        $this->assertInstanceOf(StringType::class, JsonSchema::deserialize(['type' => 'string']));
-        $this->assertInstanceOf(IntegerType::class, JsonSchema::deserialize(['type' => 'integer']));
-        $this->assertInstanceOf(NumberType::class, JsonSchema::deserialize(['type' => 'number']));
-        $this->assertInstanceOf(BooleanType::class, JsonSchema::deserialize(['type' => 'boolean']));
+        $this->assertInstanceOf(ObjectType::class, JsonSchema::fromArray(['type' => 'object']));
+        $this->assertInstanceOf(ArrayType::class, JsonSchema::fromArray(['type' => 'array']));
+        $this->assertInstanceOf(StringType::class, JsonSchema::fromArray(['type' => 'string']));
+        $this->assertInstanceOf(IntegerType::class, JsonSchema::fromArray(['type' => 'integer']));
+        $this->assertInstanceOf(NumberType::class, JsonSchema::fromArray(['type' => 'number']));
+        $this->assertInstanceOf(BooleanType::class, JsonSchema::fromArray(['type' => 'boolean']));
     }
 
     public function test_it_applies_string_constraints(): void
     {
-        $type = JsonSchema::deserialize([
+        $type = JsonSchema::fromArray([
             'type' => 'string',
             'minLength' => 2,
             'maxLength' => 8,
@@ -69,7 +69,7 @@ class DeserializerTest extends TestCase
 
     public function test_it_applies_integer_constraints(): void
     {
-        $type = JsonSchema::deserialize([
+        $type = JsonSchema::fromArray([
             'type' => 'integer',
             'minimum' => 0,
             'maximum' => 100,
@@ -87,7 +87,7 @@ class DeserializerTest extends TestCase
 
     public function test_it_applies_number_constraints_and_preserves_floats(): void
     {
-        $type = JsonSchema::deserialize([
+        $type = JsonSchema::fromArray([
             'type' => 'number',
             'minimum' => 0.5,
             'maximum' => 9.9,
@@ -105,7 +105,7 @@ class DeserializerTest extends TestCase
 
     public function test_it_applies_array_constraints_and_nested_items(): void
     {
-        $type = JsonSchema::deserialize([
+        $type = JsonSchema::fromArray([
             'type' => 'array',
             'items' => ['type' => 'string', 'maxLength' => 3],
             'minItems' => 1,
@@ -128,7 +128,7 @@ class DeserializerTest extends TestCase
 
     public function test_it_builds_nested_objects_and_marks_required_children(): void
     {
-        $type = JsonSchema::deserialize([
+        $type = JsonSchema::fromArray([
             'type' => 'object',
             'properties' => [
                 'name' => ['type' => 'string', 'minLength' => 1],
@@ -163,7 +163,7 @@ class DeserializerTest extends TestCase
 
     public function test_it_preserves_numeric_string_property_names_when_marking_required(): void
     {
-        $type = JsonSchema::deserialize([
+        $type = JsonSchema::fromArray([
             'type' => 'object',
             'properties' => [
                 '1' => ['type' => 'string'],
@@ -180,7 +180,7 @@ class DeserializerTest extends TestCase
 
     public function test_it_disallows_additional_properties_when_false(): void
     {
-        $type = JsonSchema::deserialize([
+        $type = JsonSchema::fromArray([
             'type' => 'object',
             'additionalProperties' => false,
         ]);
@@ -193,7 +193,7 @@ class DeserializerTest extends TestCase
 
     public function test_it_normalizes_nullable_from_a_type_array(): void
     {
-        $type = JsonSchema::deserialize([
+        $type = JsonSchema::fromArray([
             'type' => ['string', 'null'],
             'minLength' => 1,
         ]);
@@ -207,7 +207,7 @@ class DeserializerTest extends TestCase
 
     public function test_it_normalizes_nullable_from_an_any_of_null_branch(): void
     {
-        $type = JsonSchema::deserialize([
+        $type = JsonSchema::fromArray([
             'title' => 'Nickname',
             'anyOf' => [
                 ['type' => 'string', 'minLength' => 1],
@@ -225,7 +225,7 @@ class DeserializerTest extends TestCase
 
     public function test_it_normalizes_nullable_from_a_one_of_null_branch(): void
     {
-        $type = JsonSchema::deserialize([
+        $type = JsonSchema::fromArray([
             'oneOf' => [
                 ['type' => 'null'],
                 ['type' => 'integer', 'minimum' => 0],
@@ -241,7 +241,7 @@ class DeserializerTest extends TestCase
 
     public function test_it_resolves_a_local_ref_against_defs(): void
     {
-        $type = JsonSchema::deserialize([
+        $type = JsonSchema::fromArray([
             'type' => 'object',
             'properties' => [
                 'author' => ['$ref' => '#/$defs/User'],
@@ -275,7 +275,7 @@ class DeserializerTest extends TestCase
 
     public function test_it_resolves_a_local_ref_against_definitions(): void
     {
-        $type = JsonSchema::deserialize([
+        $type = JsonSchema::fromArray([
             '$ref' => '#/definitions/Tag',
             'definitions' => [
                 'Tag' => ['type' => 'string', 'minLength' => 1],
@@ -291,7 +291,7 @@ class DeserializerTest extends TestCase
 
     public function test_it_merges_sibling_keys_over_a_ref(): void
     {
-        $type = JsonSchema::deserialize([
+        $type = JsonSchema::fromArray([
             'type' => 'object',
             'properties' => [
                 'handle' => [
@@ -325,7 +325,7 @@ class DeserializerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to resolve JSON Schema $ref [#/$defs/Missing].');
 
-        JsonSchema::deserialize([
+        JsonSchema::fromArray([
             '$ref' => '#/$defs/Missing',
             '$defs' => [],
         ]);
@@ -336,14 +336,14 @@ class DeserializerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to resolve non-local JSON Schema $ref [https://example.com/user.json].');
 
-        JsonSchema::deserialize([
+        JsonSchema::fromArray([
             '$ref' => 'https://example.com/user.json',
         ]);
     }
 
     public function test_it_infers_object_type_from_properties(): void
     {
-        $type = JsonSchema::deserialize([
+        $type = JsonSchema::fromArray([
             'properties' => [
                 'name' => ['type' => 'string'],
             ],
@@ -354,7 +354,7 @@ class DeserializerTest extends TestCase
 
     public function test_it_infers_array_type_from_items(): void
     {
-        $type = JsonSchema::deserialize([
+        $type = JsonSchema::fromArray([
             'items' => ['type' => 'integer'],
         ]);
 
@@ -367,26 +367,26 @@ class DeserializerTest extends TestCase
 
     public function test_it_infers_scalar_type_from_a_homogeneous_enum(): void
     {
-        $this->assertInstanceOf(StringType::class, JsonSchema::deserialize([
+        $this->assertInstanceOf(StringType::class, JsonSchema::fromArray([
             'enum' => ['draft', 'published'],
         ]));
 
-        $this->assertInstanceOf(IntegerType::class, JsonSchema::deserialize([
+        $this->assertInstanceOf(IntegerType::class, JsonSchema::fromArray([
             'enum' => [1, 2, 3],
         ]));
 
-        $this->assertInstanceOf(NumberType::class, JsonSchema::deserialize([
+        $this->assertInstanceOf(NumberType::class, JsonSchema::fromArray([
             'enum' => [1, 2.5, 3],
         ]));
 
-        $this->assertInstanceOf(BooleanType::class, JsonSchema::deserialize([
+        $this->assertInstanceOf(BooleanType::class, JsonSchema::fromArray([
             'enum' => [true, false],
         ]));
     }
 
     public function test_it_applies_enum_and_default(): void
     {
-        $type = JsonSchema::deserialize([
+        $type = JsonSchema::fromArray([
             'type' => 'string',
             'enum' => ['draft', 'published'],
             'default' => 'draft',
@@ -401,7 +401,7 @@ class DeserializerTest extends TestCase
 
     public function test_it_ignores_unknown_keywords(): void
     {
-        $type = JsonSchema::deserialize([
+        $type = JsonSchema::fromArray([
             'type' => 'string',
             'minLength' => 1,
             '$schema' => 'https://json-schema.org/draft/2020-12/schema',
@@ -421,7 +421,7 @@ class DeserializerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to determine the JSON Schema type for the given schema.');
 
-        JsonSchema::deserialize([
+        JsonSchema::fromArray([
             'title' => 'Mystery',
         ]);
     }
@@ -431,7 +431,7 @@ class DeserializerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Circular JSON Schema $ref [#/$defs/node] detected.');
 
-        JsonSchema::deserialize([
+        JsonSchema::fromArray([
             'type' => 'object',
             'properties' => [
                 'children' => ['type' => 'array', 'items' => ['$ref' => '#/$defs/node']],
@@ -449,7 +449,7 @@ class DeserializerTest extends TestCase
 
     public function test_it_resolves_the_same_ref_used_in_sibling_positions(): void
     {
-        $type = JsonSchema::deserialize([
+        $type = JsonSchema::fromArray([
             'type' => 'object',
             'properties' => [
                 'home' => ['$ref' => '#/$defs/address'],
@@ -474,7 +474,7 @@ class DeserializerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to represent a multi-type JSON Schema union [string, integer].');
 
-        JsonSchema::deserialize([
+        JsonSchema::fromArray([
             'type' => ['string', 'integer'],
         ]);
     }
@@ -484,7 +484,7 @@ class DeserializerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to represent the schema for property [meta]; boolean schemas are not supported.');
 
-        JsonSchema::deserialize([
+        JsonSchema::fromArray([
             'type' => 'object',
             'properties' => [
                 'meta' => true,
@@ -492,46 +492,86 @@ class DeserializerTest extends TestCase
         ]);
     }
 
-    public function test_it_ignores_non_numeric_numeric_constraints_instead_of_failing(): void
+    public function test_it_throws_for_a_non_numeric_numeric_constraint(): void
     {
-        $type = JsonSchema::deserialize([
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The JSON Schema [minimum] constraint must be a number.');
+
+        JsonSchema::fromArray([
             'type' => 'number',
             'minimum' => 'oops',
-            'maximum' => ['not', 'a', 'number'],
-            'multipleOf' => 0.5,
         ]);
-
-        $this->assertInstanceOf(NumberType::class, $type);
-        $this->assertEquals([
-            'type' => 'number',
-            'multipleOf' => 0.5,
-        ], $type->toArray());
     }
 
-    public function test_it_prefers_a_union_branch_over_outer_sibling_keys(): void
+    public function test_it_throws_for_a_non_integer_integer_constraint(): void
     {
-        $type = JsonSchema::deserialize([
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The JSON Schema integer constraint [1.9] must be an integer.');
+
+        JsonSchema::fromArray([
+            'type' => 'integer',
+            'minimum' => 1.9,
+        ]);
+    }
+
+    public function test_it_throws_for_tuple_items(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Tuple and boolean JSON Schema "items" are not supported.');
+
+        JsonSchema::fromArray([
+            'type' => 'array',
+            'items' => [
+                ['type' => 'string'],
+                ['type' => 'integer'],
+            ],
+        ]);
+    }
+
+    public function test_it_throws_when_a_union_branch_conflicts_with_sibling_keys(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Conflicting [type] between a "anyOf" branch and its sibling keys.');
+
+        JsonSchema::fromArray([
             'type' => 'integer',
             'anyOf' => [
                 ['type' => 'string', 'minLength' => 3],
                 ['type' => 'null'],
             ],
         ]);
-
-        $this->assertInstanceOf(StringType::class, $type);
-        $this->assertEquals([
-            'type' => ['string', 'null'],
-            'minLength' => 3,
-        ], $type->toArray());
     }
 
-    public function test_it_does_not_carry_an_explicit_null_default(): void
+    public function test_it_throws_for_an_unsupported_union(): void
     {
-        $type = JsonSchema::deserialize([
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Only a nullable "anyOf" (a single schema plus a "null" branch) is supported.');
+
+        JsonSchema::fromArray([
+            'anyOf' => [
+                ['type' => 'string'],
+                ['type' => 'integer'],
+            ],
+        ]);
+    }
+
+    public function test_it_throws_for_a_null_default(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A null JSON Schema [default] is not supported.');
+
+        JsonSchema::fromArray([
             'type' => 'string',
             'default' => null,
         ]);
+    }
 
-        $this->assertEquals(['type' => 'string'], $type->toArray());
+    public function test_it_resolves_the_root_ref_pointer(): void
+    {
+        // "#" resolves to the root, so a self-reference is detected as circular...
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Circular JSON Schema $ref [#] detected.');
+
+        JsonSchema::fromArray(['$ref' => '#']);
     }
 }

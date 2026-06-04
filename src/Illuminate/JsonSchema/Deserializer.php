@@ -24,7 +24,7 @@ class Deserializer
     }
 
     /**
-     * Deserialize the given JSON Schema array into a type.
+     * Deserialize the Laravel-supported JSON Schema subset into a type.
      *
      * @param  array<string, mixed>  $schema
      *
@@ -118,12 +118,18 @@ class Deserializer
      *
      * @param  array<string, mixed>  $schema
      * @param  array<int, string>  $refs
+     *
+     * @throws \InvalidArgumentException
      */
     protected function buildArray(array $schema, array $refs = []): Types\ArrayType
     {
         $type = new Types\ArrayType;
 
-        if (isset($schema['items']) && is_array($schema['items']) && ! array_is_list($schema['items'])) {
+        if (isset($schema['items']) && $schema['items'] !== []) {
+            if (! is_array($schema['items']) || array_is_list($schema['items'])) {
+                throw new InvalidArgumentException('Tuple and boolean JSON Schema "items" are not supported.');
+            }
+
             $type->items($this->build($schema['items'], $refs));
         }
 
@@ -177,7 +183,7 @@ class Deserializer
      */
     protected function buildInteger(array $schema): Types\IntegerType
     {
-        return $this->applyNumericBounds(new Types\IntegerType, $schema, intval(...));
+        return $this->applyNumericBounds(new Types\IntegerType, $schema, $this->toInteger(...));
     }
 
     /**
@@ -199,15 +205,23 @@ class Deserializer
      * @param  array<string, mixed>  $schema
      * @param  (callable(int|float): (int|float))|null  $cast
      * @return TType
+     *
+     * @throws \InvalidArgumentException
      */
     protected function applyNumericBounds(Types\IntegerType|Types\NumberType $type, array $schema, ?callable $cast = null)
     {
         $cast ??= static fn (int|float $value) => $value;
 
         foreach (['minimum' => 'min', 'maximum' => 'max', 'multipleOf' => 'multipleOf'] as $keyword => $method) {
-            if (isset($schema[$keyword]) && ($value = $this->toNumber($schema[$keyword])) !== null) {
-                $type->{$method}($cast($value));
+            if (! isset($schema[$keyword])) {
+                continue;
             }
+
+            if (($value = $this->toNumber($schema[$keyword])) === null) {
+                throw new InvalidArgumentException("The JSON Schema [{$keyword}] constraint must be a number.");
+            }
+
+            $type->{$method}($cast($value));
         }
 
         return $type;
@@ -217,6 +231,8 @@ class Deserializer
      * Apply the keywords shared by every type to the given instance.
      *
      * @param  array<string, mixed>  $schema
+     *
+     * @throws \InvalidArgumentException
      */
     protected function applyCommon(Types\Type $type, array $schema): void
     {
@@ -232,7 +248,11 @@ class Deserializer
             $type->enum($schema['enum']);
         }
 
-        if (array_key_exists('default', $schema) && $schema['default'] !== null) {
+        if (array_key_exists('default', $schema)) {
+            if ($schema['default'] === null) {
+                throw new InvalidArgumentException('A null JSON Schema [default] is not supported.');
+            }
+
             // The "default" setter is typed per concrete type, so assign it directly...
             (fn () => $this->default = $schema['default'])->call($type);
         }
@@ -341,6 +361,8 @@ class Deserializer
      * @param  array<string, mixed>  $schema
      * @param  array<int, string>  $refs
      * @return array{0: array<string, mixed>, 1: bool, 2: array<int, string>}
+     *
+     * @throws \InvalidArgumentException
      */
     protected function normalizeUnions(array $schema, array $refs = []): array
     {
@@ -366,16 +388,26 @@ class Deserializer
                 }
             }
 
+            if (! $nullable || count($branches) !== 1) {
+                throw new InvalidArgumentException(
+                    "Only a nullable \"{$key}\" (a single schema plus a \"null\" branch) is supported."
+                );
+            }
+
+            [$branch, $branchRefs] = $branches[0];
+
             $siblings = $schema;
             unset($siblings[$key]);
 
-            if (count($branches) === 1) {
-                [$branch, $branchRefs] = $branches[0];
-
-                return [array_merge($siblings, $branch), $nullable, $branchRefs];
+            foreach ($siblings as $siblingKey => $value) {
+                if (array_key_exists($siblingKey, $branch) && $branch[$siblingKey] !== $value) {
+                    throw new InvalidArgumentException(
+                        "Conflicting [{$siblingKey}] between a \"{$key}\" branch and its sibling keys."
+                    );
+                }
             }
 
-            return [$siblings, $nullable, $refs];
+            return [array_merge($siblings, $branch), true, $branchRefs];
         }
 
         return [$schema, false, $refs];
@@ -433,6 +465,10 @@ class Deserializer
      */
     protected function lookupRef(string $ref): array
     {
+        if ($ref === '#') {
+            return $this->root;
+        }
+
         if (! str_starts_with($ref, '#/')) {
             throw new InvalidArgumentException("Unable to resolve non-local JSON Schema \$ref [{$ref}].");
         }
@@ -470,5 +506,19 @@ class Deserializer
         }
 
         return null;
+    }
+
+    /**
+     * Cast the given number to an integer, rejecting non-integer values.
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function toInteger(int|float $value): int
+    {
+        if (is_float($value) && floor($value) !== $value) {
+            throw new InvalidArgumentException("The JSON Schema integer constraint [{$value}] must be an integer.");
+        }
+
+        return (int) $value;
     }
 }
