@@ -550,20 +550,35 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function remember($key, $ttl, Closure $callback)
     {
+        return $this->rememberWithState($key, $ttl, $callback)['value'];
+    }
+
+    /**
+     * Get an item from the cache, or execute the given Closure and store the result.
+     *
+     * @template TCacheValue
+     *
+     * @param  \UnitEnum|string  $key
+     * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  \Closure(): TCacheValue  $callback
+     * @return array{value: TCacheValue, foundInCache: bool}
+     */
+    public function rememberWithState($key, $ttl, Closure $callback): array
+    {
         $value = $this->get($key);
 
         // If the item exists in the cache we will just return this immediately and if
         // not we will execute the given Closure and cache the result of that for a
         // given number of seconds so it's available for all subsequent requests.
         if (! is_null($value)) {
-            return $value;
+            return ['foundInCache' => true, 'value' => $value];
         }
 
         $value = $callback();
 
         $this->put($key, $value, value($ttl, $value));
 
-        return $value;
+        return ['foundInCache' => false, 'value' => $value];
     }
 
     /**
