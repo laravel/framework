@@ -11,7 +11,7 @@ use Symfony\Component\Process\Process;
 class InvokedProcess implements InvokedProcessContract
 {
     use Macroable;
-    
+
     /**
      * The underlying process instance.
      *
