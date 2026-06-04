@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 use function PHPStan\Testing\assertType;
@@ -18,7 +19,7 @@ assertType('mixed', Cache::pull('cache', function (): int {
 assertType('mixed', Cache::sear('cache', function (): int {
     return 33;
 }));
-assertType('mixed', Cache::remember('cache', now(), function (): int {
+assertType('mixed', Cache::remember('cache', Carbon::now(), function (): int {
     return 36;
 }));
 assertType('mixed', Cache::rememberForever('cache', function (): int {

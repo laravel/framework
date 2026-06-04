@@ -357,7 +357,7 @@ class RouteCollectionTest extends TestCase
         $request = Request::create('users/1/show', 'GET');
 
         $this->assertCount(2, $this->routeCollection->getRoutes());
-        $this->assertEquals('first', $this->routeCollection->match($request)->getName());
+        $this->assertSame('first', $this->routeCollection->match($request)->getName());
     }
 
     public function testPrependsRoutesWithDomain()
@@ -418,5 +418,20 @@ class RouteCollectionTest extends TestCase
                 'no-domain-get2' => $noDomainGet2,
             ],
         ], $this->routeCollection->getRoutesByMethod());
+    }
+
+    public function testDomainRoutesAreMatchedBeforeNonDomainRoutes()
+    {
+        $this->routeCollection->add(
+            (new Route('GET', 'users', ['uses' => 'NoDomainController@index']))->name('no-domain')
+        );
+
+        $this->routeCollection->add(
+            (new Route('GET', 'users', ['uses' => 'DomainController@index']))->domain('api.test')->name('with-domain')
+        );
+
+        $request = Request::create('http://api.test/users', 'GET');
+
+        $this->assertSame('with-domain', $this->routeCollection->match($request)->getName());
     }
 }

@@ -546,7 +546,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         $newRequest->content = $request->content;
 
         if ($newRequest->isJson()) {
-            $newRequest->request = $newRequest->json();
+            $newRequest->request->replace($newRequest->json()->all());
+            $newRequest->setJson($newRequest->request);
         }
 
         return $newRequest;
@@ -599,6 +600,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \Symfony\Component\HttpFoundation\Exception\SessionNotFoundException
      */
     #[\Override]
     public function getSession(): SessionInterface

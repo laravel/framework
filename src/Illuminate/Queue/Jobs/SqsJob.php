@@ -5,6 +5,7 @@ namespace Illuminate\Queue\Jobs;
 use Aws\Sqs\SqsClient;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job as JobContract;
+use Illuminate\Support\Arr;
 
 class SqsJob extends Job implements JobContract
 {
@@ -23,6 +24,20 @@ class SqsJob extends Job implements JobContract
     protected $job;
 
     /**
+     * The overflow storage options for large payload offloading.
+     *
+     * @var array
+     */
+    protected $overflowStorage = [];
+
+    /**
+     * The cached raw body of the job.
+     *
+     * @var string|null
+     */
+    protected $cachedRawBody = null;
+
+    /**
      * Create a new job instance.
      *
      * @param  \Illuminate\Container\Container  $container
@@ -30,14 +45,16 @@ class SqsJob extends Job implements JobContract
      * @param  array  $job
      * @param  string  $connectionName
      * @param  string  $queue
+     * @param  array  $overflowStorage
      */
-    public function __construct(Container $container, SqsClient $sqs, array $job, $connectionName, $queue)
+    public function __construct(Container $container, SqsClient $sqs, array $job, $connectionName, $queue, array $overflowStorage = [])
     {
         $this->sqs = $sqs;
         $this->job = $job;
         $this->queue = $queue;
         $this->container = $container;
         $this->connectionName = $connectionName;
+        $this->overflowStorage = $overflowStorage;
     }
 
     /**
@@ -69,6 +86,11 @@ class SqsJob extends Job implements JobContract
         $this->sqs->deleteMessage([
             'QueueUrl' => $this->queue, 'ReceiptHandle' => $this->job['ReceiptHandle'],
         ]);
+
+        if (Arr::get($this->overflowStorage, 'delete_after_processing') &&
+            $pointer = $this->overflowPointer()) {
+            $this->overflowStore()->forget($pointer);
+        }
     }
 
     /**
@@ -98,7 +120,53 @@ class SqsJob extends Job implements JobContract
      */
     public function getRawBody()
     {
+        if ($this->cachedRawBody !== null) {
+            return $this->cachedRawBody;
+        }
+
+        if ($pointer = $this->overflowPointer()) {
+            return $this->cachedRawBody = $this->overflowStore()->get($pointer);
+        }
+
         return $this->job['Body'];
+    }
+
+    /**
+     * Resolve the pointer path from the job body, if present.
+     *
+     * @return string|null
+     */
+    protected function overflowPointer()
+    {
+        if (! Arr::get($this->overflowStorage, 'enabled', false)) {
+            return null;
+        }
+
+        $body = $this->job['Body'] ?? null;
+
+        if (! is_string($body) || $body === '') {
+            return null;
+        }
+
+        $decoded = json_decode($body, true);
+
+        if (! is_array($decoded) || ! isset($decoded['@pointer'])) {
+            return null;
+        }
+
+        return is_string($decoded['@pointer']) ? $decoded['@pointer'] : null;
+    }
+
+    /**
+     * Resolve the configured cache store for extended storage.
+     *
+     * @return \Illuminate\Contracts\Cache\Repository
+     */
+    protected function overflowStore()
+    {
+        return $this->container->make('cache')->store(
+            Arr::get($this->overflowStorage, 'store')
+        );
     }
 
     /**

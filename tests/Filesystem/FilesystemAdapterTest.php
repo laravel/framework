@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Filesystem;
 
-use Carbon\Carbon;
 use GuzzleHttp\Psr7\Stream;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
@@ -10,6 +9,7 @@ use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
 use Illuminate\Testing\Assert;
 use InvalidArgumentException;
 use League\Flysystem\Filesystem;
@@ -557,7 +557,7 @@ class FilesystemAdapterTest extends TestCase
         $exceptionHandler->shouldReceive('report')
             ->once()
             ->andReturnUsing(function (UnableToReadFile $e) {
-                self::assertStringContainsString(
+                $this->assertStringContainsString(
                     'Unable to read file from location: foo.txt.',
                     $e->getMessage(),
                 );
@@ -585,7 +585,7 @@ class FilesystemAdapterTest extends TestCase
         $exceptionHandler->shouldReceive('report')
             ->once()
             ->andReturnUsing(function (UnableToReadFile $e) {
-                self::assertStringContainsString(
+                $this->assertStringContainsString(
                     'Unable to read file from location: foo.txt.',
                     $e->getMessage(),
                 );
@@ -613,7 +613,7 @@ class FilesystemAdapterTest extends TestCase
         $exceptionHandler->shouldReceive('report')
             ->once()
             ->andReturnUsing(function (UnableToWriteFile $e) {
-                self::assertStringContainsString(
+                $this->assertStringContainsString(
                     'Unable to write file at location: foo.txt.',
                     $e->getMessage(),
                 );
@@ -647,7 +647,7 @@ class FilesystemAdapterTest extends TestCase
         $exceptionHandler->shouldReceive('report')
             ->once()
             ->andReturnUsing(function (UnableToRetrieveMetadata $e) {
-                self::assertStringContainsString(
+                $this->assertStringContainsString(
                     'Unable to retrieve the mime_type for file at location: unknown.mime-type.',
                     $e->getMessage(),
                 );
@@ -677,7 +677,7 @@ class FilesystemAdapterTest extends TestCase
 
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
 
-        $this->assertSame($filesystemAdapter->files(), ['body.txt', 'existing.txt', 'file.txt', 'file1.txt']);
+        $this->assertSame(['body.txt', 'existing.txt', 'file.txt', 'file1.txt'], $filesystemAdapter->files());
     }
 
     public function testProvidesTemporaryUrls()
@@ -742,7 +742,7 @@ class FilesystemAdapterTest extends TestCase
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['url' => 'https://example.org/', 'prefix' => 'images']);
 
-        $this->assertEquals('https://example.org/images/picture.jpeg', $filesystemAdapter->url('picture.jpeg'));
+        $this->assertSame('https://example.org/images/picture.jpeg', $filesystemAdapter->url('picture.jpeg'));
     }
 
     public function testGetChecksum()
@@ -750,8 +750,8 @@ class FilesystemAdapterTest extends TestCase
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $filesystemAdapter->write('path.txt', 'contents of file');
 
-        $this->assertEquals('730bed78bccf58c2cfe44c29b71e5e6b', $filesystemAdapter->checksum('path.txt'));
-        $this->assertEquals('a5c3556d', $filesystemAdapter->checksum('path.txt', ['checksum_algo' => 'crc32']));
+        $this->assertSame('730bed78bccf58c2cfe44c29b71e5e6b', $filesystemAdapter->checksum('path.txt'));
+        $this->assertSame('a5c3556d', $filesystemAdapter->checksum('path.txt', ['checksum_algo' => 'crc32']));
     }
 
     public function testUsesRightSeperatorForS3AdapterWithoutDoublePrefixing()
@@ -766,7 +766,7 @@ class FilesystemAdapterTest extends TestCase
         ]);
 
         $path = $filesystemAdapter->path('different');
-        $this->assertEquals('my-root/someprefix/different', $path);
+        $this->assertSame('my-root/someprefix/different', $path);
     }
 
     public function testTemporaryUploadUrlWithCustomCallback()

@@ -145,6 +145,31 @@ class UniqueJobTest extends QueueTestCase
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
     }
 
+    public function testRetryOfUniqueUntilProcessingJobDoesNotForceReleaseSubsequentLock()
+    {
+        $this->markTestSkippedWhenUsingSyncQueueDriver();
+
+        dispatch($job = new UniqueUntilProcessingRetryJob);
+
+        // Lock acquired at dispatch time.
+        $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
+
+        $this->runQueueWorkerCommand(['--once' => true]); // attempt 1: releases lock, then fails
+
+        $this->assertTrue($job::$handled);
+
+        // Lock was correctly released before attempt 1 ran. Simulate a subsequent external dispatch
+        // acquiring it (asserts it was free and holds it for the rest of the test).
+        $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 60)->get());
+
+        // Attempt 2 (the retry) must not force-release the lock it did not acquire.
+        UniqueUntilProcessingRetryJob::$handled = false;
+        $this->runQueueWorkerCommand(['--once' => true]); // attempt 2
+
+        $this->assertTrue($job::$handled);
+        $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
+    }
+
     public function testLockIsReleasedOnModelNotFoundException()
     {
         UniqueTestSerializesModelsJob::$handled = false;
@@ -199,7 +224,7 @@ class UniqueJobTest extends QueueTestCase
     {
         Bus::fake();
 
-        $lockKey = 'laravel_unique_job:App\\Actions\\UniqueTestAction:';
+        $lockKey = 'laravel_unique_job:'.hash('xxh128', 'App\\Actions\\UniqueTestAction').':';
 
         dispatch(new UniqueTestJobWithDisplayName);
         $this->runQueueWorkerCommand(['--once' => true]);
@@ -221,7 +246,7 @@ class UniqueJobTest extends QueueTestCase
 
     public function testUniqueLockCreatesKeyWithClassName()
     {
-        $this->assertEquals(
+        $this->assertSame(
             'laravel_unique_job:'.UniqueTestJob::class.':',
             UniqueLock::getKey(new UniqueTestJob)
         );
@@ -229,7 +254,7 @@ class UniqueJobTest extends QueueTestCase
 
     public function testUniqueLockCreatesKeyWithIdAndClassName()
     {
-        $this->assertEquals(
+        $this->assertSame(
             'laravel_unique_job:'.UniqueIdTestJob::class.':unique-id-1',
             UniqueLock::getKey(new UniqueIdTestJob)
         );
@@ -237,16 +262,16 @@ class UniqueJobTest extends QueueTestCase
 
     public function testUniqueLockCreatesKeyWithDisplayNameWhenAvailable()
     {
-        $this->assertEquals(
-            'laravel_unique_job:App\\Actions\\UniqueTestAction:unique-id-2',
+        $this->assertSame(
+            'laravel_unique_job:'.hash('xxh128', 'App\\Actions\\UniqueTestAction').':unique-id-2',
             UniqueLock::getKey(new UniqueIdTestJobWithDisplayName)
         );
     }
 
     public function testUniqueLockCreatesKeyWithIdAndDisplayNameWhenAvailable()
     {
-        $this->assertEquals(
-            'laravel_unique_job:App\\Actions\\UniqueTestAction:unique-id-2',
+        $this->assertSame(
+            'laravel_unique_job:'.hash('xxh128', 'App\\Actions\\UniqueTestAction').':unique-id-2',
             UniqueLock::getKey(new UniqueIdTestJobWithDisplayName)
         );
     }
@@ -300,6 +325,24 @@ class UniqueTestRetryJob extends UniqueTestFailJob
 class UniqueUntilStartTestJob extends UniqueTestJob implements ShouldBeUniqueUntilProcessing
 {
     public $tries = 2;
+}
+
+class UniqueUntilProcessingRetryJob implements ShouldQueue, ShouldBeUniqueUntilProcessing
+{
+    use InteractsWithQueue, Queueable, Dispatchable;
+
+    public $tries = 2;
+
+    public static $handled = false;
+
+    public function handle()
+    {
+        static::$handled = true;
+
+        if ($this->attempts() === 1) {
+            throw new Exception('First attempt failure.');
+        }
+    }
 }
 
 class UniqueTestSerializesModelsJob extends UniqueTestJob

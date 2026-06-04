@@ -22,18 +22,22 @@ use Illuminate\Queue\Attributes\Connection as ConnectionAttribute;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
 use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
+use Illuminate\Support\RebindsCallbacksToSelf;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Pusher\Pusher;
+use ReflectionException;
 use RuntimeException;
 use Throwable;
+
+use function Illuminate\Support\enum_value;
 
 /**
  * @mixin \Illuminate\Contracts\Broadcasting\Broadcaster
  */
 class BroadcastManager implements FactoryContract
 {
-    use ReadsQueueAttributes, ResolvesQueueRoutes;
+    use ReadsQueueAttributes, RebindsCallbacksToSelf, ResolvesQueueRoutes;
 
     /**
      * The application instance.
@@ -195,15 +199,12 @@ class BroadcastManager implements FactoryContract
                 : $dispatch();
         }
 
-        $queue = null;
-
-        if (method_exists($event, 'broadcastQueue')) {
-            $queue = $event->broadcastQueue();
-        } elseif (isset($event->broadcastQueue)) {
-            $queue = $event->broadcastQueue;
-        } elseif (isset($event->queue)) {
-            $queue = $event->queue;
-        }
+        $queue = match (true) {
+            method_exists($event, 'broadcastQueue') => $event->broadcastQueue(),
+            isset($event->broadcastQueue) => $event->broadcastQueue,
+            isset($event->queue) => $event->queue,
+            default => null,
+        };
 
         if (is_null($queue)) {
             $queue = $this->getAttributeValue($event, QueueAttribute::class, 'queue')
@@ -251,9 +252,9 @@ class BroadcastManager implements FactoryContract
     }
 
     /**
-     * Get a driver instance.
+     * Get a broadcaster instance by name.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return mixed
      */
     public function connection($name = null)
@@ -264,12 +265,12 @@ class BroadcastManager implements FactoryContract
     /**
      * Get a driver instance.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return mixed
      */
     public function driver($name = null)
     {
-        $name = $name ?: $this->getDefaultDriver();
+        $name = enum_value($name) ?: $this->getDefaultDriver();
 
         return $this->drivers[$name] = $this->get($name);
     }
@@ -349,7 +350,7 @@ class BroadcastManager implements FactoryContract
      */
     protected function createPusherDriver(array $config)
     {
-        return new PusherBroadcaster($this->pusher($config));
+        return new PusherBroadcaster($this->pusher($config), $config['jsonp'] ?? false);
     }
 
     /**
@@ -468,29 +469,29 @@ class BroadcastManager implements FactoryContract
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['broadcasting.default'];
+        return $this->app['config']['broadcasting.default'] ?? 'null';
     }
 
     /**
      * Set the default driver name.
      *
-     * @param  string  $name
+     * @param  \UnitEnum|string  $name
      * @return void
      */
     public function setDefaultDriver($name)
     {
-        $this->app['config']['broadcasting.default'] = $name;
+        $this->app['config']['broadcasting.default'] = enum_value($name);
     }
 
     /**
      * Disconnect the given driver / connection and remove it from local cache.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return void
      */
     public function purge($name = null)
     {
-        $name ??= $this->getDefaultDriver();
+        $name = enum_value($name) ?? $this->getDefaultDriver();
 
         unset($this->drivers[$name]);
     }
@@ -507,7 +508,13 @@ class BroadcastManager implements FactoryContract
      */
     public function extend($driver, Closure $callback)
     {
-        $this->customCreators[$driver] = $callback->bindTo($this, $this);
+        try {
+            $callback = $this->bindCallbackToSelf($callback) ?? throw new RuntimeException('Unable to bind custom driver callback');
+        } catch (ReflectionException $e) {
+            throw new RuntimeException('Unable to bind custom driver callback', previous: $e);
+        }
+
+        $this->customCreators[$driver] = $callback;
 
         return $this;
     }

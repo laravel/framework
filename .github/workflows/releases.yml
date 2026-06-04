@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Remove optional "v" prefix
         id: version
@@ -52,7 +52,7 @@ jobs:
 
       - name: Fail if branch and release tag do not match
         if: ${{ steps.guard.outputs.VERSION_MISMATCH == 'true' }}
-        uses: actions/github-script@v7
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
               core.setFailed('Workflow failed. Release version does not match with selected target branch. Did you select the correct branch?')
@@ -61,12 +61,12 @@ jobs:
         run: sed -i "s/const VERSION = '.*';/const VERSION = '${{ steps.version.outputs.version }}';/g" src/Illuminate/Foundation/Application.php
 
       - name: Commit version change
-        uses: stefanzweifel/git-auto-commit-action@v7
+        uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9 # v7
         with:
           commit_message: "Update version to v${{ steps.version.outputs.version }}"
 
       - name: SSH into splitter server
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@1530429296e979861824d74fb800013190b5dee0 # master
         with:
           host: 104.248.56.26
           username: forge
@@ -79,7 +79,7 @@ jobs:
 
       - name: Generate release notes
         id: generated-notes
-        uses: RedCrafter07/release-notes-action@main
+        uses: RedCrafter07/release-notes-action@31674bfa3a219e7c661fc0c5b7b3851c741b9965 # main
         with:
           tag-name: v${{ steps.version.outputs.version }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -116,7 +116,7 @@ jobs:
           RELEASE_NOTES: ${{ steps.generated-notes.outputs.release-notes }}
 
       - name: Create release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -131,7 +131,7 @@ jobs:
 
     name: Update changelog
 
-    uses: laravel/.github/.github/workflows/update-changelog.yml@main
+    uses: laravel/.github/.github/workflows/update-changelog.yml@dd86ce0a18475504e42fa809d7454c1cb1a88028 # main
     with:
       branch: ${{ github.ref_name }}
       version: "v${{ needs.release.outputs.version }}"

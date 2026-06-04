@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Http;
 
+use Carbon\CarbonInterval;
+use Carbon\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Route;
@@ -815,6 +817,78 @@ class HttpRequestTest extends TestCase
         $request->date('date', 'invalid_format');
     }
 
+    public function testIntervalMethod()
+    {
+        $request = Request::create('/', 'GET', [
+            'as_null' => null,
+            'as_empty' => '',
+            'as_iso' => 'P1Y2M3DT4H5M6S',
+            'as_human' => '2 hours 30 minutes',
+            'as_seconds' => '90',
+            'as_minutes' => '45',
+        ]);
+
+        $this->assertNull($request->interval('as_null'));
+        $this->assertNull($request->interval('as_empty'));
+        $this->assertNull($request->interval('doesnt_exist'));
+
+        $interval = $request->interval('as_iso');
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+        $this->assertSame(1, $interval->years);
+        $this->assertSame(2, $interval->months);
+        $this->assertSame(3, $interval->dayz);
+        $this->assertSame(4, $interval->hours);
+        $this->assertSame(5, $interval->minutes);
+        $this->assertSame(6, $interval->seconds);
+
+        $interval = $request->interval('as_human');
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+        $this->assertSame(2, $interval->hours);
+        $this->assertSame(30, $interval->minutes);
+
+        $interval = $request->interval('as_seconds', 'second');
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+        $this->assertSame(90, $interval->seconds);
+
+        $this->assertSame(90, $request->interval('as_seconds', 'minute')->minutes);
+        $this->assertSame(90, $request->interval('as_seconds', 'hour')->hours);
+        $this->assertSame(90, $request->interval('as_seconds', 'day')->dayz);
+
+        $this->assertSame(45, $request->interval('as_minutes', Unit::Minute)->minutes);
+        $this->assertSame(45, $request->interval('as_minutes', Unit::Second)->seconds);
+    }
+
+    public function testIntervalMethodWithScientificNotationFloats()
+    {
+        $request = Request::create('/', 'GET', [
+            'small_float' => '0.000053',
+            'very_small' => '0.000001',
+            'scientific' => '5.3E-5',
+            'normal_float' => '1.5',
+            'integer' => '90',
+        ]);
+
+        // Small floats that PHP would render in scientific notation (e.g. 5.3E-5)
+        $interval = $request->interval('small_float', Unit::Millisecond);
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+
+        $interval = $request->interval('very_small', Unit::Second);
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+
+        // Scientific notation string passed directly
+        $interval = $request->interval('scientific', Unit::Millisecond);
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+
+        // Normal values should still work
+        $interval = $request->interval('normal_float', Unit::Hour);
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+        $this->assertSame(1, $interval->hours);
+
+        $interval = $request->interval('integer', Unit::Minute);
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+        $this->assertSame(90, $interval->minutes);
+    }
+
     public function testEnumMethod()
     {
         $request = Request::create('/', 'GET', [
@@ -979,15 +1053,15 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET', ['developer' => ['name' => 'Taylor', 'age' => null]]);
         $this->assertEquals(['developer' => ['name' => 'Taylor']], $request->only('developer.name', 'developer.skills'));
         $this->assertEquals(['developer' => ['age' => null]], $request->only('developer.age'));
-        $this->assertEquals([], $request->only('developer.skills'));
+        $this->assertSame([], $request->only('developer.skills'));
     }
 
     public function testExceptMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 25]);
         $this->assertEquals(['name' => 'Taylor'], $request->except('age'));
-        $this->assertEquals([], $request->except('age', 'name'));
-        $this->assertEquals([], $request->except(['age', 'name']));
+        $this->assertSame([], $request->except('age', 'name'));
+        $this->assertSame([], $request->except(['age', 'name']));
     }
 
     public function testQueryMethod()
@@ -1373,6 +1447,34 @@ class HttpRequestTest extends TestCase
         $this->assertSame('foo', $request->format('foo'));
     }
 
+    public function testWantsMarkdown()
+    {
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/markdown']);
+        $this->assertTrue($request->wantsMarkdown());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/markdown; charset=utf-8']);
+        $this->assertTrue($request->wantsMarkdown());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $this->assertFalse($request->wantsMarkdown());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/html']);
+        $this->assertFalse($request->wantsMarkdown());
+    }
+
+    public function testAcceptsMarkdown()
+    {
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/markdown']);
+        $this->assertTrue($request->acceptsMarkdown());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/html, text/markdown']);
+        $this->assertFalse($request->wantsMarkdown());
+        $this->assertTrue($request->acceptsMarkdown());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $this->assertFalse($request->acceptsMarkdown());
+    }
+
     public function testFormatReturnsAcceptsJson()
     {
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
@@ -1662,12 +1764,12 @@ class HttpRequestTest extends TestCase
         $params = ['foo' => 'bar'];
 
         $getRequest = Request::create('/', 'GET', $params, [], [], []);
-        $this->assertEquals($getRequest->request->all(), []);
+        $this->assertSame([], $getRequest->request->all());
         $this->assertEquals($getRequest->query->all(), $params);
 
         $postRequest = Request::create('/', 'POST', $params, [], [], []);
         $this->assertEquals($postRequest->request->all(), $params);
-        $this->assertEquals($postRequest->query->all(), []);
+        $this->assertSame([], $postRequest->query->all());
     }
 
     /**
@@ -1784,6 +1886,16 @@ class HttpRequestTest extends TestCase
 
         $this->assertInstanceOf(InputBag::class, $request->getPayload());
         $this->assertSame('world', $request->getPayload()->get('hello'));
+    }
+
+    public function testCreatingJsonRequestFromBaseDoesNotTriggerRequestPropertyDeprecation()
+    {
+        $request = Request::createFromBase(
+            SymfonyRequest::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json'], content: '{"hello":"world"}')
+        );
+
+        $this->assertTrue($request->isJson());
+        $this->assertSame('world', $request->input('hello'));
     }
 
     public function testJsonRequestsCanMergeDataIntoJsonRequest()

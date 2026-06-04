@@ -45,9 +45,7 @@ trait GuardsAttributes
     #[Initialize]
     public function initializeGuardsAttributes()
     {
-        if (empty($this->fillable)) {
-            $this->fillable = static::resolveClassAttribute(Fillable::class, 'columns') ?? [];
-        }
+        $this->mergeFillable(static::resolveClassAttribute(Fillable::class, 'columns') ?? []);
 
         if ($this->guarded === ['*']) {
             if (static::resolveClassAttribute(Unguarded::class) !== null) {
@@ -89,6 +87,10 @@ trait GuardsAttributes
      */
     public function mergeFillable(array $fillable)
     {
+        if ($fillable === []) {
+            return $this;
+        }
+
         $this->fillable = array_values(array_unique(array_merge($this->fillable, $fillable)));
 
         return $this;

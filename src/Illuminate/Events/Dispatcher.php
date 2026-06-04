@@ -20,11 +20,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Queue\Attributes\Backoff;
 use Illuminate\Queue\Attributes\Connection;
+use Illuminate\Queue\Attributes\Delay;
 use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use Illuminate\Queue\Attributes\FailOnTimeout;
 use Illuminate\Queue\Attributes\MaxExceptions;
 use Illuminate\Queue\Attributes\Queue as QueueAttribute;
-use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Queue\Attributes\Timeout;
 use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Queue\Attributes\UniqueFor;
@@ -33,6 +33,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\ReadsClassAttributes;
 use Illuminate\Support\Traits\ReflectsClosures;
 use ReflectionClass;
 
@@ -40,7 +41,7 @@ use function Illuminate\Support\enum_value;
 
 class Dispatcher implements DispatcherContract
 {
-    use Macroable, ReadsQueueAttributes, ReflectsClosures, ResolvesQueueRoutes;
+    use Macroable, ReadsClassAttributes, ReflectsClosures, ResolvesQueueRoutes;
 
     /**
      * The IoC container instance.
@@ -245,7 +246,7 @@ class Dispatcher implements DispatcherContract
      * Resolve the subscriber instance.
      *
      * @param  object|class-string  $subscriber
-     * @return $subscriber is object ? object : mixed
+     * @return ($subscriber is object ? object : mixed)
      */
     protected function resolveSubscriber($subscriber)
     {
@@ -542,6 +543,7 @@ class Dispatcher implements DispatcherContract
         $listener = $this->container->make($class);
 
         return $this->handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
+                && ! in_array($method, ['creating', 'updating', 'saving', 'deleting', 'restoring', 'forceDeleting'])
             ? $this->createCallbackForListenerRunningAfterCommits($listener, $method)
             : [$listener, $method];
     }
@@ -563,7 +565,7 @@ class Dispatcher implements DispatcherContract
      * @param  class-string  $class
      * @return bool
      *
-     * @phpstan-assert-if-true \Illuminate\Contracts\Queue\ShouldQueue $class
+     * @phpstan-assert-if-true class-string<\Illuminate\Contracts\Queue\ShouldQueue> $class
      */
     protected function handlerShouldBeQueued($class)
     {
@@ -678,7 +680,7 @@ class Dispatcher implements DispatcherContract
 
         $delay = method_exists($listener, 'withDelay')
             ? (isset($arguments[0]) ? $listener->withDelay($arguments[0]) : $listener->withDelay())
-            : $listener->delay ?? null;
+            : $this->getAttributeValue($listener, Delay::class, 'delay');
 
         if (is_null($queue)) {
             $queue = $this->resolveQueueFromQueueRoute($listener) ?? null;
@@ -831,7 +833,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Set the database transaction manager resolver implementation.
      *
-     * @param  (callable(): \Illuminate\Database\DatabaseTransactionsManager|null)  $resolver
+     * @param  (callable(): (\Illuminate\Database\DatabaseTransactionsManager|null))  $resolver
      * @return $this
      */
     public function setTransactionManagerResolver(callable $resolver)

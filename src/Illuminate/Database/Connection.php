@@ -622,7 +622,7 @@ class Connection implements ConnectionInterface
     /**
      * Run a raw, unprepared query against the PDO connection.
      *
-     * @param  string  $query
+     * @param  literal-string  $query
      * @return bool
      */
     public function unprepared($query)
@@ -834,11 +834,11 @@ class Connection implements ConnectionInterface
         // message to include the bindings with SQL, which will make this exception a
         // lot more helpful to the developer instead of just the database's errors.
         catch (Exception $e) {
-            $exceptionType = $this->isUniqueConstraintError($e)
+            $exceptionType = ($isUniqueConstraintError = $this->isUniqueConstraintError($e))
                 ? UniqueConstraintViolationException::class
                 : QueryException::class;
 
-            throw new $exceptionType(
+            $exception = new $exceptionType(
                 $this->getNameWithReadWriteType(),
                 $query,
                 $this->prepareBindings($bindings),
@@ -846,6 +846,14 @@ class Connection implements ConnectionInterface
                 $this->getConnectionDetails(),
                 $this->latestReadWriteTypeUsed(),
             );
+
+            if ($isUniqueConstraintError) {
+                ['index' => $index, 'columns' => $columns] = $this->parseUniqueConstraintViolation($e);
+
+                $exception->setIndex($index)->setColumns($columns);
+            }
+
+            throw $exception;
         }
     }
 
@@ -858,6 +866,17 @@ class Connection implements ConnectionInterface
     protected function isUniqueConstraintError(Exception $exception)
     {
         return false;
+    }
+
+    /**
+     * Extract the index and columns that caused a unique constraint violation.
+     *
+     * @param  Exception  $exception
+     * @return array{index: string|null, columns: list<string>}
+     */
+    protected function parseUniqueConstraintViolation(Exception $exception): array
+    {
+        return ['index' => null, 'columns' => []];
     }
 
     /**
@@ -881,7 +900,7 @@ class Connection implements ConnectionInterface
             : $query;
 
         if ($this->loggingQueries) {
-            $this->queryLog[] = compact('query', 'bindings', 'time', 'readWriteType');
+            $this->queryLog[] = ['query' => $query, 'bindings' => $bindings, 'time' => $time, 'readWriteType' => $readWriteType];
         }
     }
 
@@ -1111,7 +1130,7 @@ class Connection implements ConnectionInterface
     /**
      * Get a new raw query expression.
      *
-     * @param  mixed  $value
+     * @param  literal-string|int|float  $value
      * @return \Illuminate\Contracts\Database\Query\Expression
      */
     public function raw($value)

@@ -816,7 +816,7 @@ class SessionStoreTest extends TestCase
 
         $this->assertInstanceOf(ViewErrorBag::class, $errors);
         $this->assertInstanceOf(MessageBag::class, $errors->getBags()['default']);
-        $this->assertEquals('<p>:message</p>', $errors->getBags()['default']->getFormat());
+        $this->assertSame('<p>:message</p>', $errors->getBags()['default']->getFormat());
         $this->assertEquals(['first_name' => [
             'Your first name is required',
             'Your first name must be at least 1 character',

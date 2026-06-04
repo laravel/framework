@@ -431,6 +431,17 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     }
 
     /**
+     * Get a mailer driver instance.
+     *
+     * @param  string|null  $driver
+     * @return \Illuminate\Contracts\Mail\Mailer
+     */
+    public function driver($driver = null)
+    {
+        return $this->mailer($driver);
+    }
+
+    /**
      * Begin the process of mailing a mailable class instance.
      *
      * @param  mixed  $users

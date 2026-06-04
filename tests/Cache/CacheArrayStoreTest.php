@@ -11,7 +11,7 @@ class CacheArrayStoreTest extends TestCase
 {
     protected function tearDown(): void
     {
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
 
         parent::tearDown();
     }
@@ -90,7 +90,7 @@ class CacheArrayStoreTest extends TestCase
     {
         $mock = $this->getMockBuilder(ArrayStore::class)->onlyMethods(['put'])->getMock();
         $mock->expects($this->once())
-            ->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0))
+            ->method('put')->with('foo', 'bar', 0)
             ->willReturn(true);
         $result = $mock->forever('foo', 'bar');
         $this->assertTrue($result);
@@ -248,7 +248,7 @@ class CacheArrayStoreTest extends TestCase
         $store = new ArrayStore;
         $lock = $store->lock('foo');
         $lock->acquire();
-        Carbon::setTestNow(Carbon::now()->addYears(100));
+        Carbon::setTestNow(Carbon::now()->addCentury());
 
         $this->assertFalse($lock->acquire());
     }

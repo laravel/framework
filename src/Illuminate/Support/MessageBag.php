@@ -112,7 +112,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     /**
      * Determine if messages exist for all of the given keys.
      *
-     * @param  array|string|null  $key
+     * @param  array<string>|string|null  $key
      * @return bool
      */
     public function has($key)
@@ -139,7 +139,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     /**
      * Determine if messages exist for any of the given keys.
      *
-     * @param  array|string|null  $keys
+     * @param  array<string>|string|null  $keys
      * @return bool
      */
     public function hasAny($keys = [])
@@ -162,7 +162,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     /**
      * Determine if messages don't exist for all of the given keys.
      *
-     * @param  array|string|null  $key
+     * @param  array<string>|string|null  $key
      * @return bool
      */
     public function missing($key)
@@ -243,7 +243,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
         $all = [];
 
         foreach ($this->messages as $key => $messages) {
-            $all = array_merge($all, $this->transform($messages, $format, $key));
+            array_push($all, ...$this->transform($messages, $format, $key));
         }
 
         return $all;
@@ -253,7 +253,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
      * Get all of the unique messages for every key in the message bag.
      *
      * @param  string|null  $format
-     * @return array
+     * @return array<string>
      */
     public function unique($format = null)
     {
@@ -403,7 +403,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     /**
      * Get the instance as an array.
      *
-     * @return array
+     * @return array<string, array<string>>
      */
     public function toArray()
     {
@@ -413,7 +413,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     /**
      * Convert the object into something JSON serializable.
      *
-     * @return array
+     * @return array<string, array<string>>
      */
     public function jsonSerialize(): array
     {
@@ -434,8 +434,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     /**
      * Convert the object to pretty print formatted JSON.
      *
-     * @params int $options
-     *
+     * @param  int  $options
      * @return string
      */
     public function toPrettyJson(int $options = 0)

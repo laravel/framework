@@ -189,7 +189,7 @@ class Lottery
     }
 
     /**
-     * Force the lottery to always result in a lose.
+     * Force the lottery to always result in a loss.
      *
      * @param  callable|null  $callback
      * @return void

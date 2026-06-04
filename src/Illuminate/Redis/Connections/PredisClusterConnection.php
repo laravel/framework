@@ -39,4 +39,15 @@ class PredisClusterConnection extends PredisConnection
             $node->executeCommand(tap(new $command)->setArguments(func_get_args()));
         }
     }
+
+    /**
+     * Determine if the connection is a cluster connection.
+     *
+     * @return bool
+     */
+    #[\Override]
+    public function isCluster()
+    {
+        return true;
+    }
 }

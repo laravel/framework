@@ -26,6 +26,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use JsonSerializable;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
@@ -168,7 +169,7 @@ class PendingRequest
     /**
      * The callbacks that should execute after the Laravel Response is built.
      *
-     * @var \Illuminate\Support\Collection<int, (callable(\Illuminate\Http\Client\Response): \Illuminate\Http\Client\Response|null)>
+     * @var \Illuminate\Support\Collection<int, (callable(\Illuminate\Http\Client\Response, \Illuminate\Http\Client\Request): \Illuminate\Http\Client\Response|null)>
      */
     protected $afterResponseCallbacks;
 
@@ -351,12 +352,17 @@ class PendingRequest
 
         $this->asMultipart();
 
-        $this->pendingFiles[] = array_filter([
+        $file = [
             'name' => $name,
             'contents' => $contents,
             'headers' => $headers,
-            'filename' => $filename,
-        ]);
+        ];
+
+        if ($filename !== null) {
+            $file['filename'] = $filename;
+        }
+
+        $this->pendingFiles[] = $file;
 
         return $this;
     }
@@ -379,9 +385,9 @@ class PendingRequest
      */
     public function bodyFormat(string $format)
     {
-        return tap($this, function () use ($format) {
-            $this->bodyFormat = $format;
-        });
+        $this->bodyFormat = $format;
+
+        return $this;
     }
 
     /**
@@ -392,11 +398,11 @@ class PendingRequest
      */
     public function withQueryParameters(array $parameters)
     {
-        return tap($this, function () use ($parameters) {
-            $this->options = array_merge_recursive($this->options, [
-                'query' => $parameters,
-            ]);
-        });
+        $this->options = array_merge_recursive($this->options, [
+            'query' => $parameters,
+        ]);
+
+        return $this;
     }
 
     /**
@@ -441,11 +447,11 @@ class PendingRequest
      */
     public function withHeaders(array $headers)
     {
-        return tap($this, function () use ($headers) {
-            $this->options = array_merge_recursive($this->options, [
-                'headers' => $headers,
-            ]);
-        });
+        $this->options = array_merge_recursive($this->options, [
+            'headers' => $headers,
+        ]);
+
+        return $this;
     }
 
     /**
@@ -482,9 +488,9 @@ class PendingRequest
      */
     public function withBasicAuth(string $username, string $password)
     {
-        return tap($this, function () use ($username, $password) {
-            $this->options['auth'] = [$username, $password];
-        });
+        $this->options['auth'] = [$username, $password];
+
+        return $this;
     }
 
     /**
@@ -496,9 +502,9 @@ class PendingRequest
      */
     public function withDigestAuth($username, $password)
     {
-        return tap($this, function () use ($username, $password) {
-            $this->options['auth'] = [$username, $password, 'digest'];
-        });
+        $this->options['auth'] = [$username, $password, 'digest'];
+
+        return $this;
     }
 
     /**
@@ -510,9 +516,9 @@ class PendingRequest
      */
     public function withNtlmAuth($username, $password)
     {
-        return tap($this, function () use ($username, $password) {
-            $this->options['auth'] = [$username, $password, 'ntlm'];
-        });
+        $this->options['auth'] = [$username, $password, 'ntlm'];
+
+        return $this;
     }
 
     /**
@@ -524,9 +530,9 @@ class PendingRequest
      */
     public function withToken($token, $type = 'Bearer')
     {
-        return tap($this, function () use ($token, $type) {
-            $this->options['headers']['Authorization'] = trim($type.' '.$token);
-        });
+        $this->options['headers']['Authorization'] = trim($type.' '.$token);
+
+        return $this;
     }
 
     /**
@@ -537,9 +543,9 @@ class PendingRequest
      */
     public function withUserAgent($userAgent)
     {
-        return tap($this, function () use ($userAgent) {
-            $this->options['headers']['User-Agent'] = trim($userAgent);
-        });
+        $this->options['headers']['User-Agent'] = trim($userAgent);
+
+        return $this;
     }
 
     /**
@@ -550,9 +556,9 @@ class PendingRequest
      */
     public function withUrlParameters(array $parameters = [])
     {
-        return tap($this, function () use ($parameters) {
-            $this->urlParameters = array_merge($this->urlParameters, $parameters);
-        });
+        $this->urlParameters = array_merge($this->urlParameters, $parameters);
+
+        return $this;
     }
 
     /**
@@ -564,11 +570,11 @@ class PendingRequest
      */
     public function withCookies(array $cookies, string $domain)
     {
-        return tap($this, function () use ($cookies, $domain) {
-            $this->options = array_merge_recursive($this->options, [
-                'cookies' => CookieJar::fromArray($cookies, $domain),
-            ]);
-        });
+        $this->options = array_merge_recursive($this->options, [
+            'cookies' => CookieJar::fromArray($cookies, $domain),
+        ]);
+
+        return $this;
     }
 
     /**
@@ -579,9 +585,9 @@ class PendingRequest
      */
     public function maxRedirects(int $max)
     {
-        return tap($this, function () use ($max) {
-            $this->options['allow_redirects']['max'] = $max;
-        });
+        $this->options['allow_redirects']['max'] = $max;
+
+        return $this;
     }
 
     /**
@@ -591,9 +597,9 @@ class PendingRequest
      */
     public function withoutRedirecting()
     {
-        return tap($this, function () {
-            $this->options['allow_redirects'] = false;
-        });
+        $this->options['allow_redirects'] = false;
+
+        return $this;
     }
 
     /**
@@ -603,9 +609,9 @@ class PendingRequest
      */
     public function withoutVerifying()
     {
-        return tap($this, function () {
-            $this->options['verify'] = false;
-        });
+        $this->options['verify'] = false;
+
+        return $this;
     }
 
     /**
@@ -616,9 +622,9 @@ class PendingRequest
      */
     public function sink($to)
     {
-        return tap($this, function () use ($to) {
-            $this->options['sink'] = $to;
-        });
+        $this->options['sink'] = $to;
+
+        return $this;
     }
 
     /**
@@ -629,9 +635,9 @@ class PendingRequest
      */
     public function timeout(int|float $seconds)
     {
-        return tap($this, function () use ($seconds) {
-            $this->options['timeout'] = $seconds;
-        });
+        $this->options['timeout'] = $seconds;
+
+        return $this;
     }
 
     /**
@@ -642,9 +648,9 @@ class PendingRequest
      */
     public function connectTimeout(int|float $seconds)
     {
-        return tap($this, function () use ($seconds) {
-            $this->options['connect_timeout'] = $seconds;
-        });
+        $this->options['connect_timeout'] = $seconds;
+
+        return $this;
     }
 
     /**
@@ -674,12 +680,12 @@ class PendingRequest
      */
     public function withOptions(array $options)
     {
-        return tap($this, function () use ($options) {
-            $this->options = array_replace_recursive(
-                array_merge_recursive($this->options, Arr::only($options, $this->mergeableOptions)),
-                $options
-            );
-        });
+        $this->options = array_replace_recursive(
+            array_merge_recursive($this->options, Arr::only($options, $this->mergeableOptions)),
+            $options
+        );
+
+        return $this;
     }
 
     /**
@@ -742,15 +748,15 @@ class PendingRequest
      */
     public function beforeSending($callback)
     {
-        return tap($this, function () use ($callback) {
-            $this->beforeSendingCallbacks[] = $callback;
-        });
+        $this->beforeSendingCallbacks[] = $callback;
+
+        return $this;
     }
 
     /**
      * Add a new callback to execute after the response is built.
      *
-     * @param  (callable(\Illuminate\Http\Client\Response): \Illuminate\Http\Client\Response|null)  $callback
+     * @param  (callable(\Illuminate\Http\Client\Response, \Illuminate\Http\Client\Request): \Illuminate\Http\Client\Response|null)  $callback
      * @return $this
      */
     public function afterResponse(callable $callback)
@@ -1155,20 +1161,13 @@ class PendingRequest
     protected function parseMultipartBodyFormat(array $data)
     {
         return (new Collection($data))
-            ->flatMap(function ($value, $key) {
-                if (is_array($value)) {
-                    // If the array has 'name' and 'contents' keys, it's already formatted for multipart...
-                    if (isset($value['name']) && isset($value['contents'])) {
-                        return [$value];
-                    }
-
-                    // Otherwise, treat it as multiple values for the same field name...
-                    return (new Collection($value))->map(function ($item) use ($key) {
-                        return ['name' => $key.'[]', 'contents' => $item];
-                    });
+            ->map(function ($value, $key) {
+                // If the array has 'name' and 'contents' keys, it's already formatted for multipart...
+                if (is_array($value) && isset($value['name'], $value['contents'])) {
+                    return $value;
                 }
 
-                return [['name' => $key, 'contents' => $value]];
+                return ['name' => $key, 'contents' => $value];
             })
             ->values()
             ->all();
@@ -1247,12 +1246,10 @@ class PendingRequest
             return $exception;
         }
 
-        if ($attempt < $this->tries && $shouldRetry) {
-            $options['delay'] = value(
-                $this->retryDelay,
-                $attempt,
-                $response instanceof Response ? $response->toException() : $response
-            );
+        $exception = $response instanceof Response ? $response->toException() : $response;
+
+        if ($attempt < $this->getMaximumAttempts() && $shouldRetry) {
+            $options['delay'] = $this->retryDelayInMilliseconds($attempt, $exception);
 
             return $this->makePromise($method, $url, $options, $attempt + 1);
         }
@@ -1267,11 +1264,37 @@ class PendingRequest
             }
         }
 
-        if ($this->tries > 1 && $this->retryThrow) {
+        if ($this->getMaximumAttempts() > 1 && $this->retryThrow) {
             return $response instanceof Response ? $response->toException() : $response;
         }
 
         return $response;
+    }
+
+    /**
+     * Get the maximum number of attempts for the request.
+     *
+     * @return int
+     */
+    protected function getMaximumAttempts()
+    {
+        return is_array($this->tries)
+            ? count($this->tries) + 1
+            : ($this->tries ?? 1);
+    }
+
+    /**
+     * Get the delay in milliseconds before the next retry attempt.
+     *
+     * @param  int  $attempt
+     * @param  mixed  $exception
+     * @return int|float
+     */
+    protected function retryDelayInMilliseconds($attempt, $exception)
+    {
+        return is_array($this->tries)
+            ? $this->tries[$attempt - 1] ?? 0
+            : value($this->retryDelay ?? 100, $attempt, $exception);
     }
 
     /**
@@ -1344,6 +1367,10 @@ class PendingRequest
             $laravelData = $laravelData->jsonSerialize();
         }
 
+        if (is_array($laravelData) && $this->bodyFormat === 'multipart') {
+            return $this->normalizeMultipartOption($laravelData);
+        }
+
         return is_array($laravelData) ? $laravelData : [];
     }
 
@@ -1356,14 +1383,136 @@ class PendingRequest
     protected function normalizeRequestOptions(array $options)
     {
         foreach ($options as $key => $value) {
-            $options[$key] = match (true) {
-                is_array($value) => $this->normalizeRequestOptions($value),
-                $value instanceof Stringable => $value->toString(),
-                default => $value,
-            };
+            if ($key === 'headers' && is_array($value)) {
+                $options[$key] = $this->normalizeHeaderValues($value);
+
+                continue;
+            }
+
+            if ($key === 'multipart' && is_array($value)) {
+                $options[$key] = $this->normalizeMultipartOption($value);
+
+                continue;
+            }
+
+            $options[$key] = $this->normalizeRequestOptionValue($value);
         }
 
         return $options;
+    }
+
+    /**
+     * Normalize the given header values.
+     *
+     * @param  array  $headers
+     * @return array
+     */
+    protected function normalizeHeaderValues(array $headers): array
+    {
+        foreach ($headers as $name => $value) {
+            $headers[$name] = $this->normalizeHeaderValue($value);
+        }
+
+        return $headers;
+    }
+
+    /**
+     * Normalize the given header value.
+     *
+     * @param  mixed  $value
+     * @return string|array
+     */
+    protected function normalizeHeaderValue($value): string|array
+    {
+        if (is_array($value)) {
+            if ($value === []) {
+                return '';
+            }
+
+            foreach ($value as $key => $item) {
+                $value[$key] = match (true) {
+                    is_scalar($item) => (string) $item,
+                    $item instanceof Stringable => $item->toString(),
+                    default => throw new InvalidArgumentException('HTTP header values must be scalar, Laravel Stringable, or arrays of scalar or Laravel Stringable values.'),
+                };
+            }
+
+            return $value;
+        }
+
+        return match (true) {
+            is_scalar($value) => (string) $value,
+            $value instanceof Stringable => $value->toString(),
+            default => throw new InvalidArgumentException('HTTP header values must be scalar, Laravel Stringable, or arrays of scalar or Laravel Stringable values.'),
+        };
+    }
+
+    /**
+     * Normalize the given multipart option.
+     *
+     * @param  array  $multipart
+     * @return array
+     */
+    protected function normalizeMultipartOption(array $multipart): array
+    {
+        foreach ($multipart as $index => $part) {
+            if (! is_array($part)) {
+                $multipart[$index] = $this->normalizeRequestOptionValue($part);
+
+                continue;
+            }
+
+            foreach ($part as $key => $value) {
+                if ($key === 'headers' && is_array($value)) {
+                    continue;
+                }
+
+                $part[$key] = $this->normalizeRequestOptionValue($value);
+            }
+
+            $multipart[$index] = $part;
+        }
+
+        return $this->normalizeMultipartHeaders($multipart);
+    }
+
+    /**
+     * Normalize the given multipart headers.
+     *
+     * @param  array  $multipart
+     * @return array
+     */
+    protected function normalizeMultipartHeaders(array $multipart): array
+    {
+        foreach ($multipart as $index => $part) {
+            if (is_array($part) && isset($part['headers']) && is_array($part['headers'])) {
+                foreach ($part['headers'] as $name => $value) {
+                    $multipart[$index]['headers'][$name] = match (true) {
+                        $value === [] => '',
+                        is_scalar($value) => (string) $value,
+                        $value instanceof Stringable => $value->toString(),
+                        default => throw new InvalidArgumentException('Multipart header values must be scalar or Laravel Stringable.'),
+                    };
+                }
+            }
+        }
+
+        return $multipart;
+    }
+
+    /**
+     * Normalize the given request option value.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function normalizeRequestOptionValue($value)
+    {
+        return match (true) {
+            is_array($value) => array_map(fn ($item) => $this->normalizeRequestOptionValue($item), $value),
+            $value instanceof Stringable => $value->toString(),
+            default => $value,
+        };
     }
 
     /**
@@ -1482,7 +1631,7 @@ class PendingRequest
                 return $promise->then(function ($response) use ($request, $options) {
                     $this->factory?->recordRequestResponsePair(
                         (new Request($request))
-                            ->withData($options['laravel_data'])
+                            ->withData($options['laravel_data'] ?? [])
                             ->setRequestAttributes($this->attributes),
                         $this->newResponse($response)
                     );
@@ -1497,6 +1646,8 @@ class PendingRequest
      * Build the stub handler.
      *
      * @return \Closure
+     *
+     * @throws \Illuminate\Http\Client\Exceptions\StrayRequestException
      */
     public function buildStubHandler()
     {
@@ -1506,7 +1657,7 @@ class PendingRequest
                     ->map
                     ->__invoke(
                         (new Request($request))
-                            ->withData($options['laravel_data'])
+                            ->withData($options['laravel_data'] ?? [])
                             ->setRequestAttributes($this->attributes),
                         $options
                     )
@@ -1570,7 +1721,7 @@ class PendingRequest
                 $callbackResult = call_user_func(
                     $callback,
                     (new Request($request))
-                        ->withData($options['laravel_data'])
+                        ->withData($options['laravel_data'] ?? [])
                         ->setRequestAttributes($this->attributes),
                     $options,
                     $this
@@ -1627,7 +1778,7 @@ class PendingRequest
     protected function runAfterResponseCallbacks(Response $response)
     {
         foreach ($this->afterResponseCallbacks as $callback) {
-            $returnedResponse = $callback($response);
+            $returnedResponse = $callback($response, $this->request);
 
             if ($returnedResponse instanceof Response) {
                 $response = $returnedResponse;
@@ -1795,6 +1946,8 @@ class PendingRequest
      *
      * @param  \GuzzleHttp\Exception\ConnectException  $e
      * @return void
+     *
+     * @throws \Illuminate\Http\Client\ConnectionException
      */
     protected function marshalConnectionException(ConnectException $e)
     {
@@ -1816,6 +1969,8 @@ class PendingRequest
      *
      * @param  \GuzzleHttp\Exception\RequestException  $e
      * @return void
+     *
+     * @throws \Illuminate\Http\Client\ConnectionException
      */
     protected function marshalRequestExceptionWithoutResponse(RequestException $e)
     {
@@ -1837,6 +1992,9 @@ class PendingRequest
      *
      * @param  \GuzzleHttp\Exception\RequestException  $e
      * @return void
+     *
+     * @throws \Illuminate\Http\Client\RequestException
+     * @throws \Illuminate\Http\Client\ConnectionException
      */
     protected function marshalRequestExceptionWithResponse(RequestException $e)
     {

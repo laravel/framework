@@ -478,6 +478,36 @@ class SupportTestingBusFakeTest extends TestCase
         }
     }
 
+    public function testAssertNothingDispatchedWithSyncDispatch()
+    {
+        $this->fake->assertNothingDispatched();
+
+        $this->fake->dispatchSync(new BusJobStub);
+
+        try {
+            $this->fake->assertNothingDispatched();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The following jobs were dispatched unexpectedly:', $e->getMessage());
+            $this->assertStringContainsString(BusJobStub::class, $e->getMessage());
+        }
+    }
+
+    public function testAssertNothingDispatchedWithAfterResponseDispatch()
+    {
+        $this->fake->assertNothingDispatched();
+
+        $this->fake->dispatchAfterResponse(new BusJobStub);
+
+        try {
+            $this->fake->assertNothingDispatched();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The following jobs were dispatched unexpectedly:', $e->getMessage());
+            $this->assertStringContainsString(BusJobStub::class, $e->getMessage());
+        }
+    }
+
     public function testAssertChained()
     {
         Container::setInstance($container = new Container);

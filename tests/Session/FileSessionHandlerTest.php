@@ -49,7 +49,7 @@ class FileSessionHandlerTest extends TestCase
 
         $result = $this->sessionHandler->read($sessionId);
 
-        $this->assertEquals('session_data', $result);
+        $this->assertSame('session_data', $result);
     }
 
     public function test_read_returns_data_when_file_exists_but_expired()
@@ -66,7 +66,7 @@ class FileSessionHandlerTest extends TestCase
 
         $result = $this->sessionHandler->read($sessionId);
 
-        $this->assertEquals('', $result);
+        $this->assertSame('', $result);
     }
 
     public function test_read_returns_empty_string_when_file_does_not_exist()
@@ -79,7 +79,7 @@ class FileSessionHandlerTest extends TestCase
 
         $result = $this->sessionHandler->read($sessionId);
 
-        $this->assertEquals('', $result);
+        $this->assertSame('', $result);
     }
 
     public function test_write_stores_data()

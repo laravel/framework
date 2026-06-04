@@ -86,8 +86,8 @@ class HttpClientTest extends TestCase
             })
             ->wait();
 
-        $this->assertEquals('faked response', $myFakedResponse);
-        $this->assertEquals('stub', $r);
+        $this->assertSame('faked response', (string) $myFakedResponse);
+        $this->assertSame('stub', $r);
     }
 
     public function testCanSetRequestAttributes()
@@ -105,10 +105,10 @@ class HttpClientTest extends TestCase
         $response3 = Http::get('https://some-store.myshopify.com/admin/api/2025-10/graphql.json');
         $response4 = Http::withAttributes(['name' => 'fourth'])->get('https://some-store.myshopify.com/admin/api/2025-10/graphql.json');
 
-        $this->assertEquals('first response', $response1->body());
-        $this->assertEquals('second response', $response2->body());
-        $this->assertEquals('unnamed', $response3->body());
-        $this->assertEquals('unnamed', $response4->body());
+        $this->assertSame('first response', $response1->body());
+        $this->assertSame('second response', $response2->body());
+        $this->assertSame('unnamed', $response3->body());
+        $this->assertSame('unnamed', $response4->body());
     }
 
     public function testAsyncCanHandleThrownException()

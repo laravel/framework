@@ -366,7 +366,7 @@ abstract class Factory
     /**
      * Set the connection name on the results and store them.
      *
-     * @param  \Illuminate\Support\Collection<int, \Illuminate\Database\Eloquent\Model>  $results
+     * @param  \Illuminate\Support\Collection<int, TModel>  $results
      * @return void
      */
     protected function store(Collection $results)
@@ -391,7 +391,7 @@ abstract class Factory
     /**
      * Create the children for the given model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  TModel  $model
      * @return void
      */
     protected function createChildren(Model $model)
@@ -514,7 +514,7 @@ abstract class Factory
      * Make an instance of the model with the given attributes.
      *
      * @param  \Illuminate\Database\Eloquent\Model|null  $parent
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return TModel
      */
     protected function makeInstance(?Model $parent)
     {
@@ -724,6 +724,14 @@ abstract class Factory
      */
     public function hasAttached($factory, $pivot = [], $relationship = null)
     {
+        if (is_array($pivot) && $pivot !== [] && array_is_list($pivot) && array_all($pivot, fn ($p) => is_array($p))) {
+            $factory = $factory instanceof Factory && $factory->count === null
+                ? $factory->count(count($pivot))
+                : $factory;
+
+            $pivot = new Sequence(...$pivot);
+        }
+
         return $this->newInstance([
             'has' => $this->has->concat([new BelongsToManyRelationship(
                 $factory,
@@ -947,7 +955,7 @@ abstract class Factory
         if (! array_key_exists(static::class, static::$cachedModelAttributes)) {
             $attribute = (new ReflectionClass($this))->getAttributes(UseModel::class);
 
-            static::$cachedModelAttributes[static::class] = count($attribute) > 0
+            static::$cachedModelAttributes[static::class] = $attribute !== []
                 ? $attribute[0]->newInstance()->class
                 : false;
         }
@@ -1148,6 +1156,10 @@ abstract class Factory
         if (str_starts_with($method, 'for')) {
             return $this->for($factory->state($parameters[0] ?? []), $relationship);
         } elseif (str_starts_with($method, 'has')) {
+            if (count($parameters) > 1 && array_all($parameters, fn ($p) => is_array($p))) {
+                return $this->has($factory->forEachSequence(...$parameters), $relationship);
+            }
+
             return $this->has(
                 $factory
                     ->count(is_numeric($parameters[0] ?? null) ? $parameters[0] : 1)

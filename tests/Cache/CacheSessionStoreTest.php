@@ -13,7 +13,7 @@ class CacheSessionStoreTest extends TestCase
 {
     protected function tearDown(): void
     {
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
 
         parent::tearDown();
     }
@@ -98,7 +98,7 @@ class CacheSessionStoreTest extends TestCase
             ->onlyMethods(['put'])
             ->getMock();
         $mock->expects($this->once())
-            ->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0))
+            ->method('put')->with('foo', 'bar', 0)
             ->willReturn(true);
         $result = $mock->forever('foo', 'bar');
         $this->assertTrue($result);
@@ -207,7 +207,7 @@ class CacheSessionStoreTest extends TestCase
     public function testItemKey()
     {
         $store = new SessionStore(self::getSession(), 'custom_prefix');
-        $this->assertEquals('custom_prefix.foo', $store->itemKey('foo'));
+        $this->assertSame('custom_prefix.foo', $store->itemKey('foo'));
     }
 
     public function testValuesAreStoredByReference()
@@ -241,9 +241,9 @@ class CacheSessionStoreTest extends TestCase
     {
         return new Store(
             name: 'name',
-            serialization: 'php',
             handler: new ArraySessionHandler(10),
             id: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            serialization: 'php',
         );
     }
 }

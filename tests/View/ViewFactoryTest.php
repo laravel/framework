@@ -675,7 +675,7 @@ class ViewFactoryTest extends TestCase
         $factory->getDispatcher()->shouldReceive('hasListeners')->andReturn(false);
         $factory->startComponent(function ($data) use ($factory) {
             $this->assertArrayHasKey('name', $data);
-            $this->assertSame($data['name'], 'Taylor');
+            $this->assertSame('Taylor', $data['name']);
 
             return $factory->make('component');
         }, ['name' => 'Taylor']);
@@ -694,6 +694,20 @@ class ViewFactoryTest extends TestCase
         $factory->startComponent(new HtmlString('laravel.com'));
         $contents = $factory->renderComponent();
         $this->assertSame('laravel.com', $contents);
+    }
+
+    public function testFlushStateResetsSlots()
+    {
+        $factory = $this->getFactory();
+
+        $factory->slot('title');
+        echo 'laravel.com';
+        $factory->endSlot();
+
+        $factory->flushState();
+
+        $this->assertSame([], (fn () => $this->slots)->call($factory));
+        $this->assertSame([], (fn () => $this->slotStack)->call($factory));
     }
 
     public function testTranslation()

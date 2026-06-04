@@ -95,7 +95,7 @@ class AuthPasswordBrokerTest extends TestCase
         $broker->shouldReceive('validateReset')->once()->andReturn($user = m::mock(CanResetPassword::class));
         $mocks['tokens']->shouldReceive('delete')->once()->with($user);
         $callback = function ($user, $password) {
-            $_SERVER['__password.reset.test'] = compact('user', 'password');
+            $_SERVER['__password.reset.test'] = ['user' => $user, 'password' => $password];
 
             return 'foo';
         };

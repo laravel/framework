@@ -251,6 +251,10 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1.1 trillion', Number::forHumans(-1100000000000, maxPrecision: 1));
         $this->assertSame('-1 quadrillion', Number::forHumans(-1000000000000000));
         $this->assertSame('-1 thousand quadrillion', Number::forHumans(-1000000000000000000));
+
+        $this->assertSame('999 thousand', Number::forHumans(999499));
+        $this->assertSame('1 million', Number::forHumans(999500));
+        $this->assertSame('1 million', Number::forHumans(999999));
     }
 
     public function testSummarize()
@@ -307,6 +311,15 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1.1T', Number::abbreviate(-1100000000000, maxPrecision: 1));
         $this->assertSame('-1Q', Number::abbreviate(-1000000000000000));
         $this->assertSame('-1KQ', Number::abbreviate(-1000000000000000000));
+
+        $this->assertSame('999K', Number::abbreviate(999499));
+        $this->assertSame('1M', Number::abbreviate(999500));
+        $this->assertSame('1M', Number::abbreviate(999999));
+        $this->assertSame('1B', Number::abbreviate(999500000));
+        $this->assertSame('1B', Number::abbreviate(999999999));
+
+        Number::withLocale('de', fn () => $this->assertSame('1M', Number::abbreviate(999500)));
+        Number::withLocale('fr', fn () => $this->assertSame('1M', Number::abbreviate(999500)));
     }
 
     public function testPairs()

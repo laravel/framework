@@ -456,6 +456,116 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         ], $result->toArray());
     }
 
+    public function testUpdateOrCreateMethodAcceptsClosureValuesAndCreates(): void
+    {
+        $source = new class() extends BelongsToManyCreateOrFirstTestSourceModel
+        {
+            protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
+            {
+                $relation = m::mock(BelongsToMany::class)->makePartial();
+                $relation->__construct(...func_get_args());
+                $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
+                    'id' => 456,
+                    'attr' => 'foo',
+                    'val' => 'bar',
+                    'created_at' => '2023-01-01T00:00:00.000000Z',
+                    'updated_at' => '2023-01-01T00:00:00.000000Z',
+                ]);
+                $instance->exists = true;
+                $instance->wasRecentlyCreated = true;
+                $instance->syncOriginal();
+                $relation
+                    ->expects('firstOrCreate')
+                    ->withArgs(function ($attributes, $values, $joining, $touch) {
+                        return $attributes === ['attr' => 'foo']
+                            && $values instanceof Closure
+                            && $joining === []
+                            && $touch === true;
+                    })
+                    ->andReturn($instance);
+
+                return $relation;
+            }
+        };
+        $source->id = 123;
+        $this->mockConnectionForModels(
+            [$source, new BelongsToManyCreateOrFirstTestRelatedModel()],
+            'SQLite',
+        );
+
+        $callCount = 0;
+        $result = $source->related()->updateOrCreate(['attr' => 'foo'], function () use (&$callCount) {
+            $callCount++;
+
+            return ['val' => 'baz'];
+        });
+
+        // Closure is forwarded to firstOrCreate which would resolve it on the create path.
+        // Because we mocked firstOrCreate above, the closure was never invoked here.
+        $this->assertSame(0, $callCount);
+        $this->assertSame('bar', $result->val);
+    }
+
+    public function testUpdateOrCreateMethodAcceptsClosureValuesAndUpdates(): void
+    {
+        $source = new class() extends BelongsToManyCreateOrFirstTestSourceModel
+        {
+            protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
+            {
+                $relation = m::mock(BelongsToMany::class)->makePartial();
+                $relation->__construct(...func_get_args());
+                $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
+                    'id' => 456,
+                    'attr' => 'foo',
+                    'val' => 'bar',
+                    'created_at' => '2023-01-01T00:00:00.000000Z',
+                    'updated_at' => '2023-01-01T00:00:00.000000Z',
+                ]);
+                $instance->exists = true;
+                $instance->wasRecentlyCreated = false;
+                $instance->syncOriginal();
+                $relation
+                    ->expects('firstOrCreate')
+                    ->withArgs(function ($attributes, $values, $joining, $touch) {
+                        return $attributes === ['attr' => 'foo']
+                            && $values instanceof Closure
+                            && $joining === []
+                            && $touch === true;
+                    })
+                    ->andReturn($instance);
+
+                return $relation;
+            }
+        };
+        $source->id = 123;
+        $this->mockConnectionForModels(
+            [$source, new BelongsToManyCreateOrFirstTestRelatedModel()],
+            'SQLite',
+        );
+        $source->getConnection()->shouldReceive('transactionLevel')->andReturn(0);
+        $source->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+
+        $source->getConnection()
+            ->expects('update')
+            ->with(
+                'update "related_table" set "val" = ?, "updated_at" = ? where "id" = ?',
+                ['baz', '2023-01-01 00:00:00', 456],
+            )
+            ->andReturn(1);
+
+        $callCount = 0;
+        $result = $source->related()->updateOrCreate(['attr' => 'foo'], function () use (&$callCount) {
+            $callCount++;
+
+            return ['val' => 'baz'];
+        });
+
+        // On the update path firstOrCreate was mocked away, so the closure
+        // is only resolved once for the fill() call.
+        $this->assertSame(1, $callCount);
+        $this->assertSame('baz', $result->val);
+    }
+
     public static function createOrFirstValues(): array
     {
         return [

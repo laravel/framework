@@ -266,11 +266,11 @@ class StartSession
      */
     protected function getCookieExpirationDate()
     {
-        $expiresOnClose = $this->manager->getSessionConfig()['expire_on_close'];
-
-        return $expiresOnClose ? 0 : Date::instance(
-            Carbon::now()->addSeconds($this->getSessionLifetimeInSeconds())
-        );
+        return $this->manager->getSessionConfig()['expire_on_close']
+            ? 0
+            : Date::instance(
+                Carbon::now()->addSeconds($this->getSessionLifetimeInSeconds())
+            );
     }
 
     /**

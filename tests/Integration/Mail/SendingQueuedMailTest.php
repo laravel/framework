@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Mail;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\SendQueuedMailable;
 use Illuminate\Queue\Middleware\RateLimited;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\TestCase;
@@ -44,7 +45,7 @@ class SendingQueuedMailTest extends TestCase
     {
         Queue::fake();
 
-        $delay = now()->addMinutes(10);
+        $delay = Carbon::now()->addMinutes(10);
 
         Mail::to('test@mail.com')->later($delay, new SendingQueuedMailTestMail);
 

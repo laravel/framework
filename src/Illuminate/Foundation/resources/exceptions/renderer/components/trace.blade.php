@@ -8,7 +8,7 @@
         <h3 class="text-base font-semibold text-neutral-900 dark:text-white">Exception trace</h3>
         @if ($exception->previousExceptions()->isNotEmpty())
             <a href="#previous-exceptions" class="ml-auto text-sm text-neutral-500 dark:text-neutral-400 hover:text-blue-500 dark:hover:text-emerald-500 transition-colors">
-                {{ $exception->previousExceptions()->count() }} previous {{ Str::plural('exception', $exception->previousExceptions()->count()) }}
+                {{ $exception->previousExceptions()->count() }} previous {{ \Illuminate\Support\Str::plural('exception', $exception->previousExceptions()->count()) }}
             </a>
         @endif
     </div>

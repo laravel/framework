@@ -239,7 +239,7 @@ class Sleep
     }
 
     /**
-     * Sleep for on microsecond.
+     * Sleep for one microsecond.
      *
      * @return $this
      */

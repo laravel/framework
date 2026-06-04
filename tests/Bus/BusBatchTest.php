@@ -10,6 +10,7 @@ use Illuminate\Bus\DatabaseBatchRepository;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Events\BatchCanceled;
 use Illuminate\Bus\Events\BatchFinished;
+use Illuminate\Bus\Events\BatchStarted;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
@@ -24,6 +25,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Queue;
@@ -277,10 +279,84 @@ class BusBatchTest extends TestCase
         $batch = $batch->add([$job]);
 
         $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) use ($batch) {
+            return $event instanceof BatchStarted && $event->batch === $batch;
+        }));
+
+        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) use ($batch) {
             return $event instanceof BatchFinished && $event->batch === $batch;
         }));
 
         $batch->recordSuccessfulJob('test-id');
+    }
+
+    public function test_batch_started_event_is_dispatched()
+    {
+        Container::getInstance()->instance(EventDispatcher::class, $events = m::mock(EventDispatcher::class));
+
+        $queue = m::mock(Factory::class);
+        $batch = $this->createTestBatch($queue);
+
+        $job = new class
+        {
+            use Batchable;
+        };
+
+        $secondJob = new class
+        {
+            use Batchable;
+        };
+
+        $queue->shouldReceive('connection')->once()
+            ->with('test-connection')
+            ->andReturn($connection = m::mock(stdClass::class));
+
+        $connection->shouldReceive('bulk')->once();
+
+        $batch = $batch->add([$job, $secondJob]);
+
+        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) use ($batch) {
+            return $event instanceof BatchStarted && $event->batch === $batch;
+        }));
+
+        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) {
+            return $event instanceof BatchFinished;
+        }));
+
+        $batch->recordSuccessfulJob('test-id-1');
+        $batch->recordSuccessfulJob('test-id-2');
+    }
+
+    public function test_batch_started_event_is_dispatched_when_first_job_fails()
+    {
+        Container::getInstance()->instance(EventDispatcher::class, $events = m::mock(EventDispatcher::class));
+
+        $queue = m::mock(Factory::class);
+        $batch = $this->createTestBatch($queue, $allowFailures = true);
+
+        $job = new class
+        {
+            use Batchable;
+        };
+
+        $secondJob = new class
+        {
+            use Batchable;
+        };
+
+        $queue->shouldReceive('connection')->once()
+            ->with('test-connection')
+            ->andReturn($connection = m::mock(stdClass::class));
+
+        $connection->shouldReceive('bulk')->once();
+
+        $batch = $batch->add([$job, $secondJob]);
+
+        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) use ($batch) {
+            return $event instanceof BatchStarted && $event->batch === $batch;
+        }));
+
+        $batch->recordFailedJob('test-id-1', new RuntimeException('Something went wrong.'));
+        $batch->recordFailedJob('test-id-2', new RuntimeException('Something else went wrong.'));
     }
 
     public function test_failed_jobs_can_be_recorded_while_not_allowing_failures()
@@ -464,11 +540,15 @@ class BusBatchTest extends TestCase
         $queue = m::mock(Factory::class);
         $batch = $this->createTestBatch($queue);
 
-        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) use ($batch) {
-            return $event instanceof BatchCanceled && $event->batch->id === $batch->id;
+        $exception = new RuntimeException('Something went wrong.');
+
+        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) use ($batch, $exception) {
+            return $event instanceof BatchCanceled
+                && $event->batch->id === $batch->id
+                && $event->exception === $exception;
         }));
 
-        $batch->cancel();
+        $batch->cancel($exception);
     }
 
     public function test_batch_can_be_deleted()
@@ -491,7 +571,7 @@ class BusBatchTest extends TestCase
         $batch = $this->createTestBatch($queue);
 
         $this->assertFalse($batch->finished());
-        $batch->finishedAt = now();
+        $batch->finishedAt = Carbon::now();
         $this->assertTrue($batch->finished());
 
         $batch->options['progress'] = [];
@@ -518,7 +598,7 @@ class BusBatchTest extends TestCase
         $this->assertTrue($batch->hasCatchCallbacks());
 
         $this->assertFalse($batch->cancelled());
-        $batch->cancelledAt = now();
+        $batch->cancelledAt = Carbon::now();
         $this->assertTrue($batch->cancelled());
 
         $this->assertIsString(json_encode($batch));
@@ -558,6 +638,40 @@ class BusBatchTest extends TestCase
         $this->assertIsString($secondJob->batchId);
         $this->assertIsString($thirdJob->batchId);
         $this->assertInstanceOf(CarbonImmutable::class, $batch->createdAt);
+    }
+
+    public function test_chained_jobs_in_batch_preserve_their_queue_when_batch_has_no_queue()
+    {
+        $queue = m::mock(Factory::class);
+
+        $repository = new DatabaseBatchRepository(new BatchFactory($queue), DB::connection(), 'job_batches');
+
+        // Create a batch WITHOUT onQueue — this is the key difference
+        $pendingBatch = (new PendingBatch(new Container, collect()))
+            ->onConnection('test-connection');
+
+        $batch = $repository->store($pendingBatch);
+
+        $firstJob = (new ChainHeadJob)->onQueue('custom-queue');
+        $secondJob = (new SecondTestJob)->onQueue('custom-queue');
+
+        $queue->shouldReceive('connection')->once()
+            ->with('test-connection')
+            ->andReturn($connection = m::mock(stdClass::class));
+
+        $connection->shouldReceive('bulk')->once()->with(m::on(function ($args) {
+            return true;
+        }), '', null);
+
+        $batch->add([
+            [$firstJob, $secondJob],
+        ]);
+
+        // Both jobs had ->onQueue('custom-queue') set before batching.
+        // The second job retains its queue, but the first job's queue
+        // is wiped to null by Batch::add() calling allOnQueue(null).
+        $this->assertSame('custom-queue', $secondJob->queue);
+        $this->assertSame('custom-queue', $firstJob->queue);
     }
 
     public function test_chained_closure_after_multiple_batches_is_properly_dispatched()
@@ -625,7 +739,7 @@ class BusBatchTest extends TestCase
                 'failed_jobs' => '',
                 'failed_job_ids' => '[]',
                 'options' => $serialize,
-                'created_at' => now()->timestamp,
+                'created_at' => Carbon::now()->getTimestamp(),
                 'cancelled_at' => null,
                 'finished_at' => null,
             ]);

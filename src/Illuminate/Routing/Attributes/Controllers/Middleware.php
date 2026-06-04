@@ -13,7 +13,7 @@ class Middleware
      * @param  array<string>|null  $except
      */
     public function __construct(
-        public Closure|string $value,
+        public Closure|string $middleware,
         public ?array $only = null,
         public ?array $except = null,
     ) {

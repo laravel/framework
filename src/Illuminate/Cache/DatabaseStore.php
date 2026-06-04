@@ -126,7 +126,7 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
      */
     public function many(array $keys)
     {
-        if (count($keys) === 0) {
+        if ($keys === []) {
             return [];
         }
 
@@ -222,11 +222,11 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
         $expiration = $this->getTime() + $seconds;
 
         if (! $this->getConnection() instanceof SqlServerConnection) {
-            return $this->table()->insertOrIgnore(compact('key', 'value', 'expiration')) > 0;
+            return $this->table()->insertOrIgnore(['key' => $key, 'value' => $value, 'expiration' => $expiration]) > 0;
         }
 
         try {
-            return $this->table()->insert(compact('key', 'value', 'expiration'));
+            return $this->table()->insert(['key' => $key, 'value' => $value, 'expiration' => $expiration]);
         } catch (QueryException) {
             // ...
         }

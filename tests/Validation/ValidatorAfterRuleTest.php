@@ -19,11 +19,11 @@ class ValidatorAfterRuleTest extends TestCase
             new AfterMethodRule,
         ])->messages()->messages();
 
-        $this->assertSame($validator->messages()->messages(), [
+        $this->assertSame([
             'closure' => ['true'],
             'invokableAfterRule' => ['true'],
             'afterMethodRule' => ['true'],
-        ]);
+        ], $validator->messages()->messages());
     }
 }
 

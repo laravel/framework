@@ -137,7 +137,6 @@ class BusFake implements Fake, QueueingDispatcher
      * Assert if a job was pushed exactly once.
      *
      * @param  string|\Closure  $command
-     * @param  int  $times
      * @return void
      */
     public function assertDispatchedOnce($command)
@@ -202,9 +201,11 @@ class BusFake implements Fake, QueueingDispatcher
      */
     public function assertNothingDispatched()
     {
-        $commandNames = implode("\n- ", array_keys($this->commands));
+        $dispatchedCommands = $this->commands + $this->commandsSync + $this->commandsAfterResponse;
 
-        PHPUnit::assertEmpty($this->commands, "The following jobs were dispatched unexpectedly:\n\n- $commandNames\n");
+        $commandNames = implode("\n- ", array_keys($dispatchedCommands));
+
+        PHPUnit::assertEmpty($dispatchedCommands, "The following jobs were dispatched unexpectedly:\n\n- $commandNames\n");
     }
 
     /**
@@ -732,6 +733,19 @@ class BusFake implements Fake, QueueingDispatcher
             $this->commandsAfterResponse[get_class($command)][] = $this->getCommandRepresentation($command);
         } else {
             $this->dispatcher->dispatchAfterResponse($command, $handler);
+        }
+    }
+
+    /**
+     * Dispatch multiple commands in bulk to their appropriate handlers on the queue.
+     *
+     * @param  iterable  $jobs
+     * @return void
+     */
+    public function bulk($jobs)
+    {
+        foreach ($jobs as $job) {
+            $this->dispatch($job);
         }
     }
 

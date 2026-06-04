@@ -279,7 +279,7 @@ class ViewComponentAttributeBagTest extends TestCase
         $result = $bag->whenFilled('name', function ($value) {
             return 'callback-'.$value;
         });
-        $this->assertEquals('callback-test', $result);
+        $this->assertSame('callback-test', $result);
 
         $result = $bag->whenFilled('empty', function ($value) {
             return 'callback-'.$value;
@@ -291,7 +291,7 @@ class ViewComponentAttributeBagTest extends TestCase
         }, function () {
             return 'default-callback';
         });
-        $this->assertEquals('default-callback', $result);
+        $this->assertSame('default-callback', $result);
     }
 
     public function testWhenHas()
@@ -301,7 +301,7 @@ class ViewComponentAttributeBagTest extends TestCase
         $result = $bag->whenHas('name', function ($value) {
             return 'callback-'.$value;
         });
-        $this->assertEquals('callback-test', $result);
+        $this->assertSame('callback-test', $result);
 
         $result = $bag->whenHas('missing', function ($value) {
             return 'callback-'.$value;
@@ -313,7 +313,7 @@ class ViewComponentAttributeBagTest extends TestCase
         }, function () {
             return 'default-callback';
         });
-        $this->assertEquals('default-callback', $result);
+        $this->assertSame('default-callback', $result);
     }
 
     public function testWhenMissing()
@@ -328,14 +328,14 @@ class ViewComponentAttributeBagTest extends TestCase
         $result = $bag->whenMissing('missing', function () {
             return 'callback';
         });
-        $this->assertEquals('callback', $result);
+        $this->assertSame('callback', $result);
 
         $result = $bag->whenMissing('name', function () {
             return 'callback';
         }, function () {
             return 'default-callback';
         });
-        $this->assertEquals('default-callback', $result);
+        $this->assertSame('default-callback', $result);
     }
 
     public function testString()
@@ -347,10 +347,10 @@ class ViewComponentAttributeBagTest extends TestCase
         ]);
 
         $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $bag->string('name'));
-        $this->assertEquals('test', (string) $bag->string('name'));
-        $this->assertEquals('', (string) $bag->string('empty'));
-        $this->assertEquals('123', (string) $bag->string('number'));
-        $this->assertEquals('default', (string) $bag->string('missing', 'default'));
+        $this->assertSame('test', (string) $bag->string('name'));
+        $this->assertSame('', (string) $bag->string('empty'));
+        $this->assertSame('123', (string) $bag->string('number'));
+        $this->assertSame('default', (string) $bag->string('missing', 'default'));
     }
 
     public function testBoolean()

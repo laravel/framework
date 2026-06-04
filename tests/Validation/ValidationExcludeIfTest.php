@@ -47,7 +47,7 @@ class ValidationExcludeIfTest extends TestCase
                 new ExcludeIf($condition);
                 $this->fail('The ExcludeIf constructor must not accept '.gettype($condition));
             } catch (InvalidArgumentException $exception) {
-                $this->assertEquals('The provided condition must be a callable or boolean.', $exception->getMessage());
+                $this->assertSame('The provided condition must be a callable or boolean.', $exception->getMessage());
             }
         }
     }

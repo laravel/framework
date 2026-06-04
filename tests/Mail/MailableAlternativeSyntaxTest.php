@@ -33,7 +33,7 @@ class MailableAlternativeSyntaxTest extends TestCase
         $method = $reflection->getMethod('prepareMailableForDelivery');
         $method->invoke($mailable);
 
-        $this->assertEquals('test-view', $mailable->view);
+        $this->assertSame('test-view', $mailable->view);
         $this->assertEquals(['test-data-key' => 'test-data-value'], $mailable->viewData);
         $this->assertEquals(2, count($mailable->to));
         $this->assertEquals(1, count($mailable->cc));
@@ -46,24 +46,24 @@ class MailableAlternativeSyntaxTest extends TestCase
         $envelope->to(new Address('taylorotwell@example.com'));
 
         $this->assertCount(2, $envelope->to);
-        $this->assertEquals('taylor@example.com', $envelope->to[0]->address);
-        $this->assertEquals('taylorotwell@example.com', $envelope->to[1]->address);
+        $this->assertSame('taylor@example.com', $envelope->to[0]->address);
+        $this->assertSame('taylorotwell@example.com', $envelope->to[1]->address);
 
         $envelope->to('abigailotwell@example.com', 'Abigail Otwell');
-        $this->assertEquals('abigailotwell@example.com', $envelope->to[2]->address);
-        $this->assertEquals('Abigail Otwell', $envelope->to[2]->name);
+        $this->assertSame('abigailotwell@example.com', $envelope->to[2]->address);
+        $this->assertSame('Abigail Otwell', $envelope->to[2]->name);
 
         $envelope->to('adam@example.com');
-        $this->assertEquals('adam@example.com', $envelope->to[3]->address);
+        $this->assertSame('adam@example.com', $envelope->to[3]->address);
         $this->assertNull($envelope->to[3]->name);
 
         $envelope->to(['jeffrey@example.com', 'tyler@example.com']);
-        $this->assertEquals('jeffrey@example.com', $envelope->to[4]->address);
-        $this->assertEquals('tyler@example.com', $envelope->to[5]->address);
+        $this->assertSame('jeffrey@example.com', $envelope->to[4]->address);
+        $this->assertSame('tyler@example.com', $envelope->to[5]->address);
 
         $envelope->from('dries@example.com', 'Dries Vints');
-        $this->assertEquals('dries@example.com', $envelope->from->address);
-        $this->assertEquals('Dries Vints', $envelope->from->name);
+        $this->assertSame('dries@example.com', $envelope->from->address);
+        $this->assertSame('Dries Vints', $envelope->from->name);
     }
 }
 
