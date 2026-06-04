@@ -6613,6 +6613,12 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => '17:44'], ['x' => 'date_format:H:i|date_equals:17:45']);
         $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => 'invalid-date'], ['x' => 'date_equals:1970-01-01 00:00:00']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '1970-01-01 00:00:00'], ['x' => 'date_equals:invalid-date']);
+        $this->assertTrue($v->fails());
     }
 
     public function testDateEqualsRespectsCarbonTestNowWhenParameterIsRelative()
