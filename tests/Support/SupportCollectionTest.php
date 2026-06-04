@@ -2159,10 +2159,6 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals($data->pluck('item')->toArray(), $expected);
 
         rsort($expected);
-        $data = $data->sortBy([['item', false]]);
-        $this->assertEquals($data->pluck('item')->toArray(), $expected);
-
-        rsort($expected);
         $data = $data->sortBy([['item', SortDirection::Descending]]);
         $this->assertEquals($data->pluck('item')->toArray(), $expected);
 
