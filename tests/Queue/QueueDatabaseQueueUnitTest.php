@@ -264,6 +264,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $this->assertSame('MyTestJob', $jobs->first()->name);
         $this->assertSame('test-uuid', $jobs->first()->uuid);
         $this->assertSame(0, $jobs->first()->attempts);
+        $this->assertSame('default', $jobs->first()->queue);
         $this->assertInstanceOf(Carbon::class, $jobs->first()->createdAt);
         $this->assertSame(1000000, $jobs->first()->createdAt->getTimestamp());
     }
@@ -288,6 +289,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $this->assertSame('MyDelayedJob', $jobs->first()->name);
         $this->assertSame('test-uuid', $jobs->first()->uuid);
         $this->assertSame(0, $jobs->first()->attempts);
+        $this->assertSame('default', $jobs->first()->queue);
         $this->assertInstanceOf(Carbon::class, $jobs->first()->createdAt);
         $this->assertSame(1000000, $jobs->first()->createdAt->getTimestamp());
     }
@@ -311,6 +313,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $this->assertSame('MyTestJob', $jobs->first()->name);
         $this->assertSame('test-uuid', $jobs->first()->uuid);
         $this->assertSame(1, $jobs->first()->attempts);
+        $this->assertSame('default', $jobs->first()->queue);
         $this->assertInstanceOf(Carbon::class, $jobs->first()->createdAt);
         $this->assertSame(1000000, $jobs->first()->createdAt->getTimestamp());
     }
@@ -338,10 +341,12 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $this->assertSame('JobA', $jobs->first()->name);
         $this->assertSame('uuid-1', $jobs->first()->uuid);
         $this->assertSame(0, $jobs->first()->attempts);
+        $this->assertSame('default', $jobs->first()->queue);
         $this->assertInstanceOf(Carbon::class, $jobs->first()->createdAt);
         $this->assertSame(1000000, $jobs->first()->createdAt->getTimestamp());
         $this->assertSame('JobB', $jobs->last()->name);
         $this->assertSame('uuid-2', $jobs->last()->uuid);
+        $this->assertSame('emails', $jobs->last()->queue);
     }
 
     public function testAllDelayedJobs()
@@ -367,10 +372,12 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $this->assertSame('JobA', $jobs->first()->name);
         $this->assertSame('uuid-1', $jobs->first()->uuid);
         $this->assertSame(0, $jobs->first()->attempts);
+        $this->assertSame('default', $jobs->first()->queue);
         $this->assertInstanceOf(Carbon::class, $jobs->first()->createdAt);
         $this->assertSame(1000000, $jobs->first()->createdAt->getTimestamp());
         $this->assertSame('JobB', $jobs->last()->name);
         $this->assertSame('uuid-2', $jobs->last()->uuid);
+        $this->assertSame('emails', $jobs->last()->queue);
     }
 
     public function testAllReservedJobs()
@@ -395,11 +402,13 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $this->assertSame('JobA', $jobs->first()->name);
         $this->assertSame('uuid-1', $jobs->first()->uuid);
         $this->assertSame(1, $jobs->first()->attempts);
+        $this->assertSame('default', $jobs->first()->queue);
         $this->assertInstanceOf(Carbon::class, $jobs->first()->createdAt);
         $this->assertSame(1000000, $jobs->first()->createdAt->getTimestamp());
         $this->assertSame('JobB', $jobs->last()->name);
         $this->assertSame('uuid-2', $jobs->last()->uuid);
         $this->assertSame(2, $jobs->last()->attempts);
+        $this->assertSame('emails', $jobs->last()->queue);
     }
 
     public function testGetLockForPoppingIsCached()
