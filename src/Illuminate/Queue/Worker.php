@@ -855,9 +855,10 @@ class Worker
      *
      * @param  string|null  $connectionName
      * @param  string|null  $queue
+     * @param  \Illuminate\Queue\WorkerOptions|null  $options
      * @return void
      */
-    protected function listenForSignals($connectionName = null, $queue = null, $options = null)
+    protected function listenForSignals($connectionName = null, $queue = null, ?WorkerOptions $options = null)
     {
         pcntl_async_signals(true);
 
