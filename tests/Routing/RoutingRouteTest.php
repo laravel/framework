@@ -2745,4 +2745,3 @@ class RouteTestInsecureDeserializationStub
         self::$instantiated = true;
     }
 }
-
