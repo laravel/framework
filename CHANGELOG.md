@@ -1,6 +1,29 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.13.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.14.0...13.x)
+
+## [v13.14.0](https://github.com/laravel/framework/compare/v13.13.0...v13.14.0) - 2026-06-04
+
+* [13.x] Register the lazy refresh hook on all connections by [@tontonsb](https://github.com/tontonsb) in https://github.com/laravel/framework/pull/60359
+* [13.x] Cache falsy JSON payloads in HTTP client responses by [@Button99](https://github.com/Button99) in https://github.com/laravel/framework/pull/60357
+* GitHub Actions hardening by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/framework/pull/60363
+* Bump the github-actions group with 4 updates by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/framework/pull/60364
+* [13.x] Fix `Request::createFromBase()` compatibility with Symfony 8.1 by [@irabbi360](https://github.com/irabbi360) in https://github.com/laravel/framework/pull/60354
+* [13.x] Set default cooldown for GitHub Actions updates by [@JurianArie](https://github.com/JurianArie) in https://github.com/laravel/framework/pull/60368
+* [13.x] Fix `Message::embed` data attachment handling by [@miladev95](https://github.com/miladev95) in https://github.com/laravel/framework/pull/60361
+* [13.x] Namespace the cloud logging formatter by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/60362
+* Grant contents: read to pull requests workflow by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/framework/pull/60370
+* [13.x] Respect child queue properties over inherited attributes by [@mattiasgeniar](https://github.com/mattiasgeniar) in https://github.com/laravel/framework/pull/60369
+* Grant contents: read and pull-requests: write to issues workflow by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/framework/pull/60371
+* Use least-privilege permissions for pull requests and issues workflows by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/framework/pull/60372
+* Pin pull requests and issues workflows to latest laravel/.github by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/framework/pull/60373
+* Enable Dependabot auto-merge by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/framework/pull/60383
+* [13.x] Foundation\Cloud\Events: remove an unused import and fix docblock by [@oliverquynh](https://github.com/oliverquynh) in https://github.com/laravel/framework/pull/60378
+* [13.x] Fix StartSession docblock by [@oliverquynh](https://github.com/oliverquynh) in https://github.com/laravel/framework/pull/60375
+* [13.x] Add JSON Schema array deserializer by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/60384
+* [13.x] Add queue to InspectedJob by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60374
+* [13.x] Fix treatment of null headers by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/60386
+* [13.x] Add units to DebounceFor by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60388
 
 ## [v13.13.0](https://github.com/laravel/framework/compare/v13.12.0...v13.13.0) - 2026-06-02
 
