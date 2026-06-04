@@ -1817,6 +1817,21 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame([], $model->getAttributes());
     }
 
+    public function testGuardedThrowsExceptionWhenColumnListingIsEmpty()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Unable to retrieve columns for table [stub].');
+
+        $model = new EloquentModelStub;
+        $model->guard(['secret']);
+
+        EloquentModelStub::setConnectionResolver($resolver = m::mock(Resolver::class));
+        $resolver->shouldReceive('connection')->andReturn($connection = m::mock(stdClass::class));
+        $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn([]);
+
+        $model->isGuarded('foo');
+    }
+
     public function testGuarded()
     {
         $model = new EloquentModelStub;

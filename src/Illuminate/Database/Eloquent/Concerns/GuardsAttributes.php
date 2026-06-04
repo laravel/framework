@@ -254,7 +254,10 @@ trait GuardsAttributes
                 ->getColumnListing($this->getTable());
 
             if (empty($columns)) {
-                return true;
+                throw new \RuntimeException(sprintf(
+                    'Unable to retrieve columns for table [%s].',
+                    $this->getTable()
+                ));
             }
 
             static::$guardableColumns[get_class($this)] = $columns;
