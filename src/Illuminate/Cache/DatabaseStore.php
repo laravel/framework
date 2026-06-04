@@ -411,7 +411,7 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
     {
         $this->table()->whereIn('key', (new Collection($keys))->flatMap(fn ($key) => [
             $this->prefix.$key,
-            "{$this->prefix}illuminate:cache:flexible:created:{$key}",
+            $this->prefix.Repository::FLEXIBLE_CREATED_KEY_PREFIX.$key,
         ])->all())->delete();
 
         return true;
@@ -429,10 +429,10 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
         $this->table()
             ->whereIn('key', (new Collection($keys))->flatMap(fn ($key) => $prefixed ? [
                 $key,
-                $this->prefix.'illuminate:cache:flexible:created:'.Str::chopStart($key, $this->prefix),
+                $this->prefix.Repository::FLEXIBLE_CREATED_KEY_PREFIX.Str::chopStart($key, $this->prefix),
             ] : [
                 "{$this->prefix}{$key}",
-                "{$this->prefix}illuminate:cache:flexible:created:{$key}",
+                $this->prefix.Repository::FLEXIBLE_CREATED_KEY_PREFIX.$key,
             ])->all())
             ->where('expiration', '<=', $this->getTime())
             ->delete();

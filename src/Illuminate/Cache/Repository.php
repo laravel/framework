@@ -48,6 +48,13 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * The cache key prefix used to track when a flexible cache value was last refreshed.
+     *
+     * @var string
+     */
+    const FLEXIBLE_CREATED_KEY_PREFIX = 'illuminate:cache:flexible:created:';
+
+    /**
      * The cache store implementation.
      *
      * @var \Illuminate\Contracts\Cache\Store
@@ -623,13 +630,13 @@ class Repository implements ArrayAccess, CacheContract
 
         [
             $key => $value,
-            "illuminate:cache:flexible:created:{$key}" => $created,
-        ] = $this->many([$key, "illuminate:cache:flexible:created:{$key}"]);
+            self::FLEXIBLE_CREATED_KEY_PREFIX.$key => $created,
+        ] = $this->many([$key, self::FLEXIBLE_CREATED_KEY_PREFIX.$key]);
 
         if (in_array(null, [$value, $created], true)) {
             return tap(value($callback), fn ($value) => $this->putMany([
                 $key => $value,
-                "illuminate:cache:flexible:created:{$key}" => Carbon::now()->getTimestamp(),
+                self::FLEXIBLE_CREATED_KEY_PREFIX.$key => Carbon::now()->getTimestamp(),
             ], $ttl[1]));
         }
 
@@ -643,13 +650,13 @@ class Repository implements ArrayAccess, CacheContract
                 $lock['seconds'] ?? 0,
                 $lock['owner'] ?? null,
             )->get(function () use ($key, $callback, $created, $ttl) {
-                if ($created !== $this->get("illuminate:cache:flexible:created:{$key}")) {
+                if ($created !== $this->get(self::FLEXIBLE_CREATED_KEY_PREFIX.$key)) {
                     return;
                 }
 
                 $this->putMany([
                     $key => value($callback),
-                    "illuminate:cache:flexible:created:{$key}" => Carbon::now()->getTimestamp(),
+                    self::FLEXIBLE_CREATED_KEY_PREFIX.$key => Carbon::now()->getTimestamp(),
                 ], $ttl[1]);
             });
         };

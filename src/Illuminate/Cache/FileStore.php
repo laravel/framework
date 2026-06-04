@@ -277,7 +277,7 @@ class FileStore implements CanFlushLocks, LockProvider, Store
     {
         if ($this->files->exists($file = $this->path($key))) {
             return tap($this->files->delete($file), function ($forgotten) use ($key) {
-                if ($forgotten && $this->files->exists($file = $this->path("illuminate:cache:flexible:created:{$key}"))) {
+                if ($forgotten && $this->files->exists($file = $this->path(Repository::FLEXIBLE_CREATED_KEY_PREFIX.$key))) {
                     $this->files->delete($file);
                 }
             });
