@@ -1040,6 +1040,6 @@ class SqlServerGrammar extends Grammar
             return implode(', ', array_map([$this, __FUNCTION__], $value));
         }
 
-        return "N'$value'";
+        return sprintf("N'%s'", str_replace("'", "''", $value));
     }
 }

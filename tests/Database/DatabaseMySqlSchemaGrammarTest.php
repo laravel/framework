@@ -1739,6 +1739,18 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add index `custom_idx` using btree(`name`), lock=none', $statements[0]);
     }
 
+    public function testQuoteString()
+    {
+        $this->assertSame("'中文測試'", $this->getGrammar()->quoteString('中文測試'));
+        $this->assertSame("'foo''bar'", $this->getGrammar()->quoteString("foo'bar"));
+    }
+
+    public function testQuoteStringOnArray()
+    {
+        $this->assertSame("'中文', '測試'", $this->getGrammar()->quoteString(['中文', '測試']));
+        $this->assertSame("'foo''bar', 'baz''qux'", $this->getGrammar()->quoteString(["foo'bar", "baz'qux"]));
+    }
+
     public function getGrammar(?Connection $connection = null)
     {
         return new MySqlGrammar($connection ?? $this->getConnection());

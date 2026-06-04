@@ -959,11 +959,13 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
     public function testQuoteString()
     {
         $this->assertSame("N'中文測試'", $this->getGrammar()->quoteString('中文測試'));
+        $this->assertSame("N'foo''bar'", $this->getGrammar()->quoteString("foo'bar"));
     }
 
     public function testQuoteStringOnArray()
     {
         $this->assertSame("N'中文', N'測試'", $this->getGrammar()->quoteString(['中文', '測試']));
+        $this->assertSame("N'foo''bar', N'baz''qux'", $this->getGrammar()->quoteString(["foo'bar", "baz'qux"]));
     }
 
     public function testCreateDatabase()
