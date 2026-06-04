@@ -23,9 +23,9 @@
         "illuminate/macroable": "^14.0",
         "illuminate/session": "^14.0",
         "illuminate/support": "^14.0",
-        "symfony/http-foundation": "^8.0.0",
-        "symfony/http-kernel": "^8.0.0",
-        "symfony/mime": "^8.0.0",
+        "symfony/http-foundation": "^8.1.0",
+        "symfony/http-kernel": "^8.1.0",
+        "symfony/mime": "^8.1.0",
         "symfony/polyfill-php85": "^1.36"
     },
     "suggest": {
