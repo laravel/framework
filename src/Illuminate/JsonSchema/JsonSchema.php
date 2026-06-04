@@ -16,13 +16,13 @@ use Illuminate\JsonSchema\Types\Type;
 class JsonSchema
 {
     /**
-     * Build a type from the given raw JSON Schema array.
+     * Build a type from a raw array of the Laravel-supported JSON Schema subset.
      *
      * @param  array<string, mixed>  $schema
      *
      * @throws \InvalidArgumentException
      */
-    public static function deserialize(array $schema): Type
+    public static function fromArray(array $schema): Type
     {
         return Deserializer::deserialize($schema);
     }
