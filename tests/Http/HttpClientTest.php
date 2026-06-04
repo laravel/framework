@@ -104,24 +104,26 @@ class HttpClientTest extends TestCase
     {
         $response = $this->factory::response('OK', 200, [
             'X-Int' => 123,
+            'X-Null' => null,
             'X-False' => false,
             'X-Empty' => [],
             'X-Laravel-Stringable' => new Stringable('laravel stringable'),
-            'X-Multiple' => ['first', 123, true, false],
+            'X-Multiple' => ['first', 123, true, false, null],
         ])->wait();
 
         $this->assertSame(['123'], $response->getHeader('X-Int'));
+        $this->assertSame([''], $response->getHeader('X-Null'));
         $this->assertSame([''], $response->getHeader('X-False'));
         $this->assertSame([''], $response->getHeader('X-Empty'));
         $this->assertSame(['laravel stringable'], $response->getHeader('X-Laravel-Stringable'));
-        $this->assertSame(['first', '123', '1', ''], $response->getHeader('X-Multiple'));
+        $this->assertSame(['first', '123', '1', '', ''], $response->getHeader('X-Multiple'));
     }
 
     #[DataProvider('invalidFakeResponseHeaderValuesProvider')]
     public function testInvalidFakeResponseHeaderValuesAreRejected($value)
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('HTTP fake response header values must be scalar, Laravel Stringable, or arrays of scalar or Laravel Stringable values.');
+        $this->expectExceptionMessage('HTTP fake response header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.');
 
         $this->factory::response('OK', 200, ['X-Test' => $value]);
     }
@@ -711,20 +713,22 @@ class HttpClientTest extends TestCase
         $this->factory->withHeaders([
             'X-Int' => 123,
             'X-Float' => 1.5,
+            'X-Null' => null,
             'X-True' => true,
             'X-False' => false,
             'X-Laravel-Stringable' => new Stringable('laravel stringable'),
-            'X-Multiple' => ['first', 123, true, false],
+            'X-Multiple' => ['first', 123, true, false, null],
             'X-Empty' => [],
         ])->post('http://foo.com/json');
 
         $this->factory->assertSent(function (Request $request) {
             return $request->hasHeader('X-Int', '123')
                 && $request->hasHeader('X-Float', '1.5')
+                && $request->hasHeader('X-Null', '')
                 && $request->hasHeader('X-True', '1')
                 && $request->hasHeader('X-False', '')
                 && $request->hasHeader('X-Laravel-Stringable', 'laravel stringable')
-                && $request->hasHeader('X-Multiple', ['first', '123', '1', ''])
+                && $request->hasHeader('X-Multiple', ['first', '123', '1', '', ''])
                 && $request->hasHeader('X-Empty', '');
         });
     }
@@ -735,7 +739,7 @@ class HttpClientTest extends TestCase
         $this->factory->fake();
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('HTTP header values must be scalar, Laravel Stringable, or arrays of scalar or Laravel Stringable values.');
+        $this->expectExceptionMessage('HTTP header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.');
 
         $this->factory->withHeaders(['X-Test' => $value])->post('http://foo.com/json');
     }
@@ -745,11 +749,12 @@ class HttpClientTest extends TestCase
         $this->factory->fake();
 
         $this->factory->withOptions([
-            'headers' => ['X-Test' => 123],
+            'headers' => ['X-Test' => 123, 'X-Null' => null],
         ])->post('http://foo.com/json');
 
         $this->factory->assertSent(function (Request $request) {
-            return $request->hasHeader('X-Test', '123');
+            return $request->hasHeader('X-Test', '123')
+                && $request->hasHeader('X-Null', '');
         });
     }
 
@@ -907,10 +912,11 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->factory->attach('file', 'data', 'file.txt', ['X-Part' => 123])->post('http://foo.com/file');
+        $this->factory->attach('file', 'data', 'file.txt', ['X-Part' => 123, 'X-Null' => null])->post('http://foo.com/file');
 
         $this->factory->assertSent(function (Request $request) {
-            return $request[0]['headers']['X-Part'] === '123';
+            return $request[0]['headers']['X-Part'] === '123'
+                && $request[0]['headers']['X-Null'] === '';
         });
     }
 
@@ -924,6 +930,7 @@ class HttpClientTest extends TestCase
                 'contents' => 'data',
                 'headers' => [
                     'X-Part' => 123,
+                    'X-Null' => null,
                     'X-Empty' => [],
                     'X-Laravel-Stringable' => new Stringable('laravel stringable'),
                 ],
@@ -932,6 +939,7 @@ class HttpClientTest extends TestCase
 
         $this->factory->assertSent(function (Request $request) {
             return $request[0]['headers']['X-Part'] === '123'
+                && $request[0]['headers']['X-Null'] === ''
                 && $request[0]['headers']['X-Empty'] === ''
                 && $request[0]['headers']['X-Laravel-Stringable'] === 'laravel stringable';
         });
@@ -943,7 +951,7 @@ class HttpClientTest extends TestCase
         $this->factory->fake();
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Multipart header values must be scalar or Laravel Stringable.');
+        $this->expectExceptionMessage('Multipart header values must be scalar, null, or Laravel Stringable.');
 
         $this->factory->asMultipart()->post('http://foo.com/multipart', [
             [
@@ -4580,10 +4588,8 @@ class HttpClientTest extends TestCase
     public static function invalidHeaderValuesProvider()
     {
         return [
-            'null' => [null],
             'object' => [new stdClass],
             'resource' => [fopen('php://temp', 'r')],
-            'array with null' => [['valid', null]],
             'array with object' => [['valid', new stdClass]],
             'array with resource' => [['valid', fopen('php://temp', 'r')]],
             'array with nested array' => [['valid', ['nested']]],
@@ -4593,7 +4599,6 @@ class HttpClientTest extends TestCase
     public static function invalidMultipartHeaderValuesProvider()
     {
         return [
-            'null' => [null],
             'array' => [['nested']],
             'object' => [new stdClass],
             'resource' => [fopen('php://temp', 'r')],
@@ -4603,10 +4608,8 @@ class HttpClientTest extends TestCase
     public static function invalidFakeResponseHeaderValuesProvider()
     {
         return [
-            'null' => [null],
             'object' => [new stdClass],
             'resource' => [fopen('php://temp', 'r')],
-            'array with null' => [['valid', null]],
             'array with object' => [['valid', new stdClass]],
             'array with resource' => [['valid', fopen('php://temp', 'r')]],
             'array with nested array' => [['valid', ['nested']]],
