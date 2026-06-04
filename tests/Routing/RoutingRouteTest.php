@@ -2282,7 +2282,7 @@ class RoutingRouteTest extends TestCase
     {
         $badObject = new RouteTestInsecureDeserializationStub;
         $closureWithUse = function () use ($badObject) {
-            return 'hello';
+            return $badObject;
         };
 
         $serializedClosure = serialize(\Laravel\SerializableClosure\SerializableClosure::unsigned($closureWithUse));
