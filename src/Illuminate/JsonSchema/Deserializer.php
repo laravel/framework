@@ -356,7 +356,7 @@ class Deserializer
     }
 
     /**
-     * Collapse "anyOf"/"oneOf" null branches into a single effective schema.
+     * Collapse "anyOf" / "oneOf" null branches into a single effective schema.
      *
      * @param  array<string, mixed>  $schema
      * @param  array<int, string>  $refs
