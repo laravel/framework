@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Bootstrap;
 
 use ErrorException;
 use Exception;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Log\LogManager;
@@ -92,15 +93,16 @@ class HandleExceptions
             return;
         }
 
-        try {
-            $logger = static::$app->make(LogManager::class);
-        } catch (Exception) {
+        $logger = rescue(fn () => static::$app->make(LogManager::class), report: false);
+        $config = rescue(fn () => static::$app->make('config'), report: false);
+
+        if (is_null($logger) || is_null($config)) {
             return;
         }
 
-        $this->ensureDeprecationLoggerIsConfigured();
+        $this->ensureDeprecationLoggerIsConfigured($config);
 
-        $options = static::$app['config']->get('logging.deprecations') ?? [];
+        $options = $config->get('logging.deprecations') ?? [];
 
         with($logger->channel('deprecations'), function ($log) use ($message, $file, $line, $level, $options) {
             if ($options['trace'] ?? false) {
@@ -130,15 +132,13 @@ class HandleExceptions
      *
      * @return void
      */
-    protected function ensureDeprecationLoggerIsConfigured()
+    protected function ensureDeprecationLoggerIsConfigured(ConfigRepository $config)
     {
-        $config = static::$app['config'];
-
         if ($config->get('logging.channels.deprecations')) {
             return;
         }
 
-        $this->ensureNullLogDriverIsConfigured();
+        $this->ensureNullLogDriverIsConfigured($config);
 
         if (is_array($options = $config->get('logging.deprecations'))) {
             $driver = $options['channel'] ?? 'null';
@@ -154,10 +154,8 @@ class HandleExceptions
      *
      * @return void
      */
-    protected function ensureNullLogDriverIsConfigured()
+    protected function ensureNullLogDriverIsConfigured(ConfigRepository $config)
     {
-        $config = static::$app['config'];
-
         if ($config->get('logging.channels.null')) {
             return;
         }
