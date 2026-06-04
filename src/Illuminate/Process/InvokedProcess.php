@@ -174,4 +174,14 @@ class InvokedProcess implements InvokedProcessContract
             throw new ProcessTimedOutException($e, new ProcessResult($this->process));
         }
     }
+
+    /**
+     * Get the underlying process.
+     *
+     * @return \Symfony\Component\Process\Process
+     */
+    public function getProcess()
+    {
+        return $this->process;
+    }
 }
