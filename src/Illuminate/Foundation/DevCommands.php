@@ -33,14 +33,14 @@ class DevCommands
     /**
      * The names of commands that should be excluded when running the "dev" command.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected static $except = [];
 
     /**
      * The names of commands that should be included when running the "dev" command.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected static $only = [];
 
