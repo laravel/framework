@@ -199,6 +199,32 @@ class AuthTokenGuardTest extends TestCase
 
         $this->assertFalse($guard->validate(['custom_token_field' => '']));
     }
+
+    public function testValidateHashesTokenWhenHashIsEnabled()
+    {
+        $provider = m::mock(UserProvider::class);
+        $user = new AuthTokenGuardTestUser;
+        $user->id = 1;
+        $provider->shouldReceive('retrieveByCredentials')->once()->with(['api_token' => hash('sha256', 'foo')])->andReturn($user);
+        $request = Request::create('/', 'GET', ['api_token' => 'foo']);
+
+        $guard = new TokenGuard($provider, $request, 'api_token', 'api_token', $hash = true);
+
+        $this->assertTrue($guard->validate(['api_token' => 'foo']));
+    }
+
+    public function testValidateHashesTokenWhenHashIsEnabledWithCustomKey()
+    {
+        $provider = m::mock(UserProvider::class);
+        $user = new AuthTokenGuardTestUser;
+        $user->id = 1;
+        $provider->shouldReceive('retrieveByCredentials')->once()->with(['custom_token_field' => hash('sha256', 'bar')])->andReturn($user);
+        $request = Request::create('/', 'GET', ['custom_token_field' => 'bar']);
+
+        $guard = new TokenGuard($provider, $request, 'custom_token_field', 'custom_token_field', $hash = true);
+
+        $this->assertTrue($guard->validate(['custom_token_field' => 'bar']));
+    }
 }
 
 class AuthTokenGuardTestUser

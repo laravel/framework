@@ -114,7 +114,9 @@ class TokenGuard implements Guard
             return false;
         }
 
-        $credentials = [$this->storageKey => $credentials[$this->inputKey]];
+        $token = $credentials[$this->inputKey];
+
+        $credentials = [$this->storageKey => $this->hash ? hash('sha256', $token) : $token];
 
         return (bool) $this->provider->retrieveByCredentials($credentials);
     }
