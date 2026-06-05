@@ -109,7 +109,7 @@ class DevCommand
     /**
      * Get the command as an array.
      *
-     * @return array
+     * @return array{command: string, name: string, color: string|null}
      */
     public function toArray(): array
     {
