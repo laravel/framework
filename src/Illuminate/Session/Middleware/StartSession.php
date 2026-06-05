@@ -74,7 +74,7 @@ class StartSession
     protected function handleRequestWhileBlocking(Request $request, $session, Closure $next)
     {
         if (! $request->route() instanceof Route) {
-            return;
+            return $this->handleStatefulRequest($request, $session, $next);
         }
 
         $lockFor = $request->route() && $request->route()->locksFor()
