@@ -205,6 +205,14 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
             if ($compiledHash !== hash('xxh128', $contents)) {
                 $this->files->replace($compiledPath, $contents);
+
+                return;
+            }
+
+            $lastModified = $this->files->lastModified($this->getPath());
+
+            if ($lastModified >= $this->files->lastModified($compiledPath)) {
+                touch($compiledPath, $lastModified + 1);
             }
         }
     }
