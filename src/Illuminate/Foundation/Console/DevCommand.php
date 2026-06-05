@@ -37,7 +37,7 @@ class DevCommand extends Command
     public function handle(NodePackageManager $packageManager)
     {
         if ($this->isProhibited()) {
-            return;
+            return self::FAILURE;
         }
 
         $devCommands = DevCommands::commands();
