@@ -36,7 +36,6 @@ class DocsCommandTest extends MockeryTestCase
             ->withAnyArgs()
             ->andReturn($binary);
 
-
         $command = new DocsCommand();
 
         // Inject a stub for the protected $components property without using setAccessible.
