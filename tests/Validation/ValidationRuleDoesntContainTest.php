@@ -86,4 +86,24 @@ class ValidationRuleDoesntContainTest extends TestCase
         $v = new Validator($trans, ['roles' => null], ['roles' => ['nullable', Rule::doesntContain('admin')]]);
         $this->assertTrue($v->passes());
     }
+
+    public function testDoesntContainValidationDoesNotUseLooseBooleanComparison()
+    {
+        $trans = new Translator(new ArrayLoader, 'en');
+
+        $v = new Validator($trans, ['roles' => [true]], ['roles' => Rule::doesntContain('admin')]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['roles' => [true]], ['roles' => Rule::doesntContain(1)]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['roles' => [false]], ['roles' => Rule::doesntContain(0)]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['roles' => [1]], ['roles' => Rule::doesntContain(1)]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['roles' => [0]], ['roles' => Rule::doesntContain(0)]);
+        $this->assertTrue($v->fails());
+    }
 }

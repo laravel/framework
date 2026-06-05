@@ -26,6 +26,7 @@ use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationData;
 use InvalidArgumentException;
+use Stringable;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use ValueError;
@@ -530,7 +531,7 @@ trait ValidatesAttributes
         }
 
         foreach ($parameters as $parameter) {
-            if (! in_array($parameter, $value)) {
+            if (! $this->arrayContainsParameter($value, $parameter)) {
                 return false;
             }
         }
@@ -553,12 +554,31 @@ trait ValidatesAttributes
         }
 
         foreach ($parameters as $parameter) {
-            if (in_array($parameter, $value)) {
+            if ($this->arrayContainsParameter($value, $parameter)) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    /**
+     * Determine if an array contains a validation rule parameter.
+     *
+     * @param  array<int, mixed>  $values
+     * @param  int|string  $parameter
+     * @return bool
+     */
+    protected function arrayContainsParameter($values, $parameter)
+    {
+        foreach ($values as $value) {
+            if ((is_string($value) || is_int($value) || is_float($value) || $value instanceof Stringable)
+                && (string) $value === (string) $parameter) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
