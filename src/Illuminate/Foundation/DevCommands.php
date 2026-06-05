@@ -157,7 +157,7 @@ class DevCommands
      *
      * @return array
      */
-    public static function getCommands(): array
+    public static function commands(): array
     {
         $commands = [];
 

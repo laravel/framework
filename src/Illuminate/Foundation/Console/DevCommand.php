@@ -33,7 +33,7 @@ class DevCommand extends Command
      */
     public function handle(NodePackageManager $packageManager)
     {
-        $devCommands = DevCommands::getCommands();
+        $devCommands = DevCommands::commands();
 
         $commands = array_column($devCommands, 'command');
         $colors = array_column($devCommands, 'color');

@@ -11,7 +11,7 @@ class Npm implements NodePackageManager
      *
      * @return bool
      */
-    public static function isInUse(): bool
+    public static function matches(): bool
     {
         return file_exists(getcwd() . '/package-lock.json');
     }

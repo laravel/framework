@@ -11,7 +11,7 @@ class Bun implements NodePackageManager
      *
      * @return bool
      */
-    public static function isInUse(): bool
+    public static function matches(): bool
     {
         foreach (['bun.lock', 'bun.lockb'] as $lockFile) {
             if (file_exists(getcwd() . '/' . $lockFile)) {
