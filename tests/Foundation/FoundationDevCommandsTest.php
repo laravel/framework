@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Foundation;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\DevCommand;
+use Illuminate\Foundation\DevCommandColor;
 use Illuminate\Foundation\DevCommands;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\PhpProcess;
@@ -143,8 +144,8 @@ class FoundationDevCommandsTest extends TestCase
 
         $commands = DevCommands::commands();
 
-        $this->assertSame(DevCommand::PINK, $commands[0]['color']);
-        $this->assertNotSame(DevCommand::PINK, $commands[1]['color']);
+        $this->assertSame(DevCommandColor::PINK->value, $commands[0]['color']);
+        $this->assertNotSame(DevCommandColor::PINK->value, $commands[1]['color']);
     }
 
     public function testAutoColorSkipsExplicitlyUsedColors()
@@ -154,8 +155,8 @@ class FoundationDevCommandsTest extends TestCase
 
         $commands = DevCommands::commands();
 
-        $this->assertSame(DevCommand::BLUE, $commands[0]['color']);
-        $this->assertNotSame(DevCommand::BLUE, $commands[1]['color']);
+        $this->assertSame(DevCommandColor::BLUE->value, $commands[0]['color']);
+        $this->assertNotSame(DevCommandColor::BLUE->value, $commands[1]['color']);
     }
 
     public function testColorsRecycleWhenAllUsed()
