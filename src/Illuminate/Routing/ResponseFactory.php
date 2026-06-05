@@ -62,6 +62,18 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
+     * Create a new "created" response.
+     *
+     * @param  string  $content
+     * @param  array  $headers
+     * @return \Illuminate\Http\Response
+     */
+    public function created($content = '', array $headers = [])
+    {
+        return $this->make($content, 201, $headers);
+    }
+
+    /**
      * Create a new "no content" response.
      *
      * @param  int  $status

@@ -18,6 +18,15 @@ interface ResponseFactory
     public function make($content = '', $status = 200, array $headers = []);
 
     /**
+     * Create a new "created" response.
+     *
+     * @param  string  $content
+     * @param  array  $headers
+     * @return \Illuminate\Http\Response
+     */
+    public function created($content = '', array $headers = []);
+
+    /**
      * Create a new "no content" response.
      *
      * @param  int  $status
