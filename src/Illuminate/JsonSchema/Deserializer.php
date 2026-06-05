@@ -212,7 +212,13 @@ class Deserializer
     {
         $cast ??= static fn (int|float $value) => $value;
 
-        foreach (['minimum' => 'min', 'maximum' => 'max', 'multipleOf' => 'multipleOf'] as $keyword => $method) {
+        foreach ([
+            'minimum' => 'min',
+            'maximum' => 'max',
+            'exclusiveMinimum' => 'exclusiveMin',
+            'exclusiveMaximum' => 'exclusiveMax',
+            'multipleOf' => 'multipleOf',
+        ] as $keyword => $method) {
             if (! isset($schema[$keyword])) {
                 continue;
             }
@@ -309,7 +315,7 @@ class Deserializer
             isset($schema['items']), isset($schema['minItems']), isset($schema['maxItems']), isset($schema['uniqueItems']) => 'array',
             isset($schema['enum']) && is_array($schema['enum']) => $this->inferEnumType($schema['enum']),
             isset($schema['minLength']), isset($schema['maxLength']), isset($schema['pattern']), isset($schema['format']) => 'string',
-            isset($schema['minimum']), isset($schema['maximum']), isset($schema['multipleOf']) => 'number',
+            isset($schema['minimum']), isset($schema['maximum']), isset($schema['exclusiveMinimum']), isset($schema['exclusiveMaximum']), isset($schema['multipleOf']) => 'number',
             default => null,
         };
     }

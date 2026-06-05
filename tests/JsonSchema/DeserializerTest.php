@@ -85,6 +85,22 @@ class DeserializerTest extends TestCase
         ], $type->toArray());
     }
 
+    public function test_it_applies_exclusive_integer_constraints(): void
+    {
+        $type = JsonSchema::fromArray([
+            'type' => 'integer',
+            'exclusiveMinimum' => 0,
+            'exclusiveMaximum' => 100,
+        ]);
+
+        $this->assertInstanceOf(IntegerType::class, $type);
+        $this->assertEquals([
+            'type' => 'integer',
+            'exclusiveMinimum' => 0,
+            'exclusiveMaximum' => 100,
+        ], $type->toArray());
+    }
+
     public function test_it_applies_number_constraints_and_preserves_floats(): void
     {
         $type = JsonSchema::fromArray([
@@ -101,6 +117,22 @@ class DeserializerTest extends TestCase
         $this->assertSame(0.5, $array['minimum']);
         $this->assertSame(9.9, $array['maximum']);
         $this->assertSame(0.1, $array['multipleOf']);
+    }
+
+    public function test_it_applies_exclusive_number_constraints_and_preserves_floats(): void
+    {
+        $type = JsonSchema::fromArray([
+            'type' => 'number',
+            'exclusiveMinimum' => 0.5,
+            'exclusiveMaximum' => 9.9,
+        ]);
+
+        $this->assertInstanceOf(NumberType::class, $type);
+
+        $array = $type->toArray();
+
+        $this->assertSame(0.5, $array['exclusiveMinimum']);
+        $this->assertSame(9.9, $array['exclusiveMaximum']);
     }
 
     public function test_it_applies_array_constraints_and_nested_items(): void
@@ -350,6 +382,15 @@ class DeserializerTest extends TestCase
         ]);
 
         $this->assertInstanceOf(ObjectType::class, $type);
+    }
+
+    public function test_it_infers_number_type_from_exclusive_boundaries(): void
+    {
+        $type = JsonSchema::fromArray([
+            'exclusiveMinimum' => 0.5,
+        ]);
+
+        $this->assertInstanceOf(NumberType::class, $type);
     }
 
     public function test_it_infers_array_type_from_items(): void
