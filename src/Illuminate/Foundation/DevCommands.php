@@ -201,6 +201,7 @@ class DevCommands
             }
 
             if (! str_contains($file, base_path('vendor'))) {
+                // We found at least one frame that came from userland code, we're good.
                 return;
             }
         }
