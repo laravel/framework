@@ -237,7 +237,7 @@ class DevCommands
      */
     protected static function nameFromCommand(string $command): string
     {
-        return collect(explode(' ', $command))->first();
+        return strstr($command, ' ', true);
     }
 
     /**

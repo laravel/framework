@@ -20,7 +20,7 @@ class DevCommand
      */
     public function __construct(protected string $command, protected ?string $name = null)
     {
-        $this->name ??= collect(explode(' ', $command))->first();
+        $this->name ??= strstr($command, ' ', true);
     }
 
     /**
