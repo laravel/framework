@@ -8,8 +8,19 @@ use ReflectionClass;
 
 class DevCommands
 {
+    /**
+     * Counter to keep track of how many colors have been assigned,
+     * used to ensure colors are reused only after all have been used at least once.
+     *
+     * @var int
+     */
     protected static $colorCount = 0;
 
+    /**
+     * Predefined colors to assign to commands when displayed in the console.
+     *
+     * @var array<int, string>
+     */
     protected static $colors = [
         DevCommand::BLUE,
         DevCommand::PURPLE,
@@ -19,12 +30,32 @@ class DevCommands
         DevCommand::YELLOW,
     ];
 
+    /**
+     * The resolved NodePackageManager instance.
+     *
+     * @var null|NodePackageManager
+     */
     protected static ?NodePackageManager $packageManager = null;
 
+    /**
+     * The registered development commands.
+     *
+     * @var array
+     */
     protected static $commands = [];
 
+    /**
+     * The names of commands that should be excluded when running the "dev" command.
+     *
+     * @var array
+     */
     protected static $except = [];
 
+    /**
+     * The names of commands that should be included when running the "dev" command.
+     *
+     * @var array
+     */
     protected static $only = [];
 
     /**
@@ -43,8 +74,8 @@ class DevCommands
     /**
      * Register a development command.
      *
-     * @param string $command
-     * @param null|string $name
+     * @param  string  $command
+     * @param  null|string  $name
      * @return DevCommand
      */
     public static function register(string $command, ?string $name = null): DevCommand
@@ -66,8 +97,8 @@ class DevCommands
     /**
      * Registers an Artisan command, automatically prefixing it with "php artisan".
      *
-     * @param string $command
-     * @param null|string $name
+     * @param  string  $command
+     * @param  null|string  $name
      * @return DevCommand
      */
     public static function artisan(string $command, ?string $name = null): DevCommand
@@ -78,8 +109,8 @@ class DevCommands
     /**
      * Registers a Node command, automatically prefixing it with the detected package manager's run command.
      *
-     * @param string $command
-     * @param null|string $name
+     * @param  string  $command
+     * @param  null|string  $name
      * @return DevCommand
      */
     public static function node(string $command, ?string $name = null): DevCommand
@@ -90,8 +121,8 @@ class DevCommands
     /**
      * Registers a Node command, automatically prefixing it with the detected package manager's exec command.
      *
-     * @param string $command
-     * @param null|string $name
+     * @param  string  $command
+     * @param  null|string  $name
      * @return DevCommand
      */
     public static function nodeExec(string $command, ?string $name = null): DevCommand
@@ -102,7 +133,7 @@ class DevCommands
     /**
      * Set the commands that should be included when running the "dev" command, excluding any commands not in the given list.
      *
-     * @param mixed ...$commands
+     * @param  mixed  ...$commands
      * @return void
      */
     public static function except(...$commands): void
@@ -113,7 +144,7 @@ class DevCommands
     /**
      * Set the commands that should be included when running the "dev" command, excluding any commands not in the given list.
      *
-     * @param mixed ...$commands
+     * @param  mixed  ...$commands
      * @return void
      */
     public static function only(...$commands): void
@@ -133,7 +164,7 @@ class DevCommands
         foreach (self::$commands as $command) {
             $cmd = $command->toArray();
 
-            if ((!empty(self::$only) && !in_array($cmd['name'], self::$only)) || in_array($cmd['name'], self::$except)) {
+            if ((! empty(self::$only) && ! in_array($cmd['name'], self::$only)) || in_array($cmd['name'], self::$except)) {
                 continue;
             }
 
@@ -172,8 +203,9 @@ class DevCommands
     /**
      * Prevent automatic registration of DevCommands from within vendor packages.
      *
-     * @param string $name
+     * @param  string  $name
      * @return void
+     *
      * @throws Exception
      */
     protected static function preventVendorRegistration(string $name)
@@ -214,7 +246,7 @@ class DevCommands
     /**
      * Derive a command name from the given command string by taking the first word.
      *
-     * @param string $command
+     * @param  string  $command
      * @return string
      */
     protected static function nameFromCommand(string $command): string
@@ -225,7 +257,7 @@ class DevCommands
     /**
      * Fill in any empty colors in the given commands array, ensuring each command has a color assigned.
      *
-     * @param array $commands
+     * @param  array  $commands
      * @return array
      */
     protected static function fillInEmptyColors(array $commands): array
@@ -242,7 +274,7 @@ class DevCommands
     /**
      * Get a color for a command, ensuring that colors are reused only after all available colors have been used at least once.
      *
-     * @param array $commands
+     * @param  array  $commands
      * @return string
      */
     protected static function getColor(array $commands): string

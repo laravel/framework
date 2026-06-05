@@ -4,16 +4,46 @@ namespace Illuminate\Foundation;
 
 class DevCommand
 {
+    /**
+     * Blue color.
+     *
+     * @var string
+     */
     public const BLUE = '#93c5fd';
 
+    /**
+     * Purple color.
+     *
+     * @var string
+     */
     public const PURPLE = '#c4b5fd';
 
+    /**
+     * Pink color.
+     *
+     * @var string
+     */
     public const PINK = '#fb7185';
 
+    /**
+     * Orange color.
+     *
+     * @var string
+     */
     public const ORANGE = '#fdba74';
 
+    /**
+     * Green color.
+     *
+     * @var string
+     */
     public const GREEN = '#86efac';
 
+    /**
+     * Yellow color.
+     *
+     * @var string
+     */
     public const YELLOW = '#fcd34d';
 
     /**
@@ -26,8 +56,8 @@ class DevCommand
     /**
      * Create a new DevCommand instance.
      *
-     * @param string $command
-     * @param null|string $name
+     * @param  string  $command
+     * @param  null|string  $name
      * @return void
      */
     public function __construct(protected string $command, protected ?string $name = null)
@@ -38,7 +68,7 @@ class DevCommand
     /**
      * Set the command color.
      *
-     * @param string $color
+     * @param  string  $color
      * @return DevCommand
      */
     public function color(string $color): self
