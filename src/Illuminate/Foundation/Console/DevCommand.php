@@ -66,10 +66,10 @@ class DevCommand extends Command
 
         if (extension_loaded('pcntl')) {
             pcntl_exec('/usr/bin/env', ['sh', '-c', $command]);
-        } else {
-            passthru($command, $exitCode);
         }
 
-        return self::SUCCESS;
+        passthru($command, $exitCode);
+
+        return $exitCode;
     }
 }
