@@ -176,7 +176,8 @@ class SupportNodePackageManagerTest extends TestCase
 
     public function testManagerDelegatesToInjectedPackageManager()
     {
-        $mock = new class implements NodePackageManagerContract {
+        $mock = new class implements NodePackageManagerContract
+        {
             public static function matches(): bool
             {
                 return true;
