@@ -9,7 +9,7 @@ class NodePackageManager
     /**
      * Create a new NodePackageManager manager instance.
      *
-     * @param  NodePackageManager|null  $packageManager
+     * @param  NodePackageManagerContract|null  $packageManager
      */
     public function __construct(protected ?NodePackageManagerContract $packageManager = null)
     {
@@ -27,7 +27,7 @@ class NodePackageManager
     }
 
     /**
-     * Get the command to run a script using the detected package manager.
+     * Get the command to execute a package using the detected package manager.
      *
      * @param string $command
      * @return string

@@ -33,7 +33,7 @@ class DevCommands
     /**
      * The resolved NodePackageManager instance.
      *
-     * @var null|NodePackageManager
+     * @var NodePackageManager|null
      */
     protected static ?NodePackageManager $packageManager = null;
 

@@ -49,7 +49,7 @@ class DevCommand
     /**
      * Color of the command when output to the console.
      *
-     * @var string
+     * @var string|null
      */
     protected ?string $color = null;
 
