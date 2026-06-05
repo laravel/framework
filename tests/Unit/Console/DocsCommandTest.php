@@ -3,90 +3,49 @@
 namespace Tests\Unit\Console;
 
 use Illuminate\Foundation\Console\DocsCommand;
-use Mockery;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\ExecutableFinder;
 
-/**
- * @runTestsInSeparateProcesses
- *
- * @preserveGlobalState disabled
- */
 class DocsCommandTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Mockery::close();
-
-        parent::tearDown();
-    }
-
     /**
-     * Test that the built‑in opener uses Process with an argument array to avoid shell injection.
+     * Test that openViaBuiltInStrategy uses Process with an argument array
+     * (not fromShellCommandline) to prevent shell injection.
      */
-    public function testOpenViaBuiltInStrategyUsesArrayArguments()
+    public function testOpenViaBuiltInStrategyUsesProcessArrayArguments()
     {
-        $url = 'https://example.com';
-        $binary = 'true'; // harmless binary that always succeeds
+        $ref = new \ReflectionMethod(DocsCommand::class, 'openViaBuiltInStrategy');
 
-        // Overload ExecutableFinder so it returns the dummy binary.
-        $finderMock = Mockery::mock('overload:'.ExecutableFinder::class);
-        $finderMock->shouldReceive('find')
-            ->withAnyArgs()
-            ->andReturn($binary);
+        $lines = array_slice(
+            file($ref->getFileName()),
+            $ref->getStartLine() - 1,
+            $ref->getEndLine() - $ref->getStartLine() + 1
+        );
+        $methodBody = implode('', $lines);
 
-        $command = new DocsCommand();
+        // The security fix: Process must be constructed with an array of arguments.
+        $this->assertStringContainsString('new Process([', $methodBody,
+            'openViaBuiltInStrategy must use new Process([...]) with an argument array.');
 
-        // Inject a stub for the protected $components property.
-        $componentsStub = new class
-        {
-            public function warn($msg)
-            {
-            }
-
-            public function info($msg)
-            {
-            }
-        };
-        $setComponents = function ($value) {
-            $this->components = $value;
-        };
-        $setComponents = $setComponents->bindTo($command, $command);
-        $setComponents($componentsStub);
-
-        // Set protected property systemOsFamily to Linux.
-        $setOsFamily = function ($value) {
-            $this->systemOsFamily = $value;
-        };
-        $setOsFamily = $setOsFamily->bindTo($command, $command);
-        $setOsFamily('Linux');
-
-        // Invoke the protected method using closure binding.
-        $invoke = function ($url) {
-            $this->openViaBuiltInStrategy($url);
-        };
-        $invoke = $invoke->bindTo($command, $command);
-        $invoke($url);
+        // Ensure the unsafe shell-based construction is not used.
+        $this->assertStringNotContainsString('fromShellCommandline', $methodBody,
+            'openViaBuiltInStrategy must not use Process::fromShellCommandline().');
     }
 
     /**
      * Test that when no binary is found the method returns early without throwing.
      */
-    public function testOpenViaBuiltInStrategyReturnsWhenBinaryNotFound()
+    public function testOpenViaBuiltInStrategyReturnsWhenNoBinaryFound()
     {
-        $url = 'https://example.com';
-
-        // Overload ExecutableFinder to return null.
-        $finderMock = Mockery::mock('overload:'.ExecutableFinder::class);
-        $finderMock->shouldReceive('find')->andReturnNull();
-
         $command = new DocsCommand();
 
         // Inject a stub for the protected $components property.
         $componentsStub = new class
         {
+            public $warned = false;
+
             public function warn($msg)
             {
+                $this->warned = true;
             }
 
             public function info($msg)
@@ -106,13 +65,21 @@ class DocsCommandTest extends TestCase
         $setOsFamily = $setOsFamily->bindTo($command, $command);
         $setOsFamily('Linux');
 
-        // Invoke the protected method — should not throw.
-        $invoke = function ($url) {
-            $this->openViaBuiltInStrategy($url);
-        };
-        $invoke = $invoke->bindTo($command, $command);
-        $invoke($url);
+        // Temporarily set PATH to an empty directory so ExecutableFinder finds nothing.
+        $originalPath = getenv('PATH');
+        putenv('PATH=/nonexistent_path_for_test');
 
-        $this->assertTrue(true); // If no exception, test passes.
+        try {
+            $invoke = function ($url) {
+                $this->openViaBuiltInStrategy($url);
+            };
+            $invoke = $invoke->bindTo($command, $command);
+            $invoke('https://example.com');
+        } finally {
+            putenv("PATH=$originalPath");
+        }
+
+        $this->assertTrue($componentsStub->warned,
+            'A warning should be emitted when no suitable binary is found.');
     }
 }
