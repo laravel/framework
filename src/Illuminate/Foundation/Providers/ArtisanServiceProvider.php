@@ -92,6 +92,7 @@ use Illuminate\Foundation\Console\VendorPublishCommand;
 use Illuminate\Foundation\Console\ViewCacheCommand;
 use Illuminate\Foundation\Console\ViewClearCommand;
 use Illuminate\Foundation\Console\ViewMakeCommand;
+use Illuminate\Foundation\DevCommands;
 use Illuminate\Notifications\Console\NotificationTableCommand;
 use Illuminate\Queue\Console\BatchesTableCommand;
 use Illuminate\Queue\Console\ClearCommand as QueueClearCommand;
@@ -259,6 +260,16 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
                 && ! $this->app->runningUnitTests()
                 && extension_loaded('pcntl');
         });
+    }
+
+    /**
+     * Bootstrap the application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        DevCommands::registerDefaults();
     }
 
     /**

@@ -35,12 +35,6 @@ class DevCommand extends Command
      */
     public function handle(NodePackageManager $packageManager)
     {
-        // TODO: These probably belong elsewhere? Earlier in the process?
-        DevCommands::artisan('serve --host=localhost', 'server');
-        DevCommands::artisan('queue:listen --tries=1 --timeout=0', 'queue');
-        DevCommands::artisan('pail --timeout=0', 'logs');
-        DevCommands::node('dev', 'vite');
-
         $devCommands = DevCommands::getCommands();
 
         $commands = array_column($devCommands, 'command');
