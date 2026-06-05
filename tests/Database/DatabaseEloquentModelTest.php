@@ -876,7 +876,7 @@ class DatabaseEloquentModelTest extends TestCase
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(false);
         $model->exists = true;
-        $model->id = 123;
+        $model->foo = 'bar';
 
         $this->assertFalse($model->save());
     }
