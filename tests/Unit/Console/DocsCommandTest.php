@@ -12,6 +12,9 @@ class DocsCommandTest extends MockeryTestCase
 {
     /**
      * Test that the built‑in opener uses Process with an argument array to avoid shell injection.
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function testOpenViaBuiltInStrategyUsesArrayArguments()
     {
@@ -72,6 +75,9 @@ class DocsCommandTest extends MockeryTestCase
 
     /**
      * Test that when no binary is found the method returns early without throwing.
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function testOpenViaBuiltInStrategyReturnsWhenBinaryNotFound()
     {
