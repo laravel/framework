@@ -62,7 +62,7 @@ class NodePackageManager
         ];
 
         foreach ($candidates as $packageManager) {
-            if ($packageManager::isInUse()) {
+            if ($packageManager::matches()) {
                 return new $packageManager;
             }
         }
