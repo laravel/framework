@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\Prohibitable;
 use Illuminate\Foundation\DevCommands;
 use Illuminate\Support\NodePackageManager;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -10,6 +11,8 @@ use Symfony\Component\Console\Attribute\AsCommand;
 #[AsCommand(name: 'dev')]
 class DevCommand extends Command
 {
+    use Prohibitable;
+
     /**
      * The console command name.
      *
@@ -33,6 +36,10 @@ class DevCommand extends Command
      */
     public function handle(NodePackageManager $packageManager)
     {
+        if ($this->isProhibited()) {
+            return;
+        }
+
         $devCommands = DevCommands::commands();
 
         $commands = array_column($devCommands, 'command');
