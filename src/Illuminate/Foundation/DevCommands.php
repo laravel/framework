@@ -49,9 +49,7 @@ class DevCommands
      */
     public static function register(string $command, ?string $name = null): DevCommand
     {
-        // $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-
-        // self::preventVendorRegistration($name, $trace);
+        self::preventVendorRegistration($name);
 
         $devCommand = new DevCommand($command, $name);
 
@@ -169,12 +167,12 @@ class DevCommands
      * Prevent automatic registration of DevCommands from within vendor packages.
      *
      * @param string $name
-     * @param array $trace
      * @return void
      * @throws Exception
      */
-    protected static function preventVendorRegistration(string $name, array $trace)
+    protected static function preventVendorRegistration(string $name)
     {
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $caller = $trace[1];
 
         if ($caller['class']) {
