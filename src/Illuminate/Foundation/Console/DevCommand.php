@@ -7,8 +7,6 @@ use Illuminate\Foundation\DevCommands;
 use Illuminate\Support\NodePackageManager;
 use Symfony\Component\Console\Attribute\AsCommand;
 
-use function Laravel\Prompts\info;
-
 #[AsCommand(name: 'dev')]
 class DevCommand extends Command
 {

@@ -75,7 +75,7 @@ class DevCommands
      * Register a development command.
      *
      * @param  string  $command
-     * @param  null|string  $name
+     * @param  string|null  $name
      * @return DevCommand
      */
     public static function register(string $command, ?string $name = null): DevCommand
@@ -89,7 +89,7 @@ class DevCommands
 
         $devCommand = new DevCommand($command, $name);
 
-        self::$commands[$name] = $devCommand;
+        self::$commands[$devCommand->name()] = $devCommand;
 
         return $devCommand;
     }
@@ -98,7 +98,7 @@ class DevCommands
      * Registers an Artisan command, automatically prefixing it with "php artisan".
      *
      * @param  string  $command
-     * @param  null|string  $name
+     * @param  string|null  $name
      * @return DevCommand
      */
     public static function artisan(string $command, ?string $name = null): DevCommand
@@ -110,7 +110,7 @@ class DevCommands
      * Registers a Node command, automatically prefixing it with the detected package manager's run command.
      *
      * @param  string  $command
-     * @param  null|string  $name
+     * @param  string|null  $name
      * @return DevCommand
      */
     public static function node(string $command, ?string $name = null): DevCommand
@@ -122,7 +122,7 @@ class DevCommands
      * Registers a Node command, automatically prefixing it with the detected package manager's exec command.
      *
      * @param  string  $command
-     * @param  null|string  $name
+     * @param  string|null  $name
      * @return DevCommand
      */
     public static function nodeExec(string $command, ?string $name = null): DevCommand
@@ -133,7 +133,7 @@ class DevCommands
     /**
      * Set the commands that should be excluded when running the "dev" command.
      *
-     * @param  mixed  ...$names
+     * @param  string  ...$names
      * @return void
      */
     public static function except(...$names): void
@@ -144,7 +144,7 @@ class DevCommands
     /**
      * Set the commands that should be included when running the "dev" command.
      *
-     * @param  mixed  ...$names
+     * @param  string  ...$names
      * @return void
      */
     public static function only(...$names): void
@@ -191,7 +191,7 @@ class DevCommands
     }
 
     /**
-     * Create a new DevCommands instance.
+     * Resolve and return the NodePackageManager instance.
      *
      * @return NodePackageManager
      */

@@ -16,7 +16,8 @@ class Yarn implements NodePackageManager
         return file_exists(getcwd() . '/yarn.lock');
     }
 
-    /* Get the command to run a script using yarn.
+    /**
+     * Get the command to run a script using yarn.
      *
      * @param string $command
      * @return string

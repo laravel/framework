@@ -57,7 +57,7 @@ class DevCommand
      * Create a new DevCommand instance.
      *
      * @param  string  $command
-     * @param  null|string  $name
+     * @param  string|null  $name
      * @return void
      */
     public function __construct(protected string $command, protected ?string $name = null)
@@ -66,10 +66,20 @@ class DevCommand
     }
 
     /**
+     * Get the command name.
+     *
+     * @return string
+     */
+    public function name(): string
+    {
+        return $this->name;
+    }
+
+    /**
      * Set the command color.
      *
      * @param  string  $color
-     * @return DevCommand
+     * @return self
      */
     public function color(string $color): self
     {
@@ -81,7 +91,7 @@ class DevCommand
     /**
      * Set the command color to blue.
      *
-     * @return DevCommand
+     * @return self
      */
     public function blue(): self
     {
@@ -91,7 +101,7 @@ class DevCommand
     /**
      * Set the command color to purple.
      *
-     * @return DevCommand
+     * @return self
      */
     public function purple(): self
     {
@@ -101,7 +111,7 @@ class DevCommand
     /**
      * Set the command color to pink.
      *
-     * @return DevCommand
+     * @return self
      */
     public function pink(): self
     {
@@ -111,7 +121,7 @@ class DevCommand
     /**
      * Set the command color to orange.
      *
-     * @return DevCommand
+     * @return self
      */
     public function orange(): self
     {
@@ -121,7 +131,7 @@ class DevCommand
     /**
      * Set the command color to green.
      *
-     * @return DevCommand
+     * @return self
      */
     public function green(): self
     {
@@ -131,7 +141,7 @@ class DevCommand
     /**
      * Set the command color to yellow.
      *
-     * @return DevCommand
+     * @return self
      */
     public function yellow(): self
     {
