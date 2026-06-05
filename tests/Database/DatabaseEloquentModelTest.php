@@ -943,7 +943,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('No primary key defined on model.');
 
-        $model->foo    = 'bar';
+        $model->foo = 'bar';
         $model->exists = true;
 
         $model->save();
