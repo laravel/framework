@@ -437,47 +437,34 @@ class CacheFileStoreTest extends TestCase
         $store->flushLocks();
     }
 
-    public function testItHandlesForgettingNonFlexibleKeys()
+    public function testForgetDeletesKeyFile()
     {
         $store = new FileStore(new Filesystem, __DIR__);
 
         $key = Str::random();
         $path = $store->path($key);
-        $flexiblePath = "illuminate:cache:flexible:created:{$key}";
 
         $store->put($key, 'value', 5);
-
         $this->assertFileExists($path);
-        $this->assertFileDoesNotExist($flexiblePath);
 
         $store->forget($key);
-
         $this->assertFileDoesNotExist($path);
-        $this->assertFileDoesNotExist($flexiblePath);
     }
 
-    public function itOnlyForgetsFlexibleKeysIfParentIsForgotten()
+    public function testForgetDoesNotRemoveFlexibleCreatedKey()
     {
         $store = new FileStore(new Filesystem, __DIR__);
 
         $key = Str::random();
-        $path = $store->path($key);
-        $flexiblePath = "illuminate:cache:flexible:created:{$key}";
-
-        touch($flexiblePath);
-
-        $this->assertFileDoesNotExist($path);
-        $this->assertFileExists($flexiblePath);
+        $store->put($key, 'value', 5);
+        $store->put('illuminate:cache:flexible:created:'.$key, true, 5);
 
         $store->forget($key);
 
-        $this->assertFileDoesNotExist($path);
-        $this->assertFileExists($flexiblePath);
+        $this->assertFileDoesNotExist($store->path($key));
+        $this->assertFileExists($store->path('illuminate:cache:flexible:created:'.$key));
 
-        $store->put($key, 'value', 5);
-
-        $this->assertFileDoesNotExist($path);
-        $this->assertFileDoesNotExist($flexiblePath);
+        $store->forget('illuminate:cache:flexible:created:'.$key);
     }
 
     protected function mockFilesystem()

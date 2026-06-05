@@ -81,21 +81,17 @@ class CacheStorageStoreTest extends TestCase
         $this->assertSame('bar', $store->get('foo'));
     }
 
-    public function testForgetRemovesFlexibleCreatedKeyOnlyWhenParentIsForgotten()
+    public function testForgetDoesNotRemoveFlexibleCreatedKey()
     {
         $disk = new ArrayFilesystem;
         $store = new StorageStore($disk, 'cache');
 
         $store->put('illuminate:cache:flexible:created:foo', true, 60);
-
-        $this->assertFalse($store->forget('foo'));
-        $this->assertTrue($disk->exists($store->path('illuminate:cache:flexible:created:foo')));
-
         $store->put('foo', 'bar', 60);
 
         $this->assertTrue($store->forget('foo'));
         $this->assertFalse($disk->exists($store->path('foo')));
-        $this->assertFalse($disk->exists($store->path('illuminate:cache:flexible:created:foo')));
+        $this->assertTrue($disk->exists($store->path('illuminate:cache:flexible:created:foo')));
     }
 
     public function testFlushRemovesScopedDirectory()

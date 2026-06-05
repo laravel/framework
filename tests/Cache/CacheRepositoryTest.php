@@ -309,6 +309,7 @@ class CacheRepositoryTest extends TestCase
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('forget')->once()->with('a-key')->andReturn(true);
+        $repo->getStore()->shouldReceive('forget')->once()->with('illuminate:cache:flexible:created:a-key')->andReturn(false);
         $repo->forget('a-key');
     }
 
@@ -317,7 +318,23 @@ class CacheRepositoryTest extends TestCase
         // Alias of Forget
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('forget')->once()->with('a-key')->andReturn(true);
+        $repo->getStore()->shouldReceive('forget')->once()->with('illuminate:cache:flexible:created:a-key')->andReturn(false);
         $repo->delete('a-key');
+    }
+
+    public function testForgettingCacheKeyAlsoForgetsFlexibleCreatedKey()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('forget')->once()->with('foo')->andReturn(true);
+        $repo->getStore()->shouldReceive('forget')->once()->with('illuminate:cache:flexible:created:foo')->andReturn(true);
+        $repo->forget('foo');
+    }
+
+    public function testFlexibleCreatedKeyIsNotForgottenWhenMainKeyForgetFails()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('forget')->once()->with('foo')->andReturn(false);
+        $repo->forget('foo');
     }
 
     public function testSettingCache()
@@ -349,7 +366,9 @@ class CacheRepositoryTest extends TestCase
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('forget')->once()->with('a-key')->andReturn(true);
+        $repo->getStore()->shouldReceive('forget')->once()->with('illuminate:cache:flexible:created:a-key')->andReturn(false);
         $repo->getStore()->shouldReceive('forget')->once()->with('a-second-key')->andReturn(true);
+        $repo->getStore()->shouldReceive('forget')->once()->with('illuminate:cache:flexible:created:a-second-key')->andReturn(false);
 
         $this->assertTrue($repo->deleteMultiple(['a-key', 'a-second-key']));
     }
@@ -358,6 +377,7 @@ class CacheRepositoryTest extends TestCase
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('forget')->once()->with('a-key')->andReturn(true);
+        $repo->getStore()->shouldReceive('forget')->once()->with('illuminate:cache:flexible:created:a-key')->andReturn(false);
         $repo->getStore()->shouldReceive('forget')->once()->with('a-second-key')->andReturn(false);
 
         $this->assertFalse($repo->deleteMultiple(['a-key', 'a-second-key']));

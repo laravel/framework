@@ -409,10 +409,9 @@ class DatabaseStore implements CanFlushLocks, LockProvider, Store
      */
     protected function forgetMany(array $keys)
     {
-        $this->table()->whereIn('key', (new Collection($keys))->flatMap(fn ($key) => [
-            $this->prefix.$key,
-            $this->prefix.Repository::FLEXIBLE_CREATED_KEY_PREFIX.$key,
-        ])->all())->delete();
+        $this->table()->whereIn('key', (new Collection($keys))->map(
+            fn ($key) => $this->prefix.$key
+        )->all())->delete();
 
         return true;
     }

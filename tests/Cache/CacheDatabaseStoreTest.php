@@ -124,7 +124,7 @@ class CacheDatabaseStoreTest extends TestCase
         $store = $this->getStore();
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('whereIn')->once()->with('key', ['prefixfoo', 'prefixilluminate:cache:flexible:created:foo'])->andReturn($table);
+        $table->shouldReceive('whereIn')->once()->with('key', ['prefixfoo'])->andReturn($table);
         $table->shouldReceive('delete')->once();
 
         $store->forget('foo');

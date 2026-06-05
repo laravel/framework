@@ -164,13 +164,7 @@ class StorageStore implements Store
      */
     public function forget($key)
     {
-        $forgotten = $this->disk->delete($this->path($key));
-
-        if ($forgotten) {
-            $this->disk->delete($this->path(Repository::FLEXIBLE_CREATED_KEY_PREFIX.$key));
-        }
-
-        return $forgotten;
+        return $this->disk->delete($this->path($key));
     }
 
     /**
