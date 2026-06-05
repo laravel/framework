@@ -876,7 +876,7 @@ class DatabaseEloquentModelTest extends TestCase
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(false);
         $model->exists = true;
-        $model->foo = 'bar';
+        $model->id = 123;
 
         $this->assertFalse($model->save());
     }
@@ -932,6 +932,21 @@ class DatabaseEloquentModelTest extends TestCase
         $model->exists = true;
 
         $this->assertTrue($model->save());
+    }
+
+    public function testUpdateProcessThrowErrorWhenExistWithoutPrimaryKey()
+    {
+        $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery'])->getMock();
+        $query = m::mock(Builder::class);
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('No primary key defined on model.');
+
+        $model->foo    = 'bar';
+        $model->exists = true;
+
+        $model->save();
     }
 
     public function testTimestampsAreReturnedAsObjects()
