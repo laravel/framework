@@ -13,13 +13,13 @@ class Npm implements NodePackageManager
      */
     public static function matches(): bool
     {
-        return file_exists(getcwd() . '/package-lock.json');
+        return file_exists(getcwd().'/package-lock.json');
     }
 
     /**
      * Get the command to run a script using npm.
      *
-     * @param string $command
+     * @param  string  $command
      * @return string
      */
     public function getRunCommand(string $command): string
@@ -30,7 +30,7 @@ class Npm implements NodePackageManager
     /**
      * Get the command to execute a package using npm.
      *
-     * @param string $command
+     * @param  string  $command
      * @return string
      */
     public function getExecCommand(string $command): string

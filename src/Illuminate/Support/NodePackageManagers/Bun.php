@@ -14,7 +14,7 @@ class Bun implements NodePackageManager
     public static function matches(): bool
     {
         foreach (['bun.lock', 'bun.lockb'] as $lockFile) {
-            if (file_exists(getcwd() . '/' . $lockFile)) {
+            if (file_exists(getcwd().'/'.$lockFile)) {
                 return true;
             }
         }
@@ -25,7 +25,7 @@ class Bun implements NodePackageManager
     /**
      * Get the command to run a script using bun.
      *
-     * @param string $command
+     * @param  string  $command
      * @return string
      */
     public function getRunCommand(string $command): string
@@ -36,7 +36,7 @@ class Bun implements NodePackageManager
     /**
      * Get the command to execute a package using bun.
      *
-     * @param string $command
+     * @param  string  $command
      * @return string
      */
     public function getExecCommand(string $command): string

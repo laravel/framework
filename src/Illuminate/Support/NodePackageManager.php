@@ -29,7 +29,7 @@ class NodePackageManager
     /**
      * Get the command to execute a package using the detected package manager.
      *
-     * @param string $command
+     * @param  string  $command
      * @return string
      */
     public function getExecCommand(string $command): string
@@ -40,7 +40,7 @@ class NodePackageManager
     /**
      * Get the command to run a script using the detected package manager.
      *
-     * @param string $command
+     * @param  string  $command
      * @return string
      */
     public function getRunCommand(string $command): string

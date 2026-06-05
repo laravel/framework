@@ -13,13 +13,13 @@ class Pnpm implements NodePackageManager
      */
     public static function matches(): bool
     {
-        return file_exists(getcwd() . '/pnpm-lock.yaml');
+        return file_exists(getcwd().'/pnpm-lock.yaml');
     }
 
     /**
      * Get the command to run a script using pnpm.
      *
-     * @param string $command
+     * @param  string  $command
      * @return string
      */
     public function getRunCommand(string $command): string
@@ -30,7 +30,7 @@ class Pnpm implements NodePackageManager
     /**
      * Get the command to execute a package using pnpm.
      *
-     * @param string $command
+     * @param  string  $command
      * @return string
      */
     public function getExecCommand(string $command): string
