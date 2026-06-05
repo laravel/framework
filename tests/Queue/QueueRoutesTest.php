@@ -87,11 +87,6 @@ class QueueRoutesTest extends TestCase
 
         $this->assertSame('payments', $defaults->getQueue(new SomeJob));
         $this->assertSame('redis', $defaults->getConnection(new SomeJob));
-    }
-
-    public function testEnumsWithArray()
-    {
-        $defaults = new QueueRoutes();
 
         $defaults->set([SomeJob::class => [ConnectionName::redis, QueueName::payments]]);
 
