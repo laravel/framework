@@ -1348,6 +1348,22 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $statement = $connection->getSchemaGrammar()->compileColumns('public', 'table');
 
         $this->assertStringContainsString("where c.relname = 'table' and n.nspname = 'public'", $statement);
+        $this->assertStringContainsString('pg_catalog.pg_collation', $statement);
+        $this->assertStringContainsString('a.attgenerated as generated', $statement);
+    }
+
+    public function testCompileColumnsOnLegacyServer()
+    {
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getServerVersion')->once()->andReturn('8.0.2');
+
+        $statement = $connection->getSchemaGrammar()->compileColumns('public', 'table');
+
+        $this->assertStringContainsString("where c.relname = 'table' and n.nspname = 'public'", $statement);
+        $this->assertStringContainsString('null as collation', $statement);
+        $this->assertStringContainsString("'' as generated", $statement);
+        $this->assertStringNotContainsString('pg_catalog.pg_collation', $statement);
+        $this->assertStringNotContainsString('a.attgenerated', $statement);
     }
 
     protected function getConnection(
