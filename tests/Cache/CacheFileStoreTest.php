@@ -262,6 +262,8 @@ class CacheFileStoreTest extends TestCase
 
     public function testIncrementNonNumericValues()
     {
+        Carbon::setTestNow(Carbon::now());
+
         $filePath = $this->getCachePath('foo');
 
         $files = $this->mockFilesystem();

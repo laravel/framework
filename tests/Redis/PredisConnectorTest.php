@@ -75,6 +75,79 @@ class PredisConnectorTest extends TestCase
             'scheme' => 'tls',
         ]);
     }
+
+    public function testFormatRetryWithArray()
+    {
+        if (! class_exists(\Predis\Retry\Retry::class)) {
+            $this->markTestSkipped('Predis retry support is only available in Predis >= 3.4.0');
+        }
+
+        $connector = new TestablePredisConnector;
+
+        $config = [
+            'retry' => [
+                'retries' => 3,
+                'strategy' => 'exponential',
+                'base' => 1000,
+                'cap' => 5000,
+                'with_jitter' => true,
+            ],
+        ];
+
+        $formatted = $connector->testFormatRetry($config);
+
+        $this->assertInstanceOf(\Predis\Retry\Retry::class, $formatted['retry']);
+        $this->assertSame(3, $formatted['retry']->getRetries());
+        $this->assertInstanceOf(\Predis\Retry\Strategy\ExponentialBackoff::class, $formatted['retry']->getStrategy());
+        $this->assertSame(1000, $formatted['retry']->getStrategy()->getBase());
+        $this->assertSame(5000, $formatted['retry']->getStrategy()->getCap());
+    }
+
+    public function testFormatRetryWithEqualStrategy()
+    {
+        if (! class_exists(\Predis\Retry\Retry::class)) {
+            $this->markTestSkipped('Predis retry support is only available in Predis >= 3.4.0');
+        }
+
+        $connector = new TestablePredisConnector;
+
+        $config = [
+            'retry' => [
+                'retries' => 5,
+                'strategy' => 'equal',
+                'backoff' => 2000,
+            ],
+        ];
+
+        $formatted = $connector->testFormatRetry($config);
+
+        $this->assertInstanceOf(\Predis\Retry\Retry::class, $formatted['retry']);
+        $this->assertSame(5, $formatted['retry']->getRetries());
+        $this->assertInstanceOf(\Predis\Retry\Strategy\EqualBackoff::class, $formatted['retry']->getStrategy());
+        $this->assertSame(2000, $formatted['retry']->getStrategy()->compute(0));
+    }
+
+    public function testFormatRetryWithNoStrategy()
+    {
+        if (! class_exists(\Predis\Retry\Retry::class)) {
+            $this->markTestSkipped('Predis retry support is only available in Predis >= 3.4.0');
+        }
+
+        $connector = new TestablePredisConnector;
+
+        $config = [
+            'retry' => [
+                'retries' => 2,
+                'strategy' => 'no',
+            ],
+        ];
+
+        $formatted = $connector->testFormatRetry($config);
+
+        $this->assertInstanceOf(\Predis\Retry\Retry::class, $formatted['retry']);
+        $this->assertSame(2, $formatted['retry']->getRetries());
+        $this->assertInstanceOf(\Predis\Retry\Strategy\NoBackoff::class, $formatted['retry']->getStrategy());
+    }
 }
 
 class TestablePredisConnector extends PredisConnector
@@ -82,5 +155,10 @@ class TestablePredisConnector extends PredisConnector
     public function testFormatHost(array $config): array
     {
         return $this->formatHost($config);
+    }
+
+    public function testFormatRetry(array $config): array
+    {
+        return $this->formatRetry($config);
     }
 }

@@ -9,6 +9,10 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Predis\Client;
+use Predis\Retry\Retry;
+use Predis\Retry\Strategy\EqualBackoff;
+use Predis\Retry\Strategy\ExponentialBackoff;
+use Predis\Retry\Strategy\NoBackoff;
 
 class PredisConnector implements Connector
 {
@@ -31,6 +35,8 @@ class PredisConnector implements Connector
 
         $config = $this->formatHost($config);
 
+        $config = $this->formatRetry($config);
+
         return new PredisConnection(new Client($config, $formattedOptions));
     }
 
@@ -51,12 +57,49 @@ class PredisConnector implements Connector
         }
 
         $servers = array_map(function ($server) {
-            return is_array($server) ? $this->formatHost($server) : $server;
+            if (is_array($server)) {
+                $server = $this->formatHost($server);
+                $server = $this->formatRetry($server);
+            }
+
+            return $server;
         }, array_values($config));
 
         return new PredisClusterConnection(new Client($servers, array_merge(
             $options, $clusterOptions, $clusterSpecificOptions
         )));
+    }
+
+    /**
+     * Format the retry parameter.
+     *
+     * @param  array  $config
+     * @return array
+     */
+    protected function formatRetry(array $config)
+    {
+        if (isset($config['retry']) && is_array($config['retry']) && class_exists(Retry::class)) {
+            $retry = $config['retry'];
+            $retries = $retry['retries'] ?? 0;
+            $strategy = $retry['strategy'] ?? 'exponential';
+
+            $backoff = match ($strategy) {
+                'equal' => new EqualBackoff($retry['backoff'] ?? 0),
+                'no' => new NoBackoff,
+                'exponential' => new ExponentialBackoff(
+                    $retry['base'] ?? 250000,
+                    $retry['cap'] ?? 2000000,
+                    $retry['with_jitter'] ?? false
+                ),
+                default => is_string($strategy) && class_exists($strategy)
+                    ? new $strategy(...($retry['parameters'] ?? []))
+                    : $strategy,
+            };
+
+            $config['retry'] = new Retry($backoff, $retries);
+        }
+
+        return $config;
     }
 
     /**
