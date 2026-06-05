@@ -39,7 +39,7 @@ class DevCommand extends Command
         $colors = array_column($devCommands, 'color');
         $names = array_column($devCommands, 'name');
 
-        $longestName = max(array_map('strlen', $names));
+        $longestName = max(array_map(strlen(...), $names));
 
         $this->line('');
 
