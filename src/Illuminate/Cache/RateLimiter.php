@@ -15,6 +15,13 @@ class RateLimiter
     use InteractsWithTime;
 
     /**
+     * The cache key suffix used to store the lockout timer for a key.
+     *
+     * @var string
+     */
+    public const TIMER_KEY_SUFFIX = ':timer';
+
+    /**
      * The cache store implementation.
      *
      * @var \Illuminate\Contracts\Cache\Repository
@@ -127,7 +134,7 @@ class RateLimiter
     public function tooManyAttempts($key, $maxAttempts)
     {
         if ($this->attempts($key) >= $maxAttempts) {
-            if ($this->cache->has($this->cleanRateLimiterKey($key).':timer')) {
+            if ($this->cache->has($this->cleanRateLimiterKey($key).self::TIMER_KEY_SUFFIX)) {
                 return true;
             }
 
@@ -162,7 +169,7 @@ class RateLimiter
         $key = $this->cleanRateLimiterKey($key);
 
         $this->cache->add(
-            $key.':timer', $this->availableAt($decaySeconds), $decaySeconds
+            $key.self::TIMER_KEY_SUFFIX, $this->availableAt($decaySeconds), $decaySeconds
         );
 
         $added = $this->withoutSerializationOrCompression(
@@ -259,7 +266,7 @@ class RateLimiter
 
         $this->resetAttempts($key);
 
-        $this->cache->forget($key.':timer');
+        $this->cache->forget($key.self::TIMER_KEY_SUFFIX);
     }
 
     /**
@@ -272,7 +279,7 @@ class RateLimiter
     {
         $key = $this->cleanRateLimiterKey($key);
 
-        return max(0, $this->cache->get($key.':timer') - $this->currentTime());
+        return max(0, $this->cache->get($key.self::TIMER_KEY_SUFFIX) - $this->currentTime());
     }
 
     /**
