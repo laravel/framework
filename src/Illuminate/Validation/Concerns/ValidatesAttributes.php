@@ -257,7 +257,13 @@ trait ValidatesAttributes
             $date = $this->getDateTimestamp($this->getValue($parameters[0]));
         }
 
-        return $this->compare($this->getDateTimestamp($value), $date, $operator);
+        $first = $this->getDateTimestamp($value);
+
+        if (is_null($first) || is_null($date)) {
+            return false;
+        }
+
+        return $this->compare($first, $date, $operator);
     }
 
     /**

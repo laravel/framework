@@ -6751,6 +6751,20 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => '0001-01-01T00:00'], ['x' => 'after:1970-01-01']);
         $this->assertTrue($v->fails());
+
+        // An invalid (unparseable) date value must not bypass before/after rules via null comparison.
+        $v = new Validator($trans, ['x' => 'invalid-date'], ['x' => 'before:2024-01-01']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => 'invalid-date'], ['x' => 'after:2000-01-01']);
+        $this->assertTrue($v->fails());
+
+        // A valid date must not bypass after when the reference field is absent (resolves to null).
+        $v = new Validator($trans, ['x' => '2024-01-01'], ['x' => 'after:missing_field']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '2024-01-01'], ['x' => 'before:missing_field']);
+        $this->assertTrue($v->fails());
     }
 
     public function testBeforeAndAfterWithFormat()
@@ -6976,6 +6990,35 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['from' => '2020-05-08', 'to' => '2020-08-05'], ['from' => 'date_format:Y-m-d', 'to' => 'date_format:Y-d-m|after_or_equal:from']);
+        $this->assertTrue($v->passes());
+
+        // An invalid (unparseable) date value must not bypass before_or_equal / after_or_equal
+        // via PHP's null-coercion: compare(null, null, '<=') and compare(null, null, '>=') both
+        // evaluate to true because null is cast to 0. See also: PR #60393 for date_equals.
+        $v = new Validator($trans, ['x' => 'invalid-date'], ['x' => 'before_or_equal:1970-01-01 00:00:00']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => 'invalid-date'], ['x' => 'after_or_equal:1970-01-01 00:00:00']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => 'invalid-date'], ['x' => 'before_or_equal:2024-01-01']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => 'invalid-date'], ['x' => 'after_or_equal:2000-01-01']);
+        $this->assertTrue($v->fails());
+
+        // A valid date must not bypass after_or_equal when the reference field is absent (null).
+        $v = new Validator($trans, ['x' => '2024-01-01'], ['x' => 'after_or_equal:missing_field']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '1970-01-01'], ['x' => 'before_or_equal:missing_field']);
+        $this->assertTrue($v->fails());
+
+        // Normal valid comparisons remain unaffected.
+        $v = new Validator($trans, ['x' => '2012-01-15'], ['x' => 'before_or_equal:2012-01-15']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '2012-01-15'], ['x' => 'after_or_equal:2012-01-15']);
         $this->assertTrue($v->passes());
     }
 
