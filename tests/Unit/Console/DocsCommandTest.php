@@ -4,35 +4,30 @@ namespace Tests\Unit\Console;
 
 use Illuminate\Foundation\Console\DocsCommand;
 use Mockery;
-use Mockery\Adapter\Phpunit\MockeryTestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Process\Process;
 
-class DocsCommandTest extends MockeryTestCase
+/**
+ * @runTestsInSeparateProcesses
+ *
+ * @preserveGlobalState disabled
+ */
+class DocsCommandTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Mockery::close();
+
+        parent::tearDown();
+    }
+
     /**
      * Test that the built‑in opener uses Process with an argument array to avoid shell injection.
-     *
-     * @runInSeparateProcess
-     *
-     * @preserveGlobalState disabled
      */
     public function testOpenViaBuiltInStrategyUsesArrayArguments()
     {
         $url = 'https://example.com';
         $binary = 'true'; // harmless binary that always succeeds
-
-        // Stub for the command's $components property to safely handle warn/info calls.
-        $componentsStub = new class
-        {
-            public function warn($msg)
-            {
-            }
-
-            public function info($msg)
-            {
-            }
-        };
 
         // Overload ExecutableFinder so it returns the dummy binary.
         $finderMock = Mockery::mock('overload:'.ExecutableFinder::class);
@@ -42,7 +37,7 @@ class DocsCommandTest extends MockeryTestCase
 
         $command = new DocsCommand();
 
-        // Inject a stub for the protected $components property without using setAccessible.
+        // Inject a stub for the protected $components property.
         $componentsStub = new class
         {
             public function warn($msg)
@@ -59,7 +54,7 @@ class DocsCommandTest extends MockeryTestCase
         $setComponents = $setComponents->bindTo($command, $command);
         $setComponents($componentsStub);
 
-        // Set protected property systemOsFamily to Linux without setAccessible.
+        // Set protected property systemOsFamily to Linux.
         $setOsFamily = function ($value) {
             $this->systemOsFamily = $value;
         };
@@ -76,10 +71,6 @@ class DocsCommandTest extends MockeryTestCase
 
     /**
      * Test that when no binary is found the method returns early without throwing.
-     *
-     * @runInSeparateProcess
-     *
-     * @preserveGlobalState disabled
      */
     public function testOpenViaBuiltInStrategyReturnsWhenBinaryNotFound()
     {
@@ -90,9 +81,6 @@ class DocsCommandTest extends MockeryTestCase
         $finderMock->shouldReceive('find')->andReturnNull();
 
         $command = new DocsCommand();
-
-        // Create reflection for the command instance.
-        $ref = new \ReflectionClass($command);
 
         // Inject a stub for the protected $components property.
         $componentsStub = new class
@@ -105,16 +93,25 @@ class DocsCommandTest extends MockeryTestCase
             {
             }
         };
-        $propComp = $ref->getProperty('components');
-        $propComp->setValue($command, $componentsStub);
+        $setComponents = function ($value) {
+            $this->components = $value;
+        };
+        $setComponents = $setComponents->bindTo($command, $command);
+        $setComponents($componentsStub);
 
         // Set systemOsFamily to Linux.
-        $prop = $ref->getProperty('systemOsFamily');
-        $prop->setValue($command, 'Linux');
+        $setOsFamily = function ($value) {
+            $this->systemOsFamily = $value;
+        };
+        $setOsFamily = $setOsFamily->bindTo($command, $command);
+        $setOsFamily('Linux');
 
-        // Capture output using output buffer to ensure no exception.
-        $method = $ref->getMethod('openViaBuiltInStrategy');
-        $method->invoke($command, $url);
+        // Invoke the protected method — should not throw.
+        $invoke = function ($url) {
+            $this->openViaBuiltInStrategy($url);
+        };
+        $invoke = $invoke->bindTo($command, $command);
+        $invoke($url);
 
         $this->assertTrue(true); // If no exception, test passes.
     }
