@@ -188,7 +188,7 @@ class DevCommands
                 continue;
             }
 
-            if (!$file && $class) {
+            if (! $file && $class) {
                 $file = (new ReflectionClass($class))->getFileName();
             }
 
@@ -196,14 +196,18 @@ class DevCommands
                 continue;
             }
 
-            // The first non-DevCommands frame is the actual caller.
-            // If it's in vendor, it's auto-registration. If not, the user initiated it.
-            if (str_contains($file, base_path('vendor'))) {
-                throw new Exception(
-                    "DevCommands should be registered in application code, not within vendor packages. Attempted to register command: {$name}"
-                );
+            if (! $file) {
+                continue;
+            }
+
+            if (! str_contains($file, base_path('vendor'))) {
+                return;
             }
         }
+
+        throw new Exception(
+            "DevCommands should be registered in application code, not within vendor packages. Attempted to register command: {$name}"
+        );
     }
 
     /**
