@@ -87,6 +87,7 @@ class CronExpressionTimezoneConverter
      *
      * @param  array<int, string>  $segments
      * @param  array<int, string>  $parts
+     * @param  int  $hourCarry
      * @return array<int, string>
      */
     protected static function expressionsForHourCarry(array $segments, array $parts, int $hourCarry)
@@ -121,6 +122,7 @@ class CronExpressionTimezoneConverter
      * @param  string  $field
      * @param  int  $offset
      * @param  int  $mod
+     * @param  int  $min
      * @return array<int, string>
      */
     protected static function shiftAndGroup($field, $offset, $mod, $min = 0)
