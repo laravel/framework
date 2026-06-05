@@ -131,25 +131,25 @@ class DevCommands
     }
 
     /**
-     * Set the commands that should be included when running the "dev" command, excluding any commands not in the given list.
+     * Set the commands that should be excluded when running the "dev" command.
      *
-     * @param  mixed  ...$commands
+     * @param  mixed  ...$names
      * @return void
      */
-    public static function except(...$commands): void
+    public static function except(...$names): void
     {
-        self::$except = $commands;
+        self::$except = $names;
     }
 
     /**
-     * Set the commands that should be included when running the "dev" command, excluding any commands not in the given list.
+     * Set the commands that should be included when running the "dev" command.
      *
-     * @param  mixed  ...$commands
+     * @param  mixed  ...$names
      * @return void
      */
-    public static function only(...$commands): void
+    public static function only(...$names): void
     {
-        self::$only = $commands;
+        self::$only = $names;
     }
 
     /**
