@@ -421,7 +421,7 @@ class Number
      *
      * @return string
      */
-    public static function defaultLocale()
+    public static function defaultLocale(): string
     {
         return static::$locale;
     }
@@ -431,7 +431,7 @@ class Number
      *
      * @return string
      */
-    public static function defaultCurrency()
+    public static function defaultCurrency(): string
     {
         return static::$currency;
     }
