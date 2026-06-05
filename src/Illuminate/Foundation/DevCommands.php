@@ -17,20 +17,6 @@ class DevCommands
     protected static $colorCount = 0;
 
     /**
-     * Predefined colors to assign to commands when displayed in the console.
-     *
-     * @var array<int, string>
-     */
-    protected static $colors = [
-        DevCommand::BLUE,
-        DevCommand::PURPLE,
-        DevCommand::PINK,
-        DevCommand::ORANGE,
-        DevCommand::GREEN,
-        DevCommand::YELLOW,
-    ];
-
-    /**
      * The resolved NodePackageManager instance.
      *
      * @var NodePackageManager|null
@@ -279,9 +265,10 @@ class DevCommands
      */
     protected static function getColor(array $commands): string
     {
+        $colors = array_map(fn ($color) => $color->value, DevCommandColor::cases());
         $existing = array_values(array_filter(array_column($commands, 'color')));
-        $available = array_values(array_diff(self::$colors, $existing));
+        $available = array_values(array_diff($colors, $existing));
 
-        return $available[0] ?? self::$colors[self::$colorCount++ % count(self::$colors)];
+        return $available[0] ?? $colors[self::$colorCount++ % count($colors)];
     }
 }

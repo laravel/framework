@@ -5,48 +5,6 @@ namespace Illuminate\Foundation;
 class DevCommand
 {
     /**
-     * Blue color.
-     *
-     * @var string
-     */
-    public const BLUE = '#93c5fd';
-
-    /**
-     * Purple color.
-     *
-     * @var string
-     */
-    public const PURPLE = '#c4b5fd';
-
-    /**
-     * Pink color.
-     *
-     * @var string
-     */
-    public const PINK = '#fb7185';
-
-    /**
-     * Orange color.
-     *
-     * @var string
-     */
-    public const ORANGE = '#fdba74';
-
-    /**
-     * Green color.
-     *
-     * @var string
-     */
-    public const GREEN = '#86efac';
-
-    /**
-     * Yellow color.
-     *
-     * @var string
-     */
-    public const YELLOW = '#fcd34d';
-
-    /**
      * Color of the command when output to the console.
      *
      * @var string|null
@@ -95,7 +53,7 @@ class DevCommand
      */
     public function blue(): self
     {
-        return $this->color(self::BLUE);
+        return $this->color(DevCommandColor::BLUE->value);
     }
 
     /**
@@ -105,7 +63,7 @@ class DevCommand
      */
     public function purple(): self
     {
-        return $this->color(self::PURPLE);
+        return $this->color(DevCommandColor::PURPLE->value);
     }
 
     /**
@@ -115,7 +73,7 @@ class DevCommand
      */
     public function pink(): self
     {
-        return $this->color(self::PINK);
+        return $this->color(DevCommandColor::PINK->value);
     }
 
     /**
@@ -125,7 +83,7 @@ class DevCommand
      */
     public function orange(): self
     {
-        return $this->color(self::ORANGE);
+        return $this->color(DevCommandColor::ORANGE->value);
     }
 
     /**
@@ -135,7 +93,7 @@ class DevCommand
      */
     public function green(): self
     {
-        return $this->color(self::GREEN);
+        return $this->color(DevCommandColor::GREEN->value);
     }
 
     /**
@@ -145,7 +103,7 @@ class DevCommand
      */
     public function yellow(): self
     {
-        return $this->color(self::YELLOW);
+        return $this->color(DevCommandColor::YELLOW->value);
     }
 
     /**
