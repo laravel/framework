@@ -20,8 +20,8 @@
         "illuminate/contracts": "^14.0",
         "illuminate/macroable": "^14.0",
         "illuminate/support": "^14.0",
-        "symfony/http-foundation": "^8.0.0",
-        "symfony/http-kernel": "^8.0.0"
+        "symfony/http-foundation": "^8.1.0",
+        "symfony/http-kernel": "^8.1.0"
     },
     "minimum-stability": "dev",
     "autoload": {

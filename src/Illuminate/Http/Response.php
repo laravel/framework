@@ -23,19 +23,13 @@ class Response extends SymfonyResponse
      *
      * @param  mixed  $content
      * @param  int  $status
-     * @param  array  $headers
+     * @param  array|ResponseHeaderBag  $headers
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($content = '', $status = 200, array $headers = [])
+    public function __construct($content = '', int $status = 200, array|ResponseHeaderBag $headers = [])
     {
-        if (method_exists($this, 'setHeaders')) {
-            parent::__construct('', $status, new ResponseHeaderBag($headers));
-        } else {
-            $this->headers = new ResponseHeaderBag($headers);
-            $this->setStatusCode($status);
-            $this->setProtocolVersion('1.0');
-        }
+        parent::__construct('', $status, $headers);
 
         $this->setContent($content);
     }
