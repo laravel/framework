@@ -119,16 +119,6 @@ class DevCommands
     }
 
     /**
-     * Create a new DevCommands instance.
-     *
-     * @return NodePackageManager
-     */
-    protected static function getPackageManager(): NodePackageManager
-    {
-        return self::$packageManager ??= new NodePackageManager();
-    }
-
-    /**
      * Get the registered development commands.
      *
      * @return array
@@ -150,6 +140,29 @@ class DevCommands
         $commands = self::fillInEmptyColors($commands);
 
         return $commands;
+    }
+
+    /**
+     * Clear all registered development commands and reset the state of the DevCommands class, including registered commands, exceptions, inclusions, and color assignments.
+     *
+     * @return void
+     */
+    public static function clear(): void
+    {
+        self::$commands = [];
+        self::$except = [];
+        self::$only = [];
+        self::$colorCount = 0;
+    }
+
+    /**
+     * Create a new DevCommands instance.
+     *
+     * @return NodePackageManager
+     */
+    protected static function getPackageManager(): NodePackageManager
+    {
+        return self::$packageManager ??= new NodePackageManager();
     }
 
     /**
