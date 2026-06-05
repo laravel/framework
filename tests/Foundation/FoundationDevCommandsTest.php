@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use Exception;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\DevCommand;
 use Illuminate\Foundation\DevCommands;
