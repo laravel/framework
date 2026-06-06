@@ -87,7 +87,7 @@ class CacheStorageStoreTest extends TestCase
         $disk = new ArrayFilesystem;
         $store = new StorageStore($disk, 'cache');
 
-        $store->put(Repository::FLEXIBLE_CREATED_KEY_PREFIX.'foo', true, 60);
+        $store->put(Repository::FLEXIBLE_CREATED_KEY_PREFIX . 'foo', true, 60);
 
         $this->assertFalse($store->forget('foo'));
         $this->assertTrue($disk->exists($store->path(Repository::FLEXIBLE_CREATED_KEY_PREFIX.'foo')));
