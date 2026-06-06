@@ -624,7 +624,9 @@ class Builder implements BuilderContract
         // "on" clause with a single condition. So we will just build the join with
         // this simple join clauses attached to it. There is not a join callback.
         else {
-            $method = $where ? 'where' : 'on';
+            $method = $where
+                ? 'where'
+                : 'on';
 
             $this->joins[] = $join->$method($first, $operator, $second);
         }
