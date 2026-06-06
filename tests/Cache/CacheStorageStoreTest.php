@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Cache;
 
+use Illuminate\Cache\Repository;
 use Illuminate\Cache\StorageStore;
 use Illuminate\Support\Carbon;
 use Illuminate\Tests\Cache\Fixtures\ArrayFilesystem;
@@ -86,16 +87,16 @@ class CacheStorageStoreTest extends TestCase
         $disk = new ArrayFilesystem;
         $store = new StorageStore($disk, 'cache');
 
-        $store->put('illuminate:cache:flexible:created:foo', true, 60);
+        $store->put(Repository::FLEXIBLE_CREATED_KEY_PREFIX.'foo', true, 60);
 
         $this->assertFalse($store->forget('foo'));
-        $this->assertTrue($disk->exists($store->path('illuminate:cache:flexible:created:foo')));
+        $this->assertTrue($disk->exists($store->path(Repository::FLEXIBLE_CREATED_KEY_PREFIX.'foo')));
 
         $store->put('foo', 'bar', 60);
 
         $this->assertTrue($store->forget('foo'));
         $this->assertFalse($disk->exists($store->path('foo')));
-        $this->assertFalse($disk->exists($store->path('illuminate:cache:flexible:created:foo')));
+        $this->assertFalse($disk->exists($store->path(Repository::FLEXIBLE_CREATED_KEY_PREFIX.'foo')));
     }
 
     public function testFlushRemovesScopedDirectory()
