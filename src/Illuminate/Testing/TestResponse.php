@@ -688,6 +688,8 @@ class TestResponse implements ArrayAccess
      *
      * @param  array  $value
      * @return $this
+     *
+     * @throws \JsonException
      */
     public function assertStreamedJsonContent($value)
     {
