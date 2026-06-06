@@ -88,9 +88,9 @@ trait SupportsInverseRelations
     /**
      * Set the inverse relation on all models in a collection.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection  $models
+     * @param  \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model>  $models
      * @param  \Illuminate\Database\Eloquent\Model|null  $parent
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model>
      */
     protected function applyInverseRelationToCollection($models, ?Model $parent = null)
     {
