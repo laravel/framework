@@ -618,8 +618,6 @@ class Builder implements BuilderContract
             $first($join);
 
             $this->joins[] = $join;
-
-            $this->addBinding($join->getBindings(), 'join');
         }
 
         // If the column is simply a string, we can assume the join simply has a basic
@@ -629,9 +627,9 @@ class Builder implements BuilderContract
             $method = $where ? 'where' : 'on';
 
             $this->joins[] = $join->$method($first, $operator, $second);
-
-            $this->addBinding($join->getBindings(), 'join');
         }
+
+        $this->addBinding($join->getBindings(), 'join');
 
         return $this;
     }
