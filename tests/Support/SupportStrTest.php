@@ -612,6 +612,33 @@ class SupportStrTest extends TestCase
         $this->assertSame('some: "json"', Str::unwrap('{some: "json"}', '{', '}'));
     }
 
+    public function testIsNot()
+    {
+        $this->assertFalse(Str::isNot('/', '/'));
+        $this->assertTrue(Str::isNot('/', ' /'));
+        $this->assertTrue(Str::isNot('/', '/a'));
+        $this->assertFalse(Str::isNot('foo/*', 'foo/bar/baz'));
+
+        // isNot is case sensitive
+        $this->assertTrue(Str::isNot('*BAZ*', 'foo/bar/baz'));
+        $this->assertTrue(Str::isNot('A', 'a'));
+
+        // isNot is not case sensitive
+        $this->assertFalse(Str::isNot('A', 'a', true));
+        $this->assertFalse(Str::isNot('*BAZ*', 'foo/bar/baz', true));
+
+        // Accepts array of patterns
+        $this->assertFalse(Str::isNot(['a*', 'b*'], 'a/'));
+        $this->assertTrue(Str::isNot(['a*', 'b*'], 'f/'));
+
+        // empty patterns
+        $this->assertTrue(Str::isNot([], 'test'));
+
+        // Always the exact inverse of is()
+        $this->assertSame(! Str::is('foo/*', 'foo/bar/baz'), Str::isNot('foo/*', 'foo/bar/baz'));
+        $this->assertSame(! Str::is('foo/*', 'other'), Str::isNot('foo/*', 'other'));
+    }
+
     public function testIs()
     {
         $this->assertTrue(Str::is('/', '/'));

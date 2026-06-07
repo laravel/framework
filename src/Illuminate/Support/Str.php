@@ -550,6 +550,19 @@ class Str
     }
 
     /**
+     * Determine if a given string doesn't match a given pattern.
+     *
+     * @param  string|iterable<string>  $pattern
+     * @param  string  $value
+     * @param  bool  $ignoreCase
+     * @return bool
+     */
+    public static function isNot($pattern, $value, $ignoreCase = false)
+    {
+        return ! static::is($pattern, $value, $ignoreCase);
+    }
+
+    /**
      * Determine if a given string is 7 bit ASCII.
      *
      * @param  string  $value

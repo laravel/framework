@@ -372,6 +372,18 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Determine if a given string doesn't match a given pattern.
+     *
+     * @param  string|iterable<string>  $pattern
+     * @param  bool  $ignoreCase
+     * @return bool
+     */
+    public function isNot($pattern, $ignoreCase = false)
+    {
+        return Str::isNot($pattern, $this->value, $ignoreCase);
+    }
+
+    /**
      * Determine if a given string is 7 bit ASCII.
      *
      * @return bool
