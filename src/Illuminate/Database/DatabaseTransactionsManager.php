@@ -248,7 +248,7 @@ class DatabaseTransactionsManager
     /**
      * Get all of the pending transactions.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>
      */
     public function getPendingTransactions()
     {
@@ -258,7 +258,7 @@ class DatabaseTransactionsManager
     /**
      * Get all of the committed transactions.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>
      */
     public function getCommittedTransactions()
     {
