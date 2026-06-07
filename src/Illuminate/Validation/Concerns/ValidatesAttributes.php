@@ -629,7 +629,7 @@ trait ValidatesAttributes
             try {
                 $date = DateTime::createFromFormat('!'.$format, $value, new DateTimeZone('UTC'));
 
-                if ($date && $date->format($format) == $value) {
+                if ($date && $date->format($format) === (string) $value) {
                     return true;
                 }
             } catch (ValueError) {
