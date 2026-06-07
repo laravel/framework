@@ -1206,6 +1206,21 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Search the collection for a given value, using strict comparison and return the corresponding key if successful.
+     *
+     * @param  TValue|(callable(TValue,TKey): bool)  $value
+     * @return TKey|false
+     */
+    public function searchStrict($value)
+    {
+        if (! $this->useAsCallable($value)) {
+            return array_search($value, $this->items, true);
+        }
+
+        return array_find_key($this->items, $value) ?? false;
+    }
+
+    /**
      * Get the item before the given item.
      *
      * @param  TValue|(callable(TValue,TKey): bool)  $value
@@ -1230,6 +1245,29 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Get the item before the given item, using strict comparison.
+     *
+     * @param  TValue|(callable(TValue,TKey): bool)  $value
+     * @return TValue|null
+     */
+    public function beforeStrict($value)
+    {
+        $key = $this->search($value, true);
+
+        if ($key === false) {
+            return null;
+        }
+
+        $position = ($keys = $this->keys())->search($key);
+
+        if ($position === 0) {
+            return null;
+        }
+
+        return $this->get($keys->get($position - 1));
+    }
+
+    /**
      * Get the item after the given item.
      *
      * @param  TValue|(callable(TValue,TKey): bool)  $value
@@ -1239,6 +1277,29 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function after($value, $strict = false)
     {
         $key = $this->search($value, $strict);
+
+        if ($key === false) {
+            return null;
+        }
+
+        $position = ($keys = $this->keys())->search($key);
+
+        if ($position === $keys->count() - 1) {
+            return null;
+        }
+
+        return $this->get($keys->get($position + 1));
+    }
+
+    /**
+     * Get the item after the given item, using strict comparison.
+     *
+     * @param  TValue|(callable(TValue,TKey): bool)  $value
+     * @return TValue|null
+     */
+    public function afterStrict($value)
+    {
+        $key = $this->search($value, true);
 
         if ($key === false) {
             return null;
