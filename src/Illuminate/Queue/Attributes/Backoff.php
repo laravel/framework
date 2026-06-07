@@ -17,7 +17,7 @@ class Backoff
     /**
      * Create a new attribute instance.
      *
-     * @param  array<int>|int  ...$backoff
+     * @param  array<int>|int  ...$backoff  Seconds to wait before retrying the job.
      */
     public function __construct(array|int ...$backoff)
     {
