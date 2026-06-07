@@ -6551,6 +6551,15 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => '17:43'], ['x' => 'date_format:H:i']);
         $this->assertTrue($v->passes());
+
+        // Numeric string coercion must not bypass strict format matching.
+        // '0.5' should not pass date_format:U.u because the canonical output is '0.500000'.
+        $v = new Validator($trans, ['x' => '0.5'], ['x' => 'date_format:U.u']);
+        $this->assertTrue($v->fails());
+
+        // Integer 0 coerced to '0' must still pass date_format:G (hour without leading zero, midnight).
+        $v = new Validator($trans, ['x' => 0], ['x' => 'date_format:G']);
+        $this->assertTrue($v->passes());
     }
 
     public function testDateEquals()
