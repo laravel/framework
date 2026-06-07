@@ -512,7 +512,7 @@ class Migrator
         $previousConnection = $this->resolver->getDefaultConnection();
 
         try {
-            $this->resolver->setDefaultConnection($connection->getName());
+            $this->resolver->setDefaultConnection($connection->getNameWithReadWriteType());
 
             $migration->{$method}();
         } finally {
@@ -682,17 +682,34 @@ class Migrator
      */
     public function setConnection($name)
     {
-        if (! is_null($name)) {
-            $this->resolver->setDefaultConnection($name);
+        if (is_null($name)) {
+            $defaultName = $this->resolver->getDefaultConnection();
+            $directName = $this->directConnectionName($defaultName);
+
+            if ($directName === $defaultName) {
+                $this->repository->setSource(null);
+
+                $this->connection = null;
+
+                return;
+            }
+
+            $name = $directName;
+        } else {
+            $name = $this->directConnectionName($name);
         }
 
         $this->repository->setSource($name);
+        $this->resolver->setDefaultConnection($name);
 
         $this->connection = $name;
     }
 
     /**
      * Resolve the database connection instance.
+     *
+     * The default resolver path routes configured direct PostgreSQL connections
+     * to their direct variant; custom resolver callbacks keep full priority.
      *
      * @param  string  $connection
      * @return \Illuminate\Database\Connection
@@ -706,8 +723,29 @@ class Migrator
                 $connection ?: $this->connection
             );
         } else {
-            return $this->resolver->connection($connection ?: $this->connection);
+            return $this->resolver->connection(
+                $this->directConnectionName($connection ?: $this->connection)
+            );
         }
+    }
+
+    /**
+     * Resolve the direct connection variant when one is configured.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function directConnectionName($name)
+    {
+        $name ??= $this->resolver->getDefaultConnection();
+
+        if (Str::endsWith($name, ['::read', '::write', '::direct'])) {
+            return $name;
+        }
+
+        return $this->resolver->connection($name)->usesDirectConnection()
+            ? $name.'::direct'
+            : $name;
     }
 
     /**

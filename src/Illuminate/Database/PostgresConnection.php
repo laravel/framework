@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database;
 
+use DateTimeInterface;
 use Exception;
 use Illuminate\Database\Query\Grammars\PostgresGrammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\PostgresProcessor;
@@ -9,9 +10,50 @@ use Illuminate\Database\Schema\Grammars\PostgresGrammar as SchemaGrammar;
 use Illuminate\Database\Schema\PostgresBuilder;
 use Illuminate\Database\Schema\PostgresSchemaState;
 use Illuminate\Filesystem\Filesystem;
+use PDO;
 
 class PostgresConnection extends Connection
 {
+    /**
+     * Prepare the query bindings for execution.
+     *
+     * @param  array  $bindings
+     * @return array
+     */
+    public function prepareBindings(array $bindings)
+    {
+        $grammar = $this->getQueryGrammar();
+
+        foreach ($bindings as $key => $value) {
+            if ($value instanceof DateTimeInterface) {
+                $bindings[$key] = $value->format($grammar->getDateFormat());
+            } elseif (is_bool($value)) {
+                $bindings[$key] = $this->usesEmulatedPrepares()
+                    ? ($value ? 'true' : 'false')
+                    : (int) $value;
+            }
+        }
+
+        return $bindings;
+    }
+
+    /**
+     * Determine if the active PDO configuration uses emulated prepares.
+     *
+     * @return bool
+     */
+    protected function usesEmulatedPrepares()
+    {
+        // Binding preparation runs after query routing has selected the PDO variant.
+        $config = match ($this->latestReadWriteTypeUsed()) {
+            'read' => $this->readPdoConfig,
+            'direct' => $this->directPdoConfig,
+            default => $this->config,
+        };
+
+        return (bool) ($config['options'][PDO::ATTR_EMULATE_PREPARES] ?? false);
+    }
+
     /**
      * {@inheritdoc}
      */

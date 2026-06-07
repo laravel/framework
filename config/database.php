@@ -99,6 +99,12 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => 'prefer',
+            'pooled' => env('DB_POOLED', false),
+            'direct' => array_filter([
+                'host' => env('DB_DIRECT_HOST'),
+                'port' => env('DB_DIRECT_PORT'),
+                'sslmode' => env('DB_DIRECT_SSLMODE'),
+            ]),
         ],
 
         'sqlsrv' => [
