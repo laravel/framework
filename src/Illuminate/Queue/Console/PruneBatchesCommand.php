@@ -6,12 +6,15 @@ use Illuminate\Bus\BatchRepository;
 use Illuminate\Bus\DatabaseBatchRepository;
 use Illuminate\Bus\PrunableBatchRepository;
 use Illuminate\Console\Command;
+use Illuminate\Console\Prohibitable;
 use Illuminate\Support\Carbon;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'queue:prune-batches')]
 class PruneBatchesCommand extends Command
 {
+    use Prohibitable;
+
     /**
      * The console command signature.
      *
@@ -36,6 +39,10 @@ class PruneBatchesCommand extends Command
      */
     public function handle()
     {
+        if ($this->isProhibited()) {
+            return;
+        }
+
         $repository = $this->laravel[BatchRepository::class];
 
         $count = 0;

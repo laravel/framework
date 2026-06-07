@@ -3,6 +3,7 @@
 namespace Illuminate\Queue\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\Prohibitable;
 use Illuminate\Queue\Failed\PrunableFailedJobProvider;
 use Illuminate\Support\Carbon;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -10,6 +11,8 @@ use Symfony\Component\Console\Attribute\AsCommand;
 #[AsCommand(name: 'queue:prune-failed')]
 class PruneFailedJobsCommand extends Command
 {
+    use Prohibitable;
+
     /**
      * The console command signature.
      *
@@ -32,6 +35,10 @@ class PruneFailedJobsCommand extends Command
      */
     public function handle()
     {
+        if ($this->isProhibited()) {
+            return self::FAILURE;
+        }
+
         $failer = $this->laravel['queue.failer'];
 
         if ($failer instanceof PrunableFailedJobProvider) {

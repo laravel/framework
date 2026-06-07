@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\Prohibitable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Events\ModelPruningFinished;
@@ -17,6 +18,8 @@ use Symfony\Component\Finder\Finder;
 #[AsCommand(name: 'model:prune')]
 class PruneCommand extends Command
 {
+    use Prohibitable;
+
     /**
      * The console command name.
      *
@@ -44,6 +47,10 @@ class PruneCommand extends Command
      */
     public function handle(Dispatcher $events)
     {
+        if ($this->isProhibited()) {
+            return;
+        }
+
         $models = $this->models();
 
         if ($models->isEmpty()) {
