@@ -68,6 +68,8 @@ class DatabaseConsoleDirectConnectionTest extends TestCase
 
         $this->assertSame('direct-host', $connection['host']);
         $this->assertSame('5432', $connection['port']);
+        $this->assertSame('direct-user', $connection['username']);
+        $this->assertSame('direct-password', $connection['password']);
         $this->assertSame('require', $connection['sslmode']);
         $this->assertSame('laravel', $connection['database']);
         $this->assertArrayNotHasKey('direct', $connection);
@@ -127,6 +129,8 @@ class DatabaseConsoleDirectConnectionTest extends TestCase
                         'direct' => [
                             'host' => ['direct-host', 'direct-host-2'],
                             'port' => '5432',
+                            'username' => 'direct-user',
+                            'password' => 'direct-password',
                             'sslmode' => 'require',
                         ],
                     ],

@@ -123,14 +123,16 @@ class DatabaseConnectionFactoryTest extends TestCase
             'host' => 'pooler-host',
             'port' => '6432',
             'database' => 'laravel',
-            'username' => 'root',
-            'password' => '',
+            'username' => 'pooler-user',
+            'password' => 'pooler-password',
             'prefix' => '',
             'connect_via_database' => 'pooler_database',
             'connect_via_port' => '6432',
             'direct' => [
                 'host' => 'direct-host',
                 'port' => '5432',
+                'username' => 'direct-user',
+                'password' => 'direct-password',
                 'sslmode' => 'require',
             ],
         ], 'pooled_pgsql');
@@ -147,11 +149,59 @@ class DatabaseConnectionFactoryTest extends TestCase
 
         $this->assertSame('direct-host', $directConfig['host']);
         $this->assertSame('5432', $directConfig['port']);
+        $this->assertSame('direct-user', $directConfig['username']);
+        $this->assertSame('direct-password', $directConfig['password']);
         $this->assertSame('require', $directConfig['sslmode']);
         $this->assertSame('laravel', $directConfig['database']);
         $this->assertFalse($directConfig['options'][PDO::ATTR_EMULATE_PREPARES]);
         $this->assertArrayNotHasKey('connect_via_database', $directConfig);
         $this->assertArrayNotHasKey('connect_via_port', $directConfig);
+    }
+
+    public function testPostgresDirectConnectionConfigurationInheritsBaseCredentialsWhenNotConfigured()
+    {
+        $this->db->addConnection([
+            'driver' => 'pgsql',
+            'host' => 'pooler-host',
+            'port' => '6432',
+            'database' => 'laravel',
+            'username' => 'pooler-user',
+            'password' => 'pooler-password',
+            'prefix' => '',
+            'direct' => [
+                'host' => 'direct-host',
+                'port' => '5432',
+            ],
+        ], 'pooled_pgsql_inherited_credentials');
+
+        $directConfig = $this->db->getConnection('pooled_pgsql_inherited_credentials')->getDirectConfig();
+
+        $this->assertSame('pooler-user', $directConfig['username']);
+        $this->assertSame('pooler-password', $directConfig['password']);
+    }
+
+    public function testPostgresDirectConnectionConfigurationCanOverridePortAndUsernameWithoutHost()
+    {
+        $this->db->addConnection([
+            'driver' => 'pgsql',
+            'host' => 'same-host',
+            'port' => '6432',
+            'database' => 'laravel',
+            'username' => 'pooler-user|pooler',
+            'password' => 'shared-password',
+            'prefix' => '',
+            'direct' => [
+                'port' => '5432',
+                'username' => 'direct-user',
+            ],
+        ], 'pooled_pgsql_same_host');
+
+        $directConfig = $this->db->getConnection('pooled_pgsql_same_host')->getDirectConfig();
+
+        $this->assertSame('same-host', $directConfig['host']);
+        $this->assertSame('5432', $directConfig['port']);
+        $this->assertSame('direct-user', $directConfig['username']);
+        $this->assertSame('shared-password', $directConfig['password']);
     }
 
     public function testNonPostgresDirectConfigurationIsIgnored()
