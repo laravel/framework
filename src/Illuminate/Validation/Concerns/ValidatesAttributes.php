@@ -680,11 +680,11 @@ trait ValidatesAttributes
         $decimals = strlen(end($matches));
 
         if (! isset($parameters[1])) {
-            return $decimals == $parameters[0];
+            return $decimals === (int) $parameters[0];
         }
 
-        return $decimals >= $parameters[0] &&
-               $decimals <= $parameters[1];
+        return $decimals >= (int) $parameters[0] &&
+               $decimals <= (int) $parameters[1];
     }
 
     /**
