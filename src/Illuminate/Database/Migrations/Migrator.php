@@ -62,7 +62,7 @@ class Migrator
     /**
      * The name of the default connection.
      *
-     * @var string
+     * @var string|null
      */
     protected $connection;
 
@@ -645,7 +645,7 @@ class Migrator
     /**
      * Get the default connection name.
      *
-     * @return string
+     * @return string|null
      */
     public function getConnection()
     {
@@ -677,7 +677,7 @@ class Migrator
     /**
      * Set the default connection name.
      *
-     * @param  string  $name
+     * @param  string|null  $name
      * @return void
      */
     public function setConnection($name)
@@ -711,7 +711,7 @@ class Migrator
      * The default resolver path routes configured direct PostgreSQL connections
      * to their direct variant; custom resolver callbacks keep full priority.
      *
-     * @param  string  $connection
+     * @param  string|null  $connection
      * @return \Illuminate\Database\Connection
      */
     public function resolveConnection($connection)
@@ -732,7 +732,7 @@ class Migrator
     /**
      * Resolve the direct connection variant when one is configured.
      *
-     * @param  string  $name
+     * @param  string|null  $name
      * @return string
      */
     protected function directConnectionName($name)
