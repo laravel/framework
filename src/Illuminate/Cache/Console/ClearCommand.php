@@ -5,6 +5,7 @@ namespace Illuminate\Cache\Console;
 use BadMethodCallException;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Console\Command;
+use Illuminate\Console\Prohibitable;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -13,6 +14,8 @@ use Symfony\Component\Console\Input\InputOption;
 #[AsCommand(name: 'cache:clear')]
 class ClearCommand extends Command
 {
+    use Prohibitable;
+
     /**
      * The console command name.
      *
@@ -62,6 +65,10 @@ class ClearCommand extends Command
      */
     public function handle()
     {
+        if ($this->isProhibited()) {
+            return self::FAILURE;
+        }
+
         if ($this->option('locks')) {
             return $this->clearLocks();
         }
