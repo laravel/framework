@@ -50,11 +50,7 @@ class Can implements Rule, ValidatorAwareRule
      */
     public function passes($attribute, $value)
     {
-        $arguments = $this->arguments;
-
-        $model = array_shift($arguments);
-
-        return Gate::allows($this->ability, array_filter([$model, ...$arguments, $value]));
+        return Gate::allows($this->ability, array_values([...$this->arguments, $value]));
     }
 
     /**
