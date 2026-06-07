@@ -34,6 +34,16 @@ class FakePendingBroadcast extends PendingBroadcast
     }
 
     /**
+     * Get the event instance.
+     *
+     * @return mixed
+     */
+    public function getEvent()
+    {
+        return null;
+    }
+
+    /**
      * Handle the object's destruction.
      *
      * @return void

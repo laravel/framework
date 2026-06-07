@@ -64,6 +64,16 @@ class PendingBroadcast
     }
 
     /**
+     * Get the event instance.
+     *
+     * @return mixed
+     */
+    public function getEvent()
+    {
+        return $this->event;
+    }
+
+    /**
      * Handle the object's destruction.
      *
      * @return void
