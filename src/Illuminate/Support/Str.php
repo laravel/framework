@@ -724,11 +724,12 @@ class Str
      * @param  int  $limit
      * @param  string  $end
      * @param  bool  $preserveWords
+     * @param  non-negative-int  $threshold
      * @return string
      */
-    public static function limit($value, $limit = 100, $end = '...', $preserveWords = false)
+    public static function limit($value, $limit = 100, $end = '...', $preserveWords = false, int $threshold = 0)
     {
-        if (mb_strwidth($value, 'UTF-8') <= $limit) {
+        if (mb_strwidth($value, 'UTF-8') <= $limit + max(0, $threshold)) {
             return $value;
         }
 
