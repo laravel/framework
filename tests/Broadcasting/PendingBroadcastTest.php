@@ -10,7 +10,8 @@ class PendingBroadcastTest extends TestCase
 {
     public function testGetEvent()
     {
-        $event = new class {
+        $event = new class
+        {
             public $data = 'test';
         };
 
@@ -21,7 +22,8 @@ class PendingBroadcastTest extends TestCase
 
     public function testViaCallsBroadcastViaOnEvent()
     {
-        $event = new class {
+        $event = new class
+        {
             public $connection = null;
 
             public function broadcastVia($connection)
@@ -38,7 +40,8 @@ class PendingBroadcastTest extends TestCase
 
     public function testViaWithNullConnection()
     {
-        $event = new class {
+        $event = new class
+        {
             public $connection = 'default';
 
             public function broadcastVia($connection)
@@ -67,7 +70,8 @@ class PendingBroadcastTest extends TestCase
 
     public function testToOthersCallsDontBroadcastToCurrentUser()
     {
-        $event = new class {
+        $event = new class
+        {
             public $excludeCurrentUser = false;
 
             public function dontBroadcastToCurrentUser()
@@ -114,15 +118,24 @@ class PendingBroadcastTest extends TestCase
     {
         $dispatchedEvents = [];
 
-        $dispatcher = new class extends Dispatcher {
-            public function dispatch($event)
+        $dispatcher = new class($dispatchedEvents) extends Dispatcher
+        {
+            private $events;
+
+            public function __construct(&$events)
             {
-                $dispatchedEvents[] = $event;
+                $this->events = &$events;
+            }
+
+            public function dispatch($event, $payload = [], $halt = false)
+            {
+                $this->events[] = $event;
                 return $event;
             }
         };
 
-        $event = new class {
+        $event = new class
+        {
             public $data = 'test';
         };
 
