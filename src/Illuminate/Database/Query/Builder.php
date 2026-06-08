@@ -2982,16 +2982,9 @@ class Builder implements BuilderContract
             $this->addBinding($bindings, $this->unions ? 'unionOrder' : 'order');
         }
 
-        $direction = match (true) {
-            $direction instanceof SortDirection => match ($direction) {
-                SortDirection::Ascending => 'asc',
-                SortDirection::Descending => 'desc',
-            },
-            strtolower($direction) === 'asc', strtolower($direction) === 'ascending' => 'asc',
-            strtolower($direction) === 'desc', strtolower($direction) === 'descending' => 'desc',
         $direction = match (strtolower(enum_value($direction))) {
             'asc', 'ascending' => 'asc',
-            desc', 'descending' => 'desc',
+            'desc', 'descending' => 'desc',
             default => throw new InvalidArgumentException('Order direction must be a SortDirection, "asc" or "desc", "ascending" or "descending".'),
         };
 
