@@ -47,7 +47,7 @@ class LogManagerTest extends TestCase
         //we don't specify any channel name
         $manager->channel();
         $this->assertCount(1, $manager->getChannels());
-        $this->assertEquals('single', $manager->getDefaultDriver());
+        $this->assertSame('single', $manager->getDefaultDriver());
     }
 
     public function testStackChannel()
@@ -111,8 +111,8 @@ class LogManagerTest extends TestCase
         $manager->channel('stack');
 
         $this->assertSame(
-            array_keys($manager->getChannels()),
-            ['single', 'daily', 'stderr', 'stack']
+            ['single', 'daily', 'stderr', 'stack'],
+            array_keys($manager->getChannels())
         );
     }
 
@@ -646,7 +646,7 @@ class LogManagerTest extends TestCase
             'invocation-id' => 'expected-id',
         ]);
 
-        $this->assertSame($manager->sharedContext(), ['invocation-id' => 'expected-id']);
+        $this->assertSame(['invocation-id' => 'expected-id'], $manager->sharedContext());
     }
 
     public function testItSharesContextWithStacksWhenTheyAreResolved()
@@ -726,7 +726,7 @@ class LogManagerTest extends TestCase
 
         $format = new ReflectionProperty(get_class($formatter), 'format');
 
-        $this->assertEquals(
+        $this->assertSame(
             '[%datetime%] %channel%.%level_name%: %message% %context% %extra%',
             rtrim($format->getValue($formatter)));
     }
@@ -750,7 +750,47 @@ class LogManagerTest extends TestCase
 
         // Then
         $this->assertCount(1, $loggerSpy->logs);
-        $this->assertEquals('some alert', $loggerSpy->logs[0]['message']);
+        $this->assertSame('some alert', $loggerSpy->logs[0]['message']);
+    }
+
+    public function testCustomDriverClosureBoundObjectIsLogManager()
+    {
+        $config = $this->app['config'];
+        $config->set('logging.channels.'.__CLASS__, [
+            'driver' => __CLASS__,
+        ]);
+
+        $manager = new LogManager($this->app);
+        $manager->extend(__CLASS__, fn () => $this);
+        $this->assertSame($manager, $manager->channel(__CLASS__)->getLogger());
+    }
+
+    public function testLogManagerCanResolveBackedEnumChannel()
+    {
+        $manager = new LogManager($this->app);
+
+        $logger1 = $manager->channel(LogChannelName::Single);
+        $logger2 = $manager->channel('single');
+
+        $this->assertSame($logger1, $logger2);
+    }
+
+    public function testLogManagerCanResolveBackedEnumDriver()
+    {
+        $manager = new LogManager($this->app);
+
+        $logger1 = $manager->driver(LogChannelName::Single);
+        $logger2 = $manager->driver('single');
+
+        $this->assertSame($logger1, $logger2);
+    }
+
+    public function testSetDefaultDriverAcceptsBackedEnum()
+    {
+        $manager = new LogManager($this->app);
+        $manager->setDefaultDriver(LogChannelName::Single);
+
+        $this->assertSame('single', $this->app['config']['logging.default']);
     }
 }
 
@@ -780,4 +820,9 @@ class LoggerSpy implements LoggerInterface
             'context' => $context,
         ];
     }
+}
+
+enum LogChannelName: string
+{
+    case Single = 'single';
 }

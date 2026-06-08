@@ -9,8 +9,8 @@ use Illuminate\Support\Fluent;
  * @method ForeignKeyDefinition initiallyImmediate(bool $value = true) Set the default time to check the constraint (PostgreSQL)
  * @method ForeignKeyDefinition lock(('none'|'shared'|'default'|'exclusive') $value) Specify the DDL lock mode for the foreign key operation (MySQL)
  * @method ForeignKeyDefinition on(string $table) Specify the referenced table
- * @method ForeignKeyDefinition onDelete(('cascade'|'restrict'|'set null'|'no action') $action) Add an ON DELETE action
- * @method ForeignKeyDefinition onUpdate(('cascade'|'restrict'|'set null'|'no action') $action) Add an ON UPDATE action
+ * @method ForeignKeyDefinition onDelete(string $action) Add an ON DELETE action
+ * @method ForeignKeyDefinition onUpdate(string $action) Add an ON UPDATE action
  * @method ForeignKeyDefinition references(string|string[] $columns) Specify the referenced column(s)
  */
 class ForeignKeyDefinition extends Fluent

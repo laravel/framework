@@ -10,6 +10,7 @@ use DateTimeImmutable;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\FileStore;
 use Illuminate\Cache\Lock;
+use Illuminate\Cache\MemcachedStore;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Cache\TaggableStore;
@@ -25,6 +26,7 @@ use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class CacheRepositoryTest extends TestCase
 {
@@ -37,7 +39,8 @@ class CacheRepositoryTest extends TestCase
 
     protected function tearDown(): void
     {
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
+        Repository::handleUnserializableClassUsing(null);
 
         parent::tearDown();
     }
@@ -421,6 +424,16 @@ class CacheRepositoryTest extends TestCase
         $this->assertSame($store->getDefaultCacheTime(), $repo->getDefaultCacheTime());
     }
 
+    public function testFlushLocksDelegatesToStore()
+    {
+        $flushable = m::mock(RedisStore::class);
+        $flushable->shouldReceive('flushLocks')->once()->andReturn(true);
+
+        $repo = new Repository($flushable);
+
+        $this->assertTrue($repo->flushLocks());
+    }
+
     public function testTaggableRepositoriesSupportTags()
     {
         $taggable = m::mock(TaggableStore::class);
@@ -435,6 +448,73 @@ class CacheRepositoryTest extends TestCase
         $nonTaggableRepo = new Repository($nonTaggable);
 
         $this->assertFalse($nonTaggableRepo->supportsTags());
+    }
+
+    public function testFlushableLockRepositorySupportsFlushingLocks()
+    {
+        $flushable = m::mock(RedisStore::class);
+        $flushableRepo = new Repository($flushable);
+
+        $this->assertTrue($flushableRepo->supportsFlushingLocks());
+    }
+
+    public function testNonFlushableLockRepositoryDoesNotSupportFlushingLocks()
+    {
+        $nonFlushable = m::mock(MemcachedStore::class);
+        $nonFlushableRepo = new Repository($nonFlushable);
+
+        $this->assertFalse($nonFlushableRepo->supportsFlushingLocks());
+    }
+
+    public function testItThrowsExceptionWhenStoreDoesNotSupportFlushingLocks()
+    {
+        $this->expectException(BadMethodCallException::class);
+
+        $nonFlushable = m::mock(MemcachedStore::class);
+        $nonFlushableRepo = new Repository($nonFlushable);
+
+        $nonFlushableRepo->flushLocks();
+    }
+
+    public function testTouchWithSecondsTtlCorrectlyProxiesToStore(): void
+    {
+        $key = 'key';
+        $ttl = 60;
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('touch')->once()->with($key, $ttl)->andReturn(true);
+        $this->assertTrue($repo->touch($key, $ttl));
+    }
+
+    public function testTouchWithDatetimeTtlCorrectlyProxiesToStore(): void
+    {
+        $key = 'key';
+        $ttl = 60;
+
+        Carbon::setTestNow($now = Carbon::now());
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('touch')->once()->with($key, $ttl)->andReturn(true);
+        $this->assertTrue($repo->touch($key, $now->addSeconds($ttl)));
+    }
+
+    public function testTouchWithDateIntervalTtlCorrectlyProxiesToStore(): void
+    {
+        $key = 'key';
+        $ttl = 60;
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('touch')->once()->with($key, $ttl)->andReturn(true);
+        $this->assertTrue($repo->touch($key, DateInterval::createFromDateString("$ttl seconds")));
+    }
+
+    public function testTouchWorksWithEnumKey(): void
+    {
+        $ttl = 60;
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('touch')->once()->with('foo', $ttl)->andReturn(true);
+        $this->assertTrue($repo->touch(TestCacheKey::FOO, $ttl));
     }
 
     public function testAtomicExecutesCallbackAndReturnsResult()
@@ -501,6 +581,55 @@ class CacheRepositoryTest extends TestCase
         } catch (LockTimeoutException) {
             $this->assertFalse($called);
         }
+    }
+
+    public function testTaggedCacheWorksWithEnumKey()
+    {
+        $cache = (new Repository(new ArrayStore()))->tags('test-tag');
+
+        $cache->put(TestCacheKey::FOO, 5);
+        $this->assertSame(6, $cache->increment(TestCacheKey::FOO));
+        $this->assertSame(5, $cache->decrement(TestCacheKey::FOO));
+    }
+
+    public function testGetReturnsIncompleteClassWhenNoHandlerRegistered()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(unserialize(serialize(new stdClass), ['allowed_classes' => false]));
+
+        $this->assertInstanceOf(\__PHP_Incomplete_Class::class, $repo->get('foo'));
+    }
+
+    public function testGetCallsHandlerWithKeyAndClassForIncompleteClass()
+    {
+        $class = null;
+        $key = null;
+
+        Repository::handleUnserializableClassUsing(function ($k, $c) use (&$class, &$key) {
+            $key = $k;
+            $class = $c;
+        });
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(unserialize(serialize(new stdClass), ['allowed_classes' => false]));
+        $repo->get('foo');
+
+        $this->assertSame('foo', $key);
+        $this->assertSame('stdClass', $class);
+    }
+
+    public function testManyCallsHandlerForEachIncompleteClass()
+    {
+        $handled = [];
+        Repository::handleUnserializableClassUsing(function ($key, $class) use (&$handled) {
+            $handled[] = $key;
+        });
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('many')->once()->with(['foo', 'bar'])->andReturn(['foo' => unserialize(serialize(new stdClass), ['allowed_classes' => false]), 'bar' => 'baz']);
+        $repo->many(['foo', 'bar']);
+
+        $this->assertSame(['foo'], $handled);
     }
 
     protected function getRepository()
@@ -661,4 +790,9 @@ class CacheRepositoryTest extends TestCase
         $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('bar');
         $repo->array('foo');
     }
+}
+
+enum TestCacheKey: string
+{
+    case FOO = 'foo';
 }

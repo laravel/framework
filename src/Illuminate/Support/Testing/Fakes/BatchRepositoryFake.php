@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
+use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Closure;
 use Illuminate\Bus\BatchRepository;
@@ -112,7 +113,7 @@ class BatchRepositoryFake implements BatchRepository
     public function markAsFinished(string $batchId)
     {
         if (isset($this->batches[$batchId])) {
-            $this->batches[$batchId]->finishedAt = now();
+            $this->batches[$batchId]->finishedAt = Carbon::now();
         }
     }
 

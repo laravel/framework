@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -628,7 +629,7 @@ class HasOneOfManyTestUser extends Eloquent
             'published_at' => 'max',
             'id' => 'max',
         ], function ($q) {
-            $q->where('published_at', '<', now());
+            $q->where('published_at', '<', Carbon::now());
         });
     }
 
@@ -648,7 +649,7 @@ class HasOneOfManyTestUser extends Eloquent
             'published_at' => 'max',
             'id' => 'max',
         ], function ($q) {
-            $q->where('published_at', '<', now());
+            $q->where('published_at', '<', Carbon::now());
         });
     }
 

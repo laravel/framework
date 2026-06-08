@@ -196,3 +196,9 @@ assertType('array<0|string, float>', Arr::wrap($value));
 assertType('array<array<float>>', Arr::wrap($value));
 /** @var stdClass|stdClass[]|null $value */
 assertType('array<stdClass>', Arr::wrap($value));
+
+/** @var array<string, int|null> $arr */
+assertType('array<string, int>', Arr::whereNotNull($arr));
+
+/** @var list<int|null> $arr */
+assertType('array<int<0, max>, int>', Arr::whereNotNull($arr));

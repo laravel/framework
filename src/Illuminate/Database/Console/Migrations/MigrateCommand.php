@@ -77,6 +77,8 @@ class MigrateCommand extends BaseCommand implements Isolatable
      * Execute the console command.
      *
      * @return int
+     *
+     * @throws \Throwable
      */
     public function handle()
     {

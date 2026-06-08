@@ -15,9 +15,12 @@ class ConsoleMakeCommandTest extends TestCase
 
         $this->assertFileContains([
             'namespace App\Console\Commands;',
+            'use Illuminate\Console\Attributes\Description;',
+            'use Illuminate\Console\Attributes\Signature;',
             'use Illuminate\Console\Command;',
+            "#[Signature('app:foo-command')]",
+            "#[Description('Command description')]",
             'class FooCommand extends Command',
-            'protected $signature = \'app:foo-command\';',
         ], 'app/Console/Commands/FooCommand.php');
     }
 
@@ -28,9 +31,12 @@ class ConsoleMakeCommandTest extends TestCase
 
         $this->assertFileContains([
             'namespace App\Console\Commands;',
+            'use Illuminate\Console\Attributes\Description;',
+            'use Illuminate\Console\Attributes\Signature;',
             'use Illuminate\Console\Command;',
+            "#[Signature('foo:bar')]",
+            "#[Description('Command description')]",
             'class FooCommand extends Command',
-            'protected $signature = \'foo:bar\';',
         ], 'app/Console/Commands/FooCommand.php');
     }
 }

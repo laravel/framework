@@ -201,9 +201,11 @@ class BusFake implements Fake, QueueingDispatcher
      */
     public function assertNothingDispatched()
     {
-        $commandNames = implode("\n- ", array_keys($this->commands));
+        $dispatchedCommands = $this->commands + $this->commandsSync + $this->commandsAfterResponse;
 
-        PHPUnit::assertEmpty($this->commands, "The following jobs were dispatched unexpectedly:\n\n- $commandNames\n");
+        $commandNames = implode("\n- ", array_keys($dispatchedCommands));
+
+        PHPUnit::assertEmpty($dispatchedCommands, "The following jobs were dispatched unexpectedly:\n\n- $commandNames\n");
     }
 
     /**
@@ -438,6 +440,8 @@ class BusFake implements Fake, QueueingDispatcher
      * @param  array  $expectedChain
      * @param  callable|null  $callback
      * @return void
+     *
+     * @throws \RuntimeException
      */
     protected function assertDispatchedWithChainOfObjects($command, $expectedChain, $callback)
     {
@@ -717,17 +721,31 @@ class BusFake implements Fake, QueueingDispatcher
     }
 
     /**
-     * Dispatch a command to its appropriate handler.
+     * Dispatch a command to its appropriate handler after the current process.
      *
      * @param  mixed  $command
-     * @return mixed
+     * @param  mixed  $handler
+     * @return void
      */
-    public function dispatchAfterResponse($command)
+    public function dispatchAfterResponse($command, $handler = null)
     {
         if ($this->shouldFakeJob($command)) {
             $this->commandsAfterResponse[get_class($command)][] = $this->getCommandRepresentation($command);
         } else {
-            return $this->dispatcher->dispatch($command);
+            $this->dispatcher->dispatchAfterResponse($command, $handler);
+        }
+    }
+
+    /**
+     * Dispatch multiple commands in bulk to their appropriate handlers on the queue.
+     *
+     * @param  iterable  $jobs
+     * @return void
+     */
+    public function bulk($jobs)
+    {
+        foreach ($jobs as $job) {
+            $this->dispatch($job);
         }
     }
 

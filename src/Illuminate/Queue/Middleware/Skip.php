@@ -6,6 +6,9 @@ use Closure;
 
 class Skip
 {
+    /**
+     * @param  bool  $param  Whether the job should be skipped.
+     */
     public function __construct(protected bool $skip = false)
     {
     }
@@ -13,21 +16,21 @@ class Skip
     /**
      * Apply the middleware if the given condition is truthy.
      *
-     * @param  bool|Closure(): bool  $condition
+     * @param  bool|(\Closure(): bool)  $condition
      */
-    public static function when(Closure|bool $condition): self
+    public static function when(Closure|bool $condition): static
     {
-        return new self(value($condition));
+        return new static(value($condition));
     }
 
     /**
      * Apply the middleware unless the given condition is truthy.
      *
-     * @param  bool|Closure(): bool  $condition
+     * @param  bool|(\Closure(): bool)  $condition
      */
-    public static function unless(Closure|bool $condition): self
+    public static function unless(Closure|bool $condition): static
     {
-        return new self(! value($condition));
+        return new static(! value($condition));
     }
 
     /**

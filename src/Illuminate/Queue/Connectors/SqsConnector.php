@@ -32,12 +32,13 @@ class SqsConnector implements ConnectorInterface
 
         return new SqsQueue(
             new SqsClient(
-                Arr::except($config, ['token'])
+                Arr::except($config, ['token', 'overflow'])
             ),
             $config['queue'],
             $config['prefix'] ?? '',
             $config['suffix'] ?? '',
-            $config['after_commit'] ?? null
+            $config['after_commit'] ?? null,
+            $config['overflow'] ?? [],
         );
     }
 

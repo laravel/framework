@@ -34,7 +34,7 @@ class MakesHttpRequestsTest extends TestCase
     {
         $this->withHeader('name', 'Milwad')->from('previous/url');
 
-        $this->assertEquals('Milwad', $this->defaultHeaders['name']);
+        $this->assertSame('Milwad', $this->defaultHeaders['name']);
 
         $this->withoutHeader('name')->from('previous/url');
 
@@ -48,8 +48,8 @@ class MakesHttpRequestsTest extends TestCase
             'foo' => 'bar',
         ])->from('previous/url');
 
-        $this->assertEquals('Milwad', $this->defaultHeaders['name']);
-        $this->assertEquals('bar', $this->defaultHeaders['foo']);
+        $this->assertSame('Milwad', $this->defaultHeaders['name']);
+        $this->assertSame('bar', $this->defaultHeaders['foo']);
 
         $this->withoutHeaders(['name', 'foo'])->from('previous/url');
 

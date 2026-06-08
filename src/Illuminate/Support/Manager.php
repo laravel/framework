@@ -5,9 +5,13 @@ namespace Illuminate\Support;
 use Closure;
 use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
+use ReflectionException;
+use RuntimeException;
 
 abstract class Manager
 {
+    use RebindsCallbacksToSelf;
+
     /**
      * The container instance.
      *
@@ -25,14 +29,14 @@ abstract class Manager
     /**
      * The registered custom driver creators.
      *
-     * @var array
+     * @var array<string, \Closure>
      */
     protected $customCreators = [];
 
     /**
      * The array of created "drivers".
      *
-     * @var array
+     * @var array<string, mixed>
      */
     protected $drivers = [];
 
@@ -57,14 +61,14 @@ abstract class Manager
     /**
      * Get a driver instance.
      *
-     * @param  string|null  $driver
+     * @param  \UnitEnum|string|null  $driver
      * @return mixed
      *
      * @throws \InvalidArgumentException
      */
     public function driver($driver = null)
     {
-        $driver = $driver ?: $this->getDefaultDriver();
+        $driver = enum_value($driver) ?: $this->getDefaultDriver();
 
         if (is_null($driver)) {
             throw new InvalidArgumentException(sprintf(
@@ -119,11 +123,19 @@ abstract class Manager
      * Register a custom driver creator Closure.
      *
      * @param  string  $driver
-     * @param  \Closure  $callback
+     *
+     * @param-closure-this  $this  $callback
+     *
      * @return $this
      */
     public function extend($driver, Closure $callback)
     {
+        try {
+            $callback = $this->bindCallbackToSelf($callback) ?? throw new RuntimeException('Unable to bind custom driver callback');
+        } catch (ReflectionException $e) {
+            throw new RuntimeException('Unable to bind custom driver callback', previous: $e);
+        }
+
         $this->customCreators[$driver] = $callback;
 
         return $this;
@@ -132,7 +144,7 @@ abstract class Manager
     /**
      * Get all of the created "drivers".
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function getDrivers()
     {
@@ -178,7 +190,7 @@ abstract class Manager
      * Dynamically call the default driver instance.
      *
      * @param  string  $method
-     * @param  array  $parameters
+     * @param  array<string, mixed>  $parameters
      * @return mixed
      */
     public function __call($method, $parameters)

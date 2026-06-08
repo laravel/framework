@@ -32,15 +32,18 @@ class ValidationImageFileRuleTest extends TestCase
 
     public function testDimensionsWithCustomImageSizeMethod()
     {
+        $stream = tmpfile(); // To prevent PHP from deleting the temp file early.
+        $path = stream_get_meta_data($stream)['uri'];
+
         $this->fails(
             File::image()->dimensions(Rule::dimensions()->width(100)->height(100)),
-            new UploadedFileWithCustomImageSizeMethod(stream_get_meta_data($tmpFile = tmpfile())['uri'], 'foo.png'),
+            new UploadedFileWithCustomImageSizeMethod($path, 'foo.png'),
             ['validation.dimensions'],
         );
 
         $this->passes(
             File::image()->dimensions(Rule::dimensions()->width(200)->height(200)),
-            new UploadedFileWithCustomImageSizeMethod(stream_get_meta_data($tmpFile = tmpfile())['uri'], 'foo.png'),
+            new UploadedFileWithCustomImageSizeMethod($path, 'foo.png'),
         );
     }
 
@@ -60,42 +63,53 @@ class ValidationImageFileRuleTest extends TestCase
 
     public function testDimensionWithTheMinRatioMethod()
     {
-        $this->fails(
+        $this->passes(
             File::image()->dimensions(Rule::dimensions()->minRatio(1 / 2)),
             UploadedFile::fake()->image('foo.png', 100, 100),
-            ['validation.dimensions'],
         );
 
         $this->passes(
+            File::image()->dimensions(Rule::dimensions()->minRatio(2 / 3)),
+            UploadedFile::fake()->image('foo.png', 200, 300),
+        );
+
+        $this->fails(
             File::image()->dimensions(Rule::dimensions()->minRatio(1 / 2)),
-            UploadedFile::fake()->image('foo.png', 100, 200),
+            UploadedFile::fake()->image('foo.png', 100, 300),
+            ['validation.dimensions'],
         );
     }
 
     public function testDimensionWithTheMaxRatioMethod()
     {
-        $this->fails(
+        $this->passes(
             File::image()->dimensions(Rule::dimensions()->maxRatio(1 / 2)),
             UploadedFile::fake()->image('foo.png', 100, 300),
             ['validation.dimensions'],
         );
 
         $this->passes(
+            File::image()->dimensions(Rule::dimensions()->maxRatio(1 / 3)),
+            UploadedFile::fake()->image('foo.png', 100, 300),
+        );
+
+        $this->fails(
             File::image()->dimensions(Rule::dimensions()->maxRatio(1 / 2)),
             UploadedFile::fake()->image('foo.png', 100, 100),
+            ['validation.dimensions'],
         );
     }
 
     public function testDimensionWithTheRatioBetweenMethod()
     {
         $this->fails(
-            File::image()->dimensions(Rule::dimensions()->ratioBetween(1 / 2, 1 / 3)),
+            File::image()->dimensions(Rule::dimensions()->ratioBetween(1 / 3, 1 / 2)),
             UploadedFile::fake()->image('foo.png', 100, 100),
             ['validation.dimensions'],
         );
 
         $this->passes(
-            File::image()->dimensions(Rule::dimensions()->ratioBetween(1 / 2, 1 / 3)),
+            File::image()->dimensions(Rule::dimensions()->ratioBetween(1 / 3, 1 / 2)),
             UploadedFile::fake()->image('foo.png', 100, 200),
         );
     }

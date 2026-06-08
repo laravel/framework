@@ -858,6 +858,37 @@ class HttpRequestTest extends TestCase
         $this->assertSame(45, $request->interval('as_minutes', Unit::Second)->seconds);
     }
 
+    public function testIntervalMethodWithScientificNotationFloats()
+    {
+        $request = Request::create('/', 'GET', [
+            'small_float' => '0.000053',
+            'very_small' => '0.000001',
+            'scientific' => '5.3E-5',
+            'normal_float' => '1.5',
+            'integer' => '90',
+        ]);
+
+        // Small floats that PHP would render in scientific notation (e.g. 5.3E-5)
+        $interval = $request->interval('small_float', Unit::Millisecond);
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+
+        $interval = $request->interval('very_small', Unit::Second);
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+
+        // Scientific notation string passed directly
+        $interval = $request->interval('scientific', Unit::Millisecond);
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+
+        // Normal values should still work
+        $interval = $request->interval('normal_float', Unit::Hour);
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+        $this->assertSame(1, $interval->hours);
+
+        $interval = $request->interval('integer', Unit::Minute);
+        $this->assertInstanceOf(CarbonInterval::class, $interval);
+        $this->assertSame(90, $interval->minutes);
+    }
+
     public function testEnumMethod()
     {
         $request = Request::create('/', 'GET', [
@@ -1022,15 +1053,15 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET', ['developer' => ['name' => 'Taylor', 'age' => null]]);
         $this->assertEquals(['developer' => ['name' => 'Taylor']], $request->only('developer.name', 'developer.skills'));
         $this->assertEquals(['developer' => ['age' => null]], $request->only('developer.age'));
-        $this->assertEquals([], $request->only('developer.skills'));
+        $this->assertSame([], $request->only('developer.skills'));
     }
 
     public function testExceptMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 25]);
         $this->assertEquals(['name' => 'Taylor'], $request->except('age'));
-        $this->assertEquals([], $request->except('age', 'name'));
-        $this->assertEquals([], $request->except(['age', 'name']));
+        $this->assertSame([], $request->except('age', 'name'));
+        $this->assertSame([], $request->except(['age', 'name']));
     }
 
     public function testQueryMethod()
@@ -1733,12 +1764,12 @@ class HttpRequestTest extends TestCase
         $params = ['foo' => 'bar'];
 
         $getRequest = Request::create('/', 'GET', $params, [], [], []);
-        $this->assertEquals($getRequest->request->all(), []);
+        $this->assertSame([], $getRequest->request->all());
         $this->assertEquals($getRequest->query->all(), $params);
 
         $postRequest = Request::create('/', 'POST', $params, [], [], []);
         $this->assertEquals($postRequest->request->all(), $params);
-        $this->assertEquals($postRequest->query->all(), []);
+        $this->assertSame([], $postRequest->query->all());
     }
 
     /**
@@ -1855,6 +1886,16 @@ class HttpRequestTest extends TestCase
 
         $this->assertInstanceOf(InputBag::class, $request->getPayload());
         $this->assertSame('world', $request->getPayload()->get('hello'));
+    }
+
+    public function testCreatingJsonRequestFromBaseDoesNotTriggerRequestPropertyDeprecation()
+    {
+        $request = Request::createFromBase(
+            SymfonyRequest::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json'], content: '{"hello":"world"}')
+        );
+
+        $this->assertTrue($request->isJson());
+        $this->assertSame('world', $request->input('hello'));
     }
 
     public function testJsonRequestsCanMergeDataIntoJsonRequest()

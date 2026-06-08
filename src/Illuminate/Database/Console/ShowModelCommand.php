@@ -5,6 +5,7 @@ namespace Illuminate\Database\Console;
 use Illuminate\Console\Concerns\FindsAvailableModels;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Database\Eloquent\ModelInfo;
 use Illuminate\Database\Eloquent\ModelInspector;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -58,16 +59,7 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
             return 1;
         }
 
-        $this->display(
-            $info['class'],
-            $info['database'],
-            $info['table'],
-            $info['policy'],
-            $info['attributes'],
-            $info['relations'],
-            $info['events'],
-            $info['observers']
-        );
+        $this->display($info);
 
         return 0;
     }
@@ -75,74 +67,41 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
     /**
      * Render the model information.
      *
-     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $class
-     * @param  string  $database
-     * @param  string  $table
-     * @param  class-string|null  $policy
-     * @param  \Illuminate\Support\Collection  $attributes
-     * @param  \Illuminate\Support\Collection  $relations
-     * @param  \Illuminate\Support\Collection  $events
-     * @param  \Illuminate\Support\Collection  $observers
      * @return void
      */
-    protected function display($class, $database, $table, $policy, $attributes, $relations, $events, $observers)
+    protected function display(ModelInfo $modelData)
     {
         $this->option('json')
-            ? $this->displayJson($class, $database, $table, $policy, $attributes, $relations, $events, $observers)
-            : $this->displayCli($class, $database, $table, $policy, $attributes, $relations, $events, $observers);
+            ? $this->displayJson($modelData)
+            : $this->displayCli($modelData);
     }
 
     /**
      * Render the model information as JSON.
      *
-     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $class
-     * @param  string  $database
-     * @param  string  $table
-     * @param  class-string|null  $policy
-     * @param  \Illuminate\Support\Collection  $attributes
-     * @param  \Illuminate\Support\Collection  $relations
-     * @param  \Illuminate\Support\Collection  $events
-     * @param  \Illuminate\Support\Collection  $observers
      * @return void
      */
-    protected function displayJson($class, $database, $table, $policy, $attributes, $relations, $events, $observers)
+    protected function displayJson(ModelInfo $modelData)
     {
         $this->output->writeln(
-            (new Collection([
-                'class' => $class,
-                'database' => $database,
-                'table' => $table,
-                'policy' => $policy,
-                'attributes' => $attributes,
-                'relations' => $relations,
-                'events' => $events,
-                'observers' => $observers,
-            ]))->toJson()
+            (new Collection($modelData))->toJson()
         );
     }
 
     /**
      * Render the model information for the CLI.
      *
-     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $class
-     * @param  string  $database
-     * @param  string  $table
-     * @param  class-string|null  $policy
-     * @param  \Illuminate\Support\Collection  $attributes
-     * @param  \Illuminate\Support\Collection  $relations
-     * @param  \Illuminate\Support\Collection  $events
-     * @param  \Illuminate\Support\Collection  $observers
      * @return void
      */
-    protected function displayCli($class, $database, $table, $policy, $attributes, $relations, $events, $observers)
+    protected function displayCli(ModelInfo $modelData)
     {
         $this->newLine();
 
-        $this->components->twoColumnDetail('<fg=green;options=bold>'.$class.'</>');
-        $this->components->twoColumnDetail('Database', $database);
-        $this->components->twoColumnDetail('Table', $table);
+        $this->components->twoColumnDetail('<fg=green;options=bold>'.$modelData->class.'</>');
+        $this->components->twoColumnDetail('Database', $modelData->database);
+        $this->components->twoColumnDetail('Table', $modelData->table);
 
-        if ($policy) {
+        if ($policy = $modelData->policy ?? false) {
             $this->components->twoColumnDetail('Policy', $policy);
         }
 
@@ -153,7 +112,7 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
             'type <fg=gray>/</> <fg=yellow;options=bold>cast</>',
         );
 
-        foreach ($attributes as $attribute) {
+        foreach ($modelData->attributes as $attribute) {
             $first = trim(sprintf(
                 '%s %s',
                 $attribute['name'],
@@ -182,7 +141,7 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
 
         $this->components->twoColumnDetail('<fg=green;options=bold>Relations</>');
 
-        foreach ($relations as $relation) {
+        foreach ($modelData->relations as $relation) {
             $this->components->twoColumnDetail(
                 sprintf('%s <fg=gray>%s</>', $relation['name'], $relation['type']),
                 $relation['related']
@@ -193,8 +152,8 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
 
         $this->components->twoColumnDetail('<fg=green;options=bold>Events</>');
 
-        if ($events->count()) {
-            foreach ($events as $event) {
+        if ($modelData->events->count()) {
+            foreach ($modelData->events as $event) {
                 $this->components->twoColumnDetail(
                     sprintf('%s', $event['event']),
                     sprintf('%s', $event['class']),
@@ -206,8 +165,8 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
 
         $this->components->twoColumnDetail('<fg=green;options=bold>Observers</>');
 
-        if ($observers->count()) {
-            foreach ($observers as $observer) {
+        if ($modelData->observers->count()) {
+            foreach ($modelData->observers as $observer) {
                 $this->components->twoColumnDetail(
                     sprintf('%s', $observer['event']),
                     implode(', ', $observer['observer'])

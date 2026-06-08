@@ -14,6 +14,8 @@ class ValidatePathEncoding
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Illuminate\Http\Exceptions\MalformedUrlException
      */
     public function handle(Request $request, Closure $next)
     {

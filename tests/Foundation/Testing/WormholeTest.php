@@ -20,14 +20,14 @@ class WormholeTest extends TestCase
     public function testCanTravelBackToPresent()
     {
         // Preserve the timelines we want to compare the reality with...
-        $present = now();
-        $future = now()->addDays(10);
+        $present = Date::now();
+        $future = Date::now()->addDays(10);
 
         // Travel in time...
         (new Wormhole(10))->days();
 
         // Assert we are now in the future...
-        $this->assertEquals($future->format('Y-m-d'), now()->format('Y-m-d'));
+        $this->assertEquals($future->format('Y-m-d'), Date::now()->format('Y-m-d'));
 
         // Assert we can go back to the present...
         $this->assertEquals($present->format('Y-m-d'), Wormhole::back()->format('Y-m-d'));
@@ -39,7 +39,7 @@ class WormholeTest extends TestCase
         Date::use(CarbonImmutable::class);
 
         // Record what time it is in 10 days...
-        $present = now();
+        $present = Date::now();
         $future = $present->addDays(10);
 
         // Travel in time...
@@ -49,7 +49,7 @@ class WormholeTest extends TestCase
         $this->assertNotEquals($future->format('Y-m-d'), $present->format('Y-m-d'));
 
         // Assert the time travel was successful...
-        $this->assertEquals($future->format('Y-m-d'), now()->format('Y-m-d'));
+        $this->assertEquals($future->format('Y-m-d'), Date::now()->format('Y-m-d'));
     }
 
     public function testItCanTravelByMicroseconds()

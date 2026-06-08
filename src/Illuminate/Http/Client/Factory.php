@@ -12,7 +12,9 @@ use GuzzleHttp\TransferStats;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 /**
@@ -182,7 +184,48 @@ class Factory
             $headers['Content-Type'] = 'application/json';
         }
 
-        return new Psr7Response($status, $headers, $body);
+        return new Psr7Response($status, static::normalizeResponseHeaders($headers), $body);
+    }
+
+    /**
+     * Normalize the given fake response headers.
+     *
+     * @param  array  $headers
+     * @return array
+     */
+    protected static function normalizeResponseHeaders(array $headers): array
+    {
+        foreach ($headers as $name => $value) {
+            if (is_array($value)) {
+                if ($value === []) {
+                    $headers[$name] = '';
+
+                    continue;
+                }
+
+                foreach ($value as $key => $item) {
+                    $value[$key] = match (true) {
+                        $item === null => '',
+                        is_scalar($item) => (string) $item,
+                        $item instanceof Stringable => $item->toString(),
+                        default => throw new InvalidArgumentException('HTTP fake response header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.'),
+                    };
+                }
+
+                $headers[$name] = $value;
+
+                continue;
+            }
+
+            $headers[$name] = match (true) {
+                $value === null => '',
+                is_scalar($value) => (string) $value,
+                $value instanceof Stringable => $value->toString(),
+                default => throw new InvalidArgumentException('HTTP fake response header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.'),
+            };
+        }
+
+        return $headers;
     }
 
     /**
@@ -259,7 +302,7 @@ class Factory
                     $response = $response($request, $options);
                 }
 
-                if ($response instanceof PromiseInterface) {
+                if ($response instanceof PromiseInterface && ($options['on_stats'] ?? null) instanceof Closure) {
                     $options['on_stats'](new TransferStats(
                         $request->toPsrRequest(),
                         $response->wait(),

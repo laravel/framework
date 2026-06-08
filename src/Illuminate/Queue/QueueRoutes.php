@@ -1,0 +1,110 @@
+<?php
+
+namespace Illuminate\Queue;
+
+use function Illuminate\Support\enum_value;
+
+class QueueRoutes
+{
+    /**
+     * The mapping of class names to their default routes.
+     *
+     * @var array<class-string, array|string>
+     */
+    protected $routes = [];
+
+    /**
+     * Get the queue connection that a given queueable instance should be routed to.
+     *
+     * @param  object  $queueable
+     * @return string|null
+     */
+    public function getConnection($queueable)
+    {
+        $route = $this->getRoute($queueable);
+
+        if (is_null($route)) {
+            return;
+        }
+
+        return is_string($route)
+            ? null
+            : $route[0];
+    }
+
+    /**
+     * Get the queue that a given queueable instance should be routed to.
+     *
+     * @param  object  $queueable
+     * @return string|null
+     */
+    public function getQueue($queueable)
+    {
+        $route = $this->getRoute($queueable);
+
+        if (is_null($route)) {
+            return;
+        }
+
+        return is_string($route)
+            ? $route
+            : $route[1];
+    }
+
+    /**
+     * Get the route for a given queueable instance.
+     *
+     * @param  object  $queueable
+     * @return array|string|null
+     */
+    public function getRoute($queueable)
+    {
+        if (empty($this->routes)) {
+            return null;
+        }
+
+        $classes = array_merge(
+            [get_class($queueable)],
+            class_parents($queueable) ?: [],
+            class_implements($queueable) ?: [],
+            class_uses_recursive($queueable)
+        );
+
+        foreach ($classes as $class) {
+            if (isset($this->routes[$class])) {
+                return $this->routes[$class];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Register the queue route for the given class.
+     *
+     * @param  array|class-string  $class
+     * @param  \UnitEnum|string|null  $queue
+     * @param  \UnitEnum|string|null  $connection
+     * @return void
+     */
+    public function set(array|string $class, $queue = null, $connection = null)
+    {
+        $routes = is_array($class) ? $class : [$class => [$connection, $queue]];
+
+        foreach ($routes as $from => $to) {
+            $this->routes[$from] = is_array($to)
+                ? array_map(enum_value(...), $to)
+                : enum_value($to);
+        }
+    }
+
+    /**
+     * Get all registered queue routes.
+     *
+     * @return array
+     */
+    public function all()
+    {
+        return $this->routes;
+    }
+}

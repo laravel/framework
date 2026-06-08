@@ -28,7 +28,7 @@ class RateLimitedWithRedis extends RateLimited
     /**
      * Create a new middleware instance.
      *
-     * @param  string  $limiterName
+     * @param  \UnitEnum|string  $limiterName
      */
     public function __construct($limiterName, ?string $connection = null)
     {

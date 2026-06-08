@@ -4,6 +4,8 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
 use Illuminate\Database\ClassMorphViolationException;
+use Illuminate\Database\Eloquent\Attributes\Initialize;
+use Illuminate\Database\Eloquent\Attributes\Touches;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
@@ -68,6 +70,19 @@ trait HasRelationships
      * @var array
      */
     protected static $relationResolvers = [];
+
+    /**
+     * Initialize the HasRelationships trait.
+     *
+     * @return void
+     */
+    #[Initialize]
+    public function initializeHasRelationships()
+    {
+        if (empty($this->touches)) {
+            $this->touches = static::resolveClassAttribute(Touches::class, 'relations') ?? [];
+        }
+    }
 
     /**
      * Get the dynamic relation resolver if defined or inherited, or return null.
@@ -663,15 +678,17 @@ trait HasRelationships
      * Define a many-to-many relationship.
      *
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     * @template TPivotModel of \Illuminate\Database\Eloquent\Relations\Pivot = \Illuminate\Database\Eloquent\Relations\Pivot
+     * @template TPivotTable of string|null
      *
      * @param  class-string<TRelatedModel>  $related
-     * @param  string|class-string<\Illuminate\Database\Eloquent\Model>|null  $table
+     * @param  class-string<TPivotModel>|TPivotTable  $table
      * @param  string|null  $foreignPivotKey
      * @param  string|null  $relatedPivotKey
      * @param  string|null  $parentKey
      * @param  string|null  $relatedKey
      * @param  string|null  $relation
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<TRelatedModel, $this, \Illuminate\Database\Eloquent\Relations\Pivot>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<TRelatedModel, $this, TPivotModel>
      */
     public function belongsToMany(
         $related,
@@ -1002,6 +1019,8 @@ trait HasRelationships
      * Get the class name for polymorphic relations.
      *
      * @return string
+     *
+     * @throws \Illuminate\Database\ClassMorphViolationException
      */
     public function getMorphClass()
     {
@@ -1034,7 +1053,7 @@ trait HasRelationships
     {
         return tap(new $class, function ($instance) {
             if (! $instance->getConnectionName()) {
-                $instance->setConnection($this->connection);
+                $instance->setConnection($this->getConnectionName());
             }
         });
     }

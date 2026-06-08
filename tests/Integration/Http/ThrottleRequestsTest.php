@@ -142,9 +142,9 @@ class ThrottleRequestsTest extends TestCase
 
         for ($i = 0; $i < 3; $i++) {
             match ($i) {
-                0 => $this->assertSame('2000-01-01 00:00:00.000', now()->toDateTimeString('m')),
-                1 => $this->assertSame('2000-01-01 00:00:01.000', now()->toDateTimeString('m')),
-                2 => $this->assertSame('2000-01-01 00:00:02.000', now()->toDateTimeString('m')),
+                0 => $this->assertSame('2000-01-01 00:00:00.000', Carbon::now()->toDateTimeString('m')),
+                1 => $this->assertSame('2000-01-01 00:00:01.000', Carbon::now()->toDateTimeString('m')),
+                2 => $this->assertSame('2000-01-01 00:00:02.000', Carbon::now()->toDateTimeString('m')),
             };
 
             $response = $this->get('/');
@@ -153,18 +153,18 @@ class ThrottleRequestsTest extends TestCase
             $response->assertHeader('X-RateLimit-Limit', 3);
             $response->assertHeader('X-RateLimit-Remaining', 3 - ($i + 1));
 
-            Carbon::setTestNow(now()->addSecond());
+            Carbon::setTestNow(Carbon::now()->addSecond());
         }
 
         // It is now 3 seconds past and we will make another request that
         // should be rate limited.
 
-        $this->assertSame('2000-01-01 00:00:03.000', now()->toDateTimeString('m'));
+        $this->assertSame('2000-01-01 00:00:03.000', Carbon::now()->toDateTimeString('m'));
 
         $response = $this->get('/');
         $response->assertStatus(429);
         $response->assertHeader('Retry-After', 57);
-        $response->assertHeader('X-RateLimit-Reset', now()->addSeconds(57)->timestamp);
+        $response->assertHeader('X-RateLimit-Reset', Carbon::now()->addSeconds(57)->getTimestamp());
         $response->assertHeader('X-RateLimit-Limit', 3);
         $response->assertHeader('X-RateLimit-Remaining', 0);
 
@@ -176,7 +176,7 @@ class ThrottleRequestsTest extends TestCase
         $response = $this->get('/');
         $response->assertStatus(429);
         $response->assertHeader('Retry-After', 1);
-        $response->assertHeader('X-RateLimit-Reset', now()->addSeconds(1)->timestamp);
+        $response->assertHeader('X-RateLimit-Reset', Carbon::now()->addSecond()->getTimestamp());
         $response->assertHeader('X-RateLimit-Limit', 3);
         $response->assertHeader('X-RateLimit-Remaining', 0);
 
@@ -200,9 +200,9 @@ class ThrottleRequestsTest extends TestCase
 
         for ($i = 0; $i < 3; $i++) {
             match ($i) {
-                0 => $this->assertSame('2000-01-01 00:00:00.000', now()->toDateTimeString('m')),
-                1 => $this->assertSame('2000-01-01 00:00:00.100', now()->toDateTimeString('m')),
-                2 => $this->assertSame('2000-01-01 00:00:00.200', now()->toDateTimeString('m')),
+                0 => $this->assertSame('2000-01-01 00:00:00.000', Carbon::now()->toDateTimeString('m')),
+                1 => $this->assertSame('2000-01-01 00:00:00.100', Carbon::now()->toDateTimeString('m')),
+                2 => $this->assertSame('2000-01-01 00:00:00.200', Carbon::now()->toDateTimeString('m')),
             };
 
             $response = $this->get('/');
@@ -211,18 +211,18 @@ class ThrottleRequestsTest extends TestCase
             $response->assertHeader('X-RateLimit-Limit', 3);
             $response->assertHeader('X-RateLimit-Remaining', 3 - ($i + 1));
 
-            Carbon::setTestNow(now()->addMilliseconds(100));
+            Carbon::setTestNow(Carbon::now()->addMilliseconds(100));
         }
 
         // It is now 300 milliseconds past and we will make another request
         // that should be rate limited.
 
-        $this->assertSame('2000-01-01 00:00:00.300', now()->toDateTimeString('m'));
+        $this->assertSame('2000-01-01 00:00:00.300', Carbon::now()->toDateTimeString('m'));
 
         $response = $this->get('/');
         $response->assertStatus(429);
         $response->assertHeader('Retry-After', 1);
-        $response->assertHeader('X-RateLimit-Reset', now()->addSecond()->timestamp);
+        $response->assertHeader('X-RateLimit-Reset', Carbon::now()->addSecond()->getTimestamp());
         $response->assertHeader('X-RateLimit-Limit', 3);
         $response->assertHeader('X-RateLimit-Remaining', 0);
 
@@ -233,7 +233,7 @@ class ThrottleRequestsTest extends TestCase
 
         $response = $this->get('/');
         $response->assertHeader('Retry-After', 1);
-        $response->assertHeader('X-RateLimit-Reset', now()->addSecond()->timestamp);
+        $response->assertHeader('X-RateLimit-Reset', Carbon::now()->addSecond()->getTimestamp());
         $response->assertHeader('X-RateLimit-Limit', 3);
         $response->assertHeader('X-RateLimit-Remaining', 0);
 
@@ -260,27 +260,27 @@ class ThrottleRequestsTest extends TestCase
 
         for ($i = 0; $i < 3; $i++) {
             match ($i) {
-                0 => $this->assertSame('2000-01-01 00:00:00.000', now()->toDateTimeString('m')),
-                1 => $this->assertSame('2000-01-01 00:00:00.100', now()->toDateTimeString('m')),
-                2 => $this->assertSame('2000-01-01 00:00:00.200', now()->toDateTimeString('m')),
+                0 => $this->assertSame('2000-01-01 00:00:00.000', Carbon::now()->toDateTimeString('m')),
+                1 => $this->assertSame('2000-01-01 00:00:00.100', Carbon::now()->toDateTimeString('m')),
+                2 => $this->assertSame('2000-01-01 00:00:00.200', Carbon::now()->toDateTimeString('m')),
             };
 
             $response = $this->get('/');
             $response->assertOk();
             $response->assertContent('ok');
 
-            Carbon::setTestNow(now()->addMilliseconds(100));
+            Carbon::setTestNow(Carbon::now()->addMilliseconds(100));
         }
 
         // It is now 300 milliseconds past and we will make another request
         // that should be rate limited.
 
-        $this->assertSame('2000-01-01 00:00:00.300', now()->toDateTimeString('m'));
+        $this->assertSame('2000-01-01 00:00:00.300', Carbon::now()->toDateTimeString('m'));
 
         $response = $this->get('/');
         $response->assertStatus(429);
         $response->assertHeader('Retry-After', 1);
-        $response->assertHeader('X-RateLimit-Reset', now()->addSecond()->timestamp);
+        $response->assertHeader('X-RateLimit-Reset', Carbon::now()->addSecond()->getTimestamp());
         $response->assertHeader('X-RateLimit-Limit', 3);
         $response->assertHeader('X-RateLimit-Remaining', 0);
 
@@ -291,7 +291,7 @@ class ThrottleRequestsTest extends TestCase
 
         $response = $this->get('/');
         $response->assertHeader('Retry-After', 1);
-        $response->assertHeader('X-RateLimit-Reset', now()->addSecond()->timestamp);
+        $response->assertHeader('X-RateLimit-Reset', Carbon::now()->addSecond()->getTimestamp());
         $response->assertHeader('X-RateLimit-Limit', 3);
         $response->assertHeader('X-RateLimit-Remaining', 0);
 
@@ -301,25 +301,25 @@ class ThrottleRequestsTest extends TestCase
 
         for ($i = 0; $i < 2; $i++) {
             match ($i) {
-                0 => $this->assertSame('2000-01-01 00:00:01.000', now()->toDateTimeString('m')),
-                1 => $this->assertSame('2000-01-01 00:00:01.100', now()->toDateTimeString('m')),
+                0 => $this->assertSame('2000-01-01 00:00:01.000', Carbon::now()->toDateTimeString('m')),
+                1 => $this->assertSame('2000-01-01 00:00:01.100', Carbon::now()->toDateTimeString('m')),
             };
 
             $response = $this->get('/');
             $response->assertOk();
             $response->assertContent('ok');
 
-            Carbon::setTestNow(now()->addMilliseconds(100));
+            Carbon::setTestNow(Carbon::now()->addMilliseconds(100));
         }
 
         // The per minute rate limiter should now fail.
 
-        $this->assertSame('2000-01-01 00:00:01.200', now()->toDateTimeString('m'));
+        $this->assertSame('2000-01-01 00:00:01.200', Carbon::now()->toDateTimeString('m'));
 
         $response = $this->get('/');
         $response->assertStatus(429);
         $response->assertHeader('Retry-After', 59);
-        $response->assertHeader('X-RateLimit-Reset', now()->addSeconds(59)->timestamp);
+        $response->assertHeader('X-RateLimit-Reset', Carbon::now()->addSeconds(59)->getTimestamp());
         $response->assertHeader('X-RateLimit-Limit', 5);
         $response->assertHeader('X-RateLimit-Remaining', 0);
     }
@@ -412,6 +412,83 @@ class ThrottleRequestsTest extends TestCase
             $this->assertEquals(2, $e->getHeaders()['Retry-After']);
             $this->assertEquals(Carbon::now()->addSeconds(2)->getTimestamp(), $e->getHeaders()['X-RateLimit-Reset']);
         }
+    }
+
+    public function testMultipleDistinctKeysDoNotOverThrottle()
+    {
+        $rateLimiter = Container::getInstance()->make(RateLimiter::class);
+        $rateLimiter->for('test', fn () => [
+            Limit::perMinute(3)->by('minute-key'),
+            Limit::perSecond(1)->by('second-key'),
+            Limit::perDay(4)->by('day-key'),
+        ]);
+        Route::get('/', fn () => 'ok')->middleware(ThrottleRequests::using('test'));
+
+        // Running 2 requests in a single second is not allowed.
+        Carbon::setTestNow('2000-01-01 00:00:00.000');
+        $this->get('/')->assertOk();
+        $this->get('/')->assertStatus(429);
+
+        // After a second, the per-second limit should resets.
+        Carbon::setTestNow('2000-01-01 00:00:01.000');
+        $this->get('/')->assertOk();
+        $this->get('/')->assertStatus(429);
+
+        // A third request is allowed in the same minute.
+        Carbon::setTestNow('2000-01-01 00:00:02.000');
+        $this->get('/')->assertOk();
+
+        // A fourth request is not allowed in the same minute.
+        Carbon::setTestNow('2000-01-01 00:00:03.000');
+        $this->get('/')->assertStatus(429);
+
+        // A fourth request is allowed in the same day, but not a fifth.
+        Carbon::setTestNow('2000-01-01 01:00:00.000');
+        $this->get('/')->assertOk();
+        $this->get('/')->assertStatus(429);
+
+        // The next day, all limits should reset.
+        Carbon::setTestNow('2000-01-02 00:01:00.000');
+        $this->get('/')->assertOk();
+        Carbon::setTestNow('2000-01-02 00:01:01.000');
+        $this->get('/')->assertOk();
+        Carbon::setTestNow('2000-01-02 00:01:02.000');
+        $this->get('/')->assertOk();
+        Carbon::setTestNow('2000-01-02 00:01:03.000');
+        $this->get('/')->assertStatus(429);
+        Carbon::setTestNow('2000-01-02 01:00:00.000');
+        $this->get('/')->assertOk();
+        $this->get('/')->assertStatus(429);
+    }
+
+    public function testLimitOrderDoesNotAffectBehavior()
+    {
+        $rateLimiter = Container::getInstance()->make(RateLimiter::class);
+        $rateLimiter->for('test', fn () => [
+            Limit::perDay(4)->by('day-key'),
+            Limit::perMinute(3)->by('minute-key'),
+        ]);
+        Route::get('/', fn () => 'ok')->middleware(ThrottleRequests::using('test'));
+
+        Carbon::setTestNow('2000-01-01 00:00:00.000');
+
+        // Make 3 requests, each a second apart, that should all be successful.
+        for ($i = 0; $i < 3; $i++) {
+            $this->get('/')->assertOk();
+            Carbon::setTestNow(Carbon::now()->addSecond());
+        }
+
+        $this->assertSame('2000-01-01 00:00:03.000', Carbon::now()->toDateTimeString('m'));
+        $this->get('/')->assertStatus(429);
+
+        // A fourth request is allowed in the same day but not a fifth.
+        Carbon::setTestNow('2000-01-01 00:01:00.000');
+        $this->get('/')->assertOk();
+        $this->get('/')->assertStatus(429);
+
+        // After a day, both limits should reset.
+        Carbon::setTestNow('2000-01-02 00:00:00.000');
+        $this->get('/')->assertOk();
     }
 
     public function testItCanThrottleBasedOnResponse()

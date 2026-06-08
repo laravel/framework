@@ -729,6 +729,7 @@ trait QueriesRelationships
      * @param  string  $boolean
      * @return $this
      *
+     * @throws \InvalidArgumentException
      * @throws \Illuminate\Database\Eloquent\RelationNotFoundException
      */
     public function whereBelongsTo($related, $relationshipName = null, $boolean = 'and')
@@ -774,8 +775,6 @@ trait QueriesRelationships
      * @param  \Illuminate\Database\Eloquent\Model  $related
      * @param  string|null  $relationshipName
      * @return $this
-     *
-     * @throws \RuntimeException
      */
     public function orWhereBelongsTo($related, $relationshipName = null)
     {
@@ -790,6 +789,7 @@ trait QueriesRelationships
      * @param  string  $boolean
      * @return $this
      *
+     * @throws \InvalidArgumentException
      * @throws \Illuminate\Database\Eloquent\RelationNotFoundException
      */
     public function whereAttachedTo($related, $relationshipName = null, $boolean = 'and')

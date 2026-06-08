@@ -46,9 +46,7 @@ abstract class Type extends JsonSchema
      */
     public function required(bool $required = true): static
     {
-        if ($required) {
-            $this->required = true;
-        }
+        $this->required = $required ?: null;
 
         return $this;
     }
@@ -58,9 +56,7 @@ abstract class Type extends JsonSchema
      */
     public function nullable(bool $nullable = true): static
     {
-        if ($nullable) {
-            $this->nullable = true;
-        }
+        $this->nullable = $nullable ?: null;
 
         return $this;
     }

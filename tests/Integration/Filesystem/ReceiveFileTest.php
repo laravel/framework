@@ -26,7 +26,7 @@ class ReceiveFileTest extends TestCase
 
     public function testItCanReceiveAFile()
     {
-        $result = Storage::temporaryUploadUrl('receive-file-test.txt', now()->addMinutes(1));
+        $result = Storage::temporaryUploadUrl('receive-file-test.txt', Carbon::now()->addMinute());
 
         $response = $this->call('PUT', $result['url'], [], [], [], [], 'Hello World');
 
@@ -36,7 +36,7 @@ class ReceiveFileTest extends TestCase
 
     public function testItWill403OnWrongSignature()
     {
-        $result = Storage::temporaryUploadUrl('receive-file-test.txt', now()->addMinutes(1));
+        $result = Storage::temporaryUploadUrl('receive-file-test.txt', Carbon::now()->addMinute());
 
         $url = $result['url'].'c';
 
@@ -48,7 +48,7 @@ class ReceiveFileTest extends TestCase
 
     public function testItWill403OnExpiredUrl()
     {
-        $result = Storage::temporaryUploadUrl('receive-file-test.txt', now()->subMinutes(1));
+        $result = Storage::temporaryUploadUrl('receive-file-test.txt', Carbon::now()->subMinute());
 
         $response = $this->call('PUT', $result['url'], [], [], [], [], 'Hello World');
 
@@ -60,7 +60,7 @@ class ReceiveFileTest extends TestCase
     {
         Storage::put('receive-file-test.txt', 'Original Content');
 
-        $downloadUrl = Storage::temporaryUrl('receive-file-test.txt', now()->addMinutes(1));
+        $downloadUrl = Storage::temporaryUrl('receive-file-test.txt', Carbon::now()->addMinute());
 
         $response = $this->call('PUT', $downloadUrl, [], [], [], [], 'Malicious Content');
 
@@ -72,7 +72,7 @@ class ReceiveFileTest extends TestCase
     {
         Storage::put('receive-file-test.txt', 'Secret Content');
 
-        $uploadUrl = Storage::temporaryUploadUrl('receive-file-test.txt', now()->addMinutes(1));
+        $uploadUrl = Storage::temporaryUploadUrl('receive-file-test.txt', Carbon::now()->addMinute());
 
         $response = $this->get($uploadUrl['url']);
 

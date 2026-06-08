@@ -79,7 +79,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface patch(string $url, array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable $data = [])
  * @method static \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface put(string $url, array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable $data = [])
  * @method static \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface delete(string $url, array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable $data = [])
- * @method static array pool(callable $callback, int|null $concurrency = null)
+ * @method static array pool(callable $callback, int|null $concurrency = 0)
  * @method static \Illuminate\Http\Client\Batch batch(callable $callback)
  * @method static \Illuminate\Http\Client\Response|\Illuminate\Http\Client\Promises\LazyPromise send(string $method, string $url, array $options = [])
  * @method static \GuzzleHttp\Client buildClient()

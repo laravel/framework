@@ -10,8 +10,11 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Sleep;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
+use RuntimeException;
 
+#[RequiresPhpExtension('redis')]
 class RedisStoreTest extends TestCase
 {
     use InteractsWithRedis;
@@ -105,7 +108,7 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->tags(['people', 'author'])->put('name', 'Sally', 5);
         Cache::store('redis')->tags(['people', 'author'])->put('age', 30, 5);
 
-        $this->assertEquals('Sally', Cache::store('redis')->tags(['people', 'author'])->get('name'));
+        $this->assertSame('Sally', Cache::store('redis')->tags(['people', 'author'])->get('name'));
         $this->assertEquals(30, Cache::store('redis')->tags(['people', 'author'])->get('age'));
 
         Cache::store('redis')->tags(['people', 'author'])->flush();
@@ -121,7 +124,7 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->tags(['people', 'author'])->forever('name', 'Sally');
         Cache::store('redis')->tags(['people', 'author'])->forever('age', 30);
 
-        $this->assertEquals('Sally', Cache::store('redis')->tags(['people', 'author'])->get('name'));
+        $this->assertSame('Sally', Cache::store('redis')->tags(['people', 'author'])->get('name'));
         $this->assertEquals(30, Cache::store('redis')->tags(['people', 'author'])->get('age'));
 
         Cache::store('redis')->tags(['people', 'author'])->flush();
@@ -195,7 +198,7 @@ class RedisStoreTest extends TestCase
 
         Cache::store('redis')->tags(['artist'])->flush();
 
-        $this->assertEquals('Sally', Cache::store('redis')->tags(['people', 'author'])->get('person-1'));
+        $this->assertSame('Sally', Cache::store('redis')->tags(['people', 'author'])->get('person-1'));
         $this->assertNull(Cache::store('redis')->tags(['people', 'artist'])->get('person-2'));
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
@@ -237,7 +240,7 @@ class RedisStoreTest extends TestCase
             'norf' => null,
         ], $store->many(['foo', 'fizz', 'quz', 'norf']));
 
-        $this->assertEquals([], $store->many([]));
+        $this->assertSame([], $store->many([]));
     }
 
     public function testPutManyCallsPutWhenClustered()
@@ -282,9 +285,9 @@ class RedisStoreTest extends TestCase
             Cache::store('redis')->tags($tags)->put("key:{$i}", "value:{$i}", 300);
         }
 
-        $this->assertEquals('value:1', Cache::store('redis')->tags($tags)->get('key:1'));
-        $this->assertEquals('value:2500', Cache::store('redis')->tags($tags)->get('key:2500'));
-        $this->assertEquals('value:5000', Cache::store('redis')->tags($tags)->get('key:5000'));
+        $this->assertSame('value:1', Cache::store('redis')->tags($tags)->get('key:1'));
+        $this->assertSame('value:2500', Cache::store('redis')->tags($tags)->get('key:2500'));
+        $this->assertSame('value:5000', Cache::store('redis')->tags($tags)->get('key:5000'));
 
         Cache::store('redis')->tags($tags)->flush();
 
@@ -294,5 +297,75 @@ class RedisStoreTest extends TestCase
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
         $this->assertCount(0, $keyCount);
+    }
+
+    public function testLocksCanBeFlushed()
+    {
+        /** @var \Illuminate\Cache\RedisStore $store */
+        $store = Cache::store('redis');
+        if (! $store->hasSeparateLockStore()) {
+            $this->markTestSkipped('A separate Redis lock connection is required to test flushing locks.');
+        }
+        $store->flush();
+
+        $store->lock('lock-1', 60)->acquire();
+        $store->lock('lock-2', 60)->acquire();
+        $store->lock('lock-3', 60)->acquire();
+
+        $this->assertTrue($store->flushLocks());
+
+        $this->assertTrue($store->lock('lock-1', 60)->acquire());
+        $this->assertTrue($store->lock('lock-2', 60)->acquire());
+        $this->assertTrue($store->lock('lock-3', 60)->acquire());
+    }
+
+    public function testFlushLocksDoesNotAffectNonLockKeys()
+    {
+        /** @var \Illuminate\Cache\RedisStore $store */
+        $store = Cache::store('redis');
+        if (! $store->hasSeparateLockStore()) {
+            $this->markTestSkipped('A separate Redis lock connection is required to test flushing locks.');
+        }
+        $store->flush();
+
+        $store->put('foo', 'bar', 60);
+        $store->lock('lock-1', 60)->acquire();
+
+        $store->flushLocks();
+
+        $this->assertSame('bar', $store->get('foo'));
+    }
+
+    public function testHasSeparateLockStoreReturnsTrueWhenLockConnectionDiffers()
+    {
+        /** @var \Illuminate\Cache\RedisStore $store */
+        $store = Cache::store('redis');
+        if (! $store->hasSeparateLockStore()) {
+            $this->markTestSkipped('A separate Redis lock connection is required to test flushing locks.');
+        }
+
+        $this->assertTrue($store->hasSeparateLockStore());
+    }
+
+    public function testHasSeparateLockStoreReturnsFalseWhenLockConnectionIsSame()
+    {
+        /** @var \Illuminate\Cache\RedisStore $store */
+        $store = Cache::store('redis');
+        $store->setConnection('default');
+        $store->setLockConnection('default');
+
+        $this->assertFalse($store->hasSeparateLockStore());
+    }
+
+    public function testFlushLocksThrowsExceptionWhenLockConnectionIsSame()
+    {
+        /** @var \Illuminate\Cache\RedisStore $store */
+        $store = Cache::store('redis');
+        $store->setConnection('default');
+        $store->setLockConnection('default');
+
+        $this->expectException(RuntimeException::class);
+
+        $store->flushLocks();
     }
 }

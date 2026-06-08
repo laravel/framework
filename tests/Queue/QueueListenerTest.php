@@ -10,7 +10,6 @@ use Symfony\Component\Process\Process;
 
 use function Illuminate\Support\artisan_binary;
 use function Illuminate\Support\php_binary;
-use function Orchestra\Testbench\package_version_compare;
 
 class QueueListenerTest extends TestCase
 {
@@ -45,7 +44,7 @@ class QueueListenerTest extends TestCase
         $process = $listener->makeProcess('connection', 'queue', $options);
         $escape = $escapeMsys = '\\' === DIRECTORY_SEPARATOR ? '' : '\'';
 
-        if (package_version_compare('symfony/process', '7.4.5', '>=') && windows_os()) {
+        if (windows_os()) {
             $escapeMsys = '"';
         }
 
@@ -67,7 +66,7 @@ class QueueListenerTest extends TestCase
         $process = $listener->makeProcess('connection', 'queue', $options);
         $escape = $escapeMsys = '\\' === DIRECTORY_SEPARATOR ? '' : '\'';
 
-        if (package_version_compare('symfony/process', '7.4.5', '>=') && windows_os()) {
+        if (windows_os()) {
             $escapeMsys = '"';
         }
 
@@ -89,7 +88,7 @@ class QueueListenerTest extends TestCase
         $process = $listener->makeProcess(null, 'queue', $options);
         $escape = $escapeMsys = '\\' === DIRECTORY_SEPARATOR ? '' : '\'';
 
-        if (package_version_compare('symfony/process', '7.4.5', '>=') && windows_os()) {
+        if (windows_os()) {
             $escapeMsys = '"';
         }
 

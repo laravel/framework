@@ -51,7 +51,7 @@ class MemcachedConnector
             $this->setCredentials($memcached, $credentials);
         }
 
-        if (count($options)) {
+        if ($options !== []) {
             $memcached->setOptions($options);
         }
 

@@ -14,6 +14,8 @@ class AsBinary implements Castable
      *
      * @param  array{string}  $arguments
      * @return \Illuminate\Contracts\Database\Eloquent\CastsAttributes
+     *
+     * @throws \InvalidArgumentException
      */
     public static function castUsing(array $arguments)
     {

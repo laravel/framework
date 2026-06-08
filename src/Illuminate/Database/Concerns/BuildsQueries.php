@@ -18,6 +18,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use InvalidArgumentException;
 use RuntimeException;
+use SortDirection;
 
 /**
  * @template TValue
@@ -144,7 +145,7 @@ trait BuildsQueries
      */
     public function chunkByIdDesc($count, callable $callback, $column = null, $alias = null)
     {
-        return $this->orderedChunkById($count, $callback, $column, $alias, descending: true);
+        return $this->orderedChunkById($count, $callback, $column, $alias, descending: SortDirection::Descending);
     }
 
     /**
@@ -154,7 +155,7 @@ trait BuildsQueries
      * @param  callable(\Illuminate\Support\Collection<int, TValue>, int): mixed  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
-     * @param  bool  $descending
+     * @param  SortDirection|bool  $descending
      * @return bool
      *
      * @throws \RuntimeException
@@ -185,11 +186,10 @@ trait BuildsQueries
             // We'll execute the query for the given page and get the results. If there are
             // no results we can just break and return from here. When there are results
             // we will call the callback with the current chunk of these results here.
-            if ($descending) {
-                $results = $clone->forPageBeforeId($limit, $lastId, $column)->get();
-            } else {
-                $results = $clone->forPageAfterId($limit, $lastId, $column)->get();
-            }
+            $results = match ($descending) {
+                SortDirection::Ascending, false => $clone->forPageAfterId($limit, $lastId, $column)->get(),
+                SortDirection::Descending, true => $clone->forPageBeforeId($limit, $lastId, $column)->get(),
+            };
 
             $countResults = $results->count();
 
@@ -302,7 +302,7 @@ trait BuildsQueries
      */
     public function lazyByIdDesc($chunkSize = 1000, $column = null, $alias = null)
     {
-        return $this->orderedLazyById($chunkSize, $column, $alias, true);
+        return $this->orderedLazyById($chunkSize, $column, $alias, SortDirection::Descending);
     }
 
     /**
@@ -311,10 +311,11 @@ trait BuildsQueries
      * @param  int  $chunkSize
      * @param  string|null  $column
      * @param  string|null  $alias
-     * @param  bool  $descending
+     * @param  SortDirection|bool  $descending
      * @return \Illuminate\Support\LazyCollection
      *
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     protected function orderedLazyById($chunkSize = 1000, $column = null, $alias = null, $descending = false)
     {
@@ -332,11 +333,10 @@ trait BuildsQueries
             while (true) {
                 $clone = clone $this;
 
-                if ($descending) {
-                    $results = $clone->forPageBeforeId($chunkSize, $lastId, $column)->get();
-                } else {
-                    $results = $clone->forPageAfterId($chunkSize, $lastId, $column)->get();
-                }
+                $results = match ($descending) {
+                    SortDirection::Ascending, false => $clone->forPageAfterId($chunkSize, $lastId, $column)->get(),
+                    SortDirection::Descending, true => $clone->forPageBeforeId($chunkSize, $lastId, $column)->get(),
+                };
 
                 foreach ($results as $result) {
                     yield $result;
@@ -549,9 +549,9 @@ trait BuildsQueries
      */
     protected function paginator($items, $total, $perPage, $currentPage, $options)
     {
-        return Container::getInstance()->makeWith(LengthAwarePaginator::class, compact(
-            'items', 'total', 'perPage', 'currentPage', 'options'
-        ));
+        return Container::getInstance()->makeWith(LengthAwarePaginator::class, [
+            'items' => $items, 'total' => $total, 'perPage' => $perPage, 'currentPage' => $currentPage, 'options' => $options,
+        ]);
     }
 
     /**
@@ -565,9 +565,9 @@ trait BuildsQueries
      */
     protected function simplePaginator($items, $perPage, $currentPage, $options)
     {
-        return Container::getInstance()->makeWith(Paginator::class, compact(
-            'items', 'perPage', 'currentPage', 'options'
-        ));
+        return Container::getInstance()->makeWith(Paginator::class, [
+            'items' => $items, 'perPage' => $perPage, 'currentPage' => $currentPage, 'options' => $options,
+        ]);
     }
 
     /**
@@ -581,9 +581,9 @@ trait BuildsQueries
      */
     protected function cursorPaginator($items, $perPage, $cursor, $options)
     {
-        return Container::getInstance()->makeWith(CursorPaginator::class, compact(
-            'items', 'perPage', 'cursor', 'options'
-        ));
+        return Container::getInstance()->makeWith(CursorPaginator::class, [
+            'items' => $items, 'perPage' => $perPage, 'cursor' => $cursor, 'options' => $options,
+        ]);
     }
 
     /**

@@ -48,6 +48,21 @@ class JsonApiResourceTest extends TestCase
             ->assertJsonMissing(['jsonapi', 'included']);
     }
 
+    public function testItCanGenerateJsonApiResponseWithEmptySparseFieldsets()
+    {
+        $user = User::factory()->create();
+
+        $this->getJson("/users/{$user->getKey()}?".http_build_query(['fields' => ['users' => '']]))
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertExactJson([
+                'data' => [
+                    'id' => (string) $user->getKey(),
+                    'type' => 'users',
+                ],
+            ])
+            ->assertJsonMissing(['jsonapi', 'included']);
+    }
+
     public function testItCanGenerateJsonApiResponseWithEmptyRelationshipsUsingSparseIncluded()
     {
         $user = User::factory()->create();

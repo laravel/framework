@@ -15,7 +15,8 @@ class ListFailedCommand extends Command
      *
      * @var string
      */
-    protected $name = 'queue:failed';
+    protected $signature = 'queue:failed
+                            {--json : Output the failed jobs as JSON}';
 
     /**
      * The console command description.
@@ -38,7 +39,13 @@ class ListFailedCommand extends Command
      */
     public function handle()
     {
-        if (count($jobs = $this->getFailedJobs()) === 0) {
+        $jobs = $this->getFailedJobs();
+
+        if ($this->option('json')) {
+            return $this->displayFailedJobsAsJson($jobs);
+        }
+
+        if (count($jobs) === 0) {
             return $this->components->info('No failed jobs found.');
         }
 
@@ -129,5 +136,22 @@ class ListFailedCommand extends Command
                 sprintf('<fg=gray>%s@%s</> %s', $job[1], $job[2], $job[3])
             ),
         );
+    }
+
+    /**
+     * Display the failed jobs as JSON.
+     *
+     * @param  array  $jobs
+     * @return void
+     */
+    protected function displayFailedJobsAsJson(array $jobs)
+    {
+        $this->output->writeln((new Collection($jobs))->values()->map(fn ($job) => [
+            'id' => $job[0],
+            'connection' => $job[1],
+            'queue' => $job[2],
+            'class' => $job[3],
+            'failed_at' => $job[4],
+        ])->toJson());
     }
 }

@@ -61,7 +61,7 @@ class Serializer
                     ))
                 );
 
-                if (count($required) > 0) {
+                if ($required !== []) {
                     $attributes['required'] = $required;
                 }
 

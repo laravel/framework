@@ -230,7 +230,7 @@ class Password implements DataAwareRule, ImplicitRule, IteratorAggregate, Rule, 
      * Set the minimum size of the password.
      *
      * @param  int  $size
-     * @return $this
+     * @return static
      */
     public static function min($size)
     {
@@ -429,6 +429,39 @@ class Password implements DataAwareRule, ImplicitRule, IteratorAggregate, Rule, 
             'compromisedThreshold' => $this->compromisedThreshold,
             'customRules' => $this->customRules,
         ];
+    }
+
+    /**
+     * Convert the password rule to a passwordrules HTML attribute string.
+     *
+     * @return string
+     *
+     * @see https://developer.apple.com/password-rules/
+     */
+    public function toPasswordRulesString()
+    {
+        $rules = ['minlength: '.$this->min];
+
+        if ($this->max) {
+            $rules[] = 'maxlength: '.$this->max;
+        }
+
+        if ($this->mixedCase) {
+            $rules[] = 'required: lower';
+            $rules[] = 'required: upper';
+        } elseif ($this->letters) {
+            $rules[] = 'required: lower';
+        }
+
+        if ($this->numbers) {
+            $rules[] = 'required: digit';
+        }
+
+        if ($this->symbols) {
+            $rules[] = 'required: special';
+        }
+
+        return implode('; ', $rules).';';
     }
 
     /**

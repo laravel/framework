@@ -3,10 +3,11 @@
 namespace Illuminate\Cache;
 
 use BadMethodCallException;
+use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 
-class MemoizedStore implements LockProvider, Store
+class MemoizedStore implements CanFlushLocks, LockProvider, Store
 {
     /**
      * The memoized cache values.
@@ -66,7 +67,7 @@ class MemoizedStore implements LockProvider, Store
             }
         }
 
-        if (count($missing) > 0) {
+        if ($missing !== []) {
             $retrieved = tap($this->repository->many($missing), function ($values) {
                 foreach ($values as $key => $value) {
                     $this->cache[$this->prefix($key)] = $value;
@@ -105,7 +106,6 @@ class MemoizedStore implements LockProvider, Store
     /**
      * Store multiple items in the cache for a given number of seconds.
      *
-     * @param  array  $values
      * @param  int  $seconds
      * @return bool
      */
@@ -167,6 +167,8 @@ class MemoizedStore implements LockProvider, Store
      * @param  int  $seconds
      * @param  string|null  $owner
      * @return \Illuminate\Contracts\Cache\Lock
+     *
+     * @throws \BadMethodCallException
      */
     public function lock($name, $seconds = 0, $owner = null)
     {
@@ -183,6 +185,8 @@ class MemoizedStore implements LockProvider, Store
      * @param  string  $name
      * @param  string  $owner
      * @return \Illuminate\Contracts\Cache\Lock
+     *
+     * @throws \BadMethodCallException
      */
     public function restoreLock($name, $owner)
     {
@@ -191,6 +195,46 @@ class MemoizedStore implements LockProvider, Store
         }
 
         return $this->repository->getStore()->restoreLock(...func_get_args());
+    }
+
+    /**
+     * Flush all locks managed by the store.
+     *
+     * @throws \BadMethodCallException
+     */
+    public function flushLocks(): bool
+    {
+        $store = $this->repository->getStore();
+
+        if (! $store instanceof CanFlushLocks) {
+            throw new BadMethodCallException('This cache store does not support flushing locks.');
+        }
+
+        return $store->flushLocks();
+    }
+
+    /**
+     * Determine if the lock store is separate from the cache store.
+     */
+    public function hasSeparateLockStore(): bool
+    {
+        $store = $this->repository->getStore();
+
+        return $store instanceof CanFlushLocks && $store->hasSeparateLockStore();
+    }
+
+    /**
+     * Adjust the expiration time of a cached item.
+     *
+     * @param  string  $key
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function touch($key, $seconds)
+    {
+        unset($this->cache[$this->prefix($key)]);
+
+        return $this->repository->touch($key, $seconds);
     }
 
     /**

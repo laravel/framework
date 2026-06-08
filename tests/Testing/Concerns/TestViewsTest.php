@@ -44,8 +44,6 @@ class TestViewsTest extends TestCase
 
         unset($_SERVER['LARAVEL_PARALLEL_TESTING']);
 
-        m::close();
-
         parent::tearDown();
     }
 

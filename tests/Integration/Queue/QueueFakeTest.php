@@ -46,7 +46,7 @@ class QueueFakeTest extends TestCase
             return 'test-value';
         });
 
-        $this->assertEquals('test-value', $result);
+        $this->assertSame('test-value', $result);
     }
 
     public function testFakeExceptForReturnValue()
@@ -55,7 +55,7 @@ class QueueFakeTest extends TestCase
             return 'test-value';
         }, []);
 
-        $this->assertEquals('test-value', $result);
+        $this->assertSame('test-value', $result);
     }
 }
 

@@ -793,7 +793,7 @@ class SchemaBuilderTest extends DatabaseTestCase
     {
         Schema::macro('foo', fn () => 'foo');
 
-        $this->assertEquals('foo', Schema::foo());
+        $this->assertSame('foo', Schema::foo());
 
         Schema::macro('hasForeignKeyForColumn', function (string $column, string $table, string $foreignTable) {
             return collect(Schema::getForeignKeys($table))

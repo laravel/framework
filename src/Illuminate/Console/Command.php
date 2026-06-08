@@ -2,9 +2,16 @@
 
 namespace Illuminate\Console;
 
+use Illuminate\Console\Attributes\Aliases;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Help;
+use Illuminate\Console\Attributes\Hidden;
+use Illuminate\Console\Attributes\Signature;
+use Illuminate\Console\Attributes\Usage;
 use Illuminate\Console\View\Components\Factory;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Support\Traits\Macroable;
+use ReflectionClass;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -89,6 +96,8 @@ class Command extends SymfonyCommand
      */
     public function __construct()
     {
+        $this->configureFromAttributes();
+
         // We will go ahead and set the name, description, and parameters on console
         // commands just to make things a little easier on the developer. This is
         // so they don't have to all be manually specified in the constructors.
@@ -97,6 +106,8 @@ class Command extends SymfonyCommand
         } else {
             parent::__construct($this->name);
         }
+
+        $this->configureUsageFromAttribute();
 
         // Once we have constructed the command, we'll set the description and other
         // related properties of the command. If a signature wasn't used to build
@@ -121,6 +132,64 @@ class Command extends SymfonyCommand
 
         if ($this instanceof Isolatable) {
             $this->configureIsolation();
+        }
+    }
+
+    /**
+     * Configure the command from class attributes.
+     *
+     * @return void
+     */
+    protected function configureFromAttributes()
+    {
+        $reflection = new ReflectionClass($this);
+
+        $signature = $reflection->getAttributes(Signature::class);
+
+        if ($signature !== []) {
+            $signatureInstance = $signature[0]->newInstance();
+
+            $this->signature = $signatureInstance->signature;
+
+            if ($signatureInstance->aliases !== null) {
+                $this->aliases = $signatureInstance->aliases;
+            }
+        }
+
+        $description = $reflection->getAttributes(Description::class);
+
+        if ($description !== []) {
+            $this->description = $description[0]->newInstance()->description;
+        }
+
+        $help = $reflection->getAttributes(Help::class);
+
+        if ($help !== []) {
+            $this->help = $help[0]->newInstance()->help;
+        }
+
+        if ($reflection->getAttributes(Hidden::class) !== []) {
+            $this->hidden = true;
+        }
+
+        $aliases = $reflection->getAttributes(Aliases::class);
+
+        if ($aliases !== []) {
+            $this->aliases = $aliases[0]->newInstance()->aliases;
+        }
+    }
+
+    /**
+     * Configure usage examples for the command from class attributes.
+     *
+     * @return void
+     */
+    protected function configureUsageFromAttribute()
+    {
+        $reflection = new ReflectionClass($this);
+
+        foreach ($reflection->getAttributes(Usage::class) as $usage) {
+            $this->addUsage($usage->newInstance()->usage);
         }
     }
 

@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Cache;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Support\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -120,7 +121,7 @@ class CacheRateLimiterTest extends TestCase
     public function testAvailableInReturnsPositiveValues()
     {
         $cache = m::mock(Cache::class);
-        $cache->shouldReceive('get')->andReturn(now()->subSeconds(60)->getTimestamp(), null);
+        $cache->shouldReceive('get')->andReturn(Carbon::now()->subMinute()->getTimestamp(), null);
         $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
         $rateLimiter = new RateLimiter($cache);
 

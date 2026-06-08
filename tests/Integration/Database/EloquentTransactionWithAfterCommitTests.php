@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Orchestra\Testbench\Concerns\WithLaravelMigrations;
 use Orchestra\Testbench\Factories\UserFactory;
@@ -225,7 +226,7 @@ class EloquentTransactionWithAfterCommitTestsJob implements ShouldQueue
     {
         DB::transaction(function () {
             DB::table('password_reset_tokens')->insert([
-                ['email' => $this->email, 'token' => sha1($this->email), 'created_at' => now()],
+                ['email' => $this->email, 'token' => sha1($this->email), 'created_at' => Carbon::now()],
             ]);
         });
     }

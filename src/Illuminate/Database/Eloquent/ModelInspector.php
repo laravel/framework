@@ -49,7 +49,7 @@ class ModelInspector
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Model>|string  $model
      * @param  string|null  $connection
-     * @return array{"class": class-string<\Illuminate\Database\Eloquent\Model>, database: string, table: string, policy: class-string|null, attributes: \Illuminate\Support\Collection, relations: \Illuminate\Support\Collection, events: \Illuminate\Support\Collection, observers: \Illuminate\Support\Collection, collection: class-string<\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>>, builder: class-string<\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>>, "resource": class-string<\Illuminate\Http\Resources\Json\JsonResource>|null}
+     * @return \Illuminate\Database\Eloquent\ModelInfo
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
@@ -64,19 +64,19 @@ class ModelInspector
             $model->setConnection($connection);
         }
 
-        return [
-            'class' => get_class($model),
-            'database' => $model->getConnection()->getName(),
-            'table' => $model->getConnection()->getTablePrefix().$model->getTable(),
-            'policy' => $this->getPolicy($model),
-            'attributes' => $this->getAttributes($model),
-            'relations' => $this->getRelations($model),
-            'events' => $this->getEvents($model),
-            'observers' => $this->getObservers($model),
-            'collection' => $this->getCollectedBy($model),
-            'builder' => $this->getBuilder($model),
-            'resource' => $this->getResource($model),
-        ];
+        return new ModelInfo(
+            class: $model::class,
+            database: $model->getConnection()->getName(),
+            table: $model->getConnection()->getTablePrefix().$model->getTable(),
+            policy: $this->getPolicy($model),
+            attributes: $this->getAttributes($model),
+            relations: $this->getRelations($model),
+            events: $this->getEvents($model),
+            observers: $this->getObservers($model),
+            collection: $this->getCollectedBy($model),
+            builder: $this->getBuilder($model),
+            resource: $this->getResource($model),
+        );
     }
 
     /**

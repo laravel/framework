@@ -23,7 +23,7 @@ use Orchestra\Testbench\TestCase;
 use Throwable;
 
 #[WithConfig('cache.default', 'redis')]
-#[WithConfig('cache.prefix', 'laravel_cache_')]
+#[WithConfig('cache.prefix', 'laravel-cache-')]
 class MemoizedStoreTest extends TestCase
 {
     use InteractsWithRedis;
@@ -143,16 +143,16 @@ class MemoizedStoreTest extends TestCase
     {
         $live = Cache::getMultiple(['name.0', 'name.1']);
         $memoized = Cache::memo()->getMultiple(['name.0', 'name.1']);
-        $this->assertSame($live, ['name.0' => null, 'name.1' => null]);
-        $this->assertSame($memoized, ['name.0' => null, 'name.1' => null]);
+        $this->assertSame(['name.0' => null, 'name.1' => null], $live);
+        $this->assertSame(['name.0' => null, 'name.1' => null], $memoized);
 
         Cache::put('name.0', 'MacDonald', 60);
         Cache::put('name.1', 'Otwell', 60);
 
         $live = Cache::getMultiple(['name.0', 'name.1']);
         $memoized = Cache::memo()->getMultiple(['name.0', 'name.1']);
-        $this->assertSame($live, ['name.0' => 'MacDonald', 'name.1' => 'Otwell']);
-        $this->assertSame($memoized, ['name.0' => null, 'name.1' => null]);
+        $this->assertSame(['name.0' => 'MacDonald', 'name.1' => 'Otwell'], $live);
+        $this->assertSame(['name.0' => null, 'name.1' => null], $memoized);
     }
 
     public function test_it_can_retrieve_already_memoized_and_not_yet_memoized_values_when_retrieving_multiple_values()
@@ -296,7 +296,7 @@ class MemoizedStoreTest extends TestCase
 
     public function test_memoized_driver_uses_underlying_drivers_prefix()
     {
-        $this->assertSame('laravel_cache_', Cache::memo()->getPrefix());
+        $this->assertSame('laravel-cache-', Cache::memo()->getPrefix());
 
         Cache::driver('redis')->setPrefix('foo');
 
@@ -478,6 +478,11 @@ class MemoizedStoreTest extends TestCase
             public function forget($key)
             {
                 return Cache::forget(...func_get_args());
+            }
+
+            public function touch($key, $seconds)
+            {
+                return Cache::touch(...func_get_args());
             }
 
             public function flush()

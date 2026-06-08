@@ -127,7 +127,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
 
         $this->assertCount(1, $position);
         $this->assertTrue($position->first()->relationLoaded('contract'));
-        $this->assertEquals($position->first()->contract->pluck('title')->unique()->toArray(), ['A title']);
+        $this->assertEquals(['A title'], $position->first()->contract->pluck('title')->unique()->toArray());
     }
 
     public function testFirstOrFailThrowsAnException()

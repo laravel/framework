@@ -9,7 +9,7 @@ class ConfigurationUrlParser
     /**
      * The drivers aliases map.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected static $driverAliases = [
         'mssql' => 'sqlsrv',
@@ -24,8 +24,8 @@ class ConfigurationUrlParser
     /**
      * Parse the database configuration, hydrating options using a database configuration URL if possible.
      *
-     * @param  array|string  $config
-     * @return array
+     * @param  array<string, mixed>|string  $config
+     * @return array<string, mixed>
      */
     public function parseConfiguration($config)
     {
@@ -55,8 +55,8 @@ class ConfigurationUrlParser
     /**
      * Get the primary database connection options.
      *
-     * @param  array  $url
-     * @return array
+     * @param  array<string, mixed>  $url
+     * @return array<string, mixed>
      */
     protected function getPrimaryOptions($url)
     {
@@ -73,7 +73,7 @@ class ConfigurationUrlParser
     /**
      * Get the database driver from the URL.
      *
-     * @param  array  $url
+     * @param  array<string, mixed>  $url
      * @return string|null
      */
     protected function getDriver($url)
@@ -90,7 +90,7 @@ class ConfigurationUrlParser
     /**
      * Get the database name from the URL.
      *
-     * @param  array  $url
+     * @param  array<string, mixed>  $url
      * @return string|null
      */
     protected function getDatabase($url)
@@ -103,8 +103,8 @@ class ConfigurationUrlParser
     /**
      * Get all of the additional database options from the query string.
      *
-     * @param  array  $url
-     * @return array
+     * @param  array<string, mixed>  $url
+     * @return array<string, mixed>
      */
     protected function getQueryOptions($url)
     {
@@ -125,7 +125,7 @@ class ConfigurationUrlParser
      * Parse the string URL to an array of components.
      *
      * @param  string  $url
-     * @return array
+     * @return array<string, mixed>
      *
      * @throws \InvalidArgumentException
      */
@@ -170,7 +170,7 @@ class ConfigurationUrlParser
     /**
      * Get all of the current drivers' aliases.
      *
-     * @return array
+     * @return array<string, string>
      */
     public static function getDriverAliases()
     {

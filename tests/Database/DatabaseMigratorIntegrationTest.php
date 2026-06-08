@@ -89,8 +89,8 @@ class DatabaseMigratorIntegrationTest extends TestCase
     {
         $ran = $this->migrator->run([__DIR__.'/migrations/one']);
 
-        $this->assertTrue($this->db->schema()->hasTable('users'));
-        $this->assertTrue($this->db->schema()->hasTable('password_resets'));
+        $this->assertTrue($this->db::schema()->hasTable('users'));
+        $this->assertTrue($this->db::schema()->hasTable('password_resets'));
 
         $this->assertTrue(str_contains($ran[0], 'users'));
         $this->assertTrue(str_contains($ran[1], 'password_resets'));
@@ -102,12 +102,12 @@ class DatabaseMigratorIntegrationTest extends TestCase
             return $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqllite3']);
         });
 
-        $this->assertFalse($this->db->schema()->hasTable('users'));
-        $this->assertFalse($this->db->schema()->hasTable('password_resets'));
-        $this->assertTrue($this->db->schema('sqlite2')->hasTable('users'));
-        $this->assertTrue($this->db->schema('sqlite2')->hasTable('password_resets'));
-        $this->assertFalse($this->db->schema('sqlite3')->hasTable('users'));
-        $this->assertFalse($this->db->schema('sqlite3')->hasTable('password_resets'));
+        $this->assertFalse($this->db::schema()->hasTable('users'));
+        $this->assertFalse($this->db::schema()->hasTable('password_resets'));
+        $this->assertTrue($this->db::schema('sqlite2')->hasTable('users'));
+        $this->assertTrue($this->db::schema('sqlite2')->hasTable('password_resets'));
+        $this->assertFalse($this->db::schema('sqlite3')->hasTable('users'));
+        $this->assertFalse($this->db::schema('sqlite3')->hasTable('password_resets'));
 
         $this->assertTrue(Str::contains($ran[0], 'users'));
         $this->assertTrue(Str::contains($ran[1], 'password_resets'));
@@ -117,12 +117,12 @@ class DatabaseMigratorIntegrationTest extends TestCase
     {
         $ran = $this->migrator->run([__DIR__.'/migrations/connection_configured']);
 
-        $this->assertFalse($this->db->schema()->hasTable('failed_jobs'));
-        $this->assertFalse($this->db->schema()->hasTable('jobs'));
-        $this->assertFalse($this->db->schema('sqlite2')->hasTable('failed_jobs'));
-        $this->assertFalse($this->db->schema('sqlite2')->hasTable('jobs'));
-        $this->assertTrue($this->db->schema('sqlite3')->hasTable('failed_jobs'));
-        $this->assertTrue($this->db->schema('sqlite3')->hasTable('jobs'));
+        $this->assertFalse($this->db::schema()->hasTable('failed_jobs'));
+        $this->assertFalse($this->db::schema()->hasTable('jobs'));
+        $this->assertFalse($this->db::schema('sqlite2')->hasTable('failed_jobs'));
+        $this->assertFalse($this->db::schema('sqlite2')->hasTable('jobs'));
+        $this->assertTrue($this->db::schema('sqlite3')->hasTable('failed_jobs'));
+        $this->assertTrue($this->db::schema('sqlite3')->hasTable('jobs'));
 
         $this->assertTrue(Str::contains($ran[0], 'failed_jobs'));
         $this->assertTrue(Str::contains($ran[1], 'jobs'));
@@ -134,12 +134,12 @@ class DatabaseMigratorIntegrationTest extends TestCase
             return $this->migrator->run([__DIR__.'/migrations/connection_configured']);
         });
 
-        $this->assertFalse($this->db->schema()->hasTable('failed_jobs'));
-        $this->assertFalse($this->db->schema()->hasTable('jobs'));
-        $this->assertFalse($this->db->schema('sqlite2')->hasTable('failed_jobs'));
-        $this->assertFalse($this->db->schema('sqlite2')->hasTable('jobs'));
-        $this->assertTrue($this->db->schema('sqlite3')->hasTable('failed_jobs'));
-        $this->assertTrue($this->db->schema('sqlite3')->hasTable('jobs'));
+        $this->assertFalse($this->db::schema()->hasTable('failed_jobs'));
+        $this->assertFalse($this->db::schema()->hasTable('jobs'));
+        $this->assertFalse($this->db::schema('sqlite2')->hasTable('failed_jobs'));
+        $this->assertFalse($this->db::schema('sqlite2')->hasTable('jobs'));
+        $this->assertTrue($this->db::schema('sqlite3')->hasTable('failed_jobs'));
+        $this->assertTrue($this->db::schema('sqlite3')->hasTable('jobs'));
 
         $this->assertTrue(Str::contains($ran[0], 'failed_jobs'));
         $this->assertTrue(Str::contains($ran[1], 'jobs'));
@@ -148,11 +148,11 @@ class DatabaseMigratorIntegrationTest extends TestCase
     public function testMigrationsCanBeRolledBack()
     {
         $this->migrator->run([__DIR__.'/migrations/one']);
-        $this->assertTrue($this->db->schema()->hasTable('users'));
-        $this->assertTrue($this->db->schema()->hasTable('password_resets'));
+        $this->assertTrue($this->db::schema()->hasTable('users'));
+        $this->assertTrue($this->db::schema()->hasTable('password_resets'));
         $rolledBack = $this->migrator->rollback([__DIR__.'/migrations/one']);
-        $this->assertFalse($this->db->schema()->hasTable('users'));
-        $this->assertFalse($this->db->schema()->hasTable('password_resets'));
+        $this->assertFalse($this->db::schema()->hasTable('users'));
+        $this->assertFalse($this->db::schema()->hasTable('password_resets'));
 
         $this->assertTrue(str_contains($rolledBack[0], 'password_resets'));
         $this->assertTrue(str_contains($rolledBack[1], 'users'));
@@ -161,11 +161,11 @@ class DatabaseMigratorIntegrationTest extends TestCase
     public function testMigrationsCanBeResetUsingAnString()
     {
         $this->migrator->run([__DIR__.'/migrations/one']);
-        $this->assertTrue($this->db->schema()->hasTable('users'));
-        $this->assertTrue($this->db->schema()->hasTable('password_resets'));
+        $this->assertTrue($this->db::schema()->hasTable('users'));
+        $this->assertTrue($this->db::schema()->hasTable('password_resets'));
         $rolledBack = $this->migrator->reset(__DIR__.'/migrations/one');
-        $this->assertFalse($this->db->schema()->hasTable('users'));
-        $this->assertFalse($this->db->schema()->hasTable('password_resets'));
+        $this->assertFalse($this->db::schema()->hasTable('users'));
+        $this->assertFalse($this->db::schema()->hasTable('password_resets'));
 
         $this->assertTrue(str_contains($rolledBack[0], 'password_resets'));
         $this->assertTrue(str_contains($rolledBack[1], 'users'));
@@ -174,11 +174,11 @@ class DatabaseMigratorIntegrationTest extends TestCase
     public function testMigrationsCanBeResetUsingAnArray()
     {
         $this->migrator->run([__DIR__.'/migrations/one']);
-        $this->assertTrue($this->db->schema()->hasTable('users'));
-        $this->assertTrue($this->db->schema()->hasTable('password_resets'));
+        $this->assertTrue($this->db::schema()->hasTable('users'));
+        $this->assertTrue($this->db::schema()->hasTable('password_resets'));
         $rolledBack = $this->migrator->reset([__DIR__.'/migrations/one']);
-        $this->assertFalse($this->db->schema()->hasTable('users'));
-        $this->assertFalse($this->db->schema()->hasTable('password_resets'));
+        $this->assertFalse($this->db::schema()->hasTable('users'));
+        $this->assertFalse($this->db::schema()->hasTable('password_resets'));
 
         $this->assertTrue(str_contains($rolledBack[0], 'password_resets'));
         $this->assertTrue(str_contains($rolledBack[1], 'users'));
@@ -187,52 +187,52 @@ class DatabaseMigratorIntegrationTest extends TestCase
     public function testNoErrorIsThrownWhenNoOutstandingMigrationsExist()
     {
         $this->migrator->run([__DIR__.'/migrations/one']);
-        $this->assertTrue($this->db->schema()->hasTable('users'));
-        $this->assertTrue($this->db->schema()->hasTable('password_resets'));
+        $this->assertTrue($this->db::schema()->hasTable('users'));
+        $this->assertTrue($this->db::schema()->hasTable('password_resets'));
         $this->migrator->run([__DIR__.'/migrations/one']);
     }
 
     public function testNoErrorIsThrownWhenNothingToRollback()
     {
         $this->migrator->run([__DIR__.'/migrations/one']);
-        $this->assertTrue($this->db->schema()->hasTable('users'));
-        $this->assertTrue($this->db->schema()->hasTable('password_resets'));
+        $this->assertTrue($this->db::schema()->hasTable('users'));
+        $this->assertTrue($this->db::schema()->hasTable('password_resets'));
         $this->migrator->rollback([__DIR__.'/migrations/one']);
-        $this->assertFalse($this->db->schema()->hasTable('users'));
-        $this->assertFalse($this->db->schema()->hasTable('password_resets'));
+        $this->assertFalse($this->db::schema()->hasTable('users'));
+        $this->assertFalse($this->db::schema()->hasTable('password_resets'));
         $this->migrator->rollback([__DIR__.'/migrations/one']);
     }
 
     public function testMigrationsCanRunAcrossMultiplePaths()
     {
         $this->migrator->run([__DIR__.'/migrations/one', __DIR__.'/migrations/two']);
-        $this->assertTrue($this->db->schema()->hasTable('users'));
-        $this->assertTrue($this->db->schema()->hasTable('password_resets'));
-        $this->assertTrue($this->db->schema()->hasTable('flights'));
+        $this->assertTrue($this->db::schema()->hasTable('users'));
+        $this->assertTrue($this->db::schema()->hasTable('password_resets'));
+        $this->assertTrue($this->db::schema()->hasTable('flights'));
     }
 
     public function testMigrationsCanBeRolledBackAcrossMultiplePaths()
     {
         $this->migrator->run([__DIR__.'/migrations/one', __DIR__.'/migrations/two']);
-        $this->assertTrue($this->db->schema()->hasTable('users'));
-        $this->assertTrue($this->db->schema()->hasTable('password_resets'));
-        $this->assertTrue($this->db->schema()->hasTable('flights'));
+        $this->assertTrue($this->db::schema()->hasTable('users'));
+        $this->assertTrue($this->db::schema()->hasTable('password_resets'));
+        $this->assertTrue($this->db::schema()->hasTable('flights'));
         $this->migrator->rollback([__DIR__.'/migrations/one', __DIR__.'/migrations/two']);
-        $this->assertFalse($this->db->schema()->hasTable('users'));
-        $this->assertFalse($this->db->schema()->hasTable('password_resets'));
-        $this->assertFalse($this->db->schema()->hasTable('flights'));
+        $this->assertFalse($this->db::schema()->hasTable('users'));
+        $this->assertFalse($this->db::schema()->hasTable('password_resets'));
+        $this->assertFalse($this->db::schema()->hasTable('flights'));
     }
 
     public function testMigrationsCanBeResetAcrossMultiplePaths()
     {
         $this->migrator->run([__DIR__.'/migrations/one', __DIR__.'/migrations/two']);
-        $this->assertTrue($this->db->schema()->hasTable('users'));
-        $this->assertTrue($this->db->schema()->hasTable('password_resets'));
-        $this->assertTrue($this->db->schema()->hasTable('flights'));
+        $this->assertTrue($this->db::schema()->hasTable('users'));
+        $this->assertTrue($this->db::schema()->hasTable('password_resets'));
+        $this->assertTrue($this->db::schema()->hasTable('flights'));
         $this->migrator->reset([__DIR__.'/migrations/one', __DIR__.'/migrations/two']);
-        $this->assertFalse($this->db->schema()->hasTable('users'));
-        $this->assertFalse($this->db->schema()->hasTable('password_resets'));
-        $this->assertFalse($this->db->schema()->hasTable('flights'));
+        $this->assertFalse($this->db::schema()->hasTable('users'));
+        $this->assertFalse($this->db::schema()->hasTable('password_resets'));
+        $this->assertFalse($this->db::schema()->hasTable('flights'));
     }
 
     public function testMigrationsCanBeProperlySortedAcrossMultiplePaths()

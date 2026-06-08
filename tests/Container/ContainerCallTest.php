@@ -129,7 +129,7 @@ class ContainerCallTest extends TestCase
         });
 
         $this->assertInstanceOf(stdClass::class, $result[0]);
-        $this->assertEquals([], $result[1]);
+        $this->assertSame([], $result[1]);
 
         $result = $container->call(function (stdClass $foo, $bar = []) {
             return func_get_args();
@@ -226,6 +226,29 @@ class ContainerCallTest extends TestCase
         $container->call(function ($foo, $bar = 'default') {
             return $foo;
         });
+    }
+
+    public function testCallWithNullableClassParameterDefaultValue()
+    {
+        $container = new Container;
+
+        $result = $container->call(function (?ContainerCallConcreteStub $stub = null) {
+            return $stub;
+        });
+
+        $this->assertNull($result);
+    }
+
+    public function testCallWithNullableClassParameterDefaultValueWithBinding()
+    {
+        $container = new Container;
+        $container->bind(ContainerCallConcreteStub::class);
+
+        $result = $container->call(function (?ContainerCallConcreteStub $stub = null) {
+            return $stub;
+        });
+
+        $this->assertInstanceOf(ContainerCallConcreteStub::class, $result);
     }
 }
 

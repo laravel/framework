@@ -6,6 +6,7 @@ use ArrayAccess;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Uri;
 use LogicException;
 
 class Request implements ArrayAccess
@@ -61,6 +62,16 @@ class Request implements ArrayAccess
     public function url()
     {
         return (string) $this->request->getUri();
+    }
+
+    /**
+     * Get the request URI as a URI instance.
+     *
+     * @return \Illuminate\Support\Uri
+     */
+    public function uri()
+    {
+        return Uri::of($this->url());
     }
 
     /**

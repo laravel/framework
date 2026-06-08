@@ -35,6 +35,16 @@ class NoLock extends Lock
     }
 
     /**
+     * Determine if the lock is currently held by any process.
+     *
+     * @return bool
+     */
+    public function isLocked(): bool
+    {
+        return false;
+    }
+
+    /**
      * Returns the owner value written into the driver for this lock.
      *
      * @return mixed

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
@@ -40,7 +41,7 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
         });
 
         $user = User::create();
-        $user2 = User::forceCreate(['deleted_at' => now()]);
+        $user2 = User::forceCreate(['deleted_at' => Carbon::now()]);
 
         $post = tap((new Post)->user()->associate($user))->save();
 
@@ -98,7 +99,7 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
 
     public function testMorphWithTrashedRelationLazyLoading()
     {
-        $deletedUser = User::forceCreate(['deleted_at' => now()]);
+        $deletedUser = User::forceCreate(['deleted_at' => Carbon::now()]);
 
         $action = new Action;
         $action->target()->associate($deletedUser)->save();

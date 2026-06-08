@@ -6,12 +6,12 @@ use Laravel\Ui\UiServiceProvider;
 use RuntimeException;
 
 /**
- * @method static \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard guard(string|null $name = null)
+ * @method static \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard guard(\UnitEnum|string|null $name = null)
  * @method static \Illuminate\Auth\SessionGuard createSessionDriver(string $name, array $config)
  * @method static \Illuminate\Auth\TokenGuard createTokenDriver(string $name, array $config)
  * @method static string getDefaultDriver()
- * @method static void shouldUse(string $name)
- * @method static void setDefaultDriver(string $name)
+ * @method static void shouldUse(\UnitEnum|string|null $name)
+ * @method static void setDefaultDriver(\UnitEnum|string $name)
  * @method static \Illuminate\Auth\AuthManager viaRequest(string $driver, callable $callback)
  * @method static \Closure userResolver()
  * @method static \Illuminate\Auth\AuthManager resolveUsersUsing(\Closure $userResolver)

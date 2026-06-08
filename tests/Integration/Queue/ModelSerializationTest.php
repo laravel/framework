@@ -218,6 +218,68 @@ class ModelSerializationTest extends TestCase
         $this->assertEquals($nestedUnSerialized->order->getRelations(), $order->getRelations());
     }
 
+    public function testItReloadsRelationshipsForCollections()
+    {
+        $order1 = tap(Order::create(), function (Order $order) {
+            $order->wasRecentlyCreated = false;
+        });
+
+        $order2 = tap(Order::create(), function (Order $order) {
+            $order->wasRecentlyCreated = false;
+        });
+
+        $product1 = Product::create();
+        $product2 = Product::create();
+
+        Line::create(['order_id' => $order1->id, 'product_id' => $product1->id]);
+        Line::create(['order_id' => $order2->id, 'product_id' => $product2->id]);
+
+        $orders = Order::with('line', 'lines', 'products')->get();
+
+        $serialized = serialize(new CollectionRelationSerializationTestClass($orders));
+        $unSerialized = unserialize($serialized);
+
+        $this->assertCount(2, $unSerialized->orders);
+        $this->assertTrue($unSerialized->orders[0]->relationLoaded('line'));
+        $this->assertTrue($unSerialized->orders[0]->relationLoaded('lines'));
+        $this->assertTrue($unSerialized->orders[0]->relationLoaded('products'));
+        $this->assertTrue($unSerialized->orders[1]->relationLoaded('line'));
+        $this->assertTrue($unSerialized->orders[1]->relationLoaded('lines'));
+        $this->assertTrue($unSerialized->orders[1]->relationLoaded('products'));
+    }
+
+    public function testItReloadsNestedRelationshipsForCollections()
+    {
+        $order1 = tap(Order::create(), function (Order $order) {
+            $order->wasRecentlyCreated = false;
+        });
+
+        $order2 = tap(Order::create(), function (Order $order) {
+            $order->wasRecentlyCreated = false;
+        });
+
+        $product1 = Product::create();
+        $product2 = Product::create();
+
+        Line::create(['order_id' => $order1->id, 'product_id' => $product1->id]);
+        Line::create(['order_id' => $order2->id, 'product_id' => $product2->id]);
+
+        $orders = Order::with('line.product', 'lines.product')->get();
+
+        $serialized = serialize(new CollectionRelationSerializationTestClass($orders));
+        $unSerialized = unserialize($serialized);
+
+        $this->assertCount(2, $unSerialized->orders);
+        $this->assertTrue($unSerialized->orders[0]->relationLoaded('line'));
+        $this->assertTrue($unSerialized->orders[0]->line->relationLoaded('product'));
+        $this->assertTrue($unSerialized->orders[0]->relationLoaded('lines'));
+        $this->assertTrue($unSerialized->orders[0]->lines->first()->relationLoaded('product'));
+        $this->assertTrue($unSerialized->orders[1]->relationLoaded('line'));
+        $this->assertTrue($unSerialized->orders[1]->line->relationLoaded('product'));
+        $this->assertTrue($unSerialized->orders[1]->relationLoaded('lines'));
+        $this->assertTrue($unSerialized->orders[1]->lines->first()->relationLoaded('product'));
+    }
+
     public function testItCanRunModelBootsAndTraitInitializations()
     {
         $model = new ModelBootTestWithTraitInitialization();
@@ -407,7 +469,23 @@ class ModelSerializationTest extends TestCase
         $unserialized = unserialize($serialized);
 
         $this->assertFalse($unserialized->user->relationLoaded('roles'));
-        $this->assertEquals('hello', $unserialized->value->value);
+        $this->assertSame('hello', $unserialized->value->value);
+    }
+
+    #[WithConfig('database.default', 'testing')]
+    public function test_it_respects_without_relations_attribute_applied_to_parent_class()
+    {
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+        ])->load(['roles']);
+
+        $serialized = serialize(new ModelSerializationAttributeTargetsParentClassTestClass($user, new DataValueObject('hello')));
+
+        /** @var ModelSerializationAttributeTargetsParentClassTestClass $unserialized */
+        $unserialized = unserialize($serialized);
+
+        $this->assertFalse($unserialized->user->relationLoaded('roles'));
+        $this->assertSame('hello', $unserialized->value->value);
     }
 
     public function test_serialization_types_empty_custom_eloquent_collection()
@@ -726,6 +804,11 @@ class ModelSerializationAttributeTargetsClassTestClass
     }
 }
 
+class ModelSerializationAttributeTargetsParentClassTestClass extends ModelSerializationAttributeTargetsClassTestClass
+{
+    //
+}
+
 class ModelRelationSerializationTestClass
 {
     use SerializesModels;
@@ -747,6 +830,18 @@ class CollectionSerializationTestClass
     public function __construct($users)
     {
         $this->users = $users;
+    }
+}
+
+class CollectionRelationSerializationTestClass
+{
+    use SerializesModels;
+
+    public $orders;
+
+    public function __construct($orders)
+    {
+        $this->orders = $orders;
     }
 }
 

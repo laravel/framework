@@ -10,12 +10,13 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class CacheFileStoreTest extends TestCase
 {
     protected function tearDown(): void
     {
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
 
         parent::tearDown();
     }
@@ -23,7 +24,7 @@ class CacheFileStoreTest extends TestCase
     public function testNullIsReturnedIfFileDoesntExist()
     {
         $files = $this->mockFilesystem();
-        $files->expects($this->once())->method('get')->will($this->throwException(new FileNotFoundException));
+        $files->expects($this->once())->method('get')->willThrowException(new FileNotFoundException);
         $store = new FileStore($files, __DIR__);
         $value = $store->get('foo');
         $this->assertNull($value);
@@ -35,8 +36,8 @@ class CacheFileStoreTest extends TestCase
         $hash = sha1('foo');
         $contents = '0000000000';
         $full_dir = __DIR__.'/'.substr($hash, 0, 2).'/'.substr($hash, 2, 2);
-        $files->expects($this->once())->method('makeDirectory')->with($this->equalTo($full_dir), $this->equalTo(0777), $this->equalTo(true));
-        $files->expects($this->once())->method('put')->with($this->equalTo($full_dir.'/'.$hash))->willReturn(strlen($contents));
+        $files->expects($this->once())->method('makeDirectory')->with($full_dir, 0777, true);
+        $files->expects($this->once())->method('put')->with($full_dir.'/'.$hash)->willReturn(strlen($contents));
         $store = new FileStore($files, __DIR__);
         $result = $store->put('foo', $contents, 0);
         $this->assertTrue($result);
@@ -53,9 +54,9 @@ class CacheFileStoreTest extends TestCase
         $exclusiveLock = true;
 
         $files->expects($this->once())->method('put')->with(
-            $this->equalTo($filePath),
-            $this->equalTo($fileContents),
-            $this->equalTo($exclusiveLock) // Ensure we do lock the file while putting.
+            $filePath,
+            $fileContents,
+            $exclusiveLock // Ensure we do lock the file while putting.
         )->willReturn(strlen($fileContents));
 
         (new FileStore($files, __DIR__))->put('O--L / key', 'gold', 0);
@@ -71,8 +72,8 @@ class CacheFileStoreTest extends TestCase
         $fileContents = $ten9s.serialize('gold');
 
         $files->expects($this->once())->method('put')->with(
-            $this->equalTo($filePath),
-            $this->equalTo($fileContents),
+            $filePath,
+            $fileContents,
         );
 
         (new FileStore($files, __DIR__))->put('O--L / key', 'gold', (int) $ten9s + 1);
@@ -102,13 +103,46 @@ class CacheFileStoreTest extends TestCase
     {
         $files = $this->mockFilesystem();
         $store = $this->getMockBuilder(FileStore::class)->onlyMethods(['expiration'])->setConstructorArgs([$files, __DIR__])->getMock();
-        $store->expects($this->once())->method('expiration')->with($this->equalTo(10))->willReturn(1111111111);
+        $store->expects($this->once())->method('expiration')->with(10)->willReturn(1111111111);
         $contents = '1111111111'.serialize('Hello World');
         $hash = sha1('foo');
         $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
-        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($contents))->willReturn(strlen($contents));
+        $files->expects($this->once())->method('put')->with(__DIR__.'/'.$cache_dir.'/'.$hash, $contents)->willReturn(strlen($contents));
         $result = $store->put('foo', 'Hello World', 10);
         $this->assertTrue($result);
+    }
+
+    public function testTouchExtendsTtl(): void
+    {
+        $files = $this->mockFilesystem();
+        $store = $this->getMockBuilder(FileStore::class)->onlyMethods(['expiration', 'get', 'getPayload'])->setConstructorArgs([$files, __DIR__])->getMock();
+
+        $now = Carbon::now();
+
+        $key = 'foo';
+        $content = 'Hello World';
+        $ttl = 60;
+        $hash = sha1($key);
+        $path = __DIR__.'/'.substr($hash, 0, 2).'/'.substr($hash, 2, 2).'/'.$hash;
+
+        $store->expects($this->once())
+            ->method('expiration')
+            ->with($ttl)
+            ->willReturn($now->clone()->addSeconds($ttl)->getTimestamp());
+        $store->expects($this->once())
+            ->method('getPayload')
+            ->with($key)
+            ->willReturn(['data' => $content, 'expiration' => $now->clone()->addSeconds($ttl)->getTimestamp()]);
+        $files->expects($this->once())
+            ->method('put')
+            ->with(
+                $path,
+                $now->clone()->addSeconds($ttl)->getTimestamp().serialize($content),
+                true
+            )
+            ->willReturn(1);
+
+        $this->assertTrue($store->touch($key, $ttl));
     }
 
     public function testStoreItemProperlySetsPermissions()
@@ -161,7 +195,7 @@ class CacheFileStoreTest extends TestCase
         $contents = '9999999999'.serialize('Hello World');
         $hash = sha1('foo');
         $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
-        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($contents))->willReturn(strlen($contents));
+        $files->expects($this->once())->method('put')->with(__DIR__.'/'.$cache_dir.'/'.$hash, $contents)->willReturn(strlen($contents));
         $store = new FileStore($files, __DIR__);
         $result = $store->forever('foo', 'Hello World', 10);
         $this->assertTrue($result);
@@ -189,8 +223,8 @@ class CacheFileStoreTest extends TestCase
         $valueAfterIncrement = '9999999999'.serialize(3);
         $store = new FileStore($files, __DIR__);
 
-        $files->expects($this->once())->method('get')->with($this->equalTo($filePath), $this->equalTo(true))->willReturn($initialValue);
-        $files->expects($this->once())->method('put')->with($this->equalTo($filePath), $this->equalTo($valueAfterIncrement));
+        $files->expects($this->once())->method('get')->with($filePath, true)->willReturn($initialValue);
+        $files->expects($this->once())->method('put')->with($filePath, $valueAfterIncrement);
 
         $result = $store->increment('foo', 3);
     }
@@ -203,8 +237,8 @@ class CacheFileStoreTest extends TestCase
         $valueAfterIncrement = '9999999999'.serialize(4);
         $store = new FileStore($files, __DIR__);
 
-        $files->expects($this->once())->method('get')->with($this->equalTo($filePath), $this->equalTo(true))->willReturn($initialValue);
-        $files->expects($this->once())->method('put')->with($this->equalTo($filePath), $this->equalTo($valueAfterIncrement));
+        $files->expects($this->once())->method('get')->with($filePath, true)->willReturn($initialValue);
+        $files->expects($this->once())->method('put')->with($filePath, $valueAfterIncrement);
 
         $result = $store->increment('foo', 3);
         $this->assertEquals(4, $result);
@@ -219,8 +253,8 @@ class CacheFileStoreTest extends TestCase
         $valueAfterIncrement = '9999999999'.serialize(0);
         $store = new FileStore($files, __DIR__);
 
-        $files->expects($this->once())->method('get')->with($this->equalTo($filePath), $this->equalTo(true))->willReturn($initialValue);
-        $files->expects($this->once())->method('put')->with($this->equalTo($filePath), $this->equalTo($valueAfterIncrement));
+        $files->expects($this->once())->method('get')->with($filePath, true)->willReturn($initialValue);
+        $files->expects($this->once())->method('put')->with($filePath, $valueAfterIncrement);
 
         $result = $store->decrement('foo', 2);
         $this->assertEquals(0, $result);
@@ -234,8 +268,8 @@ class CacheFileStoreTest extends TestCase
         $initialValue = '1999999909'.serialize('foo');
         $valueAfterIncrement = '1999999909'.serialize(1);
         $store = new FileStore($files, __DIR__);
-        $files->expects($this->once())->method('get')->with($this->equalTo($filePath), $this->equalTo(true))->willReturn($initialValue);
-        $files->expects($this->once())->method('put')->with($this->equalTo($filePath), $this->equalTo($valueAfterIncrement));
+        $files->expects($this->once())->method('get')->with($filePath, true)->willReturn($initialValue);
+        $files->expects($this->once())->method('put')->with($filePath, $valueAfterIncrement);
         $result = $store->increment('foo');
 
         $this->assertEquals(1, $result);
@@ -249,8 +283,8 @@ class CacheFileStoreTest extends TestCase
         $valueAfterIncrement = '9999999999'.serialize(1);
         $store = new FileStore($files, __DIR__);
         // simulates a missing item in file store by the exception
-        $files->expects($this->once())->method('get')->with($this->equalTo($filePath), $this->equalTo(true))->willThrowException(new Exception);
-        $files->expects($this->once())->method('put')->with($this->equalTo($filePath), $this->equalTo($valueAfterIncrement));
+        $files->expects($this->once())->method('get')->with($filePath, true)->willThrowException(new Exception);
+        $files->expects($this->once())->method('put')->with($filePath, $valueAfterIncrement);
         $result = $store->increment('foo');
         $this->assertIsInt($result);
         $this->assertEquals(1, $result);
@@ -268,7 +302,7 @@ class CacheFileStoreTest extends TestCase
         $files->expects($this->once())->method('get')->willReturn($initialValue);
         $hash = sha1('foo');
         $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
-        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($valueAfterIncrement));
+        $files->expects($this->once())->method('put')->with(__DIR__.'/'.$cache_dir.'/'.$hash, $valueAfterIncrement);
         $store->increment('foo');
     }
 
@@ -277,7 +311,7 @@ class CacheFileStoreTest extends TestCase
         $files = $this->mockFilesystem();
         $hash = sha1('foobull');
         $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
-        $files->expects($this->once())->method('exists')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash))->willReturn(false);
+        $files->expects($this->once())->method('exists')->with(__DIR__.'/'.$cache_dir.'/'.$hash)->willReturn(false);
         $store = new FileStore($files, __DIR__);
         $store->forget('foobull');
     }
@@ -298,9 +332,9 @@ class CacheFileStoreTest extends TestCase
     public function testFlushCleansDirectory()
     {
         $files = $this->mockFilesystem();
-        $files->expects($this->once())->method('isDirectory')->with($this->equalTo(__DIR__))->willReturn(true);
-        $files->expects($this->once())->method('directories')->with($this->equalTo(__DIR__))->willReturn(['foo']);
-        $files->expects($this->once())->method('deleteDirectory')->with($this->equalTo('foo'))->willReturn(true);
+        $files->expects($this->once())->method('isDirectory')->with(__DIR__)->willReturn(true);
+        $files->expects($this->once())->method('directories')->with(__DIR__)->willReturn(['foo']);
+        $files->expects($this->once())->method('deleteDirectory')->with('foo')->willReturn(true);
 
         $store = new FileStore($files, __DIR__);
         $result = $store->flush();
@@ -310,9 +344,9 @@ class CacheFileStoreTest extends TestCase
     public function testFlushFailsDirectoryClean()
     {
         $files = $this->mockFilesystem();
-        $files->expects($this->once())->method('isDirectory')->with($this->equalTo(__DIR__))->willReturn(true);
-        $files->expects($this->once())->method('directories')->with($this->equalTo(__DIR__))->willReturn(['foo']);
-        $files->expects($this->once())->method('deleteDirectory')->with($this->equalTo('foo'))->willReturn(false);
+        $files->expects($this->once())->method('isDirectory')->with(__DIR__)->willReturn(true);
+        $files->expects($this->once())->method('directories')->with(__DIR__)->willReturn(['foo']);
+        $files->expects($this->once())->method('deleteDirectory')->with('foo')->willReturn(false);
 
         $store = new FileStore($files, __DIR__);
         $result = $store->flush();
@@ -322,11 +356,85 @@ class CacheFileStoreTest extends TestCase
     public function testFlushIgnoreNonExistingDirectory()
     {
         $files = $this->mockFilesystem();
-        $files->expects($this->once())->method('isDirectory')->with($this->equalTo(__DIR__.'--wrong'))->willReturn(false);
+        $files->expects($this->once())->method('isDirectory')->with(__DIR__.'--wrong')->willReturn(false);
 
         $store = new FileStore($files, __DIR__.'--wrong');
         $result = $store->flush();
         $this->assertFalse($result, 'Flush should not clean directory');
+    }
+
+    public function testFlushingLocksCleansDirectory()
+    {
+        $lockDir = __DIR__.'/locks';
+        $files = $this->mockFilesystem();
+        $files->expects($this->once())->method('isDirectory')->with($lockDir)->willReturn(true);
+        $files->expects($this->once())->method('directories')->with($lockDir)->willReturn(['foo']);
+        $files->expects($this->once())->method('deleteDirectory')->with('foo')->willReturn(true);
+
+        $store = new FileStore($files, __DIR__);
+        $store->setLockDirectory($lockDir);
+        $result = $store->flushLocks();
+        $this->assertTrue($result, 'Flushing locks failed');
+    }
+
+    public function testFlushingLocksFailsDirectoryClean()
+    {
+        $lockDir = __DIR__.'/locks';
+        $files = $this->mockFilesystem();
+        $files->expects($this->once())->method('isDirectory')->with($lockDir)->willReturn(true);
+        $files->expects($this->once())->method('directories')->with($lockDir)->willReturn(['foo']);
+        $files->expects($this->once())->method('deleteDirectory')->with('foo')->willReturn(false);
+
+        $store = new FileStore($files, __DIR__);
+        $store->setLockDirectory($lockDir);
+        $result = $store->flushLocks();
+        $this->assertFalse($result, 'Flushing locks should not have cleared directories');
+    }
+
+    public function testFlushingLocksIgnoreNonExistingDirectory()
+    {
+        $lockDir = __DIR__.'/locks';
+        $files = $this->mockFilesystem();
+        $files->expects($this->once())->method('isDirectory')->with($lockDir)->willReturn(false);
+
+        $store = new FileStore($files, __DIR__);
+        $store->setLockDirectory($lockDir);
+        $result = $store->flushLocks();
+        $this->assertFalse($result, 'Flushing locks should not clean locks directory');
+    }
+
+    public function testHasSeparateLockStoreReturnsTrueWhenLockDirectoryDiffers()
+    {
+        $store = new FileStore(new Filesystem, __DIR__);
+        $store->setLockDirectory('/locks');
+
+        $this->assertTrue($store->hasSeparateLockStore());
+    }
+
+    public function testHasSeparateLockStoreReturnsFalseWhenLockDirectoryIsSame()
+    {
+        $store = new FileStore(new Filesystem, __DIR__);
+        $store->setLockDirectory(__DIR__);
+
+        $this->assertFalse($store->hasSeparateLockStore());
+    }
+
+    public function testHasSeparateLockStoreReturnsFalseWhenLockDirectoryIsNull()
+    {
+        $store = new FileStore(new Filesystem, __DIR__);
+        $store->setLockDirectory(null);
+
+        $this->assertFalse($store->hasSeparateLockStore());
+    }
+
+    public function testFlushLocksThrowsExceptionWhenLockDirectoryIsSame()
+    {
+        $store = new FileStore(new Filesystem, __DIR__);
+        $store->setLockDirectory(__DIR__);
+
+        $this->expectException(RuntimeException::class);
+
+        $store->flushLocks();
     }
 
     public function testItHandlesForgettingNonFlexibleKeys()

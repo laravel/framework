@@ -160,7 +160,7 @@ class CacheTest extends TestCase
             return new Response('some content');
         }, "last_modified=$birthdate");
 
-        $this->assertSame(Carbon::parse($birthdate)->timestamp, $response->getLastModified()->getTimestamp());
+        $this->assertSame(Carbon::parse($birthdate)->getTimestamp(), $response->getLastModified()->getTimestamp());
     }
 
     public function testTrailingDelimiterIgnored()

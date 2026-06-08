@@ -289,6 +289,25 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile an insert or ignore statement with a returning clause into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @param  array  $returning
+     * @param  array|null  $uniqueBy
+     * @return string
+     */
+    public function compileInsertOrIgnoreReturning(Builder $query, array $values, array $returning, ?array $uniqueBy)
+    {
+        $insert = $this->compileInsert($query, $values);
+
+        return match ($uniqueBy) {
+            null => "{$insert} on conflict do nothing returning {$this->columnize($returning)}",
+            default => "{$insert} on conflict ({$this->columnize($uniqueBy)}) do nothing returning {$this->columnize($returning)}",
+        };
+    }
+
+    /**
      * Compile an insert ignore statement using a subquery into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

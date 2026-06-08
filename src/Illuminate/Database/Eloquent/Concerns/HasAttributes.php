@@ -13,6 +13,10 @@ use DateTimeInterface;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Attributes\Appends;
+use Illuminate\Database\Eloquent\Attributes\DateFormat;
+use Illuminate\Database\Eloquent\Attributes\Initialize;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
@@ -205,6 +209,12 @@ trait HasAttributes
         $this->casts = $this->ensureCastsAreStringValues(
             array_merge($this->casts, $this->casts()),
         );
+
+        $this->dateFormat ??= static::resolveClassAttribute(DateFormat::class, 'format')
+            ?? static::resolveClassAttribute(Table::class)->dateFormat
+            ?? null;
+
+        $this->mergeAppends(static::resolveClassAttribute(Appends::class, 'columns') ?? []);
     }
 
     /**
@@ -363,12 +373,14 @@ trait HasAttributes
      */
     protected function getArrayableAppends()
     {
-        if (! count($this->appends)) {
+        $appends = $this->getAppends();
+
+        if (! count($appends)) {
             return [];
         }
 
         return $this->getArrayableItems(
-            array_combine($this->appends, $this->appends)
+            array_combine($appends, $appends)
         );
     }
 
@@ -596,6 +608,8 @@ trait HasAttributes
      *
      * @param  string  $key
      * @return mixed
+     *
+     * @throws \Illuminate\Database\LazyLoadingViolationException
      */
     protected function handleLazyLoadingViolation($key)
     {
@@ -792,6 +806,8 @@ trait HasAttributes
      *
      * @param  array  $casts
      * @return array
+     *
+     * @throws \InvalidArgumentException
      */
     protected function ensureCastsAreStringValues($casts)
     {
@@ -1308,6 +1324,8 @@ trait HasAttributes
      * @param  string  $expectedEnum
      * @param  \UnitEnum  $value
      * @return string|int
+     *
+     * @throws \ValueError
      */
     protected function getStorableEnumValue($expectedEnum, $value)
     {
@@ -1358,6 +1376,8 @@ trait HasAttributes
      * @param  string  $key
      * @param  mixed  $value
      * @return string
+     *
+     * @throws \Illuminate\Database\Eloquent\JsonEncodingException
      */
     protected function castAttributeAsJson($key, $value)
     {
@@ -1466,7 +1486,9 @@ trait HasAttributes
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return string
+     * @return string|null
+     *
+     * @throws \RuntimeException
      */
     protected function castAttributeAsHashedString($key, #[\SensitiveParameter] $value)
     {
@@ -1508,11 +1530,13 @@ trait HasAttributes
      * @param  float|string  $value
      * @param  int  $decimals
      * @return string
+     *
+     * @throws \Illuminate\Support\Exceptions\MathException
      */
     protected function asDecimal($value, $decimals)
     {
         try {
-            return (string) BigDecimal::of((string) $value)->toScale($decimals, RoundingMode::HALF_UP);
+            return (string) BigDecimal::of((string) $value)->toScale($decimals, RoundingMode::HalfUp);
         } catch (BrickMathException $e) {
             throw new MathException('Unable to cast value to a decimal.', previous: $e);
         }
@@ -1698,7 +1722,7 @@ trait HasAttributes
     /**
      * Get the attributes that should be cast.
      *
-     * @return array<string, string>
+     * @return array<string, Stringable|string>
      */
     protected function casts()
     {
@@ -1907,7 +1931,7 @@ trait HasAttributes
     }
 
     /**
-     * Merge the a cast class and attribute cast attribute back into the model.
+     * Merge the cast class and attribute cast attribute back into the model.
      *
      * @return void
      */
@@ -2460,6 +2484,10 @@ trait HasAttributes
      */
     public function mergeAppends(array $appends)
     {
+        if ($appends === []) {
+            return $this;
+        }
+
         $this->appends = array_values(array_unique(array_merge($this->appends, $appends)));
 
         return $this;
@@ -2473,7 +2501,7 @@ trait HasAttributes
      */
     public function hasAppended($attribute)
     {
-        return in_array($attribute, $this->appends);
+        return in_array($attribute, $this->getAppends());
     }
 
     /**

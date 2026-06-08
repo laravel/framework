@@ -18,12 +18,16 @@ class RequiredUnless implements Stringable
     /**
      * Create a new required validation rule based on a condition.
      *
-     * @param  (\Closure(): bool)|bool  $condition
+     * @param  (\Closure(): bool)|bool|null  $condition
      *
      * @throws \InvalidArgumentException
      */
     public function __construct($condition)
     {
+        if (is_null($condition)) {
+            $condition = false;
+        }
+
         if ($condition instanceof Closure || is_bool($condition)) {
             $this->condition = $condition;
         } else {

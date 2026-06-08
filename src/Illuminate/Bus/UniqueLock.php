@@ -3,9 +3,13 @@
 namespace Illuminate\Bus;
 
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Queue\Attributes\ReadsQueueAttributes;
+use Illuminate\Queue\Attributes\UniqueFor;
 
 class UniqueLock
 {
+    use ReadsQueueAttributes;
+
     /**
      * The cache repository implementation.
      *
@@ -33,13 +37,13 @@ class UniqueLock
     {
         $uniqueFor = method_exists($job, 'uniqueFor')
             ? $job->uniqueFor()
-            : ($job->uniqueFor ?? 0);
+            : ($this->getAttributeValue($job, UniqueFor::class, 'uniqueFor') ?? 0);
 
         $cache = method_exists($job, 'uniqueVia')
             ? ($job->uniqueVia() ?? $this->cache)
             : $this->cache;
 
-        return (bool) $cache->lock($this->getKey($job), $uniqueFor)->get();
+        return (bool) $cache->lock(self::getKey($job), $uniqueFor)->get();
     }
 
     /**
@@ -54,7 +58,7 @@ class UniqueLock
             ? ($job->uniqueVia() ?? $this->cache)
             : $this->cache;
 
-        $cache->lock($this->getKey($job))->forceRelease();
+        $cache->lock(self::getKey($job))->forceRelease();
     }
 
     /**

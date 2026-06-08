@@ -78,4 +78,15 @@ class PhpRedisClusterConnection extends PhpRedisConnection
 
         return $this->defaultNode;
     }
+
+    /**
+     * Determine if the connection is a cluster connection.
+     *
+     * @return bool
+     */
+    #[\Override]
+    public function isCluster()
+    {
+        return true;
+    }
 }

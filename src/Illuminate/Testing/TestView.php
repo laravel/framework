@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Testing\Assert as PHPUnit;
+use Illuminate\Testing\Constraints\SeeInHtml;
 use Illuminate\Testing\Constraints\SeeInOrder;
 use Illuminate\View\View;
 use Stringable;
@@ -189,11 +190,7 @@ class TestView implements Stringable
 
         $values = $escape ? array_map(e(...), $value) : $value;
 
-        $rendered = strip_tags($this->rendered);
-
-        foreach ($values as $value) {
-            PHPUnit::assertStringContainsString((string) $value, $rendered);
-        }
+        PHPUnit::assertThat($values, new SeeInHtml($this->rendered));
 
         return $this;
     }
@@ -209,7 +206,7 @@ class TestView implements Stringable
     {
         $values = $escape ? array_map(e(...), $values) : $values;
 
-        PHPUnit::assertThat($values, new SeeInOrder(strip_tags($this->rendered)));
+        PHPUnit::assertThat($values, new SeeInHtml($this->rendered, true));
 
         return $this;
     }
@@ -258,11 +255,7 @@ class TestView implements Stringable
 
         $values = $escape ? array_map(e(...), $value) : $value;
 
-        $rendered = strip_tags($this->rendered);
-
-        foreach ($values as $value) {
-            PHPUnit::assertStringNotContainsString((string) $value, $rendered);
-        }
+        PHPUnit::assertThat($values, new SeeInHtml($this->rendered, negate: true));
 
         return $this;
     }

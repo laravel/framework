@@ -45,12 +45,15 @@ class Carbon extends BaseCarbon
         int $hours = 0,
         int $minutes = 0,
         int $seconds = 0,
-        int $microseconds = 0
+        int $microseconds = 0,
+        ?bool $overflow = null
     ): static {
-        return $this->add("
-            $years years $months months $weeks weeks $days days
-            $hours hours $minutes minutes $seconds seconds $microseconds microseconds
-        ");
+        return $this->add('years', $years, $overflow)
+            ->add('months', $months, $overflow)
+            ->add("
+                $weeks weeks $days days
+                $hours hours $minutes minutes $seconds seconds $microseconds microseconds
+            ");
     }
 
     /**
@@ -64,11 +67,14 @@ class Carbon extends BaseCarbon
         int $hours = 0,
         int $minutes = 0,
         int $seconds = 0,
-        int $microseconds = 0
+        int $microseconds = 0,
+        ?bool $overflow = null
     ): static {
-        return $this->sub("
-            $years years $months months $weeks weeks $days days
-            $hours hours $minutes minutes $seconds seconds $microseconds microseconds
-        ");
+        return $this->sub('years', $years, $overflow)
+            ->sub('months', $months, $overflow)
+            ->sub("
+                $weeks weeks $days days
+                $hours hours $minutes minutes $seconds seconds $microseconds microseconds
+            ");
     }
 }

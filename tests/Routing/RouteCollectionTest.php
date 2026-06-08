@@ -357,6 +357,81 @@ class RouteCollectionTest extends TestCase
         $request = Request::create('users/1/show', 'GET');
 
         $this->assertCount(2, $this->routeCollection->getRoutes());
-        $this->assertEquals('first', $this->routeCollection->match($request)->getName());
+        $this->assertSame('first', $this->routeCollection->match($request)->getName());
+    }
+
+    public function testPrependsRoutesWithDomain()
+    {
+        $this->routeCollection->add(
+            $noDomainGet1 = new Route('GET', 'no-domain-get1', ['uses' => 'NoDomainController@index'])
+        );
+
+        $this->routeCollection->add(
+            $fooDomainGet1 = (new Route('GET', 'foo-domain-get1', ['uses' => 'FooDomainController@index']))->domain('foo.test')
+        );
+
+        $this->routeCollection->add(
+            $barDomainGet1 = (new Route('GET', 'bar-domain-get1', ['uses' => 'BarDomainController@index']))->domain('bar.test')
+        );
+
+        $this->routeCollection->add(
+            $noDomainGet2 = new Route('GET', 'no-domain-get2', ['uses' => 'NoDomainController@show'])
+        );
+
+        $this->routeCollection->add(
+            $fooDomainGet2 = (new Route('GET', 'foo-domain-get2', ['uses' => 'FooDomainController@show']))->domain('foo.test')
+        );
+
+        $this->routeCollection->add(
+            $barDomainGet2 = (new Route('GET', 'bar-domain-get2', ['uses' => 'BarDomainController@show']))->domain('bar.test')
+        );
+
+        $this->assertSame([
+            $fooDomainGet1,
+            $barDomainGet1,
+            $fooDomainGet2,
+            $barDomainGet2,
+            $noDomainGet1,
+            $noDomainGet2,
+        ], $this->routeCollection->getRoutes());
+
+        $this->assertSame([
+            'GET' => [
+                'foo.testfoo-domain-get1' => $fooDomainGet1,
+                'bar.testbar-domain-get1' => $barDomainGet1,
+
+                'foo.testfoo-domain-get2' => $fooDomainGet2,
+                'bar.testbar-domain-get2' => $barDomainGet2,
+
+                'no-domain-get1' => $noDomainGet1,
+                'no-domain-get2' => $noDomainGet2,
+            ],
+
+            'HEAD' => [
+                'foo.testfoo-domain-get1' => $fooDomainGet1,
+                'bar.testbar-domain-get1' => $barDomainGet1,
+
+                'foo.testfoo-domain-get2' => $fooDomainGet2,
+                'bar.testbar-domain-get2' => $barDomainGet2,
+
+                'no-domain-get1' => $noDomainGet1,
+                'no-domain-get2' => $noDomainGet2,
+            ],
+        ], $this->routeCollection->getRoutesByMethod());
+    }
+
+    public function testDomainRoutesAreMatchedBeforeNonDomainRoutes()
+    {
+        $this->routeCollection->add(
+            (new Route('GET', 'users', ['uses' => 'NoDomainController@index']))->name('no-domain')
+        );
+
+        $this->routeCollection->add(
+            (new Route('GET', 'users', ['uses' => 'DomainController@index']))->domain('api.test')->name('with-domain')
+        );
+
+        $request = Request::create('http://api.test/users', 'GET');
+
+        $this->assertSame('with-domain', $this->routeCollection->match($request)->getName());
     }
 }

@@ -96,7 +96,7 @@ class Number
      * @param  string|null  $locale
      * @param  int|null  $after
      * @param  int|null  $until
-     * @return string
+     * @return string|false
      */
     public static function spell(int|float $number, ?string $locale = null, ?int $after = null, ?int $until = null)
     {
@@ -120,7 +120,7 @@ class Number
      *
      * @param  int|float  $number
      * @param  string|null  $locale
-     * @return string
+     * @return string|false
      */
     public static function ordinal(int|float $number, ?string $locale = null)
     {
@@ -136,7 +136,7 @@ class Number
      *
      * @param  int|float  $number
      * @param  string|null  $locale
-     * @return string
+     * @return string|false
      */
     public static function spellOrdinal(int|float $number, ?string $locale = null)
     {
@@ -261,7 +261,7 @@ class Number
      * @param  int|float  $number
      * @param  int  $precision
      * @param  int|null  $maxPrecision
-     * @param  array  $units
+     * @param  array<int, string>  $units
      * @return string|false
      */
     protected static function summarize(int|float $number, int $precision = 0, ?int $maxPrecision = null, array $units = [])
@@ -289,7 +289,15 @@ class Number
         $displayExponent = $numberExponent - ($numberExponent % 3);
         $number /= pow(10, $displayExponent);
 
-        return trim(sprintf('%s%s', static::format($number, $precision, $maxPrecision), $units[$displayExponent] ?? ''));
+        $formatted = static::format($number, $precision, $maxPrecision);
+
+        if (static::parseFloat($formatted) >= 1000 && isset($units[$displayExponent + 3])) {
+            $number /= 1000;
+            $displayExponent += 3;
+            $formatted = static::format($number, $precision, $maxPrecision);
+        }
+
+        return trim(sprintf('%s%s', $formatted, $units[$displayExponent] ?? ''));
     }
 
     /**

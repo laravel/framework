@@ -161,7 +161,7 @@ class TranslationFileLoaderTest extends TestCase
         $files->shouldReceive('exists')->once()->with(__DIR__.'/en/foo.php')->andReturn(false);
         $files->shouldReceive('getRequire')->never();
 
-        $this->assertEquals([], $loader->load('en', 'foo', null));
+        $this->assertSame([], $loader->load('en', 'foo', null));
     }
 
     public function testEmptyArraysReturnedWhenFilesDontExistForNamespacedItems()
@@ -169,7 +169,7 @@ class TranslationFileLoaderTest extends TestCase
         $loader = new FileLoader($files = m::mock(Filesystem::class), __DIR__);
         $files->shouldReceive('getRequire')->never();
 
-        $this->assertEquals([], $loader->load('en', 'foo', 'bar'));
+        $this->assertSame([], $loader->load('en', 'foo', 'bar'));
     }
 
     public function testLoadMethodForJSONProperlyCallsLoader()

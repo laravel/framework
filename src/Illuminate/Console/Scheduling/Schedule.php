@@ -102,6 +102,20 @@ class Schedule
     protected array $groupStack = [];
 
     /**
+     * Indicates if the schedule should check for the paused signal in the cache.
+     *
+     * @var bool
+     */
+    public static $pausable = true;
+
+    /**
+     * Indicates if the schedule should check for the interrupt signal in the cache.
+     *
+     * @var bool
+     */
+    public static $interruptible = true;
+
+    /**
      * Create a new schedule instance.
      *
      * @param  \DateTimeZone|string|null  $timezone
@@ -295,7 +309,7 @@ class Schedule
      */
     public function exec($command, array $parameters = [])
     {
-        if (count($parameters)) {
+        if ($parameters !== []) {
             $command .= ' '.$this->compileParameters($parameters);
         }
 
@@ -336,16 +350,18 @@ class Schedule
      */
     protected function mergePendingAttributes(Event $event)
     {
-        if (! empty($this->groupStack)) {
-            $group = array_last($this->groupStack);
-
-            $group->mergeAttributes($event);
-        }
-
         if (isset($this->attributes)) {
             $this->attributes->mergeAttributes($event);
 
             $this->attributes = null;
+
+            return;
+        }
+
+        if (! empty($this->groupStack)) {
+            $group = array_last($this->groupStack);
+
+            $group->mergeAttributes($event);
         }
     }
 
@@ -430,6 +446,20 @@ class Schedule
     }
 
     /**
+     * Get all of the events on the schedule which run on any of the provided environments.
+     *
+     * @param  list<string>  $environments
+     * @return \Illuminate\Console\Scheduling\Event[]
+     */
+    public function eventsForEnvironments(array $environments): array
+    {
+        return array_values(array_filter(
+            $this->events(),
+            static fn (Event $event) => array_any($environments, $event->runsInEnvironment(...))
+        ));
+    }
+
+    /**
      * Specify the cache store that should be used to store mutexes.
      *
      * @param  \UnitEnum|string  $store
@@ -474,11 +504,26 @@ class Schedule
     }
 
     /**
+     * Indicate that the scheduler should not poll for pause or interrupt signals.
+     *
+     * This prevents the scheduler from hitting the application cache to determine if it needs to pause or interrupt.
+     *
+     * @return void
+     */
+    public static function withoutInterruptionPolling()
+    {
+        static::$pausable = false;
+        static::$interruptible = false;
+    }
+
+    /**
      * Dynamically handle calls into the schedule instance.
      *
      * @param  string  $method
      * @param  array  $parameters
      * @return mixed
+     *
+     * @throws \BadMethodCallException
      */
     public function __call($method, $parameters)
     {
@@ -486,7 +531,9 @@ class Schedule
             return $this->macroCall($method, $parameters);
         }
 
-        if (method_exists(PendingEventAttributes::class, $method) || Event::hasMacro($method)) {
+        if (method_exists(PendingEventAttributes::class, $method)
+            || in_array($method, PendingEventAttributes::DEFERRED_EVENT_METHODS, true)
+            || Event::hasMacro($method)) {
             $this->attributes ??= $this->groupStack ? clone array_last($this->groupStack) : new PendingEventAttributes($this);
 
             return $this->attributes->$method(...$parameters);

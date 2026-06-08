@@ -17,6 +17,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use SortDirection;
 
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
@@ -194,7 +195,7 @@ class BelongsToMany extends Relation
             return $table;
         }
 
-        if (in_array(AsPivot::class, class_uses_recursive($model))) {
+        if (isset(class_uses_recursive($model)[AsPivot::class])) {
             $this->using($table);
         }
 
@@ -492,7 +493,7 @@ class BelongsToMany extends Relation
             throw new InvalidArgumentException('The provided value may not be null.');
         }
 
-        $this->pivotValues[] = compact('column', 'value');
+        $this->pivotValues[] = ['column' => $column, 'value' => $value];
 
         return $this->wherePivot($column, '=', $value);
     }
@@ -588,10 +589,10 @@ class BelongsToMany extends Relation
      * Add an "order by" clause for a pivot table column.
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  string  $direction
+     * @param  SortDirection|'asc'|'desc'  $direction
      * @return $this
      */
-    public function orderByPivot($column, $direction = 'asc')
+    public function orderByPivot($column, $direction = SortDirection::Ascending)
     {
         return $this->orderBy($this->qualifyPivotColumn($column), $direction);
     }
@@ -604,7 +605,7 @@ class BelongsToMany extends Relation
      */
     public function orderByPivotDesc($column)
     {
-        return $this->orderBy($this->qualifyPivotColumn($column), 'desc');
+        return $this->orderBy($this->qualifyPivotColumn($column), SortDirection::Descending);
     }
 
     /**
@@ -631,13 +632,13 @@ class BelongsToMany extends Relation
      * Get the first related model record matching the attributes or instantiate it.
      *
      * @param  array  $attributes
-     * @param  array  $values
+     * @param  (\Closure(): array)|array  $values
      * @return TRelatedModel&object{pivot: TPivotModel}
      */
-    public function firstOrNew(array $attributes = [], array $values = [])
+    public function firstOrNew(array $attributes = [], Closure|array $values = [])
     {
         if (is_null($instance = $this->related->where($attributes)->first())) {
-            $instance = $this->related->newInstance(array_merge($attributes, $values));
+            $instance = $this->related->newInstance(array_merge($attributes, value($values)));
         }
 
         return $instance;
@@ -677,6 +678,8 @@ class BelongsToMany extends Relation
      * @param  array  $joining
      * @param  bool  $touch
      * @return TRelatedModel&object{pivot: TPivotModel}
+     *
+     * @throws \Illuminate\Database\UniqueConstraintViolationException
      */
     public function createOrFirst(array $attributes = [], Closure|array $values = [], array $joining = [], $touch = true)
     {
@@ -699,16 +702,16 @@ class BelongsToMany extends Relation
      * Create or update a related record matching the attributes, and fill it with values.
      *
      * @param  array  $attributes
-     * @param  array  $values
+     * @param  (\Closure(): array)|array  $values
      * @param  array  $joining
      * @param  bool  $touch
      * @return TRelatedModel&object{pivot: TPivotModel}
      */
-    public function updateOrCreate(array $attributes, array $values = [], array $joining = [], $touch = true)
+    public function updateOrCreate(array $attributes, Closure|array $values = [], array $joining = [], $touch = true)
     {
         return tap($this->firstOrCreate($attributes, $values, $joining, $touch), function ($instance) use ($values) {
             if (! $instance->wasRecentlyCreated) {
-                $instance->fill($values);
+                $instance->fill(value($values));
 
                 $instance->save(['touch' => false]);
             }
@@ -1074,7 +1077,7 @@ class BelongsToMany extends Relation
      */
     public function chunkByIdDesc($count, callable $callback, $column = null, $alias = null)
     {
-        return $this->orderedChunkById($count, $callback, $column, $alias, descending: true);
+        return $this->orderedChunkById($count, $callback, $column, $alias, descending: SortDirection::Descending);
     }
 
     /**
@@ -1104,7 +1107,7 @@ class BelongsToMany extends Relation
      * @param  callable  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
-     * @param  bool  $descending
+     * @param  SortDirection|bool  $descending
      * @return bool
      */
     public function orderedChunkById($count, callable $callback, $column = null, $alias = null, $descending = false)

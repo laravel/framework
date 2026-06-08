@@ -42,7 +42,7 @@ class ConsoleApplicationTest extends TestCase
         $artisan = $this->getMockConsole(['addToParent']);
         $command = m::mock(Command::class);
         $command->shouldReceive('setLaravel')->once()->with(m::type(ApplicationContract::class));
-        $artisan->expects($this->once())->method('addToParent')->with($this->equalTo($command))->willReturn($command);
+        $artisan->expects($this->once())->method('addToParent')->with($command)->willReturn($command);
         $result = $artisan->add($command);
 
         $this->assertSame($command, $result);
@@ -53,7 +53,7 @@ class ConsoleApplicationTest extends TestCase
         $artisan = $this->getMockConsole(['addToParent']);
         $command = m::mock(SymfonyCommand::class);
         $command->shouldReceive('setLaravel')->never();
-        $artisan->expects($this->once())->method('addToParent')->with($this->equalTo($command))->willReturn($command);
+        $artisan->expects($this->once())->method('addToParent')->with($command)->willReturn($command);
         $result = $artisan->add($command);
 
         $this->assertSame($command, $result);
@@ -64,7 +64,7 @@ class ConsoleApplicationTest extends TestCase
         $artisan = $this->getMockConsole(['addToParent']);
         $command = m::mock(SymfonyCommand::class);
         $artisan->getLaravel()->shouldReceive('make')->once()->with('foo')->andReturn(m::mock(SymfonyCommand::class));
-        $artisan->expects($this->once())->method('addToParent')->with($this->equalTo($command))->willReturn($command);
+        $artisan->expects($this->once())->method('addToParent')->with($command)->willReturn($command);
         $result = $artisan->resolve('foo');
 
         $this->assertSame($command, $result);

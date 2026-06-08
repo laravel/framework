@@ -2,11 +2,14 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Contracts\Cache\CanFlushLocks;
 use Illuminate\Contracts\Cache\LockProvider;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
+use RuntimeException;
 
-class ArrayStore extends TaggableStore implements LockProvider
+class ArrayStore extends TaggableStore implements CanFlushLocks, LockProvider
 {
     use InteractsWithTime, RetrievesMultipleKeys;
 
@@ -164,6 +167,28 @@ class ArrayStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Adjust the expiration time of a cached item.
+     *
+     * @param  string  $key
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function touch($key, $seconds)
+    {
+        $item = Arr::get($this->storage, $key = $this->getPrefix().$key, null);
+
+        if (is_null($item)) {
+            return false;
+        }
+
+        $item['expiresAt'] = $this->calculateExpiration($seconds);
+
+        $this->storage = array_merge($this->storage, [$key => $item]);
+
+        return true;
+    }
+
+    /**
      * Remove an item from the cache.
      *
      * @param  string  $key
@@ -188,6 +213,24 @@ class ArrayStore extends TaggableStore implements LockProvider
     public function flush()
     {
         $this->storage = [];
+
+        return true;
+    }
+
+    /**
+     * Remove all locks from the store.
+     *
+     * @return bool
+     *
+     * @throws \RuntimeException
+     */
+    public function flushLocks(): bool
+    {
+        if (! $this->hasSeparateLockStore()) {
+            throw new RuntimeException('Flushing locks is only supported when the lock store is separate from the cache store.');
+        }
+
+        $this->locks = [];
 
         return true;
     }
@@ -247,6 +290,16 @@ class ArrayStore extends TaggableStore implements LockProvider
     public function restoreLock($name, $owner)
     {
         return $this->lock($name, 0, $owner);
+    }
+
+    /**
+     * Determine if the lock store is separate from the cache store.
+     *
+     * @return bool
+     */
+    public function hasSeparateLockStore(): bool
+    {
+        return true;
     }
 
     /**

@@ -2,6 +2,10 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\Initialize;
+use Illuminate\Database\Eloquent\Attributes\Visible;
+
 trait HidesAttributes
 {
     /**
@@ -17,6 +21,18 @@ trait HidesAttributes
      * @var array<string>
      */
     protected $visible = [];
+
+    /**
+     * Initialize the HidesAttributes trait.
+     *
+     * @return void
+     */
+    #[Initialize]
+    public function initializeHidesAttributes()
+    {
+        $this->mergeHidden(static::resolveClassAttribute(Hidden::class, 'columns') ?? []);
+        $this->mergeVisible(static::resolveClassAttribute(Visible::class, 'columns') ?? []);
+    }
 
     /**
      * Get the hidden attributes for the model.
@@ -49,6 +65,10 @@ trait HidesAttributes
      */
     public function mergeHidden(array $hidden)
     {
+        if ($hidden === []) {
+            return $this;
+        }
+
         $this->hidden = array_values(array_unique(array_merge($this->hidden, $hidden)));
 
         return $this;
@@ -85,6 +105,10 @@ trait HidesAttributes
      */
     public function mergeVisible(array $visible)
     {
+        if ($visible === []) {
+            return $this;
+        }
+
         $this->visible = array_values(array_unique(array_merge($this->visible, $visible)));
 
         return $this;
