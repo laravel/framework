@@ -2989,6 +2989,9 @@ class Builder implements BuilderContract
             },
             strtolower($direction) === 'asc', strtolower($direction) === 'ascending' => 'asc',
             strtolower($direction) === 'desc', strtolower($direction) === 'descending' => 'desc',
+        $direction = match (strtolower(enum_value($direction))) {
+            'asc', 'ascending' => 'asc',
+            desc', 'descending' => 'desc',
             default => throw new InvalidArgumentException('Order direction must be a SortDirection, "asc" or "desc", "ascending" or "descending".'),
         };
 
