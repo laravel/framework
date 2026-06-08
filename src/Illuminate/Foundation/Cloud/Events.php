@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Cloud;
 
+use Illuminate\Foundation\Cloud;
 use RuntimeException;
 use Throwable;
 

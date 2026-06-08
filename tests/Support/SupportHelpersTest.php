@@ -1524,6 +1524,23 @@ class SupportHelpersTest extends TestCase
         );
     }
 
+    public function testWriteVariableQuotesValuesWithSpecialCharacters()
+    {
+        $filesystem = new Filesystem;
+        $path = __DIR__.'/tmp/env-test-file';
+        $filesystem->put($path, 'APP_NAME=Laravel'.PHP_EOL);
+
+        Env::writeVariable('APP_BRACKET', 'pass[word', $path);
+        Env::writeVariable('APP_CARET', 'foo^bar', $path);
+        Env::writeVariable('APP_BACKTICK', 'foo`bar', $path);
+
+        $contents = $filesystem->get($path);
+
+        $this->assertStringContainsString('APP_BRACKET="pass[word"', $contents);
+        $this->assertStringContainsString('APP_CARET="foo^bar"', $contents);
+        $this->assertStringContainsString('APP_BACKTICK="foo`bar"', $contents);
+    }
+
     public function testWillThrowAnExceptionIfFileIsMissingWhenTryingToWriteVariables(): void
     {
         $this->expectExceptionObject(new RuntimeException('The file [missing-file] does not exist.'));
