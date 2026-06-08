@@ -144,8 +144,7 @@ class Worker
      *
      * @var bool
      */
-    public static 
-      = true;
+    public static $stopOnLostConnection = true;
 
     /**
      * Indicates if the worker should check for the restart signal in the cache.
