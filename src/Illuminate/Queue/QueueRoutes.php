@@ -101,7 +101,7 @@ class QueueRoutes
     /**
      * Get all registered queue routes.
      *
-     * @return array
+     * @return array<class-string, array|string>
      */
     public function all()
     {
