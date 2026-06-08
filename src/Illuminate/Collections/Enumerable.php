@@ -119,6 +119,13 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function collapse();
 
     /**
+     * Collapse the items into a single enumerable while preserving its keys.
+     *
+     * @return static<mixed, mixed>
+     */
+    public function collapseWithKeys();
+
+    /**
      * Alias for the "contains" method.
      *
      * @param  (callable(TValue, TKey): bool)|TValue|string  $key
@@ -164,6 +171,16 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @return bool
      */
     public function doesntContain($key, $operator = null, $value = null);
+
+    /**
+     * Determine if an item is not contained in the enumerable, using strict comparison.
+     *
+     * @param  mixed  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function doesntContainStrict($key, $operator = null, $value = null);
 
     /**
      * Cross join with the given lists, returning all possible permutations.
@@ -775,6 +792,14 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function merge($items);
 
     /**
+     * Multiply the items in the enumerable by the multiplier.
+     *
+     * @param  int  $multiplier
+     * @return static
+     */
+    public function multiply(int $multiplier);
+
+    /**
      * Recursively merge the collection with the given items.
      *
      * @template TMergeRecursiveValue
@@ -933,6 +958,14 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @return TKey|false
      */
     public function search($value, $strict = false);
+
+    /**
+     * Select specific values from the items within the enumerable.
+     *
+     * @param  \Illuminate\Support\Enumerable<array-key, TKey>|array<array-key, TKey>|string|null  $keys
+     * @return static
+     */
+    public function select($keys);
 
     /**
      * Get the item before the given item.
@@ -1202,6 +1235,14 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @return static
      */
     public function reject($callback = true);
+
+    /**
+     * Flatten a multi-dimensional associative array with dots.
+     *
+     * @param  int  $depth
+     * @return static
+     */
+    public function dot($depth = INF);
 
     /**
      * Convert a flatten "dot" notation array into an expanded array.
