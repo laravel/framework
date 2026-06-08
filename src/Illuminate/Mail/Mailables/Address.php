@@ -13,8 +13,8 @@ class Address
      * @param  string|null  $name
      */
     public function __construct(
-        public string $address,
-        public ?string $name = null,
+        public readonly string $address,
+        public readonly ?string $name = null,
     ) {
         if (preg_match('/[\r\n]/', $address) > 0) {
             throw new InvalidArgumentException('Email addresses may not contain line break characters.');
