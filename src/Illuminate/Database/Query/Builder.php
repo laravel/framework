@@ -2967,7 +2967,7 @@ class Builder implements BuilderContract
      * Add an "order by" clause to the query.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  SortDirection|'asc'|'desc'  $direction
+     * @param  SortDirection|'asc'|'ascending'|'desc'|'descending'  $direction
      * @return $this
      *
      * @throws \InvalidArgumentException
@@ -2987,9 +2987,9 @@ class Builder implements BuilderContract
                 SortDirection::Ascending => 'asc',
                 SortDirection::Descending => 'desc',
             },
-            strtolower($direction) === 'asc' => 'asc',
-            strtolower($direction) === 'desc' => 'desc',
-            default => throw new InvalidArgumentException('Order direction must be a SortDirection, "asc" or "desc".'),
+            strtolower($direction) === 'asc', strtolower($direction) === 'ascending' => 'asc',
+            strtolower($direction) === 'desc', strtolower($direction) === 'descending' => 'desc',
+            default => throw new InvalidArgumentException('Order direction must be a SortDirection, "asc" or "desc", "ascending" or "descending".'),
         };
 
         $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
