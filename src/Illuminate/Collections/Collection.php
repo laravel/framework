@@ -416,6 +416,18 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Get all items except for a specified array of values.
+     *
+     * @param  mixed  $values
+     * @param  bool  $strict
+     * @return static
+     */
+    public function exceptValues($values, $strict = false)
+    {
+        return $this->newInstance(Arr::exceptValues($this->items, $values, $strict));
+    }
+
+    /**
      * Run a filter over each of the items.
      *
      * @param  (callable(TValue, TKey): bool)|null  $callback
@@ -991,6 +1003,18 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         $keys = is_array($keys) ? $keys : func_get_args();
 
         return $this->newInstance(Arr::only($this->items, $keys));
+    }
+
+    /**
+     * Get a subset of the items from the given array by value.
+     *
+     * @param  mixed  $values
+     * @param  bool  $strict
+     * @return static
+     */
+    public function onlyValues($values, $strict = false)
+    {
+        return $this->newInstance(Arr::onlyValues($this->items, $values, $strict));
     }
 
     /**
