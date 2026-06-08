@@ -580,6 +580,22 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->hasCast('enumAttribute', StringStatus::class));
     }
 
+    public function testOnlyDirtyAttributes()
+    {
+        $model = new EloquentModelStub(['foo' => '1', 'bar' => 2, 'baz' => 3]);
+        $model->syncOriginal();
+        $model->foo = 1;
+        $model->bar = 20;
+        $model->baz = 30;
+
+        $this->assertFalse($model->isOnlyDirty('foo'));
+        $this->assertFalse($model->isOnlyDirty('bar'));
+        $this->assertFalse($model->isOnlyDirty('foo', 'bar'));
+        $this->assertTrue($model->isOnlyDirty('bar', 'baz'));
+        $this->assertTrue($model->isOnlyDirty(['bar', 'baz']));
+        $this->assertFalse($model->isOnlyDirty('foo', 'bar', 'baz'));
+    }
+
     public function testCleanAttributes()
     {
         $model = new EloquentModelStub(['foo' => '1', 'bar' => 2, 'baz' => 3]);

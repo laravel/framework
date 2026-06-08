@@ -66,6 +66,9 @@ class EloquentModelTest extends DatabaseTestCase
         $this->assertEquals(['name' => $originalName], $user->getPrevious());
         $this->assertTrue($user->wasChanged());
         $this->assertTrue($user->wasChanged('name'));
+        $this->assertTrue($user->wasOnlyChanged('name'));
+        $this->assertFalse($user->wasOnlyChanged('title'));
+        $this->assertFalse($user->wasOnlyChanged('name', 'title'));
     }
 
     public function testDiscardChanges()
