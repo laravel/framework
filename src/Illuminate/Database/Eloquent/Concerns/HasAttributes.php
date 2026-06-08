@@ -2227,6 +2227,19 @@ trait HasAttributes
     }
 
     /**
+     * Determine if only the given attribute(s) are dirty.
+     *
+     * @param  array<string>|string  $attributes
+     * @return bool
+     */
+    public function isOnlyDirty($attributes)
+    {
+        return $this->hasOnlyChanges(
+            $this->getDirty(), is_array($attributes) ? $attributes : func_get_args()
+        );
+    }
+
+    /**
      * Determine if the model or all the given attribute(s) have remained the same.
      *
      * @param  array<string>|string|null  $attributes
@@ -2266,6 +2279,19 @@ trait HasAttributes
     }
 
     /**
+     * Determine if only the given attribute(s) were changed when the model was last saved.
+     *
+     * @param  array<string>|string  $attributes
+     * @return bool
+     */
+    public function wasOnlyChanged($attributes)
+    {
+        return $this->hasOnlyChanges(
+            $this->getChanges(), is_array($attributes) ? $attributes : func_get_args()
+        );
+    }
+
+    /**
      * Determine if any of the given attributes were changed when the model was last saved.
      *
      * @param  array<string>  $changes
@@ -2291,6 +2317,22 @@ trait HasAttributes
         }
 
         return false;
+    }
+
+    /**
+     * Determine if only the given attributes were changed.
+     *
+     * @param  array<string>  $changes
+     * @param  array<string>  $attributes
+     * @return bool
+     */
+    protected function hasOnlyChanges($changes, $attributes)
+    {
+        $attributes = array_flip(Arr::wrap($attributes));
+
+        return count($changes) > 0
+            && count($changes) === count($attributes)
+            && count($changes) === count(array_intersect_key($changes, $attributes));
     }
 
     /**
