@@ -2,19 +2,25 @@
 
 namespace Illuminate\Console;
 
+use Closure;
+
 trait Prohibitable
 {
     /**
      * Indicates if the command should be prohibited from running.
      *
-     * @var bool
+     * @var bool|(\Closure(\Symfony\Component\Console\Input\InputInterface): bool)
      */
     protected static $prohibitedFromRunning = false;
 
     /**
      * Indicate whether the command should be prohibited from running.
      *
-     * @param  bool  $prohibit
+     * Pass a closure to prohibit the command only for specific input. The
+     * closure receives the command's input and should return true to
+     * prohibit the command from running for that invocation.
+     *
+     * @param  bool|(\Closure(\Symfony\Component\Console\Input\InputInterface): bool)  $prohibit
      * @return void
      */
     public static function prohibit($prohibit = true)
@@ -30,7 +36,11 @@ trait Prohibitable
      */
     protected function isProhibited(bool $quiet = false)
     {
-        if (! static::$prohibitedFromRunning) {
+        $prohibited = static::$prohibitedFromRunning instanceof Closure
+            ? (bool) (static::$prohibitedFromRunning)($this->input)
+            : static::$prohibitedFromRunning;
+
+        if (! $prohibited) {
             return false;
         }
 

@@ -53,6 +53,16 @@ class ClearCommandTest extends TestCase
         $this->command->setLaravel($app);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown(): void
+    {
+        ClearCommand::prohibit(false);
+
+        parent::tearDown();
+    }
+
     public function testClearWithNoStoreArgument()
     {
         $this->files->shouldReceive('exists')->andReturn(true);
@@ -183,6 +193,81 @@ class ClearCommandTest extends TestCase
         $this->cacheRepository->shouldNotReceive('flush');
 
         $this->assertSame(1, $this->runCommand($this->command, ['--locks' => true]));
+    }
+
+    public function testProhibitWithoutArgumentsBlocksEveryStore()
+    {
+        ClearCommand::prohibit();
+
+        $this->cacheManager->shouldNotReceive('store');
+        $this->cacheRepository->shouldNotReceive('flush');
+
+        $this->assertSame(1, $this->runCommand($this->command, ['store' => 'cache']));
+    }
+
+    public function testProhibitWithClosureCanBlockSpecificStores()
+    {
+        // Deny "cache:clear locks", but allow other stores through.
+        ClearCommand::prohibit(fn ($input) => $input->getArgument('store') === 'locks');
+
+        $this->cacheManager->shouldNotReceive('store');
+        $this->cacheRepository->shouldNotReceive('flush');
+
+        $this->assertSame(1, $this->runCommand($this->command, ['store' => 'locks']));
+    }
+
+    public function testProhibitWithClosureAllowsStoresThatAreNotBlocked()
+    {
+        // Same denylist closure as above: "cache:clear cache" must still run.
+        ClearCommand::prohibit(fn ($input) => $input->getArgument('store') === 'locks');
+
+        $this->files->shouldReceive('exists')->andReturn(true);
+        $this->files->shouldReceive('files')->andReturn([]);
+
+        $this->cacheManager->shouldReceive('store')->once()->with('cache')->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('flush')->once()->andReturn(true);
+
+        $this->assertSame(0, $this->runCommand($this->command, ['store' => 'cache']));
+    }
+
+    public function testProhibitWithAllowlistBlocksUnlistedStores()
+    {
+        // Allowlist: anything other than the "cache" store is prohibited. This
+        // protects custom stores by default, including new ones added later
+        // and the bare "cache:clear" (default store) invocation.
+        ClearCommand::prohibit(fn ($input) => ! in_array($input->getArgument('store'), ['cache'], true));
+
+        $this->cacheManager->shouldNotReceive('store');
+        $this->cacheRepository->shouldNotReceive('flush');
+
+        $this->assertSame(1, $this->runCommand($this->command, ['store' => 'locks']));
+        $this->assertSame(1, $this->runCommand($this->command));
+    }
+
+    public function testProhibitWithAllowlistAllowsListedStores()
+    {
+        ClearCommand::prohibit(fn ($input) => ! in_array($input->getArgument('store'), ['cache'], true));
+
+        $this->files->shouldReceive('exists')->andReturn(true);
+        $this->files->shouldReceive('files')->andReturn([]);
+
+        $this->cacheManager->shouldReceive('store')->once()->with('cache')->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('flush')->once()->andReturn(true);
+
+        $this->assertSame(0, $this->runCommand($this->command, ['store' => 'cache']));
+    }
+
+    public function testProhibitByStoreArgumentIgnoresTheLocksOption()
+    {
+        // A store *named* "locks" (the argument) is unrelated to the --locks
+        // *option*, which clears lock entries from the default store. A closure
+        // keyed on the store argument therefore does not block "cache:clear --locks".
+        ClearCommand::prohibit(fn ($input) => $input->getArgument('store') === 'locks');
+
+        $this->cacheManager->shouldReceive('store')->once()->with(null)->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('flushLocks')->once()->andReturn(true);
+
+        $this->assertSame(0, $this->runCommand($this->command, ['--locks' => true]));
     }
 
     protected function runCommand($command, $input = [])
