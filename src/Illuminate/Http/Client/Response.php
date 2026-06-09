@@ -70,6 +70,13 @@ class Response implements ArrayAccess, Stringable
     protected $truncateExceptionsAt = null;
 
     /**
+     * Indicates if the response was served from cache.
+     *
+     * @var bool
+     */
+    protected bool $fromCache = false;
+
+    /**
      * The flags passed to `json_decode` by default.
      *
      * @var int-mask<JSON_BIGINT_AS_STRING, JSON_INVALID_UTF8_IGNORE, JSON_INVALID_UTF8_SUBSTITUTE, JSON_OBJECT_AS_ARRAY, JSON_THROW_ON_ERROR>
@@ -220,6 +227,29 @@ class Response implements ArrayAccess, Stringable
     public function effectiveUri()
     {
         return $this->transferStats?->getEffectiveUri();
+    }
+
+    /**
+     * Determine if the response was served from cache.
+     *
+     * @return bool
+     */
+    public function fromCache(): bool
+    {
+        return $this->fromCache;
+    }
+
+    /**
+     * Indicate if the response was served from cache.
+     *
+     * @param  bool  $fromCache
+     * @return $this
+     */
+    public function setFromCache(bool $fromCache = true)
+    {
+        $this->fromCache = $fromCache;
+
+        return $this;
     }
 
     /**

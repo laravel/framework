@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Http;
 
+use Closure;
 use Exception;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ConnectException;
@@ -16,6 +17,8 @@ use GuzzleHttp\Psr7\Request as GuzzleRequest;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\TransferStats;
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Batch;
@@ -36,6 +39,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Defer\DeferredCallback;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
@@ -75,6 +79,12 @@ class HttpClientTest extends TestCase
     protected function tearDown(): void
     {
         Response::flushState();
+        Cache::clearResolvedInstance('cache');
+    }
+
+    protected function swapCacheRepository(?CacheRepository $repository = null)
+    {
+        Cache::swap($repository ?: new CacheRepository(new ArrayStore));
     }
 
     public function testStubbedResponsesAreReturnedAfterFaking()
@@ -4207,6 +4217,140 @@ class HttpClientTest extends TestCase
 
         $this->assertInstanceOf(TestResponse::class, $response);
         $this->assertSame('expected content', $response->body());
+    }
+
+    public function testSuccessfulGetResponsesCanBeCached()
+    {
+        $this->swapCacheRepository();
+
+        $this->factory->fake([
+            'https://laravel.com' => $this->factory->sequence()
+                ->push('fresh content', 200, ['X-Test' => 'one'])
+                ->push('uncached content'),
+        ]);
+
+        $first = $this->factory->cache('laravel-docs', 600)->get('https://laravel.com');
+        $second = $this->factory->cache('laravel-docs', 600)->get('https://laravel.com');
+
+        $this->assertFalse($first->fromCache());
+        $this->assertTrue($second->fromCache());
+        $this->assertSame('fresh content', $second->body());
+        $this->assertSame(200, $second->status());
+        $this->assertSame('OK', $second->reason());
+        $this->assertSame('one', $second->header('X-Test'));
+        $this->factory->assertSentCount(1);
+    }
+
+    public function testSuccessfulGetResponsesUseRememberForNormalTtl()
+    {
+        $cache = new class(new ArrayStore) extends CacheRepository
+        {
+            public bool $rememberCalled = false;
+
+            public function remember($key, $ttl, Closure $callback)
+            {
+                $this->rememberCalled = true;
+
+                return parent::remember($key, $ttl, $callback);
+            }
+        };
+
+        $this->swapCacheRepository($cache);
+
+        $this->factory->fake([
+            'https://laravel.com' => $this->factory::response('remembered'),
+        ]);
+
+        $response = $this->factory->cache('laravel-docs', 600)->get('https://laravel.com');
+
+        $this->assertFalse($response->fromCache());
+        $this->assertTrue($cache->rememberCalled);
+        $this->assertSame('remembered', $this->factory->cache('laravel-docs', 600)->get('https://laravel.com')->body());
+    }
+
+    public function testSuccessfulGetResponsesUseFlexibleForArrayTtl()
+    {
+        $cache = new class(new ArrayStore) extends CacheRepository
+        {
+            public bool $flexibleCalled = false;
+
+            public function flexible($key, $ttl, $callback, $lock = null, $alwaysDefer = false)
+            {
+                $this->flexibleCalled = true;
+
+                return parent::flexible($key, $ttl, $callback, $lock, $alwaysDefer);
+            }
+        };
+
+        $this->swapCacheRepository($cache);
+
+        $this->factory->fake([
+            'https://laravel.com' => $this->factory::response('flexible'),
+        ]);
+
+        $response = $this->factory->cache('laravel-docs', [60, 300])->get('https://laravel.com');
+
+        $this->assertFalse($response->fromCache());
+        $this->assertTrue($cache->flexibleCalled);
+        $this->assertSame('flexible', $this->factory->cache('laravel-docs', [60, 300])->get('https://laravel.com')->body());
+    }
+
+    public function testFailedResponsesAreNotCachedByDefault()
+    {
+        $this->swapCacheRepository();
+
+        $this->factory->fake([
+            'https://laravel.com' => $this->factory->sequence()
+                ->push('failed', 500)
+                ->push('recovered', 200),
+        ]);
+
+        $first = $this->factory->cache('laravel-docs', 600)->get('https://laravel.com');
+        $second = $this->factory->cache('laravel-docs', 600)->get('https://laravel.com');
+
+        $this->assertFalse($first->fromCache());
+        $this->assertFalse($second->fromCache());
+        $this->assertSame(500, $first->status());
+        $this->assertSame('recovered', $second->body());
+        $this->factory->assertSentCount(2);
+    }
+
+    public function testNonGetResponsesAreNotCachedByDefault()
+    {
+        $this->swapCacheRepository();
+
+        $this->factory->fake([
+            'https://laravel.com' => $this->factory->sequence()
+                ->push('created')
+                ->push('created again'),
+        ]);
+
+        $first = $this->factory->cache('laravel-docs', 600)->post('https://laravel.com');
+        $second = $this->factory->cache('laravel-docs', 600)->post('https://laravel.com');
+
+        $this->assertFalse($first->fromCache());
+        $this->assertFalse($second->fromCache());
+        $this->assertSame('created again', $second->body());
+        $this->factory->assertSentCount(2);
+    }
+
+    public function testHttpFakeWorksWithCachedResponses()
+    {
+        $this->swapCacheRepository();
+
+        $this->factory->fake([
+            'https://laravel.com' => $this->factory->sequence()
+                ->push('fake response')
+                ->push('next response'),
+        ]);
+
+        $first = $this->factory->cache('laravel-docs', 600)->get('https://laravel.com');
+        $second = $this->factory->cache('laravel-docs', 600)->get('https://laravel.com');
+
+        $this->assertFalse($first->fromCache());
+        $this->assertTrue($second->fromCache());
+        $this->assertSame('fake response', $second->body());
+        $this->factory->assertSentCount(1);
     }
 
     public function testItCanHaveGlobalDefaultValues()

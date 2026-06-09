@@ -3,6 +3,8 @@
 namespace Illuminate\Http\Client;
 
 use Closure;
+use DateInterval;
+use DateTimeInterface;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
@@ -13,6 +15,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Promise\PromiseInterface;
+use GuzzleHttp\Psr7\Response as Psr7Response;
 use GuzzleHttp\UriTemplate\UriTemplate;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\ConnectionFailed;
@@ -22,6 +25,7 @@ use Illuminate\Http\Client\Promises\FluentPromise;
 use Illuminate\Http\Client\Promises\LazyPromise;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Conditionable;
@@ -158,6 +162,20 @@ class PendingRequest
      * @var (callable(\Throwable, static, string|null): bool)|null
      */
     protected $retryWhenCallback = null;
+
+    /**
+     * The cache key to use for the request.
+     *
+     * @var string|null
+     */
+    protected $cacheKey;
+
+    /**
+     * The cache TTL to use for the request.
+     *
+     * @var \DateTimeInterface|\DateInterval|int|array|null
+     */
+    protected $cacheTtl;
 
     /**
      * The callbacks that should execute before the request is sent.
@@ -673,6 +691,21 @@ class PendingRequest
     }
 
     /**
+     * Cache successful GET responses for the request.
+     *
+     * @param  string  $key
+     * @param  \DateTimeInterface|\DateInterval|int|array  $ttl
+     * @return $this
+     */
+    public function cache(string $key, DateTimeInterface|DateInterval|int|array $ttl)
+    {
+        $this->cacheKey = $key;
+        $this->cacheTtl = $ttl;
+
+        return $this;
+    }
+
+    /**
      * Replace the specified options on the request.
      *
      * @param  array  $options
@@ -1042,6 +1075,26 @@ class PendingRequest
             );
         }
 
+        if ($this->shouldCacheRequest($method)) {
+            return $this->sendCachedRequest(fn () => $this->sendSynchronously($method, $url, $options));
+        }
+
+        return $this->sendSynchronously($method, $url, $options);
+    }
+
+    /**
+     * Send the request synchronously.
+     *
+     * @param  string  $method
+     * @param  string  $url
+     * @param  array  $options
+     * @return \Illuminate\Http\Client\Response
+     *
+     * @throws \Exception
+     * @throws \Illuminate\Http\Client\ConnectionException
+     */
+    protected function sendSynchronously(string $method, string $url, array $options)
+    {
         $shouldRetry = null;
 
         return retry($this->tries ?? 1, function ($attempt) use ($method, $url, $options, &$shouldRetry) {
@@ -1104,6 +1157,81 @@ class PendingRequest
 
             return $result;
         });
+    }
+
+    /**
+     * Determine if the request should be cached.
+     *
+     * @param  string  $method
+     * @return bool
+     */
+    protected function shouldCacheRequest(string $method)
+    {
+        return $this->cacheKey !== null && $this->cacheTtl !== null && strtoupper($method) === 'GET';
+    }
+
+    /**
+     * Send the request using the configured response cache.
+     *
+     * @param  \Closure(): \Illuminate\Http\Client\Response  $callback
+     * @return \Illuminate\Http\Client\Response
+     */
+    protected function sendCachedRequest(Closure $callback)
+    {
+        $response = null;
+
+        try {
+            $value = is_array($this->cacheTtl)
+                ? Cache::flexible($this->cacheKey, $this->cacheTtl, function () use (&$response, $callback) {
+                    return $this->cacheResponse($response = $callback());
+                })
+                : Cache::remember($this->cacheKey, $this->cacheTtl, function () use (&$response, $callback) {
+                    return $this->cacheResponse($response = $callback());
+                });
+        } catch (UncacheableResponseException $e) {
+            return $e->response;
+        }
+
+        return $response ?: $this->newResponseFromCachedValue($value)->setFromCache();
+    }
+
+    /**
+     * Get the cache value for the given response.
+     *
+     * @param  \Illuminate\Http\Client\Response  $response
+     * @return array
+     *
+     * @throws \Illuminate\Http\Client\UncacheableResponseException
+     */
+    protected function cacheResponse(Response $response)
+    {
+        if (! $response->successful()) {
+            throw new UncacheableResponseException($response);
+        }
+
+        return [
+            'body' => $response->body(),
+            'headers' => $response->headers(),
+            'reason' => $response->reason(),
+            'status' => $response->status(),
+        ];
+    }
+
+    /**
+     * Create a new response from a cached value.
+     *
+     * @param  array  $value
+     * @return \Illuminate\Http\Client\Response
+     */
+    protected function newResponseFromCachedValue(array $value)
+    {
+        return $this->newResponse(new Psr7Response(
+            $value['status'],
+            $value['headers'],
+            $value['body'],
+            '1.1',
+            $value['reason'] ?? null,
+        ));
     }
 
     /**
