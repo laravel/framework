@@ -61,6 +61,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest timeout(int|float $seconds)
  * @method static \Illuminate\Http\Client\PendingRequest connectTimeout(int|float $seconds)
  * @method static \Illuminate\Http\Client\PendingRequest retry(array|int $times, \Closure|int $sleepMilliseconds = 0, callable|null $when = null, bool $throw = true)
+ * @method static \Illuminate\Http\Client\PendingRequest cache(string $key, \DateTimeInterface|\DateInterval|int|array $ttl, array|string $methods = ['GET'])
  * @method static \Illuminate\Http\Client\PendingRequest withOptions(array $options)
  * @method static \Illuminate\Http\Client\PendingRequest withMiddleware(callable $middleware)
  * @method static \Illuminate\Http\Client\PendingRequest withRequestMiddleware(callable $middleware)
