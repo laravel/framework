@@ -52,7 +52,7 @@
   
 * [12.x] Add JSON Schema array deserializer by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/60387
   
-* ### [13.x] Fix validation bypass in date_equals rule due to loose comparison by [@gr8man](https://github.com/gr8man) in https://github.com/laravel/framework/pull/60393
+* [13.x] Fix validation bypass in date_equals rule due to loose comparison by [@gr8man](https://github.com/gr8man) in https://github.com/laravel/framework/pull/60393
   
 * [13.x] Add Macroable to InvokedProcess by [@yoeriboven](https://github.com/yoeriboven) in https://github.com/laravel/framework/pull/60392
   
