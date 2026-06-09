@@ -16,9 +16,6 @@ class UnionType extends Type
     /**
      * The union's member type names.
      *
-     * Members carry their names only (mirroring a bare "type": [...] array);
-     * they do not hold their own keyword constraints.
-     *
      * @var array<int, string>
      */
     protected array $types;
