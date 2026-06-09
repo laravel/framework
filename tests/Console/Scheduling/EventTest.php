@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Console\Scheduling;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Container\Container;
+use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Mockery as m;
@@ -51,6 +52,46 @@ class EventTest extends TestCase
         $scheduleId = '"framework'.DIRECTORY_SEPARATOR.'schedule-eeb46c93d45e928d62aaf684d727e213b7094822"';
 
         $this->assertSame('start /b cmd /v:on /c "(php -i & '.php_binary().' artisan schedule:finish '.$scheduleId.' ^!ERRORLEVEL^!) > "NUL" 2>&1"', $event->buildCommand());
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testBuildCommandWithUserUsingUnix()
+    {
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+        $event->user('forge');
+
+        $this->assertSame("sudo -u forge -- sh -c 'php -i > '\''/dev/null'\'' 2>&1'", $event->buildCommand());
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testBuildCommandWithUserAndSpacesInOutputPathUsingUnix()
+    {
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+        $event->user('forge')->sendOutputTo('/my folder/foo.log');
+
+        $this->assertSame("sudo -u forge -- sh -c 'php -i > '\''/my folder/foo.log'\'' 2>&1'", $event->buildCommand());
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testBuildCommandWithUserAndSingleQuotesInOutputPathUsingUnix()
+    {
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+        $event->user('forge')->sendOutputTo("/tmp/o'brien.log");
+
+        $this->assertSame("sudo -u forge -- sh -c 'php -i > '\''/tmp/o'\''\'\'''\''brien.log'\'' 2>&1'", $event->buildCommand());
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testBuildCommandInBackgroundWithUserUsingUnix()
+    {
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+        $event->user('forge')->runInBackground();
+
+        $scheduleId = '"framework'.DIRECTORY_SEPARATOR.'schedule-eeb46c93d45e928d62aaf684d727e213b7094822"';
+
+        $background = "(php -i > '/dev/null' 2>&1 ; '".php_binary()."' 'artisan' schedule:finish {$scheduleId} \"$?\") > '/dev/null' 2>&1 &";
+
+        $this->assertSame('sudo -u forge -- sh -c '.ProcessUtils::escapeArgument($background), $event->buildCommand());
     }
 
     public function testBuildCommandSendOutputTo()
