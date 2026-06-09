@@ -304,10 +304,6 @@ class Deserializer
     /**
      * Ensure a multi-type union carries no type-specific constraint keywords.
      *
-     * A union only retains its member names, so any keyword that constrains a
-     * single type (e.g. "items", "properties", "minLength") would be silently
-     * dropped. Reject these rather than misrepresent the schema.
-     *
      * @param  array<string, mixed>  $schema
      *
      * @throws \InvalidArgumentException
