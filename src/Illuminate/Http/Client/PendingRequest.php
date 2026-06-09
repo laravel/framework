@@ -178,6 +178,13 @@ class PendingRequest
     protected $cacheTtl;
 
     /**
+     * The HTTP methods that should be cached.
+     *
+     * @var array
+     */
+    protected $cacheMethods = ['GET'];
+
+    /**
      * The callbacks that should execute before the request is sent.
      *
      * @var \Illuminate\Support\Collection
@@ -691,16 +698,18 @@ class PendingRequest
     }
 
     /**
-     * Cache successful GET responses for the request.
+     * Cache successful responses for the request.
      *
      * @param  string  $key
      * @param  \DateTimeInterface|\DateInterval|int|array  $ttl
+     * @param  array|string  $methods
      * @return $this
      */
-    public function cache(string $key, DateTimeInterface|DateInterval|int|array $ttl)
+    public function cache(string $key, DateTimeInterface|DateInterval|int|array $ttl, array|string $methods = ['GET'])
     {
         $this->cacheKey = $key;
         $this->cacheTtl = $ttl;
+        $this->cacheMethods = array_map('strtoupper', Arr::wrap($methods));
 
         return $this;
     }
@@ -1167,7 +1176,9 @@ class PendingRequest
      */
     protected function shouldCacheRequest(string $method)
     {
-        return $this->cacheKey !== null && $this->cacheTtl !== null && strtoupper($method) === 'GET';
+        return $this->cacheKey !== null &&
+            $this->cacheTtl !== null &&
+            in_array(strtoupper($method), $this->cacheMethods, true);
     }
 
     /**
