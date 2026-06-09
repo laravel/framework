@@ -238,7 +238,7 @@ class MakesHttpRequestsTest extends TestCase
     public function testWithQueryParametersAppendsToRequestUri()
     {
         $this->app->make(Registrar::class)
-            ->get('users', fn () => request()->query());
+            ->get('users', fn () => request());
 
         $this->withQueryParameters(['page' => 2, 'sort' => 'name'])
             ->getJson('users')
@@ -249,7 +249,7 @@ class MakesHttpRequestsTest extends TestCase
     public function testWithQueryParametersMergesWithExistingQueryString()
     {
         $this->app->make(Registrar::class)
-            ->get('users', fn () => request()->query());
+            ->get('users', fn () => request());
 
         $this->withQueryParameters(['sort' => 'name'])
             ->getJson('users?filter=active')
@@ -260,7 +260,7 @@ class MakesHttpRequestsTest extends TestCase
     public function testWithQueryParametersSupportsNestedArrays()
     {
         $this->app->make(Registrar::class)
-            ->get('users', fn () => request()->query());
+            ->get('users', fn () => request());
 
         $this->withQueryParameters(['filters' => ['status' => 'active', 'tags' => ['a', 'b']]])
             ->getJson('users')
