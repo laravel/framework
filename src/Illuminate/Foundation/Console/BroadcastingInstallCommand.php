@@ -470,7 +470,7 @@ class BroadcastingInstallCommand extends Command
             'reverb' => 'Laravel Reverb',
             'pusher' => 'Pusher',
             'ably' => 'Ably',
-        ], 'reverb');
+        ], default: 'reverb');
     }
 
     /**
