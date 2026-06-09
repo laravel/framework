@@ -1,6 +1,12 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.61.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.62.0...12.x)
+
+## [v12.62.0](https://github.com/laravel/framework/compare/v12.61.1...v12.62.0) - 2026-06-09
+
+* [12.x] Add JSON Schema array deserializer by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/60387
+* [12.x] Skip pg_collation lookup in compileColumns() on PostgreSQL servers before 9.1 by [@fissible](https://github.com/fissible) in https://github.com/laravel/framework/pull/60400
+* [12.x] Add multi-type union support to Illuminate JsonSchema by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/60462
 
 ## [v12.61.1](https://github.com/laravel/framework/compare/v12.61.0...v12.61.1) - 2026-06-04
 
