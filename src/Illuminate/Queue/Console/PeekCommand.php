@@ -27,7 +27,7 @@ class PeekCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Inspect the jobs on a given queue';
+    protected $description = 'Peek at the jobs on a given queue';
 
     /**
      * Execute the console command.
