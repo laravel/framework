@@ -9,6 +9,7 @@ use Illuminate\Database\Console\PruneCommand;
 use Illuminate\Database\Events\ModelPruningFinished;
 use Illuminate\Database\Events\ModelPruningStarting;
 use Illuminate\Database\Events\ModelsPruned;
+use Illuminate\Database\Events\ModelsSoftPruned;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Application;
 use Mockery as m;
@@ -233,6 +234,70 @@ class PruneCommandTest extends TestCase
         $this->assertEquals(4, Pruning\Models\PrunableTestSoftDeletedModelWithPrunableRecords::withTrashed()->count());
     }
 
+    public function testTheCommandMayBePretendedOnSoftPrunableModel()
+    {
+        $db = new DB;
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+        $db->bootEloquent();
+        $db->setAsGlobal();
+        DB::connection('default')->getSchemaBuilder()->create('prunables', function ($table) {
+            $table->string('value')->nullable();
+            $table->datetime('deleted_at')->nullable();
+        });
+        DB::connection('default')->table('prunables')->insert([
+            ['value' => 1, 'deleted_at' => null],
+            ['value' => 2, 'deleted_at' => '2021-12-01 00:00:00'],
+            ['value' => 3, 'deleted_at' => null],
+            ['value' => 4, 'deleted_at' => '2021-12-02 00:00:00'],
+        ]);
+
+        $output = $this->artisan([
+            '--model' => Pruning\Models\PrunableTestSoftPrunableModelWithPrunableRecords::class,
+            '--pretend' => true,
+        ]);
+
+        // Soft pruning only targets live records, so the already-trashed value 4 is excluded.
+        $this->assertStringContainsString(
+            '1 [Illuminate\Tests\Database\Pruning\Models\PrunableTestSoftPrunableModelWithPrunableRecords] records will be pruned.',
+            $output->fetch(),
+        );
+
+        $this->assertEquals(4, Pruning\Models\PrunableTestSoftPrunableModelWithPrunableRecords::withTrashed()->count());
+    }
+
+    public function testPruneSoftPrunableModelWithPrunableRecords()
+    {
+        $db = new DB;
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+        $db->bootEloquent();
+        $db->setAsGlobal();
+        DB::connection('default')->getSchemaBuilder()->create('prunables', function ($table) {
+            $table->increments('id');
+            $table->string('value')->nullable();
+            $table->datetime('deleted_at')->nullable();
+        });
+        DB::connection('default')->table('prunables')->insert([
+            ['value' => 1, 'deleted_at' => null],
+            ['value' => 2, 'deleted_at' => '2021-12-01 00:00:00'],
+            ['value' => 3, 'deleted_at' => null],
+            ['value' => 4, 'deleted_at' => '2021-12-02 00:00:00'],
+        ]);
+
+        $this->artisan(['--model' => Pruning\Models\PrunableTestSoftPrunableModelWithPrunableRecords::class]);
+
+        // The live matching record (value 3) is soft deleted (per-model pruning chunks by id),
+        // nothing is hard deleted.
+        $this->assertEquals(4, Pruning\Models\PrunableTestSoftPrunableModelWithPrunableRecords::withTrashed()->count());
+        $this->assertEquals(1, Pruning\Models\PrunableTestSoftPrunableModelWithPrunableRecords::count());
+        $this->assertEquals(3, Pruning\Models\PrunableTestSoftPrunableModelWithPrunableRecords::onlyTrashed()->count());
+    }
+
     public function testTheCommandDispatchesEvents()
     {
         $dispatcher = m::mock(DispatcherContract::class);
@@ -242,12 +307,14 @@ class PruneCommandTest extends TestCase
                 $event->models === [Pruning\Models\PrunableTestModelWithPrunableRecords::class];
         });
         $dispatcher->shouldReceive('listen')->once()->with(ModelsPruned::class, m::type(Closure::class));
+        $dispatcher->shouldReceive('listen')->once()->with(ModelsSoftPruned::class, m::type(Closure::class));
         $dispatcher->shouldReceive('dispatch')->twice()->with(m::type(ModelsPruned::class));
         $dispatcher->shouldReceive('dispatch')->once()->withArgs(function ($event) {
             return get_class($event) === ModelPruningFinished::class &&
                 $event->models === [Pruning\Models\PrunableTestModelWithPrunableRecords::class];
         });
         $dispatcher->shouldReceive('forget')->once()->with(ModelsPruned::class);
+        $dispatcher->shouldReceive('forget')->once()->with(ModelsSoftPruned::class);
 
         Application::getInstance()->instance(DispatcherContract::class, $dispatcher);
 

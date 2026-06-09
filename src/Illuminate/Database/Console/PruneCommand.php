@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Events\ModelPruningFinished;
 use Illuminate\Database\Events\ModelPruningStarting;
 use Illuminate\Database\Events\ModelsPruned;
+use Illuminate\Database\Events\ModelsSoftPruned;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -63,15 +64,11 @@ class PruneCommand extends Command
         $pruning = [];
 
         $events->listen(ModelsPruned::class, function ($event) use (&$pruning) {
-            if (! in_array($event->model, $pruning)) {
-                $pruning[] = $event->model;
+            $this->displayPruningProgress($event, 'Pruning [%s] records.', $pruning);
+        });
 
-                $this->newLine();
-
-                $this->components->info(sprintf('Pruning [%s] records.', $event->model));
-            }
-
-            $this->components->twoColumnDetail($event->model, "{$event->count} records");
+        $events->listen(ModelsSoftPruned::class, function ($event) use (&$pruning) {
+            $this->displayPruningProgress($event, 'Soft pruning [%s] records.', $pruning);
         });
 
         $events->dispatch(new ModelPruningStarting($models->all()));
@@ -83,6 +80,30 @@ class PruneCommand extends Command
         $events->dispatch(new ModelPruningFinished($models->all()));
 
         $events->forget(ModelsPruned::class);
+        $events->forget(ModelsSoftPruned::class);
+    }
+
+    /**
+     * Display the pruning progress for the given event.
+     *
+     * @param  \Illuminate\Database\Events\ModelsPruned|\Illuminate\Database\Events\ModelsSoftPruned  $event
+     * @param  string  $message
+     * @param  array<int, string>  $pruning
+     * @return void
+     */
+    protected function displayPruningProgress($event, $message, array &$pruning)
+    {
+        $key = $message.$event->model;
+
+        if (! in_array($key, $pruning)) {
+            $pruning[] = $key;
+
+            $this->newLine();
+
+            $this->components->info(sprintf($message, $event->model));
+        }
+
+        $this->components->twoColumnDetail($event->model, "{$event->count} records");
     }
 
     /**
@@ -171,10 +192,17 @@ class PruneCommand extends Command
     {
         $instance = new $model;
 
-        $count = $instance->prunable()
-            ->when($model::isSoftDeletable(), function ($query) {
+        $count = 0;
+
+        if (! is_null($hard = $instance->prunable())) {
+            $count += $hard->when($model::isSoftDeletable(), function ($query) {
                 $query->withTrashed();
             })->count();
+        }
+
+        if (method_exists($instance, 'softPrunable') && ! is_null($soft = $instance->softPrunable())) {
+            $count += $soft->count();
+        }
 
         if ($count === 0) {
             $this->components->info("No prunable [$model] records found.");
