@@ -36,6 +36,9 @@ use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\VarDumper\VarDumper;
 use Throwable;
+use UnitEnum;
+
+use function Illuminate\Support\enum_value;
 
 /**
  * @template TAsync of bool = false
@@ -702,14 +705,14 @@ class PendingRequest
      *
      * @param  string  $key
      * @param  \DateTimeInterface|\DateInterval|int|array  $ttl
-     * @param  array|string  $methods
+     * @param  \UnitEnum|array|string  $methods
      * @return $this
      */
-    public function cache(string $key, DateTimeInterface|DateInterval|int|array $ttl, array|string $methods = ['GET'])
+    public function cache(string $key, DateTimeInterface|DateInterval|int|array $ttl, UnitEnum|array|string $methods = ['GET'])
     {
         $this->cacheKey = $key;
         $this->cacheTtl = $ttl;
-        $this->cacheMethods = array_map('strtoupper', Arr::wrap($methods));
+        $this->cacheMethods = array_map(fn ($method) => strtoupper(enum_value($method)), Arr::wrap($methods));
 
         return $this;
     }

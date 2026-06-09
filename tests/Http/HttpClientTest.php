@@ -4248,7 +4248,7 @@ class HttpClientTest extends TestCase
         $docComment = (new \ReflectionClass(HttpFacade::class))->getDocComment();
 
         $this->assertStringContainsString(
-            '@method static \Illuminate\Http\Client\PendingRequest cache(string $key, \DateTimeInterface|\DateInterval|int|array $ttl, array|string $methods = [\'GET\'])',
+            '@method static \Illuminate\Http\Client\PendingRequest cache(string $key, \DateTimeInterface|\DateInterval|int|array $ttl, \UnitEnum|array|string $methods = [\'GET\'])',
             $docComment
         );
     }
@@ -4377,6 +4377,25 @@ class HttpClientTest extends TestCase
 
         $first = $this->factory->cache('laravel-docs', 600, 'post')->post('https://laravel.com');
         $second = $this->factory->cache('laravel-docs', 600, 'post')->post('https://laravel.com');
+
+        $this->assertFalse($first->fromCache());
+        $this->assertTrue($second->fromCache());
+        $this->assertSame('created', $second->body());
+        $this->factory->assertSentCount(1);
+    }
+
+    public function testCacheMethodsMayBeEnums()
+    {
+        $this->swapCacheRepository();
+
+        $this->factory->fake([
+            'https://laravel.com' => $this->factory->sequence()
+                ->push('created')
+                ->push('created again'),
+        ]);
+
+        $first = $this->factory->cache('laravel-docs', 600, HttpClientCacheMethod::Post)->post('https://laravel.com');
+        $second = $this->factory->cache('laravel-docs', 600, HttpClientCacheMethod::Post)->post('https://laravel.com');
 
         $this->assertFalse($first->fromCache());
         $this->assertTrue($second->fromCache());
@@ -5021,4 +5040,9 @@ class BodyTrackingResponse extends Response
 
         return parent::body();
     }
+}
+
+enum HttpClientCacheMethod: string
+{
+    case Post = 'POST';
 }
