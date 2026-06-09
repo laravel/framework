@@ -44,6 +44,13 @@ trait MakesHttpRequests
     protected $serverVariables = [];
 
     /**
+     * Additional query parameters for the request.
+     *
+     * @var array
+     */
+    protected $queryParameters = [];
+
+    /**
      * Indicates whether redirects should be followed.
      *
      * @var bool
@@ -176,6 +183,19 @@ trait MakesHttpRequests
     public function withServerVariables(array $server)
     {
         $this->serverVariables = $server;
+
+        return $this;
+    }
+
+    /**
+     * Define additional query parameters to be appended to the request URI.
+     *
+     * @param  array  $query
+     * @return $this
+     */
+    public function withQueryParameters(array $query)
+    {
+        $this->queryParameters = array_merge($this->queryParameters, $query);
 
         return $this;
     }
@@ -625,6 +645,10 @@ trait MakesHttpRequests
      */
     protected function prepareUrlForRequest($uri)
     {
+        if ($this->queryParameters !== []) {
+            $uri = Uri::of($uri)->withQuery($this->queryParameters);
+        }
+
         $uri = $uri instanceof Uri ? $uri->value() : $uri;
 
         if (str_starts_with($uri, '/')) {

@@ -227,6 +227,58 @@ class MakesHttpRequestsTest extends TestCase
         $this->assertEquals(['from', 'to'], $callOrder);
     }
 
+    public function testWithQueryParametersMergesIntoState()
+    {
+        $this->withQueryParameters(['page' => 2]);
+        $this->withQueryParameters(['sort' => 'name']);
+
+        $this->assertSame(['page' => 2, 'sort' => 'name'], $this->queryParameters);
+    }
+
+    public function testWithQueryParametersAppendsToRequestUri()
+    {
+        $this->app->make(Registrar::class)
+            ->get('users', fn () => request()->query());
+
+        $this->withQueryParameters(['page' => 2, 'sort' => 'name'])
+            ->getJson('users')
+            ->assertOk()
+            ->assertExactJson(['page' => '2', 'sort' => 'name']);
+    }
+
+    public function testWithQueryParametersMergesWithExistingQueryString()
+    {
+        $this->app->make(Registrar::class)
+            ->get('users', fn () => request()->query());
+
+        $this->withQueryParameters(['sort' => 'name'])
+            ->getJson('users?filter=active')
+            ->assertOk()
+            ->assertExactJson(['filter' => 'active', 'sort' => 'name']);
+    }
+
+    public function testWithQueryParametersSupportsNestedArrays()
+    {
+        $this->app->make(Registrar::class)
+            ->get('users', fn () => request()->query());
+
+        $this->withQueryParameters(['filters' => ['status' => 'active', 'tags' => ['a', 'b']]])
+            ->getJson('users')
+            ->assertOk()
+            ->assertExactJson(['filters' => ['status' => 'active', 'tags' => ['a', 'b']]]);
+    }
+
+    public function testWithQueryParametersAppliesToNonGetVerbs()
+    {
+        $this->app->make(Registrar::class)
+            ->post('users', fn () => request()->query());
+
+        $this->withQueryParameters(['page' => 2])
+            ->postJson('users', ['name' => 'Taylor'])
+            ->assertOk()
+            ->assertExactJson(['page' => '2']);
+    }
+
     public function testWithPrecognition()
     {
         $this->withPrecognition();
