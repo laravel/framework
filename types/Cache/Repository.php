@@ -25,6 +25,9 @@ assertType('33', $cache->sear('cache', function (): int {
 assertType('36', $cache->remember('cache', Carbon::now(), function (): int {
     return 36;
 }));
+assertType('array{36, bool}', $cache->rememberWithWarmth('cache', Carbon::now(), function (): int {
+    return 36;
+}));
 assertType('36', $cache->rememberForever('cache', function (): int {
     return 36;
 }));

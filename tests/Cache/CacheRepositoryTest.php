@@ -147,26 +147,26 @@ class CacheRepositoryTest extends TestCase
         $this->assertSame('bar', $result);
     }
 
-    public function testRememberWithStateReturnsCachedValue()
+    public function testRememberWithWarmthReturnsCachedValue()
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('bar');
         $repo->getStore()->shouldReceive('put')->never();
 
-        $result = $repo->rememberWithState('foo', 10, function () {
+        $result = $repo->rememberWithWarmth('foo', 10, function () {
             $this->fail('The cache callback should not be called.');
         });
 
         $this->assertSame(['bar', true], $result);
     }
 
-    public function testRememberWithStateCallsPutAndReturnsDefault()
+    public function testRememberWithWarmthCallsPutAndReturnsDefault()
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(null);
         $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 10);
 
-        $result = $repo->rememberWithState('foo', function ($value) {
+        $result = $repo->rememberWithWarmth('foo', function ($value) {
             $this->assertSame('bar', $value);
 
             return 10;

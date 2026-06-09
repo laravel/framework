@@ -550,7 +550,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function remember($key, $ttl, Closure $callback)
     {
-        return $this->rememberWithState($key, $ttl, $callback)[0];
+        return $this->rememberWithWarmth($key, $ttl, $callback)[0];
     }
 
     /**
@@ -561,9 +561,9 @@ class Repository implements ArrayAccess, CacheContract
      * @param  \UnitEnum|string  $key
      * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
      * @param  \Closure(): TCacheValue  $callback
-     * @return array{TCacheValue, bool}
+     * @return array{TCacheValue, bool} The cached value and whether it was warm.
      */
-    public function rememberWithState($key, $ttl, Closure $callback): array
+    public function rememberWithWarmth($key, $ttl, Closure $callback): array
     {
         $value = $this->get($key);
 
