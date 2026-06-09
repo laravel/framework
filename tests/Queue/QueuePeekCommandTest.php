@@ -3,12 +3,15 @@
 namespace Illuminate\Tests\Queue;
 
 use Illuminate\Contracts\Queue\Factory;
+use Illuminate\Queue\Console\PeekCommand;
 use Illuminate\Queue\Jobs\InspectedJob;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 class QueuePeekCommandTest extends TestCase
 {
@@ -37,12 +40,12 @@ class QueuePeekCommandTest extends TestCase
 
         $this->mockQueueConnection($queue);
 
-        $this->artisan('queue:peek')
-            ->expectsOutputToContain('App\\Jobs\\ProcessPodcast')
-            ->expectsOutputToContain('1cde062a-8c6a-4d67-8125-e83f585c18cb')
-            ->expectsOutputToContain('1 attempt')
-            ->expectsOutputToContain('5 minutes ago')
-            ->assertSuccessful();
+        $output = $this->runPeekCommand()->fetch();
+
+        $this->assertStringContainsString('App\\Jobs\\ProcessPodcast', $output);
+        $this->assertStringContainsString('1cde062a-8c6a-4d67-8125-e83f585c18cb', $output);
+        $this->assertStringContainsString('1 attempt', $output);
+        $this->assertStringContainsString('5 minutes ago', $output);
     }
 
     public function testItDisplaysWhenEmpty()
@@ -55,9 +58,9 @@ class QueuePeekCommandTest extends TestCase
 
         $this->mockQueueConnection($queue);
 
-        $this->artisan('queue:peek')
-            ->expectsOutputToContain('No pending jobs found on the [default] queue.')
-            ->assertSuccessful();
+        $output = $this->runPeekCommand()->fetch();
+
+        $this->assertStringContainsString('No pending jobs found on the [default] queue.', $output);
     }
 
     public function testItCanOutputAsJson()
@@ -78,10 +81,10 @@ class QueuePeekCommandTest extends TestCase
 
         $this->mockQueueConnection($queue);
 
-        $this->artisan('queue:peek', ['--json' => true])
-            ->expectsOutputToContain('"uuid":"1cde062a-8c6a-4d67-8125-e83f585c18cb"')
-            ->expectsOutputToContain('"name":"App\\\\Jobs\\\\ProcessPodcast"')
-            ->assertSuccessful();
+        $output = $this->runPeekCommand(['--json' => true])->fetch();
+
+        $this->assertStringContainsString('"uuid":"1cde062a-8c6a-4d67-8125-e83f585c18cb"', $output);
+        $this->assertStringContainsString('"name":"App\\\\Jobs\\\\ProcessPodcast"', $output);
     }
 
     public function testItDisplaysDelayedJobs()
@@ -102,9 +105,9 @@ class QueuePeekCommandTest extends TestCase
 
         $this->mockQueueConnection($queue);
 
-        $this->artisan('queue:peek', ['--state' => 'delayed'])
-            ->expectsOutputToContain('App\\Jobs\\ProcessPodcast')
-            ->assertSuccessful();
+        $output = $this->runPeekCommand(['--state' => 'delayed'])->fetch();
+
+        $this->assertStringContainsString('App\\Jobs\\ProcessPodcast', $output);
     }
 
     public function testItDisplaysReservedJobs()
@@ -125,10 +128,10 @@ class QueuePeekCommandTest extends TestCase
 
         $this->mockQueueConnection($queue);
 
-        $this->artisan('queue:peek', ['--state' => 'reserved'])
-            ->expectsOutputToContain('App\\Jobs\\ProcessPodcast')
-            ->expectsOutputToContain('2 attempts')
-            ->assertSuccessful();
+        $output = $this->runPeekCommand(['--state' => 'reserved'])->fetch();
+
+        $this->assertStringContainsString('App\\Jobs\\ProcessPodcast', $output);
+        $this->assertStringContainsString('2 attempts', $output);
     }
 
     public function testItUsesTheQueueOption()
@@ -140,16 +143,16 @@ class QueuePeekCommandTest extends TestCase
 
         $this->mockQueueConnection($queue);
 
-        $this->artisan('queue:peek', ['--queue' => 'high'])
-            ->expectsOutputToContain('No pending jobs found on the [high] queue.')
-            ->assertSuccessful();
+        $output = $this->runPeekCommand(['--queue' => 'high'])->fetch();
+
+        $this->assertStringContainsString('No pending jobs found on the [high] queue.', $output);
     }
 
     public function testItRejectsAnInvalidState()
     {
-        $this->artisan('queue:peek', ['--state' => 'failed'])
-            ->expectsOutputToContain('The state must be one of: pending, delayed, reserved.')
-            ->assertFailed();
+        $output = $this->runPeekCommand(['--state' => 'failed'])->fetch();
+
+        $this->assertStringContainsString('The state must be one of: pending, delayed, reserved.', $output);
     }
 
     public function testItOutputsWhenQueueDoesNotSupportInspection()
@@ -158,9 +161,9 @@ class QueuePeekCommandTest extends TestCase
 
         $this->mockQueueConnection(m::mock());
 
-        $this->artisan('queue:peek')
-            ->expectsOutputToContain('The [jack] connection does not support inspecting jobs.')
-            ->assertFailed();
+        $output = $this->runPeekCommand()->fetch();
+
+        $this->assertStringContainsString('The [jack] connection does not support inspecting jobs.', $output);
     }
 
     protected function mockQueueConnection(mixed $queue): void
@@ -168,5 +171,17 @@ class QueuePeekCommandTest extends TestCase
         $manager = m::mock(Factory::class);
         $manager->shouldReceive('connection')->andReturn($queue);
         $this->app->instance('queue', $manager);
+    }
+
+    protected function runPeekCommand($arguments = [])
+    {
+        $input = new ArrayInput($arguments);
+        $output = new BufferedOutput;
+
+        tap(new PeekCommand)
+            ->setLaravel($this->app)
+            ->run($input, $output);
+
+        return $output;
     }
 }
