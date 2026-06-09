@@ -4,6 +4,7 @@ namespace Illuminate\Console\Concerns;
 
 use Illuminate\Console\PromptValidationException;
 use Laravel\Prompts\ConfirmPrompt;
+use Laravel\Prompts\Exceptions\NonInteractiveValidationException;
 use Laravel\Prompts\MultiSearchPrompt;
 use Laravel\Prompts\MultiSelectPrompt;
 use Laravel\Prompts\PasswordPrompt;
@@ -71,7 +72,7 @@ trait ConfiguresPrompts
 
         SelectPrompt::fallbackUsing(fn (SelectPrompt $prompt) => $this->promptUntilValid(
             fn () => $this->selectFallback($prompt->label, $prompt->options, $prompt->default),
-            false,
+            $prompt->required,
             $prompt->validate
         ));
 
@@ -123,20 +124,27 @@ trait ConfiguresPrompts
      * @return PResult
      *
      * @throws \Illuminate\Console\PromptValidationException
+     * @throws \Laravel\Prompts\Exceptions\NonInteractiveValidationException
      */
     protected function promptUntilValid($prompt, $required, $validate)
     {
         while (true) {
             $result = $prompt();
 
-            if ($required && ($result === '' || $result === [] || $result === false)) {
+            if ($required && ($result === '' || $result === [] || $result === false || is_null($result))) {
                 $this->components->error(is_string($required) ? $required : 'Required.');
 
                 if ($this->laravel->runningUnitTests()) {
                     throw new PromptValidationException;
-                } else {
-                    continue;
                 }
+
+                if (! $this->input->isInteractive()) {
+                    throw new NonInteractiveValidationException(
+                        is_string($required) ? $required : 'Required.'
+                    );
+                }
+
+                continue;
             }
 
             $error = is_callable($validate) ? $validate($result) : $this->validatePrompt($result, $validate);
@@ -146,9 +154,13 @@ trait ConfiguresPrompts
 
                 if ($this->laravel->runningUnitTests()) {
                     throw new PromptValidationException;
-                } else {
-                    continue;
                 }
+
+                if (! $this->input->isInteractive()) {
+                    throw new NonInteractiveValidationException($error);
+                }
+
+                continue;
             }
 
             return $result;
