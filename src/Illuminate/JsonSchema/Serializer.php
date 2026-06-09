@@ -32,13 +32,18 @@ class Serializer
             Types\NumberType::class => 'number',
             Types\ObjectType::class => 'object',
             Types\StringType::class => 'string',
+            Types\UnionType::class => $attributes['types'],
             default => throw new RuntimeException('Unsupported ['.get_class($type).'] type.'),
         };
+
+        unset($attributes['types']);
 
         $nullable = static::isNullable($type);
 
         if ($nullable) {
-            $attributes['type'] = [$attributes['type'], 'null'];
+            $attributes['type'] = is_array($attributes['type'])
+                ? [...$attributes['type'], 'null']
+                : [$attributes['type'], 'null'];
         }
 
         $attributes = array_filter($attributes, static function (mixed $value, string $key) {

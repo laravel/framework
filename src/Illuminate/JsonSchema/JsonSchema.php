@@ -12,6 +12,7 @@ use Illuminate\JsonSchema\Types\Type;
  * @method static Types\StringType string()
  * @method static Types\BooleanType boolean()
  * @method static Types\ArrayType array()
+ * @method static Types\UnionType union(array<int, string> $types)
  */
 class JsonSchema
 {
