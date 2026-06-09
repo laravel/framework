@@ -940,7 +940,16 @@ class Builder implements BuilderContract
 
         $relation->addEagerConstraints($models);
 
+        $query = $relation->getQuery()->getQuery();
+        $originalWhereCount = is_null($query->wheres)
+            ? 0
+            : count($query->wheres);
+
         $constraints($relation);
+
+        if (count((array) $query->wheres) > $originalWhereCount) {
+            $this->addNewWheresWithinGroup($query, $originalWhereCount);
+        }
 
         // Once we have the results, we just match those back up to their parent models
         // using the relationship instance. Then we just return the finished arrays

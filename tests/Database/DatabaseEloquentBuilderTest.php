@@ -866,6 +866,11 @@ class DatabaseEloquentBuilderTest extends TestCase
         $relation->shouldReceive('initRelation')->once()->with(['models'], 'orders')->andReturn(['models']);
         $relation->shouldReceive('getEager')->once()->andReturn(['results']);
         $relation->shouldReceive('match')->once()->with(['models'], ['results'], 'orders')->andReturn(['models.matched']);
+        $innerQueryBuilder = m::mock(stdClass::class);
+        $innerQueryBuilder->wheres = [];
+        $eloquentBuilder = m::mock(stdClass::class);
+        $eloquentBuilder->shouldReceive('getQuery')->andReturn($innerQueryBuilder);
+        $relation->shouldReceive('getQuery')->andReturn($eloquentBuilder);
         $builder->shouldReceive('getRelation')->once()->with('orders')->andReturn($relation);
         $results = $builder->eagerLoadRelations(['models']);
 
@@ -896,6 +901,35 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         unset($_SERVER['__eloquent.constrain']);
     }
+
+    public function testEagerLoadConstraintOrWhereIsProperlyGrouped()
+    {  
+        $model = new EloquentBuilderTestModelCloseRelatedStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
+        $model->getConnection()->shouldReceive('select')->andReturn([]);
+
+        $builder = $model->newQuery();
+        $builder->setEagerLoads([
+            'bar' => function ($query) {
+                $_SERVER['__eloquent.eager_constraints'] = $query;
+                $query->where('foo', '>', 1)->orWhere('bar', 'baz');
+            },
+        ]);
+
+        $parentModel = new EloquentBuilderTestModelCloseRelatedStub;
+        $parentModel->id = 5;
+
+        $builder->eagerLoadRelations([$parentModel]);
+
+        $this->assertSame(
+            'select * from "eloquent_builder_test_model_far_related_stubs" where "eloquent_builder_test_model_far_related_stubs"."eloquent_builder_test_model_close_related_stub_id" in (5) and ("foo" > ? or "bar" = ?)',
+            $_SERVER['__eloquent.eager_constraints']->getQuery()->toSql()
+        );
+
+        unset($_SERVER['__eloquent.eager_constraints']);
+    }
+
 
     public function testGetRelationProperlySetsNestedRelationships()
     {
