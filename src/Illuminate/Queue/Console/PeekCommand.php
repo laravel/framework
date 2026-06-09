@@ -41,7 +41,7 @@ class PeekCommand extends Command
         if (! in_array($state, ['pending', 'delayed', 'reserved'])) {
             $this->components->error('The state must be one of: pending, delayed, reserved.');
 
-            return 1;
+            return self::FAILURE;
         }
 
         $connection = $this->argument('connection')
@@ -80,6 +80,8 @@ class PeekCommand extends Command
         $this->newLine();
         $this->displayJobs($jobs);
         $this->newLine();
+
+        return self::SUCCESS;
     }
 
     /**
