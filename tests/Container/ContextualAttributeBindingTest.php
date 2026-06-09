@@ -35,6 +35,7 @@ use Illuminate\Log\LogManager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use ReflectionParameter;
 
 class ContextualAttributeBindingTest extends TestCase
 {
@@ -369,6 +370,28 @@ class ContextualAttributeBindingTest extends TestCase
 
         $this->assertEquals([1, 2], iterator_to_array($value));
     }
+
+    public function testParameterIsPassedToContextualAttributeResolver()
+    {
+        $container = new Container;
+
+        $value = $container->make(HasParameterAwareAttribute::class);
+
+        $this->assertSame('name', $value->name);
+    }
+
+    public function testParameterIsPassedToContextualAttributeResolverOnAppCall()
+    {
+        $container = new Container;
+
+        $value = $container->call(function (
+            #[ContainerTestParameterAwareAttribute] ?string $name
+        ) {
+            return $name;
+        });
+
+        $this->assertSame('name', $value);
+    }
 }
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
@@ -492,6 +515,15 @@ final class ContainerTestConfigValueWithResolveAndAfter implements ContextualAtt
     public function after(self $attribute, object $value, Container $container): void
     {
         $value->role = 'Developer';
+    }
+}
+
+#[Attribute(Attribute::TARGET_PARAMETER)]
+final class ContainerTestParameterAwareAttribute implements ContextualAttribute
+{
+    public function resolve(self $attribute, Container $container, ReflectionParameter $parameter): string
+    {
+        return $parameter->getName();
     }
 }
 
@@ -634,6 +666,15 @@ final class LocaleObject
 {
     public function __construct(
         #[Config('app.locale')] public readonly ?string $locale
+    ) {
+        //
+    }
+}
+
+final class HasParameterAwareAttribute
+{
+    public function __construct(
+        #[ContainerTestParameterAwareAttribute] public readonly ?string $name,
     ) {
         //
     }
