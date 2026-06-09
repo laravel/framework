@@ -196,6 +196,22 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseEmpty(new ProductStub);
     }
 
+    public function testAssertDatabaseEmptySupportsArrays()
+    {
+        $builder = $this->mockCountBuilder(false);
+        $this->connection->shouldReceive('table')->with('users')->andReturn($builder);
+
+        $this->assertDatabaseEmpty([$this->table, 'users']);
+    }
+
+    public function testAssertDatabaseCountSupportsArrays()
+    {
+        $builder = $this->mockCountBuilder(true);
+        $this->connection->shouldReceive('table')->with('users')->andReturn($builder);
+
+        $this->assertDatabaseCount([$this->table, 'users'], 1);
+    }
+
     public function testAssertTableEntriesCountWrong()
     {
         $this->expectException(ExpectationFailedException::class);

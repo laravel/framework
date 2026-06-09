@@ -100,13 +100,21 @@ trait InteractsWithDatabase
     /**
      * Assert the count of table entries.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
+     * @param  iterable<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
      * @param  int  $count
      * @param  string|null  $connection
      * @return $this
      */
     protected function assertDatabaseCount($table, int $count, $connection = null)
     {
+        if (is_iterable($table)) {
+            foreach ($table as $item) {
+                $this->assertDatabaseCount($item, $count, $connection);
+            }
+
+            return $this;
+        }
+
         $this->assertThat(
             $this->getTable($table), new CountInDatabase($this->getConnection($connection, $table), $count)
         );
@@ -117,12 +125,20 @@ trait InteractsWithDatabase
     /**
      * Assert that the given table has no entries.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
+     * @param  iterable<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
      * @param  string|null  $connection
      * @return $this
      */
     protected function assertDatabaseEmpty($table, $connection = null)
     {
+        if (is_iterable($table)) {
+            foreach ($table as $item) {
+                $this->assertDatabaseEmpty($item, $connection);
+            }
+
+            return $this;
+        }
+
         $this->assertThat(
             $this->getTable($table), new CountInDatabase($this->getConnection($connection, $table), 0)
         );
