@@ -550,7 +550,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function remember($key, $ttl, Closure $callback)
     {
-        return $this->rememberWithState($key, $ttl, $callback)['value'];
+        return $this->rememberWithState($key, $ttl, $callback)[0];
     }
 
     /**
@@ -561,7 +561,7 @@ class Repository implements ArrayAccess, CacheContract
      * @param  \UnitEnum|string  $key
      * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
      * @param  \Closure(): TCacheValue  $callback
-     * @return array{value: TCacheValue, foundInCache: bool}
+     * @return array{TCacheValue, bool}
      */
     public function rememberWithState($key, $ttl, Closure $callback): array
     {
@@ -571,14 +571,14 @@ class Repository implements ArrayAccess, CacheContract
         // not we will execute the given Closure and cache the result of that for a
         // given number of seconds so it's available for all subsequent requests.
         if (! is_null($value)) {
-            return ['foundInCache' => true, 'value' => $value];
+            return [$value, true];
         }
 
         $value = $callback();
 
         $this->put($key, $value, value($ttl, $value));
 
-        return ['foundInCache' => false, 'value' => $value];
+        return [$value, false];
     }
 
     /**
