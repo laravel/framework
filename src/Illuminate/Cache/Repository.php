@@ -557,20 +557,35 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function remember($key, $ttl, Closure $callback)
     {
+        return $this->rememberWithWarmth($key, $ttl, $callback)[0];
+    }
+
+    /**
+     * Get an item from the cache, or execute the given Closure and store the result.
+     *
+     * @template TCacheValue
+     *
+     * @param  \UnitEnum|string  $key
+     * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  \Closure(): TCacheValue  $callback
+     * @return array{TCacheValue, bool} The cached value and whether it was warm.
+     */
+    public function rememberWithWarmth($key, $ttl, Closure $callback): array
+    {
         $value = $this->get($key);
 
         // If the item exists in the cache we will just return this immediately and if
         // not we will execute the given Closure and cache the result of that for a
         // given number of seconds so it's available for all subsequent requests.
         if (! is_null($value)) {
-            return $value;
+            return [$value, true];
         }
 
         $value = $callback();
 
         $this->put($key, $value, value($ttl, $value));
 
-        return $value;
+        return [$value, false];
     }
 
     /**

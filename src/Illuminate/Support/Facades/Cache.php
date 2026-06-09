@@ -39,6 +39,7 @@ use Mockery;
  * @method static int|bool decrement(\UnitEnum|string $key, mixed $value = 1)
  * @method static bool forever(\UnitEnum|string $key, mixed $value)
  * @method static mixed remember(\UnitEnum|string $key, \Closure|\DateTimeInterface|\DateInterval|int|null $ttl, \Closure $callback)
+ * @method static array rememberWithWarmth(\UnitEnum|string $key, \Closure|\DateTimeInterface|\DateInterval|int|null $ttl, \Closure $callback)
  * @method static mixed sear(\UnitEnum|string $key, \Closure $callback)
  * @method static mixed rememberForever(\UnitEnum|string $key, \Closure $callback)
  * @method static mixed flexible(\UnitEnum|string $key, array $ttl, callable $callback, array|null $lock = null, bool $alwaysDefer = false)
