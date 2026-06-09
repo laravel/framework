@@ -903,7 +903,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     }
 
     public function testEagerLoadConstraintOrWhereIsProperlyGrouped()
-    {  
+    {
         $model = new EloquentBuilderTestModelCloseRelatedStub;
         $this->mockConnectionForModel($model, 'SQLite');
         $model->getConnection()->shouldReceive('getName')->andReturn('sqlite');
@@ -929,7 +929,6 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         unset($_SERVER['__eloquent.eager_constraints']);
     }
-
 
     public function testGetRelationProperlySetsNestedRelationships()
     {
