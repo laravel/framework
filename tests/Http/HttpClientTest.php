@@ -4790,6 +4790,18 @@ class HttpClientTest extends TestCase
         $response->json();
         $this->assertSame(1, $response->bodyCallCount);
     }
+
+    public function testPSR7ResponseJsonHeaders()
+    {
+        $defaultJsonRequest = Factory::psr7Response(['input' => 'array']);
+        $this->assertEquals('application/json', $defaultJsonRequest->getHeader('Content-Type')[0]);
+
+        $stringRequest = Factory::psr7Response('string');
+        $this->assertEmpty($stringRequest->getHeader('Content-Type'));
+
+        $overrideContentTypeRequest = Factory::psr7Response(['input' => 'array'], 200, ['Content-Type' => 'application/ld+json']);
+        $this->assertEquals('application/ld+json', $overrideContentTypeRequest->getHeader('Content-Type')[0]);
+    }
 }
 
 class CustomFactory extends Factory

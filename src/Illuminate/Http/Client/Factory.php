@@ -181,7 +181,9 @@ class Factory
         if (is_array($body)) {
             $body = json_encode($body);
 
-            $headers['Content-Type'] = 'application/json';
+            if (! isset($headers['Content-Type'])) {
+                $headers['Content-Type'] = 'application/json';
+            }
         }
 
         return new Psr7Response($status, static::normalizeResponseHeaders($headers), $body);
