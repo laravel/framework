@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Http;
 
+use ArgumentCountError;
 use Closure;
 use Exception;
 use GuzzleHttp\Client as GuzzleClient;
@@ -40,6 +41,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Defer\DeferredCallback;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http as HttpFacade;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
@@ -4241,6 +4243,16 @@ class HttpClientTest extends TestCase
         $this->factory->assertSentCount(1);
     }
 
+    public function testHttpFacadeHasCacheAutocompleteAnnotation()
+    {
+        $docComment = (new \ReflectionClass(HttpFacade::class))->getDocComment();
+
+        $this->assertStringContainsString(
+            '@method static \Illuminate\Http\Client\PendingRequest cache(string $key, \DateTimeInterface|\DateInterval|int|array $ttl, array|string $methods = [\'GET\'])',
+            $docComment
+        );
+    }
+
     public function testSuccessfulGetResponsesUseRememberForNormalTtl()
     {
         $cache = new class(new ArrayStore) extends CacheRepository
@@ -4334,6 +4346,44 @@ class HttpClientTest extends TestCase
         $this->factory->assertSentCount(2);
     }
 
+    public function testNonGetResponsesCanBeCachedWhenExplicitlyConfigured()
+    {
+        $this->swapCacheRepository();
+
+        $this->factory->fake([
+            'https://laravel.com' => $this->factory->sequence()
+                ->push('created')
+                ->push('created again'),
+        ]);
+
+        $first = $this->factory->cache('laravel-docs', 600, ['POST'])->post('https://laravel.com');
+        $second = $this->factory->cache('laravel-docs', 600, ['POST'])->post('https://laravel.com');
+
+        $this->assertFalse($first->fromCache());
+        $this->assertTrue($second->fromCache());
+        $this->assertSame('created', $second->body());
+        $this->factory->assertSentCount(1);
+    }
+
+    public function testCacheMethodsAreNormalized()
+    {
+        $this->swapCacheRepository();
+
+        $this->factory->fake([
+            'https://laravel.com' => $this->factory->sequence()
+                ->push('created')
+                ->push('created again'),
+        ]);
+
+        $first = $this->factory->cache('laravel-docs', 600, 'post')->post('https://laravel.com');
+        $second = $this->factory->cache('laravel-docs', 600, 'post')->post('https://laravel.com');
+
+        $this->assertFalse($first->fromCache());
+        $this->assertTrue($second->fromCache());
+        $this->assertSame('created', $second->body());
+        $this->factory->assertSentCount(1);
+    }
+
     public function testHttpFakeWorksWithCachedResponses()
     {
         $this->swapCacheRepository();
@@ -4351,6 +4401,13 @@ class HttpClientTest extends TestCase
         $this->assertTrue($second->fromCache());
         $this->assertSame('fake response', $second->body());
         $this->factory->assertSentCount(1);
+    }
+
+    public function testCacheKeyIsMandatory()
+    {
+        $this->expectException(ArgumentCountError::class);
+
+        $this->factory->cache();
     }
 
     public function testItCanHaveGlobalDefaultValues()
