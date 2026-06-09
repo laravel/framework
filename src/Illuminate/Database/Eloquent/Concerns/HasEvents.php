@@ -398,7 +398,7 @@ trait HasEvents
     /**
      * Get the event map for the model.
      *
-     * @return array
+     * @return array<string, class-string>
      */
     public function dispatchesEvents()
     {
