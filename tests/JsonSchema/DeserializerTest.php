@@ -10,6 +10,7 @@ use Illuminate\JsonSchema\Types\IntegerType;
 use Illuminate\JsonSchema\Types\NumberType;
 use Illuminate\JsonSchema\Types\ObjectType;
 use Illuminate\JsonSchema\Types\StringType;
+use Illuminate\JsonSchema\Types\UnionType;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -469,14 +470,78 @@ class DeserializerTest extends TestCase
         ], $type->toArray());
     }
 
-    public function test_it_throws_for_a_multi_type_union(): void
+    public function test_it_deserializes_a_multi_type_union(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unable to represent a multi-type JSON Schema union [string, integer].');
-
-        JsonSchema::fromArray([
-            'type' => ['string', 'integer'],
+        $type = JsonSchema::fromArray([
+            'type' => ['string', 'number', 'boolean'],
         ]);
+
+        $this->assertInstanceOf(UnionType::class, $type);
+        $this->assertSame(['string', 'number', 'boolean'], $type->types());
+        $this->assertSame(['type' => ['string', 'number', 'boolean']], $type->toArray());
+    }
+
+    public function test_it_deserializes_a_nullable_multi_type_union(): void
+    {
+        $type = JsonSchema::fromArray([
+            'type' => ['string', 'number', 'null'],
+        ]);
+
+        $this->assertInstanceOf(UnionType::class, $type);
+        $this->assertSame(['string', 'number'], $type->types());
+        $this->assertSame(['type' => ['string', 'number', 'null']], $type->toArray());
+    }
+
+    public function test_it_does_not_treat_a_single_type_plus_null_as_a_union(): void
+    {
+        $type = JsonSchema::fromArray([
+            'type' => ['string', 'null'],
+        ]);
+
+        $this->assertInstanceOf(StringType::class, $type);
+        $this->assertSame(['type' => ['string', 'null']], $type->toArray());
+    }
+
+    public function test_it_dedupes_and_preserves_order_of_union_members(): void
+    {
+        $type = JsonSchema::fromArray([
+            'type' => ['number', 'string', 'number', 'boolean', 'string'],
+        ]);
+
+        $this->assertInstanceOf(UnionType::class, $type);
+        $this->assertSame(['number', 'string', 'boolean'], $type->types());
+    }
+
+    public function test_it_deserializes_a_union_nested_in_an_object_property(): void
+    {
+        $type = JsonSchema::fromArray([
+            'type' => 'object',
+            'properties' => [
+                'value' => ['type' => ['string', 'number']],
+            ],
+        ]);
+
+        $this->assertInstanceOf(ObjectType::class, $type);
+        $this->assertEquals([
+            'type' => 'object',
+            'properties' => [
+                'value' => ['type' => ['string', 'number']],
+            ],
+        ], $type->toArray());
+    }
+
+    public function test_it_deserializes_a_union_nested_in_array_items(): void
+    {
+        $type = JsonSchema::fromArray([
+            'type' => 'array',
+            'items' => ['type' => ['string', 'integer', 'null']],
+        ]);
+
+        $this->assertInstanceOf(ArrayType::class, $type);
+        $this->assertEquals([
+            'type' => 'array',
+            'items' => ['type' => ['string', 'integer', 'null']],
+        ], $type->toArray());
     }
 
     public function test_it_throws_for_a_boolean_property_schema(): void

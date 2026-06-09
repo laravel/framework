@@ -51,15 +51,17 @@ class Deserializer
 
         [$name, $nullableFromType] = $this->resolveType($schema);
 
-        $type = match ($name) {
-            'object' => $this->buildObject($schema, $refs),
-            'array' => $this->buildArray($schema, $refs),
-            'string' => $this->buildString($schema),
-            'integer' => $this->buildInteger($schema),
-            'number' => $this->buildNumber($schema),
-            'boolean' => new Types\BooleanType,
-            default => throw new InvalidArgumentException("Unsupported JSON Schema type [{$name}]."),
-        };
+        $type = is_array($name)
+            ? new Types\UnionType($name)
+            : match ($name) {
+                'object' => $this->buildObject($schema, $refs),
+                'array' => $this->buildArray($schema, $refs),
+                'string' => $this->buildString($schema),
+                'integer' => $this->buildInteger($schema),
+                'number' => $this->buildNumber($schema),
+                'boolean' => new Types\BooleanType,
+                default => throw new InvalidArgumentException("Unsupported JSON Schema type [{$name}]."),
+            };
 
         $this->applyCommon($type, $schema);
 
@@ -262,7 +264,7 @@ class Deserializer
      * Resolve the base type name and whether the schema is nullable.
      *
      * @param  array<string, mixed>  $schema
-     * @return array{0: string, 1: bool}
+     * @return array{0: string|array<int, string>, 1: bool}
      *
      * @throws \InvalidArgumentException
      */
@@ -274,15 +276,13 @@ class Deserializer
         if (is_array($type)) {
             $nullable = in_array('null', $type, true);
 
-            $names = array_values(array_unique(array_filter(
+            $names = array_values(array_unique(array_map('strval', array_filter(
                 $type,
                 static fn ($value) => $value !== 'null',
-            )));
+            ))));
 
             if (count($names) > 1) {
-                throw new InvalidArgumentException(
-                    'Unable to represent a multi-type JSON Schema union ['.implode(', ', array_map('strval', $names)).'].'
-                );
+                return [$names, $nullable];
             }
 
             $type = $names[0] ?? null;
