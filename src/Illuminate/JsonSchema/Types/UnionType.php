@@ -34,7 +34,6 @@ class UnionType extends Type
     {
         $names = array_map('strval', $types);
 
-        // A "null" member expresses nullability, it is never a union member...
         if (in_array('null', $names, true)) {
             $this->nullable();
 
@@ -47,7 +46,6 @@ class UnionType extends Type
             }
         }
 
-        // Keep the declared order while removing duplicate member names...
         $this->types = array_values(array_unique($names));
     }
 

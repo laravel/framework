@@ -36,7 +36,6 @@ class Serializer
             default => throw new RuntimeException('Unsupported ['.get_class($type).'] type.'),
         };
 
-        // The member names are emitted as the "type" array, so drop the backing property...
         unset($attributes['types']);
 
         $nullable = static::isNullable($type);
