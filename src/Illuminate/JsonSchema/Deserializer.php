@@ -51,15 +51,21 @@ class Deserializer
 
         [$name, $nullableFromType] = $this->resolveType($schema);
 
-        $type = match ($name) {
-            'object' => $this->buildObject($schema, $refs),
-            'array' => $this->buildArray($schema, $refs),
-            'string' => $this->buildString($schema),
-            'integer' => $this->buildInteger($schema),
-            'number' => $this->buildNumber($schema),
-            'boolean' => new Types\BooleanType,
-            default => throw new InvalidArgumentException("Unsupported JSON Schema type [{$name}]."),
-        };
+        if (is_array($name)) {
+            $this->ensureUnionConstraintsAreSupported($schema);
+
+            $type = new Types\UnionType($name);
+        } else {
+            $type = match ($name) {
+                'object' => $this->buildObject($schema, $refs),
+                'array' => $this->buildArray($schema, $refs),
+                'string' => $this->buildString($schema),
+                'integer' => $this->buildInteger($schema),
+                'number' => $this->buildNumber($schema),
+                'boolean' => new Types\BooleanType,
+                default => throw new InvalidArgumentException("Unsupported JSON Schema type [{$name}]."),
+            };
+        }
 
         $this->applyCommon($type, $schema);
 
@@ -262,7 +268,7 @@ class Deserializer
      * Resolve the base type name and whether the schema is nullable.
      *
      * @param  array<string, mixed>  $schema
-     * @return array{0: string, 1: bool}
+     * @return array{0: string|array<int, string>, 1: bool}
      *
      * @throws \InvalidArgumentException
      */
@@ -274,15 +280,13 @@ class Deserializer
         if (is_array($type)) {
             $nullable = in_array('null', $type, true);
 
-            $names = array_values(array_unique(array_filter(
+            $names = array_values(array_unique(array_map('strval', array_filter(
                 $type,
                 static fn ($value) => $value !== 'null',
-            )));
+            ))));
 
             if (count($names) > 1) {
-                throw new InvalidArgumentException(
-                    'Unable to represent a multi-type JSON Schema union ['.implode(', ', array_map('strval', $names)).'].'
-                );
+                return [$names, $nullable];
             }
 
             $type = $names[0] ?? null;
@@ -295,6 +299,31 @@ class Deserializer
         }
 
         return [$type, $nullable];
+    }
+
+    /**
+     * Ensure a multi-type union carries no type-specific constraint keywords.
+     *
+     * @param  array<string, mixed>  $schema
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function ensureUnionConstraintsAreSupported(array $schema): void
+    {
+        $keywords = [
+            'minLength', 'maxLength', 'pattern', 'format',
+            'minimum', 'maximum', 'multipleOf',
+            'items', 'minItems', 'maxItems', 'uniqueItems',
+            'properties', 'required', 'additionalProperties',
+        ];
+
+        $unsupported = array_values(array_intersect($keywords, array_keys($schema)));
+
+        if ($unsupported !== []) {
+            throw new InvalidArgumentException(
+                'Type-specific keywords ['.implode(', ', $unsupported).'] are not supported on a multi-type JSON Schema union.'
+            );
+        }
     }
 
     /**
