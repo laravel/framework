@@ -302,31 +302,6 @@ class Deserializer
     }
 
     /**
-     * Ensure a multi-type union carries no type-specific constraint keywords.
-     *
-     * @param  array<string, mixed>  $schema
-     *
-     * @throws \InvalidArgumentException
-     */
-    protected function ensureUnionConstraintsAreSupported(array $schema): void
-    {
-        $keywords = [
-            'minLength', 'maxLength', 'pattern', 'format',
-            'minimum', 'maximum', 'multipleOf',
-            'items', 'minItems', 'maxItems', 'uniqueItems',
-            'properties', 'required', 'additionalProperties',
-        ];
-
-        $unsupported = array_values(array_intersect($keywords, array_keys($schema)));
-
-        if ($unsupported !== []) {
-            throw new InvalidArgumentException(
-                'Type-specific keywords ['.implode(', ', $unsupported).'] are not supported on a multi-type JSON Schema union.'
-            );
-        }
-    }
-
-    /**
      * Infer the type name when "type" is absent but the shape is unambiguous.
      *
      * @param  array<string, mixed>  $schema
@@ -382,6 +357,31 @@ class Deserializer
         }
 
         return $resolved;
+    }
+
+    /**
+     * Ensure a multi-type union carries no type-specific constraint keywords.
+     *
+     * @param  array<string, mixed>  $schema
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function ensureUnionConstraintsAreSupported(array $schema): void
+    {
+        $keywords = [
+            'minLength', 'maxLength', 'pattern', 'format',
+            'minimum', 'maximum', 'multipleOf',
+            'items', 'minItems', 'maxItems', 'uniqueItems',
+            'properties', 'required', 'additionalProperties',
+        ];
+
+        $unsupported = array_values(array_intersect($keywords, array_keys($schema)));
+
+        if ($unsupported !== []) {
+            throw new InvalidArgumentException(
+                'Type-specific keywords ['.implode(', ', $unsupported).'] are not supported on a multi-type JSON Schema union.'
+            );
+        }
     }
 
     /**
