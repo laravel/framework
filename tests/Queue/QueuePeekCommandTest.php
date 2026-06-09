@@ -60,7 +60,7 @@ class QueuePeekCommandTest extends TestCase
             ->assertSuccessful();
     }
 
-    public function testItCanOutputAsJsjon()
+    public function testItCanOutputAsJson()
     {
         $this->app['config']->set('queue.default', 'redis');
         $this->app['config']->set('queue.connections.redis.queue', 'default');
