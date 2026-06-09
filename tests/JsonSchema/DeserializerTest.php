@@ -544,6 +544,37 @@ class DeserializerTest extends TestCase
         ], $type->toArray());
     }
 
+    public function test_it_throws_for_an_unsupported_union_member(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported JSON Schema type [wat] in a multi-type union.');
+
+        JsonSchema::fromArray([
+            'type' => ['string', 'wat'],
+        ]);
+    }
+
+    public function test_it_throws_for_a_non_string_union_member(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported JSON Schema type [123] in a multi-type union.');
+
+        JsonSchema::fromArray([
+            'type' => ['string', 123],
+        ]);
+    }
+
+    public function test_it_throws_when_a_union_carries_type_specific_keywords(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Type-specific keywords [items] are not supported on a multi-type JSON Schema union.');
+
+        JsonSchema::fromArray([
+            'type' => ['array', 'string'],
+            'items' => ['type' => 'integer'],
+        ]);
+    }
+
     public function test_it_throws_for_a_boolean_property_schema(): void
     {
         $this->expectException(InvalidArgumentException::class);

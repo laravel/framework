@@ -5,6 +5,7 @@ namespace Illuminate\Tests\JsonSchema;
 use Illuminate\JsonSchema\JsonSchema;
 use Illuminate\JsonSchema\Serializer;
 use Illuminate\JsonSchema\Types\UnionType;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class UnionTypeTest extends TestCase
@@ -48,13 +49,39 @@ class UnionTypeTest extends TestCase
         ], $type->toArray());
     }
 
-    public function test_it_does_not_duplicate_null_when_a_member_is_already_null(): void
+    public function test_it_normalizes_a_null_member_into_nullability(): void
+    {
+        $type = JsonSchema::union(['string', 'number', 'null']);
+
+        $this->assertSame(['string', 'number'], $type->types());
+        $this->assertEquals([
+            'type' => ['string', 'number', 'null'],
+        ], $type->toArray());
+    }
+
+    public function test_it_does_not_duplicate_null_when_already_nullable(): void
     {
         $type = JsonSchema::union(['string', 'null'])->nullable();
 
         $this->assertEquals([
             'type' => ['string', 'null'],
         ], $type->toArray());
+    }
+
+    public function test_it_rejects_an_unsupported_member_name(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported JSON Schema type [wat] in a multi-type union.');
+
+        JsonSchema::union(['string', 'wat']);
+    }
+
+    public function test_it_rejects_a_non_string_member(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported JSON Schema type [123] in a multi-type union.');
+
+        JsonSchema::union(['string', 123]);
     }
 
     public function test_it_round_trips_a_union(): void

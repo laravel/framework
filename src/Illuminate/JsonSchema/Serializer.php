@@ -42,13 +42,9 @@ class Serializer
         $nullable = static::isNullable($type);
 
         if ($nullable) {
-            $names = is_array($attributes['type']) ? $attributes['type'] : [$attributes['type']];
-
-            if (! in_array('null', $names, true)) {
-                $names[] = 'null';
-            }
-
-            $attributes['type'] = $names;
+            $attributes['type'] = is_array($attributes['type'])
+                ? [...$attributes['type'], 'null']
+                : [$attributes['type'], 'null'];
         }
 
         $attributes = array_filter($attributes, static function (mixed $value, string $key) {

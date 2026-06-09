@@ -51,9 +51,12 @@ class Deserializer
 
         [$name, $nullableFromType] = $this->resolveType($schema);
 
-        $type = is_array($name)
-            ? new Types\UnionType($name)
-            : match ($name) {
+        if (is_array($name)) {
+            $this->ensureUnionConstraintsAreSupported($schema);
+
+            $type = new Types\UnionType($name);
+        } else {
+            $type = match ($name) {
                 'object' => $this->buildObject($schema, $refs),
                 'array' => $this->buildArray($schema, $refs),
                 'string' => $this->buildString($schema),
@@ -62,6 +65,7 @@ class Deserializer
                 'boolean' => new Types\BooleanType,
                 default => throw new InvalidArgumentException("Unsupported JSON Schema type [{$name}]."),
             };
+        }
 
         $this->applyCommon($type, $schema);
 
@@ -295,6 +299,35 @@ class Deserializer
         }
 
         return [$type, $nullable];
+    }
+
+    /**
+     * Ensure a multi-type union carries no type-specific constraint keywords.
+     *
+     * A union only retains its member names, so any keyword that constrains a
+     * single type (e.g. "items", "properties", "minLength") would be silently
+     * dropped. Reject these rather than misrepresent the schema.
+     *
+     * @param  array<string, mixed>  $schema
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function ensureUnionConstraintsAreSupported(array $schema): void
+    {
+        $keywords = [
+            'minLength', 'maxLength', 'pattern', 'format',
+            'minimum', 'maximum', 'multipleOf',
+            'items', 'minItems', 'maxItems', 'uniqueItems',
+            'properties', 'required', 'additionalProperties',
+        ];
+
+        $unsupported = array_values(array_intersect($keywords, array_keys($schema)));
+
+        if ($unsupported !== []) {
+            throw new InvalidArgumentException(
+                'Type-specific keywords ['.implode(', ', $unsupported).'] are not supported on a multi-type JSON Schema union.'
+            );
+        }
     }
 
     /**
