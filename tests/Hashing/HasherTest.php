@@ -49,8 +49,7 @@ class HasherTest extends TestCase
 
     public function testAbstractHasherInfoReturnsPasswordInfo()
     {
-        $hasher = new class extends AbstractHasher
-        {
+        $hasher = new class extends AbstractHasher {
         };
 
         $value = password_hash('password', PASSWORD_BCRYPT);
@@ -60,8 +59,7 @@ class HasherTest extends TestCase
 
     public function testAbstractHasherCheckReturnsFalseForEmptyOrNullHashes()
     {
-        $hasher = new class extends AbstractHasher
-        {
+        $hasher = new class extends AbstractHasher {
         };
 
         $this->assertFalse($hasher->check('password', null));
