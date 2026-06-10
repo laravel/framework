@@ -83,8 +83,15 @@ class QueuePeekCommandTest extends TestCase
 
         $output = $this->runPeekCommand(['--json' => true])->fetch();
 
-        $this->assertStringContainsString('"uuid":"1cde062a-8c6a-4d67-8125-e83f585c18cb"', $output);
-        $this->assertStringContainsString('"name":"App\\\\Jobs\\\\ProcessPodcast"', $output);
+        $jobs = json_decode($output, true);
+
+        $this->assertSame([
+            'uuid' => '1cde062a-8c6a-4d67-8125-e83f585c18cb',
+            'queue' => 'default',
+            'name' => 'App\\Jobs\\ProcessPodcast',
+            'attempts' => 1,
+            'created_at' => '2026-01-01T12:00:00+00:00',
+        ], $jobs[0]);
     }
 
     public function testItDisplaysDelayedJobs()
