@@ -13,6 +13,8 @@ use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Queue\Attributes\Timeout;
 use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Arr;
+
+use function Illuminate\Support\enum_value;
 use ReflectionClass;
 use ReflectionProperty;
 use Throwable;
@@ -88,7 +90,7 @@ class BroadcastEvent implements ShouldQueue
     public function handle(BroadcastingFactory $manager)
     {
         $name = method_exists($this->event, 'broadcastAs')
-            ? $this->event->broadcastAs()
+            ? enum_value($this->event->broadcastAs())
             : get_class($this->event);
 
         $channels = Arr::wrap($this->event->broadcastOn());
