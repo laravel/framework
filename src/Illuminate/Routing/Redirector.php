@@ -273,7 +273,7 @@ class Redirector
     /**
      * Get the "intended" URL for the given guard from the session.
      *
-     * @param string|null $authDriver
+     * @param  string|null  $authDriver
      * @return string|null
      */
     public function getIntendedUrlForGuard(?string $authDriver = null): ?string
@@ -284,8 +284,8 @@ class Redirector
     /**
      * Set the "intended" URL for the given guard from the session.
      *
-     * @param string $url
-     * @param string|null $authDriver
+     * @param  string  $url
+     * @param  string|null  $authDriver
      * @return $this
      */
     public function setIntendedUrlForGuard(string $url, ?string $authDriver = null): self
@@ -297,8 +297,8 @@ class Redirector
 
     /**
      * Get the session key for the "intended" URL for the current guard.
-     * 
-     * @param string|null $authDriver
+     *
+     * @param  string|null  $authDriver
      * @return string
      */
     protected function getIntendedUrlSessionKey(?string $authDriver = null)
