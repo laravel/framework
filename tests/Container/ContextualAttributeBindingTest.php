@@ -255,6 +255,20 @@ class ContextualAttributeBindingTest extends TestCase
         $container->make(RouteParameterTest::class);
     }
 
+    public function testRouteParameterAttributeWithouthParameterName()
+    {
+        $container = new Container;
+        $container->singleton('request', function () {
+            $request = m::mock(Request::class);
+            $request->shouldReceive('route')->with('foo')->andReturn(m::mock(Model::class));
+            $request->shouldReceive('route')->with('bar')->andReturn('bar');
+
+            return $request;
+        });
+
+        $container->make(RouteParameterTestWithoutParameterName::class);
+    }
+
     public function testContextAttribute(): void
     {
         $container = new Container;
@@ -620,6 +634,13 @@ final class LogTest
 final class RouteParameterTest
 {
     public function __construct(#[RouteParameter('foo')] Model $foo, #[RouteParameter('bar')] string $bar)
+    {
+    }
+}
+
+final class RouteParameterTestWithoutParameterName
+{
+    public function __construct(#[RouteParameter] Model $foo, #[RouteParameter] string $bar)
     {
     }
 }
