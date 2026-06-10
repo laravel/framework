@@ -6,6 +6,7 @@ use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Foundation\ExceptionRenderer;
@@ -17,6 +18,7 @@ use Illuminate\Foundation\Console\CliDumper;
 use Illuminate\Foundation\Exceptions\Renderer\Listener;
 use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
 use Illuminate\Foundation\Exceptions\Renderer\Renderer;
+use Illuminate\Foundation\Exceptions\Renderer\Solutions\SolutionProviderRepository;
 use Illuminate\Foundation\Http\HtmlDumper;
 use Illuminate\Foundation\MaintenanceModeManager;
 use Illuminate\Foundation\Precognition;
@@ -264,6 +266,14 @@ class FoundationServiceProvider extends AggregateServiceProvider
 
         $this->loadViewsFrom(__DIR__.'/../resources/exceptions/renderer', 'laravel-exceptions-renderer');
 
+        $this->app->singleton(SolutionProviderRepository::class, function ($app) {
+            $handler = $app->make(ExceptionHandlerContract::class);
+
+            return (new SolutionProviderRepository($app))->register(
+                $handler->getSolutionProviders()
+            );
+        });
+
         $this->app->singleton(Renderer::class, function (Application $app) {
             $errorRenderer = new HtmlErrorRenderer(
                 $app['config']->get('app.debug'),
@@ -275,6 +285,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
                 $errorRenderer,
                 $app->make(BladeMapper::class),
                 $app->basePath(),
+                $app->make(SolutionProviderRepository::class),
             );
         });
 

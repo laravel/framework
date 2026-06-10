@@ -176,6 +176,19 @@ class Exceptions
     }
 
     /**
+     * Register one or more custom solution providers for the exception renderer.
+     *
+     * @param  array|string  $providers
+     * @return $this
+     */
+    public function solutionProviders(array|string $providers)
+    {
+        $this->handler->solutionProviders($providers);
+
+        return $this;
+    }
+
+    /**
      * Indicate that the given attributes should never be flashed to the session on validation errors.
      *
      * @param  array|string  $attributes

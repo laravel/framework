@@ -142,6 +142,13 @@ class Handler implements ExceptionHandlerContract
     protected $exceptionMap = [];
 
     /**
+     * The custom solution providers registered for the exception renderer.
+     *
+     * @var array<int, class-string>
+     */
+    protected $solutionProviders = [];
+
+    /**
      * Indicates that throttled keys should be hashed.
      *
      * @var bool
@@ -1113,6 +1120,42 @@ class Handler implements ExceptionHandlerContract
         $this->withoutDuplicates = true;
 
         return $this;
+    }
+
+    /**
+     * Register one or more custom solution providers for the exception renderer.
+     *
+     * @param  array|string  $providers
+     * @return $this
+     */
+    public function solutionProviders(array|string $providers)
+    {
+        $this->solutionProviders = array_merge($this->solutionProviders, Arr::wrap($providers));
+
+        return $this;
+    }
+
+    /**
+     * Get the solution providers for the exception renderer.
+     *
+     * @return array
+     */
+    public function getSolutionProviders()
+    {
+        return array_merge($this->defaultSolutionProviders(), $this->solutionProviders);
+    }
+
+    /**
+     * Get the default solution providers.
+     *
+     * @return array
+     */
+    protected function defaultSolutionProviders()
+    {
+        return [
+            \Illuminate\Foundation\Exceptions\Renderer\Solutions\Providers\MissingAppKeySolutionProvider::class,
+            \Illuminate\Foundation\Exceptions\Renderer\Solutions\Providers\ViteManifestNotFoundSolutionProvider::class,
+        ];
     }
 
     /**

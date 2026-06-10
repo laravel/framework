@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Exceptions\Renderer;
 
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
+use Illuminate\Foundation\Exceptions\Renderer\Solutions\SolutionProviderRepository;
 use Illuminate\Http\Request;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Throwable;
@@ -53,6 +54,13 @@ class Renderer
     protected $basePath;
 
     /**
+     * The solution provider repository instance.
+     *
+     * @var \Illuminate\Foundation\Exceptions\Renderer\Solutions\SolutionProviderRepository|null
+     */
+    protected $solutionProviderRepository;
+
+    /**
      * Creates a new exception renderer instance.
      *
      * @param  \Illuminate\Contracts\View\Factory  $viewFactory
@@ -60,6 +68,7 @@ class Renderer
      * @param  \Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer  $htmlErrorRenderer
      * @param  \Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper  $bladeMapper
      * @param  string  $basePath
+     * @param  \Illuminate\Foundation\Exceptions\Renderer\Solutions\SolutionProviderRepository|null  $solutionProviderRepository
      */
     public function __construct(
         Factory $viewFactory,
@@ -67,12 +76,14 @@ class Renderer
         HtmlErrorRenderer $htmlErrorRenderer,
         BladeMapper $bladeMapper,
         string $basePath,
+        ?SolutionProviderRepository $solutionProviderRepository = null,
     ) {
         $this->viewFactory = $viewFactory;
         $this->listener = $listener;
         $this->htmlErrorRenderer = $htmlErrorRenderer;
         $this->bladeMapper = $bladeMapper;
         $this->basePath = $basePath;
+        $this->solutionProviderRepository = $solutionProviderRepository;
     }
 
     /**
@@ -90,6 +101,10 @@ class Renderer
 
         $exception = new Exception($flattenException, $request, $this->listener, $this->basePath);
 
+        $solutions = $this->solutionProviderRepository
+            ? $this->solutionProviderRepository->getSolutions($throwable)
+            : [];
+
         $exceptionAsMarkdown = $this->viewFactory->make('laravel-exceptions-renderer::markdown', [
             'exception' => $exception,
         ])->render();
@@ -97,6 +112,7 @@ class Renderer
         return $this->viewFactory->make('laravel-exceptions-renderer::show', [
             'exception' => $exception,
             'exceptionAsMarkdown' => $exceptionAsMarkdown,
+            'solutions' => $solutions,
         ])->render();
     }
 
