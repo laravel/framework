@@ -181,6 +181,24 @@ class DatabaseLock extends Lock
     }
 
     /**
+     * Attempt to refresh the lock for the given number of seconds.
+     *
+     * @param  int|null  $seconds
+     * @return bool
+     */
+    public function refresh($seconds = null)
+    {
+        $seconds ??= $this->seconds;
+
+        $this->seconds = $seconds;
+
+        return $this->connection->table($this->table)
+            ->where('key', $this->name)
+            ->where('owner', $this->owner)
+            ->update(['expiration' => $this->expiresAt()]) >= 1;
+    }
+
+    /**
      * Get the name of the database connection being used to manage the lock.
      *
      * @return string
