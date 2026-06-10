@@ -17,6 +17,8 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\UrlGenerator getUrlGenerator()
  * @method static void setSession(\Illuminate\Session\Store $session)
  * @method static string|null getIntendedUrl()
+ * @method static string|null getIntendedUrlForGuard(?string $authDriver = null)
+ * @method static \Illuminate\Routing\Redirector setIntendedUrlForGuard(string $url, ?string $authDriver = null)
  * @method static \Illuminate\Routing\Redirector setIntendedUrl(string $url)
  * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)

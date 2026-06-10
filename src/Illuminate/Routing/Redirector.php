@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Auth\AuthManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Session\Store as SessionStore;
 use Illuminate\Support\Traits\Macroable;
@@ -25,13 +26,22 @@ class Redirector
     protected $session;
 
     /**
+     * The auth manager instance.
+     *
+     * @var \Illuminate\Auth\AuthManager|null
+     */
+    protected $auth;
+
+    /**
      * Create a new Redirector instance.
      *
      * @param  \Illuminate\Routing\UrlGenerator  $generator
+     * @param  \Illuminate\Auth\AuthManager|null  $auth
      */
-    public function __construct(UrlGenerator $generator)
+    public function __construct(UrlGenerator $generator, ?AuthManager $auth = null)
     {
         $this->generator = $generator;
+        $this->auth = $auth;
     }
 
     /**
@@ -94,7 +104,7 @@ class Redirector
      */
     public function intended($default = '/', $status = 302, $headers = [], $secure = null)
     {
-        $path = $this->session->pull('url.intended', $default);
+        $path = $this->session->pull($this->getIntendedUrlSessionKey(), $default);
 
         return $this->to($path, $status, $headers, $secure);
     }
@@ -244,7 +254,7 @@ class Redirector
      */
     public function getIntendedUrl()
     {
-        return $this->session->get('url.intended');
+        return $this->session->get($this->getIntendedUrlSessionKey());
     }
 
     /**
@@ -255,8 +265,46 @@ class Redirector
      */
     public function setIntendedUrl($url)
     {
-        $this->session->put('url.intended', $url);
+        $this->session->put($this->getIntendedUrlSessionKey(), $url);
 
         return $this;
+    }
+
+    /**
+     * Get the "intended" URL for the given guard from the session.
+     *
+     * @param string|null $authDriver
+     * @return string|null
+     */
+    public function getIntendedUrlForGuard(?string $authDriver = null): ?string
+    {
+        return $this->session->get($this->getIntendedUrlSessionKey($authDriver));
+    }
+
+    /**
+     * Set the "intended" URL for the given guard from the session.
+     *
+     * @param string $url
+     * @param string|null $authDriver
+     * @return $this
+     */
+    public function setIntendedUrlForGuard(string $url, ?string $authDriver = null): self
+    {
+        $this->session->put($this->getIntendedUrlSessionKey($authDriver), $url);
+
+        return $this;
+    }
+
+    /**
+     * Get the session key for the "intended" URL for the current guard.
+     * 
+     * @param string|null $authDriver
+     * @return string
+     */
+    protected function getIntendedUrlSessionKey(?string $authDriver = null)
+    {
+        $guardName = $authDriver ?? $this->auth?->getDefaultDriver() ?? 'web';
+
+        return "$guardName.url.intended";
     }
 }

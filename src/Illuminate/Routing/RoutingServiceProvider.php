@@ -112,7 +112,7 @@ class RoutingServiceProvider extends ServiceProvider
     protected function registerRedirector()
     {
         $this->app->singleton('redirect', function ($app) {
-            $redirector = new Redirector($app['url']);
+            $redirector = new Redirector($app['url'], $app['auth']);
 
             // If the session is set on the application instance, we'll inject it into
             // the redirector instance. This allows the redirect responses to allow
