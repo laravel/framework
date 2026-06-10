@@ -170,6 +170,10 @@ class DatabaseTransactionsManager
             fn ($transaction) => $transaction->connection == $connection
         )->values();
 
+        $this->committedTransactions
+            ->filter(fn ($transaction) => $transaction->connection == $connection)
+            ->each(fn ($transaction) => $transaction->executeCallbacksForRollback());
+
         $this->committedTransactions = $this->committedTransactions->reject(
             fn ($transaction) => $transaction->connection == $connection
         )->values();
@@ -187,6 +191,8 @@ class DatabaseTransactionsManager
             fn ($committed) => $committed->connection == $transaction->connection &&
                                $committed->parent === $transaction
         );
+
+        $removedTransactions->each(fn ($transaction) => $transaction->executeCallbacksForRollback());
 
         // There may be multiple deeply nested transactions that have already committed that we
         // also need to remove. We will recurse down the children of all removed transaction
