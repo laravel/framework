@@ -403,6 +403,11 @@ class SupportLazyCollectionTest extends TestCase
 
         $manyCollection = new LazyCollection([1, 2, 3]);
         $this->assertTrue($manyCollection->containsManyItems());
+
+        $this->assertTrue((new LazyCollection([1, 2, 2]))->containsManyItems(fn ($number) => $number === 2));
+        $this->assertFalse((new LazyCollection(['ant', 'bear', 'cat']))->containsManyItems(fn ($word) => strlen($word) === 4));
+        $this->assertFalse((new LazyCollection(['ant', 'bear', 'cat']))->containsManyItems(fn ($word) => strlen($word) > 4));
+        $this->assertTrue((new LazyCollection(['ant', 'bear', 'cat']))->containsManyItems(fn ($word) => strlen($word) === 3));
     }
 
     public function testDoesntContain()

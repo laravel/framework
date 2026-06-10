@@ -703,13 +703,14 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Determine if the collection contains multiple items.
      *
+     * @param  (callable(TValue, TKey): bool)|null  $callback
      * @return bool
      *
      * @deprecated 12.50.0 Use the `hasMany()` method instead.
      */
-    public function containsManyItems(): bool
+    public function containsManyItems(?callable $callback = null): bool
     {
-        return $this->hasMany();
+        return $this->hasMany($callback);
     }
 
     /**

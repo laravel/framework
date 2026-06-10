@@ -588,6 +588,17 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testContainsManyItemsIsLazy()
+    {
+        $this->assertEnumerates(2, function ($collection) {
+            $collection->containsManyItems();
+        });
+
+        $this->assertEnumerates(2, function ($collection) {
+            $collection->containsManyItems(fn ($item) => $item <= 2);
+        });
+    }
+
     public function testHasSoleIsLazy()
     {
         $this->assertEnumerates(2, function ($collection) {
