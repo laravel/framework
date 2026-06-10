@@ -216,9 +216,11 @@ trait HasTimestamps
     /**
      * Disable timestamps for the given model classes during the given callback scope.
      *
+     * @template TReturn
+     *
      * @param  array  $models
-     * @param  callable  $callback
-     * @return mixed
+     * @param  callable(): TReturn  $callback
+     * @return TReturn
      */
     public static function withoutTimestampsOn($models, $callback)
     {
