@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Hashing;
 
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
+use Illuminate\Hashing\AbstractHasher;
 use Illuminate\Hashing\Argon2IdHasher;
 use Illuminate\Hashing\ArgonHasher;
 use Illuminate\Hashing\BcryptHasher;
@@ -46,6 +47,27 @@ class HasherTest extends TestCase
         $this->assertFalse($hasher->check('password', null));
     }
 
+    public function testAbstractHasherInfoReturnsPasswordInfo()
+    {
+        $hasher = new class extends AbstractHasher
+        {
+        };
+
+        $value = password_hash('password', PASSWORD_BCRYPT);
+
+        $this->assertSame(password_get_info($value), $hasher->info($value));
+    }
+
+    public function testAbstractHasherCheckReturnsFalseForEmptyOrNullHashes()
+    {
+        $hasher = new class extends AbstractHasher
+        {
+        };
+
+        $this->assertFalse($hasher->check('password', null));
+        $this->assertFalse($hasher->check('password', ''));
+    }
+
     public function testBasicBcryptHashing()
     {
         $hasher = new BcryptHasher;
@@ -64,6 +86,17 @@ class HasherTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $hasher = new BcryptHasher(['limit' => 72]);
         $hasher->make(str_repeat('a', 73));
+    }
+
+    public function testBcryptSetRoundsUpdatesTheDefaultCost()
+    {
+        $hasher = new BcryptHasher;
+
+        $value = $hasher->make('password');
+
+        $this->assertFalse($hasher->needsRehash($value, ['rounds' => 12]));
+        $this->assertSame($hasher, $hasher->setRounds(13));
+        $this->assertTrue($hasher->needsRehash($value, ['rounds' => 13]));
     }
 
     public function testBasicArgon2iHashing()
