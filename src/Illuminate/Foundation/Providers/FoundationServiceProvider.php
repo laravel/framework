@@ -17,6 +17,17 @@ use Illuminate\Foundation\Console\CliDumper;
 use Illuminate\Foundation\Exceptions\Renderer\Listener;
 use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
 use Illuminate\Foundation\Exceptions\Renderer\Renderer;
+use Illuminate\Foundation\Exceptions\Renderer\SolutionRenderer;
+use Illuminate\Foundation\Exceptions\Renderer\Solutions\Providers\AccessDeniedSolutionProvider;
+use Illuminate\Foundation\Exceptions\Renderer\Solutions\Providers\ConnectionRefusedSolutionProvider;
+use Illuminate\Foundation\Exceptions\Renderer\Solutions\Providers\MissingAppKeySolutionProvider;
+use Illuminate\Foundation\Exceptions\Renderer\Solutions\Providers\MissingColumnSolutionProvider;
+use Illuminate\Foundation\Exceptions\Renderer\Solutions\Providers\TableNotFoundSolutionProvider;
+use Illuminate\Foundation\Exceptions\Renderer\Solutions\Providers\ViewNotFoundSolutionProvider;
+use Illuminate\Foundation\Exceptions\Renderer\Solutions\Providers\ViteManifestNotFoundSolutionProvider;
+use Illuminate\Foundation\Exceptions\Renderer\Solutions\RunSolutionController;
+use Illuminate\Foundation\Exceptions\Renderer\Solutions\SolutionProviderRepository;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Http\HtmlDumper;
 use Illuminate\Foundation\MaintenanceModeManager;
 use Illuminate\Foundation\Precognition;
@@ -264,21 +275,36 @@ class FoundationServiceProvider extends AggregateServiceProvider
 
         $this->loadViewsFrom(__DIR__.'/../resources/exceptions/renderer', 'laravel-exceptions-renderer');
 
+        $this->app->singleton(SolutionProviderRepository::class, function () {
+            return (new SolutionProviderRepository())->register([
+                MissingColumnSolutionProvider::class,
+                TableNotFoundSolutionProvider::class,
+                ConnectionRefusedSolutionProvider::class,
+                MissingAppKeySolutionProvider::class,
+                AccessDeniedSolutionProvider::class,
+                ViewNotFoundSolutionProvider::class,
+                ViteManifestNotFoundSolutionProvider::class,
+            ]);
+        });
+
         $this->app->singleton(Renderer::class, function (Application $app) {
             $errorRenderer = new HtmlErrorRenderer(
                 $app['config']->get('app.debug'),
             );
 
-            return new Renderer(
+            return new SolutionRenderer(
                 $app->make(Factory::class),
                 $app->make(Listener::class),
                 $errorRenderer,
                 $app->make(BladeMapper::class),
                 $app->basePath(),
+                $app->make(SolutionProviderRepository::class),
             );
         });
 
         $this->app->singleton(Listener::class);
+
+        Route::post('/_error-solutions/run', RunSolutionController::class);
     }
 
     /**
