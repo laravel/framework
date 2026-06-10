@@ -13,11 +13,11 @@ use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Queue\Attributes\Timeout;
 use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Arr;
-
-use function Illuminate\Support\enum_value;
 use ReflectionClass;
 use ReflectionProperty;
 use Throwable;
+
+use function Illuminate\Support\enum_value;
 
 class BroadcastEvent implements ShouldQueue
 {
