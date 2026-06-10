@@ -679,8 +679,10 @@ class Connection implements ConnectionInterface
     /**
      * Execute the given callback without "pretending".
      *
-     * @param  \Closure  $callback
-     * @return mixed
+     * @template TReturn
+     *
+     * @param  \Closure(): TReturn  $callback
+     * @return TReturn
      */
     public function withoutPretending(Closure $callback)
     {
@@ -1738,8 +1740,10 @@ class Connection implements ConnectionInterface
     /**
      * Execute the given callback without table prefix.
      *
-     * @param  \Closure  $callback
-     * @return mixed
+     * @template TReturn
+     *
+     * @param  (\Closure($this): TReturn)  $callback
+     * @return TReturn
      */
     public function withoutTablePrefix(Closure $callback): mixed
     {
