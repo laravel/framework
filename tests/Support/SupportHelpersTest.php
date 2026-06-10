@@ -136,7 +136,7 @@ class SupportHelpersTest extends TestCase
         $this->assertNull(when(0, fn () => null));
         $this->assertSame('True', when([1, 2, 3, 4], 'True')); // Array
         $this->assertNull(when([], 'True')); // Empty Array = Falsy
-        $this->assertSame('True', when(new StdClass, fn () => 'True')); // Object
+        $this->assertSame('True', when(new stdClass, fn () => 'True')); // Object
         $this->assertSame('World', when(false, 'Hello', 'World'));
         $this->assertSame('World', when(1 === 0, 'Hello', 'World')); // strict types
         $this->assertSame('World', when(1 == '0', 'Hello', 'World')); // loose types
