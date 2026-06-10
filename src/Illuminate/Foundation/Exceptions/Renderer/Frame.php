@@ -54,20 +54,29 @@ class Frame
     protected $isMain = false;
 
     /**
+     * Additional paths that should be treated as source code.
+     *
+     * @var string[]
+     */
+    protected $sourcePaths;
+
+    /**
      * Create a new frame instance.
      *
      * @param  \Symfony\Component\ErrorHandler\Exception\FlattenException  $exception
      * @param  array<string, string>  $classMap
      * @param  array{file: string, line: int, class?: string, type?: string, function?: string, args?: array}  $frame
      * @param  string  $basePath
+     * @param  string[]  $sourcePaths
      * @param  \Illuminate\Foundation\Exceptions\Renderer\Frame|null  $previous
      */
-    public function __construct(FlattenException $exception, array $classMap, array $frame, string $basePath, ?Frame $previous = null)
+    public function __construct(FlattenException $exception, array $classMap, array $frame, string $basePath, array $sourcePaths = [], ?Frame $previous = null)
     {
         $this->exception = $exception;
         $this->classMap = $classMap;
         $this->frame = $frame;
         $this->basePath = $basePath;
+        $this->sourcePaths = $sourcePaths;
         $this->previous = $previous;
     }
 
@@ -211,6 +220,12 @@ class Frame
      */
     public function isFromVendor()
     {
+        foreach ($this->sourcePaths as $path) {
+            if (str_starts_with($this->frame['file'], $path)) {
+                return false;
+            }
+        }
+
         return ! str_starts_with($this->frame['file'], $this->basePath)
             || str_starts_with($this->frame['file'], join_paths($this->basePath, 'vendor'));
     }

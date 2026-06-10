@@ -87,7 +87,7 @@ class FrameTest extends TestCase
     {
         $exception = m::mock(FlattenException::class);
         $classMap = [];
-        $frame = new Frame($exception, $classMap, $frameData, $basePath);
+        $frame = new Frame($exception, $classMap, $frameData, $basePath, ['/path/to/your-package']);
 
         $this->assertEquals($expected, $frame->isFromVendor());
     }
@@ -114,6 +114,11 @@ class FrameTest extends TestCase
             '/path/to/your-app',
             false,
         ];
+        yield 'external source path' => [
+            ['file' => '/path/to/your-package/src/file.php', 'line' => 10],
+            '/path/to/your-package/src/file.php',
+            false,
+        ];
     }
 
     #[RequiresOperatingSystem('Windows')]
@@ -122,7 +127,7 @@ class FrameTest extends TestCase
     {
         $exception = m::mock(FlattenException::class);
         $classMap = [];
-        $frame = new Frame($exception, $classMap, $frameData, $basePath);
+        $frame = new Frame($exception, $classMap, $frameData, $basePath, ['C:/path/to/your-package']);
 
         $this->assertEquals($expected, $frame->isFromVendor());
     }
@@ -147,6 +152,11 @@ class FrameTest extends TestCase
         yield 'vendor in filename' => [
             ['file' => 'C:\path\to\your-app\app\vendorfile.php', 'line' => 10],
             'C:\path\to\your-app',
+            false,
+        ];
+        yield 'external source path' => [
+            ['file' => 'C:\path\to\your-package\src\file.php', 'line' => 10],
+            'C:\path\to\your-package',
             false,
         ];
     }

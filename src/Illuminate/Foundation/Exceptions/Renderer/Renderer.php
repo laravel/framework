@@ -53,6 +53,13 @@ class Renderer
     protected $basePath;
 
     /**
+     * Additional paths that should be treated as source code.
+     *
+     * @var string[]
+     */
+    protected static $sourcePaths = [];
+
+    /**
      * Creates a new exception renderer instance.
      *
      * @param  \Illuminate\Contracts\View\Factory  $viewFactory
@@ -88,7 +95,7 @@ class Renderer
             $this->htmlErrorRenderer->render($throwable),
         );
 
-        $exception = new Exception($flattenException, $request, $this->listener, $this->basePath);
+        $exception = new Exception($flattenException, $request, $this->listener, $this->basePath, self::$sourcePaths);
 
         $exceptionAsMarkdown = $this->viewFactory->make('laravel-exceptions-renderer::markdown', [
             'exception' => $exception,
@@ -98,6 +105,21 @@ class Renderer
             'exception' => $exception,
             'exceptionAsMarkdown' => $exceptionAsMarkdown,
         ])->render();
+    }
+
+    /**
+     * Set additional paths that should be considered as source code, instead of vendor code.
+     *
+     * @param  string[]  $paths
+     * @return void
+     */
+    public static function sourcePaths(array $paths): void
+    {
+        self::$sourcePaths = array_filter(array_map(function ($path) {
+            $path = realpath($path);
+
+            return $path ? rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR : null;
+        }, $paths));
     }
 
     /**

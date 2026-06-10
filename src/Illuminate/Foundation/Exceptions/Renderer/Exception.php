@@ -41,19 +41,28 @@ class Exception
     protected $basePath;
 
     /**
+     * Additional paths that should be treated as source code.
+     *
+     * @var string[]
+     */
+    protected $sourcePaths;
+
+    /**
      * Creates a new exception renderer instance.
      *
      * @param  \Symfony\Component\ErrorHandler\Exception\FlattenException  $exception
      * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Foundation\Exceptions\Renderer\Listener  $listener
      * @param  string  $basePath
+     * @param  string[]  $sourcePaths
      */
-    public function __construct(FlattenException $exception, Request $request, Listener $listener, string $basePath)
+    public function __construct(FlattenException $exception, Request $request, Listener $listener, string $basePath, array $sourcePaths = [])
     {
         $this->exception = $exception;
         $this->request = $request;
         $this->listener = $listener;
         $this->basePath = $basePath;
+        $this->sourcePaths = $sourcePaths;
     }
 
     /**
@@ -114,7 +123,7 @@ class Exception
     public function previousExceptions()
     {
         return once(fn () => (new Collection($this->exception->getAllPrevious()))->map(
-            fn ($previous) => new static($previous, $this->request, $this->listener, $this->basePath),
+            fn ($previous) => new static($previous, $this->request, $this->listener, $this->basePath, $this->sourcePaths),
         ));
     }
 
@@ -152,7 +161,7 @@ class Exception
             $previousFrame = null;
 
             foreach (array_reverse($trace) as $frameData) {
-                $frame = new Frame($this->exception, $classMap, $frameData, $this->basePath, $previousFrame);
+                $frame = new Frame($this->exception, $classMap, $frameData, $this->basePath, $this->sourcePaths, $previousFrame);
                 $frames[] = $frame;
                 $previousFrame = $frame;
             }
