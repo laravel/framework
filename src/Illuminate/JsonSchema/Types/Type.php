@@ -37,6 +37,16 @@ abstract class Type extends JsonSchema
     protected ?array $enum = null;
 
     /**
+     * The exact value this type must equal.
+     */
+    protected mixed $const = null;
+
+    /**
+     * Indicates if a const value has been set.
+     */
+    protected bool $hasConst = false;
+
+    /**
      * Indicates if the type is nullable.
      */
     protected ?bool $nullable = null;
@@ -100,6 +110,17 @@ abstract class Type extends JsonSchema
 
         // Keep order and allow complex values (arrays / objects) without forcing uniqueness...
         $this->enum = array_values($values);
+
+        return $this;
+    }
+
+    /**
+     * Restrict the value to exactly match the provided constant value.
+     */
+    public function const(mixed $value): static
+    {
+        $this->const = $value;
+        $this->hasConst = true;
 
         return $this;
     }

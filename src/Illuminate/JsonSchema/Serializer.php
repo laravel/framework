@@ -11,7 +11,7 @@ class Serializer
      *
      * @var array<int, string>
      */
-    protected static array $ignore = ['required', 'nullable'];
+    protected static array $ignore = ['required', 'nullable', 'hasConst'];
 
     /**
      * Serialize the given property to an array.
@@ -46,9 +46,15 @@ class Serializer
                 : [$attributes['type'], 'null'];
         }
 
-        $attributes = array_filter($attributes, static function (mixed $value, string $key) {
+        $hasConst = $attributes['hasConst'] ?? false;
+
+        $attributes = array_filter($attributes, static function (mixed $value, string $key) use ($hasConst) {
             if (in_array($key, static::$ignore, true)) {
                 return false;
+            }
+
+            if ($key === 'const') {
+                return $hasConst;
             }
 
             return $value !== null;

@@ -400,6 +400,63 @@ class DeserializerTest extends TestCase
         ], $type->toArray());
     }
 
+    public function test_it_applies_const(): void
+    {
+        $type = JsonSchema::fromArray([
+            'type' => 'string',
+            'const' => 'published',
+        ]);
+
+        $this->assertEquals([
+            'const' => 'published',
+            'type' => 'string',
+        ], $type->toArray());
+    }
+
+    public function test_it_preserves_null_const(): void
+    {
+        $type = JsonSchema::fromArray([
+            'type' => ['string', 'null'],
+            'const' => null,
+        ]);
+
+        $this->assertEquals([
+            'const' => null,
+            'type' => ['string', 'null'],
+        ], $type->toArray());
+    }
+
+    public function test_it_infers_type_from_const(): void
+    {
+        $this->assertInstanceOf(StringType::class, JsonSchema::fromArray([
+            'const' => 'published',
+        ]));
+
+        $this->assertInstanceOf(IntegerType::class, JsonSchema::fromArray([
+            'const' => 1,
+        ]));
+
+        $this->assertInstanceOf(NumberType::class, JsonSchema::fromArray([
+            'const' => 1.5,
+        ]));
+
+        $this->assertInstanceOf(BooleanType::class, JsonSchema::fromArray([
+            'const' => true,
+        ]));
+
+        $this->assertInstanceOf(ArrayType::class, JsonSchema::fromArray([
+            'const' => ['one', 'two'],
+        ]));
+
+        $this->assertInstanceOf(ObjectType::class, JsonSchema::fromArray([
+            'const' => ['status' => 'published'],
+        ]));
+
+        $this->assertInstanceOf(UnionType::class, JsonSchema::fromArray([
+            'const' => null,
+        ]));
+    }
+
     public function test_it_ignores_unknown_keywords(): void
     {
         $type = JsonSchema::fromArray([

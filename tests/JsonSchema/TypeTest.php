@@ -136,6 +136,19 @@ class TypeTest extends TestCase
         $this->assertNotValidOnJsonSchema($schema, null);
     }
 
+    public function test_const_may_be_null(): void
+    {
+        $schema = JsonSchema::union(['null'])->const(null);
+
+        $this->assertEquals([
+            'const' => null,
+            'type' => ['null'],
+        ], $schema->toArray());
+
+        $this->assertValidOnJsonSchema($schema, null);
+        $this->assertNotValidOnJsonSchema($schema, false);
+    }
+
     public function test_throws_with_invalid_enum_string(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -173,6 +186,7 @@ class TypeTest extends TestCase
             [JsonSchema::string()->pattern('^foo.*$'), 'foobar'],
             [JsonSchema::string()->default('x'), 'x'],
             [JsonSchema::string()->enum(['draft', 'published']), 'draft'],
+            [JsonSchema::string()->const('draft'), 'draft'],
             // additional StringType cases
             [JsonSchema::string()->min(0), ''], // empty allowed with min 0
             [JsonSchema::string()->max(0), ''], // exactly zero length
@@ -189,6 +203,7 @@ class TypeTest extends TestCase
             [JsonSchema::integer()->max(120), 120],
             [JsonSchema::integer()->default(18), 18],
             [JsonSchema::integer()->enum([1, 2, 3]), 2],
+            [JsonSchema::integer()->const(2), 2],
             [JsonSchema::integer()->multipleOf(5), 10],
             [JsonSchema::integer()->multipleOf(3), 9],
             [JsonSchema::integer()->multipleOf(7), 0],
@@ -208,6 +223,7 @@ class TypeTest extends TestCase
             [JsonSchema::number()->max(100.0), 99.9],
             [JsonSchema::number()->default(9.99), 9.99],
             [JsonSchema::number()->enum([1, 2.5, 3]), 2.5],
+            [JsonSchema::number()->const(2.5), 2.5],
             [JsonSchema::number()->multipleOf(0.5), 2.5],
             [JsonSchema::number()->multipleOf(3), 9],
             [JsonSchema::number()->multipleOf(0.1), 0.3],
@@ -224,6 +240,7 @@ class TypeTest extends TestCase
             [JsonSchema::boolean(), true],
             [JsonSchema::boolean()->default(false), false],
             [JsonSchema::boolean()->enum([true, false]), true],
+            [JsonSchema::boolean()->const(true), true],
             // additional BooleanType cases
             [JsonSchema::boolean(), false],
             [JsonSchema::boolean()->enum([true, false]), false],
@@ -257,6 +274,10 @@ class TypeTest extends TestCase
                 JsonSchema::object([
                     'status' => JsonSchema::string()->enum(['draft', 'published']),
                 ]),
+                (object) ['status' => 'published'],
+            ],
+            [
+                JsonSchema::object()->const(['status' => 'published']),
                 (object) ['status' => 'published'],
             ],
             // additional ObjectType cases
@@ -308,6 +329,7 @@ class TypeTest extends TestCase
             [JsonSchema::array()->items(JsonSchema::string()->max(3)), ['one', 'two']],
             [JsonSchema::array()->default(['x']), ['x']],
             [JsonSchema::array()->enum([['a'], ['b', 'c']]), ['b', 'c']],
+            [JsonSchema::array()->const(['b', 'c']), ['b', 'c']],
             [JsonSchema::array()->unique(), [1, 2, 3]],
             [JsonSchema::array()->items(JsonSchema::string())->unique(), ['a', 'b', 'c']],
             [JsonSchema::array()->unique(), []],
@@ -326,6 +348,7 @@ class TypeTest extends TestCase
             [JsonSchema::union(['string', 'number']), 3.14],
             [JsonSchema::union(['integer', 'boolean']), true],
             [JsonSchema::union(['string', 'number'])->enum(['draft', 5]), 'draft'],
+            [JsonSchema::union(['string', 'number'])->const('draft'), 'draft'],
             [JsonSchema::union(['string', 'number'])->nullable(), null],
             [JsonSchema::union(['string', 'number'])->nullable(), 'still valid'],
         ];
@@ -341,6 +364,7 @@ class TypeTest extends TestCase
             [JsonSchema::string()->pattern('^foo.*$'), 'barbaz'], // pattern mismatch
             [JsonSchema::string()->default('x'), 10], // default doesn't enforce, but data wrong type
             [JsonSchema::string()->enum(['draft', 'published']), 'archived'], // not in enum
+            [JsonSchema::string()->const('draft'), 'published'],
             // additional StringType cases
             [JsonSchema::string()->min(1), ''], // too short (empty)
             [JsonSchema::string()->max(0), 'a'], // too long for zero max
@@ -356,6 +380,7 @@ class TypeTest extends TestCase
             [JsonSchema::integer()->max(5), 6], // above max
             [JsonSchema::integer()->default(1), '1'], // wrong type
             [JsonSchema::integer()->enum([1, 2, 3]), 4], // not in enum
+            [JsonSchema::integer()->const(2), 3],
             [JsonSchema::integer()->multipleOf(5), 7], // not a multiple
             [JsonSchema::integer()->multipleOf(3), 10], // not a multiple
             // additional IntegerType cases
@@ -373,6 +398,7 @@ class TypeTest extends TestCase
             [JsonSchema::number()->max(1.5), 1.6], // above max
             [JsonSchema::number()->default(1.1), '1.1'], // wrong type
             [JsonSchema::number()->enum([1, 2.5, 3]), 4], // not in enum
+            [JsonSchema::number()->const(2.5), 2.6],
             [JsonSchema::number()->multipleOf(0.5), 1.3], // not a multiple
             [JsonSchema::number()->multipleOf(3), 10], // not a multiple
             // additional NumberType cases
@@ -387,6 +413,7 @@ class TypeTest extends TestCase
             [JsonSchema::boolean(), 'true'], // type mismatch
             [JsonSchema::boolean()->default(false), 0], // wrong type
             [JsonSchema::boolean()->enum([true, false]), null], // not in enum
+            [JsonSchema::boolean()->const(true), false],
             // additional BooleanType cases
             [JsonSchema::boolean()->enum([true]), false], // not in enum
             [JsonSchema::boolean()->enum([false]), true], // not in enum
@@ -399,6 +426,7 @@ class TypeTest extends TestCase
             [JsonSchema::object(['name' => JsonSchema::string()->required()]), (object) []], // missing required
             [JsonSchema::object(['meta' => JsonSchema::object()->withoutAdditionalProperties()]), (object) ['meta' => (object) ['x' => 1]]], // additional prop not allowed
             [JsonSchema::object(['age' => JsonSchema::integer()->min(21)]), (object) ['age' => 18]], // below min in nested schema
+            [JsonSchema::object()->const(['status' => 'published']), (object) ['status' => 'draft']],
             // additional ObjectType cases
             [JsonSchema::object([])->withoutAdditionalProperties(), (object) ['x' => 1]], // no additional properties allowed
             [JsonSchema::object(['name' => JsonSchema::string()]), (object) ['name' => 123]], // wrong type for property
@@ -413,6 +441,7 @@ class TypeTest extends TestCase
             [JsonSchema::array()->max(1), ['a', 'b']], // too many items
             [JsonSchema::array()->items(JsonSchema::string()->max(3)), ['four']], // item too long
             [JsonSchema::array()->enum([['a'], ['b', 'c']]), ['c', 'd']], // not in enum
+            [JsonSchema::array()->const(['b', 'c']), ['c', 'd']],
             [JsonSchema::array()->unique(), [1, 1, 2]],
             [JsonSchema::array()->items(JsonSchema::string())->unique(), ['a', 'b', 'a']],
             // additional ArrayType cases
@@ -429,6 +458,7 @@ class TypeTest extends TestCase
             [JsonSchema::union(['string', 'number']), null], // null not allowed unless nullable
             [JsonSchema::union(['integer', 'boolean']), 'nope'], // string not in union
             [JsonSchema::union(['string', 'number'])->enum(['draft', 5]), 'archived'], // not in enum
+            [JsonSchema::union(['string', 'number'])->const('draft'), 'archived'],
         ];
     }
 

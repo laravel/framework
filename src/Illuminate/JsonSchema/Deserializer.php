@@ -254,6 +254,10 @@ class Deserializer
             $type->enum($schema['enum']);
         }
 
+        if (array_key_exists('const', $schema)) {
+            $type->const($schema['const']);
+        }
+
         if (array_key_exists('default', $schema)) {
             if ($schema['default'] === null) {
                 throw new InvalidArgumentException('A null JSON Schema [default] is not supported.');
@@ -294,6 +298,10 @@ class Deserializer
 
         $type ??= $this->inferType($schema);
 
+        if (is_array($type)) {
+            return [$type, $nullable];
+        }
+
         if (! is_string($type)) {
             throw new InvalidArgumentException('Unable to determine the JSON Schema type for the given schema.');
         }
@@ -305,15 +313,36 @@ class Deserializer
      * Infer the type name when "type" is absent but the shape is unambiguous.
      *
      * @param  array<string, mixed>  $schema
+     * @return string|array<int, string>|null
      */
-    protected function inferType(array $schema): ?string
+    protected function inferType(array $schema): string|array|null
     {
         return match (true) {
             isset($schema['properties']), isset($schema['additionalProperties']), isset($schema['required']) => 'object',
             isset($schema['items']), isset($schema['minItems']), isset($schema['maxItems']), isset($schema['uniqueItems']) => 'array',
             isset($schema['enum']) && is_array($schema['enum']) => $this->inferEnumType($schema['enum']),
+            array_key_exists('const', $schema) => $this->inferConstType($schema['const']),
             isset($schema['minLength']), isset($schema['maxLength']), isset($schema['pattern']), isset($schema['format']) => 'string',
             isset($schema['minimum']), isset($schema['maximum']), isset($schema['multipleOf']) => 'number',
+            default => null,
+        };
+    }
+
+    /**
+     * Infer the type name for a JSON Schema const value.
+     *
+     * @return string|array<int, string>|null
+     */
+    protected function inferConstType(mixed $value): string|array|null
+    {
+        return match (true) {
+            is_bool($value) => 'boolean',
+            is_int($value) => 'integer',
+            is_float($value) => 'number',
+            is_string($value) => 'string',
+            is_array($value) => array_is_list($value) ? 'array' : 'object',
+            is_object($value) => 'object',
+            $value === null => ['null'],
             default => null,
         };
     }
