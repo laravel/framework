@@ -538,12 +538,38 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(['hidden', 'visible'], $c[0]->getHidden());
     }
 
+    public function testMakeHiddenIfAddsHiddenOnEntireCollection()
+    {
+        $first = new TestEloquentCollectionModel;
+        $second = new TestEloquentCollectionModel;
+
+        $c = new Collection([$first, $second]);
+        $result = $c->makeHiddenIf(fn ($model) => $model === $first, ['visible']);
+
+        $this->assertSame($c, $result);
+        $this->assertEquals(['hidden', 'visible'], $first->getHidden());
+        $this->assertEquals(['hidden'], $second->getHidden());
+    }
+
     public function testMakeVisibleRemovesHiddenFromEntireCollection()
     {
         $c = new Collection([new TestEloquentCollectionModel]);
         $c = $c->makeVisible(['hidden']);
 
         $this->assertSame([], $c[0]->getHidden());
+    }
+
+    public function testMakeVisibleIfRemovesHiddenFromEntireCollection()
+    {
+        $first = new TestEloquentCollectionModel;
+        $second = new TestEloquentCollectionModel;
+
+        $c = new Collection([$first, $second]);
+        $result = $c->makeVisibleIf(fn ($model) => $model === $first, ['hidden']);
+
+        $this->assertSame($c, $result);
+        $this->assertSame([], $first->getHidden());
+        $this->assertEquals(['hidden'], $second->getHidden());
     }
 
     public function testMergeHiddenAddsHiddenOnEntireCollection()

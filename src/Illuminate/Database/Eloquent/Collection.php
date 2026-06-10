@@ -577,6 +577,18 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Make the given, typically visible, attributes hidden across the entire collection if the given truth test passes.
+     *
+     * @param  bool|\Closure  $condition
+     * @param  array<array-key, string>|string  $attributes
+     * @return $this
+     */
+    public function makeHiddenIf($condition, $attributes)
+    {
+        return $this->each->makeHiddenIf($condition, $attributes);
+    }
+
+    /**
      * Merge the given, typically visible, attributes hidden across the entire collection.
      *
      * @param  array<array-key, string>|string  $attributes
@@ -607,6 +619,18 @@ class Collection extends BaseCollection implements QueueableCollection
     public function makeVisible($attributes)
     {
         return $this->each->makeVisible($attributes);
+    }
+
+    /**
+     * Make the given, typically hidden, attributes visible across the entire collection if the given truth test passes.
+     *
+     * @param  bool|\Closure  $condition
+     * @param  array<array-key, string>|string  $attributes
+     * @return $this
+     */
+    public function makeVisibleIf($condition, $attributes)
+    {
+        return $this->each->makeVisibleIf($condition, $attributes);
     }
 
     /**
