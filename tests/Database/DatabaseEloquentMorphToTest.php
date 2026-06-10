@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Tests\Database\stubs\TestEnum;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 class DatabaseEloquentMorphToTest extends TestCase
 {
@@ -66,6 +67,21 @@ class DatabaseEloquentMorphToTest extends TestCase
                 ],
             ],
         ], $dictionary);
+    }
+
+    public function testGatherKeysByTypeKeepsStringZeroForStringKeyTypes()
+    {
+        $relation = $this->getRelation();
+
+        $relation->addEagerConstraints([
+            (object) ['morph_type' => 'morph_type_1', 'foreign_key' => '0'],
+            (object) ['morph_type' => 'morph_type_1', 'foreign_key' => ''],
+        ]);
+
+        $method = new ReflectionMethod(MorphTo::class, 'gatherKeysByType');
+        $method->setAccessible(true);
+
+        $this->assertSame(['0'], $method->invoke($relation, 'morph_type_1', 'string'));
     }
 
     public function testMorphToWithDefault()
