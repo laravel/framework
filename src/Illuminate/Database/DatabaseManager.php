@@ -343,9 +343,11 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Set the default database connection for the callback execution.
      *
+     * @template TReturn
+     *
      * @param  \UnitEnum|string  $name
-     * @param  callable  $callback
-     * @return mixed
+     * @param  (callable(): TReturn)  $callback
+     * @return TReturn
      */
     public function usingConnection($name, callable $callback)
     {
