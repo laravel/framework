@@ -38,4 +38,19 @@ trait WithCachedConfig
 
         LoadConfiguration::alwaysUse(static fn () => CachedState::$cachedConfig);
     }
+
+    /**
+     * Disable the configuration cache for the current test.
+     *
+     * @return $this
+     */
+    protected function disableConfigCache()
+    {
+        $this->app->instance('config_loaded_from_cache', false);
+
+        CachedState::$cachedConfig = null;
+        LoadConfiguration::alwaysUse(null);
+
+        return $this;
+    }
 }
