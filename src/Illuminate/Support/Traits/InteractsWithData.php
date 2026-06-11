@@ -179,8 +179,7 @@ trait InteractsWithData
     }
 
     /**
-     * Apply the callback if the instance contains a non-empty value for the given key
-     * and the value can be converted to the given backed enum.
+     * Apply the callback if the instance contains a valid enum value for the given key.
      *
      * @param  string  $key
      * @param  class-string<\BackedEnum>  $enumClass
@@ -188,7 +187,7 @@ trait InteractsWithData
      * @param  callable|null  $default
      * @return $this|mixed
      */
-    public function whenFilledEnum($key, string $enumClass, callable $callback, ?callable $default = null)
+    public function whenEnum($key, string $enumClass, callable $callback, ?callable $default = null)
     {
         if ($this->filled($key) && $this->isBackedEnum($enumClass)) {
             $value = $enumClass::tryFrom(data_get($this->all(), $key));

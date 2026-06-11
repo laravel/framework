@@ -453,25 +453,25 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($bar);
     }
 
-    public function testWhenFilledEnumMethod()
+    public function testWhenEnumMethod()
     {
         $request = Request::create('/', 'GET', ['status' => 'test', 'invalid' => 'invalid', 'empty' => '']);
 
         $status = $invalid = $empty = $missing = $default = false;
 
-        $request->whenFilledEnum('status', TestEnumBacked::class, function ($value) use (&$status) {
+        $request->whenEnum('status', TestEnumBacked::class, function ($value) use (&$status) {
             $status = $value;
         });
 
-        $request->whenFilledEnum('invalid', TestEnumBacked::class, function ($value) use (&$invalid) {
+        $request->whenEnum('invalid', TestEnumBacked::class, function ($value) use (&$invalid) {
             $invalid = $value;
         });
 
-        $request->whenFilledEnum('empty', TestEnumBacked::class, function ($value) use (&$empty) {
+        $request->whenEnum('empty', TestEnumBacked::class, function ($value) use (&$empty) {
             $empty = $value;
         });
 
-        $request->whenFilledEnum('missing', TestEnumBacked::class, function ($value) use (&$missing) {
+        $request->whenEnum('missing', TestEnumBacked::class, function ($value) use (&$missing) {
             $missing = $value;
         }, function () use (&$default) {
             $default = true;

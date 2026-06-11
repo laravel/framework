@@ -231,25 +231,25 @@ class ValidatedInputTest extends TestCase
         $this->assertFalse($bar);
     }
 
-    public function test_when_filled_enum_method()
+    public function test_when_enum_method()
     {
         $input = new ValidatedInput(['status' => 'Hello world', 'invalid' => 'invalid', 'age' => '']);
 
         $status = $invalid = $age = $missing = $default = false;
 
-        $input->whenFilledEnum('status', StringBackedEnum::class, function ($value) use (&$status) {
+        $input->whenEnum('status', StringBackedEnum::class, function ($value) use (&$status) {
             $status = $value;
         });
 
-        $input->whenFilledEnum('invalid', StringBackedEnum::class, function ($value) use (&$invalid) {
+        $input->whenEnum('invalid', StringBackedEnum::class, function ($value) use (&$invalid) {
             $invalid = $value;
         });
 
-        $input->whenFilledEnum('age', StringBackedEnum::class, function ($value) use (&$age) {
+        $input->whenEnum('age', StringBackedEnum::class, function ($value) use (&$age) {
             $age = $value;
         });
 
-        $input->whenFilledEnum('missing', StringBackedEnum::class, function ($value) use (&$missing) {
+        $input->whenEnum('missing', StringBackedEnum::class, function ($value) use (&$missing) {
             $missing = $value;
         }, function () use (&$default) {
             $default = true;
