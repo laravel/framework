@@ -14,7 +14,6 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Contracts\View\Factory as ViewFactory;
@@ -37,6 +36,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Uri;
+use Illuminate\Translation\Translator;
 use League\Uri\Contracts\UriInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -985,7 +985,7 @@ if (! function_exists('trans')) {
      * @param  string|null  $key
      * @param  array  $replace
      * @param  string|null  $locale
-     * @return ($key is null ? \Illuminate\Contracts\Translation\Translator : array|string)
+     * @return ($key is null ? \Illuminate\Translation\Translator : array|string)
      */
     function trans($key = null, $replace = [], $locale = null): Translator|array|string
     {
