@@ -158,6 +158,10 @@ class WorkCommand extends Command
      */
     protected function gatherWorkerOptions()
     {
+        $stopWhenEmptyFor = $this->hasOption('stop-when-empty-for')
+            ? $this->option('stop-when-empty-for')
+            : 0;
+
         return new WorkerOptions(
             $this->option('name'),
             max($this->option('backoff'), $this->option('delay')),
@@ -170,7 +174,7 @@ class WorkCommand extends Command
             $this->option('max-jobs'),
             $this->option('max-time'),
             $this->option('rest'),
-            $this->option('stop-when-empty-for'),
+            $stopWhenEmptyFor,
         );
     }
 
