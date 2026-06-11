@@ -453,6 +453,37 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($bar);
     }
 
+    public function testWhenFilledEnumMethod()
+    {
+        $request = Request::create('/', 'GET', ['status' => 'test', 'invalid' => 'invalid', 'empty' => '']);
+
+        $status = $invalid = $empty = $missing = $default = false;
+
+        $request->whenFilledEnum('status', TestEnumBacked::class, function ($value) use (&$status) {
+            $status = $value;
+        });
+
+        $request->whenFilledEnum('invalid', TestEnumBacked::class, function ($value) use (&$invalid) {
+            $invalid = $value;
+        });
+
+        $request->whenFilledEnum('empty', TestEnumBacked::class, function ($value) use (&$empty) {
+            $empty = $value;
+        });
+
+        $request->whenFilledEnum('missing', TestEnumBacked::class, function ($value) use (&$missing) {
+            $missing = $value;
+        }, function () use (&$default) {
+            $default = true;
+        });
+
+        $this->assertSame(TestEnumBacked::test, $status);
+        $this->assertFalse($invalid);
+        $this->assertFalse($empty);
+        $this->assertFalse($missing);
+        $this->assertTrue($default);
+    }
+
     public function testMissingMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
