@@ -165,6 +165,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool isNotFilled(string|array $key)
  * @method static bool anyFilled(string|array $keys)
  * @method static \Illuminate\Http\Request|mixed whenFilled(string $key, callable $callback, callable|null $default = null)
+ * @method static \Illuminate\Http\Request|mixed whenEnum(string $key, string $enumClass, callable $callback, callable|null $default = null)
  * @method static bool missing(string|array $key)
  * @method static \Illuminate\Http\Request|mixed whenMissing(string $key, callable $callback, callable|null $default = null)
  * @method static \Illuminate\Support\Stringable str(string $key, mixed $default = null)
