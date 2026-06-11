@@ -7,32 +7,42 @@ use PHPUnit\Framework\TestCase;
 
 class FoundationArrayMaintenanceModeTest extends TestCase
 {
-    public function test_it_is_inactive_by_default()
+    public function test_it_determines_whether_maintenance_mode_is_active()
     {
-        $maintenanceMode = new ArrayMaintenanceMode();
+        $manager = new ArrayMaintenanceMode();
 
-        $this->assertFalse($maintenanceMode->active());
-        $this->assertSame([], $maintenanceMode->data());
+        $this->assertFalse($manager->active());
+
+        $manager->activate(['payload']);
+        $this->assertTrue($manager->active());
     }
 
-    public function test_it_stores_payload_when_activated()
+    public function test_it_retrieves_payload()
     {
-        $maintenanceMode = new ArrayMaintenanceMode();
+        $manager = new ArrayMaintenanceMode();
 
-        $maintenanceMode->activate(['payload']);
-
-        $this->assertTrue($maintenanceMode->active());
-        $this->assertSame(['payload'], $maintenanceMode->data());
+        $manager->activate(['payload']);
+        $this->assertSame(['payload'], $manager->data());
     }
 
-    public function test_it_clears_payload_when_deactivated()
+    public function test_it_stores_payload()
     {
-        $maintenanceMode = new ArrayMaintenanceMode();
+        $manager = new ArrayMaintenanceMode();
 
-        $maintenanceMode->activate(['payload']);
-        $maintenanceMode->deactivate();
+        $manager->activate(['payload']);
 
-        $this->assertFalse($maintenanceMode->active());
-        $this->assertSame([], $maintenanceMode->data());
+        $this->assertTrue($manager->active());
+        $this->assertSame(['payload'], $manager->data());
+    }
+
+    public function test_it_removes_payload()
+    {
+        $manager = new ArrayMaintenanceMode();
+
+        $manager->activate(['payload']);
+        $manager->deactivate();
+
+        $this->assertFalse($manager->active());
+        $this->assertSame([], $manager->data());
     }
 }
