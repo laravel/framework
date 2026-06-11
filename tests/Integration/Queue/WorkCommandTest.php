@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Queue\Console\WorkCommand;
 use Illuminate\Queue\Worker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
@@ -246,6 +247,18 @@ class WorkCommandTest extends QueueTestCase
         Worker::$pausable = true;
     }
 
+    public function testStopWhenEmptyForOptionIsOptionalForExtendingCommands()
+    {
+        // Simulates an older Horizon WorkCommand whose signature omits --stop-when-empty-for.
+        Artisan::registerCommand($command = new WorkCommandWithoutStopWhenEmptyFor(
+            $this->app['queue.worker'], $this->app['cache.store']
+        ));
+
+        $this->artisan('queue:work-legacy')->assertExitCode(0);
+
+        $this->assertSame(0, $command->capturedOptions->stopWhenEmptyFor);
+    }
+
     public function testFailedJobListenerOnlyRunsOnce()
     {
         $this->markTestSkippedWhenUsingQueueDrivers(['redis', 'beanstalkd']);
@@ -259,6 +272,36 @@ class WorkCommandTest extends QueueTestCase
         $this->withoutMockingConsoleOutput()->artisan('queue:work', ['--once' => true]);
         Exceptions::assertNotReported(UniqueConstraintViolationException::class);
         $this->assertSame(2, substr_count(Artisan::output(), JobWillFail::class));
+    }
+}
+
+class WorkCommandWithoutStopWhenEmptyFor extends WorkCommand
+{
+    protected $signature = 'queue:work-legacy
+                            {connection?}
+                            {--name=default}
+                            {--queue=}
+                            {--once}
+                            {--stop-when-empty}
+                            {--delay=0}
+                            {--backoff=0}
+                            {--max-jobs=0}
+                            {--max-time=0}
+                            {--force}
+                            {--memory=128}
+                            {--sleep=3}
+                            {--rest=0}
+                            {--timeout=60}
+                            {--tries=1}
+                            {--json}';
+
+    public $capturedOptions;
+
+    public function handle()
+    {
+        $this->capturedOptions = $this->gatherWorkerOptions();
+
+        return 0;
     }
 }
 
