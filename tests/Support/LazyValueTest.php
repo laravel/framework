@@ -2,20 +2,12 @@
 
 namespace Illuminate\Tests\Support;
 
-use Illuminate\Container\Container;
 use Illuminate\Support\LazyValue;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class LazyValueTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Container::setInstance(null);
-
-        parent::tearDown();
-    }
-
     public function testCallbackIsNotEvaluatedUntilValueIsRequested()
     {
         $evaluated = false;
