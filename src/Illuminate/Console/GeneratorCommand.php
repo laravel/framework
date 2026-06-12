@@ -507,6 +507,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
             'name' => [
                 'What should the '.strtolower($this->type).' be named?',
                 match ($this->type) {
+                    'Action' => 'E.g. CreateInvoice',
                     'Cast' => 'E.g. Json',
                     'Channel' => 'E.g. OrderChannel',
                     'Console command' => 'E.g. SendEmails',

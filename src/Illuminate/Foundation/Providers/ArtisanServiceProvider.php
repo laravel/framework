@@ -31,6 +31,7 @@ use Illuminate\Database\Console\ShowModelCommand;
 use Illuminate\Database\Console\TableCommand as DatabaseTableCommand;
 use Illuminate\Database\Console\WipeCommand;
 use Illuminate\Foundation\Console\AboutCommand;
+use Illuminate\Foundation\Console\ActionMakeCommand;
 use Illuminate\Foundation\Console\ApiInstallCommand;
 use Illuminate\Foundation\Console\BroadcastingInstallCommand;
 use Illuminate\Foundation\Console\CastMakeCommand;
@@ -192,6 +193,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      * @var array
      */
     protected $devCommands = [
+        'ActionMake' => ActionMakeCommand::class,
         'ApiInstall' => ApiInstallCommand::class,
         'BroadcastingInstall' => BroadcastingInstallCommand::class,
         'CacheTable' => CacheTableCommand::class,
@@ -288,6 +290,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton(AboutCommand::class, function ($app) {
             return new AboutCommand($app['composer']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerActionMakeCommand(): void
+    {
+        $this->app->singleton(ActionMakeCommand::class, function ($app) {
+            return new ActionMakeCommand($app['files']);
         });
     }
 
