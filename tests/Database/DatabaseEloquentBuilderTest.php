@@ -3013,6 +3013,44 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(1, $result);
     }
 
+    public function testGlobalScopeConstructorHasConstraintsEnabledDuringEagerLoading()
+    {
+        // This test verifies the fix for laravel/framework#56951.
+        // When a model with a global scope that does queries in its constructor
+        // is eager loaded, the noConstraints flag should not bleed into the
+        // scope constructor's relation queries.
+        $constraintsDuringBoot = null;
+
+        Relation::noConstraints(function () use (&$constraintsDuringBoot) {
+            // Simulate model booting happening inside noConstraints (as during eager loading)
+            // The withConstraints wrapper in bootIfNotBooted should restore constraints.
+            EloquentBuilderTestGlobalScopeBootModel::$constraintsDuringBoot = null;
+
+            $model = new EloquentBuilderTestGlobalScopeBootModel;
+
+            $constraintsDuringBoot = EloquentBuilderTestGlobalScopeBootModel::$constraintsDuringBoot;
+        });
+
+        $this->assertTrue($constraintsDuringBoot, 'Relation constraints should be enabled during model booting even when called inside noConstraints');
+    }
+
+    public function testWithConstraintsRestoresPreviousState()
+    {
+        $this->assertTrue(Relation::isConstrained());
+
+        Relation::noConstraints(function () {
+            $this->assertFalse(Relation::isConstrained());
+
+            Relation::withConstraints(function () {
+                $this->assertTrue(Relation::isConstrained());
+            });
+
+            $this->assertFalse(Relation::isConstrained());
+        });
+
+        $this->assertTrue(Relation::isConstrained());
+    }
+
     protected function getMockModel()
     {
         $model = m::mock(Model::class);
@@ -3278,4 +3316,18 @@ enum EloquentBuilderTestBackedEnum: string
 enum EloquentBuilderTestUnitEnum
 {
     case Baz;
+}
+
+class EloquentBuilderTestGlobalScopeBootModel extends Model
+{
+    public static $constraintsDuringBoot = null;
+
+    protected static function booted()
+    {
+        // This simulates a global scope constructor checking constraints.
+        // During eager loading, this code runs inside Relation::noConstraints
+        // but should still see constraints as enabled due to the
+        // withConstraints wrapper in bootIfNotBooted.
+        static::$constraintsDuringBoot = Relation::isConstrained();
+    }
 }

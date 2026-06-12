@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
@@ -337,23 +338,28 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
             static::$booting[static::class] = true;
 
-            $this->fireModelEvent('booting', false);
+            // We will run the booting process with relation constraints enabled to
+            // ensure that any global scopes that perform queries during registration
+            // will properly apply foreign key constraints on their relationships.
+            Relation::withConstraints(function () {
+                $this->fireModelEvent('booting', false);
 
-            static::booting();
-            static::boot();
+                static::booting();
+                static::boot();
 
-            static::$booted[static::class] = true;
-            unset(static::$booting[static::class]);
+                static::$booted[static::class] = true;
+                unset(static::$booting[static::class]);
 
-            static::booted();
+                static::booted();
 
-            static::$bootedCallbacks[static::class] ??= [];
+                static::$bootedCallbacks[static::class] ??= [];
 
-            foreach (static::$bootedCallbacks[static::class] as $callback) {
-                $callback();
-            }
+                foreach (static::$bootedCallbacks[static::class] as $callback) {
+                    $callback();
+                }
 
-            $this->fireModelEvent('booted', false);
+                $this->fireModelEvent('booted', false);
+            });
         }
     }
 
