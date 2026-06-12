@@ -58,7 +58,7 @@ class LazyValue
     }
 
     /**
-     * Get the memoized result.
+     * Execute the callback if not already evaluated and return the result.
      *
      * @return TReturn
      *
@@ -66,15 +66,11 @@ class LazyValue
      */
     public function value()
     {
-        if ($this->wasEvaluated) {
-            return $this->value;
-        }
-
-        return $this->evaluate();
+        return $this->wasEvaluated ? $this->value : $this->evaluate();
     }
 
     /**
-     * Get the memoized result.
+     * Execute the callback if not already evaluated and return the result.
      *
      * @return TReturn
      *
