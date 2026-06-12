@@ -40,6 +40,34 @@ trait Conditionable
     }
 
     /**
+     * Apply the callback if the given "value" is (or resolves to) not null.
+     *
+     * @template TWhenNotNullParameter
+     * @template TWhenNotNullReturnType
+     *
+     * @param  (\Closure($this): (TWhenNotNullParameter|null))|TWhenNotNullParameter|null  $value
+     * @param  (callable($this, TWhenNotNullParameter): TWhenNotNullReturnType)|null  $callback
+     * @param  (callable($this, null): TWhenNotNullReturnType)|null  $default
+     * @return $this|TWhenNotNullReturnType
+     */
+    public function whenNotNull($value = null, ?callable $callback = null, ?callable $default = null)
+    {
+        $value = $value instanceof Closure ? $value($this) : $value;
+
+        if (func_num_args() <= 1) {
+            return (new HigherOrderWhenProxy($this))->condition($value !== null);
+        }
+
+        if ($value !== null) {
+            return $callback($this, $value) ?? $this;
+        } elseif ($default) {
+            return $default($this, $value) ?? $this;
+        }
+
+        return $this;
+    }
+
+    /**
      * Apply the callback if the given "value" is (or resolves to) falsy.
      *
      * @template TUnlessParameter
