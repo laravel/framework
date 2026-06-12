@@ -578,10 +578,11 @@ class Worker
     protected function handleJobException($connectionName, $job, WorkerOptions $options, Throwable $e)
     {
         try {
-            // First, we will go ahead and mark the job as failed if it will exceed the maximum
-            // attempts it is allowed to run the next time we process it. If so we will just
-            // go ahead and mark it as failed now so we do not have to release this again.
             if (! $job->hasFailed()) {
+                $this->markJobAsFailedIfShouldntRetry(
+                    $connectionName, $job, $e
+                );
+
                 $this->markJobAsFailedIfWillExceedMaxAttempts(
                     $connectionName, $job, (int) $options->maxTries, $e
                 );
@@ -687,6 +688,21 @@ class Worker
         if ($maxExceptions <= $this->cache->increment('job-exceptions:'.$uuid)) {
             $this->cache->forget('job-exceptions:'.$uuid);
 
+            $this->failJob($job, $e);
+        }
+    }
+
+    /**
+     * Mark the given job as failed if it should skip its remaining retries.
+     *
+     * @param  string  $connectionName
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  \Throwable  $e
+     * @return void
+     */
+    protected function markJobAsFailedIfShouldntRetry($connectionName, $job, Throwable $e)
+    {
+        if (method_exists($job, 'shouldntRetry') ? $job->shouldntRetry() : false) {
             $this->failJob($job, $e);
         }
     }

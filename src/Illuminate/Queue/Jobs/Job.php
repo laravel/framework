@@ -317,6 +317,16 @@ abstract class Job
     }
 
     /**
+     * Determine if the job should skip its remaining retries and fail immediately on exception.
+     *
+     * @return bool
+     */
+    public function shouldntRetry()
+    {
+        return $this->payload()['shouldntRetry'] ?? false;
+    }
+
+    /**
      * The number of seconds to wait before retrying a job that encountered an uncaught exception.
      *
      * @return int|int[]|null

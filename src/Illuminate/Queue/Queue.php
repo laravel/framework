@@ -11,6 +11,7 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldntRetry;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Queue\Attributes\Backoff;
 use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
@@ -179,6 +180,7 @@ abstract class Queue
             'backoff' => $this->getJobBackoff($job),
             'timeout' => $this->getAttributeValue($job, Timeout::class, 'timeout'),
             'retryUntil' => $this->getJobExpiration($job),
+            'shouldntRetry' => $this->jobShouldntRetry($job),
             'deleteWhenMissingModels' => $this->getAttributeValue($job, DeleteWhenMissingModels::class, 'deleteWhenMissingModels') ?? false,
             'data' => [
                 'commandName' => $job,
@@ -296,6 +298,21 @@ abstract class Queue
     }
 
     /**
+     * Determine if the job should skip its remaining retries and fail immediately on exception.
+     *
+     * @param  object  $job
+     * @return bool
+     */
+    protected function jobShouldntRetry($job)
+    {
+        if ($job instanceof ShouldntRetry) {
+            return true;
+        }
+
+        return isset($job->shouldntRetry) && $job->shouldntRetry;
+    }
+
+    /**
      * Create a typical, string based queue payload array.
      *
      * @param  string  $job
@@ -312,6 +329,7 @@ abstract class Queue
             'maxTries' => null,
             'maxExceptions' => null,
             'failOnTimeout' => false,
+            'shouldntRetry' => false,
             'backoff' => null,
             'timeout' => null,
             'data' => $data,
