@@ -1601,4 +1601,22 @@ class SupportStringableTest extends TestCase
         $this->assertNotSame('foo', $encrypted->value());
         $this->assertSame('foo', $encrypted->decrypt()->value());
     }
+
+    public function testIsEmail()
+    {
+        $this->assertTrue($this->stringable('user@example.com')->isEmail());
+        $this->assertFalse($this->stringable('invalid-email')->isEmail());
+    }
+
+    public function testIsIp()
+    {
+        $this->assertTrue($this->stringable('192.168.1.1')->isIp());
+        $this->assertTrue($this->stringable('192.168.1.1')->isIp('ipv4'));
+        $this->assertFalse($this->stringable('2001:0db8:85a3:0000:0000:8a2e:0370:7334')->isIp('ipv4'));
+        $this->assertFalse($this->stringable('invalid-ipv4')->isIp('ipv4'));
+
+        $this->assertTrue($this->stringable('2001:0db8:85a3:0000:0000:8a2e:0370:7334')->isIp('ipv6'));
+        $this->assertFalse($this->stringable('192.168.1.1')->isIp('ipv6'));
+        $this->assertFalse($this->stringable('invalid-ipv6')->isIp('ipv6'));
+    }
 }

@@ -2150,6 +2150,20 @@ class Str
         return $ulid;
     }
 
+    public static function isEmail(string $value): bool
+    {
+        return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+    }
+
+    public static function isIp(string $value, ?string $version = null): bool
+    {
+        return match (strtolower($version ?? '')) {
+            'ipv4' => filter_var($value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false,
+            'ipv6' => filter_var($value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false,
+            default => filter_var($value, FILTER_VALIDATE_IP) !== false,
+        };
+    }
+
     /**
      * Remove all strings from the casing caches.
      *

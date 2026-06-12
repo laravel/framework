@@ -1603,6 +1603,16 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
         unset($this->value[$offset]);
     }
 
+    public function isEmail(): bool
+    {
+        return Str::isEmail($this->value);
+    }
+
+    public function isIp(?string $version = null): bool
+    {
+        return Str::isIp($this->value, $version);
+    }
+
     /**
      * Proxy dynamic properties onto methods.
      *
