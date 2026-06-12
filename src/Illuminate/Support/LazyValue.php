@@ -3,7 +3,6 @@
 namespace Illuminate\Support;
 
 use Closure;
-use Illuminate\Container\Container;
 
 /**
  * @template TReturn of mixed
@@ -84,18 +83,5 @@ class LazyValue
     public function __invoke()
     {
         return $this->value();
-    }
-
-    /**
-     * Create a LazyValue instance that uses the container to inject any dependencies before executing the callback.
-     *
-     * @template TContainerReturn
-     *
-     * @param  callable(): TContainerReturn  $callback
-     * @return static<TContainerReturn>
-     */
-    public static function resolveWithContainer(callable $callback)
-    {
-        return new static(static fn () => Container::getInstance()->call($callback));
     }
 }
