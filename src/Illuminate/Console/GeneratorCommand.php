@@ -124,6 +124,13 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     ];
 
     /**
+     * The permissions that should be applied to the files created by the generator commands.
+     *
+     * @var int|null
+     */
+    public static $filePermissions;
+
+    /**
      * Create a new generator command instance.
      */
     public function __construct(Filesystem $files)
@@ -183,6 +190,8 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         $this->makeDirectory($path);
 
         $this->files->put($path, $this->sortImports($this->buildClass($name)));
+
+        $this->applyPermissions($path);
 
         $info = $this->type;
 
@@ -322,6 +331,40 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         }
 
         return $path;
+    }
+
+    /**
+     * Specify the permissions that should be applied to the files created by the generator commands.
+     *
+     * @param  int|null  $permissions
+     * @return void
+     */
+    public static function createFilesWithPermissions($permissions)
+    {
+        static::$filePermissions = $permissions;
+    }
+
+    /**
+     * Apply the configured permissions to the given created file.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    protected function applyPermissions($path)
+    {
+        if (! is_null(static::$filePermissions)) {
+            $this->files->chmod($path, static::$filePermissions);
+        }
+    }
+
+    /**
+     * Flush the command's global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$filePermissions = null;
     }
 
     /**

@@ -90,6 +90,8 @@ class ComponentMakeCommand extends GeneratorCommand
 </div>'
         );
 
+        $this->applyPermissions($path);
+
         $this->components->info(sprintf('%s [%s] created successfully.', 'View', $path));
     }
 

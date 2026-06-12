@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
+use Illuminate\Console\GeneratorCommand;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Support\Composer;
@@ -111,6 +112,10 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         $file = $this->creator->create(
             $name, $this->getMigrationPath(), $table, $create
         );
+
+        if (! is_null(GeneratorCommand::$filePermissions)) {
+            $this->creator->getFilesystem()->chmod($file, GeneratorCommand::$filePermissions);
+        }
 
         if (windows_os()) {
             $file = str_replace('/', '\\', $file);

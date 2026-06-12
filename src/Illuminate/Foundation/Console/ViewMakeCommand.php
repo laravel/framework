@@ -145,6 +145,8 @@ class ViewMakeCommand extends GeneratorCommand
 
         $result = File::put($path = $this->getTestPath(), $contents);
 
+        $this->applyPermissions($path);
+
         $this->components->info(sprintf('%s [%s] created successfully.', 'Test', $path));
 
         return $result !== false;
