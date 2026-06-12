@@ -2057,6 +2057,5 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::isIp('192.168.1.1', 'ipv6'));
         $this->assertTrue(Str::isIp('::1'));
         $this->assertTrue(Str::isIp('::1', 'ipv6'));
-
     }
 }
