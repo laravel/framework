@@ -101,6 +101,7 @@ use Illuminate\Queue\Console\ListenCommand as QueueListenCommand;
 use Illuminate\Queue\Console\ListFailedCommand as ListFailedQueueCommand;
 use Illuminate\Queue\Console\MonitorCommand as QueueMonitorCommand;
 use Illuminate\Queue\Console\PauseCommand as QueuePauseCommand;
+use Illuminate\Queue\Console\PeekCommand as QueuePeekCommand;
 use Illuminate\Queue\Console\PruneBatchesCommand as QueuePruneBatchesCommand;
 use Illuminate\Queue\Console\PruneFailedJobsCommand as QueuePruneFailedJobsCommand;
 use Illuminate\Queue\Console\RestartCommand as QueueRestartCommand;
@@ -156,6 +157,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'QueueListen' => QueueListenCommand::class,
         'QueueMonitor' => QueueMonitorCommand::class,
         'QueuePause' => QueuePauseCommand::class,
+        'QueuePeek' => QueuePeekCommand::class,
         'QueuePruneBatches' => QueuePruneBatchesCommand::class,
         'QueuePruneFailedJobs' => QueuePruneFailedJobsCommand::class,
         'QueueRestart' => QueueRestartCommand::class,
