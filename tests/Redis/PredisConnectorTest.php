@@ -6,9 +6,19 @@ use Illuminate\Foundation\Application;
 use Illuminate\Redis\RedisManager;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Predis\Retry\Retry;
 
 class PredisConnectorTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        if (! class_exists(Retry::class)) {
+            $this->markTestSkipped('Predis >= 3.0 is required to test retry configuration.');
+        }
+    }
+
     public function testRetryConfigurationWithScalarValues()
     {
         $manager = new RedisManager(new Application, 'predis', [
@@ -112,7 +122,7 @@ class PredisConnectorTest extends TestCase
         $this->assertEquals(5, $retry->getRetries());
     }
 
-    public function testNoRetryConfigurationWhenNotProvided()
+    public function testNoRetryOverrideWhenNotProvided()
     {
         $manager = new RedisManager(new Application, 'predis', [
             'cluster' => false,
@@ -125,7 +135,7 @@ class PredisConnectorTest extends TestCase
         $client = $manager->connection()->client();
         $parameters = $client->getConnection()->getParameters();
 
-        // Predis defaults to Retry with NoBackoff and 0 retries
+        // Predis 3.x defaults to Retry with NoBackoff and 0 retries
         $retry = $parameters->retry;
         $this->assertEquals(0, $retry->getRetries());
     }

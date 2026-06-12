@@ -77,6 +77,10 @@ class PredisConnector implements Connector
      */
     protected function buildRetry(array $config)
     {
+        if (! class_exists(Retry::class)) {
+            return null;
+        }
+
         $retries = $config['max_retries'] ?? null;
         $algorithm = $config['backoff_algorithm'] ?? null;
         $base = $config['backoff_base'] ?? null;
