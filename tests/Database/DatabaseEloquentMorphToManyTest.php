@@ -69,6 +69,31 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $this->assertTrue($relation->detach());
     }
 
+    public function testCustomParentKeyAndRelatedKeyAreUsedInJoinAndWhere(): void
+    {
+        $relation = $this->getRelationWithCustomKeys();
+
+        $this->assertSame('custom_parent_key', $relation->getParentKeyName());
+        $this->assertSame('custom_related_key', $relation->getRelatedKeyName());
+        $this->assertSame('tags.custom_related_key', $relation->getQualifiedRelatedKeyName());
+    }
+
+    public function testEagerConstraintsUseCustomParentKey(): void
+    {
+        $relation = $this->getRelationWithCustomKeys();
+        $relation->getParent()->shouldReceive('getKeyName')->andReturn('custom_parent_key');
+        $relation->getParent()->shouldReceive('getKeyType')->once()->andReturn('string');
+        $relation->getQuery()->shouldReceive('whereIn')->once()->with('taggables.taggable_id', m::on(function ($ids) {
+            return $ids === ['parent_1', 'parent_2'];
+        }));
+        $relation->getQuery()->shouldReceive('where')->once()->with('taggables.taggable_type', get_class($relation->getParent()));
+        $model1 = new EloquentMorphToManyModelStub;
+        $model1->custom_parent_key = 'parent_1';
+        $model2 = new EloquentMorphToManyModelStub;
+        $model2->custom_parent_key = 'parent_2';
+        $relation->addEagerConstraints([$model1, $model2]);
+    }
+
     public function testQueryExpressionCanBePassedToDifferentPivotQueryBuilderClauses(): void
     {
         $value = 'pivot_value';
@@ -99,6 +124,13 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         [$builder, $parent] = $this->getRelationArguments();
 
         return new MorphToMany($builder, $parent, 'taggable', 'taggables', 'taggable_id', 'tag_id', 'id', 'id');
+    }
+
+    public function getRelationWithCustomKeys(): MorphToMany
+    {
+        [$builder, $parent] = $this->getRelationArgumentsWithCustomKeys();
+
+        return new MorphToMany($builder, $parent, 'taggable', 'taggables', 'taggable_id', 'tag_id', 'custom_parent_key', 'custom_related_key');
     }
 
     public function getRelationArguments(): array
@@ -132,6 +164,39 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         );
 
         return [$builder, $parent, 'taggable', 'taggables', 'taggable_id', 'tag_id', 'id', 'id', 'relation_name', false];
+    }
+
+    public function getRelationArgumentsWithCustomKeys(): array
+    {
+        $parent = m::mock(Model::class);
+        $parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
+        $parent->shouldReceive('getKey')->andReturn(1);
+        $parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
+        $parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
+        $parent->shouldReceive('getMorphClass')->andReturn(get_class($parent));
+        $parent->shouldReceive('getAttribute')->with('custom_parent_key')->andReturn(1);
+
+        $builder = m::mock(Builder::class);
+        $related = m::mock(Model::class);
+        $builder->shouldReceive('getModel')->andReturn($related);
+
+        $related->shouldReceive('getTable')->andReturn('tags');
+        $related->shouldReceive('getKeyName')->andReturn('id');
+        $related->shouldReceive('qualifyColumn')->with('custom_related_key')->andReturn('tags.custom_related_key');
+        $related->shouldReceive('getMorphClass')->andReturn(get_class($related));
+
+        $builder->shouldReceive('join')->once()->with('taggables', 'tags.custom_related_key', '=', 'taggables.tag_id');
+        $builder->shouldReceive('where')->once()->with('taggables.taggable_id', '=', 1);
+        $builder->shouldReceive('where')->once()->with('taggables.taggable_type', get_class($parent));
+
+        $grammar = m::mock(Grammar::class);
+        $grammar->shouldReceive('isExpression')->with(m::type(Expression::class))->andReturnTrue();
+        $grammar->shouldReceive('isExpression')->with(m::type('string'))->andReturnFalse();
+        $builder->shouldReceive('getQuery')->andReturn(
+            m::mock(stdClass::class, ['getGrammar' => $grammar])
+        );
+
+        return [$builder, $parent, 'taggable', 'taggables', 'taggable_id', 'tag_id', 'custom_parent_key', 'custom_related_key', 'relation_name', false];
     }
 }
 
