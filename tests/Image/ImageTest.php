@@ -1,10 +1,10 @@
 <?php
 
-namespace Illuminate\Tests\Foundation\Image;
+namespace Illuminate\Tests\Image;
 
-use Illuminate\Foundation\Image\Image;
-use Illuminate\Foundation\Image\ImageException;
-use Illuminate\Foundation\Image\PendingImageOptions;
+use Illuminate\Image\Image;
+use Illuminate\Image\ImageException;
+use Illuminate\Image\PendingImageOptions;
 use Illuminate\Http\UploadedFile;
 use PHPUnit\Framework\TestCase;
 

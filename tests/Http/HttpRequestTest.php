@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Http;
 
 use Carbon\CarbonInterval;
 use Carbon\Unit;
-use Illuminate\Foundation\Image\Image;
+use Illuminate\Image\Image;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Route;

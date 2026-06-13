@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Foundation\Image\Drivers;
+namespace Illuminate\Image\Drivers;
 
 use Intervention\Image\ImageManager;
 

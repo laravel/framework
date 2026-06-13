@@ -2,7 +2,7 @@
 
 namespace Illuminate\Contracts\Image;
 
-use Illuminate\Foundation\Image\PendingImageOptions;
+use Illuminate\Image\PendingImageOptions;
 
 interface Driver
 {

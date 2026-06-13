@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Foundation\Image;
+namespace Illuminate\Image;
 
 use Closure;
 use finfo;

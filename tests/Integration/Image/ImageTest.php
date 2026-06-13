@@ -1,8 +1,8 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Foundation\Image;
+namespace Illuminate\Tests\Integration\Image;
 
-use Illuminate\Foundation\Image\Image;
+use Illuminate\Image\Image;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\TestCase;

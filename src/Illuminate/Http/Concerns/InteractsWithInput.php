@@ -2,7 +2,7 @@
 
 namespace Illuminate\Http\Concerns;
 
-use Illuminate\Foundation\Image\Image;
+use Illuminate\Image\Image;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;

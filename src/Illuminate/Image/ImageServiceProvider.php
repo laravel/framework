@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Foundation\Image;
+namespace Illuminate\Image;
 
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
@@ -12,7 +12,7 @@ class ImageServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/../../../../config/image.php', 'image');
+        $this->mergeConfigFrom(__DIR__.'/config/image.php', 'image');
 
         $this->app->singleton('image', function ($app) {
             return new ImageManager($app);

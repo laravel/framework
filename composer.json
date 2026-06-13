@@ -111,6 +111,7 @@
         "illuminate/filesystem": "self.version",
         "illuminate/hashing": "self.version",
         "illuminate/http": "self.version",
+        "illuminate/image": "self.version",
         "illuminate/json-schema": "self.version",
         "illuminate/log": "self.version",
         "illuminate/macroable": "self.version",

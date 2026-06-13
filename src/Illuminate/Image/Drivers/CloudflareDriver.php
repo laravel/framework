@@ -1,12 +1,12 @@
 <?php
 
-namespace Illuminate\Foundation\Image\Drivers;
+namespace Illuminate\Image\Drivers;
 
 use DateTimeImmutable;
 use finfo;
 use Illuminate\Contracts\Image\Driver;
-use Illuminate\Foundation\Image\ImageException;
-use Illuminate\Foundation\Image\PendingImageOptions;
+use Illuminate\Image\ImageException;
+use Illuminate\Image\PendingImageOptions;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\Client\Pool;
 use Illuminate\Support\Str;

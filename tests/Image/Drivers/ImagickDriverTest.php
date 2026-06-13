@@ -1,9 +1,9 @@
 <?php
 
-namespace Illuminate\Tests\Foundation\Image\Drivers;
+namespace Illuminate\Tests\Image\Drivers;
 
-use Illuminate\Foundation\Image\Drivers\ImagickDriver;
-use Illuminate\Foundation\Image\PendingImageOptions;
+use Illuminate\Image\Drivers\ImagickDriver;
+use Illuminate\Image\PendingImageOptions;
 use Illuminate\Http\UploadedFile;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;

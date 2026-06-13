@@ -1,10 +1,10 @@
 <?php
 
-namespace Illuminate\Tests\Foundation\Image\Drivers;
+namespace Illuminate\Tests\Image\Drivers;
 
-use Illuminate\Foundation\Image\Drivers\CloudflareDriver;
-use Illuminate\Foundation\Image\ImageException;
-use Illuminate\Foundation\Image\PendingImageOptions;
+use Illuminate\Image\Drivers\CloudflareDriver;
+use Illuminate\Image\ImageException;
+use Illuminate\Image\PendingImageOptions;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\UploadedFile;

@@ -1,14 +1,14 @@
 <?php
 
-namespace Illuminate\Foundation\Image;
+namespace Illuminate\Image;
 
 use Closure;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\Image\Drivers\CloudflareDriver;
-use Illuminate\Foundation\Image\Drivers\GdDriver;
-use Illuminate\Foundation\Image\Drivers\ImagickDriver;
+use Illuminate\Image\Drivers\CloudflareDriver;
+use Illuminate\Image\Drivers\GdDriver;
+use Illuminate\Image\Drivers\ImagickDriver;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use InvalidArgumentException;
 
