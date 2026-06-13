@@ -8,6 +8,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Interruptible;
 use Illuminate\Contracts\Queue\Job as QueueJobContract;
+use Illuminate\Contracts\Queue\ShouldntRetry;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobPopped;
@@ -246,6 +247,53 @@ class QueueWorkerTest extends TestCase
         $this->exceptionHandler->shouldHaveReceived('report')->with($e);
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobExceptionOccurred::class))->once();
         $this->events->shouldNotHaveReceived('dispatch', [m::type(JobProcessed::class)]);
+    }
+
+    public function testJobIsFailedWithoutRetryingWhenExceptionShouldntRetry()
+    {
+        $e = new WorkerShouldntRetryException;
+
+        $job = new WorkerFakeJob(function ($job) use ($e) {
+            $job->attempts++;
+
+            throw $e;
+        });
+
+        $job->attempts = 0;
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['maxTries' => 3, 'backoff' => 10]));
+
+        $this->assertNull($job->releaseAfter);
+        $this->assertFalse($job->released);
+        $this->assertTrue($job->deleted);
+        $this->assertEquals($e, $job->failedWith);
+        $this->exceptionHandler->shouldHaveReceived('report')->with($e);
+        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobExceptionOccurred::class))->once();
+        $this->events->shouldNotHaveReceived('dispatch', [m::type(JobProcessed::class)]);
+    }
+
+    public function testJobIsReleasedWhenExceptionDoesNotImplementShouldntRetry()
+    {
+        $e = new RuntimeException;
+
+        $job = new WorkerFakeJob(function ($job) use ($e) {
+            $job->attempts++;
+
+            throw $e;
+        });
+
+        $job->attempts = 0;
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['maxTries' => 3, 'backoff' => 10]));
+
+        $this->assertEquals(10, $job->releaseAfter);
+        $this->assertTrue($job->released);
+        $this->assertFalse($job->deleted);
+        $this->assertNull($job->failedWith);
+        $this->exceptionHandler->shouldHaveReceived('report')->with($e);
+        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobExceptionOccurred::class))->once();
     }
 
     public function testExceptionIsNotReportedIfReportJobExceptionsIsDisabled()
@@ -936,6 +984,11 @@ class WorkerFakeJob implements QueueJobContract
 }
 
 class LoopBreakerException extends RuntimeException
+{
+    //
+}
+
+class WorkerShouldntRetryException extends RuntimeException implements ShouldntRetry
 {
     //
 }

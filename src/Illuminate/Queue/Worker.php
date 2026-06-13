@@ -7,6 +7,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Factory as QueueManager;
 use Illuminate\Contracts\Queue\Interruptible;
+use Illuminate\Contracts\Queue\ShouldntRetry;
 use Illuminate\Database\DetectsLostConnections;
 use Illuminate\Queue\Events\JobAttempted;
 use Illuminate\Queue\Events\JobExceptionOccurred;
@@ -582,6 +583,12 @@ class Worker
             // attempts it is allowed to run the next time we process it. If so we will just
             // go ahead and mark it as failed now so we do not have to release this again.
             if (! $job->hasFailed()) {
+                $this->markJobAsFailedIfExceptionShouldntRetry(
+                    $connectionName, $job, $e
+                );
+            }
+
+            if (! $job->hasFailed()) {
                 $this->markJobAsFailedIfWillExceedMaxAttempts(
                     $connectionName, $job, (int) $options->maxTries, $e
                 );
@@ -687,6 +694,21 @@ class Worker
         if ($maxExceptions <= $this->cache->increment('job-exceptions:'.$uuid)) {
             $this->cache->forget('job-exceptions:'.$uuid);
 
+            $this->failJob($job, $e);
+        }
+    }
+
+    /**
+     * Mark the given job as failed if the thrown exception should skip remaining retries.
+     *
+     * @param  string  $connectionName
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  \Throwable  $e
+     * @return void
+     */
+    protected function markJobAsFailedIfExceptionShouldntRetry($connectionName, $job, Throwable $e)
+    {
+        if ($e instanceof ShouldntRetry) {
             $this->failJob($job, $e);
         }
     }
