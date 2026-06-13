@@ -1,13 +1,13 @@
 <?php
 
-namespace Illuminate\Tests\Foundation\Image;
+namespace Illuminate\Tests\Image;
 
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\Image\Image;
-use Illuminate\Foundation\Image\ImageException;
-use Illuminate\Foundation\Image\ImageManager;
+use Illuminate\Image\Image;
+use Illuminate\Image\ImageException;
+use Illuminate\Image\ImageManager;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\UploadedFile;
 use InvalidArgumentException;
@@ -236,7 +236,7 @@ class ImageManagerTest extends TestCase
             {
             }
 
-            public function process(string $contents, \Illuminate\Foundation\Image\PendingImageOptions $options): string
+            public function process(string $contents, \Illuminate\Image\PendingImageOptions $options): string
             {
                 return $contents;
             }
@@ -266,7 +266,7 @@ class ImageManagerTest extends TestCase
             {
             }
 
-            public function process(string $contents, \Illuminate\Foundation\Image\PendingImageOptions $options): string
+            public function process(string $contents, \Illuminate\Image\PendingImageOptions $options): string
             {
                 return $contents;
             }

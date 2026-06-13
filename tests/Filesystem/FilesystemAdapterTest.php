@@ -8,7 +8,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Image\Image;
+use Illuminate\Image\Image;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Testing\Assert;
