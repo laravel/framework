@@ -4,6 +4,7 @@ namespace Illuminate\Database\Console;
 
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\Console\Concerns\ResolvesDirectConnection;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -13,6 +14,8 @@ use Symfony\Component\Console\Attribute\AsCommand;
 #[AsCommand(name: 'db:show')]
 class ShowCommand extends DatabaseInspectionCommand
 {
+    use ResolvesDirectConnection;
+
     /**
      * The name and signature of the console command.
      *
@@ -39,7 +42,7 @@ class ShowCommand extends DatabaseInspectionCommand
      */
     public function handle(ConnectionResolverInterface $connections)
     {
-        $connection = $connections->connection($database = $this->input->getOption('database'));
+        $connection = $this->resolveConnection($connections, $database = $this->input->getOption('database'));
 
         $schema = $connection->getSchemaBuilder();
 

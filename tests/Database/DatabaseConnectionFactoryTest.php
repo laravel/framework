@@ -8,7 +8,9 @@ use Illuminate\Database\Connectors\ConnectionFactory;
 use InvalidArgumentException;
 use Mockery as m;
 use PDO;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 use ReflectionProperty;
 
 class DatabaseConnectionFactoryTest extends TestCase
@@ -114,6 +116,229 @@ class DatabaseConnectionFactoryTest extends TestCase
         $this->assertSame(':memory:', $config['database']);
     }
 
+    public function testPostgresDirectConnectionConfigurationIsAttached()
+    {
+        $this->db->addConnection([
+            'driver' => 'pgsql',
+            'host' => 'pooler-host',
+            'port' => '6432',
+            'database' => 'laravel',
+            'username' => 'pooler-user',
+            'password' => 'pooler-password',
+            'prefix' => '',
+            'connect_via_database' => 'pooler_database',
+            'connect_via_port' => '6432',
+            'direct' => [
+                'host' => 'direct-host',
+                'port' => '5432',
+                'username' => 'direct-user',
+                'password' => 'direct-password',
+                'sslmode' => 'require',
+            ],
+        ], 'pooled_pgsql');
+
+        $connection = $this->db->getConnection('pooled_pgsql');
+        $directPdo = new ReflectionProperty(get_class($connection), 'directPdo');
+
+        $this->assertTrue($connection->usesDirectConnection());
+        $this->assertNotInstanceOf(PDO::class, $directPdo->getValue($connection));
+        $this->assertTrue($connection->getConfig('pooled'));
+        $this->assertTrue($connection->getConfig('options')[PDO::ATTR_EMULATE_PREPARES]);
+
+        $directConfig = $connection->getDirectConfig();
+
+        $this->assertSame('direct-host', $directConfig['host']);
+        $this->assertSame('5432', $directConfig['port']);
+        $this->assertSame('direct-user', $directConfig['username']);
+        $this->assertSame('direct-password', $directConfig['password']);
+        $this->assertSame('require', $directConfig['sslmode']);
+        $this->assertSame('laravel', $directConfig['database']);
+        $this->assertFalse($directConfig['options'][PDO::ATTR_EMULATE_PREPARES]);
+        $this->assertArrayNotHasKey('connect_via_database', $directConfig);
+        $this->assertArrayNotHasKey('connect_via_port', $directConfig);
+    }
+
+    public function testPostgresDirectConnectionConfigurationInheritsBaseCredentialsWhenNotConfigured()
+    {
+        $this->db->addConnection([
+            'driver' => 'pgsql',
+            'host' => 'pooler-host',
+            'port' => '6432',
+            'database' => 'laravel',
+            'username' => 'pooler-user',
+            'password' => 'pooler-password',
+            'prefix' => '',
+            'direct' => [
+                'host' => 'direct-host',
+                'port' => '5432',
+            ],
+        ], 'pooled_pgsql_inherited_credentials');
+
+        $directConfig = $this->db->getConnection('pooled_pgsql_inherited_credentials')->getDirectConfig();
+
+        $this->assertSame('pooler-user', $directConfig['username']);
+        $this->assertSame('pooler-password', $directConfig['password']);
+    }
+
+    public function testPostgresDirectConnectionConfigurationCanOverridePortAndUsernameWithoutHost()
+    {
+        $this->db->addConnection([
+            'driver' => 'pgsql',
+            'host' => 'same-host',
+            'port' => '6432',
+            'database' => 'laravel',
+            'username' => 'pooler-user|pooler',
+            'password' => 'shared-password',
+            'prefix' => '',
+            'direct' => [
+                'port' => '5432',
+                'username' => 'direct-user',
+            ],
+        ], 'pooled_pgsql_same_host');
+
+        $directConfig = $this->db->getConnection('pooled_pgsql_same_host')->getDirectConfig();
+
+        $this->assertSame('same-host', $directConfig['host']);
+        $this->assertSame('5432', $directConfig['port']);
+        $this->assertSame('direct-user', $directConfig['username']);
+        $this->assertSame('shared-password', $directConfig['password']);
+    }
+
+    public function testNonPostgresDirectConfigurationIsIgnored()
+    {
+        $this->db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'direct' => [
+                'database' => ':memory:',
+            ],
+        ], 'sqlite_direct');
+
+        $this->assertFalse($this->db->getConnection('sqlite_direct')->usesDirectConnection());
+    }
+
+    #[DataProvider('pooledPostgresEmulatePreparesProvider')]
+    public function testPooledPostgresEmulatePreparesPrecedence($baseOption, $directOption, $expectedPooledOption, $expectedDirectOption)
+    {
+        $config = [
+            'driver' => 'pgsql',
+            'name' => 'pgsql',
+            'host' => 'pooler-host',
+            'port' => '6432',
+            'database' => 'laravel',
+            'username' => 'root',
+            'password' => '',
+            'prefix' => '',
+            'direct' => [
+                'host' => 'direct-host',
+            ],
+        ];
+
+        if (! is_null($baseOption)) {
+            $config['options'][PDO::ATTR_EMULATE_PREPARES] = $baseOption;
+        }
+
+        if (! is_null($directOption)) {
+            $config['direct']['options'][PDO::ATTR_EMULATE_PREPARES] = $directOption;
+        }
+
+        $config = $this->callConnectionFactoryMethod('applyPooledPostgresOptions', $config);
+        $directConfig = $this->callConnectionFactoryMethod('getDirectConfig', $config);
+
+        $this->assertSame($expectedPooledOption, $config['options'][PDO::ATTR_EMULATE_PREPARES]);
+        $this->assertSame($expectedDirectOption, $directConfig['options'][PDO::ATTR_EMULATE_PREPARES]);
+    }
+
+    public static function pooledPostgresEmulatePreparesProvider()
+    {
+        return [
+            'base missing, direct missing' => [null, null, true, false],
+            'base missing, direct true' => [null, true, true, true],
+            'base missing, direct false' => [null, false, true, false],
+            'base true, direct missing' => [true, null, true, false],
+            'base true, direct true' => [true, true, true, true],
+            'base true, direct false' => [true, false, true, false],
+            'base false, direct missing' => [false, null, false, false],
+            'base false, direct true' => [false, true, false, true],
+            'base false, direct false' => [false, false, false, false],
+        ];
+    }
+
+    public function testPooledPostgresOptionsAreAppliedToReadAndWriteConfigurations()
+    {
+        $config = $this->callConnectionFactoryMethod('applyPooledPostgresOptions', [
+            'driver' => 'pgsql',
+            'name' => 'pgsql',
+            'host' => 'pooler-host',
+            'database' => 'laravel',
+            'username' => 'root',
+            'password' => '',
+            'prefix' => '',
+            'read' => [
+                'host' => 'read-pooler-host',
+                'options' => [
+                    PDO::ATTR_TIMEOUT => 5,
+                ],
+            ],
+            'write' => [[
+                'host' => 'write-pooler-host',
+                'options' => [
+                    PDO::ATTR_TIMEOUT => 10,
+                ],
+            ]],
+            'direct' => [
+                'host' => 'direct-host',
+            ],
+        ]);
+
+        $readConfig = $this->callConnectionFactoryMethod('getReadConfig', $config);
+        $writeConfig = $this->callConnectionFactoryMethod('getWriteConfig', $config);
+        $directConfig = $this->callConnectionFactoryMethod('getDirectConfig', $config);
+
+        $this->assertSame('read-pooler-host', $readConfig['host']);
+        $this->assertSame(5, $readConfig['options'][PDO::ATTR_TIMEOUT]);
+        $this->assertTrue($readConfig['options'][PDO::ATTR_EMULATE_PREPARES]);
+
+        $this->assertSame('write-pooler-host', $writeConfig['host']);
+        $this->assertSame(10, $writeConfig['options'][PDO::ATTR_TIMEOUT]);
+        $this->assertTrue($writeConfig['options'][PDO::ATTR_EMULATE_PREPARES]);
+
+        $this->assertSame('direct-host', $directConfig['host']);
+        $this->assertFalse($directConfig['options'][PDO::ATTR_EMULATE_PREPARES]);
+        $this->assertArrayNotHasKey('read', $directConfig);
+        $this->assertArrayNotHasKey('write', $directConfig);
+    }
+
+    public function testPooledPostgresWithoutDirectEndpointEmitsWarning()
+    {
+        $warning = null;
+
+        set_error_handler(function ($level, $message) use (&$warning) {
+            $warning = [$level, $message];
+
+            return true;
+        }, E_USER_WARNING);
+
+        try {
+            $config = $this->callConnectionFactoryMethod('applyPooledPostgresOptions', [
+                'driver' => 'pgsql',
+                'name' => 'pgsql',
+                'host' => 'pooler-host',
+                'database' => 'laravel',
+                'username' => 'root',
+                'password' => '',
+                'prefix' => '',
+                'pooled' => true,
+            ]);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame(E_USER_WARNING, $warning[0]);
+        $this->assertStringContainsString("sets 'pooled' => true without a 'direct' endpoint", $warning[1]);
+        $this->assertTrue($config['options'][PDO::ATTR_EMULATE_PREPARES]);
+    }
+
     public function testIfDriverIsntSetExceptionIsThrown()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -174,5 +399,13 @@ class DatabaseConnectionFactoryTest extends TestCase
         $this->assertSame(2, $this->db->getConnection()->select('PRAGMA synchronous')[0]->synchronous);
 
         $this->assertSame(1, $this->db->getConnection('synchronous_set')->select('PRAGMA synchronous')[0]->synchronous);
+    }
+
+    protected function callConnectionFactoryMethod($method, ...$arguments)
+    {
+        return (new ReflectionMethod(ConnectionFactory::class, $method))->invoke(
+            new ConnectionFactory(m::mock(Container::class)),
+            ...$arguments
+        );
     }
 }

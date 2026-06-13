@@ -62,7 +62,7 @@ class Migrator
     /**
      * The name of the default connection.
      *
-     * @var string
+     * @var string|null
      */
     protected $connection;
 
@@ -512,7 +512,7 @@ class Migrator
         $previousConnection = $this->resolver->getDefaultConnection();
 
         try {
-            $this->resolver->setDefaultConnection($connection->getName());
+            $this->resolver->setDefaultConnection($connection->getNameWithReadWriteType());
 
             $migration->{$method}();
         } finally {
@@ -645,7 +645,7 @@ class Migrator
     /**
      * Get the default connection name.
      *
-     * @return string
+     * @return string|null
      */
     public function getConnection()
     {
@@ -677,16 +677,30 @@ class Migrator
     /**
      * Set the default connection name.
      *
-     * @param  string  $name
+     * @param  string|null  $name
      * @return void
      */
     public function setConnection($name)
     {
-        if (! is_null($name)) {
-            $this->resolver->setDefaultConnection($name);
+        if (is_null($name)) {
+            $defaultName = $this->resolver->getDefaultConnection();
+            $directName = $this->directConnectionName($defaultName);
+
+            if ($directName === $defaultName) {
+                $this->repository->setSource(null);
+
+                $this->connection = null;
+
+                return;
+            }
+
+            $name = $directName;
+        } else {
+            $name = $this->directConnectionName($name);
         }
 
         $this->repository->setSource($name);
+        $this->resolver->setDefaultConnection($name);
 
         $this->connection = $name;
     }
@@ -694,7 +708,10 @@ class Migrator
     /**
      * Resolve the database connection instance.
      *
-     * @param  string  $connection
+     * The default resolver path routes configured direct PostgreSQL connections
+     * to their direct variant; custom resolver callbacks keep full priority.
+     *
+     * @param  string|null  $connection
      * @return \Illuminate\Database\Connection
      */
     public function resolveConnection($connection)
@@ -706,8 +723,29 @@ class Migrator
                 $connection ?: $this->connection
             );
         } else {
-            return $this->resolver->connection($connection ?: $this->connection);
+            return $this->resolver->connection(
+                $this->directConnectionName($connection ?: $this->connection)
+            );
         }
+    }
+
+    /**
+     * Resolve the direct connection variant when one is configured.
+     *
+     * @param  string|null  $name
+     * @return string
+     */
+    protected function directConnectionName($name)
+    {
+        $name ??= $this->resolver->getDefaultConnection();
+
+        if (Str::endsWith($name, ['::read', '::write', '::direct'])) {
+            return $name;
+        }
+
+        return $this->resolver->connection($name)->usesDirectConnection()
+            ? $name.'::direct'
+            : $name;
     }
 
     /**
