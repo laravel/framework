@@ -6,10 +6,10 @@ use Closure;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Image\Drivers\CloudflareDriver;
 use Illuminate\Image\Drivers\GdDriver;
 use Illuminate\Image\Drivers\ImagickDriver;
-use Illuminate\Http\Client\Factory as HttpFactory;
 use InvalidArgumentException;
 
 class ImageManager

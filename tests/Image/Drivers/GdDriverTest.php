@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Image\Drivers;
 
+use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Drivers\GdDriver;
 use Illuminate\Image\ImageException;
 use Illuminate\Image\PendingImageOptions;
-use Illuminate\Http\UploadedFile;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 

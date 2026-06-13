@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Image\Drivers;
 
-use Illuminate\Image\Drivers\CloudflareDriver;
-use Illuminate\Image\ImageException;
-use Illuminate\Image\PendingImageOptions;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Image\Drivers\CloudflareDriver;
+use Illuminate\Image\ImageException;
+use Illuminate\Image\PendingImageOptions;
 use PHPUnit\Framework\TestCase;
 
 class CloudflareDriverTest extends TestCase

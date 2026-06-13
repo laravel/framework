@@ -5,10 +5,10 @@ namespace Illuminate\Image\Drivers;
 use DateTimeImmutable;
 use finfo;
 use Illuminate\Contracts\Image\Driver;
-use Illuminate\Image\ImageException;
-use Illuminate\Image\PendingImageOptions;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\Client\Pool;
+use Illuminate\Image\ImageException;
+use Illuminate\Image\PendingImageOptions;
 use Illuminate\Support\Str;
 
 class CloudflareDriver implements Driver
