@@ -15,6 +15,14 @@ interface JsonSchema
     public function object(Closure|array $properties = []);
 
     /**
+     * Create a new anyOf schema instance.
+     *
+     * @param  (Closure(JsonSchema): array<int, \Illuminate\JsonSchema\Types\Type>)|array<int, \Illuminate\JsonSchema\Types\Type>  $schemas
+     * @return \Illuminate\JsonSchema\Types\AnyOfType
+     */
+    public function anyOf(Closure|array $schemas);
+
+    /**
      * Create a new array property instance.
      *
      * @return \Illuminate\JsonSchema\Types\ArrayType

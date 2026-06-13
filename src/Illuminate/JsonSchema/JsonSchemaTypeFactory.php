@@ -22,6 +22,20 @@ class JsonSchemaTypeFactory extends JsonSchema implements JsonSchemaContract
     }
 
     /**
+     * Create a new anyOf schema instance.
+     *
+     * @param  (Closure(JsonSchemaTypeFactory): array<int, Types\Type>)|array<int, Types\Type>  $schemas
+     */
+    public function anyOf(Closure|array $schemas): Types\AnyOfType
+    {
+        if ($schemas instanceof Closure) {
+            $schemas = $schemas($this);
+        }
+
+        return new Types\AnyOfType($schemas);
+    }
+
+    /**
      * Create a new array property instance.
      */
     public function array(): Types\ArrayType

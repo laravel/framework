@@ -5,6 +5,7 @@ namespace Illuminate\Tests\JsonSchema;
 use Illuminate\JsonSchema\JsonSchema;
 use Illuminate\JsonSchema\Serializer;
 use Illuminate\JsonSchema\Types\ArrayType;
+use Illuminate\JsonSchema\Types\AnyOfType;
 use Illuminate\JsonSchema\Types\BooleanType;
 use Illuminate\JsonSchema\Types\IntegerType;
 use Illuminate\JsonSchema\Types\NumberType;
@@ -544,6 +545,76 @@ class DeserializerTest extends TestCase
         ], $type->toArray());
     }
 
+    public function test_it_deserializes_an_any_of_composition(): void
+    {
+        $type = JsonSchema::fromArray([
+            'title' => 'Identifier',
+            'anyOf' => [
+                ['type' => 'string'],
+                ['type' => 'integer'],
+            ],
+        ]);
+
+        $this->assertInstanceOf(AnyOfType::class, $type);
+        $this->assertEquals([
+            'title' => 'Identifier',
+            'anyOf' => [
+                ['type' => 'string'],
+                ['type' => 'integer'],
+            ],
+        ], $type->toArray());
+    }
+
+    public function test_it_deserializes_a_nullable_any_of_composition(): void
+    {
+        $type = JsonSchema::fromArray([
+            'anyOf' => [
+                ['type' => 'string'],
+                ['type' => 'integer'],
+                ['type' => 'null'],
+            ],
+        ]);
+
+        $this->assertInstanceOf(AnyOfType::class, $type);
+        $this->assertEquals([
+            'anyOf' => [
+                ['type' => 'string'],
+                ['type' => 'integer'],
+                ['type' => 'null'],
+            ],
+        ], $type->toArray());
+    }
+
+    public function test_it_deserializes_an_any_of_nested_in_an_object_property(): void
+    {
+        $type = JsonSchema::fromArray([
+            'type' => 'object',
+            'properties' => [
+                'value' => [
+                    'anyOf' => [
+                        ['type' => 'string'],
+                        ['type' => 'integer'],
+                    ],
+                ],
+            ],
+            'required' => ['value'],
+        ]);
+
+        $this->assertInstanceOf(ObjectType::class, $type);
+        $this->assertEquals([
+            'type' => 'object',
+            'properties' => [
+                'value' => [
+                    'anyOf' => [
+                        ['type' => 'string'],
+                        ['type' => 'integer'],
+                    ],
+                ],
+            ],
+            'required' => ['value'],
+        ], $type->toArray());
+    }
+
     public function test_it_throws_for_an_unsupported_union_member(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -638,13 +709,13 @@ class DeserializerTest extends TestCase
         ]);
     }
 
-    public function test_it_throws_for_an_unsupported_union(): void
+    public function test_it_throws_for_an_unsupported_one_of_union(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Only a nullable "anyOf" (a single schema plus a "null" branch) is supported.');
+        $this->expectExceptionMessage('Only a nullable "oneOf" (a single schema plus a "null" branch) is supported.');
 
         JsonSchema::fromArray([
-            'anyOf' => [
+            'oneOf' => [
                 ['type' => 'string'],
                 ['type' => 'integer'],
             ],
