@@ -12,8 +12,6 @@ class ImageServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/config/image.php', 'image');
-
         $this->app->singleton('image', function ($app) {
             return new ImageManager($app);
         });
