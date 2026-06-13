@@ -48,6 +48,13 @@ class Factory
     protected $globalOptions = [];
 
     /**
+     * The persistent transport (connection sharing) mode to apply to every request.
+     *
+     * @var \Illuminate\Http\Client\PersistentTransport
+     */
+    protected PersistentTransport $globalPersistentTransport = PersistentTransport::None;
+
+    /**
      * The stub callables that will handle requests.
      *
      * @var \Illuminate\Support\Collection
@@ -149,6 +156,19 @@ class Factory
     public function globalOptions($options)
     {
         $this->globalOptions = $options;
+
+        return $this;
+    }
+
+    /**
+     * Set the persistent transport (connection sharing) mode to apply to every request.
+     *
+     * @param  \Illuminate\Http\Client\PersistentTransport  $mode
+     * @return $this
+     */
+    public function globalPersistentTransport(PersistentTransport $mode)
+    {
+        $this->globalPersistentTransport = $mode;
 
         return $this;
     }
@@ -559,7 +579,9 @@ class Factory
      */
     protected function newPendingRequest()
     {
-        return (new PendingRequest($this, $this->globalMiddleware))->withOptions(value($this->globalOptions));
+        return (new PendingRequest($this, $this->globalMiddleware))
+            ->withOptions(value($this->globalOptions))
+            ->persistentTransport($this->globalPersistentTransport);
     }
 
     /**
