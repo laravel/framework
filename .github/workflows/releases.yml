@@ -107,6 +107,9 @@ jobs:
               RELEASE_NOTES=$(echo -n "$RELEASE_NOTES" | sed "${START_FROM}d")
           fi
 
+          # Strip leading "#" to prevent rendering as markdown headings
+          RELEASE_NOTES=$(echo -n "$RELEASE_NOTES" | sed 's/^\(\* \)#\+\s*/\1/')
+
           {
             echo 'notes<<EOF'
             echo "$RELEASE_NOTES"
