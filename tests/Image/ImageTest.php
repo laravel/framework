@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Image;
 
+use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Image;
 use Illuminate\Image\ImageException;
 use Illuminate\Image\PendingImageOptions;
-use Illuminate\Http\UploadedFile;
 use PHPUnit\Framework\TestCase;
 
 class ImageTest extends TestCase

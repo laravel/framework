@@ -2,8 +2,8 @@
 
 namespace Illuminate\Http\Concerns;
 
-use Illuminate\Image\Image;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Image\Image;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Dumpable;

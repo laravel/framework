@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Image;
 
-use Illuminate\Image\Image;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Image\Image;
 use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
