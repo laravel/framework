@@ -470,6 +470,24 @@ class JobChainingTest extends QueueTestCase
         $this->assertEquals(['c1', 'c2', 'b1', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results);
     }
 
+    public function testClosureAfterBatchInChainIsDispatched()
+    {
+        Bus::chain([
+            new JobChainingNamedTestJob('c1'),
+            Bus::batch([
+                new JobChainingTestBatchedJob('b1'),
+                new JobChainingTestBatchedJob('b2'),
+            ]),
+            function () {
+                JobRunRecorder::record('closure-after-batch');
+            },
+        ])->dispatch();
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+
+        $this->assertContains('closure-after-batch', JobRunRecorder::$results);
+    }
+
     public function testBatchInChainUsesCorrectQueue()
     {
         $otherQueue = $this->getQueueDriver() === 'redis' ? '{other}' : 'other';
