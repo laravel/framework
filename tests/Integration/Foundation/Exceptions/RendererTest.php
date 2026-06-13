@@ -174,4 +174,88 @@ class RendererTest extends TestCase
             ->assertSee('Bad route!')
             ->assertDontSee('viewBox="0 0 1268 308"', false);
     }
+
+    #[WithConfig('app.debug', true)]
+    public function testItCanRenderExceptionAsMarkdown()
+    {
+        $response = $this->call('GET', '/failed', [], [], [], ['HTTP_ACCEPT' => 'text/markdown']);
+
+        $response->assertInternalServerError();
+        $response->assertHeader('Content-Type', 'text/markdown; charset=UTF-8');
+        $response->assertSee('RuntimeException');
+        $response->assertSee('Bad route!');
+        $response->assertSee('## Stack Trace');
+    }
+
+    #[WithConfig('app.debug', true)]
+    public function testItCanRenderExceptionAsMarkdownWithCharsetParameter()
+    {
+        $response = $this->call('GET', '/failed', [], [], [], ['HTTP_ACCEPT' => 'text/markdown; charset=utf-8']);
+
+        $response->assertInternalServerError();
+        $response->assertHeader('Content-Type', 'text/markdown; charset=UTF-8');
+        $response->assertSee('## Stack Trace');
+    }
+
+    #[WithConfig('app.debug', true)]
+    public function testJsonTakesPrecedenceOverMarkdown()
+    {
+        $response = $this->call('GET', '/failed', [], [], [], ['HTTP_ACCEPT' => 'application/json, text/markdown']);
+
+        $response->assertInternalServerError();
+        $response->assertHeader('Content-Type', 'application/json');
+        $response->assertJsonStructure(['message', 'exception']);
+    }
+
+    #[WithConfig('app.debug', true)]
+    public function testMarkdownTakesPrecedenceOverJson()
+    {
+        $response = $this->call('GET', '/failed', [], [], [], ['HTTP_ACCEPT' => 'text/markdown, application/json']);
+
+        $response->assertInternalServerError();
+        $response->assertHeader('Content-Type', 'text/markdown; charset=UTF-8');
+        $response->assertSee('## Stack Trace');
+    }
+
+    #[WithConfig('app.debug', true)]
+    public function testHtmlTakesPrecedenceOverMarkdown()
+    {
+        $response = $this->call('GET', '/failed', [], [], [], ['HTTP_ACCEPT' => 'text/html, text/markdown']);
+
+        $response->assertInternalServerError();
+        $this->assertStringContainsString('text/html', $response->headers->get('Content-Type'));
+    }
+
+    #[WithConfig('app.debug', false)]
+    public function testMarkdownResponseDoesNotLeakDebugInfoWhenDebugOff()
+    {
+        $response = $this->call('GET', '/failed', [], [], [], ['HTTP_ACCEPT' => 'text/markdown']);
+
+        $response->assertInternalServerError();
+        $response->assertHeader('Content-Type', 'text/markdown; charset=UTF-8');
+        $response->assertDontSee('## Stack Trace');
+        $response->assertDontSee('Bad route!');
+        $response->assertSee('Server Error');
+    }
+
+    #[WithConfig('app.debug', true)]
+    public function testMarkdownFallsBackWhenCustomExceptionRendererRegistered()
+    {
+        $this->app->singleton(ExceptionRenderer::class, function () {
+            return new class() implements ExceptionRenderer
+            {
+                public function render($throwable)
+                {
+                    return response('Custom Exception Renderer: '.$throwable->getMessage(), 500);
+                }
+            };
+        });
+
+        $response = $this->call('GET', '/failed', [], [], [], ['HTTP_ACCEPT' => 'text/markdown']);
+
+        $response->assertInternalServerError();
+        $response->assertHeader('Content-Type', 'text/markdown; charset=UTF-8');
+        $response->assertDontSee('## Stack Trace');
+        $response->assertSee('Server Error');
+    }
 }
