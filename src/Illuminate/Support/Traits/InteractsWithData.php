@@ -181,11 +181,15 @@ trait InteractsWithData
     /**
      * Apply the callback if the instance contains a valid enum value for the given key.
      *
+     * @template TEnum of \BackedEnum
+     * @template TReturn
+     * @template TReturnDefault = never
+     *
      * @param  string  $key
-     * @param  class-string<\BackedEnum>  $enumClass
-     * @param  callable  $callback
-     * @param  callable|null  $default
-     * @return $this|mixed
+     * @param  class-string<TEnum>  $enumClass
+     * @param  callable(TEnum):TReturn  $callback
+     * @param  (callable(): TReturnDefault)|null  $default
+     * @return $this|TReturn|TReturnDefault
      */
     public function whenEnum($key, string $enumClass, callable $callback, ?callable $default = null)
     {
