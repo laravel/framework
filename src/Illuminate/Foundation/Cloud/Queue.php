@@ -3,8 +3,10 @@
 namespace Illuminate\Foundation\Cloud;
 
 use Carbon\CarbonImmutable;
+use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Queue\SqsQueue;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 
@@ -185,6 +187,12 @@ class Queue implements QueueContract, ClearableQueue
     /**
      * Pop the next job off of the queue.
      *
+     * On a managed (SQS) queue the message has already been received from SQS
+     * by the dispatcher and handed to this pod's in-container cloud-agent,
+     * which holds it and extends its visibility. Rather than receive from SQS
+     * ourselves we long-poll the agent's runtime socket; for any other
+     * underlying queue we delegate to it as usual.
+     *
      * @param  string|null  $queue
      * @return \Illuminate\Contracts\Queue\Job|null
      */
@@ -192,11 +200,103 @@ class Queue implements QueueContract, ClearableQueue
     {
         $this->finishProcessingJob();
 
-        $job = $this->queue->pop(...func_get_args());
+        $job = $this->queue instanceof SqsQueue
+            ? $this->popFromAgent($queue)
+            : $this->queue->pop(...func_get_args());
 
         $this->startProcessingJob($queue, $job);
 
         return $job;
+    }
+
+    /**
+     * Long-poll the in-container cloud-agent's runtime socket (GET /next) for
+     * the next message and wrap it in an AgentSqsJob.
+     *
+     * The agent blocks until a job is available or returns 204 so we re-poll,
+     * exactly like SQS long polling. The returned AgentSqsJob still deletes /
+     * releases against SQS directly — the agent never touches the message — and
+     * additionally reports the outcome back to the agent via POST /result.
+     *
+     * @param  string|null  $queue
+     * @return \Illuminate\Foundation\Cloud\AgentSqsJob|null
+     */
+    protected function popFromAgent($queue = null)
+    {
+        $response = $this->agentClient()->get('/next', [
+            // Outlast the agent's ~55s poll cycle so a 204 is a deliberate
+            // "nothing yet", never our own timeout cutting a poll short.
+            'timeout' => 65,
+        ]);
+
+        if ($response->getStatusCode() === 204) {
+            return null;
+        }
+
+        $data = json_decode((string) $response->getBody(), true);
+
+        if (! is_array($data) || empty($data['messageId'])) {
+            return null;
+        }
+
+        $messageId = $data['messageId'];
+
+        return new AgentSqsJob(
+            $this->queue->getContainer(),
+            $this->queue->getSqs(),
+            [
+                'MessageId' => $messageId,
+                'ReceiptHandle' => $data['receiptHandle'] ?? null,
+                'Body' => $data['body'] ?? '',
+                'Attributes' => ($data['attributes'] ?? []) + ['ApproximateReceiveCount' => '1'],
+            ],
+            $this->queue->getConnectionName(),
+            // The agent reports the real SQS queue URL the dispatcher received
+            // from; delete / release go back to that queue, not our default.
+            $data['queueUrl'] ?? $this->queue->getQueue($queue),
+            fn (string $status, ?string $error) => $this->reportResultToAgent($messageId, $status, $error),
+        );
+    }
+
+    /**
+     * Report a job's terminal outcome back to the agent (POST /result) so it
+     * can stop heartbeating the message and accept the next invoke.
+     */
+    protected function reportResultToAgent(string $messageId, string $status, ?string $error): void
+    {
+        $this->agentClient()->post('/result', [
+            'json' => array_filter([
+                'messageId' => $messageId,
+                'status' => $status,
+                'error' => $error,
+            ], fn ($value) => $value !== null),
+            'timeout' => 10,
+        ]);
+    }
+
+    /**
+     * A Guzzle client bound to the agent's unix runtime socket, so callers just
+     * pass the path (GET /next, POST /result).
+     */
+    protected function agentClient(): HttpClient
+    {
+        return new HttpClient([
+            'base_uri' => 'http://localhost',
+            'http_errors' => false,
+            'curl' => [
+                CURLOPT_UNIX_SOCKET_PATH => $this->agentSocketPath(),
+            ],
+        ]);
+    }
+
+    /**
+     * The filesystem path of the agent's runtime socket.
+     */
+    protected function agentSocketPath(): string
+    {
+        return $_ENV['LARAVEL_CLOUD_AGENT_SOCKET'] ??
+            $_SERVER['LARAVEL_CLOUD_AGENT_SOCKET'] ??
+                '/tmp/cloud-agent.sock';
     }
 
     /**
