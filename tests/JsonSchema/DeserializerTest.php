@@ -4,8 +4,8 @@ namespace Illuminate\Tests\JsonSchema;
 
 use Illuminate\JsonSchema\JsonSchema;
 use Illuminate\JsonSchema\Serializer;
-use Illuminate\JsonSchema\Types\ArrayType;
 use Illuminate\JsonSchema\Types\AnyOfType;
+use Illuminate\JsonSchema\Types\ArrayType;
 use Illuminate\JsonSchema\Types\BooleanType;
 use Illuminate\JsonSchema\Types\IntegerType;
 use Illuminate\JsonSchema\Types\NumberType;
