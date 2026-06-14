@@ -1,5 +1,0 @@
-<?php
-
-app('router')->setCompiledRoutes(
-    {{routes}}
-);

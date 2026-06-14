@@ -103,8 +103,9 @@ class RouteCacheCommand extends Command
      */
     protected function buildRouteCacheFile(RouteCollection $routes)
     {
-        $stub = $this->files->get(__DIR__.'/stubs/routes.stub');
-
-        return str_replace('{{routes}}', var_export($routes->compile(), true), $stub);
+        return sprintf(
+            "<?php\n\napp('router')->setCompiledRoutes(\n    unserialize(%s)\n);\n",
+            var_export(serialize($routes->compile()), true)
+        );
     }
 }
