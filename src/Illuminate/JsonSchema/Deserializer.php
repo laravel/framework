@@ -47,6 +47,12 @@ class Deserializer
     {
         [$schema, $refs] = $this->resolveRef($schema, $refs);
 
+        if (($type = $this->buildAnyOfComposition($schema, $refs)) !== null) {
+            $this->applyCommon($type, $schema);
+
+            return $type;
+        }
+
         [$schema, $nullableFromUnion, $refs] = $this->normalizeUnions($schema, $refs);
 
         [$name, $nullableFromType] = $this->resolveType($schema);
@@ -70,6 +76,53 @@ class Deserializer
         $this->applyCommon($type, $schema);
 
         if ($nullableFromUnion || $nullableFromType) {
+            $type->nullable();
+        }
+
+        return $type;
+    }
+
+    /**
+     * Build an anyOf composition unless it is the existing nullable single-schema form.
+     *
+     * @param  array<string, mixed>  $schema
+     * @param  array<int, string>  $refs
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function buildAnyOfComposition(array $schema, array $refs = []): ?Types\AnyOfType
+    {
+        if (! isset($schema['anyOf']) || ! is_array($schema['anyOf'])) {
+            return null;
+        }
+
+        $nullable = false;
+        $branches = [];
+
+        foreach ($schema['anyOf'] as $branch) {
+            if (! is_array($branch)) {
+                throw new InvalidArgumentException('Unable to represent the schema for an anyOf branch; boolean schemas are not supported.');
+            }
+
+            [$branch, $branchRefs] = $this->resolveRef($branch, $refs);
+
+            if ($this->isNullBranch($branch)) {
+                $nullable = true;
+            } else {
+                $branches[] = [$branch, $branchRefs];
+            }
+        }
+
+        if ($nullable && count($branches) === 1) {
+            return null;
+        }
+
+        $type = new Types\AnyOfType(array_map(
+            fn (array $branch) => $this->build($branch[0], $branch[1]),
+            $branches,
+        ));
+
+        if ($nullable) {
             $type->nullable();
         }
 

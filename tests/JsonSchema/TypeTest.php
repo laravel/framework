@@ -328,6 +328,21 @@ class TypeTest extends TestCase
             [JsonSchema::union(['string', 'number'])->enum(['draft', 5]), 'draft'],
             [JsonSchema::union(['string', 'number'])->nullable(), null],
             [JsonSchema::union(['string', 'number'])->nullable(), 'still valid'],
+
+            // AnyOfType
+            [JsonSchema::anyOf([JsonSchema::string(), JsonSchema::integer()]), 'hello'],
+            [JsonSchema::anyOf([JsonSchema::string(), JsonSchema::integer()]), 10],
+            [JsonSchema::anyOf([JsonSchema::string(), JsonSchema::integer()])->nullable(), null],
+            [JsonSchema::anyOf([
+                JsonSchema::object([
+                    'type' => JsonSchema::string()->enum(['card'])->required(),
+                    'last4' => JsonSchema::string()->min(4)->max(4)->required(),
+                ]),
+                JsonSchema::object([
+                    'type' => JsonSchema::string()->enum(['bank_account'])->required(),
+                    'iban' => JsonSchema::string()->required(),
+                ]),
+            ]), (object) ['type' => 'card', 'last4' => '1234']],
         ];
     }
 
@@ -429,6 +444,20 @@ class TypeTest extends TestCase
             [JsonSchema::union(['string', 'number']), null], // null not allowed unless nullable
             [JsonSchema::union(['integer', 'boolean']), 'nope'], // string not in union
             [JsonSchema::union(['string', 'number'])->enum(['draft', 5]), 'archived'], // not in enum
+
+            // AnyOfType
+            [JsonSchema::anyOf([JsonSchema::string(), JsonSchema::integer()]), true],
+            [JsonSchema::anyOf([JsonSchema::string(), JsonSchema::integer()]), null],
+            [JsonSchema::anyOf([
+                JsonSchema::object([
+                    'type' => JsonSchema::string()->enum(['card'])->required(),
+                    'last4' => JsonSchema::string()->min(4)->max(4)->required(),
+                ]),
+                JsonSchema::object([
+                    'type' => JsonSchema::string()->enum(['bank_account'])->required(),
+                    'iban' => JsonSchema::string()->required(),
+                ]),
+            ]), (object) ['type' => 'card', 'iban' => 'wrong-branch']],
         ];
     }
 

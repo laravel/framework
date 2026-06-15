@@ -25,6 +25,27 @@ class Serializer
         /** @var array<string, mixed> $attributes */
         $attributes = (fn () => get_object_vars($type))->call($type);
 
+        if ($type instanceof Types\AnyOfType) {
+            $attributes['anyOf'] = array_map(
+                static fn (Types\Type $schema) => static::serialize($schema),
+                $attributes['schemas'],
+            );
+
+            unset($attributes['schemas']);
+
+            if (static::isNullable($type)) {
+                $attributes['anyOf'][] = ['type' => 'null'];
+            }
+
+            return array_filter($attributes, static function (mixed $value, string $key) {
+                if (in_array($key, static::$ignore, true)) {
+                    return false;
+                }
+
+                return $value !== null;
+            }, ARRAY_FILTER_USE_BOTH);
+        }
+
         $attributes['type'] = match (get_class($type)) {
             Types\ArrayType::class => 'array',
             Types\BooleanType::class => 'boolean',

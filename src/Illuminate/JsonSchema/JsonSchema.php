@@ -7,6 +7,7 @@ use Illuminate\JsonSchema\Types\Type;
 
 /**
  * @method static Types\ObjectType object(Closure|array<string, Types\Type> $properties = [])
+ * @method static Types\AnyOfType anyOf(Closure|array<int, Types\Type> $schemas)
  * @method static Types\IntegerType integer()
  * @method static Types\NumberType number()
  * @method static Types\StringType string()
