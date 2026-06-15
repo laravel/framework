@@ -98,6 +98,23 @@ class DatabaseLock extends Lock
     }
 
     /**
+     * Attempt to refresh the lock for the given number of seconds.
+     *
+     * @param  int|null  $seconds
+     * @return bool
+     */
+    public function refresh($seconds = null)
+    {
+        $seconds ??= $this->seconds;
+
+        return $this->connection->table($this->table)
+            ->where('key', $this->name)
+            ->where('owner', $this->owner)
+            ->where('expiration', '>', $this->currentTime())
+            ->update(['expiration' => $this->expiresAt($seconds)]) >= 1;
+    }
+
+    /**
      * Get the UNIX timestamp indicating when the lock should expire.
      *
      * @return int
@@ -170,23 +187,6 @@ class DatabaseLock extends Lock
     protected function getCurrentOwner()
     {
         return $this->connection->table($this->table)->where('key', $this->name)->first()?->owner;
-    }
-
-    /**
-     * Attempt to refresh the lock for the given number of seconds.
-     *
-     * @param  int|null  $seconds
-     * @return bool
-     */
-    public function refresh($seconds = null)
-    {
-        $seconds ??= $this->seconds;
-
-        return $this->connection->table($this->table)
-            ->where('key', $this->name)
-            ->where('owner', $this->owner)
-            ->where('expiration', '>', $this->currentTime())
-            ->update(['expiration' => $this->expiresAt($seconds)]) >= 1;
     }
 
     /**

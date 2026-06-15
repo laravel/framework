@@ -7,6 +7,7 @@ use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 abstract class Lock implements LockContract
 {
@@ -137,6 +138,17 @@ abstract class Lock implements LockContract
     }
 
     /**
+     * Attempt to refresh the lock for the given number of seconds.
+     *
+     * @param  int|null  $seconds
+     * @return bool
+     */
+    public function refresh($seconds = null)
+    {
+        throw new RuntimeException('This lock driver does not support refreshing locks.');
+    }
+
+    /**
      * Returns the current owner of the lock.
      *
      * @return string
@@ -178,16 +190,5 @@ abstract class Lock implements LockContract
         $this->sleepMilliseconds = $milliseconds;
 
         return $this;
-    }
-
-    /**
-     * Attempt to refresh the lock for the given number of seconds.
-     *
-     * @param  int|null  $seconds
-     * @return bool
-     */
-    public function refresh($seconds = null)
-    {
-        throw new \RuntimeException('This lock driver does not support refreshing locks.');
     }
 }

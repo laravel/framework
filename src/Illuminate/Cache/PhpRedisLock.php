@@ -22,19 +22,6 @@ class PhpRedisLock extends RedisLock
     /**
      * {@inheritDoc}
      */
-    public function release()
-    {
-        return (bool) $this->redis->eval(
-            LuaScripts::releaseLock(),
-            1,
-            $this->name,
-            ...$this->redis->pack([$this->owner])
-        );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function refresh($seconds = null)
     {
         $seconds ??= $this->seconds;
@@ -44,6 +31,19 @@ class PhpRedisLock extends RedisLock
             1,
             $this->name,
             ...$this->redis->pack([$this->owner, $seconds])
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function release()
+    {
+        return (bool) $this->redis->eval(
+            LuaScripts::releaseLock(),
+            1,
+            $this->name,
+            ...$this->redis->pack([$this->owner])
         );
     }
 }
