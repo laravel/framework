@@ -18,7 +18,7 @@ use Illuminate\Queue\Jobs\SqsJob;
  * SQS — and report the outcome (with the requested release delay) back to the
  * agent via POST /result, which the poller acts on.
  */
-class AgentSqsJob extends SqsJob
+class CloudJob extends SqsJob
 {
     /**
      * Whether the outcome has already been reported to the agent. The base

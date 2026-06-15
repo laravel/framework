@@ -6,7 +6,6 @@ use Carbon\CarbonImmutable;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
-use Illuminate\Queue\SqsQueue;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 
@@ -187,76 +186,55 @@ class Queue implements QueueContract, ClearableQueue
     /**
      * Pop the next job off of the queue.
      *
-     * On a managed (SQS) queue the message has already been received from SQS
-     * by the dispatcher and handed to this pod's in-container cloud-agent,
-     * which holds it and extends its visibility. Rather than receive from SQS
-     * ourselves we long-poll the agent's runtime socket; for any other
-     * underlying queue we delegate to it as usual.
-     *
-     * @param  string|null  $queue
-     * @return \Illuminate\Contracts\Queue\Job|null
-     */
-    public function pop($queue = null)
-    {
-        $this->finishProcessingJob();
-
-        $job = $this->queue instanceof SqsQueue
-            ? $this->popFromAgent($queue)
-            : $this->queue->pop(...func_get_args());
-
-        $this->startProcessingJob($queue, $job);
-
-        return $job;
-    }
-
-    /**
-     * Long-poll the in-container cloud-agent's runtime socket (GET /next) for
-     * the next message and wrap it in an AgentSqsJob.
+     * The message has already been received from SQS by the dispatcher and
+     * handed to this pod's in-container cloud-agent, which holds it and extends
+     * its visibility. Rather than receive from SQS ourselves we long-poll the
+     * agent's runtime socket (GET /next) and wrap the message in a CloudJob.
      *
      * The agent blocks until a job is available or returns 204 so we re-poll,
-     * exactly like SQS long polling. The returned AgentSqsJob never touches SQS
+     * exactly like SQS long polling. The returned CloudJob never touches SQS
      * itself; it reports the outcome (and, for a release, the requested delay)
      * back to the agent via POST /result, and the poller owns the terminal SQS
      * operation.
      *
      * @param  string|null  $queue
-     * @return \Illuminate\Foundation\Cloud\AgentSqsJob|null
+     * @return \Illuminate\Foundation\Cloud\CloudJob|null
      */
-    protected function popFromAgent($queue = null)
+    public function pop($queue = null)
     {
+        $this->finishProcessingJob();
+
         $response = $this->agentClient()->get('/next', [
             // Outlast the agent's ~55s poll cycle so a 204 is a deliberate
             // "nothing yet", never our own timeout cutting a poll short.
             'timeout' => 65,
         ]);
 
-        if ($response->getStatusCode() === 204) {
-            return null;
-        }
+        $data = $response->getStatusCode() === 204
+            ? null
+            : json_decode((string) $response->getBody(), true);
 
-        $data = json_decode((string) $response->getBody(), true);
+        $job = is_array($data) && ! empty($data['messageId'])
+            ? new CloudJob(
+                $this->queue->getContainer(),
+                $this->queue->getSqs(),
+                [
+                    'MessageId' => $data['messageId'],
+                    'ReceiptHandle' => $data['receiptHandle'] ?? null,
+                    'Body' => $data['body'] ?? '',
+                    'Attributes' => ($data['attributes'] ?? []) + ['ApproximateReceiveCount' => '1'],
+                ],
+                $this->queue->getConnectionName(),
+                // The agent reports the real SQS queue URL the dispatcher received
+                // from; delete / release go back to that queue, not our default.
+                $data['queueUrl'] ?? $this->queue->getQueue($queue),
+                fn (string $status, ?string $error, ?int $delay) => $this->reportResultToAgent($data['messageId'], $status, $error, $delay),
+            )
+            : null;
 
-        if (! is_array($data) || empty($data['messageId'])) {
-            return null;
-        }
+        $this->startProcessingJob($queue, $job);
 
-        $messageId = $data['messageId'];
-
-        return new AgentSqsJob(
-            $this->queue->getContainer(),
-            $this->queue->getSqs(),
-            [
-                'MessageId' => $messageId,
-                'ReceiptHandle' => $data['receiptHandle'] ?? null,
-                'Body' => $data['body'] ?? '',
-                'Attributes' => ($data['attributes'] ?? []) + ['ApproximateReceiveCount' => '1'],
-            ],
-            $this->queue->getConnectionName(),
-            // The agent reports the real SQS queue URL the dispatcher received
-            // from; delete / release go back to that queue, not our default.
-            $data['queueUrl'] ?? $this->queue->getQueue($queue),
-            fn (string $status, ?string $error, ?int $delay) => $this->reportResultToAgent($messageId, $status, $error, $delay),
-        );
+        return $job;
     }
 
     /**
@@ -288,19 +266,9 @@ class Queue implements QueueContract, ClearableQueue
             'base_uri' => 'http://localhost',
             'http_errors' => false,
             'curl' => [
-                CURLOPT_UNIX_SOCKET_PATH => $this->agentSocketPath(),
+                CURLOPT_UNIX_SOCKET_PATH => '/tmp/cloud-agent.sock',
             ],
         ]);
-    }
-
-    /**
-     * The filesystem path of the agent's runtime socket.
-     */
-    protected function agentSocketPath(): string
-    {
-        return $_ENV['LARAVEL_CLOUD_AGENT_SOCKET'] ??
-            $_SERVER['LARAVEL_CLOUD_AGENT_SOCKET'] ??
-                '/tmp/cloud-agent.sock';
     }
 
     /**
