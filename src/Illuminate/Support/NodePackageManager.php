@@ -17,16 +17,6 @@ class NodePackageManager
     }
 
     /**
-     * Get the node package manager in use.
-     *
-     * @return NodePackageManagerContract
-     */
-    public function packageManager(): NodePackageManagerContract
-    {
-        return $this->packageManager ??= $this->detect();
-    }
-
-    /**
      * Get the command to execute a package using the detected package manager.
      *
      * @param  string  $command
@@ -49,19 +39,27 @@ class NodePackageManager
     }
 
     /**
+     * Get the Node package manager in use.
+     *
+     * @return NodePackageManagerContract
+     */
+    public function packageManager(): NodePackageManagerContract
+    {
+        return $this->packageManager ??= $this->detect();
+    }
+
+    /**
      * Detect the current package manager.
      *
      * @return NodePackageManagerContract
      */
     protected function detect(): NodePackageManagerContract
     {
-        $candidates = [
+        foreach ([
             NodePackageManagers\Bun::class,
             NodePackageManagers\Pnpm::class,
             NodePackageManagers\Yarn::class,
-        ];
-
-        foreach ($candidates as $packageManager) {
+        ] as $packageManager) {
             if ($packageManager::matches()) {
                 return new $packageManager;
             }

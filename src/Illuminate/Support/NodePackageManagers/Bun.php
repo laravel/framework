@@ -7,7 +7,7 @@ use Illuminate\Support\Contracts\NodePackageManager;
 class Bun implements NodePackageManager
 {
     /**
-     * Determine if the bun package manager is in use.
+     * Determine if the Bun package manager is in use.
      *
      * @return bool
      */
@@ -23,7 +23,7 @@ class Bun implements NodePackageManager
     }
 
     /**
-     * Get the command to run a script using bun.
+     * Get the command to run a script using Bun.
      *
      * @param  string  $command
      * @return string
@@ -34,7 +34,7 @@ class Bun implements NodePackageManager
     }
 
     /**
-     * Get the command to execute a package using bun.
+     * Get the command to execute a package using Bun.
      *
      * @param  string  $command
      * @return string

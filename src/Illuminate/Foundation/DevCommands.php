@@ -9,19 +9,20 @@ use ReflectionClass;
 class DevCommands
 {
     /**
-     * Counter to keep track of how many colors have been assigned,
-     * used to ensure colors are reused only after all have been used at least once.
-     *
-     * @var int
-     */
-    protected static $colorCount = 0;
-
-    /**
      * The resolved NodePackageManager instance.
      *
      * @var NodePackageManager|null
      */
     protected static ?NodePackageManager $packageManager = null;
+
+    /**
+     * Counter to keep track of how many colors have been assigned,
+     *
+     * Used to ensure colors are reused only after all have been used at least once.
+     *
+     * @var int
+     */
+    protected static $colorCount = 0;
 
     /**
      * The registered development commands.
@@ -31,18 +32,18 @@ class DevCommands
     protected static $commands = [];
 
     /**
-     * The names of commands that should be excluded when running the "dev" command.
-     *
-     * @var array<int, string>
-     */
-    protected static $except = [];
-
-    /**
      * The names of commands that should be included when running the "dev" command.
      *
      * @var array<int, string>
      */
     protected static $only = [];
+
+    /**
+     * The names of commands that should be excluded when running the "dev" command.
+     *
+     * @var array<int, string>
+     */
+    protected static $except = [];
 
     /**
      * Register the default development commands.
@@ -67,7 +68,6 @@ class DevCommands
     public static function register(string $command, ?string $name = null): DevCommand
     {
         if (! app()->runningInConsole()) {
-            // If we're not running in the console, just return a dummy DevCommand instance.
             return new DevCommand('', '');
         }
 
@@ -117,28 +117,6 @@ class DevCommands
     }
 
     /**
-     * Set the commands that should be excluded when running the "dev" command.
-     *
-     * @param  string  ...$names
-     * @return void
-     */
-    public static function except(...$names): void
-    {
-        self::$except = $names;
-    }
-
-    /**
-     * Set the commands that should be included when running the "dev" command.
-     *
-     * @param  string  ...$names
-     * @return void
-     */
-    public static function only(...$names): void
-    {
-        self::$only = $names;
-    }
-
-    /**
      * Get the registered development commands.
      *
      * @return array
@@ -157,33 +135,40 @@ class DevCommands
             $commands[] = $cmd;
         }
 
-        $commands = self::fillInEmptyColors($commands);
+        return self::fillInEmptyColors($commands);
+    }
+
+    /**
+     * Fill in any empty colors in the given commands array, ensuring each command has a color assigned.
+     *
+     * @param  array  $commands
+     * @return array
+     */
+    protected static function fillInEmptyColors(array $commands): array
+    {
+        foreach ($commands as &$command) {
+            if (empty($command['color'])) {
+                $command['color'] = self::getColor($commands);
+            }
+        }
 
         return $commands;
     }
 
     /**
-     * Clear all registered development commands and reset the state of the DevCommands class,
-     * including registered commands, exceptions, inclusions, and color assignments.
+     * Get a color for a command, ensuring that colors are reused only after all available colors have been used at least once.
      *
-     * @return void
+     * @param  array  $commands
+     * @return string
      */
-    public static function clear(): void
+    protected static function getColor(array $commands): string
     {
-        self::$commands = [];
-        self::$except = [];
-        self::$only = [];
-        self::$colorCount = 0;
-    }
+        $available = array_values(array_diff(
+            $colors = array_map(fn ($color) => $color->value, DevCommandColor::cases()),
+            $existing = array_values(array_filter(array_column($commands, 'color')))
+        ));
 
-    /**
-     * Resolve and return the NodePackageManager instance.
-     *
-     * @return NodePackageManager
-     */
-    protected static function getPackageManager(): NodePackageManager
-    {
-        return self::$packageManager ??= new NodePackageManager();
+        return $available[0] ?? $colors[self::$colorCount++ % count($colors)];
     }
 
     /**
@@ -219,7 +204,7 @@ class DevCommands
             }
 
             if (! str_contains($file, base_path('vendor'))) {
-                // We found at least one frame that came from userland code, we're good.
+                // We found at least one frame that came from userland code, we're good...
                 return;
             }
         }
@@ -227,6 +212,28 @@ class DevCommands
         throw new Exception(
             "DevCommands should be registered in application code, not within vendor packages. Attempted to register command: {$name}"
         );
+    }
+
+    /**
+     * Set the commands that should be included when running the "dev" command.
+     *
+     * @param  string  ...$names
+     * @return void
+     */
+    public static function only(...$names): void
+    {
+        self::$only = $names;
+    }
+
+    /**
+     * Set the commands that should be excluded when running the "dev" command.
+     *
+     * @param  string  ...$names
+     * @return void
+     */
+    public static function except(...$names): void
+    {
+        self::$except = $names;
     }
 
     /**
@@ -241,34 +248,25 @@ class DevCommands
     }
 
     /**
-     * Fill in any empty colors in the given commands array, ensuring each command has a color assigned.
+     * Resolve and return the NodePackageManager instance.
      *
-     * @param  array  $commands
-     * @return array
+     * @return NodePackageManager
      */
-    protected static function fillInEmptyColors(array $commands): array
+    protected static function getPackageManager(): NodePackageManager
     {
-        foreach ($commands as &$command) {
-            if (empty($command['color'])) {
-                $command['color'] = self::getColor($commands);
-            }
-        }
-
-        return $commands;
+        return self::$packageManager ??= new NodePackageManager();
     }
 
     /**
-     * Get a color for a command, ensuring that colors are reused only after all available colors have been used at least once.
+     * Clear all registered development commands and reset the state of the DevCommands class.
      *
-     * @param  array  $commands
-     * @return string
+     * @return void
      */
-    protected static function getColor(array $commands): string
+    public static function clear(): void
     {
-        $colors = array_map(fn ($color) => $color->value, DevCommandColor::cases());
-        $existing = array_values(array_filter(array_column($commands, 'color')));
-        $available = array_values(array_diff($colors, $existing));
-
-        return $available[0] ?? $colors[self::$colorCount++ % count($colors)];
+        self::$commands = [];
+        self::$except = [];
+        self::$only = [];
+        self::$colorCount = 0;
     }
 }

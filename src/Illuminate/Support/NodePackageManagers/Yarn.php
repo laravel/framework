@@ -7,7 +7,7 @@ use Illuminate\Support\Contracts\NodePackageManager;
 class Yarn implements NodePackageManager
 {
     /**
-     * Determine if the yarn package manager is in use.
+     * Determine if the Yarn package manager is in use.
      *
      * @return bool
      */
@@ -17,7 +17,7 @@ class Yarn implements NodePackageManager
     }
 
     /**
-     * Get the command to run a script using yarn.
+     * Get the command to run a script using Yarn.
      *
      * @param  string  $command
      * @return string
@@ -28,7 +28,7 @@ class Yarn implements NodePackageManager
     }
 
     /**
-     * Get the command to execute a package using yarn.
+     * Get the command to execute a package using Yarn.
      *
      * @param  string  $command
      * @return string
