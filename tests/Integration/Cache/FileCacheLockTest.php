@@ -149,6 +149,44 @@ class FileCacheLockTest extends TestCase
         Cache::lock('foo', 10)->block(5);
     }
 
+    public function testLockCanBeRefreshed()
+    {
+        $lock = Cache::lock('foo', 10);
+        $this->assertTrue($lock->get());
+
+        $this->assertTrue($lock->refresh(20));
+
+        $this->assertFalse(Cache::lock('foo', 10)->get());
+
+        $lock->release();
+    }
+
+    public function testLockCannotBeRefreshedByAnotherOwner()
+    {
+        $firstLock = Cache::lock('foo', 10);
+        $this->assertTrue($firstLock->get());
+
+        $secondLock = Cache::store('file')->restoreLock('foo', 'other_owner');
+
+        $this->assertFalse($secondLock->refresh(20));
+
+        $this->assertTrue($firstLock->refresh(20));
+
+        $firstLock->release();
+    }
+
+    public function testLockRefreshWithDefaultSeconds()
+    {
+        $lock = Cache::lock('foo', 10);
+        $this->assertTrue($lock->get());
+
+        $this->assertTrue($lock->refresh());
+
+        $this->assertFalse(Cache::lock('foo', 10)->get());
+
+        $lock->release();
+    }
+
     protected function tearDown(): void
     {
         try {
