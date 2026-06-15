@@ -1748,6 +1748,8 @@ class TestResponse implements ArrayAccess
      * Assert that the session has no errors.
      *
      * @return $this
+     *
+     * @throws \JsonException
      */
     public function assertSessionHasNoErrors()
     {

@@ -103,6 +103,8 @@ class FailedJobProvider implements FailedJobProviderInterface, CountableFailedJo
      *
      * @param  mixed  $id
      * @return object|null
+     *
+     * @throws \JsonException
      */
     public function find($id)
     {
