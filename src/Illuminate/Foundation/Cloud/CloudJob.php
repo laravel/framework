@@ -12,26 +12,20 @@ use Illuminate\Queue\Jobs\SqsJob;
  * its unix-socket runtime API rather than received directly from SQS.
  *
  * This pod never mutates SQS itself: the poller owns every terminal SQS op
- * (delete on success, visibility reset on release/failure) so it can batch
- * them across messages. Delete / release / fail therefore only flag the job's
- * local state for the worker loop — bypassing the SqsJob calls that would hit
- * SQS — and report the outcome (with the requested release delay) back to the
- * agent via POST /result, which the poller acts on.
+ * (delete on success or terminal failure, visibility reset on release) so it
+ * can batch them across messages. Delete and release therefore only flag the
+ * job's local state for the worker loop — bypassing the SqsJob calls that
+ * would hit SQS — and report the outcome (with the requested release delay)
+ * back to the agent via POST /result, which the poller acts on.
  */
 class CloudJob extends SqsJob
 {
     /**
-     * Whether the outcome has already been reported to the agent. The base
-     * fail() routes through delete(), so without this guard a failed job would
-     * report twice.
+     * Whether the outcome has already been reported to the agent. A job may
+     * reach more than one terminal call (e.g. it releases itself and then
+     * throws); this guard ensures only the first outcome is POSTed.
      */
     protected bool $reported = false;
-
-    /**
-     * Set while fail() is unwinding so the delete() it triggers reports the
-     * outcome as "failed" rather than "processed".
-     */
-    protected bool $failing = false;
 
     /**
      * Create a new job instance.
@@ -39,7 +33,7 @@ class CloudJob extends SqsJob
      * @param  array  $job
      * @param  string  $connectionName
      * @param  string  $queue
-     * @param  callable(string, string|null, int|null): void  $reporter
+     * @param  callable(string, int|null): void  $reporter
      */
     public function __construct(
         Container $container,
@@ -64,7 +58,12 @@ class CloudJob extends SqsJob
         // straight to Job::delete() so SqsJob's SQS mutation never runs.
         Job::delete();
 
-        $this->report($this->failing ? 'failed' : 'processed');
+        // SqsJob::delete() always deletes the message, and the base fail()
+        // routes a terminally-failed job (already recorded in failed_jobs)
+        // through delete() too — so a delete always means "remove from SQS".
+        // We report "processed" in both cases to mirror that. The poller's
+        // "failed" status is reserved for dispatches that never cleanly ack.
+        $this->report('processed');
     }
 
     /**
@@ -84,24 +83,11 @@ class CloudJob extends SqsJob
     }
 
     /**
-     * Delete the job, call the "failed" method, and raise the failed job event.
-     *
-     * @param  \Throwable|null  $e
-     * @return void
-     */
-    public function fail($e = null)
-    {
-        $this->failing = true;
-
-        parent::fail($e);
-    }
-
-    /**
      * Report the job's terminal outcome back to the agent, at most once. The
      * release delay (in seconds) is forwarded only for the "released" status so
      * the poller can reset the message's visibility to it.
      */
-    protected function report(string $status, ?string $error = null, ?int $delay = null): void
+    protected function report(string $status, ?int $delay = null): void
     {
         if ($this->reported) {
             return;
@@ -109,6 +95,6 @@ class CloudJob extends SqsJob
 
         $this->reported = true;
 
-        ($this->reporter)($status, $error, $delay);
+        ($this->reporter)($status, $delay);
     }
 }

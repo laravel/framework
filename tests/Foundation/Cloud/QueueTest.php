@@ -10,6 +10,7 @@ use Aws\Result;
 use Aws\Sqs\SqsClient;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Foundation\Cloud;
+use Illuminate\Foundation\Cloud\CloudJob;
 use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\Cloud\FailedJobProvider;
 use Illuminate\Foundation\Cloud\ManagedQueueNotFoundException;
@@ -209,9 +210,9 @@ class QueueTest extends TestCase
     {
         $this->travelTo('2000-01-02 03:04:05.060708');
         $eventsFake = $this->fakeEvents();
-        [$queue, $queueFake] = $this->fakeQueue();
+        [$queue, $agent] = $this->fakeQueue();
 
-        $queueFake->jobsToPop[] = new FakeJob;
+        $agent->pushJob();
         $queue->pop();
 
         $this->assertSame([[
@@ -226,9 +227,9 @@ class QueueTest extends TestCase
     {
         $this->travelTo('2000-01-02 03:04:05.060708');
         $eventsFake = $this->fakeEvents();
-        [$queue, $queueFake] = $this->fakeQueue();
+        [$queue, $agent] = $this->fakeQueue();
 
-        $queueFake->jobsToPop[] = new FakeJob;
+        $agent->pushJob();
         $queue->pop();
         $this->travel(1)->second();
         $queue->pop();
@@ -254,9 +255,9 @@ class QueueTest extends TestCase
     {
         $this->travelTo('2000-01-02 03:04:05.060708');
         $eventsFake = $this->fakeEvents();
-        [$queue, $queueFake] = $this->fakeQueue();
+        [$queue, $agent] = $this->fakeQueue();
 
-        $queueFake->jobsToPop[] = new FakeJob;
+        $agent->pushJob();
         $queue->pop();
         $queue->pop();
         $queue->pop();
@@ -269,9 +270,10 @@ class QueueTest extends TestCase
     {
         $this->travelTo('2000-01-02 03:04:05.060708');
         $eventsFake = $this->fakeEvents();
-        [$queue, $queueFake] = $this->fakeQueue();
+        [$queue, $agent] = $this->fakeQueue();
 
-        $queueFake->jobsToPop = [new FakeJob, new FakeJob];
+        $agent->pushJob();
+        $agent->pushJob();
         $queue->pop('first');
         $queue->pop('second');
         $queue->pop('third');
@@ -309,15 +311,15 @@ class QueueTest extends TestCase
     {
         $this->travelTo('2000-01-02 03:04:05.060708');
         $eventsFake = $this->fakeEvents();
-        [$queue, $queueFake] = $this->fakeQueue();
+        [$queue, $agent] = $this->fakeQueue();
         $failerFake = $this->fakeFailer();
         $failedJobProvider = new FailedJobProvider($failerFake, $eventsFake, $this->app['encrypter']);
         $failedJobProvider->setQueue($queue);
         $this->app[FailedJobProvider::class] = $failedJobProvider;
 
-        $queueFake->jobsToPop[] = $jobFake = new FakeJob;
-        $queue->pop();
-        $jobFake->fail();
+        $agent->pushJob();
+        $job = $queue->pop();
+        $job->fail();
         Str::createUuidsUsingSequence([Uuid::fromString('00dc709e-90c4-70c2-87c8-9b7127d20e8f')]);
         $failedJobProvider->log('cloud', 'default', ['payload' => 'here'], new RuntimeException('Whoops!'));
         Str::createUuidsNormally();
@@ -355,11 +357,11 @@ class QueueTest extends TestCase
     {
         $this->travelTo('2000-01-02 03:04:05.060708');
         $eventsFake = $this->fakeEvents();
-        [$queue, $queueFake] = $this->fakeQueue();
+        [$queue, $agent] = $this->fakeQueue();
 
-        $queueFake->jobsToPop[] = $jobFake = new FakeJob;
-        $queue->pop();
-        $jobFake->release();
+        $agent->pushJob();
+        $job = $queue->pop();
+        $job->release();
         $queue->pop();
 
         $this->assertSame([
@@ -377,6 +379,76 @@ class QueueTest extends TestCase
                 'duration_ms' => 0,
             ],
         ], $eventsFake->emitted);
+    }
+
+    public function testPopReturnsACloudJobBuiltFromTheAgentResponse()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+
+        $agent->pushJob(['messageId' => 'message-id', 'body' => 'job-body']);
+
+        $job = $queue->pop();
+
+        $this->assertInstanceOf(CloudJob::class, $job);
+        $this->assertSame('message-id', $job->getJobId());
+        $this->assertSame('job-body', $job->getRawBody());
+    }
+
+    public function testPopReturnsNullWhenTheAgentHasNoJob()
+    {
+        $this->fakeEvents();
+        [$queue] = $this->fakeQueue();
+
+        $this->assertNull($queue->pop());
+    }
+
+    public function testDeletingAJobReportsProcessedToTheAgentWithoutTouchingSqs()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $pushed = $agent->pushJob();
+
+        $job = $queue->pop();
+        $job->delete();
+
+        $this->assertTrue($job->isDeleted());
+        $this->assertAgentResults([
+            ['messageId' => $pushed['messageId'], 'status' => 'processed'],
+        ]);
+    }
+
+    public function testFailingAJobReportsProcessedExactlyOnce()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $pushed = $agent->pushJob();
+
+        $job = $queue->pop();
+        $job->fail(new RuntimeException('Whoops!'));
+
+        // A terminally failed job is deleted from SQS just like a successful
+        // one (the base fail() routes through delete()), so it reports a single
+        // "processed" outcome rather than a "failed" one.
+        $this->assertTrue($job->hasFailed());
+        $this->assertAgentResults([
+            ['messageId' => $pushed['messageId'], 'status' => 'processed'],
+        ]);
+    }
+
+    public function testReleasingAJobReportsReleasedWithTheDelayToTheAgent()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $pushed = $agent->pushJob();
+
+        $job = $queue->pop();
+        $job->release(30);
+
+        $this->assertTrue($job->isReleased());
+        $this->assertAgentResults([
+            ['messageId' => $pushed['messageId'], 'status' => 'released', 'delay' => 30],
+        ]);
     }
 
     public function testItEmitsJobQueuedEvent()
@@ -451,9 +523,9 @@ class QueueTest extends TestCase
             Cloud::configureManagedQueues($this->app);
             Cloud::bootManagedQueues($this->app);
             $eventsFake = $this->fakeEvents();
-            [$queue, $queueFake] = $this->fakeQueue();
+            [$queue, $agent] = $this->fakeQueue();
 
-            $queueFake->jobsToPop[] = new FakeJob;
+            $agent->pushJob();
             $queue->pop();
             $this->travel(2)->seconds();
 
@@ -499,10 +571,10 @@ class QueueTest extends TestCase
             Cloud::configureManagedQueues($this->app);
             Cloud::bootManagedQueues($this->app);
             $eventsFake = $this->fakeEvents();
-            [$queue, $queueFake] = $this->fakeQueue();
+            [$queue, $agent] = $this->fakeQueue();
 
             foreach ($reasons as $index => $reason) {
-                $queueFake->jobsToPop[] = new FakeJob;
+                $agent->pushJob();
                 $queue->pop();
 
                 $this->app['events']->dispatch(new WorkerStopping(0, null, $reason));
@@ -530,9 +602,9 @@ class QueueTest extends TestCase
             Cloud::configureManagedQueues($this->app);
             Cloud::bootManagedQueues($this->app);
             $eventsFake = $this->fakeEvents();
-            [$queue, $queueFake] = $this->fakeQueue();
+            [$queue, $agent] = $this->fakeQueue();
 
-            $queueFake->jobsToPop[] = new FakeJob;
+            $agent->pushJob();
             $queue->pop();
 
             $this->app['events']->dispatch(new WorkerStopping);
@@ -567,11 +639,11 @@ class QueueTest extends TestCase
             Cloud::configureManagedQueues($this->app);
             Cloud::bootManagedQueues($this->app);
             $eventsFake = $this->fakeEvents();
-            [$queue, $queueFake] = $this->fakeQueue();
+            [$queue, $agent] = $this->fakeQueue();
 
-            $queueFake->jobsToPop[] = $jobFake = new FakeJob;
-            $queue->pop();
-            $jobFake->fail();
+            $agent->pushJob();
+            $job = $queue->pop();
+            $job->fail();
 
             $this->app['events']->dispatch(new WorkerStopping(0, null, WorkerStopReason::TimedOut));
 
@@ -591,11 +663,11 @@ class QueueTest extends TestCase
             Cloud::configureManagedQueues($this->app);
             Cloud::bootManagedQueues($this->app);
             $eventsFake = $this->fakeEvents();
-            [$queue, $queueFake] = $this->fakeQueue();
+            [$queue, $agent] = $this->fakeQueue();
 
-            $queueFake->jobsToPop[] = $jobFake = new FakeJob;
-            $queue->pop();
-            $jobFake->release();
+            $agent->pushJob();
+            $job = $queue->pop();
+            $job->release();
 
             $this->app['events']->dispatch(new WorkerStopping(0, null, WorkerStopReason::MaxJobsExceeded));
 
@@ -635,9 +707,9 @@ class QueueTest extends TestCase
             Cloud::configureManagedQueues($this->app);
             Cloud::bootManagedQueues($this->app);
             $eventsFake = $this->fakeEvents();
-            [$queue, $queueFake] = $this->fakeQueue();
+            [$queue, $agent] = $this->fakeQueue();
 
-            $queueFake->jobsToPop[] = new FakeJob;
+            $agent->pushJob();
             $queue->pop();
 
             $this->app['events']->dispatch(new WorkerStopping(0, null, WorkerStopReason::TimedOut));
@@ -727,9 +799,10 @@ class QueueTest extends TestCase
     {
         $this->travelTo('2000-01-02 03:04:05.060708');
         $eventsFake = $this->fakeEvents();
-        [$queue, $queueFake] = $this->fakeQueue();
+        [$queue, $agent] = $this->fakeQueue();
 
-        $queueFake->jobsToPop = [new FakeJob, new FakeJob];
+        $agent->pushJob();
+        $agent->pushJob();
         $queue->pop();
         $this->travel(1)->second();
         $queue->pop();
@@ -745,9 +818,9 @@ class QueueTest extends TestCase
         date_default_timezone_set('Australia/Melbourne');
         $this->travelTo(Carbon::parse('2000-01-02 03:04:05.060708', 'Australia/Melbourne'));
         $eventsFake = $this->fakeEvents();
-        [$queue, $queueFake] = $this->fakeQueue();
+        [$queue, $agent] = $this->fakeQueue();
 
-        $queueFake->jobsToPop[] = new FakeJob;
+        $agent->pushJob();
         $queue->pop();
         $this->travel(1)->second();
         $queue->pop();
@@ -1026,17 +1099,23 @@ class QueueTest extends TestCase
     }
 
     /**
-     * @return array{Queue, object{jobsToPop: array}}
+     * Build a Cloud queue whose agent runtime socket is faked via Http::fake().
+     *
+     * The returned agent exposes pushJob() to script the next GET /next
+     * responses; once drained the agent answers 204. POST /result requests are
+     * recorded by the HTTP fake and can be asserted with Http::assertSent().
+     *
+     * @return array{Queue, object{jobs: array}}
      */
     private function fakeQueue()
     {
-        $fakeQueue = new class($this->app, [], null) extends QueueFake
-        {
-            public array $jobsToPop = [];
+        $sqs = new SqsClient(['region' => 'us-east-2', 'version' => 'latest', 'credentials' => false]);
 
-            public function pop($queue = null)
+        $fakeQueue = new class($this->app, [], null, $sqs) extends QueueFake
+        {
+            public function __construct($app, $jobs, $failer, private $sqs)
             {
-                return array_shift($this->jobsToPop);
+                parent::__construct($app);
             }
 
             public function getQueue($queue)
@@ -1044,6 +1123,16 @@ class QueueTest extends TestCase
                 $queue ??= 'default';
 
                 return config('queue.connections.cloud.connection.prefix').'/'.$queue.config('queue.connections.cloud.connection.suffix');
+            }
+
+            public function getContainer()
+            {
+                return $this->app;
+            }
+
+            public function getSqs()
+            {
+                return $this->sqs;
             }
 
             public function setConfig(array $config)
@@ -1072,12 +1161,71 @@ class QueueTest extends TestCase
 
         $this->app['queue']->addConnector('cloud', $this->app->factory(QueueConnector::class));
 
-        return [$this->app['queue']->connection('cloud'), $fakeQueue];
+        $agent = $this->fakeAgent();
+
+        return [$this->app['queue']->connection('cloud'), $agent];
+    }
+
+    /**
+     * Fake the cloud-agent runtime socket with Http::fake(): GET /next serves
+     * scripted jobs (204 once drained) and POST /result is accepted (and
+     * recorded for assertions). The returned object scripts jobs via pushJob().
+     */
+    private function fakeAgent()
+    {
+        $agent = new class
+        {
+            public array $jobs = [];
+
+            public function pushJob(array $job = []): array
+            {
+                $job = array_merge([
+                    'messageId' => (string) Str::uuid(),
+                    'receiptHandle' => 'receipt-handle',
+                    'body' => json_encode(['job' => MyJob::class, 'data' => []]),
+                ], $job);
+
+                $this->jobs[] = $job;
+
+                return $job;
+            }
+        };
+
+        Http::fake(function ($request) use ($agent) {
+            if (str_ends_with($request->url(), '/next')) {
+                $job = array_shift($agent->jobs);
+
+                return $job === null
+                    ? Http::response('', 204)
+                    : Http::response($job, 200);
+            }
+
+            if (str_ends_with($request->url(), '/result')) {
+                return Http::response('', 200);
+            }
+
+            return Http::response('', 404);
+        });
+
+        return $agent;
     }
 
     private function fakeFailer()
     {
         return new FileFailedJobProvider(tempnam(sys_get_temp_dir(), 'cloud_failed_job_test_'));
+    }
+
+    /**
+     * Assert the exact sequence of POST /result bodies sent to the agent.
+     */
+    private function assertAgentResults(array $expected): void
+    {
+        $results = Http::recorded(fn ($request) => str_ends_with($request->url(), '/result'))
+            ->map(fn ($record) => $record[0]->data())
+            ->values()
+            ->all();
+
+        $this->assertSame($expected, $results);
     }
 }
 

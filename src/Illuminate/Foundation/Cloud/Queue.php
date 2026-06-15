@@ -3,9 +3,9 @@
 namespace Illuminate\Foundation\Cloud;
 
 use Carbon\CarbonImmutable;
-use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 
@@ -204,15 +204,13 @@ class Queue implements QueueContract, ClearableQueue
     {
         $this->finishProcessingJob();
 
-        $response = $this->agentClient()->get('/next', [
+        $response = $this->agentRequest()
             // Outlast the agent's ~55s poll cycle so a 204 is a deliberate
             // "nothing yet", never our own timeout cutting a poll short.
-            'timeout' => 65,
-        ]);
+            ->timeout(65)
+            ->get('/next');
 
-        $data = $response->getStatusCode() === 204
-            ? null
-            : json_decode((string) $response->getBody(), true);
+        $data = $response->status() === 204 ? null : $response->json();
 
         $job = is_array($data) && ! empty($data['messageId'])
             ? new CloudJob(
@@ -228,7 +226,7 @@ class Queue implements QueueContract, ClearableQueue
                 // The agent reports the real SQS queue URL the dispatcher received
                 // from; delete / release go back to that queue, not our default.
                 $data['queueUrl'] ?? $this->queue->getQueue($queue),
-                fn (string $status, ?string $error, ?int $delay) => $this->reportResultToAgent($data['messageId'], $status, $error, $delay),
+                fn (string $status, ?int $delay) => $this->reportResultToAgent($data['messageId'], $status, $delay),
             )
             : null;
 
@@ -243,28 +241,24 @@ class Queue implements QueueContract, ClearableQueue
      * performs the SQS operation; on a release the delay (in whole seconds)
      * tells it the visibility to reset the message to.
      */
-    protected function reportResultToAgent(string $messageId, string $status, ?string $error, ?int $delay = null): void
+    protected function reportResultToAgent(string $messageId, string $status, ?int $delay = null): void
     {
-        $this->agentClient()->post('/result', [
-            'json' => array_filter([
-                'messageId' => $messageId,
-                'status' => $status,
-                'error' => $error,
-                'delay' => $delay,
-            ], fn ($value) => $value !== null),
-            'timeout' => 10,
-        ]);
+        $this->agentRequest()->timeout(10)->post('/result', array_filter([
+            'messageId' => $messageId,
+            'status' => $status,
+            'delay' => $delay,
+        ], fn ($value) => $value !== null));
     }
 
     /**
-     * A Guzzle client bound to the agent's unix runtime socket, so callers just
-     * pass the path (GET /next, POST /result).
+     * A pending HTTP request bound to the agent's unix runtime socket, so
+     * callers just pass the path (GET /next, POST /result).
+     *
+     * @return \Illuminate\Http\Client\PendingRequest
      */
-    protected function agentClient(): HttpClient
+    protected function agentRequest()
     {
-        return new HttpClient([
-            'base_uri' => 'http://localhost',
-            'http_errors' => false,
+        return Http::baseUrl('http://localhost')->withOptions([
             'curl' => [
                 CURLOPT_UNIX_SOCKET_PATH => '/tmp/cloud-agent.sock',
             ],
