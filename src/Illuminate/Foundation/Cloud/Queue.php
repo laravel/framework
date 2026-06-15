@@ -214,9 +214,10 @@ class Queue implements QueueContract, ClearableQueue
      * the next message and wrap it in an AgentSqsJob.
      *
      * The agent blocks until a job is available or returns 204 so we re-poll,
-     * exactly like SQS long polling. The returned AgentSqsJob still deletes /
-     * releases against SQS directly — the agent never touches the message — and
-     * additionally reports the outcome back to the agent via POST /result.
+     * exactly like SQS long polling. The returned AgentSqsJob never touches SQS
+     * itself; it reports the outcome (and, for a release, the requested delay)
+     * back to the agent via POST /result, and the poller owns the terminal SQS
+     * operation.
      *
      * @param  string|null  $queue
      * @return \Illuminate\Foundation\Cloud\AgentSqsJob|null
@@ -254,21 +255,24 @@ class Queue implements QueueContract, ClearableQueue
             // The agent reports the real SQS queue URL the dispatcher received
             // from; delete / release go back to that queue, not our default.
             $data['queueUrl'] ?? $this->queue->getQueue($queue),
-            fn (string $status, ?string $error) => $this->reportResultToAgent($messageId, $status, $error),
+            fn (string $status, ?string $error, ?int $delay) => $this->reportResultToAgent($messageId, $status, $error, $delay),
         );
     }
 
     /**
      * Report a job's terminal outcome back to the agent (POST /result) so it
-     * can stop heartbeating the message and accept the next invoke.
+     * can stop heartbeating the message and accept the next invoke. The poller
+     * performs the SQS operation; on a release the delay (in whole seconds)
+     * tells it the visibility to reset the message to.
      */
-    protected function reportResultToAgent(string $messageId, string $status, ?string $error): void
+    protected function reportResultToAgent(string $messageId, string $status, ?string $error, ?int $delay = null): void
     {
         $this->agentClient()->post('/result', [
             'json' => array_filter([
                 'messageId' => $messageId,
                 'status' => $status,
                 'error' => $error,
+                'delay' => $delay,
             ], fn ($value) => $value !== null),
             'timeout' => 10,
         ]);
