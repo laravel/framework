@@ -16,7 +16,7 @@ class DevCommands
     protected static ?NodePackageManager $packageManager = null;
 
     /**
-     * Counter to keep track of how many colors have been assigned,
+     * Counter to keep track of how many colors have been assigned,.
      *
      * Used to ensure colors are reused only after all have been used at least once.
      *
