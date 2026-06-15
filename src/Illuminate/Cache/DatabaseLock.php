@@ -102,9 +102,11 @@ class DatabaseLock extends Lock
      *
      * @return int
      */
-    protected function expiresAt()
+    protected function expiresAt($seconds = null)
     {
-        $lockTimeout = $this->seconds > 0 ? $this->seconds : $this->defaultTimeoutInSeconds;
+        $seconds ??= $this->seconds;
+
+        $lockTimeout = $seconds > 0 ? $seconds : $this->defaultTimeoutInSeconds;
 
         return $this->currentTime() + $lockTimeout;
     }
@@ -180,12 +182,11 @@ class DatabaseLock extends Lock
     {
         $seconds ??= $this->seconds;
 
-        $this->seconds = $seconds;
-
         return $this->connection->table($this->table)
             ->where('key', $this->name)
             ->where('owner', $this->owner)
-            ->update(['expiration' => $this->expiresAt()]) >= 1;
+            ->where('expiration', '>', $this->currentTime())
+            ->update(['expiration' => $this->expiresAt($seconds)]) >= 1;
     }
 
     /**

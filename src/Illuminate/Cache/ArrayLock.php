@@ -115,6 +115,12 @@ class ArrayLock extends Lock
             return false;
         }
 
+        $expiresAt = $this->store->locks[$this->name]['expiresAt'];
+
+        if ($expiresAt && ! $expiresAt->isFuture()) {
+            return false;
+        }
+
         $seconds ??= $this->seconds;
 
         $this->store->locks[$this->name]['expiresAt'] = $seconds === 0 ? null : Carbon::now()->addSeconds($seconds);

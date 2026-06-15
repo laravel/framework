@@ -185,4 +185,28 @@ class RedisCacheLockTest extends TestCase
 
         $lock->release();
     }
+
+    public function testRedisLockRefreshWithNoExpirationDoesNotReleaseLock()
+    {
+        Cache::store('redis')->lock('foo')->forceRelease();
+
+        $lock = Cache::store('redis')->lock('foo');
+        $this->assertTrue($lock->get());
+        $this->assertTrue($lock->refresh());
+        $this->assertFalse(Cache::store('redis')->lock('foo')->get());
+
+        $lock->release();
+    }
+
+    public function testRedisLockRefreshWithZeroSecondsRemovesExpirationWithoutReleasingLock()
+    {
+        Cache::store('redis')->lock('foo')->forceRelease();
+
+        $lock = Cache::store('redis')->lock('foo', 10);
+        $this->assertTrue($lock->get());
+        $this->assertTrue($lock->refresh(0));
+        $this->assertFalse(Cache::store('redis')->lock('foo')->get());
+
+        $lock->release();
+    }
 }

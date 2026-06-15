@@ -107,6 +107,16 @@ class DatabaseLockTest extends DatabaseTestCase
         $firstLock->release();
     }
 
+    public function testExpiredLockCannotBeRefreshedByPreviousOwner()
+    {
+        $lock = Cache::driver('database')->lock('foo', 10);
+        $this->assertTrue($lock->get());
+
+        DB::table('cache_locks')->update(['expiration' => now()->subDay()->getTimestamp()]);
+
+        $this->assertFalse($lock->refresh(20));
+    }
+
     #[TestWith(['Deadlock found when trying to get lock', 1213, true])]
     #[TestWith(['Table does not exist', 1146, false])]
     public function testIgnoresConcurrencyException(string $message, int $code, bool $hasConcurrenyError)
