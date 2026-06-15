@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
+use RuntimeException;
 
 class Queue implements QueueContract, ClearableQueue
 {
@@ -204,29 +205,34 @@ class Queue implements QueueContract, ClearableQueue
     {
         $this->finishProcessingJob();
 
-        $response = $this->agentRequest()
-            // Outlast the agent's ~55s poll cycle so a 204 is a deliberate
-            // "nothing yet", never our own timeout cutting a poll short.
-            ->timeout(65)
-            ->get('/next');
+        $data = $this->popFromAgent();
 
-        $data = $response->status() === 204 ? null : $response->json();
-
-        $job = is_array($data) && ! empty($data['messageId'])
+        $job = is_array($data) && ! empty($messageId = $data['messageId'] ?? null)
             ? new CloudJob(
                 $this->queue->getContainer(),
                 $this->queue->getSqs(),
                 [
-                    'MessageId' => $data['messageId'],
+                    'MessageId' => $messageId,
                     'ReceiptHandle' => $data['receiptHandle'] ?? null,
                     'Body' => $data['body'] ?? '',
-                    'Attributes' => ($data['attributes'] ?? []) + ['ApproximateReceiveCount' => '1'],
+                    // Coerce a malformed (non-array) "attributes" to [] so a bad
+                    // agent response can't blow up the array union, and default
+                    // the receive count only when the agent omits it (the agent
+                    // owns redelivery, so it must supply the real count for
+                    // max-attempts enforcement to work across retries).
+                    'Attributes' => array_merge(
+                        ['ApproximateReceiveCount' => '1'],
+                        is_array($attributes = $data['attributes'] ?? null) ? $attributes : [],
+                    ),
                 ],
                 $this->queue->getConnectionName(),
                 // The agent reports the real SQS queue URL the dispatcher received
                 // from; delete / release go back to that queue, not our default.
                 $data['queueUrl'] ?? $this->queue->getQueue($queue),
-                fn (string $status, ?int $delay) => $this->reportResultToAgent($data['messageId'], $status, $delay),
+                // Capture only the message id so the closure doesn't pin the
+                // whole agent response (including the body) for the job's life.
+                fn (string $status, ?int $delay) => $this->reportResultToAgent($messageId, $status, $delay),
+                $this->queue->getOverflowStorage(),
             )
             : null;
 
@@ -236,18 +242,59 @@ class Queue implements QueueContract, ClearableQueue
     }
 
     /**
+     * Long-poll the agent's runtime socket (GET /next) for the next job.
+     *
+     * Returns the decoded message payload, or null when the agent has nothing
+     * (HTTP 204), is unreachable, or returns an unexpected status — in which
+     * case the worker simply idles and re-polls. Transport and unexpected-status
+     * errors are reported rather than swallowed so an agent fault is visible
+     * instead of looking like an empty queue.
+     */
+    protected function popFromAgent(): ?array
+    {
+        $response = rescue(fn () => $this->agentRequest()
+            // Outlast the agent's ~55s poll cycle so a 204 is a deliberate
+            // "nothing yet", never our own timeout cutting a poll short.
+            ->timeout(65)
+            ->get('/next'));
+
+        if (is_null($response) || $response->status() === 204) {
+            return null;
+        }
+
+        if ($response->failed()) {
+            report(new RuntimeException(
+                "The Laravel Cloud agent returned HTTP {$response->status()} from GET /next."
+            ));
+
+            return null;
+        }
+
+        return is_array($data = $response->json()) ? $data : null;
+    }
+
+    /**
      * Report a job's terminal outcome back to the agent (POST /result) so it
      * can stop heartbeating the message and accept the next invoke. The poller
      * performs the SQS operation; on a release the delay (in whole seconds)
      * tells it the visibility to reset the message to.
+     *
+     * Reporting is retried for transient socket hiccups and, if it ultimately
+     * fails, the error is reported but never re-thrown — a failed report must
+     * not be misattributed to the (already-completed) job by the worker, nor
+     * stop the worker.
      */
     protected function reportResultToAgent(string $messageId, string $status, ?int $delay = null): void
     {
-        $this->agentRequest()->timeout(10)->post('/result', array_filter([
-            'messageId' => $messageId,
-            'status' => $status,
-            'delay' => $delay,
-        ], fn ($value) => $value !== null));
+        rescue(fn () => $this->agentRequest()
+            ->timeout(10)
+            ->throw()
+            ->retry(3, 100)
+            ->post('/result', array_filter([
+                'messageId' => $messageId,
+                'status' => $status,
+                'delay' => $delay,
+            ], fn ($value) => $value !== null)));
     }
 
     /**
@@ -347,17 +394,27 @@ class Queue implements QueueContract, ClearableQueue
 
         $timestamp ??= CarbonImmutable::now('UTC');
 
+        $type = match (true) {
+            $this->processingJob->hasFailed() => 'failed',
+            $this->processingJob->isReleased() => 'released',
+            default => $default,
+        };
+
         $this->events->emit([
             '_cloud_event' => 'queue',
             'timestamp' => $timestamp->toDateTimeString('microsecond'),
-            'type' => match (true) {
-                $this->processingJob->hasFailed() => 'failed',
-                $this->processingJob->isReleased() => 'released',
-                default => $default,
-            },
+            'type' => $type,
             'queue' => $this->processingQueue,
             'duration_ms' => (int) $this->processingJobStartedAt->diffInMilliseconds($timestamp),
         ]);
+
+        // Make sure the agent learns the outcome even when the worker is torn
+        // down mid-job (timeout, fatal error) and the normal delete()/release()
+        // reporting never ran. This is a no-op once the job has reported, so the
+        // common path adds no extra request.
+        if ($this->processingJob instanceof CloudJob) {
+            $this->processingJob->reportToAgent($type === 'released' ? 'released' : 'processed');
+        }
 
         $this->processingQueue
             = $this->processingJob

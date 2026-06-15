@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Cloud;
 
 use Aws\Sqs\SqsClient;
 use Illuminate\Container\Container;
-use Illuminate\Queue\Jobs\Job;
 use Illuminate\Queue\Jobs\SqsJob;
 
 /**
@@ -13,19 +12,22 @@ use Illuminate\Queue\Jobs\SqsJob;
  *
  * This pod never mutates SQS itself: the poller owns every terminal SQS op
  * (delete on success or terminal failure, visibility reset on release) so it
- * can batch them across messages. Delete and release therefore only flag the
- * job's local state for the worker loop — bypassing the SqsJob calls that
- * would hit SQS — and report the outcome (with the requested release delay)
- * back to the agent via POST /result, which the poller acts on.
+ * can batch them across messages. We therefore override only SqsJob's two
+ * SQS-touching seams (delete/change-visibility) to no-ops — inheriting all of
+ * its other bookkeeping, such as overflow-payload cache cleanup — and report
+ * the outcome (with the requested release delay) back to the agent via
+ * POST /result, which the poller acts on.
  */
 class CloudJob extends SqsJob
 {
     /**
-     * Whether the outcome has already been reported to the agent. A job may
-     * reach more than one terminal call (e.g. it releases itself and then
-     * throws); this guard ensures only the first outcome is POSTed.
+     * The agent status already reported for this job, if any.
+     *
+     * A "processed" (delete) outcome is terminal and supersedes a prior
+     * "released" — e.g. a job that releases itself and then fails — so the
+     * agent always ends on the job's final outcome rather than the first one.
      */
-    protected bool $reported = false;
+    protected ?string $reportedStatus = null;
 
     /**
      * Create a new job instance.
@@ -34,6 +36,7 @@ class CloudJob extends SqsJob
      * @param  string  $connectionName
      * @param  string  $queue
      * @param  callable(string, int|null): void  $reporter
+     * @param  array  $overflowStorage
      */
     public function __construct(
         Container $container,
@@ -42,8 +45,9 @@ class CloudJob extends SqsJob
         $connectionName,
         $queue,
         protected $reporter,
+        array $overflowStorage = [],
     ) {
-        parent::__construct($container, $sqs, $job, $connectionName, $queue);
+        parent::__construct($container, $sqs, $job, $connectionName, $queue, $overflowStorage);
     }
 
     /**
@@ -53,10 +57,11 @@ class CloudJob extends SqsJob
      */
     public function delete()
     {
-        // Flag the job deleted for queue:work without the SqsJob::delete()
-        // DeleteMessage call — the poller owns the actual SQS delete. We skip
-        // straight to Job::delete() so SqsJob's SQS mutation never runs.
-        Job::delete();
+        // Runs Job::delete() (flagging the job for queue:work) and SqsJob's
+        // non-SQS bookkeeping (overflow cache cleanup), while our overridden
+        // deleteMessageFromSqs() no-op leaves the actual SQS delete to the
+        // poller.
+        parent::delete();
 
         // SqsJob::delete() always deletes the message, and the base fail()
         // routes a terminally-failed job (already recorded in failed_jobs)
@@ -74,27 +79,63 @@ class CloudJob extends SqsJob
      */
     public function release($delay = 0)
     {
-        // Flag the job released for queue:work without the SqsJob::release()
-        // ChangeMessageVisibility call — the poller resets visibility to the
-        // reported delay. We skip straight to Job::release() to avoid SQS.
-        Job::release($delay);
+        // Runs Job::release() (flagging the job for queue:work) while our
+        // overridden changeMessageVisibilityInSqs() no-op leaves the visibility
+        // reset to the poller, which uses the reported delay.
+        parent::release($delay);
 
         $this->report('released', delay: $delay);
     }
 
     /**
-     * Report the job's terminal outcome back to the agent, at most once. The
-     * release delay (in seconds) is forwarded only for the "released" status so
-     * the poller can reset the message's visibility to it.
+     * The poller owns the SQS DeleteMessage so it can batch deletes.
+     *
+     * @return void
+     */
+    protected function deleteMessageFromSqs()
+    {
+        //
+    }
+
+    /**
+     * The poller owns the SQS ChangeMessageVisibility for releases.
+     *
+     * @param  int  $delay
+     * @return void
+     */
+    protected function changeMessageVisibilityInSqs($delay)
+    {
+        //
+    }
+
+    /**
+     * Ensure an outcome has been reported to the agent.
+     *
+     * Used when the worker is torn down mid-job (timeout, fatal error) and the
+     * normal delete()/release() reporting never ran. A no-op once an outcome
+     * has already been reported.
+     */
+    public function reportToAgent(string $status, ?int $delay = null): void
+    {
+        $this->report($status, $delay);
+    }
+
+    /**
+     * Report the job's outcome back to the agent.
+     *
+     * Each distinct outcome is reported once, and a terminal "processed"
+     * supersedes a prior "released". The release delay (in seconds) is
+     * forwarded only for the "released" status so the poller can reset the
+     * message's visibility to it.
      */
     protected function report(string $status, ?int $delay = null): void
     {
-        if ($this->reported) {
+        if ($this->reportedStatus === $status || $this->reportedStatus === 'processed') {
             return;
         }
 
-        $this->reported = true;
-
         ($this->reporter)($status, $delay);
+
+        $this->reportedStatus = $status;
     }
 }

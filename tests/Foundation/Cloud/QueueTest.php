@@ -27,6 +27,7 @@ use Illuminate\Queue\SqsQueue;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerStopReason;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -448,6 +449,150 @@ class QueueTest extends TestCase
         $this->assertTrue($job->isReleased());
         $this->assertAgentResults([
             ['messageId' => $pushed['messageId'], 'status' => 'released', 'delay' => 30],
+        ]);
+    }
+
+    public function testPopBuildsTheJobWithTheCloudConnectionName()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $agent->pushJob();
+
+        $this->assertSame('cloud', $queue->pop()->getConnectionName());
+    }
+
+    public function testPopUsesTheReceiveCountSuppliedByTheAgent()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $agent->pushJob(['attributes' => ['ApproximateReceiveCount' => '5']]);
+
+        $this->assertSame(5, $queue->pop()->attempts());
+    }
+
+    public function testPopDefaultsTheReceiveCountWhenTheAgentOmitsIt()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $agent->pushJob();
+
+        $this->assertSame(1, $queue->pop()->attempts());
+    }
+
+    public function testPopToleratesMalformedAttributesFromTheAgent()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $agent->pushJob(['attributes' => 'not-an-array']);
+
+        $job = $queue->pop();
+
+        $this->assertInstanceOf(CloudJob::class, $job);
+        $this->assertSame(1, $job->attempts());
+    }
+
+    public function testPopResolvesOverflowPayloadsThroughTheCacheAndCleansUpOnDelete()
+    {
+        $this->fakeEvents();
+        config(['queue.connections.cloud.connection.overflow' => [
+            'enabled' => true,
+            'store' => 'array',
+            'delete_after_processing' => true,
+        ]]);
+        [$queue, $agent] = $this->fakeQueue();
+
+        $payload = json_encode(['job' => MyJob::class, 'data' => ['resolved' => true]]);
+        Cache::store('array')->put('overflow-pointer', $payload);
+
+        $agent->pushJob(['body' => json_encode(['@pointer' => 'overflow-pointer'])]);
+
+        $job = $queue->pop();
+
+        // The overflow-offloaded payload is resolved from the cache rather than
+        // the raw "@pointer" body...
+        $this->assertSame($payload, $job->getRawBody());
+
+        // ...and deleting the job still cleans up the cached payload, even though
+        // the SQS delete itself is left to the poller.
+        $job->delete();
+
+        $this->assertNull(Cache::store('array')->get('overflow-pointer'));
+    }
+
+    public function testPopReturnsNullWhenTheAgentReturnsAnError()
+    {
+        $this->fakeEvents();
+        [$queue] = $this->fakeQueue();
+
+        Http::fake(['*/next' => Http::response('error', 500)]);
+
+        $this->assertNull($queue->pop());
+    }
+
+    public function testProcessedSupersedesReleasedWhenAJobReleasesThenFails()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $pushed = $agent->pushJob();
+
+        $job = $queue->pop();
+        $job->release(30);
+        $job->fail(new RuntimeException('Whoops!'));
+
+        // A terminal "processed" (the fail routes through delete) supersedes the
+        // earlier self-release so the agent ends on the job's final outcome and
+        // does not redeliver a job already recorded in failed_jobs.
+        $this->assertAgentResults([
+            ['messageId' => $pushed['messageId'], 'status' => 'released', 'delay' => 30],
+            ['messageId' => $pushed['messageId'], 'status' => 'processed'],
+        ]);
+    }
+
+    public function testReportingToTheAgentIsResilientWhenItRejectsTheResult()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $agent->pushJob();
+        $agent->resultStatus = 500;
+
+        $job = $queue->pop();
+
+        // A failing /result is retried and ultimately swallowed (reported, not
+        // re-thrown) so it is never misattributed to the completed job.
+        $job->delete();
+
+        $this->assertTrue($job->isDeleted());
+    }
+
+    public function testFinishingAnUnreportedJobReleasesItToTheAgent()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $pushed = $agent->pushJob();
+
+        // Pop a job but never delete/release it, mimicking a worker torn down
+        // mid-job (timeout / fatal error); finishProcessingJob must still tell
+        // the agent so the message isn't stranded in-flight.
+        $queue->pop();
+        $queue->finishProcessingJob(default: 'released');
+
+        $this->assertAgentResults([
+            ['messageId' => $pushed['messageId'], 'status' => 'released'],
+        ]);
+    }
+
+    public function testFinishingAReportedJobDoesNotReportToTheAgentAgain()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $pushed = $agent->pushJob();
+
+        $job = $queue->pop();
+        $job->delete();
+        $queue->finishProcessingJob();
+
+        $this->assertAgentResults([
+            ['messageId' => $pushed['messageId'], 'status' => 'processed'],
         ]);
     }
 
@@ -1135,6 +1280,16 @@ class QueueTest extends TestCase
                 return $this->sqs;
             }
 
+            public function getConnectionName()
+            {
+                return 'cloud';
+            }
+
+            public function getOverflowStorage()
+            {
+                return config('queue.connections.cloud.connection.overflow') ?? [];
+            }
+
             public function setConfig(array $config)
             {
                 return $this;
@@ -1177,6 +1332,8 @@ class QueueTest extends TestCase
         {
             public array $jobs = [];
 
+            public int $resultStatus = 200;
+
             public function pushJob(array $job = []): array
             {
                 $job = array_merge([
@@ -1201,7 +1358,7 @@ class QueueTest extends TestCase
             }
 
             if (str_ends_with($request->url(), '/result')) {
-                return Http::response('', 200);
+                return Http::response('', $agent->resultStatus);
             }
 
             return Http::response('', 404);

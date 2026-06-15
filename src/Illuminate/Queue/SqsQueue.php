@@ -503,4 +503,14 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     {
         return $this->sqs;
     }
+
+    /**
+     * Get the overflow storage configuration for large payload offloading.
+     *
+     * @return array
+     */
+    public function getOverflowStorage()
+    {
+        return $this->overflowStorage;
+    }
 }
