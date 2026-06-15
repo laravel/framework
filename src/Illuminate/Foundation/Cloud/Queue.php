@@ -207,23 +207,18 @@ class Queue implements QueueContract, ClearableQueue
 
         $data = $this->popFromAgent();
 
-        $job = is_array($data) && ! empty($messageId = $data['messageId'] ?? null)
+        $job = is_array($data) && is_string($messageId = $data['messageId'] ?? null) && $messageId !== ''
             ? new CloudJob(
                 $this->queue->getContainer(),
                 $this->queue->getSqs(),
                 [
                     'MessageId' => $messageId,
                     'ReceiptHandle' => $data['receiptHandle'] ?? null,
-                    'Body' => $data['body'] ?? '',
-                    // Coerce a malformed (non-array) "attributes" to [] so a bad
-                    // agent response can't blow up the array union, and default
-                    // the receive count only when the agent omits it (the agent
-                    // owns redelivery, so it must supply the real count for
-                    // max-attempts enforcement to work across retries).
-                    'Attributes' => array_merge(
-                        ['ApproximateReceiveCount' => '1'],
-                        is_array($attributes = $data['attributes'] ?? null) ? $attributes : [],
-                    ),
+                    // Coerce a non-string body to '' so a malformed agent
+                    // response degrades to an empty payload rather than blowing
+                    // up json_decode() in payload().
+                    'Body' => is_string($body = $data['body'] ?? null) ? $body : '',
+                    'Attributes' => $this->normalizeAgentAttributes($data['attributes'] ?? null),
                 ],
                 $this->queue->getConnectionName(),
                 // The agent reports the real SQS queue URL the dispatcher received
@@ -231,7 +226,7 @@ class Queue implements QueueContract, ClearableQueue
                 $data['queueUrl'] ?? $this->queue->getQueue($queue),
                 // Capture only the message id so the closure doesn't pin the
                 // whole agent response (including the body) for the job's life.
-                fn (string $status, ?int $delay) => $this->reportResultToAgent($messageId, $status, $delay),
+                fn (string $status, ?int $delay): bool => $this->reportResultToAgent($messageId, $status, $delay),
                 $this->queue->getOverflowStorage(),
             )
             : null;
@@ -270,7 +265,36 @@ class Queue implements QueueContract, ClearableQueue
             return null;
         }
 
-        return is_array($data = $response->json()) ? $data : null;
+        if (! is_array($data = $response->json())) {
+            // A 200 with a body we can't decode into a message is an agent
+            // fault, not an empty queue — report it rather than idling silently.
+            report(new RuntimeException(
+                'The Laravel Cloud agent returned a non-array body from GET /next.'
+            ));
+
+            return null;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Normalize the message attributes supplied by the agent.
+     *
+     * A malformed (non-array) "attributes" is coerced to []. The agent owns
+     * redelivery and must supply the receive count, but we default it to 1 when
+     * it is missing or not a positive integer so a bad value can't disable
+     * max-attempts enforcement by making attempts() zero.
+     */
+    protected function normalizeAgentAttributes($attributes): array
+    {
+        $attributes = is_array($attributes) ? $attributes : [];
+
+        $attributes['ApproximateReceiveCount'] = (string) max(
+            1, (int) ($attributes['ApproximateReceiveCount'] ?? 1)
+        );
+
+        return $attributes;
     }
 
     /**
@@ -282,19 +306,24 @@ class Queue implements QueueContract, ClearableQueue
      * Reporting is retried for transient socket hiccups and, if it ultimately
      * fails, the error is reported but never re-thrown — a failed report must
      * not be misattributed to the (already-completed) job by the worker, nor
-     * stop the worker.
+     * stop the worker. Returns whether the agent accepted the report so the
+     * caller can keep retrying (and defer dependent cleanup) when it did not.
      */
-    protected function reportResultToAgent(string $messageId, string $status, ?int $delay = null): void
+    protected function reportResultToAgent(string $messageId, string $status, ?int $delay = null): bool
     {
-        rescue(fn () => $this->agentRequest()
-            ->timeout(10)
-            ->throw()
-            ->retry(3, 100)
-            ->post('/result', array_filter([
-                'messageId' => $messageId,
-                'status' => $status,
-                'delay' => $delay,
-            ], fn ($value) => $value !== null)));
+        return rescue(function () use ($messageId, $status, $delay) {
+            $this->agentRequest()
+                ->timeout(10)
+                ->throw()
+                ->retry(3, 100)
+                ->post('/result', array_filter([
+                    'messageId' => $messageId,
+                    'status' => $status,
+                    'delay' => $delay,
+                ], fn ($value) => $value !== null));
+
+            return true;
+        }, false);
     }
 
     /**

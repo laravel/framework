@@ -12,11 +12,16 @@ use Illuminate\Queue\Jobs\SqsJob;
  *
  * This pod never mutates SQS itself: the poller owns every terminal SQS op
  * (delete on success or terminal failure, visibility reset on release) so it
- * can batch them across messages. We therefore override only SqsJob's two
- * SQS-touching seams (delete/change-visibility) to no-ops — inheriting all of
- * its other bookkeeping, such as overflow-payload cache cleanup — and report
- * the outcome (with the requested release delay) back to the agent via
- * POST /result, which the poller acts on.
+ * can batch them across messages. We therefore override SqsJob's two
+ * SQS-touching seams (delete/change-visibility) to no-ops and report the
+ * outcome (with the requested release delay) back to the agent via POST
+ * /result, which the poller acts on.
+ *
+ * Overflow-payload cache cleanup is deferred too: because the real SQS delete
+ * is owned by the poller and only happens once the agent accepts a "processed"
+ * report, we must keep the offloaded payload until then — a failed report can
+ * mean the message is redelivered, and the redelivered job must still resolve
+ * its payload from the cache.
  */
 class CloudJob extends SqsJob
 {
@@ -35,7 +40,7 @@ class CloudJob extends SqsJob
      * @param  array  $job
      * @param  string  $connectionName
      * @param  string  $queue
-     * @param  callable(string, int|null): void  $reporter
+     * @param  callable(string, int|null): bool  $reporter
      * @param  array  $overflowStorage
      */
     public function __construct(
@@ -57,10 +62,10 @@ class CloudJob extends SqsJob
      */
     public function delete()
     {
-        // Runs Job::delete() (flagging the job for queue:work) and SqsJob's
-        // non-SQS bookkeeping (overflow cache cleanup), while our overridden
-        // deleteMessageFromSqs() no-op leaves the actual SQS delete to the
-        // poller.
+        // Runs Job::delete() (flagging the job for queue:work), while our
+        // overridden deleteMessageFromSqs() and deleteOverflowPayload() no-ops
+        // leave the actual SQS delete and the overflow cache cleanup to run
+        // only after the agent has accepted the outcome (below).
         parent::delete();
 
         // SqsJob::delete() always deletes the message, and the base fail()
@@ -68,7 +73,13 @@ class CloudJob extends SqsJob
         // through delete() too — so a delete always means "remove from SQS".
         // We report "processed" in both cases to mirror that. The poller's
         // "failed" status is reserved for dispatches that never cleanly ack.
-        $this->report('processed');
+        //
+        // Only purge the offloaded overflow payload once the agent has accepted
+        // the report: a failed report means the message may be redelivered, and
+        // the redelivered job must still resolve its payload from the cache.
+        if ($this->report('processed')) {
+            parent::deleteOverflowPayload();
+        }
     }
 
     /**
@@ -109,6 +120,20 @@ class CloudJob extends SqsJob
     }
 
     /**
+     * The overflow payload is purged only after the agent accepts the outcome.
+     *
+     * delete() calls parent::deleteOverflowPayload() once the "processed"
+     * report has been accepted; suppressing the eager cleanup here keeps the
+     * payload resolvable if that report fails and the message is redelivered.
+     *
+     * @return void
+     */
+    protected function deleteOverflowPayload()
+    {
+        //
+    }
+
+    /**
      * Ensure an outcome has been reported to the agent.
      *
      * Used when the worker is torn down mid-job (timeout, fatal error) and the
@@ -127,15 +152,24 @@ class CloudJob extends SqsJob
      * supersedes a prior "released". The release delay (in seconds) is
      * forwarded only for the "released" status so the poller can reset the
      * message's visibility to it.
+     *
+     * Returns whether the agent now holds the outcome. The status is only
+     * remembered once the reporter confirms delivery, so a report that failed
+     * to reach the agent is retried by the finishProcessingJob() safety net
+     * rather than being silently treated as delivered.
      */
-    protected function report(string $status, ?int $delay = null): void
+    protected function report(string $status, ?int $delay = null): bool
     {
         if ($this->reportedStatus === $status || $this->reportedStatus === 'processed') {
-            return;
+            return true;
         }
 
-        ($this->reporter)($status, $delay);
+        if (! ($this->reporter)($status, $delay)) {
+            return false;
+        }
 
         $this->reportedStatus = $status;
+
+        return true;
     }
 }

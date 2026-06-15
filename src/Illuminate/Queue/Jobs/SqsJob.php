@@ -96,10 +96,7 @@ class SqsJob extends Job implements JobContract
 
         $this->deleteMessageFromSqs();
 
-        if (Arr::get($this->overflowStorage, 'delete_after_processing') &&
-            $pointer = $this->overflowPointer()) {
-            $this->overflowStore()->forget($pointer);
-        }
+        $this->deleteOverflowPayload();
     }
 
     /**
@@ -112,6 +109,19 @@ class SqsJob extends Job implements JobContract
         $this->sqs->deleteMessage([
             'QueueUrl' => $this->queue, 'ReceiptHandle' => $this->job['ReceiptHandle'],
         ]);
+    }
+
+    /**
+     * Forget the offloaded overflow payload from the cache, if any.
+     *
+     * @return void
+     */
+    protected function deleteOverflowPayload()
+    {
+        if (Arr::get($this->overflowStorage, 'delete_after_processing') &&
+            $pointer = $this->overflowPointer()) {
+            $this->overflowStore()->forget($pointer);
+        }
     }
 
     /**

@@ -491,6 +491,39 @@ class QueueTest extends TestCase
         $this->assertSame(1, $job->attempts());
     }
 
+    public function testPopDefaultsTheReceiveCountWhenTheAgentSuppliesAFalsyValue()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        // A null/0 receive count must not override the default down to 0, which
+        // would make attempts() zero and disable max-attempts enforcement.
+        $agent->pushJob(['attributes' => ['ApproximateReceiveCount' => null]]);
+
+        $this->assertSame(1, $queue->pop()->attempts());
+    }
+
+    public function testPopToleratesANonStringBodyFromTheAgent()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $agent->pushJob(['body' => ['not' => 'a-string']]);
+
+        $job = $queue->pop();
+
+        $this->assertInstanceOf(CloudJob::class, $job);
+        $this->assertSame('', $job->getRawBody());
+    }
+
+    public function testPopAcceptsAFalsyButValidMessageId()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        // "0" is a valid, non-empty id that empty() would wrongly reject.
+        $agent->pushJob(['messageId' => '0']);
+
+        $this->assertSame('0', $queue->pop()->getJobId());
+    }
+
     public function testPopResolvesOverflowPayloadsThroughTheCacheAndCleansUpOnDelete()
     {
         $this->fakeEvents();
@@ -519,12 +552,56 @@ class QueueTest extends TestCase
         $this->assertNull(Cache::store('array')->get('overflow-pointer'));
     }
 
+    public function testOverflowPayloadIsRetainedWhenTheProcessedReportFails()
+    {
+        $this->fakeEvents();
+        config(['queue.connections.cloud.connection.overflow' => [
+            'enabled' => true,
+            'store' => 'array',
+            'delete_after_processing' => true,
+        ]]);
+        [$queue, $agent] = $this->fakeQueue();
+
+        // The agent rejects POST /result, so the poller never deletes the SQS
+        // message and it may be redelivered.
+        $agent->resultStatus = 500;
+
+        $payload = json_encode(['job' => MyJob::class, 'data' => ['resolved' => true]]);
+        Cache::store('array')->put('overflow-pointer', $payload);
+
+        $agent->pushJob(['body' => json_encode(['@pointer' => 'overflow-pointer'])]);
+
+        $job = $queue->pop();
+        $job->delete();
+
+        // Because the outcome was not acknowledged, the offloaded payload must
+        // be retained so a redelivered job can still resolve it.
+        $this->assertTrue($job->isDeleted());
+        $this->assertSame($payload, Cache::store('array')->get('overflow-pointer'));
+    }
+
     public function testPopReturnsNullWhenTheAgentReturnsAnError()
     {
         $this->fakeEvents();
-        [$queue] = $this->fakeQueue();
+        [$queue, $agent] = $this->fakeQueue();
 
-        Http::fake(['*/next' => Http::response('error', 500)]);
+        // Drive the agent's own GET /next stub, so the failed() branch is
+        // actually exercised — a second Http::fake() for "*/next" would be
+        // shadowed by the agent closure (stubs resolve first-match) and the
+        // empty-queue 204 would make the assertion pass for the wrong reason.
+        $agent->nextResponse = Http::response('error', 500);
+
+        $this->assertNull($queue->pop());
+    }
+
+    public function testPopReturnsNullWhenTheAgentReturnsANonArrayBody()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+
+        // A 200 whose body decodes to a scalar (not a message array) is an agent
+        // fault; pop() must idle rather than build a bogus job.
+        $agent->nextResponse = Http::response('"not-an-array"', 200);
 
         $this->assertNull($queue->pop());
     }
@@ -562,6 +639,30 @@ class QueueTest extends TestCase
         $job->delete();
 
         $this->assertTrue($job->isDeleted());
+    }
+
+    public function testFinishingRetriesAnOutcomeThatNeverReachedTheAgent()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $agent->pushJob();
+
+        $job = $queue->pop();
+
+        // The delete's "processed" report never reaches the agent...
+        $agent->resultStatus = 500;
+        $job->delete();
+
+        $resultsBefore = Http::recorded(fn ($request) => str_ends_with($request->url(), '/result'))->count();
+
+        // ...so once the agent recovers, the teardown safety net must retry it
+        // rather than treating the lost report as already delivered.
+        $agent->resultStatus = 200;
+        $queue->finishProcessingJob();
+
+        $resultsAfter = Http::recorded(fn ($request) => str_ends_with($request->url(), '/result'))->count();
+
+        $this->assertGreaterThan($resultsBefore, $resultsAfter);
     }
 
     public function testFinishingAnUnreportedJobReleasesItToTheAgent()
@@ -1334,6 +1435,8 @@ class QueueTest extends TestCase
 
             public int $resultStatus = 200;
 
+            public $nextResponse = null;
+
             public function pushJob(array $job = []): array
             {
                 $job = array_merge([
@@ -1350,6 +1453,10 @@ class QueueTest extends TestCase
 
         Http::fake(function ($request) use ($agent) {
             if (str_ends_with($request->url(), '/next')) {
+                if ($agent->nextResponse !== null) {
+                    return $agent->nextResponse;
+                }
+
                 $job = array_shift($agent->jobs);
 
                 return $job === null
