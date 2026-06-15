@@ -8,6 +8,8 @@ use Illuminate\Foundation\DevCommands;
 use Illuminate\Support\NodePackageManager;
 use Symfony\Component\Console\Attribute\AsCommand;
 
+use function Termwind\terminal;
+
 #[AsCommand(name: 'dev')]
 class DevCommand extends Command
 {
@@ -48,6 +50,10 @@ class DevCommand extends Command
 
         $longestName = max(array_map(strlen(...), $names));
 
+        $columns = getenv('COLUMNS');
+
+        putenv('COLUMNS='.max(terminal()->width() - $longestName - 4, 1));
+
         $this->line('');
 
         foreach ($devCommands as $devCommand) {
@@ -76,6 +82,8 @@ class DevCommand extends Command
         }
 
         passthru($command, $exitCode);
+
+        $columns === false ? putenv('COLUMNS') : putenv("COLUMNS={$columns}");
 
         return $exitCode;
     }
