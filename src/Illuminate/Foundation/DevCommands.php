@@ -52,10 +52,14 @@ class DevCommands
      */
     public static function registerDefaults()
     {
-        self::artisan('serve --host=localhost', 'server');
-        self::artisan('queue:listen --tries=1 --timeout=0', 'queue');
-        self::artisan('pail --timeout=0', 'logs');
-        self::node('dev', 'vite');
+        foreach ([
+            'server' => 'php artisan serve --host=localhost',
+            'queue' => 'php artisan queue:listen --tries=1 --timeout=0',
+            'logs' => 'php artisan pail --timeout=0',
+            'vite' => self::getPackageManager()->getRunCommand('dev'),
+        ] as $name => $command) {
+            self::$commands[$name] = new DevCommand($command, $name);
+        }
     }
 
     /**
