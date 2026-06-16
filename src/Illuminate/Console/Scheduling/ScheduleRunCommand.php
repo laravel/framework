@@ -296,6 +296,10 @@ class ScheduleRunCommand extends Command
      */
     protected function isPaused()
     {
+        if (! Schedule::$pausable) {
+            return false;
+        }
+
         return $this->cache->get('illuminate:schedule:paused', false);
     }
 
@@ -306,6 +310,10 @@ class ScheduleRunCommand extends Command
      */
     protected function shouldInterrupt()
     {
+        if (! Schedule::$interruptible) {
+            return false;
+        }
+
         return $this->cache->get('illuminate:schedule:interrupt', false);
     }
 

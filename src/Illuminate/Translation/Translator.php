@@ -190,6 +190,44 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
+     * Get the specified string translation value.
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function string(string $key, array $replace = [], ?string $locale = null, bool $fallback = true): string
+    {
+        $value = $this->get($key, $replace, $locale, $fallback);
+
+        if (! is_string($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Translation value for key [%s] must be a string, %s given.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the specified array translation value.
+     *
+     * @return array<array-key, mixed>
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function array(string $key, array $replace = [], ?string $locale = null, bool $fallback = true): array
+    {
+        $value = $this->get($key, $replace, $locale, $fallback);
+
+        if (! is_array($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Translation value for key [%s] must be an array, %s given.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
      * Get a translation according to an integer value.
      *
      * @param  string  $key
@@ -386,7 +424,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * Register a callback that is responsible for handling missing translation keys.
      *
      * @param  callable|null  $callback
-     * @return static
+     * @return $this
      */
     public function handleMissingKeysUsing(?callable $callback)
     {

@@ -85,6 +85,22 @@ class HttpResponseTest extends TestCase
         $this->assertSame('bar', $cookies[0]->getValue());
     }
 
+    public function testWithCookies()
+    {
+        $response = new Response;
+        $this->assertCount(0, $response->headers->getCookies());
+        $this->assertEquals($response, $response->withCookies([
+            new Cookie('foo', 'bar'),
+            new Cookie('baz', 'qux'),
+        ]));
+        $cookies = $response->headers->getCookies();
+        $this->assertCount(2, $cookies);
+        $this->assertSame('foo', $cookies[0]->getName());
+        $this->assertSame('bar', $cookies[0]->getValue());
+        $this->assertSame('baz', $cookies[1]->getName());
+        $this->assertSame('qux', $cookies[1]->getValue());
+    }
+
     public function testResponseCookiesInheritRequestSecureState()
     {
         $cookie = Cookie::create('foo', 'bar');

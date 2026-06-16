@@ -23,6 +23,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use SortDirection;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
 use UnexpectedValueException;
@@ -2042,13 +2043,7 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testSortWithCallback($collection)
     {
-        $data = (new $collection([5, 3, 1, 2, 4]))->sort(function ($a, $b) {
-            if ($a === $b) {
-                return 0;
-            }
-
-            return ($a < $b) ? -1 : 1;
-        });
+        $data = (new $collection([5, 3, 1, 2, 4]))->sort(fn ($a, $b) => $a <=> $b);
 
         $this->assertEquals(range(1, 5), array_values($data->all()));
     }
@@ -2062,6 +2057,16 @@ class SupportCollectionTest extends TestCase
         });
 
         $this->assertEquals(['dayle', 'taylor'], array_values($data->all()));
+
+        $data = new $collection(['dayle', 'taylor']);
+        $data = $data->sortBy(
+            function ($x) {
+                return $x;
+            },
+            SORT_REGULAR,
+            SortDirection::Descending);
+
+        $this->assertEquals(['taylor', 'dayle'], array_values($data->all()));
 
         $data = new $collection(['dayle', 'taylor']);
         $data = $data->sortByDesc(function ($x) {
@@ -2151,6 +2156,14 @@ class SupportCollectionTest extends TestCase
 
         rsort($expected);
         $data = $data->sortBy([['item', 'desc']]);
+        $this->assertEquals($data->pluck('item')->toArray(), $expected);
+
+        rsort($expected);
+        $data = $data->sortBy([['item', false]]);
+        $this->assertEquals($data->pluck('item')->toArray(), $expected);
+
+        rsort($expected);
+        $data = $data->sortBy([['item', SortDirection::Descending]]);
         $this->assertEquals($data->pluck('item')->toArray(), $expected);
 
         sort($expected, SORT_STRING);

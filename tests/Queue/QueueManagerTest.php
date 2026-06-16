@@ -125,6 +125,21 @@ class QueueManagerTest extends TestCase
         $manager->connection(QueueConnectionName::Sync);
         $this->assertTrue($manager->connected(QueueConnectionName::Sync));
     }
+
+    public function testSetDefaultDriverAcceptsBackedEnum()
+    {
+        $app = [
+            'config' => [
+                'queue.default' => 'sync',
+                'queue.connections.sync' => ['driver' => 'sync'],
+            ],
+        ];
+
+        $manager = new QueueManager($app);
+        $manager->setDefaultDriver(QueueConnectionName::Sync);
+
+        $this->assertSame('sync', $app['config']['queue.default']);
+    }
 }
 
 enum QueueConnectionName: string

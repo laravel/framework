@@ -58,9 +58,9 @@ class DatabaseFailedJobProvider implements CountableFailedJobProvider, FailedJob
 
         $exception = (string) mb_convert_encoding($exception, 'UTF-8');
 
-        return $this->getTable()->insertGetId(compact(
-            'connection', 'queue', 'payload', 'exception', 'failed_at'
-        ));
+        return $this->getTable()->insertGetId([
+            'connection' => $connection, 'queue' => $queue, 'payload' => $payload, 'exception' => $exception, 'failed_at' => $failed_at,
+        ]);
     }
 
     /**

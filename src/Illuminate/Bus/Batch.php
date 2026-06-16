@@ -137,7 +137,7 @@ class Batch implements Arrayable, JsonSerializable
     /**
      * Get a fresh instance of the batch represented by this ID.
      *
-     * @return self
+     * @return self|null
      */
     public function fresh()
     {
@@ -148,7 +148,7 @@ class Batch implements Arrayable, JsonSerializable
      * Add additional jobs to the batch.
      *
      * @param  \Illuminate\Support\Enumerable|object|array  $jobs
-     * @return self
+     * @return self|null
      */
     public function add($jobs)
     {

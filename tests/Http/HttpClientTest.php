@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Http;
 
 use Exception;
+use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException as GuzzleRequestException;
 use GuzzleHttp\Exception\TooManyRedirectsException;
@@ -39,6 +40,8 @@ use Illuminate\Support\Fluent;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
+use Illuminate\Support\Uri;
+use InvalidArgumentException;
 use JsonSerializable;
 use Mockery as m;
 use OutOfBoundsException;
@@ -49,6 +52,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
+use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
 use Throwable;
 
@@ -96,6 +100,49 @@ class HttpClientTest extends TestCase
         $this->assertFalse($response->created());
     }
 
+    public function testFakeResponseHeaderValuesAreSerialized()
+    {
+        $response = $this->factory::response('OK', 200, [
+            'X-Int' => 123,
+            'X-Null' => null,
+            'X-False' => false,
+            'X-Empty' => [],
+            'X-Laravel-Stringable' => new Stringable('laravel stringable'),
+            'X-Multiple' => ['first', 123, true, false, null],
+        ])->wait();
+
+        $this->assertSame(['123'], $response->getHeader('X-Int'));
+        $this->assertSame([''], $response->getHeader('X-Null'));
+        $this->assertSame([''], $response->getHeader('X-False'));
+        $this->assertSame([''], $response->getHeader('X-Empty'));
+        $this->assertSame(['laravel stringable'], $response->getHeader('X-Laravel-Stringable'));
+        $this->assertSame(['first', '123', '1', '', ''], $response->getHeader('X-Multiple'));
+    }
+
+    public function testFakeResponseHeaderValuesNormalizeNonFiniteFloats()
+    {
+        $response = $this->factory::response('OK', 200, [
+            'X-Nan' => NAN,
+            'X-Inf' => INF,
+            'X-Negative-Inf' => -INF,
+            'X-Multiple' => [NAN, INF, -INF],
+        ])->wait();
+
+        $this->assertSame(['NAN'], $response->getHeader('X-Nan'));
+        $this->assertSame(['INF'], $response->getHeader('X-Inf'));
+        $this->assertSame(['-INF'], $response->getHeader('X-Negative-Inf'));
+        $this->assertSame(['NAN', 'INF', '-INF'], $response->getHeader('X-Multiple'));
+    }
+
+    #[DataProvider('invalidFakeResponseHeaderValuesProvider')]
+    public function testInvalidFakeResponseHeaderValuesAreRejected($value)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('HTTP fake response header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.');
+
+        $this->factory::response('OK', 200, ['X-Test' => $value]);
+    }
+
     public function testStatusCodeShorthand()
     {
         $this->factory->fake([
@@ -108,22 +155,6 @@ class HttpClientTest extends TestCase
 
         $response = $this->factory->post('http://vapor.laravel.com');
         $this->assertTrue($response->created());
-    }
-
-    public function testStatusCodeShorthandAssumeBodyWhenInvalidHttpStatusCode()
-    {
-        $this->factory->fake([
-            'forge.laravel.com' => 999,
-            'vapor.laravel.com' => 1,
-        ]);
-
-        $response = $this->factory->post('http://forge.laravel.com');
-        $this->assertTrue($response->ok());
-        $this->assertSame('999', $response->body());
-
-        $response = $this->factory->post('http://vapor.laravel.com');
-        $this->assertTrue($response->ok());
-        $this->assertSame('1', $response->body());
     }
 
     public function testBodyShorthands()
@@ -585,6 +616,39 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testQueryParametersNormalizeNonFiniteFloats()
+    {
+        $this->factory->fake();
+
+        $this->factory->get('https://laravel.com/search', [
+            'nan' => NAN,
+            'inf' => INF,
+            'negative_inf' => -INF,
+            'nested' => ['value' => NAN],
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://laravel.com/search?nan=NAN&inf=INF&negative_inf=-INF&nested%5Bvalue%5D=NAN';
+        });
+    }
+
+    public function testFormParamsNormalizeNonFiniteFloats()
+    {
+        $this->factory->fake();
+
+        $this->factory->asForm()->post('http://foo.com/form', [
+            'nan' => NAN,
+            'inf' => INF,
+            'negative_inf' => -INF,
+            'nested' => ['value' => NAN],
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/form'
+                && $request->body() === 'nan=NAN&inf=INF&negative_inf=-INF&nested%5Bvalue%5D=NAN';
+        });
+    }
+
     #[DataProvider('methodsReceivingArrayableDataProvider')]
     public function testCanSendArrayableFormData(string $method)
     {
@@ -671,6 +735,65 @@ class HttpClientTest extends TestCase
                    $request->hasHeader('X-Test-Header', 'foo') &&
                    $request->hasHeader('X-Test-ArrayHeader', ['bar', 'baz']) &&
                    $request['name'] === 'Taylor';
+        });
+    }
+
+    public function testHeaderValuesAreSerialized()
+    {
+        $this->factory->fake();
+
+        $this->factory->withHeaders([
+            'X-Int' => 123,
+            'X-Float' => 1.5,
+            'X-Null' => null,
+            'X-True' => true,
+            'X-False' => false,
+            'X-Nan' => NAN,
+            'X-Inf' => INF,
+            'X-Negative-Inf' => -INF,
+            'X-Laravel-Stringable' => new Stringable('laravel stringable'),
+            'X-Multiple' => ['first', 123, true, false, null, NAN, INF, -INF],
+            'X-Empty' => [],
+        ])->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->hasHeader('X-Int', '123')
+                && $request->hasHeader('X-Float', '1.5')
+                && $request->hasHeader('X-Null', '')
+                && $request->hasHeader('X-True', '1')
+                && $request->hasHeader('X-False', '')
+                && $request->hasHeader('X-Nan', 'NAN')
+                && $request->hasHeader('X-Inf', 'INF')
+                && $request->hasHeader('X-Negative-Inf', '-INF')
+                && $request->hasHeader('X-Laravel-Stringable', 'laravel stringable')
+                && $request->hasHeader('X-Multiple', ['first', '123', '1', '', '', 'NAN', 'INF', '-INF'])
+                && $request->hasHeader('X-Empty', '');
+        });
+    }
+
+    #[DataProvider('invalidHeaderValuesProvider')]
+    public function testInvalidHeaderValuesAreRejected($value)
+    {
+        $this->factory->fake();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('HTTP header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.');
+
+        $this->factory->withHeaders(['X-Test' => $value])->post('http://foo.com/json');
+    }
+
+    public function testHeaderValuesProvidedThroughOptionsAreSerialized()
+    {
+        $this->factory->fake();
+
+        $this->factory->withOptions([
+            'headers' => ['X-Test' => 123, 'X-Null' => null, 'X-Nan' => NAN],
+        ])->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->hasHeader('X-Test', '123')
+                && $request->hasHeader('X-Null', '')
+                && $request->hasHeader('X-Nan', 'NAN');
         });
     }
 
@@ -795,6 +918,96 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testAttachPreservesEmptyContents()
+    {
+        $this->factory->fake();
+
+        $this->factory->attach('file')->post('http://foo.com/file');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/file'
+                && $request->isMultipart()
+                && $request[0]['name'] === 'file'
+                && array_key_exists('contents', $request[0])
+                && $request[0]['contents'] === '';
+        });
+    }
+
+    public function testAttachPreservesFalseyStringContentsAndName()
+    {
+        $this->factory->fake();
+
+        $this->factory->attach('0', '0')->post('http://foo.com/file');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/file'
+                && $request->isMultipart()
+                && $request[0]['name'] === '0'
+                && $request[0]['contents'] === '0';
+        });
+    }
+
+    public function testAttachHeaderValuesAreSerialized()
+    {
+        $this->factory->fake();
+
+        $this->factory->attach('file', 'data', 'file.txt', ['X-Part' => 123, 'X-Null' => null, 'X-Nan' => NAN])->post('http://foo.com/file');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request[0]['headers']['X-Part'] === '123'
+                && $request[0]['headers']['X-Null'] === ''
+                && $request[0]['headers']['X-Nan'] === 'NAN';
+        });
+    }
+
+    public function testMultipartHeaderValuesAreSerialized()
+    {
+        $this->factory->fake();
+
+        $this->factory->asMultipart()->post('http://foo.com/multipart', [
+            [
+                'name' => 'file',
+                'contents' => 'data',
+                'headers' => [
+                    'X-Part' => 123,
+                    'X-Null' => null,
+                    'X-Nan' => NAN,
+                    'X-Inf' => INF,
+                    'X-Negative-Inf' => -INF,
+                    'X-Empty' => [],
+                    'X-Laravel-Stringable' => new Stringable('laravel stringable'),
+                ],
+            ],
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request[0]['headers']['X-Part'] === '123'
+                && $request[0]['headers']['X-Null'] === ''
+                && $request[0]['headers']['X-Nan'] === 'NAN'
+                && $request[0]['headers']['X-Inf'] === 'INF'
+                && $request[0]['headers']['X-Negative-Inf'] === '-INF'
+                && $request[0]['headers']['X-Empty'] === ''
+                && $request[0]['headers']['X-Laravel-Stringable'] === 'laravel stringable';
+        });
+    }
+
+    #[DataProvider('invalidMultipartHeaderValuesProvider')]
+    public function testInvalidMultipartHeaderValuesAreRejected($value)
+    {
+        $this->factory->fake();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Multipart header values must be scalar, null, or Laravel Stringable.');
+
+        $this->factory->asMultipart()->post('http://foo.com/multipart', [
+            [
+                'name' => 'file',
+                'contents' => 'data',
+                'headers' => ['X-Part' => $value],
+            ],
+        ]);
+    }
+
     public function testCanSendMultipartDataWithSimplifiedParameters()
     {
         $this->factory->fake();
@@ -849,10 +1062,29 @@ class HttpClientTest extends TestCase
                 Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
                 $request[0]['name'] === 'name' &&
                 $request[0]['contents'] === 'Steve' &&
-                $request[1]['name'] === 'roles[]' &&
-                $request[1]['contents'] === 'Network Administrator' &&
-                $request[2]['name'] === 'roles[]' &&
-                $request[2]['contents'] === 'Janitor';
+                $request[1]['name'] === 'roles' &&
+                $request[1]['contents'] === ['Network Administrator', 'Janitor'];
+        });
+    }
+
+    public function testMultipartContentsNormalizeNonFiniteFloats()
+    {
+        $this->factory->fake();
+
+        $this->factory->asMultipart()->post('http://foo.com/multipart', [
+            'nan' => NAN,
+            'inf' => INF,
+            'negative_inf' => -INF,
+            'nested' => ['value' => NAN],
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/multipart'
+                && $request->isMultipart()
+                && $request[0]['contents'] === 'NAN'
+                && $request[1]['contents'] === 'INF'
+                && $request[2]['contents'] === '-INF'
+                && $request[3]['contents'] === ['value' => 'NAN'];
         });
     }
 
@@ -872,13 +1104,11 @@ class HttpClientTest extends TestCase
                 Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
                 $request[0]['name'] === 'name' &&
                 $request[0]['contents'] === 'Steve' &&
-                $request[1]['name'] === 'roles[]' &&
-                $request[1]['contents'] === 'Network Administrator' &&
-                $request[2]['name'] === 'roles[]' &&
-                $request[2]['contents'] === 'Janitor' &&
-                $request[3]['name'] === 'attachment' &&
-                $request[3]['contents'] === 'photo_content' &&
-                $request[3]['filename'] === 'photo.jpg';
+                $request[1]['name'] === 'roles' &&
+                $request[1]['contents'] === ['Network Administrator', 'Janitor'] &&
+                $request[2]['name'] === 'attachment' &&
+                $request[2]['contents'] === 'photo_content' &&
+                $request[2]['filename'] === 'photo.jpg';
         });
     }
 
@@ -1133,6 +1363,18 @@ class HttpClientTest extends TestCase
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'http://foo.com/get?foo=bar'
                 && $request['foo'] === 'bar';
+        });
+    }
+
+    public function testRequestUriMethod()
+    {
+        $this->factory->fake();
+
+        $this->factory->get('http://foo.com/get?foo=bar&page=1');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->uri() instanceof Uri
+                && (string) $request->uri() === 'http://foo.com/get?foo=bar&page=1';
         });
     }
 
@@ -1948,6 +2190,30 @@ class HttpClientTest extends TestCase
         $this->assertSame($client, $request->buildClient());
     }
 
+    public function testClientCanBeUsedExternally()
+    {
+        $this->factory->fake([
+            '200.com' => $this->factory::response('hello', 200),
+        ]);
+
+        $apiClient = new class($this->factory->buildClient())
+        {
+            public function __construct(
+                private GuzzleClient $client,
+            ) {
+            }
+
+            public function sendGetRequest()
+            {
+                return $this->client->sendRequest(new GuzzleRequest('GET', '200.com'));
+            }
+        };
+
+        $response = $apiClient->sendGetRequest();
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('hello', $response->getBody()->getContents());
+    }
+
     public function testRequestsCanReplaceOptions()
     {
         $request = new PendingRequest($this->factory);
@@ -2284,6 +2550,40 @@ class HttpClientTest extends TestCase
         $this->assertTrue($response->failed());
 
         $this->factory->assertSentCount(3);
+    }
+
+    public function testAsyncRequestRetriesWithBackoffArray()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response(['error'], 403),
+        ]);
+
+        $response = $this->factory
+            ->async()
+            ->retry([1, 2], throw: false)
+            ->get('http://foo.com/get')
+            ->wait();
+
+        $this->assertTrue($response->failed());
+
+        $this->factory->assertSentCount(3);
+    }
+
+    public function testAsyncRequestRetriesWithIntegerTries()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response(['error'], 403),
+        ]);
+
+        $response = $this->factory
+            ->async()
+            ->retry(2, 1000, null, false)
+            ->get('http://foo.com/get')
+            ->wait();
+
+        $this->assertTrue($response->failed());
+
+        $this->factory->assertSentCount(2);
     }
 
     public function testRequestExceptionIsNotThrownWithoutRetriesIfRetryNotNecessary()
@@ -2657,6 +2957,21 @@ class HttpClientTest extends TestCase
         $this->assertEqualsCanonicalizing(['code' => 'not_found'], $requestException->response->json());
         $this->assertEquals(404, $requestException->response->status());
         $this->assertEquals(199, $requestException->response->header('X-RateLimit-Remaining'));
+    }
+
+    public function testFailedRequestHeaderValuesNormalizeNonFiniteFloats()
+    {
+        $exception = $this->factory::failedRequest('error', 500, [
+            'X-Nan' => NAN,
+            'X-Inf' => INF,
+            'X-Negative-Inf' => -INF,
+        ]);
+
+        $this->assertSame('error', $exception->response->body());
+        $this->assertSame(500, $exception->response->status());
+        $this->assertSame('NAN', $exception->response->header('X-Nan'));
+        $this->assertSame('INF', $exception->response->header('X-Inf'));
+        $this->assertSame('-INF', $exception->response->header('X-Negative-Inf'));
     }
 
     public function testFakeConnectionException()
@@ -4352,6 +4667,37 @@ class HttpClientTest extends TestCase
         ];
     }
 
+    public static function invalidHeaderValuesProvider()
+    {
+        return [
+            'object' => [new stdClass],
+            'resource' => [fopen('php://temp', 'r')],
+            'array with object' => [['valid', new stdClass]],
+            'array with resource' => [['valid', fopen('php://temp', 'r')]],
+            'array with nested array' => [['valid', ['nested']]],
+        ];
+    }
+
+    public static function invalidMultipartHeaderValuesProvider()
+    {
+        return [
+            'array' => [['nested']],
+            'object' => [new stdClass],
+            'resource' => [fopen('php://temp', 'r')],
+        ];
+    }
+
+    public static function invalidFakeResponseHeaderValuesProvider()
+    {
+        return [
+            'object' => [new stdClass],
+            'resource' => [fopen('php://temp', 'r')],
+            'array with object' => [['valid', new stdClass]],
+            'array with resource' => [['valid', fopen('php://temp', 'r')]],
+            'array with nested array' => [['valid', ['nested']]],
+        ];
+    }
+
     public function testAfterResponse()
     {
         $this->factory->fake([
@@ -4468,6 +4814,63 @@ class HttpClientTest extends TestCase
         // Null flags means "use default", cached flags differ, so re-decode
         $response->json();
         $this->assertSame(3, $response->bodyCallCount);
+    }
+
+    public function testJsonDecodingIsCachedForFalsyPayloads()
+    {
+        $payloads = [
+            ['[]', []],
+            ['false', false],
+            ['0', 0],
+            ['null', null],
+            ['""', ''],
+        ];
+
+        foreach ($payloads as [$body, $expected]) {
+            $response = new BodyTrackingResponse(Factory::psr7Response($body));
+
+            // First call decodes and caches
+            $this->assertSame($expected, $response->json());
+            $this->assertSame(1, $response->bodyCallCount, "Failed for body: $body");
+
+            // Subsequent calls use cache (body() not called again)
+            $this->assertSame($expected, $response->json());
+            $this->assertSame(1, $response->bodyCallCount, "body() called again for falsy payload: $body");
+
+            // Third call to be sure
+            $this->assertSame($expected, $response->json());
+            $this->assertSame(1, $response->bodyCallCount, "body() called again for falsy payload: $body");
+        }
+    }
+
+    public function testJsonDecodingWithFalsyPayloadRespectsFlags()
+    {
+        $response = new BodyTrackingResponse(Factory::psr7Response('0'));
+
+        // First call decodes with default flags
+        $this->assertSame(0, $response->json());
+        $this->assertSame(1, $response->bodyCallCount);
+
+        // Different flags triggers re-decode
+        $response->json(flags: JSON_BIGINT_AS_STRING);
+        $this->assertSame(2, $response->bodyCallCount);
+
+        // Same flags uses cache
+        $response->json(flags: JSON_BIGINT_AS_STRING);
+        $this->assertSame(2, $response->bodyCallCount);
+    }
+
+    public function testJsonDecodingWithEmptyArrayRespectsKeyAccess()
+    {
+        $response = new BodyTrackingResponse(Factory::psr7Response('[]'));
+
+        // Accessing a key on an empty array returns default
+        $this->assertNull($response->json('missing'));
+        $this->assertSame('fallback', $response->json('missing', 'fallback'));
+
+        // body() should only be called once
+        $response->json();
+        $this->assertSame(1, $response->bodyCallCount);
     }
 }
 

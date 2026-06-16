@@ -129,8 +129,8 @@ class QueueManager implements FactoryContract, MonitorContract
      * Set the queue route for the given class.
      *
      * @param  array|class-string  $class
-     * @param  string|null  $queue
-     * @param  string|null  $connection
+     * @param  \UnitEnum|string|null  $queue
+     * @param  \UnitEnum|string|null  $connection
      * @return void
      */
     public function route(array|string $class, $queue = null, $connection = null)
@@ -285,6 +285,24 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Determine which of the given queues are currently paused.
+     *
+     * @param  string  $connection
+     * @param  array  $queues
+     * @return array
+     */
+    public function getPausedQueues($connection, $queues)
+    {
+        $keys = array_map(fn ($queue) => "illuminate:queue:paused:{$connection}:{$queue}", $queues);
+
+        $states = $this->app['cache']->store()->many($keys);
+
+        return array_values(array_filter(
+            $queues, fn ($queue) => $states["illuminate:queue:paused:{$connection}:{$queue}"] ?? false
+        ));
+    }
+
+    /**
      * Indicate that queue workers should not poll for restart or pause signals.
      *
      * This prevents the workers from hitting the application cache to determine if they need to pause or restart.
@@ -349,12 +367,12 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Set the name of the default queue connection.
      *
-     * @param  string  $name
+     * @param  \UnitEnum|string  $name
      * @return void
      */
     public function setDefaultDriver($name)
     {
-        $this->app['config']['queue.default'] = $name;
+        $this->app['config']['queue.default'] = enum_value($name);
     }
 
     /**

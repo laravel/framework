@@ -551,23 +551,23 @@ assertType('Illuminate\Support\LazyCollection<int, int>', $collection::make([1])
 assertType('Illuminate\Support\LazyCollection<int, int>', $collection::make([1])->union([1]));
 assertType('Illuminate\Support\LazyCollection<string, string>', $collection::make(['string' => 'string'])->union(['string' => 'string']));
 
-assertType('mixed', $collection::make()->min());
-assertType('mixed', $collection::make([1])->min());
+assertType('null', $collection::make()->min());
+assertType('int|null', $collection::make([1])->min());
 assertType('mixed', $collection::make([1])->min('string'));
-assertType('mixed', $collection::make([1])->min(function ($int) {
+assertType("'foo'|null", $collection::make([1])->min(function ($int) {
     assertType('int', $int);
 
-    return 1;
+    return 'foo';
 }));
 assertType('mixed', $collection::make([new User])->min('id'));
 
-assertType('mixed', $collection::make()->max());
-assertType('mixed', $collection::make([1])->max());
+assertType('null', $collection::make()->max());
+assertType('int|null', $collection::make([1])->max());
 assertType('mixed', $collection::make([1])->max('string'));
-assertType('mixed', $collection::make([1])->max(function ($int) {
+assertType("'foo'|null", $collection::make([1])->max(function ($int) {
     assertType('int', $int);
 
-    return 1;
+    return 'foo';
 }));
 assertType('mixed', $collection::make([new User])->max('id'));
 
@@ -597,20 +597,52 @@ assertType('Illuminate\Support\LazyCollection<int, int|string>', $collection::ma
 assertType('Illuminate\Support\LazyCollection<int, int>|int', $collection::make([1])->random(2));
 assertType('Illuminate\Support\LazyCollection<int, string>|string', $collection::make(['string'])->random());
 
-assertType('1', $collection
+assertType('1|null', $collection
     ->reduce(function ($null, $user) {
         assertType('User', $user);
         assertType('1|null', $null);
 
         return 1;
     }));
-assertType('1', $collection
+assertType('0|1', $collection
     ->reduce(function ($int, $user) {
         assertType('User', $user);
         assertType('0|1', $int);
 
         return 1;
     }, 0));
+assertType('0|1', $collection
+    ->reduce(function ($int, $user, $key) {
+        assertType('User', $user);
+        assertType('0|1', $int);
+        assertType('int', $key);
+
+        return 1;
+    }, 0));
+
+assertType('1|null', $collection
+    ->reduceWithKeys(function ($null, $user) {
+        assertType('User', $user);
+        assertType('1|null', $null);
+
+        return 1;
+    }));
+assertType('0|1', $collection
+    ->reduceWithKeys(function ($int, $user) {
+        assertType('User', $user);
+        assertType('0|1', $int);
+
+        return 1;
+    }, 0));
+assertType('0|1', $collection
+    ->reduceWithKeys(function ($int, $user, $key) {
+        assertType('User', $user);
+        assertType('0|1', $int);
+        assertType('int', $key);
+
+        return 1;
+    }, 0));
+assertType("'bar'|'foo'", $collection::make([])->reduce(static fn (): string => 'foo', 'bar'));
 
 assertType('Illuminate\Support\LazyCollection<int, int>', $collection::make([1])->replace([1]));
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->replace([new User]));
@@ -711,7 +743,8 @@ assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sortBy(f
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sortBy('string'));
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sortBy('string', 1, false));
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sortBy([
-    ['string', 'string'],
+    ['string', 'asc'],
+    ['foo', SortDirection::Descending],
 ]));
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sortBy([function ($user, $int) {
     // assertType('User', $user);
@@ -729,7 +762,8 @@ assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sortByDe
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sortByDesc('string'));
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sortByDesc('string', 1));
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sortByDesc([
-    ['string', 'string'],
+    ['string', 'asc'],
+    ['foo', SortDirection::Descending],
 ]));
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sortByDesc([function ($user, $int) {
     // assertType('User', $user);
@@ -748,7 +782,7 @@ assertType('mixed', $collection::make([1])->sum('string'));
 assertType('int<1, 2>', $collection::make(['string'])->sum(function ($string) {
     assertType('string', $string);
 
-    return rand(1, 2);
+    return mt_rand(1, 2);
 }));
 
 assertType('Illuminate\Support\LazyCollection<int, int>', $collection::make([1])->take(1));

@@ -131,9 +131,11 @@ interface ConnectionInterface
     /**
      * Execute a Closure within a transaction.
      *
-     * @param  \Closure  $callback
+     * @template TReturn
+     *
+     * @param  (\Closure(static): TReturn)  $callback
      * @param  int  $attempts
-     * @return mixed
+     * @return TReturn
      *
      * @throws \Throwable
      */

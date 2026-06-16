@@ -12,7 +12,7 @@ use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
-#[RequiresOperatingSystem('Linux|DAR')]
+#[RequiresOperatingSystem('Linux|Darwin')]
 class ConcurrencyTest extends TestCase
 {
     protected function setUp(): void
@@ -87,6 +87,26 @@ PHP);
         // $this->assertArrayHasKey('second', $forkOutput);
         // $this->assertEquals(2, $forkOutput['first']);
         // $this->assertEquals(4, $forkOutput['second']);
+    }
+
+    public function testProcessDriverRunMayUseCustomTimeout()
+    {
+        $factory = $this->app->make(ProcessFactory::class);
+
+        $factory->fake(fn () => $factory->result(json_encode([
+            'successful' => true,
+            'result' => serialize('result'),
+        ])));
+
+        $result = (new ProcessDriver($factory))->run([
+            fn () => 'result',
+        ], timeout: 120);
+
+        $this->assertSame(['result'], $result);
+
+        $factory->assertRan(function ($process) {
+            return $process->timeout === 120;
+        });
     }
 
     public function testDriverCanBeResolvedUsingBackedEnum()

@@ -96,7 +96,7 @@ class Number
      * @param  string|null  $locale
      * @param  int|null  $after
      * @param  int|null  $until
-     * @return string
+     * @return string|false
      */
     public static function spell(int|float $number, ?string $locale = null, ?int $after = null, ?int $until = null)
     {
@@ -120,7 +120,7 @@ class Number
      *
      * @param  int|float  $number
      * @param  string|null  $locale
-     * @return string
+     * @return string|false
      */
     public static function ordinal(int|float $number, ?string $locale = null)
     {
@@ -136,7 +136,7 @@ class Number
      *
      * @param  int|float  $number
      * @param  string|null  $locale
-     * @return string
+     * @return string|false
      */
     public static function spellOrdinal(int|float $number, ?string $locale = null)
     {
@@ -209,7 +209,7 @@ class Number
 
         $unitCount = count($units);
 
-        for ($i = 0; ($bytes / 1024) > 0.9 && ($i < $unitCount - 1); $i++) {
+        for ($i = 0; (abs($bytes) / 1024) > 0.9 && ($i < $unitCount - 1); $i++) {
             $bytes /= 1024;
         }
 
@@ -324,6 +324,12 @@ class Number
      */
     public static function pairs(int|float $to, int|float $by, int|float $start = 0, int|float $offset = 1)
     {
+        if ($by == 0) {
+            throw new \InvalidArgumentException('The $by argument must not be zero.');
+        }
+
+        $by = abs($by);
+
         $output = [];
 
         for ($lower = $start; $lower < $to; $lower += $by) {
@@ -347,6 +353,10 @@ class Number
      */
     public static function trim(int|float $number)
     {
+        if (is_infinite($number) || is_nan($number)) {
+            return $number;
+        }
+
         return json_decode(json_encode($number));
     }
 

@@ -179,6 +179,36 @@ trait InteractsWithData
     }
 
     /**
+     * Apply the callback if the instance contains a valid enum value for the given key.
+     *
+     * @template TEnum of \BackedEnum
+     * @template TReturn
+     * @template TReturnDefault = never
+     *
+     * @param  string  $key
+     * @param  class-string<TEnum>  $enumClass
+     * @param  callable(TEnum):TReturn  $callback
+     * @param  (callable(): TReturnDefault)|null  $default
+     * @return $this|TReturn|TReturnDefault
+     */
+    public function whenEnum($key, string $enumClass, callable $callback, ?callable $default = null)
+    {
+        if ($this->filled($key) && $this->isBackedEnum($enumClass)) {
+            $value = $enumClass::tryFrom(data_get($this->all(), $key));
+
+            if ($value !== null) {
+                return $callback($value) ?: $this;
+            }
+        }
+
+        if ($default) {
+            return $default();
+        }
+
+        return $this;
+    }
+
+    /**
      * Determine if the instance is missing a given key.
      *
      * @param  string|array  $key

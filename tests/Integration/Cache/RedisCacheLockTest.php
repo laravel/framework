@@ -148,4 +148,72 @@ class RedisCacheLockTest extends TestCase
         $this->assertTrue($secondLock->isOwnedBy($firstLock->owner()));
         $this->assertFalse($secondLock->isOwnedByCurrentProcess());
     }
+
+    public function testRedisLockCanBeRefreshed()
+    {
+        Cache::store('redis')->lock('foo')->forceRelease();
+
+        $lock = Cache::store('redis')->lock('foo', 10);
+        $this->assertTrue($lock->get());
+
+        $this->assertTrue($lock->refresh(20));
+
+        $this->assertFalse(Cache::store('redis')->lock('foo', 10)->get());
+
+        $lock->release();
+    }
+
+    public function testRedisLockCannotBeRefreshedByAnotherOwner()
+    {
+        Cache::store('redis')->lock('foo')->forceRelease();
+
+        $firstLock = Cache::store('redis')->lock('foo', 10);
+        $this->assertTrue($firstLock->get());
+
+        $secondLock = Cache::store('redis')->restoreLock('foo', 'other_owner');
+
+        $this->assertFalse($secondLock->refresh(20));
+
+        $this->assertTrue($firstLock->refresh(20));
+
+        $firstLock->release();
+    }
+
+    public function testRedisLockRefreshWithDefaultSeconds()
+    {
+        Cache::store('redis')->lock('foo')->forceRelease();
+
+        $lock = Cache::store('redis')->lock('foo', 10);
+        $this->assertTrue($lock->get());
+
+        $this->assertTrue($lock->refresh());
+
+        $this->assertFalse(Cache::store('redis')->lock('foo', 10)->get());
+
+        $lock->release();
+    }
+
+    public function testRedisLockRefreshWithNoExpirationDoesNotReleaseLock()
+    {
+        Cache::store('redis')->lock('foo')->forceRelease();
+
+        $lock = Cache::store('redis')->lock('foo');
+        $this->assertTrue($lock->get());
+        $this->assertTrue($lock->refresh());
+        $this->assertFalse(Cache::store('redis')->lock('foo')->get());
+
+        $lock->release();
+    }
+
+    public function testRedisLockRefreshWithZeroSecondsRemovesExpirationWithoutReleasingLock()
+    {
+        Cache::store('redis')->lock('foo')->forceRelease();
+
+        $lock = Cache::store('redis')->lock('foo', 10);
+        $this->assertTrue($lock->get());
+        $this->assertTrue($lock->refresh(0));
+        $this->assertFalse(Cache::store('redis')->lock('foo')->get());
+
+        $lock->release();
+    }
 }

@@ -103,7 +103,7 @@ class LogManager implements LoggerInterface
     public function stack(array $channels, $channel = null)
     {
         return (new Logger(
-            $this->createStackDriver(compact('channels', 'channel')),
+            $this->createStackDriver(['channels' => $channels, 'channel' => $channel]),
             $this->app['events']
         ))->withContext($this->sharedContext);
     }
@@ -583,12 +583,12 @@ class LogManager implements LoggerInterface
     /**
      * Set the default log driver name.
      *
-     * @param  string  $name
+     * @param  \UnitEnum|string  $name
      * @return void
      */
     public function setDefaultDriver($name)
     {
-        $this->app['config']['logging.default'] = $name;
+        $this->app['config']['logging.default'] = enum_value($name);
     }
 
     /**

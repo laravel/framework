@@ -78,6 +78,31 @@ class QueueRoutesTest extends TestCase
         $this->assertSame('notifications', $defaults->getQueue(new FinanceNotification));
         $this->assertNull($defaults->getConnection(new FinanceNotification));
     }
+
+    public function testEnumsAreResolved()
+    {
+        $defaults = new QueueRoutes();
+
+        $defaults->set(SomeJob::class, QueueName::payments, ConnectionName::redis);
+
+        $this->assertSame('payments', $defaults->getQueue(new SomeJob));
+        $this->assertSame('redis', $defaults->getConnection(new SomeJob));
+
+        $defaults->set([SomeJob::class => [ConnectionName::redis, QueueName::payments]]);
+
+        $this->assertSame('payments', $defaults->getQueue(new SomeJob));
+        $this->assertSame('redis', $defaults->getConnection(new SomeJob));
+    }
+}
+
+enum QueueName: string
+{
+    case payments = 'payments';
+}
+
+enum ConnectionName: string
+{
+    case redis = 'redis';
 }
 
 trait CustomTrait

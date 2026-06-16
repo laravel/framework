@@ -241,7 +241,13 @@ class Route
         $callable = $this->action['uses'];
 
         if ($this->isSerializedClosure()) {
-            $callable = unserialize($this->action['uses'])->getClosure();
+            $callable = unserialize($this->action['uses'], ['allowed_classes' => [
+                SerializableClosure::class,
+                \Laravel\SerializableClosure\UnsignedSerializableClosure::class,
+                \Laravel\SerializableClosure\Serializers\Native::class,
+                \Laravel\SerializableClosure\Serializers\Signed::class,
+                \Laravel\SerializableClosure\Support\SelfReference::class,
+            ]])->getClosure();
         }
 
         return $this->container[CallableDispatcher::class]->dispatch($this, $callable);
@@ -1072,7 +1078,13 @@ class Route
             Str::startsWith($missing, [
                 'O:47:"Laravel\\SerializableClosure\\SerializableClosure',
                 'O:55:"Laravel\\SerializableClosure\\UnsignedSerializableClosure',
-            ]) ? unserialize($missing) : $missing;
+            ]) ? unserialize($missing, ['allowed_classes' => [
+                SerializableClosure::class,
+                \Laravel\SerializableClosure\UnsignedSerializableClosure::class,
+                \Laravel\SerializableClosure\Serializers\Native::class,
+                \Laravel\SerializableClosure\Serializers\Signed::class,
+                \Laravel\SerializableClosure\Support\SelfReference::class,
+            ]]) : $missing;
     }
 
     /**
@@ -1165,21 +1177,19 @@ class Route
             $this->getControllerMethod(),
         ];
 
-        if (is_a($controllerClass, HasMiddleware::class, true)) {
-            return $this->staticallyProvidedControllerMiddleware(
-                $controllerClass, $controllerMethod
-            );
-        }
+        $attributeMiddleware = $this->attributeProvidedControllerMiddleware($controllerClass, $controllerMethod);
 
-        if (method_exists($controllerClass, 'getMiddleware')) {
-            return $this->controllerDispatcher()->getMiddleware(
-                $this->getController(), $controllerMethod
-            );
-        }
-
-        return $this->attributeProvidedControllerMiddleware(
-            $controllerClass, $controllerMethod
-        );
+        return match (true) {
+            is_a($controllerClass, HasMiddleware::class, true) => array_merge(
+                $this->staticallyProvidedControllerMiddleware($controllerClass, $controllerMethod),
+                $attributeMiddleware,
+            ),
+            method_exists($controllerClass, 'getMiddleware') => array_merge(
+                $this->controllerDispatcher()->getMiddleware($this->getController(), $controllerMethod),
+                $attributeMiddleware,
+            ),
+            default => $attributeMiddleware,
+        };
     }
 
     /**

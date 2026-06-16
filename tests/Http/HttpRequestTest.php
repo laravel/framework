@@ -453,6 +453,37 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($bar);
     }
 
+    public function testWhenEnumMethod()
+    {
+        $request = Request::create('/', 'GET', ['status' => 'test', 'invalid' => 'invalid', 'empty' => '']);
+
+        $status = $invalid = $empty = $missing = $default = false;
+
+        $request->whenEnum('status', TestEnumBacked::class, function ($value) use (&$status) {
+            $status = $value;
+        });
+
+        $request->whenEnum('invalid', TestEnumBacked::class, function ($value) use (&$invalid) {
+            $invalid = $value;
+        });
+
+        $request->whenEnum('empty', TestEnumBacked::class, function ($value) use (&$empty) {
+            $empty = $value;
+        });
+
+        $request->whenEnum('missing', TestEnumBacked::class, function ($value) use (&$missing) {
+            $missing = $value;
+        }, function () use (&$default) {
+            $default = true;
+        });
+
+        $this->assertSame(TestEnumBacked::test, $status);
+        $this->assertFalse($invalid);
+        $this->assertFalse($empty);
+        $this->assertFalse($missing);
+        $this->assertTrue($default);
+    }
+
     public function testMissingMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
@@ -1886,6 +1917,16 @@ class HttpRequestTest extends TestCase
 
         $this->assertInstanceOf(InputBag::class, $request->getPayload());
         $this->assertSame('world', $request->getPayload()->get('hello'));
+    }
+
+    public function testCreatingJsonRequestFromBaseDoesNotTriggerRequestPropertyDeprecation()
+    {
+        $request = Request::createFromBase(
+            SymfonyRequest::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json'], content: '{"hello":"world"}')
+        );
+
+        $this->assertTrue($request->isJson());
+        $this->assertSame('world', $request->input('hello'));
     }
 
     public function testJsonRequestsCanMergeDataIntoJsonRequest()

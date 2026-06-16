@@ -5,10 +5,12 @@ namespace Illuminate\Tests\Cache;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\NullStore;
+use Illuminate\Cache\StorageStore;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Events\Dispatcher as Event;
+use Illuminate\Tests\Cache\Fixtures\ArrayFilesystem;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -101,6 +103,36 @@ class CacheManagerTest extends TestCase
 
         $this->assertInstanceOf(ArrayStore::class, $arrayCache->getStore());
         $this->assertInstanceOf(NullStore::class, $nullCache->getStore());
+    }
+
+    public function testItCanCreateStorageDriver()
+    {
+        $disk = new ArrayFilesystem;
+
+        $filesystem = m::mock();
+        $filesystem->shouldReceive('disk')->with('s3')->once()->andReturn($disk);
+
+        $app = $this->getApp([
+            'cache' => [
+                'prefix' => 'cache:',
+                'stores' => [
+                    'storage' => [
+                        'driver' => 'storage',
+                        'disk' => 's3',
+                        'path' => 'cache',
+                    ],
+                ],
+            ],
+        ]);
+        $app->instance('filesystem', $filesystem);
+
+        $cacheManager = new CacheManager($app);
+        $store = $cacheManager->store('storage')->getStore();
+
+        $this->assertInstanceOf(StorageStore::class, $store);
+        $this->assertSame($disk, $store->getDisk());
+        $this->assertSame('cache', $store->getDirectory());
+        $this->assertSame('cache:', $store->getPrefix());
     }
 
     public function testItMakesRepositoryWhenContainerHasNoDispatcher()

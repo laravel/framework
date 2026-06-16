@@ -147,6 +147,36 @@ class CacheRepositoryTest extends TestCase
         $this->assertSame('bar', $result);
     }
 
+    public function testRememberWithWarmthReturnsCachedValue()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('bar');
+        $repo->getStore()->shouldReceive('put')->never();
+
+        $result = $repo->rememberWithWarmth('foo', 10, function () {
+            $this->fail('The cache callback should not be called.');
+        });
+
+        $this->assertSame(['bar', true], $result);
+    }
+
+    public function testRememberWithWarmthCallsPutAndReturnsDefault()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(null);
+        $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 10);
+
+        $result = $repo->rememberWithWarmth('foo', function ($value) {
+            $this->assertSame('bar', $value);
+
+            return 10;
+        }, function () {
+            return 'bar';
+        });
+
+        $this->assertSame(['bar', false], $result);
+    }
+
     public function testRememberForeverMethodCallsForeverAndReturnsDefault()
     {
         $repo = $this->getRepository();
@@ -506,6 +536,15 @@ class CacheRepositoryTest extends TestCase
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('touch')->once()->with($key, $ttl)->andReturn(true);
         $this->assertTrue($repo->touch($key, DateInterval::createFromDateString("$ttl seconds")));
+    }
+
+    public function testTouchWorksWithEnumKey(): void
+    {
+        $ttl = 60;
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('touch')->once()->with('foo', $ttl)->andReturn(true);
+        $this->assertTrue($repo->touch(TestCacheKey::FOO, $ttl));
     }
 
     public function testAtomicExecutesCallbackAndReturnsResult()

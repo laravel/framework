@@ -242,12 +242,12 @@ class RedisManager implements Factory
     /**
      * Disconnect the given connection and remove from local cache.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return void
      */
     public function purge($name = null)
     {
-        $name = $name ?: 'default';
+        $name = enum_value($name) ?: 'default';
 
         unset($this->connections[$name]);
     }

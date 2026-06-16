@@ -250,6 +250,55 @@ class FileStore implements CanFlushLocks, LockProvider, Store
     }
 
     /**
+     * Atomically refresh the expiration of a cache key if it matches the expected owner.
+     *
+     * @param  string  $key
+     * @param  mixed  $expectedOwner
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function refreshIfOwned($key, $expectedOwner, $seconds)
+    {
+        $this->ensureCacheDirectoryExists($path = $this->path($key));
+
+        $file = new LockableFile($path, 'c+');
+
+        try {
+            $file->getExclusiveLock();
+        } catch (LockTimeoutException) {
+            $file->close();
+
+            return false;
+        }
+
+        $contents = $file->read();
+
+        if (strlen($contents) < 10) {
+            $file->close();
+
+            return false;
+        }
+
+        $expire = substr($contents, 0, 10);
+
+        $currentOwner = $this->unserialize(substr($contents, 10));
+
+        if ($currentOwner !== $expectedOwner || $this->currentTime() >= $expire) {
+            $file->close();
+
+            return false;
+        }
+
+        $file->truncate()
+            ->write($this->expiration($seconds).serialize($expectedOwner))
+            ->close();
+
+        $this->ensurePermissionsAreCorrect($path);
+
+        return true;
+    }
+
+    /**
      * Adjust the expiration time of a cached item.
      *
      * @param  string  $key
@@ -277,7 +326,7 @@ class FileStore implements CanFlushLocks, LockProvider, Store
     {
         if ($this->files->exists($file = $this->path($key))) {
             return tap($this->files->delete($file), function ($forgotten) use ($key) {
-                if ($forgotten && $this->files->exists($file = $this->path("illuminate:cache:flexible:created:{$key}"))) {
+                if ($forgotten && $this->files->exists($file = $this->path(Repository::FLEXIBLE_CREATED_KEY_PREFIX.$key))) {
                     $this->files->delete($file);
                 }
             });
@@ -381,7 +430,7 @@ class FileStore implements CanFlushLocks, LockProvider, Store
         // operation that may be performed on this cache on a later operation.
         $time = $expire - $this->currentTime();
 
-        return compact('data', 'time');
+        return ['data' => $data, 'time' => $time];
     }
 
     /**

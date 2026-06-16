@@ -185,7 +185,7 @@ class ServeCommand extends Command
                 return [$key => $value];
             }
 
-            return in_array($key, static::$passthroughVariables) ? [$key => $value] : [$key => false];
+            return $this->shouldPassThroughEnvironmentVariable($key) ? [$key => $value] : [$key => false];
         })->merge(['PHP_CLI_SERVER_WORKERS' => $this->phpServerWorkers])->all());
 
         $this->trap(fn () => [SIGTERM, SIGINT, SIGHUP, SIGUSR1, SIGUSR2, SIGQUIT], function ($signal) use ($process) {
@@ -281,6 +281,21 @@ class ServeCommand extends Command
     {
         return is_null($this->input->getOption('port')) &&
             ($this->input->getOption('tries') > $this->portOffset);
+    }
+
+    /**
+     * Determine if the environment variable should be passed to the PHP server process.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function shouldPassThroughEnvironmentVariable($key)
+    {
+        if (PHP_OS_FAMILY === 'Windows') {
+            return in_array(strtoupper($key), array_map(strtoupper(...), static::$passthroughVariables), true);
+        }
+
+        return in_array($key, static::$passthroughVariables, true);
     }
 
     /**

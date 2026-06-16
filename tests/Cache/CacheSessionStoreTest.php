@@ -241,9 +241,9 @@ class CacheSessionStoreTest extends TestCase
     {
         return new Store(
             name: 'name',
-            serialization: 'php',
             handler: new ArraySessionHandler(10),
             id: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            serialization: 'php',
         );
     }
 }

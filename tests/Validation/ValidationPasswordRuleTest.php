@@ -498,6 +498,26 @@ class ValidationPasswordRuleTest extends TestCase
         $this->assertSame(['sometimes', 'string', 'min:8'], [...Password::sometimes()]);
     }
 
+    public function testToPasswordRulesString()
+    {
+        $this->assertSame('minlength: 8;', Password::min(8)->toPasswordRulesString());
+
+        $this->assertSame('minlength: 8; maxlength: 64;', Password::min(8)->max(64)->toPasswordRulesString());
+
+        $this->assertSame('minlength: 8; required: lower; required: upper;', Password::min(8)->mixedCase()->toPasswordRulesString());
+
+        $this->assertSame('minlength: 8; required: lower;', Password::min(8)->letters()->toPasswordRulesString());
+
+        $this->assertSame('minlength: 8; required: digit;', Password::min(8)->numbers()->toPasswordRulesString());
+
+        $this->assertSame('minlength: 8; required: special;', Password::min(8)->symbols()->toPasswordRulesString());
+
+        $this->assertSame(
+            'minlength: 12; maxlength: 64; required: lower; required: upper; required: digit; required: special;',
+            Password::min(12)->max(64)->mixedCase()->numbers()->symbols()->toPasswordRulesString()
+        );
+    }
+
     protected function passes($rule, $values)
     {
         $this->assertValidationRules($rule, $values, true, []);

@@ -10,7 +10,7 @@ use Illuminate\Support\Testing\Fakes\MailFake;
  * @method static \Illuminate\Mail\Mailer build(array $config)
  * @method static \Symfony\Component\Mailer\Transport\TransportInterface createSymfonyTransport(array $config)
  * @method static string getDefaultDriver()
- * @method static void setDefaultDriver(string $name)
+ * @method static void setDefaultDriver(\UnitEnum|string $name)
  * @method static void purge(\UnitEnum|string|null $name = null)
  * @method static \Illuminate\Mail\MailManager extend(string $driver, \Closure $callback)
  * @method static \Illuminate\Contracts\Foundation\Application getApplication()

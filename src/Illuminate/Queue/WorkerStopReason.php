@@ -10,6 +10,7 @@ enum WorkerStopReason: string
     case MaxMemoryExceeded = 'memory';
     case MaxTimeExceeded = 'max_time';
     case QueueEmpty = 'empty';
+    case QueueEmptyFor = 'empty_for';
     case ReceivedRestartSignal = 'restart_signal';
     case TimedOut = 'timed_out';
 }

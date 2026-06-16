@@ -12,7 +12,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Log\LogManager withoutContext(string[]|null $keys = null)
  * @method static \Illuminate\Log\LogManager flushSharedContext()
  * @method static string|null getDefaultDriver()
- * @method static void setDefaultDriver(string $name)
+ * @method static void setDefaultDriver(\UnitEnum|string $name)
  * @method static \Illuminate\Log\LogManager extend(string $driver, \Closure $callback)
  * @method static void forgetChannel(string|null $driver = null)
  * @method static array getChannels()

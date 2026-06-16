@@ -2,6 +2,7 @@
 
 namespace Illuminate\Concurrency;
 
+use Carbon\CarbonInterval;
 use Closure;
 use Illuminate\Contracts\Concurrency\Driver;
 use Illuminate\Support\Arr;
@@ -15,7 +16,7 @@ class ForkDriver implements Driver
     /**
      * Run the given tasks concurrently and return an array containing the results.
      */
-    public function run(Closure|array $tasks): array
+    public function run(Closure|array $tasks, CarbonInterval|int|null $timeout = null): array
     {
         $tasks = Arr::wrap($tasks);
 

@@ -160,10 +160,10 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function pendingJobs($queue = null): Collection
     {
-        $queue = $this->getQueueRedisKey($queue);
+        $name = $queue ?: $this->default;
 
-        return (new Collection($this->getConnection()->lrange($queue, 0, -1)))
-            ->map(fn ($payload) => InspectedJob::fromPayload($payload));
+        return (new Collection($this->getConnection()->lrange($this->getQueueRedisKey($queue), 0, -1)))
+            ->map(fn ($payload) => InspectedJob::fromPayload($payload, queue: $name));
     }
 
     /**
@@ -174,10 +174,10 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function delayedJobs($queue = null): Collection
     {
-        $queue = $this->getQueueRedisKey($queue);
+        $name = $queue ?: $this->default;
 
-        return (new Collection($this->getConnection()->zrange($queue.':delayed', 0, -1)))
-            ->map(fn ($payload) => InspectedJob::fromPayload($payload));
+        return (new Collection($this->getConnection()->zrange($this->getQueueRedisKey($queue).':delayed', 0, -1)))
+            ->map(fn ($payload) => InspectedJob::fromPayload($payload, queue: $name));
     }
 
     /**
@@ -188,10 +188,54 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function reservedJobs($queue = null): Collection
     {
-        $queue = $this->getQueueRedisKey($queue);
+        $name = $queue ?: $this->default;
 
-        return (new Collection($this->getConnection()->zrange($queue.':reserved', 0, -1)))
-            ->map(fn ($payload) => InspectedJob::fromPayload($payload));
+        return (new Collection($this->getConnection()->zrange($this->getQueueRedisKey($queue).':reserved', 0, -1)))
+            ->map(fn ($payload) => InspectedJob::fromPayload($payload, queue: $name));
+    }
+
+    /**
+     * Get all pending jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
+     */
+    public function allPendingJobs(): Collection
+    {
+        return $this->allQueueNames()->flatMap(fn ($name) => $this->pendingJobs($name));
+    }
+
+    /**
+     * Get all delayed jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
+     */
+    public function allDelayedJobs(): Collection
+    {
+        return $this->allQueueNames()->flatMap(fn ($name) => $this->delayedJobs($name));
+    }
+
+    /**
+     * Get all reserved jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
+     */
+    public function allReservedJobs(): Collection
+    {
+        return $this->allQueueNames()->flatMap(fn ($name) => $this->reservedJobs($name));
+    }
+
+    /**
+     * Get the unique queue names.
+     *
+     * @return \Illuminate\Support\Collection<int, string>
+     */
+    protected function allQueueNames(): Collection
+    {
+        return (new Collection($this->getConnection()->keys('queues:*')))
+            // Trim to ensure clusters get their braces removed...
+            ->map(fn ($key) => trim(Str::between($key, 'queues:', ':'), '{}'))
+            ->unique()
+            ->values();
     }
 
     /**
@@ -462,10 +506,10 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Delete all of the jobs from the queue.
      *
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return int
      */
-    public function clear($queue)
+    public function clear($queue = null)
     {
         $queue = $this->getQueueRedisKey($queue);
 

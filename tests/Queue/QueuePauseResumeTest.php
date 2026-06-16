@@ -161,6 +161,19 @@ class QueuePauseResumeTest extends TestCase
         $this->assertSame('notifications', $dispatchedEvent->queue);
     }
 
+    public function testGetPausedQueues()
+    {
+        $this->assertSame([], $this->manager->getPausedQueues('redis', ['default', 'emails']));
+
+        $this->manager->pause('redis', 'emails');
+        $this->manager->pause('redis', 'notifications');
+
+        $this->assertSame(
+            ['emails', 'notifications'],
+            $this->manager->getPausedQueues('redis', ['default', 'emails', 'notifications'])
+        );
+    }
+
     public function testParsingQueueString()
     {
         $parser = new class()

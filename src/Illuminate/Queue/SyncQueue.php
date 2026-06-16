@@ -106,6 +106,36 @@ class SyncQueue extends Queue implements QueueContract
     }
 
     /**
+     * Get all pending jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function allPendingJobs(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * Get all delayed jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function allDelayedJobs(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * Get all reserved jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function allReservedJobs(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
      * Get the creation timestamp of the oldest pending job, excluding delayed jobs.
      *
      * @param  string|null  $queue

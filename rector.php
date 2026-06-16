@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
+use Rector\CodeQuality\Rector\FuncCall\CompactToVariablesRector;
+use Rector\CodeQuality\Rector\FuncCall\SortCallLikeNamedArgsRector;
 use Rector\CodeQuality\Rector\Identical\StrlenZeroToIdenticalEmptyStringRector;
 use Rector\CodingStyle\Rector\ArrowFunction\ArrowFunctionDelegatingCallToFirstClassCallableRector;
 use Rector\CodingStyle\Rector\Closure\ClosureDelegatingCallToFirstClassCallableRector;
 use Rector\CodingStyle\Rector\FuncCall\ClosureFromCallableToFirstClassCallableRector;
-use Rector\CodingStyle\Rector\FuncCall\ConsistentImplodeRector;
 use Rector\CodingStyle\Rector\FuncCall\CountArrayToEmptyArrayComparisonRector;
 use Rector\CodingStyle\Rector\FuncCall\FunctionFirstClassCallableRector;
 use Rector\Config\RectorConfig;
@@ -14,7 +15,6 @@ use Rector\Php55\Rector\Class_\ClassConstantToSelfClassRector;
 use Rector\Php55\Rector\String_\StringClassNameToClassConstantRector;
 use Rector\Php56\Rector\FuncCall\PowToExpRector;
 use Rector\Php70\Rector\FuncCall\RandomFunctionRector;
-use Rector\Php70\Rector\If_\IfToSpaceshipRector;
 use Rector\Php70\Rector\MethodCall\ThisCallOnStaticMethodToStaticCallRector;
 use Rector\Php70\Rector\StaticCall\StaticCallOnNonStaticToInstanceCallRector;
 use Rector\Php70\Rector\Ternary\TernaryToNullCoalescingRector;
@@ -105,11 +105,9 @@ return RectorConfig::configure()
         ClosureDelegatingCallToFirstClassCallableRector::class,
         ClosureFromCallableToFirstClassCallableRector::class,
         ClosureToArrowFunctionRector::class,
-        ConsistentImplodeRector::class,
         DynamicClassConstFetchRector::class,
         FunctionFirstClassCallableRector::class,
         GetDebugTypeRector::class,
-        IfToSpaceshipRector::class,
         NullToStrictStringFuncCallArgRector::class,
         PowToExpRector::class,
         RandomFunctionRector::class,
@@ -126,7 +124,9 @@ return RectorConfig::configure()
     ])
     ->withRules([
         ...$testsuiteRules,
+        CompactToVariablesRector::class,
         CountArrayToEmptyArrayComparisonRector::class,
+        SortCallLikeNamedArgsRector::class,
         StrlenZeroToIdenticalEmptyStringRector::class,
     ])
     ->withPreparedSets(

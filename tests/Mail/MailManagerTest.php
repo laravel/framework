@@ -149,6 +149,17 @@ class MailManagerTest extends TestCase
         $this->assertSame($mailer1, $mailer2);
     }
 
+    public function testSetDefaultDriverAcceptsBackedEnum(): void
+    {
+        $this->app['config']->set('mail.mailers.array', [
+            'transport' => 'array',
+        ]);
+
+        $this->app['mail.manager']->setDefaultDriver(MailerName::ArrayMailer);
+
+        $this->assertSame('array', $this->app['config']->get('mail.default'));
+    }
+
     public function testPurgeAcceptsBackedEnum(): void
     {
         $this->app['config']->set('mail.mailers.array', [

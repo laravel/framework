@@ -122,8 +122,8 @@ trait FormatsMessages
                     if (preg_match('#^'.$pattern.'\z#u', $key) === 1) {
                         $message = $source[$sourceKey];
 
-                        if (is_array($message) && isset($message[$lowerRule])) {
-                            return $message[$lowerRule];
+                        if (is_array($message)) {
+                            return $message[$lowerRule] ?? null;
                         }
 
                         return $message;

@@ -145,7 +145,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
             ->whereNull('reserved_at')
             ->where('available_at', '<=', $this->currentTime())
             ->get()
-            ->map(fn ($record) => InspectedJob::fromPayload($record->payload, $record->attempts));
+            ->map(fn ($record) => InspectedJob::fromPayload($record->payload, $record->attempts, $record->queue));
     }
 
     /**
@@ -161,7 +161,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
             ->whereNull('reserved_at')
             ->where('available_at', '>', $this->currentTime())
             ->get()
-            ->map(fn ($record) => InspectedJob::fromPayload($record->payload, $record->attempts));
+            ->map(fn ($record) => InspectedJob::fromPayload($record->payload, $record->attempts, $record->queue));
     }
 
     /**
@@ -176,7 +176,48 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
             ->where('queue', $this->getQueue($queue))
             ->whereNotNull('reserved_at')
             ->get()
-            ->map(fn ($record) => InspectedJob::fromPayload($record->payload, $record->attempts));
+            ->map(fn ($record) => InspectedJob::fromPayload($record->payload, $record->attempts, $record->queue));
+    }
+
+    /**
+     * Get all pending jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
+     */
+    public function allPendingJobs(): Collection
+    {
+        return $this->database->table($this->table)
+            ->whereNull('reserved_at')
+            ->where('available_at', '<=', $this->currentTime())
+            ->get()
+            ->map(fn ($record) => InspectedJob::fromPayload($record->payload, $record->attempts, $record->queue));
+    }
+
+    /**
+     * Get all delayed jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
+     */
+    public function allDelayedJobs(): Collection
+    {
+        return $this->database->table($this->table)
+            ->whereNull('reserved_at')
+            ->where('available_at', '>', $this->currentTime())
+            ->get()
+            ->map(fn ($record) => InspectedJob::fromPayload($record->payload, $record->attempts, $record->queue));
+    }
+
+    /**
+     * Get all reserved jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
+     */
+    public function allReservedJobs(): Collection
+    {
+        return $this->database->table($this->table)
+            ->whereNotNull('reserved_at')
+            ->get()
+            ->map(fn ($record) => InspectedJob::fromPayload($record->payload, $record->attempts, $record->queue));
     }
 
     /**
@@ -526,10 +567,10 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Delete all of the jobs from the queue.
      *
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return int
      */
-    public function clear($queue)
+    public function clear($queue = null)
     {
         return $this->database->table($this->table)
             ->where('queue', $this->getQueue($queue))

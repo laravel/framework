@@ -139,7 +139,7 @@ class Grammar extends BaseGrammar
             $column = 'distinct '.$column;
         }
 
-        return 'select '.$aggregate['function'].'('.$column.') as aggregate';
+        return 'select '.$aggregate['function'].'('.$column.') as '.$this->wrap('aggregate');
     }
 
     /**

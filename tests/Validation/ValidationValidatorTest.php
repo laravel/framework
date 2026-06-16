@@ -105,6 +105,27 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('post name is required', $v->errors()->all()[0]);
     }
 
+    public function testWildcardArrayCustomMessagesHandleMissingRulesGracefullyWhenAnotherRuleFails()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            'users' => [
+                [
+                    'name' => 'Taylor',
+                ],
+            ],
+        ], [
+            'users.*.name' => ['required', 'in:Otwell'],
+        ], [
+            'users.*.name' => [
+                'required' => 'user name is required',
+            ],
+        ]);
+
+        $this->assertFalse($v->passes());
+        $this->assertSame('validation.in', $v->errors()->all()[0]);
+    }
+
     public function testSometimesWorksOnNestedArrays()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -3214,12 +3235,50 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => ['array', 'value']], ['x' => 'starts_with:arr']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'starts_with:1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'starts_with:2']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateEndsWithDoesNotThrowOnNonStringValue()
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => ['array', 'value']], ['x' => 'ends_with:ue']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'ends_with:3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'ends_with:2']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateDoesntStartWithDoesNotThrowOnNonStringValue()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => ['array', 'value']], ['x' => 'doesnt_start_with:arr']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'doesnt_start_with:0']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'doesnt_start_with:1']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateDoesntEndWithDoesNotThrowOnNonStringValue()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => ['array', 'value']], ['x' => 'doesnt_end_with:ue']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'doesnt_end_with:0']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'doesnt_end_with:3']);
         $this->assertFalse($v->passes());
     }
 
@@ -4894,6 +4953,9 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => 'foo@gmail.com'], ['x' => 'Email']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => "\"foo\r\nBcc: victim@example.com\"@example.com"], ['x' => 'Email']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateEmailWithInternationalCharacters()
@@ -5429,11 +5491,11 @@ class ValidationValidatorTest extends TestCase
 
         // for min_ratio
         $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:min_ratio=1/2']);
-        $this->assertTrue($v->fails());
+        $this->assertTrue($v->passes());
 
         // for max_ratio
         $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:max_ratio=2/5']);
-        $this->assertTrue($v->passes());
+        $this->assertTrue($v->fails());
 
         // Knowing that demo image2.png has width = 4 and height = 2
         $uploadedFile = new UploadedFile(__DIR__.'/fixtures/image2.png', '', null, null, true);
@@ -5494,11 +5556,11 @@ class ValidationValidatorTest extends TestCase
 
         // evaluates to (64 / 65) > (1 / 1.0) which is true/fails
         $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:min_ratio=1']);
-        $this->assertFalse($v->fails());
+        $this->assertTrue($v->fails());
 
-        // evaluates to (64 / 65) < (1 / 1.0) which is false/passes
+        // evaluates to (64 / 65) > (1 / 1.0) which is false/passes
         $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:max_ratio=1']);
-        $this->assertFalse($v->passes());
+        $this->assertTrue($v->passes());
 
         // Knowing that demo image5.png has width = 1366 and height = 768
         $uploadedFile = new UploadedFile(__DIR__.'/fixtures/image5.png', '', null, null, true);
@@ -6550,6 +6612,12 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['x' => '17:44'], ['x' => 'date_format:H:i|date_equals:17:45']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => 'invalid-date'], ['x' => 'date_equals:1970-01-01 00:00:00']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '1970-01-01 00:00:00'], ['x' => 'date_equals:invalid-date']);
         $this->assertTrue($v->fails());
     }
 

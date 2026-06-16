@@ -187,11 +187,13 @@ class DatabaseUuidFailedJobProviderTest extends TestCase
         ]);
         $db->getConnection()->getSchemaBuilder()->create('failed_jobs', function (Blueprint $table) {
             $table->uuid();
-            $table->text('connection');
-            $table->text('queue');
+            $table->string('connection');
+            $table->string('queue');
             $table->longText('payload');
             $table->longText('exception');
             $table->timestamp('failed_at')->useCurrent();
+
+            $table->index(['connection', 'queue', 'failed_at']);
         });
 
         return new DatabaseUuidFailedJobProvider($db->getDatabaseManager(), $database, $table);

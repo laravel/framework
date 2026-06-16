@@ -104,7 +104,48 @@ class ViewBladeCompilerTest extends TestCase
         $files->shouldReceive('makeDirectory')->once()->with(__DIR__, 0777, true, true);
         $files->shouldReceive('exists')->once()->with($compiledPath)->andReturn(true);
         $files->shouldReceive('hash')->once()->with($compiledPath, 'xxh128')->andReturn(hash('xxh128', 'Hello World<?php /**PATH foo ENDPATH**/ ?>'));
+        $files->shouldReceive('lastModified')->once()->with('foo')->andReturn(100);
+        $files->shouldReceive('lastModified')->once()->with($compiledPath)->andReturn(200);
         $compiler->compile('foo');
+    }
+
+    public function testCompileRefreshesCacheTimestampIfUnchangedButExpired()
+    {
+        $files = new Filesystem;
+        $directory = sys_get_temp_dir().'/laravel-blade-compiler-test-'.uniqid();
+        $source = $directory.'/source.blade.php';
+        $cache = $directory.'/cache';
+
+        try {
+            $files->ensureDirectoryExists($cache);
+            $files->put($source, 'Hello World');
+
+            $compiler = new BladeCompiler($files, $cache);
+            $compiler->compile($source);
+
+            $compiled = $compiler->getCompiledPath($source);
+
+            $compiledModified = time();
+            $sourceModified = $compiledModified + 10;
+
+            touch($source, $sourceModified);
+            touch($compiled, $compiledModified);
+
+            clearstatcache(true, $source);
+            clearstatcache(true, $compiled);
+
+            $this->assertTrue($compiler->isExpired($source));
+
+            $compiler->compile($source);
+
+            clearstatcache(true, $source);
+            clearstatcache(true, $compiled);
+
+            $this->assertGreaterThan($files->lastModified($source), $files->lastModified($compiled));
+            $this->assertFalse($compiler->isExpired($source));
+        } finally {
+            $files->deleteDirectory($directory);
+        }
     }
 
     public function testCompileCompilesAndGetThePath()

@@ -1593,6 +1593,34 @@ EOT
         $response->assertJsonPathCanonicalizing('*.foo', ['foo 0', 'foo 2', 'foo 3']);
     }
 
+    public function testAssertJsonPathsCanonicalizing(): void
+    {
+        $response = TestResponse::fromBaseResponse(new Response([
+            'data' => [
+                ['id' => 10, 'name' => 'Taylor'],
+                ['id' => 20, 'name' => 'Mohamed'],
+                ['id' => 30, 'name' => 'Nuno'],
+            ],
+        ]));
+
+        $response->assertJsonPathsCanonicalizing([
+            'data.*.id' => [30, 10, 20],
+            'data.*.name' => ['Nuno', 'Taylor', 'Mohamed'],
+        ]);
+    }
+
+    public function testAssertJsonPathsCanonicalizingCanFail(): void
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that two arrays are equal.');
+
+        $response->assertJsonPathsCanonicalizing([
+            '*.foo' => ['foo 0', 'foo 2', 'foo 3'],
+        ]);
+    }
+
     public function testAssertJsonPaths(): void
     {
         $response = TestResponse::fromBaseResponse(new Response([
@@ -3136,6 +3164,20 @@ EOT
         $response->assertSessionHasInput('foo', function ($value) {
             return $value === 'value';
         });
+    }
+
+    public function testAssertSessionMissingInput(): void
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('_old_input', [
+            'foo' => 'value',
+        ]);
+
+        $response = TestResponse::fromBaseResponse(new Response());
+
+        $response->assertSessionMissingInput('bar');
+        $response->assertSessionMissingInput(['bar', 'baz']);
     }
 
     public function testGetEncryptedCookie(): void
