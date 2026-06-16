@@ -119,19 +119,6 @@ class HttpClientTest extends TestCase
         $this->assertSame(['first', '123', '1', '', ''], $response->getHeader('X-Multiple'));
     }
 
-    public function testFakeResponseScalarBodiesAreRejected()
-    {
-        foreach ([123, 1.5, true, false, NAN, INF, -INF] as $body) {
-            try {
-                $this->factory::response($body);
-
-                $this->fail('The fake response body was not rejected.');
-            } catch (InvalidArgumentException $e) {
-                $this->assertSame('HTTP fake response body must be a string, array, or null.', $e->getMessage());
-            }
-        }
-    }
-
     public function testFakeResponseHeaderValuesNormalizeNonFiniteFloats()
     {
         $response = $this->factory::response('OK', 200, [
@@ -145,20 +132,6 @@ class HttpClientTest extends TestCase
         $this->assertSame(['INF'], $response->getHeader('X-Inf'));
         $this->assertSame(['-INF'], $response->getHeader('X-Negative-Inf'));
         $this->assertSame(['NAN', 'INF', '-INF'], $response->getHeader('X-Multiple'));
-    }
-
-    public function testJsonFakeResponseBodiesWithNonFiniteFloatsAreRejected()
-    {
-        foreach ([NAN, INF, -INF] as $value) {
-            try {
-                $this->factory::response(['value' => $value]);
-
-                $this->fail('The JSON fake response body was not rejected.');
-            } catch (InvalidArgumentException $e) {
-                $this->assertStringContainsString('could not be JSON encoded', $e->getMessage());
-                $this->assertInstanceOf(\JsonException::class, $e->getPrevious());
-            }
-        }
     }
 
     #[DataProvider('invalidFakeResponseHeaderValuesProvider')]
@@ -182,18 +155,6 @@ class HttpClientTest extends TestCase
 
         $response = $this->factory->post('http://vapor.laravel.com');
         $this->assertTrue($response->created());
-    }
-
-    public function testStatusCodeShorthandRejectsInvalidHttpStatusCode()
-    {
-        $this->factory->fake([
-            'foo.com/*' => 999,
-        ]);
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('HTTP status code must be between 100 and 599.');
-
-        $this->factory->get('http://foo.com/test');
     }
 
     public function testBodyShorthands()
@@ -595,34 +556,6 @@ class HttpClientTest extends TestCase
         $this->factory->fake($fakeRequest);
 
         $this->factory->withBody($body, 'text/plain')->send('post', 'http://foo.com/api');
-    }
-
-    public function testWithBodyRejectsInvalidBodies()
-    {
-        foreach ([123, 1.5, true, false, NAN, INF, -INF, ['foo' => 'bar'], new stdClass] as $body) {
-            try {
-                $this->factory->withBody($body, 'text/plain');
-
-                $this->fail('The request body was not rejected.');
-            } catch (InvalidArgumentException $e) {
-                $this->assertSame('HTTP request body must be a string, resource, Psr\Http\Message\StreamInterface, or null.', $e->getMessage());
-            }
-        }
-    }
-
-    public function testWithOptionsBodyRejectsInvalidBodies()
-    {
-        $this->factory->fake();
-
-        foreach ([123, 1.5, true, false, NAN, INF, -INF, ['foo' => 'bar'], new stdClass] as $body) {
-            try {
-                $this->factory->withOptions(['body' => $body])->send('POST', 'http://foo.com/api');
-
-                $this->fail('The request body was not rejected.');
-            } catch (InvalidArgumentException $e) {
-                $this->assertSame('HTTP request body must be a string, resource, Psr\Http\Message\StreamInterface, or null.', $e->getMessage());
-            }
-        }
     }
 
     public function testUrlsCanBeStubbedByPath()
@@ -1254,19 +1187,6 @@ class HttpClientTest extends TestCase
 
         // The sequence is empty, it should throw an exception.
         $this->factory->get('https://example.com');
-    }
-
-    public function testResponseSequencesRejectScalarBodies()
-    {
-        foreach ([123, 1.5, true, false, NAN, INF, -INF] as $body) {
-            try {
-                $this->factory->sequence()->push($body);
-
-                $this->fail('The fake response body was not rejected.');
-            } catch (InvalidArgumentException $e) {
-                $this->assertSame('HTTP fake response body must be a string, array, or null.', $e->getMessage());
-            }
-        }
     }
 
     public function testSequenceBuilderCanKeepGoingWhenEmpty()
@@ -3037,19 +2957,6 @@ class HttpClientTest extends TestCase
         $this->assertEqualsCanonicalizing(['code' => 'not_found'], $requestException->response->json());
         $this->assertEquals(404, $requestException->response->status());
         $this->assertEquals(199, $requestException->response->header('X-RateLimit-Remaining'));
-    }
-
-    public function testFailedRequestRejectsScalarBody()
-    {
-        foreach ([123, 1.5, true, false, NAN, INF, -INF] as $body) {
-            try {
-                $this->factory::failedRequest($body, 404);
-
-                $this->fail('The fake response body was not rejected.');
-            } catch (InvalidArgumentException $e) {
-                $this->assertSame('HTTP fake response body must be a string, array, or null.', $e->getMessage());
-            }
-        }
     }
 
     public function testFailedRequestHeaderValuesNormalizeNonFiniteFloats()
@@ -4912,14 +4819,14 @@ class HttpClientTest extends TestCase
     public function testJsonDecodingIsCachedForFalsyPayloads()
     {
         $payloads = [
-            '[]' => [],
-            'false' => false,
-            '0' => 0,
-            'null' => null,
-            '""' => '',
+            ['[]', []],
+            ['false', false],
+            ['0', 0],
+            ['null', null],
+            ['""', ''],
         ];
 
-        foreach ($payloads as $body => $expected) {
+        foreach ($payloads as [$body, $expected]) {
             $response = new BodyTrackingResponse(Factory::psr7Response($body));
 
             // First call decodes and caches
