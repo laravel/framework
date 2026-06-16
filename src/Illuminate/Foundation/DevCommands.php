@@ -186,6 +186,11 @@ class DevCommands
         foreach ($trace as $frame) {
             $file = $frame['file'] ?? null;
             $class = $frame['class'] ?? null;
+            $function = $frame['function'] ?? null;
+
+            if ($class === self::class && $function === 'registerDefaults') {
+                return;
+            }
 
             if ($class === self::class) {
                 continue;

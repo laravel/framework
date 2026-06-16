@@ -204,6 +204,37 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertContains('vite', $names);
     }
 
+    public function testRegisterDefaultsCanBeCalledFromVendorPath()
+    {
+        $basePath = realpath(__DIR__.'/../..');
+        $vendorFile = $basePath.'/vendor/_test_register_defaults_'.uniqid().'.php';
+
+        file_put_contents($vendorFile, <<<'PHP'
+<?php
+Illuminate\Foundation\DevCommands::registerDefaults();
+PHP);
+
+        try {
+            $process = new PhpProcess(<<<EOF
+<?php
+require '{$basePath}/vendor/autoload.php';
+
+\$app = new Illuminate\Foundation\Application('{$basePath}');
+\$app['env'] = 'testing';
+
+require '{$vendorFile}';
+
+echo implode(',', array_column(Illuminate\Foundation\DevCommands::commands(), 'name'));
+EOF, $basePath);
+
+            $process->run();
+
+            $this->assertSame('server,queue,logs,vite', $process->getOutput());
+        } finally {
+            unlink($vendorFile);
+        }
+    }
+
     public function testVendorRegistrationIsPrevented()
     {
         $basePath = realpath(__DIR__.'/../..');
