@@ -30,6 +30,7 @@ use InvalidArgumentException;
 use JsonSerializable;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\StreamInterface;
 use Symfony\Component\VarDumper\VarDumper;
 use Throwable;
 
@@ -303,6 +304,10 @@ class PendingRequest
     public function withBody($content, $contentType = 'application/json')
     {
         $this->bodyFormat('body');
+
+        $content = $this->normalizeRequestOptionValue($content);
+
+        $this->ensureValidRequestBody($content);
 
         $this->pendingBody = $content;
 
@@ -1389,8 +1394,24 @@ class PendingRequest
                 continue;
             }
 
+            if (($key === 'query' || $key === 'form_params') && is_array($value)) {
+                $options[$key] = $this->normalizeNonFiniteFloatValues(
+                    $this->normalizeRequestOptionValue($value)
+                );
+
+                continue;
+            }
+
             if ($key === 'multipart' && is_array($value)) {
                 $options[$key] = $this->normalizeMultipartOption($value);
+
+                continue;
+            }
+
+            if ($key === 'body') {
+                $options[$key] = $this->normalizeRequestOptionValue($value);
+
+                $this->ensureValidRequestBody($options[$key]);
 
                 continue;
             }
@@ -1432,7 +1453,7 @@ class PendingRequest
             foreach ($value as $key => $item) {
                 $value[$key] = match (true) {
                     $item === null => '',
-                    is_scalar($item) => (string) $item,
+                    is_scalar($item) => $this->normalizeScalarString($item),
                     $item instanceof Stringable => $item->toString(),
                     default => throw new InvalidArgumentException('HTTP header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.'),
                 };
@@ -1443,10 +1464,29 @@ class PendingRequest
 
         return match (true) {
             $value === null => '',
-            is_scalar($value) => (string) $value,
+            is_scalar($value) => $this->normalizeScalarString($value),
             $value instanceof Stringable => $value->toString(),
             default => throw new InvalidArgumentException('HTTP header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.'),
         };
+    }
+
+    /**
+     * Normalize non-finite floats within a nested array.
+     *
+     * @param  array  $values
+     * @return array
+     */
+    protected function normalizeNonFiniteFloatValues(array $values): array
+    {
+        foreach ($values as $key => $value) {
+            if (is_array($value)) {
+                $values[$key] = $this->normalizeNonFiniteFloatValues($value);
+            } elseif (is_float($value) && ! is_finite($value)) {
+                $values[$key] = $this->normalizeScalarString($value);
+            }
+        }
+
+        return $values;
     }
 
     /**
@@ -1470,6 +1510,14 @@ class PendingRequest
                 }
 
                 $part[$key] = $this->normalizeRequestOptionValue($value);
+
+                if ($key === 'contents') {
+                    if (is_array($part[$key])) {
+                        $part[$key] = $this->normalizeNonFiniteFloatValues($part[$key]);
+                    } elseif (is_float($part[$key]) && ! is_finite($part[$key])) {
+                        $part[$key] = $this->normalizeScalarString($part[$key]);
+                    }
+                }
             }
 
             $multipart[$index] = $part;
@@ -1492,7 +1540,7 @@ class PendingRequest
                     $multipart[$index]['headers'][$name] = match (true) {
                         $value === [] => '',
                         $value === null => '',
-                        is_scalar($value) => (string) $value,
+                        is_scalar($value) => $this->normalizeScalarString($value),
                         $value instanceof Stringable => $value->toString(),
                         default => throw new InvalidArgumentException('Multipart header values must be scalar, null, or Laravel Stringable.'),
                     };
@@ -1516,6 +1564,38 @@ class PendingRequest
             $value instanceof Stringable => $value->toString(),
             default => $value,
         };
+    }
+
+    /**
+     * Normalize a scalar to a string without triggering PHP 8.5 non-finite float warnings.
+     *
+     * @param  scalar  $value
+     * @return string
+     */
+    protected function normalizeScalarString($value): string
+    {
+        if (is_float($value) && ! is_finite($value)) {
+            return match (true) {
+                is_nan($value) => 'NAN',
+                $value > 0 => 'INF',
+                default => '-INF',
+            };
+        }
+
+        return (string) $value;
+    }
+
+    /**
+     * Ensure the given request body can be passed to Guzzle.
+     *
+     * @param  mixed  $body
+     * @return void
+     */
+    protected function ensureValidRequestBody($body): void
+    {
+        if (! is_string($body) && ! is_null($body) && ! is_resource($body) && ! $body instanceof StreamInterface) {
+            throw new InvalidArgumentException('HTTP request body must be a string, resource, Psr\Http\Message\StreamInterface, or null.');
+        }
     }
 
     /**

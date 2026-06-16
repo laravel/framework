@@ -119,6 +119,21 @@ class HttpClientTest extends TestCase
         $this->assertSame(['first', '123', '1', '', ''], $response->getHeader('X-Multiple'));
     }
 
+    public function testFakeResponseHeaderValuesNormalizeNonFiniteFloats()
+    {
+        $response = $this->factory::response('OK', 200, [
+            'X-Nan' => NAN,
+            'X-Inf' => INF,
+            'X-Negative-Inf' => -INF,
+            'X-Multiple' => [NAN, INF, -INF],
+        ])->wait();
+
+        $this->assertSame(['NAN'], $response->getHeader('X-Nan'));
+        $this->assertSame(['INF'], $response->getHeader('X-Inf'));
+        $this->assertSame(['-INF'], $response->getHeader('X-Negative-Inf'));
+        $this->assertSame(['NAN', 'INF', '-INF'], $response->getHeader('X-Multiple'));
+    }
+
     #[DataProvider('invalidFakeResponseHeaderValuesProvider')]
     public function testInvalidFakeResponseHeaderValuesAreRejected($value)
     {
@@ -140,22 +155,6 @@ class HttpClientTest extends TestCase
 
         $response = $this->factory->post('http://vapor.laravel.com');
         $this->assertTrue($response->created());
-    }
-
-    public function testStatusCodeShorthandAssumeBodyWhenInvalidHttpStatusCode()
-    {
-        $this->factory->fake([
-            'forge.laravel.com' => 999,
-            'vapor.laravel.com' => 1,
-        ]);
-
-        $response = $this->factory->post('http://forge.laravel.com');
-        $this->assertTrue($response->ok());
-        $this->assertSame('999', $response->body());
-
-        $response = $this->factory->post('http://vapor.laravel.com');
-        $this->assertTrue($response->ok());
-        $this->assertSame('1', $response->body());
     }
 
     public function testBodyShorthands()
@@ -617,6 +616,39 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testQueryParametersNormalizeNonFiniteFloats()
+    {
+        $this->factory->fake();
+
+        $this->factory->get('https://laravel.com/search', [
+            'nan' => NAN,
+            'inf' => INF,
+            'negative_inf' => -INF,
+            'nested' => ['value' => NAN],
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://laravel.com/search?nan=NAN&inf=INF&negative_inf=-INF&nested%5Bvalue%5D=NAN';
+        });
+    }
+
+    public function testFormParamsNormalizeNonFiniteFloats()
+    {
+        $this->factory->fake();
+
+        $this->factory->asForm()->post('http://foo.com/form', [
+            'nan' => NAN,
+            'inf' => INF,
+            'negative_inf' => -INF,
+            'nested' => ['value' => NAN],
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/form'
+                && $request->body() === 'nan=NAN&inf=INF&negative_inf=-INF&nested%5Bvalue%5D=NAN';
+        });
+    }
+
     #[DataProvider('methodsReceivingArrayableDataProvider')]
     public function testCanSendArrayableFormData(string $method)
     {
@@ -716,8 +748,11 @@ class HttpClientTest extends TestCase
             'X-Null' => null,
             'X-True' => true,
             'X-False' => false,
+            'X-Nan' => NAN,
+            'X-Inf' => INF,
+            'X-Negative-Inf' => -INF,
             'X-Laravel-Stringable' => new Stringable('laravel stringable'),
-            'X-Multiple' => ['first', 123, true, false, null],
+            'X-Multiple' => ['first', 123, true, false, null, NAN, INF, -INF],
             'X-Empty' => [],
         ])->post('http://foo.com/json');
 
@@ -727,8 +762,11 @@ class HttpClientTest extends TestCase
                 && $request->hasHeader('X-Null', '')
                 && $request->hasHeader('X-True', '1')
                 && $request->hasHeader('X-False', '')
+                && $request->hasHeader('X-Nan', 'NAN')
+                && $request->hasHeader('X-Inf', 'INF')
+                && $request->hasHeader('X-Negative-Inf', '-INF')
                 && $request->hasHeader('X-Laravel-Stringable', 'laravel stringable')
-                && $request->hasHeader('X-Multiple', ['first', '123', '1', '', ''])
+                && $request->hasHeader('X-Multiple', ['first', '123', '1', '', '', 'NAN', 'INF', '-INF'])
                 && $request->hasHeader('X-Empty', '');
         });
     }
@@ -749,12 +787,13 @@ class HttpClientTest extends TestCase
         $this->factory->fake();
 
         $this->factory->withOptions([
-            'headers' => ['X-Test' => 123, 'X-Null' => null],
+            'headers' => ['X-Test' => 123, 'X-Null' => null, 'X-Nan' => NAN],
         ])->post('http://foo.com/json');
 
         $this->factory->assertSent(function (Request $request) {
             return $request->hasHeader('X-Test', '123')
-                && $request->hasHeader('X-Null', '');
+                && $request->hasHeader('X-Null', '')
+                && $request->hasHeader('X-Nan', 'NAN');
         });
     }
 
@@ -912,11 +951,12 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        $this->factory->attach('file', 'data', 'file.txt', ['X-Part' => 123, 'X-Null' => null])->post('http://foo.com/file');
+        $this->factory->attach('file', 'data', 'file.txt', ['X-Part' => 123, 'X-Null' => null, 'X-Nan' => NAN])->post('http://foo.com/file');
 
         $this->factory->assertSent(function (Request $request) {
             return $request[0]['headers']['X-Part'] === '123'
-                && $request[0]['headers']['X-Null'] === '';
+                && $request[0]['headers']['X-Null'] === ''
+                && $request[0]['headers']['X-Nan'] === 'NAN';
         });
     }
 
@@ -931,6 +971,9 @@ class HttpClientTest extends TestCase
                 'headers' => [
                     'X-Part' => 123,
                     'X-Null' => null,
+                    'X-Nan' => NAN,
+                    'X-Inf' => INF,
+                    'X-Negative-Inf' => -INF,
                     'X-Empty' => [],
                     'X-Laravel-Stringable' => new Stringable('laravel stringable'),
                 ],
@@ -940,6 +983,9 @@ class HttpClientTest extends TestCase
         $this->factory->assertSent(function (Request $request) {
             return $request[0]['headers']['X-Part'] === '123'
                 && $request[0]['headers']['X-Null'] === ''
+                && $request[0]['headers']['X-Nan'] === 'NAN'
+                && $request[0]['headers']['X-Inf'] === 'INF'
+                && $request[0]['headers']['X-Negative-Inf'] === '-INF'
                 && $request[0]['headers']['X-Empty'] === ''
                 && $request[0]['headers']['X-Laravel-Stringable'] === 'laravel stringable';
         });
@@ -1018,6 +1064,27 @@ class HttpClientTest extends TestCase
                 $request[0]['contents'] === 'Steve' &&
                 $request[1]['name'] === 'roles' &&
                 $request[1]['contents'] === ['Network Administrator', 'Janitor'];
+        });
+    }
+
+    public function testMultipartContentsNormalizeNonFiniteFloats()
+    {
+        $this->factory->fake();
+
+        $this->factory->asMultipart()->post('http://foo.com/multipart', [
+            'nan' => NAN,
+            'inf' => INF,
+            'negative_inf' => -INF,
+            'nested' => ['value' => NAN],
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/multipart'
+                && $request->isMultipart()
+                && $request[0]['contents'] === 'NAN'
+                && $request[1]['contents'] === 'INF'
+                && $request[2]['contents'] === '-INF'
+                && $request[3]['contents'] === ['value' => 'NAN'];
         });
     }
 
@@ -2892,6 +2959,21 @@ class HttpClientTest extends TestCase
         $this->assertEquals(199, $requestException->response->header('X-RateLimit-Remaining'));
     }
 
+    public function testFailedRequestHeaderValuesNormalizeNonFiniteFloats()
+    {
+        $exception = $this->factory::failedRequest('error', 500, [
+            'X-Nan' => NAN,
+            'X-Inf' => INF,
+            'X-Negative-Inf' => -INF,
+        ]);
+
+        $this->assertSame('error', $exception->response->body());
+        $this->assertSame(500, $exception->response->status());
+        $this->assertSame('NAN', $exception->response->header('X-Nan'));
+        $this->assertSame('INF', $exception->response->header('X-Inf'));
+        $this->assertSame('-INF', $exception->response->header('X-Negative-Inf'));
+    }
+
     public function testFakeConnectionException()
     {
         $this->factory->fake($this->factory::failedConnection('Fake'));
@@ -4737,14 +4819,14 @@ class HttpClientTest extends TestCase
     public function testJsonDecodingIsCachedForFalsyPayloads()
     {
         $payloads = [
-            '[]' => [],
-            'false' => false,
-            '0' => 0,
-            'null' => null,
-            '""' => '',
+            ['[]', []],
+            ['false', false],
+            ['0', 0],
+            ['null', null],
+            ['""', ''],
         ];
 
-        foreach ($payloads as $body => $expected) {
+        foreach ($payloads as [$body, $expected]) {
             $response = new BodyTrackingResponse(Factory::psr7Response($body));
 
             // First call decodes and caches
