@@ -250,6 +250,20 @@ class JobDispatchingTest extends QueueTestCase
         $this->assertSame('notifications', $events[0]->queue);
     }
 
+    public function testClassQueueAttributeTakesPrecedenceOverTrait()
+    {
+        Config::set('queue.default', 'database');
+        $events = [];
+        $this->app['events']->listen(function (JobQueued $e) use (&$events) {
+            $events[] = $e;
+        });
+
+        JobWithClassQueueAttributeOverridingTrait::dispatch();
+
+        $this->assertCount(1, $events);
+        $this->assertSame('high', $events[0]->queue);
+    }
+
     /**
      * Helpers.
      */
@@ -316,6 +330,12 @@ trait JobDispatchingTestQueueTrait
 }
 
 class JobWithTraitQueueAttribute implements ShouldQueue
+{
+    use Dispatchable, JobDispatchingTestQueueTrait;
+}
+
+#[QueueAttribute('high')]
+class JobWithClassQueueAttributeOverridingTrait implements ShouldQueue
 {
     use Dispatchable, JobDispatchingTestQueueTrait;
 }
