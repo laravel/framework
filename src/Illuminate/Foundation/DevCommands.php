@@ -52,6 +52,10 @@ class DevCommands
      */
     public static function registerDefaults()
     {
+        if (! app()->runningInConsole()) {
+            return;
+        }
+
         foreach ([
             'server' => 'php artisan serve --host=localhost',
             'queue' => 'php artisan queue:listen --tries=1 --timeout=0',
