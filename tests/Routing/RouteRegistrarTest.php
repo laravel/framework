@@ -8,6 +8,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use Illuminate\Routing\RouteRegistrar;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Stringable;
@@ -623,6 +624,43 @@ class RouteRegistrarTest extends TestCase
         $route = $this->router->getRoutes()->getRoutes()[0];
 
         $this->assertSame(['noindex'], $route->getMetadata('head.robots'));
+    }
+
+    public function testCanSetRouteMetadataOnGroupUsingArraySyntax()
+    {
+        $this->router->group(['metadata' => ['head' => ['title' => 'Users']]], function ($router) {
+            $router->get('users', function () {
+                return 'all-users';
+            });
+        });
+
+        $route = $this->router->getRoutes()->getRoutes()[0];
+
+        $this->assertSame(['title' => 'Users'], $route->getMetadata('head'));
+    }
+
+    public function testEmptyRouteMetadataArrayReplacesParentValue()
+    {
+        $this->router
+            ->metadata(['head' => ['title' => 'Users']])
+            ->group(function ($router) {
+                $router
+                    ->metadata(['head' => []])
+                    ->get('users', function () {
+                        return 'all-users';
+                    });
+            });
+
+        $route = $this->router->getRoutes()->getRoutes()[0];
+
+        $this->assertSame([], $route->getMetadata('head'));
+    }
+
+    public function testRouteMetadataAttributeRequiresArray()
+    {
+        $this->expectExceptionObject(new \InvalidArgumentException('Attribute [metadata] expects an array.'));
+
+        (new RouteRegistrar($this->router))->attribute('metadata', 'invalid');
     }
 
     public function testRouteMetadataDoesNotCollideWithRouteActions()

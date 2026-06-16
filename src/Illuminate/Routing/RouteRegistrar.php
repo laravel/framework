@@ -131,9 +131,12 @@ class RouteRegistrar
         }
 
         if ($key === 'metadata') {
+            if (! is_array($value)) {
+                throw new InvalidArgumentException('Attribute [metadata] expects an array.');
+            }
+
             $value = RouteGroup::mergeMetadata(
-                $this->attributes['metadata'] ?? [],
-                is_array($value) ? $value : []
+                $this->attributes['metadata'] ?? [], $value
             );
         }
 

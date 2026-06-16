@@ -24,12 +24,19 @@ class RouteGroup
             unset($old['controller']);
         }
 
+        $metadata = static::formatMetadata($new, $old);
+
+        unset($new['metadata']);
+
         $new = array_merge(static::formatAs($new, $old), [
-            'metadata' => static::formatMetadata($new, $old),
             'namespace' => static::formatNamespace($new, $old),
             'prefix' => static::formatPrefix($new, $old, $prependExistingPrefix),
             'where' => static::formatWhere($new, $old),
         ]);
+
+        if ($metadata !== []) {
+            $new['metadata'] = $metadata;
+        }
 
         return array_merge_recursive(Arr::except(
             $old, ['metadata', 'namespace', 'prefix', 'where', 'as']
@@ -37,7 +44,8 @@ class RouteGroup
     }
 
     /**
-     * Merge route metadata arrays.
+     * Associative array values are merged recursively, while all other
+     * values, including lists, replace the existing value entirely.
      *
      * @param  array  $old
      * @param  array  $new
