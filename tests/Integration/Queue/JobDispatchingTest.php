@@ -236,6 +236,20 @@ class JobDispatchingTest extends QueueTestCase
         $this->assertSame('default', $events[1]->queue);
     }
 
+    public function testQueueAttributeOnTraitIsResolved()
+    {
+        Config::set('queue.default', 'database');
+        $events = [];
+        $this->app['events']->listen(function (JobQueued $e) use (&$events) {
+            $events[] = $e;
+        });
+
+        JobWithTraitQueueAttribute::dispatch();
+
+        $this->assertCount(1, $events);
+        $this->assertSame('notifications', $events[0]->queue);
+    }
+
     /**
      * Helpers.
      */
@@ -294,4 +308,12 @@ enum JobDispatchingTestQueueEnum: string
 class JobWithEnumQueueAttribute implements ShouldQueue
 {
     use Dispatchable;
+}
+
+#[QueueAttribute('notifications')]
+trait JobDispatchingTestQueueTrait {}
+
+class JobWithTraitQueueAttribute implements ShouldQueue
+{
+    use Dispatchable, JobDispatchingTestQueueTrait;
 }
