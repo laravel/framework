@@ -311,7 +311,9 @@ class JobWithEnumQueueAttribute implements ShouldQueue
 }
 
 #[QueueAttribute('notifications')]
-trait JobDispatchingTestQueueTrait {}
+trait JobDispatchingTestQueueTrait
+{
+}
 
 class JobWithTraitQueueAttribute implements ShouldQueue
 {
