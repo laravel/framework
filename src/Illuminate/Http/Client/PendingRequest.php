@@ -1471,38 +1471,6 @@ class PendingRequest
     }
 
     /**
-     * Normalize a scalar to a string without triggering PHP 8.5 non-finite float warnings.
-     *
-     * @param  scalar  $value
-     * @return string
-     */
-    protected function normalizeScalarString($value): string
-    {
-        if (is_float($value) && ! is_finite($value)) {
-            return match (true) {
-                is_nan($value) => 'NAN',
-                $value > 0 => 'INF',
-                default => '-INF',
-            };
-        }
-
-        return (string) $value;
-    }
-
-    /**
-     * Ensure the given request body can be passed to Guzzle.
-     *
-     * @param  mixed  $body
-     * @return void
-     */
-    protected function ensureValidRequestBody($body): void
-    {
-        if (! is_string($body) && ! is_null($body) && ! is_resource($body) && ! $body instanceof StreamInterface) {
-            throw new InvalidArgumentException('HTTP request body must be a string, resource, Psr\Http\Message\StreamInterface, or null.');
-        }
-    }
-
-    /**
      * Normalize non-finite floats within a nested array.
      *
      * @param  array  $values
@@ -1596,6 +1564,38 @@ class PendingRequest
             $value instanceof Stringable => $value->toString(),
             default => $value,
         };
+    }
+
+    /**
+     * Normalize a scalar to a string without triggering PHP 8.5 non-finite float warnings.
+     *
+     * @param  scalar  $value
+     * @return string
+     */
+    protected function normalizeScalarString($value): string
+    {
+        if (is_float($value) && ! is_finite($value)) {
+            return match (true) {
+                is_nan($value) => 'NAN',
+                $value > 0 => 'INF',
+                default => '-INF',
+            };
+        }
+
+        return (string) $value;
+    }
+
+    /**
+     * Ensure the given request body can be passed to Guzzle.
+     *
+     * @param  mixed  $body
+     * @return void
+     */
+    protected function ensureValidRequestBody($body): void
+    {
+        if (! is_string($body) && ! is_null($body) && ! is_resource($body) && ! $body instanceof StreamInterface) {
+            throw new InvalidArgumentException('HTTP request body must be a string, resource, Psr\Http\Message\StreamInterface, or null.');
+        }
     }
 
     /**
