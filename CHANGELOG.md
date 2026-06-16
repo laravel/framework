@@ -1,6 +1,10 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.16.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.16.1...13.x)
+
+## [v13.16.1](https://github.com/laravel/framework/compare/v13.16.0...v13.16.1) - 2026-06-16
+
+* [13.x] Ensure DevCommands doesnt stop itself from registering by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60526
 
 ## [v13.16.0](https://github.com/laravel/framework/compare/v13.15.0...v13.16.0) - 2026-06-16
 
