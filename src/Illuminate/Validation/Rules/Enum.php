@@ -124,7 +124,7 @@ class Enum implements Rule, ValidatorAwareRule, Stringable
     /**
      * Get the validation error message.
      *
-     * @return array
+     * @return string|array
      */
     public function message()
     {

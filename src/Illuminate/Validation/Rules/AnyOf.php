@@ -68,7 +68,7 @@ class AnyOf implements Rule, ValidatorAwareRule
     /**
      * Get the validation error messages.
      *
-     * @return array
+     * @return string|array
      */
     public function message()
     {

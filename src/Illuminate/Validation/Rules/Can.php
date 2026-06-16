@@ -60,7 +60,7 @@ class Can implements Rule, ValidatorAwareRule
     /**
      * Get the validation error message.
      *
-     * @return array
+     * @return string|array
      */
     public function message()
     {
