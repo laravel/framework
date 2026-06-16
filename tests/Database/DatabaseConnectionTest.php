@@ -7,6 +7,7 @@ use ErrorException;
 use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
+use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitted;
@@ -250,6 +251,45 @@ class DatabaseConnectionTest extends TestCase
         $connection->beginTransaction();
         $connection->disconnect();
         $this->assertEquals(0, $connection->transactionLevel());
+    }
+
+    public function testDisconnectRollsBackTransactionsManagerWhenTransactionIsActive()
+    {
+        $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
+        $connection = $this->getMockConnection(['getName'], $pdo);
+        $connection->method('getName')->willReturn('name');
+        $connection->setTransactionManager($manager = new DatabaseTransactionsManager);
+
+        $connection->beginTransaction();
+
+        $connection->disconnect();
+
+        $this->assertCount(0, $manager->getPendingTransactions());
+        $this->assertEquals(0, $connection->transactionLevel());
+    }
+
+    public function testDisconnectMidTransactionDiscardsStaleAfterCommitCallbacks()
+    {
+        $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
+        $connection = $this->getMockConnection(['getName'], $pdo);
+        $connection->method('getName')->willReturn('name');
+        $connection->setReconnector(function ($connection) {
+            $connection->setPdo($this->createMock(DatabaseConnectionTestMockPDO::class));
+        });
+        $connection->setTransactionManager($manager = new DatabaseTransactionsManager);
+
+        $fired = 0;
+        $connection->beginTransaction();
+        $manager->addCallback(function () use (&$fired) {
+            $fired++;
+        });
+
+        $connection->disconnect();
+
+        $connection->beginTransaction();
+        $connection->commit();
+
+        $this->assertSame(0, $fired);
     }
 
     public function testBeganTransactionFiresEventsIfSet()
