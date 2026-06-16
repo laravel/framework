@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
+use JsonException;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 /**
@@ -179,9 +180,17 @@ class Factory
     public static function psr7Response($body = null, $status = 200, $headers = [])
     {
         if (is_array($body)) {
-            $body = json_encode($body);
+            try {
+                $body = json_encode($body, JSON_THROW_ON_ERROR);
+            } catch (JsonException $e) {
+                throw new InvalidArgumentException('HTTP fake response body could not be JSON encoded.', previous: $e);
+            }
 
             $headers['Content-Type'] = 'application/json';
+        }
+
+        if (! is_string($body) && ! is_null($body)) {
+            throw new InvalidArgumentException('HTTP fake response body must be a string, array, or null.');
         }
 
         return new Psr7Response($status, static::normalizeResponseHeaders($headers), $body);
@@ -206,7 +215,7 @@ class Factory
                 foreach ($value as $key => $item) {
                     $value[$key] = match (true) {
                         $item === null => '',
-                        is_scalar($item) => (string) $item,
+                        is_scalar($item) => static::normalizeScalarString($item),
                         $item instanceof Stringable => $item->toString(),
                         default => throw new InvalidArgumentException('HTTP fake response header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.'),
                     };
@@ -219,13 +228,32 @@ class Factory
 
             $headers[$name] = match (true) {
                 $value === null => '',
-                is_scalar($value) => (string) $value,
+                is_scalar($value) => static::normalizeScalarString($value),
                 $value instanceof Stringable => $value->toString(),
                 default => throw new InvalidArgumentException('HTTP fake response header values must be scalar, null, Laravel Stringable, or arrays of scalar, null, or Laravel Stringable values.'),
             };
         }
 
         return $headers;
+    }
+
+    /**
+     * Normalize a scalar to a string without triggering PHP 8.5 non-finite float warnings.
+     *
+     * @param  scalar  $value
+     * @return string
+     */
+    protected static function normalizeScalarString($value): string
+    {
+        if (is_float($value) && ! is_finite($value)) {
+            return match (true) {
+                is_nan($value) => 'NAN',
+                $value > 0 => 'INF',
+                default => '-INF',
+            };
+        }
+
+        return (string) $value;
     }
 
     /**
@@ -343,11 +371,15 @@ class Factory
                 return;
             }
 
-            if (is_int($callback) && $callback >= 100 && $callback < 600) {
-                return static::response(status: $callback);
+            if (is_int($callback)) {
+                if ($callback >= 100 && $callback < 600) {
+                    return static::response(status: $callback);
+                }
+
+                throw new InvalidArgumentException('HTTP status code must be between 100 and 599.');
             }
 
-            if (is_int($callback) || is_string($callback)) {
+            if (is_string($callback)) {
                 return static::response($callback);
             }
 
