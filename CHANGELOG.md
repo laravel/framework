@@ -1,6 +1,36 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.15.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.16.0...13.x)
+
+## [v13.16.0](https://github.com/laravel/framework/compare/v13.15.0...v13.16.0) - 2026-06-16
+
+* [13.x] Fix incorrect casing of StdClass in SupportHelpersTest by [@Soean](https://github.com/Soean) in https://github.com/laravel/framework/pull/60479
+* [13.x] Fix shell quoting when scheduled commands run as another user by [@igorlealantunes](https://github.com/igorlealantunes) in https://github.com/laravel/framework/pull/60469
+* [13.x] Improve return type for `Localizable::withLocale()` by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/60466
+* [13.x] Allow RouteParameter to use the attributed parameter name by [@SanderSander](https://github.com/SanderSander) in https://github.com/laravel/framework/pull/60465
+* [13.x] Adjust CHANGELOG.md by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60464
+* [13.x] Add generic to HasEvents::dispatchesEvents() return type by [@dfinchenko](https://github.com/dfinchenko) in https://github.com/laravel/framework/pull/60463
+* [13.x] Improve return types for model callback-scope helpers by [@dfinchenko](https://github.com/dfinchenko) in https://github.com/laravel/framework/pull/60481
+* [13.x] Support enum for broadcastAs by [@alexbowers](https://github.com/alexbowers) in https://github.com/laravel/framework/pull/60483
+* [13.x] Improve return types for database connection callback wrappers by [@dfinchenko](https://github.com/dfinchenko) in https://github.com/laravel/framework/pull/60484
+* [13.x] Add `array` maintenance mode driver for parallel testing by [@ziadoz](https://github.com/ziadoz) in https://github.com/laravel/framework/pull/60489
+* [13.x] Add `whenFilledEnum` method to `InteractsWithData` by [@astandkaya](https://github.com/astandkaya) in https://github.com/laravel/framework/pull/60486
+* [13.x] Add array to supported maintainance mode drivers doc by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60490
+* Bump esbuild, [@tailwindcss](https://github.com/tailwindcss)/vite and vite in /src/Illuminate/Foundation/resources/exceptions/renderer by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/framework/pull/60501
+* Improve return types for the remaining callback-passthrough helpers by [@dfinchenko](https://github.com/dfinchenko) in https://github.com/laravel/framework/pull/60500
+* Bump shivammathur/setup-php from 2.37.1 to 2.37.2 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/framework/pull/60512
+* [13.x] Add missing [@throws](https://github.com/throws) \JsonException annotations by [@dfinchenko](https://github.com/dfinchenko) in https://github.com/laravel/framework/pull/60514
+* [13.x] Improve return types for callback-passthrough interfaces and helpers by [@dfinchenko](https://github.com/dfinchenko) in https://github.com/laravel/framework/pull/60513
+* Improve types of `InteractsWithData::whenEnum` by [@takaram](https://github.com/takaram) in https://github.com/laravel/framework/pull/60507
+* [13.x] Ensure hashtags are removed via release script by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60505
+* Add anyOf support to JSON schema by [@dbpolito](https://github.com/dbpolito) in https://github.com/laravel/framework/pull/60509
+* [13.x] Fix `Batchable::batching` for finished batches by [@miladev95](https://github.com/miladev95) in https://github.com/laravel/framework/pull/60511
+* [13.x] Add `withCookies` method to `ResponseTrait` by [@Amirhf1](https://github.com/Amirhf1) in https://github.com/laravel/framework/pull/60503
+* Add `artisan dev` command by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/framework/pull/60412
+* [13.x] Add correct return type to FileHelpers extension method by [@MatthieuFlaceliere](https://github.com/MatthieuFlaceliere) in https://github.com/laravel/framework/pull/60515
+* Guard JsonSchema deserializer against unbounded $ref expansion by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/60517
+* [13.x] Support Queue attributes on traits by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60519
+* [13.x] Harden HTTP client request and fake response serialization by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/60522
 
 ## [v13.15.0](https://github.com/laravel/framework/compare/v13.14.0...v13.15.0) - 2026-06-09
 
