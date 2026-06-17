@@ -82,10 +82,13 @@ trait InteractsWithData
     /**
      * Apply the callback if the instance contains the given key.
      *
+     * @template TReturn
+     * @template TReturnDefault = never
+     *
      * @param  string  $key
-     * @param  callable  $callback
-     * @param  callable|null  $default
-     * @return $this|mixed
+     * @param  callable(mixed): TReturn  $callback
+     * @param  (callable(): TReturnDefault)|null  $default
+     * @return $this|TReturn|TReturnDefault
      */
     public function whenHas($key, callable $callback, ?callable $default = null)
     {
@@ -160,10 +163,13 @@ trait InteractsWithData
     /**
      * Apply the callback if the instance contains a non-empty value for the given key.
      *
+     * @template TReturn
+     * @template TReturnDefault = never
+     *
      * @param  string  $key
-     * @param  callable  $callback
-     * @param  callable|null  $default
-     * @return $this|mixed
+     * @param  callable(mixed): TReturn  $callback
+     * @param  (callable(): TReturnDefault)|null  $default
+     * @return $this|TReturn|TReturnDefault
      */
     public function whenFilled($key, callable $callback, ?callable $default = null)
     {
@@ -224,10 +230,13 @@ trait InteractsWithData
     /**
      * Apply the callback if the instance is missing the given key.
      *
+     * @template TReturn
+     * @template TReturnDefault = never
+     *
      * @param  string  $key
-     * @param  callable  $callback
-     * @param  callable|null  $default
-     * @return $this|mixed
+     * @param  callable(mixed): TReturn  $callback
+     * @param  (callable(): TReturnDefault)|null  $default
+     * @return $this|TReturn|TReturnDefault
      */
     public function whenMissing($key, callable $callback, ?callable $default = null)
     {

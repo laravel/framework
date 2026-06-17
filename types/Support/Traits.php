@@ -27,6 +27,42 @@ $interactsWithData = function (UriQueryString $query): void {
     assertType('3|Illuminate\Support\UriQueryString', $query->whenEnum('foo', TestIntEnum::class, function ($enum) {
         return 3;
     }));
+
+    assertType('1|2|Illuminate\Support\UriQueryString', $query->whenHas('foo', function ($value) {
+        assertType('mixed', $value);
+
+        return 1;
+    }, function () {
+        return 2;
+    }));
+
+    assertType('3|Illuminate\Support\UriQueryString', $query->whenHas('foo', function ($value) {
+        return 3;
+    }));
+
+    assertType('1|2|Illuminate\Support\UriQueryString', $query->whenFilled('foo', function ($value) {
+        assertType('mixed', $value);
+
+        return 1;
+    }, function () {
+        return 2;
+    }));
+
+    assertType('3|Illuminate\Support\UriQueryString', $query->whenFilled('foo', function ($value) {
+        return 3;
+    }));
+
+    assertType('1|2|Illuminate\Support\UriQueryString', $query->whenMissing('foo', function ($value) {
+        assertType('mixed', $value);
+
+        return 1;
+    }, function () {
+        return 2;
+    }));
+
+    assertType('3|Illuminate\Support\UriQueryString', $query->whenMissing('foo', function ($value) {
+        return 3;
+    }));
 };
 
 enum TestIntEnum: int
