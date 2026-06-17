@@ -13,6 +13,8 @@ if (! function_exists('lazy')) {
      * @param  int  $options
      * @param  array<string, mixed>  $eager
      * @return TValue
+     *
+     * @throws \ReflectionException
      */
     function lazy($class, $callback = 0, $options = 0, $eager = [])
     {
@@ -61,6 +63,8 @@ if (! function_exists('proxy')) {
      * @param  int  $options
      * @param  array<string, mixed>  $eager
      * @return TValue
+     *
+     * @throws \ReflectionException
      */
     function proxy($class, $callback = 0, $options = 0, $eager = [])
     {
