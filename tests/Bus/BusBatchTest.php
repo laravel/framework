@@ -597,6 +597,13 @@ class BusBatchTest extends TestCase
         $batch->options['catch'] = [1];
         $this->assertTrue($batch->hasCatchCallbacks());
 
+        $this->assertSame([], $batch->failureCallbacks());
+        $batch->options['failure'] = [];
+        $this->assertFalse($batch->hasFailureCallbacks());
+        $batch->options['failure'] = [1];
+        $this->assertTrue($batch->hasFailureCallbacks());
+        $this->assertSame([1], $batch->failureCallbacks());
+
         $this->assertFalse($batch->cancelled());
         $batch->cancelledAt = Carbon::now();
         $this->assertTrue($batch->cancelled());

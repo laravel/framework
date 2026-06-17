@@ -421,6 +421,16 @@ class Batch implements Arrayable, JsonSerializable
     }
 
     /**
+     * Get the "failure" callbacks that have been registered with the batch.
+     *
+     * @return array
+     */
+    public function failureCallbacks()
+    {
+        return $this->options['failure'] ?? [];
+    }
+
+    /**
      * Determine if the batch has "finally" callbacks.
      *
      * @return bool
