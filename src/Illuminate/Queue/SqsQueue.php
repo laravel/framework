@@ -399,7 +399,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      * Store the payload in cache and return a pointer payload.
      *
      * @param  string  $payload
-     * @return string
+     * @return string|false
      */
     protected function overflow($payload)
     {

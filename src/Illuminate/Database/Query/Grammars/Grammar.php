@@ -743,7 +743,7 @@ class Grammar extends BaseGrammar
      * Prepare the binding for a "JSON contains" statement.
      *
      * @param  mixed  $binding
-     * @return string
+     * @return string|false
      */
     public function prepareBindingForJsonContains($binding)
     {

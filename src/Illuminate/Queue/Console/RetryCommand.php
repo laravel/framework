@@ -155,7 +155,7 @@ class RetryCommand extends Command
      * Applicable to Redis and other jobs which store attempts in their payload.
      *
      * @param  string  $payload
-     * @return string
+     * @return string|false
      */
     protected function resetAttempts($payload)
     {
@@ -172,7 +172,7 @@ class RetryCommand extends Command
      * Refresh the "retry until" timestamp for the job.
      *
      * @param  string  $payload
-     * @return string
+     * @return string|false
      *
      * @throws \RuntimeException
      */
