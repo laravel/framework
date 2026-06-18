@@ -10,5 +10,5 @@ interface CanBeEscapedWhenCastToString
      * @param  bool  $escape
      * @return $this
      */
-    public function escapeWhenCastingToString($escape = true);
+    public function escapeWhenCastingToString(bool $escape = true);
 }

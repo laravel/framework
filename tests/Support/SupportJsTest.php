@@ -88,7 +88,7 @@ class SupportJsTest extends TestCase
 
             public $bar = 'not world';
 
-            public function toJson($options = 0)
+            public function toJson(int $options = 0): string
             {
                 return json_encode(['foo' => 'hello', 'bar' => 'world'], $options);
             }
@@ -167,7 +167,7 @@ class SupportJsTest extends TestCase
                 return '<p>Hello, World!</p>';
             }
 
-            public function toJson($options = 0)
+            public function toJson(int $options = 0): string
             {
                 return json_encode(['foo' => 'hello', 'bar' => 'world'], $options);
             }
