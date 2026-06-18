@@ -7,7 +7,6 @@ use Illuminate\Foundation\DevCommand;
 use Illuminate\Foundation\DevCommandColor;
 use Illuminate\Foundation\DevCommands;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\PhpProcess;
 use Symfony\Component\Process\Process;
 
 class FoundationDevCommandsTest extends TestCase
