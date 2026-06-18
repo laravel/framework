@@ -12,6 +12,7 @@ use Illuminate\Image\ImageManager;
  * @method static \Illuminate\Image\Image fromBase64(string $base64)
  * @method static string getDefaultDriver()
  * @method static \Illuminate\Image\ImageManager extend(string $driver, \Closure $callback)
+ *
  * @see ImageManager
  */
 class Image extends Facade
