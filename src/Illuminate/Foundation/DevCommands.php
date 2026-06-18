@@ -195,7 +195,7 @@ class DevCommands
             $file = $frame['file'] ?? null;
             $class = $frame['class'] ?? null;
 
-            if ($class === self::class) {
+            if ($file === __FILE__) {
                 continue;
             }
 
