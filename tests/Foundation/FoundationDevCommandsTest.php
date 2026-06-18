@@ -8,6 +8,7 @@ use Illuminate\Foundation\DevCommandColor;
 use Illuminate\Foundation\DevCommands;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\PhpProcess;
+use Symfony\Component\Process\Process;
 
 class FoundationDevCommandsTest extends TestCase
 {
@@ -207,8 +208,9 @@ class FoundationDevCommandsTest extends TestCase
     public function testVendorRegistrationIsPrevented()
     {
         $basePath = realpath(__DIR__.'/../..');
+        $vendorFile = $basePath.'/vendor/_test_vendor_register_'.uniqid().'.php';
 
-        $process = new PhpProcess(<<<EOF
+        file_put_contents($vendorFile, <<<PHP
 <?php
 require '{$basePath}/vendor/autoload.php';
 
@@ -216,16 +218,17 @@ require '{$basePath}/vendor/autoload.php';
 \$app['env'] = 'testing';
 
 try {
-    // Simulate a vendor package registering a dev command by calling from
-    // a file that only has vendor frames in the backtrace.
     Illuminate\Foundation\DevCommands::register('echo hello', 'vendor-cmd');
     echo 'REGISTERED';
 } catch (Exception \$e) {
     echo 'EXCEPTION:' . \$e->getMessage();
 }
-EOF, $basePath);
+PHP);
 
+        $process = new Process(['php', $vendorFile], $basePath);
         $process->run();
+
+        @unlink($vendorFile);
 
         $this->assertStringContainsString('EXCEPTION:', $process->getOutput());
         $this->assertStringContainsString('DevCommands should be registered in application code', $process->getOutput());
