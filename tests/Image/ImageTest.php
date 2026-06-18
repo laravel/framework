@@ -527,16 +527,6 @@ class ImageTest extends TestCase
         $this->assertSame('imagick', $driver);
     }
 
-    public function test_using_cloudflare_shortcut()
-    {
-        $image = $this->makeImage();
-        $result = $image->usingCloudflare();
-
-        $driver = (new \ReflectionProperty($result, 'driver'))->getValue($result);
-
-        $this->assertSame('cloudflare', $driver);
-    }
-
     public function test_dimensions_on_tiny_image()
     {
         $image = new Image($this->fakeImageContents(1, 1));

@@ -256,14 +256,6 @@ class Image implements Stringable
     }
 
     /**
-     * Use the Cloudflare driver for processing.
-     */
-    public function usingCloudflare(): static
-    {
-        return $this->using('cloudflare');
-    }
-
-    /**
      * Process the image and return the raw bytes.
      */
     public function toBytes(): string

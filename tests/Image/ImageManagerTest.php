@@ -41,16 +41,16 @@ class ImageManagerTest extends TestCase
 
     public function test_extend_registers_custom_driver()
     {
-        $app = $this->makeApp(['image.default' => 'cloudflare']);
+        $app = $this->makeApp(['image.default' => 'custom']);
 
         $mockDriver = m::mock(Driver::class);
 
         $manager = new ImageManager($app);
-        $manager->extend('cloudflare', function ($app) use ($mockDriver) {
+        $manager->extend('custom', function ($app) use ($mockDriver) {
             return $mockDriver;
         });
 
-        $this->assertSame($mockDriver, $manager->driver('cloudflare'));
+        $this->assertSame($mockDriver, $manager->driver('custom'));
     }
 
     public function test_driver_caches_resolved_instances()
@@ -223,81 +223,6 @@ class ImageManagerTest extends TestCase
         $this->assertSame($driver1, $manager->driver('one'));
         $this->assertSame($driver2, $manager->driver('two'));
         $this->assertNotSame($manager->driver('one'), $manager->driver('two'));
-    }
-
-    public function test_prune_orphaned_uses_default_driver()
-    {
-        $app = $this->makeApp([]);
-        $pruned = false;
-
-        $driver = new class($pruned) implements Driver
-        {
-            public function __construct(private &$pruned)
-            {
-            }
-
-            public function process(string $contents, \Illuminate\Image\PendingImageOptions $options): string
-            {
-                return $contents;
-            }
-
-            public function pruneOrphaned(): void
-            {
-                $this->pruned = true;
-            }
-        };
-
-        $manager = new ImageManager($app);
-        $manager->extend('gd', fn () => $driver);
-
-        $manager->pruneOrphaned();
-
-        $this->assertTrue($pruned);
-    }
-
-    public function test_prune_orphaned_accepts_specific_driver()
-    {
-        $app = $this->makeApp([]);
-        $pruned = false;
-
-        $cloudflareDriver = new class($pruned) implements Driver
-        {
-            public function __construct(private &$pruned)
-            {
-            }
-
-            public function process(string $contents, \Illuminate\Image\PendingImageOptions $options): string
-            {
-                return $contents;
-            }
-
-            public function pruneOrphaned(): void
-            {
-                $this->pruned = true;
-            }
-        };
-
-        $manager = new ImageManager($app);
-        $manager->extend('gd', fn () => m::mock(Driver::class));
-        $manager->extend('cloudflare', fn () => $cloudflareDriver);
-
-        $manager->pruneOrphaned('cloudflare');
-
-        $this->assertTrue($pruned);
-    }
-
-    public function test_prune_orphaned_is_noop_when_driver_does_not_support_it()
-    {
-        $app = $this->makeApp([]);
-
-        $driver = m::mock(Driver::class);
-
-        $manager = new ImageManager($app);
-        $manager->extend('gd', fn () => $driver);
-
-        $manager->pruneOrphaned();
-
-        $this->assertTrue(true);
     }
 
     protected function fakeImageContents(): string

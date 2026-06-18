@@ -7,7 +7,6 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Client\Factory as HttpFactory;
-use Illuminate\Image\Drivers\CloudflareDriver;
 use Illuminate\Image\Drivers\GdDriver;
 use Illuminate\Image\Drivers\ImagickDriver;
 use InvalidArgumentException;
@@ -97,21 +96,6 @@ class ImageManager
     }
 
     /**
-     * Create the Cloudflare image driver.
-     */
-    protected function createCloudflareDriver(): CloudflareDriver
-    {
-        $config = $this->app['config']['image.drivers.cloudflare'] ?? [];
-
-        return new CloudflareDriver(
-            $this->app->make(HttpFactory::class),
-            $config['account_id'] ?? '',
-            $config['api_token'] ?? '',
-            $config['prefix'] ?? '',
-        );
-    }
-
-    /**
      * Create an image instance from raw bytes.
      */
     public function fromBytes(string $contents): Image
@@ -167,18 +151,6 @@ class ImageManager
         $this->customCreators[$driver] = $callback->bindTo($this, $this);
 
         return $this;
-    }
-
-    /**
-     * Prune orphaned images from the given driver.
-     */
-    public function pruneOrphaned(?string $name = null): void
-    {
-        $driver = $this->driver($name);
-
-        if (method_exists($driver, 'pruneOrphaned')) {
-            $driver->pruneOrphaned();
-        }
     }
 
     /**
