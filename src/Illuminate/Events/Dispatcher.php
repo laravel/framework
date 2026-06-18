@@ -700,6 +700,8 @@ class Dispatcher implements DispatcherContract
      * @param  string  $method
      * @param  array  $arguments
      * @return array{TListener, mixed}
+     *
+     * @throws \ReflectionException
      */
     protected function createListenerAndJob($class, $method, $arguments)
     {

@@ -44,6 +44,8 @@ class RouteSignatureParameters
      *
      * @param  string  $uses
      * @return array
+     *
+     * @throws \ReflectionException
      */
     protected static function fromClassMethodString($uses)
     {
