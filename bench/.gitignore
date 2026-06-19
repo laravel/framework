@@ -1,0 +1,2 @@
+# compiled perf_event_open counter (build with: gcc -O2 -o bench/perfcount bench/perfcount.c)
+/perfcount
