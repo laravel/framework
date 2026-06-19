@@ -19,6 +19,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use ReflectionClass;
@@ -1129,7 +1130,7 @@ class Builder implements BuilderContract
         $perPage = value($perPage, $total) ?: $this->model->getPerPage();
 
         if (($this->query->clampPage || LengthAwarePaginator::$defaultClampPage) && $total > 0) {
-            $page = min($page, max((int) ceil($total / $perPage), 1));
+            $page = Number::clamp($page, 1, (int) ceil($total / $perPage));
         }
 
         $results = $total

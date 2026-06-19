@@ -24,6 +24,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
@@ -3628,7 +3629,7 @@ class Builder implements BuilderContract
         $perPage = value($perPage, $total);
 
         if (($this->clampPage || LengthAwarePaginator::$defaultClampPage) && $total > 0) {
-            $page = min($page, max((int) ceil($total / $perPage), 1));
+            $page = Number::clamp($page, 1, (int) ceil($total / $perPage));
         }
 
         $results = $total ? $this->forPage($page, $perPage)->get($columns) : new Collection;
