@@ -929,8 +929,17 @@ trait HasAttributes
      */
     protected function getCastType($key)
     {
-        $castType = $this->getCasts()[$key];
+        return $this->resolveCastType($this->getCasts()[$key]);
+    }
 
+    /**
+     * Normalize a raw cast definition to its cast type.
+     *
+     * @param  string  $castType
+     * @return string
+     */
+    protected function resolveCastType($castType)
+    {
         if (isset(static::$castTypeCache[$castType])) {
             return static::$castTypeCache[$castType];
         }
@@ -964,14 +973,18 @@ trait HasAttributes
      */
     protected function getInternalCastClass($key)
     {
-        if (! array_key_exists($key, $this->getCasts())) {
+        $casts = $this->getCasts();
+
+        if (! array_key_exists($key, $casts)) {
             return null;
         }
 
-        $castType = $this->getCastType($key);
+        $cast = $casts[$key];
+
+        $castType = $this->resolveCastType($cast);
 
         if (! array_key_exists($castType, static::$castClassCache)) {
-            static::$castClassCache[$castType] = $this->resolveInternalCastClass($castType, $this->getCasts()[$key]);
+            static::$castClassCache[$castType] = $this->resolveInternalCastClass($castType, $cast);
         }
 
         if (is_null($caster = static::$castClassCache[$castType])) {
