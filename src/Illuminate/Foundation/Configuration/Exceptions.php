@@ -67,6 +67,32 @@ class Exceptions
     }
 
     /**
+     * Register a retryable callback.
+     *
+     * @param  callable  $using
+     * @return $this
+     */
+    public function retry(callable $using)
+    {
+        $this->handler->retryable($using);
+
+        return $this;
+    }
+
+    /**
+     * Register a retryable callback.
+     *
+     * @param  callable  $retryUsing
+     * @return $this
+     */
+    public function retryable(callable $retryUsing)
+    {
+        $this->handler->retryable($retryUsing);
+
+        return $this;
+    }
+
+    /**
      * Register a callback to prepare the final, rendered exception response.
      *
      * @param  callable  $using

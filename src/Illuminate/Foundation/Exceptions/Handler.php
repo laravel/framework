@@ -121,6 +121,13 @@ class Handler implements ExceptionHandlerContract
     protected $renderCallbacks = [];
 
     /**
+     * The callbacks that should be used to determine if an exception should be retried.
+     *
+     * @var \Closure[]
+     */
+    protected $retryCallbacks = [];
+
+    /**
      * The callback that determines if the exception handler response should be JSON.
      *
      * @var callable|null
@@ -249,6 +256,50 @@ class Handler implements ExceptionHandlerContract
         $this->renderCallbacks[] = $renderUsing;
 
         return $this;
+    }
+
+    /**
+     * Register a retryable callback.
+     *
+     * @param  callable  $retryUsing
+     * @return $this
+     */
+    public function retryable(callable $retryUsing)
+    {
+        if (! $retryUsing instanceof Closure) {
+            $retryUsing = Closure::fromCallable($retryUsing);
+        }
+
+        $this->retryCallbacks[] = $retryUsing;
+
+        return $this;
+    }
+
+    /**
+     * Determine if the exception should be retried when thrown from a queued job.
+     *
+     * @param  \Throwable  $e
+     * @return bool
+     */
+    public function shouldRetry(Throwable $e)
+    {
+        if (method_exists($e, 'retry')) {
+            return $e->retry();
+        }
+
+        foreach ($this->retryCallbacks as $retryCallback) {
+            foreach ($this->firstClosureParameterTypes($retryCallback) as $type) {
+                if (is_a($e, $type)) {
+                    $result = $retryCallback($e);
+
+                    if (! is_null($result)) {
+                        return $result;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     /**

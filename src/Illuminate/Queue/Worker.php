@@ -589,6 +589,10 @@ class Worker
                 $this->markJobAsFailedIfWillExceedMaxExceptions(
                     $connectionName, $job, $e
                 );
+
+                $this->markJobAsFailedIfItShouldNotBeRetried(
+                    $connectionName, $job, $e
+                );
             }
 
             $this->raiseExceptionOccurredJobEvent(
@@ -687,6 +691,21 @@ class Worker
         if ($maxExceptions <= $this->cache->increment('job-exceptions:'.$uuid)) {
             $this->cache->forget('job-exceptions:'.$uuid);
 
+            $this->failJob($job, $e);
+        }
+    }
+
+    /**
+     * Mark the given job as failed if the exception handler determines it should not be retried.
+     *
+     * @param  string  $connectionName
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  \Throwable  $e
+     * @return void
+     */
+    protected function markJobAsFailedIfItShouldNotBeRetried($connectionName, $job, Throwable $e)
+    {
+        if (method_exists($this->exceptions, 'shouldRetry') && ! $this->exceptions->shouldRetry($e)) {
             $this->failJob($job, $e);
         }
     }
