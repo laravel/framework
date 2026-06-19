@@ -6299,6 +6299,156 @@ SQL;
         $this->assertEquals(10, $result->total());
     }
 
+    public function testPaginateWithClampPageClampsToLastPage()
+    {
+        $perPage = 15;
+        $pageName = 'page';
+        $page = 100;
+        $lastPage = 2;
+        $total = 30;
+        $path = 'http://foo.bar?page=100';
+
+        $builder = $this->getBuilder();
+        $builder->from('users');
+        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(fn ($b, $results) => $results);
+        $builder->getConnection()->shouldReceive('select')->once()
+            ->andReturn([['aggregate' => $total]]);
+        $builder->getConnection()->shouldReceive('select')->once()
+            ->with(m::pattern('/limit 15 offset 15/'), m::any(), m::any(), m::any())
+            ->andReturn([['id' => 1], ['id' => 2]]);
+
+        Paginator::currentPathResolver(fn () => $path);
+
+        $result = $builder->clampPage()->paginate($perPage, ['*'], $pageName, $page);
+
+        $this->assertEquals($lastPage, $result->currentPage());
+        $this->assertEquals($total, $result->total());
+    }
+
+    public function testPaginateWithClampPageWhenPageIsWithinRange()
+    {
+        $perPage = 15;
+        $pageName = 'page';
+        $page = 1;
+        $total = 30;
+        $path = 'http://foo.bar?page=1';
+
+        $builder = $this->getBuilder();
+        $builder->from('users');
+        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(fn ($b, $results) => $results);
+        $builder->getConnection()->shouldReceive('select')->once()
+            ->andReturn([['aggregate' => $total]]);
+        $builder->getConnection()->shouldReceive('select')->once()
+            ->with(m::pattern('/limit 15 offset 0/'), m::any(), m::any(), m::any())
+            ->andReturn([['id' => 1], ['id' => 2]]);
+
+        Paginator::currentPathResolver(fn () => $path);
+
+        $result = $builder->clampPage()->paginate($perPage, ['*'], $pageName, $page);
+
+        $this->assertEquals($page, $result->currentPage());
+    }
+
+    public function testPaginateWithClampPageWhenPageIsExactlyLastPage()
+    {
+        $perPage = 15;
+        $pageName = 'page';
+        $page = 2;
+        $total = 30;
+        $path = 'http://foo.bar?page=2';
+
+        $builder = $this->getBuilder();
+        $builder->from('users');
+        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(fn ($b, $results) => $results);
+        $builder->getConnection()->shouldReceive('select')->once()
+            ->andReturn([['aggregate' => $total]]);
+        $builder->getConnection()->shouldReceive('select')->once()
+            ->with(m::pattern('/limit 15 offset 15/'), m::any(), m::any(), m::any())
+            ->andReturn([['id' => 1], ['id' => 2]]);
+
+        Paginator::currentPathResolver(fn () => $path);
+
+        $result = $builder->clampPage()->paginate($perPage, ['*'], $pageName, $page);
+
+        $this->assertEquals($page, $result->currentPage());
+    }
+
+    public function testPaginateWithClampPageWhenTotalIsZero()
+    {
+        $perPage = 15;
+        $pageName = 'page';
+        $page = 5;
+        $path = 'http://foo.bar?page=5';
+
+        $builder = $this->getBuilder();
+        $builder->from('users');
+        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(fn ($b, $results) => $results);
+        $builder->getConnection()->shouldReceive('select')->once()
+            ->andReturn([['aggregate' => 0]]);
+
+        Paginator::currentPathResolver(fn () => $path);
+
+        $result = $builder->clampPage()->paginate($perPage, ['*'], $pageName, $page);
+
+        $this->assertEquals(0, $result->total());
+        $this->assertTrue($result->isEmpty());
+    }
+
+    public function testPaginateDefaultDoesNotClamp()
+    {
+        $perPage = 15;
+        $pageName = 'page';
+        $page = 100;
+        $total = 30;
+        $path = 'http://foo.bar?page=100';
+
+        $builder = $this->getBuilder();
+        $builder->from('users');
+        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(fn ($b, $results) => $results);
+        $builder->getConnection()->shouldReceive('select')->once()
+            ->andReturn([['aggregate' => $total]]);
+        $builder->getConnection()->shouldReceive('select')->once()
+            ->with(m::pattern('/limit 15 offset 1485/'), m::any(), m::any(), m::any())
+            ->andReturn([]);
+
+        Paginator::currentPathResolver(fn () => $path);
+
+        $result = $builder->paginate($perPage, ['*'], $pageName, $page);
+
+        $this->assertEquals($page, $result->currentPage());
+        $this->assertTrue($result->isEmpty());
+    }
+
+    public function testPaginateWithDefaultClampPage()
+    {
+        $perPage = 15;
+        $pageName = 'page';
+        $page = 100;
+        $lastPage = 2;
+        $total = 30;
+        $path = 'http://foo.bar?page=100';
+
+        $builder = $this->getBuilder();
+        $builder->from('users');
+        $builder->getProcessor()->shouldReceive('processSelect')->andReturnUsing(fn ($b, $results) => $results);
+        $builder->getConnection()->shouldReceive('select')->once()
+            ->andReturn([['aggregate' => $total]]);
+        $builder->getConnection()->shouldReceive('select')->once()
+            ->with(m::pattern('/limit 15 offset 15/'), m::any(), m::any(), m::any())
+            ->andReturn([['id' => 1], ['id' => 2]]);
+
+        Paginator::currentPathResolver(fn () => $path);
+
+        LengthAwarePaginator::clampPageByDefault();
+
+        try {
+            $result = $builder->paginate($perPage, ['*'], $pageName, $page);
+            $this->assertEquals($lastPage, $result->currentPage());
+        } finally {
+            LengthAwarePaginator::clampPageByDefault(false);
+        }
+    }
+
     public function testCursorPaginate()
     {
         $perPage = 16;

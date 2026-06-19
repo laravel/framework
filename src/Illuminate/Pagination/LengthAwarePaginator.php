@@ -40,6 +40,13 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     protected $lastPage;
 
     /**
+     * Indicates whether all paginators should clamp the current page to the last page by default.
+     *
+     * @var bool
+     */
+    public static $defaultClampPage = false;
+
+    /**
      * Create a new paginator instance.
      *
      * @param  Collection<TKey, TValue>|Arrayable<TKey, TValue>|iterable<TKey, TValue>|null  $items
@@ -76,6 +83,17 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
         $currentPage = $currentPage ?: static::resolveCurrentPage($pageName);
 
         return $this->isValidPageNumber($currentPage) ? (int) $currentPage : 1;
+    }
+
+    /**
+     * Indicate that all paginators should clamp the current page to the last page by default.
+     *
+     * @param  bool  $clamp
+     * @return void
+     */
+    public static function clampPageByDefault(bool $clamp = true): void
+    {
+        static::$defaultClampPage = $clamp;
     }
 
     /**

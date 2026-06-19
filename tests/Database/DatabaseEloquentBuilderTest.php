@@ -18,6 +18,7 @@ use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Mockery as m;
@@ -3011,6 +3012,31 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $result = $builder->incrementEach(['votes' => 1]);
         $this->assertEquals(1, $result);
+    }
+
+    public function testPaginateWithClampPageClampsToLastPage()
+    {
+        $perPage = 15;
+        $pageName = 'page';
+        $page = 100;
+        $lastPage = 2;
+        $total = 30;
+        $path = 'http://foo.bar?page=100';
+
+        $model = new EloquentBuilderTestStub;
+        $connection = $this->mockConnectionForModel($model, 'SQLite');
+        $connection->shouldReceive('getName')->andReturn('sqlite');
+        $connection->shouldReceive('select')->twice()->andReturnUsing(
+            fn () => [['aggregate' => $total]],
+            fn () => [['id' => 1], ['id' => 2]],
+        );
+
+        Paginator::currentPathResolver(fn () => $path);
+
+        $result = $model->newQuery()->clampPage()->paginate($perPage, ['*'], $pageName, $page);
+
+        $this->assertEquals($lastPage, $result->currentPage());
+        $this->assertEquals($total, $result->total());
     }
 
     protected function getMockModel()

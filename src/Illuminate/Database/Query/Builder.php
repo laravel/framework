@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -277,6 +278,13 @@ class Builder implements BuilderContract
      * @var array
      */
     public array $fetchUsing = [];
+
+    /**
+     * Indicates whether paginate() should clamp the page to the last available page.
+     *
+     * @var bool
+     */
+    public $clampPage = false;
 
     /**
      * Create a new query builder instance.
@@ -3619,12 +3627,29 @@ class Builder implements BuilderContract
 
         $perPage = value($perPage, $total);
 
+        if (($this->clampPage || LengthAwarePaginator::$defaultClampPage) && $total > 0) {
+            $page = min($page, max((int) ceil($total / $perPage), 1));
+        }
+
         $results = $total ? $this->forPage($page, $perPage)->get($columns) : new Collection;
 
         return $this->paginator($results, $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
+    }
+
+    /**
+     * Indicate that the paginator should clamp the current page to the last page when out of range.
+     *
+     * @param  bool  $clamp
+     * @return $this
+     */
+    public function clampPage(bool $clamp = true): static
+    {
+        $this->clampPage = $clamp;
+
+        return $this;
     }
 
     /**
