@@ -194,9 +194,14 @@ trait HasAttributes
     protected static $castTypeCache = [];
 
     /**
-     * The cache of resolved internal cast objects, keyed by class and cast type.
+     * The cache of resolved internal cast objects, keyed by cast type.
      *
-     * @var array<class-string, array<string, \Illuminate\Database\Eloquent\Casts\ClosureCast|null>>
+     * The resolved cast object depends only on the cast type, not on the model
+     * class — its closures take the model and key as parameters and defer to the
+     * model's own cast methods — so a single instance is shared as a flyweight
+     * across every model class and field that uses the same cast.
+     *
+     * @var array<string, \Illuminate\Database\Eloquent\Casts\ClosureCast|null>
      */
     protected static $castClassCache = [];
 
@@ -965,28 +970,42 @@ trait HasAttributes
 
         $castType = $this->getCastType($key);
 
-        if (! isset(static::$castClassCache[static::class][$castType])) {
-            static::$castClassCache[static::class][$castType] = $this->resolveInternalCastClass($key);
+        if (! array_key_exists($castType, static::$castClassCache)) {
+            static::$castClassCache[$castType] = $this->resolveInternalCastClass($castType, $this->getCasts()[$key]);
         }
 
-        return static::$castClassCache[static::class][$castType];
+        if (is_null($caster = static::$castClassCache[$castType])) {
+            throw new InvalidCastException($this->getModel(), $key, $castType);
+        }
+
+        return $caster;
     }
 
     /**
-     * Build the internal cast object for the given attribute's cast type.
+     * Build the internal cast object for the given cast type.
      *
-     * @param  string  $key
+     * The result depends only on the cast definition, never on the model class
+     * or the attribute key, so a single resolved instance is shared as a
+     * flyweight. The normalized $castType drives the built-in type dispatch; the
+     * original $cast string is needed for case-correct enum/class detection
+     * (getCastType() lowercases parameterized casts, which breaks class_exists).
+     * A null return means the cast type is not recognized (an invalid cast).
+     *
+     * @param  string  $castType
+     * @param  string  $cast
      * @return \Illuminate\Database\Eloquent\Casts\ClosureCast|null
      */
-    protected function resolveInternalCastClass($key)
+    protected function resolveInternalCastClass($castType, $cast)
     {
-        $castType = $this->getCastType($key);
-
         $caster = null;
 
         $primitiveComparator = static fn ($model, $key, $current, $original) => $model->castAttribute($key, $current) === $model->castAttribute($key, $original);
 
-        if (Str::startsWith($castType, 'encrypted:')) {
+        $encrypted = in_array($castType, [
+            'encrypted', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object',
+        ], true);
+
+        if ($encrypted) {
             $castType = Str::after($castType, 'encrypted:');
         }
 
@@ -1095,16 +1114,17 @@ trait HasAttributes
                 break;
         }
 
-        if ($this->isEnumCastable($key)) {
-            $caster = new ClosureCast(
-                static fn ($model, $key, $value) => $model->getEnumCastableAttributeValue($key, $value),
-                static function ($model, $key, $value) {
-                    $model->setEnumCastableAttribute($key, $value);
-                },
-                setsOwnAttribute: true,
-            );
-        } elseif ($this->isClassCastable($key)) {
-            $caster = new ClosureCast(
+        if (! in_array($castType, static::$primitiveCastTypes, true)) {
+            if (enum_exists($cast) && ! is_subclass_of($cast, Castable::class)) {
+                $caster = new ClosureCast(
+                    static fn ($model, $key, $value) => $model->getEnumCastableAttributeValue($key, $value),
+                    static function ($model, $key, $value) {
+                        $model->setEnumCastableAttribute($key, $value);
+                    },
+                    setsOwnAttribute: true,
+                );
+            } elseif (class_exists($this->parseCasterClass($cast))) {
+                $caster = new ClosureCast(
                 static fn ($model, $key, $value) => $model->getClassCastableAttributeValue($key, $value),
                 static function ($model, $key, $value) {
                     $model->setClassCastableAttribute($key, $value);
@@ -1131,15 +1151,17 @@ trait HasAttributes
                     return is_numeric($current) && is_numeric($original)
                         && strcmp((string) $current, (string) $original) === 0;
                 },
-                setsOwnAttribute: true,
-                nullable: false,
-            );
+                    setsOwnAttribute: true,
+                    nullable: false,
+                );
+            }
         }
 
-        // If the key is one of the encrypted castable types, we'll first decrypt
-        // the value and update the cast type so we may leverage the underlying
-        // cast for casting this value to any additionally specified types.
-        if ($this->isEncryptedCastable($key)) {
+        // If the cast type is an encrypted type, we'll decrypt the value first
+        // and then leverage the underlying cast (resolved above from the inner
+        // type) for casting the decrypted value to any additionally specified
+        // type before re-encrypting on the way back out.
+        if ($encrypted) {
             $originalCaster = $caster;
 
             $caster = new ClosureCast(
