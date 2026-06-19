@@ -23,6 +23,7 @@ use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Queue\Failed\FileFailedJobProvider;
 use Illuminate\Queue\Jobs\FakeJob;
+use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Queue\SqsQueue;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerStopReason;
@@ -400,6 +401,42 @@ class QueueTest extends TestCase
     {
         $this->fakeEvents();
         [$queue] = $this->fakeQueue();
+
+        $this->assertNull($queue->pop());
+    }
+
+    public function testPopReceivesDirectlyFromSqsWhenTheAgentIsDisabled()
+    {
+        // The agent is opt-in; with it disabled (the default) the queue receives
+        // straight from SQS and never touches the agent runtime socket.
+        Http::fake();
+        $this->fakeEvents();
+        [$queue, $client] = $this->mockedQueue();
+
+        $client->shouldReceive('receiveMessage')->once()->andReturn(new Result([
+            'Messages' => [[
+                'MessageId' => 'message-id',
+                'ReceiptHandle' => 'receipt-handle',
+                'Body' => 'job-body',
+                'Attributes' => ['ApproximateReceiveCount' => 1],
+            ]],
+        ]));
+
+        $job = $queue->pop();
+
+        $this->assertInstanceOf(SqsJob::class, $job);
+        $this->assertNotInstanceOf(CloudJob::class, $job);
+        $this->assertSame('message-id', $job->getJobId());
+        $this->assertSame('job-body', $job->getRawBody());
+        Http::assertNothingSent();
+    }
+
+    public function testPopReturnsNullWhenSqsHasNoMessageAndTheAgentIsDisabled()
+    {
+        $this->fakeEvents();
+        [$queue, $client] = $this->mockedQueue();
+
+        $client->shouldReceive('receiveMessage')->once()->andReturn(new Result(['Messages' => null]));
 
         $this->assertNull($queue->pop());
     }
@@ -1355,6 +1392,13 @@ class QueueTest extends TestCase
      */
     private function fakeQueue()
     {
+        // The cloud-agent is opt-in; enable it so pop() long-polls the faked
+        // runtime socket instead of receiving directly from SQS.
+        $this->app['config']->set('queue.connections.cloud.agent', [
+            'enabled' => true,
+            'socket' => '/tmp/cloud-agent.sock',
+        ]);
+
         $sqs = new SqsClient(['region' => 'us-east-2', 'version' => 'latest', 'credentials' => false]);
 
         $fakeQueue = new class($this->app, [], null, $sqs) extends QueueFake

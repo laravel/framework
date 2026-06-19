@@ -187,10 +187,41 @@ class Queue implements QueueContract, ClearableQueue
     /**
      * Pop the next job off of the queue.
      *
-     * The message has already been received from SQS by the dispatcher and
-     * handed to this pod's in-container cloud-agent, which holds it and extends
-     * its visibility. Rather than receive from SQS ourselves we long-poll the
-     * agent's runtime socket (GET /next) and wrap the message in a CloudJob.
+     * By default the worker receives the job straight from SQS via the
+     * underlying queue, exactly as a non-managed SQS connection would. When the
+     * cloud-agent is enabled (config: agent.enabled) the message has instead
+     * already been received from SQS by the dispatcher and handed to this pod's
+     * in-container cloud-agent, which holds it and extends its visibility; in
+     * that mode we long-poll the agent's runtime socket rather than SQS.
+     *
+     * @param  string|null  $queue
+     * @return \Illuminate\Contracts\Queue\Job|null
+     */
+    public function pop($queue = null)
+    {
+        $this->finishProcessingJob();
+
+        $job = $this->usesAgent()
+            ? $this->popFromAgent($queue)
+            : $this->queue->pop(...func_get_args());
+
+        $this->startProcessingJob($queue, $job);
+
+        return $job;
+    }
+
+    /**
+     * Determine whether jobs should be popped from the in-container cloud-agent
+     * rather than received directly from SQS.
+     */
+    protected function usesAgent(): bool
+    {
+        return (bool) ($this->config['agent']['enabled'] ?? false);
+    }
+
+    /**
+     * Long-poll the in-container cloud-agent's runtime socket (GET /next) and
+     * wrap the next message in a CloudJob.
      *
      * The agent blocks until a job is available or returns 204 so we re-poll,
      * exactly like SQS long polling. The returned CloudJob never touches SQS
@@ -201,39 +232,35 @@ class Queue implements QueueContract, ClearableQueue
      * @param  string|null  $queue
      * @return \Illuminate\Foundation\Cloud\CloudJob|null
      */
-    public function pop($queue = null)
+    protected function popFromAgent($queue = null)
     {
-        $this->finishProcessingJob();
+        $data = $this->requestNextFromAgent();
 
-        $data = $this->popFromAgent();
+        if (! (is_array($data) && is_string($messageId = $data['messageId'] ?? null) && $messageId !== '')) {
+            return null;
+        }
 
-        $job = is_array($data) && is_string($messageId = $data['messageId'] ?? null) && $messageId !== ''
-            ? new CloudJob(
-                $this->queue->getContainer(),
-                $this->queue->getSqs(),
-                [
-                    'MessageId' => $messageId,
-                    'ReceiptHandle' => $data['receiptHandle'] ?? null,
-                    // Coerce a non-string body to '' so a malformed agent
-                    // response degrades to an empty payload rather than blowing
-                    // up json_decode() in payload().
-                    'Body' => is_string($body = $data['body'] ?? null) ? $body : '',
-                    'Attributes' => $this->normalizeAgentAttributes($data['attributes'] ?? null),
-                ],
-                $this->queue->getConnectionName(),
-                // The agent reports the real SQS queue URL the dispatcher received
-                // from; delete / release go back to that queue, not our default.
-                $data['queueUrl'] ?? $this->queue->getQueue($queue),
-                // Capture only the message id so the closure doesn't pin the
-                // whole agent response (including the body) for the job's life.
-                fn (string $status, ?int $delay): bool => $this->reportResultToAgent($messageId, $status, $delay),
-                $this->queue->getOverflowStorage(),
-            )
-            : null;
-
-        $this->startProcessingJob($queue, $job);
-
-        return $job;
+        return new CloudJob(
+            $this->queue->getContainer(),
+            $this->queue->getSqs(),
+            [
+                'MessageId' => $messageId,
+                'ReceiptHandle' => $data['receiptHandle'] ?? null,
+                // Coerce a non-string body to '' so a malformed agent
+                // response degrades to an empty payload rather than blowing
+                // up json_decode() in payload().
+                'Body' => is_string($body = $data['body'] ?? null) ? $body : '',
+                'Attributes' => $this->normalizeAgentAttributes($data['attributes'] ?? null),
+            ],
+            $this->queue->getConnectionName(),
+            // The agent reports the real SQS queue URL the dispatcher received
+            // from; delete / release go back to that queue, not our default.
+            $data['queueUrl'] ?? $this->queue->getQueue($queue),
+            // Capture only the message id so the closure doesn't pin the
+            // whole agent response (including the body) for the job's life.
+            fn (string $status, ?int $delay): bool => $this->reportResultToAgent($messageId, $status, $delay),
+            $this->queue->getOverflowStorage(),
+        );
     }
 
     /**
@@ -245,7 +272,7 @@ class Queue implements QueueContract, ClearableQueue
      * errors are reported rather than swallowed so an agent fault is visible
      * instead of looking like an empty queue.
      */
-    protected function popFromAgent(): ?array
+    protected function requestNextFromAgent(): ?array
     {
         $response = rescue(fn () => $this->agentRequest()
             // Outlast the agent's ~55s poll cycle so a 204 is a deliberate
@@ -336,7 +363,7 @@ class Queue implements QueueContract, ClearableQueue
     {
         return Http::baseUrl('http://localhost')->withOptions([
             'curl' => [
-                CURLOPT_UNIX_SOCKET_PATH => '/tmp/cloud-agent.sock',
+                CURLOPT_UNIX_SOCKET_PATH => $this->config['agent']['socket'] ?? '/tmp/cloud-agent.sock',
             ],
         ]);
     }
