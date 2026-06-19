@@ -162,17 +162,6 @@ class RouteRegistrar
     }
 
     /**
-     * Add metadata to routes registered by the registrar.
-     *
-     * @param  array  $metadata
-     * @return $this
-     */
-    public function metadata(array $metadata)
-    {
-        return $this->attribute('metadata', $metadata);
-    }
-
-    /**
      * Route a resource to a controller.
      *
      * @param  string  $name
@@ -248,6 +237,17 @@ class RouteRegistrar
     public function match($methods, $uri, $action = null)
     {
         return $this->router->match($methods, $uri, $this->compileAction($action));
+    }
+
+    /**
+     * Add metadata to routes registered by the registrar.
+     *
+     * @param  array  $metadata
+     * @return $this
+     */
+    public function metadata(array $metadata)
+    {
+        return $this->attribute('metadata', $metadata);
     }
 
     /**

@@ -44,8 +44,24 @@ class RouteGroup
     }
 
     /**
-     * Associative array values are merged recursively, while all other
-     * values, including lists, replace the existing value entirely.
+     * Format the metadata for the new group attributes.
+     *
+     * @param  array  $new
+     * @param  array  $old
+     * @return array
+     */
+    protected static function formatMetadata($new, $old)
+    {
+        return static::mergeMetadata(
+            $old['metadata'] ?? [],
+            $new['metadata'] ?? []
+        );
+    }
+
+    /**
+     * Merge the given route metadata.
+     *
+     * Associative array values are merged recursively, while all other values, including lists, replace the existing value entirely.
      *
      * @param  array  $old
      * @param  array  $new
@@ -54,7 +70,7 @@ class RouteGroup
     public static function mergeMetadata(array $old, array $new)
     {
         foreach ($new as $key => $value) {
-            if (isset($old[$key]) && static::mergesMetadata($old[$key], $value)) {
+            if (isset($old[$key]) && static::mergableMetadata($old[$key], $value)) {
                 $value = static::mergeMetadata($old[$key], $value);
             }
 
@@ -71,27 +87,12 @@ class RouteGroup
      * @param  mixed  $new
      * @return bool
      */
-    protected static function mergesMetadata($old, $new)
+    protected static function mergableMetadata($old, $new)
     {
         return is_array($old) &&
             is_array($new) &&
             Arr::isAssoc($old) &&
             Arr::isAssoc($new);
-    }
-
-    /**
-     * Format the metadata for the new group attributes.
-     *
-     * @param  array  $new
-     * @param  array  $old
-     * @return array
-     */
-    protected static function formatMetadata($new, $old)
-    {
-        return static::mergeMetadata(
-            $old['metadata'] ?? [],
-            $new['metadata'] ?? []
-        );
     }
 
     /**
