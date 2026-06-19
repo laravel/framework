@@ -1044,6 +1044,33 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($model->fromDateTime(null));
     }
 
+    public function testFromDateTimeConvertsToApplicationTimezoneBeforeStoring()
+    {
+        $previousTimezone = date_default_timezone_get();
+
+        date_default_timezone_set('UTC');
+
+        try {
+            $model = new EloquentModelStub;
+            $model->setDateFormat('Y-m-d H:i:s');
+
+            $value = Carbon::parse('2026-06-19 15:00:00', 'Europe/Amsterdam');
+            $this->assertSame('2026-06-19 13:00:00', $model->fromDateTime($value));
+
+            $value = new DateTime('2026-06-19 15:00:00', new \DateTimeZone('Europe/Amsterdam'));
+            $this->assertSame('2026-06-19 13:00:00', $model->fromDateTime($value));
+
+            $model = new EloquentModelCastingStub;
+            $model->setDateFormat('Y-m-d H:i:s');
+            $model->datetimeAttribute = Carbon::parse('2026-06-19 15:00:00', 'Europe/Amsterdam');
+
+            $this->assertSame('2026-06-19 13:00:00', $model->getAttributes()['datetimeAttribute']);
+            $this->assertSame('2026-06-19 13:00:00', $model->toArray()['datetimeAttribute']);
+        } finally {
+            date_default_timezone_set($previousTimezone);
+        }
+    }
+
     public function testFromDateTimeMilliseconds()
     {
         $model = $this->getMockBuilder('Illuminate\Tests\Database\EloquentDateModelStub')->onlyMethods(['getDateFormat'])->getMock();

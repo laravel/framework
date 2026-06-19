@@ -1600,9 +1600,13 @@ trait HasAttributes
      */
     public function fromDateTime($value)
     {
-        return empty($value) ? $value : $this->asDateTime($value)->format(
-            $this->getDateFormat()
-        );
+        if (empty($value)) {
+            return $value;
+        }
+
+        return $this->asDateTime($value)
+            ->timezone(date_default_timezone_get())
+            ->format($this->getDateFormat());
     }
 
     /**
