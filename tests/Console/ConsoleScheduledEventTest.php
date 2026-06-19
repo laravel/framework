@@ -119,6 +119,27 @@ class ConsoleScheduledEventTest extends TestCase
         $this->assertFalse($event->between('10:00', '8:00')->filtersPass($app));
     }
 
+    public function testTimeBetweenChecksTimezoneCallOrder()
+    {
+        $app = m::mock(Application::class.'[isDownForMaintenance,environment]');
+        $app->shouldReceive('isDownForMaintenance')->andReturn(false);
+        $app->shouldReceive('environment')->andReturn('production');
+
+        Carbon::setTestNow(Carbon::parse('2024-07-01 09:00:00', 'UTC'));
+
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
+        $this->assertTrue($event->timezone('Europe/Rome')->between('10:00', '12:00')->filtersPass($app));
+
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
+        $this->assertTrue($event->between('10:00', '12:00')->timezone('Europe/Rome')->filtersPass($app));
+
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
+        $this->assertFalse($event->timezone('Europe/Rome')->unlessBetween('10:00', '12:00')->filtersPass($app));
+
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
+        $this->assertFalse($event->unlessBetween('10:00', '12:00')->timezone('Europe/Rome')->filtersPass($app));
+    }
+
     public function testTimeUnlessBetweenChecks()
     {
         $app = m::mock(Application::class.'[isDownForMaintenance,environment]');
