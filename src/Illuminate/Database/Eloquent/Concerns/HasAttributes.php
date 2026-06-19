@@ -239,15 +239,16 @@ trait HasAttributes
     ];
 
     /**
-     * The cache of whether a model class overrides a cast-resolution hook.
+     * The cache of whether a model class uses custom cast resolution.
      *
-     * Detecting an override once per class lets the common case (no override)
-     * keep the fast, fully memoized path, while a model that overrides
-     * getCastType()/isEncryptedCastable() transparently gets per-key fidelity.
+     * True when the class overrides getCastType() or isEncryptedCastable().
+     * Detecting this once per class lets the common case (no override) keep the
+     * fast, fully memoized path, while a model that overrides either hook
+     * transparently gets per-key fidelity.
      *
-     * @var array<class-string, array<string, bool>>
+     * @var array<class-string, bool>
      */
-    protected static $castHookOverrides = [];
+    protected static $customCastResolution = [];
 
     /**
      * The encrypter instance that is used to encrypt attributes.
@@ -904,6 +905,13 @@ trait HasAttributes
      */
     protected function castAttribute($key, $value)
     {
+        // A null value on a primitive cast resolves to null without building or
+        // dispatching through a cast object — the cheapest possible path, kept
+        // as a short-circuit ahead of cast-object resolution.
+        if (is_null($value) && in_array($this->getCastType($key), static::$primitiveCastTypes, true)) {
+            return $value;
+        }
+
         if ($caster = $this->getInternalCastClass($key)) {
             return $caster->get($this, $key, $value, $this->attributes);
         }
@@ -1029,23 +1037,13 @@ trait HasAttributes
 
         $class = static::class;
 
-        // Resolve the cast type. A model that overrides getCastType() must have
-        // that override honored, but the call re-reads getCasts(); the common
-        // case (no override) skips it and reuses the cast string already in hand.
-        // The type is re-derived on every call, never hoisted into a cache, so
-        // runtime cast changes (e.g. mergeCasts()) are always honored.
-        $castType = $this->castResolutionHookIsOverridden('getCastType')
-            ? $this->getCastType($key)
-            : $this->resolveCastType($cast);
+        // The common case: the model uses Eloquent's built-in cast resolution.
+        // The cast type is derived from the cast string already in hand (one
+        // getCasts()), encryption is a pure function of that type, and the
+        // resolved caster is memoized per class and cast type.
+        if (! $this->usesCustomCastResolution()) {
+            $castType = $this->resolveCastType($cast);
 
-        // When isEncryptedCastable() is overridden it may decide encryption per
-        // attribute key, not just per cast type, so the resolved caster cannot be
-        // memoized by cast type — resolve it live (the cast objects themselves are
-        // still shared flyweights). Otherwise encryption is a pure function of the
-        // cast type and the resolved caster is memoized per class and cast type.
-        if ($this->castResolutionHookIsOverridden('isEncryptedCastable')) {
-            $caster = $this->resolveCasterFor($castType, $cast, $this->isEncryptedCastable($key));
-        } else {
             if (! isset(static::$resolvedCasterCache[$class]) ||
                 ! array_key_exists($castType, static::$resolvedCasterCache[$class])) {
                 static::$resolvedCasterCache[$class][$castType] = $this->resolveCasterFor(
@@ -1054,6 +1052,15 @@ trait HasAttributes
             }
 
             $caster = static::$resolvedCasterCache[$class][$castType];
+        } else {
+            // The model overrides getCastType() and/or isEncryptedCastable(), so
+            // both are consulted per key — the override may decide the cast type
+            // or encryption per attribute, not just per cast type, so the result
+            // is resolved live rather than memoized by cast type. The cast
+            // objects themselves are still shared flyweights.
+            $castType = $this->getCastType($key);
+
+            $caster = $this->resolveCasterFor($castType, $cast, $this->isEncryptedCastable($key));
         }
 
         if (is_null($caster)) {
@@ -1066,28 +1073,39 @@ trait HasAttributes
     /**
      * Determine whether the model class overrides a cast-resolution hook.
      *
-     * Detected once per class and memoized. Lets the common case (no override)
-     * keep the fully memoized fast path while a model that overrides the hook
-     * transparently gets per-key resolution, so userland overrides of
-     * getCastType()/isEncryptedCastable() are always honored without taxing
-     * every other model.
+     * Detected once per class and memoized as a single flag. Lets the common
+     * case (no override) keep the fully memoized fast path while a model that
+     * overrides getCastType()/isEncryptedCastable() transparently gets per-key
+     * resolution, so userland overrides are always honored without taxing every
+     * other model with a per-access check.
+     *
+     * @return bool
+     */
+    protected function usesCustomCastResolution()
+    {
+        $class = static::class;
+
+        if (isset(static::$customCastResolution[$class])) {
+            return static::$customCastResolution[$class];
+        }
+
+        return static::$customCastResolution[$class] =
+            $this->castResolutionHookIsOverridden('getCastType')
+            || $this->castResolutionHookIsOverridden('isEncryptedCastable');
+    }
+
+    /**
+     * Determine whether the model class overrides the given trait method.
      *
      * @param  string  $method
      * @return bool
      */
     protected function castResolutionHookIsOverridden($method)
     {
-        $class = static::class;
-
-        if (isset(static::$castHookOverrides[$class][$method])) {
-            return static::$castHookOverrides[$class][$method];
-        }
-
-        $defined = new ReflectionMethod($class, $method);
+        $defined = new ReflectionMethod(static::class, $method);
         $original = new ReflectionMethod(__TRAIT__, $method);
 
-        return static::$castHookOverrides[$class][$method] =
-            $defined->getStartLine() !== $original->getStartLine()
+        return $defined->getStartLine() !== $original->getStartLine()
             || $defined->getFileName() !== $original->getFileName();
     }
 
