@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
 use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Casts\ClosureCast;
 use Illuminate\Database\Eloquent\Casts\Json;
 use Illuminate\Database\Eloquent\InvalidCastException;
 use Illuminate\Database\Eloquent\JsonEncodingException;
@@ -191,6 +192,13 @@ trait HasAttributes
      * @var array
      */
     protected static $castTypeCache = [];
+
+    /**
+     * The cache of resolved internal cast objects, keyed by class and cast type.
+     *
+     * @var array<class-string, array<string, \Illuminate\Database\Eloquent\Casts\ClosureCast|null>>
+     */
+    protected static $castClassCache = [];
 
     /**
      * The encrypter instance that is used to encrypt attributes.
@@ -847,64 +855,8 @@ trait HasAttributes
      */
     protected function castAttribute($key, $value)
     {
-        $castType = $this->getCastType($key);
-
-        if (is_null($value) && in_array($castType, static::$primitiveCastTypes)) {
-            return $value;
-        }
-
-        // If the key is one of the encrypted castable types, we'll first decrypt
-        // the value and update the cast type so we may leverage the following
-        // logic for casting this value to any additionally specified types.
-        if ($this->isEncryptedCastable($key)) {
-            $value = $this->fromEncryptedString($value);
-
-            $castType = Str::after($castType, 'encrypted:');
-        }
-
-        switch ($castType) {
-            case 'int':
-            case 'integer':
-                return (int) $value;
-            case 'real':
-            case 'float':
-            case 'double':
-                return $this->fromFloat($value);
-            case 'decimal':
-                return $this->asDecimal($value, explode(':', $this->getCasts()[$key], 2)[1]);
-            case 'string':
-                return (string) $value;
-            case 'bool':
-            case 'boolean':
-                return (bool) $value;
-            case 'object':
-                return $this->fromJson($value, true);
-            case 'array':
-            case 'json':
-            case 'json:unicode':
-                return $this->fromJson($value);
-            case 'collection':
-                return new BaseCollection($this->fromJson($value));
-            case 'date':
-                return $this->asDate($value);
-            case 'datetime':
-            case 'custom_datetime':
-                return $this->asDateTime($value);
-            case 'immutable_date':
-                return $this->asDate($value)->toImmutable();
-            case 'immutable_custom_datetime':
-            case 'immutable_datetime':
-                return $this->asDateTime($value)->toImmutable();
-            case 'timestamp':
-                return $this->asTimestamp($value);
-        }
-
-        if ($this->isEnumCastable($key)) {
-            return $this->getEnumCastableAttributeValue($key, $value);
-        }
-
-        if ($this->isClassCastable($key)) {
-            return $this->getClassCastableAttributeValue($key, $value);
+        if ($caster = $this->getInternalCastClass($key)) {
+            return $caster->get($this, $key, $value, $this->attributes);
         }
 
         return $value;
@@ -991,6 +943,237 @@ trait HasAttributes
         }
 
         return static::$castTypeCache[$castType] = $convertedCastType;
+    }
+
+    /**
+     * Get the resolved internal cast object for the given attribute.
+     *
+     * Built-in casts are represented as reusable cast objects so the dispatch
+     * decision (which cast type, which branch) is made once and memoized per
+     * class and cast type, instead of being recomputed on every access. The
+     * cast object's closures defer to the model's own cast methods, preserving
+     * userland overrides.
+     *
+     * @param  string  $key
+     * @return \Illuminate\Database\Eloquent\Casts\ClosureCast|null
+     */
+    protected function getInternalCastClass($key)
+    {
+        if (! array_key_exists($key, $this->getCasts())) {
+            return null;
+        }
+
+        $castType = $this->getCastType($key);
+
+        if (! isset(static::$castClassCache[static::class][$castType])) {
+            static::$castClassCache[static::class][$castType] = $this->resolveInternalCastClass($key);
+        }
+
+        return static::$castClassCache[static::class][$castType];
+    }
+
+    /**
+     * Build the internal cast object for the given attribute's cast type.
+     *
+     * @param  string  $key
+     * @return \Illuminate\Database\Eloquent\Casts\ClosureCast|null
+     */
+    protected function resolveInternalCastClass($key)
+    {
+        $castType = $this->getCastType($key);
+
+        $caster = null;
+
+        $primitiveComparator = static fn ($model, $key, $current, $original) => $model->castAttribute($key, $current) === $model->castAttribute($key, $original);
+
+        if (Str::startsWith($castType, 'encrypted:')) {
+            $castType = Str::after($castType, 'encrypted:');
+        }
+
+        switch ($castType) {
+            case 'int':
+            case 'integer':
+                $caster = new ClosureCast(
+                    static fn ($model, $key, $value) => (int) $value,
+                    comparator: $primitiveComparator,
+                );
+                break;
+            case 'real':
+            case 'float':
+            case 'double':
+                $caster = new ClosureCast(
+                    static fn ($model, $key, $value) => $model->fromFloat($value),
+                    comparator: static function ($model, $key, $current, $original) {
+                        if ($original === null) {
+                            return false;
+                        }
+
+                        return abs($model->castAttribute($key, $current) - $model->castAttribute($key, $original)) < PHP_FLOAT_EPSILON * 4;
+                    },
+                );
+                break;
+            case 'decimal':
+                $caster = new ClosureCast(
+                    static fn ($model, $key, $value) => $model->asDecimal($value, explode(':', $model->getCasts()[$key], 2)[1]),
+                    comparator: $primitiveComparator,
+                );
+                break;
+            case 'string':
+                $caster = new ClosureCast(
+                    static fn ($model, $key, $value) => (string) $value,
+                    comparator: $primitiveComparator,
+                );
+                break;
+            case 'bool':
+            case 'boolean':
+                $caster = new ClosureCast(
+                    static fn ($model, $key, $value) => (bool) $value,
+                    comparator: $primitiveComparator,
+                );
+                break;
+            case 'object':
+                $caster = new ClosureCast(
+                    static fn ($model, $key, $value) => $model->fromJson($value, true),
+                    static fn ($model, $key, $value) => is_null($value) ? null : $model->castAttributeAsJson($key, $value),
+                    comparator: static fn ($model, $key, $current, $original) => $model->fromJson($current) === $model->fromJson($original),
+                );
+                break;
+            case 'array':
+            case 'json':
+            case 'json:unicode':
+                $caster = new ClosureCast(
+                    static fn ($model, $key, $value) => $model->fromJson($value),
+                    static fn ($model, $key, $value) => is_null($value) ? null : $model->castAttributeAsJson($key, $value),
+                    comparator: static fn ($model, $key, $current, $original) => $model->fromJson($current) === $model->fromJson($original),
+                );
+                break;
+            case 'collection':
+                $caster = new ClosureCast(
+                    static fn ($model, $key, $value) => new BaseCollection($model->fromJson($value)),
+                    static fn ($model, $key, $value) => is_null($value) ? null : $model->castAttributeAsJson($key, $value),
+                    comparator: static fn ($model, $key, $current, $original) => $model->fromJson($current) === $model->fromJson($original),
+                );
+                break;
+            case 'date':
+                $caster = new ClosureCast(
+                    static fn ($model, $key, $value) => $model->asDate($value),
+                    comparator: static fn ($model, $key, $current, $original) => $model->fromDateTime($current) === $model->fromDateTime($original),
+                );
+                break;
+            case 'datetime':
+            case 'custom_datetime':
+                $caster = new ClosureCast(
+                    static fn ($model, $key, $value) => $model->asDateTime($value),
+                    comparator: static fn ($model, $key, $current, $original) => $model->fromDateTime($current) === $model->fromDateTime($original),
+                );
+                break;
+            case 'immutable_date':
+                $caster = new ClosureCast(
+                    static fn ($model, $key, $value) => $model->asDate($value)->toImmutable(),
+                    comparator: static fn ($model, $key, $current, $original) => $model->fromDateTime($current) === $model->fromDateTime($original),
+                );
+                break;
+            case 'immutable_custom_datetime':
+            case 'immutable_datetime':
+                $caster = new ClosureCast(
+                    static fn ($model, $key, $value) => $model->asDateTime($value)->toImmutable(),
+                    comparator: static fn ($model, $key, $current, $original) => $model->fromDateTime($current) === $model->fromDateTime($original),
+                );
+                break;
+            case 'timestamp':
+                $caster = new ClosureCast(
+                    static fn ($model, $key, $value) => $model->asTimestamp($value),
+                    comparator: $primitiveComparator,
+                );
+                break;
+            case 'hashed':
+                $caster = new ClosureCast(
+                    static fn ($model, $key, $value) => $value,
+                    static fn ($model, $key, $value) => $model->castAttributeAsHashedString($key, $value),
+                    comparator: $primitiveComparator,
+                );
+                break;
+        }
+
+        if ($this->isEnumCastable($key)) {
+            $caster = new ClosureCast(
+                static fn ($model, $key, $value) => $model->getEnumCastableAttributeValue($key, $value),
+                static function ($model, $key, $value) {
+                    $model->setEnumCastableAttribute($key, $value);
+                },
+                setsOwnAttribute: true,
+            );
+        } elseif ($this->isClassCastable($key)) {
+            $caster = new ClosureCast(
+                static fn ($model, $key, $value) => $model->getClassCastableAttributeValue($key, $value),
+                static function ($model, $key, $value) {
+                    $model->setClassCastableAttribute($key, $value);
+                },
+                comparator: static function ($model, $key, $current, $original) {
+                    if ($model->isClassComparable($key)) {
+                        return $model->compareClassCastableAttribute($key, $original, $current);
+                    }
+
+                    $castType = $model->getCasts()[$key];
+
+                    if (Str::startsWith($castType, [AsArrayObject::class, AsCollection::class])) {
+                        return $model->fromJson($current) === $model->fromJson($original);
+                    } elseif (Str::startsWith($castType, [AsEnumArrayObject::class, AsEnumCollection::class])) {
+                        return $model->fromJson($current) === $model->fromJson($original);
+                    } elseif ($original !== null && Str::startsWith($castType, [AsEncryptedArrayObject::class, AsEncryptedCollection::class])) {
+                        if (empty($model::currentEncrypter()->getPreviousKeys())) {
+                            return $model->fromEncryptedString($current) === $model->fromEncryptedString($original);
+                        }
+
+                        return false;
+                    }
+
+                    return is_numeric($current) && is_numeric($original)
+                        && strcmp((string) $current, (string) $original) === 0;
+                },
+                setsOwnAttribute: true,
+                nullable: false,
+            );
+        }
+
+        // If the key is one of the encrypted castable types, we'll first decrypt
+        // the value and update the cast type so we may leverage the underlying
+        // cast for casting this value to any additionally specified types.
+        if ($this->isEncryptedCastable($key)) {
+            $originalCaster = $caster;
+
+            $caster = new ClosureCast(
+                static function ($model, $key, $value, $attributes) use ($originalCaster) {
+                    $value = $model->fromEncryptedString($value);
+
+                    if ($originalCaster) {
+                        $value = $originalCaster->get($model, $key, $value, $attributes);
+                    }
+
+                    return $value;
+                },
+                static function ($model, $key, $value, $attributes) use ($originalCaster) {
+                    if (is_null($value)) {
+                        return null;
+                    }
+
+                    if ($originalCaster) {
+                        $value = $originalCaster->set($model, $key, $value, $attributes);
+                    }
+
+                    return $model->castAttributeAsEncryptedString($key, $value);
+                },
+                comparator: static function ($model, $key, $current, $original) {
+                    if (! empty($model::currentEncrypter()->getPreviousKeys())) {
+                        return false;
+                    }
+
+                    return $model->fromEncryptedString($current) === $model->fromEncryptedString($original);
+                },
+            );
+        }
+
+        return $caster;
     }
 
     /**
@@ -1097,20 +1280,17 @@ trait HasAttributes
             $value = $this->fromDateTime($value);
         }
 
-        if ($this->isEnumCastable($key)) {
-            $this->setEnumCastableAttribute($key, $value);
+        // Each built-in cast is resolved to a reusable cast object (memoized per
+        // class and cast type), so the dispatch decision is only made once. The
+        // cast's "set" closure still defers to the model's own cast methods so
+        // any userland overrides of those methods are preserved. Enum and class
+        // casts write their own attributes and signal that via setsOwnAttribute.
+        if ($caster = $this->getInternalCastClass($key)) {
+            $value = $caster->set($this, $key, $value, $this->attributes);
 
-            return $this;
-        }
-
-        if ($this->isClassCastable($key)) {
-            $this->setClassCastableAttribute($key, $value);
-
-            return $this;
-        }
-
-        if (! is_null($value) && $this->isJsonCastable($key)) {
-            $value = $this->castAttributeAsJson($key, $value);
+            if ($caster->setsOwnAttribute) {
+                return $this;
+            }
         }
 
         // If this attribute contains a JSON ->, we'll set the proper value in the
@@ -1118,14 +1298,6 @@ trait HasAttributes
         // attribute in the array's value in the case of deeply nested items.
         if (str_contains($key, '->')) {
             return $this->fillJsonAttribute($key, $value);
-        }
-
-        if (! is_null($value) && $this->isEncryptedCastable($key)) {
-            $value = $this->castAttributeAsEncryptedString($key, $value);
-        }
-
-        if (! is_null($value) && $this->hasCast($key, 'hashed')) {
-            $value = $this->castAttributeAsHashedString($key, $value);
         }
 
         $this->attributes[$key] = $value;
@@ -2360,35 +2532,13 @@ trait HasAttributes
             return true;
         } elseif (is_null($attribute)) {
             return false;
-        } elseif ($this->isDateAttribute($key) || $this->isDateCastableWithCustomFormat($key)) {
-            return $this->fromDateTime($attribute) ===
-                $this->fromDateTime($original);
-        } elseif ($this->hasCast($key, ['object', 'collection'])) {
-            return $this->fromJson($attribute) ===
-                $this->fromJson($original);
-        } elseif ($this->hasCast($key, ['real', 'float', 'double'])) {
-            if ($original === null) {
-                return false;
-            }
+        }
 
-            return abs($this->castAttribute($key, $attribute) - $this->castAttribute($key, $original)) < PHP_FLOAT_EPSILON * 4;
-        } elseif ($this->isEncryptedCastable($key) && ! empty(static::currentEncrypter()->getPreviousKeys())) {
-            return false;
-        } elseif ($this->hasCast($key, static::$primitiveCastTypes)) {
-            return $this->castAttribute($key, $attribute) ===
-                $this->castAttribute($key, $original);
-        } elseif ($this->isClassCastable($key) && Str::startsWith($this->getCasts()[$key], [AsArrayObject::class, AsCollection::class])) {
-            return $this->fromJson($attribute) === $this->fromJson($original);
-        } elseif ($this->isClassCastable($key) && Str::startsWith($this->getCasts()[$key], [AsEnumArrayObject::class, AsEnumCollection::class])) {
-            return $this->fromJson($attribute) === $this->fromJson($original);
-        } elseif ($this->isClassCastable($key) && $original !== null && Str::startsWith($this->getCasts()[$key], [AsEncryptedArrayObject::class, AsEncryptedCollection::class])) {
-            if (empty(static::currentEncrypter()->getPreviousKeys())) {
-                return $this->fromEncryptedString($attribute) === $this->fromEncryptedString($original);
-            }
-
-            return false;
-        } elseif ($this->isClassComparable($key)) {
-            return $this->compareClassCastableAttribute($key, $original, $attribute);
+        // The resolved cast object carries the equivalence rule for its type
+        // (e.g. float epsilon comparison, JSON re-encoding, custom cast compare),
+        // memoized per class and cast type alongside the get/set behavior.
+        if ($caster = $this->getInternalCastClass($key)) {
+            return $caster->compare($this, $key, $attribute, $original);
         }
 
         return is_numeric($attribute) && is_numeric($original)
