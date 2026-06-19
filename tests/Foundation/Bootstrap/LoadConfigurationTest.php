@@ -72,4 +72,19 @@ class LoadConfigurationTest extends TestCase
             ]))->map(fn ($file) => $file->getBaseName('.php'))->unique()->values()->toArray()
         );
     }
+
+    public function testLoadsSessionCookieNameCorrectly()
+    {
+        $_ENV['APP_NAME'] = '[LOCAL] My App';
+        putenv('APP_NAME=[LOCAL] My App');
+
+        $app = new Application();
+
+        (new LoadConfiguration)->bootstrap($app);
+
+        $this->assertSame('l_o_c_a_l_my_app_session', $app['config']['session.cookie']);
+
+        unset($_ENV['APP_NAME']);
+        putenv('APP_NAME');
+    }
 }
