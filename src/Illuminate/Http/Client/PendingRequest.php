@@ -1442,6 +1442,8 @@ class PendingRequest
      *
      * @param  mixed  $value
      * @return string|array
+     *
+     * @throws \InvalidArgumentException
      */
     protected function normalizeHeaderValue($value): string|array
     {
@@ -1531,6 +1533,8 @@ class PendingRequest
      *
      * @param  array  $multipart
      * @return array
+     *
+     * @throws \InvalidArgumentException
      */
     protected function normalizeMultipartHeaders(array $multipart): array
     {
@@ -1590,6 +1594,8 @@ class PendingRequest
      *
      * @param  mixed  $body
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     protected function ensureValidRequestBody($body): void
     {
