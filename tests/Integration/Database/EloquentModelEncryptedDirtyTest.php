@@ -4,11 +4,30 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Crypt;
 use Orchestra\Testbench\TestCase;
 
 class EloquentModelEncryptedDirtyTest extends TestCase
 {
+    public function testEncryptedJsonIsNotDirtyWhenStoredFormattingDiffersFromReEncoded()
+    {
+        config(['app.key' => str_repeat('a', 32)]);
+        Model::$encrypter = null;
+
+        $model = new EncryptedDirtyAttributeCast;
+
+        // Simulate a row whose encrypted JSON was stored with non-canonical
+        // whitespace (e.g. migrated from another system). Decrypting yields the
+        // same structure Laravel re-encodes, so the attribute is not dirty.
+        $model->setRawAttributes([
+            'secret_array' => Crypt::encryptString('{"a": 1, "b": 2}'),
+        ], true);
+
+        $model->secret_array = ['a' => 1, 'b' => 2];
+
+        $this->assertFalse($model->isDirty('secret_array'));
+    }
+
     public function testDirtyAttributeBehaviorWithNoPreviousKeys()
     {
         config(['app.key' => str_repeat('a', 32)]);

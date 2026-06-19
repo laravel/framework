@@ -164,6 +164,37 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->isDirty('datetimeAttribute'));
     }
 
+    public function testNotDirtyWhenBackedEnumReassignedFromDifferentlyTypedOriginal()
+    {
+        $model = new EloquentModelWithIntEnumCastStub;
+
+        // Some database drivers (e.g. MySQL via emulated prepares) return the
+        // original integer column as a string, while the freshly set enum is
+        // stored as its int backing value. The model must not be reported dirty.
+        $model->setRawAttributes(['status' => '1'], true);
+
+        $model->status = EloquentModelTestIntBackedEnum::One;
+
+        $this->assertFalse($model->isDirty());
+        $this->assertFalse($model->isDirty('status'));
+    }
+
+    public function testNotDirtyWhenNonCastDateAttributeHasEquivalentFormat()
+    {
+        $model = new EloquentDateModelStub;
+        $model->setDateFormat('Y-m-d H:i:s');
+
+        // updated_at is a date attribute via getDates() but is NOT in $casts.
+        $model->setRawAttributes(['updated_at' => '2017-11-14'], true);
+
+        $attributes = $model->getAttributes();
+        $attributes['updated_at'] = '2017-11-14 00:00:00';
+        $model->setRawAttributes($attributes, false);
+
+        $this->assertTrue($model->originalIsEquivalent('updated_at'));
+        $this->assertFalse($model->isDirty('updated_at'));
+    }
+
     public function testDirtyOnCastedObjects()
     {
         $model = new EloquentModelCastingStub;
@@ -4041,6 +4072,21 @@ class EloquentDateModelStub extends EloquentModelStub
     {
         return ['created_at', 'updated_at'];
     }
+}
+
+enum EloquentModelTestIntBackedEnum: int
+{
+    case Zero = 0;
+    case One = 1;
+}
+
+class EloquentModelWithIntEnumCastStub extends Model
+{
+    protected $guarded = [];
+
+    protected $casts = [
+        'status' => EloquentModelTestIntBackedEnum::class,
+    ];
 }
 
 class EloquentModelSaveStub extends Model

@@ -988,7 +988,7 @@ trait HasAttributes
         }
 
         if (is_null($caster = static::$castClassCache[$castType])) {
-            throw new InvalidCastException($this->getModel(), $key, $castType);
+            throw new InvalidCastException($this->getModel(), $key, $this->parseCasterClass($cast));
         }
 
         return $caster;
@@ -1134,6 +1134,10 @@ trait HasAttributes
                     static function ($model, $key, $value) {
                         $model->setEnumCastableAttribute($key, $value);
                     },
+                    // Two stored values are equivalent when they resolve to the same
+                    // enum case, so a backed enum is not reported dirty when the same
+                    // case is re-assigned even if the raw scalar types differ.
+                    comparator: $primitiveComparator,
                     setsOwnAttribute: true,
                 );
             } elseif (class_exists($this->parseCasterClass($cast))) {
@@ -1203,7 +1207,10 @@ trait HasAttributes
                         return false;
                     }
 
-                    return $model->fromEncryptedString($current) === $model->fromEncryptedString($original);
+                    // Compare the fully cast (decrypted, then inner-cast) values so
+                    // an encrypted JSON payload that re-encodes to a different string
+                    // but the same structure is not reported as a change.
+                    return $model->castAttribute($key, $current) === $model->castAttribute($key, $original);
                 },
             );
         }
@@ -2574,6 +2581,13 @@ trait HasAttributes
         // memoized per class and cast type alongside the get/set behavior.
         if ($caster = $this->getInternalCastClass($key)) {
             return $caster->compare($this, $key, $attribute, $original);
+        }
+
+        // Date attributes that are not in the casts array (such as the timestamp
+        // columns) have no cast object, so they are still compared by normalizing
+        // both values to their storage format before checking for equivalence.
+        if ($this->isDateAttribute($key) || $this->isDateCastableWithCustomFormat($key)) {
+            return $this->fromDateTime($attribute) === $this->fromDateTime($original);
         }
 
         return is_numeric($attribute) && is_numeric($original)

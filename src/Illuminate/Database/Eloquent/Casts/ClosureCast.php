@@ -15,6 +15,9 @@ use Illuminate\Contracts\Database\Eloquent\ComparesCastableAttributes;
  * The closures always defer back to the model's own cast methods so userland
  * overrides of those methods are preserved.
  *
+ * @template TValue
+ * @template TRawValue
+ *
  * @internal
  */
 class ClosureCast implements CastsAttributes, ComparesCastableAttributes
@@ -22,30 +25,30 @@ class ClosureCast implements CastsAttributes, ComparesCastableAttributes
     /**
      * The closure used to transform the attribute from its stored value.
      *
-     * @var callable
+     * @var callable(\Illuminate\Database\Eloquent\Model, string, TRawValue, array<string, mixed>): TValue
      */
     protected $get;
 
     /**
      * The closure used to transform the attribute to its stored value.
      *
-     * @var callable
+     * @var callable(\Illuminate\Database\Eloquent\Model, string, TValue, array<string, mixed>): TRawValue
      */
     protected $set;
 
     /**
      * The closure used to compare two values for the attribute.
      *
-     * @var callable
+     * @var callable(\Illuminate\Database\Eloquent\Model, string, TValue, TValue): bool
      */
     protected $comparator;
 
     /**
      * Create a new closure cast instance.
      *
-     * @param  callable  $get
-     * @param  callable|null  $set
-     * @param  callable|null  $comparator
+     * @param  callable(\Illuminate\Database\Eloquent\Model, string, TRawValue, array<string, mixed>): TValue  $get
+     * @param  (callable(\Illuminate\Database\Eloquent\Model, string, TValue, array<string, mixed>): TRawValue)|null  $set
+     * @param  (callable(\Illuminate\Database\Eloquent\Model, string, TValue, TValue): bool)|null  $comparator
      * @param  bool  $setsOwnAttribute  Whether the set closure writes the model's attributes itself.
      * @param  bool  $nullable  Whether a null stored value should resolve to null without calling the get closure.
      */
@@ -63,6 +66,12 @@ class ClosureCast implements CastsAttributes, ComparesCastableAttributes
 
     /**
      * Transform the attribute from the underlying model values.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  array<string, mixed>  $attributes
+     * @return mixed
      */
     public function get($model, string $key, mixed $value, array $attributes)
     {
@@ -75,6 +84,12 @@ class ClosureCast implements CastsAttributes, ComparesCastableAttributes
 
     /**
      * Transform the attribute to its underlying model values.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  array<string, mixed>  $attributes
+     * @return mixed
      */
     public function set($model, string $key, mixed $value, array $attributes)
     {
@@ -83,6 +98,12 @@ class ClosureCast implements CastsAttributes, ComparesCastableAttributes
 
     /**
      * Determine if the given values are equal.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  string  $key
+     * @param  mixed  $firstValue
+     * @param  mixed  $secondValue
+     * @return bool
      */
     public function compare($model, string $key, mixed $firstValue, mixed $secondValue)
     {
