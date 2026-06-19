@@ -288,6 +288,25 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         $model->undefined_cast_column = 'Glāžšķūņu rūķīši';
     }
 
+    public function testReservedCacheKeyCastStringsAreInvalidCasts()
+    {
+        // The internal cast cache uses reserved keys (@enum, @class,
+        // @encrypted:*) for its shared flyweights. A userland cast string that
+        // collides with one of those must still be treated as an unknown cast,
+        // not silently dispatched to the enum/class/encrypted machinery.
+        foreach (['@class', '@enum', '@encrypted:array'] as $reserved) {
+            $model = new TestEloquentModelWithCustomCast;
+            $model->mergeCasts(['reserved_column' => $reserved]);
+
+            try {
+                $model->reserved_column;
+                $this->fail("Expected InvalidCastException for the cast '{$reserved}'.");
+            } catch (InvalidCastException $e) {
+                $this->addToAssertionCount(1);
+            }
+        }
+    }
+
     public function testMutatorCanDependOnAnotherCastedAttribute()
     {
         $model = new TestEloquentModelWithCustomCast([

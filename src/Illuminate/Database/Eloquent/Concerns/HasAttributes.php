@@ -187,9 +187,13 @@ trait HasAttributes
     protected static $setAttributeMutatorCache = [];
 
     /**
-     * The cache of the converted cast types.
+     * The cache of converted cast types, keyed by model class then raw cast.
      *
-     * @var array
+     * Keyed per class (not globally) so a model overriding the cast-type
+     * normalization hooks (resolveCastType, isDecimalCast, isCustomDateTimeCast,
+     * isImmutableCustomDateTimeCast) is never served another class's result.
+     *
+     * @var array<class-string, array<string, string>>
      */
     protected static $castTypeCache = [];
 
@@ -211,15 +215,39 @@ trait HasAttributes
     /**
      * The cache of cast objects resolved for a specific model class and cast.
      *
-     * Whether an attribute is encrypted is governed by the overrideable
-     * isEncryptedCastable(), so the object a class ultimately uses can differ
-     * from the shared default. This per-class layer memoizes that decision
-     * (keyed by class, then cast type) while still pointing at the shared
-     * flyweights above, so no closures are duplicated per class.
+     * Used for models that do not override the cast-resolution hooks: the
+     * resolved caster is then a pure function of the cast type, so it is
+     * memoized per class and cast type while pointing at the shared flyweights
+     * above (no closures duplicated per class). Models that override
+     * getCastType()/isEncryptedCastable() bypass this cache and resolve per key
+     * (see getInternalCastClass).
      *
      * @var array<class-string, array<string, ClosureCast|null>>
      */
     protected static $resolvedCasterCache = [];
+
+    /**
+     * The set of built-in encrypted cast types.
+     *
+     * The single source of truth shared by isEncryptedCastable() and the cast
+     * resolver's fast path, so the two can never drift apart.
+     *
+     * @var string[]
+     */
+    protected static $encryptedCastTypes = [
+        'encrypted', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object',
+    ];
+
+    /**
+     * The cache of whether a model class overrides a cast-resolution hook.
+     *
+     * Detecting an override once per class lets the common case (no override)
+     * keep the fast, fully memoized path, while a model that overrides
+     * getCastType()/isEncryptedCastable() transparently gets per-key fidelity.
+     *
+     * @var array<class-string, array<string, bool>>
+     */
+    protected static $castHookOverrides = [];
 
     /**
      * The encrypter instance that is used to encrypt attributes.
@@ -956,8 +984,10 @@ trait HasAttributes
      */
     protected function resolveCastType($castType)
     {
-        if (isset(static::$castTypeCache[$castType])) {
-            return static::$castTypeCache[$castType];
+        $class = static::class;
+
+        if (isset(static::$castTypeCache[$class][$castType])) {
+            return static::$castTypeCache[$class][$castType];
         }
 
         if ($this->isCustomDateTimeCast($castType)) {
@@ -972,7 +1002,7 @@ trait HasAttributes
             $convertedCastType = trim(strtolower($castType));
         }
 
-        return static::$castTypeCache[$castType] = $convertedCastType;
+        return static::$castTypeCache[$class][$castType] = $convertedCastType;
     }
 
     /**
@@ -997,26 +1027,68 @@ trait HasAttributes
 
         $cast = $casts[$key];
 
-        // Resolve the cast type through getCastType() rather than inlining
-        // resolveCastType() so a model that overrides getCastType() is still
-        // honored on the cast path. The type is re-derived from the live
-        // getCasts() on every call and is the only thing that keys the cache
-        // below, so runtime cast changes (e.g. mergeCasts()) are always
-        // honored — do not hoist it into the cache.
-        $castType = $this->getCastType($key);
-
         $class = static::class;
 
-        if (! isset(static::$resolvedCasterCache[$class]) ||
-            ! array_key_exists($castType, static::$resolvedCasterCache[$class])) {
-            static::$resolvedCasterCache[$class][$castType] = $this->resolveCasterFor($key, $castType, $cast);
+        // Resolve the cast type. A model that overrides getCastType() must have
+        // that override honored, but the call re-reads getCasts(); the common
+        // case (no override) skips it and reuses the cast string already in hand.
+        // The type is re-derived on every call, never hoisted into a cache, so
+        // runtime cast changes (e.g. mergeCasts()) are always honored.
+        $castType = $this->castResolutionHookIsOverridden('getCastType')
+            ? $this->getCastType($key)
+            : $this->resolveCastType($cast);
+
+        // When isEncryptedCastable() is overridden it may decide encryption per
+        // attribute key, not just per cast type, so the resolved caster cannot be
+        // memoized by cast type — resolve it live (the cast objects themselves are
+        // still shared flyweights). Otherwise encryption is a pure function of the
+        // cast type and the resolved caster is memoized per class and cast type.
+        if ($this->castResolutionHookIsOverridden('isEncryptedCastable')) {
+            $caster = $this->resolveCasterFor($castType, $cast, $this->isEncryptedCastable($key));
+        } else {
+            if (! isset(static::$resolvedCasterCache[$class]) ||
+                ! array_key_exists($castType, static::$resolvedCasterCache[$class])) {
+                static::$resolvedCasterCache[$class][$castType] = $this->resolveCasterFor(
+                    $castType, $cast, in_array($castType, static::$encryptedCastTypes, true)
+                );
+            }
+
+            $caster = static::$resolvedCasterCache[$class][$castType];
         }
 
-        if (is_null($caster = static::$resolvedCasterCache[$class][$castType])) {
+        if (is_null($caster)) {
             throw new InvalidCastException($this->getModel(), $key, $this->parseCasterClass($cast));
         }
 
         return $caster;
+    }
+
+    /**
+     * Determine whether the model class overrides a cast-resolution hook.
+     *
+     * Detected once per class and memoized. Lets the common case (no override)
+     * keep the fully memoized fast path while a model that overrides the hook
+     * transparently gets per-key resolution, so userland overrides of
+     * getCastType()/isEncryptedCastable() are always honored without taxing
+     * every other model.
+     *
+     * @param  string  $method
+     * @return bool
+     */
+    protected function castResolutionHookIsOverridden($method)
+    {
+        $class = static::class;
+
+        if (isset(static::$castHookOverrides[$class][$method])) {
+            return static::$castHookOverrides[$class][$method];
+        }
+
+        $defined = new ReflectionMethod($class, $method);
+        $original = new ReflectionMethod(__TRAIT__, $method);
+
+        return static::$castHookOverrides[$class][$method] =
+            $defined->getStartLine() !== $original->getStartLine()
+            || $defined->getFileName() !== $original->getFileName();
     }
 
     /**
@@ -1050,19 +1122,20 @@ trait HasAttributes
                 'immutable_custom_datetime' => 'immutable_datetime',
                 default => $castType,
             };
+        } elseif (enum_exists($cast) && ! is_subclass_of($cast, Castable::class)) {
+            $cacheKey = '@enum';
+        } elseif (class_exists($this->parseCasterClass($cast))) {
+            $cacheKey = '@class';
         } else {
-            $cacheKey = match (true) {
-                enum_exists($cast) && ! is_subclass_of($cast, Castable::class) => '@enum',
-                class_exists($this->parseCasterClass($cast)) => '@class',
-                default => $castType,
-            };
+            // An unrecognized cast type. Return null without caching so the
+            // reserved @enum/@class keys are only ever assigned by genuine
+            // enum/class detection — a userland cast string such as a literal
+            // '@class' cannot collide with them and still resolves to null
+            // (i.e. throws InvalidCastException upstream).
+            return null;
         }
 
-        if (array_key_exists($cacheKey, static::$internalCasterCache)) {
-            return static::$internalCasterCache[$cacheKey];
-        }
-
-        return static::$internalCasterCache[$cacheKey] = $this->buildInternalCastClass($castType, $cacheKey);
+        return static::$internalCasterCache[$cacheKey] ??= $this->buildInternalCastClass($castType, $cacheKey);
     }
 
     /**
@@ -1228,25 +1301,22 @@ trait HasAttributes
     }
 
     /**
-     * Resolve the cast object this model class uses for the given attribute.
+     * Resolve the cast object for the given cast type and encryption decision.
      *
      * Built-in casts resolve to a shared flyweight (see resolveInternalCastClass).
-     * Encrypted casts additionally wrap that flyweight in a decrypt/encrypt
-     * layer. Whether an attribute is encrypted is decided by the overrideable
-     * isEncryptedCastable(), so a subclass that widens the set of encrypted cast
-     * types is honored consistently on the read, write, and dirty-comparison
-     * paths. The caller memoizes this decision per class and cast type; an
-     * override that varies by individual attribute key while sharing a cast type
-     * is therefore not honored — overrides are expected to key off the cast type.
+     * When $encrypted is true the flyweight is additionally wrapped in a
+     * decrypt/encrypt layer. The caller decides encryption — via the overrideable
+     * isEncryptedCastable() — so a subclass that widens the set of encrypted casts
+     * is honored consistently on the read, write, and dirty-comparison paths.
      *
-     * @param  string  $key
      * @param  string  $castType
      * @param  string  $cast
+     * @param  bool  $encrypted
      * @return ClosureCast|null
      */
-    protected function resolveCasterFor($key, $castType, $cast)
+    protected function resolveCasterFor($castType, $cast, $encrypted)
     {
-        if (! $this->isEncryptedCastable($key)) {
+        if (! $encrypted) {
             return $this->resolveInternalCastClass($castType, $cast);
         }
 
@@ -2067,7 +2137,7 @@ trait HasAttributes
      */
     protected function isEncryptedCastable($key)
     {
-        return $this->hasCast($key, ['encrypted', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object']);
+        return $this->hasCast($key, static::$encryptedCastTypes);
     }
 
     /**
