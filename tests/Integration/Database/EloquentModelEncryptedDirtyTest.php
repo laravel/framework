@@ -58,6 +58,33 @@ class EloquentModelEncryptedDirtyTest extends TestCase
         $this->assertTrue($model->isDirty('secret_array_object'));
     }
 
+    public function testIsEncryptedCastableOverrideIsHonoredOnTheCastPath()
+    {
+        config(['app.key' => str_repeat('a', 32)]);
+        Model::$encrypter = null;
+
+        // The attribute is declared as a plain "array" cast, but the model
+        // overrides isEncryptedCastable() to treat it as encrypted. The read,
+        // write, and dirty-comparison paths must all honor that override.
+        $model = new OverriddenEncryptedCastable;
+
+        $model->data = ['a' => 1, 'b' => 2];
+
+        // The stored value must be encrypted (not plain JSON)...
+        $stored = $model->getAttributes()['data'];
+        $this->assertNotSame('{"a":1,"b":2}', $stored);
+        $this->assertSame('{"a":1,"b":2}', Model::currentEncrypter()->decrypt($stored, false));
+
+        // ...and reading must decrypt then JSON-decode it back.
+        $this->assertSame(['a' => 1, 'b' => 2], $model->data);
+
+        // Dirty comparison runs through the encrypted comparator (always dirty
+        // on any re-assignment because of rotatable keys), not the plain JSON one.
+        $model->syncOriginal();
+        $model->data = ['a' => 1, 'b' => 2];
+        $this->assertFalse($model->isDirty('data'));
+    }
+
     public function testDirtyAttributeBehaviorWithPreviousKeys()
     {
         config(['app.key' => str_repeat('a', 32)]);
@@ -109,4 +136,18 @@ class EncryptedDirtyAttributeCast extends Model
         'secret_collection' => 'encrypted:collection',
         'secret_array_object' => AsEncryptedArrayObject::class,
     ];
+}
+
+class OverriddenEncryptedCastable extends Model
+{
+    protected $guarded = [];
+
+    public $casts = [
+        'data' => 'array',
+    ];
+
+    protected function isEncryptedCastable($key)
+    {
+        return $key === 'data' || parent::isEncryptedCastable($key);
+    }
 }

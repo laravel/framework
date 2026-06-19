@@ -126,6 +126,47 @@ class DatabaseEloquentCastEquivalenceTest extends TestCase
         $this->assertSame($expectedDirty, $model->isDirty('updated_at'));
         $this->assertSame(! $expectedDirty, $model->originalIsEquivalent('updated_at'));
     }
+
+    public function testGetCastTypeOverrideIsHonoredOnTheCastPath()
+    {
+        // The attribute is declared as a string cast, but the model overrides
+        // getCastType() to force it to boolean. Casting must follow the override,
+        // not the raw declaration — guards against resolving the cast type
+        // without consulting getCastType().
+        $model = (new CastTypeOverrideModel)->newFromBuilder(['flag' => '1']);
+
+        $this->assertTrue($model->flag);
+
+        $model->flag = '0';
+
+        $this->assertFalse($model->flag);
+    }
+
+    public function testBuiltInCastObjectsAreSharedFlyweights()
+    {
+        $resolve = fn ($model, $cast) => \Closure::bind(
+            fn ($key) => $this->getInternalCastClass($key),
+            (new CastEquivalenceModel([], ['value' => $cast]))->newFromBuilder(['value' => null]),
+            Model::class,
+        )('value');
+
+        // Aliases collapse to a single shared instance...
+        $float = $resolve(null, 'float');
+        $this->assertSame($float, $resolve(null, 'double'));
+        $this->assertSame($float, $resolve(null, 'real'));
+
+        // ...as does every enum, regardless of the concrete enum class...
+        $enum = $resolve(null, CastEquivalenceIntEnum::class);
+        $this->assertSame($enum, $resolve(null, CastEquivalenceStringEnum::class));
+
+        // ...and every custom cast class.
+        $class = $resolve(null, CastEquivalenceReverseCast::class);
+        $this->assertSame($class, $resolve(null, CastEquivalenceReverseCast::class));
+
+        // Different logical types remain distinct.
+        $this->assertNotSame($float, $enum);
+        $this->assertNotSame($float, $class);
+    }
 }
 
 enum CastEquivalenceIntEnum: int
@@ -180,5 +221,19 @@ class CastEquivalenceTimestampModel extends Model
     public function getDates()
     {
         return ['created_at', 'updated_at'];
+    }
+}
+
+class CastTypeOverrideModel extends Model
+{
+    protected $guarded = [];
+
+    public $timestamps = false;
+
+    protected $casts = ['flag' => 'string'];
+
+    protected function getCastType($key)
+    {
+        return $key === 'flag' ? 'boolean' : parent::getCastType($key);
     }
 }
