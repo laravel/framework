@@ -1014,6 +1014,10 @@ trait HasAttributes
 
         $primitiveComparator = static fn ($model, $key, $current, $original) => $model->castAttribute($key, $current) === $model->castAttribute($key, $original);
 
+        $jsonSetter = static fn ($model, $key, $value) => is_null($value) ? null : $model->castAttributeAsJson($key, $value);
+
+        $jsonComparator = static fn ($model, $key, $current, $original) => $model->fromJson($current) === $model->fromJson($original);
+
         $encrypted = in_array($castType, [
             'encrypted', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object',
         ], true);
@@ -1066,8 +1070,8 @@ trait HasAttributes
             case 'object':
                 $caster = new ClosureCast(
                     static fn ($model, $key, $value) => $model->fromJson($value, true),
-                    static fn ($model, $key, $value) => is_null($value) ? null : $model->castAttributeAsJson($key, $value),
-                    comparator: static fn ($model, $key, $current, $original) => $model->fromJson($current) === $model->fromJson($original),
+                    $jsonSetter,
+                    comparator: $jsonComparator,
                 );
                 break;
             case 'array':
@@ -1075,15 +1079,15 @@ trait HasAttributes
             case 'json:unicode':
                 $caster = new ClosureCast(
                     static fn ($model, $key, $value) => $model->fromJson($value),
-                    static fn ($model, $key, $value) => is_null($value) ? null : $model->castAttributeAsJson($key, $value),
-                    comparator: static fn ($model, $key, $current, $original) => $model->fromJson($current) === $model->fromJson($original),
+                    $jsonSetter,
+                    comparator: $jsonComparator,
                 );
                 break;
             case 'collection':
                 $caster = new ClosureCast(
                     static fn ($model, $key, $value) => new BaseCollection($model->fromJson($value)),
-                    static fn ($model, $key, $value) => is_null($value) ? null : $model->castAttributeAsJson($key, $value),
-                    comparator: static fn ($model, $key, $current, $original) => $model->fromJson($current) === $model->fromJson($original),
+                    $jsonSetter,
+                    comparator: $jsonComparator,
                 );
                 break;
             case 'date':
