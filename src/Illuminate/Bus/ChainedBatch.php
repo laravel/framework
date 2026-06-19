@@ -130,9 +130,11 @@ class ChainedBatch implements ShouldQueue
             $next->chainQueue = $this->chainQueue;
             $next->chainCatchCallbacks = $this->chainCatchCallbacks;
 
+            $next = serialize($next);
+
             $batch->finally(function (Batch $batch) use ($next) {
                 if (! $batch->cancelled()) {
-                    Container::getInstance()->make(Dispatcher::class)->dispatch($next);
+                    Container::getInstance()->make(Dispatcher::class)->dispatch(unserialize($next));
                 }
             });
 
