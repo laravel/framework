@@ -26,6 +26,7 @@ use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Str;
 use Illuminate\Tests\Database\Fixtures\Enums\Bar;
 use InvalidArgumentException;
 use Mockery as m;
@@ -613,6 +614,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->whereDate('result->created_at', new Raw('NOW()'));
         $this->assertSame('select * from "users" where ("result"->>\'created_at\')::date = NOW()', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereDate(new Raw('COALESCE(created_at, updated_at)'), new Raw('NOW()'));
+        $this->assertSame('select * from "users" where COALESCE(created_at, updated_at)::date = NOW()', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereDate(Str::of('result->created_at'), new Raw('NOW()'));
+        $this->assertSame('select * from "users" where ("result"->>\'created_at\')::date = NOW()', $builder->toSql());
     }
 
     public function testWhereDayPostgres()
@@ -648,6 +657,16 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->whereTime('result->created_at', '>=', '22:00');
+        $this->assertSame('select * from "users" where ("result"->>\'created_at\')::time >= ?', $builder->toSql());
+        $this->assertEquals([0 => '22:00'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereTime(new Raw('COALESCE(created_at, updated_at)'), '>=', '22:00');
+        $this->assertSame('select * from "users" where COALESCE(created_at, updated_at)::time >= ?', $builder->toSql());
+        $this->assertEquals([0 => '22:00'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereTime(Str::of('result->created_at'), '>=', '22:00');
         $this->assertSame('select * from "users" where ("result"->>\'created_at\')::time >= ?', $builder->toSql());
         $this->assertEquals([0 => '22:00'], $builder->getBindings());
     }
