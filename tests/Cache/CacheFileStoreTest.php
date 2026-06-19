@@ -112,6 +112,30 @@ class CacheFileStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testPutPadsShortTimestampsToTenDigits()
+    {
+        $files = $this->mockFilesystem();
+        $store = $this->getMockBuilder(FileStore::class)->onlyMethods(['expiration'])->setConstructorArgs([$files, __DIR__])->getMock();
+        $store->expects($this->once())->method('expiration')->with(3)->willReturn(990464403);
+        $contents = '0990464403'.serialize('Hello World');
+        $hash = sha1('foo');
+        $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
+        $files->expects($this->once())->method('put')->with(__DIR__.'/'.$cache_dir.'/'.$hash, $contents)->willReturn(strlen($contents));
+        $result = $store->put('foo', 'Hello World', 3);
+        $this->assertTrue($result);
+    }
+
+    public function testGetPayloadReadsZeroPaddedTimestampsCorrectly()
+    {
+        Carbon::setTestNow(Carbon::createFromTimestampUTC(990464400));
+
+        $files = $this->mockFilesystem();
+        $contents = '0990464403'.serialize('Hello World');
+        $files->expects($this->once())->method('get')->willReturn($contents);
+        $store = new FileStore($files, __DIR__);
+        $this->assertSame('Hello World', $store->get('foo'));
+    }
+
     public function testTouchExtendsTtl(): void
     {
         $files = $this->mockFilesystem();
