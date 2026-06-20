@@ -69,7 +69,7 @@ class Exceptions
     /**
      * Register a retryable callback.
      *
-     * @param  callable  $using
+     * @param  callable(\Throwable): bool|null  $using
      * @return $this
      */
     public function retry(callable $using)
@@ -82,7 +82,7 @@ class Exceptions
     /**
      * Register a retryable callback.
      *
-     * @param  callable  $retryUsing
+     * @param  callable(\Throwable): bool|null  $retryUsing
      * @return $this
      */
     public function retryable(callable $retryUsing)
