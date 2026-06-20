@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation;
 
-use Exception;
 use Illuminate\Support\NodePackageManager;
 use ReflectionClass;
 
@@ -14,6 +13,13 @@ class DevCommands
      * @var NodePackageManager|null
      */
     protected static ?NodePackageManager $packageManager = null;
+
+    /**
+     * Whether vendor packages should be prevented from registering dev commands.
+     *
+     * @var bool
+     */
+    protected static bool $preventVendorRegistration = false;
 
     /**
      * Counter to keep track of how many colors have been assigned,.
@@ -56,12 +62,14 @@ class DevCommands
             return;
         }
 
-        foreach ([
-            'server' => 'php artisan serve --host=localhost',
-            'queue' => 'php artisan queue:listen --tries=1 --timeout=0',
-            'logs' => 'php artisan pail --timeout=0',
-            'vite' => self::getPackageManager()->getRunCommand('dev'),
-        ] as $name => $command) {
+        foreach (
+            [
+                'server' => 'php artisan serve --host=localhost',
+                'queue' => 'php artisan queue:listen --tries=1 --timeout=0',
+                'logs' => 'php artisan pail --timeout=0',
+                'vite' => self::getPackageManager()->getRunCommand('dev'),
+            ] as $name => $command
+        ) {
             self::$commands[$name] = new DevCommand($command, $name);
         }
     }
@@ -75,11 +83,9 @@ class DevCommands
      */
     public static function register(string $command, ?string $name = null): DevCommand
     {
-        if (! app()->runningInConsole()) {
+        if (! app()->runningInConsole() || self::shouldPreventVendorRegistration()) {
             return new DevCommand('', '');
         }
-
-        self::preventVendorRegistration($name ?? $command);
 
         $devCommand = new DevCommand($command, $name);
 
@@ -180,15 +186,16 @@ class DevCommands
     }
 
     /**
-     * Prevent automatic registration of DevCommands from within vendor packages.
+     * Determine if the current call originated from a vendor package.
      *
-     * @param  string  $name
-     * @return void
-     *
-     * @throws Exception
+     * @return bool
      */
-    protected static function preventVendorRegistration(string $name)
+    protected static function shouldPreventVendorRegistration(): bool
     {
+        if (self::$preventVendorRegistration === false) {
+            return false;
+        }
+
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 
         foreach ($trace as $frame) {
@@ -211,15 +218,20 @@ class DevCommands
                 continue;
             }
 
-            if (! str_contains($file, base_path('vendor'))) {
-                // We found at least one frame that came from userland code, we're good...
-                return;
-            }
+            return str_contains($file, base_path('vendor'));
         }
 
-        throw new Exception(
-            "DevCommands should be registered in application code, not within vendor packages. Attempted to register command: {$name}"
-        );
+        return false;
+    }
+
+    /**
+     * Prevent vendor packages from registering dev commands.
+     *
+     * @return void
+     */
+    public static function preventVendorCommands(): void
+    {
+        self::$preventVendorRegistration = true;
     }
 
     /**

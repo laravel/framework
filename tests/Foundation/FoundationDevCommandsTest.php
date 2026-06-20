@@ -216,12 +216,11 @@ require '{$basePath}/vendor/autoload.php';
 \$app = new Illuminate\Foundation\Application('{$basePath}');
 \$app['env'] = 'testing';
 
-try {
-    Illuminate\Foundation\DevCommands::register('echo hello', 'vendor-cmd');
-    echo 'REGISTERED';
-} catch (Exception \$e) {
-    echo 'EXCEPTION:' . \$e->getMessage();
-}
+Illuminate\Foundation\DevCommands::preventVendorCommands();
+
+Illuminate\Foundation\DevCommands::register('echo hello', 'vendor-cmd');
+
+echo json_encode(Illuminate\Foundation\DevCommands::commands());
 PHP);
 
         $process = new Process(['php', $vendorFile], $basePath);
@@ -229,8 +228,7 @@ PHP);
 
         @unlink($vendorFile);
 
-        $this->assertStringContainsString('EXCEPTION:', $process->getOutput());
-        $this->assertStringContainsString('DevCommands should be registered in application code', $process->getOutput());
+        $this->assertSame('[]', $process->getOutput());
     }
 
     public function testUserlandRegistrationIsAllowed()
