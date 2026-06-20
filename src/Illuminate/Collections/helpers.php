@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
@@ -264,6 +265,22 @@ if (! function_exists('value')) {
     function value($value, ...$args)
     {
         return $value instanceof Closure ? $value(...$args) : $value;
+    }
+}
+
+if (! function_exists('to_array')) {
+    /**
+     * Convert an Arrayable instance to a plain array, or return the value unchanged if it's already an array.
+     *
+     * @template TKey of array-key
+     * @template TValue
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|array<TKey, TValue>  $value
+     * @return array<TKey, TValue>
+     */
+    function to_array($value)
+    {
+        return $value instanceof Arrayable ? $value->toArray() : $value;
     }
 }
 
