@@ -447,6 +447,13 @@ class DatabaseEloquentModelAttributesTest extends TestCase
 
         $this->assertEqualsCanonicalizing(['name', 'email', 'phone'], $model->getFillable());
     }
+
+    public function test_trait_with_attribute_applies_to_class(): void
+    {
+        $model = new ModelUsingWithoutIncrementingTraitWithAttribute;
+        $this->assertFalse($model->getIncrementing());
+    }
+
 }
 
 enum ConnectionUnitEnum
@@ -773,3 +780,14 @@ class ModelWithFillableAttributeAndTrait extends Model
 {
     use AddsPhoneFillable;
 }
+
+#[WithoutIncrementing]
+trait TraitUsingWithoutIncrementingAttribute
+{
+}
+
+class ModelUsingWithoutIncrementingTraitWithAttribute extends Model
+{
+    use TraitUsingWithoutIncrementingAttribute;
+}
+
