@@ -78,7 +78,9 @@ class TestResponseAssert
             $session = $this->response->baseResponse->getSession();
 
             if (! is_null($session) && $session->has('errors')) {
-                return $this->appendErrorsToException($session->get('errors')->all(), $exception);
+                $errors = $session->get('errors');
+
+                return $this->appendErrorsToException(is_array($errors) ? $errors : $errors->all(), $exception);
             }
         }
 
