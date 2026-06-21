@@ -57,6 +57,20 @@ class Connection implements ConnectionInterface
     protected $readPdoConfig = [];
 
     /**
+     * The active PDO connection used for direct connections.
+     *
+     * @var \PDO|(\Closure(): \PDO)
+     */
+    protected $directPdo;
+
+    /**
+     * The database connection configuration options for direct connections.
+     *
+     * @var array
+     */
+    protected $directPdoConfig = [];
+
+    /**
      * The name of the connected database.
      *
      * @var string
@@ -213,7 +227,7 @@ class Connection implements ConnectionInterface
     /**
      * The last retrieved PDO read / write type.
      *
-     * @var null|'read'|'write'
+     * @var null|'read'|'write'|'direct'
      */
     protected $latestPdoTypeRetrieved = null;
 
@@ -1061,7 +1075,7 @@ class Connection implements ConnectionInterface
      */
     public function disconnect()
     {
-        $this->setPdo(null)->setReadPdo(null);
+        $this->setPdo(null)->setReadPdo(null)->setDirectPdo(null);
     }
 
     /**
@@ -1330,6 +1344,32 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Get the current PDO connection used for direct connections.
+     *
+     * @return \PDO
+     */
+    public function getDirectPdo()
+    {
+        $this->latestPdoTypeRetrieved = 'direct';
+
+        if ($this->directPdo instanceof Closure) {
+            return $this->directPdo = call_user_func($this->directPdo);
+        }
+
+        return $this->directPdo ?: $this->getPdo();
+    }
+
+    /**
+     * Get the current direct PDO connection parameter without executing any reconnect logic.
+     *
+     * @return \PDO|\Closure|null
+     */
+    public function getRawDirectPdo()
+    {
+        return $this->directPdo;
+    }
+
+    /**
      * Set the PDO connection.
      *
      * @param  \PDO|\Closure|null  $pdo
@@ -1368,6 +1408,52 @@ class Connection implements ConnectionInterface
         $this->readPdoConfig = $config;
 
         return $this;
+    }
+
+    /**
+     * Set the PDO connection used for direct connections.
+     *
+     * @param  \PDO|\Closure|null  $pdo
+     * @return $this
+     */
+    public function setDirectPdo($pdo)
+    {
+        $this->directPdo = $pdo;
+
+        return $this;
+    }
+
+    /**
+     * Set the direct PDO connection configuration.
+     *
+     * @param  array  $config
+     * @return $this
+     */
+    public function setDirectPdoConfig(array $config)
+    {
+        $this->directPdoConfig = $config;
+
+        return $this;
+    }
+
+    /**
+     * Get the direct PDO connection configuration.
+     *
+     * @return array
+     */
+    public function getDirectPdoConfig()
+    {
+        return $this->directPdoConfig;
+    }
+
+    /**
+     * Determine if this connection has a direct PDO connection configured.
+     *
+     * @return bool
+     */
+    public function hasDirectConnection()
+    {
+        return ! empty($this->directPdoConfig);
     }
 
     /**
@@ -1423,9 +1509,11 @@ class Connection implements ConnectionInterface
      */
     protected function getConnectionDetails()
     {
-        $config = $this->latestReadWriteTypeUsed() === 'read'
-            ? $this->readPdoConfig
-            : $this->config;
+        $config = match ($this->latestReadWriteTypeUsed()) {
+            'read' => $this->readPdoConfig,
+            'direct' => $this->directPdoConfig,
+            default => $this->config,
+        };
 
         return [
             'driver' => $this->getDriverName(),
@@ -1707,7 +1795,7 @@ class Connection implements ConnectionInterface
     /**
      * Retrieve the latest read / write type used.
      *
-     * @return 'read'|'write'|null
+     * @return 'read'|'write'|'direct'|null
      */
     protected function latestReadWriteTypeUsed()
     {
