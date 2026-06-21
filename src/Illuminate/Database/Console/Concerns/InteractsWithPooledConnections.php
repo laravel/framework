@@ -16,6 +16,7 @@ trait InteractsWithPooledConnections
     protected function resolveDirectConnectionIfPossible($connections, $database)
     {
         $name = $database ?: $connections->getDefaultConnection();
+
         $connection = $connections->connection($name);
 
         return $connection->usesDirectConnection() && ! Str::endsWith($name, ['::read', '::write', '::direct'])
