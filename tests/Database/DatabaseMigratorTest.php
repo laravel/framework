@@ -148,6 +148,25 @@ class DatabaseMigratorTest extends TestCase
         $this->assertSame('pgsql', $resolver->getDefaultConnection());
     }
 
+    public function testUsingConnectionRestoresOriginalDefaultConnectionWithoutReroutingToDirect()
+    {
+        $resolver = new DatabaseMigratorTestResolver;
+        $resolver->connections['pgsql'] = new DatabaseMigratorTestConnection(true);
+
+        $repository = new DatabaseMigratorTestRepository;
+        $migrator = $this->migrator($resolver, $repository);
+
+        $migrator->usingConnection(null, function () use ($migrator, $resolver, $repository) {
+            $this->assertSame('pgsql::direct', $migrator->getConnection());
+            $this->assertSame('pgsql::direct', $resolver->getDefaultConnection());
+            $this->assertSame('pgsql::direct', $repository->source);
+        });
+
+        $this->assertNull($migrator->getConnection());
+        $this->assertSame('pgsql', $resolver->getDefaultConnection());
+        $this->assertNull($repository->source);
+    }
+
     protected function migrator($resolver, $repository = null)
     {
         return new DatabaseMigratorTestMigrator(
@@ -170,9 +189,11 @@ class DatabaseMigratorTestResolver implements ConnectionResolverInterface
 {
     public $default = 'pgsql';
 
+    public $connections = [];
+
     public function connection($name = null)
     {
-        //
+        return $this->connections[$name ?? $this->default];
     }
 
     public function getDefaultConnection()
@@ -183,5 +204,83 @@ class DatabaseMigratorTestResolver implements ConnectionResolverInterface
     public function setDefaultConnection($name)
     {
         $this->default = $name;
+    }
+}
+
+class DatabaseMigratorTestConnection extends Connection
+{
+    public function __construct(protected $hasDirectConnection)
+    {
+        //
+    }
+
+    public function hasDirectConnection()
+    {
+        return $this->hasDirectConnection;
+    }
+}
+
+class DatabaseMigratorTestRepository implements MigrationRepositoryInterface
+{
+    public $source;
+
+    public function getRan()
+    {
+        //
+    }
+
+    public function getMigrations($steps)
+    {
+        //
+    }
+
+    public function getMigrationsByBatch($batch)
+    {
+        //
+    }
+
+    public function getLast()
+    {
+        //
+    }
+
+    public function getMigrationBatches()
+    {
+        //
+    }
+
+    public function log($file, $batch)
+    {
+        //
+    }
+
+    public function delete($migration)
+    {
+        //
+    }
+
+    public function getNextBatchNumber()
+    {
+        //
+    }
+
+    public function createRepository()
+    {
+        //
+    }
+
+    public function deleteRepository()
+    {
+        //
+    }
+
+    public function repositoryExists()
+    {
+        //
+    }
+
+    public function setSource($name)
+    {
+        $this->source = $name;
     }
 }

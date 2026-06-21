@@ -663,14 +663,18 @@ class Migrator
      */
     public function usingConnection($name, callable $callback)
     {
-        $previousConnection = $this->resolver->getDefaultConnection();
+        $previousConnection = $this->connection;
+        $previousDefaultConnection = $this->resolver->getDefaultConnection();
 
         $this->setConnection($name);
 
         try {
             return $callback();
         } finally {
-            $this->setConnection($previousConnection);
+            $this->repository->setSource($previousConnection);
+            $this->resolver->setDefaultConnection($previousDefaultConnection);
+
+            $this->connection = $previousConnection;
         }
     }
 
