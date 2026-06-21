@@ -7,7 +7,7 @@ use Throwable;
 /**
  * @method bool isReporting(\Throwable $e)
  * @method array buildContextForException()
- * @method bool shouldntRetry(\Throwable $e)
+ * @method bool shouldStopRetries(\Throwable $e)
  */
 interface ExceptionHandler
 {

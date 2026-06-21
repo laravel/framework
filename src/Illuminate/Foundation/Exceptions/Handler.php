@@ -79,6 +79,20 @@ class Handler implements ExceptionHandlerContract
     protected $dontReportCallbacks = [];
 
     /**
+     * A list of the exception types that should stop job retries.
+     *
+     * @var array<int, class-string<\Throwable>>
+     */
+    protected $dontRetry = [];
+
+    /**
+     * The callbacks that inspect exceptions to determine if they should stop job retries.
+     *
+     * @var array
+     */
+    protected $dontRetryCallbacks = [];
+
+    /**
      * The callbacks that should be used during reporting.
      *
      * @var \Illuminate\Foundation\Exceptions\ReportableHandler[]
@@ -119,20 +133,6 @@ class Handler implements ExceptionHandlerContract
      * @var \Closure[]
      */
     protected $renderCallbacks = [];
-
-    /**
-     * A list of the exception types that should not be retried.
-     *
-     * @var array<int, class-string<\Throwable>>
-     */
-    protected $dontRetry = [];
-
-    /**
-     * The callbacks that inspect exceptions to determine if they should not be retried.
-     *
-     * @var array
-     */
-    protected $dontRetryCallbacks = [];
 
     /**
      * The callback that determines if the exception handler response should be JSON.
@@ -339,7 +339,7 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
-     * Indicate that the given exception type should not be retried.
+     * Indicate that the given exception type should stop job retries.
      *
      * @param  array|string  $exceptions
      * @return $this
@@ -354,7 +354,7 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
-     * Register a callback to determine if an exception should not be retried.
+     * Register a callback to determine if an exception should stop job retries.
      *
      * @param  (callable(\Throwable): bool)  $dontRetryWhen
      * @return $this
@@ -371,12 +371,12 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
-     * Determine if the exception should not be retried when thrown from a queued job.
+     * Determine if the exception should stop job retries.
      *
      * @param  \Throwable  $e
      * @return bool
      */
-    public function shouldntRetry(Throwable $e)
+    public function shouldStopRetries(Throwable $e)
     {
         if (method_exists($e, 'dontRetry')) {
             return $e->dontRetry();

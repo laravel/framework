@@ -267,14 +267,14 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testShouldntRetryDefaultsToFalse()
     {
-        $this->assertFalse($this->handler->shouldntRetry(new CustomException));
+        $this->assertFalse($this->handler->shouldStopRetries(new CustomException));
     }
 
     public function testShouldntRetryUsesRegisteredExceptionClass()
     {
         $this->handler->dontRetry(CustomException::class);
 
-        $this->assertTrue($this->handler->shouldntRetry(new CustomException));
+        $this->assertTrue($this->handler->shouldStopRetries(new CustomException));
     }
 
     public function testShouldntRetryUsesRegisteredCallback()
@@ -283,7 +283,7 @@ class FoundationExceptionsHandlerTest extends TestCase
             return true;
         });
 
-        $this->assertTrue($this->handler->shouldntRetry(new CustomException));
+        $this->assertTrue($this->handler->shouldStopRetries(new CustomException));
     }
 
     public function testShouldntRetryIgnoresFalseCallbackResult()
@@ -292,12 +292,12 @@ class FoundationExceptionsHandlerTest extends TestCase
             return false;
         });
 
-        $this->assertFalse($this->handler->shouldntRetry(new CustomException));
+        $this->assertFalse($this->handler->shouldStopRetries(new CustomException));
     }
 
     public function testShouldntRetryUsesExceptionMethod()
     {
-        $this->assertTrue($this->handler->shouldntRetry(new NonRetryableException));
+        $this->assertTrue($this->handler->shouldStopRetries(new NonRetryableException));
     }
 
     public function testReturnsCustomResponseWhenExceptionImplementsResponsable()

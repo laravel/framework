@@ -151,7 +151,7 @@ class Exceptions
     }
 
     /**
-     * Indicate that the given exception type should not be retried.
+     * Indicate that the given exception type should stop job retries.
      *
      * @param  array|string  $class
      * @return $this
@@ -179,7 +179,7 @@ class Exceptions
     }
 
     /**
-     * Register a callback to determine if an exception should not be retried.
+     * Register a callback to determine if an exception should stop job retries.
      *
      * @param  (\Closure(\Throwable): bool)  $dontRetryWhen
      * @return $this

@@ -815,7 +815,7 @@ class ShouldntRetryExceptionHandler implements ExceptionHandler
         //
     }
 
-    public function shouldntRetry(\Throwable $e)
+    public function shouldStopRetries(\Throwable $e)
     {
         return true;
     }
