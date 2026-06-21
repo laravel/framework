@@ -15,6 +15,14 @@ use PDO;
 class PostgresConnection extends Connection
 {
     /**
+     * {@inheritdoc}
+     */
+    public function getDriverTitle()
+    {
+        return 'PostgreSQL';
+    }
+
+    /**
      * Prepare the query bindings for execution.
      *
      * @param  array  $bindings
@@ -35,31 +43,6 @@ class PostgresConnection extends Connection
         }
 
         return $bindings;
-    }
-
-    /**
-     * Determine if the active PDO configuration uses emulated prepares.
-     *
-     * @return bool
-     */
-    protected function usesEmulatedPrepares()
-    {
-        // Binding preparation runs after query routing has selected the PDO variant.
-        $config = match ($this->latestReadWriteTypeUsed()) {
-            'read' => $this->readPdoConfig,
-            'direct' => $this->directPdoConfig,
-            default => $this->config,
-        };
-
-        return (bool) ($config['options'][PDO::ATTR_EMULATE_PREPARES] ?? false);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDriverTitle()
-    {
-        return 'PostgreSQL';
     }
 
     /**
@@ -172,5 +155,22 @@ class PostgresConnection extends Connection
     protected function getDefaultPostProcessor()
     {
         return new PostgresProcessor;
+    }
+
+    /**
+     * Determine if the active PDO configuration uses emulated prepares.
+     *
+     * @return bool
+     */
+    protected function usesEmulatedPrepares()
+    {
+        // Binding preparation runs after query routing has selected the PDO variant...
+        $config = match ($this->latestReadWriteTypeUsed()) {
+            'read' => $this->readPdoConfig,
+            'direct' => $this->directPdoConfig,
+            default => $this->config,
+        };
+
+        return (bool) ($config['options'][PDO::ATTR_EMULATE_PREPARES] ?? false);
     }
 }
