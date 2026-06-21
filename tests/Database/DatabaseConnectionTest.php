@@ -781,7 +781,7 @@ class DatabaseConnectionTest extends TestCase
         ]);
 
         $this->assertTrue($connection->hasDirectConnection());
-        $this->assertSame($config, $connection->getDirectConfig());
+        $this->assertSame($config, $connection->getDirectPdoConfig());
     }
 
     public function testDisconnectClearsDirectPdo()

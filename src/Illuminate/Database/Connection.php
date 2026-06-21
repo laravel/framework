@@ -1439,7 +1439,7 @@ class Connection implements ConnectionInterface
      *
      * @return array
      */
-    public function getDirectConfig()
+    public function getDirectPdoConfig()
     {
         return $this->directPdoConfig;
     }

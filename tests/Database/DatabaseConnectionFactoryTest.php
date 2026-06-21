@@ -145,7 +145,7 @@ class DatabaseConnectionFactoryTest extends TestCase
         $this->assertTrue($connection->getConfig('pooled'));
         $this->assertTrue($connection->getConfig('options')[PDO::ATTR_EMULATE_PREPARES]);
 
-        $directConfig = $connection->getDirectConfig();
+        $directConfig = $connection->getDirectPdoConfig();
 
         $this->assertSame('direct-host', $directConfig['host']);
         $this->assertSame('5432', $directConfig['port']);
@@ -174,7 +174,7 @@ class DatabaseConnectionFactoryTest extends TestCase
             ],
         ], 'pooled_pgsql_inherited_credentials');
 
-        $directConfig = $this->db->getConnection('pooled_pgsql_inherited_credentials')->getDirectConfig();
+        $directConfig = $this->db->getConnection('pooled_pgsql_inherited_credentials')->getDirectPdoConfig();
 
         $this->assertSame('pooler-user', $directConfig['username']);
         $this->assertSame('pooler-password', $directConfig['password']);
@@ -196,7 +196,7 @@ class DatabaseConnectionFactoryTest extends TestCase
             ],
         ], 'pooled_pgsql_same_host');
 
-        $directConfig = $this->db->getConnection('pooled_pgsql_same_host')->getDirectConfig();
+        $directConfig = $this->db->getConnection('pooled_pgsql_same_host')->getDirectPdoConfig();
 
         $this->assertSame('same-host', $directConfig['host']);
         $this->assertSame('5432', $directConfig['port']);
