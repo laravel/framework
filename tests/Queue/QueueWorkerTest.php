@@ -248,6 +248,31 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldNotHaveReceived('dispatch', [m::type(JobProcessed::class)]);
     }
 
+    public function testJobIsFailedIfExceptionHandlerSaysItShouldntRetry()
+    {
+        $e = new RuntimeException;
+
+        $job = new WorkerFakeJob(function () use ($e) {
+            throw $e;
+        });
+
+        $worker = new InsomniacWorker(
+            new WorkerFakeManager('default', new WorkerFakeConnection('default', ['queue' => [$job]])),
+            $this->events,
+            new ShouldntRetryExceptionHandler,
+            function () {
+                return false;
+            },
+        );
+
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['backoff' => 10]));
+
+        $this->assertNull($job->releaseAfter);
+        $this->assertTrue($job->deleted);
+        $this->assertEquals($e, $job->failedWith);
+        $this->events->shouldNotHaveReceived('dispatch', [m::type(JobReleasedAfterException::class)]);
+    }
+
     public function testExceptionIsNotReportedIfReportJobExceptionsIsDisabled()
     {
         $e = new RuntimeException;
@@ -765,6 +790,34 @@ class BrokenQueueConnection
     public function getConnectionName()
     {
         return $this->connectionName;
+    }
+}
+
+class ShouldntRetryExceptionHandler implements ExceptionHandler
+{
+    public function report(\Throwable $e)
+    {
+        //
+    }
+
+    public function shouldReport(\Throwable $e)
+    {
+        return true;
+    }
+
+    public function render($request, \Throwable $e)
+    {
+        //
+    }
+
+    public function renderForConsole($output, \Throwable $e)
+    {
+        //
+    }
+
+    public function shouldStopRetries(\Throwable $e)
+    {
+        return true;
     }
 }
 

@@ -265,6 +265,36 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertSame('{"response":"My renderable exception response"}', $response);
     }
 
+    public function testShouldntRetryDefaultsToFalse()
+    {
+        $this->assertFalse($this->handler->shouldStopRetries(new CustomException));
+    }
+
+    public function testShouldntRetryUsesRegisteredExceptionClass()
+    {
+        $this->handler->dontRetry(CustomException::class);
+
+        $this->assertTrue($this->handler->shouldStopRetries(new CustomException));
+    }
+
+    public function testShouldntRetryUsesRegisteredCallback()
+    {
+        $this->handler->dontRetryWhen(function (CustomException $e) {
+            return true;
+        });
+
+        $this->assertTrue($this->handler->shouldStopRetries(new CustomException));
+    }
+
+    public function testShouldntRetryIgnoresFalseCallbackResult()
+    {
+        $this->handler->dontRetryWhen(function (CustomException $e) {
+            return false;
+        });
+
+        $this->assertFalse($this->handler->shouldStopRetries(new CustomException));
+    }
+
     public function testReturnsCustomResponseWhenExceptionImplementsResponsable()
     {
         $response = $this->handler->render($this->request, new ResponsableException)->getContent();

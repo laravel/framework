@@ -79,6 +79,20 @@ class Handler implements ExceptionHandlerContract
     protected $dontReportCallbacks = [];
 
     /**
+     * A list of the exception types that should stop job retries.
+     *
+     * @var array<int, class-string<\Throwable>>
+     */
+    protected $dontRetry = [];
+
+    /**
+     * The callbacks that inspect exceptions to determine if they should stop job retries.
+     *
+     * @var array
+     */
+    protected $dontRetryCallbacks = [];
+
+    /**
      * The callbacks that should be used during reporting.
      *
      * @var \Illuminate\Foundation\Exceptions\ReportableHandler[]
@@ -322,6 +336,59 @@ class Handler implements ExceptionHandlerContract
         $this->dontReport = array_values(array_unique(array_merge($this->dontReport, $exceptions)));
 
         return $this;
+    }
+
+    /**
+     * Indicate that the given exception type should stop job retries.
+     *
+     * @param  array|string  $exceptions
+     * @return $this
+     */
+    public function dontRetry(array|string $exceptions)
+    {
+        $exceptions = Arr::wrap($exceptions);
+
+        $this->dontRetry = array_values(array_unique(array_merge($this->dontRetry, $exceptions)));
+
+        return $this;
+    }
+
+    /**
+     * Register a callback to determine if an exception should stop job retries.
+     *
+     * @param  (callable(\Throwable): bool)  $dontRetryWhen
+     * @return $this
+     */
+    public function dontRetryWhen(callable $dontRetryWhen)
+    {
+        if (! $dontRetryWhen instanceof Closure) {
+            $dontRetryWhen = Closure::fromCallable($dontRetryWhen);
+        }
+
+        $this->dontRetryCallbacks[] = $dontRetryWhen;
+
+        return $this;
+    }
+
+    /**
+     * Determine if the exception should stop job retries.
+     *
+     * @param  \Throwable  $e
+     * @return bool
+     */
+    public function shouldStopRetries(Throwable $e)
+    {
+        if (! is_null(Arr::first($this->dontRetry, fn ($type) => $e instanceof $type))) {
+            return true;
+        }
+
+        foreach ($this->dontRetryCallbacks as $dontRetryCallback) {
+            if ($dontRetryCallback($e) === true) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
