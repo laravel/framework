@@ -454,6 +454,12 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertFalse($model->getIncrementing());
     }
 
+    public function test_class_attribute_takes_precedence_over_trait(): void
+    {
+        $model = new ModelOverridingTraitConnectionAttribute;
+
+        $this->assertSame('primary', $model->getConnectionName());
+    }
 }
 
 enum ConnectionUnitEnum
@@ -789,5 +795,16 @@ trait TraitUsingWithoutIncrementingAttribute
 class ModelUsingWithoutIncrementingTraitWithAttribute extends Model
 {
     use TraitUsingWithoutIncrementingAttribute;
+}
+
+#[Connection('secondary')]
+trait TraitUsingConnectionAttribute
+{
+}
+
+#[Connection('primary')]
+class ModelOverridingTraitConnectionAttribute extends Model
+{
+    use TraitUsingConnectionAttribute;
 }
 
