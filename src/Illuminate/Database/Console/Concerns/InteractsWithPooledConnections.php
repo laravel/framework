@@ -4,7 +4,7 @@ namespace Illuminate\Database\Console\Concerns;
 
 use Illuminate\Support\Str;
 
-trait ResolvesDirectConnection
+trait InteractsWithPooledConnections
 {
     /**
      * Resolve a database connection, preferring the direct variant when configured.
@@ -13,7 +13,7 @@ trait ResolvesDirectConnection
      * @param  string|null  $database
      * @return \Illuminate\Database\Connection
      */
-    protected function resolveConnection($connections, $database)
+    protected function resolveDirectConnectionIfPossible($connections, $database)
     {
         $name = $database ?: $connections->getDefaultConnection();
         $connection = $connections->connection($name);

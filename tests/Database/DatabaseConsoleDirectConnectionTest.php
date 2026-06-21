@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
-use Illuminate\Database\Console\Concerns\ResolvesDirectConnection;
+use Illuminate\Database\Console\Concerns\InteractsWithPooledConnections;
 use Illuminate\Database\Console\DbCommand;
 use Illuminate\Foundation\Application;
 use Mockery as m;
@@ -14,7 +14,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 
 class DatabaseConsoleDirectConnectionTest extends TestCase
 {
-    public function testResolvesDirectConnectionConcernUsesDirectVariantWhenConfigured()
+    public function testInteractsWithPooledConnectionsUsesDirectVariantWhenConfigured()
     {
         $resolver = m::mock(ConnectionResolverInterface::class);
         $baseConnection = m::mock(Connection::class);
@@ -29,7 +29,7 @@ class DatabaseConsoleDirectConnectionTest extends TestCase
         $this->assertSame($directConnection, $command->resolve($resolver, null));
     }
 
-    public function testResolvesDirectConnectionConcernPassesThroughWhenNoDirectVariantIsConfigured()
+    public function testInteractsWithPooledConnectionsPassesThroughWhenNoDirectVariantIsConfigured()
     {
         $resolver = m::mock(ConnectionResolverInterface::class);
         $connection = m::mock(Connection::class);
@@ -41,7 +41,7 @@ class DatabaseConsoleDirectConnectionTest extends TestCase
         $this->assertSame($connection, $command->resolve($resolver, 'sqlite'));
     }
 
-    public function testResolvesDirectConnectionConcernPassesThroughExplicitSuffixes()
+    public function testInteractsWithPooledConnectionsPassesThroughExplicitSuffixes()
     {
         $resolver = m::mock(ConnectionResolverInterface::class);
         $connection = m::mock(Connection::class);
@@ -144,10 +144,10 @@ class DatabaseConsoleDirectConnectionTest extends TestCase
 
 class DatabaseConsoleDirectConnectionTestCommand
 {
-    use ResolvesDirectConnection;
+    use InteractsWithPooledConnections;
 
     public function resolve($connections, $database)
     {
-        return $this->resolveConnection($connections, $database);
+        return $this->resolveDirectConnectionIfPossible($connections, $database);
     }
 }
