@@ -686,9 +686,9 @@ class Migrator
             $defaultName = $this->resolver->getDefaultConnection();
             $directName = $this->directConnectionName($defaultName);
 
+            // Using "null" connection, default is "null", and no direct connection...
             if ($directName === $defaultName) {
                 $this->repository->setSource(null);
-
                 $this->connection = null;
 
                 return;
@@ -707,9 +707,6 @@ class Migrator
 
     /**
      * Resolve the database connection instance.
-     *
-     * The default resolver path routes configured direct PostgreSQL connections
-     * to their direct variant; custom resolver callbacks keep full priority.
      *
      * @param  string|null  $connection
      * @return \Illuminate\Database\Connection
