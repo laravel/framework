@@ -121,11 +121,18 @@ class Handler implements ExceptionHandlerContract
     protected $renderCallbacks = [];
 
     /**
-     * The callbacks that should be used to determine if an exception should be retried.
+     * A list of the exception types that should not be retried.
      *
-     * @var \Closure[]
+     * @var array<int, class-string<\Throwable>>
      */
-    protected $retryCallbacks = [];
+    protected $dontRetry = [];
+
+    /**
+     * The callbacks that inspect exceptions to determine if they should not be retried.
+     *
+     * @var array
+     */
+    protected $dontRetryCallbacks = [];
 
     /**
      * The callback that determines if the exception handler response should be JSON.
@@ -259,50 +266,6 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
-     * Register a retryable callback.
-     *
-     * @param  callable  $retryUsing
-     * @return $this
-     */
-    public function retryable(callable $retryUsing)
-    {
-        if (! $retryUsing instanceof Closure) {
-            $retryUsing = Closure::fromCallable($retryUsing);
-        }
-
-        $this->retryCallbacks[] = $retryUsing;
-
-        return $this;
-    }
-
-    /**
-     * Determine if the exception should be retried when thrown from a queued job.
-     *
-     * @param  \Throwable  $e
-     * @return bool
-     */
-    public function shouldRetry(Throwable $e)
-    {
-        if (method_exists($e, 'retry')) {
-            return $e->retry();
-        }
-
-        foreach ($this->retryCallbacks as $retryCallback) {
-            foreach ($this->firstClosureParameterTypes($retryCallback) as $type) {
-                if (is_a($e, $type)) {
-                    $result = $retryCallback($e);
-
-                    if (! is_null($result)) {
-                        return $result;
-                    }
-                }
-            }
-        }
-
-        return true;
-    }
-
-    /**
      * Register a new exception mapping.
      *
      * @param  \Closure|string  $from
@@ -373,6 +336,63 @@ class Handler implements ExceptionHandlerContract
         $this->dontReport = array_values(array_unique(array_merge($this->dontReport, $exceptions)));
 
         return $this;
+    }
+
+    /**
+     * Indicate that the given exception type should not be retried.
+     *
+     * @param  array|string  $exceptions
+     * @return $this
+     */
+    public function dontRetry(array|string $exceptions)
+    {
+        $exceptions = Arr::wrap($exceptions);
+
+        $this->dontRetry = array_values(array_unique(array_merge($this->dontRetry, $exceptions)));
+
+        return $this;
+    }
+
+    /**
+     * Register a callback to determine if an exception should not be retried.
+     *
+     * @param  (callable(\Throwable): bool)  $dontRetryWhen
+     * @return $this
+     */
+    public function dontRetryWhen(callable $dontRetryWhen)
+    {
+        if (! $dontRetryWhen instanceof Closure) {
+            $dontRetryWhen = Closure::fromCallable($dontRetryWhen);
+        }
+
+        $this->dontRetryCallbacks[] = $dontRetryWhen;
+
+        return $this;
+    }
+
+    /**
+     * Determine if the exception should not be retried when thrown from a queued job.
+     *
+     * @param  \Throwable  $e
+     * @return bool
+     */
+    public function shouldntRetry(Throwable $e)
+    {
+        if (method_exists($e, 'dontRetry')) {
+            return $e->dontRetry();
+        }
+
+        if (! is_null(Arr::first($this->dontRetry, fn ($type) => $e instanceof $type))) {
+            return true;
+        }
+
+        foreach ($this->dontRetryCallbacks as $dontRetryCallback) {
+            if ($dontRetryCallback($e) === true) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

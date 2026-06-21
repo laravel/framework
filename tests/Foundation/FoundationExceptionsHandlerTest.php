@@ -265,32 +265,39 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertSame('{"response":"My renderable exception response"}', $response);
     }
 
-    public function testShouldRetryDefaultsToTrue()
+    public function testShouldntRetryDefaultsToFalse()
     {
-        $this->assertTrue($this->handler->shouldRetry(new CustomException));
+        $this->assertFalse($this->handler->shouldntRetry(new CustomException));
     }
 
-    public function testShouldRetryUsesRegisteredCallback()
+    public function testShouldntRetryUsesRegisteredExceptionClass()
     {
-        $this->handler->retryable(function (CustomException $e) {
+        $this->handler->dontRetry(CustomException::class);
+
+        $this->assertTrue($this->handler->shouldntRetry(new CustomException));
+    }
+
+    public function testShouldntRetryUsesRegisteredCallback()
+    {
+        $this->handler->dontRetryWhen(function (CustomException $e) {
+            return true;
+        });
+
+        $this->assertTrue($this->handler->shouldntRetry(new CustomException));
+    }
+
+    public function testShouldntRetryIgnoresFalseCallbackResult()
+    {
+        $this->handler->dontRetryWhen(function (CustomException $e) {
             return false;
         });
 
-        $this->assertFalse($this->handler->shouldRetry(new CustomException));
+        $this->assertFalse($this->handler->shouldntRetry(new CustomException));
     }
 
-    public function testShouldRetryIgnoresCallbackForDifferentException()
+    public function testShouldntRetryUsesExceptionMethod()
     {
-        $this->handler->retryable(function (CustomException $e) {
-            return false;
-        });
-
-        $this->assertTrue($this->handler->shouldRetry(new RuntimeException));
-    }
-
-    public function testShouldRetryUsesExceptionMethod()
-    {
-        $this->assertFalse($this->handler->shouldRetry(new RetryableException));
+        $this->assertTrue($this->handler->shouldntRetry(new NonRetryableException));
     }
 
     public function testReturnsCustomResponseWhenExceptionImplementsResponsable()
@@ -1006,11 +1013,11 @@ class RenderableException extends Exception
     }
 }
 
-class RetryableException extends Exception
+class NonRetryableException extends Exception
 {
-    public function retry()
+    public function dontRetry()
     {
-        return false;
+        return true;
     }
 }
 

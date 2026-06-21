@@ -248,7 +248,7 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldNotHaveReceived('dispatch', [m::type(JobProcessed::class)]);
     }
 
-    public function testJobIsFailedIfExceptionHandlerSaysItShouldNotRetry()
+    public function testJobIsFailedIfExceptionHandlerSaysItShouldntRetry()
     {
         $e = new RuntimeException;
 
@@ -259,7 +259,7 @@ class QueueWorkerTest extends TestCase
         $worker = new InsomniacWorker(
             new WorkerFakeManager('default', new WorkerFakeConnection('default', ['queue' => [$job]])),
             $this->events,
-            new ShouldNotRetryExceptionHandler,
+            new ShouldntRetryExceptionHandler,
             function () {
                 return false;
             },
@@ -793,7 +793,7 @@ class BrokenQueueConnection
     }
 }
 
-class ShouldNotRetryExceptionHandler implements ExceptionHandler
+class ShouldntRetryExceptionHandler implements ExceptionHandler
 {
     public function report(\Throwable $e)
     {
@@ -815,9 +815,9 @@ class ShouldNotRetryExceptionHandler implements ExceptionHandler
         //
     }
 
-    public function shouldRetry(\Throwable $e)
+    public function shouldntRetry(\Throwable $e)
     {
-        return false;
+        return true;
     }
 }
 

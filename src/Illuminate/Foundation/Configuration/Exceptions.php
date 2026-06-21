@@ -67,32 +67,6 @@ class Exceptions
     }
 
     /**
-     * Register a retryable callback.
-     *
-     * @param  callable(\Throwable): bool|null  $using
-     * @return $this
-     */
-    public function retry(callable $using)
-    {
-        $this->handler->retryable($using);
-
-        return $this;
-    }
-
-    /**
-     * Register a retryable callback.
-     *
-     * @param  callable(\Throwable): bool|null  $retryUsing
-     * @return $this
-     */
-    public function retryable(callable $retryUsing)
-    {
-        $this->handler->retryable($retryUsing);
-
-        return $this;
-    }
-
-    /**
      * Register a callback to prepare the final, rendered exception response.
      *
      * @param  callable  $using
@@ -177,6 +151,21 @@ class Exceptions
     }
 
     /**
+     * Indicate that the given exception type should not be retried.
+     *
+     * @param  array|string  $class
+     * @return $this
+     */
+    public function dontRetry(array|string $class)
+    {
+        foreach (Arr::wrap($class) as $exceptionClass) {
+            $this->handler->dontRetry($exceptionClass);
+        }
+
+        return $this;
+    }
+
+    /**
      * Register a callback to determine if an exception should not be reported.
      *
      * @param  (\Closure(\Throwable): bool)  $dontReportWhen
@@ -185,6 +174,19 @@ class Exceptions
     public function dontReportWhen(Closure $dontReportWhen)
     {
         $this->handler->dontReportWhen($dontReportWhen);
+
+        return $this;
+    }
+
+    /**
+     * Register a callback to determine if an exception should not be retried.
+     *
+     * @param  (\Closure(\Throwable): bool)  $dontRetryWhen
+     * @return $this
+     */
+    public function dontRetryWhen(Closure $dontRetryWhen)
+    {
+        $this->handler->dontRetryWhen($dontRetryWhen);
 
         return $this;
     }

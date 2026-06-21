@@ -590,7 +590,7 @@ class Worker
                     $connectionName, $job, $e
                 );
 
-                $this->markJobAsFailedIfItShouldNotBeRetried(
+                $this->markJobAsFailedIfItShouldntBeRetried(
                     $connectionName, $job, $e
                 );
             }
@@ -703,9 +703,9 @@ class Worker
      * @param  \Throwable  $e
      * @return void
      */
-    protected function markJobAsFailedIfItShouldNotBeRetried($connectionName, $job, Throwable $e)
+    protected function markJobAsFailedIfItShouldntBeRetried($connectionName, $job, Throwable $e)
     {
-        if (method_exists($this->exceptions, 'shouldRetry') && ! $this->exceptions->shouldRetry($e)) {
+        if (method_exists($this->exceptions, 'shouldntRetry') && $this->exceptions->shouldntRetry($e)) {
             $this->failJob($job, $e);
         }
     }
