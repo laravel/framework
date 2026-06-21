@@ -269,7 +269,7 @@ class PhpRedisConnector implements Connector
     {
         $host = $options['host'] ?? null;
 
-        if (! is_string($host) || $host === '') {
+        if (! is_string($host) || trim($host) === '') {
             throw new InvalidArgumentException('Redis host must be a non-empty string.');
         }
 
