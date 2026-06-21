@@ -378,10 +378,6 @@ class Handler implements ExceptionHandlerContract
      */
     public function shouldStopRetries(Throwable $e)
     {
-        if (method_exists($e, 'dontRetry')) {
-            return $e->dontRetry();
-        }
-
         if (! is_null(Arr::first($this->dontRetry, fn ($type) => $e instanceof $type))) {
             return true;
         }

@@ -295,11 +295,6 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertFalse($this->handler->shouldStopRetries(new CustomException));
     }
 
-    public function testShouldntRetryUsesExceptionMethod()
-    {
-        $this->assertTrue($this->handler->shouldStopRetries(new NonRetryableException));
-    }
-
     public function testReturnsCustomResponseWhenExceptionImplementsResponsable()
     {
         $response = $this->handler->render($this->request, new ResponsableException)->getContent();
@@ -1010,14 +1005,6 @@ class RenderableException extends Exception
     public function render($request)
     {
         return response()->json(['response' => 'My renderable exception response']);
-    }
-}
-
-class NonRetryableException extends Exception
-{
-    public function dontRetry()
-    {
-        return true;
     }
 }
 
