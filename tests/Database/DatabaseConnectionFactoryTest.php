@@ -140,7 +140,7 @@ class DatabaseConnectionFactoryTest extends TestCase
         $connection = $this->db->getConnection('pooled_pgsql');
         $directPdo = new ReflectionProperty(get_class($connection), 'directPdo');
 
-        $this->assertTrue($connection->usesDirectConnection());
+        $this->assertTrue($connection->hasDirectConnection());
         $this->assertNotInstanceOf(PDO::class, $directPdo->getValue($connection));
         $this->assertTrue($connection->getConfig('pooled'));
         $this->assertTrue($connection->getConfig('options')[PDO::ATTR_EMULATE_PREPARES]);
@@ -214,7 +214,7 @@ class DatabaseConnectionFactoryTest extends TestCase
             ],
         ], 'sqlite_direct');
 
-        $this->assertFalse($this->db->getConnection('sqlite_direct')->usesDirectConnection());
+        $this->assertFalse($this->db->getConnection('sqlite_direct')->hasDirectConnection());
     }
 
     #[DataProvider('pooledPostgresEmulatePreparesProvider')]
@@ -242,7 +242,7 @@ class DatabaseConnectionFactoryTest extends TestCase
             $config['direct']['options'][PDO::ATTR_EMULATE_PREPARES] = $directOption;
         }
 
-        $config = $this->callConnectionFactoryMethod('applyPooledPostgresOptions', $config);
+        $config = $this->callConnectionFactoryMethod('ensurePooledPostgresIsProperlyConfigured', $config);
         $directConfig = $this->callConnectionFactoryMethod('getDirectConfig', $config);
 
         $this->assertSame($expectedPooledOption, $config['options'][PDO::ATTR_EMULATE_PREPARES]);
@@ -266,7 +266,7 @@ class DatabaseConnectionFactoryTest extends TestCase
 
     public function testPooledPostgresOptionsAreAppliedToReadAndWriteConfigurations()
     {
-        $config = $this->callConnectionFactoryMethod('applyPooledPostgresOptions', [
+        $config = $this->callConnectionFactoryMethod('ensurePooledPostgresIsProperlyConfigured', [
             'driver' => 'pgsql',
             'name' => 'pgsql',
             'host' => 'pooler-host',
@@ -320,7 +320,7 @@ class DatabaseConnectionFactoryTest extends TestCase
         }, E_USER_WARNING);
 
         try {
-            $config = $this->callConnectionFactoryMethod('applyPooledPostgresOptions', [
+            $config = $this->callConnectionFactoryMethod('ensurePooledPostgresIsProperlyConfigured', [
                 'driver' => 'pgsql',
                 'name' => 'pgsql',
                 'host' => 'pooler-host',

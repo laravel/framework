@@ -50,18 +50,18 @@ class Connection implements ConnectionInterface
     protected $readPdo;
 
     /**
-     * The active PDO connection used for direct connections.
-     *
-     * @var \PDO|(\Closure(): \PDO)
-     */
-    protected $directPdo;
-
-    /**
      * The database connection configuration options for reading.
      *
      * @var array
      */
     protected $readPdoConfig = [];
+
+    /**
+     * The active PDO connection used for direct connections.
+     *
+     * @var \PDO|(\Closure(): \PDO)
+     */
+    protected $directPdo;
 
     /**
      * The database connection configuration options for direct connections.
@@ -1396,19 +1396,6 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Set the PDO connection used for direct connections.
-     *
-     * @param  \PDO|\Closure|null  $pdo
-     * @return $this
-     */
-    public function setDirectPdo($pdo)
-    {
-        $this->directPdo = $pdo;
-
-        return $this;
-    }
-
-    /**
      * Set the read PDO connection configuration.
      *
      * @param  array  $config
@@ -1417,6 +1404,19 @@ class Connection implements ConnectionInterface
     public function setReadPdoConfig(array $config)
     {
         $this->readPdoConfig = $config;
+
+        return $this;
+    }
+
+    /**
+     * Set the PDO connection used for direct connections.
+     *
+     * @param  \PDO|\Closure|null  $pdo
+     * @return $this
+     */
+    public function setDirectPdo($pdo)
+    {
+        $this->directPdo = $pdo;
 
         return $this;
     }
@@ -1449,7 +1449,7 @@ class Connection implements ConnectionInterface
      *
      * @return bool
      */
-    public function usesDirectConnection()
+    public function hasDirectConnection()
     {
         return ! empty($this->directPdoConfig);
     }

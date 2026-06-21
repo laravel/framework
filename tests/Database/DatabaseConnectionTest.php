@@ -773,14 +773,14 @@ class DatabaseConnectionTest extends TestCase
     {
         $connection = new Connection(new DatabaseConnectionTestMockPDO);
 
-        $this->assertFalse($connection->usesDirectConnection());
+        $this->assertFalse($connection->hasDirectConnection());
 
         $connection->setDirectPdoConfig($config = [
             'host' => 'direct-host',
             'database' => 'direct_db',
         ]);
 
-        $this->assertTrue($connection->usesDirectConnection());
+        $this->assertTrue($connection->hasDirectConnection());
         $this->assertSame($config, $connection->getDirectConfig());
     }
 

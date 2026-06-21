@@ -743,7 +743,7 @@ class Migrator
             return $name;
         }
 
-        return $this->resolver->connection($name)->usesDirectConnection()
+        return $this->resolver->connection($name)->hasDirectConnection()
             ? $name.'::direct'
             : $name;
     }

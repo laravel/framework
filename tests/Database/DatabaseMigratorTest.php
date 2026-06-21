@@ -29,7 +29,7 @@ class DatabaseMigratorTest extends TestCase
         $directConnection = m::mock(Connection::class);
 
         $resolver->shouldReceive('connection')->once()->with('pgsql')->andReturn($baseConnection);
-        $baseConnection->shouldReceive('usesDirectConnection')->once()->andReturn(true);
+        $baseConnection->shouldReceive('hasDirectConnection')->once()->andReturn(true);
         $resolver->shouldReceive('connection')->once()->with('pgsql::direct')->andReturn($directConnection);
 
         $this->assertSame($directConnection, $this->migrator($resolver)->resolveConnection('pgsql'));
@@ -51,7 +51,7 @@ class DatabaseMigratorTest extends TestCase
         $connection = m::mock(Connection::class);
 
         $resolver->shouldReceive('connection')->twice()->with('sqlite')->andReturn($connection);
-        $connection->shouldReceive('usesDirectConnection')->once()->andReturn(false);
+        $connection->shouldReceive('hasDirectConnection')->once()->andReturn(false);
 
         $this->assertSame($connection, $this->migrator($resolver)->resolveConnection('sqlite'));
     }
@@ -77,7 +77,7 @@ class DatabaseMigratorTest extends TestCase
         $baseConnection = m::mock(Connection::class);
 
         $resolver->shouldReceive('connection')->once()->with('pgsql')->andReturn($baseConnection);
-        $baseConnection->shouldReceive('usesDirectConnection')->once()->andReturn(true);
+        $baseConnection->shouldReceive('hasDirectConnection')->once()->andReturn(true);
         $resolver->shouldReceive('setDefaultConnection')->once()->with('pgsql::direct');
         $repository->shouldReceive('setSource')->once()->with('pgsql::direct');
 
@@ -95,7 +95,7 @@ class DatabaseMigratorTest extends TestCase
 
         $resolver->shouldReceive('getDefaultConnection')->once()->andReturn('sqlite');
         $resolver->shouldReceive('connection')->once()->with('sqlite')->andReturn($connection);
-        $connection->shouldReceive('usesDirectConnection')->once()->andReturn(false);
+        $connection->shouldReceive('hasDirectConnection')->once()->andReturn(false);
         $repository->shouldReceive('setSource')->once()->with(null);
         $resolver->shouldNotReceive('setDefaultConnection');
 
@@ -113,7 +113,7 @@ class DatabaseMigratorTest extends TestCase
 
         $resolver->shouldReceive('getDefaultConnection')->once()->andReturn('pgsql');
         $resolver->shouldReceive('connection')->once()->with('pgsql')->andReturn($connection);
-        $connection->shouldReceive('usesDirectConnection')->once()->andReturn(true);
+        $connection->shouldReceive('hasDirectConnection')->once()->andReturn(true);
         $repository->shouldReceive('setSource')->once()->with('pgsql::direct');
         $resolver->shouldReceive('setDefaultConnection')->once()->with('pgsql::direct');
 

@@ -82,7 +82,7 @@ class PostgresSchemaState extends SchemaState
      */
     protected function baseVariables(array $config)
     {
-        if ($this->connection->usesDirectConnection()) {
+        if ($this->connection->hasDirectConnection()) {
             $config = $this->connection->getDirectConfig();
         }
 

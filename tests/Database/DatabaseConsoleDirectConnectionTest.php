@@ -23,7 +23,7 @@ class DatabaseConsoleDirectConnectionTest extends TestCase
 
         $resolver->shouldReceive('getDefaultConnection')->once()->andReturn('pgsql');
         $resolver->shouldReceive('connection')->once()->with('pgsql')->andReturn($baseConnection);
-        $baseConnection->shouldReceive('usesDirectConnection')->once()->andReturn(true);
+        $baseConnection->shouldReceive('hasDirectConnection')->once()->andReturn(true);
         $resolver->shouldReceive('connection')->once()->with('pgsql::direct')->andReturn($directConnection);
 
         $this->assertSame($directConnection, $command->resolve($resolver, null));
@@ -36,7 +36,7 @@ class DatabaseConsoleDirectConnectionTest extends TestCase
         $command = new DatabaseConsoleDirectConnectionTestCommand;
 
         $resolver->shouldReceive('connection')->once()->with('sqlite')->andReturn($connection);
-        $connection->shouldReceive('usesDirectConnection')->once()->andReturn(false);
+        $connection->shouldReceive('hasDirectConnection')->once()->andReturn(false);
 
         $this->assertSame($connection, $command->resolve($resolver, 'sqlite'));
     }
@@ -48,7 +48,7 @@ class DatabaseConsoleDirectConnectionTest extends TestCase
         $command = new DatabaseConsoleDirectConnectionTestCommand;
 
         $resolver->shouldReceive('connection')->once()->with('pgsql::write')->andReturn($connection);
-        $connection->shouldReceive('usesDirectConnection')->once()->andReturn(true);
+        $connection->shouldReceive('hasDirectConnection')->once()->andReturn(true);
 
         $this->assertSame($connection, $command->resolve($resolver, 'pgsql::write'));
     }

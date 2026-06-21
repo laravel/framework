@@ -19,7 +19,7 @@ trait InteractsWithPooledConnections
 
         $connection = $connections->connection($name);
 
-        return $connection->usesDirectConnection() && ! Str::endsWith($name, ['::read', '::write', '::direct'])
+        return $connection->hasDirectConnection() && ! Str::endsWith($name, ['::read', '::write', '::direct'])
             ? $connections->connection($name.'::direct')
             : $connection;
     }

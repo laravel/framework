@@ -82,7 +82,7 @@ use Illuminate\Database\Console\WipeCommand;
  * @method static \Illuminate\Database\Connection setReadPdoConfig(array $config)
  * @method static \Illuminate\Database\Connection setDirectPdoConfig(array $config)
  * @method static array getDirectConfig()
- * @method static bool usesDirectConnection()
+ * @method static bool hasDirectConnection()
  * @method static string|null getName()
  * @method static string|null getNameWithReadWriteType()
  * @method static mixed getConfig(string|null $option = null)
