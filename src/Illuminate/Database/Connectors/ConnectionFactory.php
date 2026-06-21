@@ -4,6 +4,7 @@ namespace Illuminate\Database\Connectors;
 
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Connectors\Concerns\ConfiguresPooledConnections;
 use Illuminate\Database\MariaDbConnection;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\PostgresConnection;
@@ -11,11 +12,12 @@ use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\SqlServerConnection;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
-use PDO;
 use PDOException;
 
 class ConnectionFactory
 {
+    use ConfiguresPooledConnections;
+
     /**
      * The IoC container instance.
      *
@@ -43,7 +45,10 @@ class ConnectionFactory
     public function make(array $config, $name = null)
     {
         $config = $this->parseConfig($config, $name);
-        $config = $this->applyPooledPostgresOptions($config);
+
+        if (($config['driver'] ?? null) === 'pgsql') {
+            $config = $this->ensurePooledPostgresIsProperlyConfigured($config);
+        }
 
         if (isset($config['read'])) {
             return $this->createReadWriteConnection($config);
@@ -146,30 +151,6 @@ class ConnectionFactory
     }
 
     /**
-     * Create a new PDO instance for direct connections.
-     *
-     * @param  array  $config
-     * @return \Closure
-     */
-    protected function createDirectPdo(array $config)
-    {
-        return $this->createPdoResolver($this->getDirectConfig($config));
-    }
-
-    /**
-     * Get the direct configuration for a connection.
-     *
-     * @param  array  $config
-     * @return array
-     */
-    protected function getDirectConfig(array $config)
-    {
-        return $this->mergeDirectConfig(
-            $config, $this->getReadWriteConfig($config, 'direct')
-        );
-    }
-
-    /**
      * Get a read / write level configuration.
      *
      * @param  array  $config
@@ -196,111 +177,14 @@ class ConnectionFactory
     }
 
     /**
-     * Merge a configuration for a direct connection.
+     * Create a new PDO instance for direct connections.
      *
      * @param  array  $config
-     * @param  array  $merge
-     * @return array
+     * @return \Closure
      */
-    protected function mergeDirectConfig(array $config, array $merge)
+    protected function createDirectPdo(array $config)
     {
-        $direct = Arr::except(array_merge($config, $merge), [
-            'read', 'write', 'direct', 'pooled', 'connect_via_database', 'connect_via_port',
-        ]);
-
-        if (! isset($direct['options']) || ! is_array($direct['options'])) {
-            $direct['options'] = [];
-        }
-
-        $directEmulatePreparesConfigured = isset($merge['options']) &&
-            is_array($merge['options']) &&
-            array_key_exists(PDO::ATTR_EMULATE_PREPARES, $merge['options']);
-
-        if (! $directEmulatePreparesConfigured) {
-            $direct['options'][PDO::ATTR_EMULATE_PREPARES] = false;
-        }
-
-        return $direct;
-    }
-
-    /**
-     * Apply transaction-pooler options to PostgreSQL connections.
-     *
-     * @param  array  $config
-     * @return array
-     */
-    protected function applyPooledPostgresOptions(array $config)
-    {
-        if (($config['driver'] ?? null) !== 'pgsql') {
-            return $config;
-        }
-
-        $hasDirectConnection = ! empty($config['direct']);
-
-        if (! $hasDirectConnection && ($config['pooled'] ?? false) !== true) {
-            return $config;
-        }
-
-        if ($hasDirectConnection) {
-            $config['pooled'] = true;
-        }
-
-        if (! $hasDirectConnection && ($config['pooled'] ?? false) === true) {
-            trigger_error(
-                "Database connection [{$config['name']}] sets 'pooled' => true without a 'direct' endpoint; migrations and DDL will still traverse the transaction pooler.",
-                E_USER_WARNING
-            );
-        }
-
-        $config = $this->withEmulatedPrepares($config);
-
-        foreach (['read', 'write'] as $type) {
-            if (! isset($config[$type])) {
-                continue;
-            }
-
-            if (isset($config[$type][0])) {
-                foreach ($config[$type] as $index => $connection) {
-                    if (isset($connection['options'])) {
-                        $config[$type][$index] = $this->withEmulatedPrepares($connection);
-                    }
-                }
-            } elseif (isset($config[$type]['options'])) {
-                $config[$type] = $this->withEmulatedPrepares($config[$type]);
-            }
-        }
-
-        return $config;
-    }
-
-    /**
-     * Stamp emulated prepares onto a connection configuration when not explicit.
-     *
-     * @param  array  $config
-     * @return array
-     */
-    protected function withEmulatedPrepares(array $config)
-    {
-        if (! isset($config['options']) || ! is_array($config['options'])) {
-            $config['options'] = [];
-        }
-
-        if (! array_key_exists(PDO::ATTR_EMULATE_PREPARES, $config['options'] ?? [])) {
-            $config['options'][PDO::ATTR_EMULATE_PREPARES] = true;
-        }
-
-        return $config;
-    }
-
-    /**
-     * Determine if the configuration has a direct PostgreSQL connection.
-     *
-     * @param  array  $config
-     * @return bool
-     */
-    protected function hasDirectConnection(array $config)
-    {
-        return ($config['driver'] ?? null) === 'pgsql' && ! empty($config['direct']);
+        return $this->createPdoResolver($this->getDirectConfig($config));
     }
 
     /**
