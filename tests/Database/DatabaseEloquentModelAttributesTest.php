@@ -451,6 +451,7 @@ class DatabaseEloquentModelAttributesTest extends TestCase
     public function test_trait_with_attribute_applies_to_class(): void
     {
         $model = new ModelUsingWithoutIncrementingTraitWithAttribute;
+
         $this->assertFalse($model->getIncrementing());
     }
 
