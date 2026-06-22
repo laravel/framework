@@ -39,7 +39,6 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use InvalidArgumentException;
-use Mockery;
 use Mockery\MockInterface;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
@@ -590,48 +589,46 @@ class QueueTest extends TestCase
         $this->assertSame($payload, Cache::store('array')->get('overflow-pointer'));
     }
 
-    public function testDeletingFallsBackToSqsWhenTheAgentIsUnreachable()
+    public function testDeletingPropagatesWhenTheAgentIsUnreachable()
     {
         $this->fakeEvents();
         $sqs = $this->mock(SqsClient::class);
         [$queue, $agent] = $this->fakeQueue($sqs);
-        $pushed = $agent->pushJob();
+        $agent->pushJob();
 
         $job = $queue->pop();
 
-        // The agent crashes before we can report the outcome, so rather than
-        // lose the completed job we delete its message from SQS directly using
-        // the receipt handle the agent forwarded.
+        // The agent crashes before we can report the outcome. The worker pod
+        // never touches SQS itself, so rather than delete the message directly
+        // the unreachable agent surfaces as an exception the worker treats as a
+        // lost connection and exits on; the crashed agent stops heartbeating, so
+        // SQS redelivers the message when its visibility timeout lapses.
         $agent->resultUnreachable = true;
-        $sqs->shouldReceive('deleteMessage')->once()->with(Mockery::on(
-            fn ($args) => $args['ReceiptHandle'] === $pushed['receiptHandle']
-        ));
+        $sqs->shouldNotReceive('deleteMessage');
+
+        $this->expectException(AgentUnreachableException::class);
 
         $job->delete();
-
-        $this->assertTrue($job->isDeleted());
     }
 
-    public function testReleasingFallsBackToSqsWhenTheAgentIsUnreachable()
+    public function testReleasingPropagatesWhenTheAgentIsUnreachable()
     {
         $this->fakeEvents();
         $sqs = $this->mock(SqsClient::class);
         [$queue, $agent] = $this->fakeQueue($sqs);
-        $pushed = $agent->pushJob();
+        $agent->pushJob();
 
         $job = $queue->pop();
 
-        // A crashed agent can't reset the message's visibility, so we do it
-        // directly with the requested delay.
+        // As with delete(), a crashed agent is not worked around by resetting
+        // visibility on SQS ourselves: it propagates and the worker exits, and
+        // the message redelivers via its visibility timeout.
         $agent->resultUnreachable = true;
-        $sqs->shouldReceive('changeMessageVisibility')->once()->with(Mockery::on(
-            fn ($args) => $args['ReceiptHandle'] === $pushed['receiptHandle']
-                && $args['VisibilityTimeout'] === 30
-        ));
+        $sqs->shouldNotReceive('changeMessageVisibility');
+
+        $this->expectException(AgentUnreachableException::class);
 
         $job->release(30);
-
-        $this->assertTrue($job->isReleased());
     }
 
     public function testDeletingDoesNotTouchSqsWhenTheAgentRejectsTheReport()
@@ -644,61 +641,15 @@ class QueueTest extends TestCase
         $job = $queue->pop();
 
         // A rejected report (the agent is alive, just erroring) must not trigger
-        // a direct SQS delete: the poller still owns the message, so acting on it
-        // ourselves would double-own it. The retry / safety net handles it.
+        // a direct SQS delete: the agent has already finalized the job itself, so
+        // the message is redelivering regardless and acting on it ourselves would
+        // double-own it.
         $agent->resultStatus = 500;
         $sqs->shouldNotReceive('deleteMessage');
 
         $job->delete();
 
         $this->assertTrue($job->isDeleted());
-    }
-
-    public function testOverflowPayloadIsPurgedWhenDeletingViaTheSqsFallback()
-    {
-        $this->fakeEvents();
-        config(['queue.connections.cloud.connection.overflow' => [
-            'enabled' => true,
-            'store' => 'array',
-            'delete_after_processing' => true,
-        ]]);
-        $sqs = $this->mock(SqsClient::class);
-        [$queue, $agent] = $this->fakeQueue($sqs);
-
-        $payload = json_encode(['job' => MyJob::class, 'data' => ['resolved' => true]]);
-        Cache::store('array')->put('overflow-pointer', $payload);
-        $agent->pushJob(['body' => json_encode(['@pointer' => 'overflow-pointer'])]);
-
-        $job = $queue->pop();
-
-        // When the fallback deletes the message from SQS the message is gone for
-        // good, so — unlike a merely rejected report — the overflow payload is
-        // safe to purge.
-        $agent->resultUnreachable = true;
-        $sqs->shouldReceive('deleteMessage')->once();
-
-        $job->delete();
-
-        $this->assertNull(Cache::store('array')->get('overflow-pointer'));
-    }
-
-    public function testFinishingFallsBackToSqsWhenTheAgentIsUnreachable()
-    {
-        $this->fakeEvents();
-        $sqs = $this->mock(SqsClient::class);
-        [$queue, $agent] = $this->fakeQueue($sqs);
-        $pushed = $agent->pushJob();
-
-        // A worker torn down mid-job reports 'released' from the teardown safety
-        // net; with the agent unreachable that falls back to resetting the
-        // message's visibility on SQS directly so it isn't stranded in-flight.
-        $queue->pop();
-        $agent->resultUnreachable = true;
-        $sqs->shouldReceive('changeMessageVisibility')->once()->with(Mockery::on(
-            fn ($args) => $args['ReceiptHandle'] === $pushed['receiptHandle']
-        ));
-
-        $queue->finishProcessingJob(default: 'released');
     }
 
     public function testPopReturnsNullWhenTheAgentReturnsAnError()
@@ -788,62 +739,6 @@ class QueueTest extends TestCase
         $job->delete();
 
         $this->assertTrue($job->isDeleted());
-    }
-
-    public function testFinishingRetriesAnOutcomeThatNeverReachedTheAgent()
-    {
-        $this->fakeEvents();
-        [$queue, $agent] = $this->fakeQueue();
-        $agent->pushJob();
-
-        $job = $queue->pop();
-
-        // The delete's "processed" report never reaches the agent...
-        $agent->resultStatus = 500;
-        $job->delete();
-
-        $resultsBefore = Http::recorded(fn ($request) => str_ends_with($request->url(), '/result'))->count();
-
-        // ...so once the agent recovers, the teardown safety net must retry it
-        // rather than treating the lost report as already delivered.
-        $agent->resultStatus = 200;
-        $queue->finishProcessingJob();
-
-        $resultsAfter = Http::recorded(fn ($request) => str_ends_with($request->url(), '/result'))->count();
-
-        $this->assertGreaterThan($resultsBefore, $resultsAfter);
-    }
-
-    public function testFinishingAnUnreportedJobReleasesItToTheAgent()
-    {
-        $this->fakeEvents();
-        [$queue, $agent] = $this->fakeQueue();
-        $pushed = $agent->pushJob();
-
-        // Pop a job but never delete/release it, mimicking a worker torn down
-        // mid-job (timeout / fatal error); finishProcessingJob must still tell
-        // the agent so the message isn't stranded in-flight.
-        $queue->pop();
-        $queue->finishProcessingJob(default: 'released');
-
-        $this->assertAgentResults([
-            ['messageId' => $pushed['messageId'], 'status' => 'released'],
-        ]);
-    }
-
-    public function testFinishingAReportedJobDoesNotReportToTheAgentAgain()
-    {
-        $this->fakeEvents();
-        [$queue, $agent] = $this->fakeQueue();
-        $pushed = $agent->pushJob();
-
-        $job = $queue->pop();
-        $job->delete();
-        $queue->finishProcessingJob();
-
-        $this->assertAgentResults([
-            ['messageId' => $pushed['messageId'], 'status' => 'processed'],
-        ]);
     }
 
     public function testItEmitsJobQueuedEvent()

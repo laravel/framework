@@ -480,14 +480,6 @@ class Queue implements QueueContract, ClearableQueue
             'duration_ms' => (int) $this->processingJobStartedAt->diffInMilliseconds($timestamp),
         ]);
 
-        // Make sure the agent learns the outcome even when the worker is torn
-        // down mid-job (timeout, fatal error) and the normal delete()/release()
-        // reporting never ran. This is a no-op once the job has reported, so the
-        // common path adds no extra request.
-        if ($this->processingJob instanceof CloudJob) {
-            $this->processingJob->reportToAgent($type === 'released' ? 'released' : 'processed');
-        }
-
         $this->processingQueue
             = $this->processingJob
             = $this->processingJobStartedAt

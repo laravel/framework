@@ -11,24 +11,25 @@ use Illuminate\Queue\Jobs\SqsJob;
  * An SQS job that was handed to the worker by the in-container cloud-agent over
  * its unix-socket runtime API rather than received directly from SQS.
  *
- * In normal operation this pod does not mutate SQS itself: the poller owns
- * every terminal SQS op (delete on success or terminal failure, visibility
- * reset on release) so it can batch them across messages. delete()/release()
- * therefore only flag the job for queue:work — via the base Job, skipping
- * SqsJob's SQS calls entirely — and report the outcome (with the requested
- * release delay) back to the agent via POST /result, which the poller acts on.
+ * This pod never mutates SQS itself: the poller owns every terminal SQS op
+ * (delete on success or terminal failure, visibility reset on release) so it
+ * can batch them across messages. delete()/release() therefore only flag the
+ * job for queue:work — via the base Job, skipping SqsJob's SQS calls entirely —
+ * and report the outcome (with the requested release delay) back to the agent
+ * via POST /result, which the poller acts on.
  *
- * If the agent is unreachable when we report an outcome, though, it has crashed
- * and its poller can no longer perform that op — so we fall back to talking to
- * SQS directly (the worker pod has SQS access): delete()/release() invoke
- * SqsJob's seams themselves rather than lose a job already in flight when the
- * agent died. An agent that responds but rejects the report is left to the
- * retry/safety-net path instead, since it is alive and still owns the message.
+ * An agent that responds but rejects a report has already finalized the job
+ * itself (a deadline, death detection), so the message is redelivering anyway
+ * and there is nothing for us to do. An agent that is unreachable has crashed:
+ * the AgentUnreachableException propagates, the worker treats it as a lost
+ * connection and exits — matching how popping a job handles an unreachable
+ * agent — and the pod restarts. The job is never lost either way: a crashed
+ * agent stops heartbeating the message's visibility, so SQS redelivers it once
+ * the visibility timeout lapses, exactly as for any unacknowledged SQS message.
  *
- * Overflow-payload cache cleanup is deferred until the outcome is finalized —
- * the agent accepting a "processed" report, or our own direct SQS delete. While
- * a "processed" report is merely rejected (not unreachable) the message may
- * still be redelivered, so the offloaded payload is kept until then.
+ * Overflow-payload cache cleanup is deferred until the agent accepts a
+ * "processed" report; while a report is merely rejected the message may still
+ * be redelivered, so the offloaded payload is kept until then.
  */
 class CloudJob extends SqsJob
 {
@@ -80,18 +81,12 @@ class CloudJob extends SqsJob
         // delete() too. We report "processed" in both cases to mirror that;
         // the poller's "failed" status is reserved for dispatches that never
         // cleanly ack.
-        try {
-            // Only purge the offloaded overflow payload once the agent has
-            // accepted the report: a rejected report means the message may be
-            // redelivered, and the redelivered job must still resolve its
-            // payload from the cache.
-            if ($this->report('processed')) {
-                $this->deleteOverflowPayload();
-            }
-        } catch (AgentUnreachableException) {
-            // The agent crashed, so its poller will never delete the message:
-            // delete it (and purge the payload) ourselves instead.
-            $this->fallBackToSqs('processed');
+        //
+        // Only purge the offloaded overflow payload once the agent has accepted
+        // the report: a rejected report means the message may be redelivered,
+        // and the redelivered job must still resolve its payload from the cache.
+        if ($this->report('processed')) {
+            $this->deleteOverflowPayload();
         }
     }
 
@@ -108,51 +103,7 @@ class CloudJob extends SqsJob
         // poller, which uses the reported delay.
         Job::release($delay);
 
-        try {
-            $this->report('released', delay: $delay);
-        } catch (AgentUnreachableException) {
-            // The agent crashed, so its poller will never reset the message's
-            // visibility: do it ourselves so the job becomes available again.
-            $this->fallBackToSqs('released', $delay);
-        }
-    }
-
-    /**
-     * Ensure an outcome has been reported to the agent.
-     *
-     * Used when the worker is torn down mid-job (timeout, fatal error) and the
-     * normal delete()/release() reporting never ran. A no-op once an outcome
-     * has already been reported.
-     */
-    public function reportToAgent(string $status, ?int $delay = null): void
-    {
-        try {
-            $this->report($status, $delay);
-        } catch (AgentUnreachableException) {
-            $this->fallBackToSqs($status, $delay);
-        }
-    }
-
-    /**
-     * Perform a job outcome's SQS operation directly, as a fallback for when
-     * the agent has crashed and its poller can no longer perform it.
-     *
-     * Mirrors what the poller would have done: a "processed" outcome deletes the
-     * message (and, now that it is gone, purges any overflow payload), while any
-     * other outcome resets the message's visibility so it becomes available
-     * again. The outcome is then marked reported so the teardown safety net does
-     * not repeat the SQS operation.
-     */
-    protected function fallBackToSqs(string $status, ?int $delay = null): void
-    {
-        if ($status === 'processed') {
-            $this->deleteMessageFromSqs();
-            $this->deleteOverflowPayload();
-        } else {
-            $this->changeMessageVisibilityInSqs($delay ?? 0);
-        }
-
-        $this->reportedStatus = $status;
+        $this->report('released', delay: $delay);
     }
 
     /**
@@ -163,10 +114,13 @@ class CloudJob extends SqsJob
      * forwarded only for the "released" status so the poller can reset the
      * message's visibility to it.
      *
-     * Returns whether the agent now holds the outcome. The status is only
-     * remembered once the reporter confirms delivery, so a report that failed
-     * to reach the agent is retried by the finishProcessingJob() safety net
-     * rather than being silently treated as delivered.
+     * Returns whether the agent now holds the outcome: false when the agent is
+     * alive but rejected the report, in which case it has already finalized the
+     * job itself (a deadline, death detection) and the message is redelivering
+     * regardless, so the outcome is left unrecorded rather than treated as
+     * delivered. An unreachable agent instead throws AgentUnreachableException
+     * out of the reporter; the worker treats it as a lost connection and exits,
+     * and the message redelivers when its visibility timeout lapses.
      */
     protected function report(string $status, ?int $delay = null): bool
     {
