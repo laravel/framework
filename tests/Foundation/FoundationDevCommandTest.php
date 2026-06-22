@@ -30,7 +30,7 @@ class FoundationDevCommandTest extends TestCase
             'command' => 'php artisan serve',
             'name' => 'server',
             'color' => null,
-            'source' => '',
+            'source' => [],
         ], $command->toArray());
     }
 

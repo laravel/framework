@@ -199,6 +199,7 @@ class FoundationDevCommandsTest extends TestCase
         $commands = DevCommands::commands();
 
         $this->assertArrayHasKey('source', $commands[0]);
-        $this->assertStringContainsString(__CLASS__, $commands[0]['source']);
+        $this->assertIsArray($commands[0]['source']);
+        $this->assertSame(__CLASS__, $commands[0]['source']['class']);
     }
 }
