@@ -10,14 +10,14 @@ class FoundationDevCommandTest extends TestCase
 {
     public function testNameDefaultsToFirstWordOfCommand()
     {
-        $command = new DevCommand('php artisan serve');
+        $command = new DevCommand('php artisan serve', []);
 
         $this->assertSame('php', $command->name());
     }
 
     public function testNameCanBeExplicitlySet()
     {
-        $command = new DevCommand('php artisan serve', 'server');
+        $command = new DevCommand('php artisan serve', [], 'server');
 
         $this->assertSame('server', $command->name());
     }
@@ -30,6 +30,7 @@ class FoundationDevCommandTest extends TestCase
             'command' => 'php artisan serve',
             'name' => 'server',
             'color' => null,
+            'source' => '',
         ], $command->toArray());
     }
 
