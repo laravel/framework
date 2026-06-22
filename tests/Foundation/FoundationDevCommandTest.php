@@ -24,7 +24,7 @@ class FoundationDevCommandTest extends TestCase
 
     public function testToArrayReturnsCommandDetails()
     {
-        $command = new DevCommand('php artisan serve', 'server');
+        $command = new DevCommand('php artisan serve', [], 'server');
 
         $this->assertSame([
             'command' => 'php artisan serve',
@@ -35,7 +35,7 @@ class FoundationDevCommandTest extends TestCase
 
     public function testColorCanBeSet()
     {
-        $command = new DevCommand('php artisan serve', 'server');
+        $command = new DevCommand('php artisan serve', [], 'server');
         $result = $command->color('#ff0000');
 
         $this->assertSame($command, $result);
@@ -44,7 +44,7 @@ class FoundationDevCommandTest extends TestCase
 
     public function testBlueColor()
     {
-        $command = new DevCommand('cmd', 'test');
+        $command = new DevCommand('cmd', [], 'test');
         $result = $command->blue();
 
         $this->assertSame($command, $result);
@@ -53,7 +53,7 @@ class FoundationDevCommandTest extends TestCase
 
     public function testPurpleColor()
     {
-        $command = new DevCommand('cmd', 'test');
+        $command = new DevCommand('cmd', [], 'test');
         $command->purple();
 
         $this->assertSame(DevCommandColor::PURPLE->value, $command->toArray()['color']);
@@ -61,7 +61,7 @@ class FoundationDevCommandTest extends TestCase
 
     public function testPinkColor()
     {
-        $command = new DevCommand('cmd', 'test');
+        $command = new DevCommand('cmd', [], 'test');
         $command->pink();
 
         $this->assertSame(DevCommandColor::PINK->value, $command->toArray()['color']);
@@ -69,7 +69,7 @@ class FoundationDevCommandTest extends TestCase
 
     public function testOrangeColor()
     {
-        $command = new DevCommand('cmd', 'test');
+        $command = new DevCommand('cmd', [], 'test');
         $command->orange();
 
         $this->assertSame(DevCommandColor::ORANGE->value, $command->toArray()['color']);
@@ -77,7 +77,7 @@ class FoundationDevCommandTest extends TestCase
 
     public function testGreenColor()
     {
-        $command = new DevCommand('cmd', 'test');
+        $command = new DevCommand('cmd', [], 'test');
         $command->green();
 
         $this->assertSame(DevCommandColor::GREEN->value, $command->toArray()['color']);
@@ -85,7 +85,7 @@ class FoundationDevCommandTest extends TestCase
 
     public function testYellowColor()
     {
-        $command = new DevCommand('cmd', 'test');
+        $command = new DevCommand('cmd', [], 'test');
         $command->yellow();
 
         $this->assertSame(DevCommandColor::YELLOW->value, $command->toArray()['color']);
@@ -93,7 +93,7 @@ class FoundationDevCommandTest extends TestCase
 
     public function testColorMethodsAreFluent()
     {
-        $command = new DevCommand('cmd', 'test');
+        $command = new DevCommand('cmd', [], 'test');
 
         $this->assertSame($command, $command->blue());
         $this->assertSame($command, $command->purple());

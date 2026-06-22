@@ -7,7 +7,6 @@ use Illuminate\Foundation\DevCommand;
 use Illuminate\Foundation\DevCommandColor;
 use Illuminate\Foundation\DevCommands;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
 
 class FoundationDevCommandsTest extends TestCase
 {
@@ -204,64 +203,13 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertContains('vite', $names);
     }
 
-    public function testVendorRegistrationIsPrevented()
+    public function testRegisteredCommandIncludesSource()
     {
-        $basePath = realpath(__DIR__.'/../..');
-        $vendorFile = $basePath.'/vendor/_test_vendor_register_'.uniqid().'.php';
+        DevCommands::register('echo hello', 'greeter');
 
-        file_put_contents($vendorFile, <<<PHP
-<?php
-require '{$basePath}/vendor/autoload.php';
+        $commands = DevCommands::commands();
 
-\$app = new Illuminate\Foundation\Application('{$basePath}');
-\$app['env'] = 'testing';
-
-Illuminate\Foundation\DevCommands::preventVendorCommands();
-
-Illuminate\Foundation\DevCommands::register('echo hello', 'vendor-cmd');
-
-echo json_encode(Illuminate\Foundation\DevCommands::commands());
-PHP);
-
-        $process = new Process(['php', $vendorFile], $basePath);
-        $process->run();
-
-        @unlink($vendorFile);
-
-        $this->assertSame('[]', $process->getOutput());
-    }
-
-    public function testUserlandRegistrationIsAllowed()
-    {
-        $devCommand = DevCommands::register('echo hello', 'test-cmd');
-
-        $this->assertInstanceOf(DevCommand::class, $devCommand);
-        $this->assertSame('echo hello', DevCommands::commands()[0]['command']);
-    }
-
-    public function testVendorHelperCalledFromUserlandIsAllowed()
-    {
-        $basePath = realpath(__DIR__.'/../..');
-        $vendorHelper = $basePath.'/vendor/_test_helper_'.uniqid().'.php';
-
-        file_put_contents($vendorHelper, <<<'PHP'
-<?php
-function _test_register_dev_command() {
-    Illuminate\Foundation\DevCommands::register('echo from-vendor-helper', 'vendor-helper');
-}
-PHP);
-
-        try {
-            require $vendorHelper;
-
-            _test_register_dev_command();
-
-            $commands = DevCommands::commands();
-            $this->assertCount(1, $commands);
-            $this->assertSame('echo from-vendor-helper', $commands[0]['command']);
-            $this->assertSame('vendor-helper', $commands[0]['name']);
-        } finally {
-            unlink($vendorHelper);
-        }
+        $this->assertArrayHasKey('source', $commands[0]);
+        $this->assertStringContainsString(__CLASS__, $commands[0]['source']);
     }
 }
