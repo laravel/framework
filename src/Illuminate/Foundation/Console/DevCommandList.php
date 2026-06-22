@@ -177,7 +177,7 @@ class DevCommandList extends Command
      * @param  array{'file': string, 'line': int, 'class'?: string, 'function'?: string}  $source
      * @return string
      */
-    protected function sourceFormatted($source): string
+    protected function formatSource($source): string
     {
         $file = $source['file'] ?? null;
         $line = $source['line'] ?? null;
