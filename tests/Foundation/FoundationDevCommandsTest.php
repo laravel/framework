@@ -7,12 +7,21 @@ use Illuminate\Foundation\DevCommand;
 use Illuminate\Foundation\DevCommandColor;
 use Illuminate\Foundation\DevCommands;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class FoundationDevCommandsTest extends TestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
+
+        $ref = new ReflectionClass(DevCommands::class);
+
+        foreach (['commands', 'except', 'only'] as $prop) {
+            $ref->getProperty($prop)->setValue([]);
+        }
+
+        $ref->getProperty('colorCount')->setValue(0);
 
         $app = new Application(__DIR__);
         $app['env'] = 'testing';
