@@ -1545,11 +1545,6 @@ class QueueTest extends TestCase
                 return 'cloud';
             }
 
-            public function getOverflowStorage()
-            {
-                return config('queue.connections.cloud.connection.overflow') ?? [];
-            }
-
             public function setConfig(array $config)
             {
                 return $this;

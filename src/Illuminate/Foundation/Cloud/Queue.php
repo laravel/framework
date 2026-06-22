@@ -261,7 +261,7 @@ class Queue implements QueueContract, ClearableQueue
             // Capture only the message id so the closure doesn't pin the
             // whole agent response (including the body) for the job's life.
             fn (string $status, ?int $delay): bool => $this->reportResultToAgent($messageId, $status, $delay),
-            $this->queue->getOverflowStorage(),
+            $this->config['connection']['overflow'] ?? [],
         );
     }
 
