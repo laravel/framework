@@ -81,6 +81,10 @@ class DevCommands
                 continue;
             }
 
+            if (($frame['class'] ?? null) === self::class) {
+                continue;
+            }
+
             $source = $frame;
 
             break;

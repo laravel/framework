@@ -18,10 +18,10 @@ class FoundationDevCommandsTest extends TestCase
         $ref = new ReflectionClass(DevCommands::class);
 
         foreach (['commands', 'except', 'only'] as $prop) {
-            $ref->getProperty($prop)->setValue([]);
+            $ref->getProperty($prop)->setValue(null, []);
         }
 
-        $ref->getProperty('colorCount')->setValue(0);
+        $ref->getProperty('colorCount')->setValue(null, 0);
 
         $app = new Application(__DIR__);
         $app['env'] = 'testing';
