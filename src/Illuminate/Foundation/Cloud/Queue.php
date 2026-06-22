@@ -6,6 +6,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -325,15 +326,27 @@ class Queue implements QueueContract, ClearableQueue
      * performs the SQS operation; on a release the delay (in whole seconds)
      * tells it the visibility to reset the message to.
      *
-     * Reporting is retried for transient socket hiccups and, if it ultimately
-     * fails, the error is reported but never re-thrown — a failed report must
-     * not be misattributed to the (already-completed) job by the worker, nor
-     * stop the worker. Returns whether the agent accepted the report so the
-     * caller can keep retrying (and defer dependent cleanup) when it did not.
+     * Reporting is retried for transient socket hiccups. The two failure modes
+     * are then handled differently:
+     *
+     *  - The agent responds but rejects the report (an HTTP error). It is alive
+     *    and its poller still owns the message, so we must not touch SQS
+     *    ourselves: the error is reported and we return false, leaving the
+     *    retry / teardown safety net to try again.
+     *  - The agent is unreachable (a connection error). It has crashed, so its
+     *    poller can no longer act on the message at all. We surface an
+     *    AgentUnreachableException so the job falls back to operating on SQS
+     *    directly rather than lose its outcome. (This is the same fatal
+     *    condition GET /next escalates to a worker exit; here we can still
+     *    salvage the in-flight job first.)
+     *
+     * Returns whether the agent accepted the report.
+     *
+     * @throws \Illuminate\Foundation\Cloud\AgentUnreachableException
      */
     protected function reportResultToAgent(string $messageId, string $status, ?int $delay = null): bool
     {
-        return rescue(function () use ($messageId, $status, $delay) {
+        try {
             $this->agentRequest()
                 ->timeout(10)
                 ->throw()
@@ -345,7 +358,15 @@ class Queue implements QueueContract, ClearableQueue
                 ], fn ($value) => $value !== null));
 
             return true;
-        }, false);
+        } catch (ConnectionException $e) {
+            throw new AgentUnreachableException(
+                'The Laravel Cloud agent runtime socket is unreachable.', previous: $e
+            );
+        } catch (RequestException $e) {
+            report($e);
+
+            return false;
+        }
     }
 
     /**

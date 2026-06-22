@@ -10,18 +10,24 @@ use Illuminate\Queue\Jobs\SqsJob;
  * An SQS job that was handed to the worker by the in-container cloud-agent over
  * its unix-socket runtime API rather than received directly from SQS.
  *
- * This pod never mutates SQS itself: the poller owns every terminal SQS op
- * (delete on success or terminal failure, visibility reset on release) so it
- * can batch them across messages. We therefore override SqsJob's two
- * SQS-touching seams (delete/change-visibility) to no-ops and report the
- * outcome (with the requested release delay) back to the agent via POST
- * /result, which the poller acts on.
+ * In normal operation this pod does not mutate SQS itself: the poller owns
+ * every terminal SQS op (delete on success or terminal failure, visibility
+ * reset on release) so it can batch them across messages. We therefore override
+ * SqsJob's two SQS-touching seams (delete/change-visibility) to no-ops and
+ * report the outcome (with the requested release delay) back to the agent via
+ * POST /result, which the poller acts on.
  *
- * Overflow-payload cache cleanup is deferred too: because the real SQS delete
- * is owned by the poller and only happens once the agent accepts a "processed"
- * report, we must keep the offloaded payload until then — a failed report can
- * mean the message is redelivered, and the redelivered job must still resolve
- * its payload from the cache.
+ * If the agent is unreachable when we report an outcome, though, it has crashed
+ * and its poller can no longer perform that op — so we fall back to talking to
+ * SQS directly (the worker pod has SQS access): delete()/release() invoke
+ * SqsJob's real seams themselves rather than lose a job already in flight when
+ * the agent died. An agent that responds but rejects the report is left to the
+ * retry/safety-net path instead, since it is alive and still owns the message.
+ *
+ * Overflow-payload cache cleanup is deferred until the outcome is finalized —
+ * the agent accepting a "processed" report, or our own direct SQS delete. While
+ * a "processed" report is merely rejected (not unreachable) the message may
+ * still be redelivered, so the offloaded payload is kept until then.
  */
 class CloudJob extends SqsJob
 {
@@ -73,12 +79,18 @@ class CloudJob extends SqsJob
         // through delete() too — so a delete always means "remove from SQS".
         // We report "processed" in both cases to mirror that. The poller's
         // "failed" status is reserved for dispatches that never cleanly ack.
-        //
-        // Only purge the offloaded overflow payload once the agent has accepted
-        // the report: a failed report means the message may be redelivered, and
-        // the redelivered job must still resolve its payload from the cache.
-        if ($this->report('processed')) {
-            parent::deleteOverflowPayload();
+        try {
+            // Only purge the offloaded overflow payload once the agent has
+            // accepted the report: a rejected report means the message may be
+            // redelivered, and the redelivered job must still resolve its
+            // payload from the cache.
+            if ($this->report('processed')) {
+                parent::deleteOverflowPayload();
+            }
+        } catch (AgentUnreachableException) {
+            // The agent crashed, so its poller will never delete the message:
+            // delete it (and purge the payload) ourselves instead.
+            $this->fallBackToSqs('processed');
         }
     }
 
@@ -95,7 +107,13 @@ class CloudJob extends SqsJob
         // reset to the poller, which uses the reported delay.
         parent::release($delay);
 
-        $this->report('released', delay: $delay);
+        try {
+            $this->report('released', delay: $delay);
+        } catch (AgentUnreachableException) {
+            // The agent crashed, so its poller will never reset the message's
+            // visibility: do it ourselves so the job becomes available again.
+            $this->fallBackToSqs('released', $delay);
+        }
     }
 
     /**
@@ -142,7 +160,33 @@ class CloudJob extends SqsJob
      */
     public function reportToAgent(string $status, ?int $delay = null): void
     {
-        $this->report($status, $delay);
+        try {
+            $this->report($status, $delay);
+        } catch (AgentUnreachableException) {
+            $this->fallBackToSqs($status, $delay);
+        }
+    }
+
+    /**
+     * Perform a job outcome's SQS operation directly, as a fallback for when
+     * the agent has crashed and its poller can no longer perform it.
+     *
+     * Mirrors what the poller would have done: a "processed" outcome deletes the
+     * message (and, now that it is gone, purges any overflow payload), while any
+     * other outcome resets the message's visibility so it becomes available
+     * again. The outcome is then marked reported so the teardown safety net does
+     * not repeat the SQS operation.
+     */
+    protected function fallBackToSqs(string $status, ?int $delay = null): void
+    {
+        if ($status === 'processed') {
+            parent::deleteMessageFromSqs();
+            parent::deleteOverflowPayload();
+        } else {
+            parent::changeMessageVisibilityInSqs($delay ?? 0);
+        }
+
+        $this->reportedStatus = $status;
     }
 
     /**

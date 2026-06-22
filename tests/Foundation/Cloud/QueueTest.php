@@ -39,6 +39,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use InvalidArgumentException;
+use Mockery;
 use Mockery\MockInterface;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
@@ -587,6 +588,117 @@ class QueueTest extends TestCase
         // be retained so a redelivered job can still resolve it.
         $this->assertTrue($job->isDeleted());
         $this->assertSame($payload, Cache::store('array')->get('overflow-pointer'));
+    }
+
+    public function testDeletingFallsBackToSqsWhenTheAgentIsUnreachable()
+    {
+        $this->fakeEvents();
+        $sqs = $this->mock(SqsClient::class);
+        [$queue, $agent] = $this->fakeQueue($sqs);
+        $pushed = $agent->pushJob();
+
+        $job = $queue->pop();
+
+        // The agent crashes before we can report the outcome, so rather than
+        // lose the completed job we delete its message from SQS directly using
+        // the receipt handle the agent forwarded.
+        $agent->resultUnreachable = true;
+        $sqs->shouldReceive('deleteMessage')->once()->with(Mockery::on(
+            fn ($args) => $args['ReceiptHandle'] === $pushed['receiptHandle']
+        ));
+
+        $job->delete();
+
+        $this->assertTrue($job->isDeleted());
+    }
+
+    public function testReleasingFallsBackToSqsWhenTheAgentIsUnreachable()
+    {
+        $this->fakeEvents();
+        $sqs = $this->mock(SqsClient::class);
+        [$queue, $agent] = $this->fakeQueue($sqs);
+        $pushed = $agent->pushJob();
+
+        $job = $queue->pop();
+
+        // A crashed agent can't reset the message's visibility, so we do it
+        // directly with the requested delay.
+        $agent->resultUnreachable = true;
+        $sqs->shouldReceive('changeMessageVisibility')->once()->with(Mockery::on(
+            fn ($args) => $args['ReceiptHandle'] === $pushed['receiptHandle']
+                && $args['VisibilityTimeout'] === 30
+        ));
+
+        $job->release(30);
+
+        $this->assertTrue($job->isReleased());
+    }
+
+    public function testDeletingDoesNotTouchSqsWhenTheAgentRejectsTheReport()
+    {
+        $this->fakeEvents();
+        $sqs = $this->mock(SqsClient::class);
+        [$queue, $agent] = $this->fakeQueue($sqs);
+        $agent->pushJob();
+
+        $job = $queue->pop();
+
+        // A rejected report (the agent is alive, just erroring) must not trigger
+        // a direct SQS delete: the poller still owns the message, so acting on it
+        // ourselves would double-own it. The retry / safety net handles it.
+        $agent->resultStatus = 500;
+        $sqs->shouldNotReceive('deleteMessage');
+
+        $job->delete();
+
+        $this->assertTrue($job->isDeleted());
+    }
+
+    public function testOverflowPayloadIsPurgedWhenDeletingViaTheSqsFallback()
+    {
+        $this->fakeEvents();
+        config(['queue.connections.cloud.connection.overflow' => [
+            'enabled' => true,
+            'store' => 'array',
+            'delete_after_processing' => true,
+        ]]);
+        $sqs = $this->mock(SqsClient::class);
+        [$queue, $agent] = $this->fakeQueue($sqs);
+
+        $payload = json_encode(['job' => MyJob::class, 'data' => ['resolved' => true]]);
+        Cache::store('array')->put('overflow-pointer', $payload);
+        $agent->pushJob(['body' => json_encode(['@pointer' => 'overflow-pointer'])]);
+
+        $job = $queue->pop();
+
+        // When the fallback deletes the message from SQS the message is gone for
+        // good, so — unlike a merely rejected report — the overflow payload is
+        // safe to purge.
+        $agent->resultUnreachable = true;
+        $sqs->shouldReceive('deleteMessage')->once();
+
+        $job->delete();
+
+        $this->assertNull(Cache::store('array')->get('overflow-pointer'));
+    }
+
+    public function testFinishingFallsBackToSqsWhenTheAgentIsUnreachable()
+    {
+        $this->fakeEvents();
+        $sqs = $this->mock(SqsClient::class);
+        [$queue, $agent] = $this->fakeQueue($sqs);
+        $pushed = $agent->pushJob();
+
+        // A worker torn down mid-job reports 'released' from the teardown safety
+        // net; with the agent unreachable that falls back to resetting the
+        // message's visibility on SQS directly so it isn't stranded in-flight.
+        $queue->pop();
+        $agent->resultUnreachable = true;
+        $sqs->shouldReceive('changeMessageVisibility')->once()->with(Mockery::on(
+            fn ($args) => $args['ReceiptHandle'] === $pushed['receiptHandle']
+        ));
+
+        $queue->finishProcessingJob(default: 'released');
     }
 
     public function testPopReturnsNullWhenTheAgentReturnsAnError()
@@ -1390,7 +1502,7 @@ class QueueTest extends TestCase
      *
      * @return array{Queue, object{jobs: array}}
      */
-    private function fakeQueue()
+    private function fakeQueue($sqs = null)
     {
         // The cloud-agent is opt-in; enable it so pop() long-polls the faked
         // runtime socket instead of receiving directly from SQS.
@@ -1399,7 +1511,10 @@ class QueueTest extends TestCase
             'socket' => '/tmp/cloud-agent.sock',
         ]);
 
-        $sqs = new SqsClient(['region' => 'us-east-2', 'version' => 'latest', 'credentials' => false]);
+        // A real client suffices when the SQS seams stay no-ops; tests that
+        // exercise the unreachable-agent fallback pass a mock to assert the
+        // direct SQS calls.
+        $sqs ??= new SqsClient(['region' => 'us-east-2', 'version' => 'latest', 'credentials' => false]);
 
         $fakeQueue = new class($this->app, [], null, $sqs) extends QueueFake
         {
@@ -1479,6 +1594,8 @@ class QueueTest extends TestCase
 
             public int $resultStatus = 200;
 
+            public bool $resultUnreachable = false;
+
             public $nextResponse = null;
 
             public function pushJob(array $job = []): array
@@ -1513,6 +1630,10 @@ class QueueTest extends TestCase
             }
 
             if (str_ends_with($request->url(), '/result')) {
+                if ($agent->resultUnreachable) {
+                    throw new ConnectionException('Connection refused');
+                }
+
                 return Http::response('', $agent->resultStatus);
             }
 
