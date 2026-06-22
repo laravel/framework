@@ -118,15 +118,15 @@ class DevCommandList extends Command
      */
     protected function isVendorCommand(array $command): bool
     {
-        if (! str_contains($command['source'], '@')) {
-            return str_contains($command['source'], base_path('vendor'));
+        $source = $command['source'];
+
+        if ($class = $source['class'] ?? null) {
+            $reflection = new ReflectionClass($class);
+
+            return str_contains($reflection->getFileName(), base_path('vendor'));
         }
 
-        $class = explode('@', $command['source'])[0];
-
-        $reflection = new ReflectionClass($class);
-
-        return str_contains($reflection->getFileName(), base_path('vendor'));
+        return str_contains($source['file'] ?? '', base_path('vendor'));
     }
 
     /**
