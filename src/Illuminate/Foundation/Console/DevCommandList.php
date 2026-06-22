@@ -44,7 +44,9 @@ class DevCommandList extends Command
 
         $this->newLine();
 
-        $devCommands = $this->filterCommands(DevCommands::commands());
+        $devCommands = array_map(fn ($command) => array_merge($command, [
+            'source' => $this->formatSource($command['source']),
+        ]), $this->filterCommands(DevCommands::commands()));
 
         if ($this->option('json') || ! $this->input->isInteractive()) {
             $this->output->writeln(json_encode($devCommands));
@@ -167,6 +169,26 @@ class DevCommandList extends Command
         }
 
         return array_values($commands);
+    }
+
+    /**
+     * Format the source information for display.
+     *
+     * @param  array{'file': string, 'line': int, 'class'?: string, 'function'?: string}  $source
+     * @return string
+     */
+    protected function sourceFormatted($source): string
+    {
+        $file = $source['file'] ?? null;
+        $line = $source['line'] ?? null;
+        $class = $source['class'] ?? null;
+        $function = $source['function'] ?? null;
+
+        if ($class) {
+            return "{$class}@{$function}";
+        }
+
+        return implode(':', array_filter([$file, $line]));
     }
 
     /**

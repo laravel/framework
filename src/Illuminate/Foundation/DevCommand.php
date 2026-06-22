@@ -15,6 +15,7 @@ class DevCommand
      * Create a new DevCommand instance.
      *
      * @param  string  $command
+     * @param  array{'file': string, 'line': int, 'class'?: string, 'function'?: string}  $source
      * @param  string|null  $name
      * @return void
      */
@@ -123,7 +124,7 @@ class DevCommand
     /**
      * Get the command as an array.
      *
-     * @return array{command: string, name: string, color: string|null, source: string}
+     * @return array{command: string, name: string, color: string|null, source: array{'file': string, 'line': int, 'class'?: string, 'function'?: string}}
      */
     public function toArray(): array
     {
@@ -131,26 +132,7 @@ class DevCommand
             'command' => $this->command,
             'name' => $this->name,
             'color' => $this->color,
-            'source' => $this->sourceFormatted(),
+            'source' => $this->source,
         ];
-    }
-
-    /**
-     * Format the source information for display.
-     *
-     * @return string
-     */
-    protected function sourceFormatted(): string
-    {
-        $file = $this->source['file'] ?? null;
-        $line = $this->source['line'] ?? null;
-        $class = $this->source['class'] ?? null;
-        $function = $this->source['function'] ?? null;
-
-        if ($class) {
-            return "{$class}@{$function}";
-        }
-
-        return implode(':', array_filter([$file, $line]));
     }
 }
