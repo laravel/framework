@@ -74,17 +74,10 @@ class DevCommands
         }
 
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-        $source = null;
-        $foundFrame = false;
+        $source = [];
 
         foreach ($trace as $frame) {
             if (($frame['file'] ?? null) === __FILE__) {
-                continue;
-            }
-
-            if (! $foundFrame) {
-                $foundFrame = true;
-
                 continue;
             }
 
