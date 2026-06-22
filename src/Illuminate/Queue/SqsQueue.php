@@ -503,5 +503,4 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     {
         return $this->sqs;
     }
-
 }
