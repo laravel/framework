@@ -162,7 +162,7 @@ class DevCommandList extends Command
         if ($this->option('only-vendor')) {
             $commands = array_filter(
                 $commands,
-                fn ($command) => $this->isVendorCommand($command),
+                $this->isVendorCommand(...),
             );
         }
 
