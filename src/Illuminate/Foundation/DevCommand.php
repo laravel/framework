@@ -135,6 +135,11 @@ class DevCommand
         ];
     }
 
+    /**
+     * Format the source information for display.
+     *
+     * @return string
+     */
     protected function sourceFormatted(): string
     {
         $file = $this->source['file'] ?? null;
