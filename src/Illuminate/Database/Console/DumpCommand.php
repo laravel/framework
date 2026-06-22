@@ -84,8 +84,12 @@ class DumpCommand extends Command
 
         $migrationTable = is_array($migrations) ? ($migrations['table'] ?? 'migrations') : $migrations;
 
+        if ($this->option('without-migration-data')) {
+            $migrationTable = null;
+        }
+
         return $connection->getSchemaState()
-            ->withMigrationTable($this->option('without-migration-data') ? null : $migrationTable)
+            ->withMigrationTable($migrationTable)
             ->handleOutputUsing(function ($type, $buffer) {
                 $this->output->write($buffer);
             });
