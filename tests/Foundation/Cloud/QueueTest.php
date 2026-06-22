@@ -411,8 +411,7 @@ class QueueTest extends TestCase
 
     public function testPopReceivesDirectlyFromSqsWhenTheAgentIsDisabled()
     {
-        // The agent is opt-in; with it disabled (the default) the queue receives
-        // straight from SQS and never touches the agent runtime socket.
+        // With the agent disabled (the default) the queue receives from SQS.
         Http::fake();
         $this->fakeEvents();
         [$queue, $client] = $this->mockedQueue();
@@ -469,9 +468,7 @@ class QueueTest extends TestCase
         $job = $queue->pop();
         $job->fail(new RuntimeException('Whoops!'));
 
-        // A terminally failed job is deleted from SQS just like a successful
-        // one (the base fail() routes through delete()), so it reports a single
-        // "processed" outcome rather than a "failed" one.
+        // fail() routes through delete(), so it reports a single "processed".
         $this->assertTrue($job->hasFailed());
         $this->assertAgentResults([
             ['messageId' => $pushed['messageId'], 'status' => 'processed'],
@@ -550,12 +547,10 @@ class QueueTest extends TestCase
 
         $job = $queue->pop();
 
-        // The overflow-offloaded payload is resolved from the cache rather than
-        // the raw "@pointer" body...
+        // The payload is resolved from the cache, not the raw "@pointer" body.
         $this->assertSame($payload, $job->getRawBody());
 
-        // ...and deleting the job still cleans up the cached payload, even though
-        // the SQS delete itself is left to the poller.
+        // Deleting still cleans up the cached payload.
         $job->delete();
 
         $this->assertNull(Cache::store('array')->get('overflow-pointer'));
@@ -571,8 +566,7 @@ class QueueTest extends TestCase
         ]]);
         [$queue, $agent] = $this->fakeQueue();
 
-        // The agent rejects POST /result, so the poller never deletes the SQS
-        // message and it may be redelivered.
+        // The agent rejects POST /result.
         $agent->resultStatus = 500;
 
         $payload = json_encode(['job' => MyJob::class, 'data' => ['resolved' => true]]);
@@ -587,11 +581,10 @@ class QueueTest extends TestCase
             $job->delete();
             $this->fail('Expected the rejected report to throw a RequestException.');
         } catch (RequestException) {
-            // Expected — the agent could not accept the outcome.
+            //
         }
 
-        // Because the outcome was not acknowledged, the offloaded payload must
-        // be retained so a redelivered job can still resolve it.
+        // The unacknowledged payload is retained for the redelivered job.
         $this->assertSame($payload, Cache::store('array')->get('overflow-pointer'));
     }
 
@@ -604,11 +597,7 @@ class QueueTest extends TestCase
 
         $job = $queue->pop();
 
-        // The agent crashes before we can report the outcome. The worker pod
-        // never touches SQS itself, so rather than delete the message directly
-        // the unreachable agent surfaces as an exception the worker treats as a
-        // lost connection and exits on; the crashed agent stops heartbeating, so
-        // SQS redelivers the message when its visibility timeout lapses.
+        // An unreachable agent propagates rather than deleting from SQS directly.
         $agent->resultUnreachable = true;
         $sqs->shouldNotReceive('deleteMessage');
 
@@ -626,9 +615,7 @@ class QueueTest extends TestCase
 
         $job = $queue->pop();
 
-        // As with delete(), a crashed agent is not worked around by resetting
-        // visibility on SQS ourselves: it propagates and the worker exits, and
-        // the message redelivers via its visibility timeout.
+        // An unreachable agent propagates rather than resetting visibility on SQS.
         $agent->resultUnreachable = true;
         $sqs->shouldNotReceive('changeMessageVisibility');
 
@@ -646,11 +633,7 @@ class QueueTest extends TestCase
 
         $job = $queue->pop();
 
-        // A rejected report (the agent is alive, but cannot apply the outcome)
-        // is not swallowed or worked around on SQS ourselves: the agent owns the
-        // SQS operation and the authority over what it can accept, so the
-        // rejection propagates as an exception and the worker pod never touches
-        // SQS itself.
+        // A rejected report propagates rather than deleting from SQS directly.
         $agent->resultStatus = 500;
         $sqs->shouldNotReceive('deleteMessage');
 
@@ -664,10 +647,8 @@ class QueueTest extends TestCase
         $this->fakeEvents();
         [$queue, $agent] = $this->fakeQueue();
 
-        // Drive the agent's own GET /next stub, so the failed() branch is
-        // actually exercised — a second Http::fake() for "*/next" would be
-        // shadowed by the agent closure (stubs resolve first-match) and the
-        // empty-queue 204 would make the assertion pass for the wrong reason.
+        // Drive the agent's own GET /next stub so the failed() branch is hit;
+        // a separate Http::fake() would be shadowed by the agent closure.
         $agent->nextResponse = Http::response('error', 500);
 
         $this->assertNull($queue->pop());
@@ -678,8 +659,7 @@ class QueueTest extends TestCase
         $this->fakeEvents();
         [$queue, $agent] = $this->fakeQueue();
 
-        // A 200 whose body decodes to a scalar (not a message array) is an agent
-        // fault; pop() must idle rather than build a bogus job.
+        // A 200 that decodes to a scalar is an agent fault; pop() must idle.
         $agent->nextResponse = Http::response('"not-an-array"', 200);
 
         $this->assertNull($queue->pop());
@@ -690,10 +670,7 @@ class QueueTest extends TestCase
         $this->fakeEvents();
         [$queue] = $this->fakeQueue();
 
-        // The agent's runtime socket being unreachable (the agent is not running
-        // in the pod) surfaces as a ConnectionException, which pop() must
-        // escalate as an unrecoverable fault rather than swallow and idle as if
-        // the queue were empty.
+        // An unreachable socket must escalate as an unrecoverable fault, not idle.
         Http::fake(fn () => throw new ConnectionException('Connection refused'));
 
         $this->expectException(AgentUnreachableException::class);
@@ -723,11 +700,8 @@ class QueueTest extends TestCase
         $job->release(30);
         $job->fail(new RuntimeException('Whoops!'));
 
-        // CloudJob reports each outcome as the worker produces it and keeps no
-        // memory of prior reports. Making the terminal "processed" (the fail
-        // routes through delete) supersede the earlier self-release is the
-        // agent's responsibility, not something CloudJob fakes by suppressing
-        // calls, so both outcomes are reported in order.
+        // CloudJob keeps no memory of prior reports, so both outcomes are
+        // reported in order; reconciling them is the agent's responsibility.
         $this->assertAgentResults([
             ['messageId' => $pushed['messageId'], 'status' => 'released', 'delay' => 30],
             ['messageId' => $pushed['messageId'], 'status' => 'processed'],
@@ -1326,9 +1300,8 @@ class QueueTest extends TestCase
 
         $queue->push(new FakeJob, queue: 'orders.fifo');
 
-        // The suffix is injected before the ".fifo" extension on the real SQS
-        // queue name, so the normalized name must strip it back out and keep
-        // the ".fifo" terminal rather than reporting "orders-env-....fifo".
+        // The suffix is injected before ".fifo", so it must be stripped without
+        // leaking into the normalized name.
         $this->assertSame('orders.fifo', $eventsFake->emitted[0]['queue']);
     }
 
@@ -1392,16 +1365,14 @@ class QueueTest extends TestCase
      */
     private function fakeQueue($sqs = null)
     {
-        // The cloud-agent is opt-in; enable it so pop() long-polls the faked
-        // runtime socket instead of receiving directly from SQS.
+        // Enable the agent so pop() long-polls the faked runtime socket.
         $this->app['config']->set('queue.connections.cloud.agent', [
             'enabled' => true,
             'socket' => '/tmp/cloud-agent.sock',
         ]);
 
-        // A real client suffices when the SQS seams stay no-ops; tests that
-        // exercise the unreachable-agent fallback pass a mock to assert the
-        // direct SQS calls.
+        // A real client suffices while the SQS seams stay no-ops; callers asserting
+        // direct SQS calls pass a mock instead.
         $sqs ??= new SqsClient(['region' => 'us-east-2', 'version' => 'latest', 'credentials' => false]);
 
         $fakeQueue = new class($this->app, [], null, $sqs) extends QueueFake
@@ -1487,9 +1458,7 @@ class QueueTest extends TestCase
                     'messageId' => (string) Str::uuid(),
                     'receiptHandle' => 'receipt-handle',
                     'body' => json_encode(['job' => MyJob::class, 'data' => []]),
-                    // The dispatcher receives the message from SQS, which always
-                    // returns ApproximateReceiveCount, so the agent always
-                    // forwards it — mirror that here.
+                    // SQS always returns ApproximateReceiveCount, so mirror it.
                     'attributes' => ['ApproximateReceiveCount' => 1],
                 ], $job);
 

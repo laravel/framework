@@ -102,10 +102,8 @@ class QueueConnector implements ConnectorInterface
         Worker::$restartable = false;
         Worker::$pausable = false;
 
-        // Teach the worker's lost-connection detection about an unreachable
-        // agent socket so a missing/wedged agent exits the worker (and restarts
-        // the pod) instead of looping forever. Additive: all other exceptions
-        // still fall through to the framework's detector.
+        // Exit the worker (and restart the pod) when the agent socket is
+        // unreachable instead of looping forever.
         $this->app->extend(
             LostConnectionDetector::class,
             fn ($detector) => new AgentAwareLostConnectionDetector($detector),

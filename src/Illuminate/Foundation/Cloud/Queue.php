@@ -188,12 +188,8 @@ class Queue implements QueueContract, ClearableQueue
     /**
      * Pop the next job off of the queue.
      *
-     * By default the worker receives the job straight from SQS via the
-     * underlying queue, exactly as a non-managed SQS connection would. When the
-     * cloud-agent is enabled (config: agent.enabled) the message has instead
-     * already been received from SQS by the dispatcher and handed to this pod's
-     * in-container cloud-agent, which holds it and extends its visibility; in
-     * that mode we long-poll the agent's runtime socket rather than SQS.
+     * Jobs come straight from SQS unless the cloud-agent is enabled, in which
+     * case we long-poll the agent's runtime socket instead.
      *
      * @param  string|null  $queue
      * @return \Illuminate\Contracts\Queue\Job|null
@@ -221,14 +217,8 @@ class Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Long-poll the in-container cloud-agent's runtime socket (GET /next) and
-     * wrap the next message in a CloudJob.
-     *
-     * The agent blocks until a job is available or returns 204 so we re-poll,
-     * exactly like SQS long polling. The returned CloudJob never touches SQS
-     * itself; it reports the outcome (and, for a release, the requested delay)
-     * back to the agent via POST /result, and the poller owns the terminal SQS
-     * operation.
+     * Long-poll the cloud-agent's runtime socket and wrap the next message in a
+     * CloudJob.
      *
      * @param  string|null  $queue
      * @return \Illuminate\Foundation\Cloud\CloudJob|null
@@ -247,18 +237,17 @@ class Queue implements QueueContract, ClearableQueue
             [
                 'MessageId' => $messageId,
                 'ReceiptHandle' => $data['receiptHandle'] ?? null,
-                // Coerce a non-string body to '' so a malformed agent
-                // response degrades to an empty payload rather than blowing
-                // up json_decode() in payload().
+                // Coerce a non-string body to '' so a malformed response degrades
+                // to an empty payload rather than blowing up json_decode().
                 'Body' => is_string($body = $data['body'] ?? null) ? $body : '',
                 'Attributes' => $data['attributes'] ?? [],
             ],
             $this->queue->getConnectionName(),
-            // The agent reports the real SQS queue URL the dispatcher received
-            // from; delete / release go back to that queue, not our default.
+            // The agent reports the real SQS queue URL the message came from;
+            // delete / release go back to that queue, not our default.
             $data['queueUrl'] ?? $this->queue->getQueue($queue),
-            // Capture only the message id so the closure doesn't pin the
-            // whole agent response (including the body) for the job's life.
+            // Capture only the message id so the closure doesn't pin the whole
+            // agent response for the job's life.
             fn (string $status, ?int $delay) => $this->reportResultToAgent($messageId, $status, $delay),
             $this->config['connection']['overflow'] ?? [],
         );
@@ -268,15 +257,10 @@ class Queue implements QueueContract, ClearableQueue
      * Long-poll the agent's runtime socket (GET /next) for the next job.
      *
      * Returns the decoded message payload, or null when the agent has nothing
-     * (HTTP 204) or returns an unexpected status — in which case the worker
-     * idles and re-polls, with the unexpected status reported so an agent
-     * fault is visible instead of looking like an empty queue.
-     *
-     * An unreachable socket is different: it means the agent is not running in
-     * the pod (or is wedged past its poll cycle), which is unrecoverable. We let
-     * that surface as an AgentUnreachableException — which the worker treats as
-     * a lost connection and exits on — so the pod is restarted rather than the
-     * worker spinning forever as if the queue were simply empty.
+     * (HTTP 204) or returns an unexpected status — reported so a fault is
+     * visible — in which case the worker idles and re-polls. An unreachable
+     * socket means a crashed or wedged agent, so it surfaces as an
+     * AgentUnreachableException to restart the pod rather than spin forever.
      *
      * @throws \Illuminate\Foundation\Cloud\AgentUnreachableException
      */
@@ -307,8 +291,6 @@ class Queue implements QueueContract, ClearableQueue
         }
 
         if (! is_array($data = $response->json())) {
-            // A 200 with a body we can't decode into a message is an agent
-            // fault, not an empty queue — report it rather than idling silently.
             report(new RuntimeException(
                 'The Laravel Cloud agent returned a non-array body from GET /next.'
             ));
@@ -321,24 +303,15 @@ class Queue implements QueueContract, ClearableQueue
 
     /**
      * Report a job's terminal outcome back to the agent (POST /result) so it
-     * can stop heartbeating the message and accept the next invoke. The poller
-     * performs the SQS operation; on a release the delay (in whole seconds)
-     * tells it the visibility to reset the message to.
+     * can stop heartbeating the message and the poller can perform the SQS
+     * operation. On a release the delay (in whole seconds) is the visibility to
+     * reset the message to.
      *
-     * Reporting is retried for transient socket hiccups, after which both
-     * failure modes surface as exceptions — the caller may assume a report that
-     * returns was accepted and is now owned by the agent:
-     *
-     *  - The agent rejects the report (an HTTP error). The outcome is one it
-     *    cannot apply — a result for a message it has already finalized, an
-     *    invalid order of operations — and the agent is the authority on what is
-     *    valid, so the RequestException propagates rather than being papered over.
-     *  - The agent is unreachable (a connection error). It has crashed, so we
-     *    raise an AgentUnreachableException, which the worker treats as a lost
-     *    connection and exits on — the same fatal condition GET /next escalates.
-     *
-     * The job is never lost: a crashed agent stops heartbeating, so SQS
-     * redelivers the message once its visibility timeout lapses.
+     * The request is retried for transient socket hiccups. A rejected report
+     * (the agent is the authority on a valid outcome) propagates as a
+     * RequestException; an unreachable agent raises an AgentUnreachableException
+     * to exit the worker. The job is never lost — a crashed agent stops
+     * heartbeating, so SQS redelivers once the visibility timeout lapses.
      *
      * @throws \Illuminate\Http\Client\RequestException
      * @throws \Illuminate\Foundation\Cloud\AgentUnreachableException
