@@ -14,17 +14,8 @@ class FoundationDevCommandsTest extends TestCase
     {
         parent::setUp();
 
-        DevCommands::clear();
-
         $app = new Application(__DIR__);
         $app['env'] = 'testing';
-    }
-
-    protected function tearDown(): void
-    {
-        DevCommands::clear();
-
-        parent::tearDown();
     }
 
     public function testRegisterAddsCommand()
@@ -118,8 +109,6 @@ class FoundationDevCommandsTest extends TestCase
         DevCommands::register('echo one', 'one');
         DevCommands::except('something');
         DevCommands::only('something');
-
-        DevCommands::clear();
 
         $this->assertEmpty(DevCommands::commands());
     }

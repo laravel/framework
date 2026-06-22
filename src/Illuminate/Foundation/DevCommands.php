@@ -215,17 +215,4 @@ class DevCommands
     {
         return self::$packageManager ??= new NodePackageManager();
     }
-
-    /**
-     * Clear all registered development commands and reset the state of the DevCommands class.
-     *
-     * @return void
-     */
-    public static function clear(): void
-    {
-        self::$commands = [];
-        self::$except = [];
-        self::$only = [];
-        self::$colorCount = 0;
-    }
 }
