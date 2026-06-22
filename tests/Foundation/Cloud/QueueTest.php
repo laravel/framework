@@ -9,7 +9,10 @@ use Aws\MockHandler;
 use Aws\Result;
 use Aws\Sqs\SqsClient;
 use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Database\LostConnectionDetector;
 use Illuminate\Foundation\Cloud;
+use Illuminate\Foundation\Cloud\AgentAwareLostConnectionDetector;
+use Illuminate\Foundation\Cloud\AgentUnreachableException;
 use Illuminate\Foundation\Cloud\CloudJob;
 use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\Cloud\FailedJobProvider;
@@ -17,6 +20,7 @@ use Illuminate\Foundation\Cloud\ManagedQueueNotFoundException;
 use Illuminate\Foundation\Cloud\Queue;
 use Illuminate\Foundation\Cloud\QueueConnector;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Queue\Connectors\ConnectorInterface;
 use Illuminate\Queue\Connectors\SqsConnector;
@@ -507,38 +511,6 @@ class QueueTest extends TestCase
         $this->assertSame(5, $queue->pop()->attempts());
     }
 
-    public function testPopDefaultsTheReceiveCountWhenTheAgentOmitsIt()
-    {
-        $this->fakeEvents();
-        [$queue, $agent] = $this->fakeQueue();
-        $agent->pushJob();
-
-        $this->assertSame(1, $queue->pop()->attempts());
-    }
-
-    public function testPopToleratesMalformedAttributesFromTheAgent()
-    {
-        $this->fakeEvents();
-        [$queue, $agent] = $this->fakeQueue();
-        $agent->pushJob(['attributes' => 'not-an-array']);
-
-        $job = $queue->pop();
-
-        $this->assertInstanceOf(CloudJob::class, $job);
-        $this->assertSame(1, $job->attempts());
-    }
-
-    public function testPopDefaultsTheReceiveCountWhenTheAgentSuppliesAFalsyValue()
-    {
-        $this->fakeEvents();
-        [$queue, $agent] = $this->fakeQueue();
-        // A null/0 receive count must not override the default down to 0, which
-        // would make attempts() zero and disable max-attempts enforcement.
-        $agent->pushJob(['attributes' => ['ApproximateReceiveCount' => null]]);
-
-        $this->assertSame(1, $queue->pop()->attempts());
-    }
-
     public function testPopToleratesANonStringBodyFromTheAgent()
     {
         $this->fakeEvents();
@@ -641,6 +613,34 @@ class QueueTest extends TestCase
         $agent->nextResponse = Http::response('"not-an-array"', 200);
 
         $this->assertNull($queue->pop());
+    }
+
+    public function testPopThrowsWhenTheAgentSocketIsUnreachable()
+    {
+        $this->fakeEvents();
+        [$queue] = $this->fakeQueue();
+
+        // The agent's runtime socket being unreachable (the agent is not running
+        // in the pod) surfaces as a ConnectionException, which pop() must
+        // escalate as an unrecoverable fault rather than swallow and idle as if
+        // the queue were empty.
+        Http::fake(fn () => throw new ConnectionException('Connection refused'));
+
+        $this->expectException(AgentUnreachableException::class);
+
+        $queue->pop();
+    }
+
+    public function testAgentAwareDetectorTreatsAnUnreachableAgentAsALostConnection()
+    {
+        $detector = new AgentAwareLostConnectionDetector(new LostConnectionDetector);
+
+        // An unreachable agent is treated as a lost connection so the worker exits.
+        $this->assertTrue($detector->causedByLostConnection(new AgentUnreachableException));
+
+        // Everything else is delegated to the wrapped detector untouched.
+        $this->assertFalse($detector->causedByLostConnection(new \RuntimeException('boom')));
+        $this->assertTrue($detector->causedByLostConnection(new \RuntimeException('server has gone away')));
     }
 
     public function testProcessedSupersedesReleasedWhenAJobReleasesThenFails()
@@ -1487,6 +1487,10 @@ class QueueTest extends TestCase
                     'messageId' => (string) Str::uuid(),
                     'receiptHandle' => 'receipt-handle',
                     'body' => json_encode(['job' => MyJob::class, 'data' => []]),
+                    // The dispatcher receives the message from SQS, which always
+                    // returns ApproximateReceiveCount, so the agent always
+                    // forwards it — mirror that here.
+                    'attributes' => ['ApproximateReceiveCount' => 1],
                 ], $job);
 
                 $this->jobs[] = $job;

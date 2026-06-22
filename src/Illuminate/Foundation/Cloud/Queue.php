@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Cloud;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -250,7 +251,7 @@ class Queue implements QueueContract, ClearableQueue
                 // response degrades to an empty payload rather than blowing
                 // up json_decode() in payload().
                 'Body' => is_string($body = $data['body'] ?? null) ? $body : '',
-                'Attributes' => $this->normalizeAgentAttributes($data['attributes'] ?? null),
+                'Attributes' => $data['attributes'] ?? [],
             ],
             $this->queue->getConnectionName(),
             // The agent reports the real SQS queue URL the dispatcher received
@@ -267,20 +268,33 @@ class Queue implements QueueContract, ClearableQueue
      * Long-poll the agent's runtime socket (GET /next) for the next job.
      *
      * Returns the decoded message payload, or null when the agent has nothing
-     * (HTTP 204), is unreachable, or returns an unexpected status — in which
-     * case the worker simply idles and re-polls. Transport and unexpected-status
-     * errors are reported rather than swallowed so an agent fault is visible
-     * instead of looking like an empty queue.
+     * (HTTP 204) or returns an unexpected status — in which case the worker
+     * idles and re-polls, with the unexpected status reported so an agent
+     * fault is visible instead of looking like an empty queue.
+     *
+     * An unreachable socket is different: it means the agent is not running in
+     * the pod (or is wedged past its poll cycle), which is unrecoverable. We let
+     * that surface as an AgentUnreachableException — which the worker treats as
+     * a lost connection and exits on — so the pod is restarted rather than the
+     * worker spinning forever as if the queue were simply empty.
+     *
+     * @throws \Illuminate\Foundation\Cloud\AgentUnreachableException
      */
     protected function requestNextFromAgent(): ?array
     {
-        $response = rescue(fn () => $this->agentRequest()
-            // Outlast the agent's ~55s poll cycle so a 204 is a deliberate
-            // "nothing yet", never our own timeout cutting a poll short.
-            ->timeout(65)
-            ->get('/next'));
+        try {
+            $response = $this->agentRequest()
+                // Outlast the agent's ~55s poll cycle so a 204 is a deliberate
+                // "nothing yet", never our own timeout cutting a poll short.
+                ->timeout(65)
+                ->get('/next');
+        } catch (ConnectionException $e) {
+            throw new AgentUnreachableException(
+                'The Laravel Cloud agent runtime socket is unreachable.', previous: $e
+            );
+        }
 
-        if (is_null($response) || $response->status() === 204) {
+        if ($response->status() === 204) {
             return null;
         }
 
@@ -303,25 +317,6 @@ class Queue implements QueueContract, ClearableQueue
         }
 
         return $data;
-    }
-
-    /**
-     * Normalize the message attributes supplied by the agent.
-     *
-     * A malformed (non-array) "attributes" is coerced to []. The agent owns
-     * redelivery and must supply the receive count, but we default it to 1 when
-     * it is missing or not a positive integer so a bad value can't disable
-     * max-attempts enforcement by making attempts() zero.
-     */
-    protected function normalizeAgentAttributes($attributes): array
-    {
-        $attributes = is_array($attributes) ? $attributes : [];
-
-        $attributes['ApproximateReceiveCount'] = (string) max(
-            1, (int) ($attributes['ApproximateReceiveCount'] ?? 1)
-        );
-
-        return $attributes;
     }
 
     /**
