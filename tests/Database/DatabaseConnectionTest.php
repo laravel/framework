@@ -7,6 +7,7 @@ use ErrorException;
 use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
+use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitted;
@@ -250,6 +251,26 @@ class DatabaseConnectionTest extends TestCase
         $connection->beginTransaction();
         $connection->disconnect();
         $this->assertEquals(0, $connection->transactionLevel());
+    }
+
+    public function testDisconnectClearsTransactionManagerState()
+    {
+        $connection = $this->getMockConnection(['getName']);
+        $connection->method('getName')->willReturn('default');
+        $manager = new DatabaseTransactionsManager;
+        $connection->setTransactionManager($manager);
+
+        $manager->begin('default', 1);
+        $manager->begin('default', 2);
+        $manager->stageTransactions('default', 2);
+
+        $this->assertCount(1, $manager->getCommittedTransactions());
+        $this->assertCount(1, $manager->getPendingTransactions());
+
+        $connection->disconnect();
+
+        $this->assertCount(0, $manager->getCommittedTransactions());
+        $this->assertCount(0, $manager->getPendingTransactions());
     }
 
     public function testBeganTransactionFiresEventsIfSet()

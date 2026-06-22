@@ -159,7 +159,7 @@ class DatabaseTransactionsManager
     protected function removeAllTransactionsForConnection($connection)
     {
         if ($this->currentTransaction) {
-            for ($currentTransaction = $this->currentTransaction[$connection]; isset($currentTransaction); $currentTransaction = $currentTransaction->parent) {
+            for ($currentTransaction = $this->currentTransaction[$connection] ?? null; isset($currentTransaction); $currentTransaction = $currentTransaction->parent) {
                 $currentTransaction->executeCallbacksForRollback();
             }
         }

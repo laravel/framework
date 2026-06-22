@@ -1075,6 +1075,8 @@ class Connection implements ConnectionInterface
      */
     public function disconnect()
     {
+        $this->transactionsManager?->rollback($this->getName(), 0);
+
         $this->setPdo(null)->setReadPdo(null)->setDirectPdo(null);
     }
 
