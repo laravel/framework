@@ -95,9 +95,10 @@ class ApplicationBuilder
      * Register the core event service provider for the application.
      *
      * @param  iterable<int, string>|bool  $discover
+     * @param  bool  $emailVerification
      * @return $this
      */
-    public function withEvents(iterable|bool $discover = true)
+    public function withEvents(iterable|bool $discover = true, bool $emailVerification = true)
     {
         if (is_iterable($discover)) {
             AppEventServiceProvider::setEventDiscoveryPaths($discover);
@@ -105,6 +106,10 @@ class ApplicationBuilder
 
         if ($discover === false) {
             AppEventServiceProvider::disableEventDiscovery();
+        }
+
+        if ($emailVerification === false) {
+            AppEventServiceProvider::disableEmailVerification();
         }
 
         if (! isset($this->pendingProviders[AppEventServiceProvider::class])) {

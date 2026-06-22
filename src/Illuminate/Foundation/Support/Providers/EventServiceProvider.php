@@ -48,6 +48,13 @@ class EventServiceProvider extends ServiceProvider
     protected static $eventDiscoveryPaths;
 
     /**
+     * Indicates if the default email verification notification listener should be registered.
+     *
+     * @var bool
+     */
+    protected static $configureEmailVerification = true;
+
+    /**
      * Register the application's event listeners.
      *
      * @return void
@@ -216,12 +223,26 @@ class EventServiceProvider extends ServiceProvider
     }
 
     /**
+     * Disable the registration of the default email verification notification listener.
+     *
+     * @return void
+     */
+    public static function disableEmailVerification()
+    {
+        static::$configureEmailVerification = false;
+    }
+
+    /**
      * Configure the proper event listeners for email verification.
      *
      * @return void
      */
     protected function configureEmailVerification()
     {
+        if (! static::$configureEmailVerification) {
+            return;
+        }
+
         if (! isset($this->listen[Registered::class]) ||
             ! in_array(SendEmailVerificationNotification::class, Arr::wrap($this->listen[Registered::class]))) {
             Event::listen(Registered::class, SendEmailVerificationNotification::class);
