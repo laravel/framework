@@ -581,11 +581,17 @@ class QueueTest extends TestCase
         $agent->pushJob(['body' => json_encode(['@pointer' => 'overflow-pointer'])]);
 
         $job = $queue->pop();
-        $job->delete();
+
+        // A rejected report throws, so delete() never reaches the overflow purge.
+        try {
+            $job->delete();
+            $this->fail('Expected the rejected report to throw a RequestException.');
+        } catch (RequestException) {
+            // Expected — the agent could not accept the outcome.
+        }
 
         // Because the outcome was not acknowledged, the offloaded payload must
         // be retained so a redelivered job can still resolve it.
-        $this->assertTrue($job->isDeleted());
         $this->assertSame($payload, Cache::store('array')->get('overflow-pointer'));
     }
 
@@ -631,7 +637,7 @@ class QueueTest extends TestCase
         $job->release(30);
     }
 
-    public function testDeletingDoesNotTouchSqsWhenTheAgentRejectsTheReport()
+    public function testReportingThrowsWhenTheAgentRejectsTheResult()
     {
         $this->fakeEvents();
         $sqs = $this->mock(SqsClient::class);
@@ -640,16 +646,17 @@ class QueueTest extends TestCase
 
         $job = $queue->pop();
 
-        // A rejected report (the agent is alive, just erroring) must not trigger
-        // a direct SQS delete: the agent has already finalized the job itself, so
-        // the message is redelivering regardless and acting on it ourselves would
-        // double-own it.
+        // A rejected report (the agent is alive, but cannot apply the outcome)
+        // is not swallowed or worked around on SQS ourselves: the agent owns the
+        // SQS operation and the authority over what it can accept, so the
+        // rejection propagates as an exception and the worker pod never touches
+        // SQS itself.
         $agent->resultStatus = 500;
         $sqs->shouldNotReceive('deleteMessage');
 
-        $job->delete();
+        $this->expectException(RequestException::class);
 
-        $this->assertTrue($job->isDeleted());
+        $job->delete();
     }
 
     public function testPopReturnsNullWhenTheAgentReturnsAnError()
@@ -706,7 +713,7 @@ class QueueTest extends TestCase
         $this->assertTrue($detector->causedByLostConnection(new \RuntimeException('server has gone away')));
     }
 
-    public function testProcessedSupersedesReleasedWhenAJobReleasesThenFails()
+    public function testReleasingThenFailingReportsBothOutcomesToTheAgent()
     {
         $this->fakeEvents();
         [$queue, $agent] = $this->fakeQueue();
@@ -716,29 +723,15 @@ class QueueTest extends TestCase
         $job->release(30);
         $job->fail(new RuntimeException('Whoops!'));
 
-        // A terminal "processed" (the fail routes through delete) supersedes the
-        // earlier self-release so the agent ends on the job's final outcome and
-        // does not redeliver a job already recorded in failed_jobs.
+        // CloudJob reports each outcome as the worker produces it and keeps no
+        // memory of prior reports. Making the terminal "processed" (the fail
+        // routes through delete) supersede the earlier self-release is the
+        // agent's responsibility, not something CloudJob fakes by suppressing
+        // calls, so both outcomes are reported in order.
         $this->assertAgentResults([
             ['messageId' => $pushed['messageId'], 'status' => 'released', 'delay' => 30],
             ['messageId' => $pushed['messageId'], 'status' => 'processed'],
         ]);
-    }
-
-    public function testReportingToTheAgentIsResilientWhenItRejectsTheResult()
-    {
-        $this->fakeEvents();
-        [$queue, $agent] = $this->fakeQueue();
-        $agent->pushJob();
-        $agent->resultStatus = 500;
-
-        $job = $queue->pop();
-
-        // A failing /result is retried and ultimately swallowed (reported, not
-        // re-thrown) so it is never misattributed to the completed job.
-        $job->delete();
-
-        $this->assertTrue($job->isDeleted());
     }
 
     public function testItEmitsJobQueuedEvent()

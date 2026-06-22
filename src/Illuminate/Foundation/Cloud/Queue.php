@@ -6,7 +6,6 @@ use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -260,7 +259,7 @@ class Queue implements QueueContract, ClearableQueue
             $data['queueUrl'] ?? $this->queue->getQueue($queue),
             // Capture only the message id so the closure doesn't pin the
             // whole agent response (including the body) for the job's life.
-            fn (string $status, ?int $delay): bool => $this->reportResultToAgent($messageId, $status, $delay),
+            fn (string $status, ?int $delay) => $this->reportResultToAgent($messageId, $status, $delay),
             $this->config['connection']['overflow'] ?? [],
         );
     }
@@ -326,25 +325,25 @@ class Queue implements QueueContract, ClearableQueue
      * performs the SQS operation; on a release the delay (in whole seconds)
      * tells it the visibility to reset the message to.
      *
-     * Reporting is retried for transient socket hiccups. The two failure modes
-     * are then handled differently:
+     * Reporting is retried for transient socket hiccups, after which both
+     * failure modes surface as exceptions — the caller may assume a report that
+     * returns was accepted and is now owned by the agent:
      *
-     *  - The agent responds but rejects the report (an HTTP error). It is alive
-     *    and its poller still owns the message, so we must not touch SQS
-     *    ourselves: the error is reported and we return false, leaving the
-     *    retry / teardown safety net to try again.
-     *  - The agent is unreachable (a connection error). It has crashed, so its
-     *    poller can no longer act on the message at all. We surface an
-     *    AgentUnreachableException so the job falls back to operating on SQS
-     *    directly rather than lose its outcome. (This is the same fatal
-     *    condition GET /next escalates to a worker exit; here we can still
-     *    salvage the in-flight job first.)
+     *  - The agent rejects the report (an HTTP error). The outcome is one it
+     *    cannot apply — a result for a message it has already finalized, an
+     *    invalid order of operations — and the agent is the authority on what is
+     *    valid, so the RequestException propagates rather than being papered over.
+     *  - The agent is unreachable (a connection error). It has crashed, so we
+     *    raise an AgentUnreachableException, which the worker treats as a lost
+     *    connection and exits on — the same fatal condition GET /next escalates.
      *
-     * Returns whether the agent accepted the report.
+     * The job is never lost: a crashed agent stops heartbeating, so SQS
+     * redelivers the message once its visibility timeout lapses.
      *
+     * @throws \Illuminate\Http\Client\RequestException
      * @throws \Illuminate\Foundation\Cloud\AgentUnreachableException
      */
-    protected function reportResultToAgent(string $messageId, string $status, ?int $delay = null): bool
+    protected function reportResultToAgent(string $messageId, string $status, ?int $delay = null): void
     {
         try {
             $this->agentRequest()
@@ -356,16 +355,10 @@ class Queue implements QueueContract, ClearableQueue
                     'status' => $status,
                     'delay' => $delay,
                 ], fn ($value) => $value !== null));
-
-            return true;
         } catch (ConnectionException $e) {
             throw new AgentUnreachableException(
                 'The Laravel Cloud agent runtime socket is unreachable.', previous: $e
             );
-        } catch (RequestException $e) {
-            report($e);
-
-            return false;
         }
     }
 

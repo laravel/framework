@@ -18,37 +18,32 @@ use Illuminate\Queue\Jobs\SqsJob;
  * and report the outcome (with the requested release delay) back to the agent
  * via POST /result, which the poller acts on.
  *
- * An agent that responds but rejects a report has already finalized the job
- * itself (a deadline, death detection), so the message is redelivering anyway
- * and there is nothing for us to do. An agent that is unreachable has crashed:
- * the AgentUnreachableException propagates, the worker treats it as a lost
- * connection and exits — matching how popping a job handles an unreachable
- * agent — and the pod restarts. The job is never lost either way: a crashed
- * agent stops heartbeating the message's visibility, so SQS redelivers it once
- * the visibility timeout lapses, exactly as for any unacknowledged SQS message.
+ * Reporting an outcome is fire-and-trust: report() returns once the agent has
+ * accepted the outcome and owns it, or it throws. An agent that rejects a
+ * report — an outcome it cannot apply, such as a result for a message it has
+ * already finalized or an out-of-order operation — surfaces the rejection as an
+ * exception rather than CloudJob suppressing the call or papering over it; the
+ * agent is the single authority on what ordering of operations is valid. An
+ * unreachable agent has crashed and raises an AgentUnreachableException, which
+ * the worker treats as a lost connection and exits on (matching how popping a
+ * job handles an unreachable agent), restarting the pod. The job is never lost:
+ * a crashed agent stops heartbeating the message's visibility, so SQS redelivers
+ * it once the visibility timeout lapses, exactly as for any unacknowledged SQS
+ * message.
  *
- * Overflow-payload cache cleanup is deferred until the agent accepts a
- * "processed" report; while a report is merely rejected the message may still
- * be redelivered, so the offloaded payload is kept until then.
+ * Because a rejected report throws, delete()'s overflow-payload purge is only
+ * reached once the agent has accepted the "processed" outcome; a rejected or
+ * unreachable report leaves the offloaded payload in place for the redelivery.
  */
 class CloudJob extends SqsJob
 {
-    /**
-     * The agent status already reported for this job, if any.
-     *
-     * A "processed" (delete) outcome is terminal and supersedes a prior
-     * "released" — e.g. a job that releases itself and then fails — so the
-     * agent always ends on the job's final outcome rather than the first one.
-     */
-    protected ?string $reportedStatus = null;
-
     /**
      * Create a new job instance.
      *
      * @param  array  $job
      * @param  string  $connectionName
      * @param  string  $queue
-     * @param  callable(string, int|null): bool  $reporter
+     * @param  callable(string, int|null): void  $reporter
      * @param  array  $overflowStorage
      */
     public function __construct(
@@ -81,13 +76,14 @@ class CloudJob extends SqsJob
         // delete() too. We report "processed" in both cases to mirror that;
         // the poller's "failed" status is reserved for dispatches that never
         // cleanly ack.
-        //
-        // Only purge the offloaded overflow payload once the agent has accepted
-        // the report: a rejected report means the message may be redelivered,
-        // and the redelivered job must still resolve its payload from the cache.
-        if ($this->report('processed')) {
-            $this->deleteOverflowPayload();
-        }
+        $this->report('processed');
+
+        // Purge the offloaded overflow payload only once the agent has accepted
+        // the outcome. report() throws when the agent rejects or is unreachable,
+        // so reaching here means the message is gone and the payload is safe to
+        // drop; a thrown report leaves it in place for the redelivered job to
+        // resolve from the cache.
+        $this->deleteOverflowPayload();
     }
 
     /**
@@ -107,33 +103,17 @@ class CloudJob extends SqsJob
     }
 
     /**
-     * Report the job's outcome back to the agent.
+     * Report the job's outcome to the agent, which owns the SQS operation.
      *
-     * Each distinct outcome is reported once, and a terminal "processed"
-     * supersedes a prior "released". The release delay (in seconds) is
-     * forwarded only for the "released" status so the poller can reset the
-     * message's visibility to it.
-     *
-     * Returns whether the agent now holds the outcome: false when the agent is
-     * alive but rejected the report, in which case it has already finalized the
-     * job itself (a deadline, death detection) and the message is redelivering
-     * regardless, so the outcome is left unrecorded rather than treated as
-     * delivered. An unreachable agent instead throws AgentUnreachableException
-     * out of the reporter; the worker treats it as a lost connection and exits,
-     * and the message redelivers when its visibility timeout lapses.
+     * The release delay (in seconds) is forwarded only for the "released" status
+     * so the poller can reset the message's visibility to it. This is
+     * fire-and-trust: it returns once the agent has accepted the outcome and
+     * throws otherwise (see reportResultToAgent). It deliberately keeps no memory
+     * of prior reports — enforcing idempotency or a valid order of operations is
+     * the agent's responsibility, not something CloudJob suppresses calls to fake.
      */
-    protected function report(string $status, ?int $delay = null): bool
+    protected function report(string $status, ?int $delay = null): void
     {
-        if ($this->reportedStatus === $status || $this->reportedStatus === 'processed') {
-            return true;
-        }
-
-        if (! ($this->reporter)($status, $delay)) {
-            return false;
-        }
-
-        $this->reportedStatus = $status;
-
-        return true;
+        ($this->reporter)($status, $delay);
     }
 }
