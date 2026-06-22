@@ -200,7 +200,7 @@ class DevCommandList extends Command
     {
         return [
             ['json', null, InputOption::VALUE_NONE, 'Output the dev process list as JSON'],
-            ['filter', null, InputOption::VALUE_OPTIONAL, 'Filter the dev processes by name or command'],
+            ['filter', null, InputOption::VALUE_REQUIRED, 'Filter the dev processes by name or command'],
             ['except-vendor', null, InputOption::VALUE_NONE, 'Do not display dev processes registered by vendor packages'],
             ['only-vendor', null, InputOption::VALUE_NONE, 'Only display dev processes registered by vendor packages'],
         ];
