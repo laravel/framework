@@ -18,9 +18,23 @@ class DevCommand
      * @param  string|null  $name
      * @return void
      */
-    public function __construct(protected string $command, protected ?string $name = null)
+    public function __construct(
+        protected string $command,
+        protected array $source,
+        protected ?string $name = null,
+    ) {
+        $this->name ??= self::nameFromCommand($command);
+    }
+
+    /**
+     * Derive the name from a command string.
+     *
+     * @param  string  $command
+     * @return string
+     */
+    public static function nameFromCommand(string $command): string
     {
-        $this->name ??= strstr($command, ' ', true);
+        return strstr($command, ' ', true) ?: $command;
     }
 
     /**
@@ -117,6 +131,21 @@ class DevCommand
             'command' => $this->command,
             'name' => $this->name,
             'color' => $this->color,
+            'source' => $this->sourceFormatted(),
         ];
+    }
+
+    protected function sourceFormatted(): string
+    {
+        $file = $this->source['file'] ?? null;
+        $line = $this->source['line'] ?? null;
+        $class = $this->source['class'] ?? null;
+        $function = $this->source['function'] ?? null;
+
+        if ($class) {
+            return "{$class}@{$function}";
+        }
+
+        return "{$file}:{$line}";
     }
 }

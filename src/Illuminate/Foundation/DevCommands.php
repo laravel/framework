@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation;
 
 use Illuminate\Support\NodePackageManager;
-use ReflectionClass;
 
 class DevCommands
 {
@@ -13,13 +12,6 @@ class DevCommands
      * @var NodePackageManager|null
      */
     protected static ?NodePackageManager $packageManager = null;
-
-    /**
-     * Whether vendor packages should be prevented from registering dev commands.
-     *
-     * @var bool
-     */
-    protected static bool $preventVendorRegistration = false;
 
     /**
      * Counter to keep track of how many colors have been assigned,.
@@ -62,16 +54,10 @@ class DevCommands
             return;
         }
 
-        foreach (
-            [
-                'server' => 'php artisan serve --host=localhost',
-                'queue' => 'php artisan queue:listen --tries=1 --timeout=0',
-                'logs' => 'php artisan pail --timeout=0',
-                'vite' => self::getPackageManager()->getRunCommand('dev'),
-            ] as $name => $command
-        ) {
-            self::$commands[$name] = new DevCommand($command, $name);
-        }
+        self::artisan('serve --host=localhost', 'server');
+        self::artisan('queue:listen --tries=1 --timeout=0', 'queue');
+        self::artisan('pail --timeout=0', 'logs');
+        self::node('dev', 'vite');
     }
 
     /**
@@ -83,11 +69,31 @@ class DevCommands
      */
     public static function register(string $command, ?string $name = null): DevCommand
     {
-        if (! app()->runningInConsole() || self::shouldPreventVendorRegistration()) {
-            return new DevCommand('', '');
+        if (! app()->runningInConsole()) {
+            return new DevCommand('', [], '');
         }
 
-        $devCommand = new DevCommand($command, $name);
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        $source = null;
+        $foundFrame = false;
+
+        foreach ($trace as $frame) {
+            if (($frame['file'] ?? null) === __FILE__) {
+                continue;
+            }
+
+            if (! $foundFrame) {
+                $foundFrame = true;
+
+                continue;
+            }
+
+            $source = $frame;
+
+            break;
+        }
+
+        $devCommand = new DevCommand($command, $source, $name);
 
         self::$commands[$devCommand->name()] = $devCommand;
 
@@ -103,7 +109,7 @@ class DevCommands
      */
     public static function artisan(string $command, ?string $name = null): DevCommand
     {
-        return self::register("php artisan {$command}", $name ?? self::nameFromCommand($command));
+        return self::register("php artisan {$command}", $name ?? DevCommand::nameFromCommand($command));
     }
 
     /**
@@ -115,7 +121,7 @@ class DevCommands
      */
     public static function node(string $command, ?string $name = null): DevCommand
     {
-        return self::register(self::getPackageManager()->getRunCommand($command), $name ?? self::nameFromCommand($command));
+        return self::register(self::getPackageManager()->getRunCommand($command), $name ?? DevCommand::nameFromCommand($command));
     }
 
     /**
@@ -127,13 +133,13 @@ class DevCommands
      */
     public static function nodeExec(string $command, ?string $name = null): DevCommand
     {
-        return self::register(self::getPackageManager()->getExecCommand($command), $name ?? self::nameFromCommand($command));
+        return self::register(self::getPackageManager()->getExecCommand($command), $name);
     }
 
     /**
      * Get the registered development commands.
      *
-     * @return array
+     * @return array{'name': string, 'command': string, 'source': string, 'color': string}[]
      */
     public static function commands(): array
     {
@@ -186,55 +192,6 @@ class DevCommands
     }
 
     /**
-     * Determine if the current call originated from a vendor package.
-     *
-     * @return bool
-     */
-    protected static function shouldPreventVendorRegistration(): bool
-    {
-        if (self::$preventVendorRegistration === false) {
-            return false;
-        }
-
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-
-        foreach ($trace as $frame) {
-            $file = $frame['file'] ?? null;
-            $class = $frame['class'] ?? null;
-
-            if ($file === __FILE__) {
-                continue;
-            }
-
-            if (! $file && $class) {
-                $file = (new ReflectionClass($class))->getFileName();
-            }
-
-            if ($file === base_path('artisan')) {
-                continue;
-            }
-
-            if (! $file) {
-                continue;
-            }
-
-            return str_contains($file, base_path('vendor'));
-        }
-
-        return false;
-    }
-
-    /**
-     * Prevent vendor packages from registering dev commands.
-     *
-     * @return void
-     */
-    public static function preventVendorCommands(): void
-    {
-        self::$preventVendorRegistration = true;
-    }
-
-    /**
      * Set the commands that should be included when running the "dev" command.
      *
      * @param  string  ...$names
@@ -254,17 +211,6 @@ class DevCommands
     public static function except(...$names): void
     {
         self::$except = $names;
-    }
-
-    /**
-     * Derive a command name from the given command string by taking the first word.
-     *
-     * @param  string  $command
-     * @return string
-     */
-    protected static function nameFromCommand(string $command): string
-    {
-        return strstr($command, ' ', true);
     }
 
     /**
