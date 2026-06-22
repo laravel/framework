@@ -91,7 +91,10 @@ class SQLiteConnection extends Connection
      */
     protected function getDefaultQueryGrammar()
     {
-        return new QueryGrammar($this);
+        $grammar = new QueryGrammar($this);
+        $grammar->useStrictIdentifiers((bool) $this->getConfig('strict_identifiers'));
+
+        return $grammar;
     }
 
     /**
@@ -115,7 +118,10 @@ class SQLiteConnection extends Connection
      */
     protected function getDefaultSchemaGrammar()
     {
-        return new SchemaGrammar($this);
+        $grammar = new SchemaGrammar($this);
+        $grammar->useStrictIdentifiers((bool) $this->getConfig('strict_identifiers'));
+
+        return $grammar;
     }
 
     /**

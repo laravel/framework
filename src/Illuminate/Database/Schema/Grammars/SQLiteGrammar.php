@@ -27,6 +27,47 @@ class SQLiteGrammar extends Grammar
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
     /**
+     * Whether to wrap identifiers in backticks instead of double-quotes.
+     *
+     * @var bool
+     */
+    protected $strictIdentifiers = false;
+
+    /**
+     * Enable strict identifier wrapping using backticks.
+     *
+     * @param  bool  $enabled
+     * @return $this
+     */
+    public function useStrictIdentifiers($enabled = true)
+    {
+        $this->strictIdentifiers = $enabled;
+
+        return $this;
+    }
+
+    /**
+     * Wrap a single string in keyword identifiers.
+     *
+     * @param  string  $value
+     * @return string
+     *
+     * @see https://www.sqlite.org/quirks.html#dblquote
+     */
+    protected function wrapValue($value)
+    {
+        if ($value === '*') {
+            return $value;
+        }
+
+        if ($this->strictIdentifiers) {
+            return '`'.str_replace('`', '``', $value).'`';
+        }
+
+        return '"'.str_replace('"', '""', $value).'"';
+    }
+
+    /**
      * Get the commands to be compiled on the alter command.
      *
      * @return array
