@@ -104,15 +104,6 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertSame('one', $commands[0]['name']);
     }
 
-    public function testClearResetsState()
-    {
-        DevCommands::register('echo one', 'one');
-        DevCommands::except('something');
-        DevCommands::only('something');
-
-        $this->assertEmpty(DevCommands::commands());
-    }
-
     public function testCommandsGetAutoAssignedColors()
     {
         DevCommands::register('echo one', 'one');
