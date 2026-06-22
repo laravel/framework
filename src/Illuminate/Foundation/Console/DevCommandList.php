@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Illuminate\Console\Prohibitable;
 use Illuminate\Foundation\DevCommands;
-use Illuminate\Support\NodePackageManager;
 use Laravel\Prompts\Prompt;
 use ReflectionClass;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -37,7 +36,7 @@ class DevCommandList extends Command
      *
      * @throws \Exception
      */
-    public function handle(NodePackageManager $packageManager)
+    public function handle()
     {
         if ($this->isProhibited()) {
             return self::FAILURE;
@@ -45,34 +44,7 @@ class DevCommandList extends Command
 
         $this->newLine();
 
-        $devCommands = DevCommands::commands();
-
-        if ($this->option('filter')) {
-            $devCommands = array_values(
-                array_filter(
-                    $devCommands,
-                    fn ($command) => str_contains($command['name'], $this->option('filter')) || str_contains($command['command'], $this->option('filter')),
-                ),
-            );
-        }
-
-        if ($this->option('except-vendor')) {
-            $devCommands = array_values(
-                array_filter(
-                    $devCommands,
-                    fn ($command) => ! $this->isVendorCommand($command),
-                ),
-            );
-        }
-
-        if ($this->option('only-vendor')) {
-            $devCommands = array_values(
-                array_filter(
-                    $devCommands,
-                    fn ($command) => $this->isVendorCommand($command),
-                ),
-            );
-        }
+        $devCommands = $this->filterCommands(DevCommands::commands());
 
         if ($this->option('json') || ! $this->input->isInteractive()) {
             $this->output->writeln(json_encode($devCommands));
@@ -130,17 +102,55 @@ class DevCommandList extends Command
         return self::SUCCESS;
     }
 
+    /**
+     * Determine if the given command is registered by a vendor package.
+     *
+     * @param  array  $command
+     * @return bool
+     */
     protected function isVendorCommand(array $command): bool
     {
         if (! str_contains($command['source'], '@')) {
             return str_contains($command['source'], base_path('vendor'));
         }
 
-        [$class, $method] = explode('@', $command['source']);
+        $class = explode('@', $command['source'])[0];
 
         $reflection = new ReflectionClass($class);
 
         return str_contains($reflection->getFileName(), base_path('vendor'));
+    }
+
+    /**
+     * Filter the given commands based on the provided options.
+     *
+     * @param  array  $commands
+     * @return array
+     */
+    protected function filterCommands(array $commands): array
+    {
+        if ($this->option('filter')) {
+            $commands = array_filter(
+                $commands,
+                fn ($command) => str_contains($command['name'], $this->option('filter')) || str_contains($command['command'], $this->option('filter')),
+            );
+        }
+
+        if ($this->option('except-vendor')) {
+            $commands = array_filter(
+                $commands,
+                fn ($command) => ! $this->isVendorCommand($command),
+            );
+        }
+
+        if ($this->option('only-vendor')) {
+            $commands = array_filter(
+                $commands,
+                fn ($command) => $this->isVendorCommand($command),
+            );
+        }
+
+        return array_values($commands);
     }
 
     /**
