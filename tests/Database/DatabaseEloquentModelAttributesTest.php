@@ -808,4 +808,3 @@ class ModelOverridingTraitConnectionAttribute extends Model
 {
     use TraitUsingConnectionAttribute;
 }
-
