@@ -151,6 +151,6 @@ class DevCommand
             return "{$class}@{$function}";
         }
 
-        return "{$file}:{$line}";
+        return implode(':', array_filter([$file, $line]));
     }
 }

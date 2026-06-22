@@ -49,13 +49,19 @@ class DevCommandList extends Command
         if ($this->option('json') || ! $this->input->isInteractive()) {
             $this->output->writeln(json_encode($devCommands));
 
-            return self::SUCCESS;
+            return empty($devCommands) && $this->isFiltering() ? self::FAILURE : self::SUCCESS;
         }
 
         if (empty($devCommands)) {
-            $this->components->error("Your application doesn't have any dev processes matching the given criteria.");
+            if ($this->isFiltering()) {
+                $this->components->error("Your application doesn't have any dev processes matching the given criteria.");
 
-            return self::FAILURE;
+                return self::FAILURE;
+            }
+
+            $this->components->warn("Your application doesn't have any dev processes.");
+
+            return self::SUCCESS;
         }
 
         $names = array_column($devCommands, 'name');
@@ -119,6 +125,16 @@ class DevCommandList extends Command
         $reflection = new ReflectionClass($class);
 
         return str_contains($reflection->getFileName(), base_path('vendor'));
+    }
+
+    /**
+     * Determine if any filtering options are active.
+     *
+     * @return bool
+     */
+    protected function isFiltering(): bool
+    {
+        return $this->option('filter') || $this->option('except-vendor') || $this->option('only-vendor');
     }
 
     /**

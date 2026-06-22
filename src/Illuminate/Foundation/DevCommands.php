@@ -126,7 +126,7 @@ class DevCommands
      */
     public static function nodeExec(string $command, ?string $name = null): DevCommand
     {
-        return self::register(self::getPackageManager()->getExecCommand($command), $name);
+        return self::register(self::getPackageManager()->getExecCommand($command), $name ?? DevCommand::nameFromCommand($command));
     }
 
     /**
