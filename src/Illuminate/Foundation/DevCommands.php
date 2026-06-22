@@ -136,7 +136,7 @@ class DevCommands
     /**
      * Get the registered development commands.
      *
-     * @return array{'name': string, 'command': string, 'source': string, 'color': string}[]
+     * @return array{'name': string, 'command': string, 'source': array{'file': string, 'line': int, 'class'?: string, 'function'?: string}, 'color': string}[]
      */
     public static function commands(): array
     {
