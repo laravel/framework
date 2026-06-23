@@ -256,10 +256,11 @@ class Queue implements QueueContract, ClearableQueue
      * Long-poll the agent's runtime socket (GET /next) for the next job.
      *
      * Returns the decoded message payload, or null when the agent has nothing
-     * (HTTP 204). An unreachable socket, an error status, or a malformed body
-     * all mean the agent cannot serve work — a crashed or wedged agent — so
-     * each surfaces as an AgentUnreachableException to restart the pod rather
-     * than spin re-polling a broken agent forever.
+     * (HTTP 204). The agent only ever answers 200 with a job or 204 when empty,
+     * so an unreachable socket, any other status, or a malformed body all mean
+     * the agent cannot serve work — a crashed or wedged agent — and each
+     * surfaces as an AgentUnreachableException to restart the pod rather than
+     * spin re-polling a broken agent forever.
      *
      * @throws \Illuminate\Foundation\Cloud\AgentUnreachableException
      */
@@ -281,7 +282,7 @@ class Queue implements QueueContract, ClearableQueue
             return null;
         }
 
-        if ($response->failed()) {
+        if ($response->status() !== 200) {
             throw new AgentUnreachableException(
                 "The Laravel Cloud agent returned HTTP {$response->status()} from GET /next."
             );

@@ -647,12 +647,26 @@ class QueueTest extends TestCase
         $this->fakeEvents();
         [$queue, $agent] = $this->fakeQueue();
 
-        // Drive the agent's own GET /next stub so the failed() branch is hit;
+        // Drive the agent's own GET /next stub so the non-200 branch is hit;
         // a separate Http::fake() would be shadowed by the agent closure.
         $agent->nextResponse = Http::response('error', 500);
 
         // An error status means the agent cannot serve work, so it escalates
         // as an unrecoverable fault rather than idling and re-polling forever.
+        $this->expectException(AgentUnreachableException::class);
+
+        $queue->pop();
+    }
+
+    public function testPopThrowsWhenTheAgentReturnsAnUnexpectedSuccessStatus()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+
+        // The agent only ever answers 200 (job) or 204 (empty); any other 2xx
+        // is off-contract, so it escalates rather than being decoded as a job.
+        $agent->nextResponse = Http::response('', 202);
+
         $this->expectException(AgentUnreachableException::class);
 
         $queue->pop();
