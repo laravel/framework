@@ -199,7 +199,7 @@ class Queue implements QueueContract, ClearableQueue
         $this->finishProcessingJob();
 
         $job = $this->usesAgent()
-            ? $this->popFromAgent($queue)
+            ? $this->popFromAgent()
             : $this->queue->pop(...func_get_args());
 
         $this->startProcessingJob($queue, $job);
@@ -220,10 +220,12 @@ class Queue implements QueueContract, ClearableQueue
      * Long-poll the cloud-agent's runtime socket and wrap the next message in a
      * CloudJob.
      *
-     * @param  string|null  $queue
+     * The agent only ever receives messages, so it has no queue to pop from;
+     * each message reports the SQS queue URL it came from instead.
+     *
      * @return \Illuminate\Foundation\Cloud\CloudJob|null
      */
-    protected function popFromAgent($queue = null)
+    protected function popFromAgent()
     {
         $data = $this->requestNextFromAgent();
 
@@ -245,7 +247,7 @@ class Queue implements QueueContract, ClearableQueue
             $this->queue->getConnectionName(),
             // The agent reports the real SQS queue URL the message came from;
             // delete / release go back to that queue, not our default.
-            $data['queueUrl'] ?? $this->queue->getQueue($queue),
+            $data['queueUrl'] ?? null,
             // Capture only the message id so the closure doesn't pin the whole
             // agent response for the job's life.
             fn (string $status, ?int $delay) => $this->reportResultToAgent($messageId, $status, $delay),

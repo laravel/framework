@@ -1499,6 +1499,8 @@ class QueueTest extends TestCase
                 $job = array_merge([
                     'messageId' => (string) Str::uuid(),
                     'receiptHandle' => 'receipt-handle',
+                    // The agent always reports the SQS queue URL the message came from.
+                    'queueUrl' => 'https://sqs.us-east-1.amazonaws.com/123456789012/default',
                     'body' => json_encode(['job' => MyJob::class, 'data' => []]),
                     // SQS always returns ApproximateReceiveCount, so mirror it.
                     'attributes' => ['ApproximateReceiveCount' => 1],
