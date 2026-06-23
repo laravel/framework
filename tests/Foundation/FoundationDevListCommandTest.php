@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use Illuminate\Foundation\Console\DevCommandList;
+use Illuminate\Foundation\Console\DevListCommand;
 use Illuminate\Foundation\DevCommands;
 use Illuminate\Support\Facades\Artisan;
 use Orchestra\Testbench\TestCase;
 use ReflectionClass;
 
-class FoundationDevCommandListTest extends TestCase
+class FoundationDevListCommandTest extends TestCase
 {
     protected function setUp(): void
     {
@@ -143,7 +143,7 @@ class FoundationDevCommandListTest extends TestCase
 
     public function testFormatSourceWithClassAndFunction()
     {
-        $command = new DevCommandList();
+        $command = new DevListCommand();
 
         $ref = new ReflectionClass($command);
         $method = $ref->getMethod('formatSource');
@@ -160,7 +160,7 @@ class FoundationDevCommandListTest extends TestCase
 
     public function testFormatSourceWithFileAndLine()
     {
-        $command = new DevCommandList();
+        $command = new DevListCommand();
 
         $ref = new ReflectionClass($command);
         $method = $ref->getMethod('formatSource');
@@ -175,7 +175,7 @@ class FoundationDevCommandListTest extends TestCase
 
     public function testFormatSourceWithEmptyArray()
     {
-        $command = new DevCommandList();
+        $command = new DevListCommand();
 
         $ref = new ReflectionClass($command);
         $method = $ref->getMethod('formatSource');
@@ -194,17 +194,6 @@ class FoundationDevCommandListTest extends TestCase
 
         $this->assertCount(1, $output);
         $this->assertSame('server', $output[0]['name']);
-    }
-
-    public function testProhibitable()
-    {
-        DevCommandList::prohibit();
-
-        try {
-            $this->artisan('dev:list')->assertFailed();
-        } finally {
-            DevCommandList::prohibit(false);
-        }
     }
 
     protected function getJsonOutput(array $options = []): array

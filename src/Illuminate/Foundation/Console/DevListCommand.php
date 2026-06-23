@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Console\Prohibitable;
 use Illuminate\Foundation\DevCommands;
 use Laravel\Prompts\Prompt;
 use ReflectionClass;
@@ -11,10 +10,8 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(name: 'dev:list')]
-class DevCommandList extends Command
+class DevListCommand extends Command
 {
-    use Prohibitable;
-
     /**
      * The console command name.
      *
@@ -38,12 +35,6 @@ class DevCommandList extends Command
      */
     public function handle()
     {
-        if ($this->isProhibited()) {
-            return self::FAILURE;
-        }
-
-        $this->newLine();
-
         $devCommands = array_map(fn ($command) => array_merge($command, [
             'source' => $this->formatSource($command['source']),
         ]), $this->filterCommands(DevCommands::commands()));
@@ -53,6 +44,8 @@ class DevCommandList extends Command
 
             return empty($devCommands) && $this->isFiltering() ? self::FAILURE : self::SUCCESS;
         }
+
+        $this->newLine();
 
         if (empty($devCommands)) {
             if ($this->isFiltering()) {
@@ -82,7 +75,11 @@ class DevCommandList extends Command
 
             // Truncate source if it doesn't fit, but ensure command is always fully visible.
             if ($textWidth + $spaceBuffer > $columns) {
-                $availableSourceWidth = max(0, $columns - mb_strwidth($label) - mb_strwidth($command) - mb_strwidth($dots) - $spaceBuffer);
+                $availableSourceWidth = max(
+                    0,
+                    $columns - mb_strwidth($label) - mb_strwidth($command) - mb_strwidth($dots) - $spaceBuffer
+                );
+
                 $source = str($source)->limit($availableSourceWidth - 1, '…')->toString();
             }
 
