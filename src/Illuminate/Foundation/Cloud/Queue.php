@@ -6,6 +6,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -303,10 +304,12 @@ class Queue implements QueueContract, ClearableQueue
      * operation. On a release the delay (in whole seconds) is the visibility to
      * reset the message to.
      *
-     * The request is retried for transient socket hiccups. A rejected report
-     * (the agent is the authority on a valid outcome) propagates as a
-     * RequestException; an unreachable agent raises an AgentUnreachableException
-     * to exit the worker. The job is never lost — a crashed agent stops
+     * The request is retried for transient socket hiccups. A client-error
+     * rejection (the agent is the authority on a valid outcome for this one
+     * message) propagates as a RequestException so the worker reports it and
+     * moves on. An unreachable socket or a server error means the agent itself
+     * is wedged, so both raise an AgentUnreachableException to exit the worker
+     * and restart the pod. The job is never lost — a crashed agent stops
      * heartbeating, so SQS redelivers once the visibility timeout lapses.
      *
      * @throws \Illuminate\Http\Client\RequestException
@@ -328,6 +331,14 @@ class Queue implements QueueContract, ClearableQueue
             throw new AgentUnreachableException(
                 'The Laravel Cloud agent runtime socket is unreachable.', previous: $e
             );
+        } catch (RequestException $e) {
+            if ($e->response->serverError()) {
+                throw new AgentUnreachableException(
+                    "The Laravel Cloud agent returned HTTP {$e->response->status()} from POST /result.", previous: $e
+                );
+            }
+
+            throw $e;
         }
     }
 

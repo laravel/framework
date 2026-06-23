@@ -566,8 +566,8 @@ class QueueTest extends TestCase
         ]]);
         [$queue, $agent] = $this->fakeQueue();
 
-        // The agent rejects POST /result.
-        $agent->resultStatus = 500;
+        // The agent rejects POST /result with a client error.
+        $agent->resultStatus = 422;
 
         $payload = json_encode(['job' => MyJob::class, 'data' => ['resolved' => true]]);
         Cache::store('array')->put('overflow-pointer', $payload);
@@ -633,11 +633,32 @@ class QueueTest extends TestCase
 
         $job = $queue->pop();
 
-        // A rejected report propagates rather than deleting from SQS directly.
-        $agent->resultStatus = 500;
+        // A client-error rejection is message-specific, so it propagates as a
+        // RequestException for the worker to report rather than deleting from
+        // SQS directly or restarting the pod.
+        $agent->resultStatus = 422;
         $sqs->shouldNotReceive('deleteMessage');
 
         $this->expectException(RequestException::class);
+
+        $job->delete();
+    }
+
+    public function testReportingEscalatesWhenTheAgentReturnsAServerError()
+    {
+        $this->fakeEvents();
+        $sqs = $this->mock(SqsClient::class);
+        [$queue, $agent] = $this->fakeQueue($sqs);
+        $agent->pushJob();
+
+        $job = $queue->pop();
+
+        // A server error means the agent itself is wedged, so it escalates as
+        // an unreachable fault to restart the pod rather than deleting from SQS.
+        $agent->resultStatus = 500;
+        $sqs->shouldNotReceive('deleteMessage');
+
+        $this->expectException(AgentUnreachableException::class);
 
         $job->delete();
     }
