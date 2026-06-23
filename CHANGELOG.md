@@ -1,6 +1,34 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.16.1...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.17.0...13.x)
+
+## [v13.17.0](https://github.com/laravel/framework/compare/v13.16.1...v13.17.0) - 2026-06-23
+
+* [12.x] Add multi-type union support to Illuminate JsonSchema by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/60462
+* [12.x] Add new error messages for detecting lost connections by [@mfn](https://github.com/mfn) in https://github.com/laravel/framework/pull/60472
+* [12.x] Ability to refresh cache locks by [@bytestream](https://github.com/bytestream) in https://github.com/laravel/framework/pull/58349
+* [12.x] Guard JsonSchema deserializer against unbounded $ref expansion by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/60524
+* [13.x] Improve types of InteractsWithData when* helpers by [@dfinchenko](https://github.com/dfinchenko) in https://github.com/laravel/framework/pull/60536
+* [13.x] Add missing [@throws](https://github.com/throws) \ReflectionException annotations by [@dfinchenko](https://github.com/dfinchenko) in https://github.com/laravel/framework/pull/60535
+* [13.x] Add nightly workflow to verify framework install by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60532
+* [13.x] Fix DevCommands vendor registration check skipping userland frames by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/framework/pull/60538
+* [13.x] Fix FileStore cache deserialization with short timestamps by [@hamdyelbatal122](https://github.com/hamdyelbatal122) in https://github.com/laravel/framework/pull/60543
+* [13.x] Add missing [@throws](https://github.com/throws) \InvalidArgumentException annotations by [@maiobarbero](https://github.com/maiobarbero) in https://github.com/laravel/framework/pull/60546
+* [12.x] Fix Postgres whereDate/whereTime crash when column is Expression by [@irabbi360](https://github.com/irabbi360) in https://github.com/laravel/framework/pull/60540
+* [13.x] Add route metadata support by [@benbjurstrom](https://github.com/benbjurstrom) in https://github.com/laravel/framework/pull/60530
+* [13.x] Make between()/unlessBetween() independent of timezone() call order by [@ManicardiFrancesco](https://github.com/ManicardiFrancesco) in https://github.com/laravel/framework/pull/60518
+* [13.X] Fix too narrow typehint for validateBoolean and validateNumeric by [@chippisc](https://github.com/chippisc) in https://github.com/laravel/framework/pull/60549
+* [13.x] Fix: typo by [@alipowerful7](https://github.com/alipowerful7) in https://github.com/laravel/framework/pull/60556
+* [13.x] Fix too narrow array-shape typehints where the first parameter is optional by [@dfinchenko](https://github.com/dfinchenko) in https://github.com/laravel/framework/pull/60553
+* [13.x] Add Postgres transaction pooler support by [@DGarbs51](https://github.com/DGarbs51) in https://github.com/laravel/framework/pull/60425
+* [13.x] Should Not Retry Exception Handler by [@alexbowers](https://github.com/alexbowers) in https://github.com/laravel/framework/pull/60552
+* Bump actions/checkout from 6.0.3 to 7.0.0 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/framework/pull/60562
+* [13.x] Allow brick/math 0.18 by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60560
+* [13.x] Reduce cache hits when debouncing with maxWait by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60559
+* Merge branch `12.x` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/60568
+* Clear transaction manager state on disconnect by [@lazerg](https://github.com/lazerg) in https://github.com/laravel/framework/pull/60574
+* [13.x] Add `without-migration-data` flag to DumpCommand by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60570
+* Add `dev:list` command and track dev command source by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/framework/pull/60573
 
 ## [v13.16.1](https://github.com/laravel/framework/compare/v13.16.0...v13.16.1) - 2026-06-16
 
