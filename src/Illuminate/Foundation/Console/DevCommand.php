@@ -59,7 +59,7 @@ class DevCommand extends Command
         foreach ($devCommands as $devCommand) {
             $this->line(
                 sprintf(
-                    '<fg=%s>[%s]</>%s<fg=#888888>%s</>',
+                    '<fg=%s>[%s]</>%s%s',
                     $devCommand['color'],
                     $devCommand['name'],
                     str_repeat(' ', ($longestName - strlen($devCommand['name'])) + 1),

@@ -7,7 +7,7 @@ use Illuminate\Foundation\DevCommand;
 use Illuminate\Foundation\DevCommandColor;
 use Illuminate\Foundation\DevCommands;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
+use ReflectionClass;
 
 class FoundationDevCommandsTest extends TestCase
 {
@@ -15,17 +15,16 @@ class FoundationDevCommandsTest extends TestCase
     {
         parent::setUp();
 
-        DevCommands::clear();
+        $ref = new ReflectionClass(DevCommands::class);
+
+        foreach (['commands', 'except', 'only'] as $prop) {
+            $ref->getProperty($prop)->setValue(null, []);
+        }
+
+        $ref->getProperty('colorCount')->setValue(null, 0);
 
         $app = new Application(__DIR__);
         $app['env'] = 'testing';
-    }
-
-    protected function tearDown(): void
-    {
-        DevCommands::clear();
-
-        parent::tearDown();
     }
 
     public function testRegisterAddsCommand()
@@ -114,17 +113,6 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertSame('one', $commands[0]['name']);
     }
 
-    public function testClearResetsState()
-    {
-        DevCommands::register('echo one', 'one');
-        DevCommands::except('something');
-        DevCommands::only('something');
-
-        DevCommands::clear();
-
-        $this->assertEmpty(DevCommands::commands());
-    }
-
     public function testCommandsGetAutoAssignedColors()
     {
         DevCommands::register('echo one', 'one');
@@ -204,66 +192,14 @@ class FoundationDevCommandsTest extends TestCase
         $this->assertContains('vite', $names);
     }
 
-    public function testVendorRegistrationIsPrevented()
+    public function testRegisteredCommandIncludesSource()
     {
-        $basePath = realpath(__DIR__.'/../..');
-        $vendorFile = $basePath.'/vendor/_test_vendor_register_'.uniqid().'.php';
+        DevCommands::register('echo hello', 'greeter');
 
-        file_put_contents($vendorFile, <<<PHP
-<?php
-require '{$basePath}/vendor/autoload.php';
+        $commands = DevCommands::commands();
 
-\$app = new Illuminate\Foundation\Application('{$basePath}');
-\$app['env'] = 'testing';
-
-try {
-    Illuminate\Foundation\DevCommands::register('echo hello', 'vendor-cmd');
-    echo 'REGISTERED';
-} catch (Exception \$e) {
-    echo 'EXCEPTION:' . \$e->getMessage();
-}
-PHP);
-
-        $process = new Process(['php', $vendorFile], $basePath);
-        $process->run();
-
-        @unlink($vendorFile);
-
-        $this->assertStringContainsString('EXCEPTION:', $process->getOutput());
-        $this->assertStringContainsString('DevCommands should be registered in application code', $process->getOutput());
-    }
-
-    public function testUserlandRegistrationIsAllowed()
-    {
-        $devCommand = DevCommands::register('echo hello', 'test-cmd');
-
-        $this->assertInstanceOf(DevCommand::class, $devCommand);
-        $this->assertSame('echo hello', DevCommands::commands()[0]['command']);
-    }
-
-    public function testVendorHelperCalledFromUserlandIsAllowed()
-    {
-        $basePath = realpath(__DIR__.'/../..');
-        $vendorHelper = $basePath.'/vendor/_test_helper_'.uniqid().'.php';
-
-        file_put_contents($vendorHelper, <<<'PHP'
-<?php
-function _test_register_dev_command() {
-    Illuminate\Foundation\DevCommands::register('echo from-vendor-helper', 'vendor-helper');
-}
-PHP);
-
-        try {
-            require $vendorHelper;
-
-            _test_register_dev_command();
-
-            $commands = DevCommands::commands();
-            $this->assertCount(1, $commands);
-            $this->assertSame('echo from-vendor-helper', $commands[0]['command']);
-            $this->assertSame('vendor-helper', $commands[0]['name']);
-        } finally {
-            unlink($vendorHelper);
-        }
+        $this->assertArrayHasKey('source', $commands[0]);
+        $this->assertIsArray($commands[0]['source']);
+        $this->assertSame(__CLASS__, $commands[0]['source']['class']);
     }
 }

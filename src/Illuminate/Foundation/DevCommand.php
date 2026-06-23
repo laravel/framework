@@ -15,12 +15,27 @@ class DevCommand
      * Create a new DevCommand instance.
      *
      * @param  string  $command
+     * @param  array{'file': string, 'line': int, 'class'?: string, 'function'?: string}  $source
      * @param  string|null  $name
      * @return void
      */
-    public function __construct(protected string $command, protected ?string $name = null)
+    public function __construct(
+        protected string $command,
+        protected array $source,
+        protected ?string $name = null,
+    ) {
+        $this->name ??= self::nameFromCommand($command);
+    }
+
+    /**
+     * Derive the name from a command string.
+     *
+     * @param  string  $command
+     * @return string
+     */
+    public static function nameFromCommand(string $command): string
     {
-        $this->name ??= strstr($command, ' ', true);
+        return strstr($command, ' ', true) ?: $command;
     }
 
     /**
@@ -109,7 +124,7 @@ class DevCommand
     /**
      * Get the command as an array.
      *
-     * @return array{command: string, name: string, color: string|null}
+     * @return array{command: string, name: string, color: string|null, source: array{'file': string, 'line': int, 'class'?: string, 'function'?: string}}
      */
     public function toArray(): array
     {
@@ -117,6 +132,7 @@ class DevCommand
             'command' => $this->command,
             'name' => $this->name,
             'color' => $this->color,
+            'source' => $this->source,
         ];
     }
 }
