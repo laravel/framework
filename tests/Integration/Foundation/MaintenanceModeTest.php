@@ -43,6 +43,7 @@ class MaintenanceModeTest extends TestCase
         $response->assertStatus(503);
         $response->assertHeader('Retry-After', '60');
         $response->assertHeader('Refresh', '60');
+        $response->assertHeader('X-Laravel-Maintenance-Mode', 'active');
     }
 
     public function testMaintenanceModeCanHaveCustomStatus()
