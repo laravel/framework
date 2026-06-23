@@ -343,6 +343,21 @@ class QueueTest extends TestCase
         $this->assertSame('message-id', $job->getJobId());
     }
 
+    public function testPopReadsTheWorkerQueueFromTheSpaceSeparatedQueueOption()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $agent->pushJob(['messageId' => 'message-id']);
+
+        // The --queue option may be given space-separated rather than with "=".
+        $_SERVER['argv'] = ['artisan', 'queue:work', '--queue', 'emails'];
+
+        $job = $queue->pop('emails');
+
+        $this->assertInstanceOf(CloudJob::class, $job);
+        $this->assertSame('message-id', $job->getJobId());
+    }
+
     public function testPopReceivesFromSqsWhenTheQueueIsNotTheWorkerQueue()
     {
         $this->fakeEvents();
@@ -355,6 +370,23 @@ class QueueTest extends TestCase
         $_SERVER['argv'] = ['artisan', 'queue:work', '--queue=emails'];
 
         $this->assertNull($queue->pop('not-the-worker-queue'));
+
+        Http::assertNothingSent();
+    }
+
+    public function testPopReceivesFromSqsForAMultiQueueWorker()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $agent->pushJob();
+
+        // The agent serves a single queue, so a worker spanning several queues
+        // (the worker pops each individually) cannot be served by it and falls
+        // back to SQS rather than being handed the agent's one queue for all.
+        $_SERVER['argv'] = ['artisan', 'queue:work', '--queue=high,low'];
+
+        $this->assertNull($queue->pop('high'));
+        $this->assertNull($queue->pop('low'));
 
         Http::assertNothingSent();
     }

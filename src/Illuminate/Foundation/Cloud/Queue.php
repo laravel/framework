@@ -232,6 +232,11 @@ class Queue implements QueueContract, ClearableQueue
      * Get the queue the running queue:work worker is processing: its --queue
      * option, or null (the connection default) when the option is omitted.
      *
+     * The agent serves a single queue, so a managed worker is expected to run
+     * one too. The raw option is returned as-is: a comma-separated --queue (the
+     * worker splits these and pops each individually) won't match any single
+     * popped queue, so such a worker simply falls back to SQS.
+     *
      * @return string|null
      */
     protected function workerQueue()
