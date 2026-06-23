@@ -261,12 +261,16 @@ class Queue implements QueueContract, ClearableQueue
             return null;
         }
 
+        // Coerce a non-string handle to null so a malformed response degrades
+        // gracefully rather than tripping the typed reporter argument.
+        $receiptHandle = is_string($handle = $data['receiptHandle'] ?? null) ? $handle : null;
+
         return new CloudJob(
             $this->queue->getContainer(),
             $this->queue->getSqs(),
             [
                 'MessageId' => $messageId,
-                'ReceiptHandle' => $data['receiptHandle'] ?? null,
+                'ReceiptHandle' => $receiptHandle,
                 // Coerce a non-string body to '' so a malformed response degrades
                 // to an empty payload rather than blowing up json_decode().
                 'Body' => is_string($body = $data['body'] ?? null) ? $body : '',
@@ -276,9 +280,12 @@ class Queue implements QueueContract, ClearableQueue
             // The agent reports the real SQS queue URL the message came from;
             // delete / release go back to that queue, not our default.
             $data['queueUrl'] ?? null,
-            // Capture only the message id so the closure doesn't pin the whole
-            // agent response for the job's life.
-            fn (string $status, ?int $delay) => $this->reportResultToAgent($messageId, $status, $delay),
+            // Capture only the message id and receipt handle so the closure
+            // doesn't pin the whole agent response for the job's life. The
+            // handle pins the result to this exact receive: SQS reuses message
+            // ids across redeliveries, so a id-only match could let a stale
+            // result finalize a re-dispatched job.
+            fn (string $status, ?int $delay) => $this->reportResultToAgent($messageId, $receiptHandle, $status, $delay),
             $this->config['connection']['overflow'] ?? [],
         );
     }
@@ -345,7 +352,7 @@ class Queue implements QueueContract, ClearableQueue
      * @throws \Illuminate\Http\Client\RequestException
      * @throws \Illuminate\Foundation\Cloud\AgentUnreachableException
      */
-    protected function reportResultToAgent(string $messageId, string $status, ?int $delay = null): void
+    protected function reportResultToAgent(string $messageId, ?string $receiptHandle, string $status, ?int $delay = null): void
     {
         try {
             $this->agentRequest()
@@ -354,6 +361,7 @@ class Queue implements QueueContract, ClearableQueue
                 ->retry(3, 100)
                 ->post('/result', array_filter([
                     'messageId' => $messageId,
+                    'receiptHandle' => $receiptHandle,
                     'status' => $status,
                     'delay' => $delay,
                 ], fn ($value) => $value !== null));

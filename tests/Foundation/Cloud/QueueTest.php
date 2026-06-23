@@ -548,7 +548,7 @@ class QueueTest extends TestCase
 
         $this->assertTrue($job->isDeleted());
         $this->assertAgentResults([
-            ['messageId' => $pushed['messageId'], 'status' => 'processed'],
+            ['messageId' => $pushed['messageId'], 'receiptHandle' => $pushed['receiptHandle'], 'status' => 'processed'],
         ]);
     }
 
@@ -564,7 +564,7 @@ class QueueTest extends TestCase
         // fail() routes through delete(), so it reports a single "processed".
         $this->assertTrue($job->hasFailed());
         $this->assertAgentResults([
-            ['messageId' => $pushed['messageId'], 'status' => 'processed'],
+            ['messageId' => $pushed['messageId'], 'receiptHandle' => $pushed['receiptHandle'], 'status' => 'processed'],
         ]);
     }
 
@@ -579,7 +579,7 @@ class QueueTest extends TestCase
 
         $this->assertTrue($job->isReleased());
         $this->assertAgentResults([
-            ['messageId' => $pushed['messageId'], 'status' => 'released', 'delay' => 30],
+            ['messageId' => $pushed['messageId'], 'receiptHandle' => $pushed['receiptHandle'], 'status' => 'released', 'delay' => 30],
         ]);
     }
 
@@ -599,6 +599,21 @@ class QueueTest extends TestCase
         $agent->pushJob(['attributes' => ['ApproximateReceiveCount' => '5']]);
 
         $this->assertSame(5, $queue->pop()->attempts());
+    }
+
+    public function testReportingAnOutcomeOmitsTheReceiptHandleWhenTheAgentDoesNotSupplyOne()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        // A non-string handle is treated as absent, so the result omits it and
+        // the agent falls back to matching on the message id alone.
+        $pushed = $agent->pushJob(['receiptHandle' => null]);
+
+        $queue->pop()->delete();
+
+        $this->assertAgentResults([
+            ['messageId' => $pushed['messageId'], 'status' => 'processed'],
+        ]);
     }
 
     public function testPopToleratesANonStringBodyFromTheAgent()
@@ -838,8 +853,8 @@ class QueueTest extends TestCase
         // CloudJob keeps no memory of prior reports, so both outcomes are
         // reported in order; reconciling them is the agent's responsibility.
         $this->assertAgentResults([
-            ['messageId' => $pushed['messageId'], 'status' => 'released', 'delay' => 30],
-            ['messageId' => $pushed['messageId'], 'status' => 'processed'],
+            ['messageId' => $pushed['messageId'], 'receiptHandle' => $pushed['receiptHandle'], 'status' => 'released', 'delay' => 30],
+            ['messageId' => $pushed['messageId'], 'receiptHandle' => $pushed['receiptHandle'], 'status' => 'processed'],
         ]);
     }
 
