@@ -52,6 +52,14 @@ class QueueTest extends TestCase
 {
     use DatabaseMigrations;
 
+    /**
+     * The original $_SERVER['argv'], restored in tearDown() after fakeQueue()
+     * spoofs a queue:work worker.
+     *
+     * @var array|null
+     */
+    private $savedArgv = null;
+
     protected function defineEnvironment($app)
     {
         $app['config']->set('app.key', Str::random(32));
@@ -75,6 +83,8 @@ class QueueTest extends TestCase
 
         parent::setUp();
 
+        $this->savedArgv = $_SERVER['argv'];
+
         $this->app['config']->set('queue.connections.cloud', json_decode($_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES_CONFIG'], true));
     }
 
@@ -85,6 +95,8 @@ class QueueTest extends TestCase
         unset($_SERVER['LARAVEL_CLOUD'], $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES_CONFIG']);
         Worker::$restartable = true;
         Worker::$pausable = true;
+
+        $_SERVER['argv'] = $this->savedArgv;
     }
 
     public function testItDisablesQueueRestartPollingForManagedQueues()
@@ -280,37 +292,86 @@ class QueueTest extends TestCase
 
         $agent->pushJob();
         $agent->pushJob();
-        $queue->pop('first');
-        $queue->pop('second');
-        $queue->pop('third');
+        // The agent only serves the connection's default queue, so the worker
+        // pops that queue; each pop finishes the previous job and starts the next.
+        $queue->pop('default');
+        $queue->pop('default');
+        $queue->pop('default');
 
         $this->assertSame([
             [
                 '_cloud_event' => 'queue',
                 'timestamp' => '2000-01-02 03:04:05.060708',
                 'type' => 'started',
-                'queue' => 'first',
+                'queue' => 'default',
             ],
             [
                 '_cloud_event' => 'queue',
                 'timestamp' => '2000-01-02 03:04:05.060708',
                 'type' => 'processed',
-                'queue' => 'first',
+                'queue' => 'default',
                 'duration_ms' => 0,
             ], [
                 '_cloud_event' => 'queue',
                 'timestamp' => '2000-01-02 03:04:05.060708',
                 'type' => 'started',
-                'queue' => 'second',
+                'queue' => 'default',
             ],
             [
                 '_cloud_event' => 'queue',
                 'timestamp' => '2000-01-02 03:04:05.060708',
                 'type' => 'processed',
-                'queue' => 'second',
+                'queue' => 'default',
                 'duration_ms' => 0,
             ],
         ], $eventsFake->emitted);
+    }
+
+    public function testPopReceivesFromTheAgentForANonDefaultWorkerQueue()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $agent->pushJob(['messageId' => 'message-id']);
+
+        // A managed worker started for a non-default queue is still served by the
+        // agent: the agent polls whatever queue the worker is processing.
+        $_SERVER['argv'] = ['artisan', 'queue:work', '--queue=emails'];
+
+        $job = $queue->pop('emails');
+
+        $this->assertInstanceOf(CloudJob::class, $job);
+        $this->assertSame('message-id', $job->getJobId());
+    }
+
+    public function testPopReceivesFromSqsWhenTheQueueIsNotTheWorkerQueue()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $agent->pushJob();
+
+        // A pop for a queue other than the one the worker is processing has no
+        // agent feeding it, so it comes from SQS directly and the socket is never
+        // polled.
+        $_SERVER['argv'] = ['artisan', 'queue:work', '--queue=emails'];
+
+        $this->assertNull($queue->pop('not-the-worker-queue'));
+
+        Http::assertNothingSent();
+    }
+
+    public function testPopReceivesFromSqsWhenNotRunningAsAQueueWorker()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $agent->pushJob();
+
+        // Outside a queue:work worker (e.g. a web request) the agent sidecar is
+        // not serving us, so jobs come from SQS directly.
+        $_SERVER['argv'] = ['artisan', 'tinker'];
+
+        $this->assertNull($queue->pop());
+
+        Http::assertNothingSent();
     }
 
     public function testItEmitsFailedJobEvents()
@@ -1474,7 +1535,15 @@ class QueueTest extends TestCase
 
         $agent = $this->fakeAgent();
 
-        return [$this->app['queue']->connection('cloud'), $agent];
+        $connection = $this->app['queue']->connection('cloud');
+
+        // The agent only serves a queue:work worker popping its queue, so present
+        // as one for pop() (see usesAgent()). Set after connecting so the
+        // connector's worker wiring - which expects the cloud failed-job provider
+        // - isn't exercised here. Restored in tearDown().
+        $_SERVER['argv'] = ['artisan', 'queue:work'];
+
+        return [$connection, $agent];
     }
 
     /**

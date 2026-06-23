@@ -43,6 +43,7 @@ class QueueConnector implements ConnectorInterface
             $underlying,
             $this->app[Events::class],
             $config,
+            $this->app,
         );
 
         if ($underlying instanceof SqsQueue) {

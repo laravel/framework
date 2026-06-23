@@ -5,11 +5,13 @@ namespace Illuminate\Foundation\Cloud;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
+use Symfony\Component\Console\Input\ArgvInput;
 
 class Queue implements QueueContract, ClearableQueue
 {
@@ -43,6 +45,7 @@ class Queue implements QueueContract, ClearableQueue
         protected QueueContract $queue,
         protected Events $events,
         protected array $config,
+        protected Application $app,
     ) {
         //
     }
@@ -198,7 +201,7 @@ class Queue implements QueueContract, ClearableQueue
     {
         $this->finishProcessingJob();
 
-        $job = $this->usesAgent()
+        $job = $this->usesAgent($queue)
             ? $this->popFromAgent()
             : $this->queue->pop(...func_get_args());
 
@@ -208,12 +211,32 @@ class Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Determine whether jobs should be popped from the in-container cloud-agent
-     * rather than received directly from SQS.
+     * Determine whether the next job should be received from the in-container
+     * cloud-agent rather than directly from SQS.
+     *
+     * The agent is a sidecar that long-polls a single queue on behalf of one
+     * queue:work worker, so it only serves work when that worker is popping the
+     * queue it was started for. A pop for any other queue - or one outside a
+     * queue:work worker - has no agent feeding it and falls back to SQS.
+     *
+     * @param  string|null  $queue
      */
-    protected function usesAgent(): bool
+    protected function usesAgent($queue = null): bool
     {
-        return (bool) ($this->config['agent']['enabled'] ?? false);
+        return ($this->config['agent']['enabled'] ?? false)
+            && $this->app->runningConsoleCommand('queue:work')
+            && $this->queue->getQueue($queue) === $this->queue->getQueue($this->workerQueue());
+    }
+
+    /**
+     * Get the queue the running queue:work worker is processing: its --queue
+     * option, or null (the connection default) when the option is omitted.
+     *
+     * @return string|null
+     */
+    protected function workerQueue()
+    {
+        return (new ArgvInput)->getParameterOption('--queue') ?: null;
     }
 
     /**
