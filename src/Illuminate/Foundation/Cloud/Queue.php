@@ -282,7 +282,7 @@ class Queue implements QueueContract, ClearableQueue
             return null;
         }
 
-        if ($response->status() !== 200) {
+        if (! $response->ok()) {
             throw new AgentUnreachableException(
                 "The Laravel Cloud agent returned HTTP {$response->status()} from GET /next."
             );
