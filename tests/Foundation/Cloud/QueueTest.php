@@ -642,7 +642,7 @@ class QueueTest extends TestCase
         $job->delete();
     }
 
-    public function testPopReturnsNullWhenTheAgentReturnsAnError()
+    public function testPopThrowsWhenTheAgentReturnsAnError()
     {
         $this->fakeEvents();
         [$queue, $agent] = $this->fakeQueue();
@@ -651,18 +651,25 @@ class QueueTest extends TestCase
         // a separate Http::fake() would be shadowed by the agent closure.
         $agent->nextResponse = Http::response('error', 500);
 
-        $this->assertNull($queue->pop());
+        // An error status means the agent cannot serve work, so it escalates
+        // as an unrecoverable fault rather than idling and re-polling forever.
+        $this->expectException(AgentUnreachableException::class);
+
+        $queue->pop();
     }
 
-    public function testPopReturnsNullWhenTheAgentReturnsANonArrayBody()
+    public function testPopThrowsWhenTheAgentReturnsANonArrayBody()
     {
         $this->fakeEvents();
         [$queue, $agent] = $this->fakeQueue();
 
-        // A 200 that decodes to a scalar is an agent fault; pop() must idle.
+        // A 200 that decodes to a scalar is an agent fault; treat it the same
+        // as an unreachable agent rather than idling.
         $agent->nextResponse = Http::response('"not-an-array"', 200);
 
-        $this->assertNull($queue->pop());
+        $this->expectException(AgentUnreachableException::class);
+
+        $queue->pop();
     }
 
     public function testPopThrowsWhenTheAgentSocketIsUnreachable()

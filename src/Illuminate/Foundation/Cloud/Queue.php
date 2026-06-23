@@ -9,7 +9,6 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
-use RuntimeException;
 
 class Queue implements QueueContract, ClearableQueue
 {
@@ -257,10 +256,10 @@ class Queue implements QueueContract, ClearableQueue
      * Long-poll the agent's runtime socket (GET /next) for the next job.
      *
      * Returns the decoded message payload, or null when the agent has nothing
-     * (HTTP 204) or returns an unexpected status — reported so a fault is
-     * visible — in which case the worker idles and re-polls. An unreachable
-     * socket means a crashed or wedged agent, so it surfaces as an
-     * AgentUnreachableException to restart the pod rather than spin forever.
+     * (HTTP 204). An unreachable socket, an error status, or a malformed body
+     * all mean the agent cannot serve work — a crashed or wedged agent — so
+     * each surfaces as an AgentUnreachableException to restart the pod rather
+     * than spin re-polling a broken agent forever.
      *
      * @throws \Illuminate\Foundation\Cloud\AgentUnreachableException
      */
@@ -283,19 +282,15 @@ class Queue implements QueueContract, ClearableQueue
         }
 
         if ($response->failed()) {
-            report(new RuntimeException(
+            throw new AgentUnreachableException(
                 "The Laravel Cloud agent returned HTTP {$response->status()} from GET /next."
-            ));
-
-            return null;
+            );
         }
 
         if (! is_array($data = $response->json())) {
-            report(new RuntimeException(
+            throw new AgentUnreachableException(
                 'The Laravel Cloud agent returned a non-array body from GET /next.'
-            ));
-
-            return null;
+            );
         }
 
         return $data;
