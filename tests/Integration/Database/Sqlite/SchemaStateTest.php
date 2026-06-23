@@ -61,4 +61,34 @@ class SchemaStateTest extends TestCase
             'sqlite_sequence',
         ], 'database/schema/sqlite-schema.sql');
     }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testSchemaDumpWithoutMigrationDataOnSqlite()
+    {
+        if ($this->usesSqliteInMemoryDatabaseConnection()) {
+            $this->markTestSkipped('Test cannot be run using :in-memory: database connection');
+        }
+
+        $connection = DB::connection();
+        $connection->getSchemaBuilder()->createDatabase($connection->getConfig('database'));
+
+        $connection->statement('CREATE TABLE IF NOT EXISTS migrations (id integer primary key autoincrement not null, migration varchar not null, batch integer not null);');
+        $connection->statement('CREATE TABLE users (id integer primary key autoincrement not null, email varchar not null, name varchar not null);');
+        $connection->statement('INSERT INTO migrations (migration, batch) VALUES ("2014_10_12_000000_create_users_table", 1);');
+
+        $this->app['files']->ensureDirectoryExists(database_path('schema'));
+
+        $connection->getSchemaState()
+            ->withMigrationTable(null)
+            ->dump($connection, database_path('schema/sqlite-schema.sql'));
+
+        $this->assertFileContains([
+            'CREATE TABLE migrations',
+            'CREATE TABLE users',
+        ], 'database/schema/sqlite-schema.sql');
+
+        $this->assertFileNotContains([
+            'INSERT INTO "migrations"',
+        ], 'database/schema/sqlite-schema.sql');
+    }
 }
