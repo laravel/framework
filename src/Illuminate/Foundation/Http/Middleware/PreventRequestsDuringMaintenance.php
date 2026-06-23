@@ -147,7 +147,11 @@ class PreventRequestsDuringMaintenance
      */
     protected function getHeaders($data)
     {
-        $headers = isset($data['retry']) ? ['Retry-After' => $data['retry']] : [];
+        $headers = ['X-Laravel-Maintenance-Mode' => 'active'];
+
+        if (isset($data['retry'])) {
+            $headers['Retry-After'] = $data['retry'];
+        }
 
         if (isset($data['refresh'])) {
             $headers['Refresh'] = $data['refresh'];
