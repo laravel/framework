@@ -4346,6 +4346,28 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Delete records from a PostgreSQL database using the delete using syntax.
+     *
+     * @return int
+     *
+     * @throws \LogicException
+     */
+    public function deleteUsing(): int
+    {
+        if (! method_exists($this->grammar, 'compileDeleteUsing')) {
+            throw new LogicException('This database engine does not support the deleteUsing method.');
+        }
+
+        $this->applyBeforeQueryCallbacks();
+
+        return $this->connection->delete(
+            $this->grammar->compileDeleteUsing($this), $this->cleanBindings(
+                $this->grammar->prepareBindingsForDeleteUsing($this->bindings)
+            )
+        );
+    }
+
+    /**
      * Insert or update a record matching the attributes, and fill it with values.
      *
      * @return bool

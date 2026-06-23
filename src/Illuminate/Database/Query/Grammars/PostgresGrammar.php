@@ -539,18 +539,18 @@ class PostgresGrammar extends Grammar
             }
         }
 
-        $where = $this->compileUpdateWheres($query);
+        $where = $this->compileWheresWithJoins($query);
 
         return trim("update {$table} set {$columns}{$from} {$where}");
     }
 
     /**
-     * Compile the additional where clauses for updates with joins.
+     * Compile the additional where clauses for updates or deletes with joins.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @return string
      */
-    protected function compileUpdateWheres(Builder $query)
+    protected function compileWheresWithJoins(Builder $query)
     {
         $baseWheres = $this->compileWheres($query);
 
@@ -561,7 +561,7 @@ class PostgresGrammar extends Grammar
         // Once we compile the join constraints, we will either use them as the where
         // clause or append them to the existing base where clauses. If we need to
         // strip the leading boolean we will do so when using as the only where.
-        $joinWheres = $this->compileUpdateJoinWheres($query);
+        $joinWheres = $this->compileJoinWheres($query);
 
         if (trim($baseWheres) == '') {
             return 'where '.$this->removeLeadingBoolean($joinWheres);
@@ -571,12 +571,12 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Compile the "join" clause where clauses for an update.
+     * Compile the "join" clause where clauses for an update or delete.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @return string
      */
-    protected function compileUpdateJoinWheres(Builder $query)
+    protected function compileJoinWheres(Builder $query)
     {
         $joinWheres = [];
 
@@ -693,6 +693,48 @@ class PostgresGrammar extends Grammar
         $selectSql = $this->compileSelect($query->select($alias.'.ctid'));
 
         return "delete from {$table} where {$this->wrap('ctid')} in ({$selectSql})";
+    }
+
+    /**
+     * Compile a delete using statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    public function compileDeleteUsing(Builder $query): string
+    {
+        $table = $this->wrapTable($query->from);
+
+        $using = '';
+
+        if (isset($query->joins)) {
+            $usings = (new Collection($query->joins))
+                ->map(fn ($join) => $this->wrapTable($join->table))
+                ->all();
+
+            if (count($usings) > 0) {
+                $using = ' using '.implode(', ', $usings);
+            }
+        }
+
+        $where = $this->compileWheresWithJoins($query);
+
+        return trim("delete from {$table}{$using} {$where}");
+    }
+
+    /**
+     * Prepare the bindings for a delete using statement.
+     *
+     * @param  array  $bindings
+     * @return array
+     */
+    public function prepareBindingsForDeleteUsing(array $bindings): array
+    {
+        $bindingsWithoutWhere = Arr::except($bindings, ['select', 'where']);
+
+        return array_values(
+            array_merge($bindings['where'], Arr::flatten($bindingsWithoutWhere))
+        );
     }
 
     /**

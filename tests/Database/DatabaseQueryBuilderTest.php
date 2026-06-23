@@ -4805,6 +4805,39 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(1, $result);
     }
 
+    public function testDeleteUsingMethodWithJoinsOnPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" using "orders" where "users"."id" = ? and "users"."id" = "orders"."user_id"', [1])->andReturn(1);
+        $result = $builder->from('users')->join('orders', 'users.id', '=', 'orders.user_id')->where('users.id', '=', 1)->deleteUsing();
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" using "orders" where "users"."id" = "orders"."user_id" and "users"."id" = ?', [1])->andReturn(1);
+        $result = $builder->from('users')->join('orders', function ($join) {
+            $join->on('users.id', '=', 'orders.user_id')
+                ->where('users.id', '=', 1);
+        })->deleteUsing();
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" using "orders" where "name" = ? and "users"."id" = "orders"."user_id" and "users"."id" = ?', ['baz', 1])->andReturn(1);
+        $result = $builder->from('users')
+            ->join('orders', function ($join) {
+                $join->on('users.id', '=', 'orders.user_id')
+                    ->where('users.id', '=', 1);
+            })->where('name', 'baz')
+            ->deleteUsing();
+        $this->assertEquals(1, $result);
+    }
+
+    public function testDeleteUsingThrowsForNonPostgres()
+    {
+        $this->expectException(\LogicException::class);
+        $builder = $this->getBuilder();
+        $builder->from('users')->join('orders', 'users.id', '=', 'orders.user_id')->deleteUsing();
+    }
+
     public function testUpdateMethodRespectsRaw()
     {
         $builder = $this->getBuilder();
