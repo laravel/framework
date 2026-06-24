@@ -2377,18 +2377,20 @@ trait HasAttributes
         } elseif ($this->hasCast($key, static::$primitiveCastTypes)) {
             return $this->castAttribute($key, $attribute) ===
                 $this->castAttribute($key, $original);
-        } elseif ($this->isClassCastable($key) && Str::startsWith($this->getCasts()[$key], [AsArrayObject::class, AsCollection::class])) {
-            return $this->fromJson($attribute) === $this->fromJson($original);
-        } elseif ($this->isClassCastable($key) && Str::startsWith($this->getCasts()[$key], [AsEnumArrayObject::class, AsEnumCollection::class])) {
-            return $this->fromJson($attribute) === $this->fromJson($original);
-        } elseif ($this->isClassCastable($key) && $original !== null && Str::startsWith($this->getCasts()[$key], [AsEncryptedArrayObject::class, AsEncryptedCollection::class])) {
-            if (empty(static::currentEncrypter()->getPreviousKeys())) {
-                return $this->fromEncryptedString($attribute) === $this->fromEncryptedString($original);
-            }
+        } elseif ($this->isClassCastable($key)) {
+            $castValue = $this->getCasts()[$key];
 
-            return false;
-        } elseif ($this->isClassComparable($key)) {
-            return $this->compareClassCastableAttribute($key, $original, $attribute);
+            if (Str::startsWith($castValue, [AsArrayObject::class, AsCollection::class, AsEnumArrayObject::class, AsEnumCollection::class])) {
+                return $this->fromJson($attribute) === $this->fromJson($original);
+            } elseif ($original !== null && Str::startsWith($castValue, [AsEncryptedArrayObject::class, AsEncryptedCollection::class])) {
+                if (empty(static::currentEncrypter()->getPreviousKeys())) {
+                    return $this->fromEncryptedString($attribute) === $this->fromEncryptedString($original);
+                }
+
+                return false;
+            } elseif ($this->isClassComparable($key)) {
+                return $this->compareClassCastableAttribute($key, $original, $attribute);
+            }
         }
 
         return is_numeric($attribute) && is_numeric($original)
