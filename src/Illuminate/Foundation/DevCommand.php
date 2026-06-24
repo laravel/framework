@@ -151,7 +151,7 @@ class DevCommand
     /**
      * Get the command as an array.
      *
-     * @return array{command: string, name: string, color: string|null, source: array{'file': string, 'line': int, 'class'?: string, 'function'?: string, 'priority': int}}
+     * @return array{command: string, name: string, color: string|null, source: array{'file': string, 'line': int, 'class'?: string, 'function'?: string}, priority: int}
      */
     public function toArray(): array
     {
