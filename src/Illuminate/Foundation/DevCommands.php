@@ -181,28 +181,6 @@ class DevCommands
     }
 
     /**
-     * Set the commands that should be included when running the "dev" command.
-     *
-     * @param  string  ...$names
-     * @return void
-     */
-    public static function only(...$names): void
-    {
-        self::$only = $names;
-    }
-
-    /**
-     * Set the commands that should be excluded when running the "dev" command.
-     *
-     * @param  string  ...$names
-     * @return void
-     */
-    public static function except(...$names): void
-    {
-        self::$except = $names;
-    }
-
-    /**
      * Resolve the first external caller frame from a debug backtrace.
      *
      * @param  array<int, array{'file': string, 'line': int, 'class'?: string, 'function'?: string}>  $trace
@@ -259,6 +237,28 @@ class DevCommands
         }
 
         return DevCommand::PRIORITY_VENDOR;
+    }
+
+    /**
+     * Set the commands that should be included when running the "dev" command.
+     *
+     * @param  string  ...$names
+     * @return void
+     */
+    public static function only(...$names): void
+    {
+        self::$only = $names;
+    }
+
+    /**
+     * Set the commands that should be excluded when running the "dev" command.
+     *
+     * @param  string  ...$names
+     * @return void
+     */
+    public static function except(...$names): void
+    {
+        self::$except = $names;
     }
 
     /**
