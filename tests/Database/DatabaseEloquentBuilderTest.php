@@ -274,6 +274,23 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->firstOrFail(['column']);
     }
 
+    public function testLastOrFailMethodThrowsModelNotFoundException()
+    {
+        $this->expectException(ModelNotFoundException::class);
+
+        $query = $this->getMockQueryBuilder();
+        $query->shouldReceive('latest')->with('foo')->andReturnSelf();
+
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn('foo');
+
+        $builder = m::mock(Builder::class.'[first]', [$query]);
+        $builder->setModel($model);
+        $builder->shouldReceive('first')->once()->with(['column'])->andReturn(null);
+
+        $builder->lastOrFail(['column']);
+    }
+
     public function testFindWithMany()
     {
         $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
@@ -308,6 +325,23 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->shouldReceive('get')->with(['*'])->andReturn(new Collection(['bar']));
 
         $result = $builder->first();
+        $this->assertSame('bar', $result);
+    }
+
+    public function testLastMethod()
+    {
+        $query = $this->getMockQueryBuilder();
+        $query->shouldReceive('latest')->with('created_at')->andReturnSelf();
+
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
+
+        $builder = m::mock(Builder::class.'[get,take]', [$query]);
+        $builder->setModel($model);
+        $builder->shouldReceive('limit')->with(1)->andReturnSelf();
+        $builder->shouldReceive('get')->with(['*'])->andReturn(new Collection(['bar']));
+
+        $result = $builder->last();
         $this->assertSame('bar', $result);
     }
 
@@ -2562,6 +2596,84 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->shouldReceive('latest')->once()->with('foo');
 
         $builder->latest('foo');
+    }
+
+    public function testLastWithoutColumnWithCreatedAt()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($model);
+
+        $builder->getQuery()->shouldReceive('latest')->once()->with('created_at');
+        $builder->shouldReceive('first')->once()->with(['*'])->andReturn(null);
+
+        $builder->last();
+    }
+
+    public function testLastWithoutColumnWithCreatedAtAndSelectColumns()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($model);
+
+        $builder->getQuery()->shouldReceive('latest')->once()->with('created_at');
+        $builder->shouldReceive('first')->once()->with(['column'])->andReturn(null);
+
+        $builder->last(['column']);
+    }
+
+    public function testLastWithoutColumnWithoutCreatedAt()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn(null);
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($model);
+
+        $builder->getQuery()->shouldReceive('latest')->once()->with('created_at');
+        $builder->shouldReceive('first')->once()->with(['*'])->andReturn(null);
+
+        $builder->last();
+    }
+
+    public function testLastWithoutColumnWithoutCreatedAtAndSelectColumns()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn(null);
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($model);
+
+        $builder->getQuery()->shouldReceive('latest')->once()->with('created_at');
+        $builder->shouldReceive('first')->once()->with(['column'])->andReturn(null);
+
+        $builder->last(['column']);
+    }
+
+    public function testLastWithColumn()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn(null);
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($model);
+
+        $builder->getQuery()->shouldReceive('latest')->once()->with('foo');
+        $builder->shouldReceive('first')->once()->with(['*'])->andReturn(null);
+
+        $builder->last('foo');
+    }
+
+    public function testLastWithColumnAndSelectColumns()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn(null);
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($model);
+
+        $builder->getQuery()->shouldReceive('latest')->once()->with('foo');
+        $builder->shouldReceive('first')->once()->with(['column'])->andReturn(null);
+
+        $builder->last('foo', ['column']);
     }
 
     public function testOldestWithoutColumnWithCreatedAt()

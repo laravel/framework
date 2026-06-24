@@ -311,6 +311,23 @@ abstract class HasOneOrManyThrough extends Relation
     }
 
     /**
+     * Execute the query and get the last result or throw an exception.
+     *
+     * @param  array|string  $columns
+     * @return TModel
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<TModel>
+     */
+    public function lastOrFail($columns = ['*'])
+    {
+        if (! is_null($model = $this->last($columns))) {
+            return $model;
+        }
+
+        throw (new ModelNotFoundException)->setModel(get_class($this->related));
+    }
+
+    /**
      * Execute the query and get the first result or call a callback.
      *
      * @template TValue

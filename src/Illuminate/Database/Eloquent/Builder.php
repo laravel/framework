@@ -770,6 +770,23 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Execute the query and get the last result.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string|array  $column
+     * @param  array|string  $columns
+     * @return TValue|null
+     */
+    public function last($column = null, $columns = ['*'])
+    {
+        if (is_array($column)) {
+            $columns = $column;
+            $column = null;
+        }
+
+        return $this->latest($column)->first($columns);
+    }
+
+    /**
      * Execute the query and get the first result or throw an exception.
      *
      * @param  array|string  $columns
@@ -784,6 +801,25 @@ class Builder implements BuilderContract
         }
 
         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    }
+
+    /**
+     * Execute the query and get the last result or throw an exception.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string|array  $column
+     * @param  array|string  $columns
+     * @return TModel
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<TModel>
+     */
+    public function lastOrFail($column = null, $columns = ['*'])
+    {
+        if (is_array($column)) {
+            $columns = $column;
+            $column = null;
+        }
+
+        return $this->latest($column)->firstOrFail($columns);
     }
 
     /**

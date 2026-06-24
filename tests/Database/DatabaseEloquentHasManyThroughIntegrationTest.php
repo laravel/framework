@@ -180,6 +180,17 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         HasManyThroughTestCountry::first()->posts()->firstOrFail();
     }
 
+    public function testLastOrFailThrowsAnException()
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost].');
+
+        HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
+
+        HasManyThroughTestCountry::first()->posts()->lastOrFail();
+    }
+
     public function testFindOrFailThrowsAnException()
     {
         $this->expectException(ModelNotFoundException::class);
