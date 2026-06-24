@@ -57,16 +57,38 @@ abstract class MorphOneOrMany extends HasOneOrMany
         if (static::$constraints) {
             $this->getRelationQuery()->where($this->morphType, $this->morphClass);
 
-            parent::addConstraints();
+            $this->getRelationQuery()->where(
+                $this->foreignKey, '=', (string) $this->getParentKey()
+            );
+
+            $this->getRelationQuery()->whereNotNull($this->foreignKey);
         }
     }
 
     /** @inheritDoc */
     public function addEagerConstraints(array $models)
     {
-        parent::addEagerConstraints($models);
+        $this->whereInEager(
+            'whereIn',
+            $this->foreignKey,
+            $this->getEagerModelKeys($models),
+            $this->getRelationQuery()
+        );
 
         $this->getRelationQuery()->where($this->morphType, $this->morphClass);
+    }
+
+    /**
+     * Get the keys of the models used for the eager loading query.
+     *
+     * @param  array<int, TDeclaringModel>  $models
+     * @return array
+     */
+    protected function getEagerModelKeys(array $models)
+    {
+        return array_map(function ($value) {
+            return (string) $value;
+        }, $this->getKeys($models, $this->localKey));
     }
 
     /**
