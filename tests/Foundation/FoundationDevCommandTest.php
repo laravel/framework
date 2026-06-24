@@ -31,6 +31,7 @@ class FoundationDevCommandTest extends TestCase
             'name' => 'server',
             'color' => null,
             'source' => [],
+            'priority' => DevCommand::PRIORITY_USERLAND,
         ], $command->toArray());
     }
 

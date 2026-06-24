@@ -3,9 +3,9 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Foundation\DevCommand;
 use Illuminate\Foundation\DevCommands;
 use Laravel\Prompts\Prompt;
-use ReflectionClass;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -115,15 +115,7 @@ class DevListCommand extends Command
      */
     protected function isVendorCommand(array $command): bool
     {
-        $source = $command['source'];
-
-        if ($class = $source['class'] ?? null) {
-            $reflection = new ReflectionClass($class);
-
-            return str_contains($reflection->getFileName(), base_path('vendor'));
-        }
-
-        return str_contains($source['file'] ?? '', base_path('vendor'));
+        return $command['priority'] === DevCommand::PRIORITY_VENDOR;
     }
 
     /**
