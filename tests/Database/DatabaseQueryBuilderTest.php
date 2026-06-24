@@ -3863,6 +3863,91 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->where('id', '=', 1)->firstOrFail();
     }
 
+    public function testLastMethodReturnsLastResult()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" where "id" = ? order by "created_at" desc limit 1', [1], true, [])->andReturn([['foo' => 'bar']]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturnUsing(function ($query, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->where('id', '=', 1)->last();
+        $this->assertEquals(['foo' => 'bar'], $results);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" where "id" = ? order by "updated_at" desc limit 1', [1], true, [])->andReturn([['foo' => 'bar']]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturnUsing(function ($query, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->where('id', '=', 1)->last('updated_at');
+        $this->assertEquals(['foo' => 'bar'], $results);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select "id" from "users" where "id" = ? order by "created_at" desc limit 1', [1], true, [])->andReturn([['foo' => 'bar']]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturnUsing(function ($query, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->where('id', '=', 1)->last(['id']);
+
+        $this->assertEquals(['foo' => 'bar'], $results);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select "id" from "users" where "id" = ? order by "updated_at" desc limit 1', [1], true, [])->andReturn([['foo' => 'bar']]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturnUsing(function ($query, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->where('id', '=', 1)->last('updated_at', ['id']);
+
+        $this->assertEquals(['foo' => 'bar'], $results);
+    }
+
+    public function testLastOrFailMethodReturnsLastResult()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" where "id" = ? order by "created_at" desc limit 1', [1], true, [])->andReturn([['foo' => 'bar']]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturnUsing(function ($query, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->where('id', '=', 1)->lastOrFail();
+        $this->assertEquals(['foo' => 'bar'], $results);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" where "id" = ? order by "updated_at" desc limit 1', [1], true, [])->andReturn([['foo' => 'bar']]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturnUsing(function ($query, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->where('id', '=', 1)->lastOrFail('updated_at');
+        $this->assertEquals(['foo' => 'bar'], $results);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select "id" from "users" where "id" = ? order by "created_at" desc limit 1', [1], true, [])->andReturn([['foo' => 'bar']]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturnUsing(function ($query, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->where('id', '=', 1)->lastOrFail(['id']);
+        $this->assertEquals(['foo' => 'bar'], $results);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select "id" from "users" where "id" = ? order by "updated_at" desc limit 1', [1], true, [])->andReturn([['foo' => 'bar']]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar']])->andReturnUsing(function ($query, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->where('id', '=', 1)->lastOrFail('updated_at', ['id']);
+        $this->assertEquals(['foo' => 'bar'], $results);
+    }
+
+    public function testLastOrFailMethodThrowsRecordNotFoundException()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" where "id" = ? order by "created_at" desc limit 1', [1], true, [])->andReturn([]);
+
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [])->andReturn([]);
+
+        $this->expectException(RecordNotFoundException::class);
+        $this->expectExceptionMessage('No record found for the given query.');
+
+        $builder->from('users')->where('id', '=', 1)->lastOrFail();
+    }
+
     public function testPluckMethodGetsCollectionOfColumnValues()
     {
         $builder = $this->getBuilder();

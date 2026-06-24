@@ -385,6 +385,43 @@ trait BuildsQueries
     }
 
     /**
+     * Execute the query and get the last result.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string|array  $column
+     * @param  array|string  $columns
+     * @return TValue|null
+     */
+    public function last($column = 'created_at', $columns = ['*'])
+    {
+        if (is_array($column)) {
+            $columns = $column;
+            $column = 'created_at';
+        }
+
+        return $this->latest($column)->first($columns);
+    }
+
+    /**
+     * Execute the query and get the last result or throw an exception.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string|array  $column
+     * @param  array|string  $columns
+     * @param  string|null  $message
+     * @return TValue
+     *
+     * @throws \Illuminate\Database\RecordNotFoundException
+     */
+    public function lastOrFail($column = 'created_at', $columns = ['*'], $message = null)
+    {
+        if (is_array($column)) {
+            $columns = $column;
+            $column = 'created_at';
+        }
+
+        return $this->latest($column)->firstOrFail($columns, $message);
+    }
+
+    /**
      * Execute the query and get the first result if it's the sole matching record.
      *
      * @param  array|string  $columns
