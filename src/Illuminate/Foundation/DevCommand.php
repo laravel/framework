@@ -32,7 +32,7 @@ class DevCommand
      * @param  string  $command
      * @param  array{'file': string, 'line': int, 'class'?: string, 'function'?: string}  $source
      * @param  string|null  $name
-     * @param  int  $priority
+     * @param  self::PRIORITY_DEFAULT|self::PRIORITY_VENDOR|self::PRIORITY_USERLAND  $priority
      * @return void
      */
     public function __construct(
