@@ -1973,6 +1973,20 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testJoinStr($collection)
+    {
+        $this->assertSame('a, b, c', (new $collection(['a', 'b', 'c']))->joinStr(', ')->toString());
+
+        $this->assertSame('a, b and c', (new $collection(['a', 'b', 'c']))->joinStr(', ', ' and ')->toString());
+
+        $this->assertSame('a and b', (new $collection(['a', 'b']))->joinStr(', ', ' and ')->toString());
+
+        $this->assertSame('a', (new $collection(['a']))->joinStr(', ', ' and ')->toString());
+
+        $this->assertSame('', (new $collection([]))->joinStr(', ', ' and ')->toString());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testCrossJoin($collection)
     {
         // Cross join with an array
@@ -2609,6 +2623,34 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame('foobar', $data->implode('email'));
         $this->assertSame('foo,bar', $data->implode('email', ','));
+    }
+    
+    #[DataProvider('collectionClassProvider')]
+    public function testImplodeStr($collection)
+    {
+        $data = new $collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);
+        $this->assertSame('foobar', $data->implodeStr('email')->toString());
+        $this->assertSame('foo,bar', $data->implodeStr('email', ',')->toString());
+
+        $data = new $collection(['taylor', 'dayle']);
+        $this->assertSame('taylordayle', $data->implodeStr('')->toString());
+        $this->assertSame('taylor,dayle', $data->implodeStr(',')->toString());
+
+        $data = new $collection([
+            ['name' => new Stringable('taylor'), 'email' => new Stringable('foo')],
+            ['name' => new Stringable('dayle'), 'email' => new Stringable('bar')],
+        ]);
+        $this->assertSame('foobar', $data->implodeStr('email'));
+        $this->assertSame('foo,bar', $data->implodeStr('email', ','));
+
+        $data = new $collection([new Stringable('taylor'), new Stringable('dayle')]);
+        $this->assertSame('taylordayle', $data->implodeStr('')->toString());
+        $this->assertSame('taylor,dayle', $data->implodeStr(',')->toString());
+        $this->assertSame('taylor_dayle', $data->implodeStr('_')->toString());
+
+        $data = new $collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);
+        $this->assertSame('taylor-foodayle-bar', $data->implodeStr(fn ($user) => $user['name'].'-'.$user['email'])->toString());
+        $this->assertSame('taylor-foo,dayle-bar', $data->implodeStr(fn ($user) => $user['name'].'-'.$user['email'], ',')->toString());
     }
 
     #[DataProvider('collectionClassProvider')]
