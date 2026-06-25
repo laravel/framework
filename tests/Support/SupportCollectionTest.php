@@ -2624,7 +2624,7 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('foobar', $data->implode('email'));
         $this->assertSame('foo,bar', $data->implode('email', ','));
     }
-    
+
     #[DataProvider('collectionClassProvider')]
     public function testImplodeStr($collection)
     {
