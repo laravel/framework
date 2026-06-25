@@ -1687,7 +1687,7 @@ class BelongsToMany extends Relation
     /**
      * Get the pivot columns for this relationship.
      *
-     * @return array
+     * @return array<string|\Illuminate\Contracts\Database\Query\Expression>
      */
     public function getPivotColumns()
     {
