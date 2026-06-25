@@ -648,6 +648,18 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Concatenate values of a given key as a Stringable.
+     *
+     * @param  (callable(TValue, TKey): mixed)|string|null  $value
+     * @param  string|null  $glue
+     * @return \Illuminate\Support\Stringable
+     */
+    public function implodeStr($value, $glue = null)
+    {
+        return str($this->implode($value, $glue));
+    }
+
+    /**
      * Intersect the collection with the given items.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
@@ -776,6 +788,18 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         $finalItem = $collection->pop();
 
         return $collection->implode($glue).$finalGlue.$finalItem;
+    }
+
+    /**
+     * Join all items from the collection using a Stringable. The final items can use a separate glue string.
+     *
+     * @param  string  $glue
+     * @param  string  $finalGlue
+     * @return \Illuminate\Support\Stringable
+     */
+    public function joinStr($glue, $finalGlue = '')
+    {
+        return str($this->join($glue, $finalGlue));
     }
 
     /**
