@@ -186,6 +186,20 @@ trait HasAttributes
     protected static $setAttributeMutatorCache = [];
 
     /**
+     * The cache of the classic "getXAttribute" mutator existence for each class.
+     *
+     * @var array
+     */
+    protected static $hasGetMutatorCache = [];
+
+    /**
+     * The cache of the classic "setXAttribute" mutator existence for each class.
+     *
+     * @var array
+     */
+    protected static $hasSetMutatorCache = [];
+
+    /**
      * The cache of the converted cast types.
      *
      * @var array
@@ -661,7 +675,12 @@ trait HasAttributes
      */
     public function hasGetMutator($key)
     {
-        return method_exists($this, 'get'.Str::studly($key).'Attribute');
+        if (isset(static::$hasGetMutatorCache[$class = static::class][$key])) {
+            return static::$hasGetMutatorCache[$class][$key];
+        }
+
+        return static::$hasGetMutatorCache[$class][$key] =
+                    method_exists($this, 'get'.Str::studly($key).'Attribute');
     }
 
     /**
@@ -1141,7 +1160,12 @@ trait HasAttributes
      */
     public function hasSetMutator($key)
     {
-        return method_exists($this, 'set'.Str::studly($key).'Attribute');
+        if (isset(static::$hasSetMutatorCache[$class = static::class][$key])) {
+            return static::$hasSetMutatorCache[$class][$key];
+        }
+
+        return static::$hasSetMutatorCache[$class][$key] =
+                    method_exists($this, 'set'.Str::studly($key).'Attribute');
     }
 
     /**

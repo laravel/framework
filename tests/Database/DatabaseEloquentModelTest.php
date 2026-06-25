@@ -2619,6 +2619,24 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(['firstName', 'middleName', 'lastName'], $model->getMutatedAttributes());
     }
 
+    public function testClassicMutatorChecksAreIsolatedPerClass()
+    {
+        $withMutators = new EloquentModelWithClassicMutatorsStub;
+        $withoutMutators = new EloquentModelWithoutClassicMutatorsStub;
+
+        // Prime any cache from the model that defines the classic mutators first.
+        $this->assertTrue($withMutators->hasGetMutator('name'));
+        $this->assertTrue($withMutators->hasSetMutator('name'));
+
+        // A different class without those mutators must not inherit the cached result.
+        $this->assertFalse($withoutMutators->hasGetMutator('name'));
+        $this->assertFalse($withoutMutators->hasSetMutator('name'));
+
+        // Unknown attributes are still reported correctly on the mutating model.
+        $this->assertFalse($withMutators->hasGetMutator('missing'));
+        $this->assertFalse($withMutators->hasSetMutator('missing'));
+    }
+
     public function testReplicateCreatesANewModelInstanceWithSameAttributeValues()
     {
         $model = new EloquentModelStub;
@@ -4192,6 +4210,24 @@ class EloquentModelAppendsStub extends Model
     {
         return 'StudlyCased';
     }
+}
+
+class EloquentModelWithClassicMutatorsStub extends Model
+{
+    public function getNameAttribute($value)
+    {
+        return ucfirst((string) $value);
+    }
+
+    public function setNameAttribute($value)
+    {
+        $this->attributes['name'] = strtolower((string) $value);
+    }
+}
+
+class EloquentModelWithoutClassicMutatorsStub extends Model
+{
+    //
 }
 
 class EloquentModelGetMutatorsStub extends Model
