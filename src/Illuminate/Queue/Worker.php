@@ -93,7 +93,7 @@ class Worker
     /**
      * The timestamp of the last job processed by the worker.
      *
-     * @var float|null
+     * @var int|float|null
      */
     protected $lastJobProcessedAt;
 
