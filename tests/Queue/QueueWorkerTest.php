@@ -556,7 +556,9 @@ class QueueWorkerTest extends TestCase
             return $event instanceof WorkerStopping
                 && $event->status === 0
                 && $event->workerOptions === $workerOptions
-                && $event->reason === WorkerStopReason::QueueEmpty;
+                && $event->reason === WorkerStopReason::QueueEmpty
+                && $event->jobsProcessed === 2
+                && $event->lastJobProcessedAt !== null;
         }));
     }
 
