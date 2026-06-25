@@ -894,7 +894,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Gets the raw, unprepared listeners.
      *
-     * @return array
+     * @return array<string, callable|array|class-string|null>
      */
     public function getRawListeners()
     {
