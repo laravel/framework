@@ -12,5 +12,5 @@ assertType(Route::class, RouteFacade::get('/')->middleware(['auth']));
 assertType('string|null', RouteFacade::get('/')->domain());
 assertType(Route::class, RouteFacade::get('/')->domain('example.com'));
 
-assertType('array<string, mixed>', RouteFacade::get('/')->getMetadata());
+assertType('array<mixed>', RouteFacade::get('/')->getMetadata());
 assertType('mixed', RouteFacade::get('/')->getMetadata('key'));

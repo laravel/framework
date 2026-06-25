@@ -1355,7 +1355,7 @@ class Route
      *
      * @param  string|null  $key
      * @param  mixed  $default
-     * @return ($key is null ? array<string, mixed> : mixed)
+     * @return ($key is null ? array<array-key, mixed> : mixed)
      */
     public function getMetadata($key = null, $default = null)
     {
