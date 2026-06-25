@@ -633,6 +633,18 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Concatenate values of a given key as a Stringable.
+     *
+     * @param  (callable(TValue, TKey): mixed)|string  $value
+     * @param  string|null  $glue
+     * @return Stringable
+     */
+    public function implodeStr($value, $glue = null)
+    {
+        return str($this->implode($value, $glue));
+    }
+
+    /**
      * {@inheritDoc}
      */
     #[\Override]
@@ -722,6 +734,18 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     public function join($glue, $finalGlue = '')
     {
         return $this->collect()->join(...func_get_args());
+    }
+
+    /**
+     * Join all items from the collection using a Stringable. The final items can use a separate glue string.
+     *
+     * @param  string  $glue
+     * @param  string  $finalGlue
+     * @return Stringable
+     */
+    public function joinStr($glue, $finalGlue = '')
+    {
+        return str($this->join($glue, $finalGlue));
     }
 
     /**
