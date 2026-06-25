@@ -117,7 +117,7 @@ class Lottery
      * Run the lottery.
      *
      * @param  null|int  $times
-     * @return mixed
+     * @return ($times is null ? mixed : list<mixed>)
      */
     public function choose($times = null)
     {

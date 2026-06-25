@@ -92,9 +92,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      * If no arguments are passed, the default file rule configuration will be returned.
      *
      * @param  static|callable|null  $callback
-     * @return static|void
-     *
-     * @phpstan-return ($callback is null ? static : ($callback is callable ? void : ($callback is static ? void : never)))
+     * @return ($callback is null ? static : void)
      *
      * @throws \InvalidArgumentException
      */

@@ -948,7 +948,7 @@ class Arr
      * @param  array  $array
      * @param  int|null  $number
      * @param  bool  $preserveKeys
-     * @return mixed
+     * @return ($number is null ? mixed : array)
      *
      * @throws \InvalidArgumentException
      */
