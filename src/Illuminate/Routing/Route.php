@@ -766,7 +766,7 @@ class Route
      * Get or set the domain for the route.
      *
      * @param  \BackedEnum|string|null  $domain
-     * @return $this|string|null
+     * @return ($domain is null ? string|null : $this)
      *
      * @throws \InvalidArgumentException
      */
@@ -1355,7 +1355,7 @@ class Route
      *
      * @param  string|null  $key
      * @param  mixed  $default
-     * @return mixed
+     * @return ($key is null ? array<array-key, mixed> : mixed)
      */
     public function getMetadata($key = null, $default = null)
     {

@@ -82,7 +82,7 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
      *
      * @param  string|null  $key
      * @param  mixed  $default
-     * @return mixed
+     * @return ($key is null ? array<array-key, mixed> : mixed)
      */
     protected function data($key = null, $default = null)
     {
