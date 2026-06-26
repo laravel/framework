@@ -247,7 +247,7 @@ class Arr
      */
     public static function exceptValues($array, $values, $strict = false)
     {
-        $values = self::wrap($values);
+        $values = static::wrap($values);
 
         return array_filter($array, function ($value) use ($values, $strict) {
             return ! in_array($value, $values, $strict);
