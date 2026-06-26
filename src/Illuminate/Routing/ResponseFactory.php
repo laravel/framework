@@ -62,6 +62,42 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
+     * Create a new "created" response.
+     *
+     * @param  string  $content
+     * @param  array  $headers
+     * @return \Illuminate\Http\Response
+     */
+    public function created($content = '', array $headers = [])
+    {
+        return $this->make($content, 201, $headers);
+    }
+
+    /**
+     * Create a new "success" response.
+     *
+     * @param  string  $content
+     * @param  array  $headers
+     * @return \Illuminate\Http\Response
+     */
+    public function success($content = '', array $headers = [])
+    {
+        return $this->make($content, 200, $headers);
+    }
+
+    /**
+     * Create a new "not found" response.
+     *
+     * @param  string  $content
+     * @param  array  $headers
+     * @return \Illuminate\Http\Response
+     */
+    public function notFound($content = '', array $headers = [])
+    {
+        return $this->make($content, 404, $headers);
+    }
+
+    /**
      * Create a new "no content" response.
      *
      * @param  int  $status
