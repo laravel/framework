@@ -90,7 +90,7 @@ class PreventRequestsDuringMaintenance
                 }
             }
 
-            if (isset($data['template']) && ! $this->inIgnoreArray($request, $data) ) {
+            if (isset($data['template']) && ! $this->inIgnoreArray($request, $data)) {
                 return response(
                     $data['template'],
                     $data['status'] ?? 503,
@@ -111,7 +111,7 @@ class PreventRequestsDuringMaintenance
 
     protected function inIgnoreArray($request, array $data)
     {
-        if ( ! isset($data['ignore']) || ! is_array($data['ignore']) ) {
+        if (! isset($data['ignore']) || ! is_array($data['ignore'])) {
             return false;
         }
 
