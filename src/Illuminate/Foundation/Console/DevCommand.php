@@ -71,7 +71,7 @@ class DevCommand extends Command
         $this->line('');
 
         $command = $packageManager->getExecCommand(sprintf(
-            'concurrently -c "%s" "%s" --names=%s --kill-others',
+            'concurrently -c "%s" "%s" --names=%s --kill-others-on-fail',
             implode(',', $colors),
             implode('" "', $commands),
             implode(',', $names)
