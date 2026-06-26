@@ -284,10 +284,8 @@ if (! function_exists('when')) {
     {
         $condition = $condition instanceof Closure ? $condition() : $condition;
 
-        if ($condition) {
-            return value($value, $condition);
-        }
-
-        return value($default, $condition);
+        return $condition
+            ? value($value, $condition)
+            : value($default, $condition);
     }
 }
