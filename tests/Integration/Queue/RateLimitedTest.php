@@ -166,6 +166,27 @@ class RateLimitedTest extends TestCase
         $this->assertInstanceOf(RateLimiter::class, $fetch('limiter'));
     }
 
+    public function testReleaseAfterIsSurvivedThroughSerialization()
+    {
+        $rateLimited = (new RateLimited('limiterName'))->releaseAfter(120);
+
+        $restoredRateLimited = unserialize(serialize($rateLimited));
+
+        $this->assertSame(120, $restoredRateLimited->releaseAfter);
+    }
+
+    public function testCustomReleaseAfterIsRespectedWhenMiddlewareIsStoredAsJobProperty()
+    {
+        $rateLimiter = $this->app->make(RateLimiter::class);
+
+        $rateLimiter->for('test', function ($job) {
+            return Limit::perHour(1);
+        });
+
+        $this->assertJobRanSuccessfully(RateLimitedSerializedPropertyTestJob::class);
+        $this->assertJobWasReleasedAfter(RateLimitedSerializedPropertyTestJob::class, 60);
+    }
+
     protected function assertJobRanSuccessfully($class)
     {
         $class::$handled = false;
@@ -377,6 +398,28 @@ class RateLimitedReleaseAfterTestJob extends RateLimitedTestJob
     public function middleware()
     {
         return [(new RateLimited('test'))->releaseAfter(60)];
+    }
+}
+
+class RateLimitedSerializedPropertyTestJob
+{
+    use InteractsWithQueue, Queueable;
+
+    public static $handled = false;
+
+    public function __construct()
+    {
+        $this->through([(new RateLimited('test'))->releaseAfter(60)]);
+    }
+
+    public function handle()
+    {
+        static::$handled = true;
+    }
+
+    public function middleware()
+    {
+        return [];
     }
 }
 
