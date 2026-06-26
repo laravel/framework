@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Concerns;
 
 use Closure;
+use Illuminate\Console\CommandInput;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
@@ -126,6 +127,16 @@ trait InteractsWithIO
     public function options()
     {
         return $this->option();
+    }
+
+    /**
+     * Retrieve the command's input as a CommandInput instance.
+     *
+     * @return \Illuminate\Console\CommandInput
+     */
+    public function input()
+    {
+        return new CommandInput($this->arguments(), $this->options());
     }
 
     /**
