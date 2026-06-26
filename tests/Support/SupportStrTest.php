@@ -1876,6 +1876,14 @@ class SupportStrTest extends TestCase
         );
     }
 
+    public function testPasswordThrowsWhenAllTypesDisabled()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('At least one character type must be enabled to generate a password.');
+
+        Str::password(32, letters: false, numbers: false, symbols: false, spaces: false);
+    }
+
     public function testToBase64()
     {
         $this->assertSame(base64_encode('foo'), Str::toBase64('foo'));

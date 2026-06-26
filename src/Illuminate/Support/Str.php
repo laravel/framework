@@ -1075,6 +1075,7 @@ class Str
             'spaces' => $spaces === true ? [' '] : null,
         ]))
             ->filter()
+            ->whenEmpty(fn () => throw new \InvalidArgumentException('At least one character type must be enabled to generate a password.'))
             ->each(fn ($c) => $password->push($c[random_int(0, count($c) - 1)]))
             ->flatten();
 
