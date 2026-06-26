@@ -346,6 +346,11 @@ class SupportArrTest extends TestCase
         $array = [1, 2, 3, 4, 5];
         $this->assertEquals([0 => 1, 1 => 2, 4 => 5], Arr::exceptValues($array, [3, 4]));
 
+        $array = [1 => TestEnum::A, 2 => TestBackedEnum::A, 3 => TestStringBackedEnum::A];
+        $this->assertEquals([2 => TestBackedEnum::A, 3 => TestStringBackedEnum::A], Arr::exceptValues($array, TestEnum::A));
+        $this->assertEquals([1 => TestEnum::A, 3 => TestStringBackedEnum::A], Arr::exceptValues($array, TestBackedEnum::A));
+        $this->assertEquals([1 => TestEnum::A, 2 => TestBackedEnum::A], Arr::exceptValues($array, TestStringBackedEnum::A));
+
         $array = ['a' => 1, 'b' => 2, 'c' => 1, 'd' => 3];
         $this->assertEquals(['b' => 2, 'd' => 3], Arr::exceptValues($array, 1));
 
