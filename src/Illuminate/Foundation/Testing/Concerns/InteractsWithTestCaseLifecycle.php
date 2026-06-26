@@ -218,6 +218,8 @@ trait InteractsWithTestCaseLifecycle
      * Boot the testing helper traits.
      *
      * @return array
+     *
+     * @throws \ReflectionException
      */
     protected function setUpTraits()
     {

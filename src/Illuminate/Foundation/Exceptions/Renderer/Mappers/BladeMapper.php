@@ -115,6 +115,8 @@ class BladeMapper
      * Get the list of known paths from the compiler engine.
      *
      * @return array<string, string>
+     *
+     * @throws \ReflectionException
      */
     protected function getKnownPaths()
     {

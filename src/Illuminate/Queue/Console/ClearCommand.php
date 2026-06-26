@@ -35,6 +35,8 @@ class ClearCommand extends Command
      * Execute the console command.
      *
      * @return int|null
+     *
+     * @throws \ReflectionException
      */
     public function handle()
     {

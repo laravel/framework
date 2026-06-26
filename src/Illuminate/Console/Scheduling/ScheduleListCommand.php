@@ -332,6 +332,8 @@ class ScheduleListCommand extends Command
      *
      * @param  \Illuminate\Console\Scheduling\CallbackEvent  $event
      * @return string
+     *
+     * @throws \ReflectionException
      */
     private function getClosureLocation(CallbackEvent $event)
     {

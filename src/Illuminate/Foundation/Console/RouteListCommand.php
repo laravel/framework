@@ -257,6 +257,8 @@ class RouteListCommand extends Command
      *
      * @param  \Illuminate\Routing\Route  $route
      * @return bool
+     *
+     * @throws \ReflectionException
      */
     protected function isVendorRoute(Route $route)
     {
