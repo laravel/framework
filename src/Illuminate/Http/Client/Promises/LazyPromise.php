@@ -59,9 +59,10 @@ class LazyPromise implements PromiseInterface
     public function then(?callable $onFulfilled = null, ?callable $onRejected = null): PromiseInterface
     {
         if ($this->promiseNeedsBuilt()) {
-            $this->pending[] = static fn (PromiseInterface $promise) => $promise->then($onFulfilled, $onRejected);
-
-            return $this;
+            return new self(function () use ($onFulfilled, $onRejected) {
+                return ($this->promiseNeedsBuilt() ? $this->buildPromise() : $this->guzzlePromise)
+                    ->then($onFulfilled, $onRejected);
+            });
         }
 
         return $this->guzzlePromise->then($onFulfilled, $onRejected);

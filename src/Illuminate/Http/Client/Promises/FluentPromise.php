@@ -88,8 +88,6 @@ class FluentPromise implements PromiseInterface
             return $result;
         }
 
-        $this->guzzlePromise = $result;
-
-        return $this;
+        return new static($result);
     }
 }
