@@ -32,6 +32,29 @@ class SleepTest extends TestCase
         $this->assertEqualsWithDelta(1, $end - $start, 0.03);
     }
 
+    public function testItKeepsSleepingWhenInterruptedBySignal()
+    {
+        if (! function_exists('pcntl_alarm')) {
+            $this->markTestSkipped('The pcntl extension is required.');
+        }
+
+        pcntl_async_signals(true);
+        pcntl_signal(SIGALRM, fn () => null);
+
+        // Schedule a signal that will interrupt the sleep after one second.
+        pcntl_alarm(1);
+
+        $start = microtime(true);
+        Sleep::for(2)->seconds();
+        $elapsed = microtime(true) - $start;
+
+        pcntl_alarm(0);
+        pcntl_signal(SIGALRM, SIG_DFL);
+        pcntl_async_signals(false);
+
+        $this->assertGreaterThanOrEqual(2, round($elapsed, 1));
+    }
+
     public function testCallbacksMayBeExecutedUsingThen()
     {
         $this->assertEquals(123, Sleep::for(1)->milliseconds()->then(fn () => 123));
