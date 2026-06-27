@@ -1278,6 +1278,13 @@ class HttpRequestTest extends TestCase
         $this->assertEquals($payload, $data);
     }
 
+    public function testJSONMethodDecodesTopLevelZero()
+    {
+        $request = Request::create('/', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'], '0');
+
+        $this->assertSame([0], $request->json()->all());
+    }
+
     public function testJSONEmulatingPHPBuiltInServer()
     {
         $payload = ['name' => 'taylor'];
