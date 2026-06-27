@@ -110,6 +110,25 @@ class HasherTest extends TestCase
         (new ArgonHasher(['verify' => true]))->check('password', $bcryptHashed);
     }
 
+    public function testArgon2iVerificationCanBeEnabledAfterConstruction()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $bcryptHasher = new BcryptHasher;
+        $bcryptHashed = $bcryptHasher->make('password');
+
+        (new ArgonHasher)->setVerify(true)->check('password', $bcryptHashed);
+    }
+
+    public function testArgon2iThreadsCanBeSetAfterConstruction()
+    {
+        $hasher = new ArgonHasher;
+        $value = $hasher->make('password');
+
+        $this->assertFalse($hasher->needsRehash($value));
+        $this->assertTrue($hasher->setThreads(1)->needsRehash($value));
+    }
+
     #[Depends('testBasicArgon2idHashing')]
     public function testBasicArgon2idVerification()
     {

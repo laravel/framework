@@ -212,6 +212,19 @@ class ArgonHasher extends AbstractHasher implements HasherContract
     }
 
     /**
+     * Set whether to verify the hashed value's algorithm before checking.
+     *
+     * @param  bool  $verify
+     * @return $this
+     */
+    public function setVerify(bool $verify)
+    {
+        $this->verifyAlgorithm = $verify;
+
+        return $this;
+    }
+
+    /**
      * Extract the memory cost value from the options array.
      *
      * @param  array  $options
