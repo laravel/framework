@@ -953,7 +953,7 @@ class Worker
      */
     public function memoryExceeded($memoryLimit)
     {
-        return ((int) $memoryLimit) > 0 && ($this->currentMemoryUsage()) >= ((int) $memoryLimit);
+        return ((int) $memoryLimit) > 0 && $this->currentMemoryUsage() >= ((int) $memoryLimit);
     }
 
     /**
