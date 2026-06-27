@@ -217,8 +217,6 @@ class Worker
 
         $this->jobsProcessed = 0;
 
-        $this->lastJobProcessedAt = $startTime;
-
         $this->raiseWorkerStartingEvent($connectionName, $queue, $options);
 
         while (true) {
