@@ -33,6 +33,20 @@ class Pluralizer
     ];
 
     /**
+     * The cache of plural forms, keyed by the input value.
+     *
+     * @var array<string, string>
+     */
+    protected static $pluralCache = [];
+
+    /**
+     * The cache of singular forms, keyed by the input value.
+     *
+     * @var array<string, string>
+     */
+    protected static $singularCache = [];
+
+    /**
      * Get the plural form of an English word.
      *
      * @param  string  $value
@@ -45,13 +59,21 @@ class Pluralizer
             $count = count($count);
         }
 
-        if ((int) abs($count) === 1 || static::uncountable($value) || preg_match('/^(.*)[A-Za-z0-9\x{0080}-\x{FFFF}]$/u', $value) == 0) {
+        if ((int) abs($count) === 1) {
             return $value;
+        }
+
+        if (isset(static::$pluralCache[$value])) {
+            return static::$pluralCache[$value];
+        }
+
+        if (static::uncountable($value) || preg_match('/^(.*)[A-Za-z0-9\x{0080}-\x{FFFF}]$/u', $value) == 0) {
+            return static::$pluralCache[$value] = $value;
         }
 
         $plural = static::inflector()->pluralize($value);
 
-        return static::matchCase($plural, $value);
+        return static::$pluralCache[$value] = static::matchCase($plural, $value);
     }
 
     /**
@@ -62,9 +84,13 @@ class Pluralizer
      */
     public static function singular($value)
     {
+        if (isset(static::$singularCache[$value])) {
+            return static::$singularCache[$value];
+        }
+
         $singular = static::inflector()->singularize($value);
 
-        return static::matchCase($singular, $value);
+        return static::$singularCache[$value] = static::matchCase($singular, $value);
     }
 
     /**
@@ -123,5 +149,7 @@ class Pluralizer
         static::$language = $language;
 
         static::$inflector = null;
+        static::$pluralCache = [];
+        static::$singularCache = [];
     }
 }

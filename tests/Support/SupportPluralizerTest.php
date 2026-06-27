@@ -2,11 +2,19 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Support\Pluralizer;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 
 class SupportPluralizerTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Pluralizer::useLanguage('english');
+
+        parent::tearDown();
+    }
+
     public function testBasicSingular()
     {
         $this->assertSame('child', Str::singular('children'));
@@ -111,6 +119,62 @@ class SupportPluralizerTest extends TestCase
         $this->assertPluralStudly('SomeUsers', 'SomeUser', collect());
         $this->assertPluralStudly('SomeUser', 'SomeUser', collect(['one']));
         $this->assertPluralStudly('SomeUsers', 'SomeUser', collect(['one', 'two']));
+    }
+
+    public function testPluralIsCachedAndConsistentAcrossCalls()
+    {
+        $first = Pluralizer::plural('user');
+        $second = Pluralizer::plural('user');
+        $third = Pluralizer::plural('user', 5);
+
+        $this->assertSame('users', $first);
+        $this->assertSame($first, $second);
+        $this->assertSame($first, $third);
+    }
+
+    public function testSingularIsCachedAndConsistentAcrossCalls()
+    {
+        $first = Pluralizer::singular('users');
+        $second = Pluralizer::singular('users');
+
+        $this->assertSame('user', $first);
+        $this->assertSame($first, $second);
+    }
+
+    public function testCachePreservesOriginalCase()
+    {
+        $this->assertSame('Users', Pluralizer::plural('User'));
+        $this->assertSame('USERS', Pluralizer::plural('USER'));
+        $this->assertSame('users', Pluralizer::plural('user'));
+
+        $this->assertSame('Users', Pluralizer::plural('User'));
+        $this->assertSame('USERS', Pluralizer::plural('USER'));
+        $this->assertSame('users', Pluralizer::plural('user'));
+    }
+
+    public function testTrailingNonAlphanumericValuesAreCachedAsIdentity()
+    {
+        $this->assertSame('Alien.', Pluralizer::plural('Alien.'));
+        $this->assertSame('Alien.', Pluralizer::plural('Alien.'));
+    }
+
+    public function testUseLanguageInvalidatesCache()
+    {
+        $englishPlural = Pluralizer::plural('user');
+
+        Pluralizer::useLanguage('portuguese');
+
+        $portuguesePlural = Pluralizer::plural('user');
+
+        Pluralizer::useLanguage('english');
+
+        $englishPluralAfterCacheClear = Pluralizer::plural('user');
+
+        // Both english calls should yield the english form; the portuguese call should differ.
+        // If useLanguage() did not invalidate the cache, the portuguese call would return
+        // the cached english form, defeating the purpose of switching languages.
+        $this->assertSame($englishPlural, $englishPluralAfterCacheClear);
+        $this->assertNotSame($englishPlural, $portuguesePlural);
     }
 
     private function assertPluralStudly($expected, $value, $count = 2)
