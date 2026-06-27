@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
@@ -340,12 +341,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $this->fireModelEvent('booting', false);
 
             static::booting();
-            static::boot();
+
+            Relation::withConstraints(static::boot(...));
 
             static::$booted[static::class] = true;
             unset(static::$booting[static::class]);
 
-            static::booted();
+            Relation::withConstraints(static::booted(...));
 
             static::$bootedCallbacks[static::class] ??= [];
 
