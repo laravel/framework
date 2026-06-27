@@ -966,7 +966,9 @@ class Worker
      */
     public function stop($status = 0, $options = null, $reason = null)
     {
-        $this->events->dispatch(new WorkerStopping($status, $options, $reason, $this->jobsProcessed, $this->lastJobProcessedAt));
+        $memoryUsage = memory_get_usage(true) / 1024 / 1024;
+
+        $this->events->dispatch(new WorkerStopping($status, $options, $reason, $this->jobsProcessed, $this->lastJobProcessedAt, $memoryUsage));
 
         return $status;
     }
@@ -981,7 +983,9 @@ class Worker
      */
     public function kill($status = 0, $options = null, $reason = null)
     {
-        $this->events->dispatch(new WorkerStopping($status, $options, $reason, $this->jobsProcessed, $this->lastJobProcessedAt));
+        $memoryUsage = memory_get_usage(true) / 1024 / 1024;
+
+        $this->events->dispatch(new WorkerStopping($status, $options, $reason, $this->jobsProcessed, $this->lastJobProcessedAt, $memoryUsage));
 
         if (extension_loaded('posix')) {
             posix_kill(getmypid(), SIGKILL);
