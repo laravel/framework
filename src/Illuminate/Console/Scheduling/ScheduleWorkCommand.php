@@ -30,9 +30,23 @@ class ScheduleWorkCommand extends Command
     protected $description = 'Start the schedule worker';
 
     /**
+     * Indicates if the schedule worker should exit.
+     *
+     * @var bool
+     */
+    protected $shouldQuit = false;
+
+    /**
+     * The "schedule:run" executions that are currently running.
+     *
+     * @var \Symfony\Component\Process\Process[]
+     */
+    protected $executions = [];
+
+    /**
      * Execute the console command.
      *
-     * @return never
+     * @return int
      */
     public function handle()
     {
@@ -40,8 +54,6 @@ class ScheduleWorkCommand extends Command
             'Running scheduled tasks.',
             $this->getLaravel()->environment('local') ? OutputInterface::VERBOSITY_NORMAL : OutputInterface::VERBOSITY_VERBOSE
         );
-
-        [$lastExecutionStartedAt, $executions] = [Carbon::now()->subMinutes(10), []];
 
         $command = Application::formatCommandString('schedule:run');
 
@@ -53,28 +65,79 @@ class ScheduleWorkCommand extends Command
             $command .= ' >> '.ProcessUtils::escapeArgument($this->option('run-output-file')).' 2>&1';
         }
 
-        while (true) {
-            usleep(100 * 1000);
+        $this->listenForSignals();
 
-            if (Carbon::now()->second === 0 &&
+        return $this->work($command);
+    }
+
+    /**
+     * Run the schedule worker loop until it is signalled to stop.
+     *
+     * @param  string  $command
+     * @return int
+     */
+    protected function work($command)
+    {
+        $lastExecutionStartedAt = Carbon::now()->subMinutes(10);
+
+        while (true) {
+            $this->sleep();
+
+            // Once a stop signal has been received we stop scheduling new runs so
+            // that the worker can drain any in-flight executions before exiting.
+            // This lets the current tasks finish instead of being interrupted.
+            if (! $this->shouldQuit &&
+                Carbon::now()->second === 0 &&
                 ! Carbon::now()->startOfMinute()->equalTo($lastExecutionStartedAt)) {
-                $executions[] = $execution = Process::fromShellCommandline($command, base_path());
+                $this->executions[] = $execution = Process::fromShellCommandline($command, base_path());
 
                 $execution->start();
 
                 $lastExecutionStartedAt = Carbon::now()->startOfMinute();
             }
 
-            foreach ($executions as $key => $execution) {
+            foreach ($this->executions as $key => $execution) {
                 $output = $execution->getIncrementalOutput().
                     $execution->getIncrementalErrorOutput();
 
                 $this->output->write(ltrim($output, "\n"));
 
                 if (! $execution->isRunning()) {
-                    unset($executions[$key]);
+                    unset($this->executions[$key]);
                 }
             }
+
+            // When a stop signal has been received and every in-flight execution
+            // has finished, we can break out of the loop and exit cleanly so the
+            // process can be safely restarted (for example on a Kubernetes pod).
+            if ($this->shouldQuit && empty($this->executions)) {
+                return static::SUCCESS;
+            }
         }
+    }
+
+    /**
+     * Listen for the signals that should terminate the schedule worker.
+     *
+     * This mirrors the queue worker so the process can be stopped gracefully,
+     * allowing any in-flight tasks to finish before the worker exits.
+     *
+     * @return void
+     */
+    protected function listenForSignals()
+    {
+        $this->trap(fn () => [SIGINT, SIGTERM, SIGQUIT], function () {
+            $this->shouldQuit = true;
+        });
+    }
+
+    /**
+     * Sleep for a short period before the next worker tick.
+     *
+     * @return void
+     */
+    protected function sleep()
+    {
+        usleep(100 * 1000);
     }
 }
