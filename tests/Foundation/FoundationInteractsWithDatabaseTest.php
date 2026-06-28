@@ -196,6 +196,17 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseEmpty(new ProductStub);
     }
 
+    public function testAssertDatabaseEmptySupportsArrays()
+    {
+        $builder = m::mock(Builder::class);
+        $builder->shouldReceive('count')->twice()->andReturn(0);
+
+        $this->connection->shouldReceive('table')->with($this->table)->andReturn($builder);
+        $this->connection->shouldReceive('table')->with('orders')->andReturn($builder);
+
+        $this->assertDatabaseEmpty([ProductStub::class, OrderStub::class]);
+    }
+
     public function testAssertTableEntriesCountWrong()
     {
         $this->expectException(ExpectationFailedException::class);
@@ -616,4 +627,11 @@ class ProductStub extends Model
 class CustomProductStub extends ProductStub
 {
     const DELETED_AT = 'trashed_at';
+}
+
+class OrderStub extends Model
+{
+    protected $table = 'orders';
+
+    protected $guarded = [];
 }
