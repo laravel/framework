@@ -30,18 +30,18 @@ class ScheduleWorkCommand extends Command
     protected $description = 'Start the schedule worker';
 
     /**
-     * Indicates if the schedule worker should exit.
-     *
-     * @var bool
-     */
-    protected $shouldQuit = false;
-
-    /**
      * The "schedule:run" executions that are currently running.
      *
      * @var \Symfony\Component\Process\Process[]
      */
     protected $executions = [];
+
+    /**
+     * Indicates if the schedule worker should exit.
+     *
+     * @var bool
+     */
+    protected $shouldQuit = false;
 
     /**
      * Execute the console command.
