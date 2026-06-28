@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Support\Pluralizer;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 
@@ -111,6 +112,22 @@ class SupportPluralizerTest extends TestCase
         $this->assertPluralStudly('SomeUsers', 'SomeUser', collect());
         $this->assertPluralStudly('SomeUser', 'SomeUser', collect(['one']));
         $this->assertPluralStudly('SomeUsers', 'SomeUser', collect(['one', 'two']));
+    }
+
+    public function testPluralStudlyCacheRespectsLanguageSwitch()
+    {
+        $english = Str::pluralStudly('SomeMal');
+
+        Pluralizer::useLanguage('portuguese');
+
+        $portuguese = Str::pluralStudly('SomeMal');
+
+        $this->assertSame('SomeMales', $portuguese);
+        $this->assertNotSame($english, $portuguese);
+
+        Pluralizer::useLanguage('english');
+
+        $this->assertSame($english, Str::pluralStudly('SomeMal'));
     }
 
     private function assertPluralStudly($expected, $value, $count = 2)

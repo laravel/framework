@@ -113,6 +113,16 @@ class Pluralizer
     }
 
     /**
+     * Get the language that should be used by the inflector.
+     *
+     * @return string
+     */
+    public static function getLanguage(): string
+    {
+        return static::$language;
+    }
+
+    /**
      * Specify the language that should be used by the inflector.
      *
      * @param  string  $language

@@ -53,6 +53,13 @@ class Str
     protected static $studlyCache = [];
 
     /**
+     * The cache of plural studly-cased words, keyed by language and input value.
+     *
+     * @var array<string, array<string, string>>
+     */
+    protected static $pluralStudlyCache = [];
+
+    /**
      * The callback that should be used to generate UUIDs.
      *
      * @var (callable(): \Ramsey\Uuid\UuidInterface)|null
@@ -1023,11 +1030,25 @@ class Str
      */
     public static function pluralStudly($value, $count = 2)
     {
+        if (is_countable($count)) {
+            $count = count($count);
+        }
+
+        if ((int) abs($count) === 1) {
+            return $value;
+        }
+
+        $language = Pluralizer::getLanguage();
+
+        if (isset(static::$pluralStudlyCache[$language][$value])) {
+            return static::$pluralStudlyCache[$language][$value];
+        }
+
         $parts = preg_split('/(.)(?=[A-Z])/u', $value, -1, PREG_SPLIT_DELIM_CAPTURE);
 
         $lastWord = array_pop($parts);
 
-        return implode('', $parts).self::plural($lastWord, $count);
+        return static::$pluralStudlyCache[$language][$value] = implode('', $parts).self::plural($lastWord, $count);
     }
 
     /**
