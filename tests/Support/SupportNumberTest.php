@@ -261,6 +261,10 @@ class SupportNumberTest extends TestCase
         $this->assertSame('999 thousand', Number::forHumans(999499));
         $this->assertSame('1 million', Number::forHumans(999500));
         $this->assertSame('1 million', Number::forHumans(999999));
+
+        $this->assertSame('∞', Number::forHumans(INF));
+        $this->assertSame('-∞', Number::forHumans(-INF));
+        $this->assertSame('NaN', Number::forHumans(NAN));
     }
 
     public function testSummarize()
@@ -326,6 +330,10 @@ class SupportNumberTest extends TestCase
 
         Number::withLocale('de', fn () => $this->assertSame('1M', Number::abbreviate(999500)));
         Number::withLocale('fr', fn () => $this->assertSame('1M', Number::abbreviate(999500)));
+
+        $this->assertSame('∞', Number::abbreviate(INF));
+        $this->assertSame('-∞', Number::abbreviate(-INF));
+        $this->assertSame('NaN', Number::abbreviate(NAN));
     }
 
     public function testPairs()
