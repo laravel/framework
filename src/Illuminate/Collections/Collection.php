@@ -1624,8 +1624,28 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         $items = $this->items;
 
-        uasort($items, function ($a, $b) use ($comparisons, $options) {
-            foreach ($comparisons as $comparison) {
+        $precomputed = [];
+
+        foreach ($comparisons as $index => $comparison) {
+            $comparison = Arr::wrap($comparison);
+            $prop = $comparison[0];
+
+            if (! is_string($prop) && is_callable($prop)) {
+                continue;
+            }
+
+            foreach ($items as $key => $item) {
+                $precomputed[$index][$key] = data_get($item, $prop);
+            }
+        }
+
+        $keys = array_keys($items);
+
+        usort($keys, function ($keyA, $keyB) use ($items, $comparisons, $options, $precomputed) {
+            $a = $items[$keyA];
+            $b = $items[$keyB];
+
+            foreach ($comparisons as $index => $comparison) {
                 $comparison = Arr::wrap($comparison);
 
                 $prop = $comparison[0];
@@ -1639,7 +1659,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                 if (! is_string($prop) && is_callable($prop)) {
                     $result = $prop($a, $b);
                 } else {
-                    $values = [data_get($a, $prop), data_get($b, $prop)];
+                    $values = [$precomputed[$index][$keyA], $precomputed[$index][$keyB]];
 
                     if ($direction === SortDirection::Descending) {
                         $values = array_reverse($values);
@@ -1670,7 +1690,13 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             }
         });
 
-        return $this->newInstance($items);
+        $results = [];
+
+        foreach ($keys as $key) {
+            $results[$key] = $items[$key];
+        }
+
+        return $this->newInstance($results);
     }
 
     /**

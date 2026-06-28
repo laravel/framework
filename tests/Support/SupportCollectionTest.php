@@ -2257,6 +2257,27 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testSortByManyWithCallback($collection)
+    {
+        $data = new $collection([
+            ['name' => 'taylor', 'age' => 25],
+            ['name' => 'dayle', 'age' => 30],
+            ['name' => 'taylor', 'age' => 20],
+        ]);
+
+        $sorted = $data->sortBy([
+            'name',
+            fn ($a, $b) => $a['age'] <=> $b['age'],
+        ]);
+
+        $this->assertEquals([
+            ['name' => 'dayle', 'age' => 30],
+            ['name' => 'taylor', 'age' => 20],
+            ['name' => 'taylor', 'age' => 25],
+        ], array_values($sorted->all()));
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testSortKeys($collection)
     {
         $data = new $collection(['b' => 'dayle', 'a' => 'taylor']);
