@@ -84,8 +84,8 @@ class ScheduleWorkCommand extends Command
             $this->sleep();
 
             // Once a stop signal has been received we stop scheduling new runs so
-            // that the worker can drain any in-flight executions before exiting.
-            // This lets the current tasks finish instead of being interrupted.
+            // that the worker can stop any in-flight executions before exiting
+            // which lets the current tasks execute instead of being stopped.
             if (! $this->shouldQuit &&
                 Carbon::now()->second === 0 &&
                 ! Carbon::now()->startOfMinute()->equalTo($lastExecutionStartedAt)) {
@@ -107,9 +107,6 @@ class ScheduleWorkCommand extends Command
                 }
             }
 
-            // When a stop signal has been received and every in-flight execution
-            // has finished, we can break out of the loop and exit cleanly so the
-            // process can be safely restarted (for example on a Kubernetes pod).
             if ($this->shouldQuit && empty($this->executions)) {
                 return static::SUCCESS;
             }
@@ -118,9 +115,6 @@ class ScheduleWorkCommand extends Command
 
     /**
      * Listen for the signals that should terminate the schedule worker.
-     *
-     * This mirrors the queue worker so the process can be stopped gracefully,
-     * allowing any in-flight tasks to finish before the worker exits.
      *
      * @return void
      */
