@@ -1856,6 +1856,15 @@ class SupportArrTest extends TestCase
         $this->assertEquals([1, 2, 3, 4, 5, 6], Arr::take($array, -10));
     }
 
+    public function testSkip(): void
+    {
+        $array = ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4];
+
+        $this->assertSame(['c' => 3, 'd' => 4], Arr::skip($array, 2));
+        $this->assertSame([], Arr::skip($array, 10));
+        $this->assertSame($array, Arr::skip($array, 0));
+    }
+
     public function testSelect()
     {
         $array = [

@@ -353,6 +353,18 @@ class Arr
     }
 
     /**
+     * Skip the first {$count} items from an array.
+     *
+     * @param  array  $array
+     * @param  int  $count
+     * @return array
+     */
+    public static function skip($array, $count)
+    {
+        return array_slice($array, $count, null, true);
+    }
+
+    /**
      * Flatten a multi-dimensional array into a single level.
      *
      * @param  iterable  $array
