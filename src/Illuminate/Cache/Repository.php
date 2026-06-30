@@ -661,7 +661,7 @@ class Repository implements ArrayAccess, CacheContract
 
         $refresh = function () use ($key, $ttl, $callback, $lock, $created) {
             $this->store->lock(
-                "illuminate:cache:flexible:lock:{$key}",
+                "illuminate:cache:flexible:lock:{$this->itemKey($key)}",
                 $lock['seconds'] ?? 0,
                 $lock['owner'] ?? null,
             )->get(function () use ($key, $callback, $created, $ttl) {
@@ -676,7 +676,7 @@ class Repository implements ArrayAccess, CacheContract
             });
         };
 
-        defer($refresh, "illuminate:cache:flexible:{$key}", $alwaysDefer);
+        defer($refresh, "illuminate:cache:flexible:{$this->itemKey($key)}", $alwaysDefer);
 
         return $value;
     }
