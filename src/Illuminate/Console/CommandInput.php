@@ -66,7 +66,7 @@ class CommandInput
      */
     public function all($keys = null)
     {
-        $input = array_merge($this->arguments, $this->options);
+        $input = array_merge($this->options, $this->arguments);
 
         if (! $keys) {
             return $input;

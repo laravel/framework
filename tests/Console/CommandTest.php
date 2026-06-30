@@ -142,7 +142,7 @@ class CommandTest extends TestCase
             }
         };
 
-        $application = app();
+        $application = m::mock(Application::class);
         $command->setLaravel($application);
 
         $input = new ArrayInput([
@@ -153,6 +153,11 @@ class CommandTest extends TestCase
             '--role' => 'user',
         ]);
         $output = new NullOutput;
+        $outputStyle = m::mock(OutputStyle::class);
+        $application->shouldReceive('make')->with(OutputStyle::class, ['input' => $input, 'output' => $output])->andReturn($outputStyle);
+        $application->shouldReceive('make')->with(Factory::class, ['output' => $outputStyle])->andReturn(m::mock(Factory::class));
+        $application->shouldReceive('runningUnitTests')->andReturn(true);
+        $application->shouldReceive('call')->with([$command, 'handle'])->andReturn(0);
 
         $command->run($input, $output);
 
@@ -163,8 +168,8 @@ class CommandTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $commandInput->date('when'));
         $this->assertSame('2026-06-26', $commandInput->date('when')->format('Y-m-d'));
         $this->assertSame(5, $commandInput->integer('limit'));
-        $this->assertSame('user', $commandInput->all()['role']);
-        $this->assertSame('user', (string) $commandInput->string('role'));
+        $this->assertSame('admin', $commandInput->all()['role']);
+        $this->assertSame('admin', (string) $commandInput->string('role'));
         $this->assertSame('admin', $commandInput->arguments()['role']);
         $this->assertSame('user', $commandInput->options()['role']);
     }
