@@ -58,6 +58,20 @@ trait InteractsWithIO
     ];
 
     /**
+     * Retrieve the command's input as a CommandInput instance or retrieve an input item.
+     *
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return ($key is null ? \Illuminate\Console\CommandInput : mixed)
+     */
+    public function input($key = null, $default = null)
+    {
+        $input = new CommandInput($this->arguments(), $this->options());
+
+        return is_null($key) ? $input : data_get($input->all(), $key, $default);
+    }
+
+    /**
      * Determine if the given argument is present.
      *
      * @param  string|int  $name
@@ -127,20 +141,6 @@ trait InteractsWithIO
     public function options()
     {
         return $this->option();
-    }
-
-    /**
-     * Retrieve the command's input as a CommandInput instance or retrieve an input item.
-     *
-     * @param  string|null  $key
-     * @param  mixed  $default
-     * @return ($key is null ? \Illuminate\Console\CommandInput : mixed)
-     */
-    public function input($key = null, $default = null)
-    {
-        $input = new CommandInput($this->arguments(), $this->options());
-
-        return is_null($key) ? $input : data_get($input->all(), $key, $default);
     }
 
     /**
