@@ -16,16 +16,16 @@ class ReleaseMiddlewareTest extends TestCase
 {
     public function testJobIsReleasedWhenConditionIsTrue()
     {
-        $job = new ReleaseTestJob(release: true, retryAfter: 60);
+        $job = new ReleaseTestJob(release: true, releaseAfter: 60);
 
-        $this->assertJobWasReleased($job, retryAfter: 60);
+        $this->assertJobWasReleased($job, releaseAfter: 60);
     }
 
     public function testJobIsReleasedWhenConditionIsTrueUsingClosure()
     {
-        $job = new ReleaseTestJob(release: new SerializableClosure(fn () => true), retryAfter: 60);
+        $job = new ReleaseTestJob(release: new SerializableClosure(fn () => true), releaseAfter: 60);
 
-        $this->assertJobWasReleased($job, retryAfter: 60);
+        $this->assertJobWasReleased($job, releaseAfter: 60);
     }
 
     public function testJobRunsWhenConditionIsFalse()
@@ -46,7 +46,7 @@ class ReleaseMiddlewareTest extends TestCase
     {
         $job = new ReleaseTestJob(release: true);
 
-        $this->assertJobWasReleased($job, retryAfter: 0);
+        $this->assertJobWasReleased($job, releaseAfter: 0);
     }
 
     public function testJobRunsWhenConditionIsTrueWithUnless()
@@ -65,16 +65,16 @@ class ReleaseMiddlewareTest extends TestCase
 
     public function testJobIsReleasedWhenConditionIsFalseWithUnless()
     {
-        $job = new ReleaseTestJob(release: false, useUnless: true, retryAfter: 60);
+        $job = new ReleaseTestJob(release: false, useUnless: true, releaseAfter: 60);
 
-        $this->assertJobWasReleased($job, retryAfter: 60);
+        $this->assertJobWasReleased($job, releaseAfter: 60);
     }
 
     public function testJobIsReleasedWhenConditionIsFalseWithUnlessUsingClosure()
     {
-        $job = new ReleaseTestJob(release: new SerializableClosure(fn () => false), useUnless: true, retryAfter: 60);
+        $job = new ReleaseTestJob(release: new SerializableClosure(fn () => false), useUnless: true, releaseAfter: 60);
 
-        $this->assertJobWasReleased($job, retryAfter: 60);
+        $this->assertJobWasReleased($job, releaseAfter: 60);
     }
 
     protected function assertJobRanSuccessfully(ReleaseTestJob $class)
@@ -97,7 +97,7 @@ class ReleaseMiddlewareTest extends TestCase
         $this->assertTrue($class::$handled);
     }
 
-    protected function assertJobWasReleased(ReleaseTestJob $class, int $retryAfter = 0)
+    protected function assertJobWasReleased(ReleaseTestJob $class, int $releaseAfter = 0)
     {
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
@@ -107,7 +107,7 @@ class ReleaseMiddlewareTest extends TestCase
         $job->shouldReceive('hasFailed')->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(true);
         $job->shouldReceive('isDeletedOrReleased')->andReturn(true);
-        $job->shouldReceive('release')->once()->with($retryAfter);
+        $job->shouldReceive('release')->once()->with($releaseAfter);
         $job->shouldReceive('delete')->never();
 
         $instance->call($job, [
@@ -127,7 +127,7 @@ class ReleaseTestJob
     public function __construct(
         protected bool|SerializableClosure $release,
         protected bool $useUnless = false,
-        protected int $retryAfter = 0,
+        protected int $releaseAfter = 0,
     ) {
     }
 
@@ -143,9 +143,9 @@ class ReleaseTestJob
             : $this->release;
 
         if ($this->useUnless) {
-            return [Release::unless($release, $this->retryAfter)];
+            return [Release::unless($release, $this->releaseAfter)];
         }
 
-        return [Release::when($release, $this->retryAfter)];
+        return [Release::when($release, $this->releaseAfter)];
     }
 }

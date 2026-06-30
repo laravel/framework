@@ -8,11 +8,11 @@ class Release
 {
     /**
      * @param  bool  $release  Whether the job should be released back onto the queue.
-     * @param  int  $retryAfter  The number of seconds to wait before retrying the job.
+     * @param  int  $releaseAfter  The number of seconds before the job is available again.
      */
     public function __construct(
         protected bool $release = false,
-        protected int $retryAfter = 0,
+        protected int $releaseAfter = 0,
     ) {
     }
 
@@ -20,22 +20,22 @@ class Release
      * Release the job back onto the queue if the given condition is truthy.
      *
      * @param  bool|(\Closure(): bool)  $condition
-     * @param  int  $retryAfter  The number of seconds to wait before retrying the job.
+     * @param  int  $releaseAfter  The number of seconds before the job is available again.
      */
-    public static function when(Closure|bool $condition, int $retryAfter = 0): static
+    public static function when(Closure|bool $condition, int $releaseAfter = 0): static
     {
-        return new static(value($condition), $retryAfter);
+        return new static(value($condition), $releaseAfter);
     }
 
     /**
      * Release the job back onto the queue unless the given condition is truthy.
      *
      * @param  bool|(\Closure(): bool)  $condition
-     * @param  int  $retryAfter  The number of seconds to wait before retrying the job.
+     * @param  int  $releaseAfter  The number of seconds before the job is available again.
      */
-    public static function unless(Closure|bool $condition, int $retryAfter = 0): static
+    public static function unless(Closure|bool $condition, int $releaseAfter = 0): static
     {
-        return new static(! value($condition), $retryAfter);
+        return new static(! value($condition), $releaseAfter);
     }
 
     /**
@@ -44,7 +44,7 @@ class Release
     public function handle(mixed $job, callable $next): mixed
     {
         if ($this->release) {
-            return $job->release($this->retryAfter);
+            return $job->release($this->releaseAfter);
         }
 
         return $next($job);
