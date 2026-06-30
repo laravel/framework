@@ -37,26 +37,6 @@ class CommandInput
     }
 
     /**
-     * Get all of the arguments passed to the command.
-     *
-     * @return array
-     */
-    public function arguments()
-    {
-        return $this->arguments;
-    }
-
-    /**
-     * Get all of the options passed to the command.
-     *
-     * @return array
-     */
-    public function options()
-    {
-        return $this->options;
-    }
-
-    /**
      * Get all of the input for the command.
      *
      * Options take precedence over arguments when keys collide.
@@ -91,6 +71,26 @@ class CommandInput
     protected function data($key = null, $default = null)
     {
         return data_get($this->all(), $key, $default);
+    }
+
+    /**
+     * Get all of the arguments passed to the command.
+     *
+     * @return array
+     */
+    public function arguments()
+    {
+        return $this->arguments;
+    }
+
+    /**
+     * Get all of the options passed to the command.
+     *
+     * @return array
+     */
+    public function options()
+    {
+        return $this->options;
     }
 
     /**
