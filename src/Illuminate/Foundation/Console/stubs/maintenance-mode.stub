@@ -8,6 +8,21 @@ if (! file_exists($down = __DIR__.'/down')) {
 // Decode the "down" file's JSON...
 $data = json_decode(file_get_contents($down), true);
 
+$expectsJson = (function () {
+    $acceptable = array_map('trim', explode(',', $_SERVER['HTTP_ACCEPT'] ?? ''));
+
+    $firstAcceptable = strtolower(strtok($acceptable[0] ?? '', ';'));
+
+    if (str_contains($firstAcceptable, '/json') || str_contains($firstAcceptable, '+json')) {
+        return true;
+    }
+
+    return isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+        strcasecmp($_SERVER['HTTP_X_REQUESTED_WITH'], 'XMLHttpRequest') === 0 &&
+        (! isset($_SERVER['HTTP_X_PJAX']) || strcasecmp($_SERVER['HTTP_X_PJAX'], 'true') !== 0) &&
+        in_array($firstAcceptable, ['', '*/*', '*'], true);
+})();
+
 // Allow framework to handle request if no prerendered template...
 if (! isset($data['template'])) {
     return;
@@ -52,6 +67,11 @@ if (isset($_COOKIE['laravel_maintenance']) && isset($data['secret'])) {
         (int) $payload['expires_at'] >= time()) {
         return;
     }
+}
+
+// Allow framework to handle requests expecting a JSON response...
+if ($expectsJson) {
+    return;
 }
 
 // Redirect to the proper path if necessary...
