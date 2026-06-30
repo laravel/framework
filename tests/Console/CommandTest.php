@@ -9,8 +9,10 @@ use Illuminate\Console\Attributes\Hidden;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Attributes\Usage;
 use Illuminate\Console\Command;
+use Illuminate\Console\CommandInput;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components\Factory;
+use Illuminate\Support\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -112,6 +114,66 @@ class CommandTest extends TestCase
         $this->assertSame('test-first-option', $command->option('option-one'));
         $this->assertSame('test-second-option', $command->option('option-two'));
         $this->assertSame('third-option-default', $command->option('option-three'));
+    }
+
+    public function testGettingCommandInputAsFluentData()
+    {
+        $command = new class extends Command
+        {
+            public function handle()
+            {
+            }
+
+            protected function getArguments()
+            {
+                return [
+                    ['type', InputArgument::OPTIONAL, 'a backed enum argument'],
+                    ['when', InputArgument::OPTIONAL, 'a date argument'],
+                    ['role', InputArgument::OPTIONAL, 'a colliding argument'],
+                ];
+            }
+
+            protected function getOptions()
+            {
+                return [
+                    ['limit', null, InputOption::VALUE_OPTIONAL, 'an integer option'],
+                    ['role', null, InputOption::VALUE_OPTIONAL, 'a colliding option'],
+                ];
+            }
+        };
+
+        $application = m::mock(Application::class);
+        $command->setLaravel($application);
+
+        $input = new ArrayInput([
+            'type' => 'foo',
+            'when' => '2026-06-26',
+            'role' => 'admin',
+            '--limit' => '5',
+            '--role' => 'user',
+        ]);
+        $output = new NullOutput;
+        $outputStyle = m::mock(OutputStyle::class);
+        $application->shouldReceive('make')->with(OutputStyle::class, ['input' => $input, 'output' => $output])->andReturn($outputStyle);
+        $application->shouldReceive('make')->with(Factory::class, ['output' => $outputStyle])->andReturn(m::mock(Factory::class));
+        $application->shouldReceive('runningUnitTests')->andReturn(true);
+        $application->shouldReceive('call')->with([$command, 'handle'])->andReturn(0);
+
+        $command->run($input, $output);
+
+        $commandInput = $command->input();
+
+        $this->assertInstanceOf(CommandInput::class, $commandInput);
+        $this->assertSame(CommandInputType::Foo, $commandInput->enum('type', CommandInputType::class));
+        $this->assertInstanceOf(Carbon::class, $commandInput->date('when'));
+        $this->assertSame('2026-06-26', $commandInput->date('when')->format('Y-m-d'));
+        $this->assertSame(5, $commandInput->integer('limit'));
+        $this->assertSame('admin', $commandInput->all()['role']);
+        $this->assertSame('admin', $command->input('role'));
+        $this->assertSame('fallback', $command->input('missing', 'fallback'));
+        $this->assertSame('admin', (string) $commandInput->string('role'));
+        $this->assertSame('admin', $commandInput->arguments()['role']);
+        $this->assertSame('user', $commandInput->options()['role']);
     }
 
     public function testTheInputSetterOverwrite()
@@ -260,6 +322,12 @@ class CommandTest extends TestCase
 
         $this->assertSame(['foo:bar 1', 'foo:bar 1 --force'], $command->getUsages());
     }
+}
+
+enum CommandInputType: string
+{
+    case Foo = 'foo';
+    case Bar = 'bar';
 }
 
 #[Signature('foo:bar', aliases: ['bar:baz', 'baz:qux'])]
