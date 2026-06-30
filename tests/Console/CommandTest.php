@@ -169,6 +169,8 @@ class CommandTest extends TestCase
         $this->assertSame('2026-06-26', $commandInput->date('when')->format('Y-m-d'));
         $this->assertSame(5, $commandInput->integer('limit'));
         $this->assertSame('admin', $commandInput->all()['role']);
+        $this->assertSame('admin', $command->input('role'));
+        $this->assertSame('fallback', $command->input('missing', 'fallback'));
         $this->assertSame('admin', (string) $commandInput->string('role'));
         $this->assertSame('admin', $commandInput->arguments()['role']);
         $this->assertSame('user', $commandInput->options()['role']);

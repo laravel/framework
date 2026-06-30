@@ -130,13 +130,17 @@ trait InteractsWithIO
     }
 
     /**
-     * Retrieve the command's input as a CommandInput instance.
+     * Retrieve the command's input as a CommandInput instance or retrieve an input item.
      *
-     * @return \Illuminate\Console\CommandInput
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return ($key is null ? \Illuminate\Console\CommandInput : mixed)
      */
-    public function input()
+    public function input($key = null, $default = null)
     {
-        return new CommandInput($this->arguments(), $this->options());
+        $input = new CommandInput($this->arguments(), $this->options());
+
+        return is_null($key) ? $input : data_get($input->all(), $key, $default);
     }
 
     /**
