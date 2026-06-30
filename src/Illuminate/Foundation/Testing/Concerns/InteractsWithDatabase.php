@@ -115,7 +115,7 @@ trait InteractsWithDatabase
     }
 
     /**
-     * Assert that the given table has no entries.
+     * Assert that the given table or tables has no entries.
      *
      * @param  iterable<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
      * @param  string|null  $connection
