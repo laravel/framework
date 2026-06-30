@@ -22,6 +22,7 @@ class MaintenanceModeTest extends TestCase
     {
         $this->beforeApplicationDestroyed(function () {
             @unlink(storage_path('framework/down'));
+            @unlink(storage_path('framework/maintenance.php'));
         });
 
         parent::setUp();
@@ -78,6 +79,67 @@ class MaintenanceModeTest extends TestCase
         $response->assertStatus(503);
         $response->assertHeader('Retry-After', '60');
         $this->assertSame('Rendered Content', $response->original);
+    }
+
+    public function testMaintenanceModeDoesNotUseCustomTemplateForJsonRequests()
+    {
+        file_put_contents(storage_path('framework/down'), json_encode([
+            'retry' => 60,
+            'template' => 'Rendered Content',
+        ]));
+
+        Route::get('/foo', function () {
+            return 'Hello World';
+        })->middleware(PreventRequestsDuringMaintenance::class);
+
+        $response = $this->getJson('/foo');
+
+        $response->assertStatus(503);
+        $response->assertHeader('Retry-After', '60');
+        $response->assertJson(['message' => 'Service Unavailable']);
+    }
+
+    public function testMaintenanceModeDoesNotRedirectJsonRequests()
+    {
+        file_put_contents(storage_path('framework/down'), json_encode([
+            'redirect' => '/maintenance',
+        ]));
+
+        Route::get('/foo', function () {
+            return 'Hello World';
+        })->middleware(PreventRequestsDuringMaintenance::class);
+
+        $response = $this->getJson('/foo');
+
+        $response->assertStatus(503);
+        $response->assertJson(['message' => 'Service Unavailable']);
+    }
+
+    public function testPrerenderedMaintenanceFileAllowsJsonRequestsToReachFramework()
+    {
+        file_put_contents(storage_path('framework/down'), json_encode([
+            'template' => 'Rendered Content',
+        ]));
+
+        file_put_contents(
+            storage_path('framework/maintenance.php'),
+            file_get_contents(__DIR__.'/../../../src/Illuminate/Foundation/Console/stubs/maintenance-mode.stub')
+        );
+
+        $server = $_SERVER;
+
+        try {
+            $_SERVER['REQUEST_URI'] = '/foo';
+            $_SERVER['HTTP_ACCEPT'] = 'application/json';
+
+            ob_start();
+            include storage_path('framework/maintenance.php');
+            $output = ob_get_clean();
+        } finally {
+            $_SERVER = $server;
+        }
+
+        $this->assertSame('', $output);
     }
 
     public function testMaintenanceModeCanRedirectWithBypassCookie()

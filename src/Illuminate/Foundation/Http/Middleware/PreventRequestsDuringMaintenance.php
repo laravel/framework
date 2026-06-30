@@ -80,7 +80,7 @@ class PreventRequestsDuringMaintenance
                 return $next($request);
             }
 
-            if (isset($data['redirect'])) {
+            if (isset($data['redirect']) && ! $request->expectsJson()) {
                 $path = $data['redirect'] === '/'
                     ? $data['redirect']
                     : trim($data['redirect'], '/');
@@ -90,7 +90,7 @@ class PreventRequestsDuringMaintenance
                 }
             }
 
-            if (isset($data['template']) && ! $this->inIgnoreArray($request, $data)) {
+            if (isset($data['template']) && ! $request->expectsJson()) {
                 return response(
                     $data['template'],
                     $data['status'] ?? 503,
@@ -107,25 +107,6 @@ class PreventRequestsDuringMaintenance
         }
 
         return $next($request);
-    }
-
-    protected function inIgnoreArray($request, array $data)
-    {
-        if (! isset($data['ignore']) || ! is_array($data['ignore'])) {
-            return false;
-        }
-
-        foreach ($data['ignore'] as $ignore) {
-            if ($ignore !== '/') {
-                $ignore = trim($ignore, '/');
-            }
-
-            if ($request->fullUrlIs($ignore) || $request->is($ignore)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

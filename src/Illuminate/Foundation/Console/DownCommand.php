@@ -28,8 +28,7 @@ class DownCommand extends Command
                                  {--refresh= : The number of seconds after which the browser may refresh}
                                  {--secret= : The secret phrase that may be used to bypass maintenance mode}
                                  {--with-secret : Generate a random secret phrase that may be used to bypass maintenance mode}
-                                 {--status=503 : The status code that should be used when returning the maintenance mode response}
-                                 {--ignore=* : The paths to ignore and allow the framework to handle}';
+                                 {--status=503 : The status code that should be used when returning the maintenance mode response}';
 
     /**
      * The console command description.
@@ -87,8 +86,7 @@ class DownCommand extends Command
     protected function getDownFilePayload()
     {
         return [
-            'except' => $this->ignoredAndExcludedPaths(),
-            'ignore' => $this->ignoredPaths(),
+            'except' => $this->excludedPaths(),
             'redirect' => $this->redirectPath(),
             'retry' => $this->getRetryTime(),
             'refresh' => $this->option('refresh'),
@@ -96,16 +94,6 @@ class DownCommand extends Command
             'status' => (int) ($this->option('status') ?? 503),
             'template' => $this->option('render') ? $this->prerenderView() : null,
         ];
-    }
-
-    /**
-     * Get the paths that should be ignored and passed to the framework.
-     *
-     * @return array
-     */
-    protected function ignoredPaths()
-    {
-        return $this->option('ignore') ?? [];
     }
 
     /**
@@ -124,17 +112,6 @@ class DownCommand extends Command
                 return [];
             }
         }
-    }
-
-    /**
-     * Get the paths that should be excluded from maintenance
-     * or ignored and passed to the framework.
-     *
-     * @return array
-     */
-    protected function ignoredAndExcludedPaths()
-    {
-        return array_merge($this->ignoredPaths(), $this->excludedPaths());
     }
 
     /**
