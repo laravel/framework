@@ -286,27 +286,29 @@ class Worker
     /**
      * Handle a timed out job.
      *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  \Illuminate\Contracts\Queue\Job|null  $job
      * @param  \Illuminate\Queue\WorkerOptions  $options
      * @return never
      */
     protected function handleJobTimeout($job, WorkerOptions $options)
     {
-        $this->markJobAsFailedIfWillExceedMaxAttempts(
-            $job->getConnectionName(), $job, (int) $options->maxTries, $e = $this->timeoutExceededException($job)
-        );
+        if ($job) {
+            $this->markJobAsFailedIfWillExceedMaxAttempts(
+                $job->getConnectionName(), $job, (int) $options->maxTries, $e = $this->timeoutExceededException($job)
+            );
 
-        $this->markJobAsFailedIfWillExceedMaxExceptions(
-            $job->getConnectionName(), $job, $e
-        );
+            $this->markJobAsFailedIfWillExceedMaxExceptions(
+                $job->getConnectionName(), $job, $e
+            );
 
-        $this->markJobAsFailedIfItShouldFailOnTimeout(
-            $job->getConnectionName(), $job, $e
-        );
+            $this->markJobAsFailedIfItShouldFailOnTimeout(
+                $job->getConnectionName(), $job, $e
+            );
 
-        $this->events->dispatch(new JobTimedOut(
-            $job->getConnectionName(), $job
-        ));
+            $this->events->dispatch(new JobTimedOut(
+                $job->getConnectionName(), $job
+            ));
+        }
 
         $this->kill(static::$timedOutExitCode ?? static::EXIT_ERROR, $options, WorkerStopReason::TimedOut);
     }
@@ -335,7 +337,7 @@ class Worker
         $now = $this->currentTime();
 
         // Track the next absolute deadlines for the timeout and keepalive alarm.
-        $timeout = max($this->timeoutForJob($job, $options), 0);
+        $timeout = $job ? max($this->timeoutForJob($job, $options), 0) : 0;
         $timeoutAt = $timeout > 0 ? $now + $timeout : null;
 
         $keepAliveFrequency = max($this->keepAliveForJob($job, $options), 0);
