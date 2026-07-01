@@ -821,6 +821,21 @@ class ShouldntRetryExceptionHandler implements ExceptionHandler
     {
         return true;
     }
+
+    public function isReporting(\Throwable $e): bool
+    {
+        return true;
+    }
+
+    /**
+     * Creates the context for an exception.
+     *
+     * @return array<array-key, mixed>
+     */
+    public function buildContextForException(\Throwable $e)
+    {
+        return [];
+    }
 }
 
 class WorkerFakeJob implements QueueJobContract
