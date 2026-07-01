@@ -382,7 +382,7 @@ class Number
         if ($number > 9) {
             return implode('', array_map(fn (string $digit) => self::sup((int) $digit), (string) $number));
         }
-        
+
         return match ($number) {
             0 => "\u{2070}",
             1 => "\u{00B9}",
@@ -409,7 +409,7 @@ class Number
         if ($number > 9) {
             return implode('', array_map(fn (string $digit) => self::sup((int) $digit), (string) $number));
         }
-        
+
         return match ($number) {
             0 => "\u{2080}",
             1 => "\u{2081}",
