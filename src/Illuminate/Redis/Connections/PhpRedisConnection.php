@@ -455,6 +455,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * @param  \Closure  $callback
      * @return void
      */
+    #[\Override]
     public function subscribe($channels, Closure $callback)
     {
         $this->client->subscribe((array) $channels, function ($redis, $channel, $message) use ($callback) {
@@ -469,6 +470,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * @param  \Closure  $callback
      * @return void
      */
+    #[\Override]
     public function psubscribe($channels, Closure $callback)
     {
         $this->client->psubscribe((array) $channels, function ($redis, $pattern, $channel, $message) use ($callback) {
@@ -525,6 +527,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      *
      * @throws \RedisException
      */
+    #[\Override]
     public function command($method, array $parameters = [])
     {
         try {
@@ -555,6 +558,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * @param  array  $parameters
      * @return mixed
      */
+    #[\Override]
     public function __call($method, $parameters)
     {
         return parent::__call(strtolower($method), $parameters);

@@ -58,6 +58,7 @@ class PredisConnection extends Connection implements ConnectionContract
      * @param  array  $parameters
      * @return array
      */
+    #[\Override]
     protected function parseParametersForEvent(array $parameters)
     {
         return (new Collection($parameters))

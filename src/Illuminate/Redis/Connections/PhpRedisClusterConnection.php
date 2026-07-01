@@ -50,6 +50,7 @@ class PhpRedisClusterConnection extends PhpRedisConnection
      *
      * @return void
      */
+    #[\Override]
     public function flushdb()
     {
         $arguments = func_get_args();
