@@ -500,6 +500,15 @@ class LogManagerTest extends TestCase
         $this->assertSame(storage_path('logs/custom.log'), $url->getValue($handler));
     }
 
+    public function testLogManagerCanSetChannelNameForOnDemandStack()
+    {
+        $manager = new LogManager($this->app);
+
+        $logger = $manager->stack(['single'], 'custom');
+
+        $this->assertSame('custom', $logger->getName());
+    }
+
     public function testWrappingHandlerInFingersCrossedWhenActionLevelIsUsed()
     {
         $config = $this->app['config'];
