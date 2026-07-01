@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use Exception;
+use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Support\Fixtures\StringableObjectStub;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -794,6 +795,30 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame('foo bar baz', Str::lower('FOO BAR BAZ'));
         $this->assertSame('foo bar baz', Str::lower('fOo Bar bAz'));
+    }
+
+    public function testTransReturnsStringable()
+    {
+        $originalContainer = Container::getInstance();
+
+        Container::setInstance($container = new Container);
+
+        $container->instance('translator', new class
+        {
+            public function get($key, array $replace = [], $locale = null)
+            {
+                return str_replace(':name', $replace['name'], $key).' '.$locale;
+            }
+        });
+
+        try {
+            $string = Str::trans('Hello :name', ['name' => 'Taylor'], 'en');
+        } finally {
+            Container::setInstance($originalContainer);
+        }
+
+        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $string);
+        $this->assertSame('hello taylor en', (string) $string->lower());
     }
 
     public function testUpper()

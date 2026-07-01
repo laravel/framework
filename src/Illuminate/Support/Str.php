@@ -85,6 +85,19 @@ class Str
     }
 
     /**
+     * Translate the given message and get a new stringable object.
+     *
+     * @param  string  $key
+     * @param  array  $replace
+     * @param  string|null  $locale
+     * @return \Illuminate\Support\Stringable
+     */
+    public static function trans($key, $replace = [], $locale = null)
+    {
+        return new Stringable(__($key, $replace, $locale));
+    }
+
+    /**
      * Return the remainder of a string after the first occurrence of a given value.
      *
      * @param  string  $subject
