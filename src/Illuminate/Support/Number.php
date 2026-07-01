@@ -371,6 +371,60 @@ class Number
     }
 
     /**
+     * @param  non-negative-int  $number
+     */
+    public static function sup(int $number): string
+    {
+        if ($number < 0) {
+            throw new InvalidArgumentException('Negative numbers are not supported');
+        }
+
+        if ($number > 9) {
+            return implode('', array_map(fn (string $digit) => self::sup((int) $digit), (string) $number));
+        }
+        
+        return match ($number) {
+            0 => "\u{2070}",
+            1 => "\u{00B9}",
+            2 => "\u{00B2}",
+            3 => "\u{00B3}",
+            4 => "\u{2074}",
+            5 => "\u{2075}",
+            6 => "\u{2076}",
+            7 => "\u{2077}",
+            8 => "\u{2078}",
+            9 => "\u{2079}",
+        };
+    }
+
+    /**
+     * @param  non-negative-int  $number
+     */
+    public static function sub(int $number): string
+    {
+        if ($number < 0) {
+            throw new InvalidArgumentException('Negative numbers are not supported');
+        }
+
+        if ($number > 9) {
+            return implode('', array_map(fn (string $digit) => self::sup((int) $digit), (string) $number));
+        }
+        
+        return match ($number) {
+            0 => "\u{2080}",
+            1 => "\u{2081}",
+            2 => "\u{2082}",
+            3 => "\u{2083}",
+            4 => "\u{2084}",
+            5 => "\u{2085}",
+            6 => "\u{2086}",
+            7 => "\u{2087}",
+            8 => "\u{2088}",
+            9 => "\u{2089}",
+        };
+    }
+
+    /**
      * Execute the given callback using the given locale.
      *
      * @template TReturn
