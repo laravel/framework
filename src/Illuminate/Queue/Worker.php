@@ -351,7 +351,14 @@ class Worker
                 $next = $timeoutAt;
             }
 
-            pcntl_alarm(is_null($next) ? 0 : (int) max($next - $now, 1));
+            if (is_null($next)) {
+                $next = 0;
+            }
+
+            $secondsUntilNext = max($nextAlarmAt - $now, 1);
+
+            // Account for floating point drift from high-resolution timestamps without firing early.
+            pcntl_alarm((int) ceil($secondsUntilNext - 1e-9));
         };
 
         pcntl_signal(SIGALRM, function () use ($job, $options, $timeoutAt, $keepAliveFrequency, &$keepAliveAt, $scheduleNextAlarm) {
