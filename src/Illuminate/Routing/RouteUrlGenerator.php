@@ -253,9 +253,10 @@ class RouteUrlGenerator
         } elseif ($requiredRouteParametersWithoutDefaultsOrNamedParameters === [] && count($parameters) !== 0) {
             // Handle the case where all passed parameters are for parameters that have default values...
             $remainingCount = count($parameters);
+            $parameterCount = count($namedParameters);
 
             // Loop over empty parameters backwards and stop when we run out of passed parameters...
-            for ($i = count($namedParameters) - 1; $i >= 0; $i--) {
+            for ($i = $parameterCount - 1; $i >= 0; $i--) {
                 if ($namedParameters[array_keys($namedParameters)[$i]] === '') {
                     $offset = $i;
                     $remainingCount--;
