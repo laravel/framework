@@ -418,7 +418,7 @@ class SupportNumberTest extends TestCase
         $this->assertSame(1234.56, Number::parseFloat('1 234,56', locale: 'fr'));
     }
 
-    #[DataProvider('provideSupNumbers')
+    #[DataProvider('provideSupNumbers')]
     public function testSup(int $number, string $result)
     {
         $this->assertSame($result, Number::sup($number));
@@ -438,7 +438,7 @@ class SupportNumberTest extends TestCase
         ];
     }
 
-    #[DataProvider('provideSubNumbers')
+    #[DataProvider('provideSubNumbers')]
     public function testSub(int $number, string $result)
     {
         $this->assertSame($result, Number::sub($number));
