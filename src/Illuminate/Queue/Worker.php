@@ -351,7 +351,7 @@ class Worker
                 $next = $timeoutAt;
             }
 
-            pcntl_alarm(is_null($next) ? 0 : max($next - $now, 1));
+            pcntl_alarm(is_null($next) ? 0 : (int) max($next - $now, 1));
         };
 
         pcntl_signal(SIGALRM, function () use ($job, $options, $timeoutAt, $keepAliveFrequency, &$keepAliveAt, $scheduleNextAlarm) {
