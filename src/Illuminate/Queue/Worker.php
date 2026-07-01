@@ -355,7 +355,7 @@ class Worker
                 $next = 0;
             }
 
-            $secondsUntilNext = max($nextAlarmAt - $now, 1);
+            $secondsUntilNext = max($next - $now, 1);
 
             // Account for floating point drift from high-resolution timestamps without firing early.
             pcntl_alarm((int) ceil($secondsUntilNext - 1e-9));
