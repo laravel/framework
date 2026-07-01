@@ -63,6 +63,8 @@ class Attachment
      *
      * @param  string  $url
      * @return static
+     *
+     * @throws \InvalidArgumentException
      */
     public static function fromUrl($url)
     {

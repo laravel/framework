@@ -25,6 +25,8 @@ class Address
      *
      * @param  string  $address
      * @param  string|null  $name
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct(string $address, ?string $name = null)
     {

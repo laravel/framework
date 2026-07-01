@@ -792,6 +792,8 @@ trait HasAttributes
      *
      * @param  array  $casts
      * @return array
+     *
+     * @throws \InvalidArgumentException
      */
     protected function ensureCastsAreStringValues($casts)
     {

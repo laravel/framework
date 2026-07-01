@@ -270,6 +270,8 @@ class Message
      *
      * @param  mixed  $address
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
      */
     protected function ensureAddressIsSafe($address)
     {
