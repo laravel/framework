@@ -33,6 +33,13 @@ class WorkerOptions
     public $timeout;
 
     /**
+     * The number of seconds between keepalive heartbeats for supported queue connections.
+     *
+     * @var int
+     */
+    public $keepAlive;
+
+    /**
      * The number of seconds to wait in between polling the queue.
      *
      * @var int
@@ -103,6 +110,7 @@ class WorkerOptions
      * @param  int  $maxTime
      * @param  int  $rest
      * @param  int  $stopWhenEmptyFor
+     * @param  int  $keepAlive  The number of seconds between keepalive heartbeats.
      */
     public function __construct(
         $name = 'default',
@@ -117,6 +125,7 @@ class WorkerOptions
         $maxTime = 0,
         $rest = 0,
         $stopWhenEmptyFor = 0,
+        $keepAlive = 0,
     ) {
         $this->name = $name;
         $this->backoff = $backoff;
@@ -125,6 +134,7 @@ class WorkerOptions
         $this->force = $force;
         $this->memory = $memory;
         $this->timeout = $timeout;
+        $this->keepAlive = $keepAlive;
         $this->maxTries = $maxTries;
         $this->stopWhenEmpty = $stopWhenEmpty;
         $this->stopWhenEmptyFor = $stopWhenEmptyFor;

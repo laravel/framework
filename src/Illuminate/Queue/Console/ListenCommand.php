@@ -26,6 +26,7 @@ class ListenCommand extends Command
                             {--queue= : The queue to listen on}
                             {--sleep=3 : The number of seconds to sleep when no job is available}
                             {--rest=0 : The number of seconds to rest between jobs}
+                            {--keepalive=0 : The number of seconds between keepalive heartbeats for supported queue drivers}
                             {--timeout=60 : The number of seconds a child process can run}
                             {--tries=1 : The number of times to attempt a job before logging it failed}';
 
@@ -111,7 +112,8 @@ class ListenCommand extends Command
             sleep: $this->option('sleep'),
             maxTries: $this->option('tries'),
             force: $this->option('force'),
-            rest: $this->option('rest')
+            rest: $this->option('rest'),
+            keepAlive: $this->option('keepalive'),
         );
     }
 

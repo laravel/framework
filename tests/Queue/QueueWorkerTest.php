@@ -8,6 +8,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Interruptible;
 use Illuminate\Contracts\Queue\Job as QueueJobContract;
+use Illuminate\Contracts\Queue\KeepsJobsAlive;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobPopped;
@@ -658,6 +659,49 @@ class QueueWorkerTest extends TestCase
         $this->assertSame(15, $interruptible->receivedSignal);
     }
 
+    public function testWorkerUsesKeepAliveWhenConnectionSupportsIt()
+    {
+        $worker = new InsomniacWorker(
+            new WorkerFakeManager('default', new WorkerFakeKeepAliveConnection('default', [])),
+            $this->events,
+            $this->exceptionHandler,
+            fn () => false,
+        );
+
+        $job = new WorkerFakeJob();
+        $job->connectionName = 'default';
+
+        $this->assertSame(30, $worker->keepAliveForJobValue($job, new WorkerOptions(keepAlive: 30)));
+    }
+
+    public function testWorkerIgnoresKeepAliveWhenConnectionIsUnsupported()
+    {
+        $worker = $this->getWorker('default', ['queue' => []]);
+
+        $job = new WorkerFakeJob();
+        $job->connectionName = 'default';
+
+        $this->assertSame(0, $worker->keepAliveForJobValue($job, new WorkerOptions(keepAlive: 30)));
+    }
+
+    public function testWorkerCanKeepAJobAlive()
+    {
+        $connection = new WorkerFakeKeepAliveConnection('default', []);
+        $worker = new InsomniacWorker(
+            new WorkerFakeManager('default', $connection),
+            $this->events,
+            $this->exceptionHandler,
+            fn () => false,
+        );
+
+        $job = new WorkerFakeJob();
+        $job->connectionName = 'default';
+
+        $worker->keepJobAliveValue($job, 30);
+
+        $this->assertSame([[$job, 30]], $connection->keptAliveJobs);
+    }
+
     /**
      * Helpers...
      */
@@ -725,6 +769,16 @@ class InsomniacWorker extends Worker
         return parent::stop($status, $options, $reason);
     }
 
+    public function keepAliveForJobValue($job, WorkerOptions $options)
+    {
+        return $this->keepAliveForJob($job, $options);
+    }
+
+    public function keepJobAliveValue($job, $keepAlive)
+    {
+        $this->handleJobKeepAlive($job, $keepAlive);
+    }
+
     public function daemonShouldRun(WorkerOptions $options, $connectionName, $queue)
     {
         return ! ($this->isDownForMaintenance)();
@@ -770,6 +824,16 @@ class WorkerFakeConnection
     public function getConnectionName()
     {
         return $this->connectionName;
+    }
+}
+
+class WorkerFakeKeepAliveConnection extends WorkerFakeConnection implements KeepsJobsAlive
+{
+    public $keptAliveJobs = [];
+
+    public function keepAlive(QueueJobContract $job, int $seconds)
+    {
+        $this->keptAliveJobs[] = [$job, $seconds];
     }
 }
 

@@ -7,6 +7,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Factory as QueueManager;
 use Illuminate\Contracts\Queue\Interruptible;
+use Illuminate\Contracts\Queue\KeepsJobsAlive;
 use Illuminate\Database\DetectsLostConnections;
 use Illuminate\Queue\Events\JobAttempted;
 use Illuminate\Queue\Events\JobExceptionOccurred;
@@ -238,14 +239,14 @@ class Worker
             }
 
             // First, we will attempt to get the next job off of the queue. We will also
-            // register the timeout handler and reset the alarm for this job so it is
+            // register the signal deadlines and reset the alarm for this job so it is
             // not stuck in a frozen state forever. Then, we can fire off this job.
             $job = $this->getNextJob(
                 $this->manager->connection($connectionName), $queue
             );
 
             if ($supportsAsyncSignals) {
-                $this->registerTimeoutHandler($job, $options);
+                $this->listenForJobSignals($job, $options);
             }
 
             // If the daemon should run (not in maintenance mode, etc.), then we can run
@@ -268,7 +269,7 @@ class Worker
             }
 
             if ($supportsAsyncSignals) {
-                $this->resetTimeoutHandler();
+                $this->resetJobSignals();
             }
 
             // Finally, we will check to see if we have exceeded our memory limits or if
@@ -283,50 +284,100 @@ class Worker
     }
 
     /**
-     * Register the worker timeout handler.
+     * Handle a timed out job.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  \Illuminate\Queue\WorkerOptions  $options
+     * @return never
+     */
+    protected function handleJobTimeout($job, WorkerOptions $options)
+    {
+        $this->markJobAsFailedIfWillExceedMaxAttempts(
+            $job->getConnectionName(), $job, (int) $options->maxTries, $e = $this->timeoutExceededException($job)
+        );
+
+        $this->markJobAsFailedIfWillExceedMaxExceptions(
+            $job->getConnectionName(), $job, $e
+        );
+
+        $this->markJobAsFailedIfItShouldFailOnTimeout(
+            $job->getConnectionName(), $job, $e
+        );
+
+        $this->events->dispatch(new JobTimedOut(
+            $job->getConnectionName(), $job
+        ));
+
+        $this->kill(static::$timedOutExitCode ?? static::EXIT_ERROR, $options, WorkerStopReason::TimedOut);
+    }
+
+    /**
+     * Inform the queue connection that the given job is still being processed.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  int  $keepAlive
+     * @return void
+     */
+    protected function handleJobKeepAlive($job, $keepAlive)
+    {
+        $this->manager->connection($job->getConnectionName())->keepAlive($job, $keepAlive);
+    }
+
+    /**
+     * Register the alarm signal handler for the given job.
      *
      * @param  \Illuminate\Contracts\Queue\Job|null  $job
      * @param  \Illuminate\Queue\WorkerOptions  $options
      * @return void
      */
-    protected function registerTimeoutHandler($job, WorkerOptions $options)
+    protected function listenForJobSignals($job, WorkerOptions $options)
     {
-        // We will register a signal handler for the alarm signal so that we can kill this
-        // process if it is running too long because it has frozen. This uses the async
-        // signals supported in recent versions of PHP to accomplish it conveniently.
-        pcntl_signal(SIGALRM, function () use ($job, $options) {
-            if ($job) {
-                $this->markJobAsFailedIfWillExceedMaxAttempts(
-                    $job->getConnectionName(), $job, (int) $options->maxTries, $e = $this->timeoutExceededException($job)
-                );
+        $now = $this->currentTime();
 
-                $this->markJobAsFailedIfWillExceedMaxExceptions(
-                    $job->getConnectionName(), $job, $e
-                );
+        // Track the next absolute deadlines for the timeout and keepalive alarm.
+        $timeout = max($this->timeoutForJob($job, $options), 0);
+        $timeoutAt = $timeout > 0 ? $now + $timeout : null;
 
-                $this->markJobAsFailedIfItShouldFailOnTimeout(
-                    $job->getConnectionName(), $job, $e
-                );
+        $keepAliveFrequency = max($this->keepAliveForJob($job, $options), 0);
+        $keepAliveAt = $keepAliveFrequency > 0 ? $now + $keepAliveFrequency : null;
 
-                $this->events->dispatch(new JobTimedOut(
-                    $job->getConnectionName(), $job
-                ));
+        $scheduleNextAlarm = function ($now) use ($timeoutAt, &$keepAliveAt) {
+            // Schedule the next alarm for whichever deadline comes first: timeout or keepalive.
+            $next = $keepAliveAt;
+
+            if (is_null($next) || (! is_null($timeoutAt) && $timeoutAt < $next)) {
+                $next = $timeoutAt;
             }
 
-            $this->kill(static::$timedOutExitCode ?? static::EXIT_ERROR, $options, WorkerStopReason::TimedOut);
+            pcntl_alarm(is_null($next) ? 0 : max($next - $now, 1));
+        };
+
+        pcntl_signal(SIGALRM, function () use ($job, $options, $timeoutAt, $keepAliveFrequency, &$keepAliveAt, $scheduleNextAlarm) {
+            $now = $this->currentTime();
+
+            if (! is_null($timeoutAt) && $now >= $timeoutAt) {
+                $this->handleJobTimeout($job, $options);
+            }
+
+            if (! is_null($keepAliveAt) && $now >= $keepAliveAt) {
+                $this->handleJobKeepAlive($job, $keepAliveFrequency);
+
+                // Keepalive continues to run on its configured interval from the prior deadline.
+                $keepAliveAt += $keepAliveFrequency;
+            }
+
+            $scheduleNextAlarm($now);
         }, true);
 
-        pcntl_alarm(
-            max($this->timeoutForJob($job, $options), 0)
-        );
+        $scheduleNextAlarm($now);
     }
 
     /**
-     * Reset the worker timeout handler.
+     * Reset the alarm signal for the current job.
      *
      * @return void
      */
-    protected function resetTimeoutHandler()
+    protected function resetJobSignals()
     {
         pcntl_alarm(0);
     }
@@ -341,6 +392,20 @@ class Worker
     protected function timeoutForJob($job, WorkerOptions $options)
     {
         return $job && ! is_null($job->timeout()) ? $job->timeout() : $options->timeout;
+    }
+
+    /**
+     * Get the keepalive interval for the given job.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job|null  $job
+     * @param  \Illuminate\Queue\WorkerOptions  $options
+     * @return int
+     */
+    protected function keepAliveForJob($job, WorkerOptions $options)
+    {
+        return $job && $this->manager->connection($job->getConnectionName()) instanceof KeepsJobsAlive
+            ? $options->keepAlive
+            : 0;
     }
 
     /**

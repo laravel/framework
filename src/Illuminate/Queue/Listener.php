@@ -161,6 +161,7 @@ class Listener
             "--backoff={$options->backoff}",
             "--memory={$options->memory}",
             "--sleep={$options->sleep}",
+            "--keepalive={$options->keepAlive}",
             "--tries={$options->maxTries}",
             $options->force ? '--force' : null,
         ], function ($value) {

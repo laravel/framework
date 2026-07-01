@@ -23,11 +23,12 @@ class ListenerOptions extends WorkerOptions
      * @param  int  $maxTries
      * @param  bool  $force
      * @param  int  $rest
+     * @param  int  $keepAlive  The number of seconds between keepalive heartbeats.
      */
-    public function __construct($name = 'default', $environment = null, $backoff = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 1, $force = false, $rest = 0)
+    public function __construct($name = 'default', $environment = null, $backoff = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 1, $force = false, $rest = 0, $keepAlive = 0)
     {
         $this->environment = $environment;
 
-        parent::__construct($name, $backoff, $memory, $timeout, $sleep, $maxTries, $force, false, 0, 0, $rest);
+        parent::__construct($name, $backoff, $memory, $timeout, $sleep, $maxTries, $force, false, 0, 0, $rest, 0, $keepAlive);
     }
 }

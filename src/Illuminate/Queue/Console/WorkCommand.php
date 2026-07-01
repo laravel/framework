@@ -46,6 +46,7 @@ class WorkCommand extends Command
                             {--memory=128 : The memory limit in megabytes}
                             {--sleep=3 : The number of seconds to sleep when no job is available}
                             {--rest=0 : The number of seconds to rest between jobs}
+                            {--keepalive=0 : The number of seconds between keepalive heartbeats for supported queue drivers}
                             {--timeout=60 : The number of seconds a child process can run}
                             {--tries=1 : The number of times to attempt a job before logging it failed}
                             {--json : Output the queue worker information as JSON}';
@@ -171,6 +172,7 @@ class WorkCommand extends Command
             $this->option('max-time'),
             $this->option('rest'),
             $this->option('stop-when-empty-for'),
+            $this->option('keepalive'),
         );
     }
 
