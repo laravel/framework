@@ -541,6 +541,50 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->assertTrue($pending->contains(fn ($job) => $job->name === JobToFakeStub::class));
     }
 
+    public function testDelayedJobs()
+    {
+        $this->fake->later(10, $this->job, '', 'foo');
+        $this->fake->later(10, new JobToFakeStub, '', 'bar');
+
+        $delayed = $this->fake->delayedJobs('foo');
+
+        $this->assertCount(1, $delayed);
+        $this->assertInstanceOf(InspectedJob::class, $delayed->first());
+        $this->assertSame(JobStub::class, $delayed->first()->name);
+        $this->assertSame(0, $delayed->first()->attempts);
+        $this->assertSame('foo', $delayed->first()->queue);
+    }
+
+    public function testAllDelayedJobs()
+    {
+        $this->fake->later(10, $this->job, '', 'foo');
+        $this->fake->later(10, new JobToFakeStub, '', 'bar');
+
+        $delayed = $this->fake->allDelayedJobs();
+
+        $this->assertCount(2, $delayed);
+        $this->assertInstanceOf(InspectedJob::class, $delayed->first());
+        $this->assertTrue($delayed->contains(fn ($job) => $job->name === JobStub::class));
+        $this->assertTrue($delayed->contains(fn ($job) => $job->name === JobToFakeStub::class));
+    }
+
+    public function testDelayedSize()
+    {
+        $this->fake->later(10, $this->job, '', 'foo');
+        $this->fake->later(10, new JobToFakeStub, '', 'bar');
+
+        $this->assertSame(1, $this->fake->delayedSize('foo'));
+        $this->assertSame(1, $this->fake->delayedSize('bar'));
+        $this->assertSame(0, $this->fake->delayedSize('baz'));
+    }
+
+    public function testDelayedJobsAreStillPushed()
+    {
+        $this->fake->later(10, $this->job, '', 'foo');
+
+        $this->fake->assertPushedOn('foo', JobStub::class);
+    }
+
     public function testGetRawPushes()
     {
         $this->fake->pushRaw('some-payload', null, ['options' => 'yeah']);
