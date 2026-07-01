@@ -577,7 +577,7 @@ class Kernel implements KernelContract
     /**
      * Get the application's global middleware.
      *
-     * @return array
+     * @return array<int, class-string|string>
      */
     public function getGlobalMiddleware()
     {

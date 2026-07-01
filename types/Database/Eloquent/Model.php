@@ -49,6 +49,11 @@ function test(User $user, Post $post, Comment $comment, Article $article): void
     assertType('bool', $user->restore());
     assertType('User', $user->restoreOrCreate());
     assertType('User', $user->createOrRestore());
+
+    assertType("'foo'", User::withoutEvents(fn () => 'foo'));
+    assertType("'foo'", User::withoutBroadcasting(fn () => 'foo'));
+    assertType("'foo'", User::withoutTimestampsOn([], fn () => 'foo'));
+    assertType("'foo'", User::withoutTimestamps(fn () => 'foo'));
 }
 
 class Post extends Model

@@ -3,9 +3,12 @@
 namespace Illuminate\Tests\Routing;
 
 use ArrayIterator;
+use Illuminate\Container\Container;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
+use Illuminate\Routing\Router;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -282,6 +285,23 @@ class RouteCollectionTest extends TestCase
         $this->expectException(LogicException::class);
 
         $this->routeCollection->compile();
+    }
+
+    public function testCompiledRouteCollectionPreservesRouteMetadata()
+    {
+        $this->routeCollection->add(
+            new Route('GET', 'users', [
+                'uses' => 'UsersController@index',
+                'as' => 'users',
+                'metadata' => ['head' => ['title' => 'Users']],
+            ])
+        );
+
+        $route = $this->routeCollection
+            ->toCompiledRouteCollection(new Router(new Dispatcher, new Container), new Container)
+            ->getByName('users');
+
+        $this->assertSame(['title' => 'Users'], $route->getMetadata('head'));
     }
 
     public function testRouteCollectionDontMatchNonMatchingDoubleSlashes()

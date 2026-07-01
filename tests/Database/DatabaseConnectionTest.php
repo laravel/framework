@@ -7,6 +7,7 @@ use ErrorException;
 use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
+use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitted;
@@ -250,6 +251,26 @@ class DatabaseConnectionTest extends TestCase
         $connection->beginTransaction();
         $connection->disconnect();
         $this->assertEquals(0, $connection->transactionLevel());
+    }
+
+    public function testDisconnectClearsTransactionManagerState()
+    {
+        $connection = $this->getMockConnection(['getName']);
+        $connection->method('getName')->willReturn('default');
+        $manager = new DatabaseTransactionsManager;
+        $connection->setTransactionManager($manager);
+
+        $manager->begin('default', 1);
+        $manager->begin('default', 2);
+        $manager->stageTransactions('default', 2);
+
+        $this->assertCount(1, $manager->getCommittedTransactions());
+        $this->assertCount(1, $manager->getPendingTransactions());
+
+        $connection->disconnect();
+
+        $this->assertCount(0, $manager->getCommittedTransactions());
+        $this->assertCount(0, $manager->getPendingTransactions());
     }
 
     public function testBeganTransactionFiresEventsIfSet()
@@ -753,6 +774,93 @@ class DatabaseConnectionTest extends TestCase
             $this->assertSame('192.168.1.10', $connectionDetails['host']);
             $this->assertSame('3306', $connectionDetails['port']);
             $this->assertSame('write_db', $connectionDetails['database']);
+        }
+    }
+
+    public function testDirectPdoCanBeSetAndResolved()
+    {
+        $connection = new Connection(new DatabaseConnectionTestMockPDO);
+        $directPdo = new DatabaseConnectionTestMockPDO;
+
+        $connection->setDirectPdo(function () use ($directPdo) {
+            return $directPdo;
+        });
+
+        $this->assertSame($directPdo, $connection->getDirectPdo());
+        $this->assertSame($directPdo, $connection->getRawDirectPdo());
+    }
+
+    public function testDirectConnectionConfigurationCanBeSet()
+    {
+        $connection = new Connection(new DatabaseConnectionTestMockPDO);
+
+        $this->assertFalse($connection->hasDirectConnection());
+
+        $connection->setDirectPdoConfig($config = [
+            'host' => 'direct-host',
+            'database' => 'direct_db',
+        ]);
+
+        $this->assertTrue($connection->hasDirectConnection());
+        $this->assertSame($config, $connection->getDirectPdoConfig());
+    }
+
+    public function testDisconnectClearsDirectPdo()
+    {
+        $connection = new Connection(new DatabaseConnectionTestMockPDO);
+
+        $connection->setDirectPdo(new DatabaseConnectionTestMockPDO);
+        $connection->disconnect();
+
+        $this->assertNull($connection->getRawDirectPdo());
+    }
+
+    public function testNameWithReadWriteTypeIncludesDirectType()
+    {
+        $connection = new Connection(new DatabaseConnectionTestMockPDO, 'database', '', [
+            'name' => 'pgsql',
+        ]);
+
+        $connection->setReadWriteType('direct');
+
+        $this->assertSame('pgsql::direct', $connection->getNameWithReadWriteType());
+    }
+
+    public function testQueryExceptionContainsDirectConnectionDetailsWhenUsingDirectConnection()
+    {
+        $directPdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)
+            ->onlyMethods(['prepare'])
+            ->getMock();
+        $directPdo->expects($this->once())
+            ->method('prepare')
+            ->willThrowException(new PDOException('Connection refused'));
+
+        $connection = new Connection($directPdo, 'write_db', '', [
+            'driver' => 'pgsql',
+            'name' => 'pgsql',
+            'host' => 'pooler-host',
+            'port' => '6432',
+            'database' => 'write_db',
+        ]);
+        $connection->useDefaultQueryGrammar();
+        $connection->useDefaultPostProcessor();
+        $connection->setReadWriteType('direct');
+        $connection->setDirectPdoConfig([
+            'host' => 'direct-host',
+            'port' => '5432',
+            'database' => 'direct_db',
+        ]);
+
+        try {
+            $connection->select('SELECT * FROM users', useReadPdo: false);
+            $this->fail('Expected QueryException was not thrown');
+        } catch (QueryException $e) {
+            $this->assertSame('direct', $e->readWriteType);
+
+            $connectionDetails = $e->getConnectionDetails();
+            $this->assertSame('direct-host', $connectionDetails['host']);
+            $this->assertSame('5432', $connectionDetails['port']);
+            $this->assertSame('direct_db', $connectionDetails['database']);
         }
     }
 

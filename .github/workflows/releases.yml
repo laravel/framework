@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Remove optional "v" prefix
         id: version
@@ -66,7 +66,7 @@ jobs:
           commit_message: "Update version to v${{ steps.version.outputs.version }}"
 
       - name: SSH into splitter server
-        uses: appleboy/ssh-action@1530429296e979861824d74fb800013190b5dee0 # master
+        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 # v1.2.5
         with:
           host: 104.248.56.26
           username: forge
@@ -107,6 +107,9 @@ jobs:
               RELEASE_NOTES=$(echo -n "$RELEASE_NOTES" | sed "${START_FROM}d")
           fi
 
+          # Strip leading "#" to prevent rendering as markdown headings
+          RELEASE_NOTES=$(echo -n "$RELEASE_NOTES" | sed 's/^\(\* \)#\+\s*/\1/')
+
           {
             echo 'notes<<EOF'
             echo "$RELEASE_NOTES"
@@ -116,7 +119,7 @@ jobs:
           RELEASE_NOTES: ${{ steps.generated-notes.outputs.release-notes }}
 
       - name: Create release
-        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
+        uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b # v3.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

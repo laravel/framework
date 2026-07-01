@@ -15,6 +15,17 @@ class NoLock extends Lock
     }
 
     /**
+     * Attempt to refresh the lock for the given number of seconds.
+     *
+     * @param  int|null  $seconds
+     * @return bool
+     */
+    public function refresh($seconds = null)
+    {
+        return true;
+    }
+
+    /**
      * Release the lock.
      *
      * @return bool

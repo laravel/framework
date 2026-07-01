@@ -1018,6 +1018,7 @@ if (! function_exists('__')) {
      * @param  string|null  $key
      * @param  array  $replace
      * @param  string|null  $locale
+     * @return ($key is null ? null : array|string)
      */
     function __($key = null, $replace = [], $locale = null): string|array|null
     {

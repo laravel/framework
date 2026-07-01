@@ -4,6 +4,9 @@ namespace Illuminate\Contracts\Debug;
 
 use Throwable;
 
+/**
+ * @method bool shouldStopRetries(\Throwable $e)
+ */
 interface ExceptionHandler
 {
     /**

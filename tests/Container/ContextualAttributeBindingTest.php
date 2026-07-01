@@ -35,6 +35,7 @@ use Illuminate\Log\LogManager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use ReflectionParameter;
 
 class ContextualAttributeBindingTest extends TestCase
 {
@@ -254,6 +255,20 @@ class ContextualAttributeBindingTest extends TestCase
         $container->make(RouteParameterTest::class);
     }
 
+    public function testRouteParameterAttributeWithouthParameterName()
+    {
+        $container = new Container;
+        $container->singleton('request', function () {
+            $request = m::mock(Request::class);
+            $request->shouldReceive('route')->with('foo')->andReturn(m::mock(Model::class));
+            $request->shouldReceive('route')->with('bar')->andReturn('bar');
+
+            return $request;
+        });
+
+        $container->make(RouteParameterTestWithoutParameterName::class);
+    }
+
     public function testContextAttribute(): void
     {
         $container = new Container;
@@ -368,6 +383,28 @@ class ContextualAttributeBindingTest extends TestCase
         });
 
         $this->assertEquals([1, 2], iterator_to_array($value));
+    }
+
+    public function testParameterIsPassedToContextualAttributeResolver()
+    {
+        $container = new Container;
+
+        $value = $container->make(HasParameterAwareAttribute::class);
+
+        $this->assertSame('name', $value->name);
+    }
+
+    public function testParameterIsPassedToContextualAttributeResolverOnAppCall()
+    {
+        $container = new Container;
+
+        $value = $container->call(function (
+            #[ContainerTestParameterAwareAttribute] ?string $name
+        ) {
+            return $name;
+        });
+
+        $this->assertSame('name', $value);
     }
 }
 
@@ -495,6 +532,15 @@ final class ContainerTestConfigValueWithResolveAndAfter implements ContextualAtt
     }
 }
 
+#[Attribute(Attribute::TARGET_PARAMETER)]
+final class ContainerTestParameterAwareAttribute implements ContextualAttribute
+{
+    public function resolve(self $attribute, Container $container, ReflectionParameter $parameter): string
+    {
+        return $parameter->getName();
+    }
+}
+
 final class ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback
 {
     public function __construct(
@@ -592,6 +638,13 @@ final class RouteParameterTest
     }
 }
 
+final class RouteParameterTestWithoutParameterName
+{
+    public function __construct(#[RouteParameter] Model $foo, #[RouteParameter] string $bar)
+    {
+    }
+}
+
 final class StorageTest
 {
     public function __construct(
@@ -634,6 +687,15 @@ final class LocaleObject
 {
     public function __construct(
         #[Config('app.locale')] public readonly ?string $locale
+    ) {
+        //
+    }
+}
+
+final class HasParameterAwareAttribute
+{
+    public function __construct(
+        #[ContainerTestParameterAwareAttribute] public readonly ?string $name,
     ) {
         //
     }

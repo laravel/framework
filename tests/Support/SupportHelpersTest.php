@@ -136,7 +136,7 @@ class SupportHelpersTest extends TestCase
         $this->assertNull(when(0, fn () => null));
         $this->assertSame('True', when([1, 2, 3, 4], 'True')); // Array
         $this->assertNull(when([], 'True')); // Empty Array = Falsy
-        $this->assertSame('True', when(new StdClass, fn () => 'True')); // Object
+        $this->assertSame('True', when(new stdClass, fn () => 'True')); // Object
         $this->assertSame('World', when(false, 'Hello', 'World'));
         $this->assertSame('World', when(1 === 0, 'Hello', 'World')); // strict types
         $this->assertSame('World', when(1 == '0', 'Hello', 'World')); // loose types
@@ -1522,6 +1522,23 @@ class SupportHelpersTest extends TestCase
             ]),
             $filesystem->get($path)
         );
+    }
+
+    public function testWriteVariableQuotesValuesWithSpecialCharacters()
+    {
+        $filesystem = new Filesystem;
+        $path = __DIR__.'/tmp/env-test-file';
+        $filesystem->put($path, 'APP_NAME=Laravel'.PHP_EOL);
+
+        Env::writeVariable('APP_BRACKET', 'pass[word', $path);
+        Env::writeVariable('APP_CARET', 'foo^bar', $path);
+        Env::writeVariable('APP_BACKTICK', 'foo`bar', $path);
+
+        $contents = $filesystem->get($path);
+
+        $this->assertStringContainsString('APP_BRACKET="pass[word"', $contents);
+        $this->assertStringContainsString('APP_CARET="foo^bar"', $contents);
+        $this->assertStringContainsString('APP_BACKTICK="foo`bar"', $contents);
     }
 
     public function testWillThrowAnExceptionIfFileIsMissingWhenTryingToWriteVariables(): void

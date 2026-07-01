@@ -64,6 +64,44 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('foo', $t->get('foo::bar.foo'));
     }
 
+    public function testStringMethodProperlyLoadsAndRetrievesStringItem()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['baz' => 'breeze :foo']);
+        $this->assertSame('breeze bar', $t->string('foo::bar.baz', ['foo' => 'bar'], 'en'));
+    }
+
+    public function testStringMethodThrowsExceptionForArrayItem()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['baz' => ['breeze']]);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Translation value for key [foo::bar.baz] must be a string, array given.');
+
+        $t->string('foo::bar.baz', [], 'en');
+    }
+
+    public function testArrayMethodProperlyLoadsAndRetrievesArrayItem()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['baz' => ['breeze :foo']]);
+        $this->assertSame(['breeze bar'], $t->array('foo::bar.baz', ['foo' => 'bar'], 'en'));
+    }
+
+    public function testArrayMethodThrowsExceptionForStringItem()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['baz' => 'breeze']);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Translation value for key [foo::bar.baz] must be an array, string given.');
+
+        $t->array('foo::bar.baz', [], 'en');
+    }
+
     public function testGetMethodForNonExistingReturnsSameKey()
     {
         $t = new Translator($this->getLoader(), 'en');

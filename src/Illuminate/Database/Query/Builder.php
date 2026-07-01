@@ -495,6 +495,8 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>|string  $vector
      * @param  string|null  $as
      * @return $this
+     *
+     * @throws \JsonException
      */
     public function selectVectorDistance($column, $vector, $as = null)
     {
@@ -1240,6 +1242,8 @@ class Builder implements BuilderContract
      * @param  float  $maxDistance
      * @param  string  $boolean
      * @return $this
+     *
+     * @throws \JsonException
      */
     public function whereVectorDistanceLessThan($column, $vector, $maxDistance, $boolean = 'and')
     {
@@ -3035,6 +3039,8 @@ class Builder implements BuilderContract
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>  $vector
      * @return $this
+     *
+     * @throws \JsonException
      */
     public function orderByVectorDistance($column, $vector)
     {

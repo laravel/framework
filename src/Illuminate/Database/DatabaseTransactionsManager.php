@@ -159,7 +159,7 @@ class DatabaseTransactionsManager
     protected function removeAllTransactionsForConnection($connection)
     {
         if ($this->currentTransaction) {
-            for ($currentTransaction = $this->currentTransaction[$connection]; isset($currentTransaction); $currentTransaction = $currentTransaction->parent) {
+            for ($currentTransaction = $this->currentTransaction[$connection] ?? null; isset($currentTransaction); $currentTransaction = $currentTransaction->parent) {
                 $currentTransaction->executeCallbacksForRollback();
             }
         }
@@ -248,7 +248,7 @@ class DatabaseTransactionsManager
     /**
      * Get all of the pending transactions.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>
      */
     public function getPendingTransactions()
     {
@@ -258,7 +258,7 @@ class DatabaseTransactionsManager
     /**
      * Get all of the committed transactions.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Database\DatabaseTransactionRecord>
      */
     public function getCommittedTransactions()
     {

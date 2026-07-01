@@ -176,7 +176,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     protected function parseConnectionName($name)
     {
-        return Str::endsWith($name, ['::read', '::write'])
+        return Str::endsWith($name, ['::read', '::write', '::direct'])
             ? explode('::', $name, 2)
             : [$name, null];
     }
@@ -290,6 +290,9 @@ class DatabaseManager implements ConnectionResolverInterface
             $connection->setPdo($connection->getReadPdo());
         } elseif ($type === 'write') {
             $connection->setReadPdo($connection->getPdo());
+        } elseif ($type === 'direct') {
+            $connection->setPdo($connection->getDirectPdo())
+                ->setReadPdo($connection->getDirectPdo());
         }
 
         return $connection;
@@ -343,9 +346,11 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Set the default database connection for the callback execution.
      *
+     * @template TReturn
+     *
      * @param  \UnitEnum|string  $name
-     * @param  callable  $callback
-     * @return mixed
+     * @param  (callable(): TReturn)  $callback
+     * @return TReturn
      */
     public function usingConnection($name, callable $callback)
     {
@@ -376,7 +381,8 @@ class DatabaseManager implements ConnectionResolverInterface
 
         return $this->connections[$name]
             ->setPdo($fresh->getRawPdo())
-            ->setReadPdo($fresh->getRawReadPdo());
+            ->setReadPdo($fresh->getRawReadPdo())
+            ->setDirectPdo($fresh->getRawDirectPdo());
     }
 
     /**

@@ -129,8 +129,8 @@ class QueueManager implements FactoryContract, MonitorContract
      * Set the queue route for the given class.
      *
      * @param  array|class-string  $class
-     * @param  string|null  $queue
-     * @param  string|null  $connection
+     * @param  \UnitEnum|string|null  $queue
+     * @param  \UnitEnum|string|null  $connection
      * @return void
      */
     public function route(array|string $class, $queue = null, $connection = null)

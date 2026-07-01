@@ -10,6 +10,7 @@ class InspectedJob
      * Create a new inspected job instance.
      *
      * @param  string|null  $uuid  The unique identifier for the job.
+     * @param  string|null  $queue  The name of the queue the job is on.
      * @param  string|null  $name  The display name of the job.
      * @param  int  $attempts  The number of times the job has been attempted.
      * @param  array  $payload
@@ -17,6 +18,7 @@ class InspectedJob
      */
     public function __construct(
         public readonly ?string $uuid,
+        public readonly ?string $queue,
         public readonly ?string $name,
         public readonly int $attempts,
         public readonly array $payload = [],
@@ -29,14 +31,16 @@ class InspectedJob
      *
      * @param  string  $payload  The raw JSON job payload.
      * @param  int|null  $attempts  The number of times the job has been attempted.
+     * @param  string|null  $queue  The name of the queue the job is on.
      * @return static
      */
-    public static function fromPayload(string $payload, ?int $attempts = null): static
+    public static function fromPayload(string $payload, ?int $attempts = null, ?string $queue = null): static
     {
         $decoded = json_decode($payload, true);
 
         return new static(
             uuid: $decoded['uuid'] ?? null,
+            queue: $queue,
             name: $decoded['displayName'] ?? null,
             attempts: $attempts ?? $decoded['attempts'] ?? 0,
             payload: $decoded,

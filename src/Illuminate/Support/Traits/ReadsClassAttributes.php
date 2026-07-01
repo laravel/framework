@@ -71,6 +71,16 @@ trait ReadsClassAttributes
 
                     return $attributes[0]->newInstance();
                 }
+
+                foreach ($reflection->getTraits() as $trait) {
+                    $attributes = $trait->getAttributes($attributeClass);
+
+                    if (count($attributes) > 0) {
+                        $declaringClass = $reflection;
+
+                        return $attributes[0]->newInstance();
+                    }
+                }
             } while ($reflection = $reflection->getParentClass());
         } catch (Exception) {
             //

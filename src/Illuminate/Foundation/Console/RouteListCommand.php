@@ -236,6 +236,8 @@ class RouteListCommand extends Command
      *
      * @param  \Illuminate\Routing\Route  $route
      * @return string|null
+     *
+     * @throws \ReflectionException
      */
     protected function getClosurePath(Route $route)
     {

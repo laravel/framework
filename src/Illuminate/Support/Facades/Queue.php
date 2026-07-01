@@ -13,7 +13,7 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static void failing(mixed $callback)
  * @method static void starting(mixed $callback)
  * @method static void stopping(mixed $callback)
- * @method static void route(array|string $class, string|null $queue = null, string|null $connection = null)
+ * @method static void route(array|string $class, \UnitEnum|string|null $queue = null, \UnitEnum|string|null $connection = null)
  * @method static bool connected(\UnitEnum|string|null $name = null)
  * @method static \Illuminate\Contracts\Queue\Queue connection(\UnitEnum|string|null $name = null)
  * @method static void pause(string $connection, string $queue)
