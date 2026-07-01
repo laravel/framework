@@ -376,7 +376,7 @@ class Number
     public static function sup(int $number): string
     {
         if ($number < 0) {
-            throw new InvalidArgumentException('Negative numbers are not supported');
+            throw new \InvalidArgumentException('Negative numbers are not supported');
         }
 
         if ($number > 9) {
@@ -403,7 +403,7 @@ class Number
     public static function sub(int $number): string
     {
         if ($number < 0) {
-            throw new InvalidArgumentException('Negative numbers are not supported');
+            throw new \InvalidArgumentException('Negative numbers are not supported');
         }
 
         if ($number > 9) {
