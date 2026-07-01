@@ -827,11 +827,6 @@ class ShouldntRetryExceptionHandler implements ExceptionHandler
         return true;
     }
 
-    /**
-     * Creates the context for an exception.
-     *
-     * @return array<array-key, mixed>
-     */
     public function buildContextForException(\Throwable $e)
     {
         return [];
