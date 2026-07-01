@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Number;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
@@ -415,5 +416,45 @@ class SupportNumberTest extends TestCase
 
         $this->assertSame(1234.56, Number::parseFloat('1.234,56', locale: 'de'));
         $this->assertSame(1234.56, Number::parseFloat('1 234,56', locale: 'fr'));
+    }
+
+    #[DataProvider('provideSupNumbers')
+    public function testSup(int $number, string $result)
+    {
+        $this->assertSame($result, Number::sup($number));
+    }
+
+    public function testSupFails()
+    {
+        $this->expectExceptionObject(new \InvalidArgumentException('Negative numbers are not supported'));
+        Number::sup(-1);
+    }
+
+    public static function provideSupNumbers(): array
+    {
+        return [
+            'single-digit number' => [0, '⁰'],
+            'multi-digit number' => [42, '⁴²'],
+        ];
+    }
+
+    #[DataProvider('provideSubNumbers')
+    public function testSub(int $number, string $result)
+    {
+        $this->assertSame($result, Number::sub($number));
+    }
+
+    public function testSubFails()
+    {
+        $this->expectExceptionObject(new \InvalidArgumentException('Negative numbers are not supported'));
+        Number::sub(-1);
+    }
+
+    public static function provideSubNumbers(): array
+    {
+        return [
+            'single-digit number' => [0, '₀'],
+            'multi-digit number' => [42, '₄₂'],
+        ];
     }
 }
