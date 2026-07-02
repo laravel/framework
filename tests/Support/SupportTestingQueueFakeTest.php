@@ -585,6 +585,61 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->assertPushedOn('foo', JobStub::class);
     }
 
+    public function testReservedJobs()
+    {
+        $this->fake->reserve($this->job, 'foo');
+        $this->fake->reserve(new JobToFakeStub, 'bar');
+
+        $reserved = $this->fake->reservedJobs('foo');
+
+        $this->assertCount(1, $reserved);
+        $this->assertInstanceOf(InspectedJob::class, $reserved->first());
+        $this->assertSame(JobStub::class, $reserved->first()->name);
+        $this->assertSame(0, $reserved->first()->attempts);
+        $this->assertSame('foo', $reserved->first()->queue);
+    }
+
+    public function testAllReservedJobs()
+    {
+        $this->fake->reserve($this->job, 'foo');
+        $this->fake->reserve(new JobToFakeStub, 'bar');
+
+        $reserved = $this->fake->allReservedJobs();
+
+        $this->assertCount(2, $reserved);
+        $this->assertInstanceOf(InspectedJob::class, $reserved->first());
+        $this->assertTrue($reserved->contains(fn ($job) => $job->name === JobStub::class));
+        $this->assertTrue($reserved->contains(fn ($job) => $job->name === JobToFakeStub::class));
+    }
+
+    public function testReservedSize()
+    {
+        $this->fake->reserve($this->job, 'foo');
+        $this->fake->reserve(new JobToFakeStub, 'bar');
+
+        $this->assertSame(1, $this->fake->reservedSize('foo'));
+        $this->assertSame(1, $this->fake->reservedSize('bar'));
+        $this->assertSame(0, $this->fake->reservedSize('baz'));
+    }
+
+    public function testReservedJobsAreNotPushed()
+    {
+        $this->fake->reserve($this->job, 'foo');
+
+        $this->fake->assertNotPushed(JobStub::class);
+    }
+
+    public function testClearReserved()
+    {
+        $this->fake->reserve($this->job, 'foo');
+        $this->fake->reserve(new JobToFakeStub, 'bar');
+
+        $this->fake->clearReserved();
+
+        $this->assertSame(0, $this->fake->reservedSize('foo'));
+        $this->assertSame(0, $this->fake->reservedSize('bar'));
+    }
+
     public function testGetRawPushes()
     {
         $this->fake->pushRaw('some-payload', null, ['options' => 'yeah']);
