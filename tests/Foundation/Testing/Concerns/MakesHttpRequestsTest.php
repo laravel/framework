@@ -270,6 +270,7 @@ class MakesHttpRequestsTest extends TestCase
         $router = $this->app->make(Registrar::class);
         $router->get('/', fn () => 'tada!')->name('foo');
         $router->match(['PUT', 'PATCH'], '/', fn () => 'tada!')->name('bar');
+        $router->delete('/', fn () => 'tada!')->name('baz');
         $response = $this->callRoute($name, method: $method);
         $response->assertOk();
         $response->assertSeeText('tada!');
@@ -281,9 +282,10 @@ class MakesHttpRequestsTest extends TestCase
     public static function providesCallRouteOptions(): array
     {
         return [
-            'unambigious HTTP method' => [RouteNames::Foo, null],
+            'unambigious HTTP method' => ['baz', null],
+            'GET/HEAD HTTP method fallback' => [RouteNames::Foo, null],
             'provide HTTP method for ambigious route' => [RouteNames::Bar, 'PUT'],
-            'provide HTTP method despite being unambigious' => ['foo', 'GET'],
+            'provide HTTP method despite being unambigious' => ['baz', 'DELETE'],
         ];
     }
 }
