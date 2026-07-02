@@ -10,9 +10,7 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Predis\Client;
 use Predis\Retry\Retry;
-use Predis\Retry\Strategy\EqualBackoff;
-use Predis\Retry\Strategy\ExponentialBackoff;
-use Predis\Retry\Strategy\NoBackoff;
+use Predis\Retry\Strategy\RetryStrategyInterface;
 
 class PredisConnector implements Connector
 {
@@ -77,22 +75,20 @@ class PredisConnector implements Connector
             return $config;
         }
 
-        if (! class_exists(Retry::class) ||
-            ! class_exists(ExponentialBackoff::class) ||
-            ! class_exists(EqualBackoff::class) ||
-            ! class_exists(NoBackoff::class)) {
+        if (! class_exists(Retry::class) || ! interface_exists(RetryStrategyInterface::class)) {
             throw new InvalidArgumentException('Predis retry configuration requires predis/predis 3.4.0 or newer.');
         }
 
-        $retry = $config['retry'];
-        $retries = Arr::pull($retry, 'max_retries', Arr::pull($retry, 'retries', 0));
-        $algorithm = Arr::pull($retry, 'backoff_algorithm', 'exponential');
-        $base = Arr::pull($retry, 'backoff_base', ExponentialBackoff::DEFAULT_BASE);
-        $cap = Arr::pull($retry, 'backoff_cap', ExponentialBackoff::DEFAULT_CAP);
+        $strategy = array_key_first($config['retry']);
+        $retries = $config['max_retries'] ?? 0;
+
+        if (! is_subclass_of($strategy, RetryStrategyInterface::class)) {
+            throw new InvalidArgumentException("Strategy [{$strategy}] is not a valid Predis backoff strategy.");
+        }
 
         $config['retry'] = new Retry(
-            $this->parseBackoffStrategy($algorithm, (int) $base, (int) $cap),
-            (int) $retries
+            new $strategy(...$config['retry'][$strategy]),
+            $retries,
         );
 
         return $config;

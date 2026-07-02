@@ -89,11 +89,11 @@ class PredisConnectorTest extends TestCase
         $config = $connector->testFormatRetry([
             'host' => '127.0.0.1',
             'retry' => [
-                'max_retries' => 3,
-                'backoff_algorithm' => 'exponential',
-                'backoff_base' => 250000,
-                'backoff_cap' => 2000000,
+                ExponentialBackoff::class => [
+                    250_000, 2_000_000,
+                ],
             ],
+            'max_retries' => 3,
         ]);
 
         $this->assertInstanceOf(Retry::class, $config['retry']);
@@ -127,10 +127,9 @@ class PredisConnectorTest extends TestCase
 
         $config = $connector->testFormatRetry([
             'retry' => [
-                'max_retries' => 3,
-                'backoff_algorithm' => 'constant',
-                'backoff_base' => 250000,
+                EqualBackoff::class => [250_000],
             ],
+            'max_retries' => 3,
         ]);
 
         $this->assertInstanceOf(EqualBackoff::class, $config['retry']->getStrategy());
@@ -145,9 +144,9 @@ class PredisConnectorTest extends TestCase
 
         $config = $connector->testFormatRetry([
             'retry' => [
-                'max_retries' => 3,
-                'backoff_algorithm' => 'none',
+                NoBackoff::class => [],
             ],
+            'max_retries' => 3,
         ]);
 
         $this->assertInstanceOf(NoBackoff::class, $config['retry']->getStrategy());
@@ -178,13 +177,13 @@ class PredisConnectorTest extends TestCase
         $connector = new TestablePredisConnector;
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Algorithm [bogus] is not a valid Predis backoff algorithm.');
+        $this->expectExceptionMessage('Strategy [bogus] is not a valid Predis backoff strategy.');
 
         $connector->testFormatRetry([
             'retry' => [
-                'max_retries' => 3,
-                'backoff_algorithm' => 'bogus',
+                'bogus' => [],
             ],
+            'max_retries' => 3,
         ]);
     }
 
