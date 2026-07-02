@@ -10,6 +10,7 @@ use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use UnitEnum;
 
 class MakesHttpRequestsTest extends TestCase
 {
@@ -244,7 +245,7 @@ class MakesHttpRequestsTest extends TestCase
     }
 
     #[DataProvider('providesCallRouteExceptions')]
-    public function testCallRouteFails(string $name, ?string $method, \Throwable $exception)
+    public function testCallRouteFails(string|UnitEnum $name, ?string $method, \Throwable $exception)
     {
         $this->expectExceptionObject($exception);
 
@@ -267,7 +268,7 @@ class MakesHttpRequestsTest extends TestCase
     }
 
     #[DataProvider('providesCallRouteOptions')]
-    public function testCallRouteSucceeds(string $name, ?string $method)
+    public function testCallRouteSucceeds(string|UnitEnum $name, ?string $method)
     {
         $router = $this->app->make(Registrar::class);
         $router->get('/', fn () => 'tada!')->name('foo');
