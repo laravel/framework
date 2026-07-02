@@ -581,6 +581,37 @@ trait MakesHttpRequests
         );
     }
 
+    public function callRoute(BackedEnum|string $name, array $parameters = [], array $cookies = [], array $files = [], array $server = [], ?string $content = null, ?string $method = null): TestResponse
+    {
+        if ($name instanceof BackedEnum && ! is_string($name = $name->value)) {
+            throw new InvalidArgumentException('Attribute [name] expects a string backed enum.');
+        }
+
+        if (is_null($route = app('router')->getRoutes()->getByName($name))) {
+            throw new RouteNotFoundException("Route [{$name}] not defined.");
+        }
+
+        if (count($route->methods) > 1 && $method === null) {
+            throw new InvalidArgumentException('This route supports multiple HTTP methods. Please provide one of: ' implode(', ', $route->methods));
+        }
+
+        if ($method !== null && in_array($method, $route->methods)) {
+            throw new InvalidArgumentException("HTTP method [{$method}] not support by this route. Please provide one of: " implode(', ', $route->methods));
+        }
+
+        $method ??= $route->methods[0];
+        
+        return $this->call(
+            $method,
+            $route->uri,
+            [],
+            $this->prepareCookiesForJsonRequest(),
+            $files,
+            $this->transformHeadersToServerVars($headers),
+            $content,
+        );
+    }
+
     /**
      * Call the given URI and return the Response.
      *
