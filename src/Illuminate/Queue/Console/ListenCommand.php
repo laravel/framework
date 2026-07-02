@@ -111,7 +111,7 @@ class ListenCommand extends Command
             sleep: $this->option('sleep'),
             maxTries: $this->option('tries'),
             force: $this->option('force'),
-            rest: $this->option('rest'),
+            rest: $this->option('rest')
         );
     }
 
