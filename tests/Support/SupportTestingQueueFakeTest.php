@@ -622,15 +622,15 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->assertSame(0, $this->fake->reservedSize('baz'));
     }
 
-    public function testDeleteReserved()
+    public function testClearReserved()
     {
         $this->fake->reserve($this->job, 'foo');
         $this->fake->reserve(new JobToFakeStub, 'bar');
 
-        $this->fake->deleteReserved($this->job, 'foo');
+        $this->fake->clearReserved();
 
         $this->assertSame(0, $this->fake->reservedSize('foo'));
-        $this->assertSame(1, $this->fake->reservedSize('bar'));
+        $this->assertSame(0, $this->fake->reservedSize('bar'));
     }
 
     public function testGetRawPushes()

@@ -639,25 +639,13 @@ class QueueFake extends QueueManager implements Fake, Queue
     }
 
     /**
-     * Delete a reserved job.
+     * Clear all of the reserved jobs.
      *
-     * @param  string|object  $job
-     * @param  \UnitEnum|string|null  $queue
      * @return void
      */
-    public function deleteReserved($job, $queue = null)
+    public function clearReserved()
     {
-        $queue = enum_value($queue);
-
-        $class = is_object($job) ? get_class($job) : $job;
-
-        foreach ($this->reserved[$class] ?? [] as $index => $reserved) {
-            if ($reserved['queue'] === $queue) {
-                unset($this->reserved[$class][$index]);
-
-                break;
-            }
-        }
+        $this->reserved = [];
     }
 
     /**
