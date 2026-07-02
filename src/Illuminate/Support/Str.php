@@ -870,7 +870,7 @@ class Str
 
         $start = mb_substr($string, 0, $startIndex, $encoding);
         $segmentLen = mb_strlen($segment, $encoding);
-        $end = mb_substr($string, $startIndex + $segmentLen);
+        $end = mb_substr($string, $startIndex + $segmentLen, null, $encoding);
 
         return $start.str_repeat(mb_substr($character, 0, 1, $encoding), $segmentLen).$end;
     }

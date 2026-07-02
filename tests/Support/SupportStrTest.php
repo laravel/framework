@@ -1255,6 +1255,12 @@ class SupportStrTest extends TestCase
         $this->assertSame('maria@email.co*', Str::mask('maria@email.com', '*', -1));
         $this->assertSame('***************', Str::mask('maria@email.com', '*', -15));
         $this->assertSame('***************', Str::mask('maria@email.com', '*', 0));
+
+        // the trailing portion of the string must respect a non-default encoding
+        $latin1 = mb_convert_encoding('José Pérez García', 'ISO-8859-1', 'UTF-8');
+        $expected = mb_convert_encoding('José ***** García', 'ISO-8859-1', 'UTF-8');
+        $this->assertSame($expected, Str::mask($latin1, '*', 5, 5, 'ISO-8859-1'));
+        $this->assertSame($expected, Str::mask($latin1, '*', -12, 5, 'ISO-8859-1'));
     }
 
     public function testMatch(): void
