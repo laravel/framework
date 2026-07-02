@@ -55,6 +55,13 @@ class QueueFake extends QueueManager implements Fake, Queue
     protected $jobs = [];
 
     /**
+     * All of the jobs that have been pushed with a delay.
+     *
+     * @var array
+     */
+    protected $delayed = [];
+
+    /**
      * All of the payloads that have been raw pushed.
      *
      * @var list<RawPushType>
@@ -460,7 +467,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function delayedSize($queue = null)
     {
-        return 0;
+        return $this->delayedJobs($queue)->count();
     }
 
     /**
@@ -482,32 +489,18 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function pendingJobs($queue = null): Collection
     {
-        $queue = enum_value($queue);
-
-        return (new Collection($this->jobs))
-            ->flatten(1)
-            ->filter(fn ($job) => $job['queue'] === $queue)
-            ->map(fn ($data) => new InspectedJob(
-                uuid: null,
-                name: is_object($data['job'])
-                    ? (method_exists($data['job'], 'displayName') ? $data['job']->displayName() : get_class($data['job']))
-                    : $data['job'],
-                attempts: 0,
-                payload: [],
-                queue: $queue,
-                createdAt: null,
-            ));
+        return $this->allPendingJobs()->whereStrict('queue', enum_value($queue))->values();
     }
 
     /**
      * Get the delayed jobs for the given queue.
      *
      * @param  \UnitEnum|string|null  $queue
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
      */
     public function delayedJobs($queue = null): Collection
     {
-        return new Collection;
+        return $this->allDelayedJobs()->whereStrict('queue', enum_value($queue))->values();
     }
 
     /**
@@ -528,7 +521,28 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function allPendingJobs(): Collection
     {
-        return (new Collection($this->jobs))
+        return $this->inspectJobs($this->jobs);
+    }
+
+    /**
+     * Get all delayed jobs across every queue.
+     *
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
+     */
+    public function allDelayedJobs(): Collection
+    {
+        return $this->inspectJobs($this->delayed);
+    }
+
+    /**
+     * Map an array of jobs to a collection of inspected jobs.
+     *
+     * @param  array  $jobs
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
+     */
+    protected function inspectJobs(array $jobs): Collection
+    {
+        return (new Collection($jobs))
             ->flatten(1)
             ->map(fn ($data) => new InspectedJob(
                 uuid: null,
@@ -540,16 +554,6 @@ class QueueFake extends QueueManager implements Fake, Queue
                 queue: $data['queue'],
                 createdAt: null,
             ));
-    }
-
-    /**
-     * Get all delayed jobs across every queue.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function allDelayedJobs(): Collection
-    {
-        return new Collection;
     }
 
     /**
@@ -674,6 +678,13 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
+        if ($this->shouldFakeJob($job)) {
+            $this->delayed[is_object($job) ? get_class($job) : $job][] = [
+                'job' => $job,
+                'queue' => enum_value($queue),
+            ];
+        }
+
         return $this->push($job, $data, $queue);
     }
 
@@ -701,7 +712,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function laterOn($queue, $delay, $job, $data = '')
     {
-        return $this->push($job, $data, $queue);
+        return $this->later($delay, $job, $data, $queue);
     }
 
     /**
