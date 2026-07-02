@@ -7,6 +7,7 @@ use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 use Illuminate\Http\RedirectResponse;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class MakesHttpRequestsTest extends TestCase
 {
@@ -239,6 +240,64 @@ class MakesHttpRequestsTest extends TestCase
             ->assertHeader('Precognition', 'true')
             ->assertHeader('Precognition-Success', 'true');
     }
+
+    #[DataProvider('providesCallRouteExceptions')]
+    public function testCallRouteFails(string $name, ?string $method, \Throwable $exception)
+    {
+        $this->expectExceptionObject($exception);
+
+        $router = $this->app->make(Registrar::class);
+        $router->match(['PUT', 'PATCH'], '/', fn () => '')->name('test');
+        $this->callRoute($name, method: $method);
+    }
+
+    /**
+     * @return array<string, array{string|BackedEnum, ?string, \Throwable}>
+     */
+    public static function providesCallRouteExceptions(): array
+    {
+        return [
+            'integer-backed enum' => [RouteNumbers::Foo, null, new InvalidArgumentException('Attribute [name] expects a string backed enum.')],
+            'non-existing route' => ['foo', null, new RouteNotFoundException("Route [{$name}] not defined.")],
+            'ambigious HTTP method' => ['test', null, new InvalidArgumentException('This route supports multiple HTTP methods. Please provide one of: PUT, PATCH')],
+            'wrong HTTP method' => ['test', 'DELETE', new InvalidArgumentException('HTTP method [DELETE] not support by this route. Please provide one of: PUT, PATCH')],
+        ];
+    }
+
+    #[DataProvider('providesCallRouteOptions')]
+    public function testCallRouteSucceeds(string $name, ?string $method)
+    {
+        $router = $this->app->make(Registrar::class);
+        $router->get(['/', fn () => 'tada!')->name('foo');
+        $router->match(['PUT', 'PATCH'], '/', fn () => 'tada!')->name('bar');
+        $response = $this->callRoute($name, method: $method);
+        $response->assertOk();
+        $response->assertSeeText('tada!');
+    }
+
+    /**
+     * @return array<string, array{string|BackedEnum, ?string}>
+     */
+    public static function providesCallRouteOptions(): array
+    {
+        return [
+            'unambigious HTTP method' => [RouteNames::Foo, null],
+            'provide HTTP method for ambigious route' => [RouteNames::Bar, 'PUT'],
+            'provide HTTP method despite being unambigious' => ['foo', 'GET'],
+        ];
+    }
+}
+
+enum RouteNumbers: int
+{
+    case Foo = 1;
+    case Bar = 2;
+}
+
+enum RouteNames: string
+{
+    case Foo = 'foo';
+    case Bar = 'bar';
 }
 
 class MyMiddleware
