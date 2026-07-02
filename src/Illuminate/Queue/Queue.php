@@ -365,21 +365,7 @@ abstract class Queue
     {
         if ($this->shouldDispatchAfterCommit($job) &&
             $this->container->bound('db.transactions')) {
-            if ($job instanceof ShouldBeUnique) {
-                $this->container->make('db.transactions')->addCallbackForRollback(
-                    function () use ($job) {
-                        (new UniqueLock($this->container->make(Cache::class)))->release($job);
-                    }
-                );
-            }
-
-            if (! empty($job->debounceOwner ?? '')) {
-                $this->container->make('db.transactions')->addCallbackForRollback(
-                    function () use ($job) {
-                        (new DebounceLock($this->container->make(Cache::class)))->release($job, $job->debounceOwner ?? '');
-                    }
-                );
-            }
+            $this->registerRollbackCallbacksForDeferredJob($job);
 
             return $this->container->make('db.transactions')->addCallback(
                 function () use ($queue, $job, $payload, $delay, $callback) {
@@ -416,6 +402,32 @@ abstract class Queue
         }
 
         return $this->dispatchAfterCommit ?? false;
+    }
+
+    /**
+     * Register rollback callbacks to release any unique or debounce locks held
+     * by the given job if the current database transaction is rolled back.
+     *
+     * @param  \Closure|string|object  $job
+     * @return void
+     */
+    protected function registerRollbackCallbacksForDeferredJob($job)
+    {
+        if ($job instanceof ShouldBeUnique) {
+            $this->container->make('db.transactions')->addCallbackForRollback(
+                function () use ($job) {
+                    (new UniqueLock($this->container->make(Cache::class)))->release($job);
+                }
+            );
+        }
+
+        if (! empty($job->debounceOwner ?? '')) {
+            $this->container->make('db.transactions')->addCallbackForRollback(
+                function () use ($job) {
+                    (new DebounceLock($this->container->make(Cache::class)))->release($job, $job->debounceOwner ?? '');
+                }
+            );
+        }
     }
 
     /**

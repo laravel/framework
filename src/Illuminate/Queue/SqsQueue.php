@@ -2,6 +2,8 @@
 
 namespace Illuminate\Queue;
 
+use Aws\Command;
+use Aws\Sqs\Exception\SqsException;
 use Aws\Sqs\SqsClient;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
@@ -18,6 +20,13 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      * @var int
      */
     const MAX_SQS_PAYLOAD_SIZE = 1048576;
+
+    /**
+     * The maximum number of messages allowed per SendMessageBatch request.
+     *
+     * @var int
+     */
+    const MAX_MESSAGES_PER_BATCH = 10;
 
     /**
      * The cache key prefix for extended SQS payloads.
@@ -361,7 +370,15 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Push an array of jobs onto the queue.
+     * Push an array of jobs onto the queue using the SendMessageBatch API.
+     *
+     * Entries are chunked to respect the SQS per-batch limits of 10 messages
+     * and {@see static::MAX_SQS_PAYLOAD_SIZE} cumulative payload bytes, then
+     * each chunk is dispatched sequentially. FIFO queues stop at the first
+     * failure to preserve ordering, while standard queues attempt every chunk
+     * and aggregate any failures. Per-job afterCommit, unique and debounce
+     * locks, delays, and JobQueueing / JobQueued events all behave identically
+     * to {@see static::push()}.
      *
      * @param  array  $jobs
      * @param  mixed  $data
@@ -370,13 +387,214 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function bulk($jobs, $data = '', $queue = null)
     {
-        foreach ((array) $jobs as $job) {
-            if (isset($job->delay)) {
-                $this->later($job->delay, $job, $data, $queue);
+        $jobs = array_values((array) $jobs);
+
+        if (empty($jobs)) {
+            return;
+        }
+
+        [$deferred, $immediate] = $this->partitionJobsByAfterCommit($jobs);
+
+        if (! empty($immediate)) {
+            $this->sendBatchedMessages($this->createBatchMessages($immediate, $data, $queue), $queue);
+        }
+
+        if (! empty($deferred)) {
+            foreach ($deferred as $job) {
+                $this->registerRollbackCallbacksForDeferredJob($job);
+            }
+
+            $messages = $this->createBatchMessages($deferred, $data, $queue);
+
+            $this->container->make('db.transactions')->addCallback(
+                fn () => $this->sendBatchedMessages($messages, $queue),
+            );
+        }
+    }
+
+    /**
+     * Partition the given jobs into those that should be deferred until the
+     * active database transaction commits and those that should be dispatched
+     * immediately.
+     *
+     * @param  array  $jobs
+     * @return array{0: array, 1: array}
+     */
+    protected function partitionJobsByAfterCommit(array $jobs)
+    {
+        if (! $this->container->bound('db.transactions')) {
+            return [[], $jobs];
+        }
+
+        $deferred = $immediate = [];
+
+        foreach ($jobs as $job) {
+            if ($this->shouldDispatchAfterCommit($job)) {
+                $deferred[] = $job;
             } else {
-                $this->push($job, $data, $queue);
+                $immediate[] = $job;
             }
         }
+
+        return [$deferred, $immediate];
+    }
+
+    /**
+     * Create the payload for each of the given jobs.
+     *
+     * Payloads are created at dispatch time, even for jobs deferred until
+     * after the transaction commits, mirroring {@see static::push()}.
+     *
+     * @param  array  $jobs
+     * @param  mixed  $data
+     * @param  string|null  $queue
+     * @return array<int, array{job: mixed, delay: mixed, payload: string}>
+     */
+    protected function createBatchMessages(array $jobs, $data, $queue)
+    {
+        return array_map(function ($job) use ($data, $queue) {
+            $delay = is_object($job) ? ($job->delay ?? null) : null;
+
+            return [
+                'job' => $job,
+                'delay' => $delay,
+                'payload' => $this->createPayload($job, $queue ?: $this->default, $data, $delay),
+            ];
+        }, $jobs);
+    }
+
+    /**
+     * Build entries for the given messages, raise the queueing events,
+     * dispatch each chunk via SendMessageBatch, and then raise the queued
+     * events using the message IDs returned by SQS.
+     *
+     * @param  array  $messages
+     * @param  string|null  $queue
+     * @return void
+     *
+     * @throws \Aws\Sqs\Exception\SqsException
+     * @throws \Throwable
+     */
+    protected function sendBatchedMessages(array $messages, $queue)
+    {
+        $entries = [];
+
+        foreach ($messages as $id => $message) {
+            $this->raiseJobQueueingEvent($queue, $message['job'], $message['payload'], $message['delay']);
+
+            $entries[$id] = $this->createBatchEntry($id, $message, $queue);
+        }
+
+        $queueUrl = $this->getQueue($queue);
+
+        // Chunks are dispatched one at a time and we stop at the first failure,
+        // mirroring push(): jobs already sent stay queued, later chunks are not
+        // attempted, and the error surfaces to the caller. Stopping also keeps
+        // FIFO ordering intact, since no later message can arrive ahead of one
+        // that was never sent.
+        foreach ($this->chunkBatchEntries($entries) as $chunk) {
+            // Request-level errors (throttling, auth, networking) throw an
+            // SqsException here, which we allow to propagate untouched.
+            $result = $this->sqs->sendMessageBatch([
+                'QueueUrl' => $queueUrl,
+                'Entries' => $chunk,
+            ]);
+
+            foreach ($result['Successful'] ?? [] as $success) {
+                if (! isset($messages[$success['Id']])) {
+                    continue;
+                }
+
+                $message = $messages[$success['Id']];
+
+                $this->raiseJobQueuedEvent(
+                    $queue, $success['MessageId'], $message['job'], $message['payload'], $message['delay']
+                );
+            }
+
+            // A batch can return HTTP 200 while still rejecting individual
+            // entries, which the SDK does not raise for. Surface those as the
+            // same SqsException a failed request would throw, carrying the
+            // reported error code and the full result, so the rejected jobs
+            // are not silently dropped.
+            if (! empty($result['Failed'])) {
+                $failure = $result['Failed'][0];
+
+                throw new SqsException(
+                    sprintf(
+                        'SQS SendMessageBatch rejected [%d] of [%d] messages. First failure [%s]: %s',
+                        count($result['Failed']),
+                        count($chunk),
+                        $failure['Code'] ?? 'Unknown',
+                        $failure['Message'] ?? '',
+                    ),
+                    new Command('SendMessageBatch', ['QueueUrl' => $queueUrl, 'Entries' => $chunk]),
+                    [
+                        'code' => $failure['Code'] ?? null,
+                        'message' => $failure['Message'] ?? null,
+                        'result' => $result,
+                    ],
+                );
+            }
+        }
+    }
+
+    /**
+     * Build the SendMessageBatch entry for a single prepared message.
+     *
+     * The entry Id is the message's index, which lets the response handler map
+     * each Successful / Failed result returned by SQS back to its job.
+     *
+     * @param  int  $id
+     * @param  array{job: mixed, delay: mixed, payload: string}  $message
+     * @param  string|null  $queue
+     * @return array
+     */
+    protected function createBatchEntry($id, array $message, $queue)
+    {
+        ['job' => $job, 'delay' => $delay, 'payload' => $payload] = $message;
+
+        return [
+            'Id' => (string) $id,
+            'MessageBody' => $this->willOverflow($payload) ? $this->overflow($payload) : $payload,
+            ...$this->getQueueableOptions($job, $queue, $payload, $delay),
+        ];
+    }
+
+    /**
+     * Chunk batch entries respecting both the 10-message and cumulative
+     * payload-size limits enforced by SendMessageBatch.
+     *
+     * @param  array  $entries
+     * @return array
+     */
+    protected function chunkBatchEntries(array $entries)
+    {
+        $chunks = [];
+        $current = [];
+        $currentBytes = 0;
+
+        foreach ($entries as $item) {
+            $bytes = strlen($item['MessageBody']);
+
+            $wouldExceedCount = count($current) >= static::MAX_MESSAGES_PER_BATCH;
+            $wouldExceedBytes = $currentBytes + $bytes > static::MAX_SQS_PAYLOAD_SIZE;
+
+            if (! empty($current) && ($wouldExceedCount || $wouldExceedBytes)) {
+                $chunks[] = $current;
+                $current = [];
+                $currentBytes = 0;
+            }
+
+            $current[] = $item;
+            $currentBytes += $bytes;
+        }
+
+        if (! empty($current)) {
+            $chunks[] = $current;
+        }
+
+        return $chunks;
     }
 
     /**
