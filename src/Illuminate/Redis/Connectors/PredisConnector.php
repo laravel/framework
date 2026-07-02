@@ -23,7 +23,7 @@ class PredisConnector implements Connector
      */
     public function connect(array $config, array $options)
     {
-        $config = $this->formatRetry($config);
+        $config = $this->formatRetryConfig($config);
 
         $formattedOptions = array_merge(
             ['timeout' => 10.0], $options, Arr::pull($config, 'options', [])
@@ -61,41 +61,10 @@ class PredisConnector implements Connector
         $options = array_merge($options, $clusterOptions, $clusterSpecificOptions);
 
         if (isset($options['parameters']) && is_array($options['parameters'])) {
-            $options['parameters'] = $this->formatRetry($options['parameters']);
+            $options['parameters'] = $this->formatRetryConfig($options['parameters']);
         }
 
         return new PredisClusterConnection(new Client($servers, $options));
-    }
-
-    /**
-     * Format scalar retry configuration into a Predis retry instance.
-     *
-     * @param  array  $config
-     * @return array
-     */
-    protected function formatRetry(array $config)
-    {
-        if (! array_key_exists('retry', $config) || ! is_array($config['retry'])) {
-            return $config;
-        }
-
-        if (! class_exists(Retry::class) || ! interface_exists(RetryStrategyInterface::class)) {
-            throw new InvalidArgumentException('Predis retry configuration requires predis/predis 3.4.0 or newer.');
-        }
-
-        $strategy = array_key_first($config['retry']);
-        $retries = $config['max_retries'] ?? 0;
-
-        if (! is_subclass_of($strategy, RetryStrategyInterface::class)) {
-            throw new InvalidArgumentException("Strategy [{$strategy}] is not a valid Predis backoff strategy.");
-        }
-
-        $config['retry'] = new Retry(
-            new $strategy(...$config['retry'][$strategy]),
-            $retries,
-        );
-
-        return $config;
     }
 
     /**
@@ -124,6 +93,38 @@ class PredisConnector implements Connector
 
         $config['scheme'] = $config['scheme'] ?? $hostScheme;
         $config['host'] = Str::after($host, "{$hostScheme}://");
+
+        return $config;
+    }
+
+    /**
+     * Format a scalar retry configuration into a Predis retry instance if applicable.
+     *
+     * @param  array  $config
+     * @return array
+     */
+    protected function formatRetryConfig(array $config)
+    {
+        if (! array_key_exists('retry', $config) || ! is_array($config['retry'])) {
+            return $config;
+        }
+
+        if (! class_exists(Retry::class) || ! interface_exists(RetryStrategyInterface::class)) {
+            throw new InvalidArgumentException('Predis retry configuration requires predis/predis 3.4.0 or newer.');
+        }
+
+        $strategy = array_key_first($config['retry']);
+
+        $retries = $config['max_retries'] ?? 0;
+
+        if (! is_subclass_of($strategy, RetryStrategyInterface::class)) {
+            throw new InvalidArgumentException("Strategy [{$strategy}] is not a valid Predis backoff strategy.");
+        }
+
+        $config['retry'] = new Retry(
+            new $strategy(...$config['retry'][$strategy]),
+            $retries,
+        );
 
         return $config;
     }
