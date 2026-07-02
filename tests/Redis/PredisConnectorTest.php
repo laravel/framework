@@ -104,6 +104,32 @@ class PredisConnectorTest extends TestCase
         $this->assertSame(2000000, $config['retry']->getStrategy()->getCap());
     }
 
+    public function testFormatRetryCreatesRetryFromScalarOptionsWithNamedArray()
+    {
+        $this->requiresPredisRetrySupport();
+
+        $connector = new TestablePredisConnector;
+
+        $config = $connector->testFormatRetry([
+            'host' => '127.0.0.1',
+            'retry' => [
+                ExponentialBackoff::class => [
+                    'withJitter' => true,
+                    'base' => 250_000,
+                    'cap' => 2_000_000,
+                ],
+            ],
+            'max_retries' => 3,
+        ]);
+
+        $this->assertInstanceOf(Retry::class, $config['retry']);
+        $this->assertSame(3, $config['retry']->getRetries());
+
+        $this->assertInstanceOf(ExponentialBackoff::class, $config['retry']->getStrategy());
+        $this->assertSame(250000, $config['retry']->getStrategy()->getBase());
+        $this->assertSame(2000000, $config['retry']->getStrategy()->getCap());
+    }
+
     public function testFormatRetryDoesNotTreatPhpRedisBackoffOptionsAsPredisRetryConfig()
     {
         $connector = new TestablePredisConnector;
