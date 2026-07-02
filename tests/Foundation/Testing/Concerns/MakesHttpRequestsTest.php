@@ -6,8 +6,10 @@ use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 use Illuminate\Http\RedirectResponse;
+use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class MakesHttpRequestsTest extends TestCase
 {
