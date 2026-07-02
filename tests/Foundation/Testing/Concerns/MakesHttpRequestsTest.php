@@ -249,8 +249,7 @@ class MakesHttpRequestsTest extends TestCase
     {
         $this->expectExceptionObject($exception);
 
-        $router = $this->app->make(Registrar::class);
-        $router->match(['PUT', 'PATCH'], '/', fn () => '')->name('test');
+        $router = $this->app['router']->match(['PUT', 'PATCH'], '/', fn () => '')->name('test');
         $this->callRoute($name, method: $method);
     }
 
@@ -270,10 +269,9 @@ class MakesHttpRequestsTest extends TestCase
     #[DataProvider('providesCallRouteOptions')]
     public function testCallRouteSucceeds(string|UnitEnum $name, ?string $method)
     {
-        $router = $this->app->make(Registrar::class);
-        $router->get('/', fn () => 'tada!')->name('foo');
-        $router->match(['PUT', 'PATCH'], '/', fn () => 'tada!')->name('bar');
-        $router->delete('/', fn () => 'tada!')->name('baz');
+        $this->app['router']->get('/', fn () => 'tada!')->name('foo');
+        $this->app['router']->match(['PUT', 'PATCH'], '/', fn () => 'tada!')->name('bar');
+        $this->app['router']->delete('/', fn () => 'tada!')->name('baz');
         $response = $this->callRoute($name, method: $method);
         $response->assertOk();
         $response->assertSeeText('tada!');
