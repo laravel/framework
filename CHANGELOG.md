@@ -1,6 +1,18 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.18.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.18.1...13.x)
+
+## [v13.18.1](https://github.com/laravel/framework/compare/v13.18.0...v13.18.1) - 2026-07-02
+
+* [13.x] Allow assertDatabaseEmpty to handle iterable by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60621
+* [13.x] Add `input()` method to console commands by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/60607
+* [13.x] Handle api / json routes with Down (Maintenance) command by [@davidrushton](https://github.com/davidrushton) in https://github.com/laravel/framework/pull/60595
+* [13.x] fix: respect channel name for on-demand log stacks by [@maltf0](https://github.com/maltf0) in https://github.com/laravel/framework/pull/60635
+* [13.x] Support inspecting delayed jobs on the queue fake by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60636
+* Add `Release` queue middleware by [@mgcodeur](https://github.com/mgcodeur) in https://github.com/laravel/framework/pull/60630
+* [13.x] Update docblocks of Blueprint foreignUuid and foreignUlid to match foreignId by [@LiddleDev](https://github.com/LiddleDev) in https://github.com/laravel/framework/pull/60643
+* Respect the encoding in Str::mask() when building the end of the string by [@iammcoding](https://github.com/iammcoding) in https://github.com/laravel/framework/pull/60646
+* [13.x] Supports scalar Predis retry config to allows `config:cache` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/60642
 
 ## [v13.18.0](https://github.com/laravel/framework/compare/v13.17.0...v13.18.0) - 2026-06-30
 
