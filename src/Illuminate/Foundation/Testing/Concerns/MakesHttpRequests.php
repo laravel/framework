@@ -591,6 +591,10 @@ trait MakesHttpRequests
             throw new RouteNotFoundException("Route [{$name}] not defined.");
         }
 
+        if (count($route->methods) === 2 && in_array('GET', $route->methods) && in_array('HEAD', $route->methods) && $method === null) {
+            $method = 'GET';
+        }
+
         if (count($route->methods) > 1 && $method === null) {
             throw new InvalidArgumentException('This route supports multiple HTTP methods. Please provide one of: '.implode(', ', $route->methods));
         }
