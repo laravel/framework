@@ -95,28 +95,6 @@ class PredisConnector implements Connector
     }
 
     /**
-     * Parse a Predis backoff strategy.
-     *
-     * @param  mixed  $algorithm
-     * @param  int  $base
-     * @param  int  $cap
-     * @return \Predis\Retry\Strategy\RetryStrategyInterface
-     */
-    protected function parseBackoffStrategy($algorithm, int $base, int $cap)
-    {
-        if (! is_string($algorithm)) {
-            throw new InvalidArgumentException('Predis backoff algorithm must be a string.');
-        }
-
-        return match (Str::snake($algorithm)) {
-            'default', 'exponential' => new ExponentialBackoff($base, $cap),
-            'constant', 'equal', 'equal_backoff' => new EqualBackoff($base),
-            'none', 'no_backoff' => new NoBackoff,
-            default => throw new InvalidArgumentException("Algorithm [{$algorithm}] is not a valid Predis backoff algorithm."),
-        };
-    }
-
-    /**
      * Format the host using the scheme if available.
      *
      * @param  array  $config
