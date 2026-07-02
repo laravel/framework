@@ -604,8 +604,8 @@ trait MakesHttpRequests
         return $this->call(
             $method,
             $route->uri,
-            [],
-            $this->prepareCookiesForJsonRequest(),
+            $parameters,
+            $cookies,
             $files,
             $this->transformHeadersToServerVars($headers),
             $content,
