@@ -628,6 +628,7 @@ class SupportTestingQueueFakeTest extends TestCase
 
         $this->fake->assertNotPushed(JobStub::class);
     }
+
     public function testClearReserved()
     {
         $this->fake->reserve($this->job, 'foo');
