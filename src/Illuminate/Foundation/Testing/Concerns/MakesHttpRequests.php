@@ -600,7 +600,7 @@ trait MakesHttpRequests
         }
 
         $method ??= $route->methods[0];
-        
+
         return $this->call(
             $method,
             $route->uri,
