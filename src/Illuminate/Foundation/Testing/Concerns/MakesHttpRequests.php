@@ -581,7 +581,7 @@ trait MakesHttpRequests
         );
     }
 
-    public function callRoute(BackedEnum|string $name, array $parameters = [], array $cookies = [], array $files = [], array $server = [], ?string $content = null, ?string $method = null): TestResponse
+    public function callRoute(BackedEnum|string $name, array $parameters = [], array $cookies = [], array $files = [], array $headers = [], ?string $content = null, ?string $method = null): TestResponse
     {
         if ($name instanceof BackedEnum && ! is_string($name = $name->value)) {
             throw new InvalidArgumentException('Attribute [name] expects a string backed enum.');
