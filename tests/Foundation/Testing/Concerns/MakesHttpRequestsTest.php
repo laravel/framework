@@ -268,7 +268,7 @@ class MakesHttpRequestsTest extends TestCase
     public function testCallRouteSucceeds(string $name, ?string $method)
     {
         $router = $this->app->make(Registrar::class);
-        $router->get(['/', fn () => 'tada!')->name('foo');
+        $router->get('/', fn () => 'tada!')->name('foo');
         $router->match(['PUT', 'PATCH'], '/', fn () => 'tada!')->name('bar');
         $response = $this->callRoute($name, method: $method);
         $response->assertOk();
