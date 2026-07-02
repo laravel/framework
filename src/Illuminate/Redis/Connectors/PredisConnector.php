@@ -58,9 +58,13 @@ class PredisConnector implements Connector
             return is_array($server) ? $this->formatHost($server) : $server;
         }, array_values($config));
 
-        return new PredisClusterConnection(new Client($servers, array_merge(
-            $options, $clusterOptions, $clusterSpecificOptions
-        )));
+        $options = array_merge($options, $clusterOptions, $clusterSpecificOptions);
+
+        if (isset($options['parameters']) && is_array($options['parameters'])) {
+            $options['parameters'] = $this->formatRetry($options['parameters']);
+        }
+
+        return new PredisClusterConnection(new Client($servers, $options));
     }
 
     /**

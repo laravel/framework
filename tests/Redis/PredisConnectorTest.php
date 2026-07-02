@@ -179,6 +179,32 @@ class PredisConnectorTest extends TestCase
         $this->assertSame(0, $config['retry']->getStrategy()->compute(0));
     }
 
+    public function testConnectToClusterFormatsRetryParameters()
+    {
+        $this->requiresPredisRetrySupport();
+
+        $connector = new TestablePredisConnector;
+
+        $connection = $connector->connectToCluster([
+            ['host' => '127.0.0.1', 'port' => 6379],
+        ], [
+            'cluster' => 'redis',
+            'parameters' => [
+                'retry' => [
+                    NoBackoff::class => [],
+                ],
+                'max_retries' => 3,
+            ],
+        ], []);
+
+        $property = new \ReflectionProperty($connection->client()->getConnection(), 'connectionParameters');
+        $parameters = $property->getValue($connection->client()->getConnection());
+
+        $this->assertInstanceOf(Retry::class, $parameters->retry);
+        $this->assertSame(3, $parameters->retry->getRetries());
+        $this->assertInstanceOf(NoBackoff::class, $parameters->retry->getStrategy());
+    }
+
     public function testFormatRetryKeepsExplicitRetryInstance()
     {
         $this->requiresPredisRetrySupport();
