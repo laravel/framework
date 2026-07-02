@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Query\Expression;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -562,6 +563,60 @@ class SchemaBuilderTest extends DatabaseTestCase
             fn ($foreign) => $foreign['columns'] === ['parent_id']
                 && $foreign['foreign_table'] === 'parents' && $foreign['foreign_columns'] === ['id']
         ));
+    }
+
+    public function testDisableAndEnableForeignKeyConstraintsViaDBFacade()
+    {
+        Schema::create('parents', function (Blueprint $table) {
+            $table->id();
+        });
+
+        Schema::create('children', function (Blueprint $table) {
+            $table->foreignId('parent_id')->constrained();
+        });
+
+        // Disabling lets an orphaned row through that enforcement would otherwise reject.
+        $this->assertTrue(DB::disableForeignKeyConstraints());
+        DB::table('children')->insert(['parent_id' => 999]);
+        $this->assertSame(1, DB::table('children')->count());
+
+        // Re-enabling restores enforcement for subsequent writes.
+        $this->assertTrue(DB::enableForeignKeyConstraints());
+        $this->expectException(QueryException::class);
+        DB::table('children')->insert(['parent_id' => 998]);
+    }
+
+    public function testDBFacadeWithoutForeignKeyConstraintsAllowsInvalidData()
+    {
+        Schema::create('parents', function (Blueprint $table) {
+            $table->id();
+        });
+
+        Schema::create('children', function (Blueprint $table) {
+            $table->foreignId('parent_id')->constrained();
+        });
+
+        // The callback runs with constraints off, so the orphan insert succeeds.
+        DB::withoutForeignKeyConstraints(function () {
+            DB::table('children')->insert(['parent_id' => 999]);
+        });
+        $this->assertSame(1, DB::table('children')->count());
+
+        // now the constraints are back in force once the callback returns.
+        $this->expectException(QueryException::class);
+        DB::table('children')->insert(['parent_id' => 998]);
+    }
+
+    #[RequiresDatabase(['mysql', 'pgsql', 'sqlsrv', 'mariadb'])]
+    public function testDBFacadeWithoutForeignKeyConstraintsRestoresConstraintsAfterException()
+    {
+        Schema::create('parents', fn (Blueprint $t) => $t->id());
+        Schema::create('children', fn (Blueprint $t) => $t->foreignId('parent_id')->constrained());
+
+        rescue(fn () => DB::withoutForeignKeyConstraints(fn () => throw new \RuntimeException), report: false);
+
+        $this->expectException(QueryException::class);
+        DB::table('children')->insert(['parent_id' => 999]);
     }
 
     #[RequiresDatabase('mariadb')]

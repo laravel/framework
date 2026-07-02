@@ -1849,6 +1849,35 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Enable foreign key constraints.
+     */
+    public function enableForeignKeyConstraints(): bool
+    {
+        return $this->getSchemaBuilder()->enableForeignKeyConstraints();
+    }
+
+    /**
+     * Disable foreign key constraints.
+     */
+    public function disableForeignKeyConstraints(): bool
+    {
+        return $this->getSchemaBuilder()->disableForeignKeyConstraints();
+    }
+
+    /**
+     * Disable foreign key constraints during the execution of a callback.
+     *
+     * @template TReturn
+     *
+     * @param  (Closure(): TReturn)  $callback
+     * @return TReturn
+     */
+    public function withoutForeignKeyConstraints(Closure $callback): mixed
+    {
+        return $this->getSchemaBuilder()->withoutForeignKeyConstraints($callback);
+    }
+
+    /**
      * Get the server version for the connection.
      *
      * @return string
