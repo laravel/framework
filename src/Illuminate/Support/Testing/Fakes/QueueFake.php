@@ -62,6 +62,13 @@ class QueueFake extends QueueManager implements Fake, Queue
     protected $delayed = [];
 
     /**
+     * All of the jobs that have been marked as reserved.
+     *
+     * @var array
+     */
+    protected $reserved = [];
+
+    /**
      * All of the payloads that have been raw pushed.
      *
      * @var list<RawPushType>
@@ -478,7 +485,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function reservedSize($queue = null)
     {
-        return 0;
+        return $this->reservedJobs($queue)->count();
     }
 
     /**
@@ -507,11 +514,11 @@ class QueueFake extends QueueManager implements Fake, Queue
      * Get the reserved jobs for the given queue.
      *
      * @param  \UnitEnum|string|null  $queue
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
      */
     public function reservedJobs($queue = null): Collection
     {
-        return new Collection;
+        return $this->allReservedJobs()->whereStrict('queue', enum_value($queue))->values();
     }
 
     /**
@@ -559,11 +566,11 @@ class QueueFake extends QueueManager implements Fake, Queue
     /**
      * Get all reserved jobs across every queue.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Queue\Jobs\InspectedJob>
      */
     public function allReservedJobs(): Collection
     {
-        return new Collection;
+        return $this->inspectJobs($this->reserved);
     }
 
     /**
@@ -607,6 +614,49 @@ class QueueFake extends QueueManager implements Fake, Queue
             is_object($job) && isset($job->connection)
                 ? $this->queue->connection($job->connection)->push($job, $data, $queue)
                 : $this->queue->push($job, $data, $queue);
+        }
+    }
+
+    /**
+     * Mark the given job as reserved.
+     *
+     * @param  \Closure|string|object  $job
+     * @param  \UnitEnum|string|null  $queue
+     * @return void
+     */
+    public function reserve($job, $queue = null)
+    {
+        $queue = enum_value($queue);
+
+        if ($job instanceof Closure) {
+            $job = CallQueuedClosure::create($job);
+        }
+
+        $this->reserved[is_object($job) ? get_class($job) : $job][] = [
+            'job' => $this->serializeAndRestore ? $this->serializeAndRestoreJob($job) : $job,
+            'queue' => $queue,
+        ];
+    }
+
+    /**
+     * Delete a reserved job.
+     *
+     * @param  string|object  $job
+     * @param  \UnitEnum|string|null  $queue
+     * @return void
+     */
+    public function deleteReserved($job, $queue = null)
+    {
+        $queue = enum_value($queue);
+
+        $class = is_object($job) ? get_class($job) : $job;
+
+        foreach ($this->reserved[$class] ?? [] as $index => $reserved) {
+            if ($reserved['queue'] === $queue) {
+                unset($this->reserved[$class][$index]);
+
+                break;
+            }
         }
     }
 
