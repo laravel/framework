@@ -622,6 +622,12 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->assertSame(0, $this->fake->reservedSize('baz'));
     }
 
+    public function testReservedJobsAreNotPushed()
+    {
+        $this->fake->reserve($this->job, 'foo');
+
+        $this->fake->assertNotPushed(JobStub::class);
+    }
     public function testClearReserved()
     {
         $this->fake->reserve($this->job, 'foo');
