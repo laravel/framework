@@ -12,6 +12,7 @@ use Illuminate\Testing\LoggedExceptionCollection;
 use Illuminate\Testing\TestResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 trait MakesHttpRequests
 {
