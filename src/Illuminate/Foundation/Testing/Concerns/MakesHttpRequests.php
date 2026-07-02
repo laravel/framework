@@ -592,11 +592,11 @@ trait MakesHttpRequests
         }
 
         if (count($route->methods) > 1 && $method === null) {
-            throw new InvalidArgumentException('This route supports multiple HTTP methods. Please provide one of: ' . implode(', ', $route->methods));
+            throw new InvalidArgumentException('This route supports multiple HTTP methods. Please provide one of: '.implode(', ', $route->methods));
         }
 
         if ($method !== null && in_array($method, $route->methods)) {
-            throw new InvalidArgumentException("HTTP method [{$method}] not support by this route. Please provide one of: " . implode(', ', $route->methods));
+            throw new InvalidArgumentException("HTTP method [{$method}] not support by this route. Please provide one of: ".implode(', ', $route->methods));
         }
 
         $method ??= $route->methods[0];
