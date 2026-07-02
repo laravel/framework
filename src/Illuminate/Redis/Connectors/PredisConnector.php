@@ -23,7 +23,7 @@ class PredisConnector implements Connector
      */
     public function connect(array $config, array $options)
     {
-        $config = $this->formatRetryConfig($config);
+        $config = $this->formatRetry($config);
 
         $formattedOptions = array_merge(
             ['timeout' => 10.0], $options, Arr::pull($config, 'options', [])
@@ -61,7 +61,7 @@ class PredisConnector implements Connector
         $options = array_merge($options, $clusterOptions, $clusterSpecificOptions);
 
         if (isset($options['parameters']) && is_array($options['parameters'])) {
-            $options['parameters'] = $this->formatRetryConfig($options['parameters']);
+            $options['parameters'] = $this->formatRetry($options['parameters']);
         }
 
         return new PredisClusterConnection(new Client($servers, $options));
@@ -103,7 +103,7 @@ class PredisConnector implements Connector
      * @param  array  $config
      * @return array
      */
-    protected function formatRetryConfig(array $config)
+    protected function formatRetry(array $config)
     {
         if (! array_key_exists('retry', $config) || ! is_array($config['retry'])) {
             return $config;
