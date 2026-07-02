@@ -368,6 +368,34 @@ class SupportNumberTest extends TestCase
         $this->assertSame(Number::pairs(100, 10), Number::pairs(100, -10));
     }
 
+    public function testPairsThrowsWhenToIsNotFinite()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Number::pairs(INF, 10);
+    }
+
+    public function testPairsThrowsWhenToIsNan()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Number::pairs(NAN, 10);
+    }
+
+    public function testPairsThrowsWhenByIsNotFinite()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Number::pairs(100, INF);
+    }
+
+    public function testPairsThrowsWhenByIsNan()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Number::pairs(100, NAN);
+    }
+
     public function testTrim()
     {
         $this->assertSame(12, Number::trim(12));

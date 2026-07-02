@@ -338,6 +338,10 @@ class Number
             throw new \InvalidArgumentException('The $by argument must not be zero.');
         }
 
+        if (! is_finite($to) || ! is_finite($by)) {
+            throw new \InvalidArgumentException('The $to and $by arguments must be finite.');
+        }
+
         $by = abs($by);
 
         $output = [];
