@@ -86,8 +86,12 @@ class RoutingRouteTest extends TestCase
         $router->post('foo/bar', function () {
             return 'post hello';
         });
+        $router->query('foo/bar', function () {
+            return 'query hello';
+        });
         $this->assertSame('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
         $this->assertSame('post hello', $router->dispatch(Request::create('foo/bar', 'POST'))->getContent());
+        $this->assertSame('query hello', $router->dispatch(Request::create('foo/bar', 'QUERY'))->getContent());
 
         $router = $this->getRouter();
         $router->get('foo/{bar}', function ($name) {
@@ -157,6 +161,7 @@ class RoutingRouteTest extends TestCase
             return 'hello';
         });
         $this->assertEmpty($router->dispatch(Request::create('foo/bar', 'HEAD'))->getContent());
+        $this->assertSame('hello', $router->dispatch(Request::create('foo/bar', 'QUERY'))->getContent());
 
         $router = $this->getRouter();
         $router->get('foo/bar', function () {
