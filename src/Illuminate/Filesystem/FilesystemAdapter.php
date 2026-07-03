@@ -208,6 +208,18 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
+     * Assert that the disk contains no files.
+     *
+     * @return $this
+     */
+    public function assertEmpty()
+    {
+        PHPUnit::assertEmpty($this->allFiles(), 'Disk is not empty.');
+
+        return $this;
+    }
+
+    /**
      * Determine if a file or directory exists.
      *
      * @param  string  $path

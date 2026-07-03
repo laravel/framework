@@ -20,6 +20,7 @@ use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToWriteFile;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -826,5 +827,23 @@ class FilesystemAdapterTest extends TestCase
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
 
         $this->assertFalse($filesystemAdapter->providesTemporaryUploadUrls());
+    }
+
+    public function testAssertEmpty()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $filesystemAdapter->assertEmpty();
+    }
+
+    public function testAssertEmptyFailsWhenDiskContainsFiles()
+    {
+        $this->filesystem->write('foo/file.txt', 'Hello World');
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Disk is not empty.');
+
+        $filesystemAdapter->assertEmpty();
     }
 }
