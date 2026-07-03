@@ -376,6 +376,18 @@ class Str
     }
 
     /**
+     * Get the plural form of an English word with the count prepended.
+     *
+     * @param  string  $value
+     * @param  int|array|\Countable  $count
+     * @return string
+     */
+    public static function counted($value, $count)
+    {
+        return static::plural($value, $count, prependCount: true);
+    }
+
+    /**
      * Replace consecutive instances of a given character with a single character in the given string.
      *
      * @param  string  $string
