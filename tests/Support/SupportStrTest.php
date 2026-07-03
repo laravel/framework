@@ -2023,6 +2023,18 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo baZ baz bar', $result);
     }
 
+    public function testCounted(): void
+    {
+        $this->assertSame('1 order', Str::counted('order', 1));
+        $this->assertSame('2 orders', Str::counted('order', 2));
+        $this->assertSame('0 orders', Str::counted('order', 0));
+        $this->assertSame('1 child', Str::counted('child', 1));
+        $this->assertSame('3 children', Str::counted('child', 3));
+        $this->assertSame('1,000 orders', Str::counted('order', 1000));
+        $this->assertSame('1 order', Str::counted('order', ['a']));
+        $this->assertSame('2 orders', Str::counted('order', ['a', 'b']));
+    }
+
     public function testPlural(): void
     {
         $this->assertSame('Laracon', Str::plural('Laracon', 1));
