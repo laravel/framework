@@ -9,23 +9,30 @@ use Aws\MockHandler;
 use Aws\Result;
 use Aws\Sqs\SqsClient;
 use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Database\LostConnectionDetector;
 use Illuminate\Foundation\Cloud;
+use Illuminate\Foundation\Cloud\AgentAwareLostConnectionDetector;
+use Illuminate\Foundation\Cloud\AgentUnreachableException;
+use Illuminate\Foundation\Cloud\CloudJob;
 use Illuminate\Foundation\Cloud\Events;
 use Illuminate\Foundation\Cloud\FailedJobProvider;
 use Illuminate\Foundation\Cloud\ManagedQueueNotFoundException;
 use Illuminate\Foundation\Cloud\Queue;
 use Illuminate\Foundation\Cloud\QueueConnector;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Queue\Connectors\ConnectorInterface;
 use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Queue\Failed\FileFailedJobProvider;
 use Illuminate\Queue\Jobs\FakeJob;
+use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Queue\SqsQueue;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerStopReason;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -45,6 +52,14 @@ class QueueTest extends TestCase
 {
     use DatabaseMigrations;
 
+    /**
+     * The original $_SERVER['argv'], restored in tearDown() after fakeQueue()
+     * spoofs a queue:work worker.
+     *
+     * @var array|null
+     */
+    private $savedArgv = null;
+
     protected function defineEnvironment($app)
     {
         $app['config']->set('app.key', Str::random(32));
@@ -52,6 +67,8 @@ class QueueTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->savedArgv = $_SERVER['argv'];
+
         Worker::$restartable = true;
         Worker::$pausable = true;
         $_SERVER['LARAVEL_CLOUD'] = '1';
@@ -73,6 +90,13 @@ class QueueTest extends TestCase
 
     protected function tearDown(): void
     {
+        // Restore before the parent tears down (and even when setUp failed) so
+        // a spoofed queue:work argv never leaks into the rest of the process.
+        if ($this->savedArgv !== null) {
+            $_SERVER['argv'] = $this->savedArgv;
+            $this->savedArgv = null;
+        }
+
         parent::tearDown();
 
         unset($_SERVER['LARAVEL_CLOUD'], $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES_CONFIG']);
@@ -209,9 +233,9 @@ class QueueTest extends TestCase
     {
         $this->travelTo('2000-01-02 03:04:05.060708');
         $eventsFake = $this->fakeEvents();
-        [$queue, $queueFake] = $this->fakeQueue();
+        [$queue, $agent] = $this->fakeQueue();
 
-        $queueFake->jobsToPop[] = new FakeJob;
+        $agent->pushJob();
         $queue->pop();
 
         $this->assertSame([[
@@ -226,9 +250,9 @@ class QueueTest extends TestCase
     {
         $this->travelTo('2000-01-02 03:04:05.060708');
         $eventsFake = $this->fakeEvents();
-        [$queue, $queueFake] = $this->fakeQueue();
+        [$queue, $agent] = $this->fakeQueue();
 
-        $queueFake->jobsToPop[] = new FakeJob;
+        $agent->pushJob();
         $queue->pop();
         $this->travel(1)->second();
         $queue->pop();
@@ -254,9 +278,9 @@ class QueueTest extends TestCase
     {
         $this->travelTo('2000-01-02 03:04:05.060708');
         $eventsFake = $this->fakeEvents();
-        [$queue, $queueFake] = $this->fakeQueue();
+        [$queue, $agent] = $this->fakeQueue();
 
-        $queueFake->jobsToPop[] = new FakeJob;
+        $agent->pushJob();
         $queue->pop();
         $queue->pop();
         $queue->pop();
@@ -269,11 +293,19 @@ class QueueTest extends TestCase
     {
         $this->travelTo('2000-01-02 03:04:05.060708');
         $eventsFake = $this->fakeEvents();
-        [$queue, $queueFake] = $this->fakeQueue();
+        [$queue, $agent] = $this->fakeQueue();
 
-        $queueFake->jobsToPop = [new FakeJob, new FakeJob];
+        $agent->pushJob();
+        $agent->pushJob();
+        // Each pop finishes the previous job, so its processed event must carry
+        // the queue that job was popped from, not the queue being popped now.
+        // The agent only serves the worker's own queue, so retarget the worker
+        // alongside each pop.
+        $_SERVER['argv'] = ['artisan', 'queue:work', '--queue=first'];
         $queue->pop('first');
+        $_SERVER['argv'] = ['artisan', 'queue:work', '--queue=second'];
         $queue->pop('second');
+        $_SERVER['argv'] = ['artisan', 'queue:work', '--queue=third'];
         $queue->pop('third');
 
         $this->assertSame([
@@ -305,19 +337,115 @@ class QueueTest extends TestCase
         ], $eventsFake->emitted);
     }
 
+    public function testPopReceivesFromTheAgentForANonDefaultWorkerQueue()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $agent->pushJob(['messageId' => 'message-id']);
+
+        // A managed worker started for a non-default queue is still served by the
+        // agent: the agent polls whatever queue the worker is processing.
+        $_SERVER['argv'] = ['artisan', 'queue:work', '--queue=emails'];
+
+        $job = $queue->pop('emails');
+
+        $this->assertInstanceOf(CloudJob::class, $job);
+        $this->assertSame('message-id', $job->getJobId());
+    }
+
+    public function testPopReadsTheWorkerQueueFromTheSpaceSeparatedQueueOption()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $agent->pushJob(['messageId' => 'message-id']);
+
+        // The --queue option may be given space-separated rather than with "=".
+        $_SERVER['argv'] = ['artisan', 'queue:work', '--queue', 'emails'];
+
+        $job = $queue->pop('emails');
+
+        $this->assertInstanceOf(CloudJob::class, $job);
+        $this->assertSame('message-id', $job->getJobId());
+    }
+
+    public function testPopReceivesFromSqsWhenTheQueueIsNotTheWorkerQueue()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $agent->pushJob();
+
+        // A pop for a queue other than the one the worker is processing has no
+        // agent feeding it, so it comes from SQS directly and the socket is never
+        // polled.
+        $_SERVER['argv'] = ['artisan', 'queue:work', '--queue=emails'];
+
+        $this->assertNull($queue->pop('not-the-worker-queue'));
+
+        Http::assertNothingSent();
+    }
+
+    public function testPopReceivesFromSqsForAMultiQueueWorker()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $agent->pushJob();
+
+        // The agent serves a single queue, so a worker spanning several queues
+        // (the worker pops each individually) cannot be served by it and falls
+        // back to SQS rather than being handed the agent's one queue for all.
+        $_SERVER['argv'] = ['artisan', 'queue:work', '--queue=high,low'];
+
+        $this->assertNull($queue->pop('high'));
+        $this->assertNull($queue->pop('low'));
+
+        Http::assertNothingSent();
+    }
+
+    public function testPopReceivesFromTheAgentWhenTheQueueOptionIsOmitted()
+    {
+        $this->fakeEvents();
+        // WorkCommand falls back to the connection's top-level "queue" key when
+        // --queue is omitted, so workerQueue() must mirror that exact fallback.
+        config(['queue.connections.cloud.queue' => 'emails']);
+        [$queue, $agent] = $this->fakeQueue();
+        $agent->pushJob(['messageId' => 'message-id']);
+
+        $_SERVER['argv'] = ['artisan', 'queue:work'];
+
+        $job = $queue->pop('emails');
+
+        $this->assertInstanceOf(CloudJob::class, $job);
+        $this->assertSame('message-id', $job->getJobId());
+    }
+
+    public function testPopReceivesFromSqsWhenNotRunningAsAQueueWorker()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $agent->pushJob();
+
+        // Outside a queue:work worker (e.g. a web request) the agent sidecar is
+        // not serving us, so jobs come from SQS directly.
+        $_SERVER['argv'] = ['artisan', 'tinker'];
+
+        $this->assertNull($queue->pop());
+
+        Http::assertNothingSent();
+    }
+
     public function testItEmitsFailedJobEvents()
     {
         $this->travelTo('2000-01-02 03:04:05.060708');
         $eventsFake = $this->fakeEvents();
-        [$queue, $queueFake] = $this->fakeQueue();
+        [$queue, $agent] = $this->fakeQueue();
         $failerFake = $this->fakeFailer();
         $failedJobProvider = new FailedJobProvider($failerFake, $eventsFake, $this->app['encrypter']);
         $failedJobProvider->setQueue($queue);
         $this->app[FailedJobProvider::class] = $failedJobProvider;
 
-        $queueFake->jobsToPop[] = $jobFake = new FakeJob;
-        $queue->pop();
-        $jobFake->fail();
+        $agent->pushJob();
+        $job = $queue->pop();
+        $job->fail();
         Str::createUuidsUsingSequence([Uuid::fromString('00dc709e-90c4-70c2-87c8-9b7127d20e8f')]);
         $failedJobProvider->log('cloud', 'default', ['payload' => 'here'], new RuntimeException('Whoops!'));
         Str::createUuidsNormally();
@@ -355,11 +483,11 @@ class QueueTest extends TestCase
     {
         $this->travelTo('2000-01-02 03:04:05.060708');
         $eventsFake = $this->fakeEvents();
-        [$queue, $queueFake] = $this->fakeQueue();
+        [$queue, $agent] = $this->fakeQueue();
 
-        $queueFake->jobsToPop[] = $jobFake = new FakeJob;
-        $queue->pop();
-        $jobFake->release();
+        $agent->pushJob();
+        $job = $queue->pop();
+        $job->release();
         $queue->pop();
 
         $this->assertSame([
@@ -377,6 +505,408 @@ class QueueTest extends TestCase
                 'duration_ms' => 0,
             ],
         ], $eventsFake->emitted);
+    }
+
+    public function testPopReturnsACloudJobBuiltFromTheAgentResponse()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+
+        $agent->pushJob(['messageId' => 'message-id', 'body' => 'job-body']);
+
+        $job = $queue->pop();
+
+        $this->assertInstanceOf(CloudJob::class, $job);
+        $this->assertSame('message-id', $job->getJobId());
+        $this->assertSame('job-body', $job->getRawBody());
+    }
+
+    public function testPopReturnsNullWhenTheAgentHasNoJob()
+    {
+        $this->fakeEvents();
+        [$queue] = $this->fakeQueue();
+
+        $this->assertNull($queue->pop());
+    }
+
+    public function testPopReceivesDirectlyFromSqsWhenTheAgentIsDisabled()
+    {
+        // With the agent disabled (the default) the queue receives from SQS.
+        Http::fake();
+        $this->fakeEvents();
+        [$queue, $client] = $this->mockedQueue();
+
+        $client->shouldReceive('receiveMessage')->once()->andReturn(new Result([
+            'Messages' => [[
+                'MessageId' => 'message-id',
+                'ReceiptHandle' => 'receipt-handle',
+                'Body' => 'job-body',
+                'Attributes' => ['ApproximateReceiveCount' => 1],
+            ]],
+        ]));
+
+        $job = $queue->pop();
+
+        $this->assertInstanceOf(SqsJob::class, $job);
+        $this->assertNotInstanceOf(CloudJob::class, $job);
+        $this->assertSame('message-id', $job->getJobId());
+        $this->assertSame('job-body', $job->getRawBody());
+        Http::assertNothingSent();
+    }
+
+    public function testPopReturnsNullWhenSqsHasNoMessageAndTheAgentIsDisabled()
+    {
+        $this->fakeEvents();
+        [$queue, $client] = $this->mockedQueue();
+
+        $client->shouldReceive('receiveMessage')->once()->andReturn(new Result(['Messages' => null]));
+
+        $this->assertNull($queue->pop());
+    }
+
+    public function testDeletingAJobReportsProcessedToTheAgentWithoutTouchingSqs()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $pushed = $agent->pushJob();
+
+        $job = $queue->pop();
+        $job->delete();
+
+        $this->assertTrue($job->isDeleted());
+        $this->assertAgentResults([
+            ['messageId' => $pushed['messageId'], 'receiptHandle' => $pushed['receiptHandle'], 'status' => 'processed'],
+        ]);
+    }
+
+    public function testFailingAJobReportsProcessedExactlyOnce()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $pushed = $agent->pushJob();
+
+        $job = $queue->pop();
+        $job->fail(new RuntimeException('Whoops!'));
+
+        // fail() routes through delete(), so it reports a single "processed".
+        $this->assertTrue($job->hasFailed());
+        $this->assertAgentResults([
+            ['messageId' => $pushed['messageId'], 'receiptHandle' => $pushed['receiptHandle'], 'status' => 'processed'],
+        ]);
+    }
+
+    public function testReleasingAJobReportsReleasedWithTheDelayToTheAgent()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $pushed = $agent->pushJob();
+
+        $job = $queue->pop();
+        $job->release(30);
+
+        $this->assertTrue($job->isReleased());
+        $this->assertAgentResults([
+            ['messageId' => $pushed['messageId'], 'receiptHandle' => $pushed['receiptHandle'], 'status' => 'released', 'delay' => 30],
+        ]);
+    }
+
+    public function testPopBuildsTheJobWithTheCloudConnectionName()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $agent->pushJob();
+
+        $this->assertSame('cloud', $queue->pop()->getConnectionName());
+    }
+
+    public function testPopUsesTheReceiveCountSuppliedByTheAgent()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $agent->pushJob(['attributes' => ['ApproximateReceiveCount' => '5']]);
+
+        $this->assertSame(5, $queue->pop()->attempts());
+    }
+
+    public function testReportingAnOutcomeOmitsTheReceiptHandleWhenTheAgentDoesNotSupplyOne()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        // A non-string handle is treated as absent, so the result omits it and
+        // the agent falls back to matching on the message id alone.
+        $pushed = $agent->pushJob(['receiptHandle' => null]);
+
+        $queue->pop()->delete();
+
+        $this->assertAgentResults([
+            ['messageId' => $pushed['messageId'], 'status' => 'processed'],
+        ]);
+    }
+
+    public function testPopToleratesANonStringBodyFromTheAgent()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $agent->pushJob(['body' => ['not' => 'a-string']]);
+
+        $job = $queue->pop();
+
+        $this->assertInstanceOf(CloudJob::class, $job);
+        $this->assertSame('', $job->getRawBody());
+    }
+
+    public function testPopAcceptsAFalsyButValidMessageId()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        // "0" is a valid, non-empty id that empty() would wrongly reject.
+        $agent->pushJob(['messageId' => '0']);
+
+        $this->assertSame('0', $queue->pop()->getJobId());
+    }
+
+    public function testARejectedResultIsReportedOnlyOnce()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $pushed = $agent->pushJob();
+
+        $agent->resultStatus = 422;
+
+        $job = $queue->pop();
+
+        try {
+            $job->delete();
+            $this->fail('Expected the rejected report to throw a RequestException.');
+        } catch (RequestException) {
+            //
+        }
+
+        // The agent's rejection is authoritative for this message, so only
+        // transient socket failures are retried - never the verdict itself.
+        $this->assertAgentResults([
+            ['messageId' => $pushed['messageId'], 'receiptHandle' => $pushed['receiptHandle'], 'status' => 'processed'],
+        ]);
+    }
+
+    public function testPopResolvesOverflowPayloadsThroughTheCacheAndCleansUpOnDelete()
+    {
+        $this->fakeEvents();
+        config(['queue.connections.cloud.connection.overflow' => [
+            'enabled' => true,
+            'store' => 'array',
+            'delete_after_processing' => true,
+        ]]);
+        [$queue, $agent] = $this->fakeQueue();
+
+        $payload = json_encode(['job' => MyJob::class, 'data' => ['resolved' => true]]);
+        Cache::store('array')->put('overflow-pointer', $payload);
+
+        $agent->pushJob(['body' => json_encode(['@pointer' => 'overflow-pointer'])]);
+
+        $job = $queue->pop();
+
+        // The payload is resolved from the cache, not the raw "@pointer" body.
+        $this->assertSame($payload, $job->getRawBody());
+
+        // Deleting still cleans up the cached payload.
+        $job->delete();
+
+        $this->assertNull(Cache::store('array')->get('overflow-pointer'));
+    }
+
+    public function testOverflowPayloadIsRetainedWhenTheProcessedReportFails()
+    {
+        $this->fakeEvents();
+        config(['queue.connections.cloud.connection.overflow' => [
+            'enabled' => true,
+            'store' => 'array',
+            'delete_after_processing' => true,
+        ]]);
+        [$queue, $agent] = $this->fakeQueue();
+
+        // The agent rejects POST /result with a client error.
+        $agent->resultStatus = 422;
+
+        $payload = json_encode(['job' => MyJob::class, 'data' => ['resolved' => true]]);
+        Cache::store('array')->put('overflow-pointer', $payload);
+
+        $agent->pushJob(['body' => json_encode(['@pointer' => 'overflow-pointer'])]);
+
+        $job = $queue->pop();
+
+        // A rejected report throws, so delete() never reaches the overflow purge.
+        try {
+            $job->delete();
+            $this->fail('Expected the rejected report to throw a RequestException.');
+        } catch (RequestException) {
+            //
+        }
+
+        // The unacknowledged payload is retained for the redelivered job.
+        $this->assertSame($payload, Cache::store('array')->get('overflow-pointer'));
+    }
+
+    public function testDeletingPropagatesWhenTheAgentIsUnreachable()
+    {
+        $this->fakeEvents();
+        $sqs = $this->mock(SqsClient::class);
+        [$queue, $agent] = $this->fakeQueue($sqs);
+        $agent->pushJob();
+
+        $job = $queue->pop();
+
+        // An unreachable agent propagates rather than deleting from SQS directly.
+        $agent->resultUnreachable = true;
+        $sqs->shouldNotReceive('deleteMessage');
+
+        $this->expectException(AgentUnreachableException::class);
+
+        $job->delete();
+    }
+
+    public function testReleasingPropagatesWhenTheAgentIsUnreachable()
+    {
+        $this->fakeEvents();
+        $sqs = $this->mock(SqsClient::class);
+        [$queue, $agent] = $this->fakeQueue($sqs);
+        $agent->pushJob();
+
+        $job = $queue->pop();
+
+        // An unreachable agent propagates rather than resetting visibility on SQS.
+        $agent->resultUnreachable = true;
+        $sqs->shouldNotReceive('changeMessageVisibility');
+
+        $this->expectException(AgentUnreachableException::class);
+
+        $job->release(30);
+    }
+
+    public function testReportingThrowsWhenTheAgentRejectsTheResult()
+    {
+        $this->fakeEvents();
+        $sqs = $this->mock(SqsClient::class);
+        [$queue, $agent] = $this->fakeQueue($sqs);
+        $agent->pushJob();
+
+        $job = $queue->pop();
+
+        // A client-error rejection is message-specific, so it propagates as a
+        // RequestException for the worker to report rather than deleting from
+        // SQS directly or restarting the pod.
+        $agent->resultStatus = 422;
+        $sqs->shouldNotReceive('deleteMessage');
+
+        $this->expectException(RequestException::class);
+
+        $job->delete();
+    }
+
+    public function testReportingEscalatesWhenTheAgentReturnsAServerError()
+    {
+        $this->fakeEvents();
+        $sqs = $this->mock(SqsClient::class);
+        [$queue, $agent] = $this->fakeQueue($sqs);
+        $agent->pushJob();
+
+        $job = $queue->pop();
+
+        // A server error means the agent itself is wedged, so it escalates as
+        // an unreachable fault to restart the pod rather than deleting from SQS.
+        $agent->resultStatus = 500;
+        $sqs->shouldNotReceive('deleteMessage');
+
+        $this->expectException(AgentUnreachableException::class);
+
+        $job->delete();
+    }
+
+    public function testPopThrowsWhenTheAgentReturnsAnError()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+
+        // Drive the agent's own GET /next stub so the non-200 branch is hit;
+        // a separate Http::fake() would be shadowed by the agent closure.
+        $agent->nextResponse = Http::response('error', 500);
+
+        // An error status means the agent cannot serve work, so it escalates
+        // as an unrecoverable fault rather than idling and re-polling forever.
+        $this->expectException(AgentUnreachableException::class);
+
+        $queue->pop();
+    }
+
+    public function testPopThrowsWhenTheAgentReturnsAnUnexpectedSuccessStatus()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+
+        // The agent only ever answers 200 (job) or 204 (empty); any other 2xx
+        // is off-contract, so it escalates rather than being decoded as a job.
+        $agent->nextResponse = Http::response('', 202);
+
+        $this->expectException(AgentUnreachableException::class);
+
+        $queue->pop();
+    }
+
+    public function testPopThrowsWhenTheAgentReturnsANonArrayBody()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+
+        // A 200 that decodes to a scalar is an agent fault; treat it the same
+        // as an unreachable agent rather than idling.
+        $agent->nextResponse = Http::response('"not-an-array"', 200);
+
+        $this->expectException(AgentUnreachableException::class);
+
+        $queue->pop();
+    }
+
+    public function testPopThrowsWhenTheAgentSocketIsUnreachable()
+    {
+        $this->fakeEvents();
+        [$queue] = $this->fakeQueue();
+
+        // An unreachable socket must escalate as an unrecoverable fault, not idle.
+        Http::fake(fn () => throw new ConnectionException('Connection refused'));
+
+        $this->expectException(AgentUnreachableException::class);
+
+        $queue->pop();
+    }
+
+    public function testAgentAwareDetectorTreatsAnUnreachableAgentAsALostConnection()
+    {
+        $detector = new AgentAwareLostConnectionDetector(new LostConnectionDetector);
+
+        // An unreachable agent is treated as a lost connection so the worker exits.
+        $this->assertTrue($detector->causedByLostConnection(new AgentUnreachableException));
+
+        // Everything else is delegated to the wrapped detector untouched.
+        $this->assertFalse($detector->causedByLostConnection(new \RuntimeException('boom')));
+        $this->assertTrue($detector->causedByLostConnection(new \RuntimeException('server has gone away')));
+    }
+
+    public function testReleasingThenFailingReportsBothOutcomesToTheAgent()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $pushed = $agent->pushJob();
+
+        $job = $queue->pop();
+        $job->release(30);
+        $job->fail(new RuntimeException('Whoops!'));
+
+        // CloudJob keeps no memory of prior reports, so both outcomes are
+        // reported in order; reconciling them is the agent's responsibility.
+        $this->assertAgentResults([
+            ['messageId' => $pushed['messageId'], 'receiptHandle' => $pushed['receiptHandle'], 'status' => 'released', 'delay' => 30],
+            ['messageId' => $pushed['messageId'], 'receiptHandle' => $pushed['receiptHandle'], 'status' => 'processed'],
+        ]);
     }
 
     public function testItEmitsJobQueuedEvent()
@@ -451,9 +981,9 @@ class QueueTest extends TestCase
             Cloud::configureManagedQueues($this->app);
             Cloud::bootManagedQueues($this->app);
             $eventsFake = $this->fakeEvents();
-            [$queue, $queueFake] = $this->fakeQueue();
+            [$queue, $agent] = $this->fakeQueue();
 
-            $queueFake->jobsToPop[] = new FakeJob;
+            $agent->pushJob();
             $queue->pop();
             $this->travel(2)->seconds();
 
@@ -499,10 +1029,10 @@ class QueueTest extends TestCase
             Cloud::configureManagedQueues($this->app);
             Cloud::bootManagedQueues($this->app);
             $eventsFake = $this->fakeEvents();
-            [$queue, $queueFake] = $this->fakeQueue();
+            [$queue, $agent] = $this->fakeQueue();
 
             foreach ($reasons as $index => $reason) {
-                $queueFake->jobsToPop[] = new FakeJob;
+                $agent->pushJob();
                 $queue->pop();
 
                 $this->app['events']->dispatch(new WorkerStopping(0, null, $reason));
@@ -530,9 +1060,9 @@ class QueueTest extends TestCase
             Cloud::configureManagedQueues($this->app);
             Cloud::bootManagedQueues($this->app);
             $eventsFake = $this->fakeEvents();
-            [$queue, $queueFake] = $this->fakeQueue();
+            [$queue, $agent] = $this->fakeQueue();
 
-            $queueFake->jobsToPop[] = new FakeJob;
+            $agent->pushJob();
             $queue->pop();
 
             $this->app['events']->dispatch(new WorkerStopping);
@@ -567,11 +1097,11 @@ class QueueTest extends TestCase
             Cloud::configureManagedQueues($this->app);
             Cloud::bootManagedQueues($this->app);
             $eventsFake = $this->fakeEvents();
-            [$queue, $queueFake] = $this->fakeQueue();
+            [$queue, $agent] = $this->fakeQueue();
 
-            $queueFake->jobsToPop[] = $jobFake = new FakeJob;
-            $queue->pop();
-            $jobFake->fail();
+            $agent->pushJob();
+            $job = $queue->pop();
+            $job->fail();
 
             $this->app['events']->dispatch(new WorkerStopping(0, null, WorkerStopReason::TimedOut));
 
@@ -591,11 +1121,11 @@ class QueueTest extends TestCase
             Cloud::configureManagedQueues($this->app);
             Cloud::bootManagedQueues($this->app);
             $eventsFake = $this->fakeEvents();
-            [$queue, $queueFake] = $this->fakeQueue();
+            [$queue, $agent] = $this->fakeQueue();
 
-            $queueFake->jobsToPop[] = $jobFake = new FakeJob;
-            $queue->pop();
-            $jobFake->release();
+            $agent->pushJob();
+            $job = $queue->pop();
+            $job->release();
 
             $this->app['events']->dispatch(new WorkerStopping(0, null, WorkerStopReason::MaxJobsExceeded));
 
@@ -635,9 +1165,9 @@ class QueueTest extends TestCase
             Cloud::configureManagedQueues($this->app);
             Cloud::bootManagedQueues($this->app);
             $eventsFake = $this->fakeEvents();
-            [$queue, $queueFake] = $this->fakeQueue();
+            [$queue, $agent] = $this->fakeQueue();
 
-            $queueFake->jobsToPop[] = new FakeJob;
+            $agent->pushJob();
             $queue->pop();
 
             $this->app['events']->dispatch(new WorkerStopping(0, null, WorkerStopReason::TimedOut));
@@ -727,9 +1257,10 @@ class QueueTest extends TestCase
     {
         $this->travelTo('2000-01-02 03:04:05.060708');
         $eventsFake = $this->fakeEvents();
-        [$queue, $queueFake] = $this->fakeQueue();
+        [$queue, $agent] = $this->fakeQueue();
 
-        $queueFake->jobsToPop = [new FakeJob, new FakeJob];
+        $agent->pushJob();
+        $agent->pushJob();
         $queue->pop();
         $this->travel(1)->second();
         $queue->pop();
@@ -745,9 +1276,9 @@ class QueueTest extends TestCase
         date_default_timezone_set('Australia/Melbourne');
         $this->travelTo(Carbon::parse('2000-01-02 03:04:05.060708', 'Australia/Melbourne'));
         $eventsFake = $this->fakeEvents();
-        [$queue, $queueFake] = $this->fakeQueue();
+        [$queue, $agent] = $this->fakeQueue();
 
-        $queueFake->jobsToPop[] = new FakeJob;
+        $agent->pushJob();
         $queue->pop();
         $this->travel(1)->second();
         $queue->pop();
@@ -970,9 +1501,8 @@ class QueueTest extends TestCase
 
         $queue->push(new FakeJob, queue: 'orders.fifo');
 
-        // The suffix is injected before the ".fifo" extension on the real SQS
-        // queue name, so the normalized name must strip it back out and keep
-        // the ".fifo" terminal rather than reporting "orders-env-....fifo".
+        // The suffix is injected before ".fifo", so it must be stripped without
+        // leaking into the normalized name.
         $this->assertSame('orders.fifo', $eventsFake->emitted[0]['queue']);
     }
 
@@ -1026,17 +1556,31 @@ class QueueTest extends TestCase
     }
 
     /**
-     * @return array{Queue, object{jobsToPop: array}}
+     * Build a Cloud queue whose agent runtime socket is faked via Http::fake().
+     *
+     * The returned agent exposes pushJob() to script the next GET /next
+     * responses; once drained the agent answers 204. POST /result requests are
+     * recorded by the HTTP fake and can be asserted with Http::assertSent().
+     *
+     * @return array{Queue, object{jobs: array}}
      */
-    private function fakeQueue()
+    private function fakeQueue($sqs = null)
     {
-        $fakeQueue = new class($this->app, [], null) extends QueueFake
-        {
-            public array $jobsToPop = [];
+        // Enable the agent so pop() long-polls the faked runtime socket.
+        $this->app['config']->set('queue.connections.cloud.agent', [
+            'enabled' => true,
+            'socket' => '/tmp/cloud-agent.sock',
+        ]);
 
-            public function pop($queue = null)
+        // A real client suffices while the SQS seams stay no-ops; callers asserting
+        // direct SQS calls pass a mock instead.
+        $sqs ??= new SqsClient(['region' => 'us-east-2', 'version' => 'latest', 'credentials' => false]);
+
+        $fakeQueue = new class($this->app, $sqs) extends QueueFake
+        {
+            public function __construct($app, private $sqs)
             {
-                return array_shift($this->jobsToPop);
+                parent::__construct($app);
             }
 
             public function getQueue($queue)
@@ -1044,6 +1588,21 @@ class QueueTest extends TestCase
                 $queue ??= 'default';
 
                 return config('queue.connections.cloud.connection.prefix').'/'.$queue.config('queue.connections.cloud.connection.suffix');
+            }
+
+            public function getContainer()
+            {
+                return $this->app;
+            }
+
+            public function getSqs()
+            {
+                return $this->sqs;
+            }
+
+            public function getConnectionName()
+            {
+                return 'cloud';
             }
 
             public function setConfig(array $config)
@@ -1072,12 +1631,97 @@ class QueueTest extends TestCase
 
         $this->app['queue']->addConnector('cloud', $this->app->factory(QueueConnector::class));
 
-        return [$this->app['queue']->connection('cloud'), $fakeQueue];
+        $agent = $this->fakeAgent();
+
+        $connection = $this->app['queue']->connection('cloud');
+
+        // The agent only serves a queue:work worker popping its queue, so present
+        // as one for pop() (see usesAgent()). Set after connecting so the
+        // connector's worker wiring - which expects the cloud failed-job provider
+        // - isn't exercised here. Restored in tearDown().
+        $_SERVER['argv'] = ['artisan', 'queue:work'];
+
+        return [$connection, $agent];
+    }
+
+    /**
+     * Fake the cloud-agent runtime socket with Http::fake(): GET /next serves
+     * scripted jobs (204 once drained) and POST /result is accepted (and
+     * recorded for assertions). The returned object scripts jobs via pushJob().
+     */
+    private function fakeAgent()
+    {
+        $agent = new class
+        {
+            public array $jobs = [];
+
+            public int $resultStatus = 200;
+
+            public bool $resultUnreachable = false;
+
+            public $nextResponse = null;
+
+            public function pushJob(array $job = []): array
+            {
+                $job = array_merge([
+                    'messageId' => (string) Str::uuid(),
+                    'receiptHandle' => 'receipt-handle',
+                    // The agent always reports the SQS queue URL the message came from.
+                    'queueUrl' => 'https://sqs.us-east-1.amazonaws.com/123456789012/default',
+                    'body' => json_encode(['job' => MyJob::class, 'data' => []]),
+                    // SQS always returns ApproximateReceiveCount, so mirror it.
+                    'attributes' => ['ApproximateReceiveCount' => 1],
+                ], $job);
+
+                $this->jobs[] = $job;
+
+                return $job;
+            }
+        };
+
+        Http::fake(function ($request) use ($agent) {
+            if (str_ends_with($request->url(), '/next')) {
+                if ($agent->nextResponse !== null) {
+                    return $agent->nextResponse;
+                }
+
+                $job = array_shift($agent->jobs);
+
+                return $job === null
+                    ? Http::response('', 204)
+                    : Http::response($job, 200);
+            }
+
+            if (str_ends_with($request->url(), '/result')) {
+                if ($agent->resultUnreachable) {
+                    throw new ConnectionException('Connection refused');
+                }
+
+                return Http::response('', $agent->resultStatus);
+            }
+
+            return Http::response('', 404);
+        });
+
+        return $agent;
     }
 
     private function fakeFailer()
     {
         return new FileFailedJobProvider(tempnam(sys_get_temp_dir(), 'cloud_failed_job_test_'));
+    }
+
+    /**
+     * Assert the exact sequence of POST /result bodies sent to the agent.
+     */
+    private function assertAgentResults(array $expected): void
+    {
+        $results = Http::recorded(fn ($request) => str_ends_with($request->url(), '/result'))
+            ->map(fn ($record) => $record[0]->data())
+            ->values()
+            ->all();
+
+        $this->assertSame($expected, $results);
     }
 }
 
