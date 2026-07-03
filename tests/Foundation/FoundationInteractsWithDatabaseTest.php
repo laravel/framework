@@ -248,6 +248,32 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         ]);
     }
 
+    public function testAssertSoftDeletedTableSupportsIterablesWithCustomDeletedAtColumn()
+    {
+        $builder = m::mock(Builder::class);
+        $builder->shouldReceive('where')->with($this->data)->twice()->andReturnSelf();
+        $builder->shouldReceive('whereNotNull')->with('removed_at')->twice()->andReturnSelf();
+        $builder->shouldReceive('exists')->twice()->andReturn(true);
+
+        $this->connection->shouldReceive('table')->with($this->table)->andReturn($builder);
+        $this->connection->shouldReceive('table')->with('orders')->andReturn($builder);
+
+        $this->assertSoftDeleted(['products', 'orders'], $this->data, deletedAtColumn: 'removed_at');
+    }
+
+    public function testAssertNotSoftDeletedTableSupportsIterablesWithCustomDeletedAtColumn()
+    {
+        $builder = m::mock(Builder::class);
+        $builder->shouldReceive('where')->with($this->data)->twice()->andReturnSelf();
+        $builder->shouldReceive('whereNull')->with('removed_at')->twice()->andReturnSelf();
+        $builder->shouldReceive('exists')->twice()->andReturn(true);
+
+        $this->connection->shouldReceive('table')->with($this->table)->andReturn($builder);
+        $this->connection->shouldReceive('table')->with('orders')->andReturn($builder);
+
+        $this->assertNotSoftDeleted(['products', 'orders'], $this->data, deletedAtColumn: 'removed_at');
+    }
+
     public function testAssertDatabaseMissingPassesWhenDoesNotFindResults()
     {
         $this->mockCountBuilder(false);
