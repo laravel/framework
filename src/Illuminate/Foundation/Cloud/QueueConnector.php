@@ -39,6 +39,7 @@ class QueueConnector implements ConnectorInterface
         $underlying = $this->connector->connect($config['connection']);
 
         $queue = new Queue(
+            $this->app,
             $underlying,
             $this->app[Events::class],
             $config,
