@@ -9,6 +9,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\RouteRegistrar;
+use Illuminate\Routing\RoutingServiceProvider;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Stringable;
@@ -26,7 +27,10 @@ class RouteRegistrarTest extends TestCase
     {
         parent::setUp();
 
-        $this->router = new Router(m::mock(Dispatcher::class), Container::getInstance());
+        $container = new Container();
+        (new RoutingServiceProvider($container))->register();
+
+        $this->router = new Router(m::mock(Dispatcher::class), $container);
     }
 
     public function testMiddlewareFluentRegistration()
