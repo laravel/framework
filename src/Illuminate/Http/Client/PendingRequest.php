@@ -953,6 +953,24 @@ class PendingRequest
     }
 
     /**
+     * Issue a QUERY request to the given URL.
+     *
+     * @param  string  $url
+     * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     *
+     * @phpstan-return (TAsync is false ?  \Illuminate\Http\Client\Response : \GuzzleHttp\Promise\PromiseInterface)
+     *
+     * @throws \Illuminate\Http\Client\ConnectionException
+     */
+    public function query(string $url, $data = [])
+    {
+        return $this->send('QUERY', $url, [
+            $this->bodyFormat => $data,
+        ]);
+    }
+
+    /**
      * Send a pool of asynchronous requests concurrently.
      *
      * @param  (callable(\Illuminate\Http\Client\Pool): mixed)  $callback

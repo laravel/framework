@@ -616,6 +616,38 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testCanSendJsonDataWithQueryMethod()
+    {
+        $this->factory->fake();
+
+        $this->factory->query('http://foo.com/search', [
+            'filter' => 'active',
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/search' &&
+                   $request->method() === 'QUERY' &&
+                   $request->hasHeader('Content-Type', 'application/json') &&
+                   $request['filter'] === 'active';
+        });
+    }
+
+    public function testCanSendFormDataWithQueryMethod()
+    {
+        $this->factory->fake();
+
+        $this->factory->asForm()->query('http://foo.com/search', [
+            'filter' => 'active',
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/search' &&
+                   $request->method() === 'QUERY' &&
+                   $request->hasHeader('Content-Type', 'application/x-www-form-urlencoded') &&
+                   $request['filter'] === 'active';
+        });
+    }
+
     public function testQueryParametersNormalizeNonFiniteFloats()
     {
         $this->factory->fake();
