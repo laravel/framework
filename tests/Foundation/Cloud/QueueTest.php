@@ -67,6 +67,8 @@ class QueueTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->savedArgv = $_SERVER['argv'];
+
         Worker::$restartable = true;
         Worker::$pausable = true;
         $_SERVER['LARAVEL_CLOUD'] = '1';
@@ -83,20 +85,23 @@ class QueueTest extends TestCase
 
         parent::setUp();
 
-        $this->savedArgv = $_SERVER['argv'];
-
         $this->app['config']->set('queue.connections.cloud', json_decode($_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES_CONFIG'], true));
     }
 
     protected function tearDown(): void
     {
+        // Restore before the parent tears down (and even when setUp failed) so
+        // a spoofed queue:work argv never leaks into the rest of the process.
+        if ($this->savedArgv !== null) {
+            $_SERVER['argv'] = $this->savedArgv;
+            $this->savedArgv = null;
+        }
+
         parent::tearDown();
 
         unset($_SERVER['LARAVEL_CLOUD'], $_SERVER['LARAVEL_CLOUD_MANAGED_QUEUES_CONFIG']);
         Worker::$restartable = true;
         Worker::$pausable = true;
-
-        $_SERVER['argv'] = $this->savedArgv;
     }
 
     public function testItDisablesQueueRestartPollingForManagedQueues()
@@ -292,36 +297,41 @@ class QueueTest extends TestCase
 
         $agent->pushJob();
         $agent->pushJob();
-        // The agent only serves the connection's default queue, so the worker
-        // pops that queue; each pop finishes the previous job and starts the next.
-        $queue->pop('default');
-        $queue->pop('default');
-        $queue->pop('default');
+        // Each pop finishes the previous job, so its processed event must carry
+        // the queue that job was popped from, not the queue being popped now.
+        // The agent only serves the worker's own queue, so retarget the worker
+        // alongside each pop.
+        $_SERVER['argv'] = ['artisan', 'queue:work', '--queue=first'];
+        $queue->pop('first');
+        $_SERVER['argv'] = ['artisan', 'queue:work', '--queue=second'];
+        $queue->pop('second');
+        $_SERVER['argv'] = ['artisan', 'queue:work', '--queue=third'];
+        $queue->pop('third');
 
         $this->assertSame([
             [
                 '_cloud_event' => 'queue',
                 'timestamp' => '2000-01-02 03:04:05.060708',
                 'type' => 'started',
-                'queue' => 'default',
+                'queue' => 'first',
             ],
             [
                 '_cloud_event' => 'queue',
                 'timestamp' => '2000-01-02 03:04:05.060708',
                 'type' => 'processed',
-                'queue' => 'default',
+                'queue' => 'first',
                 'duration_ms' => 0,
             ], [
                 '_cloud_event' => 'queue',
                 'timestamp' => '2000-01-02 03:04:05.060708',
                 'type' => 'started',
-                'queue' => 'default',
+                'queue' => 'second',
             ],
             [
                 '_cloud_event' => 'queue',
                 'timestamp' => '2000-01-02 03:04:05.060708',
                 'type' => 'processed',
-                'queue' => 'default',
+                'queue' => 'second',
                 'duration_ms' => 0,
             ],
         ], $eventsFake->emitted);
@@ -389,6 +399,23 @@ class QueueTest extends TestCase
         $this->assertNull($queue->pop('low'));
 
         Http::assertNothingSent();
+    }
+
+    public function testPopReceivesFromTheAgentWhenTheQueueOptionIsOmitted()
+    {
+        $this->fakeEvents();
+        // WorkCommand falls back to the connection's top-level "queue" key when
+        // --queue is omitted, so workerQueue() must mirror that exact fallback.
+        config(['queue.connections.cloud.queue' => 'emails']);
+        [$queue, $agent] = $this->fakeQueue();
+        $agent->pushJob(['messageId' => 'message-id']);
+
+        $_SERVER['argv'] = ['artisan', 'queue:work'];
+
+        $job = $queue->pop('emails');
+
+        $this->assertInstanceOf(CloudJob::class, $job);
+        $this->assertSame('message-id', $job->getJobId());
     }
 
     public function testPopReceivesFromSqsWhenNotRunningAsAQueueWorker()
@@ -636,6 +663,30 @@ class QueueTest extends TestCase
         $agent->pushJob(['messageId' => '0']);
 
         $this->assertSame('0', $queue->pop()->getJobId());
+    }
+
+    public function testARejectedResultIsReportedOnlyOnce()
+    {
+        $this->fakeEvents();
+        [$queue, $agent] = $this->fakeQueue();
+        $pushed = $agent->pushJob();
+
+        $agent->resultStatus = 422;
+
+        $job = $queue->pop();
+
+        try {
+            $job->delete();
+            $this->fail('Expected the rejected report to throw a RequestException.');
+        } catch (RequestException) {
+            //
+        }
+
+        // The agent's rejection is authoritative for this message, so only
+        // transient socket failures are retried - never the verdict itself.
+        $this->assertAgentResults([
+            ['messageId' => $pushed['messageId'], 'receiptHandle' => $pushed['receiptHandle'], 'status' => 'processed'],
+        ]);
     }
 
     public function testPopResolvesOverflowPayloadsThroughTheCacheAndCleansUpOnDelete()
@@ -1525,9 +1576,9 @@ class QueueTest extends TestCase
         // direct SQS calls pass a mock instead.
         $sqs ??= new SqsClient(['region' => 'us-east-2', 'version' => 'latest', 'credentials' => false]);
 
-        $fakeQueue = new class($this->app, [], null, $sqs) extends QueueFake
+        $fakeQueue = new class($this->app, $sqs) extends QueueFake
         {
-            public function __construct($app, $jobs, $failer, private $sqs)
+            public function __construct($app, private $sqs)
             {
                 parent::__construct($app);
             }

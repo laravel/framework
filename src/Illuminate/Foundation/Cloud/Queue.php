@@ -230,18 +230,19 @@ class Queue implements QueueContract, ClearableQueue
 
     /**
      * Get the queue the running queue:work worker is processing: its --queue
-     * option, or null (the connection default) when the option is omitted.
+     * option, or the same fallback WorkCommand pops when the option is omitted.
      *
      * The agent serves a single queue, so a managed worker is expected to run
      * one too. The raw option is returned as-is: a comma-separated --queue (the
      * worker splits these and pops each individually) won't match any single
      * popped queue, so such a worker simply falls back to SQS.
      *
-     * @return string|null
+     * @return string
      */
     protected function workerQueue()
     {
-        return (new ArgvInput)->getParameterOption('--queue') ?: null;
+        return (new ArgvInput)->getParameterOption('--queue')
+            ?: ($this->config['queue'] ?? 'default');
     }
 
     /**
@@ -358,7 +359,7 @@ class Queue implements QueueContract, ClearableQueue
             $this->agentRequest()
                 ->timeout(10)
                 ->throw()
-                ->retry(3, 100)
+                ->retry(3, 100, fn ($exception) => $exception instanceof ConnectionException)
                 ->post('/result', array_filter([
                     'messageId' => $messageId,
                     'receiptHandle' => $receiptHandle,
