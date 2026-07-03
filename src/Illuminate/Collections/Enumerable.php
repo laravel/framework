@@ -892,6 +892,17 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function reduce(callable $callback, $initial = null);
 
     /**
+     * Reduce the collection to a single value by mutating an initial value.
+     *
+     * @template TReduceIntoInitial
+     *
+     * @param  TReduceIntoInitial  $initial
+     * @param  callable(TReduceIntoInitial, TValue, TKey): void  $callback
+     * @return TReduceIntoInitial
+     */
+    public function reduceInto($initial, callable $callback);
+
+    /**
      * Reduce the collection to multiple aggregate values.
      *
      * @param  callable  $callback
