@@ -5,8 +5,14 @@ namespace Illuminate\Foundation\Cloud;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Foundation\Application;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
+use Symfony\Component\Console\Input\ArgvInput;
+use Throwable;
 
 class Queue implements QueueContract, ClearableQueue
 {
@@ -37,6 +43,7 @@ class Queue implements QueueContract, ClearableQueue
      * Create a new Queue instance.
      */
     public function __construct(
+        protected Application $app,
         protected QueueContract $queue,
         protected Events $events,
         protected array $config,
@@ -185,6 +192,10 @@ class Queue implements QueueContract, ClearableQueue
     /**
      * Pop the next job off of the queue.
      *
+     * Jobs come straight from SQS unless the cloud-agent is enabled.
+     *
+     * When cloud-agent is enabled, we long-poll the agent's runtime socket instead.
+     *
      * @param  string|null  $queue
      * @return \Illuminate\Contracts\Queue\Job|null
      */
@@ -192,11 +203,148 @@ class Queue implements QueueContract, ClearableQueue
     {
         $this->finishProcessingJob();
 
-        $job = $this->queue->pop(...func_get_args());
+        $job = $this->usesAgent($queue)
+            ? $this->popFromAgent()
+            : $this->queue->pop(...func_get_args());
 
         $this->startProcessingJob($queue, $job);
 
         return $job;
+    }
+
+    /**
+     * Long-poll the cloud-agent's runtime socket and wrap the next message in a CloudJob.
+     *
+     * @return \Illuminate\Foundation\Cloud\CloudJob|null
+     */
+    protected function popFromAgent()
+    {
+        $data = $this->requestNextJobFromAgent();
+
+        if (! (is_array($data) && is_string($messageId = $data['messageId'] ?? null) && $messageId !== '')) {
+            return null;
+        }
+
+        // Coerce a non-string handle to null so a malformed response degrades gracefully...
+        $receiptHandle = is_string($handle = $data['receiptHandle'] ?? null) ? $handle : null;
+
+        return new CloudJob(
+            $this->queue->getContainer(),
+            $this->queue->getSqs(),
+            [
+                'MessageId' => $messageId,
+                'ReceiptHandle' => $receiptHandle,
+                'Body' => is_string($body = $data['body'] ?? null) ? $body : '',
+                'Attributes' => $data['attributes'] ?? [],
+            ],
+            $this->queue->getConnectionName(),
+            $data['queueUrl'] ?? null,
+            fn (string $status, ?int $delay) => $this->reportJobStatusToAgent(
+                $messageId, $receiptHandle, $status, $delay
+            ),
+        );
+    }
+
+    /**
+     * Long-poll the agent's runtime socket (GET /next) for the next job.
+     *
+     * @throws \Illuminate\Foundation\Cloud\AgentUnreachableException
+     */
+    protected function requestNextJobFromAgent(): ?array
+    {
+        try {
+            $response = $this->agentRequest()
+                ->timeout(65)
+                ->get('/next');
+        } catch (ConnectionException $e) {
+            throw $this->agentUnreachable(
+                'The Laravel Cloud agent runtime socket is unreachable.', $e
+            );
+        }
+
+        if ($response->status() === 204) {
+            return null;
+        }
+
+        if (! $response->ok()) {
+            throw $this->agentUnreachable(
+                "The Laravel Cloud agent returned HTTP {$response->status()} from GET /next."
+            );
+        }
+
+        if (! is_array($data = $response->json())) {
+            throw $this->agentUnreachable(
+                'The Laravel Cloud agent returned a non-array body from GET /next.'
+            );
+        }
+
+        return $data;
+    }
+
+    /**
+     * Report a job's terminal outcome back to the agent (POST /result).
+     *
+     * @throws \Illuminate\Http\Client\RequestException
+     * @throws \Illuminate\Foundation\Cloud\AgentUnreachableException
+     */
+    protected function reportJobStatusToAgent(string $messageId, ?string $receiptHandle, string $status, ?int $delay = null): void
+    {
+        try {
+            $this->agentRequest()
+                ->timeout(10)
+                ->throw()
+                ->retry(3, 100, fn ($exception) => $exception instanceof ConnectionException)
+                ->post('/result', array_filter([
+                    'messageId' => $messageId,
+                    'receiptHandle' => $receiptHandle,
+                    'status' => $status,
+                    'delay' => $delay,
+                ], fn ($value) => $value !== null));
+        } catch (ConnectionException $e) {
+            throw $this->agentUnreachable(
+                'The Laravel Cloud agent runtime socket is unreachable.', $e
+            );
+        } catch (RequestException $e) {
+            if ($e->response->serverError()) {
+                throw $this->agentUnreachable(
+                    "The Laravel Cloud agent returned HTTP {$e->response->status()} from POST /result.", $e
+                );
+            }
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Build the exception for an unreachable agent, first flagging the running
+     * queue:work worker to stop so the pod restarts.
+     *
+     * This release has no injectable LostConnectionDetector, so rather than
+     * teaching the worker to recognize the exception, flag the shared worker
+     * singleton directly. Its daemon loop then exits with a "lost connection"
+     * stop reason on the next tick and the process is restarted.
+     */
+    protected function agentUnreachable(string $message, ?Throwable $previous = null): AgentUnreachableException
+    {
+        if ($this->app->bound('queue.worker')) {
+            $this->app['queue.worker']->lostConnection = true;
+        }
+
+        return new AgentUnreachableException($message, previous: $previous);
+    }
+
+    /**
+     * Get a pending HTTP request bound to the agent's Unix runtime socket.
+     *
+     * @return \Illuminate\Http\Client\PendingRequest
+     */
+    protected function agentRequest()
+    {
+        return Http::baseUrl('http://localhost')->withOptions([
+            'curl' => [
+                CURLOPT_UNIX_SOCKET_PATH => $this->config['agent']['socket'] ?? '/tmp/cloud-agent.sock',
+            ],
+        ]);
     }
 
     /**
@@ -208,6 +356,29 @@ class Queue implements QueueContract, ClearableQueue
     public function clear($queue)
     {
         return $this->queue->clear(...func_get_args());
+    }
+
+    /**
+     * Determine whether the next job should be received from the in-container cloud-agent.
+     *
+     * @param  string|null  $queue
+     */
+    protected function usesAgent($queue = null): bool
+    {
+        return ($this->config['agent']['enabled'] ?? false)
+            && $this->app->runningConsoleCommand('queue:work')
+            && $this->queue->getQueue($queue) === $this->queue->getQueue($this->workerQueue());
+    }
+
+    /**
+     * Get the queue the running queue:work worker is processing.
+     *
+     * @return string
+     */
+    protected function workerQueue()
+    {
+        return (new ArgvInput)->getParameterOption('--queue')
+            ?: ($this->config['queue'] ?? 'default');
     }
 
     /**
