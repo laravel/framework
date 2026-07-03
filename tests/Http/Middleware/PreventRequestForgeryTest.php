@@ -32,6 +32,16 @@ class PreventRequestForgeryTest extends TestCase
         $this->assertSame('OK', $response->getContent());
     }
 
+    public function test_query_requests_pass_without_token()
+    {
+        $middleware = $this->createMiddleware();
+        $request = $this->createRequest(method: 'QUERY');
+
+        $response = $middleware->handle($request, fn () => new Response('OK'));
+
+        $this->assertSame('OK', $response->getContent());
+    }
+
     public function test_same_site_header_rejected_by_default()
     {
         $middleware = $this->createMiddleware();
@@ -121,11 +131,11 @@ class PreventRequestForgeryTest extends TestCase
         $this->assertSame('OK', $response->getContent());
     }
 
-    protected function createRequest(array $server = [], ?string $token = null)
+    protected function createRequest(array $server = [], ?string $token = null, string $method = 'POST')
     {
         $request = Request::create(
             'http://example.com/test',
-            'POST',
+            $method,
             $token ? ['_token' => $token] : [],
             [],
             [],

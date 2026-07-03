@@ -216,6 +216,17 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware('post-middleware');
     }
 
+    public function testCanRegisterQueryRouteWithClosureAction()
+    {
+        $this->router->middleware('query-middleware')->query('users', function () {
+            return 'found';
+        });
+
+        $this->assertTrue($this->getRoute()->matches(Request::create('users', 'QUERY')));
+        $this->assertSame(['QUERY'], $this->getRoute()->methods());
+        $this->seeMiddleware('query-middleware');
+    }
+
     public function testCanRegisterAnyRouteWithClosureAction()
     {
         $this->router->middleware('test-middleware')->any('users', function () {

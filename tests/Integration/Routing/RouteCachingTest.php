@@ -23,6 +23,17 @@ class RouteCachingTest extends TestCase
         $this->get('/foo/1')->assertRedirect('/foo/1/bar');
     }
 
+    public function testQueryRoutes()
+    {
+        $this->routes(__DIR__.'/Fixtures/query_routes.php');
+
+        $this->call('QUERY', '/search?term=laravel', ['filter' => 'framework'])->assertExactJson([
+            'method' => 'QUERY',
+            'term' => 'laravel',
+            'filter' => 'framework',
+        ]);
+    }
+
     protected function routes(string $file)
     {
         $this->defineCacheRoutes(file_get_contents($file));

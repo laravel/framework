@@ -59,6 +59,15 @@ interface Registrar
     public function options($uri, $action);
 
     /**
+     * Register a new QUERY route with the router.
+     *
+     * @param  string  $uri
+     * @param  array|string|callable  $action
+     * @return \Illuminate\Routing\Route
+     */
+    public function query($uri, $action);
+
+    /**
      * Register a new route with the given verbs.
      *
      * @param  array|string  $methods
