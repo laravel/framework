@@ -7,8 +7,8 @@ use Throwable;
 
 /**
  * Treats an unreachable cloud-agent runtime socket as a lost connection so the
- * worker exits and the pod restarts — the only way to recover an agent that has
- * died in-pod. Every other exception is delegated to the wrapped detector.
+ * worker exits and the pod restarts — the only way to recover an agent that
+ * has died in-pod. Every other exception is delegated to parent instance.
  */
 class AgentAwareLostConnectionDetector implements LostConnectionDetector
 {

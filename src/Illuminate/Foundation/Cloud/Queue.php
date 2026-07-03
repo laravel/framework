@@ -42,10 +42,10 @@ class Queue implements QueueContract, ClearableQueue
      * Create a new Queue instance.
      */
     public function __construct(
+        protected Application $app,
         protected QueueContract $queue,
         protected Events $events,
         protected array $config,
-        protected Application $app,
     ) {
         //
     }
@@ -191,8 +191,9 @@ class Queue implements QueueContract, ClearableQueue
     /**
      * Pop the next job off of the queue.
      *
-     * Jobs come straight from SQS unless the cloud-agent is enabled, in which
-     * case we long-poll the agent's runtime socket instead.
+     * Jobs come straight from SQS unless the cloud-agent is enabled.
+     *
+     * When cloud-agent is enabled, we long-poll the agent's runtime socket instead.
      *
      * @param  string|null  $queue
      * @return \Illuminate\Contracts\Queue\Job|null
@@ -211,59 +212,19 @@ class Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Determine whether the next job should be received from the in-container
-     * cloud-agent rather than directly from SQS.
-     *
-     * The agent is a sidecar that long-polls a single queue on behalf of one
-     * queue:work worker, so it only serves work when that worker is popping the
-     * queue it was started for. A pop for any other queue - or one outside a
-     * queue:work worker - has no agent feeding it and falls back to SQS.
-     *
-     * @param  string|null  $queue
-     */
-    protected function usesAgent($queue = null): bool
-    {
-        return ($this->config['agent']['enabled'] ?? false)
-            && $this->app->runningConsoleCommand('queue:work')
-            && $this->queue->getQueue($queue) === $this->queue->getQueue($this->workerQueue());
-    }
-
-    /**
-     * Get the queue the running queue:work worker is processing: its --queue
-     * option, or the same fallback WorkCommand pops when the option is omitted.
-     *
-     * The agent serves a single queue, so a managed worker is expected to run
-     * one too. The raw option is returned as-is: a comma-separated --queue (the
-     * worker splits these and pops each individually) won't match any single
-     * popped queue, so such a worker simply falls back to SQS.
-     *
-     * @return string
-     */
-    protected function workerQueue()
-    {
-        return (new ArgvInput)->getParameterOption('--queue')
-            ?: ($this->config['queue'] ?? 'default');
-    }
-
-    /**
-     * Long-poll the cloud-agent's runtime socket and wrap the next message in a
-     * CloudJob.
-     *
-     * The agent only ever receives messages, so it has no queue to pop from;
-     * each message reports the SQS queue URL it came from instead.
+     * Long-poll the cloud-agent's runtime socket and wrap the next message in a CloudJob.
      *
      * @return \Illuminate\Foundation\Cloud\CloudJob|null
      */
     protected function popFromAgent()
     {
-        $data = $this->requestNextFromAgent();
+        $data = $this->requestNextJobFromAgent();
 
         if (! (is_array($data) && is_string($messageId = $data['messageId'] ?? null) && $messageId !== '')) {
             return null;
         }
 
-        // Coerce a non-string handle to null so a malformed response degrades
-        // gracefully rather than tripping the typed reporter argument.
+        // Coerce a non-string handle to null so a malformed response degrades gracefully...
         $receiptHandle = is_string($handle = $data['receiptHandle'] ?? null) ? $handle : null;
 
         return new CloudJob(
@@ -272,21 +233,14 @@ class Queue implements QueueContract, ClearableQueue
             [
                 'MessageId' => $messageId,
                 'ReceiptHandle' => $receiptHandle,
-                // Coerce a non-string body to '' so a malformed response degrades
-                // to an empty payload rather than blowing up json_decode().
                 'Body' => is_string($body = $data['body'] ?? null) ? $body : '',
                 'Attributes' => $data['attributes'] ?? [],
             ],
             $this->queue->getConnectionName(),
-            // The agent reports the real SQS queue URL the message came from;
-            // delete / release go back to that queue, not our default.
             $data['queueUrl'] ?? null,
-            // Capture only the message id and receipt handle so the closure
-            // doesn't pin the whole agent response for the job's life. The
-            // handle pins the result to this exact receive: SQS reuses message
-            // ids across redeliveries, so a id-only match could let a stale
-            // result finalize a re-dispatched job.
-            fn (string $status, ?int $delay) => $this->reportResultToAgent($messageId, $receiptHandle, $status, $delay),
+            fn (string $status, ?int $delay) => $this->reportJobStatusToAgent(
+                $messageId, $receiptHandle, $status, $delay
+            ),
             $this->config['connection']['overflow'] ?? [],
         );
     }
@@ -294,21 +248,12 @@ class Queue implements QueueContract, ClearableQueue
     /**
      * Long-poll the agent's runtime socket (GET /next) for the next job.
      *
-     * Returns the decoded message payload, or null when the agent has nothing
-     * (HTTP 204). The agent only ever answers 200 with a job or 204 when empty,
-     * so an unreachable socket, any other status, or a malformed body all mean
-     * the agent cannot serve work — a crashed or wedged agent — and each
-     * surfaces as an AgentUnreachableException to restart the pod rather than
-     * spin re-polling a broken agent forever.
-     *
      * @throws \Illuminate\Foundation\Cloud\AgentUnreachableException
      */
-    protected function requestNextFromAgent(): ?array
+    protected function requestNextJobFromAgent(): ?array
     {
         try {
             $response = $this->agentRequest()
-                // Outlast the agent's ~55s poll cycle so a 204 is a deliberate
-                // "nothing yet", never our own timeout cutting a poll short.
                 ->timeout(65)
                 ->get('/next');
         } catch (ConnectionException $e) {
@@ -337,23 +282,12 @@ class Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Report a job's terminal outcome back to the agent (POST /result) so it
-     * can stop heartbeating the message and the poller can perform the SQS
-     * operation. On a release the delay (in whole seconds) is the visibility to
-     * reset the message to.
-     *
-     * The request is retried for transient socket hiccups. A client-error
-     * rejection (the agent is the authority on a valid outcome for this one
-     * message) propagates as a RequestException so the worker reports it and
-     * moves on. An unreachable socket or a server error means the agent itself
-     * is wedged, so both raise an AgentUnreachableException to exit the worker
-     * and restart the pod. The job is never lost — a crashed agent stops
-     * heartbeating, so SQS redelivers once the visibility timeout lapses.
+     * Report a job's terminal outcome back to the agent (POST /result). so it
      *
      * @throws \Illuminate\Http\Client\RequestException
      * @throws \Illuminate\Foundation\Cloud\AgentUnreachableException
      */
-    protected function reportResultToAgent(string $messageId, ?string $receiptHandle, string $status, ?int $delay = null): void
+    protected function reportJobStatusToAgent(string $messageId, ?string $receiptHandle, string $status, ?int $delay = null): void
     {
         try {
             $this->agentRequest()
@@ -382,8 +316,7 @@ class Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * A pending HTTP request bound to the agent's unix runtime socket, so
-     * callers just pass the path (GET /next, POST /result).
+     * Get a pending HTTP request bound to the agent's Unix runtime socket.
      *
      * @return \Illuminate\Http\Client\PendingRequest
      */
@@ -405,6 +338,29 @@ class Queue implements QueueContract, ClearableQueue
     public function clear($queue)
     {
         return $this->queue->clear(...func_get_args());
+    }
+
+    /**
+     * Determine whether the next job should be received from the in-container cloud-agent.
+     *
+     * @param  string|null  $queue
+     */
+    protected function usesAgent($queue = null): bool
+    {
+        return ($this->config['agent']['enabled'] ?? false)
+            && $this->app->runningConsoleCommand('queue:work')
+            && $this->queue->getQueue($queue) === $this->queue->getQueue($this->workerQueue());
+    }
+
+    /**
+     * Get the queue the running queue:work worker is processing.
+     *
+     * @return string
+     */
+    protected function workerQueue()
+    {
+        return (new ArgvInput)->getParameterOption('--queue')
+            ?: ($this->config['queue'] ?? 'default');
     }
 
     /**

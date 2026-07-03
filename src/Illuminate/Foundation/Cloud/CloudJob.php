@@ -7,12 +7,6 @@ use Illuminate\Container\Container;
 use Illuminate\Queue\Jobs\Job;
 use Illuminate\Queue\Jobs\SqsJob;
 
-/**
- * An SQS job handed to the worker by the in-container cloud-agent over its
- * runtime socket rather than received directly from SQS. This pod never mutates
- * SQS itself; delete()/release() only flag the job for queue:work and report the
- * outcome to the agent, which owns the terminal SQS operation.
- */
 class CloudJob extends SqsJob
 {
     /**
@@ -43,13 +37,12 @@ class CloudJob extends SqsJob
      */
     public function delete()
     {
-        // Skip SqsJob::delete() so the SQS DeleteMessage is left to the poller.
+        // Skip SQS deletion so SQS DeleteMessage is left to the poller...
         Job::delete();
 
         $this->report('processed');
 
-        // Only reached once the agent has accepted the outcome (report() throws
-        // otherwise), so the offloaded payload is safe to drop.
+        // Only reached once the agent has accepted the outcome (report() throws otherwise)...
         $this->deleteOverflowPayload();
     }
 
@@ -61,7 +54,7 @@ class CloudJob extends SqsJob
      */
     public function release($delay = 0)
     {
-        // Skip SqsJob::release() so the visibility reset is left to the poller.
+        // Skip SQS deletion so SQS release is left to the poller...
         Job::release($delay);
 
         $this->report('released', delay: $delay);

@@ -112,7 +112,7 @@ class SqsJob extends Job implements JobContract
     }
 
     /**
-     * Forget the offloaded overflow payload from the cache, if any.
+     * Delete the offloaded overflow payload from the cache, if applicable.
      *
      * @return void
      */

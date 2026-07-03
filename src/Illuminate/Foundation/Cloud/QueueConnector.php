@@ -40,10 +40,10 @@ class QueueConnector implements ConnectorInterface
         $underlying = $this->connector->connect($config['connection']);
 
         $queue = new Queue(
+            $this->app,
             $underlying,
             $this->app[Events::class],
             $config,
-            $this->app,
         );
 
         if ($underlying instanceof SqsQueue) {
@@ -103,8 +103,7 @@ class QueueConnector implements ConnectorInterface
         Worker::$restartable = false;
         Worker::$pausable = false;
 
-        // Exit the worker (and restart the pod) when the agent socket is
-        // unreachable instead of looping forever.
+        // Exit the worker (and restart the pod) when the agent socket is unreachable...
         $this->app->extend(
             LostConnectionDetector::class,
             fn ($detector) => new AgentAwareLostConnectionDetector($detector),
