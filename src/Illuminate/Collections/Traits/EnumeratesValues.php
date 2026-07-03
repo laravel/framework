@@ -858,6 +858,24 @@ trait EnumeratesValues
     }
 
     /**
+     * Reduce the collection to a single value by mutating an initial value.
+     *
+     * @template TReduceIntoInitial
+     *
+     * @param  TReduceIntoInitial  $initial
+     * @param  callable(TReduceIntoInitial, TValue, TKey): void  $callback
+     * @return TReduceIntoInitial
+     */
+    public function reduceInto($initial, callable $callback)
+    {
+        foreach ($this as $key => $value) {
+            $callback($initial, $value, $key);
+        }
+
+        return $initial;
+    }
+
+    /**
      * Reduce the collection to multiple aggregate values.
      *
      * @param  callable  $callback
