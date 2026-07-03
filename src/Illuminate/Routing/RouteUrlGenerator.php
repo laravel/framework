@@ -232,11 +232,12 @@ class RouteUrlGenerator
 
         $offset = 0;
         $emptyParameters = array_filter($namedParameters, static fn ($val) => $val === '');
+        $namedParameterKeys = array_keys($namedParameters);
 
         if ($requiredRouteParametersWithoutDefaultsOrNamedParameters !== [] &&
             count($parameters) !== count($emptyParameters)) {
             // Find the index of the first required parameter...
-            $offset = array_search($requiredRouteParametersWithoutDefaultsOrNamedParameters[0], array_keys($namedParameters));
+            $offset = array_search($requiredRouteParametersWithoutDefaultsOrNamedParameters[0], $namedParameterKeys);
 
             // If more empty parameters remain, adjust the offset...
             $remaining = count($emptyParameters) - $offset - count($parameters);
@@ -256,7 +257,7 @@ class RouteUrlGenerator
 
             // Loop over empty parameters backwards and stop when we run out of passed parameters...
             for ($i = count($namedParameters) - 1; $i >= 0; $i--) {
-                if ($namedParameters[array_keys($namedParameters)[$i]] === '') {
+                if ($namedParameters[$namedParameterKeys[$i]] === '') {
                     $offset = $i;
                     $remainingCount--;
 
@@ -270,7 +271,7 @@ class RouteUrlGenerator
 
         // Starting from the offset, match any passed parameters from left to right...
         for ($i = $offset; $i < count($namedParameters); $i++) {
-            $key = array_keys($namedParameters)[$i];
+            $key = $namedParameterKeys[$i];
 
             if ($namedParameters[$key] !== '') {
                 continue;
