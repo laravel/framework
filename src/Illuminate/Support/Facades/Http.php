@@ -20,6 +20,7 @@ use Illuminate\Http\Client\Factory;
  * @method static void recordRequestResponsePair(\Illuminate\Http\Client\Request $request, \Illuminate\Http\Client\Response|null $response)
  * @method static void assertSent(callable|\Closure $callback)
  * @method static void assertSentInOrder(array $callbacks)
+ * @method static void assertSentJson(array|\Closure $data)
  * @method static void assertNotSent(callable|\Closure $callback)
  * @method static void assertNothingSent()
  * @method static void assertSentCount(int $count)
