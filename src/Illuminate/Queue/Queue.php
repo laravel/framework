@@ -365,7 +365,7 @@ abstract class Queue
     {
         if ($this->shouldDispatchAfterCommit($job) &&
             $this->container->bound('db.transactions')) {
-            $this->registerRollbackCallbacksForDeferredJob($job);
+            $this->registerRollbackCallbacksForJobsThatDispatchAfterCommit($job);
 
             return $this->container->make('db.transactions')->addCallback(
                 function () use ($queue, $job, $payload, $delay, $callback) {
@@ -405,12 +405,12 @@ abstract class Queue
     }
 
     /**
-     * Register rollback callbacks to release unique or debounce locks if the current database transaction is rolled back.
+     * Register callbacks to release locks if the current database transaction is rolled back.
      *
      * @param  \Closure|string|object  $job
      * @return void
      */
-    protected function registerRollbackCallbacksForDeferredJob($job)
+    protected function registerRollbackCallbacksForJobsThatDispatchAfterCommit($job)
     {
         if ($job instanceof ShouldBeUnique) {
             $this->container->make('db.transactions')->addCallbackForRollback(

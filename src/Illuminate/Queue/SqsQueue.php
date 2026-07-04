@@ -393,7 +393,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
 
         if (! empty($deferred)) {
             foreach ($deferred as $job) {
-                $this->registerRollbackCallbacksForDeferredJob($job);
+                $this->registerRollbackCallbacksForJobsThatDispatchAfterCommit($job);
             }
 
             $messages = $this->createBatchMessages($deferred, $data, $queue);
