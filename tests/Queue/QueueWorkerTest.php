@@ -16,6 +16,8 @@ use Illuminate\Queue\Events\JobPopping;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobReleasedAfterException;
+use Illuminate\Queue\Events\JobTimedOut;
+use Illuminate\Queue\TimeoutExceededException;
 use Illuminate\Queue\Events\WorkerIdle;
 use Illuminate\Queue\Events\WorkerStarting;
 use Illuminate\Queue\Events\WorkerStopping;
@@ -674,6 +676,54 @@ class QueueWorkerTest extends TestCase
         $this->assertSame(30, $worker->keepAliveForJobValue($job, new WorkerOptions(keepAlive: 30)));
     }
 
+    public function testWorkerUsesTimeoutAndKeepAliveForAnActiveJob()
+    {
+        $worker = new InsomniacWorker(
+            new WorkerFakeManager('default', new WorkerFakeKeepAliveConnection('default', [])),
+            $this->events,
+            $this->exceptionHandler,
+            fn () => false,
+        );
+
+        $job = new class extends WorkerFakeJob
+        {
+            public function timeout()
+            {
+                return 90;
+            }
+        };
+        $job->connectionName = 'default';
+
+        $options = new WorkerOptions(timeout: 60, keepAlive: 30);
+
+        $this->assertSame(90, $worker->timeoutForJobValue($job, $options));
+        $this->assertSame(30, $worker->keepAliveForJobValue($job, $options));
+    }
+
+    public function testWorkerDoesNotUseTimeoutWithoutAnActiveJob()
+    {
+        $worker = new InsomniacWorker(
+            new WorkerFakeManager('default', new WorkerFakeKeepAliveConnection('default', [])),
+            $this->events,
+            $this->exceptionHandler,
+            fn () => false,
+        );
+
+        $this->assertSame(0, $worker->timeoutForJobValue(null, new WorkerOptions(timeout: 60)));
+    }
+
+    public function testWorkerDoesNotUseKeepAliveWithoutAnActiveJob()
+    {
+        $worker = new InsomniacWorker(
+            new WorkerFakeManager('default', new WorkerFakeKeepAliveConnection('default', [])),
+            $this->events,
+            $this->exceptionHandler,
+            fn () => false,
+        );
+
+        $this->assertSame(0, $worker->keepAliveForJobValue(null, new WorkerOptions(keepAlive: 30)));
+    }
+
     public function testWorkerIgnoresKeepAliveWhenConnectionIsUnsupported()
     {
         $worker = $this->getWorker('default', ['queue' => []]);
@@ -700,6 +750,35 @@ class QueueWorkerTest extends TestCase
         $worker->keepJobAliveValue($job, 30);
 
         $this->assertSame([[$job, 30]], $connection->keptAliveJobs);
+    }
+
+    public function testWorkerCanKeepAJobAliveBeforeTimingOut()
+    {
+        $connection = new WorkerFakeKeepAliveConnection('default', []);
+        $worker = new InsomniacWorker(
+            new WorkerFakeManager('default', $connection),
+            $this->events,
+            $this->exceptionHandler,
+            fn () => false,
+        );
+
+        $job = new WorkerFakeJob();
+        $job->connectionName = 'default';
+        $job->shouldFailOnTimeout = true;
+
+        $options = new WorkerOptions(timeout: 60, keepAlive: 30);
+
+        $worker->keepJobAliveValue($job, $worker->keepAliveForJobValue($job, $options));
+        $worker->timeoutJobValue($job, $options);
+
+        $this->assertSame([[$job, 30]], $connection->keptAliveJobs);
+        $this->assertTrue($job->failed);
+        $this->assertTrue($job->deleted);
+        $this->assertInstanceOf(TimeoutExceededException::class, $job->failedWith);
+        $this->assertSame(Worker::EXIT_ERROR, $worker->killedWithStatus);
+        $this->assertSame(WorkerStopReason::TimedOut, $worker->killedWithReason);
+
+        $this->events->shouldHaveReceived('dispatch')->with(m::type(JobTimedOut::class))->once();
     }
 
     /**
@@ -744,6 +823,9 @@ class InsomniacWorker extends Worker
     public $sleptFor;
     public $stopOnMemoryExceeded = false;
     public $currentTime;
+    public $killedWithStatus;
+    public $killedWithOptions;
+    public $killedWithReason;
 
     public function sleep($seconds)
     {
@@ -774,9 +856,23 @@ class InsomniacWorker extends Worker
         return $this->keepAliveForJob($job, $options);
     }
 
+    public function timeoutForJobValue($job, WorkerOptions $options)
+    {
+        return $this->timeoutForJob($job, $options);
+    }
+
     public function keepJobAliveValue($job, $keepAlive)
     {
         $this->handleJobKeepAlive($job, $keepAlive);
+    }
+
+    public function timeoutJobValue($job, WorkerOptions $options)
+    {
+        try {
+            $this->handleJobTimeout($job, $options);
+        } catch (LoopBreakerException) {
+            //
+        }
     }
 
     public function daemonShouldRun(WorkerOptions $options, $connectionName, $queue)
@@ -787,6 +883,15 @@ class InsomniacWorker extends Worker
     public function memoryExceeded($memoryLimit)
     {
         return $this->stopOnMemoryExceeded;
+    }
+
+    public function kill($status = 0, $options = null, $reason = null)
+    {
+        $this->killedWithStatus = $status;
+        $this->killedWithOptions = $options;
+        $this->killedWithReason = $reason;
+
+        throw new LoopBreakerException('Worker killed');
     }
 }
 

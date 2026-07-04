@@ -337,7 +337,7 @@ class Worker
         $now = $this->currentTime();
 
         // Track the next absolute deadlines for the timeout and keepalive alarm.
-        $timeout = $job ? max($this->timeoutForJob($job, $options), 0) : 0;
+        $timeout = max($this->timeoutForJob($job, $options), 0);
         $timeoutAt = $timeout > 0 ? $now + $timeout : null;
 
         $keepAliveFrequency = max($this->keepAliveForJob($job, $options), 0);
@@ -400,7 +400,11 @@ class Worker
      */
     protected function timeoutForJob($job, WorkerOptions $options)
     {
-        return $job && ! is_null($job->timeout()) ? $job->timeout() : $options->timeout;
+        if (! $job) {
+            return 0;
+        }
+
+        return ! is_null($job->timeout()) ? $job->timeout() : $options->timeout;
     }
 
     /**
@@ -412,7 +416,11 @@ class Worker
      */
     protected function keepAliveForJob($job, WorkerOptions $options)
     {
-        return $job && $this->manager->connection($job->getConnectionName()) instanceof KeepsJobsAlive
+        if (! $job) {
+            return 0;
+        }
+
+        return $this->manager->connection($job->getConnectionName()) instanceof KeepsJobsAlive
             ? $options->keepAlive
             : 0;
     }
