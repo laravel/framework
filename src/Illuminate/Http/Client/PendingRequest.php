@@ -500,7 +500,7 @@ class PendingRequest
     /**
      * Remove the given headers from the request.
      *
-     * @param  array  $names
+     * @param  list<string>  $names
      * @return $this
      */
     public function withoutHeaders(array $names)
