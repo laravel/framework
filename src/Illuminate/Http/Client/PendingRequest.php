@@ -485,6 +485,34 @@ class PendingRequest
     }
 
     /**
+     * Remove the given header from the request.
+     *
+     * @param  string  $name
+     * @return $this
+     */
+    public function withoutHeader($name)
+    {
+        unset($this->options['headers'][$name]);
+
+        return $this;
+    }
+
+    /**
+     * Remove the given headers from the request.
+     *
+     * @param  array  $names
+     * @return $this
+     */
+    public function withoutHeaders(array $names)
+    {
+        foreach ($names as $name) {
+            $this->withoutHeader($name);
+        }
+
+        return $this;
+    }
+
+    /**
      * Specify the basic authentication username and password for the request.
      *
      * @param  string  $username

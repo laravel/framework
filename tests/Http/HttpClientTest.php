@@ -600,6 +600,28 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testCanRemoveHeadersFromRequest()
+    {
+        $this->factory->fake();
+
+        $this->factory->withHeaders([
+            'X-Test-Header' => 'foo',
+            'X-Keep-Header' => 'bar',
+        ])->withHeader('X-Another-Header', 'baz')
+            ->withoutHeader('X-Test-Header')
+            ->withoutHeaders(['X-Another-Header', 'X-Missing-Header'])
+            ->post('http://foo.com/json', [
+                'name' => 'Taylor',
+            ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/json' &&
+                   ! $request->hasHeader('X-Test-Header') &&
+                   ! $request->hasHeader('X-Another-Header') &&
+                   $request->hasHeader('X-Keep-Header', 'bar');
+        });
+    }
+
     public function testCanSendFormData()
     {
         $this->factory->fake();
