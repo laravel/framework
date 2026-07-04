@@ -372,14 +372,6 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Push an array of jobs onto the queue using the SendMessageBatch API.
      *
-     * Entries are chunked to respect the SQS per-batch limits of 10 messages
-     * and {@see static::MAX_SQS_PAYLOAD_SIZE} cumulative payload bytes, then
-     * each chunk is dispatched sequentially. FIFO queues stop at the first
-     * failure to preserve ordering, while standard queues attempt every chunk
-     * and aggregate any failures. Per-job afterCommit, unique and debounce
-     * locks, delays, and JobQueueing / JobQueued events all behave identically
-     * to {@see static::push()}.
-     *
      * @param  array  $jobs
      * @param  mixed  $data
      * @param  string|null  $queue
@@ -413,9 +405,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Partition the given jobs into those that should be deferred until the
-     * active database transaction commits and those that should be dispatched
-     * immediately.
+     * Partition the given jobs by whether they should be deferred until the active database transaction commits.
      *
      * @param  array  $jobs
      * @return array{0: array, 1: array}
@@ -442,8 +432,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Create the payload for each of the given jobs.
      *
-     * Payloads are created at dispatch time, even for jobs deferred until
-     * after the transaction commits, mirroring {@see static::push()}.
+     * Payloads are created at dispatch time, even for jobs deferred until after the transaction commits.
      *
      * @param  array  $jobs
      * @param  mixed  $data
@@ -464,9 +453,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Build entries for the given messages, raise the queueing events,
-     * dispatch each chunk via SendMessageBatch, and then raise the queued
-     * events using the message IDs returned by SQS.
+     * Build entries, raise queueing events, dispatch chunks, and raise queued events with SQS message IDs.
      *
      * @param  array  $messages
      * @param  string|null  $queue
@@ -487,14 +474,9 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
 
         $queueUrl = $this->getQueue($queue);
 
-        // Chunks are dispatched one at a time and we stop at the first failure,
-        // mirroring push(): jobs already sent stay queued, later chunks are not
-        // attempted, and the error surfaces to the caller. Stopping also keeps
-        // FIFO ordering intact, since no later message can arrive ahead of one
-        // that was never sent.
+        // Dispatch chunks one at a time and stop at the first failure so later messages cannot arrive ahead of unsent ones.
         foreach ($this->chunkBatchEntries($entries) as $chunk) {
-            // Request-level errors (throttling, auth, networking) throw an
-            // SqsException here, which we allow to propagate untouched.
+            // Request-level errors throw an SqsException here, which we allow to propagate untouched.
             $result = $this->sqs->sendMessageBatch([
                 'QueueUrl' => $queueUrl,
                 'Entries' => $chunk,
@@ -512,11 +494,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
                 );
             }
 
-            // A batch can return HTTP 200 while still rejecting individual
-            // entries, which the SDK does not raise for. Surface those as the
-            // same SqsException a failed request would throw, carrying the
-            // reported error code and the full result, so the rejected jobs
-            // are not silently dropped.
+            // A batch can return HTTP 200 while rejecting entries, so surface those failures as an SqsException.
             if (! empty($result['Failed'])) {
                 $failure = $result['Failed'][0];
 
@@ -542,8 +520,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Build the SendMessageBatch entry for a single prepared message.
      *
-     * The entry Id is the message's index, which lets the response handler map
-     * each Successful / Failed result returned by SQS back to its job.
+     * The entry Id maps each Successful or Failed result returned by SQS back to its job.
      *
      * @param  int  $id
      * @param  array{job: mixed, delay: mixed, payload: string}  $message
@@ -562,8 +539,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Chunk batch entries respecting both the 10-message and cumulative
-     * payload-size limits enforced by SendMessageBatch.
+     * Chunk batch entries respecting both the 10-message and cumulative payload-size limits enforced by SendMessageBatch.
      *
      * @param  array  $entries
      * @return array

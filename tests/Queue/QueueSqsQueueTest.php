@@ -1107,8 +1107,7 @@ class QueueSqsQueueTest extends TestCase
         $queue->expects($this->once())->method('getQueue')->willReturn($this->fifoQueueUrl);
         $queue->method('createPayload')->willReturnCallback(fn ($job) => "payload-{$job}");
 
-        // Only the first of the two chunks is attempted; the exception from
-        // that request propagates untouched and later chunks are not sent.
+        // Only the first chunk is attempted; its exception propagates untouched and later chunks are not sent.
         $this->sqs->shouldReceive('sendMessageBatch')->once()->andThrow(new RuntimeException('SQS is down'));
 
         $this->expectException(RuntimeException::class);
@@ -1275,8 +1274,7 @@ class QueueSqsQueueTest extends TestCase
             $this->assertSame('chunk failed', $e->getMessage());
         }
 
-        // The first chunk was queued before the second failed, so its queued
-        // events must already have fired.
+        // The first chunk was queued before the second failed, so its queued events must already have fired.
         $queuedEvents = array_filter($dispatched, fn ($e) => $e instanceof \Illuminate\Queue\Events\JobQueued);
 
         $this->assertCount(10, $queuedEvents);

@@ -405,8 +405,7 @@ abstract class Queue
     }
 
     /**
-     * Register rollback callbacks to release any unique or debounce locks held
-     * by the given job if the current database transaction is rolled back.
+     * Register rollback callbacks to release unique or debounce locks if the current database transaction is rolled back.
      *
      * @param  \Closure|string|object  $job
      * @return void
