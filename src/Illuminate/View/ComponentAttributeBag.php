@@ -257,6 +257,10 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
 
             if ($key === 'style') {
                 $value = Str::finish($value, ';');
+
+                if (is_string($defaultsValue) && $defaultsValue !== '') {
+                    $defaultsValue = Str::finish($defaultsValue, ';');
+                }
             }
 
             return [$key => implode(' ', array_unique(array_filter([$defaultsValue, $value])))];
