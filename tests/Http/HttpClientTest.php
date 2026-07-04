@@ -4872,6 +4872,77 @@ class HttpClientTest extends TestCase
         $response->json();
         $this->assertSame(1, $response->bodyCallCount);
     }
+
+    public function testAssertSentJsonWithSubsetMatch()
+    {
+        $this->factory->fake();
+
+        $this->factory->post('http://laravel.com/json', [
+            'email' => 'user@example.com',
+            'name' => 'Taylor',
+        ]);
+
+        $this->factory->assertSentJson([
+            'email' => 'user@example.com',
+        ]);
+    }
+
+    public function testAssertSentJsonWithClosure()
+    {
+        $this->factory->fake();
+
+        $this->factory->post('http://laravel.com/json', [
+            'status' => 'active',
+        ]);
+
+        $this->factory->assertSentJson(function (array $json, Request $request) {
+            return $json['status'] === 'active'
+                && $request->url() === 'http://laravel.com/json';
+        });
+    }
+
+    public function testAssertSentJsonWithNestedDotNotationKeys()
+    {
+        $this->factory->fake();
+
+        $this->factory->post('http://laravel.com/json', [
+            'user' => ['name' => 'Taylor', 'email' => 'user@example.com'],
+        ]);
+
+        $this->factory->assertSentJson([
+            'user.email' => 'user@example.com',
+        ]);
+    }
+
+    public function testAssertSentJsonFailsWhenNoMatchingJsonRequestWasSent()
+    {
+        $this->factory->fake();
+
+        $this->factory->post('http://laravel.com/json', [
+            'email' => 'user@example.com',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+
+        $this->factory->assertSentJson([
+            'email' => 'other@example.com',
+        ]);
+    }
+
+    public function testAssertSentJsonDoesNotMatchNonJsonRequests()
+    {
+        $this->factory->fake();
+
+        $this->factory->asForm()->post('http://laravel.com/form', [
+            'email' => 'user@example.com',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+
+        $this->factory->assertSentJson([
+            'email' => 'user@example.com',
+        ]);
+    }
 }
 
 class CustomFactory extends Factory

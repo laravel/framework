@@ -502,6 +502,35 @@ class Factory
     }
 
     /**
+     * Assert that a request was sent with the given JSON data.
+     *
+     * @param  array|(\Closure(array, \Illuminate\Http\Client\Request): bool)  $data
+     * @return void
+     */
+    public function assertSentJson($data)
+    {
+        $this->assertSent(function ($request) use ($data) {
+            if (! $request->isJson()) {
+                return false;
+            }
+
+            $json = $request->data();
+
+            if ($data instanceof Closure) {
+                return $data($json, $request) === true;
+            }
+
+            foreach ($data as $key => $value) {
+                if (data_get($json, $key) !== $value) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+    }
+
+    /**
      * Assert that a request / response pair was not recorded matching a given truth test.
      *
      * @param  callable|(\Closure(\Illuminate\Http\Client\Request, \Illuminate\Http\Client\Response|null): bool)  $callback
