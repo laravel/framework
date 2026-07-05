@@ -158,6 +158,14 @@ class DatabaseTransactionsManager
      */
     protected function removeAllTransactionsForConnection($connection)
     {
+        // Execute rollback callbacks in deepest-first order: committed savepoint
+        // records first (innermost committed level was staged first, so natural
+        // iteration is deepest-first), then the currently open transaction chain
+        // from innermost to outermost.
+        $this->committedTransactions
+            ->filter(fn ($transaction) => $transaction->connection == $connection)
+            ->each(fn ($transaction) => $transaction->executeCallbacksForRollback());
+
         if ($this->currentTransaction) {
             for ($currentTransaction = $this->currentTransaction[$connection]; isset($currentTransaction); $currentTransaction = $currentTransaction->parent) {
                 $currentTransaction->executeCallbacksForRollback();
@@ -169,10 +177,6 @@ class DatabaseTransactionsManager
         $this->pendingTransactions = $this->pendingTransactions->reject(
             fn ($transaction) => $transaction->connection == $connection
         )->values();
-
-        $this->committedTransactions
-            ->filter(fn ($transaction) => $transaction->connection == $connection)
-            ->each(fn ($transaction) => $transaction->executeCallbacksForRollback());
 
         $this->committedTransactions = $this->committedTransactions->reject(
             fn ($transaction) => $transaction->connection == $connection
@@ -192,14 +196,16 @@ class DatabaseTransactionsManager
                                $committed->parent === $transaction
         );
 
-        $removedTransactions->each(fn ($transaction) => $transaction->executeCallbacksForRollback());
-
         // There may be multiple deeply nested transactions that have already committed that we
         // also need to remove. We will recurse down the children of all removed transaction
         // instances until there are no more deeply nested child transactions for removal.
+        // Recursion runs first so descendant rollback callbacks fire deepest-first before
+        // this level's callbacks fire.
         $removedTransactions->each(
             fn ($transaction) => $this->removeCommittedTransactionsThatAreChildrenOf($transaction)
         );
+
+        $removedTransactions->each(fn ($transaction) => $transaction->executeCallbacksForRollback());
     }
 
     /**
