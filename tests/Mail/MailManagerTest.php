@@ -175,6 +175,23 @@ class MailManagerTest extends TestCase
         $this->assertNotSame($mailer1, $mailer2);
     }
 
+    public function testGlobalToAddressWithoutName(): void
+    {
+        $this->app['config']->set('mail.mailers.array', [
+            'transport' => 'array',
+        ]);
+
+        $this->app['config']->set('mail.to', ['address' => 'taylor@laravel.com']);
+
+        $mailer = $this->app['mail.manager']->mailer('array');
+
+        $sentMessage = $mailer->raw('Hello World', function ($message) {
+            $message->to('jack@laravel.com');
+        });
+
+        $this->assertStringContainsString('To: taylor@laravel.com', $sentMessage->toString());
+    }
+
     public static function emptyTransportConfigDataProvider()
     {
         return [
