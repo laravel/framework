@@ -33,6 +33,7 @@ use Rector\Php82\Rector\Class_\ReadOnlyClassRector;
 use Rector\Php83\Rector\ClassConst\AddTypeToConstRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use Rector\Php83\Rector\FuncCall\DynamicClassConstFetchRector;
+use Rector\Php84\Rector\Class_\DeprecatedAnnotationToDeprecatedAttributeRector;
 use Rector\PHPUnit\CodeQuality\Rector\CallLike\DirectInstanceOverMockArgRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\ConstructClassMethodToSetUpTestCaseRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\InlineStubPropertyToCreateStubMethodCallRector;
@@ -104,6 +105,7 @@ return RectorConfig::configure()
         ClosureDelegatingCallToFirstClassCallableRector::class,
         ClosureFromCallableToFirstClassCallableRector::class,
         ClosureToArrowFunctionRector::class,
+        DeprecatedAnnotationToDeprecatedAttributeRector::class,
         DynamicClassConstFetchRector::class,
         FunctionFirstClassCallableRector::class,
         GetDebugTypeRector::class,
