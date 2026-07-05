@@ -127,7 +127,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
 
         $keys = is_array($key) ? $key : func_get_args();
 
-        return array_all($keys, fn ($key) => ! ($this->first($key) === ''));
+        return array_all($keys, fn ($key) => $this->first($key) !== '');
     }
 
     /**
