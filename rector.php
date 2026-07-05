@@ -16,7 +16,6 @@ use Rector\Php55\Rector\String_\StringClassNameToClassConstantRector;
 use Rector\Php56\Rector\FuncCall\PowToExpRector;
 use Rector\Php70\Rector\FuncCall\RandomFunctionRector;
 use Rector\Php70\Rector\MethodCall\ThisCallOnStaticMethodToStaticCallRector;
-use Rector\Php70\Rector\StaticCall\StaticCallOnNonStaticToInstanceCallRector;
 use Rector\Php70\Rector\Ternary\TernaryToNullCoalescingRector;
 use Rector\Php71\Rector\BinaryOp\BinaryOpBetweenNumberAndStringRector;
 use Rector\Php71\Rector\FuncCall\RemoveExtraParametersRector;
@@ -115,7 +114,6 @@ return RectorConfig::configure()
         ReadOnlyPropertyRector::class,
         RemoveExtraParametersRector::class,
         ReturnNeverTypeRector::class,
-        StaticCallOnNonStaticToInstanceCallRector::class,
         StringClassNameToClassConstantRector::class,
         StringableForToStringRector::class,
         TernaryToNullCoalescingRector::class,
