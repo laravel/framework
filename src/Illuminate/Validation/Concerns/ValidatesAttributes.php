@@ -2935,6 +2935,10 @@ trait ValidatesAttributes
     {
         $stringValue = (string) $value;
 
+        if ($value === 'INF' || $value === '-INF') {
+            throw new MathException('Unsupported numeric value.');
+        }
+
         if (! is_numeric($value) || ! Str::contains($stringValue, 'e', ignoreCase: true)) {
             return $value;
         }
