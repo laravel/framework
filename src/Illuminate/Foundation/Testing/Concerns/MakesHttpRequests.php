@@ -12,6 +12,7 @@ use Illuminate\Testing\LoggedExceptionCollection;
 use Illuminate\Testing\TestResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 trait MakesHttpRequests
 {
@@ -578,6 +579,41 @@ trait MakesHttpRequests
             $files,
             $this->transformHeadersToServerVars($headers),
             $content
+        );
+    }
+
+    public function callRoute(BackedEnum|string $name, array $parameters = [], array $cookies = [], array $files = [], array $headers = [], ?string $content = null, ?string $method = null): TestResponse
+    {
+        if ($name instanceof BackedEnum && ! is_string($name = $name->value)) {
+            throw new InvalidArgumentException('Attribute [name] expects a string backed enum.');
+        }
+
+        if (is_null($route = app('router')->getRoutes()->getByName($name))) {
+            throw new RouteNotFoundException("Route [{$name}] not defined.");
+        }
+
+        if (count($route->methods) === 2 && in_array('GET', $route->methods) && in_array('HEAD', $route->methods) && $method === null) {
+            $method = 'GET';
+        }
+
+        if (count($route->methods) > 1 && $method === null) {
+            throw new InvalidArgumentException('This route supports multiple HTTP methods. Please provide one of: '.implode(', ', $route->methods));
+        }
+
+        if ($method !== null && in_array($method, $route->methods)) {
+            throw new InvalidArgumentException("HTTP method [{$method}] not support by this route. Please provide one of: ".implode(', ', $route->methods));
+        }
+
+        $method ??= $route->methods[0];
+
+        return $this->call(
+            $method,
+            $route->uri,
+            $parameters,
+            $cookies,
+            $files,
+            $this->transformHeadersToServerVars($headers),
+            $content,
         );
     }
 
