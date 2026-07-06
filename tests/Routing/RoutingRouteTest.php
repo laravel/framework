@@ -2313,7 +2313,7 @@ class RoutingRouteTest extends TestCase
 
         try {
             $route->run();
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             //
         }
 

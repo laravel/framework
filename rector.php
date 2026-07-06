@@ -16,7 +16,6 @@ use Rector\Php55\Rector\String_\StringClassNameToClassConstantRector;
 use Rector\Php56\Rector\FuncCall\PowToExpRector;
 use Rector\Php70\Rector\FuncCall\RandomFunctionRector;
 use Rector\Php70\Rector\MethodCall\ThisCallOnStaticMethodToStaticCallRector;
-use Rector\Php70\Rector\StaticCall\StaticCallOnNonStaticToInstanceCallRector;
 use Rector\Php70\Rector\Ternary\TernaryToNullCoalescingRector;
 use Rector\Php71\Rector\BinaryOp\BinaryOpBetweenNumberAndStringRector;
 use Rector\Php71\Rector\FuncCall\RemoveExtraParametersRector;
@@ -34,6 +33,7 @@ use Rector\Php82\Rector\Class_\ReadOnlyClassRector;
 use Rector\Php83\Rector\ClassConst\AddTypeToConstRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use Rector\Php83\Rector\FuncCall\DynamicClassConstFetchRector;
+use Rector\Php84\Rector\Class_\DeprecatedAnnotationToDeprecatedAttributeRector;
 use Rector\PHPUnit\CodeQuality\Rector\CallLike\DirectInstanceOverMockArgRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\ConstructClassMethodToSetUpTestCaseRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\InlineStubPropertyToCreateStubMethodCallRector;
@@ -105,6 +105,7 @@ return RectorConfig::configure()
         ClosureDelegatingCallToFirstClassCallableRector::class,
         ClosureFromCallableToFirstClassCallableRector::class,
         ClosureToArrowFunctionRector::class,
+        DeprecatedAnnotationToDeprecatedAttributeRector::class,
         DynamicClassConstFetchRector::class,
         FunctionFirstClassCallableRector::class,
         GetDebugTypeRector::class,
@@ -115,7 +116,6 @@ return RectorConfig::configure()
         ReadOnlyPropertyRector::class,
         RemoveExtraParametersRector::class,
         ReturnNeverTypeRector::class,
-        StaticCallOnNonStaticToInstanceCallRector::class,
         StringClassNameToClassConstantRector::class,
         StringableForToStringRector::class,
         TernaryToNullCoalescingRector::class,

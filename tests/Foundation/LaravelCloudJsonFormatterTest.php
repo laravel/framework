@@ -26,12 +26,12 @@ class LaravelCloudJsonFormatterTest extends TestCase
     protected function createRecord(): LogRecord
     {
         return new LogRecord(
-            message: 'Test message',
-            level: Level::Info,
-            channel: 'test',
             datetime: new \DateTimeImmutable,
-            extra: [],
+            channel: 'test',
+            level: Level::Info,
+            message: 'Test message',
             context: [],
+            extra: [],
         );
     }
 
@@ -79,12 +79,12 @@ class LaravelCloudJsonFormatterTest extends TestCase
         $app->instance('request', $request);
 
         $record = new LogRecord(
-            message: 'Test message',
-            level: Level::Warning,
-            channel: 'my-channel',
             datetime: new \DateTimeImmutable('2024-01-15 10:30:00'),
-            extra: ['extra_field' => 'extra_value'],
+            channel: 'my-channel',
+            level: Level::Warning,
+            message: 'Test message',
             context: ['context_field' => 'context_value'],
+            extra: ['extra_field' => 'extra_value'],
         );
 
         $formatter = new LaravelCloudJsonFormatter;

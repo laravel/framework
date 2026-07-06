@@ -127,13 +127,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
 
         $keys = is_array($key) ? $key : func_get_args();
 
-        foreach ($keys as $key) {
-            if ($this->first($key) === '') {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($keys, fn ($key) => $this->first($key) !== '');
     }
 
     /**
@@ -150,13 +144,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
 
         $keys = is_array($keys) ? $keys : func_get_args();
 
-        foreach ($keys as $key) {
-            if ($this->has($key)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($keys, fn ($key) => $this->has($key));
     }
 
     /**
