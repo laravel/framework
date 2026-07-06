@@ -29,7 +29,7 @@ class UnionType extends Type
      */
     public function __construct(array $types)
     {
-        $names = array_map('strval', $types);
+        $names = array_map(strval(...), $types);
 
         if (in_array('null', $names, true)) {
             $this->nullable();

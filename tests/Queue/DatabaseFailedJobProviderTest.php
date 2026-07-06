@@ -29,7 +29,7 @@ class DatabaseFailedJobProviderTest extends TestCase
     {
         $this->assertEmpty($this->provider->ids());
 
-        array_map(fn () => $this->createFailedJobsRecord(), range(1, 4));
+        array_map($this->createFailedJobsRecord(...), range(1, 4));
 
         $this->assertCount(4, $this->provider->ids());
         $this->assertSame([4, 3, 2, 1], $this->provider->ids());
@@ -39,7 +39,7 @@ class DatabaseFailedJobProviderTest extends TestCase
     {
         $this->assertEmpty($this->provider->all());
 
-        array_map(fn () => $this->createFailedJobsRecord(), range(1, 4));
+        array_map($this->createFailedJobsRecord(...), range(1, 4));
 
         $this->assertCount(4, $this->provider->all());
         $this->assertSame(3, $this->provider->all()[1]->id);
@@ -48,7 +48,7 @@ class DatabaseFailedJobProviderTest extends TestCase
 
     public function testCanRetrieveFailedJobsById()
     {
-        array_map(fn () => $this->createFailedJobsRecord(), range(1, 2));
+        array_map($this->createFailedJobsRecord(...), range(1, 2));
 
         $this->assertNotNull($this->provider->find(1));
         $this->assertNotNull($this->provider->find(2));

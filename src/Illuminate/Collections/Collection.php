@@ -1881,7 +1881,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function zip($items)
     {
-        $arrayableItems = array_map(fn ($items) => $this->getArrayableItems($items), func_get_args());
+        $arrayableItems = array_map($this->getArrayableItems(...), func_get_args());
 
         $params = array_merge([fn () => $this->newInstance(func_get_args()), $this->items], $arrayableItems);
 

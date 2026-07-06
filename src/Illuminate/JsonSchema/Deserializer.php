@@ -166,7 +166,7 @@ class Deserializer
 
         if (isset($schema['properties']) && is_array($schema['properties'])) {
             $required = is_array($schema['required'] ?? null)
-                ? array_flip(array_map('strval', $schema['required']))
+                ? array_flip(array_map(strval(...), $schema['required']))
                 : [];
 
             foreach ($schema['properties'] as $key => $definition) {
@@ -356,7 +356,7 @@ class Deserializer
         if (is_array($type)) {
             $nullable = in_array('null', $type, true);
 
-            $names = array_values(array_unique(array_map('strval', array_filter(
+            $names = array_values(array_unique(array_map(strval(...), array_filter(
                 $type,
                 static fn ($value) => $value !== 'null',
             ))));

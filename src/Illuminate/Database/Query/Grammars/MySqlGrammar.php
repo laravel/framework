@@ -146,7 +146,7 @@ class MySqlGrammar extends Grammar
     {
         $index = $indexHint->index;
 
-        $indexes = array_map('trim', explode(',', $index));
+        $indexes = array_map(trim(...), explode(',', $index));
 
         foreach ($indexes as $i) {
             if (! preg_match('/^[a-zA-Z0-9_$]+$/', $i)) {

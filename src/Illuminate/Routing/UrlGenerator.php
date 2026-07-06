@@ -223,7 +223,7 @@ class UrlGenerator implements UrlGeneratorContract
         }
 
         $tail = implode('/', array_map(
-            'rawurlencode', (array) $this->formatParameters($extra))
+            rawurlencode(...), (array) $this->formatParameters($extra))
         );
 
         // Once we have the scheme we will compile the "tail" by collapsing the values

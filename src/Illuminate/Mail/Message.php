@@ -290,7 +290,7 @@ class Message
      */
     protected function ensureAddressesAreSafe(array $addresses)
     {
-        return array_map(fn ($address) => $this->ensureAddressIsSafe($address), $addresses);
+        return array_map($this->ensureAddressIsSafe(...), $addresses);
     }
 
     /**

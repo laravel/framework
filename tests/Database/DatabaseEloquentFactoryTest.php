@@ -1272,7 +1272,7 @@ class FactoryTestCommentFactory extends Factory
         return [
             'commentable_id' => FactoryTestPostFactory::new(),
             'commentable_type' => FactoryTestPost::class,
-            'user_id' => fn () => FactoryTestUserFactory::new(),
+            'user_id' => FactoryTestUserFactory::new(...),
             'body' => $this->faker->name(),
         ];
     }

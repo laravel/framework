@@ -1148,7 +1148,7 @@ trait EnumeratesValues
                 };
             });
 
-            if (count($strings) < 2 && count(array_filter([$retrieved, $value], 'is_object')) == 1) {
+            if (count($strings) < 2 && count(array_filter([$retrieved, $value], is_object(...))) == 1) {
                 return in_array($operator, ['!=', '<>', '!==']);
             }
 

@@ -1564,7 +1564,7 @@ class PendingRequest
     protected function normalizeRequestOptionValue($value)
     {
         return match (true) {
-            is_array($value) => array_map(fn ($item) => $this->normalizeRequestOptionValue($item), $value),
+            is_array($value) => array_map($this->normalizeRequestOptionValue(...), $value),
             $value instanceof Stringable => $value->toString(),
             default => $value,
         };

@@ -27,7 +27,7 @@ class Serializer
 
         if ($type instanceof Types\AnyOfType) {
             $attributes['anyOf'] = array_map(
-                static fn (Types\Type $schema) => static::serialize($schema),
+                static::serialize(...),
                 $attributes['schemas'],
             );
 
@@ -80,10 +80,10 @@ class Serializer
                 unset($attributes['properties']);
             } else {
                 $required = array_map(
-                    'strval',
+                    strval(...),
                     array_keys(array_filter(
                         $attributes['properties'],
-                        static fn (Types\Type $property) => static::isRequired($property),
+                        static::isRequired(...),
                     ))
                 );
 
@@ -92,7 +92,7 @@ class Serializer
                 }
 
                 $attributes['properties'] = array_map(
-                    static fn (Types\Type $property) => static::serialize($property),
+                    static::serialize(...),
                     $attributes['properties'],
                 );
             }
