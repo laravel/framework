@@ -916,7 +916,10 @@ class QueueTest extends TestCase
         Cloud::bootManagedQueues($this->app);
         $eventsFake = $this->fakeEvents();
         [$queue, $client] = $this->mockedQueue();
-        $client->shouldReceive('sendMessage')->times(7)->andReturn(new Result());
+        $client->shouldReceive('sendMessage')->times(5)->andReturn(new Result());
+        $client->shouldReceive('sendMessageBatch')->once()->andReturnUsing(fn ($args) => new Result([
+            'Successful' => array_map(fn ($entry) => ['Id' => $entry['Id'], 'MessageId' => 'id'], $args['Entries']),
+        ]));
 
         $queue->push(new FakeJob, queue: '1');
         $queue->pushOn('2', new FakeJob);
@@ -1193,7 +1196,10 @@ class QueueTest extends TestCase
         $eventsFake = $this->fakeEvents();
         $this->app['config']->set('queue.connections.cloud.connection.after_commit', true);
         [$queue, $client] = $this->mockedQueue();
-        $client->shouldReceive('sendMessage')->times(7)->andReturn(new Result());
+        $client->shouldReceive('sendMessage')->times(5)->andReturn(new Result());
+        $client->shouldReceive('sendMessageBatch')->once()->andReturnUsing(fn ($args) => new Result([
+            'Successful' => array_map(fn ($entry) => ['Id' => $entry['Id'], 'MessageId' => 'id'], $args['Entries']),
+        ]));
 
         DB::beginTransaction();
 
