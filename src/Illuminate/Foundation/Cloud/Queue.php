@@ -282,7 +282,7 @@ class Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Report a job's terminal outcome back to the agent (POST /result).
+     * Report a job's terminal outcome back to the agent (POST /result). so it.
      *
      * @throws \Illuminate\Http\Client\RequestException
      * @throws \Illuminate\Foundation\Cloud\AgentUnreachableException
