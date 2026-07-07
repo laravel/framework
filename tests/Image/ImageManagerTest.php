@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Image;
 
+use Illuminate\Config\Repository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Filesystem\Filesystem;
@@ -236,8 +237,9 @@ class ImageManagerTest extends TestCase
     {
         $app = m::mock(Application::class, \ArrayAccess::class);
 
-        $configRepo = new \ArrayObject($config);
+        $configRepo = new Repository($config);
 
+        $app->shouldReceive('make')->with('config')->andReturn($configRepo)->byDefault();
         $app->shouldReceive('offsetGet')->with('config')->andReturn($configRepo);
         $app->shouldReceive('offsetExists')->andReturn(true);
 

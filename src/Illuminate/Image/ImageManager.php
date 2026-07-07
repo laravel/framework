@@ -2,81 +2,34 @@
 
 namespace Illuminate\Image;
 
-use Closure;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Image\Drivers\GdDriver;
 use Illuminate\Image\Drivers\ImagickDriver;
+use Illuminate\Support\Manager;
 use InvalidArgumentException;
 
-class ImageManager
+class ImageManager extends Manager
 {
     /**
-     * The array of resolved drivers.
-     *
-     * @var array<string, Driver>
-     */
-    protected array $drivers = [];
-
-    /**
-     * The registered custom driver creators.
-     *
-     * @var array<string, Closure>
-     */
-    protected array $customCreators = [];
-
-    /**
-     * Create a new image manager instance.
-     */
-    public function __construct(protected Application $app)
-    {
-        //
-    }
-
-    /**
-     * Get a driver instance.
-     */
-    public function driver(?string $name = null): Driver
-    {
-        $name = $name ?? $this->getDefaultDriver();
-
-        return $this->drivers[$name] ??= $this->resolve($name);
-    }
-
-    /**
-     * Resolve the given driver.
+     * Create a new driver instance.
      *
      * @throws InvalidArgumentException
      */
-    protected function resolve(string $name): Driver
+    protected function createDriver($driver): Driver
     {
-        if (isset($this->customCreators[$name])) {
-            $driver = $this->callCustomCreator($name);
-        } else {
-            $driverMethod = 'create'.ucfirst($name).'Driver';
-
-            if (! method_exists($this, $driverMethod)) {
-                throw new InvalidArgumentException("Image driver [{$name}] is not supported.");
-            }
-
-            $driver = $this->{$driverMethod}();
+        try {
+            $instance = parent::createDriver($driver);
+        } catch (InvalidArgumentException $e) {
+            throw new InvalidArgumentException("Image driver [{$driver}] is not supported.", 0, $e);
         }
 
-        if (method_exists($driver, 'ensureRequirementsAreMet')) {
-            $driver->ensureRequirementsAreMet();
+        if (method_exists($instance, 'ensureRequirementsAreMet')) {
+            $instance->ensureRequirementsAreMet();
         }
 
-        return $driver;
-    }
-
-    /**
-     * Call a custom driver creator.
-     */
-    protected function callCustomCreator(string $name): Driver
-    {
-        return $this->customCreators[$name]($this->app);
+        return $instance;
     }
 
     /**
@@ -109,7 +62,7 @@ class ImageManager
     public function fromPath(string $path): Image
     {
         return new Image(
-            fn () => $this->app->make(Filesystem::class)->get($path),
+            fn () => $this->container->make(Filesystem::class)->get($path),
         );
     }
 
@@ -119,7 +72,7 @@ class ImageManager
     public function fromUrl(string $url): Image
     {
         return new Image(
-            fn () => $this->app->make(HttpFactory::class)->get($url)->body(),
+            fn () => $this->container->make(HttpFactory::class)->get($url)->body(),
         );
     }
 
@@ -138,28 +91,6 @@ class ImageManager
      */
     public function getDefaultDriver(): string
     {
-        return $this->app['config']['image.default'] ?? 'gd';
-    }
-
-    /**
-     * Register a custom driver creator.
-     *
-     * @return $this
-     */
-    public function extend(string $driver, Closure $callback): static
-    {
-        $this->customCreators[$driver] = $callback->bindTo($this, $this);
-
-        return $this;
-    }
-
-    /**
-     * Dynamically call the default driver instance.
-     *
-     * @param  array<int, mixed>  $parameters
-     */
-    public function __call(string $method, array $parameters): mixed
-    {
-        return $this->driver()->$method(...$parameters);
+        return $this->config->get('image.default', 'gd');
     }
 }
