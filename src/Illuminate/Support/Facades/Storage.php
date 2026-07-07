@@ -50,6 +50,7 @@ use function Illuminate\Support\enum_value;
  * @method static \Illuminate\Filesystem\FilesystemAdapter assertCount(string $path, int $count, bool $recursive = false)
  * @method static \Illuminate\Filesystem\FilesystemAdapter assertMissing(string|array $path)
  * @method static \Illuminate\Filesystem\FilesystemAdapter assertDirectoryEmpty(string $path)
+ * @method static \Illuminate\Filesystem\FilesystemAdapter assertEmpty()
  * @method static bool missing(string $path)
  * @method static bool fileExists(string $path)
  * @method static bool fileMissing(string $path)
