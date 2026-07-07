@@ -657,6 +657,36 @@ class ImageTest extends TestCase
         $this->assertSame(800, $options->scaleHeight);
     }
 
+    public function test_scale_sets_width_only()
+    {
+        $image = $this->makeImage();
+        $result = $image->scale(width: 1200);
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(1200, $options->scaleWidth);
+        $this->assertNull($options->scaleHeight);
+    }
+
+    public function test_scale_sets_height_only()
+    {
+        $image = $this->makeImage();
+        $result = $image->scale(height: 800);
+
+        $options = $this->getOptions($result);
+
+        $this->assertNull($options->scaleWidth);
+        $this->assertSame(800, $options->scaleHeight);
+    }
+
+    public function test_scale_requires_at_least_one_dimension()
+    {
+        $this->expectException(ImageException::class);
+        $this->expectExceptionMessage('At least one scale dimension must be specified.');
+
+        $this->makeImage()->scale();
+    }
+
     public function test_orient_sets_option()
     {
         $image = $this->makeImage();

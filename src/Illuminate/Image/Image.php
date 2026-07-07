@@ -71,12 +71,19 @@ class Image implements Stringable
     /**
      * Set the scale dimensions.
      *
-     * @param  int<1, max>  $width
-     * @param  int<1, max>  $height
+     * @param  int<1, max>|null  $width
+     * @param  int<1, max>|null  $height
      */
-    public function scale(int $width, int $height): static
+    public function scale(?int $width = null, ?int $height = null): static
     {
-        return $this->transform(new Scale(max(1, $width), max(1, $height)));
+        if ($width === null && $height === null) {
+            throw new ImageException('At least one scale dimension must be specified.');
+        }
+
+        return $this->transform(new Scale(
+            $width === null ? null : max(1, $width),
+            $height === null ? null : max(1, $height),
+        ));
     }
 
     /**

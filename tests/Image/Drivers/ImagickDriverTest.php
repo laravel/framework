@@ -88,6 +88,36 @@ class ImagickDriverTest extends TestCase
         $this->assertSame(100, $height);
     }
 
+    public function test_processes_scale_width_only()
+    {
+        $driver = new ImagickDriver;
+        $contents = $this->fakeImageContents(400, 200);
+
+        $pipeline = $this->pipeline(new Scale(200, null));
+
+        $result = $driver->process($contents, $pipeline);
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(200, $width);
+        $this->assertSame(100, $height);
+    }
+
+    public function test_processes_scale_height_only()
+    {
+        $driver = new ImagickDriver;
+        $contents = $this->fakeImageContents(400, 200);
+
+        $pipeline = $this->pipeline(new Scale(null, 100));
+
+        $result = $driver->process($contents, $pipeline);
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(200, $width);
+        $this->assertSame(100, $height);
+    }
+
     public function test_scale_does_not_upscale()
     {
         $driver = new ImagickDriver;
