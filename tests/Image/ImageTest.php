@@ -192,6 +192,16 @@ class ImageTest extends TestCase
         $this->assertSame([300, 200], $image->dimensions());
     }
 
+    public function test_dimensions_throws_when_dimensions_cannot_be_determined()
+    {
+        $image = new Image('not-an-image');
+
+        $this->expectException(ImageException::class);
+        $this->expectExceptionMessage('Unable to determine the dimensions of the image.');
+
+        $image->dimensions();
+    }
+
     public function test_hash_name_returns_name_with_extension()
     {
         $image = new Image($this->fakeImageContents());

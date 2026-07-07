@@ -356,7 +356,11 @@ class Image implements Stringable
     public function dimensions(): array
     {
         return once(function () {
-            $size = getimagesizefromstring($this->toBytes());
+            $size = @getimagesizefromstring($this->toBytes());
+
+            if ($size === false) {
+                throw new ImageException('Unable to determine the dimensions of the image.');
+            }
 
             return [$size[0], $size[1]];
         });
