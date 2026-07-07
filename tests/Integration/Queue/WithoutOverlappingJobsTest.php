@@ -152,7 +152,7 @@ class WithoutOverlappingJobsTest extends QueueTestCase
         );
 
         $this->assertSame(
-            'prefix:'.hash('xxh128', 'App\\Actions\\WithoutOverlappingTestAction').':unit',
+            'prefix:Illuminate\\Tests\\Integration\\Queue\\OverlappingTestJob:unit',
             (new WithoutOverlapping(UnitCategory::unit))->withPrefix('prefix:')->getLockKey($job)
         );
 
@@ -162,7 +162,7 @@ class WithoutOverlappingJobsTest extends QueueTestCase
         );
 
         $this->assertSame(
-            'prefix:'.hash('xxh128', 'App\\Actions\\WithoutOverlappingTestAction').':backed',
+            'prefix:Illuminate\\Tests\\Integration\\Queue\\OverlappingTestJob:backed',
             (new WithoutOverlapping(BackedCategory::backed))->withPrefix('prefix:')->getLockKey($job)
         );
 
