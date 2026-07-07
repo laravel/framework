@@ -2,8 +2,8 @@
 
 namespace Illuminate\Image;
 
-use Illuminate\Contracts\Image\Driver;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
+use Illuminate\Contracts\Image\Driver;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\UploadedFile;
