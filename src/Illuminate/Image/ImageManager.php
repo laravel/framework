@@ -3,8 +3,10 @@
 namespace Illuminate\Image;
 
 use Illuminate\Contracts\Image\Driver;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Client\Factory as HttpFactory;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Drivers\GdDriver;
 use Illuminate\Image\Drivers\ImagickDriver;
 use Illuminate\Support\Manager;
@@ -28,6 +30,16 @@ class ImageManager extends Manager
     }
 
     /**
+     * Create an image instance from a base64 encoded string.
+     */
+    public function fromBase64(string $base64): Image
+    {
+        return new Image(
+            fn () => base64_decode($base64, true) ?: throw new ImageException('Invalid base64 image data.'),
+        );
+    }
+
+    /**
      * Create an image instance from a file path.
      */
     public function fromPath(string $path): Image
@@ -38,22 +50,30 @@ class ImageManager extends Manager
     }
 
     /**
+     * Create an image instance from a storage disk path.
+     */
+    public function fromStorage(string $path, ?string $disk = null): Image
+    {
+        return new Image(
+            fn () => $this->container->make(FilesystemFactory::class)->disk($disk)->get($path),
+        );
+    }
+
+    /**
+     * Create an image instance from an uploaded file.
+     */
+    public function fromUpload(UploadedFile $file): Image
+    {
+        return new Image(fn () => $file->getContent(), $file);
+    }
+
+    /**
      * Create an image instance from a URL.
      */
     public function fromUrl(string $url): Image
     {
         return new Image(
             fn () => $this->container->make(HttpFactory::class)->get($url)->body(),
-        );
-    }
-
-    /**
-     * Create an image instance from a base64 encoded string.
-     */
-    public function fromBase64(string $base64): Image
-    {
-        return new Image(
-            fn () => base64_decode($base64, true) ?: throw new ImageException('Invalid base64 image data.'),
         );
     }
 

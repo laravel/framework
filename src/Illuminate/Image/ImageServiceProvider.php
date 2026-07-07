@@ -12,7 +12,7 @@ class ImageServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     public function register(): void
     {
-        $this->app->singleton('image', function ($app) {
+        $this->app->scoped('image', function ($app) {
             return new ImageManager($app);
         });
     }

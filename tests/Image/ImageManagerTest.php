@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Image;
 
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Contracts\Image\Transformation;
 use Illuminate\Filesystem\Filesystem;
@@ -134,6 +135,63 @@ class ImageManagerTest extends TestCase
         $image = $manager->fromPath('/some/path.jpg');
 
         $this->assertInstanceOf(Image::class, $image);
+    }
+
+    public function test_from_storage_returns_image_from_storage_disk_path()
+    {
+        $contents = $this->fakeImageContents();
+
+        $disk = m::mock();
+        $disk->shouldReceive('get')
+            ->once()
+            ->with('images/avatar.jpg')
+            ->andReturn($contents);
+
+        $filesystem = m::mock(FilesystemFactory::class);
+        $filesystem->shouldReceive('disk')
+            ->once()
+            ->with('public')
+            ->andReturn($disk);
+
+        $app = $this->makeApp([]);
+        $app->shouldReceive('make')
+            ->with(FilesystemFactory::class)
+            ->andReturn($filesystem);
+
+        $manager = new ImageManager($app);
+        $image = $manager->fromStorage('images/avatar.jpg', 'public');
+
+        $this->assertInstanceOf(Image::class, $image);
+        $this->assertSame($contents, $image->toBytes());
+    }
+
+    public function test_from_storage_is_lazy()
+    {
+        $filesystem = m::mock(FilesystemFactory::class);
+        $filesystem->shouldNotReceive('disk');
+
+        $app = $this->makeApp([]);
+        $app->shouldReceive('make')
+            ->with(FilesystemFactory::class)
+            ->andReturn($filesystem);
+
+        $manager = new ImageManager($app);
+        $image = $manager->fromStorage('images/avatar.jpg', 'public');
+
+        $this->assertInstanceOf(Image::class, $image);
+    }
+
+    public function test_from_upload_returns_image_from_uploaded_file()
+    {
+        $file = UploadedFile::fake()->image('avatar.jpg', 100, 100);
+
+        $app = $this->makeApp([]);
+        $manager = new ImageManager($app);
+        $image = $manager->fromUpload($file);
+
+        $this->assertInstanceOf(Image::class, $image);
+        $this->assertSame(file_get_contents($file->getRealPath()), $image->toBytes());
+        $this->assertSame($file, $image->file());
     }
 
     public function test_from_url_returns_image()
