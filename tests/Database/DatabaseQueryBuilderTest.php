@@ -981,6 +981,61 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => '2022-04-20', 1 => '2022-04-20'], $builder->getBindings());
     }
 
+    public function testOrWhereNotLike()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereNotLike('name', '%Taylor%');
+        $this->assertSame('select * from "posts" where "id" = ? or "name" not like ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '%Taylor%'], $builder->getBindings());
+    }
+
+    public function testOrWhereNotLikePostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereNotLike('name', '%Taylor%');
+        $this->assertSame('select * from "posts" where "id" = ? or "name"::text not ilike ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '%Taylor%'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereNotLike('name', '%Taylor%', true);
+        $this->assertSame('select * from "posts" where "id" = ? or "name"::text not like ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '%Taylor%'], $builder->getBindings());
+    }
+
+    public function testOrWhereNotLikeMysql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereNotLike('name', '%Taylor%');
+        $this->assertSame('select * from `posts` where `id` = ? or `name` not like ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '%Taylor%'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereNotLike('name', '%Taylor%', true);
+        $this->assertSame('select * from `posts` where `id` = ? or `name` not like binary ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '%Taylor%'], $builder->getBindings());
+    }
+
+    public function testOrWhereNotLikeSqlite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereNotLike('name', '%Taylor%');
+        $this->assertSame('select * from "posts" where "id" = ? or "name" not like ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '%Taylor%'], $builder->getBindings());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereNotLike('name', '%Taylor%', true);
+        $this->assertSame('select * from "posts" where "id" = ? or "name" not glob ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '*Taylor*'], $builder->getBindings());
+    }
+
+    public function testOrWhereNotLikeSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereNotLike('name', '%Taylor%');
+        $this->assertSame('select * from [posts] where [id] = ? or [name] not like ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '%Taylor%'], $builder->getBindings());
+    }
+
     public function testWhereLikePostgres()
     {
         $builder = $this->getPostgresBuilder();
