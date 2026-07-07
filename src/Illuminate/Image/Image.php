@@ -10,11 +10,15 @@ use Illuminate\Contracts\Image\Driver;
 use Illuminate\Contracts\Image\Transformation;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Transformations\Blur;
+use Illuminate\Image\Transformations\Contain;
 use Illuminate\Image\Transformations\Cover;
+use Illuminate\Image\Transformations\Crop;
 use Illuminate\Image\Transformations\FlipHorizontally;
 use Illuminate\Image\Transformations\FlipVertically;
 use Illuminate\Image\Transformations\Grayscale;
 use Illuminate\Image\Transformations\Orient;
+use Illuminate\Image\Transformations\Resize;
+use Illuminate\Image\Transformations\Rotate;
 use Illuminate\Image\Transformations\Scale;
 use Illuminate\Image\Transformations\Sharpen;
 use Illuminate\Support\Str;
@@ -66,6 +70,54 @@ class Image implements Stringable
     public function cover(int $width, int $height): static
     {
         return $this->transform(new Cover(max(1, $width), max(1, $height)));
+    }
+
+    /**
+     * Set the contain dimensions.
+     *
+     * @param  int<1, max>  $width
+     * @param  int<1, max>  $height
+     */
+    public function contain(int $width, int $height, ?string $background = null): static
+    {
+        return $this->transform(new Contain(max(1, $width), max(1, $height), $background));
+    }
+
+    /**
+     * Crop the image to the given dimensions and position.
+     *
+     * @param  int<1, max>  $width
+     * @param  int<1, max>  $height
+     */
+    public function crop(int $width, int $height, int $x = 0, int $y = 0): static
+    {
+        return $this->transform(new Crop(max(1, $width), max(1, $height), $x, $y));
+    }
+
+    /**
+     * Resize the image to the given dimensions.
+     *
+     * @param  int<1, max>|null  $width
+     * @param  int<1, max>|null  $height
+     */
+    public function resize(?int $width = null, ?int $height = null): static
+    {
+        if ($width === null && $height === null) {
+            throw new ImageException('At least one resize dimension must be specified.');
+        }
+
+        return $this->transform(new Resize(
+            $width === null ? null : max(1, $width),
+            $height === null ? null : max(1, $height),
+        ));
+    }
+
+    /**
+     * Rotate the image clockwise by the given angle.
+     */
+    public function rotate(float $angle, ?string $background = null): static
+    {
+        return $this->transform(new Rotate($angle, $background));
     }
 
     /**

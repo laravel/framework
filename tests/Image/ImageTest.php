@@ -8,11 +8,15 @@ use Illuminate\Image\ImageException;
 use Illuminate\Image\ImageOutputOptions;
 use Illuminate\Image\ImagePipeline;
 use Illuminate\Image\Transformations\Blur;
+use Illuminate\Image\Transformations\Contain;
 use Illuminate\Image\Transformations\Cover;
+use Illuminate\Image\Transformations\Crop;
 use Illuminate\Image\Transformations\FlipHorizontally;
 use Illuminate\Image\Transformations\FlipVertically;
 use Illuminate\Image\Transformations\Grayscale;
 use Illuminate\Image\Transformations\Orient;
+use Illuminate\Image\Transformations\Resize;
+use Illuminate\Image\Transformations\Rotate;
 use Illuminate\Image\Transformations\Scale;
 use Illuminate\Image\Transformations\Sharpen;
 use PHPUnit\Framework\TestCase;
@@ -31,6 +35,38 @@ class ImageTest extends TestCase
     {
         $image = $this->makeImage();
         $result = $image->scale(800, 600);
+
+        $this->assertNotSame($image, $result);
+    }
+
+    public function test_contain_returns_new_instance()
+    {
+        $image = $this->makeImage();
+        $result = $image->contain(800, 600);
+
+        $this->assertNotSame($image, $result);
+    }
+
+    public function test_crop_returns_new_instance()
+    {
+        $image = $this->makeImage();
+        $result = $image->crop(100, 100);
+
+        $this->assertNotSame($image, $result);
+    }
+
+    public function test_resize_returns_new_instance()
+    {
+        $image = $this->makeImage();
+        $result = $image->resize(800, 600);
+
+        $this->assertNotSame($image, $result);
+    }
+
+    public function test_rotate_returns_new_instance()
+    {
+        $image = $this->makeImage();
+        $result = $image->rotate(90);
 
         $this->assertNotSame($image, $result);
     }
@@ -657,6 +693,83 @@ class ImageTest extends TestCase
         $this->assertSame(800, $options->scaleHeight);
     }
 
+    public function test_contain_sets_dimensions_and_background()
+    {
+        $image = $this->makeImage();
+        $result = $image->contain(1200, 800, '#ffffff');
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(1200, $options->containWidth);
+        $this->assertSame(800, $options->containHeight);
+        $this->assertSame('#ffffff', $options->containBackground);
+    }
+
+    public function test_crop_sets_dimensions_and_position()
+    {
+        $image = $this->makeImage();
+        $result = $image->crop(300, 200, 10, 20);
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(300, $options->cropWidth);
+        $this->assertSame(200, $options->cropHeight);
+        $this->assertSame(10, $options->cropX);
+        $this->assertSame(20, $options->cropY);
+    }
+
+    public function test_resize_sets_both_dimensions()
+    {
+        $image = $this->makeImage();
+        $result = $image->resize(1200, 800);
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(1200, $options->resizeWidth);
+        $this->assertSame(800, $options->resizeHeight);
+    }
+
+    public function test_resize_sets_width_only()
+    {
+        $image = $this->makeImage();
+        $result = $image->resize(width: 1200);
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(1200, $options->resizeWidth);
+        $this->assertNull($options->resizeHeight);
+    }
+
+    public function test_resize_sets_height_only()
+    {
+        $image = $this->makeImage();
+        $result = $image->resize(height: 800);
+
+        $options = $this->getOptions($result);
+
+        $this->assertNull($options->resizeWidth);
+        $this->assertSame(800, $options->resizeHeight);
+    }
+
+    public function test_resize_requires_at_least_one_dimension()
+    {
+        $this->expectException(ImageException::class);
+        $this->expectExceptionMessage('At least one resize dimension must be specified.');
+
+        $this->makeImage()->resize();
+    }
+
+    public function test_rotate_sets_angle_and_background()
+    {
+        $image = $this->makeImage();
+        $result = $image->rotate(90, '#ffffff');
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(90.0, $options->rotateAngle);
+        $this->assertSame('#ffffff', $options->rotateBackground);
+    }
+
     public function test_scale_sets_width_only()
     {
         $image = $this->makeImage();
@@ -840,6 +953,17 @@ class ImageTest extends TestCase
         $options = (object) [
             'coverWidth' => null,
             'coverHeight' => null,
+            'containWidth' => null,
+            'containHeight' => null,
+            'containBackground' => null,
+            'cropWidth' => null,
+            'cropHeight' => null,
+            'cropX' => null,
+            'cropY' => null,
+            'resizeWidth' => null,
+            'resizeHeight' => null,
+            'rotateAngle' => null,
+            'rotateBackground' => null,
             'scaleWidth' => null,
             'scaleHeight' => null,
             'orient' => null,
@@ -855,6 +979,10 @@ class ImageTest extends TestCase
         foreach ($pipeline->transformations as $transformation) {
             match (true) {
                 $transformation instanceof Cover => [$options->coverWidth, $options->coverHeight] = [$transformation->width, $transformation->height],
+                $transformation instanceof Contain => [$options->containWidth, $options->containHeight, $options->containBackground] = [$transformation->width, $transformation->height, $transformation->background],
+                $transformation instanceof Crop => [$options->cropWidth, $options->cropHeight, $options->cropX, $options->cropY] = [$transformation->width, $transformation->height, $transformation->x, $transformation->y],
+                $transformation instanceof Resize => [$options->resizeWidth, $options->resizeHeight] = [$transformation->width, $transformation->height],
+                $transformation instanceof Rotate => [$options->rotateAngle, $options->rotateBackground] = [$transformation->angle, $transformation->background],
                 $transformation instanceof Scale => [$options->scaleWidth, $options->scaleHeight] = [$transformation->width, $transformation->height],
                 $transformation instanceof Orient => $options->orient = true,
                 $transformation instanceof Blur => $options->blur = $transformation->amount,

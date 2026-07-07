@@ -8,11 +8,15 @@ use Illuminate\Image\ImageException;
 use Illuminate\Image\ImageOutputOptions;
 use Illuminate\Image\ImagePipeline;
 use Illuminate\Image\Transformations\Blur;
+use Illuminate\Image\Transformations\Contain;
 use Illuminate\Image\Transformations\Cover;
+use Illuminate\Image\Transformations\Crop;
 use Illuminate\Image\Transformations\FlipHorizontally;
 use Illuminate\Image\Transformations\FlipVertically;
 use Illuminate\Image\Transformations\Grayscale;
 use Illuminate\Image\Transformations\Orient;
+use Illuminate\Image\Transformations\Resize;
+use Illuminate\Image\Transformations\Rotate;
 use Illuminate\Image\Transformations\Scale;
 use Illuminate\Image\Transformations\Sharpen;
 use Intervention\Image\Direction;
@@ -58,7 +62,7 @@ abstract class InterventionDriver implements Driver
         if (! class_exists(ImageManager::class)) {
             throw new ImageException(
                 'Intervention Image is required to use this driver. '.
-                'You may install it via: composer require intervention/image:^3.11.7',
+                'You may install it via: composer require intervention/image:^4.0',
             );
         }
     }
@@ -86,6 +90,10 @@ abstract class InterventionDriver implements Driver
             $image = match (true) {
                 $transformation instanceof Orient => $image->orient(),
                 $transformation instanceof Cover => $image->cover($transformation->width, $transformation->height),
+                $transformation instanceof Contain => $image->contain($transformation->width, $transformation->height, $transformation->background),
+                $transformation instanceof Crop => $image->crop($transformation->width, $transformation->height, $transformation->x, $transformation->y),
+                $transformation instanceof Resize => $image->resize($transformation->width, $transformation->height),
+                $transformation instanceof Rotate => $image->rotate($transformation->angle, $transformation->background),
                 $transformation instanceof Scale => $image->scaleDown($transformation->width, $transformation->height),
                 $transformation instanceof Blur => $image->blur($transformation->amount),
                 $transformation instanceof Grayscale => $image->grayscale(),

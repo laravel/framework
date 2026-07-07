@@ -8,11 +8,15 @@ use Illuminate\Image\Drivers\GdDriver;
 use Illuminate\Image\ImageException;
 use Illuminate\Image\ImagePipeline;
 use Illuminate\Image\Transformations\Blur;
+use Illuminate\Image\Transformations\Contain;
 use Illuminate\Image\Transformations\Cover;
+use Illuminate\Image\Transformations\Crop;
 use Illuminate\Image\Transformations\FlipHorizontally;
 use Illuminate\Image\Transformations\FlipVertically;
 use Illuminate\Image\Transformations\Grayscale;
 use Illuminate\Image\Transformations\Orient;
+use Illuminate\Image\Transformations\Resize;
+use Illuminate\Image\Transformations\Rotate;
 use Illuminate\Image\Transformations\Scale;
 use Illuminate\Image\Transformations\Sharpen;
 use Intervention\Image\Interfaces\ImageInterface;
@@ -73,6 +77,66 @@ class GdDriverTest extends TestCase
         $this->assertSame(75, $width);
         $this->assertSame(75, $height);
         $this->assertSame(IMAGETYPE_WEBP, $type);
+    }
+
+    public function test_processes_contain()
+    {
+        $driver = new GdDriver;
+        $contents = $this->fakeImageContents(400, 200);
+
+        $pipeline = $this->pipeline(new Contain(200, 200, '#ffffff'));
+
+        $result = $driver->process($contents, $pipeline);
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(200, $width);
+        $this->assertSame(200, $height);
+    }
+
+    public function test_processes_crop()
+    {
+        $driver = new GdDriver;
+        $contents = $this->fakeImageContents(400, 200);
+
+        $pipeline = $this->pipeline(new Crop(100, 50, 10, 20));
+
+        $result = $driver->process($contents, $pipeline);
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(100, $width);
+        $this->assertSame(50, $height);
+    }
+
+    public function test_processes_resize()
+    {
+        $driver = new GdDriver;
+        $contents = $this->fakeImageContents(400, 200);
+
+        $pipeline = $this->pipeline(new Resize(200, 200));
+
+        $result = $driver->process($contents, $pipeline);
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(200, $width);
+        $this->assertSame(200, $height);
+    }
+
+    public function test_processes_rotate()
+    {
+        $driver = new GdDriver;
+        $contents = $this->fakeImageContents(100, 50);
+
+        $pipeline = $this->pipeline(new Rotate(90));
+
+        $result = $driver->process($contents, $pipeline);
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(50, $width);
+        $this->assertSame(100, $height);
     }
 
     public function test_processes_scale()

@@ -35,6 +35,54 @@ class ImageTest extends TestCase
         $this->assertSame(100, $height);
     }
 
+    public function test_contain_and_to_bytes()
+    {
+        $image = new Image($this->fakeImageContents(400, 200));
+
+        $result = $image->contain(200, 200, '#ffffff')->toBytes();
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(200, $width);
+        $this->assertSame(200, $height);
+    }
+
+    public function test_crop_and_to_bytes()
+    {
+        $image = new Image($this->fakeImageContents(400, 200));
+
+        $result = $image->crop(100, 50, 10, 20)->toBytes();
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(100, $width);
+        $this->assertSame(50, $height);
+    }
+
+    public function test_resize_and_to_bytes()
+    {
+        $image = new Image($this->fakeImageContents(400, 200));
+
+        $result = $image->resize(200, 200)->toBytes();
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(200, $width);
+        $this->assertSame(200, $height);
+    }
+
+    public function test_rotate_and_to_bytes()
+    {
+        $image = new Image($this->fakeImageContents(100, 50));
+
+        $result = $image->rotate(90)->toBytes();
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame(50, $width);
+        $this->assertSame(100, $height);
+    }
+
     public function test_to_png_and_to_bytes()
     {
         $image = new Image($this->fakeImageContents(100, 100));
