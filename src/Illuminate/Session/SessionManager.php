@@ -139,9 +139,13 @@ class SessionManager extends Manager
     {
         $handler = $this->createCacheHandler('redis');
 
-        $handler->getCache()->getStore()->setConnection(
-            $this->config->get('session.connection')
-        );
+        $store = $handler->getCache()->getStore();
+
+        $store->setConnection($this->config->get('session.connection'));
+
+        if ($prefix = $this->config->get('session.prefix')) {
+            $store->setPrefix($prefix);
+        }
 
         return $this->buildSession($handler);
     }
