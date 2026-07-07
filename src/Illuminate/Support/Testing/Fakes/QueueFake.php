@@ -90,6 +90,20 @@ class QueueFake extends QueueManager implements Fake, Queue
     protected bool $serializeAndRestore = false;
 
     /**
+     * The callbacks that should be invoked before pushing a job.
+     *
+     * @var array<int, callable>
+     */
+    protected $beforePushingCallbacks = [];
+
+    /**
+     * The callbacks that should be invoked after pushing a job.
+     *
+     * @var array<int, callable>
+     */
+    protected $afterPushingCallbacks = [];
+
+    /**
      * Create a new fake queue instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -596,6 +610,10 @@ class QueueFake extends QueueManager implements Fake, Queue
     {
         $queue = enum_value($queue);
 
+        foreach ($this->beforePushingCallbacks as $callback) {
+            call_user_func($callback, $job, $data, $queue);
+        }
+
         if ($this->shouldFakeJob($job)) {
             if ($job instanceof Closure) {
                 $job = CallQueuedClosure::create($job);
@@ -614,6 +632,10 @@ class QueueFake extends QueueManager implements Fake, Queue
             is_object($job) && isset($job->connection)
                 ? $this->queue->connection($job->connection)->push($job, $data, $queue)
                 : $this->queue->push($job, $data, $queue);
+        }
+
+        foreach ($this->afterPushingCallbacks as $callback) {
+            call_user_func($callback, $job, $data, $queue);
         }
     }
 
@@ -837,6 +859,32 @@ class QueueFake extends QueueManager implements Fake, Queue
     public function clearReserved()
     {
         $this->reserved = [];
+    }
+
+    /**
+     * Register a callback to be invoked before pushing a job.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function beforePushing(callable $callback)
+    {
+        $this->beforePushingCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Register a callback to be invoked after pushing a job.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function afterPushing(callable $callback)
+    {
+        $this->afterPushingCallbacks[] = $callback;
+
+        return $this;
     }
 
     /**
