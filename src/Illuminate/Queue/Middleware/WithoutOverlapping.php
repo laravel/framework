@@ -5,6 +5,7 @@ namespace Illuminate\Queue\Middleware;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Support\InteractsWithTime;
+use function Illuminate\Support\enum_value;
 
 class WithoutOverlapping
 {
@@ -48,13 +49,13 @@ class WithoutOverlapping
     /**
      * Create a new middleware instance.
      *
-     * @param  string  $key
+     * @param  \UnitEnum|string  $key
      * @param  \DateTimeInterface|int|null  $releaseAfter
      * @param  \DateTimeInterface|int  $expiresAfter
      */
     public function __construct($key = '', $releaseAfter = 0, $expiresAfter = 0)
     {
-        $this->key = $key;
+        $this->key = enum_value($key);
         $this->releaseAfter = $releaseAfter;
         $this->expiresAfter = $this->secondsUntil($expiresAfter);
     }
