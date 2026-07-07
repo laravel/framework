@@ -1734,12 +1734,10 @@ class Builder implements BuilderContract
             $values = $this->resolveDatePeriodBounds($values);
         }
 
-        $periodStart = array_first($values);
-        $periodEnd = array_last($values);
+        [$periodStart, $periodEnd] = $values;
 
         return $this->whereNested(function ($query) use ($columns, $periodStart, $periodEnd, $inclusive, $not) {
-            $startColumn = array_first($columns);
-            $endColumn = array_last($columns);
+            [$startColumn, $endColumn] = $columns;
 
             if ($not) {
                 $query->where($startColumn, $inclusive ? '>' : '>=', $periodEnd)
