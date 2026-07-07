@@ -13,42 +13,6 @@ use InvalidArgumentException;
 class ImageManager extends Manager
 {
     /**
-     * Create a new driver instance.
-     *
-     * @throws InvalidArgumentException
-     */
-    protected function createDriver($driver): Driver
-    {
-        try {
-            $instance = parent::createDriver($driver);
-        } catch (InvalidArgumentException $e) {
-            throw new InvalidArgumentException("Image driver [{$driver}] is not supported.", 0, $e);
-        }
-
-        if (method_exists($instance, 'ensureRequirementsAreMet')) {
-            $instance->ensureRequirementsAreMet();
-        }
-
-        return $instance;
-    }
-
-    /**
-     * Create the GD image driver.
-     */
-    protected function createGdDriver(): GdDriver
-    {
-        return new GdDriver;
-    }
-
-    /**
-     * Create the Imagick image driver.
-     */
-    protected function createImagickDriver(): ImagickDriver
-    {
-        return new ImagickDriver;
-    }
-
-    /**
      * Create an image instance from raw bytes.
      */
     public function fromBytes(string $contents): Image
@@ -84,6 +48,42 @@ class ImageManager extends Manager
         return new Image(
             fn () => base64_decode($base64, true) ?: throw new ImageException('Invalid base64 image data.'),
         );
+    }
+
+    /**
+     * Create a new driver instance.
+     *
+     * @throws InvalidArgumentException
+     */
+    protected function createDriver($driver): Driver
+    {
+        try {
+            $instance = parent::createDriver($driver);
+        } catch (InvalidArgumentException $e) {
+            throw new InvalidArgumentException("Image driver [{$driver}] is not supported.", 0, $e);
+        }
+
+        if (method_exists($instance, 'ensureRequirementsAreMet')) {
+            $instance->ensureRequirementsAreMet();
+        }
+
+        return $instance;
+    }
+
+    /**
+     * Create the GD image driver.
+     */
+    protected function createGdDriver(): GdDriver
+    {
+        return new GdDriver;
+    }
+
+    /**
+     * Create the Imagick image driver.
+     */
+    protected function createImagickDriver(): ImagickDriver
+    {
+        return new ImagickDriver;
     }
 
     /**
