@@ -9,6 +9,7 @@ use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Image\Image;
 use Illuminate\Support\Carbon;
 use Illuminate\Testing\Assert;
 use InvalidArgumentException;
@@ -201,6 +202,18 @@ class FilesystemAdapterTest extends TestCase
         $this->filesystem->write('file.json', '{"foo":');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $this->assertNull($filesystemAdapter->json('file.json'));
+    }
+
+    public function testImage()
+    {
+        $file = UploadedFile::fake()->image('photo.jpg', 100, 100);
+        $this->filesystem->write('photo.jpg', file_get_contents($file->getRealPath()));
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $image = $filesystemAdapter->image('photo.jpg');
+
+        $this->assertInstanceOf(Image::class, $image);
+        $this->assertSame([100, 100], $image->dimensions());
     }
 
     public function testMimeTypeNotDetected()

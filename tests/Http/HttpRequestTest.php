@@ -6,6 +6,7 @@ use Carbon\CarbonInterval;
 use Carbon\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Image\Image;
 use Illuminate\Routing\Route;
 use Illuminate\Session\Store;
 use Illuminate\Support\Carbon;
@@ -1156,6 +1157,27 @@ class HttpRequestTest extends TestCase
         ];
         $request = Request::create('/', 'GET', [], [], $files);
         $this->assertInstanceOf(SymfonyUploadedFile::class, $request->file('foo'));
+    }
+
+    public function testImageMethod()
+    {
+        $files = [
+            'avatar' => [
+                'size' => 500,
+                'name' => 'avatar.jpg',
+                'tmp_name' => __FILE__,
+                'type' => 'image/jpeg',
+                'error' => null,
+            ],
+        ];
+        $request = Request::create('/', 'GET', [], [], $files);
+        $this->assertInstanceOf(Image::class, $request->image('avatar'));
+    }
+
+    public function testImageMethodReturnsNullForMissingKey()
+    {
+        $request = Request::create('/', 'GET', [], [], []);
+        $this->assertNull($request->image('avatar'));
     }
 
     public function testHasFileMethod()

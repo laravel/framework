@@ -29,7 +29,8 @@
         "symfony/polyfill-php85": "^1.36"
     },
     "suggest": {
-        "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image()."
+        "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image().",
+        "illuminate/image": "Required to retrieve uploaded files as images (^13.0)."
     },
     "minimum-stability": "dev",
     "autoload": {
