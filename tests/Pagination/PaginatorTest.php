@@ -2,11 +2,53 @@
 
 namespace Illuminate\Tests\Pagination;
 
+use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Pagination\Paginator;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 
 class PaginatorTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        // Reset the static query string resolver so it does not leak into other tests.
+        (new ReflectionProperty(AbstractPaginator::class, 'queryStringResolver'))->setValue(null, null);
+
+        parent::tearDown();
+    }
+
+    public function testWithQueryStringControlsWhetherTheQueryStringIsAppended()
+    {
+        Paginator::queryStringResolver(fn () => ['sort' => 'name', 'status' => 'active']);
+
+        // the resolved query string is dropped from the generated URLs
+        $p = new Paginator(['item1', 'item2', 'item3'], 2, 2, ['path' => 'http://website.com/test']);
+        $this->assertSame('http://website.com/test?page=1', $p->previousPageUrl());
+
+        // the same query string is now appended to the URLs
+        $p = new Paginator(['item1', 'item2', 'item3'], 2, 2, ['path' => 'http://website.com/test']);
+        $p->withQueryString();
+        $this->assertSame('http://website.com/test?sort=name&status=active&page=1', $p->previousPageUrl());
+    }
+
+    public function testWithQueryStringExcludesThePageNameFromTheQueryString()
+    {
+        Paginator::queryStringResolver(fn () => ['page' => 5, 'sort' => 'name']);
+
+        $p = new Paginator(['item1', 'item2', 'item3'], 2, 2, ['path' => 'http://website.com/test']);
+        $p->withQueryString();
+
+        $this->assertSame('http://website.com/test?sort=name&page=1', $p->previousPageUrl());
+    }
+
+    public function testWithQueryStringIsANoOpWhenNoResolverIsSet()
+    {
+        $p = new Paginator(['item1', 'item2', 'item3'], 2, 2, ['path' => 'http://website.com/test']);
+
+        $this->assertSame($p, $p->withQueryString());
+        $this->assertSame('http://website.com/test?page=1', $p->previousPageUrl());
+    }
+
     public function testSimplePaginatorReturnsRelevantContextInformation()
     {
         /** @var Paginator<int, string> $p */
