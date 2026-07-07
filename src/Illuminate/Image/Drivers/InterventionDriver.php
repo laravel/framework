@@ -2,6 +2,7 @@
 
 namespace Illuminate\Image\Drivers;
 
+use finfo;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Image\ImageException;
 use Illuminate\Image\ImageOutputOptions;
@@ -19,7 +20,6 @@ use Intervention\Image\Encoders\JpegEncoder;
 use Intervention\Image\Encoders\MediaTypeEncoder;
 use Intervention\Image\Encoders\WebpEncoder;
 use Intervention\Image\ImageManager;
-use finfo;
 
 abstract class InterventionDriver implements Driver
 {
