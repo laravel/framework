@@ -558,7 +558,8 @@ class QueueWorkerTest extends TestCase
                 && $event->workerOptions === $workerOptions
                 && $event->reason === WorkerStopReason::QueueEmpty
                 && $event->jobsProcessed === 2
-                && $event->lastJobProcessedAt !== null;
+                && $event->lastJobProcessedAt !== null
+                && $event->memoryUsage > 0;
         }));
     }
 
