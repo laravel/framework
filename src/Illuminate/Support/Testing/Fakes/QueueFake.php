@@ -90,6 +90,20 @@ class QueueFake extends QueueManager implements Fake, Queue
     protected bool $serializeAndRestore = false;
 
     /**
+     * The callback that should be invoked before pushing a job.
+     *
+     * @var callable|null
+     */
+    protected $beforePushingCallback;
+
+    /**
+     * The callback that should be invoked after pushing a job.
+     *
+     * @var callable|null
+     */
+    protected $afterPushingCallback;
+
+    /**
      * Create a new fake queue instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -114,6 +128,32 @@ class QueueFake extends QueueManager implements Fake, Queue
     public function except($jobsToBeQueued)
     {
         $this->jobsToBeQueued = Collection::wrap($jobsToBeQueued)->merge($this->jobsToBeQueued);
+
+        return $this;
+    }
+
+    /**
+     * Register a callback to be invoked before pushing a job.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function beforePushing(callable $callback)
+    {
+        $this->beforePushingCallback = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Register a callback to be invoked after pushing a job.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function afterPushing(callable $callback)
+    {
+        $this->afterPushingCallback = $callback;
 
         return $this;
     }
@@ -596,6 +636,10 @@ class QueueFake extends QueueManager implements Fake, Queue
     {
         $queue = enum_value($queue);
 
+        if ($this->beforePushingCallback) {
+            call_user_func($this->beforePushingCallback, $job, $data, $queue);
+        }
+
         if ($this->shouldFakeJob($job)) {
             if ($job instanceof Closure) {
                 $job = CallQueuedClosure::create($job);
@@ -614,6 +658,10 @@ class QueueFake extends QueueManager implements Fake, Queue
             is_object($job) && isset($job->connection)
                 ? $this->queue->connection($job->connection)->push($job, $data, $queue)
                 : $this->queue->push($job, $data, $queue);
+        }
+
+        if ($this->afterPushingCallback) {
+            call_user_func($this->afterPushingCallback, $job, $data, $queue);
         }
     }
 
