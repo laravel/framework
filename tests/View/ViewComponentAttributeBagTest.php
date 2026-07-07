@@ -118,6 +118,25 @@ class ViewComponentAttributeBagTest extends TestCase
         $this->assertSame('class="font-bold" id="my-id"', (string) $bag->except(['name', 'missing']));
     }
 
+    public function testMergeTerminatesDefaultStyleWithSemicolon()
+    {
+        $bag = new ComponentAttributeBag(['style' => 'color: blue']);
+
+        // The default style value is not terminated with a semicolon, so one
+        // should be added to keep the resulting declaration list valid.
+        $this->assertSame('style="font-weight: bold; color: blue;"', (string) $bag->merge(['style' => 'font-weight: bold']));
+
+        $bag = new ComponentAttributeBag(['style' => 'color: blue']);
+
+        // A default style value that already ends with a semicolon must not gain a second one.
+        $this->assertSame('style="font-weight: bold; color: blue;"', (string) $bag->merge(['style' => 'font-weight: bold;']));
+
+        // When no default style is provided the existing value should be returned untouched.
+        $bag = new ComponentAttributeBag(['style' => 'color: blue']);
+
+        $this->assertSame('style="color: blue;"', (string) $bag->merge([]));
+    }
+
     public function testAttributeRetrievalUsingDotNotation()
     {
         $bag = new ComponentAttributeBag([
