@@ -133,32 +133,6 @@ class QueueFake extends QueueManager implements Fake, Queue
     }
 
     /**
-     * Register a callback to be invoked before pushing a job.
-     *
-     * @param  callable  $callback
-     * @return $this
-     */
-    public function beforePushing(callable $callback)
-    {
-        $this->beforePushingCallback = $callback;
-
-        return $this;
-    }
-
-    /**
-     * Register a callback to be invoked after pushing a job.
-     *
-     * @param  callable  $callback
-     * @return $this
-     */
-    public function afterPushing(callable $callback)
-    {
-        $this->afterPushingCallback = $callback;
-
-        return $this;
-    }
-
-    /**
      * Assert if a job was pushed based on a truth-test callback.
      *
      * @param  string|\Closure  $job
@@ -885,6 +859,32 @@ class QueueFake extends QueueManager implements Fake, Queue
     public function clearReserved()
     {
         $this->reserved = [];
+    }
+
+    /**
+     * Register a callback to be invoked before pushing a job.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function beforePushing(callable $callback)
+    {
+        $this->beforePushingCallback = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Register a callback to be invoked after pushing a job.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function afterPushing(callable $callback)
+    {
+        $this->afterPushingCallback = $callback;
+
+        return $this;
     }
 
     /**
