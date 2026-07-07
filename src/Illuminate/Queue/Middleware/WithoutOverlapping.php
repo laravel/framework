@@ -5,6 +5,7 @@ namespace Illuminate\Queue\Middleware;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Support\InteractsWithTime;
+
 use function Illuminate\Support\enum_value;
 
 class WithoutOverlapping
