@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Image\Drivers;
 
+use Illuminate\Contracts\Image\Transformation;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Drivers\GdDriver;
 use Illuminate\Image\ImageException;
 use Illuminate\Image\ImagePipeline;
-use Illuminate\Contracts\Image\Transformation;
 use Illuminate\Image\Transformations\Blur;
 use Illuminate\Image\Transformations\Cover;
 use Illuminate\Image\Transformations\FlipHorizontally;
@@ -216,8 +216,7 @@ class GdDriverTest extends TestCase
     public function test_processes_custom_transformation()
     {
         $driver = new GdDriver;
-        $transformation = new class implements Transformation
-        {
+        $transformation = new class implements Transformation {
             //
         };
         $received = null;

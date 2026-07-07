@@ -3,6 +3,7 @@
 namespace Illuminate\Image;
 
 use Closure;
+use finfo;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Image\Driver;
@@ -21,7 +22,6 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Stringable;
 use Throwable;
-use finfo;
 
 class Image implements Stringable
 {
