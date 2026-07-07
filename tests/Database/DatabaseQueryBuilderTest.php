@@ -1501,6 +1501,62 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 2], $builder->getBindings());
     }
 
+    public function testWhereIntersects()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereIntersects(['started_at', 'ended_at'], ['2020-01-01 00:00:00', '2020-01-31 23:59:59']);
+        $this->assertSame('select * from "users" where ("started_at" <= ? and "ended_at" >= ?)', $builder->toSql());
+        $this->assertEquals([0 => '2020-01-31 23:59:59', 1 => '2020-01-01 00:00:00'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereIntersects(['started_at', 'ended_at'], ['2020-01-01 00:00:00', '2020-01-31 23:59:59'], inclusive: false);
+        $this->assertSame('select * from "users" where ("started_at" < ? and "ended_at" > ?)', $builder->toSql());
+        $this->assertEquals([0 => '2020-01-31 23:59:59', 1 => '2020-01-01 00:00:00'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereIntersects(['started_at', 'ended_at'], [new Raw("'2020-01-01 00:00:00'"), new Raw("'2020-01-31 23:59:59'")]);
+        $this->assertSame('select * from "users" where ("started_at" <= \'2020-01-31 23:59:59\' and "ended_at" >= \'2020-01-01 00:00:00\')', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereIntersects(['started_at', 'ended_at'], new DatePeriod(
+            new DateTime('2020-01-01 00:00:00'),
+            new DateInterval('P30D'),
+            new DateTime('2020-01-31 00:00:00'),
+        ));
+        $this->assertSame('select * from "users" where ("started_at" <= ? and "ended_at" >= ?)', $builder->toSql());
+        $this->assertEquals([0 => new DateTime('2020-01-31 00:00:00'), 1 => new DateTime('2020-01-01 00:00:00')], $builder->getBindings());
+    }
+
+    public function testOrWhereIntersects()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', 2)->orWhereIntersects(['started_at', 'ended_at'], ['2020-01-01 00:00:00', '2020-01-31 23:59:59']);
+        $this->assertSame('select * from "users" where "id" = ? or ("started_at" <= ? and "ended_at" >= ?)', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => '2020-01-31 23:59:59', 2 => '2020-01-01 00:00:00'], $builder->getBindings());
+    }
+
+    public function testWhereNotIntersects()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNotIntersects(['started_at', 'ended_at'], ['2020-01-01 00:00:00', '2020-01-31 23:59:59']);
+        $this->assertSame('select * from "users" where ("started_at" > ? or "ended_at" < ?)', $builder->toSql());
+        $this->assertEquals([0 => '2020-01-31 23:59:59', 1 => '2020-01-01 00:00:00'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNotIntersects(['started_at', 'ended_at'], ['2020-01-01 00:00:00', '2020-01-31 23:59:59'], inclusive: false);
+        $this->assertSame('select * from "users" where ("started_at" >= ? or "ended_at" <= ?)', $builder->toSql());
+        $this->assertEquals([0 => '2020-01-31 23:59:59', 1 => '2020-01-01 00:00:00'], $builder->getBindings());
+    }
+
+    public function testOrWhereNotIntersects()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', 2)->orWhereNotIntersects(['started_at', 'ended_at'], ['2020-01-01 00:00:00', '2020-01-31 23:59:59']);
+        $this->assertSame('select * from "users" where "id" = ? or ("started_at" > ? or "ended_at" < ?)', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => '2020-01-31 23:59:59', 2 => '2020-01-01 00:00:00'], $builder->getBindings());
+    }
+
     public function testWhereValueBetween()
     {
         $builder = $this->getBuilder();

@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use DateInterval;
+use DatePeriod;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\RecordsNotFoundException;
@@ -301,6 +303,50 @@ class QueryBuilderTest extends DatabaseTestCase
         })->get();
 
         $this->assertCount(2, $results);
+    }
+
+    public function testWhereIntersects()
+    {
+        Schema::create('periods', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->date('starts_on');
+            $table->date('ends_on');
+            $table->dateTime('starts_at');
+            $table->dateTime('ends_at');
+        });
+
+        DB::table('periods')->insert([
+            ['name' => 'before', 'starts_on' => '2020-01-01', 'ends_on' => '2020-01-09', 'starts_at' => '2020-01-10 08:00:00', 'ends_at' => '2020-01-10 09:59:59'],
+            ['name' => 'touches-start', 'starts_on' => '2020-01-01', 'ends_on' => '2020-01-10', 'starts_at' => '2020-01-10 09:00:00', 'ends_at' => '2020-01-10 10:00:00'],
+            ['name' => 'inside', 'starts_on' => '2020-01-12', 'ends_on' => '2020-01-18', 'starts_at' => '2020-01-10 10:30:00', 'ends_at' => '2020-01-10 11:00:00'],
+            ['name' => 'touches-end', 'starts_on' => '2020-01-20', 'ends_on' => '2020-01-25', 'starts_at' => '2020-01-10 12:00:00', 'ends_at' => '2020-01-10 13:00:00'],
+            ['name' => 'after', 'starts_on' => '2020-01-21', 'ends_on' => '2020-01-31', 'starts_at' => '2020-01-10 12:00:01', 'ends_at' => '2020-01-10 13:00:00'],
+        ]);
+
+        $this->assertSame(
+            ['touches-start', 'inside', 'touches-end'],
+            DB::table('periods')->whereIntersects(['starts_on', 'ends_on'], ['2020-01-10', '2020-01-20'])->orderBy('id')->pluck('name')->all()
+        );
+
+        $this->assertSame(
+            ['inside'],
+            DB::table('periods')->whereIntersects(['starts_on', 'ends_on'], ['2020-01-10', '2020-01-20'], inclusive: false)->orderBy('id')->pluck('name')->all()
+        );
+
+        $this->assertSame(
+            ['before', 'after'],
+            DB::table('periods')->whereNotIntersects(['starts_on', 'ends_on'], ['2020-01-10', '2020-01-20'])->orderBy('id')->pluck('name')->all()
+        );
+
+        $this->assertSame(
+            ['touches-start', 'inside', 'touches-end'],
+            DB::table('periods')->whereIntersects(['starts_at', 'ends_at'], new DatePeriod(
+                new Carbon('2020-01-10 10:00:00'),
+                new DateInterval('PT1H'),
+                new Carbon('2020-01-10 12:00:00'),
+            ))->orderBy('id')->pluck('name')->all()
+        );
     }
 
     public function testWhereDate()

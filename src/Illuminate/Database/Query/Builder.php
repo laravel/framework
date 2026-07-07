@@ -1722,6 +1722,72 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where intersects" statement to the query.
+     *
+     * @param  array{\Illuminate\Contracts\Database\Query\Expression|string, \Illuminate\Contracts\Database\Query\Expression|string}  $columns
+     * @param  array{mixed, mixed}|\DatePeriod  $values
+     * @return $this
+     */
+    public function whereIntersects(array $columns, array|DatePeriod $values, bool $inclusive = true, string $boolean = 'and', bool $not = false)
+    {
+        if ($values instanceof DatePeriod) {
+            $values = $this->resolveDatePeriodBounds($values);
+        }
+
+        $periodStart = array_first($values);
+        $periodEnd = array_last($values);
+
+        return $this->whereNested(function ($query) use ($columns, $periodStart, $periodEnd, $inclusive, $not) {
+            $startColumn = array_first($columns);
+            $endColumn = array_last($columns);
+
+            if ($not) {
+                $query->where($startColumn, $inclusive ? '>' : '>=', $periodEnd)
+                    ->orWhere($endColumn, $inclusive ? '<' : '<=', $periodStart);
+            } else {
+                $query->where($startColumn, $inclusive ? '<=' : '<', $periodEnd)
+                    ->where($endColumn, $inclusive ? '>=' : '>', $periodStart);
+            }
+        }, $boolean);
+    }
+
+    /**
+     * Add an "or where intersects" statement to the query.
+     *
+     * @param  array{\Illuminate\Contracts\Database\Query\Expression|string, \Illuminate\Contracts\Database\Query\Expression|string}  $columns
+     * @param  array{mixed, mixed}|\DatePeriod  $values
+     * @return $this
+     */
+    public function orWhereIntersects(array $columns, array|DatePeriod $values, bool $inclusive = true)
+    {
+        return $this->whereIntersects($columns, $values, $inclusive, 'or');
+    }
+
+    /**
+     * Add a "where not intersects" statement to the query.
+     *
+     * @param  array{\Illuminate\Contracts\Database\Query\Expression|string, \Illuminate\Contracts\Database\Query\Expression|string}  $columns
+     * @param  array{mixed, mixed}|\DatePeriod  $values
+     * @return $this
+     */
+    public function whereNotIntersects(array $columns, array|DatePeriod $values, bool $inclusive = true, string $boolean = 'and')
+    {
+        return $this->whereIntersects($columns, $values, $inclusive, $boolean, true);
+    }
+
+    /**
+     * Add an "or where not intersects" statement to the query.
+     *
+     * @param  array{\Illuminate\Contracts\Database\Query\Expression|string, \Illuminate\Contracts\Database\Query\Expression|string}  $columns
+     * @param  array{mixed, mixed}|\DatePeriod  $values
+     * @return $this
+     */
+    public function orWhereNotIntersects(array $columns, array|DatePeriod $values, bool $inclusive = true)
+    {
+        return $this->whereNotIntersects($columns, $values, $inclusive, 'or');
+    }
+
+    /**
      * Add a "where between columns" statement using a value to the query.
      *
      * @param  mixed  $value
