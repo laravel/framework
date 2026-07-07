@@ -23,6 +23,13 @@ use Intervention\Image\ImageManager;
 abstract class InterventionDriver implements Driver
 {
     /**
+     * The registered transformation handlers.
+     *
+     * @var array<class-string<\Illuminate\Contracts\Image\Transformation>, callable>
+     */
+    protected array $transformationHandlers = [];
+
+    /**
      * The Intervention image manager instance.
      */
     protected ImageManager $manager;
@@ -69,6 +76,12 @@ abstract class InterventionDriver implements Driver
         $image = $this->manager->read($contents);
 
         foreach ($pipeline->transformations as $transformation) {
+            if ($handler = $this->transformationHandlerFor($transformation)) {
+                $image = $handler($image, $transformation);
+
+                continue;
+            }
+
             $image = match (true) {
                 $transformation instanceof Orient => $image->orient(),
                 $transformation instanceof Cover => $image->cover($transformation->width, $transformation->height),
@@ -101,5 +114,31 @@ abstract class InterventionDriver implements Driver
         } finally {
             unset($image);
         }
+    }
+
+    /**
+     * Register a transformation handler.
+     *
+     * @param  class-string<\Illuminate\Contracts\Image\Transformation>  $transformation
+     */
+    public function transformUsing(string $transformation, callable $callback): static
+    {
+        $this->transformationHandlers[$transformation] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Get the handler for the given transformation.
+     */
+    protected function transformationHandlerFor(object $transformation): ?callable
+    {
+        foreach ($this->transformationHandlers as $class => $handler) {
+            if ($transformation instanceof $class) {
+                return $handler;
+            }
+        }
+
+        return null;
     }
 }

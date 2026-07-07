@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Image\Drivers;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Drivers\ImagickDriver;
 use Illuminate\Image\ImagePipeline;
-use Illuminate\Image\Transformation;
+use Illuminate\Contracts\Image\Transformation;
 use Illuminate\Image\Transformations\Blur;
 use Illuminate\Image\Transformations\Cover;
 use Illuminate\Image\Transformations\FlipHorizontally;

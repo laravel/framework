@@ -2,12 +2,14 @@
 
 namespace Illuminate\Image;
 
+use Illuminate\Contracts\Image\Transformation;
+
 class ImagePipeline
 {
     /**
      * The ordered image transformations.
      *
-     * @var array<int, \Illuminate\Image\Transformation>
+     * @var array<int, \Illuminate\Contracts\Image\Transformation>
      */
     public array $transformations = [];
 

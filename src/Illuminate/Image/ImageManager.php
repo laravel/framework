@@ -13,6 +13,13 @@ use InvalidArgumentException;
 class ImageManager extends Manager
 {
     /**
+     * The registered transformation handlers.
+     *
+     * @var array<string, array<class-string<\Illuminate\Contracts\Image\Transformation>, callable>>
+     */
+    protected array $transformationHandlers = [];
+
+    /**
      * Create an image instance from raw bytes.
      */
     public function fromBytes(string $contents): Image
@@ -67,6 +74,8 @@ class ImageManager extends Manager
             $instance->ensureRequirementsAreMet();
         }
 
+        $this->applyTransformationHandlers($driver, $instance);
+
         return $instance;
     }
 
@@ -84,6 +93,32 @@ class ImageManager extends Manager
     protected function createImagickDriver(): ImagickDriver
     {
         return new ImagickDriver;
+    }
+
+    /**
+     * Register a transformation handler for the given driver.
+     *
+     * @param  class-string<\Illuminate\Contracts\Image\Transformation>  $transformation
+     */
+    public function transformUsing(string $driver, string $transformation, callable $callback): static
+    {
+        $this->transformationHandlers[$driver][$transformation] = $callback;
+
+        if (isset($this->drivers[$driver])) {
+            $this->applyTransformationHandlers($driver, $this->drivers[$driver]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Apply registered transformation handlers to the given driver instance.
+     */
+    protected function applyTransformationHandlers(string $driver, Driver $instance): void
+    {
+        foreach ($this->transformationHandlers[$driver] ?? [] as $transformation => $callback) {
+            $instance->transformUsing($transformation, $callback);
+        }
     }
 
     /**

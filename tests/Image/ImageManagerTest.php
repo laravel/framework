@@ -5,12 +5,14 @@ namespace Illuminate\Tests\Image;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Image\Driver;
+use Illuminate\Contracts\Image\Transformation;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Image;
 use Illuminate\Image\ImageException;
 use Illuminate\Image\ImageManager;
+use Illuminate\Image\ImagePipeline;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -224,6 +226,71 @@ class ImageManagerTest extends TestCase
         $this->assertSame($driver1, $manager->driver('one'));
         $this->assertSame($driver2, $manager->driver('two'));
         $this->assertNotSame($manager->driver('one'), $manager->driver('two'));
+    }
+
+    public function test_transform_using_applies_handlers_to_new_driver_instances()
+    {
+        $app = $this->makeApp([]);
+        $driver = new class implements Driver
+        {
+            public array $handlers = [];
+
+            public function process(string $contents, ImagePipeline $pipeline): string
+            {
+                return $contents;
+            }
+
+            public function transformUsing(string $transformation, callable $callback): static
+            {
+                $this->handlers[$transformation] = $callback;
+
+                return $this;
+            }
+        };
+        $transformation = new class implements Transformation
+        {
+            //
+        };
+        $callback = fn () => null;
+
+        $manager = new ImageManager($app);
+        $manager->extend('custom', fn () => $driver);
+        $manager->transformUsing('custom', $transformation::class, $callback);
+
+        $this->assertSame($callback, $manager->driver('custom')->handlers[$transformation::class]);
+    }
+
+    public function test_transform_using_applies_handlers_to_resolved_driver_instances()
+    {
+        $app = $this->makeApp([]);
+        $driver = new class implements Driver
+        {
+            public array $handlers = [];
+
+            public function process(string $contents, ImagePipeline $pipeline): string
+            {
+                return $contents;
+            }
+
+            public function transformUsing(string $transformation, callable $callback): static
+            {
+                $this->handlers[$transformation] = $callback;
+
+                return $this;
+            }
+        };
+        $transformation = new class implements Transformation
+        {
+            //
+        };
+        $callback = fn () => null;
+
+        $manager = new ImageManager($app);
+        $manager->extend('custom', fn () => $driver);
+        $manager->driver('custom');
+        $manager->transformUsing('custom', $transformation::class, $callback);
+
+        $this->assertSame($callback, $driver->handlers[$transformation::class]);
     }
 
     protected function fakeImageContents(): string

@@ -6,7 +6,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Drivers\GdDriver;
 use Illuminate\Image\ImageException;
 use Illuminate\Image\ImagePipeline;
-use Illuminate\Image\Transformation;
+use Illuminate\Contracts\Image\Transformation;
 use Illuminate\Image\Transformations\Blur;
 use Illuminate\Image\Transformations\Cover;
 use Illuminate\Image\Transformations\FlipHorizontally;
@@ -15,6 +15,7 @@ use Illuminate\Image\Transformations\Greyscale;
 use Illuminate\Image\Transformations\Orient;
 use Illuminate\Image\Transformations\Scale;
 use Illuminate\Image\Transformations\Sharpen;
+use Intervention\Image\Interfaces\ImageInterface;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
@@ -210,6 +211,30 @@ class GdDriverTest extends TestCase
         $result = $driver->process($contents, $pipeline);
 
         $this->assertNotEmpty($result);
+    }
+
+    public function test_processes_custom_transformation()
+    {
+        $driver = new GdDriver;
+        $transformation = new class implements Transformation
+        {
+            //
+        };
+        $received = null;
+
+        $driver->transformUsing($transformation::class, function (ImageInterface $image, Transformation $transformation) use (&$received) {
+            $received = $transformation;
+
+            return $image->scaleDown(50, 50);
+        });
+
+        $result = $driver->process($this->fakeImageContents(100, 100), $this->pipeline($transformation));
+
+        [$width, $height] = getimagesizefromstring($result);
+
+        $this->assertSame($transformation, $received);
+        $this->assertSame(50, $width);
+        $this->assertSame(50, $height);
     }
 
     public function test_throws_for_unsupported_input_format()

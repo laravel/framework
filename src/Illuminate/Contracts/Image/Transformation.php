@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Image;
+namespace Illuminate\Contracts\Image;
 
 interface Transformation
 {

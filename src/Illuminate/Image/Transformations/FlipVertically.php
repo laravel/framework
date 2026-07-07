@@ -2,7 +2,7 @@
 
 namespace Illuminate\Image\Transformations;
 
-use Illuminate\Image\Transformation;
+use Illuminate\Contracts\Image\Transformation;
 
 class FlipVertically implements Transformation
 {

@@ -3,10 +3,10 @@
 namespace Illuminate\Image;
 
 use Closure;
-use finfo;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Image\Driver;
+use Illuminate\Contracts\Image\Transformation;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Transformations\Blur;
 use Illuminate\Image\Transformations\Cover;
@@ -17,11 +17,16 @@ use Illuminate\Image\Transformations\Orient;
 use Illuminate\Image\Transformations\Scale;
 use Illuminate\Image\Transformations\Sharpen;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Macroable;
 use Stringable;
 use Throwable;
+use finfo;
 
 class Image implements Stringable
 {
+    use Conditionable, Macroable;
+
     /**
      * The image processing pipeline.
      */
