@@ -1,6 +1,28 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.18.1...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.19.0...13.x)
+
+## [v13.19.0](https://github.com/laravel/framework/compare/v13.18.1...v13.19.0) - 2026-07-07
+
+* [13.x] Support inspecting reserved jobs on the queue fake by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60644
+* [13.x] Add `reduceInto` method to collection by [@JosephSilber](https://github.com/JosephSilber) in https://github.com/laravel/framework/pull/60651
+* [13.x] Add `counted` method to `Str` and `Stringable` by [@JosephSilber](https://github.com/JosephSilber) in https://github.com/laravel/framework/pull/60649
+* [13.x] Ensure `deletedAtColumn` is passed to `assertSoftDeleted` & `assertNotSoftDeleted` by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60657
+* [13.x] Pop managed queue jobs from the cloud-agent instead of SQS by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/60659
+* [12.x] Pop managed queue jobs from the cloud-agent instead of SQS by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/60660
+* [12.x] Terminate default style value with a semicolon in ComponentAttributeBag::merge() by [@Amirhf1](https://github.com/Amirhf1) in https://github.com/laravel/framework/pull/60665
+* Bump stefanzweifel/git-auto-commit-action from 7.1.0 to 7.2.0 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/framework/pull/60672
+* [13.x] Update comment in `Cloud/Queue.php` by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60673
+* [13.x] Add tests for relative date where clauses by [@aligulzar729](https://github.com/aligulzar729) in https://github.com/laravel/framework/pull/60675
+* [13.x] Add `phpdoc_trim_consecutive_blank_line_separation rule` to pint by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/60669
+* [13.x] Remove deprecated `StaticCallOnNonStaticToInstanceCallRector` fixer rule by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/60670
+* [13.x] Allow mail config options without name by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60668
+* [13.x] Adjust Queue comment after Dependabot by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60679
+* [13.x] Send bulk SQS jobs via SendMessageBatch by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/60645
+* [13.x] Add `query` and `queryJson` HTTP testing helpers by [@shanerbaner82](https://github.com/shanerbaner82) in https://github.com/laravel/framework/pull/60662
+* [13.x] Add `Http::query()` method to the HTTP client by [@shanerbaner82](https://github.com/shanerbaner82) in https://github.com/laravel/framework/pull/60663
+* Merge branch '12.x' into 13.x by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/60684
+* [13.x] Add tests for the date rule's past/future/nowOrPast/nowOrFuture methods by [@aligulzar729](https://github.com/aligulzar729) in https://github.com/laravel/framework/pull/60687
 
 ## [v13.18.1](https://github.com/laravel/framework/compare/v13.18.0...v13.18.1) - 2026-07-02
 
