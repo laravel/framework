@@ -80,6 +80,8 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static array pushedJobs()
  * @method static array rawPushes()
  * @method static \Illuminate\Support\Testing\Fakes\QueueFake serializeAndRestore(bool $serializeAndRestore = true)
+ * @method static \Illuminate\Support\Testing\Fakes\QueueFake beforePushing(callable $callback)
+ * @method static \Illuminate\Support\Testing\Fakes\QueueFake afterPushing(callable $callback)
  * @method static void releaseUniqueJobLocks()
  * @method static void clearReserved()
  *

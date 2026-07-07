@@ -435,15 +435,25 @@ class SupportTestingQueueFakeTest extends TestCase
             $steps[] = ['before', is_object($job) ? get_class($job) : $job, $data, $queue];
         });
 
+        $this->fake->beforePushing(function ($job, $data, $queue) use (&$steps) {
+            $steps[] = ['before again', is_object($job) ? get_class($job) : $job, $data, $queue];
+        });
+
         $this->fake->afterPushing(function ($job, $data, $queue) use (&$steps) {
             $steps[] = ['after', is_object($job) ? get_class($job) : $job, $data, $queue];
+        });
+
+        $this->fake->afterPushing(function ($job, $data, $queue) use (&$steps) {
+            $steps[] = ['after again', is_object($job) ? get_class($job) : $job, $data, $queue];
         });
 
         $this->fake->push($this->job, ['foo' => 'bar'], 'redis');
 
         $this->assertSame([
             ['before', JobStub::class, ['foo' => 'bar'], 'redis'],
+            ['before again', JobStub::class, ['foo' => 'bar'], 'redis'],
             ['after', JobStub::class, ['foo' => 'bar'], 'redis'],
+            ['after again', JobStub::class, ['foo' => 'bar'], 'redis'],
         ], $steps);
     }
 
@@ -462,15 +472,23 @@ class SupportTestingQueueFakeTest extends TestCase
             ->beforePushing(function ($job, $data, $queue) use (&$steps) {
                 $steps[] = ['before', is_object($job) ? get_class($job) : $job, $data, $queue];
             })
+            ->beforePushing(function ($job, $data, $queue) use (&$steps) {
+                $steps[] = ['before again', is_object($job) ? get_class($job) : $job, $data, $queue];
+            })
             ->afterPushing(function ($job, $data, $queue) use (&$steps) {
                 $steps[] = ['after', is_object($job) ? get_class($job) : $job, $data, $queue];
+            })
+            ->afterPushing(function ($job, $data, $queue) use (&$steps) {
+                $steps[] = ['after again', is_object($job) ? get_class($job) : $job, $data, $queue];
             });
 
         $fake->push($job, ['foo' => 'bar'], 'redis');
 
         $this->assertSame([
             ['before', JobStub::class, ['foo' => 'bar'], 'redis'],
+            ['before again', JobStub::class, ['foo' => 'bar'], 'redis'],
             ['after', JobStub::class, ['foo' => 'bar'], 'redis'],
+            ['after again', JobStub::class, ['foo' => 'bar'], 'redis'],
         ], $steps);
     }
 

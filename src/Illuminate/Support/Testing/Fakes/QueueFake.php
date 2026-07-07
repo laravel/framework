@@ -90,18 +90,18 @@ class QueueFake extends QueueManager implements Fake, Queue
     protected bool $serializeAndRestore = false;
 
     /**
-     * The callback that should be invoked before pushing a job.
+     * The callbacks that should be invoked before pushing a job.
      *
-     * @var callable|null
+     * @var array<int, callable>
      */
-    protected $beforePushingCallback;
+    protected $beforePushingCallbacks = [];
 
     /**
-     * The callback that should be invoked after pushing a job.
+     * The callbacks that should be invoked after pushing a job.
      *
-     * @var callable|null
+     * @var array<int, callable>
      */
-    protected $afterPushingCallback;
+    protected $afterPushingCallbacks = [];
 
     /**
      * Create a new fake queue instance.
@@ -610,8 +610,8 @@ class QueueFake extends QueueManager implements Fake, Queue
     {
         $queue = enum_value($queue);
 
-        if ($this->beforePushingCallback) {
-            call_user_func($this->beforePushingCallback, $job, $data, $queue);
+        foreach ($this->beforePushingCallbacks as $callback) {
+            call_user_func($callback, $job, $data, $queue);
         }
 
         if ($this->shouldFakeJob($job)) {
@@ -634,8 +634,8 @@ class QueueFake extends QueueManager implements Fake, Queue
                 : $this->queue->push($job, $data, $queue);
         }
 
-        if ($this->afterPushingCallback) {
-            call_user_func($this->afterPushingCallback, $job, $data, $queue);
+        foreach ($this->afterPushingCallbacks as $callback) {
+            call_user_func($callback, $job, $data, $queue);
         }
     }
 
@@ -869,7 +869,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function beforePushing(callable $callback)
     {
-        $this->beforePushingCallback = $callback;
+        $this->beforePushingCallbacks[] = $callback;
 
         return $this;
     }
@@ -882,7 +882,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function afterPushing(callable $callback)
     {
-        $this->afterPushingCallback = $callback;
+        $this->afterPushingCallbacks[] = $callback;
 
         return $this;
     }
