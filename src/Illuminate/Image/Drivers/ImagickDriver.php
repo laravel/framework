@@ -2,6 +2,7 @@
 
 namespace Illuminate\Image\Drivers;
 
+use Intervention\Image\Drivers\Imagick\Driver as InterventionImagickDriver;
 use Intervention\Image\ImageManager;
 
 class ImagickDriver extends InterventionDriver
@@ -11,6 +12,6 @@ class ImagickDriver extends InterventionDriver
      */
     protected function createManager(): ImageManager
     {
-        return ImageManager::imagick();
+        return ImageManager::usingDriver(InterventionImagickDriver::class);
     }
 }

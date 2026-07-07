@@ -63,12 +63,12 @@ class ImageTest extends TestCase
         $this->assertNotSame($contents, $result);
     }
 
-    public function test_greyscale_and_to_bytes()
+    public function test_grayscale_and_to_bytes()
     {
         $contents = $this->fakeImageContents(100, 100);
         $image = new Image($contents);
 
-        $result = $image->greyscale()->toBytes();
+        $result = $image->grayscale()->toBytes();
 
         $this->assertNotSame($contents, $result);
     }
@@ -338,7 +338,7 @@ class ImageTest extends TestCase
             ->orient()
             ->cover(200, 200)
             ->blur(5)
-            ->greyscale()
+            ->grayscale()
             ->sharpen(10)
             ->flipVertically()
             ->toWebp()
@@ -526,11 +526,11 @@ class ImageTest extends TestCase
         $this->assertSame(200, $result->height());
     }
 
-    public function test_greyscale_does_not_change_dimensions()
+    public function test_grayscale_does_not_change_dimensions()
     {
         $image = new Image($this->fakeImageContents(200, 150));
 
-        $result = $image->greyscale();
+        $result = $image->grayscale();
 
         $this->assertSame(200, $result->width());
         $this->assertSame(150, $result->height());

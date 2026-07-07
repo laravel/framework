@@ -7,7 +7,7 @@ class ImageOutputOptions
     /**
      * The default output quality.
      */
-    const DEFAULT_QUALITY = 75;
+    const DEFAULT_QUALITY = 70;
 
     /**
      * The output format.

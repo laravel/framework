@@ -22,7 +22,7 @@
         "illuminate/support": "^13.0"
     },
     "suggest": {
-        "intervention/image": "Required to use the GD and Imagick image drivers (^3.11.7)."
+        "intervention/image": "Required to use the GD and Imagick image drivers (^4.0)."
     },
     "minimum-stability": "dev",
     "autoload": {

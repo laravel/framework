@@ -2,6 +2,7 @@
 
 namespace Illuminate\Image\Drivers;
 
+use Intervention\Image\Drivers\Gd\Driver as InterventionGdDriver;
 use Intervention\Image\ImageManager;
 
 class GdDriver extends InterventionDriver
@@ -11,6 +12,6 @@ class GdDriver extends InterventionDriver
      */
     protected function createManager(): ImageManager
     {
-        return ImageManager::gd();
+        return ImageManager::usingDriver(InterventionGdDriver::class);
     }
 }

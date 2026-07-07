@@ -11,7 +11,7 @@ use Illuminate\Image\Transformations\Blur;
 use Illuminate\Image\Transformations\Cover;
 use Illuminate\Image\Transformations\FlipHorizontally;
 use Illuminate\Image\Transformations\FlipVertically;
-use Illuminate\Image\Transformations\Greyscale;
+use Illuminate\Image\Transformations\Grayscale;
 use Illuminate\Image\Transformations\Orient;
 use Illuminate\Image\Transformations\Scale;
 use Illuminate\Image\Transformations\Sharpen;
@@ -51,10 +51,10 @@ class ImageTest extends TestCase
         $this->assertNotSame($image, $result);
     }
 
-    public function test_greyscale_returns_new_instance()
+    public function test_grayscale_returns_new_instance()
     {
         $image = $this->makeImage();
-        $result = $image->greyscale();
+        $result = $image->grayscale();
 
         $this->assertNotSame($image, $result);
     }
@@ -254,7 +254,7 @@ class ImageTest extends TestCase
         $options = $this->getOptions($result);
 
         $this->assertSame('webp', $options->format);
-        $this->assertSame(75, $options->quality);
+        $this->assertSame(70, $options->quality);
     }
 
     public function test_optimize_throws_for_unsupported_format()
@@ -500,7 +500,7 @@ class ImageTest extends TestCase
     public function test_multiple_operations_chained()
     {
         $image = $this->makeImage();
-        $result = $image->orient()->cover(200, 200)->blur(10)->greyscale()->sharpen(5)->toWebp()->quality(75);
+        $result = $image->orient()->cover(200, 200)->blur(10)->grayscale()->sharpen(5)->toWebp()->quality(75);
 
         $options = $this->getOptions($result);
 
@@ -508,7 +508,7 @@ class ImageTest extends TestCase
         $this->assertSame(200, $options->coverWidth);
         $this->assertSame(200, $options->coverHeight);
         $this->assertSame(10, $options->blur);
-        $this->assertTrue($options->greyscale);
+        $this->assertTrue($options->grayscale);
         $this->assertSame(5, $options->sharpen);
         $this->assertSame('webp', $options->format);
         $this->assertSame(75, $options->quality);
@@ -632,7 +632,7 @@ class ImageTest extends TestCase
 
     public function test_image_output_options_default_quality_constant()
     {
-        $this->assertSame(75, ImageOutputOptions::DEFAULT_QUALITY);
+        $this->assertSame(70, ImageOutputOptions::DEFAULT_QUALITY);
     }
 
     public function test_cover_sets_both_dimensions()
@@ -844,7 +844,7 @@ class ImageTest extends TestCase
             'scaleHeight' => null,
             'orient' => null,
             'blur' => null,
-            'greyscale' => null,
+            'grayscale' => null,
             'sharpen' => null,
             'flipVertically' => null,
             'flipHorizontally' => null,
@@ -858,7 +858,7 @@ class ImageTest extends TestCase
                 $transformation instanceof Scale => [$options->scaleWidth, $options->scaleHeight] = [$transformation->width, $transformation->height],
                 $transformation instanceof Orient => $options->orient = true,
                 $transformation instanceof Blur => $options->blur = $transformation->amount,
-                $transformation instanceof Greyscale => $options->greyscale = true,
+                $transformation instanceof Grayscale => $options->grayscale = true,
                 $transformation instanceof Sharpen => $options->sharpen = $transformation->amount,
                 $transformation instanceof FlipVertically => $options->flipVertically = true,
                 $transformation instanceof FlipHorizontally => $options->flipHorizontally = true,

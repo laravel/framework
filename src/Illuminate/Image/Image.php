@@ -13,7 +13,7 @@ use Illuminate\Image\Transformations\Blur;
 use Illuminate\Image\Transformations\Cover;
 use Illuminate\Image\Transformations\FlipHorizontally;
 use Illuminate\Image\Transformations\FlipVertically;
-use Illuminate\Image\Transformations\Greyscale;
+use Illuminate\Image\Transformations\Grayscale;
 use Illuminate\Image\Transformations\Orient;
 use Illuminate\Image\Transformations\Scale;
 use Illuminate\Image\Transformations\Sharpen;
@@ -105,11 +105,11 @@ class Image implements Stringable
     }
 
     /**
-     * Convert the image to greyscale.
+     * Convert the image to grayscale.
      */
-    public function greyscale(): static
+    public function grayscale(): static
     {
-        return $this->transform(new Greyscale);
+        return $this->transform(new Grayscale);
     }
 
     /**
