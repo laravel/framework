@@ -1,6 +1,15 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.62.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.63.0...12.x)
+
+## [v12.63.0](https://github.com/laravel/framework/compare/v12.62.0...v12.63.0) - 2026-07-07
+
+* [12.x] Add new error messages for detecting lost connections by [@mfn](https://github.com/mfn) in https://github.com/laravel/framework/pull/60472
+* [12.x] Ability to refresh cache locks by [@bytestream](https://github.com/bytestream) in https://github.com/laravel/framework/pull/58349
+* [12.x] Guard JsonSchema deserializer against unbounded $ref expansion by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/60524
+* [12.x] Fix Postgres whereDate/whereTime crash when column is Expression by [@irabbi360](https://github.com/irabbi360) in https://github.com/laravel/framework/pull/60540
+* [12.x] Pop managed queue jobs from the cloud-agent instead of SQS by [@kieranbrown](https://github.com/kieranbrown) in https://github.com/laravel/framework/pull/60660
+* [12.x] Terminate default style value with a semicolon in ComponentAttributeBag::merge() by [@Amirhf1](https://github.com/Amirhf1) in https://github.com/laravel/framework/pull/60665
 
 ## [v12.62.0](https://github.com/laravel/framework/compare/v12.61.1...v12.62.0) - 2026-06-09
 
