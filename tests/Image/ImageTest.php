@@ -5,7 +5,16 @@ namespace Illuminate\Tests\Image;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Image;
 use Illuminate\Image\ImageException;
-use Illuminate\Image\PendingImageOptions;
+use Illuminate\Image\ImageOutputOptions;
+use Illuminate\Image\ImagePipeline;
+use Illuminate\Image\Transformations\Blur;
+use Illuminate\Image\Transformations\Cover;
+use Illuminate\Image\Transformations\FlipHorizontally;
+use Illuminate\Image\Transformations\FlipVertically;
+use Illuminate\Image\Transformations\Greyscale;
+use Illuminate\Image\Transformations\Orient;
+use Illuminate\Image\Transformations\Scale;
+use Illuminate\Image\Transformations\Sharpen;
 use PHPUnit\Framework\TestCase;
 
 class ImageTest extends TestCase
@@ -325,32 +334,32 @@ class ImageTest extends TestCase
         $this->assertSame(10, $this->getOptions($image->sharpen())->sharpen);
     }
 
-    public function test_flip_returns_new_instance()
+    public function test_flip_vertically_returns_new_instance()
     {
         $image = $this->makeImage();
 
-        $this->assertNotSame($image, $image->flip());
+        $this->assertNotSame($image, $image->flipVertically());
     }
 
-    public function test_flip_sets_option()
+    public function test_flip_vertically_sets_option()
     {
         $image = $this->makeImage();
 
-        $this->assertTrue($this->getOptions($image->flip())->flip);
+        $this->assertTrue($this->getOptions($image->flipVertically())->flipVertically);
     }
 
-    public function test_flop_returns_new_instance()
+    public function test_flip_horizontally_returns_new_instance()
     {
         $image = $this->makeImage();
 
-        $this->assertNotSame($image, $image->flop());
+        $this->assertNotSame($image, $image->flipHorizontally());
     }
 
-    public function test_flop_sets_option()
+    public function test_flip_horizontally_sets_option()
     {
         $image = $this->makeImage();
 
-        $this->assertTrue($this->getOptions($image->flop())->flop);
+        $this->assertTrue($this->getOptions($image->flipHorizontally())->flipHorizontally);
     }
 
     public function test_width_returns_int()
@@ -433,7 +442,7 @@ class ImageTest extends TestCase
         $image = $this->makeImage();
         $result = $image->quality(50);
 
-        $this->assertTrue($this->getOptions($result)->hasChanges());
+        $this->assertTrue($this->getPipeline($result)->hasChanges());
     }
 
     public function test_clone_does_not_share_hash_name_cache()
@@ -455,13 +464,27 @@ class ImageTest extends TestCase
         $this->assertSame($image->hashName(), $image->hashName());
     }
 
-    public function test_flip_and_flop_together()
+    public function test_flip_alias_sets_vertical_option()
     {
         $image = $this->makeImage();
-        $result = $image->flip()->flop();
 
-        $this->assertTrue($this->getOptions($result)->flip);
-        $this->assertTrue($this->getOptions($result)->flop);
+        $this->assertTrue($this->getOptions($image->flip())->flipVertically);
+    }
+
+    public function test_flop_alias_sets_horizontal_option()
+    {
+        $image = $this->makeImage();
+
+        $this->assertTrue($this->getOptions($image->flop())->flipHorizontally);
+    }
+
+    public function test_flip_vertically_and_horizontally_together()
+    {
+        $image = $this->makeImage();
+        $result = $image->flipVertically()->flipHorizontally();
+
+        $this->assertTrue($this->getOptions($result)->flipVertically);
+        $this->assertTrue($this->getOptions($result)->flipHorizontally);
     }
 
     public function test_multiple_operations_chained()
@@ -566,40 +589,40 @@ class ImageTest extends TestCase
         serialize($image);
     }
 
-    public function test_pending_image_options_has_no_changes_by_default()
+    public function test_image_pipeline_has_no_changes_by_default()
     {
-        $options = new PendingImageOptions;
+        $pipeline = new ImagePipeline;
 
-        $this->assertFalse($options->hasChanges());
+        $this->assertFalse($pipeline->hasChanges());
     }
 
-    public function test_pending_image_options_has_changes_with_zero_quality()
+    public function test_image_pipeline_has_changes_with_zero_quality()
     {
-        $options = new PendingImageOptions;
-        $options->quality = 0;
+        $pipeline = new ImagePipeline;
+        $pipeline->output->quality = 0;
 
-        $this->assertTrue($options->hasChanges());
+        $this->assertTrue($pipeline->hasChanges());
     }
 
-    public function test_pending_image_options_has_changes_with_zero_blur()
+    public function test_image_pipeline_has_changes_with_zero_blur()
     {
-        $options = new PendingImageOptions;
-        $options->blur = 0;
+        $pipeline = new ImagePipeline;
+        $pipeline->add(new Blur(0));
 
-        $this->assertTrue($options->hasChanges());
+        $this->assertTrue($pipeline->hasChanges());
     }
 
-    public function test_pending_image_options_has_changes_with_zero_sharpen()
+    public function test_image_pipeline_has_changes_with_zero_sharpen()
     {
-        $options = new PendingImageOptions;
-        $options->sharpen = 0;
+        $pipeline = new ImagePipeline;
+        $pipeline->add(new Sharpen(0));
 
-        $this->assertTrue($options->hasChanges());
+        $this->assertTrue($pipeline->hasChanges());
     }
 
-    public function test_pending_image_options_default_quality_constant()
+    public function test_image_output_options_default_quality_constant()
     {
-        $this->assertSame(75, PendingImageOptions::DEFAULT_QUALITY);
+        $this->assertSame(75, ImageOutputOptions::DEFAULT_QUALITY);
     }
 
     public function test_cover_sets_both_dimensions()
@@ -770,8 +793,44 @@ class ImageTest extends TestCase
         return file_get_contents($file->getRealPath());
     }
 
-    protected function getOptions(Image $image): PendingImageOptions
+    protected function getOptions(Image $image): object
     {
-        return (new \ReflectionProperty($image, 'options'))->getValue($image);
+        $pipeline = (new \ReflectionProperty($image, 'pipeline'))->getValue($image);
+
+        $options = (object) [
+            'coverWidth' => null,
+            'coverHeight' => null,
+            'scaleWidth' => null,
+            'scaleHeight' => null,
+            'orient' => null,
+            'blur' => null,
+            'greyscale' => null,
+            'sharpen' => null,
+            'flipVertically' => null,
+            'flipHorizontally' => null,
+            'format' => $pipeline->output->format,
+            'quality' => $pipeline->output->quality,
+        ];
+
+        foreach ($pipeline->transformations as $transformation) {
+            match (true) {
+                $transformation instanceof Cover => [$options->coverWidth, $options->coverHeight] = [$transformation->width, $transformation->height],
+                $transformation instanceof Scale => [$options->scaleWidth, $options->scaleHeight] = [$transformation->width, $transformation->height],
+                $transformation instanceof Orient => $options->orient = true,
+                $transformation instanceof Blur => $options->blur = $transformation->amount,
+                $transformation instanceof Greyscale => $options->greyscale = true,
+                $transformation instanceof Sharpen => $options->sharpen = $transformation->amount,
+                $transformation instanceof FlipVertically => $options->flipVertically = true,
+                $transformation instanceof FlipHorizontally => $options->flipHorizontally = true,
+                default => null,
+            };
+        }
+
+        return $options;
+    }
+
+    protected function getPipeline(Image $image): ImagePipeline
+    {
+        return (new \ReflectionProperty($image, 'pipeline'))->getValue($image);
     }
 }

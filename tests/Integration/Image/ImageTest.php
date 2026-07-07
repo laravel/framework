@@ -296,11 +296,11 @@ class ImageTest extends TestCase
         $this->assertSame(200, $height);
     }
 
-    public function test_flip_preserves_dimensions()
+    public function test_flip_vertically_preserves_dimensions()
     {
         $image = new Image($this->fakeImageContents(300, 200));
 
-        $result = $image->flip()->toBytes();
+        $result = $image->flipVertically()->toBytes();
 
         [$width, $height] = getimagesizefromstring($result);
 
@@ -308,11 +308,11 @@ class ImageTest extends TestCase
         $this->assertSame(200, $height);
     }
 
-    public function test_flop_preserves_dimensions()
+    public function test_flip_horizontally_preserves_dimensions()
     {
         $image = new Image($this->fakeImageContents(300, 200));
 
-        $result = $image->flop()->toBytes();
+        $result = $image->flipHorizontally()->toBytes();
 
         [$width, $height] = getimagesizefromstring($result);
 
@@ -320,11 +320,11 @@ class ImageTest extends TestCase
         $this->assertSame(200, $height);
     }
 
-    public function test_flip_and_flop_together()
+    public function test_flip_vertically_and_horizontally_together()
     {
         $image = new Image($this->fakeImageContents(200, 200));
 
-        $result = $image->flip()->flop()->toBytes();
+        $result = $image->flipVertically()->flipHorizontally()->toBytes();
 
         $this->assertNotEmpty($result);
         $this->assertSame([200, 200], getimagesizefromstring($result) ? [getimagesizefromstring($result)[0], getimagesizefromstring($result)[1]] : [0, 0]);
@@ -340,7 +340,7 @@ class ImageTest extends TestCase
             ->blur(5)
             ->greyscale()
             ->sharpen(10)
-            ->flip()
+            ->flipVertically()
             ->toWebp()
             ->quality(80);
 
@@ -405,12 +405,12 @@ class ImageTest extends TestCase
         $this->assertCount(1, $files);
     }
 
-    public function test_store_with_array_disk_option()
+    public function test_store_with_array_options()
     {
         Storage::fake('custom');
 
         $image = new Image($this->fakeImageContents(100, 100));
-        $image->toWebp()->store('images', ['disk' => 'custom']);
+        $image->toWebp()->store('images', 'custom', ['visibility' => 'public']);
 
         $files = Storage::disk('custom')->files('images');
 
@@ -435,7 +435,7 @@ class ImageTest extends TestCase
 
         $image = new Image($this->fakeImageContents(100, 100));
 
-        $image->storeAs('avatar.jpg', options: 'local');
+        $image->storeAs('avatar.jpg', disk: 'local');
 
         Storage::disk('local')->assertExists('avatar.jpg');
     }

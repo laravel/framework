@@ -8,7 +8,14 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Arr;
+use Illuminate\Image\Transformations\Blur;
+use Illuminate\Image\Transformations\Cover;
+use Illuminate\Image\Transformations\FlipHorizontally;
+use Illuminate\Image\Transformations\FlipVertically;
+use Illuminate\Image\Transformations\Greyscale;
+use Illuminate\Image\Transformations\Orient;
+use Illuminate\Image\Transformations\Scale;
+use Illuminate\Image\Transformations\Sharpen;
 use Illuminate\Support\Str;
 use Stringable;
 use Throwable;
@@ -16,9 +23,9 @@ use Throwable;
 class Image implements Stringable
 {
     /**
-     * The image processing options.
+     * The image processing pipeline.
      */
-    protected PendingImageOptions $options;
+    protected ImagePipeline $pipeline;
 
     /**
      * The driver override.
@@ -42,15 +49,7 @@ class Image implements Stringable
         protected Closure|string $contents,
         protected ?UploadedFile $file = null,
     ) {
-        $this->options = new PendingImageOptions;
-    }
-
-    /**
-     * Get the underlying uploaded file instance.
-     */
-    public function file(): ?UploadedFile
-    {
-        return $this->file;
+        $this->pipeline = new ImagePipeline;
     }
 
     /**
@@ -61,12 +60,7 @@ class Image implements Stringable
      */
     public function cover(int $width, int $height): static
     {
-        $clone = $this->cloneWith();
-
-        $clone->options->coverWidth = max(1, $width);
-        $clone->options->coverHeight = max(1, $height);
-
-        return $clone;
+        return $this->transform(new Cover(max(1, $width), max(1, $height)));
     }
 
     /**
@@ -77,12 +71,7 @@ class Image implements Stringable
      */
     public function scale(int $width, int $height): static
     {
-        $clone = $this->cloneWith();
-
-        $clone->options->scaleWidth = max(1, $width);
-        $clone->options->scaleHeight = max(1, $height);
-
-        return $clone;
+        return $this->transform(new Scale(max(1, $width), max(1, $height)));
     }
 
     /**
@@ -90,11 +79,7 @@ class Image implements Stringable
      */
     public function orient(): static
     {
-        $clone = $this->cloneWith();
-
-        $clone->options->orient = true;
-
-        return $clone;
+        return $this->transform(new Orient);
     }
 
     /**
@@ -104,11 +89,7 @@ class Image implements Stringable
      */
     public function blur(int $amount = 5): static
     {
-        $clone = $this->cloneWith();
-
-        $clone->options->blur = max(0, min(100, $amount));
-
-        return $clone;
+        return $this->transform(new Blur(max(0, min(100, $amount))));
     }
 
     /**
@@ -116,11 +97,7 @@ class Image implements Stringable
      */
     public function greyscale(): static
     {
-        $clone = $this->cloneWith();
-
-        $clone->options->greyscale = true;
-
-        return $clone;
+        return $this->transform(new Greyscale);
     }
 
     /**
@@ -130,11 +107,23 @@ class Image implements Stringable
      */
     public function sharpen(int $amount = 10): static
     {
-        $clone = $this->cloneWith();
+        return $this->transform(new Sharpen(max(0, min(100, $amount))));
+    }
 
-        $clone->options->sharpen = max(0, min(100, $amount));
+    /**
+     * Flip the image vertically.
+     */
+    public function flipVertically(): static
+    {
+        return $this->transform(new FlipVertically);
+    }
 
-        return $clone;
+    /**
+     * Flip the image horizontally.
+     */
+    public function flipHorizontally(): static
+    {
+        return $this->transform(new FlipHorizontally);
     }
 
     /**
@@ -142,11 +131,7 @@ class Image implements Stringable
      */
     public function flip(): static
     {
-        $clone = $this->cloneWith();
-
-        $clone->options->flip = true;
-
-        return $clone;
+        return $this->flipVertically();
     }
 
     /**
@@ -154,11 +139,15 @@ class Image implements Stringable
      */
     public function flop(): static
     {
-        $clone = $this->cloneWith();
+        return $this->flipHorizontally();
+    }
 
-        $clone->options->flop = true;
-
-        return $clone;
+    /**
+     * Add a transformation to the image pipeline.
+     */
+    public function transform(Transformation $transformation): static
+    {
+        return $this->withClone(fn (Image $image) => $image->pipeline->add($transformation));
     }
 
     /**
@@ -166,7 +155,7 @@ class Image implements Stringable
      *
      * @throws ImageException
      */
-    public function optimize(string $format = 'webp', int $quality = PendingImageOptions::DEFAULT_QUALITY): static
+    public function optimize(string $format = 'webp', int $quality = ImageOutputOptions::DEFAULT_QUALITY): static
     {
         return $this->toFormat($format)->quality($quality);
     }
@@ -178,11 +167,7 @@ class Image implements Stringable
      */
     public function quality(int $quality): static
     {
-        $clone = $this->cloneWith();
-
-        $clone->options->quality = max(1, min(100, $quality));
-
-        return $clone;
+        return $this->withOutput(fn (ImageOutputOptions $output) => $output->quality = max(1, min(100, $quality)));
     }
 
     /**
@@ -220,39 +205,77 @@ class Image implements Stringable
             throw new ImageException("The [{$format}] format is not supported.");
         }
 
-        $clone = $this->cloneWith();
-
-        $clone->options->format = $format;
-
-        return $clone;
+        return $this->withOutput(fn (ImageOutputOptions $output) => $output->format = $format);
     }
 
     /**
-     * Set the driver to use for processing.
+     * Store the processed image on a filesystem disk.
+     *
+     * @param  array<string, mixed>  $options
      */
-    public function using(string $driver): static
+    public function store(string $path = '', ?string $disk = null, array $options = []): string|false
     {
-        $clone = $this->cloneWith();
-
-        $clone->driver = $driver;
-
-        return $clone;
+        return $this->storeAs($path, $this->hashName(), $disk, $options);
     }
 
     /**
-     * Use the GD driver for processing.
+     * Store the processed image on a filesystem disk with public visibility.
+     *
+     * @param  array<string, mixed>  $options
      */
-    public function usingGd(): static
+    public function storePublicly(string $path = '', ?string $disk = null, array $options = []): string|false
     {
-        return $this->using('gd');
+        $options['visibility'] = 'public';
+
+        return $this->storeAs($path, $this->hashName(), $disk, $options);
     }
 
     /**
-     * Use the Imagick driver for processing.
+     * Store the processed image on a filesystem disk with a given name.
+     *
+     * @param  array<string, mixed>  $options
      */
-    public function usingImagick(): static
+    public function storeAs(string $path, ?string $name = null, ?string $disk = null, array $options = []): string|false
     {
-        return $this->using('imagick');
+        if (is_null($name)) {
+            [$path, $name] = ['', $path];
+        }
+
+        $path = trim($path.'/'.$name, '/');
+
+        $result = Container::getInstance()->make(FilesystemFactory::class)
+            ->disk($disk)
+            ->put($path, $this->toBytes(), $options);
+
+        return $result ? $path : false;
+    }
+
+    /**
+     * Store the processed image on a filesystem disk with public visibility and a given name.
+     *
+     * @param  array<string, mixed>  $options
+     */
+    public function storePubliclyAs(string $path, ?string $name = null, ?string $disk = null, array $options = []): string|false
+    {
+        if (is_null($name)) {
+            [$path, $name] = ['', $path];
+        }
+
+        $options['visibility'] = 'public';
+
+        return $this->storeAs($path, $name, $disk, $options);
+    }
+
+    /**
+     * Get a hashed filename with the correct extension.
+     */
+    public function hashName(string $path = ''): string
+    {
+        $this->hashName ??= Str::random(40);
+
+        $hash = $this->hashName.'.'.$this->extension();
+
+        return $path ? $path.'/'.$hash : $hash;
     }
 
     /**
@@ -260,10 +283,10 @@ class Image implements Stringable
      */
     public function toBytes(): string
     {
-        if ($this->options->hasChanges() && ! $this->processed) {
+        if ($this->pipeline->hasChanges() && ! $this->processed) {
             try {
                 $this->contents = $this->resolveDriver()->process(
-                    value($this->contents), $this->options
+                    value($this->contents), $this->pipeline
                 );
             } catch (ImageException $e) {
                 throw $e;
@@ -294,82 +317,6 @@ class Image implements Stringable
     }
 
     /**
-     * Store the processed image on a filesystem disk.
-     *
-     * @param  array<string, mixed>|string  $options
-     */
-    public function store(string $path = '', array|string $options = []): string|false
-    {
-        return $this->storeAs($path, $this->hashName(), $this->parseOptions($options));
-    }
-
-    /**
-     * Store the processed image on a filesystem disk with public visibility.
-     *
-     * @param  array<string, mixed>|string  $options
-     */
-    public function storePublicly(string $path = '', array|string $options = []): string|false
-    {
-        $options = $this->parseOptions($options);
-
-        $options['visibility'] = 'public';
-
-        return $this->storeAs($path, $this->hashName(), $options);
-    }
-
-    /**
-     * Store the processed image on a filesystem disk with a given name.
-     *
-     * @param  array<string, mixed>|string  $options
-     */
-    public function storeAs(string $path, ?string $name = null, array|string $options = []): string|false
-    {
-        if (is_null($name)) {
-            [$path, $name, $options] = ['', $path, []];
-        }
-
-        $options = $this->parseOptions($options);
-
-        $disk = Arr::pull($options, 'disk');
-
-        return Container::getInstance()->make(FilesystemFactory::class)
-            ->disk($disk)
-            ->put(
-                ($path ? $path.'/' : '').$name,
-                $this->toBytes(),
-                $options,
-            );
-    }
-
-    /**
-     * Store the processed image on a filesystem disk with public visibility and a given name.
-     *
-     * @param  array<string, mixed>|string  $options
-     */
-    public function storePubliclyAs(string $path, ?string $name = null, array|string $options = []): string|false
-    {
-        if (is_null($name)) {
-            [$path, $name, $options] = ['', $path, []];
-        }
-
-        $options = $this->parseOptions($options);
-
-        $options['visibility'] = 'public';
-
-        return $this->storeAs($path, $name, $options);
-    }
-
-    /**
-     * Get the MIME type of the processed image.
-     */
-    public function mimeType(): string
-    {
-        return once(function () {
-            return (new finfo(FILEINFO_MIME_TYPE))->buffer($this->toBytes());
-        });
-    }
-
-    /**
      * Get the file extension based on the MIME type.
      */
     public function extension(): string
@@ -384,6 +331,16 @@ class Image implements Stringable
             'image/tiff' => 'tiff',
             default => 'bin',
         };
+    }
+
+    /**
+     * Get the MIME type of the processed image.
+     */
+    public function mimeType(): string
+    {
+        return once(function () {
+            return (new finfo(FILEINFO_MIME_TYPE))->buffer($this->toBytes());
+        });
     }
 
     /**
@@ -417,30 +374,31 @@ class Image implements Stringable
     }
 
     /**
-     * Get a hashed filename with the correct extension.
+     * Set the driver to use for processing.
      */
-    public function hashName(string $path = ''): string
+    public function using(string $driver): static
     {
-        $this->hashName ??= Str::random(40);
+        $clone = $this->newClone();
 
-        $hash = $this->hashName.'.'.$this->extension();
+        $clone->driver = $driver;
 
-        return $path ? $path.'/'.$hash : $hash;
+        return $clone;
     }
 
     /**
-     * Parse the given options into an array.
-     *
-     * @param  array<string, mixed>|string  $options
-     * @return array<string, mixed>
+     * Use the GD driver for processing.
      */
-    protected function parseOptions(array|string $options): array
+    public function usingGd(): static
     {
-        if (is_string($options)) {
-            $options = ['disk' => $options];
-        }
+        return $this->using('gd');
+    }
 
-        return $options;
+    /**
+     * Use the Imagick driver for processing.
+     */
+    public function usingImagick(): static
+    {
+        return $this->using('imagick');
     }
 
     /**
@@ -453,6 +411,47 @@ class Image implements Stringable
         return $this->driver
             ? $manager->driver($this->driver)
             : $manager->driver();
+    }
+
+    /**
+     * Get the underlying uploaded file instance.
+     */
+    public function file(): ?UploadedFile
+    {
+        return $this->file;
+    }
+
+    /**
+     * Create an immutable clone with copied options.
+     */
+    protected function newClone(): static
+    {
+        $clone = clone $this;
+
+        $clone->pipeline = clone $this->pipeline;
+        $clone->processed = false;
+
+        return $clone;
+    }
+
+    /**
+     * Create an immutable clone with updated output options.
+     */
+    protected function withOutput(Closure $callback): static
+    {
+        return $this->withClone(fn (Image $image) => $callback($image->pipeline->output));
+    }
+
+    /**
+     * Create an immutable clone with the given callback applied.
+     */
+    protected function withClone(Closure $callback): static
+    {
+        $clone = $this->newClone();
+
+        $callback($clone);
+
+        return $clone;
     }
 
     /**
@@ -480,18 +479,5 @@ class Image implements Stringable
     public function __toString(): string
     {
         return $this->toString();
-    }
-
-    /**
-     * Create an immutable clone with copied options.
-     */
-    protected function cloneWith(): static
-    {
-        $clone = clone $this;
-
-        $clone->options = clone $this->options;
-        $clone->processed = false;
-
-        return $clone;
     }
 }

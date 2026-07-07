@@ -5,7 +5,16 @@ namespace Illuminate\Image\Drivers;
 use finfo;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Image\ImageException;
-use Illuminate\Image\PendingImageOptions;
+use Illuminate\Image\ImageOutputOptions;
+use Illuminate\Image\ImagePipeline;
+use Illuminate\Image\Transformations\Blur;
+use Illuminate\Image\Transformations\Cover;
+use Illuminate\Image\Transformations\FlipHorizontally;
+use Illuminate\Image\Transformations\FlipVertically;
+use Illuminate\Image\Transformations\Greyscale;
+use Illuminate\Image\Transformations\Orient;
+use Illuminate\Image\Transformations\Scale;
+use Illuminate\Image\Transformations\Sharpen;
 use Intervention\Image\Encoders\JpegEncoder;
 use Intervention\Image\Encoders\MediaTypeEncoder;
 use Intervention\Image\Encoders\WebpEncoder;
@@ -47,9 +56,9 @@ abstract class InterventionDriver implements Driver
     }
 
     /**
-     * Process the given image contents with the specified options.
+     * Process the given image contents with the specified pipeline.
      */
-    public function process(string $contents, PendingImageOptions $options): string
+    public function process(string $contents, ImagePipeline $pipeline): string
     {
         $mimeType = (new finfo(FILEINFO_MIME_TYPE))->buffer($contents);
 
@@ -59,43 +68,25 @@ abstract class InterventionDriver implements Driver
 
         $image = $this->manager->read($contents);
 
-        if ($options->orient) {
-            $image = $image->orient();
+        foreach ($pipeline->transformations as $transformation) {
+            $image = match (true) {
+                $transformation instanceof Orient => $image->orient(),
+                $transformation instanceof Cover => $image->cover($transformation->width, $transformation->height),
+                $transformation instanceof Scale => $image->scaleDown($transformation->width, $transformation->height),
+                $transformation instanceof Blur => $image->blur($transformation->amount),
+                $transformation instanceof Greyscale => $image->greyscale(),
+                $transformation instanceof Sharpen => $image->sharpen($transformation->amount),
+                $transformation instanceof FlipVertically => $image->flip(),
+                $transformation instanceof FlipHorizontally => $image->flop(),
+                default => throw new ImageException('The image transformation ['.get_class($transformation).'] is not supported.'),
+            };
         }
 
-        if ($options->coverWidth !== null && $options->coverHeight !== null) {
-            $image = $image->cover($options->coverWidth, $options->coverHeight);
-        }
-
-        if ($options->scaleWidth !== null) {
-            $image = $image->scaleDown($options->scaleWidth, $options->scaleHeight);
-        }
-
-        if ($options->blur !== null) {
-            $image = $image->blur($options->blur);
-        }
-
-        if ($options->greyscale) {
-            $image = $image->greyscale();
-        }
-
-        if ($options->sharpen !== null) {
-            $image = $image->sharpen($options->sharpen);
-        }
-
-        if ($options->flip) {
-            $image = $image->flip();
-        }
-
-        if ($options->flop) {
-            $image = $image->flop();
-        }
-
-        $quality = $options->quality ?? PendingImageOptions::DEFAULT_QUALITY;
+        $quality = $pipeline->output->quality ?? ImageOutputOptions::DEFAULT_QUALITY;
 
         try {
-            if ($options->format !== null) {
-                return $image->encode(match ($options->format) {
+            if ($pipeline->output->format !== null) {
+                return $image->encode(match ($pipeline->output->format) {
                     'webp' => new WebpEncoder($quality),
                     'jpg', 'jpeg' => new JpegEncoder($quality),
                 })->toString();

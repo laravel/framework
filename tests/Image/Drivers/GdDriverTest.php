@@ -5,7 +5,16 @@ namespace Illuminate\Tests\Image\Drivers;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Drivers\GdDriver;
 use Illuminate\Image\ImageException;
-use Illuminate\Image\PendingImageOptions;
+use Illuminate\Image\ImagePipeline;
+use Illuminate\Image\Transformation;
+use Illuminate\Image\Transformations\Blur;
+use Illuminate\Image\Transformations\Cover;
+use Illuminate\Image\Transformations\FlipHorizontally;
+use Illuminate\Image\Transformations\FlipVertically;
+use Illuminate\Image\Transformations\Greyscale;
+use Illuminate\Image\Transformations\Orient;
+use Illuminate\Image\Transformations\Scale;
+use Illuminate\Image\Transformations\Sharpen;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
@@ -17,11 +26,9 @@ class GdDriverTest extends TestCase
         $driver = new GdDriver;
         $contents = $this->fakeImageContents(200, 200);
 
-        $options = new PendingImageOptions;
-        $options->coverWidth = 100;
-        $options->coverHeight = 50;
+        $pipeline = $this->pipeline(new Cover(100, 50));
 
-        $result = $driver->process($contents, $options);
+        $result = $driver->process($contents, $pipeline);
 
         [$width, $height] = getimagesizefromstring($result);
 
@@ -33,10 +40,9 @@ class GdDriverTest extends TestCase
     {
         $driver = new GdDriver;
 
-        $options = new PendingImageOptions;
-        $options->format = 'webp';
+        $pipeline = $this->pipeline(format: 'webp');
 
-        $result = $driver->process($this->fakeImageContents(), $options);
+        $result = $driver->process($this->fakeImageContents(), $pipeline);
 
         $this->assertSame(IMAGETYPE_WEBP, getimagesizefromstring($result)[2]);
     }
@@ -45,10 +51,9 @@ class GdDriverTest extends TestCase
     {
         $driver = new GdDriver;
 
-        $options = new PendingImageOptions;
-        $options->format = 'jpg';
+        $pipeline = $this->pipeline(format: 'jpg');
 
-        $result = $driver->process($this->fakeImageContents(), $options);
+        $result = $driver->process($this->fakeImageContents(), $pipeline);
 
         $this->assertSame(IMAGETYPE_JPEG, getimagesizefromstring($result)[2]);
     }
@@ -58,12 +63,9 @@ class GdDriverTest extends TestCase
         $driver = new GdDriver;
         $contents = $this->fakeImageContents(300, 300);
 
-        $options = new PendingImageOptions;
-        $options->coverWidth = 75;
-        $options->coverHeight = 75;
-        $options->format = 'webp';
+        $pipeline = $this->pipeline(new Cover(75, 75), format: 'webp');
 
-        $result = $driver->process($contents, $options);
+        $result = $driver->process($contents, $pipeline);
 
         [$width, $height, $type] = getimagesizefromstring($result);
 
@@ -77,11 +79,9 @@ class GdDriverTest extends TestCase
         $driver = new GdDriver;
         $contents = $this->fakeImageContents(400, 200);
 
-        $options = new PendingImageOptions;
-        $options->scaleWidth = 200;
-        $options->scaleHeight = 200;
+        $pipeline = $this->pipeline(new Scale(200, 200));
 
-        $result = $driver->process($contents, $options);
+        $result = $driver->process($contents, $pipeline);
 
         [$width, $height] = getimagesizefromstring($result);
 
@@ -94,11 +94,9 @@ class GdDriverTest extends TestCase
         $driver = new GdDriver;
         $contents = $this->fakeImageContents(100, 80);
 
-        $options = new PendingImageOptions;
-        $options->scaleWidth = 800;
-        $options->scaleHeight = 600;
+        $pipeline = $this->pipeline(new Scale(800, 600));
 
-        $result = $driver->process($contents, $options);
+        $result = $driver->process($contents, $pipeline);
 
         [$width, $height] = getimagesizefromstring($result);
 
@@ -111,10 +109,9 @@ class GdDriverTest extends TestCase
         $driver = new GdDriver;
         $contents = $this->fakeImageContents(300, 200);
 
-        $options = new PendingImageOptions;
-        $options->format = 'webp';
+        $pipeline = $this->pipeline(format: 'webp');
 
-        $result = $driver->process($contents, $options);
+        $result = $driver->process($contents, $pipeline);
 
         [$width, $height] = getimagesizefromstring($result);
 
@@ -127,10 +124,9 @@ class GdDriverTest extends TestCase
         $driver = new GdDriver;
         $contents = $this->fakeImageContents(300, 200);
 
-        $options = new PendingImageOptions;
-        $options->quality = 50;
+        $pipeline = $this->pipeline(quality: 50);
 
-        $result = $driver->process($contents, $options);
+        $result = $driver->process($contents, $pipeline);
 
         [$width, $height] = getimagesizefromstring($result);
 
@@ -143,10 +139,9 @@ class GdDriverTest extends TestCase
         $driver = new GdDriver;
         $contents = $this->fakeImageContents(100, 100);
 
-        $options = new PendingImageOptions;
-        $options->orient = true;
+        $pipeline = $this->pipeline(new Orient);
 
-        $result = $driver->process($contents, $options);
+        $result = $driver->process($contents, $pipeline);
 
         [$width, $height] = getimagesizefromstring($result);
 
@@ -159,10 +154,9 @@ class GdDriverTest extends TestCase
         $driver = new GdDriver;
         $contents = $this->fakeImageContents(100, 100);
 
-        $options = new PendingImageOptions;
-        $options->blur = 10;
+        $pipeline = $this->pipeline(new Blur(10));
 
-        $result = $driver->process($contents, $options);
+        $result = $driver->process($contents, $pipeline);
 
         $this->assertNotEmpty($result);
         $this->assertNotSame($contents, $result);
@@ -173,10 +167,9 @@ class GdDriverTest extends TestCase
         $driver = new GdDriver;
         $contents = $this->fakeImageContents(100, 100);
 
-        $options = new PendingImageOptions;
-        $options->greyscale = true;
+        $pipeline = $this->pipeline(new Greyscale);
 
-        $result = $driver->process($contents, $options);
+        $result = $driver->process($contents, $pipeline);
 
         $this->assertNotEmpty($result);
         $this->assertNotSame($contents, $result);
@@ -187,37 +180,34 @@ class GdDriverTest extends TestCase
         $driver = new GdDriver;
         $contents = $this->fakeImageContents(100, 100);
 
-        $options = new PendingImageOptions;
-        $options->sharpen = 10;
+        $pipeline = $this->pipeline(new Sharpen(10));
 
-        $result = $driver->process($contents, $options);
+        $result = $driver->process($contents, $pipeline);
 
         $this->assertNotEmpty($result);
         $this->assertNotSame($contents, $result);
     }
 
-    public function test_processes_flip()
+    public function test_processes_flip_vertically()
     {
         $driver = new GdDriver;
         $contents = $this->fakeImageContents(100, 100);
 
-        $options = new PendingImageOptions;
-        $options->flip = true;
+        $pipeline = $this->pipeline(new FlipVertically);
 
-        $result = $driver->process($contents, $options);
+        $result = $driver->process($contents, $pipeline);
 
         $this->assertNotEmpty($result);
     }
 
-    public function test_processes_flop()
+    public function test_processes_flip_horizontally()
     {
         $driver = new GdDriver;
         $contents = $this->fakeImageContents(100, 100);
 
-        $options = new PendingImageOptions;
-        $options->flop = true;
+        $pipeline = $this->pipeline(new FlipHorizontally);
 
-        $result = $driver->process($contents, $options);
+        $result = $driver->process($contents, $pipeline);
 
         $this->assertNotEmpty($result);
     }
@@ -229,7 +219,7 @@ class GdDriverTest extends TestCase
         $this->expectException(ImageException::class);
         $this->expectExceptionMessage('The image format [text/plain] is not supported.');
 
-        $driver->process('not-an-image', new PendingImageOptions);
+        $driver->process('not-an-image', new ImagePipeline);
     }
 
     public function test_returns_image_without_options()
@@ -237,7 +227,7 @@ class GdDriverTest extends TestCase
         $driver = new GdDriver;
         $contents = $this->fakeImageContents(100, 100);
 
-        $result = $driver->process($contents, new PendingImageOptions);
+        $result = $driver->process($contents, new ImagePipeline);
 
         [$width, $height] = getimagesizefromstring($result);
 
@@ -250,13 +240,8 @@ class GdDriverTest extends TestCase
         $driver = new GdDriver;
         $contents = $this->fakeImageContents(100, 100);
 
-        $lowQuality = new PendingImageOptions;
-        $lowQuality->format = 'jpg';
-        $lowQuality->quality = 1;
-
-        $highQuality = new PendingImageOptions;
-        $highQuality->format = 'jpg';
-        $highQuality->quality = 100;
+        $lowQuality = $this->pipeline(format: 'jpg', quality: 1);
+        $highQuality = $this->pipeline(format: 'jpg', quality: 100);
 
         $lowResult = $driver->process($contents, $lowQuality);
         $highResult = $driver->process($contents, $highQuality);
@@ -278,5 +263,19 @@ class GdDriverTest extends TestCase
         $file = UploadedFile::fake()->image('test.jpg', $width, $height);
 
         return file_get_contents($file->getRealPath());
+    }
+
+    protected function pipeline(?Transformation $transformation = null, ?string $format = null, ?int $quality = null): ImagePipeline
+    {
+        $pipeline = new ImagePipeline;
+
+        if ($transformation) {
+            $pipeline->add($transformation);
+        }
+
+        $pipeline->output->format = $format;
+        $pipeline->output->quality = $quality;
+
+        return $pipeline;
     }
 }
