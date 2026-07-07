@@ -298,14 +298,6 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
-     * Create an image instance from a file in storage.
-     */
-    public function image(string $path): Image
-    {
-        return new Image(fn () => $this->get($path));
-    }
-
-    /**
      * Get the contents of a file.
      *
      * @param  string  $path
@@ -406,6 +398,14 @@ class FilesystemAdapter implements CloudFilesystemContract
     public function download($path, $name = null, array $headers = [])
     {
         return $this->response($path, $name, $headers, 'attachment');
+    }
+
+    /**
+     * Create an image instance from a file in storage.
+     */
+    public function image(string $path): Image
+    {
+        return new Image(fn () => $this->get($path));
     }
 
     /**
