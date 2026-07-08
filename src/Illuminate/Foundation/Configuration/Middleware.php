@@ -648,7 +648,11 @@ class Middleware
      */
     public function convertEmptyStringsToNull(array $except = [])
     {
-        (new Collection($except))->each(fn (Closure $callback) => ConvertEmptyStringsToNull::skipWhen($callback));
+        [$skipWhen, $except] = (new Collection($except))->partition(fn ($value) => $value instanceof Closure);
+
+        $skipWhen->each(fn (Closure $callback) => ConvertEmptyStringsToNull::skipWhen($callback));
+
+        ConvertEmptyStringsToNull::except($except->all());
 
         return $this;
     }

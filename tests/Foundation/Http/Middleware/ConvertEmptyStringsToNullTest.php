@@ -25,6 +25,22 @@ class ConvertEmptyStringsToNullTest extends TestCase
         });
     }
 
+    public function testConvertsEmptyStringsToNullIgnoringExceptAttribute()
+    {
+        $middleware = new ConvertEmptyStringsToNullWithExceptAttribute;
+        $symfonyRequest = new SymfonyRequest([
+            'foo' => 'bar',
+            'baz' => '',
+        ]);
+        $symfonyRequest->server->set('REQUEST_METHOD', 'GET');
+        $request = Request::createFromBase($symfonyRequest);
+
+        $middleware->handle($request, function (Request $request) {
+            $this->assertSame('bar', $request->get('foo'));
+            $this->assertSame('', $request->get('baz'));
+        });
+    }
+
     public function testSkipConvertsEmptyStringsToNull()
     {
         $middleware = new ConvertEmptyStringsToNull;
@@ -41,4 +57,11 @@ class ConvertEmptyStringsToNullTest extends TestCase
             $this->assertSame('', $request->get('baz'));
         });
     }
+}
+
+class ConvertEmptyStringsToNullWithExceptAttribute extends ConvertEmptyStringsToNull
+{
+    protected $except = [
+        'baz',
+    ];
 }
