@@ -26,6 +26,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Uri;
 use InvalidArgumentException;
 use JsonSerializable;
 use Psr\Http\Message\MessageInterface;
@@ -661,11 +662,15 @@ class PendingRequest
     /**
      * Specify the proxy that the request should be sent through.
      *
-     * @param  string|array  $proxy
+     * @param  \Illuminate\Support\Uri|string|array  $proxy
      * @return $this
      */
-    public function withProxy(string|array $proxy)
+    public function withProxy(Uri|string|array $proxy)
     {
+        if ($proxy instanceof Uri) {
+            $proxy = (string) $proxy;
+        }
+
         $this->options['proxy'] = $proxy;
 
         return $this;

@@ -4135,6 +4135,15 @@ class HttpClientTest extends TestCase
         $this->assertNull(Arr::get($request->getOptions(), 'proxy'));
     }
 
+    public function testItCanSetAUriProxy(): void
+    {
+        $request = new PendingRequest($this->factory);
+
+        $request = $request->withProxy(Uri::of('http://proxy.example.com:8080'));
+
+        $this->assertSame('http://proxy.example.com:8080', Arr::get($request->getOptions(), 'proxy'));
+    }
+
     public function testPreventDuplicatedContentType(): void
     {
         $client = $this->factory->asJson();
