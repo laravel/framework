@@ -37,6 +37,21 @@ class SessionManagerTest extends TestCase
 
         $this->assertSame('some_custom_prefix', $manager->driver()->getHandler()->getCache()->getStore()->getPrefix());
     }
+
+    public function testRedisDriverFallsBackToCachePrefixWhenNoSessionPrefix()
+    {
+        $app = new Container;
+        $app->singleton('config', fn () => new Config([
+            'session' => ['driver' => 'redis', 'lifetime' => 120],
+            'cache' => ['prefix' => 'cache_prefix', 'stores' => ['redis' => ['driver' => 'redis']]],
+        ]));
+        $app->singleton('cache', fn ($app) => new CacheManager($app));
+        $app->instance('redis', m::mock(RedisFactory::class));
+
+        $manager = new SessionManager($app);
+
+        $this->assertSame('cache_prefix', $manager->driver()->getHandler()->getCache()->getStore()->getPrefix());
+    }
 }
 
 enum SessionDriverName: string
