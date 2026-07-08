@@ -4102,6 +4102,39 @@ class HttpClientTest extends TestCase
         $this->assertSame(['connect_timeout' => 10, 'crypto_method' => 33, 'http_errors' => false, 'timeout' => 30, 'allow_redirects' => ['max' => 10]], $request->getOptions());
     }
 
+    public function testItCanSetAStringProxy(): void
+    {
+        $request = new PendingRequest($this->factory);
+
+        $request = $request->withProxy('http://proxy.example.com:8080');
+
+        $this->assertSame('http://proxy.example.com:8080', Arr::get($request->getOptions(), 'proxy'));
+    }
+
+    public function testItCanSetAnArrayProxy(): void
+    {
+        $request = new PendingRequest($this->factory);
+
+        $request = $request->withProxy([
+            'http' => 'http://http-proxy.example.com:8080',
+            'https' => 'http://https-proxy.example.com:8080',
+            'no' => ['.local', '127.0.0.1'],
+        ]);
+
+        $this->assertSame([
+            'http' => 'http://http-proxy.example.com:8080',
+            'https' => 'http://https-proxy.example.com:8080',
+            'no' => ['.local', '127.0.0.1'],
+        ], Arr::get($request->getOptions(), 'proxy'));
+    }
+
+    public function testProxyIsNotSetByDefault(): void
+    {
+        $request = new PendingRequest($this->factory);
+
+        $this->assertNull(Arr::get($request->getOptions(), 'proxy'));
+    }
+
     public function testPreventDuplicatedContentType(): void
     {
         $client = $this->factory->asJson();

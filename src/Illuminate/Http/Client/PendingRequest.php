@@ -659,6 +659,19 @@ class PendingRequest
     }
 
     /**
+     * Specify the proxy that the request should be sent through.
+     *
+     * @param  string|array  $proxy
+     * @return $this
+     */
+    public function withProxy(string|array $proxy)
+    {
+        $this->options['proxy'] = $proxy;
+
+        return $this;
+    }
+
+    /**
      * Specify the number of times the request should be attempted.
      *
      * @param  array|int  $times
