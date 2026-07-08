@@ -201,6 +201,87 @@ class QueueSqsQueueTest extends TestCase
         $this->assertEquals(6, $size); // 1 + 2 + 3
     }
 
+    public function testPendingSizeProperlyReadsSqsQueuePendingSize()
+    {
+        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
+        $queue->expects($this->exactly(2))->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
+
+        $this->sqs->shouldReceive('getQueueAttributes')->once()->with([
+            'QueueUrl' => $this->queueUrl,
+            'AttributeNames' => ['ApproximateNumberOfMessages'],
+        ])->andReturn(new Result([
+            'Attributes' => [
+                'ApproximateNumberOfMessages' => 1,
+            ],
+        ]));
+
+        $this->assertEquals(1, $queue->pendingSize($this->queueName));
+
+        // Test missing attribute fallback
+        $this->sqs->shouldReceive('getQueueAttributes')->once()->with([
+            'QueueUrl' => $this->queueUrl,
+            'AttributeNames' => ['ApproximateNumberOfMessages'],
+        ])->andReturn(new Result([
+            'Attributes' => [],
+        ]));
+
+        $this->assertEquals(0, $queue->pendingSize($this->queueName));
+    }
+
+    public function testDelayedSizeProperlyReadsSqsQueueDelayedSize()
+    {
+        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
+        $queue->expects($this->exactly(2))->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
+
+        $this->sqs->shouldReceive('getQueueAttributes')->once()->with([
+            'QueueUrl' => $this->queueUrl,
+            'AttributeNames' => ['ApproximateNumberOfMessagesDelayed'],
+        ])->andReturn(new Result([
+            'Attributes' => [
+                'ApproximateNumberOfMessagesDelayed' => 2,
+            ],
+        ]));
+
+        $this->assertEquals(2, $queue->delayedSize($this->queueName));
+
+        // Test missing attribute fallback
+        $this->sqs->shouldReceive('getQueueAttributes')->once()->with([
+            'QueueUrl' => $this->queueUrl,
+            'AttributeNames' => ['ApproximateNumberOfMessagesDelayed'],
+        ])->andReturn(new Result([
+            'Attributes' => [],
+        ]));
+
+        $this->assertEquals(0, $queue->delayedSize($this->queueName));
+    }
+
+    public function testReservedSizeProperlyReadsSqsQueueReservedSize()
+    {
+        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
+        $queue->expects($this->exactly(2))->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
+
+        $this->sqs->shouldReceive('getQueueAttributes')->once()->with([
+            'QueueUrl' => $this->queueUrl,
+            'AttributeNames' => ['ApproximateNumberOfMessagesNotVisible'],
+        ])->andReturn(new Result([
+            'Attributes' => [
+                'ApproximateNumberOfMessagesNotVisible' => 3,
+            ],
+        ]));
+
+        $this->assertEquals(3, $queue->reservedSize($this->queueName));
+
+        // Test missing attribute fallback
+        $this->sqs->shouldReceive('getQueueAttributes')->once()->with([
+            'QueueUrl' => $this->queueUrl,
+            'AttributeNames' => ['ApproximateNumberOfMessagesNotVisible'],
+        ])->andReturn(new Result([
+            'Attributes' => [],
+        ]));
+
+        $this->assertEquals(0, $queue->reservedSize($this->queueName));
+    }
+
     public function testGetQueueProperlyResolvesUrlWithPrefix()
     {
         $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix);
