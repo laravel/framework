@@ -393,6 +393,42 @@ class HttpClientTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $response['result']);
     }
 
+    public function testResponseIsJson()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response(['foo' => 'bar'], 200, ['Content-Type' => 'application/json']),
+        ]);
+
+        $this->assertTrue($this->factory->get('http://foo.com/api')->isJson());
+    }
+
+    public function testResponseIsJsonWithCharset()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response(['foo' => 'bar'], 200, ['Content-Type' => 'application/json; charset=utf-8']),
+        ]);
+
+        $this->assertTrue($this->factory->get('http://foo.com/api')->isJson());
+    }
+
+    public function testResponseIsNotJson()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('foo', 200, ['Content-Type' => 'text/plain']),
+        ]);
+
+        $this->assertFalse($this->factory->get('http://foo.com/api')->isJson());
+    }
+
+    public function testResponseIsNotJsonWithoutContentType()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('foo'),
+        ]);
+
+        $this->assertFalse($this->factory->get('http://foo.com/api')->isJson());
+    }
+
     public function testResponseObjectAsArray()
     {
         $this->factory->fake([
@@ -2420,6 +2456,28 @@ class HttpClientTest extends TestCase
         $effectiveUri = $this->factory->get('https://example.com')->effectiveUri();
 
         $this->assertSame('https://example.com', (string) $effectiveUri);
+    }
+
+    public function testTransferTimeCanBeRetrieved()
+    {
+        $response = new Response(new Psr7Response());
+        $response->transferStats = new TransferStats(new GuzzleRequest('GET', 'http://example.com'), null, 1.234);
+
+        $this->assertSame(1.234, $response->transferTime());
+    }
+
+    public function testTransferTimeIsNullWhenNoTransferStatsAreAvailable()
+    {
+        $response = new Response(new Psr7Response());
+
+        $this->assertNull($response->transferTime());
+    }
+
+    public function testTransferTimeIsNullWhenFakingTheRequest()
+    {
+        $this->factory->fake(['https://example.com' => ['world' => 'Hello world']]);
+
+        $this->assertNull($this->factory->get('https://example.com')->transferTime());
     }
 
     public function testClonedClientsWorkSuccessfullyWithTheRequestObject()

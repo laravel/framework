@@ -125,6 +125,16 @@ class Response implements ArrayAccess, Stringable
     }
 
     /**
+     * Determine if the response is JSON.
+     *
+     * @return bool
+     */
+    public function isJson()
+    {
+        return str_contains($this->header('Content-Type'), 'json');
+    }
+
+    /**
      * Get the decoded JSON body of the response as an object.
      *
      * @param  int-mask<JSON_BIGINT_AS_STRING, JSON_INVALID_UTF8_IGNORE, JSON_INVALID_UTF8_SUBSTITUTE, JSON_OBJECT_AS_ARRAY, JSON_THROW_ON_ERROR>|null  $flags
@@ -305,6 +315,16 @@ class Response implements ArrayAccess, Stringable
     public function handlerStats()
     {
         return $this->transferStats?->getHandlerStats() ?? [];
+    }
+
+    /**
+     * Get the transfer time of the response in seconds.
+     *
+     * @return float|null
+     */
+    public function transferTime()
+    {
+        return $this->transferStats?->getTransferTime();
     }
 
     /**
