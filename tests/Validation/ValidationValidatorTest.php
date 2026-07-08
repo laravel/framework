@@ -10147,6 +10147,30 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($validator->passes());
     }
 
+    #[DataProvider('nonFiniteFloatSizeRules')]
+    public function testItFailsSizeRulesForNonFiniteFloatsWithoutThrowing($value, $rule)
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $validator = new Validator($trans, ['foo' => $value], ['foo' => ['numeric', $rule]]);
+
+        $this->assertFalse($validator->passes());
+    }
+
+    public static function nonFiniteFloatSizeRules()
+    {
+        $rules = ['min:3', 'max:3', 'size:3', 'between:1,5', 'gt:0', 'lt:10', 'gte:0', 'lte:10'];
+
+        $cases = [];
+
+        foreach (['INF' => INF, '-INF' => -INF, 'NAN' => NAN] as $name => $value) {
+            foreach ($rules as $rule) {
+                $cases[$name.' '.$rule] = [$value, $rule];
+            }
+        }
+
+        return $cases;
+    }
+
     public function testMessagesDefaultWhenUsingSizeSpecificCustomMessages()
     {
         $trans = $this->getIlluminateArrayTranslator();

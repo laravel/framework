@@ -2792,6 +2792,10 @@ trait ValidatesAttributes
         // is the size. If it is a file, we take kilobytes, and for a string the
         // entire length of the string will be considered the attribute size.
         if (is_numeric($value) && $hasNumeric) {
+            if (is_float($value) && ! is_finite($value)) {
+                throw new MathException('The value is not a finite number.');
+            }
+
             return (string) $this->ensureExponentWithinAllowedRange($attribute, $this->trim($value));
         } elseif (is_array($value)) {
             return count($value);
