@@ -1251,6 +1251,34 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Increment each given column's value by the given amounts without raising any events.
+     *
+     * @param  array<string, float|int>  $columns
+     * @param  array<string, mixed>  $extra
+     * @return int
+     */
+    protected function incrementEachQuietly(array $columns, array $extra = [])
+    {
+        return static::withoutEvents(
+            fn () => $this->incrementOrDecrementEach($columns, $extra, 'incrementEach')
+        );
+    }
+
+    /**
+     * Decrement each given column's value by the given amounts without raising any events.
+     *
+     * @param  array<string, float|int>  $columns
+     * @param  array<string, mixed>  $extra
+     * @return int
+     */
+    protected function decrementEachQuietly(array $columns, array $extra = [])
+    {
+        return static::withoutEvents(
+            fn () => $this->incrementOrDecrementEach($columns, $extra, 'decrementEach')
+        );
+    }
+
+    /**
      * Run the incrementEach or decrementEach method on the model.
      *
      * @param  array<string, float|int>  $columns
