@@ -375,6 +375,36 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertNull($builder->value('name'));
     }
 
+    public function testValueOrMethodWithModelFound()
+    {
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $mockModel = new stdClass;
+        $mockModel->name = 'foo';
+        $builder->shouldReceive('first')->with(['name'])->andReturn($mockModel);
+
+        $this->assertSame('foo', $builder->valueOr('name', function () {
+            return 'bar';
+        }));
+    }
+
+    public function testValueOrMethodWithModelNotFoundCallsCallback()
+    {
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder->shouldReceive('first')->with(['name'])->andReturn(null);
+
+        $this->assertSame('bar', $builder->valueOr('name', function () {
+            return 'bar';
+        }));
+    }
+
+    public function testValueOrMethodWithModelNotFoundAndNoCallbackReturnsNull()
+    {
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder->shouldReceive('first')->with(['name'])->andReturn(null);
+
+        $this->assertNull($builder->valueOr('name'));
+    }
+
     public function testValueOrFailMethodWithModelFound()
     {
         $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);

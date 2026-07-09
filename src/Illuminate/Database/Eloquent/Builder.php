@@ -844,6 +844,24 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get a single column's value from the first result of a query or call a callback.
+     *
+     * @template TValue
+     *
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  (\Closure(): TValue)|null  $callback
+     * @return mixed|TValue
+     */
+    public function valueOr($column, ?Closure $callback = null)
+    {
+        if (! is_null($value = $this->value($column))) {
+            return $value;
+        }
+
+        return $callback === null ? null : $callback();
+    }
+
+    /**
      * Get a single column's value from the first result of a query if it's the sole matching record.
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
