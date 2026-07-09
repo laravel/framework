@@ -91,7 +91,11 @@ class ImagickDriverTest extends TestCase
 
         $result = $driver->process($this->fakeImageContents(), $pipeline);
 
-        $this->assertSame(IMAGETYPE_AVIF, getimagesizefromstring($result)[2]);
+        // PHP's getimagesizefromstring()/finfo AVIF detection varies by the
+        // libavif/libmagic versions installed, so we assert on the ISOBMFF
+        // "ftyp" box and brand directly instead of relying on either.
+        $this->assertStringContainsString('ftyp', substr($result, 0, 16));
+        $this->assertMatchesRegularExpression('/avif|avis|mif1/', substr($result, 0, 32));
     }
 
     public function test_processes_optimize_to_bmp()

@@ -258,8 +258,13 @@ class ImageTest extends TestCase
         $imagick = new \Imagick;
         $imagick->newImage(10, 10, 'red');
         $imagick->setImageFormat('avif');
+        $contents = $imagick->getImageBlob();
 
-        $image = new Image($imagick->getImageBlob());
+        if ((new \finfo(FILEINFO_MIME_TYPE))->buffer($contents) !== 'image/avif') {
+            $this->markTestSkipped('The installed fileinfo database does not recognize AVIF.');
+        }
+
+        $image = new Image($contents);
 
         $this->assertSame('avif', $image->extension());
     }
