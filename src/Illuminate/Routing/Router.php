@@ -566,6 +566,9 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     protected function createRoute($methods, $uri, $action)
     {
+        // If no action was provided for the route we will check the group
+        // for an invokable controller and use it as the default action
+        // so the controller doesn't need to be given on each route.
         if (is_null($action)) {
             $action = $this->groupControllerAsDefaultAction();
         }
