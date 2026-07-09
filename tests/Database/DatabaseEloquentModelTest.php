@@ -2780,6 +2780,66 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(3, $model->bar);
     }
 
+    public function testIncrementEachQuietlyOnExistingModelCallsQueryAndSetsAttributeAndIsQuiet()
+    {
+        $model = m::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
+        $model->exists = true;
+        $model->id = 1;
+        $model->syncOriginalAttribute('id');
+        $model->foo = 2;
+        $model->bar = 5;
+
+        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('where')->andReturn($query);
+        $query->shouldReceive('incrementEach');
+
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('until')->never()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('until')->never()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->never()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->never()->with('eloquent.saved: '.get_class($model), $model)->andReturn(true);
+
+        $model->publicIncrementEachQuietly(['foo' => 1, 'bar' => 2]);
+        $this->assertEquals(3, $model->foo);
+        $this->assertEquals(7, $model->bar);
+        $this->assertFalse($model->isDirty());
+
+        $model->publicIncrementEachQuietly(['foo' => 1], ['category' => 1]);
+        $this->assertEquals(4, $model->foo);
+        $this->assertEquals(1, $model->category);
+        $this->assertTrue($model->isDirty('category'));
+    }
+
+    public function testDecrementEachQuietlyOnExistingModelCallsQueryAndSetsAttributeAndIsQuiet()
+    {
+        $model = m::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
+        $model->exists = true;
+        $model->id = 1;
+        $model->syncOriginalAttribute('id');
+        $model->foo = 10;
+        $model->bar = 5;
+
+        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('where')->andReturn($query);
+        $query->shouldReceive('decrementEach');
+
+        $model::setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('until')->never()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('until')->never()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->never()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->never()->with('eloquent.saved: '.get_class($model), $model)->andReturn(true);
+
+        $model->publicDecrementEachQuietly(['foo' => 3, 'bar' => 2]);
+        $this->assertEquals(7, $model->foo);
+        $this->assertEquals(3, $model->bar);
+        $this->assertFalse($model->isDirty());
+
+        $model->publicDecrementEachQuietly(['foo' => 1], ['category' => 1]);
+        $this->assertEquals(6, $model->foo);
+        $this->assertEquals(1, $model->category);
+        $this->assertTrue($model->isDirty('category'));
+    }
+
     public function testIncrementEachWithExtraColumnsOnExistingModel()
     {
         $model = m::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
@@ -3947,6 +4007,16 @@ class EloquentModelStub extends Model
     public function publicDecrementEach(array $columns, array $extra = [])
     {
         return $this->decrementEach($columns, $extra);
+    }
+
+    public function publicIncrementEachQuietly(array $columns, array $extra = [])
+    {
+        return $this->incrementEachQuietly($columns, $extra);
+    }
+
+    public function publicDecrementEachQuietly(array $columns, array $extra = [])
+    {
+        return $this->decrementEachQuietly($columns, $extra);
     }
 
     public function belongsToStub()
