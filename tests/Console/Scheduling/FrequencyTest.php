@@ -202,6 +202,11 @@ class FrequencyTest extends TestCase
         $this->assertSame('0 0 1 1-12/3 *', $this->event->quarterly()->getExpression());
     }
 
+    public function testQuarterlyOn()
+    {
+        $this->assertSame('0 15 4 1-12/3 *', $this->event->quarterlyOn(4, '15:00')->getExpression());
+    }
+
     public function testYearly()
     {
         $this->assertSame('0 0 1 1 *', $this->event->yearly()->getExpression());
