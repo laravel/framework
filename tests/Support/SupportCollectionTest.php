@@ -297,6 +297,66 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testLastOrFailReturnsLastItemInCollection($collection)
+    {
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $this->assertSame(['name' => 'bar'], $collection->where('name', 'bar')->lastOrFail());
+        $this->assertSame(['name' => 'bar'], $collection->lastOrFail('name', '=', 'bar'));
+        $this->assertSame(['name' => 'bar'], $collection->lastOrFail('name', 'bar'));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testLastOrFailThrowsExceptionIfNoItemsExist($collection)
+    {
+        $this->expectException(ItemNotFoundException::class);
+
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $collection->where('name', 'INVALID')->lastOrFail();
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testLastOrFailReturnsLastMatchingItemInCollection($collection)
+    {
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+            ['name' => 'bar'],
+        ]);
+
+        $this->assertSame(['name' => 'bar'], $collection->where('name', 'bar')->lastOrFail());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testLastOrFailReturnsLastItemInCollectionWithCallback($collection)
+    {
+        $data = new $collection(['foo', 'bar', 'baz']);
+        $result = $data->lastOrFail(function ($value) {
+            return $value !== 'baz';
+        });
+        $this->assertSame('bar', $result);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testLastOrFailThrowsExceptionIfNoItemsExistWithCallback($collection)
+    {
+        $this->expectException(ItemNotFoundException::class);
+
+        $data = new $collection(['foo', 'bar', 'baz']);
+
+        $data->lastOrFail(function ($value) {
+            return $value === 'invalid';
+        });
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testFirstWhere($collection)
     {
         $data = new $collection([

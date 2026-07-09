@@ -1507,6 +1507,33 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Get the last item in the collection but throw an exception if no matching items exist.
+     *
+     * @param  (callable(TValue, TKey): bool)|string|null  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return TValue
+     *
+     * @throws \Illuminate\Support\ItemNotFoundException
+     */
+    public function lastOrFail($key = null, $operator = null, $value = null)
+    {
+        $filter = func_num_args() > 1
+            ? $this->operatorForWhere(...func_get_args())
+            : $key;
+
+        $placeholder = new stdClass();
+
+        $item = $this->last($filter, $placeholder);
+
+        if ($item === $placeholder) {
+            throw new ItemNotFoundException;
+        }
+
+        return $item;
+    }
+
+    /**
      * Chunk the collection into chunks of the given size.
      *
      * @param  int  $size

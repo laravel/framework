@@ -1046,6 +1046,18 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function firstOrFail($key = null, $operator = null, $value = null);
 
     /**
+     * Get the last item in the collection but throw an exception if no matching items exist.
+     *
+     * @param  (callable(TValue, TKey): bool)|string|null  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return TValue
+     *
+     * @throws \Illuminate\Support\ItemNotFoundException
+     */
+    public function lastOrFail($key = null, $operator = null, $value = null);
+
+    /**
      * Chunk the collection into chunks of the given size.
      *
      * @param  int  $size
