@@ -27,6 +27,31 @@ class FrequencyTest extends TestCase
         $this->assertSame('* * * * *', $this->event->everyMinute()->getExpression());
     }
 
+    public function testEveryXSeconds()
+    {
+        $this->assertSame('* * * * *', $this->event->everySecond()->getExpression());
+        $this->assertSame(1, $this->event->repeatSeconds);
+        $this->assertTrue($this->event->isRepeatable());
+
+        $this->assertSame('* * * * *', $this->event->everyTwoSeconds()->getExpression());
+        $this->assertSame(2, $this->event->repeatSeconds);
+
+        $this->assertSame('* * * * *', $this->event->everyFiveSeconds()->getExpression());
+        $this->assertSame(5, $this->event->repeatSeconds);
+
+        $this->assertSame('* * * * *', $this->event->everyTenSeconds()->getExpression());
+        $this->assertSame(10, $this->event->repeatSeconds);
+
+        $this->assertSame('* * * * *', $this->event->everyFifteenSeconds()->getExpression());
+        $this->assertSame(15, $this->event->repeatSeconds);
+
+        $this->assertSame('* * * * *', $this->event->everyTwentySeconds()->getExpression());
+        $this->assertSame(20, $this->event->repeatSeconds);
+
+        $this->assertSame('* * * * *', $this->event->everyThirtySeconds()->getExpression());
+        $this->assertSame(30, $this->event->repeatSeconds);
+    }
+
     public function testEveryXMinutes()
     {
         $this->assertSame('*/2 * * * *', $this->event->everyTwoMinutes()->getExpression());
