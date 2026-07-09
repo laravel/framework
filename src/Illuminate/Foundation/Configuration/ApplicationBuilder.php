@@ -59,14 +59,18 @@ class ApplicationBuilder
      */
     public function withKernels()
     {
-        $this->app->singleton(
-            \Illuminate\Contracts\Http\Kernel::class,
+        $this->app->singleton(\Illuminate\Foundation\Http\Kernel::class);
+
+        $this->app->alias(
             \Illuminate\Foundation\Http\Kernel::class,
+            \Illuminate\Contracts\Http\Kernel::class,
         );
 
-        $this->app->singleton(
-            \Illuminate\Contracts\Console\Kernel::class,
+        $this->app->singleton(\Illuminate\Foundation\Console\Kernel::class);
+
+        $this->app->alias(
             \Illuminate\Foundation\Console\Kernel::class,
+            \Illuminate\Contracts\Console\Kernel::class,
         );
 
         return $this;
