@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\RouteRegistrar;
 use Illuminate\Routing\RoutingServiceProvider;
+use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Stringable;
@@ -430,6 +431,41 @@ class RouteRegistrarTest extends TestCase
             RouteRegistrarControllerStub::class.'@index',
             $this->getRoute()->getAction()['uses']
         );
+    }
+
+    public function testCanRegisterGroupWithInvokableControllerAsDefaultAction()
+    {
+        $this->router->controller(InvokableRouteRegistrarControllerStub::class)
+            ->group(function ($router) {
+                $router->get('users');
+            });
+
+        $this->seeResponse('controller', Request::create('users', 'GET'));
+        $this->assertSame(
+            InvokableRouteRegistrarControllerStub::class.'@__invoke',
+            $this->getRoute()->getAction()['uses']
+        );
+    }
+
+    public function testGroupWithNonInvokableControllerStillRequiresAction()
+    {
+        $this->router->controller(RouteRegistrarControllerStub::class)
+            ->group(function ($router) {
+                $router->get('users');
+            });
+
+        $this->expectException(LogicException::class);
+
+        $this->router->dispatch(Request::create('users', 'GET'));
+    }
+
+    public function testRouteWithNoActionAndNoGroupStillRequiresAction()
+    {
+        $this->router->get('users');
+
+        $this->expectException(LogicException::class);
+
+        $this->router->dispatch(Request::create('users', 'GET'));
     }
 
     public function testCanOverrideGroupControllerWithStringSyntax()

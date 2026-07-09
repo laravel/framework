@@ -566,6 +566,10 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     protected function createRoute($methods, $uri, $action)
     {
+        if (is_null($action)) {
+            $action = $this->groupControllerAsDefaultAction();
+        }
+
         // If the route is routing to a controller we will parse the route action into
         // an acceptable array format before registering it and creating this route
         // instance itself. We need to build the Closure that will call this out.
@@ -670,6 +674,24 @@ class Router implements BindingRegistrar, RegistrarContract
         }
 
         return $group['controller'].'@'.$class;
+    }
+
+    /**
+     * Use the group controller as the route action if the controller is invokable.
+     *
+     * @return string|null
+     */
+    protected function groupControllerAsDefaultAction()
+    {
+        if (! $this->hasGroupStack()) {
+            return null;
+        }
+
+        $controller = array_last($this->groupStack)['controller'] ?? null;
+
+        return is_string($controller) && method_exists($controller, '__invoke')
+            ? $controller
+            : null;
     }
 
     /**
