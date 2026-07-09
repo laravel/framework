@@ -38,7 +38,7 @@ class HandleExceptionsTest extends TestCase
         Application::setInstance(null);
         HandleExceptions::flushState($this);
 
-        m::close();
+        parent::tearDown();
     }
 
     public function testPhpDeprecations()

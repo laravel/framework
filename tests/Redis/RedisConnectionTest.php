@@ -25,11 +25,9 @@ class RedisConnectionTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         $this->tearDownRedis();
 
-        m::close();
+        parent::tearDown();
     }
 
     public function testItSetsValuesWithExpiry()

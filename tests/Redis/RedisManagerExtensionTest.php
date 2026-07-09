@@ -43,11 +43,6 @@ class RedisManagerExtensionTest extends TestCase
         });
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testUsingCustomRedisConnectorWithSingleRedisInstance()
     {
         $this->assertSame(

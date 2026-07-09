@@ -17,7 +17,7 @@ class Signals
     /**
      * The signal registry's previous list of handlers.
      *
-     * @var array<int, array<int, callable>>|null
+     * @var array<int, array<int, callable(int): void>>|null
      */
     protected $previousHandlers;
 

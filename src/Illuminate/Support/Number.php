@@ -209,7 +209,7 @@ class Number
 
         $unitCount = count($units);
 
-        for ($i = 0; ($bytes / 1024) > 0.9 && ($i < $unitCount - 1); $i++) {
+        for ($i = 0; (abs($bytes) / 1024) > 0.9 && ($i < $unitCount - 1); $i++) {
             $bytes /= 1024;
         }
 
@@ -222,7 +222,7 @@ class Number
      * @param  int|float  $number
      * @param  int  $precision
      * @param  int|null  $maxPrecision
-     * @return bool|string
+     * @return string|false
      */
     public static function abbreviate(int|float $number, int $precision = 0, ?int $maxPrecision = null)
     {
@@ -312,10 +312,16 @@ class Number
      * @param  int|float  $by
      * @param  int|float  $start
      * @param  int|float  $offset
-     * @return array
+     * @return list<array{int|float, int|float}>
      */
     public static function pairs(int|float $to, int|float $by, int|float $start = 0, int|float $offset = 1)
     {
+        if ($by == 0) {
+            throw new \InvalidArgumentException('The $by argument must not be zero.');
+        }
+
+        $by = abs($by);
+
         $output = [];
 
         for ($lower = $start; $lower < $to; $lower += $by) {
@@ -339,15 +345,21 @@ class Number
      */
     public static function trim(int|float $number)
     {
+        if (is_infinite($number) || is_nan($number)) {
+            return $number;
+        }
+
         return json_decode(json_encode($number));
     }
 
     /**
      * Execute the given callback using the given locale.
      *
+     * @template TReturn
+     *
      * @param  string  $locale
-     * @param  callable  $callback
-     * @return mixed
+     * @param  callable(): TReturn  $callback
+     * @return TReturn
      */
     public static function withLocale(string $locale, callable $callback)
     {
@@ -365,9 +377,11 @@ class Number
     /**
      * Execute the given callback using the given currency.
      *
+     * @template TReturn
+     *
      * @param  string  $currency
-     * @param  callable  $callback
-     * @return mixed
+     * @param  callable(): TReturn  $callback
+     * @return TReturn
      */
     public static function withCurrency(string $currency, callable $callback)
     {

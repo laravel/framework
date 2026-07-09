@@ -180,6 +180,10 @@ class Logger implements LoggerInterface
      */
     protected function writeLog($level, $message, $context): void
     {
+        if (method_exists($this->logger, 'isHandling') && ! $this->logger->isHandling($level)) {
+            return;
+        }
+
         $this->logger->{$level}(
             $message = $this->formatMessage($message),
             $context = array_merge($this->context, $context)
@@ -265,15 +269,12 @@ class Logger implements LoggerInterface
      */
     protected function formatMessage($message)
     {
-        if (is_array($message)) {
-            return var_export($message, true);
-        } elseif ($message instanceof Jsonable) {
-            return $message->toJson();
-        } elseif ($message instanceof Arrayable) {
-            return var_export($message->toArray(), true);
-        }
-
-        return (string) $message;
+        return match (true) {
+            is_array($message) => var_export($message, true),
+            $message instanceof Jsonable => $message->toJson(),
+            $message instanceof Arrayable => var_export($message->toArray(), true),
+            default => (string) $message,
+        };
     }
 
     /**
@@ -289,7 +290,7 @@ class Logger implements LoggerInterface
     /**
      * Get the event dispatcher instance.
      *
-     * @return \Illuminate\Contracts\Events\Dispatcher
+     * @return \Illuminate\Contracts\Events\Dispatcher|null
      */
     public function getEventDispatcher()
     {

@@ -9,11 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseSqlServerQueryGrammarTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testToRawSql()
     {
         $connection = m::mock(Connection::class);

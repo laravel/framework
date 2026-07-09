@@ -776,6 +776,36 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertTrue($url->hasValidSignature($request, ignoreQuery: fn ($parameter) => $parameter === 'tampered'));
     }
 
+    public function testSignedUrlWithArraySignatureReturnsFalseWithoutWarning()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $route = new Route(['GET'], 'foo', ['as' => 'foo', function () {
+            //
+        }]);
+        $routes->add($route);
+
+        // ?signature[]=foo&signature[]=bar previously raised an
+        // "Array to string conversion" warning.
+        $request = Request::create('http://www.foo.com/foo?signature[]=foo&signature[]=bar');
+
+        set_error_handler(static function (int $errno, string $errstr) {
+            throw new \ErrorException($errstr, 0, $errno);
+        }, E_WARNING);
+
+        try {
+            $this->assertFalse($url->hasValidSignature($request));
+        } finally {
+            restore_error_handler();
+        }
+    }
+
     public function testSignedUrlImplicitModelBinding()
     {
         $url = new UrlGenerator(

@@ -11,11 +11,6 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseMariaDbSchemaBuilderTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testHasTable()
     {
         $connection = m::mock(Connection::class);

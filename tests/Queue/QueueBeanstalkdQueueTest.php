@@ -30,11 +30,6 @@ class QueueBeanstalkdQueueTest extends TestCase
      */
     private $container;
 
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testPushProperlyPushesJobOntoBeanstalkd()
     {
         $uuid = Str::uuid();

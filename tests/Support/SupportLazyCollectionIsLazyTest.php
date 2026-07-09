@@ -588,6 +588,40 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testHasSoleIsLazy()
+    {
+        $this->assertEnumerates(2, function ($collection) {
+            $collection->hasSole();
+        });
+
+        $this->assertEnumerates(2, function ($collection) {
+            $collection->hasSole(fn ($item) => $item <= 2);
+        });
+
+        $this->assertEnumeratesCollection(
+            LazyCollection::times(10, fn ($i) => ['age' => $i]),
+            2,
+            fn ($collection) => $collection->hasSole('age', '<=', 2),
+        );
+    }
+
+    public function testHasManyIsLazy()
+    {
+        $this->assertEnumerates(2, function ($collection) {
+            $collection->hasMany();
+        });
+
+        $this->assertEnumerates(2, function ($collection) {
+            $collection->hasMany(fn ($item) => $item <= 2);
+        });
+
+        $this->assertEnumeratesCollection(
+            LazyCollection::times(10, fn ($i) => ['age' => $i]),
+            2,
+            fn ($collection) => $collection->hasMany('age', '<=', 2),
+        );
+    }
+
     public function testJoinIsLazy()
     {
         $this->assertEnumeratesOnce(function ($collection) {
@@ -1340,8 +1374,6 @@ class SupportLazyCollectionIsLazyTest extends TestCase
                     ->all();
             });
         });
-
-        m::close();
     }
 
     public function testTakeWhileIsLazy()

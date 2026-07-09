@@ -156,12 +156,16 @@ class PostgresGrammar extends Grammar
      */
     public function compileColumns($schema, $table)
     {
+        $serverVersion = $this->connection->getServerVersion();
+
         return sprintf(
             'select a.attname as name, t.typname as type_name, format_type(a.atttypid, a.atttypmod) as type, '
-            .'(select tc.collcollate from pg_catalog.pg_collation tc where tc.oid = a.attcollation) as collation, '
+            .(version_compare($serverVersion, '9.1', '<')
+                ? 'null as collation, '
+                : '(select tc.collcollate from pg_catalog.pg_collation tc where tc.oid = a.attcollation) as collation, ')
             .'not a.attnotnull as nullable, '
             .'(select pg_get_expr(adbin, adrelid) from pg_attrdef where c.oid = pg_attrdef.adrelid and pg_attrdef.adnum = a.attnum) as default, '
-            .(version_compare($this->connection->getServerVersion(), '12.0', '<') ? "'' as generated, " : 'a.attgenerated as generated, ')
+            .(version_compare($serverVersion, '12.0', '<') ? "'' as generated, " : 'a.attgenerated as generated, ')
             .'col_description(c.oid, a.attnum) as comment '
             .'from pg_attribute a, pg_class c, pg_type t, pg_namespace n '
             .'where c.relname = %s and n.nspname = %s and a.attnum > 0 and a.attrelid = c.oid and a.atttypid = t.oid and n.oid = c.relnamespace '
@@ -269,11 +273,12 @@ class PostgresGrammar extends Grammar
     {
         if ($command->column->autoIncrement
             && $value = $command->column->get('startingValue', $command->column->get('from'))) {
-            [$schema, $table] = $this->connection->getSchemaBuilder()->parseSchemaAndTable($blueprint->getTable());
-
-            $table = ($schema ? $schema.'.' : '').$this->connection->getTablePrefix().$table;
-
-            return 'alter sequence '.$table.'_'.$command->column->name.'_seq restart with '.$value;
+            return sprintf(
+                'select setval(pg_get_serial_sequence(%s, %s), %s, false)',
+                $this->quoteString($this->wrapTable($blueprint)),
+                $this->quoteString($command->column->name),
+                $value
+            );
         }
     }
 
@@ -427,6 +432,18 @@ class PostgresGrammar extends Grammar
         }
 
         return $this->compileIndex($blueprint, $command);
+    }
+
+    /**
+     * Compile a vector index key command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileVectorIndex(Blueprint $blueprint, Fluent $command)
+    {
+        return $this->compileIndexWithOperatorClass($blueprint, $command);
     }
 
     /**
@@ -1166,6 +1183,17 @@ class PostgresGrammar extends Grammar
         return isset($column->dimensions) && $column->dimensions !== ''
             ? "vector({$column->dimensions})"
             : 'vector';
+    }
+
+    /**
+     * Create the column definition for a tsvector type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeTsvector(Fluent $column)
+    {
+        return 'tsvector';
     }
 
     /**

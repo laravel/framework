@@ -15,11 +15,6 @@ use PHPUnit\Framework\TestCase;
 
 class TranslationTranslatorTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testHasMethodReturnsFalseWhenReturnedTranslationIsNull()
     {
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
@@ -116,6 +111,17 @@ class TranslationTranslatorTest extends TestCase
         $t->getLoader()->shouldReceive('load')->once()->with('lv', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo']);
         $this->assertSame('breeze bar', $t->get('foo::bar.baz', ['foo' => 'bar'], 'en'));
         $this->assertSame('foo', $t->get('foo::bar.foo'));
+    }
+
+    public function testGetDoesNotCallGetLineTwiceForMissingKeyWhenLocaleMatchesFallback()
+    {
+        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['getLine'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
+        $t->setFallback('en');
+        $t->getLoader()->shouldReceive('load')->with('en', '*', '*')->andReturn([]);
+
+        $t->expects($this->once())->method('getLine')->with('*', 'messages', 'en', 'test', [])->willReturn(null);
+
+        $t->get('messages.test', [], 'en');
     }
 
     public function testGetMethodProperlyLoadsAndRetrievesItemForGlobalNamespace()

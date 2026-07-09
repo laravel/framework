@@ -11,9 +11,9 @@ class CacheArrayStoreTest extends TestCase
 {
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Carbon::setTestNow(null);
+
+        parent::tearDown();
     }
 
     public function testItemsCanBeSetAndRetrieved()
@@ -318,6 +318,19 @@ class CacheArrayStoreTest extends TestCase
         $secondLock = $store->restoreLock('foo', 'other_owner');
 
         $this->assertFalse($secondLock->isOwnedByCurrentProcess());
+    }
+
+    public function testExpiredLockCannotBeRefreshedByPreviousOwner()
+    {
+        Carbon::setTestNow(Carbon::now());
+
+        $store = new ArrayStore;
+        $lock = $store->lock('foo', 10);
+        $this->assertTrue($lock->get());
+
+        Carbon::setTestNow(Carbon::now()->addSeconds(10)->addSecond());
+
+        $this->assertFalse($lock->refresh(20));
     }
 
     public function testRestoringNonExistingLockDoesNotOwnAnything()

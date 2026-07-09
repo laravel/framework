@@ -41,8 +41,6 @@ class SerializableClosureV1CacheRouteTest extends TestCase
     protected function tearDown(): void
     {
         unset($_ENV['APP_ROUTES_CACHE']);
-
-        parent::tearDown();
     }
 
     public function testItCanUseCachedRouteFromSerializableClosureV1()

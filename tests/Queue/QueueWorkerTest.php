@@ -12,11 +12,14 @@ use Illuminate\Queue\Events\JobPopped;
 use Illuminate\Queue\Events\JobPopping;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Events\WorkerStarting;
+use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Queue\MaxAttemptsExceededException;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
+use Illuminate\Queue\WorkerStopReason;
 use Illuminate\Support\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -41,11 +44,11 @@ class QueueWorkerTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Carbon::setTestNow();
 
         Container::setInstance();
+
+        parent::tearDown();
     }
 
     public function testJobCanBeFired()
@@ -57,6 +60,19 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobPopped::class))->once();
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessing::class))->once();
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessed::class))->once();
+    }
+
+    public function testJobPoppingEvent()
+    {
+        $worker = $this->getWorker('default', ['queue' => [$job = new WorkerFakeJob]]);
+        $worker->runNextJob('default', 'queue', new WorkerOptions);
+        $this->assertTrue($job->fired);
+
+        $this->events->shouldHaveReceived('dispatch')->with(m::on(function ($event) {
+            return $event instanceof JobPopping
+                && $event->connectionName === 'default'
+                && $event->queue === 'queue';
+        }))->once();
     }
 
     public function testWorkerCanWorkUntilQueueIsEmpty()
@@ -78,6 +94,52 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessing::class))->twice();
 
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessed::class))->twice();
+    }
+
+    public function testWorkerStopsWhenQueueIsEmptyForConfiguredSeconds()
+    {
+        $workerOptions = new WorkerOptions();
+        $workerOptions->stopWhenEmptyFor = 5;
+
+        $worker = $this->getWorker('default', ['queue' => []]);
+        $worker->currentTime = 0;
+
+        $status = $worker->daemon('default', 'queue', $workerOptions);
+
+        $this->assertSame(0, $status);
+
+        $this->events->shouldHaveReceived('dispatch')->with(m::on(function ($event) use ($workerOptions) {
+            return $event instanceof WorkerStopping
+                && $event->status === 0
+                && $event->workerOptions === $workerOptions
+                && $event->reason === WorkerStopReason::QueueEmptyFor;
+        }))->once();
+    }
+
+    public function testWorkerResetsQueueEmptyTimerAfterProcessingJob()
+    {
+        $workerOptions = new WorkerOptions();
+        $workerOptions->stopWhenEmptyFor = 5;
+
+        $worker = $this->getWorker('default', ['queue' => [
+            $job = new WorkerFakeJob(function () use (&$worker) {
+                $worker->currentTime = 10;
+            }),
+        ]]);
+        $worker->currentTime = 0;
+
+        $status = $worker->daemon('default', 'queue', $workerOptions);
+
+        $this->assertTrue($job->fired);
+        $this->assertSame(0, $status);
+        $this->assertSame(16, $worker->currentTime);
+
+        $this->events->shouldHaveReceived('dispatch')->with(m::on(function ($event) use ($workerOptions) {
+            return $event instanceof WorkerStopping
+                && $event->status === 0
+                && $event->workerOptions === $workerOptions
+                && $event->reason === WorkerStopReason::QueueEmptyFor;
+        }))->once();
     }
 
     public function testWorkerStopsWhenMemoryExceeded()
@@ -405,6 +467,71 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldHaveReceived('dispatch')->with(m::type(WorkerStarting::class))->once();
     }
 
+    public function testWorkerStoppingIsDispatched()
+    {
+        $workerOptions = new WorkerOptions();
+        $workerOptions->stopWhenEmpty = true;
+
+        $worker = $this->getWorker('default', ['queue' => [
+            $firstJob = new WorkerFakeJob(),
+            $secondJob = new WorkerFakeJob(),
+        ]]);
+
+        $worker->daemon('default', 'queue', $workerOptions);
+
+        $this->assertTrue($firstJob->fired);
+        $this->assertTrue($secondJob->fired);
+
+        $this->events->shouldHaveReceived('dispatch')->with(m::on(function ($event) use ($workerOptions) {
+            return $event instanceof WorkerStopping
+                && $event->status === 0
+                && $event->workerOptions === $workerOptions
+                && $event->reason === WorkerStopReason::QueueEmpty;
+        }))->once();
+    }
+
+    public function testWorkerStopsWithLostConnectionReason()
+    {
+        $workerOptions = new WorkerOptions();
+        $workerOptions->stopWhenEmpty = true;
+
+        $worker = $this->getWorker('default', ['queue' => [
+            $job = new WorkerFakeJob(function () {
+                throw new RuntimeException('server has gone away');
+            }),
+        ]]);
+
+        $worker->daemon('default', 'queue', $workerOptions);
+
+        $this->assertTrue($job->fired);
+
+        $this->events->shouldHaveReceived('dispatch')->with(m::on(function ($event) use ($workerOptions) {
+            return $event instanceof WorkerStopping
+                && $event->status === 0
+                && $event->workerOptions === $workerOptions
+                && $event->reason === WorkerStopReason::LostConnection;
+        }));
+    }
+
+    public function testJobReleasedEvent()
+    {
+        $e = new RuntimeException;
+
+        $job = new WorkerFakeJob(function () use ($e) {
+            throw $e;
+        });
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['backoff' => 10]));
+
+        $this->events->shouldHaveReceived('dispatch')->with(m::on(function ($event) use ($job) {
+            return $event instanceof JobReleasedAfterException
+                && $event->connectionName === 'default'
+                && $event->job === $job
+                && $event->backoff === 10;
+        }))->once();
+    }
+
     /**
      * Helpers...
      */
@@ -446,15 +573,25 @@ class InsomniacWorker extends Worker
 {
     public $sleptFor;
     public $stopOnMemoryExceeded = false;
+    public $currentTime;
 
     public function sleep($seconds)
     {
         $this->sleptFor = $seconds;
+
+        if (! is_null($this->currentTime)) {
+            $this->currentTime += $seconds;
+        }
     }
 
-    public function stop($status = 0, $options = null)
+    protected function currentTime()
     {
-        return $status;
+        return $this->currentTime ?? parent::currentTime();
+    }
+
+    public function stop($status = 0, $options = null, $reason = null)
+    {
+        return parent::stop($status, $options, $reason);
     }
 
     public function daemonShouldRun(WorkerOptions $options, $connectionName, $queue)

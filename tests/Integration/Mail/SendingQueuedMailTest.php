@@ -28,6 +28,19 @@ class SendingQueuedMailTest extends TestCase
             return $job->middleware[0] instanceof RateLimited;
         });
     }
+
+    public function testMailIsSentWithDelay()
+    {
+        Queue::fake();
+
+        $delay = now()->addMinutes(10);
+
+        Mail::to('test@mail.com')->later($delay, new SendingQueuedMailTestMail);
+
+        Queue::assertPushed(SendQueuedMailable::class, function ($job) use ($delay) {
+            return $job->delay === $delay;
+        });
+    }
 }
 
 class SendingQueuedMailTestMail extends Mailable

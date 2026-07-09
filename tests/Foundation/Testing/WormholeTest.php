@@ -12,9 +12,9 @@ class WormholeTest extends TestCase
 {
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Date::useDefault();
+
+        parent::tearDown();
     }
 
     public function testCanTravelBackToPresent()

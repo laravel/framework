@@ -21,8 +21,9 @@ class ScheduleRunCommandTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
         Carbon::setTestNow();
+
+        parent::tearDown();
     }
 
     /**

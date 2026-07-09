@@ -1067,7 +1067,7 @@ class Route
      * Get or set the middlewares attached to the route.
      *
      * @param  array|string|null  $middleware
-     * @return $this|array
+     * @return ($middleware is null ? array : $this)
      */
     public function middleware($middleware = null)
     {

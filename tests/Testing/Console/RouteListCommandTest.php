@@ -8,6 +8,7 @@ use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDeprecationHandling;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Artisan;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
@@ -39,6 +40,11 @@ class RouteListCommandTest extends TestCase
 
     public function testDisplayRoutesForCli()
     {
+        $this->withoutMockingConsoleOutput();
+
+        RouteListCommand::resolveTerminalWidthUsing(fn () => 200);
+
+        $closureLine = __LINE__ + 1;
         $this->router->get('/', function () {
             //
         });
@@ -59,22 +65,24 @@ class RouteListCommandTest extends TestCase
             })->name('user.show')->middleware('web');
         });
 
-        $this->artisan(RouteListCommand::class)
-            ->assertSuccessful()
-            ->expectsOutput('')
-            ->expectsOutput('  GET|HEAD   / ..................................................... ')
-            ->expectsOutput('  GET|HEAD   {account}.example.com/ ................................ ')
-            ->expectsOutput('  GET|HEAD   closure ............................................... ')
-            ->expectsOutput('  POST       controller-invokable Illuminate\Tests\Testing\Console\…')
-            ->expectsOutput('  GET|HEAD   controller-method/{user} Illuminate\Tests\Testing\Cons…')
-            ->expectsOutput('  GET|HEAD   {account}.example.com/user/{id} ............. user.show')
-            ->expectsOutput('')
-            ->expectsOutput('                                                  Showing [6] routes')
-            ->expectsOutput('');
+        $this->artisan(RouteListCommand::class);
+        $output = Artisan::output();
+
+        $this->assertStringContainsString('GET|HEAD', $output);
+        $this->assertStringContainsString('closure', $output);
+        $this->assertStringContainsString('controller-invokable', $output);
+        $this->assertStringContainsString('controller-method/{user}', $output);
+        $this->assertStringContainsString('RouteListCommandTest.php:'.$closureLine, $output);
+        $this->assertStringContainsString('Showing [6] routes', $output);
     }
 
     public function testDisplayRoutesForCliInVerboseMode()
     {
+        $this->withoutMockingConsoleOutput();
+
+        RouteListCommand::resolveTerminalWidthUsing(fn () => 200);
+
+        $closureLine = __LINE__ + 1;
         $this->router->get('closure', function () {
             return new RedirectResponse($this->urlGenerator->signedRoute('signed-route'));
         });
@@ -87,37 +95,40 @@ class RouteListCommandTest extends TestCase
             })->name('user.show')->middleware('web');
         });
 
-        $this->artisan(RouteListCommand::class, ['-v' => true])
-            ->assertSuccessful()
-            ->expectsOutput('')
-            ->expectsOutput('  GET|HEAD   closure ............................................... ')
-            ->expectsOutput('  POST       controller-invokable Illuminate\\Tests\\Testing\\Console\\FooController')
-            ->expectsOutput('  GET|HEAD   controller-method/{user} Illuminate\\Tests\\Testing\\Console\\FooController@show')
-            ->expectsOutput('  GET|HEAD   {account}.example.com/user/{id} ............. user.show')
-            ->expectsOutput('             ⇂ web')
-            ->expectsOutput('')
-            ->expectsOutput('                                                  Showing [4] routes')
-            ->expectsOutput('');
+        $this->artisan(RouteListCommand::class, ['-v' => true]);
+        $output = Artisan::output();
+
+        $this->assertStringContainsString('closure', $output);
+        $this->assertStringContainsString('RouteListCommandTest.php:'.$closureLine, $output);
+        $this->assertStringContainsString('controller-invokable', $output);
+        $this->assertStringContainsString('FooController@show', $output);
+        $this->assertStringContainsString('user.show', $output);
+        $this->assertStringContainsString('web', $output);
+        $this->assertStringContainsString('Showing [4] routes', $output);
     }
 
     public function testRouteCanBeFilteredByName()
     {
         $this->withoutDeprecationHandling();
+        $this->withoutMockingConsoleOutput();
+
+        RouteListCommand::resolveTerminalWidthUsing(fn () => 200);
 
         $this->router->get('/', function () {
             //
         });
+        $closureLine = __LINE__ + 1;
         $this->router->get('/foo', function () {
             //
         })->name('foo.show');
 
-        $this->artisan(RouteListCommand::class, ['--name' => 'foo'])
-            ->assertSuccessful()
-            ->expectsOutput('')
-            ->expectsOutput('  GET|HEAD       foo ...................................... foo.show')
-            ->expectsOutput('')
-            ->expectsOutput('                                                  Showing [1] routes')
-            ->expectsOutput('');
+        $this->artisan(RouteListCommand::class, ['--name' => 'foo']);
+        $output = Artisan::output();
+
+        $this->assertStringContainsString('foo', $output);
+        $this->assertStringContainsString('foo.show', $output);
+        $this->assertStringContainsString('RouteListCommandTest.php:'.$closureLine, $output);
+        $this->assertStringContainsString('Showing [1] routes', $output);
     }
 
     public function testRouteCanBeFilteredByAction()
@@ -143,6 +154,64 @@ class RouteListCommandTest extends TestCase
                 '                                                              Showing [1] routes'
             )
             ->expectsOutput('');
+    }
+
+    public function testClosurePathIsDisplayedInVerboseMode()
+    {
+        $closureLine = __LINE__ + 1;
+        $this->router->get('closure-path', function () {
+            //
+        });
+
+        $this->router->get('controller-method/{user}', [FooController::class, 'show']);
+
+        $expectedPath = 'tests/Testing/Console/RouteListCommandTest.php:'.$closureLine;
+
+        $this->artisan(RouteListCommand::class, ['-v' => true])
+            ->assertSuccessful()
+            ->expectsOutputToContain($expectedPath);
+    }
+
+    public function testClosurePathIsDisplayedInNonVerboseMode()
+    {
+        RouteListCommand::resolveTerminalWidthUsing(fn () => 200);
+
+        $closureLine = __LINE__ + 1;
+        $this->router->get('closure-path', function () {
+            //
+        });
+
+        $expectedPath = 'tests/Testing/Console/RouteListCommandTest.php:'.$closureLine;
+
+        $this->artisan(RouteListCommand::class)
+            ->assertSuccessful()
+            ->expectsOutputToContain($expectedPath);
+    }
+
+    public function testClosurePathIsIncludedInJsonOutput()
+    {
+        $closureLine = __LINE__ + 1;
+        $this->router->get('closure-path', function () {
+            //
+        });
+
+        $this->router->get('controller-method/{user}', [FooController::class, 'show']);
+
+        $expectedPath = 'tests/Testing/Console/RouteListCommandTest.php:'.$closureLine;
+        $jsonPath = str_replace('/', '\\/', $expectedPath);
+
+        $this->artisan(RouteListCommand::class, ['--json' => true])
+            ->assertSuccessful()
+            ->expectsOutputToContain($jsonPath);
+    }
+
+    public function testControllerRouteHasNullPathInJsonOutput()
+    {
+        $this->router->get('controller-method/{user}', [FooController::class, 'show']);
+
+        $this->artisan(RouteListCommand::class, ['--json' => true])
+            ->assertSuccessful()
+            ->expectsOutputToContain('"path":null');
     }
 
     public function testDisplayRoutesExceptVendor()

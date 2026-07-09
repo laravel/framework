@@ -398,5 +398,7 @@ class ValidationAnyOfRuleTest extends TestCase
         Container::setInstance(null);
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
+
+        parent::tearDown();
     }
 }

@@ -2,11 +2,14 @@
 
 namespace Illuminate\Foundation\Console;
 
-use App\Http\Middleware\PreventRequestsDuringMaintenance;
+use App\Http\Middleware\PreventRequestsDuringMaintenance as AppPreventRequestsDuringMaintenance;
+use DateTimeInterface;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Events\MaintenanceModeEnabled;
 use Illuminate\Foundation\Exceptions\RegisterErrorViewPaths;
+use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Throwable;
@@ -21,7 +24,7 @@ class DownCommand extends Command
      */
     protected $signature = 'down {--redirect= : The path that users should be redirected to}
                                  {--render= : The view that should be prerendered for display during maintenance mode}
-                                 {--retry= : The number of seconds after which the request may be retried}
+                                 {--retry= : The number of seconds or the datetime after which the request may be retried}
                                  {--refresh= : The number of seconds after which the browser may refresh}
                                  {--secret= : The secret phrase that may be used to bypass maintenance mode}
                                  {--with-secret : Generate a random secret phrase that may be used to bypass maintenance mode}
@@ -42,11 +45,7 @@ class DownCommand extends Command
     public function handle()
     {
         try {
-            if ($this->laravel->maintenanceMode()->active() && ! $this->getSecret()) {
-                $this->components->info('Application is already down.');
-
-                return 0;
-            }
+            $wasAlreadyDown = $this->laravel->maintenanceMode()->active();
 
             $downFilePayload = $this->getDownFilePayload();
 
@@ -59,7 +58,10 @@ class DownCommand extends Command
 
             $this->laravel->get('events')->dispatch(new MaintenanceModeEnabled());
 
-            $this->components->info('Application is now in maintenance mode.');
+            $this->components->info($wasAlreadyDown
+                ? 'Maintenance mode options updated.'
+                : 'Application is now in maintenance mode.'
+            );
 
             if ($downFilePayload['secret'] !== null) {
                 $this->components->info('You may bypass maintenance mode via ['.config('app.url')."/{$downFilePayload['secret']}].");
@@ -100,9 +102,13 @@ class DownCommand extends Command
     protected function excludedPaths()
     {
         try {
-            return $this->laravel->make(PreventRequestsDuringMaintenance::class)->getExcludedPaths();
+            return $this->laravel->make(AppPreventRequestsDuringMaintenance::class)->getExcludedPaths();
         } catch (Throwable) {
-            return [];
+            try {
+                return $this->laravel->make(PreventRequestsDuringMaintenance::class)->getExcludedPaths();
+            } catch (Throwable) {
+                return [];
+            }
         }
     }
 
@@ -135,15 +141,29 @@ class DownCommand extends Command
     }
 
     /**
-     * Get the number of seconds the client should wait before retrying their request.
+     * Get the number of seconds or date / time the client should wait before retrying their request.
      *
-     * @return int|null
+     * @return int|string|null
      */
     protected function getRetryTime()
     {
         $retry = $this->option('retry');
 
-        return is_numeric($retry) && $retry > 0 ? (int) $retry : null;
+        if (is_numeric($retry) && $retry > 0) {
+            return (int) $retry;
+        }
+
+        if (is_string($retry) && ! empty($retry)) {
+            try {
+                $date = Carbon::parse($retry);
+
+                return $date->format(DateTimeInterface::RFC7231);
+            } catch (Exception) {
+                return null;
+            }
+        }
+
+        return null;
     }
 
     /**

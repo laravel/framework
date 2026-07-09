@@ -18,11 +18,6 @@ use function Laravel\Prompts\select;
 
 class ConfiguresPromptsTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     #[DataProvider('selectDataProvider')]
     public function testSelectFallback($prompt, $expectedOptions, $expectedDefault, $return, $expectedReturn)
     {

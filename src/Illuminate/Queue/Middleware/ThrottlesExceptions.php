@@ -185,7 +185,7 @@ class ThrottlesExceptions
     /**
      * Run the skip / delete callbacks to determine if the job should be deleted for the given exception.
      *
-     * @param  Throwable  $throwable
+     * @param  \Throwable  $throwable
      * @return bool
      */
     protected function shouldDelete(Throwable $throwable): bool
@@ -202,7 +202,7 @@ class ThrottlesExceptions
     /**
      * Run the skip / fail callbacks to determine if the job should be failed for the given exception.
      *
-     * @param  Throwable  $throwable
+     * @param  \Throwable  $throwable
      * @return bool
      */
     protected function shouldFail(Throwable $throwable): bool

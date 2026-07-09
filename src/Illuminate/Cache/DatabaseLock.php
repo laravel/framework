@@ -28,7 +28,7 @@ class DatabaseLock extends Lock
     /**
      * The prune probability odds.
      *
-     * @var array
+     * @var array{int, int}|null
      */
     protected $lottery;
 
@@ -47,7 +47,7 @@ class DatabaseLock extends Lock
      * @param  string  $name
      * @param  int  $seconds
      * @param  string|null  $owner
-     * @param  array  $lottery
+     * @param  array{int, int}|null  $lottery
      * @param  int  $defaultTimeoutInSeconds
      */
     public function __construct(Connection $connection, $table, $name, $seconds, $owner = null, $lottery = [2, 100], $defaultTimeoutInSeconds = 86400)
@@ -65,7 +65,7 @@ class DatabaseLock extends Lock
      *
      * @return bool
      *
-     * @throws Throwable
+     * @throws \Throwable
      */
     public function acquire()
     {
@@ -90,19 +90,28 @@ class DatabaseLock extends Lock
             $acquired = $updated >= 1;
         }
 
-        if (random_int(1, $this->lottery[1]) <= $this->lottery[0]) {
-            try {
-                $this->connection->table($this->table)
-                    ->where('expiration', '<=', $this->currentTime())
-                    ->delete();
-            } catch (Throwable $e) {
-                if (! $this->causedByConcurrencyError($e)) {
-                    throw $e;
-                }
-            }
+        if (count($this->lottery ?? []) === 2 && random_int(1, $this->lottery[1]) <= $this->lottery[0]) {
+            $this->pruneExpiredLocks();
         }
 
         return $acquired;
+    }
+
+    /**
+     * Attempt to refresh the lock for the given number of seconds.
+     *
+     * @param  int|null  $seconds
+     * @return bool
+     */
+    public function refresh($seconds = null)
+    {
+        $seconds ??= $this->seconds;
+
+        return $this->connection->table($this->table)
+            ->where('key', $this->name)
+            ->where('owner', $this->owner)
+            ->where('expiration', '>', $this->currentTime())
+            ->update(['expiration' => $this->expiresAt($seconds)]) >= 1;
     }
 
     /**
@@ -110,9 +119,11 @@ class DatabaseLock extends Lock
      *
      * @return int
      */
-    protected function expiresAt()
+    protected function expiresAt($seconds = null)
     {
-        $lockTimeout = $this->seconds > 0 ? $this->seconds : $this->defaultTimeoutInSeconds;
+        $seconds ??= $this->seconds;
+
+        $lockTimeout = $seconds > 0 ? $seconds : $this->defaultTimeoutInSeconds;
 
         return $this->currentTime() + $lockTimeout;
     }
@@ -121,16 +132,26 @@ class DatabaseLock extends Lock
      * Release the lock.
      *
      * @return bool
+     *
+     * @throws \Throwable
      */
     public function release()
     {
         if ($this->isOwnedByCurrentProcess()) {
-            $this->connection->table($this->table)
-                ->where('key', $this->name)
-                ->where('owner', $this->owner)
-                ->delete();
+            try {
+                $this->connection->table($this->table)
+                    ->where('key', $this->name)
+                    ->where('owner', $this->owner)
+                    ->delete();
 
-            return true;
+                return true;
+            } catch (Throwable $e) {
+                if ($this->causedByConcurrencyError($e)) {
+                    return true;
+                }
+
+                throw $e;
+            }
         }
 
         return false;
@@ -146,6 +167,26 @@ class DatabaseLock extends Lock
         $this->connection->table($this->table)
             ->where('key', $this->name)
             ->delete();
+    }
+
+    /**
+     * Deletes locks that are past expiration.
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function pruneExpiredLocks()
+    {
+        try {
+            $this->connection->table($this->table)
+                ->where('expiration', '<=', $this->currentTime())
+                ->delete();
+        } catch (Throwable $e) {
+            if (! $this->causedByConcurrencyError($e)) {
+                throw $e;
+            }
+        }
     }
 
     /**

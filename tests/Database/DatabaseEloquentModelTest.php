@@ -72,13 +72,12 @@ class DatabaseEloquentModelTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
-        m::close();
         Carbon::setTestNow(null);
 
         Model::unsetEventDispatcher();
         Carbon::resetToStringFormat();
+
+        parent::tearDown();
     }
 
     public function testAttributeManipulation()
@@ -2476,6 +2475,34 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertContains('bar', $model->getAppends());
     }
 
+    public function testHasAppendedReturnsTrueWhenAttributeIsAppended()
+    {
+        $model = new EloquentModelAppendsStub;
+
+        $this->assertTrue($model->hasAppended('is_admin'));
+        $this->assertTrue($model->hasAppended('camelCased'));
+        $this->assertTrue($model->hasAppended('StudlyCased'));
+    }
+
+    public function testHasAppendedReturnsFalseWhenAttributeIsNotAppended()
+    {
+        $model = new EloquentModelAppendsStub;
+
+        $this->assertFalse($model->hasAppended('foo'));
+        $this->assertFalse($model->hasAppended('bar'));
+    }
+
+    public function testWithoutAppendsRemovesAppends()
+    {
+        $model = new EloquentModelAppendsStub;
+
+        $this->assertEquals(['is_admin', 'camelCased', 'StudlyCased'], $model->getAppends());
+
+        $model->withoutAppends();
+
+        $this->assertEmpty($model->getAppends());
+    }
+
     public function testGetMutatedAttributes()
     {
         $model = new EloquentModelGetMutatorsStub;
@@ -3226,6 +3253,20 @@ class DatabaseEloquentModelTest extends TestCase
         $connection->shouldReceive('query')->andReturnUsing(function () use ($connection, $grammar, $processor) {
             return new BaseBuilder($connection, $grammar, $processor);
         });
+    }
+
+    public function testTouchMethodWithMultipleAttributes()
+    {
+        Carbon::setTestNow($now = Carbon::now());
+
+        $model = m::mock(EloquentModelStub::class.'[save]');
+        $model->shouldReceive('save')->once()->andReturn(true);
+
+        $result = $model->touch(['published_at', 'verified_at']);
+
+        $this->assertTrue($result);
+        $this->assertEquals($now->toDateTimeString(), $model->published_at->toDateTimeString());
+        $this->assertEquals($now->toDateTimeString(), $model->verified_at->toDateTimeString());
     }
 
     public function testTouchingModelWithTimestamps()

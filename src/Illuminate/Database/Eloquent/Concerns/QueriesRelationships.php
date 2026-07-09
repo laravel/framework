@@ -615,6 +615,8 @@ trait QueriesRelationships
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
      * @param  \Illuminate\Database\Eloquent\Model|iterable<int, \Illuminate\Database\Eloquent\Model>|string|null  $model
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function whereMorphedTo($relation, $model, $boolean = 'and')
     {
@@ -658,6 +660,8 @@ trait QueriesRelationships
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string  $relation
      * @param  \Illuminate\Database\Eloquent\Model|iterable<int, \Illuminate\Database\Eloquent\Model>|string  $model
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function whereNotMorphedTo($relation, $model, $boolean = 'and')
     {
@@ -672,7 +676,9 @@ trait QueriesRelationships
                 $model = array_search($model, $morphMap, true);
             }
 
-            return $this->whereNot($relation->qualifyColumn($relation->getMorphType()), '<=>', $model, $boolean);
+            return $this->whereNot(fn ($query) => $query->whereNullSafeEquals(
+                $relation->qualifyColumn($relation->getMorphType()), $model
+            ), null, null, $boolean);
         }
 
         $models = BaseCollection::wrap($model);
@@ -684,7 +690,7 @@ trait QueriesRelationships
         return $this->whereNot(function ($query) use ($relation, $models) {
             $models->groupBy(fn ($model) => $model->getMorphClass())->each(function ($models) use ($query, $relation) {
                 $query->orWhere(function ($query) use ($relation, $models) {
-                    $query->where($relation->qualifyColumn($relation->getMorphType()), '<=>', $models->first()->getMorphClass())
+                    $query->whereNullSafeEquals($relation->qualifyColumn($relation->getMorphType()), $models->first()->getMorphClass())
                         ->whereIn($relation->qualifyColumn($relation->getForeignKeyName()), $models->map->getKey());
                 });
             });

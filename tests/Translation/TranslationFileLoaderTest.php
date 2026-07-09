@@ -9,11 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 class TranslationFileLoaderTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testLoadMethodLoadsTranslationsFromAddedPath()
     {
         $files = m::mock(Filesystem::class);

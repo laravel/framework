@@ -23,7 +23,7 @@ class RedisJob extends Job implements JobContract
     protected $job;
 
     /**
-     * The JSON decoded version of "$job".
+     * The decoded JSON version of "$job".
      *
      * @var array
      */

@@ -72,6 +72,9 @@ class ValidationNumericRuleTest extends TestCase
     {
         $rule = Rule::numeric()->integer();
         $this->assertEquals('numeric|integer', (string) $rule);
+
+        $rule = Rule::numeric()->integer(strict: true);
+        $this->assertEquals('numeric|integer:strict', (string) $rule);
     }
 
     public function testLessThanRule()

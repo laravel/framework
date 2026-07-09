@@ -63,7 +63,8 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->schema()->drop('users');
         $this->schema()->drop('articles');
         $this->schema()->drop('comments');
-        m::close();
+
+        parent::tearDown();
     }
 
     public function testAddingItemsToCollection()
@@ -543,6 +544,22 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c = $c->makeVisible(['hidden']);
 
         $this->assertEquals([], $c[0]->getHidden());
+    }
+
+    public function testMergeHiddenAddsHiddenOnEntireCollection()
+    {
+        $c = new Collection([new TestEloquentCollectionModel]);
+        $c = $c->mergeHidden(['merged']);
+
+        $this->assertEquals(['hidden', 'merged'], $c[0]->getHidden());
+    }
+
+    public function testMergeVisibleRemovesHiddenFromEntireCollection()
+    {
+        $c = new Collection([new TestEloquentCollectionModel]);
+        $c = $c->mergeVisible(['merged']);
+
+        $this->assertEquals(['visible', 'merged'], $c[0]->getVisible());
     }
 
     public function testSetVisibleReplacesVisibleOnEntireCollection()

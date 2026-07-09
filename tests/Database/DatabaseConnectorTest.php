@@ -17,11 +17,6 @@ use stdClass;
 
 class DatabaseConnectorTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testOptionResolution()
     {
         $connector = new Connector;

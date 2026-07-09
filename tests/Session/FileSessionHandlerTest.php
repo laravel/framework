@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Session;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Session\FileSessionHandler;
 use Illuminate\Support\Carbon;
-use Mockery;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 use function Illuminate\Filesystem\join_paths;
@@ -19,15 +19,10 @@ class FileSessionHandlerTest extends TestCase
     protected function setUp(): void
     {
         // Create a mock for the Filesystem class
-        $this->files = Mockery::mock(Filesystem::class);
+        $this->files = m::mock(Filesystem::class);
 
         // Initialize the FileSessionHandler with the mocked Filesystem
         $this->sessionHandler = new FileSessionHandler($this->files, '/path/to/sessions', 30);
-    }
-
-    protected function tearDown(): void
-    {
-        Mockery::close();
     }
 
     public function test_open()

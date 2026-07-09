@@ -243,7 +243,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
         $all = [];
 
         foreach ($this->messages as $key => $messages) {
-            $all = array_merge($all, $this->transform($messages, $format, $key));
+            array_push($all, ...$this->transform($messages, $format, $key));
         }
 
         return $all;
@@ -434,8 +434,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     /**
      * Convert the object to pretty print formatted JSON.
      *
-     * @params int $options
-     *
+     * @param  int  $options
      * @return string
      */
     public function toPrettyJson(int $options = 0)

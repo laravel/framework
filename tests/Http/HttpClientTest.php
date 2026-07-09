@@ -7,8 +7,10 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException as GuzzleRequestException;
 use GuzzleHttp\Exception\TooManyRedirectsException;
 use GuzzleHttp\Middleware;
+use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Promise\RejectedPromise;
+use GuzzleHttp\Psr7\NoSeekStream;
 use GuzzleHttp\Psr7\Request as GuzzleRequest;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use GuzzleHttp\Psr7\Utils;
@@ -42,6 +44,7 @@ use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -67,9 +70,7 @@ class HttpClientTest extends TestCase
 
     protected function tearDown(): void
     {
-        m::close();
-
-        parent::tearDown();
+        Response::flushState();
     }
 
     public function testStubbedResponsesAreReturnedAfterFaking()
@@ -385,6 +386,51 @@ class HttpClientTest extends TestCase
 
         $this->assertIsObject($response->object());
         $this->assertSame('bar', $response->object()->result->foo);
+    }
+
+    public function testResponseObjectIsTappable()
+    {
+        $bar = null;
+        $this->factory->fake([
+            '*' => ['result' => ['foo' => 'bar']],
+        ]);
+
+        $this->factory->get('http://foo.com/api')
+            ->tap(function (Response $response) use (&$bar) {
+                $bar = $response['result']['foo'];
+            });
+
+        $this->assertSame('bar', $bar);
+    }
+
+    public function testResponseObjectIsMacroable()
+    {
+        Response::macro('movieFields', function () {
+            return $this->collect()
+                ->mapWithKeys(fn ($field, $key) => [strtolower($key) => $field])
+                ->toArray();
+        });
+
+        $response = $this->factory->fake([
+            '*' => [
+                'Title' => 'The Godfather',
+                'Year' => 1972,
+                'Rated' => 'R',
+                'Runtime' => '175 min',
+                'Director' => 'Francis Ford Coppola',
+            ],
+        ]);
+
+        $response = $this->factory->get('http://www.omdbapi.com/?apikey=test_api_key&i=test_imdb_id');
+
+        $this->assertIsArray($response->movieFields());
+        $this->assertSame([
+            'title' => 'The Godfather',
+            'year' => 1972,
+            'rated' => 'R',
+            'runtime' => '175 min',
+            'director' => 'Francis Ford Coppola',
+        ], $response->movieFields());
     }
 
     public function testResponseCanBeReturnedAsResource()
@@ -746,6 +792,35 @@ class HttpClientTest extends TestCase
                    Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
                    $request[0]['name'] === 'foo' &&
                    $request->hasFile('foo', 'data', 'file.txt');
+        });
+    }
+
+    public function testAttachPreservesEmptyContents()
+    {
+        $this->factory->fake();
+
+        $this->factory->attach('file')->post('http://foo.com/file');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/file'
+                && $request->isMultipart()
+                && $request[0]['name'] === 'file'
+                && array_key_exists('contents', $request[0])
+                && $request[0]['contents'] === '';
+        });
+    }
+
+    public function testAttachPreservesFalseyStringContentsAndName()
+    {
+        $this->factory->fake();
+
+        $this->factory->attach('0', '0')->post('http://foo.com/file');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/file'
+                && $request->isMultipart()
+                && $request[0]['name'] === '0'
+                && $request[0]['contents'] === '0';
         });
     }
 
@@ -1374,8 +1449,12 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
+        // Ensure the exception message is truncated according to the request level truncation setting.
+        $this->assertEquals("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
+
         $exception->report();
 
+        // Ensure that the truncation level is not changed when reporting the exception.
         $this->assertEquals("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
 
         $this->assertEquals(60, RequestException::$truncateAt);
@@ -1470,6 +1549,43 @@ class HttpClientTest extends TestCase
         $exception->report();
 
         $this->assertEquals(1, substr_count($exception->getMessage(), '{"error":{"code":403,"message":"The Request can not be completed"}}'));
+    }
+
+    #[TestWith([false])]
+    #[TestWith([120])]
+    public function testStreamingResponseExceptionMessageIsNotSummarizedWhenBodyIsNotSeekable(int|false $truncateAt)
+    {
+        RequestException::$truncateAt = $truncateAt;
+
+        $this->factory->fake([
+            '*' => Create::promiseFor(
+                new Psr7Response(
+                    400,
+                    ['Content-Type' => 'application/json'],
+                    new NoSeekStream(Utils::streamFor(json_encode(['hello' => 'world'])))
+                )
+            ),
+        ]);
+
+        $throwCallbackCalled = false;
+
+        try {
+            $this->factory
+                ->withOptions(['stream' => true])
+                ->throw(function (Response $response, RequestException $exception) use (&$throwCallbackCalled) {
+                    $throwCallbackCalled = true;
+
+                    $this->assertNotNull($response->json());
+                    $this->assertSame('HTTP request returned status code 400', $exception->getMessage());
+                })
+                ->get('http://example.com');
+
+            $this->fail('RequestException was not thrown.');
+        } catch (RequestException $exception) {
+            $this->assertSame('HTTP request returned status code 400', $exception->getMessage());
+        }
+
+        $this->assertTrue($throwCallbackCalled);
     }
 
     public function testOnErrorDoesntCallClosureOnInformational()
@@ -1783,7 +1899,8 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('http://200.com')->dump();
 
-        $this->assertSame('hello', $dumped[0]);
+        $this->assertSame('"GET http://200.com" 200', $dumped[0]);
+        $this->assertSame('hello', $dumped[1]);
 
         VarDumper::setHandler(null);
     }
@@ -1802,7 +1919,8 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('http://200.com')->dump('hello');
 
-        $this->assertSame('world', $dumped[0]);
+        $this->assertSame('"GET http://200.com" 200', $dumped[0]);
+        $this->assertSame('world', $dumped[1]);
 
         VarDumper::setHandler(null);
     }
@@ -3444,6 +3562,74 @@ class HttpClientTest extends TestCase
         $this->assertNull($exception);
     }
 
+    public function testThrowIfStatusWorksWithNonErrorStatusCodes()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('', 201),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api')->throwIfStatus(201);
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api')->throwIfStatus(fn ($status) => $status === 201);
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+    }
+
+    public function testThrowUnlessStatusWorksWithNonErrorStatusCodes()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('', 201),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api')->throwUnlessStatus(200);
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api')->throwUnlessStatus(201);
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNull($exception);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api')->throwUnlessStatus(fn ($status) => $status === 200);
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+    }
+
     public function testRequestExceptionIsThrownIfIsServerError()
     {
         $this->factory->fake([
@@ -3640,7 +3826,7 @@ class HttpClientTest extends TestCase
                     $onStatsFunctionCalled = true;
                 },
             ])
-            ->get('https://example.com')
+            ->get('http://example.com')
             ->handlerStats();
 
         $this->assertIsArray($stats);
@@ -4194,6 +4380,114 @@ class HttpClientTest extends TestCase
             'delete' => ['delete'],
         ];
     }
+
+    public function testAfterResponse()
+    {
+        $this->factory->fake([
+            'http://200.com*' => $this->factory::response('OK'),
+        ]);
+
+        $response = $this->factory
+            ->afterResponse(fn (Response $response): TestResponse => new TestResponse($response->toPsrResponse()))
+            ->afterResponse(fn () => 'abc')
+            ->afterResponse(function ($r) {
+                $this->assertInstanceOf(TestResponse::class, $r);
+            })
+            ->afterResponse(fn (Response $r) => new Response($r->toPsrResponse()->withBody(Utils::streamFor(strtolower($r->body())))))
+            ->get('http://200.com');
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertSame('ok', $response->body());
+    }
+
+    public function testAfterResponseWithThrows()
+    {
+        $this->factory->fake([
+            'http://500.com*' => $this->factory::response('oh no', 500),
+        ]);
+
+        try {
+            $this->factory->throw()
+                ->afterResponse(fn ($response) => new TestResponse($response->toPsrResponse()))
+                ->post('http://500.com');
+        } catch (RequestException $e) {
+            $this->assertInstanceOf(TestResponse::class, $e->response);
+        }
+    }
+
+    public function testAfterResponseWithAsync()
+    {
+        $this->factory->fake([
+            'http://200.com*' => $this->factory::response('OK', 200),
+            'http://401.com*' => $this->factory::response('Unauthorized.', 401),
+        ]);
+
+        $o = $this->factory->pool(function (Pool $pool): void {
+            $pool->as('200')->afterResponse(fn (Response $response) => new TestResponse($response->toPsrResponse()))->get('http://200.com');
+            $pool->as('401-throwing')->throw()->afterResponse(fn (Response $response) => new TestResponse($response->toPsrResponse()))->get('http://401.com');
+            $pool->as('401-response')->afterResponse(fn (Response $response) => new TestResponse($response->toPsrResponse()->withBody(Utils::streamFor('different'))))->get('http://401.com');
+        }, 0);
+
+        $this->assertInstanceOf(TestResponse::class, $o['200']);
+        $this->assertInstanceOf(TestResponse::class, $o['401-response']);
+        $this->assertEquals('different', $o['401-response']->body());
+        $this->assertInstanceOf(RequestException::class, $o['401-throwing']);
+        $this->assertInstanceOf(TestResponse::class, $o['401-throwing']->response);
+    }
+
+    public function testRespectsDefaultFlags()
+    {
+        Response::$defaultJsonDecodingFlags = JSON_BIGINT_AS_STRING;
+
+        // Create a response with a big integer that exceeds PHP_INT_MAX
+        $bigInt = '9223372036854775808';
+        $body = '{"value":'.$bigInt.'}';
+
+        $response = new Response(Factory::psr7Response($body));
+
+        // With JSON_BIGINT_AS_STRING, it should be the exact string
+        $this->assertSame($bigInt, $response->json('value'));
+        $this->assertSame($bigInt, $response->object()->value);
+        $this->assertSame($bigInt, $response->collect('value')->first());
+        $this->assertSame($bigInt, $response->fluent()->get('value'));
+
+        // Default json_decode behavior (flags=0), big integers become floats (losing precision)
+        $this->assertIsFloat($response->json('value', null, 0));
+        $this->assertIsFloat($response->object(0)->value);
+        $this->assertIsFloat($response->collect('value', 0)->first());
+        $this->assertIsFloat($response->fluent(flags: 0)->get('value'));
+    }
+
+    public function testJsonDecodingIsCachedWhenFlagsMatch()
+    {
+        Response::$defaultJsonDecodingFlags = JSON_BIGINT_AS_STRING;
+
+        $response = new BodyTrackingResponse(Factory::psr7Response('{"foo":"bar"}'));
+
+        // First call decodes with default (JSON_BIGINT_AS_STRING)
+        $response->json();
+        $this->assertSame(1, $response->bodyCallCount);
+
+        // Second call with same (null) flags uses cache
+        $response->json();
+        $this->assertSame(1, $response->bodyCallCount);
+
+        // Explicit flags matching default still uses cache
+        $response->json(flags: JSON_BIGINT_AS_STRING);
+        $this->assertSame(1, $response->bodyCallCount);
+
+        // Different flags triggers re-decode
+        $response->json(flags: 0);
+        $this->assertSame(2, $response->bodyCallCount);
+
+        // Same explicit flags uses cache
+        $response->json(flags: 0);
+        $this->assertSame(2, $response->bodyCallCount);
+
+        // Null flags means "use default", cached flags differ, so re-decode
+        $response->json();
+        $this->assertSame(3, $response->bodyCallCount);
+    }
 }
 
 class CustomFactory extends Factory
@@ -4212,4 +4506,16 @@ class CustomFactory extends Factory
 
 class TestResponse extends Response
 {
+}
+
+class BodyTrackingResponse extends Response
+{
+    public int $bodyCallCount = 0;
+
+    public function body()
+    {
+        $this->bodyCallCount++;
+
+        return parent::body();
+    }
 }

@@ -12,11 +12,6 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class ComponentsTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testAlert()
     {
         $output = new BufferedOutput();
@@ -133,6 +128,15 @@ class ComponentsTest extends TestCase
         $result = $output->fetch();
         $this->assertStringContainsString('First', $result);
         $this->assertStringContainsString('Second', $result);
+    }
+
+    public function testTwoColumnDetailPreservesTrailingPunctuationInValue()
+    {
+        $output = new BufferedOutput();
+
+        (new Components\TwoColumnDetail($output))->render('Key', 'value!');
+        $result = $output->fetch();
+        $this->assertStringContainsString('value!', $result);
     }
 
     public function testWarn()

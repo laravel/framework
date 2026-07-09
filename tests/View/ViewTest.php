@@ -17,11 +17,6 @@ use PHPUnit\Framework\TestCase;
 
 class ViewTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testDataCanBeSetOnView()
     {
         $view = $this->getView();

@@ -13,11 +13,6 @@ use stdClass;
 
 class DatabaseMigrationRepositoryTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testGetRanMigrationsListMigrationsByPackage()
     {
         $repo = $this->getRepository();

@@ -42,6 +42,8 @@ namespace Illuminate\Support\Facades;
  * @method static bool enableForeignKeyConstraints()
  * @method static bool disableForeignKeyConstraints()
  * @method static mixed withoutForeignKeyConstraints(\Closure $callback)
+ * @method static void ensureVectorExtensionExists(string|null $schema = null)
+ * @method static void ensureExtensionExists(string $name, string|null $schema = null)
  * @method static string[]|null getCurrentSchemaListing()
  * @method static string|null getCurrentSchemaName()
  * @method static array parseSchemaAndTable(string $reference, string|bool|null $withDefaultSchema = null)

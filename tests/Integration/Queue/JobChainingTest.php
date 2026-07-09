@@ -258,6 +258,26 @@ class JobChainingTest extends QueueTestCase
         $this->assertNull(JobChainingTestThirdJob::$usedConnection);
     }
 
+    public function testChainJobRemovesFalsy()
+    {
+        $job = (new JobChainingTestFirstJob)->chain([
+            new JobChainingTestSecondJob,
+            null,
+            '',
+            0,
+            [],
+        ]);
+
+        $this->assertCount(1, $job->chained);
+
+        Queue::push($job);
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+
+        $this->assertTrue(JobChainingTestFirstJob::$ran);
+        $this->assertTrue(JobChainingTestSecondJob::$ran);
+    }
+
     public function testChainJobsCanBePrepended()
     {
         JobChainAddingPrependingJob::withChain([new JobChainAddingExistingJob])->dispatch();
@@ -349,6 +369,40 @@ class JobChainingTest extends QueueTestCase
         $this->assertEquals([$secondJob, $thirdJob], $chain->chain);
     }
 
+    public function testChainRemovesFalsy()
+    {
+        $chain = Bus::chain([
+            $firstJob = new JobChainingTestFirstJob,
+            $secondJob = new JobChainingTestSecondJob,
+            null,
+            '',
+            0,
+            [],
+        ]);
+
+        $this->assertEquals($firstJob, $chain->job);
+        $this->assertEquals([$secondJob], $chain->chain);
+    }
+
+    public function testChainAppendRemovesFalsy()
+    {
+        $chain = Bus::chain([
+            $firstJob = new JobChainingNamedTestJob('j1'),
+        ]);
+
+        $chain->append([
+            $secondJob = new JobChainingNamedTestJob('j2'),
+            $thirdJob = new JobChainingNamedTestJob('j3'),
+            null,
+            '',
+            0,
+            [],
+        ]);
+
+        $this->assertEquals($firstJob, $chain->job);
+        $this->assertEquals([$secondJob, $thirdJob], $chain->chain);
+    }
+
     public function testChainCanBePrepended()
     {
         $chain = Bus::chain();
@@ -371,6 +425,26 @@ class JobChainingTest extends QueueTestCase
             $secondJob = new JobChainingNamedTestJob('j1'),
             $thirdJob = new JobChainingNamedTestJob('j2'),
             $fourthJob = new JobChainingNamedTestJob('j3'),
+        ]);
+
+        $this->assertEquals($secondJob, $chain->job);
+        $this->assertEquals([$thirdJob, $fourthJob, $firstJob], $chain->chain);
+    }
+
+    public function testChainPrependRemovesFalsy()
+    {
+        $chain = Bus::chain([
+            $firstJob = new JobChainingNamedTestJob('j4'),
+        ]);
+
+        $chain->prepend([
+            $secondJob = new JobChainingNamedTestJob('j1'),
+            $thirdJob = new JobChainingNamedTestJob('j2'),
+            $fourthJob = new JobChainingNamedTestJob('j3'),
+            null,
+            '',
+            0,
+            [],
         ]);
 
         $this->assertEquals($secondJob, $chain->job);

@@ -62,6 +62,8 @@ class Pipe
      *
      * @param  callable|null  $output
      * @return \Illuminate\Contracts\Process\ProcessResult
+     *
+     * @throws \InvalidArgumentException
      */
     public function run(?callable $output = null)
     {

@@ -10,11 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class AuthTokenGuardTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testUserCanBeRetrievedByQueryStringVariable()
     {
         $provider = m::mock(UserProvider::class);

@@ -60,7 +60,7 @@ class FileViewFinder implements ViewFinderInterface
     }
 
     /**
-     * Get the fully qualified location of the view.
+     * Get the fully-qualified location of the view.
      *
      * @param  string  $name
      * @return string

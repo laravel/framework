@@ -49,6 +49,7 @@ class LostConnectionDetector implements LostConnectionDetectorContract
             'SQLSTATE[HY000] [2002] php_network_getaddresses: getaddrinfo failed: Name or service not known',
             'SQLSTATE[HY000] [2002] php_network_getaddresses: getaddrinfo for',
             'SQLSTATE[HY000]: General error: 7 SSL SYSCALL error: EOF detected',
+            'SSL error: unexpected eof',
             'SQLSTATE[HY000] [2002] Connection timed out',
             'SSL: Connection timed out',
             'SQLSTATE[HY000]: General error: 1105 The last transaction was aborted due to Seamless Scaling. Please retry.',
@@ -65,6 +66,7 @@ class LostConnectionDetector implements LostConnectionDetectorContract
             'Unknown $curl_error_code: 77',
             'SSL: Handshake timed out',
             'SSL error: sslv3 alert unexpected message',
+            'SSL error: ssl/tls alert unexpected message',
             'unrecognized SSL error code:',
             'SQLSTATE[HY000] [1045] Access denied for user',
             'SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it',
@@ -83,12 +85,23 @@ class LostConnectionDetector implements LostConnectionDetectorContract
             'Connection lost',
             'Broken pipe',
             'SQLSTATE[25006]: Read only sql transaction: 7',
+
+            // PlanetScale MySQL / Vitess related things...
             'vtgate connection error: no healthy endpoints',
             'primary is not serving, there may be a reparent operation in progress',
             'current keyspace is being resharded',
             'no healthy tablet available',
             'transaction pool connection limit exceeded',
             'SSL operation failed with code 5',
+
+            // PlanetScale PostgreSQL / pg_bouncer related things...
+            'no primary available for branch',
+            'no replica available for branch',
+            'no running members available for branch',
+            'failed to connect to upstream',
+            'failed to send startup message',
+            'failed to read startup message',
+            'canceling statement due to conflict with recovery',
         ]);
     }
 }

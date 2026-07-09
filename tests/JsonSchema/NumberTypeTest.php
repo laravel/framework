@@ -61,6 +61,38 @@ class NumberTypeTest extends TestCase
         ], $type->toArray());
     }
 
+    public function test_it_may_set_multiple_of_as_float(): void
+    {
+        $type = JsonSchema::number()->multipleOf(0.5);
+
+        $this->assertEquals([
+            'type' => 'number',
+            'multipleOf' => 0.5,
+        ], $type->toArray());
+    }
+
+    public function test_it_may_set_multiple_of_as_int(): void
+    {
+        $type = JsonSchema::number()->multipleOf(3);
+
+        $this->assertEquals([
+            'type' => 'number',
+            'multipleOf' => 3,
+        ], $type->toArray());
+    }
+
+    public function test_it_may_combine_multiple_of_with_min_and_max(): void
+    {
+        $type = JsonSchema::number()->min(0.0)->max(10.0)->multipleOf(0.25);
+
+        $this->assertEquals([
+            'type' => 'number',
+            'minimum' => 0.0,
+            'maximum' => 10.0,
+            'multipleOf' => 0.25,
+        ], $type->toArray());
+    }
+
     public function test_it_may_set_enum(): void
     {
         $type = JsonSchema::number()->enum([1, 2.5, 3]);

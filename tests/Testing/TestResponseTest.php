@@ -239,6 +239,18 @@ class TestResponseTest extends TestCase
         $response->assertViewMissing('foo.baz');
     }
 
+    public function testViewData(): void
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => ['foo' => 'bar', 'baz' => 'qux'],
+        ]);
+
+        $this->assertEquals('bar', $response->viewData('foo'));
+
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $response->viewData());
+    }
+
     public function testAssertContent(): void
     {
         $response = $this->makeMockResponse([
@@ -353,6 +365,43 @@ class TestResponseTest extends TestCase
 
         try {
             $response->assertStreamedContent('not expected response string');
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
+        }
+    }
+
+    public function testAssertStreamedBinaryFile(): void
+    {
+        $response = TestResponse::fromBaseResponse(
+            new BinaryFileResponse(__DIR__.'/Fixtures/file.json')
+        );
+
+        $response->assertStreamedContent('{"foo":"bar"}');
+
+        try {
+            $response->assertStreamedContent('not expected response string');
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
+        }
+    }
+
+    public function testAssertStreamedJsonFile(): void
+    {
+        $response = TestResponse::fromBaseResponse(
+            new BinaryFileResponse(__DIR__.'/Fixtures/file.json')
+        );
+
+        $response->assertStreamedJsonContent(['foo' => 'bar']);
+
+        try {
+            $response->assertStreamedJsonContent([
+                'data' => [
+                    ['id' => 1],
+                    ['id' => 2],
+                ],
+            ]);
             $this->fail('xxxx');
         } catch (AssertionFailedError $e) {
             $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
@@ -2675,6 +2724,31 @@ class TestResponseTest extends TestCase
         $response->assertRedirectContains('url.net');
     }
 
+    public function testAssertHeaderContainsSuccess(): void
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->headers->set('X-Custom-Header', 'prefix-value-suffix');
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertHeaderContains('X-Custom-Header', 'value');
+    }
+
+    public function testAssertHeaderContainsFailure(): void
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->headers->set('X-Custom-Header', 'unrelated');
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Header [X-Custom-Header] was found, but [unrelated] does not contain [value].');
+
+        $response->assertHeaderContains('X-Custom-Header', 'value');
+    }
+
     public function testAssertRedirect(): void
     {
         $response = TestResponse::fromBaseResponse(
@@ -2813,6 +2887,78 @@ class TestResponseTest extends TestCase
         $response->assertSessionHas('foo');
         $response->assertSessionHas('bar');
         $response->assertSessionHas(['foo', 'bar']);
+    }
+
+    public function testAssertSessionHasAllWithValues(): void
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('foo', 'apple');
+        $store->put('bar', 'banana');
+
+        $response = TestResponse::fromBaseResponse(new Response());
+
+        $response->assertSessionHasAll([
+            'foo' => 'apple',
+            'bar' => 'banana',
+        ]);
+    }
+
+    public function testAssertSessionHasAllShowsAllMismatches(): void
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('foo', 'wrong1');
+        $store->put('bar', 'wrong2');
+
+        $response = TestResponse::fromBaseResponse(new Response());
+
+        try {
+            $response->assertSessionHasAll([
+                'foo' => 'apple',
+                'bar' => 'banana',
+            ]);
+
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $diff = $e->getComparisonFailure()->getDiff();
+            $this->assertStringContainsString('wrong1', $diff);
+            $this->assertStringContainsString('wrong2', $diff);
+            $this->assertStringContainsString('apple', $diff);
+            $this->assertStringContainsString('banana', $diff);
+        }
+    }
+
+    public function testAssertSessionHasAllWithMixedKeys(): void
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('foo', 'apple');
+        $store->put('bar', 'banana');
+        $store->put('baz', 'cherry');
+
+        $response = TestResponse::fromBaseResponse(new Response());
+
+        $response->assertSessionHasAll([
+            'baz',
+            'foo' => 'apple',
+            'bar' => 'banana',
+        ]);
+    }
+
+    public function testAssertSessionHasAllWithClosures(): void
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('foo', 'apple');
+        $store->put('bar', 'banana');
+
+        $response = TestResponse::fromBaseResponse(new Response());
+
+        $response->assertSessionHasAll([
+            'foo' => fn ($value) => $value === 'apple',
+            'bar' => 'banana',
+        ]);
     }
 
     public function testAssertSessionMissing(): void

@@ -78,6 +78,8 @@ class EloquentModelCustomCastingTest extends TestCase
         $this->schema()->drop('casting_table');
         $this->schema()->drop('members');
         $this->schema()->drop('documents');
+
+        parent::tearDown();
     }
 
     #[RequiresPhpExtension('gmp')]
@@ -442,14 +444,14 @@ class EuroCaster implements CastsAttributes
 
     public function increment($model, $key, $value, $attributes)
     {
-        $model->$key = new Euro((string) BigNumber::of($model->$key->value)->plus($value->value)->toScale(2));
+        $model->$key = new Euro((string) BigNumber::of((string) $model->$key->value)->plus($value->value)->toScale(2));
 
         return $model->$key;
     }
 
     public function decrement($model, $key, $value, $attributes)
     {
-        $model->$key = new Euro((string) BigNumber::of($model->$key->value)->subtract($value->value)->toScale(2));
+        $model->$key = new Euro((string) BigNumber::of((string) $model->$key->value)->subtract($value->value)->toScale(2));
 
         return $model->$key;
     }

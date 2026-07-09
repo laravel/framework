@@ -56,6 +56,8 @@ class DatabaseEloquentInverseRelationMorphManyTest extends TestCase
     {
         $this->schema()->drop('test_posts');
         $this->schema()->drop('test_comments');
+
+        parent::tearDown();
     }
 
     public function testMorphManyInverseRelationIsProperlySetToParentWhenLazyLoaded()

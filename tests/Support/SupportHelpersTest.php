@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use ArrayAccess;
 use ArrayIterator;
+use Carbon\CarbonInterval;
 use Countable;
 use Error;
 use Illuminate\Contracts\Support\Htmlable;
@@ -36,8 +37,6 @@ class SupportHelpersTest extends TestCase
 
     protected function tearDown(): void
     {
-        m::close();
-
         if (is_dir(__DIR__.'/tmp')) {
             (new Filesystem)->deleteDirectory(__DIR__.'/tmp');
         }
@@ -1056,6 +1055,29 @@ class SupportHelpersTest extends TestCase
         ]);
     }
 
+    public function testRetryWithCarbonIntervalSleep()
+    {
+        Sleep::fake();
+
+        $attempts = retry(2, function ($attempts) {
+            if ($attempts > 1) {
+                return $attempts;
+            }
+
+            throw new RuntimeException;
+        }, CarbonInterval::milliseconds(100));
+
+        // Make sure we made two attempts
+        $this->assertEquals(2, $attempts);
+
+        // Make sure we waited 100ms for the first attempt
+        Sleep::assertSleptTimes(1);
+
+        Sleep::assertSequence([
+            Sleep::usleep(100_000),
+        ]);
+    }
+
     public function testRetryWithPassingSleepCallback()
     {
         Sleep::fake();
@@ -1500,6 +1522,23 @@ class SupportHelpersTest extends TestCase
             ]),
             $filesystem->get($path)
         );
+    }
+
+    public function testWriteVariableQuotesValuesWithSpecialCharacters()
+    {
+        $filesystem = new Filesystem;
+        $path = __DIR__.'/tmp/env-test-file';
+        $filesystem->put($path, 'APP_NAME=Laravel'.PHP_EOL);
+
+        Env::writeVariable('APP_BRACKET', 'pass[word', $path);
+        Env::writeVariable('APP_CARET', 'foo^bar', $path);
+        Env::writeVariable('APP_BACKTICK', 'foo`bar', $path);
+
+        $contents = $filesystem->get($path);
+
+        $this->assertStringContainsString('APP_BRACKET="pass[word"', $contents);
+        $this->assertStringContainsString('APP_CARET="foo^bar"', $contents);
+        $this->assertStringContainsString('APP_BACKTICK="foo`bar"', $contents);
     }
 
     public function testWillThrowAnExceptionIfFileIsMissingWhenTryingToWriteVariables(): void

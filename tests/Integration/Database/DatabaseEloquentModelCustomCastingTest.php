@@ -287,6 +287,27 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
         $model->undefined_cast_column = 'Glāžšķūņu rūķīši';
     }
+
+    public function testMutatorCanDependOnAnotherCastedAttribute()
+    {
+        $model = new TestEloquentModelWithCustomCast([
+            'address_line_one' => '110 Kingsbrook St.',
+            'address_line_two' => 'My Childhood House',
+        ]);
+        $model->address->lineOne = 'Changed St.';
+        $this->assertSame('Changed St. (My Childhood House)', $model->address_string);
+    }
+
+    public function testMutatorCanDependOnAnotherCastedCarbonAttribute()
+    {
+        $model = new TestEloquentModelWithCustomCast([
+            'dob' => '2000-11-11',
+            'tob' => '2000-11-11 11:11:00',
+        ]);
+
+        $model->dob->addDay();
+        $this->assertSame('2000-11-12 11:11:00', $model->tob);
+    }
 }
 
 class TestEloquentModelWithCustomCast extends Model
@@ -304,6 +325,7 @@ class TestEloquentModelWithCustomCast extends Model
      * @var array
      */
     protected $casts = [
+        'dob' => DOBCaster::class,
         'address' => AddressCaster::class,
         'price' => DecimalCaster::class,
         'password' => HashCaster::class,
@@ -319,6 +341,65 @@ class TestEloquentModelWithCustomCast extends Model
         'anniversary_on_with_object_caching' => DateTimezoneCasterWithObjectCaching::class.':America/New_York',
         'anniversary_on_without_object_caching' => DateTimezoneCasterWithoutObjectCaching::class.':America/New_York',
     ];
+
+    protected function getTobAttribute(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        if (isset($this->attributes['dob'])) {
+            return Carbon::parse($this->attributes['dob'])->toDateString().' '.
+                Carbon::parse($value)->toTimeString();
+        }
+
+        return Carbon::parse($value)->toDateTimeString();
+    }
+
+    /**
+     * A computed attribute that depends on another casted attribute.
+     *
+     * This simulates a mutator that uses the value of a casted property.
+     */
+    protected function addressString(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::get(function () {
+            $address = $this->address;
+
+            // If mergeAttributesFromClassCasts() hasn't prepared casts properly,
+            // this could be an array instead of an Address instance.
+            if (! $address instanceof Address) {
+                throw new \RuntimeException('Address was not cast before mutator access.');
+            }
+
+            return "{$address->lineOne} ({$address->lineTwo})";
+        });
+    }
+}
+
+class DOBCaster implements CastsAttributes
+{
+    public function get($model, $key, $value, $attributes)
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        return Carbon::parse($value);
+    }
+
+    public function set($model, $key, $value, $attributes)
+    {
+        if ($value instanceof Carbon) {
+            return [$key => $value->toDateString()];
+        }
+
+        if ($value === null) {
+            return [$key => null];
+        }
+
+        return [$key => (string) $value];
+    }
 }
 
 class HashCaster implements CastsInboundAttributes

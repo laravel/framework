@@ -20,9 +20,9 @@ class RedisConnectorTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         $this->tearDownRedis();
+
+        parent::tearDown();
     }
 
     public function testDefaultConfiguration()
@@ -207,6 +207,26 @@ class RedisConnectorTest extends TestCase
         $predisClient = $predis->connection()->client();
         $parameters = $predisClient->getConnection()->getSentinelConnection()->getParameters();
         $this->assertEquals($host, $parameters->host);
+    }
+
+    public function testPhpRedisTcpKeepalive()
+    {
+        $host = env('REDIS_HOST', '127.0.0.1');
+        $port = env('REDIS_PORT', 6379);
+
+        $phpRedis = new RedisManager(new Application, 'phpredis', [
+            'cluster' => false,
+            'default' => [
+                'host' => $host,
+                'port' => $port,
+                'database' => 5,
+                'timeout' => 0.5,
+                'tcp_keepalive' => 60,
+            ],
+        ]);
+
+        $phpRedisClient = $phpRedis->connection()->client();
+        $this->assertEquals(1, $phpRedisClient->getOption(Redis::OPT_TCP_KEEPALIVE));
     }
 
     public function testPrefixOverrideBehaviour()

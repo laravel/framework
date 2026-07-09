@@ -43,7 +43,9 @@ trait CollectsResources
     /**
      * Get the resource that this resource collects.
      *
-     * @return string|null
+     * @return class-string<\Illuminate\Http\Resources\Json\JsonResource>|null
+     *
+     * @throws \LogicException
      */
     protected function collects()
     {

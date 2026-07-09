@@ -54,7 +54,9 @@ class HasManyThrough extends HasOneOrManyThrough
         // link them up with their children using the keyed dictionary to make the
         // matching very convenient and easy work. Then we'll just return them.
         foreach ($models as $model) {
-            if (isset($dictionary[$key = $this->getDictionaryKey($model->getAttribute($this->localKey))])) {
+            $key = $this->getDictionaryKey($model->getAttribute($this->localKey));
+
+            if ($key !== null && isset($dictionary[$key])) {
                 $model->setRelation(
                     $relation, $this->related->newCollection($dictionary[$key])
                 );

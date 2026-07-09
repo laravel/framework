@@ -68,6 +68,8 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
         }
 
         Relation::morphMap([], false);
+
+        parent::tearDown();
     }
 
     public function testCreation()

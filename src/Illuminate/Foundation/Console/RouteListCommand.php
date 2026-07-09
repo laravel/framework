@@ -47,7 +47,7 @@ class RouteListCommand extends Command
      *
      * @var string[]
      */
-    protected $headers = ['Domain', 'Method', 'URI', 'Name', 'Action', 'Middleware'];
+    protected $headers = ['Domain', 'Method', 'URI', 'Name', 'Action', 'Middleware', 'Path'];
 
     /**
      * The terminal width resolver callback.
@@ -146,6 +146,7 @@ class RouteListCommand extends Command
             'name' => $route->getName(),
             'action' => ltrim($route->getActionName(), '\\'),
             'middleware' => $this->getMiddleware($route),
+            'path' => $this->getClosurePath($route),
             'vendor' => $this->isVendorRoute($route),
         ]);
     }
@@ -211,6 +212,25 @@ class RouteListCommand extends Command
         return (new Collection($this->router->gatherRouteMiddleware($route)))
             ->map(fn ($middleware) => $middleware instanceof Closure ? 'Closure' : $middleware)
             ->implode("\n");
+    }
+
+    /**
+     * Get the file path and line number for a closure-based route.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return string|null
+     */
+    protected function getClosurePath(Route $route)
+    {
+        if (! $route->action['uses'] instanceof Closure) {
+            return null;
+        }
+
+        $reflection = new ReflectionFunction($route->action['uses']);
+
+        return str_replace(
+            '\\', '/', ltrim(Str::after($reflection->getFileName(), base_path()), DIRECTORY_SEPARATOR)
+        ).':'.$reflection->getStartLine();
     }
 
     /**
@@ -417,14 +437,20 @@ class RouteListCommand extends Command
      * Get the formatted action for display on the CLI.
      *
      * @param  array  $route
-     * @return string
+     * @return string|null
      */
     protected function formatActionForCli($route)
     {
         ['action' => $action, 'name' => $name] = $route;
 
         if ($action === 'Closure' || $action === ViewController::class) {
-            return $name;
+            $path = $route['path'] ?? null;
+
+            if ($name && $path) {
+                return $name.'   '.$path;
+            }
+
+            return $name ?? $path;
         }
 
         $name = $name ? "$name   " : null;

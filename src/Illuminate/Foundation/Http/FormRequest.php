@@ -248,7 +248,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * Get custom messages for validator errors.
      *
-     * @return array
+     * @return array<string, string>
      */
     public function messages()
     {
@@ -258,7 +258,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * Get custom attributes for validator errors.
      *
-     * @return array
+     * @return array<string, string>
      */
     public function attributes()
     {

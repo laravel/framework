@@ -248,6 +248,7 @@ class SupportStringableTest extends TestCase
         $this->assertSame('what', (string) $this->stringable('whaaat')->deduplicate('a'));
         $this->assertSame('/some/odd/path/', (string) $this->stringable('/some//odd//path/')->deduplicate('/'));
         $this->assertSame('ムだム', (string) $this->stringable('ムだだム')->deduplicate('だ'));
+        $this->assertSame(' laravel forever ', (string) $this->stringable(' laravell    foreverrr  ')->deduplicate([' ', 'l', 'r']));
     }
 
     public function testDirname()
@@ -1478,6 +1479,11 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('Foo')->exactly('foo'));
         $this->assertFalse($this->stringable('[]')->exactly([]));
         $this->assertFalse($this->stringable('0')->exactly(0));
+    }
+
+    public function testInitials()
+    {
+        $this->assertSame('TO', $this->stringable('Taylor Otwell')->initials()->value());
     }
 
     public function testToInteger()

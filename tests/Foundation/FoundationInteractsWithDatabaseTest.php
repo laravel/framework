@@ -33,11 +33,6 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->connection = m::mock(Connection::class);
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testSeeInDatabaseFindsResults()
     {
         $this->mockCountBuilder(true);

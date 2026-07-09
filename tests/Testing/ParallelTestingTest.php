@@ -99,10 +99,10 @@ class ParallelTestingTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Container::setInstance(null);
 
         unset($_SERVER['LARAVEL_PARALLEL_TESTING']);
+
+        parent::tearDown();
     }
 }

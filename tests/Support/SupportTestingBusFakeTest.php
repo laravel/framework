@@ -26,12 +26,6 @@ class SupportTestingBusFakeTest extends TestCase
         $this->fake = new BusFake(m::mock(QueueingDispatcher::class));
     }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        m::close();
-    }
-
     public function testItUsesCustomBusRepository()
     {
         $busRepository = new BatchRepositoryFake;
@@ -853,6 +847,132 @@ class SupportTestingBusFakeTest extends TestCase
         $serializingBusFake->assertBatched(function (PendingBatchFake $batchedCollection) {
             return $batchedCollection->jobs->count() === 1 && $batchedCollection->jobs->first()->value === 'hello';
         });
+    }
+
+    public function testCanAssertJobsOnPendingBatchFake()
+    {
+        $this->fake->batch([
+            new BusFakeJobWithSerialization('foo'),
+            new BusFakeJobWithSerialization('bar'),
+            new BusFakeJobWithSerialization('baz'),
+        ])->dispatch();
+
+        $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+            return $batchedCollection->hasJobs([
+                new BusFakeJobWithSerialization('foo'),
+                new BusFakeJobWithSerialization('bar'),
+                new BusFakeJobWithSerialization('baz'),
+            ]);
+        });
+
+        $this->fake->assertBatched([
+            new BusFakeJobWithSerialization('foo'),
+            new BusFakeJobWithSerialization('bar'),
+            new BusFakeJobWithSerialization('baz'),
+        ]);
+
+        try {
+            $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+                return $batchedCollection->hasJobs([
+                    new BusFakeJobWithSerialization('baz'),
+                    new BusFakeJobWithSerialization('foo'),
+                    new BusFakeJobWithSerialization('bar'),
+                ]);
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected batch was not dispatched.', $e->getMessage());
+        }
+
+        try {
+            $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+                return $batchedCollection->hasJobs([
+                    new BusFakeJobWithSerialization('foo'),
+                    new BusFakeJobWithSerialization('baaar'),
+                    new BusFakeJobWithSerialization('baz'),
+                ]);
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected batch was not dispatched.', $e->getMessage());
+        }
+
+        try {
+            $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+                return $batchedCollection->hasJobs([
+                    new BusFakeJobWithSerialization('foo'),
+                    new BusFakeJobWithSerialization('baz'),
+                ]);
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected batch was not dispatched.', $e->getMessage());
+        }
+
+        try {
+            $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+                return $batchedCollection->hasJobs([
+                    new BusFakeJobWithSerialization('foo'),
+                    new BusFakeJobWithSerialization('bar'),
+                    new BusFakeJobWithSerialization('baz'),
+                    new BusFakeJobWithSerialization('qux'),
+                ]);
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected batch was not dispatched.', $e->getMessage());
+        }
+    }
+
+    public function testCanAssertJobsOnPendingBatchFakeWithClosures()
+    {
+        $this->fake->batch([
+            new BusFakeJobWithSerialization('foo'),
+            new BusFakeJobWithSerialization('bar'),
+            new BusFakeJobWithSerialization('baz'),
+        ])->dispatch();
+
+        $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+            return $batchedCollection->hasJobs([
+                fn (BusFakeJobWithSerialization $job) => $job->value === 'foo',
+                fn (BusFakeJobWithSerialization $job) => $job->value === 'bar',
+                fn (BusFakeJobWithSerialization $job) => $job->value === 'baz',
+            ]);
+        });
+
+        $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+            return $batchedCollection->hasJobs([
+                fn (BusFakeJobWithSerialization $job) => $job->value === 'foo',
+                BusFakeJobWithSerialization::class,
+                new BusFakeJobWithSerialization('baz'),
+            ]);
+        });
+
+        try {
+            $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+                return $batchedCollection->hasJobs([
+                    fn (BusFakeJobWithSerialization $job) => $job->value === 'foo',
+                    fn (BusFakeJobWithSerialization $job) => $job->value === 'wrong',
+                    fn (BusFakeJobWithSerialization $job) => $job->value === 'baz',
+                ]);
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected batch was not dispatched.', $e->getMessage());
+        }
+
+        try {
+            $this->fake->assertBatched(function (PendingBatchFake $batchedCollection) {
+                return $batchedCollection->hasJobs([
+                    fn (BusFakeJobWithSerialization $job) => $job->value === 'foo',
+                    fn (BusJobStub $job) => true,
+                    fn (BusFakeJobWithSerialization $job) => $job->value === 'baz',
+                ]);
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected batch was not dispatched.', $e->getMessage());
+        }
     }
 }
 

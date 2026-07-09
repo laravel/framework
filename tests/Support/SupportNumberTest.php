@@ -186,6 +186,12 @@ class SupportNumberTest extends TestCase
         $this->assertSame('1 ZB', Number::fileSize(1024 ** 7));
         $this->assertSame('1 YB', Number::fileSize(1024 ** 8));
         $this->assertSame('1,024 YB', Number::fileSize(1024 ** 9));
+
+        $this->assertSame('-1 B', Number::fileSize(-1));
+        $this->assertSame('-2 KB', Number::fileSize(-2048));
+        $this->assertSame('-2.00 KB', Number::fileSize(-2048, precision: 2));
+        $this->assertSame('-1.23 KB', Number::fileSize(-1264, precision: 2));
+        $this->assertSame('-5 GB', Number::fileSize(-1024 * 1024 * 1024 * 5));
     }
 
     public function testClamp()
@@ -325,6 +331,18 @@ class SupportNumberTest extends TestCase
         $this->assertSame([[0.5, 2.5], [3.0, 5.0], [5.5, 7.5], [8.0, 10.0]], Number::pairs(10, 2.5, 0.5, 0.5));
     }
 
+    public function testPairsThrowsWhenByIsZero()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Number::pairs(100, 0);
+    }
+
+    public function testPairsWithNegativeByWorksLikePositive()
+    {
+        $this->assertSame(Number::pairs(100, 10), Number::pairs(100, -10));
+    }
+
     public function testTrim()
     {
         $this->assertSame(12, Number::trim(12));
@@ -334,6 +352,9 @@ class SupportNumberTest extends TestCase
         $this->assertSame(12.3, Number::trim(12.30));
         $this->assertSame(12.3456789, Number::trim(12.3456789));
         $this->assertSame(12.3456789, Number::trim(12.34567890000));
+        $this->assertSame(INF, Number::trim(INF));
+        $this->assertSame(-INF, Number::trim(-INF));
+        $this->assertNan(Number::trim(NAN));
     }
 
     #[RequiresPhpExtension('intl')]

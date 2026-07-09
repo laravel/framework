@@ -64,6 +64,7 @@ class Reflector
      *
      * @param  object|class-string  $objectOrClass
      * @param  class-string<TAttribute>  $attribute
+     * @param  bool  $ascend
      * @return TAttribute|null
      */
     public static function getClassAttribute($objectOrClass, $attribute, $ascend = false)
@@ -79,6 +80,7 @@ class Reflector
      *
      * @param  TTarget|class-string<TTarget>  $objectOrClass
      * @param  class-string<TAttribute>  $attribute
+     * @param  bool  $includeParents
      * @return ($includeParents is true ? Collection<class-string<contravariant TTarget>, Collection<int, TAttribute>> : Collection<int, TAttribute>)
      */
     public static function getClassAttributes($objectOrClass, $attribute, $includeParents = false)

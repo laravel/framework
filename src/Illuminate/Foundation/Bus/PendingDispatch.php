@@ -184,11 +184,12 @@ class PendingDispatch
     /**
      * Indicate that the job should be dispatched after the response is sent to the browser.
      *
+     * @param  bool  $afterResponse
      * @return $this
      */
-    public function afterResponse()
+    public function afterResponse($afterResponse = true)
     {
-        $this->afterResponse = true;
+        $this->afterResponse = $afterResponse;
 
         return $this;
     }

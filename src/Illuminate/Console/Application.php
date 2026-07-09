@@ -55,7 +55,7 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * A map of command names to classes.
      *
-     * @var array
+     * @var array<string, \Illuminate\Console\Command|string>
      */
     protected $commandMap = [];
 
@@ -172,7 +172,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      *
      * @param  \Symfony\Component\Console\Command\Command|string  $command
      * @param  array  $parameters
-     * @return array
+     * @return array<string, \Symfony\Component\Console\Input\ArrayInput>
      */
     protected function parseCommand($command, $parameters)
     {

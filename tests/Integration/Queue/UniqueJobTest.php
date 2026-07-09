@@ -16,6 +16,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
 
@@ -166,6 +167,29 @@ class UniqueJobTest extends QueueTestCase
         }
     }
 
+    public function testQueueFakeReleasesUniqueJobLocksBetweenFakes()
+    {
+        Queue::fake();
+
+        UniqueTestJob::dispatch();
+        Queue::assertPushed(UniqueTestJob::class);
+
+        Queue::fake();
+
+        UniqueTestJob::dispatch();
+        Queue::assertPushed(UniqueTestJob::class);
+    }
+
+    public function testQueueFakePreservesUniqueJobLockWithinTest()
+    {
+        Queue::fake();
+
+        UniqueTestJob::dispatch();
+        UniqueTestJob::dispatch();
+
+        Queue::assertPushedTimes(UniqueTestJob::class, 1);
+    }
+
     protected function getLockKey($job)
     {
         return 'laravel_unique_job:'.(is_string($job) ? $job : get_class($job)).':';
@@ -175,7 +199,7 @@ class UniqueJobTest extends QueueTestCase
     {
         Bus::fake();
 
-        $lockKey = 'laravel_unique_job:App\\Actions\\UniqueTestAction:';
+        $lockKey = 'laravel_unique_job:'.hash('xxh128', 'App\\Actions\\UniqueTestAction').':';
 
         dispatch(new UniqueTestJobWithDisplayName);
         $this->runQueueWorkerCommand(['--once' => true]);
@@ -214,7 +238,7 @@ class UniqueJobTest extends QueueTestCase
     public function testUniqueLockCreatesKeyWithDisplayNameWhenAvailable()
     {
         $this->assertEquals(
-            'laravel_unique_job:App\\Actions\\UniqueTestAction:unique-id-2',
+            'laravel_unique_job:'.hash('xxh128', 'App\\Actions\\UniqueTestAction').':unique-id-2',
             UniqueLock::getKey(new UniqueIdTestJobWithDisplayName)
         );
     }
@@ -222,7 +246,7 @@ class UniqueJobTest extends QueueTestCase
     public function testUniqueLockCreatesKeyWithIdAndDisplayNameWhenAvailable()
     {
         $this->assertEquals(
-            'laravel_unique_job:App\\Actions\\UniqueTestAction:unique-id-2',
+            'laravel_unique_job:'.hash('xxh128', 'App\\Actions\\UniqueTestAction').':unique-id-2',
             UniqueLock::getKey(new UniqueIdTestJobWithDisplayName)
         );
     }

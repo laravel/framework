@@ -101,6 +101,10 @@ class Frame
      */
     public function class()
     {
+        if (! empty($this->frame['class'])) {
+            return $this->frame['class'];
+        }
+
         $class = array_search((string) realpath($this->frame['file']), $this->classMap, true);
 
         return $class === false ? null : $class;
@@ -143,7 +147,7 @@ class Frame
      */
     public function operator()
     {
-        return $this->frame['type'];
+        return $this->frame['type'] ?? '';
     }
 
     /**

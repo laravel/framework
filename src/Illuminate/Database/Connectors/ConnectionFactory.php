@@ -87,7 +87,9 @@ class ConnectionFactory
     {
         $connection = $this->createSingleConnection($this->getWriteConfig($config));
 
-        return $connection->setReadPdo($this->createReadPdo($config));
+        return $connection
+            ->setReadPdo($this->createReadPdo($config))
+            ->setReadPdoConfig($this->getReadConfig($config));
     }
 
     /**
