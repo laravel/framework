@@ -49,6 +49,7 @@ use Illuminate\Support\Testing\Fakes\MailFake;
  * @method static void assertNothingOutgoing()
  * @method static void assertNothingSent()
  * @method static void assertQueued(string|\Closure $mailable, callable|array|string|int|null $callback = null)
+ * @method static void assertQueuedTimes(string $mailable, int $times = 1)
  * @method static void assertNotQueued(string|\Closure $mailable, callable|array|string|null $callback = null)
  * @method static void assertNothingQueued()
  * @method static void assertSentCount(int $count)
