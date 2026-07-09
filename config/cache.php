@@ -87,6 +87,7 @@ return [
             'driver' => 'redis',
             'connection' => env('REDIS_CACHE_CONNECTION', 'cache'),
             'lock_connection' => env('REDIS_CACHE_LOCK_CONNECTION', 'default'),
+            'flush_scope' => env('REDIS_CACHE_FLUSH_SCOPE', 'database'),
         ],
 
         'dynamodb' => [
@@ -119,7 +120,9 @@ return [
     |
     | When utilizing the APC, database, memcached, Redis, and DynamoDB cache
     | stores, there might be other applications using the same cache. For
-    | that reason, you may prefix every cache key to avoid collisions.
+    | that reason, you may prefix every cache key to avoid collisions. This
+    | prefix also allows Redis cache stores to be cleared without flushing the
+    | entire database when REDIS_CACHE_FLUSH_SCOPE is set to "prefix".
     |
     */
 

@@ -20,6 +20,7 @@ use Illuminate\Cache\Events\RetrievingManyKeys;
 use Illuminate\Cache\Events\WritingKey;
 use Illuminate\Cache\Events\WritingManyKeys;
 use Illuminate\Cache\Repository;
+use Illuminate\Contracts\Cache\CanFlushPrefix;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Events\Dispatcher;
 use Mockery as m;
@@ -239,6 +240,30 @@ class CacheEventsTest extends TestCase
             ])
         );
         $this->assertTrue($repository->clear());
+    }
+
+    public function testFlushPrefixTriggersEvents()
+    {
+        $dispatcher = $this->getDispatcher();
+        $store = m::mock(Store::class, CanFlushPrefix::class);
+        $repository = new Repository($store, ['store' => 'redis']);
+        $repository->setEventDispatcher($dispatcher);
+
+        $store->shouldReceive('flushPrefix')->once()->andReturn(true);
+
+        $dispatcher->shouldReceive('dispatch')->once()->with(
+            $this->assertEventMatches(CacheFlushing::class, [
+                'storeName' => 'redis',
+            ])
+        );
+
+        $dispatcher->shouldReceive('dispatch')->once()->with(
+            $this->assertEventMatches(CacheFlushed::class, [
+                'storeName' => 'redis',
+            ])
+        );
+
+        $this->assertTrue($repository->flushPrefix());
     }
 
     public function testFlushLocksTriggersEvents()

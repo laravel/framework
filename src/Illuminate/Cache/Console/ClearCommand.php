@@ -73,11 +73,27 @@ class ClearCommand extends Command
             return $this->clearLocks();
         }
 
+        if ($this->option('prefix') && ! empty($this->tags())) {
+            $this->components->error('Cache tags cannot be used when clearing by prefix.');
+
+            return self::FAILURE;
+        }
+
         $this->laravel['events']->dispatch(
             'cache:clearing', [$this->argument('store'), $this->tags()]
         );
 
-        $successful = $this->cache()->flush();
+        if ($this->flushesByPrefix()) {
+            try {
+                $successful = $this->cache()->flushPrefix();
+            } catch (BadMethodCallException) {
+                $this->components->error('This cache store does not support clearing by prefix.');
+
+                return self::FAILURE;
+            }
+        } else {
+            $successful = $this->cache()->flush();
+        }
 
         $this->flushFacades();
 
@@ -103,6 +119,12 @@ class ClearCommand extends Command
      */
     protected function clearLocks()
     {
+        if ($this->option('prefix')) {
+            $this->components->error('Cache locks cannot be used when clearing by prefix.');
+
+            return self::FAILURE;
+        }
+
         if (! empty($this->tags())) {
             $this->components->error('Cache tags cannot be used when clearing locks.');
 
@@ -169,6 +191,26 @@ class ClearCommand extends Command
     }
 
     /**
+     * Determine if the cache store should be cleared by prefix.
+     *
+     * @return bool
+     */
+    protected function flushesByPrefix()
+    {
+        if ($this->option('prefix')) {
+            return true;
+        }
+
+        if (! empty($this->tags()) || ! $this->laravel->bound('config')) {
+            return false;
+        }
+
+        $store = $this->argument('store') ?: $this->laravel['config']->get('cache.default');
+
+        return $this->laravel['config']->get("cache.stores.{$store}.flush_scope") === 'prefix';
+    }
+
+    /**
      * Get the console command arguments.
      *
      * @return array
@@ -189,6 +231,7 @@ class ClearCommand extends Command
     {
         return [
             ['tags', null, InputOption::VALUE_OPTIONAL, 'The cache tags you would like to clear', null],
+            ['prefix', null, InputOption::VALUE_NONE, 'Only clear cache entries matching the configured prefix'],
             ['locks', null, InputOption::VALUE_NONE, 'Only clear cache locks'],
         ];
     }
