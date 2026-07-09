@@ -57,7 +57,6 @@ class WithoutMiddlewareAttributeController
     }
 }
 
-
 class ChildWithoutMiddlewareAttributeController extends WithoutMiddlewareAttributeController
 {
 }
