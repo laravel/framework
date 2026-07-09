@@ -13,14 +13,14 @@ class FoundationHelpersTest extends TestCase
 {
     public function testRescue()
     {
-        $this->assertEquals(
+        $this->assertSame(
             'rescued!',
             rescue(function () {
                 throw new Exception;
             }, 'rescued!')
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             'rescued!',
             rescue(function () {
                 throw new Exception;
@@ -29,7 +29,7 @@ class FoundationHelpersTest extends TestCase
             })
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             'no need to rescue',
             rescue(function () {
                 return 'no need to rescue';
@@ -44,7 +44,7 @@ class FoundationHelpersTest extends TestCase
             }
         };
 
-        $this->assertEquals(
+        $this->assertSame(
             'rescued!',
             rescue(function () use ($testClass) {
                 $testClass->test([]);
@@ -124,10 +124,10 @@ class FoundationHelpersTest extends TestCase
 
     public function testFakeUsesLocale()
     {
-        mt_srand(12345, MT_RAND_PHP);
+        mt_srand(12345);
 
         // Should fallback to en_US
-        $this->assertSame('Arkansas', fake()->state());
+        $this->assertSame('New Jersey', fake()->state());
         $this->assertContains(fake('de_DE')->state(), [
             'Baden-Württemberg', 'Bayern', 'Berlin', 'Brandenburg', 'Bremen', 'Hamburg', 'Hessen', 'Mecklenburg-Vorpommern', 'Niedersachsen', 'Nordrhein-Westfalen', 'Rheinland-Pfalz', 'Saarland', 'Sachsen', 'Sachsen-Anhalt', 'Schleswig-Holstein', 'Thüringen',
         ]);
@@ -138,10 +138,10 @@ class FoundationHelpersTest extends TestCase
         ]);
 
         config(['app.faker_locale' => 'en_AU']);
-        mt_srand(4, MT_RAND_PHP);
+        mt_srand(4);
 
         // Should fallback to en_US
-        $this->assertSame('Australian Capital Territory', fake()->state());
+        $this->assertSame('Northern Territory', fake()->state());
     }
 
     protected function makeManifest($directory = '')

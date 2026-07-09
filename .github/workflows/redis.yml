@@ -4,8 +4,11 @@ on:
   push:
     branches:
       - master
-      - '*.x'
+      - "*.x"
   pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   redis:
@@ -21,16 +24,18 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        client: ['phpredis', 'predis']
+        client: ["phpredis", "predis"]
 
     name: Redis (${{ matrix.client}}) Driver
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
         with:
           php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
@@ -41,7 +46,7 @@ jobs:
         run: composer config version "13.x-dev"
 
       - name: Install dependencies
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -67,16 +72,18 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        client: ['phpredis', 'predis']
+        client: ["phpredis", "predis"]
 
     name: Redis Cluster (${{ matrix.client}}) Driver
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
         with:
           php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
@@ -87,7 +94,7 @@ jobs:
         run: composer config version "13.x-dev"
 
       - name: Install dependencies
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -104,7 +111,7 @@ jobs:
           redis-cli --cluster create 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 --cluster-replicas 0 --cluster-yes
 
       - name: Check Redis Cluster is ready
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
         with:
           timeout_seconds: 5
           max_attempts: 5
@@ -129,6 +136,5 @@ jobs:
         env:
           REDIS_CLIENT: ${{ matrix.client }}
           REDIS_CLUSTER_HOSTS_AND_PORTS: 127.0.0.1:7000,127.0.0.1:7001,127.0.0.1:7002
-          REDIS_QUEUE: '{default}'
+          REDIS_QUEUE: "default"
           QUEUE_CONNECTION: redis
-

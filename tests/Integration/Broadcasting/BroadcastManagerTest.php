@@ -17,7 +17,9 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
 use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
+use stdClass;
 
 class BroadcastManagerTest extends TestCase
 {
@@ -87,7 +89,7 @@ class BroadcastManagerTest extends TestCase
         Bus::assertNotDispatched(UniqueBroadcastEvent::class);
         Queue::assertPushed(UniqueBroadcastEvent::class);
 
-        $lockKey = 'laravel_unique_job:'.TestEventUnique::class.':';
+        $lockKey = 'laravel_unique_job:'.hash('xxh128', TestEventUnique::class).':';
         $this->assertFalse($this->app->get(Cache::class)->lock($lockKey, 10)->get());
     }
 
@@ -101,7 +103,7 @@ class BroadcastManagerTest extends TestCase
         Bus::assertNotDispatched(UniqueBroadcastEvent::class);
         Queue::assertPushed(UniqueBroadcastEvent::class);
 
-        $lockKey = 'laravel_unique_job:'.TestEventUniqueWithIdProperty::class.':unique-id-property';
+        $lockKey = 'laravel_unique_job:'.hash('xxh128', TestEventUniqueWithIdProperty::class).':unique-id-property';
         $this->assertFalse($this->app->get(Cache::class)->lock($lockKey, 10)->get());
     }
 
@@ -115,7 +117,7 @@ class BroadcastManagerTest extends TestCase
         Bus::assertNotDispatched(UniqueBroadcastEvent::class);
         Queue::assertPushed(UniqueBroadcastEvent::class);
 
-        $lockKey = 'laravel_unique_job:'.TestEventUniqueWithIdMethod::class.':unique-id-method';
+        $lockKey = 'laravel_unique_job:'.hash('xxh128', TestEventUniqueWithIdMethod::class).':unique-id-method';
         $this->assertFalse($this->app->get(Cache::class)->lock($lockKey, 10)->get());
     }
 
@@ -156,7 +158,44 @@ class BroadcastManagerTest extends TestCase
         $this->assertSame($manager, $manager->connection(__CLASS__));
     }
 
-    public function testThrowExceptionWhenDriverCreationFails()
+    public function testCustomDriverStaticClosure()
+    {
+        $manager = new BroadcastManager($this->getApp([
+            'broadcasting' => [
+                'connections' => [
+                    __CLASS__ => [
+                        'driver' => __CLASS__,
+                    ],
+                ],
+            ],
+        ]));
+
+        $driver = new stdClass;
+
+        $manager->extend(__CLASS__, static fn () => $driver);
+        $this->assertSame($driver, $manager->connection(__CLASS__));
+    }
+
+    public function testInvokableObjectDriverClosure()
+    {
+        $manager = new BroadcastManager($this->getApp([
+            'broadcasting' => [
+                'connections' => [
+                    __CLASS__ => [
+                        'driver' => __CLASS__,
+                    ],
+                ],
+            ],
+        ]));
+
+        $driver = new stdClass;
+        $creator = new CustomBroadcastDriver($driver);
+
+        $manager->extend(__CLASS__, $creator(...));
+        $this->assertSame($driver, $manager->connection(__CLASS__));
+    }
+
+    public function test_throw_exception_when_driver_creation_fails()
     {
         $userConfig = [
             'broadcasting' => [
@@ -169,8 +208,8 @@ class BroadcastManagerTest extends TestCase
         ];
 
         $app = $this->getApp($userConfig);
-        $app->singleton(\Psr\Log\LoggerInterface::class, function () {
-            throw new \RuntimeException('Logger service not available');
+        $app->singleton(LoggerInterface::class, function () {
+            throw new RuntimeException('Logger service not available');
         });
 
         $broadcastManager = new BroadcastManager($app);
@@ -181,8 +220,79 @@ class BroadcastManagerTest extends TestCase
         } catch (RuntimeException $e) {
             $this->assertStringContainsString('Failed to create broadcaster for connection "log_connection_1"', $e->getMessage());
             $this->assertStringContainsString('Logger service not available', $e->getMessage());
-            $this->assertInstanceOf(\RuntimeException::class, $e->getPrevious());
+            $this->assertInstanceOf(RuntimeException::class, $e->getPrevious());
         }
+    }
+
+    public function testBroadcastManagerCanResolveBackedEnumConnection(): void
+    {
+        $app = $this->getApp([
+            'broadcasting' => [
+                'connections' => [
+                    'log' => ['driver' => 'log'],
+                ],
+            ],
+        ]);
+
+        $driver = new stdClass;
+        $manager = new BroadcastManager($app);
+        $manager->extend('log', static fn () => $driver);
+
+        $this->assertSame($driver, $manager->connection(BroadcastConnectionName::Log));
+        $this->assertSame($manager->connection('log'), $manager->connection(BroadcastConnectionName::Log));
+    }
+
+    public function testBroadcastManagerCanResolveBackedEnumDriver(): void
+    {
+        $app = $this->getApp([
+            'broadcasting' => [
+                'connections' => [
+                    'log' => ['driver' => 'log'],
+                ],
+            ],
+        ]);
+
+        $driver = new stdClass;
+        $manager = new BroadcastManager($app);
+        $manager->extend('log', static fn () => $driver);
+
+        $this->assertSame($driver, $manager->driver(BroadcastConnectionName::Log));
+        $this->assertSame($manager->driver('log'), $manager->driver(BroadcastConnectionName::Log));
+    }
+
+    public function testSetDefaultDriverAcceptsBackedEnum(): void
+    {
+        $app = $this->getApp([
+            'broadcasting' => [
+                'default' => 'null',
+                'connections' => [],
+            ],
+        ]);
+
+        $manager = new BroadcastManager($app);
+        $manager->setDefaultDriver(BroadcastConnectionName::Log);
+
+        $this->assertSame('log', $app['config']['broadcasting.default']);
+    }
+
+    public function testPurgeAcceptsBackedEnum(): void
+    {
+        $app = $this->getApp([
+            'broadcasting' => [
+                'connections' => [
+                    'log' => ['driver' => 'log'],
+                ],
+            ],
+        ]);
+
+        $manager = new BroadcastManager($app);
+        $manager->extend('log', static fn () => new stdClass);
+
+        $instance1 = $manager->connection(BroadcastConnectionName::Log);
+        $manager->purge(BroadcastConnectionName::Log);
+        $instance2 = $manager->connection(BroadcastConnectionName::Log);
+
+        $this->assertNotSame($instance1, $instance2);
     }
 
     protected function getApp(array $userConfig)
@@ -192,6 +302,11 @@ class BroadcastManagerTest extends TestCase
 
         return $app;
     }
+}
+
+enum BroadcastConnectionName: string
+{
+    case Log = 'log';
 }
 
 class TestEvent implements ShouldBroadcast
@@ -266,5 +381,17 @@ class TestEventNowRescue implements ShouldBroadcastNow, ShouldRescue
     public function broadcastOn()
     {
         //
+    }
+}
+
+class CustomBroadcastDriver
+{
+    public function __construct(private object $driver)
+    {
+    }
+
+    public function __invoke()
+    {
+        return $this->driver;
     }
 }

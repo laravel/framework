@@ -186,10 +186,10 @@ class EloquentModelCustomCastingTest extends TestCase
         $model->save();
 
         $this->assertInstanceOf(Euro::class, $model->amount);
-        $this->assertEquals('2', $model->amount->value);
+        $this->assertSame('2', $model->amount->value);
 
         $model->increment('amount', new Euro('1'));
-        $this->assertEquals('3.00', $model->amount->value);
+        $this->assertSame('3.00', $model->amount->value);
     }
 
     public function testModelWithCustomCastsCompareFunction()

@@ -72,7 +72,7 @@ SQL);
         $tableView = Schema::getViews();
 
         $this->assertCount(1, $tableView);
-        $this->assertEquals('users_view', $tableView[0]['name']);
+        $this->assertSame('users_view', $tableView[0]['name']);
 
         DB::connection('conn1')->statement(<<<'SQL'
 DROP VIEW IF EXISTS users_view;

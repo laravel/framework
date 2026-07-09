@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Mail;
 
 use InvalidArgumentException;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -125,10 +126,78 @@ class MailManagerTest extends TestCase
         $this->assertSame(5876, $transport->getStream()->getPort());
     }
 
+    public function testMailManagerCanResolveBackedEnumMailer(): void
+    {
+        $this->app['config']->set('mail.mailers.array', [
+            'transport' => 'array',
+        ]);
+
+        $mailer1 = $this->app['mail.manager']->mailer(MailerName::ArrayMailer);
+        $mailer2 = $this->app['mail.manager']->mailer('array');
+
+        $this->assertSame($mailer1, $mailer2);
+    }
+
+    public function testMailManagerCanResolveBackedEnumDriver(): void
+    {
+        $this->app['config']->set('mail.mailers.array', [
+            'transport' => 'array',
+        ]);
+
+        $mailer1 = $this->app['mail.manager']->driver(MailerName::ArrayMailer);
+        $mailer2 = $this->app['mail.manager']->driver('array');
+
+        $this->assertSame($mailer1, $mailer2);
+    }
+
+    public function testSetDefaultDriverAcceptsBackedEnum(): void
+    {
+        $this->app['config']->set('mail.mailers.array', [
+            'transport' => 'array',
+        ]);
+
+        $this->app['mail.manager']->setDefaultDriver(MailerName::ArrayMailer);
+
+        $this->assertSame('array', $this->app['config']->get('mail.default'));
+    }
+
+    public function testPurgeAcceptsBackedEnum(): void
+    {
+        $this->app['config']->set('mail.mailers.array', [
+            'transport' => 'array',
+        ]);
+
+        $manager = $this->app['mail.manager'];
+
+        $mailer1 = $manager->mailer(MailerName::ArrayMailer);
+        $manager->purge(MailerName::ArrayMailer);
+        $mailer2 = $manager->mailer(MailerName::ArrayMailer);
+
+        $this->assertNotSame($mailer1, $mailer2);
+    }
+
+    #[WithConfig('mail.mailers.array', ['transport' => 'array'])]
+    #[WithConfig('mail.to', ['address' => 'taylor@laravel.com'])]
+    public function testGlobalToAddressWithoutName(): void
+    {
+        $mailer = $this->app['mail.manager']->mailer('array');
+
+        $sentMessage = $mailer->raw('Hello World', function ($message) {
+            $message->to('jack@laravel.com');
+        });
+
+        $this->assertStringContainsString('To: taylor@laravel.com', $sentMessage->toString());
+    }
+
     public static function emptyTransportConfigDataProvider()
     {
         return [
             [null], [''], [' '],
         ];
     }
+}
+
+enum MailerName: string
+{
+    case ArrayMailer = 'array';
 }

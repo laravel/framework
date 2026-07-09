@@ -242,7 +242,13 @@ class Route
         $callable = $this->action['uses'];
 
         if ($this->isSerializedClosure()) {
-            $callable = unserialize($this->action['uses'])->getClosure();
+            $callable = unserialize($this->action['uses'], ['allowed_classes' => [
+                SerializableClosure::class,
+                \Laravel\SerializableClosure\UnsignedSerializableClosure::class,
+                \Laravel\SerializableClosure\Serializers\Native::class,
+                \Laravel\SerializableClosure\Serializers\Signed::class,
+                \Laravel\SerializableClosure\Support\SelfReference::class,
+            ]])->getClosure();
         }
 
         return $this->container[CallableDispatcher::class]->dispatch($this, $callable);
@@ -516,11 +522,7 @@ class Route
      */
     public function parameterNames()
     {
-        if (isset($this->parameterNames)) {
-            return $this->parameterNames;
-        }
-
-        return $this->parameterNames = $this->compileParameterNames();
+        return $this->parameterNames ?? $this->parameterNames = $this->compileParameterNames();
     }
 
     /**
@@ -765,7 +767,7 @@ class Route
      * Get or set the domain for the route.
      *
      * @param  \BackedEnum|string|null  $domain
-     * @return $this|string|null
+     * @return ($domain is null ? string|null : $this)
      *
      * @throws \InvalidArgumentException
      */
@@ -921,13 +923,7 @@ class Route
             return false;
         }
 
-        foreach ($patterns as $pattern) {
-            if (Str::is($pattern, $routeName)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($patterns, fn ($pattern) => Str::is($pattern, $routeName));
     }
 
     /**
@@ -1034,7 +1030,13 @@ class Route
             Str::startsWith($missing, [
                 'O:47:"Laravel\\SerializableClosure\\SerializableClosure',
                 'O:55:"Laravel\\SerializableClosure\\UnsignedSerializableClosure',
-            ]) ? unserialize($missing) : $missing;
+            ]) ? unserialize($missing, ['allowed_classes' => [
+                SerializableClosure::class,
+                \Laravel\SerializableClosure\UnsignedSerializableClosure::class,
+                \Laravel\SerializableClosure\Serializers\Native::class,
+                \Laravel\SerializableClosure\Serializers\Signed::class,
+                \Laravel\SerializableClosure\Support\SelfReference::class,
+            ]]) : $missing;
     }
 
     /**
@@ -1127,21 +1129,19 @@ class Route
             $this->getControllerMethod(),
         ];
 
-        if (is_a($controllerClass, HasMiddleware::class, true)) {
-            return $this->staticallyProvidedControllerMiddleware(
-                $controllerClass, $controllerMethod
-            );
-        }
+        $attributeMiddleware = $this->attributeProvidedControllerMiddleware($controllerClass, $controllerMethod);
 
-        if (method_exists($controllerClass, 'getMiddleware')) {
-            return $this->controllerDispatcher()->getMiddleware(
-                $this->getController(), $controllerMethod
-            );
-        }
-
-        return $this->attributeProvidedControllerMiddleware(
-            $controllerClass, $controllerMethod
-        );
+        return match (true) {
+            is_a($controllerClass, HasMiddleware::class, true) => array_merge(
+                $this->staticallyProvidedControllerMiddleware($controllerClass, $controllerMethod),
+                $attributeMiddleware,
+            ),
+            method_exists($controllerClass, 'getMiddleware') => array_merge(
+                $this->controllerDispatcher()->getMiddleware($this->getController(), $controllerMethod),
+                $attributeMiddleware,
+            ),
+            default => $attributeMiddleware,
+        };
     }
 
     /**
@@ -1180,21 +1180,35 @@ class Route
     {
         try {
             $reflectionClass = new ReflectionClass($class);
-
             $reflectionMethod = $reflectionClass->getMethod($method);
         } catch (ReflectionException) {
             return [];
         }
 
-        return (new Collection(array_merge(
-            $reflectionClass->getAttributes(MiddlewareAttribute::class, ReflectionAttribute::IS_INSTANCEOF),
-            $reflectionMethod->getAttributes(MiddlewareAttribute::class, ReflectionAttribute::IS_INSTANCEOF),
-        )))->map(function (ReflectionAttribute $attribute) use ($method) {
+        $attributes = new Collection;
+
+        $current = $reflectionClass;
+
+        while ($current) {
+            $classAttributes = array_reverse($current->getAttributes(
+                MiddlewareAttribute::class, ReflectionAttribute::IS_INSTANCEOF
+            ));
+
+            foreach ($classAttributes as $attribute) {
+                $attributes->prepend($attribute);
+            }
+
+            $current = $current->getParentClass();
+        }
+
+        return $attributes->merge(
+            $reflectionMethod->getAttributes(MiddlewareAttribute::class, ReflectionAttribute::IS_INSTANCEOF)
+        )->map(function (ReflectionAttribute $attribute) use ($method) {
             $instance = $attribute->newInstance();
 
             return static::methodExcludedByOptions(
                 $method, ['only' => $instance->only, 'except' => $instance->except],
-            ) ? null : $instance->value;
+            ) ? null : $instance->middleware;
         })
             ->filter()
             ->values()
@@ -1363,6 +1377,49 @@ class Route
     }
 
     /**
+     * Add metadata to the route.
+     *
+     * @param  array  $metadata
+     * @return $this
+     */
+    public function metadata(array $metadata)
+    {
+        $this->action['metadata'] = RouteGroup::mergeMetadata(
+            $this->action['metadata'] ?? [],
+            $metadata
+        );
+
+        return $this;
+    }
+
+    /**
+     * Get metadata for the route.
+     *
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return ($key is null ? array<array-key, mixed> : mixed)
+     */
+    public function getMetadata($key = null, $default = null)
+    {
+        $metadata = $this->action['metadata'] ?? [];
+
+        return is_null($key) ? $metadata : Arr::get($metadata, $key, $default);
+    }
+
+    /**
+     * Set the metadata for the route, replacing any existing metadata.
+     *
+     * @param  array  $metadata
+     * @return $this
+     */
+    public function setMetadata(array $metadata)
+    {
+        $this->action['metadata'] = $metadata;
+
+        return $this;
+    }
+
+    /**
      * Get the dispatcher for the route's controller.
      *
      * @return \Illuminate\Routing\Contracts\ControllerDispatcher
@@ -1385,14 +1442,10 @@ class Route
      */
     public static function getValidators()
     {
-        if (isset(static::$validators)) {
-            return static::$validators;
-        }
-
         // To match the route, we will use a chain of responsibility pattern with the
         // validator implementations. We will spin through each one making sure it
         // passes and then we will know if the route as a whole matches request.
-        return static::$validators = [
+        return static::$validators ?? static::$validators = [
             new UriValidator, new MethodValidator,
             new SchemeValidator, new HostValidator,
         ];

@@ -209,6 +209,26 @@ class RedisConnectorTest extends TestCase
         $this->assertEquals($host, $parameters->host);
     }
 
+    public function testPhpRedisTcpKeepalive()
+    {
+        $host = env('REDIS_HOST', '127.0.0.1');
+        $port = env('REDIS_PORT', 6379);
+
+        $phpRedis = new RedisManager(new Application, 'phpredis', [
+            'cluster' => false,
+            'default' => [
+                'host' => $host,
+                'port' => $port,
+                'database' => 5,
+                'timeout' => 0.5,
+                'tcp_keepalive' => 60,
+            ],
+        ]);
+
+        $phpRedisClient = $phpRedis->connection()->client();
+        $this->assertEquals(1, $phpRedisClient->getOption(Redis::OPT_TCP_KEEPALIVE));
+    }
+
     public function testPrefixOverrideBehaviour()
     {
         $host = env('REDIS_HOST', '127.0.0.1');
@@ -231,7 +251,7 @@ class RedisConnectorTest extends TestCase
             ],
         ]);
         $predisClient1 = $predis1->client();
-        $this->assertEquals('test_default_options_', $predisClient1->getOptions()->prefix->getPrefix());
+        $this->assertSame('test_default_options_', $predisClient1->getOptions()->prefix->getPrefix());
 
         $predis2 = new RedisManager(new Application, 'predis', [
             'cluster' => false,
@@ -251,7 +271,7 @@ class RedisConnectorTest extends TestCase
             ],
         ]);
         $predisClient2 = $predis2->client();
-        $this->assertEquals('test_default_config_', $predisClient2->getOptions()->prefix->getPrefix());
+        $this->assertSame('test_default_config_', $predisClient2->getOptions()->prefix->getPrefix());
 
         $phpRedis1 = new RedisManager(new Application, 'phpredis', [
             'cluster' => false,
@@ -270,7 +290,7 @@ class RedisConnectorTest extends TestCase
             ],
         ]);
         $phpRedisClient1 = $phpRedis1->connection()->client();
-        $this->assertEquals('test_default_options_', $phpRedisClient1->getOption(Redis::OPT_PREFIX));
+        $this->assertSame('test_default_options_', $phpRedisClient1->getOption(Redis::OPT_PREFIX));
 
         $phpRedis2 = new RedisManager(new Application, 'phpredis', [
             'cluster' => false,
@@ -290,6 +310,6 @@ class RedisConnectorTest extends TestCase
             ],
         ]);
         $phpRedisClient2 = $phpRedis2->connection()->client();
-        $this->assertEquals('test_default_config_', $phpRedisClient2->getOption(Redis::OPT_PREFIX));
+        $this->assertSame('test_default_config_', $phpRedisClient2->getOption(Redis::OPT_PREFIX));
     }
 }

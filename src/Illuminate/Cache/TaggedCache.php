@@ -53,7 +53,7 @@ class TaggedCache extends Repository
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  \UnitEnum|string  $key
      * @param  mixed  $value
      * @return int|bool
      */
@@ -65,7 +65,7 @@ class TaggedCache extends Repository
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  \UnitEnum|string  $key
      * @param  mixed  $value
      * @return int|bool
      */

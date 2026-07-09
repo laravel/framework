@@ -118,6 +118,25 @@ class ViewComponentAttributeBagTest extends TestCase
         $this->assertSame('class="font-bold" id="my-id"', (string) $bag->except(['name', 'missing']));
     }
 
+    public function testMergeTerminatesDefaultStyleWithSemicolon()
+    {
+        $bag = new ComponentAttributeBag(['style' => 'color: blue']);
+
+        // The default style value is not terminated with a semicolon, so one
+        // should be added to keep the resulting declaration list valid.
+        $this->assertSame('style="font-weight: bold; color: blue;"', (string) $bag->merge(['style' => 'font-weight: bold']));
+
+        $bag = new ComponentAttributeBag(['style' => 'color: blue']);
+
+        // A default style value that already ends with a semicolon must not gain a second one.
+        $this->assertSame('style="font-weight: bold; color: blue;"', (string) $bag->merge(['style' => 'font-weight: bold;']));
+
+        // When no default style is provided the existing value should be returned untouched.
+        $bag = new ComponentAttributeBag(['style' => 'color: blue']);
+
+        $this->assertSame('style="color: blue;"', (string) $bag->merge([]));
+    }
+
     public function testAttributeRetrievalUsingDotNotation()
     {
         $bag = new ComponentAttributeBag([
@@ -279,7 +298,7 @@ class ViewComponentAttributeBagTest extends TestCase
         $result = $bag->whenFilled('name', function ($value) {
             return 'callback-'.$value;
         });
-        $this->assertEquals('callback-test', $result);
+        $this->assertSame('callback-test', $result);
 
         $result = $bag->whenFilled('empty', function ($value) {
             return 'callback-'.$value;
@@ -291,7 +310,7 @@ class ViewComponentAttributeBagTest extends TestCase
         }, function () {
             return 'default-callback';
         });
-        $this->assertEquals('default-callback', $result);
+        $this->assertSame('default-callback', $result);
     }
 
     public function testWhenHas()
@@ -301,7 +320,7 @@ class ViewComponentAttributeBagTest extends TestCase
         $result = $bag->whenHas('name', function ($value) {
             return 'callback-'.$value;
         });
-        $this->assertEquals('callback-test', $result);
+        $this->assertSame('callback-test', $result);
 
         $result = $bag->whenHas('missing', function ($value) {
             return 'callback-'.$value;
@@ -313,7 +332,7 @@ class ViewComponentAttributeBagTest extends TestCase
         }, function () {
             return 'default-callback';
         });
-        $this->assertEquals('default-callback', $result);
+        $this->assertSame('default-callback', $result);
     }
 
     public function testWhenMissing()
@@ -328,14 +347,14 @@ class ViewComponentAttributeBagTest extends TestCase
         $result = $bag->whenMissing('missing', function () {
             return 'callback';
         });
-        $this->assertEquals('callback', $result);
+        $this->assertSame('callback', $result);
 
         $result = $bag->whenMissing('name', function () {
             return 'callback';
         }, function () {
             return 'default-callback';
         });
-        $this->assertEquals('default-callback', $result);
+        $this->assertSame('default-callback', $result);
     }
 
     public function testString()
@@ -347,10 +366,10 @@ class ViewComponentAttributeBagTest extends TestCase
         ]);
 
         $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $bag->string('name'));
-        $this->assertEquals('test', (string) $bag->string('name'));
-        $this->assertEquals('', (string) $bag->string('empty'));
-        $this->assertEquals('123', (string) $bag->string('number'));
-        $this->assertEquals('default', (string) $bag->string('missing', 'default'));
+        $this->assertSame('test', (string) $bag->string('name'));
+        $this->assertSame('', (string) $bag->string('empty'));
+        $this->assertSame('123', (string) $bag->string('number'));
+        $this->assertSame('default', (string) $bag->string('missing', 'default'));
     }
 
     public function testBoolean()

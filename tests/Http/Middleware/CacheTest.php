@@ -92,6 +92,17 @@ class CacheTest extends TestCase
         $this->assertSame('max-age=100, public, s-maxage=200', $response->headers->get('Cache-Control'));
     }
 
+    public function testAddCacheHeadersForMethodHEAD()
+    {
+        $request = new Request;
+        $request->setMethod('HEAD');
+        $response = (new Cache)->handle($request, function () {
+            return new Response;
+        }, 'max_age=120;s_maxage=60');
+
+        $this->assertNotNull($response->getMaxAge());
+    }
+
     public function testAddHeadersUsingArray()
     {
         $response = (new Cache)->handle(new Request, function () {
@@ -160,7 +171,7 @@ class CacheTest extends TestCase
             return new Response('some content');
         }, "last_modified=$birthdate");
 
-        $this->assertSame(Carbon::parse($birthdate)->timestamp, $response->getLastModified()->getTimestamp());
+        $this->assertSame(Carbon::parse($birthdate)->getTimestamp(), $response->getLastModified()->getTimestamp());
     }
 
     public function testTrailingDelimiterIgnored()

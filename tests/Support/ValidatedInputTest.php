@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Stringable;
@@ -228,6 +229,37 @@ class ValidatedInputTest extends TestCase
         $this->assertFalse($age);
         $this->assertFalse($city);
         $this->assertFalse($bar);
+    }
+
+    public function test_when_enum_method()
+    {
+        $input = new ValidatedInput(['status' => 'Hello world', 'invalid' => 'invalid', 'age' => '']);
+
+        $status = $invalid = $age = $missing = $default = false;
+
+        $input->whenEnum('status', StringBackedEnum::class, function ($value) use (&$status) {
+            $status = $value;
+        });
+
+        $input->whenEnum('invalid', StringBackedEnum::class, function ($value) use (&$invalid) {
+            $invalid = $value;
+        });
+
+        $input->whenEnum('age', StringBackedEnum::class, function ($value) use (&$age) {
+            $age = $value;
+        });
+
+        $input->whenEnum('missing', StringBackedEnum::class, function ($value) use (&$missing) {
+            $missing = $value;
+        }, function () use (&$default) {
+            $default = true;
+        });
+
+        $this->assertSame(StringBackedEnum::HELLO_WORLD, $status);
+        $this->assertFalse($invalid);
+        $this->assertFalse($age);
+        $this->assertFalse($missing);
+        $this->assertTrue($default);
     }
 
     public function test_missing_method()
@@ -493,6 +525,23 @@ class ValidatedInputTest extends TestCase
         $this->assertEmpty($input->enums('invalid_enum_value', StringBackedEnum::class));
     }
 
+    public function test_file_method()
+    {
+        $file = UploadedFile::fake()->create('document.pdf');
+
+        $input = new ValidatedInput([
+            'name' => 'Taylor',
+            'avatar' => $file,
+        ]);
+
+        $this->assertInstanceOf(UploadedFile::class, $input->file('avatar'));
+        $this->assertSame($file, $input->file('avatar'));
+        $this->assertNull($input->file('name'));
+        $this->assertNull($input->file('missing'));
+        $this->assertSame('default', $input->file('missing', 'default'));
+        $this->assertSame('default', $input->file('name', 'default'));
+    }
+
     public function test_collect_method()
     {
         $input = new ValidatedInput(['users' => [1, 2, 3]]);
@@ -538,6 +587,6 @@ class ValidatedInputTest extends TestCase
 
         $this->assertEquals(['name' => 'Fatih', 'surname' => 'AYDIN', 'foo' => ['bar' => null]], $input->except('foo.baz'));
         $this->assertEquals(['surname' => 'AYDIN'], $input->except('name', 'foo'));
-        $this->assertEquals([], $input->except('name', 'surname', 'foo'));
+        $this->assertSame([], $input->except('name', 'surname', 'foo'));
     }
 }

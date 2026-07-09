@@ -6,11 +6,13 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\View;
 use Illuminate\View\Component;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
+use function Illuminate\Filesystem\join_paths;
 use function Orchestra\Testbench\artisan;
 use function Orchestra\Testbench\phpunit_version_compare;
 
@@ -242,6 +244,19 @@ class BladeTest extends TestCase
         ])->render();
 
         $this->assertSame('Parent: undefined, Explicit: explicit-value', trim($scopedInclude));
+    }
+
+    public function test_view_cache_command_deduplicates_paths_before_compiling()
+    {
+        View::addNamespace('templates', join_paths(__DIR__, 'templates'));
+        View::addNamespace('components', join_paths(__DIR__, 'templates', 'components'));
+
+        $compiler = Mockery::mock(app('blade.compiler'))->makePartial();
+        $compiler->shouldReceive('compile')->with(realpath(__DIR__.'/templates/components/panel.blade.php'))->once();
+
+        $this->instance('blade.compiler', $compiler);
+
+        $this->artisan('view:cache');
     }
 
     /** {@inheritdoc} */

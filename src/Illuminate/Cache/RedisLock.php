@@ -41,6 +41,21 @@ class RedisLock extends Lock
     }
 
     /**
+     * Attempt to refresh the lock for the given number of seconds.
+     *
+     * @param  int|null  $seconds
+     * @return bool
+     */
+    public function refresh($seconds = null)
+    {
+        $seconds ??= $this->seconds;
+
+        return (bool) $this->redis->eval(
+            LuaScripts::refreshLock(), 1, $this->name, $this->owner, $seconds
+        );
+    }
+
+    /**
      * Release the lock.
      *
      * @return bool
@@ -63,7 +78,7 @@ class RedisLock extends Lock
     /**
      * Returns the owner value written into the driver for this lock.
      *
-     * @return string
+     * @return string|null
      */
     protected function getCurrentOwner()
     {

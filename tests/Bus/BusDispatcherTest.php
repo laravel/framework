@@ -149,6 +149,29 @@ class BusDispatcherTest extends TestCase
 
         Container::setInstance(null);
     }
+
+    public function testDispatchBulk()
+    {
+        $container = new Container;
+        $container->instance('queue.routes', $queueRoutes = m::mock());
+        $queueRoutes->shouldReceive('getQueue')->andReturn(null);
+        $queueRoutes->shouldReceive('getConnection')->andReturn(null);
+        Container::setInstance($container);
+
+        $mock = m::mock(Queue::class);
+        $mock->shouldReceive('bulk')->once()->with(m::on(fn ($jobs) => count($jobs) === 2), '', null);
+        $mock->shouldReceive('bulk')->once()->with(m::on(fn ($jobs) => count($jobs) === 1), '', 'high');
+
+        $dispatcher = new Dispatcher($container, fn () => $mock);
+
+        $dispatcher->bulk([
+            new BusDispatcherQueueable,
+            new BusDispatcherQueueable,
+            new BusDispatcherTestSpecificQueueCommand,
+        ]);
+
+        Container::setInstance(null);
+    }
 }
 
 class BusInjectionStub
@@ -183,6 +206,11 @@ class BusDispatcherTestSpecificQueueAndDelayCommand implements ShouldQueue
 {
     public $queue = 'foo';
     public $delay = 10;
+}
+
+class BusDispatcherTestSpecificQueueCommand implements ShouldQueue
+{
+    public $queue = 'high';
 }
 
 class BusDispatcherQueueable implements ShouldQueue

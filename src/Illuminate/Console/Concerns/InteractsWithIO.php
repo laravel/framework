@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Concerns;
 
 use Closure;
+use Illuminate\Console\CommandInput;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
@@ -55,6 +56,20 @@ trait InteractsWithIO
         'quiet' => OutputInterface::VERBOSITY_QUIET,
         'normal' => OutputInterface::VERBOSITY_NORMAL,
     ];
+
+    /**
+     * Retrieve the command's input as a CommandInput instance or retrieve an input item.
+     *
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return ($key is null ? \Illuminate\Console\CommandInput : mixed)
+     */
+    public function input($key = null, $default = null)
+    {
+        $input = new CommandInput($this->arguments(), $this->options());
+
+        return is_null($key) ? $input : data_get($input->all(), $key, $default);
+    }
 
     /**
      * Determine if the given argument is present.
@@ -250,10 +265,11 @@ trait InteractsWithIO
      *
      * @template TKey of array-key
      * @template TValue
+     * @template TIterable of iterable<TKey, TValue>
      *
-     * @param  iterable<TKey, TValue>|int  $totalSteps
-     * @param  \Closure(\Symfony\Component\Console\Helper\ProgressBar|TValue, \Symfony\Component\Console\Helper\ProgressBar|null, TKey|null): void  $callback
-     * @return mixed|void
+     * @param  TIterable|int  $totalSteps
+     * @param  \Closure(\Symfony\Component\Console\Helper\ProgressBar): mixed|\Closure(TValue, \Symfony\Component\Console\Helper\ProgressBar, TKey): mixed  $callback
+     * @return ($totalSteps is iterable ? TIterable : void)
      */
     public function withProgressBar($totalSteps, Closure $callback)
     {

@@ -51,13 +51,13 @@ unset($__defined_vars, $__key, $__value); ?>', $this->compiler->compileString('@
         eval(" ?> $template <?php ");
         ob_get_clean();
 
-        $this->assertSame($test1, 'value1');
-        $this->assertSame($test2, 'value2');
+        $this->assertSame('value1', $test1);
+        $this->assertSame('value2', $test2);
         $this->assertFalse(isset($test3));
-        $this->assertSame($test4, 'default');
+        $this->assertSame('default', $test4);
 
         $this->assertNull($attributes->get('test1'));
         $this->assertNull($attributes->get('test2'));
-        $this->assertSame($attributes->get('test3'), 'value3');
+        $this->assertSame('value3', $attributes->get('test3'));
     }
 }

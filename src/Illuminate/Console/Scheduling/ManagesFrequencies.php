@@ -55,21 +55,30 @@ trait ManagesFrequencies
      */
     private function inTimeInterval($startTime, $endTime)
     {
-        [$now, $startTime, $endTime] = [
-            Carbon::now($this->timezone),
-            Carbon::parse($startTime, $this->timezone),
-            Carbon::parse($endTime, $this->timezone),
-        ];
+        $now = Carbon::now();
 
-        if ($endTime->lessThan($startTime)) {
-            if ($startTime->greaterThan($now)) {
-                $startTime = $startTime->subDay();
-            } else {
-                $endTime = $endTime->addDay();
+        return function () use ($startTime, $endTime, $now) {
+            $now = $now->copy();
+
+            if ($this->timezone) {
+                $now->setTimezone($this->timezone);
             }
-        }
 
-        return fn () => $now->between($startTime, $endTime);
+            [$startTime, $endTime] = [
+                Carbon::parse($startTime, $this->timezone),
+                Carbon::parse($endTime, $this->timezone),
+            ];
+
+            if ($endTime->lessThan($startTime)) {
+                if ($startTime->greaterThan($now)) {
+                    $startTime = $startTime->subDay();
+                } else {
+                    $endTime = $endTime->addDay();
+                }
+            }
+
+            return $now->between($startTime, $endTime);
+        };
     }
 
     /**
@@ -145,13 +154,17 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run multiple times per minute.
      *
-     * @param  int<0, 59>  $seconds
+     * @param  int<1, 59>  $seconds
      * @return $this
      *
      * @throws \InvalidArgumentException
      */
     protected function repeatEvery($seconds)
     {
+        if ($seconds <= 0) {
+            throw new InvalidArgumentException("The seconds [$seconds] must be greater than zero.");
+        }
+
         if (60 % $seconds !== 0) {
             throw new InvalidArgumentException("The seconds [$seconds] are not evenly divisible by 60.");
         }

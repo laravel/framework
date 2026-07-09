@@ -111,7 +111,7 @@ class PostgresGrammar extends Grammar
         $column = $this->wrap($where['column']);
         $value = $this->parameter($where['value']);
 
-        if ($this->isJsonSelector($where['column'])) {
+        if ($this->isJsonSelector($column)) {
             $column = '('.$column.')';
         }
 
@@ -130,7 +130,7 @@ class PostgresGrammar extends Grammar
         $column = $this->wrap($where['column']);
         $value = $this->parameter($where['value']);
 
-        if ($this->isJsonSelector($where['column'])) {
+        if ($this->isJsonSelector($column)) {
             $column = '('.$column.')';
         }
 
@@ -378,15 +378,18 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $values
-     * @param  array  $uniqueBy
      * @param  array  $returning
+     * @param  array|null  $uniqueBy
      * @return string
      */
-    public function compileInsertOrIgnoreReturning(Builder $query, array $values, array $uniqueBy, array $returning)
+    public function compileInsertOrIgnoreReturning(Builder $query, array $values, array $returning, ?array $uniqueBy)
     {
-        return $this->compileInsert($query, $values)
-            .' on conflict ('.$this->columnize($uniqueBy).') do nothing'
-            .' returning '.$this->columnize($returning);
+        $insert = $this->compileInsert($query, $values);
+
+        return match ($uniqueBy) {
+            null => "{$insert} on conflict do nothing returning {$this->columnize($returning)}",
+            default => "{$insert} on conflict ({$this->columnize($uniqueBy)}) do nothing returning {$this->columnize($returning)}",
+        };
     }
 
     /**

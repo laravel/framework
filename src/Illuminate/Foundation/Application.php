@@ -45,7 +45,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * @var string
      */
-    const VERSION = '13.x-dev';
+    const VERSION = '13.19.0';
 
     /**
      * The base path for the Laravel installation.
@@ -748,7 +748,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function environment(...$environments)
     {
-        if (count($environments) > 0) {
+        if ($environments !== []) {
             $patterns = is_array($environments[0]) ? $environments[0] : $environments;
 
             return Str::is($patterns, $this['env']);
@@ -1658,6 +1658,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
             'filesystem.cloud' => [\Illuminate\Contracts\Filesystem\Cloud::class],
             'hash' => [\Illuminate\Hashing\HashManager::class],
             'hash.driver' => [\Illuminate\Contracts\Hashing\Hasher::class],
+            'image' => [\Illuminate\Image\ImageManager::class],
             'log' => [\Illuminate\Log\LogManager::class, \Psr\Log\LoggerInterface::class],
             'mail.manager' => [\Illuminate\Mail\MailManager::class, \Illuminate\Contracts\Mail\Factory::class],
             'mailer' => [\Illuminate\Mail\Mailer::class, \Illuminate\Contracts\Mail\Mailer::class, \Illuminate\Contracts\Mail\MailQueue::class],

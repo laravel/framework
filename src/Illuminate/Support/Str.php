@@ -85,6 +85,19 @@ class Str
     }
 
     /**
+     * Translate the given message and get a new stringable object.
+     *
+     * @param  string  $key
+     * @param  array  $replace
+     * @param  string|null  $locale
+     * @return \Illuminate\Support\Stringable
+     */
+    public static function trans($key, $replace = [], $locale = null)
+    {
+        return new Stringable(__($key, $replace, $locale));
+    }
+
+    /**
      * Return the remainder of a string after the first occurrence of a given value.
      *
      * @param  string  $subject
@@ -140,7 +153,7 @@ class Str
      */
     public static function transliterate($string, $unknown = '?', $strict = false)
     {
-        return ASCII::to_transliterate($string, $unknown, $strict);
+        return ASCII::to_transliterate((string) $string, $unknown, $strict);
     }
 
     /**
@@ -225,11 +238,7 @@ class Str
      */
     public static function camel($value)
     {
-        if (isset(static::$camelCache[$value])) {
-            return static::$camelCache[$value];
-        }
-
-        return static::$camelCache[$value] = lcfirst(static::studly($value));
+        return static::$camelCache[$value] ?? static::$camelCache[$value] = lcfirst(static::studly($value));
     }
 
     /**
@@ -364,6 +373,18 @@ class Str
     public static function convertCase(string $string, int $mode = MB_CASE_FOLD, ?string $encoding = 'UTF-8')
     {
         return mb_convert_case($string, $mode, $encoding);
+    }
+
+    /**
+     * Get the plural form of an English word with the count prepended.
+     *
+     * @param  string  $value
+     * @param  int|array|\Countable  $count
+     * @return string
+     */
+    public static function counted($value, $count)
+    {
+        return static::plural($value, $count, prependCount: true);
     }
 
     /**
@@ -610,15 +631,20 @@ class Str
             (((?:[\_\.\pL\pN-]|%[0-9A-Fa-f]{2})+:)?((?:[\_\.\pL\pN-]|%[0-9A-Fa-f]{2})+)@)?  # basic auth
             (
                 (?:
-                    (?:xn--[a-z0-9-]++\.)*+xn--[a-z0-9-]++            # a domain name using punycode
+                    (?:
+                        (?:[\pL\pN\pS\pM\-\_]++\.)+
+                        (?:
+                            (?:xn--[a-z0-9-]++)     # punycode in tld
+                            |
+                            (?:[\pL\pN\pM]++)       # no punycode in tld
+                        )
+                    )                               # a multi-level domain name
                         |
-                    (?:[\pL\pN\pS\pM\-\_]++\.)+[\pL\pN\pM]++          # a multi-level domain name
-                        |
-                    [a-z0-9\-\_]++                                    # a single-level domain name
+                    [a-z0-9\-\_]++                  # a single-level domain name
                 )\.?
-                    |                                                 # or
-                \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}                    # an IP address
-                    |                                                 # or
+                    |                               # or
+                \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}  # an IP address
+                    |                               # or
                 \[
                     (?:(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){6})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:::(?:(?:(?:[0-9a-f]{1,4})):){5})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:[0-9a-f]{1,4})))?::(?:(?:(?:[0-9a-f]{1,4})):){4})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,1}(?:(?:[0-9a-f]{1,4})))?::(?:(?:(?:[0-9a-f]{1,4})):){3})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,2}(?:(?:[0-9a-f]{1,4})))?::(?:(?:(?:[0-9a-f]{1,4})):){2})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,3}(?:(?:[0-9a-f]{1,4})))?::(?:(?:[0-9a-f]{1,4})):)(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,4}(?:(?:[0-9a-f]{1,4})))?::)(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,5}(?:(?:[0-9a-f]{1,4})))?::)(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,6}(?:(?:[0-9a-f]{1,4})))?::))))
                 \]  # an IPv6 address
@@ -786,6 +812,8 @@ class Str
      */
     public static function markdown($string, array $options = [], array $extensions = [])
     {
+        $string = (string) $string;
+
         $converter = new GithubFlavoredMarkdownConverter($options);
 
         $environment = $converter->getEnvironment();
@@ -807,6 +835,8 @@ class Str
      */
     public static function inlineMarkdown($string, array $options = [], array $extensions = [])
     {
+        $string = (string) $string;
+
         $environment = new Environment($options);
 
         $environment->addExtension(new GithubFlavoredMarkdownExtension());
@@ -852,7 +882,7 @@ class Str
 
         $start = mb_substr($string, 0, $startIndex, $encoding);
         $segmentLen = mb_strlen($segment, $encoding);
-        $end = mb_substr($string, $startIndex + $segmentLen);
+        $end = mb_substr($string, $startIndex + $segmentLen, null, $encoding);
 
         return $start.str_repeat(mb_substr($character, 0, 1, $encoding), $segmentLen).$end;
     }
@@ -1197,7 +1227,7 @@ class Str
     public static function replaceArray($search, $replace, $subject)
     {
         if ($replace instanceof Traversable) {
-            $replace = Arr::from($replace);
+            $replace = iterator_to_array($replace);
         }
 
         $segments = explode($search, $subject);
@@ -1222,7 +1252,7 @@ class Str
     {
         try {
             return (string) $value;
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return $fallback;
         }
     }
@@ -1239,15 +1269,15 @@ class Str
     public static function replace($search, $replace, $subject, $caseSensitive = true)
     {
         if ($search instanceof Traversable) {
-            $search = Arr::from($search);
+            $search = iterator_to_array($search);
         }
 
         if ($replace instanceof Traversable) {
-            $replace = Arr::from($replace);
+            $replace = iterator_to_array($replace);
         }
 
         if ($subject instanceof Traversable) {
-            $subject = Arr::from($subject);
+            $subject = iterator_to_array($subject);
         }
 
         return $caseSensitive
@@ -1380,7 +1410,7 @@ class Str
     public static function remove($search, $subject, $caseSensitive = true)
     {
         if ($search instanceof Traversable) {
-            $search = Arr::from($search);
+            $search = iterator_to_array($search);
         }
 
         return $caseSensitive
@@ -1396,7 +1426,7 @@ class Str
      */
     public static function reverse(string $value)
     {
-        return implode(array_reverse(mb_str_split($value)));
+        return implode('', array_reverse(mb_str_split($value)));
     }
 
     /**
@@ -1443,7 +1473,7 @@ class Str
      */
     public static function headline($value)
     {
-        $parts = mb_split('\s+', $value);
+        $parts = preg_split('/\s+/u', $value, -1, PREG_SPLIT_NO_EMPTY);
 
         $parts = count($parts) > 1
             ? array_map(static::title(...), $parts)
@@ -1452,6 +1482,24 @@ class Str
         $collapsed = static::replace(['-', '_', ' '], '_', implode('_', $parts));
 
         return implode(' ', array_filter(explode('_', $collapsed)));
+    }
+
+    /**
+     * Get the "initials" representing each word in the provided string, optionally capitalizing.
+     *
+     * @param  string  $value
+     * @param  bool  $capitalize
+     * @return string
+     */
+    public static function initials($value, $capitalize = false)
+    {
+        $parts = preg_split('/\s+/u', $value, -1, PREG_SPLIT_NO_EMPTY);
+
+        $parts = array_map(fn ($part) => mb_substr($part, 0, 1), $parts);
+
+        $initials = implode('', $parts);
+
+        return $capitalize ? static::upper($initials) : $initials;
     }
 
     /**
@@ -1476,7 +1524,7 @@ class Str
 
         $endPunctuation = ['.', '!', '?', ':', '—', ','];
 
-        $words = mb_split('\s+', $value);
+        $words = preg_split('/\s+/u', $value, -1, PREG_SPLIT_NO_EMPTY);
         $wordCount = count($words);
 
         for ($i = 0; $i < $wordCount; $i++) {
@@ -1686,32 +1734,42 @@ class Str
      * Convert a value to studly caps case.
      *
      * @param  string  $value
+     * @param  bool  $normalize  When true, all-uppercase words (e.g. acronyms) are lowercased before conversion so "CBOR" becomes "Cbor" instead of "CBOR".
      * @return ($value is '' ? '' : string)
      */
-    public static function studly($value)
+    public static function studly($value, bool $normalize = false)
     {
+        if ($normalize) {
+            $value = preg_replace_callback(
+                '/(^|[-_ \s])([A-Z]+)(?=[-_ \s]|$)/u',
+                fn ($m) => $m[1].static::lower($m[2]),
+                $value
+            );
+        }
+
         $key = $value;
 
         if (isset(static::$studlyCache[$key])) {
             return static::$studlyCache[$key];
         }
 
-        $words = mb_split('\s+', static::replace(['-', '_'], ' ', $value));
+        $words = preg_split('/\s+/u', static::replace(['-', '_'], ' ', $value), -1, PREG_SPLIT_NO_EMPTY);
 
         $studlyWords = array_map(fn ($word) => static::ucfirst($word), $words);
 
-        return static::$studlyCache[$key] = implode($studlyWords);
+        return static::$studlyCache[$key] = implode('', $studlyWords);
     }
 
     /**
      * Convert a value to Pascal case.
      *
      * @param  string  $value
+     * @param  bool  $normalize  When true, all-uppercase words (e.g. acronyms) are lowercased before conversion so "CBOR" becomes "Cbor" instead of "CBOR".
      * @return ($value is '' ? '' : string)
      */
-    public static function pascal($value)
+    public static function pascal($value, bool $normalize = false)
     {
-        return static::studly($value);
+        return static::studly($value, $normalize);
     }
 
     /**

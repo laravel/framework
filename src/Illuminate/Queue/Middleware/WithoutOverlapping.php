@@ -135,7 +135,7 @@ class WithoutOverlapping
     }
 
     /**
-     * Indicate that the lock key should be shared across job classes.
+     * Indicate that the lock key may be shared across jobs belonging to different classes.
      *
      * @return $this
      */
@@ -159,7 +159,7 @@ class WithoutOverlapping
         }
 
         $jobName = method_exists($job, 'displayName')
-            ? $job->displayName()
+            ? hash('xxh128', $job->displayName())
             : get_class($job);
 
         return $this->prefix.$jobName.':'.$this->key;

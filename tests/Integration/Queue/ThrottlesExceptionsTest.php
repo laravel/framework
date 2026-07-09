@@ -186,7 +186,7 @@ class ThrottlesExceptionsTest extends TestCase
             $this->assertTrue($job->released);
             $this->assertTrue($job->handled);
 
-            Carbon::setTestNow(now()->addSeconds(1));
+            Carbon::setTestNow(Carbon::now()->addSecond());
         }
 
         $result = $middleware->handle($job = $jobFactory(), $next);
@@ -240,7 +240,7 @@ class ThrottlesExceptionsTest extends TestCase
             $this->assertTrue($job->released);
             $this->assertTrue($job->handled);
 
-            Carbon::setTestNow(now()->addMilliseconds(100));
+            Carbon::setTestNow(Carbon::now()->addMilliseconds(100));
         }
 
         $result = $middleware->handle($job = $jobFactory(), $next);
@@ -294,7 +294,7 @@ class ThrottlesExceptionsTest extends TestCase
             $this->assertTrue($job->released);
             $this->assertTrue($job->handled);
 
-            Carbon::setTestNow(now()->addSeconds(1));
+            Carbon::setTestNow(Carbon::now()->addSecond());
         }
 
         $result = $middleware->handle($job = $jobFactory(), $next);
@@ -315,6 +315,38 @@ class ThrottlesExceptionsTest extends TestCase
         $this->assertSame($job, $result);
         $this->assertTrue($job->released);
         $this->assertTrue($job->handled);
+    }
+
+    public function testItCanBackoffUsingException()
+    {
+        $job = new class
+        {
+            public $releasedAfter;
+
+            public function release($delay)
+            {
+                $this->releasedAfter = $delay;
+
+                return $this;
+            }
+        };
+        $expectedException = new RuntimeException('Whoops!');
+        $receivedException = null;
+        $next = function () use ($expectedException) {
+            throw $expectedException;
+        };
+
+        $middleware = (new ThrottlesExceptions())->backoff(function ($throwable) use (&$receivedException) {
+            $receivedException = $throwable;
+
+            return 5;
+        });
+
+        $result = $middleware->handle($job, $next);
+
+        $this->assertSame($job, $result);
+        $this->assertSame($expectedException, $receivedException);
+        $this->assertSame(300, $job->releasedAfter);
     }
 
     public function testReportingExceptions()

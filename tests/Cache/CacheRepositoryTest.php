@@ -26,6 +26,7 @@ use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class CacheRepositoryTest extends TestCase
 {
@@ -38,7 +39,8 @@ class CacheRepositoryTest extends TestCase
 
     protected function tearDown(): void
     {
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
+        Repository::handleUnserializableClassUsing(null);
 
         parent::tearDown();
     }
@@ -143,6 +145,36 @@ class CacheRepositoryTest extends TestCase
             return 'bar';
         });
         $this->assertSame('bar', $result);
+    }
+
+    public function testRememberWithWarmthReturnsCachedValue()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('bar');
+        $repo->getStore()->shouldReceive('put')->never();
+
+        $result = $repo->rememberWithWarmth('foo', 10, function () {
+            $this->fail('The cache callback should not be called.');
+        });
+
+        $this->assertSame(['bar', true], $result);
+    }
+
+    public function testRememberWithWarmthCallsPutAndReturnsDefault()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(null);
+        $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 10);
+
+        $result = $repo->rememberWithWarmth('foo', function ($value) {
+            $this->assertSame('bar', $value);
+
+            return 10;
+        }, function () {
+            return 'bar';
+        });
+
+        $this->assertSame(['bar', false], $result);
     }
 
     public function testRememberForeverMethodCallsForeverAndReturnsDefault()
@@ -474,24 +506,12 @@ class CacheRepositoryTest extends TestCase
         $nonFlushableRepo->flushLocks();
     }
 
-    public function testTouchWithNullTTLRemembersItemForever(): void
-    {
-        $key = 'key';
-        $ttl = null;
-
-        $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->with($key)->andReturn('bar');
-        $repo->getStore()->shouldReceive('forever')->once()->with($key, 'bar')->andReturn(true);
-        $this->assertTrue($repo->touch($key, $ttl));
-    }
-
     public function testTouchWithSecondsTtlCorrectlyProxiesToStore(): void
     {
         $key = 'key';
         $ttl = 60;
 
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->with($key)->andReturn('bar');
         $repo->getStore()->shouldReceive('touch')->once()->with($key, $ttl)->andReturn(true);
         $this->assertTrue($repo->touch($key, $ttl));
     }
@@ -504,7 +524,6 @@ class CacheRepositoryTest extends TestCase
         Carbon::setTestNow($now = Carbon::now());
 
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->with($key)->andReturn('bar');
         $repo->getStore()->shouldReceive('touch')->once()->with($key, $ttl)->andReturn(true);
         $this->assertTrue($repo->touch($key, $now->addSeconds($ttl)));
     }
@@ -515,9 +534,17 @@ class CacheRepositoryTest extends TestCase
         $ttl = 60;
 
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->with($key)->andReturn('bar');
         $repo->getStore()->shouldReceive('touch')->once()->with($key, $ttl)->andReturn(true);
         $this->assertTrue($repo->touch($key, DateInterval::createFromDateString("$ttl seconds")));
+    }
+
+    public function testTouchWorksWithEnumKey(): void
+    {
+        $ttl = 60;
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('touch')->once()->with('foo', $ttl)->andReturn(true);
+        $this->assertTrue($repo->touch(TestCacheKey::FOO, $ttl));
     }
 
     public function testAtomicExecutesCallbackAndReturnsResult()
@@ -593,6 +620,46 @@ class CacheRepositoryTest extends TestCase
         $cache->put(TestCacheKey::FOO, 5);
         $this->assertSame(6, $cache->increment(TestCacheKey::FOO));
         $this->assertSame(5, $cache->decrement(TestCacheKey::FOO));
+    }
+
+    public function testGetReturnsIncompleteClassWhenNoHandlerRegistered()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(unserialize(serialize(new stdClass), ['allowed_classes' => false]));
+
+        $this->assertInstanceOf(\__PHP_Incomplete_Class::class, $repo->get('foo'));
+    }
+
+    public function testGetCallsHandlerWithKeyAndClassForIncompleteClass()
+    {
+        $class = null;
+        $key = null;
+
+        Repository::handleUnserializableClassUsing(function ($k, $c) use (&$class, &$key) {
+            $key = $k;
+            $class = $c;
+        });
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(unserialize(serialize(new stdClass), ['allowed_classes' => false]));
+        $repo->get('foo');
+
+        $this->assertSame('foo', $key);
+        $this->assertSame('stdClass', $class);
+    }
+
+    public function testManyCallsHandlerForEachIncompleteClass()
+    {
+        $handled = [];
+        Repository::handleUnserializableClassUsing(function ($key, $class) use (&$handled) {
+            $handled[] = $key;
+        });
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('many')->once()->with(['foo', 'bar'])->andReturn(['foo' => unserialize(serialize(new stdClass), ['allowed_classes' => false]), 'bar' => 'baz']);
+        $repo->many(['foo', 'bar']);
+
+        $this->assertSame(['foo'], $handled);
     }
 
     protected function getRepository()

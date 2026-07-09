@@ -67,7 +67,7 @@ class ValidationInArrayKeysTest extends TestCase
 
         $v = new Validator($trans, ['foo' => ['wrong_key' => 'bar']], ['foo' => 'in_array_keys:first_key,second_key']);
         $this->assertFalse($v->passes());
-        $this->assertEquals(
+        $this->assertSame(
             'The foo field must contain at least one of the following keys: first_key, second_key.',
             $v->messages()->first('foo')
         );

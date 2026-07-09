@@ -107,6 +107,35 @@ class TypeTest extends TestCase
         $this->assertInstanceOf(JsonSchema::class, $schema);
     }
 
+    public function test_required_may_be_unset(): void
+    {
+        $schema = JsonSchema::object([
+            'name' => JsonSchema::string()->required()->required(false),
+        ]);
+
+        $this->assertEquals([
+            'type' => 'object',
+            'properties' => [
+                'name' => [
+                    'type' => 'string',
+                ],
+            ],
+        ], $schema->toArray());
+
+        $this->assertValidOnJsonSchema($schema, (object) []);
+    }
+
+    public function test_nullable_may_be_unset(): void
+    {
+        $schema = JsonSchema::string()->nullable()->nullable(false);
+
+        $this->assertEquals([
+            'type' => 'string',
+        ], $schema->toArray());
+
+        $this->assertNotValidOnJsonSchema($schema, null);
+    }
+
     public function test_throws_with_invalid_enum_string(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -279,6 +308,9 @@ class TypeTest extends TestCase
             [JsonSchema::array()->items(JsonSchema::string()->max(3)), ['one', 'two']],
             [JsonSchema::array()->default(['x']), ['x']],
             [JsonSchema::array()->enum([['a'], ['b', 'c']]), ['b', 'c']],
+            [JsonSchema::array()->unique(), [1, 2, 3]],
+            [JsonSchema::array()->items(JsonSchema::string())->unique(), ['a', 'b', 'c']],
+            [JsonSchema::array()->unique(), []],
             // additional ArrayType cases
             [JsonSchema::array()->min(0), []], // explicit min zero
             [JsonSchema::array()->max(0), []], // exactly zero length
@@ -287,6 +319,30 @@ class TypeTest extends TestCase
             [JsonSchema::array()->enum([[]]), []],
             [JsonSchema::array()->nullable(), null],
             [JsonSchema::array()->nullable(false), []],
+
+            // UnionType
+            [JsonSchema::union(['string', 'number']), 'hello'],
+            [JsonSchema::union(['string', 'number']), 42],
+            [JsonSchema::union(['string', 'number']), 3.14],
+            [JsonSchema::union(['integer', 'boolean']), true],
+            [JsonSchema::union(['string', 'number'])->enum(['draft', 5]), 'draft'],
+            [JsonSchema::union(['string', 'number'])->nullable(), null],
+            [JsonSchema::union(['string', 'number'])->nullable(), 'still valid'],
+
+            // AnyOfType
+            [JsonSchema::anyOf([JsonSchema::string(), JsonSchema::integer()]), 'hello'],
+            [JsonSchema::anyOf([JsonSchema::string(), JsonSchema::integer()]), 10],
+            [JsonSchema::anyOf([JsonSchema::string(), JsonSchema::integer()])->nullable(), null],
+            [JsonSchema::anyOf([
+                JsonSchema::object([
+                    'type' => JsonSchema::string()->enum(['card'])->required(),
+                    'last4' => JsonSchema::string()->min(4)->max(4)->required(),
+                ]),
+                JsonSchema::object([
+                    'type' => JsonSchema::string()->enum(['bank_account'])->required(),
+                    'iban' => JsonSchema::string()->required(),
+                ]),
+            ]), (object) ['type' => 'card', 'last4' => '1234']],
         ];
     }
 
@@ -372,6 +428,8 @@ class TypeTest extends TestCase
             [JsonSchema::array()->max(1), ['a', 'b']], // too many items
             [JsonSchema::array()->items(JsonSchema::string()->max(3)), ['four']], // item too long
             [JsonSchema::array()->enum([['a'], ['b', 'c']]), ['c', 'd']], // not in enum
+            [JsonSchema::array()->unique(), [1, 1, 2]],
+            [JsonSchema::array()->items(JsonSchema::string())->unique(), ['a', 'b', 'a']],
             // additional ArrayType cases
             [JsonSchema::array()->items(JsonSchema::integer()), ['a']], // wrong item type
             [JsonSchema::array()->min(1), []], // too few
@@ -379,6 +437,27 @@ class TypeTest extends TestCase
             [JsonSchema::array()->enum([['a'], ['b']]), ['a', 'b']], // not equal to any enum member
             [JsonSchema::array()->items(JsonSchema::string()->max(1)), ['ab']], // item too long
             [JsonSchema::array()->nullable(false), null], // not nullable
+
+            // UnionType
+            [JsonSchema::union(['string', 'number']), true], // boolean not in union
+            [JsonSchema::union(['string', 'number']), []], // array not in union
+            [JsonSchema::union(['string', 'number']), null], // null not allowed unless nullable
+            [JsonSchema::union(['integer', 'boolean']), 'nope'], // string not in union
+            [JsonSchema::union(['string', 'number'])->enum(['draft', 5]), 'archived'], // not in enum
+
+            // AnyOfType
+            [JsonSchema::anyOf([JsonSchema::string(), JsonSchema::integer()]), true],
+            [JsonSchema::anyOf([JsonSchema::string(), JsonSchema::integer()]), null],
+            [JsonSchema::anyOf([
+                JsonSchema::object([
+                    'type' => JsonSchema::string()->enum(['card'])->required(),
+                    'last4' => JsonSchema::string()->min(4)->max(4)->required(),
+                ]),
+                JsonSchema::object([
+                    'type' => JsonSchema::string()->enum(['bank_account'])->required(),
+                    'iban' => JsonSchema::string()->required(),
+                ]),
+            ]), (object) ['type' => 'card', 'iban' => 'wrong-branch']],
         ];
     }
 

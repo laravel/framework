@@ -7,21 +7,23 @@ on:
       - '*.x'
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   sync:
     runs-on: ubuntu-24.04
-
-    strategy:
-      fail-fast: true
 
     name: Sync Driver
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
         with:
           php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
@@ -32,7 +34,7 @@ jobs:
         run: composer config version "13.x-dev"
 
       - name: Install dependencies
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -46,17 +48,16 @@ jobs:
   database:
     runs-on: ubuntu-24.04
 
-    strategy:
-      fail-fast: true
-
     name: Database Driver
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
         with:
           php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
@@ -67,7 +68,7 @@ jobs:
         run: composer config version "13.x-dev"
 
       - name: Install dependencies
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -90,15 +91,17 @@ jobs:
       matrix:
         include:
           - php: 8.3
-            pheanstalk: 5
-          - php: 8.4
             pheanstalk: 7
+          - php: 8.4
+            pheanstalk: 8
 
     name: Beanstalkd Driver (pda/pheanstalk:^${{ matrix.pheanstalk }})
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
 
       - name: Download & Extract beanstalkd
         run: curl -L https://github.com/beanstalkd/beanstalkd/archive/refs/tags/v1.13.tar.gz | tar xz
@@ -108,7 +111,7 @@ jobs:
         working-directory: beanstalkd-1.13
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
         with:
           php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
@@ -119,7 +122,7 @@ jobs:
         run: composer config version "13.x-dev"
 
       - name: Install dependencies
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
         with:
           timeout_minutes: 5
           max_attempts: 5

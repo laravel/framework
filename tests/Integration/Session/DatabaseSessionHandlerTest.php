@@ -17,7 +17,7 @@ class DatabaseSessionHandlerTest extends DatabaseTestCase
         $handler->setContainer($this->app);
 
         // read non-existing session id:
-        $this->assertEquals('', $handler->read('invalid_session_id'));
+        $this->assertSame('', $handler->read('invalid_session_id'));
 
         // open and close:
         $this->assertTrue($handler->open('', ''));
@@ -47,7 +47,7 @@ class DatabaseSessionHandlerTest extends DatabaseTestCase
 
         // read expired:
         Carbon::setTestNow(Carbon::now()->addMinutes(2));
-        $this->assertEquals('', $handler->read('valid_session_id_2425'));
+        $this->assertSame('', $handler->read('valid_session_id_2425'));
 
         // rewriting an expired session-id, makes it live:
         $this->assertTrue($handler->write('valid_session_id_2425', json_encode(['come' => 'alive'])));
@@ -103,7 +103,7 @@ class DatabaseSessionHandlerTest extends DatabaseTestCase
 
         // write and read:
         $this->assertTrue($handler->write('session_id', 'some data'));
-        $this->assertEquals('some data', $handler->read('session_id'));
+        $this->assertSame('some data', $handler->read('session_id'));
         $this->assertEquals(1, $connection->table('sessions')->count());
 
         $session = $connection->table('sessions')->first();

@@ -253,7 +253,7 @@ class SupportLazyCollectionTest extends TestCase
     public function testThrottleAccountsForTimePassed()
     {
         Sleep::fake();
-        Carbon::setTestNow(now());
+        Carbon::setTestNow(Carbon::now());
 
         $data = LazyCollection::times(3)
             ->throttle(3)
@@ -530,5 +530,18 @@ class SupportLazyCollectionTest extends TestCase
         foreach ($keysWithPreserve as $key) {
             $this->assertContains($key, ['first', 'second', 'third']);
         }
+    }
+
+    public function testHasDoesNotCountDuplicateKeys()
+    {
+        $collection = LazyCollection::make(function () {
+            yield 'a' => 1;
+            yield 'a' => 2;
+            yield 'c' => 3;
+        });
+
+        $this->assertFalse($collection->has('a', 'b'));
+        $this->assertFalse($collection->has(['a', 'b']));
+        $this->assertTrue($collection->has('a'));
     }
 }

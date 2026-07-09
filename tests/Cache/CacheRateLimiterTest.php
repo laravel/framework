@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Cache;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Support\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -71,6 +72,19 @@ class CacheRateLimiterTest extends TestCase
         $rateLimiter->hit('key', 1);
     }
 
+    public function testIncrementWithCustomAmountHasNoMemoryLeak()
+    {
+        $cache = m::mock(Cache::class);
+        $cache->shouldReceive('add')->once()->with('key:timer', m::type('int'), 60)->andReturn(true);
+        $cache->shouldReceive('add')->once()->with('key', 0, 60)->andReturn(false);
+        $cache->shouldReceive('increment')->once()->with('key', 2)->andReturn(2);
+        $cache->shouldReceive('put')->once()->with('key', 2, 60);
+        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
+        $rateLimiter = new RateLimiter($cache);
+
+        $rateLimiter->increment('key', 60, 2);
+    }
+
     public function testRemainingIsNotNegative(): void
     {
         $cache = m::mock(Cache::class);
@@ -107,7 +121,7 @@ class CacheRateLimiterTest extends TestCase
     public function testAvailableInReturnsPositiveValues()
     {
         $cache = m::mock(Cache::class);
-        $cache->shouldReceive('get')->andReturn(now()->subSeconds(60)->getTimestamp(), null);
+        $cache->shouldReceive('get')->andReturn(Carbon::now()->subMinute()->getTimestamp(), null);
         $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
         $rateLimiter = new RateLimiter($cache);
 

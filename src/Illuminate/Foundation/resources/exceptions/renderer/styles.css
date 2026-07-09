@@ -7,6 +7,13 @@
     display: none !important;
 }
 
+body {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+}
+
 .tippy-box[data-theme~='laravel'] {
     @apply max-w-7xl! rounded-md border text-xs shadow-md backdrop-blur-md overflow-x-auto;
     @apply border-neutral-800 bg-neutral-900 text-white;

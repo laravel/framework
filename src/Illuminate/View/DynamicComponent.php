@@ -135,11 +135,7 @@ EOF;
      */
     protected function classForComponent()
     {
-        if (isset(static::$componentClasses[$this->component])) {
-            return static::$componentClasses[$this->component];
-        }
-
-        return static::$componentClasses[$this->component] =
+        return static::$componentClasses[$this->component] ?? static::$componentClasses[$this->component] =
                     $this->compiler()->componentClass($this->component);
     }
 

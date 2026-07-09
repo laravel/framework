@@ -11,7 +11,7 @@ class CacheArrayStoreTest extends TestCase
 {
     protected function tearDown(): void
     {
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
 
         parent::tearDown();
     }
@@ -90,7 +90,7 @@ class CacheArrayStoreTest extends TestCase
     {
         $mock = $this->getMockBuilder(ArrayStore::class)->onlyMethods(['put'])->getMock();
         $mock->expects($this->once())
-            ->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0))
+            ->method('put')->with('foo', 'bar', 0)
             ->willReturn(true);
         $result = $mock->forever('foo', 'bar');
         $this->assertTrue($result);
@@ -248,7 +248,7 @@ class CacheArrayStoreTest extends TestCase
         $store = new ArrayStore;
         $lock = $store->lock('foo');
         $lock->acquire();
-        Carbon::setTestNow(Carbon::now()->addYears(100));
+        Carbon::setTestNow(Carbon::now()->addCentury());
 
         $this->assertFalse($lock->acquire());
     }
@@ -347,6 +347,19 @@ class CacheArrayStoreTest extends TestCase
         $secondLock = $store->restoreLock('foo', 'other_owner');
 
         $this->assertFalse($secondLock->isOwnedByCurrentProcess());
+    }
+
+    public function testExpiredLockCannotBeRefreshedByPreviousOwner()
+    {
+        Carbon::setTestNow(Carbon::now());
+
+        $store = new ArrayStore;
+        $lock = $store->lock('foo', 10);
+        $this->assertTrue($lock->get());
+
+        Carbon::setTestNow(Carbon::now()->addSeconds(10)->addSecond());
+
+        $this->assertFalse($lock->refresh(20));
     }
 
     public function testRestoringNonExistingLockDoesNotOwnAnything()

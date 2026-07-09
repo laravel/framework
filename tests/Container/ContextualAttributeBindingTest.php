@@ -35,6 +35,7 @@ use Illuminate\Log\LogManager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use ReflectionParameter;
 
 class ContextualAttributeBindingTest extends TestCase
 {
@@ -100,7 +101,7 @@ class ContextualAttributeBindingTest extends TestCase
         $class = $container->make(ContainerTestHasConfigValueProperty::class);
 
         $this->assertInstanceOf(ContainerTestHasConfigValueProperty::class, $class);
-        $this->assertEquals('Europe/Paris', $class->timezone);
+        $this->assertSame('Europe/Paris', $class->timezone);
     }
 
     public function testScalarDependencyCanBeResolvedFromAttributeResolveMethod()
@@ -115,7 +116,7 @@ class ContextualAttributeBindingTest extends TestCase
         $class = $container->make(ContainerTestHasConfigValueWithResolveProperty::class);
 
         $this->assertInstanceOf(ContainerTestHasConfigValueWithResolveProperty::class, $class);
-        $this->assertEquals('production', $class->env);
+        $this->assertSame('production', $class->env);
     }
 
     public function testDependencyWithAfterCallbackAttributeCanBeResolved()
@@ -124,7 +125,7 @@ class ContextualAttributeBindingTest extends TestCase
 
         $class = $container->make(ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback::class);
 
-        $this->assertEquals('Developer', $class->person->role);
+        $this->assertSame('Developer', $class->person->role);
     }
 
     public function testAuthedAttribute()
@@ -145,6 +146,18 @@ class ContextualAttributeBindingTest extends TestCase
 
                 return $guard;
             });
+            $manager->shouldReceive('guard')->with(AuthGuardUnitEnum::unit)->andReturnUsing(function () {
+                $guard = m::mock(GuardContract::class);
+                $guard->shouldReceive('user')->andReturn(m:mock(AuthenticatableContract::class));
+
+                return $guard;
+            });
+            $manager->shouldReceive('guard')->with(AuthGuardBackedEnum::Backed)->andReturnUsing(function () {
+                $guard = m::mock(GuardContract::class);
+                $guard->shouldReceive('user')->andReturn(m:mock(AuthenticatableContract::class));
+
+                return $guard;
+            });
 
             return $manager;
         });
@@ -159,6 +172,10 @@ class ContextualAttributeBindingTest extends TestCase
             $manager = m::mock(CacheManager::class);
             $manager->shouldReceive('store')->with('foo')->andReturn(m::mock(CacheRepository::class));
             $manager->shouldReceive('store')->with('bar')->andReturn(m::mock(CacheRepository::class));
+            $manager->shouldReceive('store')->with(CacheStoreUnitEnum::unit)->andReturn(m::mock(CacheRepository::class));
+            $manager->shouldReceive('store')->with(CacheStoreBackedEnum::Backed)->andReturn(m::mock(CacheRepository::class));
+            $manager->shouldReceive('memo')->with('foo')->andReturn(m::mock(CacheRepository::class));
+            $manager->shouldReceive('memo')->with('bar')->andReturn(m::mock(CacheRepository::class));
 
             return $manager;
         });
@@ -201,6 +218,8 @@ class ContextualAttributeBindingTest extends TestCase
             $manager = m::mock(AuthManager::class);
             $manager->shouldReceive('guard')->with('foo')->andReturn(m::mock(GuardContract::class));
             $manager->shouldReceive('guard')->with('bar')->andReturn(m::mock(GuardContract::class));
+            $manager->shouldReceive('guard')->with(AuthGuardUnitEnum::unit)->andReturn(m::mock(GuardContract::class));
+            $manager->shouldReceive('guard')->with(AuthGuardBackedEnum::Backed)->andReturn(m::mock(GuardContract::class));
 
             return $manager;
         });
@@ -234,6 +253,20 @@ class ContextualAttributeBindingTest extends TestCase
         });
 
         $container->make(RouteParameterTest::class);
+    }
+
+    public function testRouteParameterAttributeWithouthParameterName()
+    {
+        $container = new Container;
+        $container->singleton('request', function () {
+            $request = m::mock(Request::class);
+            $request->shouldReceive('route')->with('foo')->andReturn(m::mock(Model::class));
+            $request->shouldReceive('route')->with('bar')->andReturn('bar');
+
+            return $request;
+        });
+
+        $container->make(RouteParameterTestWithoutParameterName::class);
     }
 
     public function testContextAttribute(): void
@@ -272,6 +305,8 @@ class ContextualAttributeBindingTest extends TestCase
             $manager = m::mock(FilesystemManager::class);
             $manager->shouldReceive('disk')->with('foo')->andReturn(m::mock(Filesystem::class));
             $manager->shouldReceive('disk')->with('bar')->andReturn(m::mock(Filesystem::class));
+            $manager->shouldReceive('disk')->with(StorageDiskUnitEnum::unit)->andReturn(m::mock(Filesystem::class));
+            $manager->shouldReceive('disk')->with(StorageDiskBackedEnum::Backed)->andReturn(m::mock(Filesystem::class));
 
             return $manager;
         });
@@ -287,7 +322,7 @@ class ContextualAttributeBindingTest extends TestCase
             return $hasAttribute->person;
         });
 
-        $this->assertEquals('Taylor', $person->name);
+        $this->assertSame('Taylor', $person->name);
     }
 
     public function testAttributeOnAppCall()
@@ -304,7 +339,7 @@ class ContextualAttributeBindingTest extends TestCase
             return $value;
         });
 
-        $this->assertEquals('Europe/Paris', $value);
+        $this->assertSame('Europe/Paris', $value);
 
         $value = $container->call(function (#[Config('app.locale')] ?string $value) {
             return $value;
@@ -327,7 +362,7 @@ class ContextualAttributeBindingTest extends TestCase
             return $object;
         });
 
-        $this->assertEquals('Europe/Paris', $value->timezone);
+        $this->assertSame('Europe/Paris', $value->timezone);
 
         $value = $container->call(function (LocaleObject $object) {
             return $object;
@@ -349,6 +384,28 @@ class ContextualAttributeBindingTest extends TestCase
 
         $this->assertEquals([1, 2], iterator_to_array($value));
     }
+
+    public function testParameterIsPassedToContextualAttributeResolver()
+    {
+        $container = new Container;
+
+        $value = $container->make(HasParameterAwareAttribute::class);
+
+        $this->assertSame('name', $value->name);
+    }
+
+    public function testParameterIsPassedToContextualAttributeResolverOnAppCall()
+    {
+        $container = new Container;
+
+        $value = $container->call(function (
+            #[ContainerTestParameterAwareAttribute] ?string $name
+        ) {
+            return $name;
+        });
+
+        $this->assertSame('name', $value);
+    }
 }
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
@@ -358,6 +415,36 @@ class ContainerTestAttributeThatResolvesContractImpl implements ContextualAttrib
         public readonly string $name
     ) {
     }
+}
+
+enum StorageDiskUnitEnum
+{
+    case unit;
+}
+
+enum StorageDiskBackedEnum: string
+{
+    case Backed = 'backed';
+}
+
+enum AuthGuardUnitEnum
+{
+    case unit;
+}
+
+enum AuthGuardBackedEnum: string
+{
+    case Backed = 'backed';
+}
+
+enum CacheStoreUnitEnum
+{
+    case unit;
+}
+
+enum CacheStoreBackedEnum: string
+{
+    case Backed = 'backed';
 }
 
 interface ContainerTestContract
@@ -445,6 +532,15 @@ final class ContainerTestConfigValueWithResolveAndAfter implements ContextualAtt
     }
 }
 
+#[Attribute(Attribute::TARGET_PARAMETER)]
+final class ContainerTestParameterAwareAttribute implements ContextualAttribute
+{
+    public function resolve(self $attribute, Container $container, ReflectionParameter $parameter): string
+    {
+        return $parameter->getName();
+    }
+}
+
 final class ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback
 {
     public function __construct(
@@ -467,15 +563,25 @@ final class ComplexDependency implements ContainerTestContract
 
 final class AuthedTest
 {
-    public function __construct(#[Authenticated('foo')] AuthenticatableContract $foo, #[CurrentUser('bar')] AuthenticatableContract $bar)
-    {
+    public function __construct(
+        #[Authenticated('foo')] AuthenticatableContract $foo,
+        #[CurrentUser('bar')] AuthenticatableContract $bar,
+        #[Authenticated(AuthGuardUnitEnum::unit)] AuthenticatableContract $unit,
+        #[CurrentUser(AuthGuardBackedEnum::Backed)] AuthenticatableContract $backed,
+    ) {
     }
 }
 
 final class CacheTest
 {
-    public function __construct(#[Cache('foo')] CacheRepository $foo, #[Cache('bar')] CacheRepository $bar)
-    {
+    public function __construct(
+        #[Cache('foo')] CacheRepository $foo,
+        #[Cache('bar')] CacheRepository $bar,
+        #[Cache(CacheStoreUnitEnum::unit)] CacheRepository $unit,
+        #[Cache(CacheStoreBackedEnum::Backed)] CacheRepository $backed,
+        #[Cache('foo', memo: true)] CacheRepository $fooMemoized,
+        #[Cache('bar', memo: true)] CacheRepository $barMemoized,
+    ) {
     }
 }
 
@@ -509,8 +615,12 @@ final class DatabaseTest
 
 final class GuardTest
 {
-    public function __construct(#[Auth('foo')] GuardContract $foo, #[Auth('bar')] GuardContract $bar)
-    {
+    public function __construct(
+        #[Auth('foo')] GuardContract $foo,
+        #[Auth('bar')] GuardContract $bar,
+        #[Auth(AuthGuardUnitEnum::unit)] GuardContract $unit,
+        #[Auth(AuthGuardBackedEnum::Backed)] GuardContract $backed,
+    ) {
     }
 }
 
@@ -528,10 +638,21 @@ final class RouteParameterTest
     }
 }
 
+final class RouteParameterTestWithoutParameterName
+{
+    public function __construct(#[RouteParameter] Model $foo, #[RouteParameter] string $bar)
+    {
+    }
+}
+
 final class StorageTest
 {
-    public function __construct(#[Storage('foo')] Filesystem $foo, #[Storage('bar')] Filesystem $bar)
-    {
+    public function __construct(
+        #[Storage('foo')] Filesystem $foo,
+        #[Storage('bar')] Filesystem $bar,
+        #[Storage(StorageDiskUnitEnum::unit)] Filesystem $unit,
+        #[Storage(StorageDiskBackedEnum::Backed)] Filesystem $backed,
+    ) {
     }
 }
 
@@ -566,6 +687,15 @@ final class LocaleObject
 {
     public function __construct(
         #[Config('app.locale')] public readonly ?string $locale
+    ) {
+        //
+    }
+}
+
+final class HasParameterAwareAttribute
+{
+    public function __construct(
+        #[ContainerTestParameterAwareAttribute] public readonly ?string $name,
     ) {
         //
     }

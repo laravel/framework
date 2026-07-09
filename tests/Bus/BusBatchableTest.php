@@ -65,4 +65,16 @@ class BusBatchableTest extends TestCase
         $job->batch()->cancel();
         $this->assertFalse($job->batching());
     }
+
+    public function test_batching_returns_false_when_batch_is_finished()
+    {
+        $job = new class
+        {
+            use Batchable;
+        };
+
+        $job->withFakeBatch('test-batch-id', 'test-batch-name', finishedAt: \Carbon\CarbonImmutable::now());
+
+        $this->assertFalse($job->batching());
+    }
 }

@@ -403,6 +403,23 @@ class HandleExceptionsTest extends TestCase
         $this->assertNotSame($this->app, $appResolver());
         $this->assertSame($newApp, $appResolver());
     }
+
+    public function testDeprecationErrorsAreIgnoredWhenAppIsNull()
+    {
+        $instance = $this->handleExceptions();
+
+        HandleExceptions::forgetApp();
+
+        // Should not throw when static::$app is null (e.g., during Octane request marshaling)
+        $instance->handleError(
+            E_USER_DEPRECATED,
+            'Directly setting property "request" of "Illuminate\Http\Request" is deprecated',
+            '/vendor/symfony/http-foundation/Request.php',
+            100
+        );
+
+        $this->assertTrue(true);
+    }
 }
 
 class CustomNullHandler extends NullHandler

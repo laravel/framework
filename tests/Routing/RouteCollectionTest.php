@@ -3,9 +3,12 @@
 namespace Illuminate\Tests\Routing;
 
 use ArrayIterator;
+use Illuminate\Container\Container;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
+use Illuminate\Routing\Router;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -284,6 +287,23 @@ class RouteCollectionTest extends TestCase
         $this->routeCollection->compile();
     }
 
+    public function testCompiledRouteCollectionPreservesRouteMetadata()
+    {
+        $this->routeCollection->add(
+            new Route('GET', 'users', [
+                'uses' => 'UsersController@index',
+                'as' => 'users',
+                'metadata' => ['head' => ['title' => 'Users']],
+            ])
+        );
+
+        $route = $this->routeCollection
+            ->toCompiledRouteCollection(new Router(new Dispatcher, new Container), new Container)
+            ->getByName('users');
+
+        $this->assertSame(['title' => 'Users'], $route->getMetadata('head'));
+    }
+
     public function testRouteCollectionDontMatchNonMatchingDoubleSlashes()
     {
         $this->expectException(NotFoundHttpException::class);
@@ -357,7 +377,7 @@ class RouteCollectionTest extends TestCase
         $request = Request::create('users/1/show', 'GET');
 
         $this->assertCount(2, $this->routeCollection->getRoutes());
-        $this->assertEquals('first', $this->routeCollection->match($request)->getName());
+        $this->assertSame('first', $this->routeCollection->match($request)->getName());
     }
 
     public function testPrependsRoutesWithDomain()
@@ -418,5 +438,20 @@ class RouteCollectionTest extends TestCase
                 'no-domain-get2' => $noDomainGet2,
             ],
         ], $this->routeCollection->getRoutesByMethod());
+    }
+
+    public function testDomainRoutesAreMatchedBeforeNonDomainRoutes()
+    {
+        $this->routeCollection->add(
+            (new Route('GET', 'users', ['uses' => 'NoDomainController@index']))->name('no-domain')
+        );
+
+        $this->routeCollection->add(
+            (new Route('GET', 'users', ['uses' => 'DomainController@index']))->domain('api.test')->name('with-domain')
+        );
+
+        $request = Request::create('http://api.test/users', 'GET');
+
+        $this->assertSame('with-domain', $this->routeCollection->match($request)->getName());
     }
 }

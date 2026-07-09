@@ -907,7 +907,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             '{"data":{"id":5,"title":"Test Title","reading_time":3.0}}',
             $response->baseResponse->content()
         );
@@ -925,7 +925,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             '{"data":[{"id":5,"title":"Test Title","reading_time":3.0}]}',
             $response->baseResponse->content()
         );
@@ -946,7 +946,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             '{"data":[{"id":5,"title":"Test Title","reading_time":3.0}],"links":{"first":"\/?page=1","last":"\/?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","page":null,"active":false},{"url":"\/?page=1","label":"1","page":1,"active":true},{"url":null,"label":"Next &raquo;","page":null,"active":false}],"path":"\/","per_page":15,"to":1,"total":10}}',
             $response->baseResponse->content()
         );
@@ -966,7 +966,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             '{"data":{"id":5,"title":"Test Title","reading_time":3.0}}',
             $response->baseResponse->content()
         );

@@ -156,12 +156,16 @@ class PostgresGrammar extends Grammar
      */
     public function compileColumns($schema, $table)
     {
+        $serverVersion = $this->connection->getServerVersion();
+
         return sprintf(
             'select a.attname as name, t.typname as type_name, format_type(a.atttypid, a.atttypmod) as type, '
-            .'(select tc.collcollate from pg_catalog.pg_collation tc where tc.oid = a.attcollation) as collation, '
+            .(version_compare($serverVersion, '9.1', '<')
+                ? 'null as collation, '
+                : '(select tc.collcollate from pg_catalog.pg_collation tc where tc.oid = a.attcollation) as collation, ')
             .'not a.attnotnull as nullable, '
             .'(select pg_get_expr(adbin, adrelid) from pg_attrdef where c.oid = pg_attrdef.adrelid and pg_attrdef.adnum = a.attnum) as default, '
-            .(version_compare($this->connection->getServerVersion(), '12.0', '<') ? "'' as generated, " : 'a.attgenerated as generated, ')
+            .(version_compare($serverVersion, '12.0', '<') ? "'' as generated, " : 'a.attgenerated as generated, ')
             .'col_description(c.oid, a.attnum) as comment '
             .'from pg_attribute a, pg_class c, pg_type t, pg_namespace n '
             .'where c.relname = %s and n.nspname = %s and a.attnum > 0 and a.attrelid = c.oid and a.atttypid = t.oid and n.oid = c.relnamespace '
@@ -1179,6 +1183,17 @@ class PostgresGrammar extends Grammar
         return isset($column->dimensions) && $column->dimensions !== ''
             ? "vector({$column->dimensions})"
             : 'vector';
+    }
+
+    /**
+     * Create the column definition for a tsvector type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeTsvector(Fluent $column)
+    {
+        return 'tsvector';
     }
 
     /**

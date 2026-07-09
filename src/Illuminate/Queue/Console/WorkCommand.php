@@ -37,6 +37,7 @@ class WorkCommand extends Command
                             {--daemon : Run the worker in daemon mode (Deprecated)}
                             {--once : Only process the next job on the queue}
                             {--stop-when-empty : Stop when the queue is empty}
+                            {--stop-when-empty-for=0 : Stop when no jobs have been processed for the given number of seconds}
                             {--delay=0 : The number of seconds to delay failed jobs (Deprecated)}
                             {--backoff=0 : The number of seconds to wait before retrying a job that encountered an uncaught exception}
                             {--max-jobs=0 : The number of jobs to process before stopping}
@@ -169,6 +170,7 @@ class WorkCommand extends Command
             $this->option('max-jobs'),
             $this->option('max-time'),
             $this->option('rest'),
+            $this->option('stop-when-empty-for'),
         );
     }
 
@@ -256,13 +258,14 @@ class WorkCommand extends Command
         }
 
         $runTime = $this->runTimeForHumans($this->latestStartedAt);
+        $memory = $isVerbose ? round(memory_get_usage(true) / 1024 / 1024, 1).'MB' : '';
 
         $dots = max(terminal()->width() - mb_strlen($job->resolveName()) - (
-            $isVerbose ? mb_strlen($job->getJobId()) + mb_strlen($job->getConnectionName()) + mb_strlen($job->getQueue()) + 2 : 0
+            $isVerbose ? mb_strlen($job->getJobId()) + mb_strlen($job->getConnectionName()) + mb_strlen($job->getQueue()) + mb_strlen($memory) + 3 : 0
         ) - mb_strlen($runTime) - 31, 0);
 
         $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
-        $this->output->write(" <fg=gray>$runTime</>");
+        $this->output->write(" <fg=gray>{$runTime}".($memory ? " {$memory}" : '').'</>');
 
         $this->output->writeln(match ($status) {
             'success' => ' <fg=green;options=bold>DONE</>',

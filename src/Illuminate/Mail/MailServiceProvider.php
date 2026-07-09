@@ -53,6 +53,7 @@ class MailServiceProvider extends ServiceProvider implements DeferrableProvider
             return new Markdown($app->make('view'), [
                 'theme' => $config->get('mail.markdown.theme', 'default'),
                 'paths' => $config->get('mail.markdown.paths', []),
+                'extensions' => $config->get('mail.markdown.extensions', []),
             ]);
         });
     }

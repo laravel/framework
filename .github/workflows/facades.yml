@@ -14,17 +14,14 @@ jobs:
   update:
     runs-on: ubuntu-24.04
 
-    strategy:
-      fail-fast: true
-
     name: Facade DocBlocks
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
         with:
           php-version: 8.3
           extensions: :php-psr
@@ -35,7 +32,7 @@ jobs:
         run: composer config version "13.x-dev"
 
       - name: Install dependencies
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -92,7 +89,7 @@ jobs:
             Illuminate\\Support\\Facades\\Vite
 
       - name: Commit facade docblocks
-        uses: stefanzweifel/git-auto-commit-action@v7
+        uses: stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d # v7
         with:
           commit_message: Update facade docblocks
           file_pattern: src/

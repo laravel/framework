@@ -366,6 +366,19 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
+     * Create the column definition for a tsvector type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    protected function typeTsvector(Fluent $column)
+    {
+        throw new RuntimeException('This database driver does not support the tsvector type.');
+    }
+
+    /**
      * Create the column definition for a raw column type.
      *
      * @param  \Illuminate\Support\Fluent  $column
@@ -425,7 +438,7 @@ abstract class Grammar extends BaseGrammar
         });
     }
 
-    /*
+    /**
      * Determine if a command with a given name exists on the blueprint.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint

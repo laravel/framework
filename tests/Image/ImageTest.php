@@ -1,0 +1,1004 @@
+<?php
+
+namespace Illuminate\Tests\Image;
+
+use Illuminate\Http\UploadedFile;
+use Illuminate\Image\Image;
+use Illuminate\Image\ImageException;
+use Illuminate\Image\ImageOutputOptions;
+use Illuminate\Image\ImagePipeline;
+use Illuminate\Image\Transformations\Blur;
+use Illuminate\Image\Transformations\Contain;
+use Illuminate\Image\Transformations\Cover;
+use Illuminate\Image\Transformations\Crop;
+use Illuminate\Image\Transformations\FlipHorizontally;
+use Illuminate\Image\Transformations\FlipVertically;
+use Illuminate\Image\Transformations\Grayscale;
+use Illuminate\Image\Transformations\Orient;
+use Illuminate\Image\Transformations\Resize;
+use Illuminate\Image\Transformations\Rotate;
+use Illuminate\Image\Transformations\Scale;
+use Illuminate\Image\Transformations\Sharpen;
+use PHPUnit\Framework\TestCase;
+
+class ImageTest extends TestCase
+{
+    public function test_cover_returns_new_instance()
+    {
+        $image = $this->makeImage();
+        $result = $image->cover(100, 200);
+
+        $this->assertNotSame($image, $result);
+    }
+
+    public function test_scale_returns_new_instance()
+    {
+        $image = $this->makeImage();
+        $result = $image->scale(800, 600);
+
+        $this->assertNotSame($image, $result);
+    }
+
+    public function test_contain_returns_new_instance()
+    {
+        $image = $this->makeImage();
+        $result = $image->contain(800, 600);
+
+        $this->assertNotSame($image, $result);
+    }
+
+    public function test_crop_returns_new_instance()
+    {
+        $image = $this->makeImage();
+        $result = $image->crop(100, 100);
+
+        $this->assertNotSame($image, $result);
+    }
+
+    public function test_resize_returns_new_instance()
+    {
+        $image = $this->makeImage();
+        $result = $image->resize(800, 600);
+
+        $this->assertNotSame($image, $result);
+    }
+
+    public function test_rotate_returns_new_instance()
+    {
+        $image = $this->makeImage();
+        $result = $image->rotate(90);
+
+        $this->assertNotSame($image, $result);
+    }
+
+    public function test_orient_returns_new_instance()
+    {
+        $image = $this->makeImage();
+        $result = $image->orient();
+
+        $this->assertNotSame($image, $result);
+    }
+
+    public function test_blur_returns_new_instance()
+    {
+        $image = $this->makeImage();
+        $result = $image->blur(10);
+
+        $this->assertNotSame($image, $result);
+    }
+
+    public function test_grayscale_returns_new_instance()
+    {
+        $image = $this->makeImage();
+        $result = $image->grayscale();
+
+        $this->assertNotSame($image, $result);
+    }
+
+    public function test_optimize_returns_new_instance()
+    {
+        $image = $this->makeImage();
+        $result = $image->optimize('webp');
+
+        $this->assertNotSame($image, $result);
+    }
+
+    public function test_quality_returns_new_instance()
+    {
+        $image = $this->makeImage();
+        $result = $image->quality(80);
+
+        $this->assertNotSame($image, $result);
+    }
+
+    public function test_to_webp_returns_new_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertNotSame($image, $image->toWebp());
+    }
+
+    public function test_to_jpg_returns_new_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertNotSame($image, $image->toJpg());
+    }
+
+    public function test_using_returns_new_instance()
+    {
+        $image = $this->makeImage();
+        $result = $image->using('imagick');
+
+        $this->assertNotSame($image, $result);
+    }
+
+    public function test_original_is_not_mutated()
+    {
+        $image = $this->makeImage();
+        $originalOptions = clone $this->getOptions($image);
+
+        $image->cover(100, 100)->optimize('webp');
+
+        $this->assertEquals($originalOptions, $this->getOptions($image));
+    }
+
+    public function test_chained_operations_accumulate()
+    {
+        $image = $this->makeImage();
+        $result = $image->cover(100, 100)->optimize('webp', 90)->blur(5);
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(100, $options->coverWidth);
+        $this->assertSame(100, $options->coverHeight);
+        $this->assertSame('webp', $options->format);
+        $this->assertSame(90, $options->quality);
+        $this->assertSame(5, $options->blur);
+    }
+
+    public function test_variants_from_same_source_are_independent()
+    {
+        $image = $this->makeImage();
+
+        $thumb = $image->cover(100, 100);
+        $large = $image->scale(800, 600);
+
+        $thumbOptions = $this->getOptions($thumb);
+        $largeOptions = $this->getOptions($large);
+
+        $this->assertSame(100, $thumbOptions->coverWidth);
+        $this->assertNull($thumbOptions->scaleWidth);
+
+        $this->assertNull($largeOptions->coverWidth);
+        $this->assertSame(800, $largeOptions->scaleWidth);
+    }
+
+    public function test_to_bytes_returns_string()
+    {
+        $contents = $this->fakeImageContents();
+        $image = new Image($contents);
+
+        $this->assertSame($contents, $image->toBytes());
+    }
+
+    public function test_to_bytes_with_closure()
+    {
+        $contents = $this->fakeImageContents();
+        $image = new Image(fn () => $contents);
+
+        $this->assertSame($contents, $image->toBytes());
+    }
+
+    public function test_closure_is_not_called_until_to_bytes()
+    {
+        $called = false;
+
+        $image = new Image(function () use (&$called) {
+            $called = true;
+
+            return $this->fakeImageContents();
+        });
+
+        $this->assertFalse($called);
+
+        $image->toBytes();
+
+        $this->assertTrue($called);
+    }
+
+    public function test_mime_type_detects_jpeg()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $this->assertSame('image/jpeg', $image->mimeType());
+    }
+
+    public function test_extension_returns_jpg_for_jpeg()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $this->assertSame('jpg', $image->extension());
+    }
+
+    public function test_dimensions_returns_width_and_height()
+    {
+        $image = new Image($this->fakeImageContents(300, 200));
+
+        $this->assertSame([300, 200], $image->dimensions());
+    }
+
+    public function test_dimensions_throws_when_dimensions_cannot_be_determined()
+    {
+        $image = new Image('not-an-image');
+
+        $this->expectException(ImageException::class);
+        $this->expectExceptionMessage('Unable to determine the dimensions of the image.');
+
+        $image->dimensions();
+    }
+
+    public function test_hash_name_returns_name_with_extension()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $name = $image->hashName();
+
+        $this->assertMatchesRegularExpression('/^[a-zA-Z0-9]{40}\.jpg$/', $name);
+    }
+
+    public function test_hash_name_with_path()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $name = $image->hashName('avatars');
+
+        $this->assertStringStartsWith('avatars/', $name);
+        $this->assertMatchesRegularExpression('/^avatars\/[a-zA-Z0-9]{40}\.jpg$/', $name);
+    }
+
+    public function test_file_returns_uploaded_file_when_provided()
+    {
+        $file = UploadedFile::fake()->image('avatar.jpg');
+        $image = new Image(fn () => $file->getContent(), $file);
+
+        $this->assertSame($file, $image->file());
+    }
+
+    public function test_file_returns_null_when_not_provided()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $this->assertNull($image->file());
+    }
+
+    public function test_clone_preserves_uploaded_file()
+    {
+        $file = UploadedFile::fake()->image('avatar.jpg');
+        $image = new Image(fn () => $file->getContent(), $file);
+
+        $cloned = $image->cover(100, 100);
+
+        $this->assertSame($file, $cloned->file());
+    }
+
+    public function test_optimize_has_defaults()
+    {
+        $image = $this->makeImage();
+        $result = $image->optimize();
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame('webp', $options->format);
+        $this->assertSame(70, $options->quality);
+    }
+
+    public function test_optimize_throws_for_unsupported_format()
+    {
+        $image = $this->makeImage();
+
+        $this->expectException(ImageException::class);
+        $this->expectExceptionMessage('The [bmp] format is not supported.');
+
+        $image->optimize('bmp');
+    }
+
+    public function test_quality_sets_option()
+    {
+        $image = $this->makeImage();
+        $result = $image->quality(60);
+
+        $this->assertSame(60, $this->getOptions($result)->quality);
+    }
+
+    public function test_to_webp_sets_format()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame('webp', $this->getOptions($image->toWebp())->format);
+    }
+
+    public function test_to_jpg_sets_format()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame('jpg', $this->getOptions($image->toJpg())->format);
+    }
+
+    public function test_to_jpeg_is_alias_for_to_jpg()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame('jpg', $this->getOptions($image->toJpeg())->format);
+    }
+
+    public function test_quality_survives_format_conversion()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame(50, $this->getOptions($image->quality(50)->toJpg())->quality);
+        $this->assertSame(90, $this->getOptions($image->quality(90)->toWebp())->quality);
+    }
+
+    public function test_format_and_quality_can_be_set_separately()
+    {
+        $image = $this->makeImage();
+        $result = $image->toWebp()->quality(60);
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame('webp', $options->format);
+        $this->assertSame(60, $options->quality);
+    }
+
+    public function test_blur_has_default()
+    {
+        $image = $this->makeImage();
+        $result = $image->blur();
+
+        $this->assertSame(5, $this->getOptions($result)->blur);
+    }
+
+    public function test_sharpen_returns_new_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertNotSame($image, $image->sharpen());
+    }
+
+    public function test_sharpen_sets_option()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame(20, $this->getOptions($image->sharpen(20))->sharpen);
+    }
+
+    public function test_sharpen_has_default()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame(10, $this->getOptions($image->sharpen())->sharpen);
+    }
+
+    public function test_flip_vertically_returns_new_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertNotSame($image, $image->flipVertically());
+    }
+
+    public function test_flip_vertically_sets_option()
+    {
+        $image = $this->makeImage();
+
+        $this->assertTrue($this->getOptions($image->flipVertically())->flipVertically);
+    }
+
+    public function test_flip_horizontally_returns_new_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertNotSame($image, $image->flipHorizontally());
+    }
+
+    public function test_flip_horizontally_sets_option()
+    {
+        $image = $this->makeImage();
+
+        $this->assertTrue($this->getOptions($image->flipHorizontally())->flipHorizontally);
+    }
+
+    public function test_width_returns_int()
+    {
+        $image = new Image($this->fakeImageContents(300, 200));
+
+        $this->assertSame(300, $image->width());
+    }
+
+    public function test_height_returns_int()
+    {
+        $image = new Image($this->fakeImageContents(300, 200));
+
+        $this->assertSame(200, $image->height());
+    }
+
+    public function test_to_base64_returns_encoded_string()
+    {
+        $contents = $this->fakeImageContents();
+        $image = new Image($contents);
+
+        $this->assertSame(base64_encode($contents), $image->toBase64());
+    }
+
+    public function test_to_data_uri_returns_data_uri()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $dataUri = $image->toDataUri();
+
+        $this->assertStringStartsWith('data:image/jpeg;base64,', $dataUri);
+    }
+
+    public function test_driver_exception_is_wrapped_in_image_exception()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $this->expectException(ImageException::class);
+        $this->expectExceptionMessage('Failed to process image:');
+
+        // Trigger a driver error by using a non-existent driver
+        $image->using('nonexistent')->cover(100, 100)->toBytes();
+    }
+
+    public function test_wrapped_exception_preserves_original()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        try {
+            $image->using('nonexistent')->cover(100, 100)->toBytes();
+        } catch (ImageException $e) {
+            $this->assertNotNull($e->getPrevious());
+
+            return;
+        }
+
+        $this->fail('ImageException was not thrown.');
+    }
+
+    public function test_to_bytes_returns_same_result_on_multiple_calls()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $first = $image->toBytes();
+        $second = $image->toBytes();
+
+        $this->assertSame($first, $second);
+    }
+
+    public function test_to_bytes_without_operations_returns_original()
+    {
+        $contents = $this->fakeImageContents();
+        $image = new Image($contents);
+
+        $this->assertSame($contents, $image->toBytes());
+    }
+
+    public function test_has_changes_with_only_quality_set()
+    {
+        $image = $this->makeImage();
+        $result = $image->quality(50);
+
+        $this->assertTrue($this->getPipeline($result)->hasChanges());
+    }
+
+    public function test_clone_does_not_share_hash_name_cache()
+    {
+        $image = $this->makeImage();
+        $name1 = $image->hashName();
+
+        $clone = $image->blur(1);
+        $name2 = $image->hashName();
+
+        // Same instance returns cached name
+        $this->assertSame($name1, $name2);
+    }
+
+    public function test_hash_name_is_consistent_on_same_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame($image->hashName(), $image->hashName());
+    }
+
+    public function test_flip_alias_sets_vertical_option()
+    {
+        $image = $this->makeImage();
+
+        $this->assertTrue($this->getOptions($image->flip())->flipVertically);
+    }
+
+    public function test_flop_alias_sets_horizontal_option()
+    {
+        $image = $this->makeImage();
+
+        $this->assertTrue($this->getOptions($image->flop())->flipHorizontally);
+    }
+
+    public function test_flip_vertically_and_horizontally_together()
+    {
+        $image = $this->makeImage();
+        $result = $image->flipVertically()->flipHorizontally();
+
+        $this->assertTrue($this->getOptions($result)->flipVertically);
+        $this->assertTrue($this->getOptions($result)->flipHorizontally);
+    }
+
+    public function test_multiple_operations_chained()
+    {
+        $image = $this->makeImage();
+        $result = $image->orient()->cover(200, 200)->blur(10)->grayscale()->sharpen(5)->toWebp()->quality(75);
+
+        $options = $this->getOptions($result);
+
+        $this->assertTrue($options->orient);
+        $this->assertSame(200, $options->coverWidth);
+        $this->assertSame(200, $options->coverHeight);
+        $this->assertSame(10, $options->blur);
+        $this->assertTrue($options->grayscale);
+        $this->assertSame(5, $options->sharpen);
+        $this->assertSame('webp', $options->format);
+        $this->assertSame(75, $options->quality);
+    }
+
+    public function test_later_operation_overrides_earlier()
+    {
+        $image = $this->makeImage();
+        $result = $image->cover(200, 200)->cover(100, 100);
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(100, $options->coverWidth);
+        $this->assertSame(100, $options->coverHeight);
+    }
+
+    public function test_extension_returns_bin_for_unknown_mime()
+    {
+        $image = new Image('not-an-image');
+
+        $this->assertSame('bin', $image->extension());
+    }
+
+    public function test_file_returns_null_for_non_upload()
+    {
+        $image = Image::class;
+        $instance = new $image($this->fakeImageContents());
+
+        $this->assertNull($instance->file());
+    }
+
+    public function test_using_gd_shortcut()
+    {
+        $image = $this->makeImage();
+        $result = $image->usingGd();
+
+        $driver = (new \ReflectionProperty($result, 'driver'))->getValue($result);
+
+        $this->assertSame('gd', $driver);
+    }
+
+    public function test_using_imagick_shortcut()
+    {
+        $image = $this->makeImage();
+        $result = $image->usingImagick();
+
+        $driver = (new \ReflectionProperty($result, 'driver'))->getValue($result);
+
+        $this->assertSame('imagick', $driver);
+    }
+
+    public function test_dimensions_on_tiny_image()
+    {
+        $image = new Image($this->fakeImageContents(1, 1));
+
+        $this->assertSame([1, 1], $image->dimensions());
+        $this->assertSame(1, $image->width());
+        $this->assertSame(1, $image->height());
+    }
+
+    public function test_to_data_uri_contains_valid_base64()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $dataUri = $image->toDataUri();
+        $base64Part = substr($dataUri, strpos($dataUri, ',') + 1);
+
+        $this->assertNotFalse(base64_decode($base64Part, true));
+    }
+
+    public function test_optimize_throws_for_jpg_with_wrong_spelling()
+    {
+        $image = $this->makeImage();
+
+        $this->expectException(ImageException::class);
+        $this->expectExceptionMessage('The [png] format is not supported.');
+
+        $image->optimize('png');
+    }
+
+    public function test_serialization_throws_exception()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $this->expectException(ImageException::class);
+        $this->expectExceptionMessage('Images cannot be serialized. Store the image first and serialize the path instead.');
+
+        serialize($image);
+    }
+
+    public function test_image_pipeline_has_no_changes_by_default()
+    {
+        $pipeline = new ImagePipeline;
+
+        $this->assertFalse($pipeline->hasChanges());
+    }
+
+    public function test_image_pipeline_has_changes_with_zero_quality()
+    {
+        $pipeline = new ImagePipeline;
+        $pipeline->output->quality = 0;
+
+        $this->assertTrue($pipeline->hasChanges());
+    }
+
+    public function test_image_pipeline_has_changes_with_zero_blur()
+    {
+        $pipeline = new ImagePipeline;
+        $pipeline->add(new Blur(0));
+
+        $this->assertTrue($pipeline->hasChanges());
+    }
+
+    public function test_image_pipeline_has_changes_with_zero_sharpen()
+    {
+        $pipeline = new ImagePipeline;
+        $pipeline->add(new Sharpen(0));
+
+        $this->assertTrue($pipeline->hasChanges());
+    }
+
+    public function test_image_output_options_default_quality_constant()
+    {
+        $this->assertSame(70, ImageOutputOptions::DEFAULT_QUALITY);
+    }
+
+    public function test_cover_sets_both_dimensions()
+    {
+        $image = $this->makeImage();
+        $result = $image->cover(300, 150);
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(300, $options->coverWidth);
+        $this->assertSame(150, $options->coverHeight);
+    }
+
+    public function test_scale_sets_both_dimensions()
+    {
+        $image = $this->makeImage();
+        $result = $image->scale(1200, 800);
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(1200, $options->scaleWidth);
+        $this->assertSame(800, $options->scaleHeight);
+    }
+
+    public function test_contain_sets_dimensions_and_background()
+    {
+        $image = $this->makeImage();
+        $result = $image->contain(1200, 800, '#ffffff');
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(1200, $options->containWidth);
+        $this->assertSame(800, $options->containHeight);
+        $this->assertSame('#ffffff', $options->containBackground);
+    }
+
+    public function test_crop_sets_dimensions_and_position()
+    {
+        $image = $this->makeImage();
+        $result = $image->crop(300, 200, 10, 20);
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(300, $options->cropWidth);
+        $this->assertSame(200, $options->cropHeight);
+        $this->assertSame(10, $options->cropX);
+        $this->assertSame(20, $options->cropY);
+    }
+
+    public function test_resize_sets_both_dimensions()
+    {
+        $image = $this->makeImage();
+        $result = $image->resize(1200, 800);
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(1200, $options->resizeWidth);
+        $this->assertSame(800, $options->resizeHeight);
+    }
+
+    public function test_resize_sets_width_only()
+    {
+        $image = $this->makeImage();
+        $result = $image->resize(width: 1200);
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(1200, $options->resizeWidth);
+        $this->assertNull($options->resizeHeight);
+    }
+
+    public function test_resize_sets_height_only()
+    {
+        $image = $this->makeImage();
+        $result = $image->resize(height: 800);
+
+        $options = $this->getOptions($result);
+
+        $this->assertNull($options->resizeWidth);
+        $this->assertSame(800, $options->resizeHeight);
+    }
+
+    public function test_resize_requires_at_least_one_dimension()
+    {
+        $this->expectException(ImageException::class);
+        $this->expectExceptionMessage('At least one resize dimension must be specified.');
+
+        $this->makeImage()->resize();
+    }
+
+    public function test_rotate_sets_angle_and_background()
+    {
+        $image = $this->makeImage();
+        $result = $image->rotate(90, '#ffffff');
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(90.0, $options->rotateAngle);
+        $this->assertSame('#ffffff', $options->rotateBackground);
+    }
+
+    public function test_scale_sets_width_only()
+    {
+        $image = $this->makeImage();
+        $result = $image->scale(width: 1200);
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame(1200, $options->scaleWidth);
+        $this->assertNull($options->scaleHeight);
+    }
+
+    public function test_scale_sets_height_only()
+    {
+        $image = $this->makeImage();
+        $result = $image->scale(height: 800);
+
+        $options = $this->getOptions($result);
+
+        $this->assertNull($options->scaleWidth);
+        $this->assertSame(800, $options->scaleHeight);
+    }
+
+    public function test_scale_requires_at_least_one_dimension()
+    {
+        $this->expectException(ImageException::class);
+        $this->expectExceptionMessage('At least one scale dimension must be specified.');
+
+        $this->makeImage()->scale();
+    }
+
+    public function test_orient_sets_option()
+    {
+        $image = $this->makeImage();
+        $result = $image->orient();
+
+        $this->assertTrue($this->getOptions($result)->orient);
+    }
+
+    public function test_optimize_sets_both_format_and_quality()
+    {
+        $image = $this->makeImage();
+        $result = $image->optimize('jpg', 90);
+
+        $options = $this->getOptions($result);
+
+        $this->assertSame('jpg', $options->format);
+        $this->assertSame(90, $options->quality);
+    }
+
+    public function test_optimize_throws_for_gif()
+    {
+        $this->expectException(ImageException::class);
+        $this->expectExceptionMessage('The [gif] format is not supported.');
+
+        $this->makeImage()->optimize('gif');
+    }
+
+    public function test_optimize_throws_for_avif()
+    {
+        $this->expectException(ImageException::class);
+        $this->expectExceptionMessage('The [avif] format is not supported.');
+
+        $this->makeImage()->optimize('avif');
+    }
+
+    public function test_optimize_allows_jpeg_spelling()
+    {
+        $image = $this->makeImage();
+        $result = $image->optimize('jpeg', 90);
+
+        $this->assertSame('jpeg', $this->getOptions($result)->format);
+    }
+
+    public function test_scale_does_not_set_cover()
+    {
+        $image = $this->makeImage();
+        $result = $image->scale(800, 600);
+
+        $options = $this->getOptions($result);
+
+        $this->assertNull($options->coverWidth);
+        $this->assertNull($options->coverHeight);
+    }
+
+    public function test_cover_does_not_set_scale()
+    {
+        $image = $this->makeImage();
+        $result = $image->cover(200, 200);
+
+        $options = $this->getOptions($result);
+
+        $this->assertNull($options->scaleWidth);
+        $this->assertNull($options->scaleHeight);
+    }
+
+    public function test_three_variants_from_same_source()
+    {
+        $image = $this->makeImage();
+
+        $a = $image->cover(100, 100);
+        $b = $image->scale(800, 600);
+        $c = $image->blur(10);
+
+        $this->assertSame(100, $this->getOptions($a)->coverWidth);
+        $this->assertNull($this->getOptions($a)->scaleWidth);
+        $this->assertNull($this->getOptions($a)->blur);
+
+        $this->assertNull($this->getOptions($b)->coverWidth);
+        $this->assertSame(800, $this->getOptions($b)->scaleWidth);
+        $this->assertNull($this->getOptions($b)->blur);
+
+        $this->assertNull($this->getOptions($c)->coverWidth);
+        $this->assertNull($this->getOptions($c)->scaleWidth);
+        $this->assertSame(10, $this->getOptions($c)->blur);
+    }
+
+    public function test_clone_resets_processed_flag()
+    {
+        $image = $this->makeImage();
+        $clone = $image->cover(100, 100);
+
+        $processed = (new \ReflectionProperty($clone, 'processed'))->getValue($clone);
+
+        $this->assertFalse($processed);
+    }
+
+    public function test_using_sets_driver_string()
+    {
+        $image = $this->makeImage();
+        $result = $image->using('custom-driver');
+
+        $driver = (new \ReflectionProperty($result, 'driver'))->getValue($result);
+
+        $this->assertSame('custom-driver', $driver);
+    }
+
+    public function test_implements_stringable()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $this->assertInstanceOf(\Stringable::class, $image);
+    }
+
+    public function test_to_string_returns_data_uri()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $this->assertSame($image->toDataUri(), $image->toString());
+    }
+
+    public function test_magic_to_string_returns_data_uri()
+    {
+        $image = new Image($this->fakeImageContents());
+
+        $this->assertSame($image->toDataUri(), (string) $image);
+    }
+
+    public function test_image_exception_extends_runtime_exception()
+    {
+        $exception = new ImageException('test');
+
+        $this->assertInstanceOf(\RuntimeException::class, $exception);
+    }
+
+    protected function makeImage(): Image
+    {
+        return new Image($this->fakeImageContents());
+    }
+
+    protected function fakeImageContents(int $width = 100, int $height = 100): string
+    {
+        $file = UploadedFile::fake()->image('test.jpg', $width, $height);
+
+        return file_get_contents($file->getRealPath());
+    }
+
+    protected function getOptions(Image $image): object
+    {
+        $pipeline = (new \ReflectionProperty($image, 'pipeline'))->getValue($image);
+
+        $options = (object) [
+            'coverWidth' => null,
+            'coverHeight' => null,
+            'containWidth' => null,
+            'containHeight' => null,
+            'containBackground' => null,
+            'cropWidth' => null,
+            'cropHeight' => null,
+            'cropX' => null,
+            'cropY' => null,
+            'resizeWidth' => null,
+            'resizeHeight' => null,
+            'rotateAngle' => null,
+            'rotateBackground' => null,
+            'scaleWidth' => null,
+            'scaleHeight' => null,
+            'orient' => null,
+            'blur' => null,
+            'grayscale' => null,
+            'sharpen' => null,
+            'flipVertically' => null,
+            'flipHorizontally' => null,
+            'format' => $pipeline->output->format,
+            'quality' => $pipeline->output->quality,
+        ];
+
+        foreach ($pipeline->transformations as $transformation) {
+            match (true) {
+                $transformation instanceof Cover => [$options->coverWidth, $options->coverHeight] = [$transformation->width, $transformation->height],
+                $transformation instanceof Contain => [$options->containWidth, $options->containHeight, $options->containBackground] = [$transformation->width, $transformation->height, $transformation->background],
+                $transformation instanceof Crop => [$options->cropWidth, $options->cropHeight, $options->cropX, $options->cropY] = [$transformation->width, $transformation->height, $transformation->x, $transformation->y],
+                $transformation instanceof Resize => [$options->resizeWidth, $options->resizeHeight] = [$transformation->width, $transformation->height],
+                $transformation instanceof Rotate => [$options->rotateAngle, $options->rotateBackground] = [$transformation->angle, $transformation->background],
+                $transformation instanceof Scale => [$options->scaleWidth, $options->scaleHeight] = [$transformation->width, $transformation->height],
+                $transformation instanceof Orient => $options->orient = true,
+                $transformation instanceof Blur => $options->blur = $transformation->amount,
+                $transformation instanceof Grayscale => $options->grayscale = true,
+                $transformation instanceof Sharpen => $options->sharpen = $transformation->amount,
+                $transformation instanceof FlipVertically => $options->flipVertically = true,
+                $transformation instanceof FlipHorizontally => $options->flipHorizontally = true,
+                default => null,
+            };
+        }
+
+        return $options;
+    }
+
+    protected function getPipeline(Image $image): ImagePipeline
+    {
+        return (new \ReflectionProperty($image, 'pipeline'))->getValue($image);
+    }
+}

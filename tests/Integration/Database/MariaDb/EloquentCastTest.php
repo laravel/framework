@@ -36,8 +36,8 @@ class EloquentCastTest extends MariaDbTestCase
 
     public function testItCastTimestampsCreatedByTheBuilderWhenTimeHasNotPassed()
     {
-        Carbon::setTestNow(now());
-        $createdAt = now()->timestamp;
+        Carbon::setTestNow(Carbon::now());
+        $createdAt = Carbon::now()->getTimestamp();
 
         $castUser = UserWithIntTimestampsViaCasts::create([
             'email' => fake()->unique()->email,
@@ -79,8 +79,8 @@ class EloquentCastTest extends MariaDbTestCase
 
     public function testItCastTimestampsCreatedByTheBuilderWhenTimeHasPassed()
     {
-        Carbon::setTestNow(now());
-        $createdAt = now()->timestamp;
+        Carbon::setTestNow(Carbon::now());
+        $createdAt = Carbon::now()->getTimestamp();
 
         $castUser = UserWithIntTimestampsViaCasts::create([
             'email' => fake()->unique()->email,
@@ -99,8 +99,8 @@ class EloquentCastTest extends MariaDbTestCase
         $this->assertSame($createdAt, $mutatorUser->created_at->timestamp);
         $this->assertSame($createdAt, $mutatorUser->updated_at->timestamp);
 
-        Carbon::setTestNow(now()->addSecond());
-        $updatedAt = now()->timestamp;
+        Carbon::setTestNow(Carbon::now()->addSecond());
+        $updatedAt = Carbon::now()->getTimestamp();
 
         $castUser->update([
             'email' => fake()->unique()->email,
@@ -125,7 +125,7 @@ class EloquentCastTest extends MariaDbTestCase
 
     public function testItCastTimestampsUpdatedByAMutator()
     {
-        Carbon::setTestNow(now());
+        Carbon::setTestNow(Carbon::now());
 
         $mutatorUser = UserWithUpdatedAtViaMutator::create([
             'email' => fake()->unique()->email,
@@ -133,8 +133,8 @@ class EloquentCastTest extends MariaDbTestCase
 
         $this->assertNull($mutatorUser->updated_at);
 
-        Carbon::setTestNow(now()->addSecond());
-        $updatedAt = now()->timestamp;
+        Carbon::setTestNow(Carbon::now()->addSecond());
+        $updatedAt = Carbon::now()->getTimestamp();
 
         $mutatorUser->update([
             'email' => fake()->unique()->email,
@@ -166,7 +166,7 @@ class UnixTimeStampToCarbon implements CastsAttributes
 
     public function set($model, string $key, $value, array $attributes)
     {
-        return Carbon::parse($value)->timestamp;
+        return Carbon::parse($value)->getTimestamp();
     }
 }
 
@@ -180,7 +180,7 @@ class UserWithIntTimestampsViaAttribute extends Model
     {
         return Attribute::make(
             get: fn ($value) => Carbon::parse($value),
-            set: fn ($value) => Carbon::parse($value)->timestamp,
+            set: fn ($value) => Carbon::parse($value)->getTimestamp(),
         );
     }
 
@@ -188,7 +188,7 @@ class UserWithIntTimestampsViaAttribute extends Model
     {
         return Attribute::make(
             get: fn ($value) => Carbon::parse($value),
-            set: fn ($value) => Carbon::parse($value)->timestamp,
+            set: fn ($value) => Carbon::parse($value)->getTimestamp(),
         );
     }
 }
@@ -206,7 +206,7 @@ class UserWithIntTimestampsViaMutator extends Model
 
     protected function setUpdatedAtAttribute($value)
     {
-        $this->attributes['updated_at'] = Carbon::parse($value)->timestamp;
+        $this->attributes['updated_at'] = Carbon::parse($value)->getTimestamp();
     }
 
     protected function getCreatedAtAttribute($value)
@@ -216,7 +216,7 @@ class UserWithIntTimestampsViaMutator extends Model
 
     protected function setCreatedAtAttribute($value)
     {
-        $this->attributes['created_at'] = Carbon::parse($value)->timestamp;
+        $this->attributes['created_at'] = Carbon::parse($value)->getTimestamp();
     }
 }
 

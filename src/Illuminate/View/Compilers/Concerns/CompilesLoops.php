@@ -27,7 +27,7 @@ trait CompilesLoops
 
         preg_match('/\( *(.+) +as +(.+)\)$/is', $expression ?? '', $matches);
 
-        if (count($matches) === 0) {
+        if ($matches === []) {
             throw new ViewCompilationException('Malformed @forelse statement.');
         }
 
@@ -102,7 +102,7 @@ trait CompilesLoops
     {
         preg_match('/\( *(.+) +as +(.*)\)$/is', $expression ?? '', $matches);
 
-        if (count($matches) === 0) {
+        if ($matches === []) {
             throw new ViewCompilationException('Malformed @foreach statement.');
         }
 

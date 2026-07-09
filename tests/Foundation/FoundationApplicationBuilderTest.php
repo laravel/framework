@@ -2,16 +2,17 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Illuminate\Contracts\Http\Kernel as HttpKernelContract;
 use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Http\Kernel as HttpKernel;
+use Illuminate\Http\Middleware\PrefersJsonResponses;
 use PHPUnit\Framework\TestCase;
 
 class FoundationApplicationBuilderTest extends TestCase
 {
     protected function tearDown(): void
     {
-        unset($_ENV['APP_BASE_PATH']);
-
-        unset($_ENV['LARAVEL_STORAGE_PATH'], $_SERVER['LARAVEL_STORAGE_PATH']);
+        unset($_ENV['APP_BASE_PATH'], $_ENV['LARAVEL_STORAGE_PATH'], $_SERVER['LARAVEL_STORAGE_PATH']);
 
         parent::tearDown();
     }
@@ -83,5 +84,59 @@ class FoundationApplicationBuilderTest extends TestCase
         $app->useStoragePath(__DIR__.'/custom-storage');
 
         $this->assertSame(__DIR__.'/custom-storage', $app->storagePath());
+    }
+
+    public function testPrefersJsonResponsesIsFluent()
+    {
+        $builder = Application::configure();
+
+        $this->assertSame($builder, $builder->prefersJsonResponses());
+        $this->assertSame($builder, $builder->prefersJsonResponses(false));
+    }
+
+    public function testPrefersJsonResponsesRegistersMiddlewareWhenEnabled()
+    {
+        $app = Application::configure()->prefersJsonResponses()->create();
+
+        $this->assertTrue($this->bootAndResolveKernel($app)->hasMiddleware(PrefersJsonResponses::class));
+    }
+
+    public function testPrefersJsonResponsesDefaultsToDisabled()
+    {
+        $app = Application::configure()->create();
+
+        $this->assertFalse($this->bootAndResolveKernel($app)->hasMiddleware(PrefersJsonResponses::class));
+    }
+
+    public function testPrefersJsonResponsesIsIdempotentWhenCalledMultipleTimes()
+    {
+        $app = Application::configure()->prefersJsonResponses()->prefersJsonResponses()->create();
+
+        $this->assertTrue($this->bootAndResolveKernel($app)->hasMiddleware(PrefersJsonResponses::class));
+    }
+
+    public function testPrefersJsonResponsesFalseDoesNotRegisterMiddleware()
+    {
+        $app = Application::configure()->prefersJsonResponses(false)->create();
+
+        $this->assertFalse($this->bootAndResolveKernel($app)->hasMiddleware(PrefersJsonResponses::class));
+    }
+
+    protected function bootAndResolveKernel(Application $app): HttpKernel
+    {
+        $app->singleton(HttpKernelContract::class, HttpKernel::class);
+
+        // The builder registers its wiring inside $app->booted() callbacks.
+        // We can't call $app->boot() from a unit test — it runs the full
+        // provider chain which expects a real application — so invoke the
+        // booted callbacks directly. Real boot behavior is covered by the
+        // PrefersJson integration tests.
+        $property = (new \ReflectionClass(Application::class))->getProperty('bootedCallbacks');
+
+        foreach ($property->getValue($app) as $callback) {
+            $callback($app);
+        }
+
+        return $app->make(HttpKernelContract::class);
     }
 }

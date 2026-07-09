@@ -113,7 +113,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     public function alwaysFrom($address, $name = null)
     {
-        $this->from = compact('address', 'name');
+        $this->from = ['address' => $address, 'name' => $name];
     }
 
     /**
@@ -125,7 +125,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     public function alwaysReplyTo($address, $name = null)
     {
-        $this->replyTo = compact('address', 'name');
+        $this->replyTo = ['address' => $address, 'name' => $name];
     }
 
     /**
@@ -136,7 +136,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     public function alwaysReturnPath($address)
     {
-        $this->returnPath = compact('address');
+        $this->returnPath = ['address' => $address];
     }
 
     /**
@@ -148,7 +148,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     public function alwaysTo($address, $name = null)
     {
-        $this->to = compact('address', 'name');
+        $this->to = ['address' => $address, 'name' => $name];
     }
 
     /**

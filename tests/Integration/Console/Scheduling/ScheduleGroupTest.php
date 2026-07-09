@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Illuminate\Tests\Integration\Console\Scheduling;
 
+use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\Schedule as ScheduleClass;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schedule;
@@ -87,6 +88,44 @@ class ScheduleGroupTest extends TestCase
         $this->assertSame('Asia/Dhaka', $events[1]->timezone);
     }
 
+    public function testGroupCanApplyAttributesToSchedules()
+    {
+        Schedule::withAttributes(['team' => 'platform'])->group(function () {
+            Schedule::command('inspire');
+        });
+
+        $events = Schedule::events();
+
+        $this->assertSame(['team' => 'platform'], $events[0]->attributes);
+    }
+
+    public function testGroupAttributesAreNotDuplicatedOnPendingSchedules()
+    {
+        Schedule::withAttributes(['team' => 'platform'])->group(function () {
+            Schedule::dailyAt('09:00')->command('inspire');
+        });
+
+        $events = Schedule::events();
+
+        $this->assertSame(['team' => 'platform'], $events[0]->attributes);
+        $this->assertSame('0 9 * * *', $events[0]->expression);
+    }
+
+    public function testGroupAttributesAreMergedWithPendingAttributes()
+    {
+        Schedule::withAttributes(['team' => 'platform'])->group(function () {
+            Schedule::withAttributes(['tagName' => 'import-premium-podcasts'])
+                ->command('audio:import-podcasts --only-premium');
+        });
+
+        $events = Schedule::events();
+
+        $this->assertSame([
+            'team' => 'platform',
+            'tagName' => 'import-premium-podcasts',
+        ], $events[0]->attributes);
+    }
+
     #[DataProvider('groupAttributes')]
     public function testGroupCanApplyAttributeToSchedules(string $property, mixed $value)
     {
@@ -101,6 +140,7 @@ class ScheduleGroupTest extends TestCase
         } else {
             $this->assertSame($value, $events[0]->expiresAt);
             $this->assertTrue($events[0]->withoutOverlapping);
+            $this->assertTrue($events[0]->releaseOnTerminationSignals);
         }
     }
 
@@ -116,7 +156,8 @@ class ScheduleGroupTest extends TestCase
             ],
             'runInBackground' => ['runInBackground', true],
             'evenInMaintenanceMode' => ['evenInMaintenanceMode', true],
-            'withoutOverlapping' => ['withoutOverlapping', rand(1000, 1400)],
+            'evenWhenPaused' => ['evenWhenPaused', true],
+            'withoutOverlapping' => ['withoutOverlapping', mt_rand(1000, 1400)],
         ];
     }
 
@@ -212,5 +253,377 @@ class ScheduleGroupTest extends TestCase
         $this->assertSame('0 3 * * 1-5', $events[1]->expression);
         $this->assertSame('* * * * 1-5', $events[2]->expression);
         $this->assertSame('0 4 * * 1-5', $events[3]->expression);
+    }
+
+    public function testGroupCanOptOutOfReleaseOnTerminationSignals()
+    {
+        $schedule = new ScheduleClass;
+        $schedule->daily()
+            ->withoutOverlapping(1440, releaseOnTerminationSignals: false)
+            ->group(function ($schedule) {
+                $schedule->command('inspire');
+            });
+
+        $events = $schedule->events();
+        $this->assertTrue($events[0]->withoutOverlapping);
+        $this->assertFalse($events[0]->releaseOnTerminationSignals);
+    }
+
+    public function testGroupAppliesEventMacrosToAllEvents()
+    {
+        Event::macro('sentryMonitor', function () {
+            $this->sentryMonitored = true;
+
+            return $this;
+        });
+
+        $schedule = new ScheduleClass;
+        $schedule->daily()->sentryMonitor()->group(function ($schedule) {
+            $schedule->command('inspire');
+            $schedule->command('inspire');
+        });
+
+        $events = $schedule->events();
+        $this->assertTrue($events[0]->sentryMonitored);
+        $this->assertTrue($events[1]->sentryMonitored);
+        $this->assertSame('0 0 * * *', $events[0]->expression);
+        $this->assertSame('0 0 * * *', $events[1]->expression);
+
+        Event::flushMacros();
+    }
+
+    public function testGroupAppliesEventMacroCalledBeforeBuiltInAttributes()
+    {
+        Event::macro('sentryMonitor', function () {
+            $this->sentryMonitored = true;
+
+            return $this;
+        });
+
+        $schedule = new ScheduleClass;
+        $schedule->sentryMonitor()->daily()->onOneServer()->group(function ($schedule) {
+            $schedule->command('inspire');
+        });
+
+        $events = $schedule->events();
+        $this->assertTrue($events[0]->sentryMonitored);
+        $this->assertTrue($events[0]->onOneServer);
+        $this->assertSame('0 0 * * *', $events[0]->expression);
+
+        Event::flushMacros();
+    }
+
+    public function testGroupAppliesMultipleEventMacros()
+    {
+        Event::macro('sentryMonitor', function () {
+            $this->sentryMonitored = true;
+
+            return $this;
+        });
+
+        Event::macro('customTag', function ($tag) {
+            $this->customTag = $tag;
+
+            return $this;
+        });
+
+        $schedule = new ScheduleClass;
+        $schedule->daily()->sentryMonitor()->customTag('billing')->group(function ($schedule) {
+            $schedule->command('inspire');
+            $schedule->command('inspire');
+        });
+
+        $events = $schedule->events();
+        $this->assertTrue($events[0]->sentryMonitored);
+        $this->assertSame('billing', $events[0]->customTag);
+        $this->assertTrue($events[1]->sentryMonitored);
+        $this->assertSame('billing', $events[1]->customTag);
+
+        Event::flushMacros();
+    }
+
+    public function testNestedGroupInheritsEventMacros()
+    {
+        Event::macro('sentryMonitor', function () {
+            $this->sentryMonitored = true;
+
+            return $this;
+        });
+
+        $schedule = new ScheduleClass;
+        $schedule->daily()->sentryMonitor()->group(function ($schedule) {
+            $schedule->command('inspire');
+            $schedule->weekly()->group(function ($schedule) {
+                $schedule->command('inspire');
+            });
+        });
+
+        $events = $schedule->events();
+        $this->assertTrue($events[0]->sentryMonitored);
+        $this->assertSame('0 0 * * *', $events[0]->expression);
+        $this->assertTrue($events[1]->sentryMonitored);
+        $this->assertSame('0 0 * * 0', $events[1]->expression);
+
+        Event::flushMacros();
+    }
+
+    public function testGroupAppliesEventMacrosOnceToPendingSchedules()
+    {
+        Event::macro('sentryMonitor', function () {
+            $this->sentryMonitored = ($this->sentryMonitored ?? 0) + 1;
+
+            return $this;
+        });
+
+        $schedule = new ScheduleClass;
+        $schedule->daily()->sentryMonitor()->group(function ($schedule) {
+            $schedule->at('09:00')->command('inspire');
+        });
+
+        $events = $schedule->events();
+        $this->assertSame(1, $events[0]->sentryMonitored);
+        $this->assertSame('0 9 * * *', $events[0]->expression);
+
+        Event::flushMacros();
+    }
+
+    public function testGroupAppliesOnFailureCallbackToAllEvents()
+    {
+        $calls = [];
+
+        $schedule = new ScheduleClass;
+        $schedule->daily()
+            ->onFailure(function () use (&$calls) {
+                $calls[] = 'group-failure';
+            })
+            ->group(function ($schedule) {
+                $schedule->command('inspire');
+                $schedule->command('inspire');
+            });
+
+        $events = $schedule->events();
+        $this->assertCount(2, $events);
+
+        $events[0]->finish(app(), 1);
+        $events[1]->finish(app(), 1);
+
+        $this->assertSame(['group-failure', 'group-failure'], $calls);
+    }
+
+    public function testGroupOnFailureCallbackDoesNotRunOnSuccess()
+    {
+        $calls = [];
+
+        $schedule = new ScheduleClass;
+        $schedule->daily()
+            ->onFailure(function () use (&$calls) {
+                $calls[] = 'group-failure';
+            })
+            ->group(function ($schedule) {
+                $schedule->command('inspire');
+            });
+
+        $events = $schedule->events();
+        $events[0]->finish(app(), 0);
+
+        $this->assertSame([], $calls);
+    }
+
+    public function testGroupAppliesOnSuccessCallbackToAllEvents()
+    {
+        $calls = [];
+
+        $schedule = new ScheduleClass;
+        $schedule->daily()
+            ->onSuccess(function () use (&$calls) {
+                $calls[] = 'group-success';
+            })
+            ->group(function ($schedule) {
+                $schedule->command('inspire');
+                $schedule->command('inspire');
+            });
+
+        $events = $schedule->events();
+        $events[0]->finish(app(), 0);
+        $events[1]->finish(app(), 0);
+
+        $this->assertSame(['group-success', 'group-success'], $calls);
+    }
+
+    public function testGroupAppliesBeforeAndAfterCallbacksToAllEvents()
+    {
+        $calls = [];
+
+        $schedule = new ScheduleClass;
+        $schedule->daily()
+            ->before(function () use (&$calls) {
+                $calls[] = 'before';
+            })
+            ->after(function () use (&$calls) {
+                $calls[] = 'after';
+            })
+            ->then(function () use (&$calls) {
+                $calls[] = 'then';
+            })
+            ->group(function ($schedule) {
+                $schedule->command('inspire');
+            });
+
+        $events = $schedule->events();
+        $events[0]->callBeforeCallbacks(app());
+        $events[0]->finish(app(), 0);
+
+        $this->assertSame(['before', 'after', 'then'], $calls);
+    }
+
+    public function testGroupAppliesAfterCallbackOnceToPendingSchedules()
+    {
+        $calls = [];
+
+        $schedule = new ScheduleClass;
+        $schedule
+            ->after(function () use (&$calls) {
+                $calls[] = 'after';
+            })
+            ->group(function ($schedule) {
+                $schedule->at('09:00')->command('inspire');
+            });
+
+        $events = $schedule->events();
+        $events[0]->finish(app(), 0);
+
+        $this->assertSame(['after'], $calls);
+        $this->assertSame('0 9 * * *', $events[0]->expression);
+    }
+
+    public function testGroupCallbacksCombineWithEventLevelCallbacks()
+    {
+        $calls = [];
+
+        $schedule = new ScheduleClass;
+        $schedule->daily()
+            ->onFailure(function () use (&$calls) {
+                $calls[] = 'group';
+            })
+            ->group(function ($schedule) use (&$calls) {
+                $schedule->command('inspire')->onFailure(function () use (&$calls) {
+                    $calls[] = 'event';
+                });
+            });
+
+        $events = $schedule->events();
+        $events[0]->finish(app(), 1);
+
+        $this->assertSame(['group', 'event'], $calls);
+    }
+
+    public function testNestedGroupInheritsLifecycleCallbacks()
+    {
+        $calls = [];
+
+        $schedule = new ScheduleClass;
+        $schedule->daily()
+            ->onFailure(function () use (&$calls) {
+                $calls[] = 'outer';
+            })
+            ->group(function ($schedule) use (&$calls) {
+                $schedule->command('inspire');
+                $schedule->weekly()
+                    ->onFailure(function () use (&$calls) {
+                        $calls[] = 'inner';
+                    })
+                    ->group(function ($schedule) {
+                        $schedule->command('inspire');
+                    });
+            });
+
+        $events = $schedule->events();
+        $this->assertCount(2, $events);
+
+        $events[0]->finish(app(), 1);
+        $this->assertSame(['outer'], $calls);
+
+        $events[1]->finish(app(), 1);
+        $this->assertSame(['outer', 'outer', 'inner'], $calls);
+    }
+
+    public function testNestedGroupInheritsLifecycleCallbacksOnce()
+    {
+        $calls = [];
+
+        $schedule = new ScheduleClass;
+        $schedule
+            ->after(function () use (&$calls) {
+                $calls[] = 'outer';
+            })
+            ->group(function ($schedule) use (&$calls) {
+                $schedule
+                    ->after(function () use (&$calls) {
+                        $calls[] = 'inner';
+                    })
+                    ->group(function ($schedule) {
+                        $schedule->command('inspire');
+                    });
+            });
+
+        $events = $schedule->events();
+        $events[0]->finish(app(), 0);
+
+        $this->assertSame(['outer', 'inner'], $calls);
+    }
+
+    public function testGroupCanStartWithLifecycleCallbackWithoutFrequency()
+    {
+        $calls = [];
+
+        $schedule = new ScheduleClass;
+        $schedule
+            ->before(function () use (&$calls) {
+                $calls[] = 'before';
+            })
+            ->onSuccess(function () use (&$calls) {
+                $calls[] = 'success';
+            })
+            ->onFailure(function () use (&$calls) {
+                $calls[] = 'failure';
+            })
+            ->group(function ($schedule) {
+                $schedule->command('inspire')->daily();
+                $schedule->command('inspire')->weekly();
+            });
+
+        $events = $schedule->events();
+        $this->assertCount(2, $events);
+        $this->assertSame('0 0 * * *', $events[0]->expression);
+        $this->assertSame('0 0 * * 0', $events[1]->expression);
+
+        $events[0]->callBeforeCallbacks(app());
+        $events[0]->finish(app(), 0);
+        $events[1]->callBeforeCallbacks(app());
+        $events[1]->finish(app(), 1);
+
+        $this->assertSame(['before', 'success', 'before', 'failure'], $calls);
+    }
+
+    public function testGroupCanStartWithOutputCallbackWithoutFrequency()
+    {
+        $calls = [];
+
+        $schedule = new ScheduleClass;
+        $schedule
+            ->onFailureWithOutput(function (Event $event, \Illuminate\Support\Stringable $output) use (&$calls) {
+                $calls[] = 'failure:'.$output;
+            })
+            ->group(function ($schedule) {
+                $schedule->command('inspire')->daily();
+            });
+
+        $events = $schedule->events();
+        $this->assertCount(1, $events);
+        $this->assertSame('0 0 * * *', $events[0]->expression);
+
+        $events[0]->finish(app(), 1);
+
+        $this->assertCount(1, $calls);
     }
 }

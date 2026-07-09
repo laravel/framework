@@ -386,6 +386,21 @@ class RoutingRouteTest extends TestCase
         unset($_SERVER['__middleware.group']);
     }
 
+    public function testMiddlewareGroupsCannotReferenceItself()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('[web] middleware group is referencing itself.');
+
+        $router = $this->getRouter();
+        $router->get('foo/bar', ['middleware' => 'web', function () {
+            return 'hello';
+        }]);
+
+        $router->middlewareGroup('web', ['web']);
+
+        $router->dispatch(Request::create('foo/bar', 'GET'));
+    }
+
     public function testFluentRouteNamingWithinAGroup()
     {
         $router = $this->getRouter();
@@ -708,7 +723,7 @@ class RoutingRouteTest extends TestCase
         unset($_SERVER['__test.controller_callAction_parameters']);
         $router->get(($str = Str::random()).'', RouteTestAnotherControllerWithParameterStub::class.'@oneArgument');
         $router->dispatch(Request::create($str, 'GET'));
-        $this->assertEquals([], $_SERVER['__test.controller_callAction_parameters']);
+        $this->assertSame([], $_SERVER['__test.controller_callAction_parameters']);
 
         // With model bindings
         unset($_SERVER['__test.controller_callAction_parameters']);
@@ -2277,6 +2292,33 @@ class RoutingRouteTest extends TestCase
 
         return $router;
     }
+
+    public function testRouteDeserializationAllowedClasses()
+    {
+        $badObject = new RouteTestInsecureDeserializationStub;
+        $closureWithUse = function () use ($badObject) {
+            return $badObject;
+        };
+
+        $serializedClosure = serialize(\Laravel\SerializableClosure\SerializableClosure::unsigned($closureWithUse));
+
+        RouteTestInsecureDeserializationStub::$instantiated = false;
+        unserialize($serializedClosure);
+        $this->assertTrue(RouteTestInsecureDeserializationStub::$instantiated);
+        $route = new Route(['GET'], 'foo', [
+            'uses' => $serializedClosure,
+        ]);
+
+        RouteTestInsecureDeserializationStub::$instantiated = false;
+
+        try {
+            $route->run();
+        } catch (\Throwable) {
+            //
+        }
+
+        $this->assertFalse(RouteTestInsecureDeserializationStub::$instantiated);
+    }
 }
 
 class RouteTestControllerStub extends Controller
@@ -2706,5 +2748,15 @@ final class RoutingTestHasTenantImpl
     public function onTenant(RoutingTestTenant $tenant): void
     {
         $this->tenant = $tenant;
+    }
+}
+
+class RouteTestInsecureDeserializationStub
+{
+    public static $instantiated = false;
+
+    public function __wakeup()
+    {
+        self::$instantiated = true;
     }
 }

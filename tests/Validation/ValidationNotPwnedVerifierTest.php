@@ -105,6 +105,53 @@ class ValidationNotPwnedVerifierTest extends TestCase
         ]));
     }
 
+    public function testMagicHashDoesNotCauseFalsePositive()
+    {
+        // "aaroZmOk" produces a SHA-1 hash that is all digits prefixed with "0E",
+        // which PHP treats as scientific notation (zero) during loose comparison,
+        // causing any other all-digit "0E" hash to falsely match.
+        $password = 'aaroZmOk';
+        $hash = strtoupper(sha1($password));
+        $hashPrefix = substr($hash, 0, 5);
+
+        $differentSuffix = '00000000000000000000000000000000000';
+
+        $httpFactory = m::mock(HttpFactory::class);
+        $response = m::mock(Response::class);
+
+        $httpFactory
+            ->shouldReceive('withHeaders')
+            ->once()
+            ->with(['Add-Padding' => true])
+            ->andReturn($httpFactory);
+
+        $httpFactory
+            ->shouldReceive('timeout')
+            ->once()
+            ->with(30)
+            ->andReturn($httpFactory);
+
+        $httpFactory->shouldReceive('get')
+            ->once()
+            ->with('https://api.pwnedpasswords.com/range/'.$hashPrefix)
+            ->andReturn($response);
+
+        $response->shouldReceive('successful')
+            ->once()
+            ->andReturn(true);
+
+        $response->shouldReceive('body')
+            ->once()
+            ->andReturn($differentSuffix.':5');
+
+        $verifier = new NotPwnedVerifier($httpFactory);
+
+        $this->assertTrue($verifier->verify([
+            'value' => $password,
+            'threshold' => 0,
+        ]));
+    }
+
     public function testDnsDown()
     {
         $container = Container::getInstance();

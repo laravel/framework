@@ -42,7 +42,7 @@ trait HasParameters
      *
      * @return (InputArgument|array{
      *    0: non-empty-string,
-     *    1?: InputArgument::REQUIRED|InputArgument::OPTIONAL|InputArgument::IS_ARRAY,
+     *    1?: int-mask-of<InputArgument::REQUIRED|InputArgument::OPTIONAL|InputArgument::IS_ARRAY>,
      *    2?: string,
      *    3?: mixed,
      *    4?: list<string|Suggestion>|\Closure(CompletionInput, CompletionSuggestions): list<string|Suggestion>
@@ -59,7 +59,7 @@ trait HasParameters
      * @return (InputOption|array{
      *    0: non-empty-string,
      *    1?: string|non-empty-array<string>,
-     *    2?: InputOption::VALUE_*,
+     *    2?: int-mask-of<InputOption::VALUE_*>,
      *    3?: string,
      *    4?: mixed,
      *    5?: list<string|Suggestion>|\Closure(CompletionInput, CompletionSuggestions): list<string|Suggestion>

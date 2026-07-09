@@ -117,7 +117,7 @@ class WorkCommandTest extends QueueTestCase
         $this->artisan('queue:work', [
             '--daemon' => true,
             '--stop-when-empty' => true,
-            '--memory' => 0.1,
+            '--memory' => 1,
         ])->assertExitCode(12);
 
         // Memory limit isn't checked until after the first job is attempted.
@@ -176,7 +176,7 @@ class WorkCommandTest extends QueueTestCase
         Queue::push(new SecondJob);
 
         $this->artisan('queue:work', [
-            '--memory' => 0.1,
+            '--memory' => 1,
         ])->assertExitCode(0);
 
         // Memory limit isn't checked until after the first job is attempted.
@@ -195,7 +195,7 @@ class WorkCommandTest extends QueueTestCase
 
         $cache = m::mock(Repository::class);
         $cache->shouldNotReceive('get')->with('illuminate:queue:restart');
-        $cache->shouldReceive('get')->with(m::pattern('/^illuminate:queue:paused:/'), false);
+        $cache->shouldReceive('many')->andReturn([]);
 
         $cacheManager = m::mock(CacheManager::class);
         $cacheManager->shouldReceive('driver')->andReturn($cache);
@@ -225,7 +225,7 @@ class WorkCommandTest extends QueueTestCase
         $cache = m::mock(Repository::class);
 
         $cache->shouldReceive('get')->with('illuminate:queue:restart')->andReturn(null);
-        $cache->shouldNotReceive('get')->with(m::pattern('/^illuminate:queue:paused:/'), false);
+        $cache->shouldNotReceive('many');
 
         $cacheManager = m::mock(CacheManager::class);
         $cacheManager->shouldReceive('driver')->andReturn($cache);

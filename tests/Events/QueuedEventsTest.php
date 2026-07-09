@@ -17,6 +17,7 @@ use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Queue\QueueRoutes;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use Laravel\SerializableClosure\SerializableClosure;
 use Mockery as m;
@@ -455,7 +456,7 @@ class QueuedEventsTest extends TestCase
 
         $this->assertSame(TestDispatcherShouldBeUnique::class, $listener->displayName());
         $this->assertSame(
-            'laravel_unique_job:'.TestDispatcherShouldBeUnique::class.':test-id',
+            'laravel_unique_job:'.hash('xxh128', TestDispatcherShouldBeUnique::class).':test-id',
             \Illuminate\Bus\UniqueLock::getKey($listener)
         );
     }
@@ -471,7 +472,7 @@ class QueuedEventsTest extends TestCase
 
         $container->instance(Cache::class, $cache);
 
-        $expectedKey = 'laravel_unique_job:'.TestDispatcherShouldBeUnique::class.':unique-listener-id';
+        $expectedKey = 'laravel_unique_job:'.hash('xxh128', TestDispatcherShouldBeUnique::class).':unique-listener-id';
 
         $cache->shouldReceive('lock')
             ->once()
@@ -505,7 +506,7 @@ class QueuedEventsTest extends TestCase
 
         TestDispatcherShouldBeUniqueWithCustomCache::$cache = $uniqueCache;
 
-        $expectedKey = 'laravel_unique_job:'.TestDispatcherShouldBeUniqueWithCustomCache::class.':unique-listener-id';
+        $expectedKey = 'laravel_unique_job:'.hash('xxh128', TestDispatcherShouldBeUniqueWithCustomCache::class).':unique-listener-id';
 
         $uniqueCache->shouldReceive('lock')
             ->once()
@@ -537,7 +538,7 @@ class QueuedEventsTest extends TestCase
         $listener->uniqueId = 'unique-listener-id';
         $listener->uniqueFor = 60;
 
-        $expectedKey = 'laravel_unique_job:'.TestDispatcherShouldBeUnique::class.':unique-listener-id';
+        $expectedKey = 'laravel_unique_job:'.hash('xxh128', TestDispatcherShouldBeUnique::class).':unique-listener-id';
 
         $cache->shouldReceive('lock')
             ->once()
@@ -567,14 +568,14 @@ class QueuedEventsTest extends TestCase
 
         TestDispatcherShouldBeUniqueUntilProcessing::$lockReleasedBeforeHandling = null;
         TestDispatcherShouldBeUniqueUntilProcessing::$cache = $cache;
-        TestDispatcherShouldBeUniqueUntilProcessing::$expectedLockKey = 'laravel_unique_job:'.TestDispatcherShouldBeUniqueUntilProcessing::class.':until-processing-id';
+        TestDispatcherShouldBeUniqueUntilProcessing::$expectedLockKey = 'laravel_unique_job:'.hash('xxh128', TestDispatcherShouldBeUniqueUntilProcessing::class).':until-processing-id';
 
         $listener = new CallQueuedListener(TestDispatcherShouldBeUniqueUntilProcessing::class, 'handle', ['foo', 'bar']);
         $listener->shouldBeUnique = true;
         $listener->shouldBeUniqueUntilProcessing = true;
         $listener->uniqueId = 'until-processing-id';
 
-        $expectedKey = 'laravel_unique_job:'.TestDispatcherShouldBeUniqueUntilProcessing::class.':until-processing-id';
+        $expectedKey = 'laravel_unique_job:'.hash('xxh128', TestDispatcherShouldBeUniqueUntilProcessing::class).':until-processing-id';
 
         $cache->shouldReceive('lock')
             ->with($expectedKey)
@@ -586,6 +587,7 @@ class QueuedEventsTest extends TestCase
         $job->shouldReceive('isDeleted')->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
+        $job->shouldReceive('attempts')->andReturn(1);
         $job->shouldReceive('delete')->once();
 
         $handler = new CallQueuedHandler(new BusDispatcher($container), $container);
@@ -668,7 +670,7 @@ class TestDispatcherOptions implements ShouldQueue
 
     public function retryUntil()
     {
-        return now()->addHour(1);
+        return Carbon::now()->addHour();
     }
 
     public function tries()

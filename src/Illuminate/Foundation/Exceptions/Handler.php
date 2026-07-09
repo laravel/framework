@@ -17,7 +17,6 @@ use Illuminate\Contracts\Debug\ShouldntReport;
 use Illuminate\Contracts\Foundation\ExceptionRenderer;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\RecordNotFoundException;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Foundation\Exceptions\Renderer\Renderer;
@@ -80,6 +79,20 @@ class Handler implements ExceptionHandlerContract
     protected $dontReportCallbacks = [];
 
     /**
+     * A list of the exception types that should stop job retries.
+     *
+     * @var array<int, class-string<\Throwable>>
+     */
+    protected $dontRetry = [];
+
+    /**
+     * The callbacks that inspect exceptions to determine if they should stop job retries.
+     *
+     * @var array
+     */
+    protected $dontRetryCallbacks = [];
+
+    /**
      * The callbacks that should be used during reporting.
      *
      * @var \Illuminate\Foundation\Exceptions\ReportableHandler[]
@@ -106,6 +119,13 @@ class Handler implements ExceptionHandlerContract
      * @var array
      */
     protected $contextCallbacks = [];
+
+    /**
+     * The exception currently being reported.
+     *
+     * @var \Throwable|null
+     */
+    protected ?Throwable $currentlyReporting = null;
 
     /**
      * The callbacks that should be used during rendering.
@@ -154,7 +174,6 @@ class Handler implements ExceptionHandlerContract
         HttpException::class,
         HttpResponseException::class,
         ModelNotFoundException::class,
-        MultipleRecordsFoundException::class,
         OriginMismatchException::class,
         RecordNotFoundException::class,
         RecordsNotFoundException::class,
@@ -320,6 +339,59 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
+     * Indicate that the given exception type should stop job retries.
+     *
+     * @param  array|string  $exceptions
+     * @return $this
+     */
+    public function dontRetry(array|string $exceptions)
+    {
+        $exceptions = Arr::wrap($exceptions);
+
+        $this->dontRetry = array_values(array_unique(array_merge($this->dontRetry, $exceptions)));
+
+        return $this;
+    }
+
+    /**
+     * Register a callback to determine if an exception should stop job retries.
+     *
+     * @param  (callable(\Throwable): bool)  $dontRetryWhen
+     * @return $this
+     */
+    public function dontRetryWhen(callable $dontRetryWhen)
+    {
+        if (! $dontRetryWhen instanceof Closure) {
+            $dontRetryWhen = Closure::fromCallable($dontRetryWhen);
+        }
+
+        $this->dontRetryCallbacks[] = $dontRetryWhen;
+
+        return $this;
+    }
+
+    /**
+     * Determine if the exception should stop job retries.
+     *
+     * @param  \Throwable  $e
+     * @return bool
+     */
+    public function shouldStopRetries(Throwable $e)
+    {
+        if (! is_null(Arr::first($this->dontRetry, fn ($type) => $e instanceof $type))) {
+            return true;
+        }
+
+        foreach ($this->dontRetryCallbacks as $dontRetryCallback) {
+            if ($dontRetryCallback($e) === true) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Indicate that the given attributes should never be flashed to the session on validation errors.
      *
      * @param  array|string  $attributes
@@ -398,11 +470,27 @@ class Handler implements ExceptionHandlerContract
 
         $level = $this->mapLogLevel($e);
 
-        $context = $this->buildExceptionContext($e);
+        $originallyReporting = $this->currentlyReporting;
 
-        method_exists($logger, $level)
-            ? $logger->{$level}($e->getMessage(), $context)
-            : $logger->log($level, $e->getMessage(), $context);
+        $this->currentlyReporting = $e;
+
+        try {
+            $context = $this->buildExceptionContext($e);
+
+            method_exists($logger, $level)
+                ? $logger->{$level}($e->getMessage(), $context)
+                : $logger->log($level, $e->getMessage(), $context);
+        } finally {
+            $this->currentlyReporting = $originallyReporting;
+        }
+    }
+
+    /**
+     * Determine if a given exception is being reported.
+     */
+    public function isReporting(Throwable $e): bool
+    {
+        return $this->currentlyReporting === $e;
     }
 
     /**
@@ -534,10 +622,20 @@ class Handler implements ExceptionHandlerContract
     protected function buildExceptionContext(Throwable $e)
     {
         return array_merge(
-            $this->exceptionContext($e),
+            $this->buildContextForException($e),
             $this->context(),
             ['exception' => $e]
         );
+    }
+
+    /**
+     * Creates the context for an exception.
+     *
+     * @return array<array-key, mixed>
+     */
+    public function buildContextForException(Throwable $e)
+    {
+        return $this->exceptionContext($e);
     }
 
     /**
@@ -750,9 +848,17 @@ class Handler implements ExceptionHandlerContract
      */
     protected function unauthenticated($request, AuthenticationException $exception)
     {
-        return $this->shouldReturnJson($request, $exception)
-            ? response()->json(['message' => $exception->getMessage()], 401)
-            : redirect()->guest($exception->redirectTo($request) ?? route('login'));
+        if ($this->shouldReturnJson($request, $exception)) {
+            return response()->json(['message' => $exception->getMessage()], 401);
+        }
+
+        $redirectTo = $exception->redirectTo($request);
+
+        if (! $redirectTo) {
+            return response()->noContent(401);
+        }
+
+        return redirect()->guest($redirectTo);
     }
 
     /**
