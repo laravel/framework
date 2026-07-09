@@ -2,8 +2,10 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Contracts\Http\Kernel as HttpKernelContract;
 use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Illuminate\Http\Middleware\PrefersJsonResponses;
 use PHPUnit\Framework\TestCase;
@@ -86,6 +88,23 @@ class FoundationApplicationBuilderTest extends TestCase
         $this->assertSame(__DIR__.'/custom-storage', $app->storagePath());
     }
 
+    public function testKernelContractResolvesToSameInstanceAsConcrete()
+    {
+        $app = Application::configure()->create();
+
+        $this->assertSame($app->make(HttpKernelContract::class), $app->make(HttpKernel::class));
+        $this->assertSame($app->make(ConsoleKernelContract::class), $app->make(ConsoleKernel::class));
+    }
+
+    public function testKernelAbstractCanBeBoundToCustomConcrete()
+    {
+        $app = Application::configure()->create();
+
+        $app->singleton(HttpKernelContract::class, CustomHttpKernelStub::class);
+
+        $this->assertInstanceOf(CustomHttpKernelStub::class, $app->make(HttpKernelContract::class));
+    }
+
     public function testPrefersJsonResponsesIsFluent()
     {
         $builder = Application::configure();
@@ -139,4 +158,9 @@ class FoundationApplicationBuilderTest extends TestCase
 
         return $app->make(HttpKernelContract::class);
     }
+}
+
+class CustomHttpKernelStub extends HttpKernel
+{
+    //
 }
