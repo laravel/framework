@@ -1234,7 +1234,14 @@ class Route
         return $this->attributeProvidedControllerMiddlewareExclusions($controllerClass, $controllerMethod);
     }
 
-    private function attributeProvidedControllerMiddlewareExclusions(string $class, string $method): array
+    /**
+     * Get the attribute provided excluded controller middleware for the given class and method.
+     *
+     * @param  string  $class
+     * @param  string  $method
+     * @return array
+     */
+    protected function attributeProvidedControllerMiddlewareExclusions(string $class, string $method): array
     {
         try {
             $reflectionClass = new ReflectionClass($class);
