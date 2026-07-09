@@ -23,6 +23,20 @@ class WithoutMiddlewareAttributeTest extends TestCase
             'all',
             'except-index',
         ], $route->excludedMiddleware());
+
+        $route = Route::get('/', [ChildWithoutMiddlewareAttributeController::class, 'index']);
+        $this->assertEquals([
+            'all',
+            'only-index',
+            'also-index',
+        ], $route->excludedMiddleware());
+
+        $route = Route::get('/', [ChildWithoutMiddlewareAttributeController::class, 'show'])->withoutMiddleware('merged');
+        $this->assertEquals([
+            'merged',
+            'all',
+            'except-index',
+        ], $route->excludedMiddleware());
     }
 }
 
@@ -42,3 +56,6 @@ class WithoutMiddlewareAttributeController
         // ...
     }
 }
+
+
+class ChildWithoutMiddlewareAttributeController extends WithoutMiddlewareAttributeController {}

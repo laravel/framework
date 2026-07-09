@@ -1234,25 +1234,39 @@ class Route
         return $this->attributeProvidedControllerMiddlewareExclusions($controllerClass, $controllerMethod);
     }
 
-    private function attributeProvidedControllerMiddlewareExclusions($class, $method): array
+    private function attributeProvidedControllerMiddlewareExclusions(string $class, string $method): array
     {
         try {
             $reflectionClass = new ReflectionClass($class);
-
             $reflectionMethod = $reflectionClass->getMethod($method);
         } catch (ReflectionException) {
             return [];
         }
 
-        return (new Collection(array_merge(
-            $reflectionClass->getAttributes(WithoutMiddleware::class, ReflectionAttribute::IS_INSTANCEOF),
-            $reflectionMethod->getAttributes(WithoutMiddleware::class, ReflectionAttribute::IS_INSTANCEOF),
-        )))->map(function (ReflectionAttribute $attribute) use ($method) {
+        $attributes = new Collection;
+
+        $current = $reflectionClass;
+
+        while ($current) {
+            $classAttributes = array_reverse($current->getAttributes(
+                WithoutMiddleware::class, ReflectionAttribute::IS_INSTANCEOF
+            ));
+
+            foreach ($classAttributes as $attribute) {
+                $attributes->prepend($attribute);
+            }
+
+            $current = $current->getParentClass();
+        }
+
+        return $attributes->merge(
+            $reflectionMethod->getAttributes(WithoutMiddleware::class, ReflectionAttribute::IS_INSTANCEOF)
+        )->map(function (ReflectionAttribute $attribute) use ($method) {
             $instance = $attribute->newInstance();
 
             return static::methodExcludedByOptions(
                 $method, ['only' => $instance->only, 'except' => $instance->except],
-            ) ? null : $instance->value;
+            ) ? null : $instance->middleware;
         })
             ->filter()
             ->values()
