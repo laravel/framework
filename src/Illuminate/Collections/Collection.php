@@ -133,15 +133,24 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         $collection = isset($key) ? $this->pluck($key) : $this;
 
         $counts = $this->newInstance();
+        $values = [];
 
-        $collection->each(fn ($value) => $counts[$value] = isset($counts[$value]) ? $counts[$value] + 1 : 1);
+        $collection->each(function ($value) use ($counts, &$values) {
+            $index = serialize($value);
+
+            $counts[$index] = isset($counts[$index]) ? $counts[$index] + 1 : 1;
+
+            $values[$index] = $value;
+        });
 
         $sorted = $counts->sort();
 
         $highestValue = $sorted->last();
 
         return $sorted->filter(fn ($value) => $value == $highestValue)
-            ->sort()->keys()->all();
+            ->keys()
+            ->map(fn ($index) => $values[$index])
+            ->sort()->values()->all();
     }
 
     /**
