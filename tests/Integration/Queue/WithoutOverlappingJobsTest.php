@@ -284,4 +284,3 @@ enum BackedCategory: string
 {
     case backed = 'backed';
 }
-
