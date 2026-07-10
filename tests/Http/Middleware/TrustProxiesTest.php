@@ -163,9 +163,9 @@ class TrustProxiesTest extends TestCase
 
         $forwardedFor = [
             '192.0.2.2',
-            '192.0.2.199, 192.0.2.2',
-            '192.0.2.199,192.0.2.2',
-            '99.99.99.99,192.0.2.199,192.0.2.2',
+            '192.0.2.2, 192.0.2.199',
+            '192.0.2.2,192.0.2.199',
+            '192.0.2.2,99.99.99.99,192.0.2.199',
         ];
 
         foreach ($forwardedFor as $forwardedForHeader) {
@@ -173,6 +173,28 @@ class TrustProxiesTest extends TestCase
 
             $trustedProxy->handle($request, function ($request) use ($forwardedForHeader) {
                 $this->assertSame('192.0.2.2', $request->getClientIp(), 'Assert sets the '.$forwardedForHeader);
+            });
+        }
+    }
+
+    /**
+     * Test Forwarded header with multiple IP addresses, with * wildcard trusting of all proxies.
+     */
+    public function test_get_client_ip_with_multiple_ip_addresses_all_proxies_are_trusted_using_forwarded_header()
+    {
+        $trustedProxy = $this->createTrustedProxy(Request::HEADER_FORWARDED, '*');
+
+        $forwarded = [
+            'for=192.0.2.2',
+            'for=192.0.2.2,for=192.0.2.199',
+            'for=192.0.2.2,for=99.99.99.99,for=192.0.2.199',
+        ];
+
+        foreach ($forwarded as $forwardedHeader) {
+            $request = $this->createProxiedRequest(['HTTP_FORWARDED' => $forwardedHeader, 'HTTP_X_FORWARDED_FOR' => '']);
+
+            $trustedProxy->handle($request, function ($request) use ($forwardedHeader) {
+                $this->assertSame('192.0.2.2', $request->getClientIp(), 'Assert sets the '.$forwardedHeader);
             });
         }
     }
