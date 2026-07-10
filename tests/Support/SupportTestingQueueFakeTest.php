@@ -8,6 +8,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\Jobs\InspectedJob;
 use Illuminate\Queue\QueueManager;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use Mockery as m;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -648,6 +649,21 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->later(10, $this->job, '', 'foo');
 
         $this->fake->assertPushedOn('foo', JobStub::class);
+    }
+
+    public function testCreationTimeOfOldestPendingJob()
+    {
+        Carbon::setTestNow($now = Carbon::now());
+
+        $this->assertNull($this->fake->creationTimeOfOldestPendingJob('foo'));
+
+        $this->fake->push($this->job, '', 'foo');
+
+        Carbon::setTestNow($now->copy()->addMinutes(5));
+
+        $this->fake->push(new JobToFakeStub, '', 'foo');
+
+        $this->assertSame($now->getTimestamp(), $this->fake->creationTimeOfOldestPendingJob('foo'));
     }
 
     public function testReservedJobs()
