@@ -17,6 +17,7 @@ use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use JsonException;
 use PHPUnit\Framework\Assert as PHPUnit;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * @mixin \Illuminate\Http\Client\PendingRequest
@@ -157,7 +158,7 @@ class Factory
     /**
      * Create a new response instance for use during stubbing.
      *
-     * @param  array|string|null  $body
+     * @param  array|string|resource|StreamInterface|null  $body
      * @param  int  $status
      * @param  array  $headers
      * @return \GuzzleHttp\Promise\PromiseInterface
@@ -172,7 +173,7 @@ class Factory
     /**
      * Create a new PSR-7 response instance for use during stubbing.
      *
-     * @param  array|string|null  $body
+     * @param  array|string|resource|StreamInterface|null  $body
      * @param  int  $status
      * @param  array<string, mixed>  $headers
      * @return \GuzzleHttp\Psr7\Response
@@ -191,8 +192,8 @@ class Factory
             $headers['Content-Type'] = 'application/json';
         }
 
-        if (! is_string($body) && ! is_null($body)) {
-            throw new InvalidArgumentException('HTTP fake response body must be a string, array, or null.');
+        if (! is_string($body) && ! is_null($body) && ! is_resource($body) && ! $body instanceof StreamInterface) {
+            throw new InvalidArgumentException('HTTP fake response body must be a string, array, resource, Psr\Http\Message\StreamInterface, or null.');
         }
 
         return new Psr7Response($status, static::normalizeResponseHeaders($headers), $body);
