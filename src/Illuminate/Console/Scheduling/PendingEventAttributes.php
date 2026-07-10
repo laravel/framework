@@ -121,6 +121,10 @@ class PendingEventAttributes
             $event->runInBackground();
         }
 
+        if ($this->outputShouldBeForwardedToConsole) {
+            $event->forwardOutputToConsole();
+        }
+
         foreach ($this->filters as $filter) {
             $event->when($filter);
         }

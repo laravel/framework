@@ -27,6 +27,8 @@ class ScheduleRunCommandTest extends TestCase
     {
         Carbon::setTestNow();
 
+        Schedule::$outputShouldBeForwardedToConsole = false;
+
         parent::tearDown();
     }
 
@@ -260,6 +262,130 @@ class ScheduleRunCommandTest extends TestCase
         Event::assertDispatched(ScheduledTaskStarting::class);
         Event::assertDispatched(ScheduledTaskFinished::class);
         Event::assertNotDispatched(ScheduledTaskFailed::class);
+    }
+
+    /**
+     * @throws BindingResolutionException
+     */
+    public function test_forward_output_to_console_preserves_failing_exit_code()
+    {
+        Event::fake([
+            ScheduledTaskStarting::class,
+            ScheduledTaskFinished::class,
+            ScheduledTaskFailed::class,
+        ]);
+
+        $schedule = $this->app->make(Schedule::class);
+        $task = $schedule->exec('exit 1')
+            ->everyMinute()
+            ->forwardOutputToConsole();
+
+        $task->when(function () {
+            return true;
+        });
+
+        $this->artisan('schedule:run');
+
+        Event::assertDispatched(ScheduledTaskFailed::class, function ($event) use ($task) {
+            return $event->task === $task;
+        });
+    }
+
+    /**
+     * @throws BindingResolutionException
+     */
+    public function test_forward_output_to_console_writes_output_to_configured_destination()
+    {
+        $path = tempnam(sys_get_temp_dir(), 'laravel-schedule-output-');
+
+        $schedule = $this->app->make(Schedule::class);
+        $command = PHP_OS_FAMILY === 'Windows' ? 'echo hello world' : "echo 'hello world'";
+        $task = $schedule->exec($command)
+            ->everyMinute()
+            ->forwardOutputToConsole()
+            ->sendOutputTo($path);
+
+        $task->when(function () {
+            return true;
+        });
+
+        $this->artisan('schedule:run');
+
+        $this->assertSame('hello world', trim(file_get_contents($path)));
+
+        unlink($path);
+    }
+
+    /**
+     * @throws BindingResolutionException
+     */
+    public function test_forward_output_to_console_does_not_affect_background_events()
+    {
+        Event::fake([
+            ScheduledTaskStarting::class,
+            ScheduledTaskFinished::class,
+            ScheduledTaskFailed::class,
+        ]);
+
+        $path = tempnam(sys_get_temp_dir(), 'laravel-schedule-output-');
+        file_put_contents($path, "existing\n");
+
+        $schedule = $this->app->make(Schedule::class);
+        $command = PHP_OS_FAMILY === 'Windows' ? 'echo hello world' : "echo 'hello world'";
+        $task = $schedule->exec($command)
+            ->everyMinute()
+            ->forwardOutputToConsole()
+            ->appendOutputTo($path)
+            ->runInBackground();
+
+        $task->when(function () {
+            return true;
+        });
+
+        $this->artisan('schedule:run');
+
+        // Give the detached background process a moment to finish writing its own output.
+        usleep(300000);
+
+        Event::assertNotDispatched(ScheduledTaskFailed::class);
+        $this->assertStringContainsString('hello world', file_get_contents($path));
+
+        unlink($path);
+    }
+
+    /**
+     * @throws BindingResolutionException
+     */
+    public function test_schedule_wide_forward_output_to_console_applies_to_events_created_before_and_after()
+    {
+        $schedule = $this->app->make(Schedule::class);
+
+        $beforePath = tempnam(sys_get_temp_dir(), 'laravel-schedule-output-');
+        $afterPath = tempnam(sys_get_temp_dir(), 'laravel-schedule-output-');
+
+        $before = $schedule->exec("echo 'before'")
+            ->everyMinute()
+            ->sendOutputTo($beforePath);
+
+        $schedule->forwardOutputToConsole();
+
+        $after = $schedule->exec("echo 'after'")
+            ->everyMinute()
+            ->sendOutputTo($afterPath);
+
+        foreach ([$before, $after] as $task) {
+            $task->when(function () {
+                return true;
+            });
+        }
+
+        $this->artisan('schedule:run');
+
+        $this->assertSame('before', trim(file_get_contents($beforePath)));
+        $this->assertSame('after', trim(file_get_contents($afterPath)));
+
+        unlink($beforePath);
+        unlink($afterPath);
     }
 
     public function test_repeat_events_does_not_mutate_started_at()

@@ -4,18 +4,31 @@ namespace Illuminate\Tests\Console\Scheduling;
 
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Container\Container;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Log\Context\Repository;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
+use ReflectionFunction;
+use ReflectionMethod;
+use RuntimeException;
 
 use function Illuminate\Support\php_binary;
 
 class EventTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Schedule::$outputShouldBeForwardedToConsole = false;
+
+        parent::tearDown();
+    }
+
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testBuildCommandUsingUnix()
     {
@@ -117,6 +130,198 @@ class EventTest extends TestCase
 
         $event->appendOutputTo('/dev/null');
         $this->assertSame("php -i >> {$quote}/dev/null{$quote} 2>&1", $event->buildCommand());
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testForwardOutputToConsoleSetsFlagAndReturnsEvent()
+    {
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+
+        $result = $event->forwardOutputToConsole();
+
+        $this->assertSame($event, $result);
+        $this->assertTrue($event->outputShouldBeForwardedToConsole);
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testForwardOutputToConsoleDoesNotUseShellRedirectionOrTee()
+    {
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+        $event->forwardOutputToConsole();
+
+        $this->assertSame('php -i', $event->buildCommand());
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testForwardOutputToConsolePreservesExitCode()
+    {
+        $event = new Event(m::mock(EventMutex::class), 'false');
+        $event->forwardOutputToConsole();
+
+        $this->assertSame('false', $event->buildCommand());
+    }
+
+    #[RequiresOperatingSystem('Windows')]
+    public function testForwardOutputToConsoleDoesNotUseTeeOnWindows()
+    {
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+        $event->forwardOutputToConsole();
+
+        $this->assertSame('php -i', $event->buildCommand());
+    }
+
+    public function testOutputIsNotForwardedByDefault()
+    {
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+
+        $this->assertFalse($event->outputShouldBeForwardedToConsole);
+    }
+
+    #[RequiresOperatingSystem('Linux|Darwin')]
+    public function testScheduleWideForwardingAppliesRegardlessOfWhenEventWasCreated()
+    {
+        $before = new Event(m::mock(EventMutex::class), 'php -i');
+
+        Schedule::$outputShouldBeForwardedToConsole = true;
+
+        $after = new Event(m::mock(EventMutex::class), 'php -i');
+
+        $this->assertFalse($before->outputShouldBeForwardedToConsole);
+        $this->assertFalse($after->outputShouldBeForwardedToConsole);
+        $this->assertSame('php -i', $before->buildCommand());
+        $this->assertSame('php -i', $after->buildCommand());
+    }
+
+    public function testExecuteUsesForwardingCallbackWhenForwardingEnabled()
+    {
+        $event = $this->silentForwardingEvent('php -i');
+        $event->forwardOutputToConsole();
+
+        $callback = (new ReflectionMethod($event, 'outputForwardingCallback'))->invoke($event);
+
+        $this->assertSame(2, (new ReflectionFunction($callback))->getNumberOfParameters());
+    }
+
+    public function testExecuteUsesNoopCallbackByDefault()
+    {
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+
+        $callback = (new ReflectionMethod($event, 'outputForwardingCallback'))->invoke($event);
+
+        $this->assertSame(0, (new ReflectionFunction($callback))->getNumberOfParameters());
+    }
+
+    public function testForwardedOutputIsStreamedToConfiguredOutputPath()
+    {
+        $path = tempnam(sys_get_temp_dir(), 'laravel-schedule-output-');
+
+        $event = $this->silentForwardingEvent('php -i');
+        $event->forwardOutputToConsole()->sendOutputTo($path);
+
+        (new ReflectionMethod($event, 'openForwardedOutputHandle'))->invoke($event);
+
+        $callback = (new ReflectionMethod($event, 'outputForwardingCallback'))->invoke($event);
+        $callback('out', "hello world\n");
+
+        (new ReflectionMethod($event, 'closeForwardedOutputHandle'))->invoke($event);
+
+        $this->assertSame("hello world\n", file_get_contents($path));
+        $this->assertSame([['out', "hello world\n"]], $event->forwardedLines);
+
+        unlink($path);
+    }
+
+    public function testForwardedOutputIsAppendedWhenConfigured()
+    {
+        $path = tempnam(sys_get_temp_dir(), 'laravel-schedule-output-');
+        file_put_contents($path, "existing\n");
+
+        $event = $this->silentForwardingEvent('php -i');
+        $event->forwardOutputToConsole()->appendOutputTo($path);
+
+        (new ReflectionMethod($event, 'openForwardedOutputHandle'))->invoke($event);
+
+        $callback = (new ReflectionMethod($event, 'outputForwardingCallback'))->invoke($event);
+        $callback('out', "new line\n");
+
+        (new ReflectionMethod($event, 'closeForwardedOutputHandle'))->invoke($event);
+
+        $this->assertSame("existing\nnew line\n", file_get_contents($path));
+
+        unlink($path);
+    }
+
+    public function testForwardedOutputIsNotStreamedForBackgroundEvents()
+    {
+        $path = tempnam(sys_get_temp_dir(), 'laravel-schedule-output-');
+        file_put_contents($path, "existing\n");
+
+        $event = $this->silentForwardingEvent('php -i');
+        $event->forwardOutputToConsole()->appendOutputTo($path)->runInBackground();
+
+        (new ReflectionMethod($event, 'openForwardedOutputHandle'))->invoke($event);
+
+        $callback = (new ReflectionMethod($event, 'outputForwardingCallback'))->invoke($event);
+        $this->assertSame(0, (new ReflectionFunction($callback))->getNumberOfParameters());
+        $callback();
+
+        (new ReflectionMethod($event, 'closeForwardedOutputHandle'))->invoke($event);
+
+        $this->assertSame([], $event->forwardedLines);
+        $this->assertSame("existing\n", file_get_contents($path));
+
+        unlink($path);
+    }
+
+    public function testOpenForwardedOutputHandleThrowsForUnwritableDestination()
+    {
+        $event = $this->silentForwardingEvent('php -i');
+        $event->forwardOutputToConsole()->sendOutputTo('/this/path/does/not/exist/output.log');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageMatches('/\/this\/path\/does\/not\/exist\/output\.log/');
+
+        (new ReflectionMethod($event, 'openForwardedOutputHandle'))->invoke($event);
+    }
+
+    public function testRunReportsFailureWhenOutputDestinationCannotBeOpened()
+    {
+        $mutex = m::mock(EventMutex::class);
+        $mutex->shouldReceive('create')->andReturn(true);
+        $mutex->shouldReceive('forget');
+
+        $event = new Event($mutex, 'php -i');
+        $event->forwardOutputToConsole()->sendOutputTo('/this/path/does/not/exist/output.log');
+
+        $container = new Container;
+        $container->instance(
+            Repository::class,
+            new Repository(new Dispatcher)
+        );
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageMatches('/\/this\/path\/does\/not\/exist\/output\.log/');
+
+        $event->run($container);
+    }
+
+    /**
+     * Create an event whose console output is captured instead of being written to the real STDOUT/STDERR streams.
+     *
+     * @param  string  $command
+     * @return \Illuminate\Console\Scheduling\Event
+     */
+    protected function silentForwardingEvent($command)
+    {
+        return new class(m::mock(EventMutex::class), $command) extends Event
+        {
+            public $forwardedLines = [];
+
+            protected function forwardLineToConsole($type, $line)
+            {
+                $this->forwardedLines[] = [$type, $line];
+            }
+        };
     }
 
     public function testNextRunDate()

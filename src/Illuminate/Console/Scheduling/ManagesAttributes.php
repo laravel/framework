@@ -91,6 +91,13 @@ trait ManagesAttributes
     public $runInBackground = false;
 
     /**
+     * Indicates if the command's output should be forwarded to the console.
+     *
+     * @var bool
+     */
+    public $outputShouldBeForwardedToConsole = false;
+
+    /**
      * The array of filter callbacks.
      *
      * @var array
@@ -210,6 +217,18 @@ trait ManagesAttributes
     public function runInBackground()
     {
         $this->runInBackground = true;
+
+        return $this;
+    }
+
+    /**
+     * State that the command's output should be forwarded to the console.
+     *
+     * @return $this
+     */
+    public function forwardOutputToConsole()
+    {
+        $this->outputShouldBeForwardedToConsole = true;
 
         return $this;
     }

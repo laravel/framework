@@ -116,6 +116,13 @@ class Schedule
     public static $interruptible = true;
 
     /**
+     * Indicates if the output of scheduled foreground commands should be forwarded to the console.
+     *
+     * @var bool
+     */
+    public static $outputShouldBeForwardedToConsole = false;
+
+    /**
      * Create a new schedule instance.
      *
      * @param  \DateTimeZone|string|null  $timezone
@@ -363,6 +370,18 @@ class Schedule
 
             $group->mergeAttributes($event);
         }
+    }
+
+    /**
+     * Forward the output of all scheduled foreground commands to the console.
+     *
+     * @return $this
+     */
+    public function forwardOutputToConsole()
+    {
+        static::$outputShouldBeForwardedToConsole = true;
+
+        return $this;
     }
 
     /**

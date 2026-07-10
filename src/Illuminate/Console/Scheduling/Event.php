@@ -19,6 +19,7 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\Support\Traits\Tappable;
 use Psr\Http\Client\ClientExceptionInterface;
+use RuntimeException;
 use Symfony\Component\Process\Process;
 use Throwable;
 
@@ -46,6 +47,13 @@ class Event
      * @var bool
      */
     public $shouldAppendOutput = false;
+
+    /**
+     * The open file handle the forwarded output is streamed to while the command process is running.
+     *
+     * @var resource|null
+     */
+    protected $forwardedOutputHandle;
 
     /**
      * The array of callbacks to be run before the event is started.
@@ -213,13 +221,123 @@ class Event
     {
         $context = json_encode($container[Repository::class]->dehydrate());
 
+        $this->openForwardedOutputHandle();
+
+        try {
+            return $this->process($context)->run($this->outputForwardingCallback());
+        } finally {
+            $this->closeForwardedOutputHandle();
+        }
+    }
+
+    /**
+     * Create the process instance for the event.
+     *
+     * @param  string|false  $context
+     * @return \Symfony\Component\Process\Process
+     */
+    protected function process($context)
+    {
         return Process::fromShellCommandline(
             $this->buildCommand(), base_path(), ['__LARAVEL_CONTEXT' => $context], null, null
-        )->run(
-            laravel_cloud()
-                ? fn ($type, $line) => fwrite($type === 'out' ? STDOUT : STDERR, $line)
-                : fn () => true
         );
+    }
+
+    /**
+     * Determine if the command's output should be forwarded to the console process.
+     *
+     * Background events are never forwarded here: they are executed through a
+     * detached shell that manages its own output redirection independently of
+     * this process, so there is nothing meaningful for this process to forward.
+     *
+     * @return bool
+     */
+    protected function shouldForwardOutputToConsole()
+    {
+        return ($this->outputShouldBeForwardedToConsole || Schedule::$outputShouldBeForwardedToConsole)
+            && ! $this->runInBackground;
+    }
+
+    /**
+     * Open the file handle the event's output should be streamed to, if applicable.
+     *
+     * The command itself is built without any output redirection when forwarding is
+     * enabled outside of Laravel Cloud, so the destination is opened here in order
+     * for output to still be streamed to the event's configured destination as the
+     * process runs.
+     *
+     * @return void
+     *
+     * @throws \RuntimeException if the destination cannot be opened
+     */
+    protected function openForwardedOutputHandle()
+    {
+        if (laravel_cloud()
+            || ! $this->shouldForwardOutputToConsole()
+            || $this->output === $this->getDefaultOutput()) {
+            return;
+        }
+
+        $this->forwardedOutputHandle = @fopen($this->output, $this->shouldAppendOutput ? 'ab' : 'wb');
+
+        if ($this->forwardedOutputHandle === false) {
+            $error = error_get_last();
+
+            throw new RuntimeException(sprintf(
+                'Unable to open [%s] for the scheduled command output: %s',
+                $this->output, $error['message'] ?? 'unknown error'
+            ));
+        }
+    }
+
+    /**
+     * Close the file handle the event's output was streamed to, if one was opened.
+     *
+     * @return void
+     */
+    protected function closeForwardedOutputHandle()
+    {
+        if (is_resource($this->forwardedOutputHandle)) {
+            fclose($this->forwardedOutputHandle);
+        }
+
+        $this->forwardedOutputHandle = null;
+    }
+
+    /**
+     * Get the callback used to forward the process output to the console.
+     *
+     * @return callable
+     */
+    protected function outputForwardingCallback()
+    {
+        if (laravel_cloud()) {
+            return fn ($type, $line) => $this->forwardLineToConsole($type, $line);
+        }
+
+        if (! $this->shouldForwardOutputToConsole()) {
+            return fn () => true;
+        }
+
+        return function ($type, $line) {
+            $this->forwardLineToConsole($type, $line);
+
+            if (is_resource($this->forwardedOutputHandle)) {
+                fwrite($this->forwardedOutputHandle, $line);
+            }
+        };
+    }
+
+    /**
+     * Write a line of process output to the console's standard streams.
+     *
+     * @param  string  $type
+     * @param  string  $line
+     * @return void
+     */
+    protected function forwardLineToConsole($type, $line)
+    {
+        fwrite($type === 'out' ? STDOUT : STDERR, $line);
     }
 
     /**

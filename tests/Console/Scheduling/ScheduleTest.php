@@ -32,6 +32,13 @@ final class ScheduleTest extends TestCase
         $this->container->instance(SchedulingMutex::class, $schedulingMutex);
     }
 
+    protected function tearDown(): void
+    {
+        Schedule::$outputShouldBeForwardedToConsole = false;
+
+        parent::tearDown();
+    }
+
     #[DataProvider('jobHonoursDisplayNameIfMethodExistsProvider')]
     public function testJobHonoursDisplayNameIfMethodExists(object $job, string $jobName): void
     {
@@ -115,5 +122,30 @@ final class ScheduleTest extends TestCase
 
         $this->assertSame(['team' => 'platform'], $events[0]->attributes);
         $this->assertSame([], $events[1]->attributes);
+    }
+
+    public function testForwardOutputToConsoleAppliesRegardlessOfCallOrder(): void
+    {
+        $schedule = new Schedule();
+
+        $before = $schedule->command('inspire');
+
+        $schedule->forwardOutputToConsole();
+
+        $after = $schedule->command('queue:work');
+
+        $this->assertTrue(Schedule::$outputShouldBeForwardedToConsole);
+        $this->assertStringNotContainsString('>', $before->buildCommand());
+        $this->assertStringNotContainsString('>', $after->buildCommand());
+    }
+
+    public function testForwardOutputToConsoleIsDisabledByDefault(): void
+    {
+        $schedule = new Schedule();
+
+        $event = $schedule->command('inspire');
+
+        $this->assertFalse(Schedule::$outputShouldBeForwardedToConsole);
+        $this->assertStringContainsString('>', $event->buildCommand());
     }
 }
