@@ -3,7 +3,6 @@
 namespace Illuminate\Http\Client;
 
 use ArrayAccess;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Uri;
@@ -83,19 +82,17 @@ class Request implements ArrayAccess
      */
     public function hasHeader($key, $value = null)
     {
-        if (is_null($value)) {
-            return ! empty($this->request->getHeaders()[$key]);
+        if (! $this->request->hasHeader($key)) {
+            return false;
         }
 
-        $headers = $this->headers();
-
-        if (! Arr::has($headers, $key)) {
-            return false;
+        if (is_null($value)) {
+            return true;
         }
 
         $value = is_array($value) ? $value : [$value];
 
-        return empty(array_diff($value, $headers[$key]));
+        return empty(array_diff($value, $this->request->getHeader($key)));
     }
 
     /**
@@ -127,7 +124,7 @@ class Request implements ArrayAccess
      */
     public function header($key)
     {
-        return Arr::get($this->headers(), $key, []);
+        return $this->request->getHeader($key);
     }
 
     /**
