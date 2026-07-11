@@ -219,13 +219,15 @@ trait HasRelationships
      *
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  class-string<TRelatedModel>  $related
+     * @param  class-string<TRelatedModel>  $related  The related model class or a mapped contract
      * @param  string|null  $foreignKey
      * @param  string|null  $localKey
      * @return \Illuminate\Database\Eloquent\Relations\HasOne<TRelatedModel, $this>
      */
     public function hasOne($related, $foreignKey = null, $localKey = null)
     {
+        $related = Relation::getModelForContract($related) ?? $related;
+
         $instance = $this->newRelatedInstance($related);
 
         $foreignKey = $foreignKey ?: $this->getForeignKey();
@@ -258,8 +260,8 @@ trait HasRelationships
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
      * @template TIntermediateModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  class-string<TRelatedModel>  $related
-     * @param  class-string<TIntermediateModel>  $through
+     * @param  class-string<TRelatedModel>  $related  The related model class or a mapped contract
+     * @param  class-string<TIntermediateModel>  $through  The intermediate model class or a mapped contract
      * @param  string|null  $firstKey
      * @param  string|null  $secondKey
      * @param  string|null  $localKey
@@ -268,6 +270,9 @@ trait HasRelationships
      */
     public function hasOneThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null, $secondLocalKey = null)
     {
+        $related = Relation::getModelForContract($related) ?? $related;
+        $through = Relation::getModelForContract($through) ?? $through;
+
         $through = $this->newRelatedThroughInstance($through);
 
         $firstKey = $firstKey ?: $this->getForeignKey();
@@ -311,7 +316,7 @@ trait HasRelationships
      *
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  class-string<TRelatedModel>  $related
+     * @param  class-string<TRelatedModel>  $related  The related model class or a mapped contract
      * @param  string  $name
      * @param  string|null  $type
      * @param  string|null  $id
@@ -320,6 +325,8 @@ trait HasRelationships
      */
     public function morphOne($related, $name, $type = null, $id = null, $localKey = null)
     {
+        $related = Relation::getModelForContract($related) ?? $related;
+
         $instance = $this->newRelatedInstance($related);
 
         [$type, $id] = $this->getMorphs($name, $type, $id);
@@ -352,7 +359,7 @@ trait HasRelationships
      *
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  class-string<TRelatedModel>  $related
+     * @param  class-string<TRelatedModel>  $related  The related model class or a mapped contract
      * @param  string|null  $foreignKey
      * @param  string|null  $ownerKey
      * @param  string|null  $relation
@@ -366,6 +373,8 @@ trait HasRelationships
         if (is_null($relation)) {
             $relation = $this->guessBelongsToRelation();
         }
+
+        $related = Relation::getModelForContract($related) ?? $related;
 
         $instance = $this->newRelatedInstance($related);
 
@@ -541,13 +550,15 @@ trait HasRelationships
      *
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  class-string<TRelatedModel>  $related
+     * @param  class-string<TRelatedModel>  $related  The related model class or a mapped contract
      * @param  string|null  $foreignKey
      * @param  string|null  $localKey
      * @return \Illuminate\Database\Eloquent\Relations\HasMany<TRelatedModel, $this>
      */
     public function hasMany($related, $foreignKey = null, $localKey = null)
     {
+        $related = Relation::getModelForContract($related) ?? $related;
+
         $instance = $this->newRelatedInstance($related);
 
         $foreignKey = $foreignKey ?: $this->getForeignKey();
@@ -582,8 +593,8 @@ trait HasRelationships
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
      * @template TIntermediateModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  class-string<TRelatedModel>  $related
-     * @param  class-string<TIntermediateModel>  $through
+     * @param  class-string<TRelatedModel>  $related  The related model class or a mapped contract
+     * @param  class-string<TIntermediateModel>  $through  The intermediate model class or a mapped contract
      * @param  string|null  $firstKey
      * @param  string|null  $secondKey
      * @param  string|null  $localKey
@@ -592,6 +603,9 @@ trait HasRelationships
      */
     public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null, $secondLocalKey = null)
     {
+        $related = Relation::getModelForContract($related) ?? $related;
+        $through = Relation::getModelForContract($through) ?? $through;
+
         $through = $this->newRelatedThroughInstance($through);
 
         $firstKey = $firstKey ?: $this->getForeignKey();
@@ -635,7 +649,7 @@ trait HasRelationships
      *
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  class-string<TRelatedModel>  $related
+     * @param  class-string<TRelatedModel>  $related  The related model class or a mapped contract
      * @param  string  $name
      * @param  string|null  $type
      * @param  string|null  $id
@@ -644,6 +658,8 @@ trait HasRelationships
      */
     public function morphMany($related, $name, $type = null, $id = null, $localKey = null)
     {
+        $related = Relation::getModelForContract($related) ?? $related;
+
         $instance = $this->newRelatedInstance($related);
 
         // Here we will gather up the morph type and ID for the relationship so that we
@@ -681,7 +697,7 @@ trait HasRelationships
      * @template TPivotModel of \Illuminate\Database\Eloquent\Relations\Pivot = \Illuminate\Database\Eloquent\Relations\Pivot
      * @template TPivotTable of string|null
      *
-     * @param  class-string<TRelatedModel>  $related
+     * @param  class-string<TRelatedModel>  $related  The related model class or a mapped contract
      * @param  class-string<TPivotModel>|TPivotTable  $table
      * @param  string|null  $foreignPivotKey
      * @param  string|null  $relatedPivotKey
@@ -709,6 +725,8 @@ trait HasRelationships
         // First, we'll need to determine the foreign key and "other key" for the
         // relationship. Once we have determined the keys we'll make the query
         // instances as well as the relationship instances we need for this.
+        $related = Relation::getModelForContract($related) ?? $related;
+
         $instance = $this->newRelatedInstance($related);
 
         $foreignPivotKey = $foreignPivotKey ?: $this->getForeignKey();
@@ -768,7 +786,7 @@ trait HasRelationships
      *
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  class-string<TRelatedModel>  $related
+     * @param  class-string<TRelatedModel>  $related  The related model class or a mapped contract
      * @param  string  $name
      * @param  string|null  $table
      * @param  string|null  $foreignPivotKey
@@ -791,6 +809,8 @@ trait HasRelationships
         $inverse = false,
     ) {
         $relation = $relation ?: $this->guessBelongsToManyRelation();
+
+        $related = Relation::getModelForContract($related) ?? $related;
 
         // First, we will need to determine the foreign key and "other key" for the
         // relationship. Once we have determined the keys we will make the query
@@ -875,7 +895,7 @@ trait HasRelationships
      *
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  class-string<TRelatedModel>  $related
+     * @param  class-string<TRelatedModel>  $related  The related model class or a mapped contract
      * @param  string  $name
      * @param  string|null  $table
      * @param  string|null  $foreignPivotKey

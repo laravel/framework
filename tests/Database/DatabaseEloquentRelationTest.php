@@ -10,11 +10,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Carbon;
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentRelationTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Relation::contractMap([], false);
+
+        parent::tearDown();
+    }
+
     public function testSetRelationFail()
     {
         $parent = new EloquentRelationResetModelStub;
@@ -238,6 +246,67 @@ class DatabaseEloquentRelationTest extends TestCase
         $this->assertSame('Does\Not\Exist', Relation::getMorphAlias('Does\Not\Exist'));
     }
 
+    public function testContractMapCanBeRegisteredLookedUpMergedReplacedAndReset()
+    {
+        $this->assertSame([], Relation::contractMap());
+
+        Relation::contractMap([
+            EloquentRelationContractStub::class => EloquentRelationContractModelStub::class,
+        ]);
+
+        $this->assertSame(EloquentRelationContractModelStub::class, Relation::getModelForContract(EloquentRelationContractStub::class));
+        $this->assertNull(Relation::getModelForContract(EloquentRelationOtherContractStub::class));
+
+        Relation::contractMap([
+            EloquentRelationOtherContractStub::class => EloquentRelationOtherContractModelStub::class,
+        ]);
+
+        $this->assertSame([
+            EloquentRelationOtherContractStub::class => EloquentRelationOtherContractModelStub::class,
+            EloquentRelationContractStub::class => EloquentRelationContractModelStub::class,
+        ], Relation::contractMap());
+
+        Relation::contractMap([
+            EloquentRelationContractStub::class => EloquentRelationContractModelStub::class,
+        ], false);
+
+        $this->assertSame([
+            EloquentRelationContractStub::class => EloquentRelationContractModelStub::class,
+        ], Relation::contractMap());
+
+        $this->assertSame([], Relation::contractMap([], false));
+    }
+
+    public function testContractMapRejectsNonInterfaceKeys()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Model contract ['.EloquentRelationResetModelStub::class.'] must be an interface.');
+
+        Relation::contractMap([
+            EloquentRelationResetModelStub::class => EloquentRelationContractModelStub::class,
+        ]);
+    }
+
+    public function testContractMapRejectsValuesThatAreNotModels()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Model ['.EloquentRelationNonModelStub::class.'] mapped to contract ['.EloquentRelationContractStub::class.'] must extend ['.Model::class.'].');
+
+        Relation::contractMap([
+            EloquentRelationContractStub::class => EloquentRelationNonModelStub::class,
+        ]);
+    }
+
+    public function testContractMapRejectsModelsThatDoNotImplementTheContract()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Model ['.EloquentRelationResetModelStub::class.'] mapped to contract ['.EloquentRelationContractStub::class.'] must implement ['.EloquentRelationContractStub::class.'].');
+
+        Relation::contractMap([
+            EloquentRelationContractStub::class => EloquentRelationResetModelStub::class,
+        ]);
+    }
+
     public function testWithoutRelations()
     {
         $original = new EloquentNoTouchingModelStub;
@@ -397,4 +466,29 @@ class EloquentRelationAndAttributeModelStub extends Model
     {
         return $this->belongsTo(self::class);
     }
+}
+
+interface EloquentRelationContractStub
+{
+    //
+}
+
+interface EloquentRelationOtherContractStub
+{
+    //
+}
+
+class EloquentRelationContractModelStub extends Model implements EloquentRelationContractStub
+{
+    //
+}
+
+class EloquentRelationOtherContractModelStub extends Model implements EloquentRelationOtherContractStub
+{
+    //
+}
+
+class EloquentRelationNonModelStub implements EloquentRelationContractStub
+{
+    //
 }

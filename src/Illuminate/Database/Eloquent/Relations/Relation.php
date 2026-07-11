@@ -13,6 +13,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
@@ -68,6 +69,13 @@ abstract class Relation implements BuilderContract
      * @var array<string, class-string<\Illuminate\Database\Eloquent\Model>>
      */
     public static $morphMap = [];
+
+    /**
+     * An array to map model contracts to their concrete model classes.
+     *
+     * @var array<class-string, class-string<\Illuminate\Database\Eloquent\Model>>
+     */
+    public static $modelContractMap = [];
 
     /**
      * Prevents morph relationships without a morph map.
@@ -481,6 +489,55 @@ abstract class Relation implements BuilderContract
         }
 
         return static::$morphMap;
+    }
+
+    /**
+     * Set or get the map of model contracts to concrete model classes.
+     *
+     * @param  array<class-string, class-string<\Illuminate\Database\Eloquent\Model>>|null  $map
+     * @param  bool  $merge
+     * @return array<class-string, class-string<\Illuminate\Database\Eloquent\Model>>
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function contractMap(?array $map = null, $merge = true)
+    {
+        if (is_array($map)) {
+            $eloquentModelClass = Model::class;
+
+            foreach ($map as $contract => $model) {
+                if (! is_string($contract) || ! interface_exists($contract)) {
+                    throw new InvalidArgumentException("Model contract [{$contract}] must be an interface.");
+                }
+
+                if (! is_string($model) || ! is_subclass_of($model, $eloquentModelClass)) {
+                    $model = is_string($model) ? $model : get_debug_type($model);
+
+                    throw new InvalidArgumentException("Model [{$model}] mapped to contract [{$contract}] must extend [{$eloquentModelClass}].");
+                }
+
+                if (! is_a($model, $contract, true)) {
+                    throw new InvalidArgumentException("Model [{$model}] mapped to contract [{$contract}] must implement [{$contract}].");
+                }
+            }
+
+            static::$modelContractMap = $merge && static::$modelContractMap
+                ? $map + static::$modelContractMap
+                : $map;
+        }
+
+        return static::$modelContractMap;
+    }
+
+    /**
+     * Get the model associated with a model contract.
+     *
+     * @param  class-string  $contract
+     * @return class-string<\Illuminate\Database\Eloquent\Model>|null
+     */
+    public static function getModelForContract($contract)
+    {
+        return static::$modelContractMap[$contract] ?? null;
     }
 
     /**

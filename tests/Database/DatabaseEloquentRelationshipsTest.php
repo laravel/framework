@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
@@ -23,6 +24,13 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentRelationshipsTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Relation::contractMap([], false);
+
+        parent::tearDown();
+    }
+
     public function testStandardRelationships()
     {
         $post = new Post;
@@ -53,6 +61,36 @@ class DatabaseEloquentRelationshipsTest extends TestCase
         $this->assertInstanceOf(CustomHasOneThrough::class, $post->contract());
         $this->assertInstanceOf(CustomMorphToMany::class, $post->tags());
         $this->assertInstanceOf(CustomMorphTo::class, $post->postable());
+    }
+
+    public function testRelationshipHelpersResolveMappedContractsBeforeProtectedExtensionPoints()
+    {
+        Relation::contractMap([
+            RelatedContract::class => ContractModel::class,
+            ThroughContract::class => ContractThroughModel::class,
+        ]);
+
+        $post = new ContractPost;
+
+        $relations = Relation::noConstraints(fn () => [
+            $post->hasOne(RelatedContract::class),
+            $post->hasMany(RelatedContract::class),
+            $post->belongsTo(RelatedContract::class),
+            $post->hasOneThrough(RelatedContract::class, ThroughContract::class),
+            $post->hasManyThrough(RelatedContract::class, ThroughContract::class),
+            $post->morphOne(RelatedContract::class, 'contractable'),
+            $post->morphMany(RelatedContract::class, 'contractable'),
+            $post->belongsToMany(RelatedContract::class),
+            $post->morphToMany(RelatedContract::class, 'contractable'),
+            $post->morphedByMany(RelatedContract::class, 'contractable'),
+        ]);
+
+        foreach ($relations as $relation) {
+            $this->assertInstanceOf(ContractModel::class, $relation->getRelated());
+        }
+
+        $this->assertSame(array_fill(0, 10, ContractModel::class), $post->relatedClasses);
+        $this->assertSame(array_fill(0, 2, ContractThroughModel::class), $post->throughClasses);
     }
 
     public function testAlwaysUnsetBelongsToRelationWhenReceivedModelId()
@@ -263,6 +301,55 @@ class DatabaseEloquentRelationshipsTest extends TestCase
 class FakeRelationship extends Model
 {
     //
+}
+
+interface RelatedContract
+{
+    //
+}
+
+interface ThroughContract
+{
+    //
+}
+
+class ContractConnectionModel extends Model
+{
+    public function getConnection()
+    {
+        return new Connection(null);
+    }
+}
+
+class ContractModel extends ContractConnectionModel implements RelatedContract
+{
+    //
+}
+
+class ContractThroughModel extends ContractConnectionModel implements ThroughContract
+{
+    //
+}
+
+class ContractPost extends ContractConnectionModel
+{
+    public $relatedClasses = [];
+
+    public $throughClasses = [];
+
+    protected function newRelatedInstance($class)
+    {
+        $this->relatedClasses[] = $class;
+
+        return parent::newRelatedInstance($class);
+    }
+
+    protected function newRelatedThroughInstance($class)
+    {
+        $this->throughClasses[] = $class;
+
+        return parent::newRelatedThroughInstance($class);
+    }
 }
 
 class Post extends Model
