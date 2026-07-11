@@ -262,6 +262,12 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1 quadrillion', Number::forHumans(-1000000000000000));
         $this->assertSame('-1 thousand quadrillion', Number::forHumans(-1000000000000000000));
 
+        // A negative magnitude that rounds down to zero must not keep the sign.
+        $this->assertSame('0', Number::forHumans(-0.4));
+        $this->assertSame('0', Number::forHumans(-0.05));
+        $this->assertSame('0', Number::forHumans(-0.4999));
+        $this->assertSame('-0.40', Number::forHumans(-0.4, precision: 2));
+
         $this->assertSame('999 thousand', Number::forHumans(999499));
         $this->assertSame('1 million', Number::forHumans(999500));
         $this->assertSame('1 million', Number::forHumans(999999));
@@ -325,6 +331,10 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1.1T', Number::abbreviate(-1100000000000, maxPrecision: 1));
         $this->assertSame('-1Q', Number::abbreviate(-1000000000000000));
         $this->assertSame('-1KQ', Number::abbreviate(-1000000000000000000));
+
+        // A negative magnitude that rounds down to zero must not keep the sign.
+        $this->assertSame('0', Number::abbreviate(-0.4));
+        $this->assertSame('0', Number::abbreviate(-0.05));
 
         $this->assertSame('999K', Number::abbreviate(999499));
         $this->assertSame('1M', Number::abbreviate(999500));
