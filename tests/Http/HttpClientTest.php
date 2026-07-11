@@ -829,6 +829,37 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testRequestHeadersAreCheckedCaseInsensitively()
+    {
+        $this->factory->fake();
+
+        $this->factory->withHeaders([
+            'foo' => 'Bar',
+        ])->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->hasHeader('Foo')
+                && $request->hasHeader('Foo', 'Bar')
+                && $request->header('Foo') === ['Bar'];
+        });
+    }
+
+    public function testContentTypeHeadersAreCheckedCaseInsensitively()
+    {
+        $this->factory->fake();
+
+        $this->factory->send('POST', 'http://foo.com/json', [
+            'headers' => ['content-type' => 'application/json'],
+            'body' => '{"name":"Taylor"}',
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->hasHeader('Content-Type')
+                && $request->header('Content-Type') === ['application/json']
+                && $request->isJson();
+        });
+    }
+
     public function testCanSendFormDataWithStringable()
     {
         $this->factory->fake();
