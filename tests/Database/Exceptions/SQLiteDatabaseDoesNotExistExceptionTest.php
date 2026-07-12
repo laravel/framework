@@ -8,14 +8,14 @@ use PHPUnit\Framework\TestCase;
 
 class SQLiteDatabaseDoesNotExistExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfInvalidArgumentException()
+    public function testExceptionIsInstanceOfInvalidArgumentException(): void
     {
         $exception = new SQLiteDatabaseDoesNotExistException('/path/to/database.sqlite');
 
         $this->assertInstanceOf(InvalidArgumentException::class, $exception);
     }
 
-    public function testExceptionHoldsPathAndMessage()
+    public function testExceptionHoldsPathAndMessage(): void
     {
         $exception = new SQLiteDatabaseDoesNotExistException('/path/to/database.sqlite');
 

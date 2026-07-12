@@ -8,14 +8,14 @@ use PHPUnit\Framework\TestCase;
 
 class MixManifestNotFoundExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfException()
+    public function testExceptionIsInstanceOfException(): void
     {
         $exception = new MixManifestNotFoundException;
 
         $this->assertInstanceOf(Exception::class, $exception);
     }
 
-    public function testExceptionHoldsMessageCodeAndPrevious()
+    public function testExceptionHoldsMessageCodeAndPrevious(): void
     {
         $previous = new Exception('previous');
 

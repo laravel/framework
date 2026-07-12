@@ -14,16 +14,18 @@ class MaxAttemptsExceededExceptionTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+
+        parent::tearDown();
     }
 
-    public function testExceptionIsInstanceOfRuntimeException()
+    public function testExceptionIsInstanceOfRuntimeException(): void
     {
         $exception = new MaxAttemptsExceededException;
 
         $this->assertInstanceOf(RuntimeException::class, $exception);
     }
 
-    public function testExceptionHoldsMessageCodeAndPrevious()
+    public function testExceptionHoldsMessageCodeAndPrevious(): void
     {
         $previous = new Exception('previous');
 
@@ -34,14 +36,14 @@ class MaxAttemptsExceededExceptionTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    public function testJobDefaultsToNull()
+    public function testJobDefaultsToNull(): void
     {
         $exception = new MaxAttemptsExceededException;
 
         $this->assertNull($exception->job);
     }
 
-    public function testForJobBuildsExceptionAndAssignsJob()
+    public function testForJobBuildsExceptionAndAssignsJob(): void
     {
         $job = m::mock(SyncJob::class);
         $job->shouldReceive('resolveName')->andReturn('App\\Jobs\\UnderlyingJob');

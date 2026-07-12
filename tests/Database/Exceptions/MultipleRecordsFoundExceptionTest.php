@@ -9,14 +9,14 @@ use RuntimeException;
 
 class MultipleRecordsFoundExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfRuntimeException()
+    public function testExceptionIsInstanceOfRuntimeException(): void
     {
         $exception = new MultipleRecordsFoundException(2);
 
         $this->assertInstanceOf(RuntimeException::class, $exception);
     }
 
-    public function testExceptionHoldsCountAndMessage()
+    public function testExceptionHoldsCountAndMessage(): void
     {
         $exception = new MultipleRecordsFoundException(3);
 
@@ -27,7 +27,7 @@ class MultipleRecordsFoundExceptionTest extends TestCase
         $this->assertNull($exception->getPrevious());
     }
 
-    public function testExceptionHoldsCodeAndPrevious()
+    public function testExceptionHoldsCodeAndPrevious(): void
     {
         $previous = new Exception('previous');
 

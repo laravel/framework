@@ -9,14 +9,14 @@ use RuntimeException;
 
 class MultipleColumnsSelectedExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfRuntimeException()
+    public function testExceptionIsInstanceOfRuntimeException(): void
     {
         $exception = new MultipleColumnsSelectedException;
 
         $this->assertInstanceOf(RuntimeException::class, $exception);
     }
 
-    public function testExceptionHoldsMessageCodeAndPrevious()
+    public function testExceptionHoldsMessageCodeAndPrevious(): void
     {
         $previous = new Exception('previous');
 

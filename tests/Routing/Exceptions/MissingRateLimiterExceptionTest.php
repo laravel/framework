@@ -8,21 +8,21 @@ use PHPUnit\Framework\TestCase;
 
 class MissingRateLimiterExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfException()
+    public function testExceptionIsInstanceOfException(): void
     {
         $exception = MissingRateLimiterException::forLimiter('uploads');
 
         $this->assertInstanceOf(Exception::class, $exception);
     }
 
-    public function testForLimiter()
+    public function testForLimiter(): void
     {
         $exception = MissingRateLimiterException::forLimiter('uploads');
 
         $this->assertSame('Rate limiter [uploads] is not defined.', $exception->getMessage());
     }
 
-    public function testForLimiterAndUser()
+    public function testForLimiterAndUser(): void
     {
         $exception = MissingRateLimiterException::forLimiterAndUser('uploads', 'App\\Models\\User');
 

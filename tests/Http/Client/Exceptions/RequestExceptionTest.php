@@ -24,14 +24,14 @@ class RequestExceptionTest extends TestCase
         parent::tearDown();
     }
 
-    public function testExceptionIsInstanceOfHttpClientException()
+    public function testExceptionIsInstanceOfHttpClientException(): void
     {
         $exception = new RequestException(new Response(new Psr7Response(500)));
 
         $this->assertInstanceOf(HttpClientException::class, $exception);
     }
 
-    public function testExceptionHoldsResponseAndStatusCodeAsCode()
+    public function testExceptionHoldsResponseAndStatusCodeAsCode(): void
     {
         $response = new Response(new Psr7Response(403));
 
@@ -42,7 +42,7 @@ class RequestExceptionTest extends TestCase
         $this->assertSame('HTTP request returned status code 403', $exception->getMessage());
     }
 
-    public function testExceptionAppendsBodySummaryOnReport()
+    public function testExceptionAppendsBodySummaryOnReport(): void
     {
         $response = new Response(new Psr7Response(403, [], 'Forbidden.'));
 
@@ -53,7 +53,7 @@ class RequestExceptionTest extends TestCase
         $this->assertTrue($exception->hasBeenSummarized);
     }
 
-    public function testExceptionTruncatesBodySummaryAtGlobalLimit()
+    public function testExceptionTruncatesBodySummaryAtGlobalLimit(): void
     {
         RequestException::truncateAt(5);
 
@@ -65,7 +65,7 @@ class RequestExceptionTest extends TestCase
         $this->assertSame("HTTP request returned status code 403:\nForbi (truncated...)\n", $exception->getMessage());
     }
 
-    public function testExceptionTruncatesBodySummaryAtInstanceLimit()
+    public function testExceptionTruncatesBodySummaryAtInstanceLimit(): void
     {
         $response = new Response(new Psr7Response(403, [], 'Forbidden.'));
 
@@ -75,14 +75,14 @@ class RequestExceptionTest extends TestCase
         $this->assertSame("HTTP request returned status code 403:\nForbi (truncated...)\n", $exception->getMessage());
     }
 
-    public function testDontTruncateDisablesSummaryTruncation()
+    public function testDontTruncateDisablesSummaryTruncation(): void
     {
         RequestException::dontTruncate();
 
         $this->assertFalse(RequestException::$truncateAt);
     }
 
-    public function testTruncateResetsGlobalLimitToDefault()
+    public function testTruncateResetsGlobalLimitToDefault(): void
     {
         RequestException::truncateAt(5);
         RequestException::truncate();

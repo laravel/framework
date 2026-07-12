@@ -8,14 +8,14 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class InvalidSignatureExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfHttpException()
+    public function testExceptionIsInstanceOfHttpException(): void
     {
         $exception = new InvalidSignatureException;
 
         $this->assertInstanceOf(HttpException::class, $exception);
     }
 
-    public function testExceptionUsesStatusCode403AndMessage()
+    public function testExceptionUsesStatusCode403AndMessage(): void
     {
         $exception = new InvalidSignatureException;
 

@@ -9,14 +9,14 @@ use PHPUnit\Framework\TestCase;
 
 class DeadlockExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfPDOException()
+    public function testExceptionIsInstanceOfPDOException(): void
     {
         $exception = new DeadlockException;
 
         $this->assertInstanceOf(PDOException::class, $exception);
     }
 
-    public function testExceptionHoldsMessageCodeAndPrevious()
+    public function testExceptionHoldsMessageCodeAndPrevious(): void
     {
         $previous = new Exception('previous');
 

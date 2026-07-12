@@ -8,14 +8,14 @@ use PHPUnit\Framework\TestCase;
 
 class InvalidArgumentExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfPHPUnitException()
+    public function testExceptionIsInstanceOfPHPUnitException(): void
     {
         $exception = InvalidArgumentException::create(1, 'array');
 
         $this->assertInstanceOf(Exception::class, $exception);
     }
 
-    public function testCreateUsesAArticleForConsonantSoundingType()
+    public function testCreateUsesAArticleForConsonantSoundingType(): void
     {
         $exception = InvalidArgumentException::create(1, 'string');
 
@@ -25,7 +25,7 @@ class InvalidArgumentExceptionTest extends TestCase
         );
     }
 
-    public function testCreateUsesAnArticleForVowelSoundingType()
+    public function testCreateUsesAnArticleForVowelSoundingType(): void
     {
         $exception = InvalidArgumentException::create(2, 'array or ArrayAccess');
 
@@ -35,7 +35,7 @@ class InvalidArgumentExceptionTest extends TestCase
         );
     }
 
-    public function testCreateIncludesArgumentNumber()
+    public function testCreateIncludesArgumentNumber(): void
     {
         $exception = InvalidArgumentException::create(3, 'string');
 

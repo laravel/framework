@@ -8,21 +8,21 @@ use RuntimeException;
 
 class MissingAppKeyExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfRuntimeException()
+    public function testExceptionIsInstanceOfRuntimeException(): void
     {
         $exception = new MissingAppKeyException;
 
         $this->assertInstanceOf(RuntimeException::class, $exception);
     }
 
-    public function testExceptionDefaultsToStandardMessage()
+    public function testExceptionDefaultsToStandardMessage(): void
     {
         $exception = new MissingAppKeyException;
 
         $this->assertSame('No application encryption key has been specified.', $exception->getMessage());
     }
 
-    public function testExceptionAcceptsCustomMessage()
+    public function testExceptionAcceptsCustomMessage(): void
     {
         $exception = new MissingAppKeyException('Custom message.');
 

@@ -18,30 +18,32 @@ class ValidationExceptionTest extends TestCase
     {
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
+
+        parent::tearDown();
     }
 
-    public function testExceptionSummarizesZeroErrors()
+    public function testExceptionSummarizesZeroErrors(): void
     {
         $exception = $this->getException([], []);
 
         $this->assertSame('The given data was invalid.', $exception->getMessage());
     }
 
-    public function testExceptionSummarizesOneError()
+    public function testExceptionSummarizesOneError(): void
     {
         $exception = $this->getException([], ['foo' => 'required']);
 
         $this->assertSame('validation.required', $exception->getMessage());
     }
 
-    public function testExceptionSummarizesTwoErrors()
+    public function testExceptionSummarizesTwoErrors(): void
     {
         $exception = $this->getException([], ['foo' => 'required', 'bar' => 'required']);
 
         $this->assertSame('validation.required (and 1 more error)', $exception->getMessage());
     }
 
-    public function testExceptionSummarizesThreeOrMoreErrors()
+    public function testExceptionSummarizesThreeOrMoreErrors(): void
     {
         $exception = $this->getException([], [
             'foo' => 'required',
@@ -52,7 +54,7 @@ class ValidationExceptionTest extends TestCase
         $this->assertSame('validation.required (and 2 more errors)', $exception->getMessage());
     }
 
-    public function testExceptionTranslatedSummarizesTwoErrors()
+    public function testExceptionTranslatedSummarizesTwoErrors(): void
     {
         $translator = $this->getTranslator('uk', [
             '*' => [
@@ -73,7 +75,7 @@ class ValidationExceptionTest extends TestCase
         $this->assertSame('validation.required (та ще 1 помилка)', $exception->getMessage());
     }
 
-    public function testExceptionTranslatedSummarizesThreeOrMoreErrors()
+    public function testExceptionTranslatedSummarizesThreeOrMoreErrors(): void
     {
         $translator = $this->getTranslator('uk', [
             '*' => [
@@ -95,7 +97,7 @@ class ValidationExceptionTest extends TestCase
         $this->assertSame('validation.required (та ще 2 помилки)', $exception->getMessage());
     }
 
-    public function testExceptionTranslatedSummarizesFiveOrMoreErrors()
+    public function testExceptionTranslatedSummarizesFiveOrMoreErrors(): void
     {
         $translator = $this->getTranslator('uk', [
             '*' => [
@@ -120,21 +122,21 @@ class ValidationExceptionTest extends TestCase
         $this->assertSame('validation.required (та ще 5 помилок)', $exception->getMessage());
     }
 
-    public function testExceptionErrorZeroErrors()
+    public function testExceptionErrorZeroErrors(): void
     {
         $exception = $this->getException([], []);
 
         $this->assertSame([], $exception->errors());
     }
 
-    public function testExceptionErrorOneError()
+    public function testExceptionErrorOneError(): void
     {
         $exception = $this->getException([], ['foo' => 'required']);
 
         $this->assertSame(['foo' => ['validation.required']], $exception->errors());
     }
 
-    public function testExceptionStatusOneError()
+    public function testExceptionStatusOneError(): void
     {
         $exception = $this->getException([], ['foo' => 'required']);
         $exception->status(500);
@@ -142,7 +144,7 @@ class ValidationExceptionTest extends TestCase
         $this->assertEquals(500, $exception->status);
     }
 
-    public function testExceptionErrorBagOneError()
+    public function testExceptionErrorBagOneError(): void
     {
         $exception = $this->getException([], ['foo' => 'required']);
         $exception->errorBag('milwad');
@@ -150,7 +152,7 @@ class ValidationExceptionTest extends TestCase
         $this->assertSame('milwad', $exception->errorBag);
     }
 
-    public function testExceptionRedirectToOneError()
+    public function testExceptionRedirectToOneError(): void
     {
         $exception = $this->getException([], ['foo' => 'required']);
         $exception->redirectTo('https://google.com');
@@ -158,14 +160,14 @@ class ValidationExceptionTest extends TestCase
         $this->assertSame('https://google.com', $exception->redirectTo);
     }
 
-    public function testExceptionGetResponseOneError()
+    public function testExceptionGetResponseOneError(): void
     {
         $exception = $this->getException([], ['foo' => 'required']);
 
         $this->assertNull($exception->getResponse());
     }
 
-    public function testGetExceptionClassFromValidator()
+    public function testGetExceptionClassFromValidator(): void
     {
         $validator = $this->getValidator();
 
@@ -174,7 +176,7 @@ class ValidationExceptionTest extends TestCase
         $this->assertEquals(ValidationException::class, $exception);
     }
 
-    public function testConstructorDefaultsToNullResponseAndDefaultErrorBag()
+    public function testConstructorDefaultsToNullResponseAndDefaultErrorBag(): void
     {
         $exception = $this->getException([], ['foo' => 'required']);
 
@@ -182,7 +184,7 @@ class ValidationExceptionTest extends TestCase
         $this->assertSame('default', $exception->errorBag);
     }
 
-    public function testConstructorAcceptsResponseAndErrorBag()
+    public function testConstructorAcceptsResponseAndErrorBag(): void
     {
         $validator = $this->getValidator([], ['foo' => 'required']);
         $response = new Response;
@@ -193,7 +195,7 @@ class ValidationExceptionTest extends TestCase
         $this->assertSame('milwad', $exception->errorBag);
     }
 
-    public function testWithMessagesCreatesExceptionFromPlainArray()
+    public function testWithMessagesCreatesExceptionFromPlainArray(): void
     {
         $container = new Container;
         $container->instance('validator', new Factory($this->getTranslator()));

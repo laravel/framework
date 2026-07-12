@@ -8,14 +8,14 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class MalformedUrlExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfHttpException()
+    public function testExceptionIsInstanceOfHttpException(): void
     {
         $exception = new MalformedUrlException;
 
         $this->assertInstanceOf(HttpException::class, $exception);
     }
 
-    public function testExceptionUsesStatusCode400AndMessage()
+    public function testExceptionUsesStatusCode400AndMessage(): void
     {
         $exception = new MalformedUrlException;
 

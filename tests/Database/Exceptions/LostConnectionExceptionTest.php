@@ -9,14 +9,14 @@ use PHPUnit\Framework\TestCase;
 
 class LostConnectionExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfLogicException()
+    public function testExceptionIsInstanceOfLogicException(): void
     {
         $exception = new LostConnectionException;
 
         $this->assertInstanceOf(LogicException::class, $exception);
     }
 
-    public function testExceptionHoldsMessageCodeAndPrevious()
+    public function testExceptionHoldsMessageCodeAndPrevious(): void
     {
         $previous = new Exception('previous');
 

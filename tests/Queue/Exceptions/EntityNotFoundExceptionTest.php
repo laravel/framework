@@ -8,14 +8,14 @@ use PHPUnit\Framework\TestCase;
 
 class EntityNotFoundExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfInvalidArgumentException()
+    public function testExceptionIsInstanceOfInvalidArgumentException(): void
     {
         $exception = new EntityNotFoundException('App\\Models\\User', 1);
 
         $this->assertInstanceOf(InvalidArgumentException::class, $exception);
     }
 
-    public function testExceptionUsesTypeAndIdInMessage()
+    public function testExceptionUsesTypeAndIdInMessage(): void
     {
         $exception = new EntityNotFoundException('App\\Models\\User', 1);
 
@@ -27,7 +27,7 @@ class EntityNotFoundExceptionTest extends TestCase
         $this->assertNull($exception->getPrevious());
     }
 
-    public function testExceptionCastsIdToString()
+    public function testExceptionCastsIdToString(): void
     {
         $exception = new EntityNotFoundException('App\\Models\\User', null);
 

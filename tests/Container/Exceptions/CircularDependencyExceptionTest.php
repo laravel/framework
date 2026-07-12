@@ -9,14 +9,14 @@ use Psr\Container\ContainerExceptionInterface;
 
 class CircularDependencyExceptionTest extends TestCase
 {
-    public function testExceptionImplementsContainerExceptionInterface()
+    public function testExceptionImplementsContainerExceptionInterface(): void
     {
         $exception = new CircularDependencyException;
 
         $this->assertInstanceOf(ContainerExceptionInterface::class, $exception);
     }
 
-    public function testExceptionHoldsMessageCodeAndPrevious()
+    public function testExceptionHoldsMessageCodeAndPrevious(): void
     {
         $previous = new Exception('previous');
 

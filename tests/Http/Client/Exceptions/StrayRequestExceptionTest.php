@@ -8,14 +8,14 @@ use RuntimeException;
 
 class StrayRequestExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfRuntimeException()
+    public function testExceptionIsInstanceOfRuntimeException(): void
     {
         $exception = new StrayRequestException('http://foo.com');
 
         $this->assertInstanceOf(RuntimeException::class, $exception);
     }
 
-    public function testExceptionUsesUriInMessage()
+    public function testExceptionUsesUriInMessage(): void
     {
         $exception = new StrayRequestException('http://foo.com');
 

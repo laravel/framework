@@ -9,14 +9,14 @@ use PHPUnit\Framework\TestCase;
 
 class ViteManifestNotFoundExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfViteException()
+    public function testExceptionIsInstanceOfViteException(): void
     {
         $exception = new ViteManifestNotFoundException;
 
         $this->assertInstanceOf(ViteException::class, $exception);
     }
 
-    public function testExceptionHoldsMessageCodeAndPrevious()
+    public function testExceptionHoldsMessageCodeAndPrevious(): void
     {
         $previous = new Exception('previous');
 

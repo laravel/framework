@@ -9,14 +9,14 @@ use stdClass;
 
 class LazyLoadingViolationExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfRuntimeException()
+    public function testExceptionIsInstanceOfRuntimeException(): void
     {
         $exception = new LazyLoadingViolationException(new stdClass, 'posts');
 
         $this->assertInstanceOf(RuntimeException::class, $exception);
     }
 
-    public function testExceptionHoldsModelRelationAndMessage()
+    public function testExceptionHoldsModelRelationAndMessage(): void
     {
         $exception = new LazyLoadingViolationException(new stdClass, 'posts');
 

@@ -8,14 +8,14 @@ use PHPUnit\Framework\TestCase;
 
 class TokenMismatchExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfException()
+    public function testExceptionIsInstanceOfException(): void
     {
         $exception = new TokenMismatchException;
 
         $this->assertInstanceOf(Exception::class, $exception);
     }
 
-    public function testExceptionHoldsMessageCodeAndPrevious()
+    public function testExceptionHoldsMessageCodeAndPrevious(): void
     {
         $previous = new Exception('previous');
 

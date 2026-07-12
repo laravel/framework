@@ -9,14 +9,14 @@ use PHPUnit\Framework\TestCase;
 
 class ConnectionExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfHttpClientException()
+    public function testExceptionIsInstanceOfHttpClientException(): void
     {
         $exception = new ConnectionException;
 
         $this->assertInstanceOf(HttpClientException::class, $exception);
     }
 
-    public function testExceptionHoldsMessageCodeAndPrevious()
+    public function testExceptionHoldsMessageCodeAndPrevious(): void
     {
         $previous = new Exception('previous');
 

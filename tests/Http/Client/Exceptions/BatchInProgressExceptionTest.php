@@ -8,14 +8,14 @@ use PHPUnit\Framework\TestCase;
 
 class BatchInProgressExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfHttpClientException()
+    public function testExceptionIsInstanceOfHttpClientException(): void
     {
         $exception = new BatchInProgressException;
 
         $this->assertInstanceOf(HttpClientException::class, $exception);
     }
 
-    public function testExceptionUsesFixedMessage()
+    public function testExceptionUsesFixedMessage(): void
     {
         $exception = new BatchInProgressException;
 

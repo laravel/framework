@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class UniqueConstraintViolationExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfQueryException()
+    public function testExceptionIsInstanceOfQueryException(): void
     {
         $exception = new UniqueConstraintViolationException(
             'mysql', 'insert into users (email) values (?)', ['taylor@laravel.com'], new Exception('Duplicate entry')
@@ -18,7 +18,7 @@ class UniqueConstraintViolationExceptionTest extends TestCase
         $this->assertInstanceOf(QueryException::class, $exception);
     }
 
-    public function testExceptionDefaultsIndexAndColumns()
+    public function testExceptionDefaultsIndexAndColumns(): void
     {
         $exception = new UniqueConstraintViolationException(
             'mysql', 'insert into users (email) values (?)', ['taylor@laravel.com'], new Exception('Duplicate entry')
@@ -28,7 +28,7 @@ class UniqueConstraintViolationExceptionTest extends TestCase
         $this->assertSame([], $exception->columns);
     }
 
-    public function testSetIndexIsFluentAndAssignsIndex()
+    public function testSetIndexIsFluentAndAssignsIndex(): void
     {
         $exception = new UniqueConstraintViolationException(
             'mysql', 'insert into users (email) values (?)', ['taylor@laravel.com'], new Exception('Duplicate entry')
@@ -40,7 +40,7 @@ class UniqueConstraintViolationExceptionTest extends TestCase
         $this->assertSame('users_email_unique', $exception->index);
     }
 
-    public function testSetColumnsIsFluentAndAssignsColumns()
+    public function testSetColumnsIsFluentAndAssignsColumns(): void
     {
         $exception = new UniqueConstraintViolationException(
             'mysql', 'insert into users (email) values (?)', ['taylor@laravel.com'], new Exception('Duplicate entry')

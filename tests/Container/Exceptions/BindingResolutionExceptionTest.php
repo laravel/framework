@@ -9,14 +9,14 @@ use Psr\Container\ContainerExceptionInterface;
 
 class BindingResolutionExceptionTest extends TestCase
 {
-    public function testExceptionImplementsContainerExceptionInterface()
+    public function testExceptionImplementsContainerExceptionInterface(): void
     {
         $exception = new BindingResolutionException;
 
         $this->assertInstanceOf(ContainerExceptionInterface::class, $exception);
     }
 
-    public function testExceptionHoldsMessageCodeAndPrevious()
+    public function testExceptionHoldsMessageCodeAndPrevious(): void
     {
         $previous = new Exception('previous');
 

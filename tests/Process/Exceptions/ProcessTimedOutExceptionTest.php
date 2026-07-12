@@ -11,14 +11,14 @@ use Symfony\Component\Process\Process;
 
 class ProcessTimedOutExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfSymfonyRuntimeException()
+    public function testExceptionIsInstanceOfSymfonyRuntimeException(): void
     {
         $exception = new ProcessTimedOutException($this->symfonyTimeoutException(), new FakeProcessResult);
 
         $this->assertInstanceOf(SymfonyRuntimeException::class, $exception);
     }
 
-    public function testExceptionHoldsResultAndInheritsMessageAndCodeFromOriginal()
+    public function testExceptionHoldsResultAndInheritsMessageAndCodeFromOriginal(): void
     {
         $original = $this->symfonyTimeoutException();
         $result = new FakeProcessResult;

@@ -8,14 +8,14 @@ use RuntimeException;
 
 class BackedEnumCaseNotFoundExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfRuntimeException()
+    public function testExceptionIsInstanceOfRuntimeException(): void
     {
         $exception = new BackedEnumCaseNotFoundException('App\\Enums\\Status', 'archived');
 
         $this->assertInstanceOf(RuntimeException::class, $exception);
     }
 
-    public function testExceptionUsesEnumClassAndCaseInMessage()
+    public function testExceptionUsesEnumClassAndCaseInMessage(): void
     {
         $exception = new BackedEnumCaseNotFoundException('App\\Enums\\Status', 'archived');
 

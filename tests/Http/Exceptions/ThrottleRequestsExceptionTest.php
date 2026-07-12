@@ -9,21 +9,21 @@ use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 class ThrottleRequestsExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfTooManyRequestsHttpException()
+    public function testExceptionIsInstanceOfTooManyRequestsHttpException(): void
     {
         $exception = new ThrottleRequestsException;
 
         $this->assertInstanceOf(TooManyRequestsHttpException::class, $exception);
     }
 
-    public function testExceptionUsesStatusCode429()
+    public function testExceptionUsesStatusCode429(): void
     {
         $exception = new ThrottleRequestsException;
 
         $this->assertSame(429, $exception->getStatusCode());
     }
 
-    public function testExceptionHoldsMessageHeadersCodeAndPrevious()
+    public function testExceptionHoldsMessageHeadersCodeAndPrevious(): void
     {
         $previous = new Exception('previous');
 

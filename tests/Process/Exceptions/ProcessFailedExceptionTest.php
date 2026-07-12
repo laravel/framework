@@ -9,7 +9,7 @@ use RuntimeException;
 
 class ProcessFailedExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfRuntimeException()
+    public function testExceptionIsInstanceOfRuntimeException(): void
     {
         $result = new FakeProcessResult(command: 'exit 1', exitCode: 1);
 
@@ -18,7 +18,7 @@ class ProcessFailedExceptionTest extends TestCase
         $this->assertInstanceOf(RuntimeException::class, $exception);
     }
 
-    public function testExceptionHoldsResultAndUsesExitCodeAsCode()
+    public function testExceptionHoldsResultAndUsesExitCodeAsCode(): void
     {
         $result = new FakeProcessResult(command: 'exit 1', exitCode: 1);
 
@@ -29,7 +29,7 @@ class ProcessFailedExceptionTest extends TestCase
         $this->assertSame("The command \"exit 1\" failed.\n\nExit Code: 1", $exception->getMessage());
     }
 
-    public function testExceptionMessageIncludesOutput()
+    public function testExceptionMessageIncludesOutput(): void
     {
         $result = new FakeProcessResult(command: 'ls', exitCode: 1, output: 'file.txt');
 
@@ -41,7 +41,7 @@ class ProcessFailedExceptionTest extends TestCase
         );
     }
 
-    public function testExceptionMessageIncludesErrorOutput()
+    public function testExceptionMessageIncludesErrorOutput(): void
     {
         $result = new FakeProcessResult(command: 'ls', exitCode: 1, errorOutput: 'permission denied');
 

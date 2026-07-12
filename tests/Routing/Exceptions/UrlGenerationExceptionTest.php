@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class UrlGenerationExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfException()
+    public function testExceptionIsInstanceOfException(): void
     {
         $route = new Route('GET', 'foo/{bar}', ['as' => 'foo']);
 
@@ -18,7 +18,7 @@ class UrlGenerationExceptionTest extends TestCase
         $this->assertInstanceOf(Exception::class, $exception);
     }
 
-    public function testForMissingParametersWithoutParameters()
+    public function testForMissingParametersWithoutParameters(): void
     {
         $route = new Route('GET', 'foo/{bar}', ['as' => 'foo']);
 
@@ -30,7 +30,7 @@ class UrlGenerationExceptionTest extends TestCase
         );
     }
 
-    public function testForMissingParametersWithParameters()
+    public function testForMissingParametersWithParameters(): void
     {
         $route = new Route('GET', 'foo/{bar}/{baz}', ['as' => 'foo']);
 
@@ -42,7 +42,7 @@ class UrlGenerationExceptionTest extends TestCase
         );
     }
 
-    public function testForMissingParametersWithSingleParameter()
+    public function testForMissingParametersWithSingleParameter(): void
     {
         $route = new Route('GET', 'foo/{bar}', ['as' => 'foo']);
 

@@ -9,14 +9,14 @@ use PHPUnit\Framework\TestCase;
 
 class QueryExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfPDOException()
+    public function testExceptionIsInstanceOfPDOException(): void
     {
         $exception = new QueryException('mysql', 'select * from users', [], new Exception('Syntax error'));
 
         $this->assertInstanceOf(PDOException::class, $exception);
     }
 
-    public function testExceptionHoldsConnectionSqlAndBindings()
+    public function testExceptionHoldsConnectionSqlAndBindings(): void
     {
         $previous = new Exception('Syntax error');
 
@@ -34,7 +34,7 @@ class QueryExceptionTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    public function testExceptionInheritsCodeFromPreviousException()
+    public function testExceptionInheritsCodeFromPreviousException(): void
     {
         $previous = new Exception('Syntax error', 1234);
 
@@ -43,7 +43,7 @@ class QueryExceptionTest extends TestCase
         $this->assertSame(1234, $exception->getCode());
     }
 
-    public function testExceptionInheritsErrorInfoFromPreviousPDOException()
+    public function testExceptionInheritsErrorInfoFromPreviousPDOException(): void
     {
         $previous = new PDOException('Syntax error');
         $previous->errorInfo = ['42S02', 1146, "Table 'db.users' doesn't exist"];
@@ -53,7 +53,7 @@ class QueryExceptionTest extends TestCase
         $this->assertSame(['42S02', 1146, "Table 'db.users' doesn't exist"], $exception->errorInfo);
     }
 
-    public function testExceptionFormatsMessageWithHostAndPort()
+    public function testExceptionFormatsMessageWithHostAndPort(): void
     {
         $exception = new QueryException('mysql', 'select 1', [], new Exception('Syntax error'), [
             'driver' => 'mysql',
@@ -74,7 +74,7 @@ class QueryExceptionTest extends TestCase
         ], $exception->getConnectionDetails());
     }
 
-    public function testExceptionFormatsMessageWithUnixSocket()
+    public function testExceptionFormatsMessageWithUnixSocket(): void
     {
         $exception = new QueryException('mysql', 'select 1', [], new Exception('Syntax error'), [
             'driver' => 'mysql',
@@ -88,7 +88,7 @@ class QueryExceptionTest extends TestCase
         );
     }
 
-    public function testExceptionFormatsMessageWithoutHostForSqliteDriver()
+    public function testExceptionFormatsMessageWithoutHostForSqliteDriver(): void
     {
         $exception = new QueryException('sqlite', 'select 1', [], new Exception('Syntax error'), [
             'driver' => 'sqlite',
@@ -101,7 +101,7 @@ class QueryExceptionTest extends TestCase
         );
     }
 
-    public function testExceptionHoldsReadWriteType()
+    public function testExceptionHoldsReadWriteType(): void
     {
         $exception = new QueryException(
             'mysql', 'select 1', [], new Exception('Syntax error'), [], 'write'

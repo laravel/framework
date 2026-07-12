@@ -9,35 +9,35 @@ use stdClass;
 
 class ResourceIdentificationExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfRuntimeException()
+    public function testExceptionIsInstanceOfRuntimeException(): void
     {
         $exception = ResourceIdentificationException::attemptingToDetermineIdFor(new stdClass);
 
         $this->assertInstanceOf(RuntimeException::class, $exception);
     }
 
-    public function testAttemptingToDetermineIdForObject()
+    public function testAttemptingToDetermineIdForObject(): void
     {
         $exception = ResourceIdentificationException::attemptingToDetermineIdFor(new stdClass);
 
         $this->assertSame('Unable to resolve resource object ID for [stdClass].', $exception->getMessage());
     }
 
-    public function testAttemptingToDetermineIdForScalar()
+    public function testAttemptingToDetermineIdForScalar(): void
     {
         $exception = ResourceIdentificationException::attemptingToDetermineIdFor('foo');
 
         $this->assertSame('Unable to resolve resource object ID for [string].', $exception->getMessage());
     }
 
-    public function testAttemptingToDetermineTypeForObject()
+    public function testAttemptingToDetermineTypeForObject(): void
     {
         $exception = ResourceIdentificationException::attemptingToDetermineTypeFor(new stdClass);
 
         $this->assertSame('Unable to resolve resource object type for [stdClass].', $exception->getMessage());
     }
 
-    public function testAttemptingToDetermineTypeForScalar()
+    public function testAttemptingToDetermineTypeForScalar(): void
     {
         $exception = ResourceIdentificationException::attemptingToDetermineTypeFor(42);
 

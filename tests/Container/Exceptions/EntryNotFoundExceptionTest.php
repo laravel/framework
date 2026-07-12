@@ -9,14 +9,14 @@ use Psr\Container\NotFoundExceptionInterface;
 
 class EntryNotFoundExceptionTest extends TestCase
 {
-    public function testExceptionImplementsNotFoundExceptionInterface()
+    public function testExceptionImplementsNotFoundExceptionInterface(): void
     {
         $exception = new EntryNotFoundException;
 
         $this->assertInstanceOf(NotFoundExceptionInterface::class, $exception);
     }
 
-    public function testExceptionHoldsMessageCodeAndPrevious()
+    public function testExceptionHoldsMessageCodeAndPrevious(): void
     {
         $previous = new Exception('previous');
 

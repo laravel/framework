@@ -8,14 +8,14 @@ use PHPUnit\Framework\TestCase;
 
 class InvalidPayloadExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfInvalidArgumentException()
+    public function testExceptionIsInstanceOfInvalidArgumentException(): void
     {
         $exception = new InvalidPayloadException('Invalid payload.');
 
         $this->assertInstanceOf(InvalidArgumentException::class, $exception);
     }
 
-    public function testExceptionHoldsProvidedMessageAndValue()
+    public function testExceptionHoldsProvidedMessageAndValue(): void
     {
         $exception = new InvalidPayloadException('Invalid payload.', 'bad-json');
 
@@ -23,7 +23,7 @@ class InvalidPayloadExceptionTest extends TestCase
         $this->assertSame('bad-json', $exception->value);
     }
 
-    public function testExceptionFallsBackToJsonLastErrorWhenNoMessageGiven()
+    public function testExceptionFallsBackToJsonLastErrorWhenNoMessageGiven(): void
     {
         json_decode('{invalid');
 

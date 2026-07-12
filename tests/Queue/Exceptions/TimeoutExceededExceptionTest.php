@@ -13,9 +13,11 @@ class TimeoutExceededExceptionTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+
+        parent::tearDown();
     }
 
-    public function testExceptionIsInstanceOfMaxAttemptsExceededException()
+    public function testExceptionIsInstanceOfMaxAttemptsExceededException(): void
     {
         $job = m::mock(SyncJob::class);
         $job->shouldReceive('resolveName')->andReturn('App\\Jobs\\UnderlyingJob');
@@ -25,7 +27,7 @@ class TimeoutExceededExceptionTest extends TestCase
         $this->assertInstanceOf(MaxAttemptsExceededException::class, $exception);
     }
 
-    public function testForJobBuildsExceptionAndAssignsJob()
+    public function testForJobBuildsExceptionAndAssignsJob(): void
     {
         $job = m::mock(SyncJob::class);
         $job->shouldReceive('resolveName')->andReturn('App\\Jobs\\UnderlyingJob');

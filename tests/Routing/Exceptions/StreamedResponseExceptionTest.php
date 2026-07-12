@@ -10,14 +10,14 @@ use RuntimeException;
 
 class StreamedResponseExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfRuntimeException()
+    public function testExceptionIsInstanceOfRuntimeException(): void
     {
         $exception = new StreamedResponseException(new Exception('Stream failed.'));
 
         $this->assertInstanceOf(RuntimeException::class, $exception);
     }
 
-    public function testExceptionHoldsOriginalExceptionAndItsMessage()
+    public function testExceptionHoldsOriginalExceptionAndItsMessage(): void
     {
         $original = new Exception('Stream failed.');
 
@@ -28,7 +28,7 @@ class StreamedResponseExceptionTest extends TestCase
         $this->assertSame('Stream failed.', $exception->getMessage());
     }
 
-    public function testRenderReturnsEmptyResponse()
+    public function testRenderReturnsEmptyResponse(): void
     {
         $exception = new StreamedResponseException(new Exception('Stream failed.'));
 

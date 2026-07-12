@@ -9,14 +9,14 @@ use PHPUnit\Framework\TestCase;
 
 class AuthorizationExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfException()
+    public function testExceptionIsInstanceOfException(): void
     {
         $exception = new AuthorizationException;
 
         $this->assertInstanceOf(Exception::class, $exception);
     }
 
-    public function testExceptionDefaultsToUnauthorizedMessage()
+    public function testExceptionDefaultsToUnauthorizedMessage(): void
     {
         $exception = new AuthorizationException;
 
@@ -25,7 +25,7 @@ class AuthorizationExceptionTest extends TestCase
         $this->assertNull($exception->getPrevious());
     }
 
-    public function testExceptionHoldsMessageCodeAndPrevious()
+    public function testExceptionHoldsMessageCodeAndPrevious(): void
     {
         $previous = new Exception('previous');
 
@@ -36,7 +36,7 @@ class AuthorizationExceptionTest extends TestCase
         $this->assertSame($previous, $exception->getPrevious());
     }
 
-    public function testSetResponseIsFluentAndAssignsResponse()
+    public function testSetResponseIsFluentAndAssignsResponse(): void
     {
         $exception = new AuthorizationException;
         $response = Response::deny('Denied.');
@@ -47,7 +47,7 @@ class AuthorizationExceptionTest extends TestCase
         $this->assertSame($response, $exception->response());
     }
 
-    public function testWithStatusIsFluentAndAssignsStatus()
+    public function testWithStatusIsFluentAndAssignsStatus(): void
     {
         $exception = new AuthorizationException;
 
@@ -60,7 +60,7 @@ class AuthorizationExceptionTest extends TestCase
         $this->assertSame(404, $exception->status());
     }
 
-    public function testAsNotFoundSetsStatusTo404()
+    public function testAsNotFoundSetsStatusTo404(): void
     {
         $exception = new AuthorizationException;
 
@@ -69,7 +69,7 @@ class AuthorizationExceptionTest extends TestCase
         $this->assertSame(404, $exception->status());
     }
 
-    public function testToResponseBuildsDenyResponseWithMessageCodeAndStatus()
+    public function testToResponseBuildsDenyResponseWithMessageCodeAndStatus(): void
     {
         $exception = new AuthorizationException('Custom message.', 'ability-code');
         $exception->withStatus(403);

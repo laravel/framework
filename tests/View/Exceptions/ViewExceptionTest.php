@@ -10,35 +10,35 @@ use PHPUnit\Framework\TestCase;
 
 class ViewExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfErrorException()
+    public function testExceptionIsInstanceOfErrorException(): void
     {
         $exception = new ViewException('View error.');
 
         $this->assertInstanceOf(ErrorException::class, $exception);
     }
 
-    public function testExceptionHoldsMessage()
+    public function testExceptionHoldsMessage(): void
     {
         $exception = new ViewException('View error.');
 
         $this->assertSame('View error.', $exception->getMessage());
     }
 
-    public function testReportReturnsFalseWithoutPreviousException()
+    public function testReportReturnsFalseWithoutPreviousException(): void
     {
         $exception = new ViewException('View error.');
 
         $this->assertFalse($exception->report());
     }
 
-    public function testReportReturnsFalseWhenPreviousExceptionIsNotReportable()
+    public function testReportReturnsFalseWhenPreviousExceptionIsNotReportable(): void
     {
         $exception = new ViewException('View error.', 0, 1, __FILE__, __LINE__, new Exception('previous'));
 
         $this->assertFalse($exception->report());
     }
 
-    public function testReportDelegatesToReportableePreviousException()
+    public function testReportDelegatesToReportableePreviousException(): void
     {
         $previous = new class extends Exception
         {
@@ -58,21 +58,21 @@ class ViewExceptionTest extends TestCase
         $this->assertTrue($previous->reported);
     }
 
-    public function testRenderReturnsNullWithoutPreviousException()
+    public function testRenderReturnsNullWithoutPreviousException(): void
     {
         $exception = new ViewException('View error.');
 
         $this->assertNull($exception->render(Request::create('/')));
     }
 
-    public function testRenderReturnsNullWhenPreviousExceptionIsNotRenderable()
+    public function testRenderReturnsNullWhenPreviousExceptionIsNotRenderable(): void
     {
         $exception = new ViewException('View error.', 0, 1, __FILE__, __LINE__, new Exception('previous'));
 
         $this->assertNull($exception->render(Request::create('/')));
     }
 
-    public function testRenderDelegatesToRenderablePreviousException()
+    public function testRenderDelegatesToRenderablePreviousException(): void
     {
         $previous = new class extends Exception
         {

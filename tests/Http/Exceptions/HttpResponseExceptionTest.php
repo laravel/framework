@@ -10,14 +10,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class HttpResponseExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfRuntimeException()
+    public function testExceptionIsInstanceOfRuntimeException(): void
     {
         $exception = new HttpResponseException(new Response);
 
         $this->assertInstanceOf(RuntimeException::class, $exception);
     }
 
-    public function testExceptionHoldsResponse()
+    public function testExceptionHoldsResponse(): void
     {
         $response = new Response('body', 404);
 
@@ -26,7 +26,7 @@ class HttpResponseExceptionTest extends TestCase
         $this->assertSame($response, $exception->getResponse());
     }
 
-    public function testExceptionDefaultsToEmptyMessageAndCodeWithoutPrevious()
+    public function testExceptionDefaultsToEmptyMessageAndCodeWithoutPrevious(): void
     {
         $exception = new HttpResponseException(new Response);
 
@@ -35,7 +35,7 @@ class HttpResponseExceptionTest extends TestCase
         $this->assertNull($exception->getPrevious());
     }
 
-    public function testExceptionInheritsMessageAndCodeFromPrevious()
+    public function testExceptionInheritsMessageAndCodeFromPrevious(): void
     {
         $previous = new Exception('Something went wrong.', 42);
 

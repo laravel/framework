@@ -9,21 +9,21 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PostTooLargeExceptionTest extends TestCase
 {
-    public function testExceptionIsInstanceOfHttpException()
+    public function testExceptionIsInstanceOfHttpException(): void
     {
         $exception = new PostTooLargeException;
 
         $this->assertInstanceOf(HttpException::class, $exception);
     }
 
-    public function testExceptionUsesStatusCode413()
+    public function testExceptionUsesStatusCode413(): void
     {
         $exception = new PostTooLargeException;
 
         $this->assertSame(413, $exception->getStatusCode());
     }
 
-    public function testExceptionHoldsMessageHeadersCodeAndPrevious()
+    public function testExceptionHoldsMessageHeadersCodeAndPrevious(): void
     {
         $previous = new Exception('previous');
 
