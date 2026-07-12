@@ -325,7 +325,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     protected function isChainOfObjects($chain)
     {
-        return ! (new Collection($chain))->contains(fn ($job) => ! is_object($job));
+        return (new Collection($chain))->doesntContain(fn ($job) => ! is_object($job));
     }
 
     /**
