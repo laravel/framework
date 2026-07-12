@@ -41,7 +41,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * The expiration time of a job.
      *
-     * @var int|null
+     * @var int|string|null
      */
     protected $retryAfter = 60;
 
@@ -58,7 +58,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      * @param  \Illuminate\Database\Connection  $database
      * @param  string  $table
      * @param  string  $default
-     * @param  int  $retryAfter
+     * @param  int|string  $retryAfter
      * @param  bool  $dispatchAfterCommit
      */
     public function __construct(
@@ -486,7 +486,8 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      */
     protected function isReservedButExpired($query)
     {
-        $expiration = Carbon::now()->subSeconds($this->retryAfter)->getTimestamp();
+        // In-flight jobs have a 300-second grace period when config is switched from a fixed value to "auto"
+        $expiration = Carbon::now()->subSeconds($this->retryAfter === 'auto' ? 300 : $this->retryAfter)->getTimestamp();
 
         $query->orWhere(function ($query) use ($expiration) {
             $query->where('reserved_at', '<=', $expiration);
@@ -519,8 +520,20 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      */
     protected function markJobAsReserved($job)
     {
+        $reservationOffset = 0;
+
+        if ($this->retryAfter === 'auto') {
+            $timeout = json_decode($job->payload, true)['timeout'] ?? null;
+
+            if (! is_numeric($timeout) || (int) $timeout <= 0) {
+                $timeout = $this->workerTimeout ?? 60;
+            }
+
+            $reservationOffset = (int) $timeout + 10 - 300;
+        }
+
         $this->database->table($this->table)->where('id', $job->id)->update([
-            'reserved_at' => $job->touch(),
+            'reserved_at' => $job->touch($reservationOffset),
             'attempts' => $job->increment(),
         ]);
 

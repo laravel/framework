@@ -219,6 +219,8 @@ class Worker
 
         $this->raiseWorkerStartingEvent($connectionName, $queue, $options);
 
+        $this->shareWorkerTimeout($connectionName, $options);
+
         while (true) {
             // Before reserving any jobs, we will make sure this queue is not paused and
             // if it is we will just pause this worker for a given amount of time and
@@ -407,6 +409,8 @@ class Worker
      */
     public function runNextJob($connectionName, $queue, WorkerOptions $options)
     {
+        $this->shareWorkerTimeout($connectionName, $options);
+
         $job = $this->getNextJob(
             $this->manager->connection($connectionName), $queue
         );
@@ -419,6 +423,22 @@ class Worker
         }
 
         $this->sleep($options->sleep);
+    }
+
+    /**
+     * Share the worker's job timeout with the given queue connection.
+     *
+     * @param  string  $connectionName
+     * @param  \Illuminate\Queue\WorkerOptions  $options
+     * @return void
+     */
+    protected function shareWorkerTimeout($connectionName, WorkerOptions $options)
+    {
+        $connection = $this->manager->connection($connectionName);
+
+        if (method_exists($connection, 'setWorkerTimeout')) {
+            $connection->setWorkerTimeout($options->timeout);
+        }
     }
 
     /**

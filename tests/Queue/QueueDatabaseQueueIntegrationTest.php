@@ -156,6 +156,50 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
         $this->assertEquals(1, $popped_job->attempts(), 'The "attempts" attribute of the Job object was not updated by pop!');
     }
 
+    public function testPoppedJobsAreReservedBasedOnTheJobTimeoutWhenRetryAfterIsAuto()
+    {
+        Carbon::setTestNow($time = Carbon::now());
+
+        $queue = new DatabaseQueue($this->connection(), $this->table, 'default', 'auto');
+        $queue->setContainer($this->container);
+
+        $getJobReservedAt = function ($timeout) use ($queue) {
+            $this->connection()->table('jobs')->insert([
+                'queue' => 'default',
+                'payload' => json_encode(['timeout' => $timeout]),
+                'attempts' => 0,
+                'reserved_at' => null,
+                'available_at' => Carbon::now()->subSecond()->getTimestamp(),
+                'created_at' => Carbon::now()->getTimestamp(),
+            ]);
+
+            $queue->pop('default');
+
+            $reservedAt = (int) $this->connection()->table('jobs')->latest()->value('reserved_at');
+
+            $queue->clear();
+
+            return $reservedAt;
+        };
+
+        // 600-second timeout on the job, + 10-second buffer - 300-second grace period
+        $this->assertSame($time->getTimestamp() + 600 + 10 - 300, $getJobReservedAt(600));
+
+        // If the job doesn't define a timeout and the worker timeout is unknown, then the 60-second default is used
+        $this->assertSame($time->getTimestamp() + 60 + 10 - 300, $getJobReservedAt(null));
+        $this->assertSame($time->getTimestamp() + 60 + 10 - 300, $getJobReservedAt(0));
+
+        // Worker timeout is used if the job doesn't define a timeout
+        $queue->setWorkerTimeout(120);
+        $this->assertSame($time->getTimestamp() + 120 + 10 - 300, $getJobReservedAt(null));
+        $this->assertSame($time->getTimestamp() + 120 + 10 - 300, $getJobReservedAt(0));
+
+        // Timeout on the job takes precedence over the queue worker timeout
+        $this->assertSame($time->getTimestamp() + 45 + 10 - 300, $getJobReservedAt(45));
+
+        Carbon::setTestNow();
+    }
+
     /**
      * Test that the queue can be cleared.
      */

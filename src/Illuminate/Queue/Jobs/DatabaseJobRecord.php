@@ -40,11 +40,12 @@ class DatabaseJobRecord
     /**
      * Update the "reserved at" timestamp of the job.
      *
+     * @param  int  $offset
      * @return int
      */
-    public function touch()
+    public function touch($offset = 0)
     {
-        $this->record->reserved_at = $this->currentTime();
+        $this->record->reserved_at = $this->currentTime() + $offset;
 
         return $this->record->reserved_at;
     }

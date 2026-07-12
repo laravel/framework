@@ -39,7 +39,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * The expiration time of a job.
      *
-     * @var int|null
+     * @var int|string|null
      */
     protected $retryAfter = 60;
 
@@ -81,7 +81,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      * @param  \Illuminate\Contracts\Redis\Factory  $redis
      * @param  string  $default
      * @param  string|null  $connection
-     * @param  int  $retryAfter
+     * @param  int|string  $retryAfter
      * @param  int|null  $blockFor
      * @param  bool  $dispatchAfterCommit
      * @param  int  $migrationBatchSize
@@ -456,7 +456,8 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     {
         $nextJob = $this->getConnection()->eval(
             LuaScripts::pop(), 3, $queue, $queue.':reserved', $queue.':notify',
-            $this->availableAt($this->retryAfter)
+            $this->availableAt($this->retryAfter === 'auto' ? ($this->workerTimeout ?? 60) + 10 : $this->retryAfter),
+            $this->retryAfter === 'auto' ? $this->availableAt(10) : ''
         );
 
         if (empty($nextJob)) {
