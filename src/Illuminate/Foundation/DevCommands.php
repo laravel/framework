@@ -57,7 +57,11 @@ class DevCommands
 
         self::artisan('serve --host=localhost', 'server');
         self::artisan('queue:listen --tries=1 --timeout=0', 'queue');
-        self::artisan('pail --timeout=0', 'logs');
+
+        if (! windows_os()) {
+            self::artisan('pail --timeout=0', 'logs');
+        }
+
         self::node('dev', 'vite');
     }
 
