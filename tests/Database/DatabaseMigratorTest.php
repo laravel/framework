@@ -17,8 +17,6 @@ class DatabaseMigratorTest extends TestCase
     {
         (new ReflectionProperty(Migrator::class, 'connectionResolverCallback'))->setValue(null, null);
 
-        m::close();
-
         parent::tearDown();
     }
 
