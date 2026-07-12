@@ -2,14 +2,24 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Illuminate\Container\Container;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
+use Illuminate\Validation\Factory;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class ValidationExceptionTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Facade::clearResolvedInstances();
+        Facade::setFacadeApplication(null);
+    }
+
     public function testExceptionSummarizesZeroErrors()
     {
         $exception = $this->getException([], []);
@@ -162,6 +172,43 @@ class ValidationExceptionTest extends TestCase
         $exception = $validator->getException();
 
         $this->assertEquals(ValidationException::class, $exception);
+    }
+
+    public function testConstructorDefaultsToNullResponseAndDefaultErrorBag()
+    {
+        $exception = $this->getException([], ['foo' => 'required']);
+
+        $this->assertNull($exception->getResponse());
+        $this->assertSame('default', $exception->errorBag);
+    }
+
+    public function testConstructorAcceptsResponseAndErrorBag()
+    {
+        $validator = $this->getValidator([], ['foo' => 'required']);
+        $response = new Response;
+
+        $exception = new ValidationException($validator, $response, 'milwad');
+
+        $this->assertSame($response, $exception->getResponse());
+        $this->assertSame('milwad', $exception->errorBag);
+    }
+
+    public function testWithMessagesCreatesExceptionFromPlainArray()
+    {
+        $container = new Container;
+        $container->instance('validator', new Factory($this->getTranslator()));
+        Facade::setFacadeApplication($container);
+
+        $exception = ValidationException::withMessages([
+            'foo' => 'Foo is required.',
+            'bar' => ['Bar is required.', 'Bar must be a string.'],
+        ]);
+
+        $this->assertSame([
+            'foo' => ['Foo is required.'],
+            'bar' => ['Bar is required.', 'Bar must be a string.'],
+        ], $exception->errors());
+        $this->assertSame('Foo is required. (and 2 more errors)', $exception->getMessage());
     }
 
     protected function getException($data = [], $rules = [], $translator = null)
