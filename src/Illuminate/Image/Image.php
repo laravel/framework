@@ -358,6 +358,7 @@ class Image implements Stringable
                 throw new ImageException("Failed to process image: {$e->getMessage()}", 0, $e);
             }
 
+            $this->pipeline = new ImagePipeline;
             $this->processed = true;
         }
 
@@ -524,7 +525,6 @@ class Image implements Stringable
 
     /**
      * Prevent serialization of the image.
-     *
      *
      * @throws ImageException
      */
