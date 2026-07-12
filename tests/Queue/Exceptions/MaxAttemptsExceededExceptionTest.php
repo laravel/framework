@@ -11,13 +11,6 @@ use RuntimeException;
 
 class MaxAttemptsExceededExceptionTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-
-        parent::tearDown();
-    }
-
     public function testExceptionIsInstanceOfRuntimeException(): void
     {
         $exception = new MaxAttemptsExceededException;

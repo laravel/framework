@@ -10,13 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class TimeoutExceededExceptionTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-
-        parent::tearDown();
-    }
-
     public function testExceptionIsInstanceOfMaxAttemptsExceededException(): void
     {
         $job = m::mock(SyncJob::class);
