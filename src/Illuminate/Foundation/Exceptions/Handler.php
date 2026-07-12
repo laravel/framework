@@ -382,13 +382,7 @@ class Handler implements ExceptionHandlerContract
             return true;
         }
 
-        foreach ($this->dontRetryCallbacks as $dontRetryCallback) {
-            if ($dontRetryCallback($e) === true) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->dontRetryCallbacks, fn ($dontRetryCallback) => $dontRetryCallback($e) === true);
     }
 
     /**

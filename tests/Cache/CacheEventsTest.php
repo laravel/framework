@@ -317,13 +317,7 @@ class CacheEventsTest extends TestCase
                 return false;
             }
 
-            foreach ($properties as $name => $value) {
-                if ($value != $event->$name) {
-                    return false;
-                }
-            }
-
-            return true;
+            return array_all($properties, fn ($value, $name) => $value == $event->$name);
         });
     }
 
