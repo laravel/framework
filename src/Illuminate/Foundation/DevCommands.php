@@ -58,7 +58,7 @@ class DevCommands
         self::artisan('serve --host=localhost', 'server');
         self::artisan('queue:listen --tries=1 --timeout=0', 'queue');
 
-        if (! windows_os()) {
+        if (function_exists('pcntl_fork')) {
             self::artisan('pail --timeout=0', 'logs');
         }
 
