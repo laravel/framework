@@ -351,7 +351,7 @@ class BroadcastingInstallCommand extends Command
             // Add Echo configuration after the last import...
             $lastImport = array_last($matches[0]);
 
-            $positionOfLastImport = strrpos($contents, $lastImport);
+            $positionOfLastImport = mb_strrpos($contents, $lastImport);
 
             if ($positionOfLastImport !== false) {
                 $insertPosition = $positionOfLastImport + strlen($lastImport);

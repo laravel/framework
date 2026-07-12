@@ -1800,7 +1800,7 @@ class Blueprint
 
         if ($this->connection->getConfig('prefix_indexes')) {
             $table = str_contains($this->table, '.')
-                ? substr_replace($this->table, '.'.$this->connection->getTablePrefix(), strrpos($this->table, '.'), 1)
+                ? substr_replace($this->table, '.'.$this->connection->getTablePrefix(), mb_strrpos($this->table, '.'), 1)
                 : $this->connection->getTablePrefix().$this->table;
         }
 

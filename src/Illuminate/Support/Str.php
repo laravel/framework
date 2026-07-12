@@ -1349,7 +1349,7 @@ class Str
             return $subject;
         }
 
-        $position = strrpos($subject, $search);
+        $position = mb_strrpos($subject, $search);
 
         if ($position !== false) {
             return substr_replace($subject, $replace, $position, strlen($search));

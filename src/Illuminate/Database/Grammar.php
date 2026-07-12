@@ -65,7 +65,7 @@ abstract class Grammar
         // prefix the last segment as the table name then wrap each segment alone
         // and eventually join them both back together using the dot connector.
         if (str_contains($table, '.')) {
-            $table = substr_replace($table, '.'.$prefix, strrpos($table, '.'), 1);
+            $table = substr_replace($table, '.'.$prefix, mb_strrpos($table, '.'), 1);
 
             return (new Collection(explode('.', $table)))
                 ->map($this->wrapValue(...))
