@@ -20,11 +20,6 @@ use PHPUnit\Framework\TestCase;
 
 class ImageManagerTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function test_default_driver_returns_configured_value()
     {
         $app = $this->makeApp(['image.default' => 'imagick']);
