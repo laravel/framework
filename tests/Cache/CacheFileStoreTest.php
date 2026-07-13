@@ -235,7 +235,7 @@ class CacheFileStoreTest extends TestCase
 
         $filePath = $this->getCachePath('foo');
         $files = $this->mockFilesystem();
-        $initialValue = ($now->getTimestamp() - 10).serialize(77);
+        $initialValue = $now->subSeconds(10)->getTimestamp().serialize(77);
         $valueAfterIncrement = '9999999999'.serialize(3);
         $store = new FileStore($files, __DIR__);
 
