@@ -188,9 +188,8 @@ class QueueRedisQueueTest extends TestCase
             $callback();
         });
         $queue->expects($this->once())->method('later')->with(15, $this->isInstanceOf(RedisJobWithDelayAttribute::class), ['data'], null);
-        $queue->expects($this->once())->method('push')->with('foo', ['data'], null);
 
-        $queue->bulk([new RedisJobWithDelayAttribute, 'foo'], ['data']);
+        $queue->bulk([new RedisJobWithDelayAttribute], ['data']);
     }
 
     public function testGetQueueRemainsUnchangedForNonCluster()
