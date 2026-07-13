@@ -835,6 +835,17 @@ class FilesystemAdapterTest extends TestCase
         $this->assertTrue($filesystemAdapter->providesTemporaryUploadUrls());
     }
 
+    public function testProvidesTemporaryUploadUrlsForS3Adapter()
+    {
+        $filesystem = new FilesystemManager(new Application);
+        $filesystemAdapter = $filesystem->createS3Driver([
+            'region' => 'us-west-1',
+            'bucket' => 'laravel',
+        ]);
+
+        $this->assertTrue($filesystemAdapter->providesTemporaryUploadUrls());
+    }
+
     public function testProvidesTemporaryUploadUrlsForAdapterWithoutTemporaryUploadUrlSupport()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
