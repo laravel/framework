@@ -107,13 +107,7 @@ class Request implements ArrayAccess
             $headers = [$headers => null];
         }
 
-        foreach ($headers as $key => $value) {
-            if (! $this->hasHeader($key, $value)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($headers, fn ($value, $key) => $this->hasHeader($key, $value));
     }
 
     /**

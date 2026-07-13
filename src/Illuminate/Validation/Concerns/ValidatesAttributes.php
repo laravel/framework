@@ -453,13 +453,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        foreach ($parameters as $param) {
-            if (! Arr::exists($value, $param)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($parameters, fn ($param) => Arr::exists($value, $param));
     }
 
     /**
@@ -529,13 +523,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        foreach ($parameters as $parameter) {
-            if (! in_array($parameter, $value)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($parameters, fn ($parameter) => in_array($parameter, $value));
     }
 
     /**
@@ -552,13 +540,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        foreach ($parameters as $parameter) {
-            if (in_array($parameter, $value)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($parameters, fn ($parameter) => ! in_array($parameter, $value));
     }
 
     /**
@@ -1574,13 +1556,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        foreach ($parameters as $param) {
-            if (Arr::exists($value, $param)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($parameters, fn ($param) => Arr::exists($value, $param));
     }
 
     /**
