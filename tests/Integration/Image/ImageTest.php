@@ -477,6 +477,21 @@ class ImageTest extends TestCase
         $this->assertSame(100, $height);
     }
 
+    public function test_branching_after_to_bytes_does_not_reapply_stale_transformations(): void
+    {
+        $image = new Image($this->fakeImageContents(100, 50));
+
+        $rotatedOnce = $image->rotate(90);
+        $rotatedOnce->toBytes();
+
+        $rotatedTwice = $rotatedOnce->rotate(90);
+
+        [$width, $height] = getimagesizefromstring($rotatedTwice->toBytes());
+
+        $this->assertSame(100, $width);
+        $this->assertSame(50, $height);
+    }
+
     public function test_store_as_with_name_only()
     {
         Storage::fake('local');
