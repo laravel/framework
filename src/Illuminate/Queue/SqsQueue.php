@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Aws\Command;
 use Aws\Sqs\Exception\SqsException;
 use Aws\Sqs\SqsClient;
+use GuzzleHttp\Promise\Each;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Queue\Jobs\SqsJob;
@@ -27,6 +28,13 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      * @var int
      */
     const MAX_MESSAGES_PER_BATCH = 10;
+
+    /**
+     * The maximum number of concurrent SendMessageBatch requests for standard queues.
+     *
+     * @var int
+     */
+    const MAX_CONCURRENT_BATCH_REQUESTS = 10;
 
     /**
      * The cache key prefix for extended SQS payloads.
@@ -310,6 +318,9 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Push an array of jobs onto the queue using the SendMessageBatch API.
      *
+     * Standard queue batches are sent concurrently, while FIFO queue batches
+     * are sent one at a time so messages cannot arrive out of order.
+     *
      * @param  array  $jobs
      * @param  mixed  $data
      * @param  string|null  $queue
@@ -388,6 +399,9 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Build entries, raise queueing events, dispatch chunks, and raise queued events with SQS message IDs.
      *
+     * Once a chunk fails, no further chunks are dispatched, and the earliest
+     * failure is thrown after every in-flight request has settled.
+     *
      * @param  array  $messages
      * @param  string|null  $queue
      * @return void
@@ -407,46 +421,113 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
 
         $queueUrl = $this->getQueue($queue);
 
-        // Dispatch chunks and stop at the first failure so later messages cannot arrive ahead of unsent ones...
-        foreach ($this->chunkBatchEntries($entries) as $chunk) {
-            $result = $this->sqs->sendMessageBatch([
-                'QueueUrl' => $queueUrl,
-                'Entries' => $chunk,
-            ]);
+        $chunks = $this->chunkBatchEntries($entries);
 
-            foreach ($result['Successful'] ?? [] as $success) {
-                if (! isset($messages[$success['Id']])) {
-                    continue;
+        [$results, $failures, $halted] = [[], [], false];
+
+        // Requests are created lazily so a failure stops any further chunks from being dispatched...
+        $requests = function () use ($chunks, $queueUrl, &$halted) {
+            foreach ($chunks as $index => $chunk) {
+                if ($halted) {
+                    return;
                 }
 
-                $message = $messages[$success['Id']];
-
-                $this->raiseJobQueuedEvent(
-                    $queue, $success['MessageId'], $message['job'], $message['payload'], $message['delay']
-                );
+                yield $index => $this->sqs->sendMessageBatchAsync([
+                    'QueueUrl' => $queueUrl,
+                    'Entries' => $chunk,
+                ]);
             }
+        };
 
-            // A batch can return HTTP 200 while rejecting entries, so surface those failures as an SqsException...
+        // FIFO queues require ordering, so chunks are dispatched one at a time and later messages
+        // cannot arrive ahead of unsent ones. Standard queues make no ordering guarantees, so
+        // their chunks may be dispatched concurrently for much higher total throughput...
+        Each::ofLimit(
+            $requests(),
+            str_ends_with($queueUrl, '.fifo') ? 1 : static::MAX_CONCURRENT_BATCH_REQUESTS,
+            function ($result, $index) use (&$results, &$halted) {
+                $results[$index] = $result;
+
+                $halted = $halted || ! empty($result['Failed']);
+            },
+            function ($reason, $index) use (&$failures, &$halted) {
+                $failures[$index] = $reason;
+
+                $halted = true;
+            },
+        )->wait();
+
+        ksort($results);
+
+        // Every message accepted by SQS raises a queued event, even when another chunk failed...
+        foreach ($results as $result) {
+            $this->raiseJobQueuedEventsForBatchResult($result, $messages, $queue);
+        }
+
+        // A batch can return HTTP 200 while rejecting entries, so surface those failures as an SqsException...
+        foreach ($results as $index => $result) {
             if (! empty($result['Failed'])) {
-                $failure = $result['Failed'][0];
-
-                throw new SqsException(
-                    sprintf(
-                        'SQS SendMessageBatch rejected [%d] of [%d] messages. First failure [%s]: %s',
-                        count($result['Failed']),
-                        count($chunk),
-                        $failure['Code'] ?? 'Unknown',
-                        $failure['Message'] ?? '',
-                    ),
-                    new Command('SendMessageBatch', ['QueueUrl' => $queueUrl, 'Entries' => $chunk]),
-                    [
-                        'code' => $failure['Code'] ?? null,
-                        'message' => $failure['Message'] ?? null,
-                        'result' => $result,
-                    ],
-                );
+                $failures[$index] = $this->toBatchEntriesFailedException($result, $chunks[$index], $queueUrl);
             }
         }
+
+        if (! empty($failures)) {
+            ksort($failures);
+
+            throw reset($failures);
+        }
+    }
+
+    /**
+     * Raise the queued events for entries accepted by SQS in the given batch result.
+     *
+     * @param  \Aws\Result  $result
+     * @param  array  $messages
+     * @param  string|null  $queue
+     * @return void
+     */
+    protected function raiseJobQueuedEventsForBatchResult($result, array $messages, $queue)
+    {
+        foreach ($result['Successful'] ?? [] as $success) {
+            if (! isset($messages[$success['Id']])) {
+                continue;
+            }
+
+            $message = $messages[$success['Id']];
+
+            $this->raiseJobQueuedEvent(
+                $queue, $success['MessageId'], $message['job'], $message['payload'], $message['delay']
+            );
+        }
+    }
+
+    /**
+     * Create the exception for a batch result that was accepted with rejected entries.
+     *
+     * @param  \Aws\Result  $result
+     * @param  array  $chunk
+     * @param  string  $queueUrl
+     * @return \Aws\Sqs\Exception\SqsException
+     */
+    protected function toBatchEntriesFailedException($result, array $chunk, $queueUrl)
+    {
+        $failure = $result['Failed'][0];
+
+        return new SqsException(
+            sprintf(
+                'SQS SendMessageBatch rejected [%d] of [%d] messages. First failure [%s]: %s',
+                count($result['Failed']),
+                count($chunk),
+                $failure['Code'] ?? 'Unknown',
+                $failure['Message'] ?? '',
+            ),
+            new Command('SendMessageBatch', ['QueueUrl' => $queueUrl, 'Entries' => $chunk]),
+            [
+                'code' => $failure['Code'] ?? null,
+                'message' => $failure['Message'] ?? null,
+                'result' => $result,
+            ],
+        );
     }
 
     /**
