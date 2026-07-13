@@ -83,11 +83,11 @@ class FreshCommand extends BaseCommand
                     $this->components->task(
                         "Dropping all tables [{$connection}]",
                         fn () => $this->callSilent('db:wipe', array_filter([
-                                '--database' => $connection,
-                                '--drop-views' => $this->option('drop-views'),
-                                '--drop-types' => $this->option('drop-types'),
-                                '--force' => true,
-                            ])) == 0
+                            '--database' => $connection,
+                            '--drop-views' => $this->option('drop-views'),
+                            '--drop-types' => $this->option('drop-types'),
+                            '--force' => true,
+                        ])) == 0
                     );
                 }
             }

@@ -872,10 +872,10 @@ class Migrator
     }
 
     /**
-     * Get connections from migrations
+     * Get connections from migrations.
      *
      * @param  array  $paths
-     * @return  array
+     * @return array
      */
     public function getConnectionsForPendingMigrations(array $paths): array
     {
