@@ -292,7 +292,7 @@ class Number
             case $number < 0:
                 $summary = static::summarize(abs($number), $precision, $maxPrecision, $units);
 
-                // Avoid a spurious "-0" when the magnitude rounds down to zero at the given precision.
+                // Avoid a spurious "-0" when the magnitude rounds down to zero at the given precision...
                 return $summary === static::summarize(0, $precision, $maxPrecision, $units)
                     ? $summary
                     : sprintf('-%s', $summary);
