@@ -97,12 +97,12 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
 
     public function testRecentlyCreatedReturnsTrueIfRecordIsRecentlyCreated()
     {
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
 
         $repo = $this->getRepo();
         $repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('where')->once()->with('email', 'email')->andReturn($query);
-        $date = Carbon::now()->subSeconds(59)->toDateTimeString();
+        $date = $now->subSeconds(59)->toDateTimeString();
         $query->shouldReceive('first')->once()->andReturn((object) ['created_at' => $date, 'token' => 'hashed-token']);
         $user = m::mock(CanResetPassword::class);
         $user->shouldReceive('getEmailForPasswordReset')->once()->andReturn('email');
@@ -112,12 +112,12 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
 
     public function testRecentlyCreatedReturnsFalseIfValidRecordExists()
     {
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
 
         $repo = $this->getRepo();
         $repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('where')->once()->with('email', 'email')->andReturn($query);
-        $date = Carbon::now()->subSeconds(61)->toDateTimeString();
+        $date = $now->subSeconds(61)->toDateTimeString();
         $query->shouldReceive('first')->once()->andReturn((object) ['created_at' => $date, 'token' => 'hashed-token']);
         $user = m::mock(CanResetPassword::class);
         $user->shouldReceive('getEmailForPasswordReset')->once()->andReturn('email');

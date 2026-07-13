@@ -36,8 +36,8 @@ class EloquentCastTest extends MariaDbTestCase
 
     public function testItCastTimestampsCreatedByTheBuilderWhenTimeHasNotPassed()
     {
-        Carbon::setTestNow(Carbon::now());
-        $createdAt = Carbon::now()->getTimestamp();
+        Carbon::setTestNow($now = Carbon::now());
+        $createdAt = $now->getTimestamp();
 
         $castUser = UserWithIntTimestampsViaCasts::create([
             'email' => fake()->unique()->email,
@@ -79,8 +79,8 @@ class EloquentCastTest extends MariaDbTestCase
 
     public function testItCastTimestampsCreatedByTheBuilderWhenTimeHasPassed()
     {
-        Carbon::setTestNow(Carbon::now());
-        $createdAt = Carbon::now()->getTimestamp();
+        Carbon::setTestNow($now = Carbon::now());
+        $createdAt = $now->getTimestamp();
 
         $castUser = UserWithIntTimestampsViaCasts::create([
             'email' => fake()->unique()->email,
@@ -99,8 +99,8 @@ class EloquentCastTest extends MariaDbTestCase
         $this->assertSame($createdAt, $mutatorUser->created_at->getTimestamp());
         $this->assertSame($createdAt, $mutatorUser->updated_at->getTimestamp());
 
-        Carbon::setTestNow(Carbon::now()->addSecond());
-        $updatedAt = Carbon::now()->getTimestamp();
+        Carbon::setTestNow($now->addSecond());
+        $updatedAt = $now->getTimestamp();
 
         $castUser->update([
             'email' => fake()->unique()->email,
@@ -125,7 +125,7 @@ class EloquentCastTest extends MariaDbTestCase
 
     public function testItCastTimestampsUpdatedByAMutator()
     {
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
 
         $mutatorUser = UserWithUpdatedAtViaMutator::create([
             'email' => fake()->unique()->email,
@@ -133,8 +133,8 @@ class EloquentCastTest extends MariaDbTestCase
 
         $this->assertNull($mutatorUser->updated_at);
 
-        Carbon::setTestNow(Carbon::now()->addSecond());
-        $updatedAt = Carbon::now()->getTimestamp();
+        Carbon::setTestNow($now->addSecond());
+        $updatedAt = $now->getTimestamp();
 
         $mutatorUser->update([
             'email' => fake()->unique()->email,
