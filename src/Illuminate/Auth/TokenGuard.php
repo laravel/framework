@@ -108,7 +108,7 @@ class TokenGuard implements Guard
      * @param  array  $credentials
      * @return bool
      */
-    public function validate(array $credentials = [])
+    public function validate(#[\SensitiveParameter] array $credentials = [])
     {
         if (empty($credentials[$this->inputKey])) {
             return false;
