@@ -799,6 +799,64 @@ class ValidationEmailRuleTest extends TestCase
         );
     }
 
+    public function testDomains(): void
+    {
+        $this->passes(
+            (new Email)->domains('laravel.com'),
+            'taylor@laravel.com'
+        );
+
+        $this->passes(
+            Rule::email()->domains(['laravel.com', 'example.com']),
+            'taylor@example.com'
+        );
+
+        $this->fails(
+            (new Email)->domains('laravel.com'),
+            'taylor@example.com',
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+
+        $this->fails(
+            Rule::email()->domains(['laravel.com', 'example.com']),
+            'taylor@other.com',
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+
+        // domain matching is case-insensitive.
+        $this->passes(
+            (new Email)->domains('Laravel.com'),
+            'taylor@laravel.com'
+        );
+    }
+
+    public function testNotDomains(): void
+    {
+        $this->passes(
+            (new Email)->notDomains('spam.com'),
+            'taylor@laravel.com'
+        );
+
+        $this->fails(
+            (new Email)->notDomains('spam.com'),
+            'taylor@spam.com',
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+
+        $this->fails(
+            Rule::email()->notDomains(['spam.com', 'junk.com']),
+            'taylor@junk.com',
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+
+        // domain matching is case-insensitive.
+        $this->fails(
+            (new Email)->notDomains('Spam.com'),
+            'taylor@spam.com',
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+    }
+
     public function testMacro()
     {
         Email::macro('laravelEmployee', function () {

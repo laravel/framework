@@ -7,6 +7,7 @@ use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
@@ -35,6 +36,20 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      * @var array
      */
     protected $data;
+
+    /**
+     * The list of domains the email address must belong to.
+     *
+     * @var array|null
+     */
+    protected $allowedDomains = [];
+
+    /**
+     * The list of domains the email address must not belong to.
+     *
+     * @var array|null
+     */
+    protected $excludedDomains = [];
 
     /**
      * An array of custom rules that will be merged into the validation rules.
@@ -165,6 +180,32 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
+     * Restrict the email address to the given domain(s).
+     *
+     * @param  string|array  $domains
+     * @return $this
+     */
+    public function domains($domains)
+    {
+        $this->allowedDomains = array_merge($this->allowedDomains, Arr::wrap($domains));
+
+        return $this;
+    }
+
+    /**
+     * Prevent the email address from belonging to the given domain(s).
+     *
+     * @param  string|array  $domains
+     * @return $this
+     */
+    public function notDomains($domains)
+    {
+        $this->excludedDomains = array_merge($this->excludedDomains, Arr::wrap($domains));
+
+        return $this;
+    }
+
+    /**
      * Specify additional validation rules that should be merged with the default rules during validation.
      *
      * @param  string|array  $rules
@@ -193,7 +234,31 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
             [$attribute => $this->buildValidationRules()],
             $this->validator->customMessages,
             $this->validator->customAttributes
-        );
+        )->after(function ($validator) use ($attribute, $value): void {
+            if ($this->allowedDomains === [] && $this->excludedDomains === []) {
+                return;
+            }
+
+            if (! is_string($value) && ! (is_object($value) && method_exists($value, '__toString'))) {
+                return;
+            }
+
+            $domain = new Stringable((string) $value);
+
+            if ($domain->doesntContain('@')) {
+                return;
+            }
+
+            $domain = $domain->lower()->afterLast('@');
+
+            $isAllowed = $this->allowedDomains === [] || $domain->is($this->allowedDomains, ignoreCase: true);
+
+            $isExcluded = $this->excludedDomains !== [] && $domain->is($this->excludedDomains, ignoreCase: true);
+
+            if (! $isAllowed || $isExcluded) {
+                $validator->addFailure($attribute, 'email');
+            }
+        });
 
         if ($validator->fails()) {
             $this->messages = array_merge($this->messages, $validator->messages()->all());
