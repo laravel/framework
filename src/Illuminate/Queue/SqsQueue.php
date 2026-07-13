@@ -318,9 +318,6 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Push an array of jobs onto the queue using the SendMessageBatch API.
      *
-     * Standard queue batches are sent concurrently, while FIFO queue batches
-     * are sent one at a time so messages cannot arrive out of order.
-     *
      * @param  array  $jobs
      * @param  mixed  $data
      * @param  string|null  $queue
@@ -399,9 +396,6 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Build entries, raise queueing events, dispatch chunks, and raise queued events with SQS message IDs.
      *
-     * The first failed chunk aborts the dispatch: its exception is rethrown
-     * and chunks that have not been dispatched yet will never be sent.
-     *
      * @param  array  $messages
      * @param  string|null  $queue
      * @return void
@@ -423,7 +417,6 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
 
         $chunks = $this->chunkBatchEntries($entries);
 
-        // Requests are created lazily so a failure stops any further chunks from being dispatched...
         $requests = function () use ($chunks, $queueUrl) {
             foreach ($chunks as $index => $chunk) {
                 yield $index => $this->sqs->sendMessageBatchAsync([
@@ -433,9 +426,6 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             }
         };
 
-        // FIFO queues require ordering, so chunks are dispatched one at a time and later messages
-        // cannot arrive ahead of unsent ones. Standard queues make no ordering guarantees, so
-        // their chunks may be dispatched concurrently for much higher total throughput...
         Each::ofLimitAll(
             $requests(),
             str_ends_with($queueUrl, '.fifo') ? 1 : static::MAX_CONCURRENT_BATCH_REQUESTS,
