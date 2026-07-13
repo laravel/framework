@@ -2840,6 +2840,36 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->isDirty('category'));
     }
 
+    public function testIncrementEachQuietlyCanBeCalledDynamicallyOnModelInstance()
+    {
+        $model = new EloquentModelDynamicIncrementEachStub(['foo' => 2, 'bar' => 5]);
+        $model->exists = true;
+        $model->id = 1;
+        $model->syncOriginalAttribute('id');
+
+        // Called dynamically (the method is protected) so it routes through Model::__call.
+        $model->incrementEachQuietly(['foo' => 1, 'bar' => 2]);
+
+        $this->assertSame('incrementEach', $model->queryStub->called);
+        $this->assertEquals(3, $model->foo);
+        $this->assertEquals(7, $model->bar);
+    }
+
+    public function testDecrementEachQuietlyCanBeCalledDynamicallyOnModelInstance()
+    {
+        $model = new EloquentModelDynamicIncrementEachStub(['foo' => 5, 'bar' => 10]);
+        $model->exists = true;
+        $model->id = 1;
+        $model->syncOriginalAttribute('id');
+
+        // Called dynamically (the method is protected) so it routes through Model::__call.
+        $model->decrementEachQuietly(['foo' => 1, 'bar' => 2]);
+
+        $this->assertSame('decrementEach', $model->queryStub->called);
+        $this->assertEquals(4, $model->foo);
+        $this->assertEquals(8, $model->bar);
+    }
+
     public function testIncrementEachWithExtraColumnsOnExistingModel()
     {
         $model = m::mock(EloquentModelStub::class.'[newQueryWithoutScopes]');
@@ -4855,4 +4885,57 @@ enum ConnectionNameBacked: string
 {
     case Foo = 'Foo';
     case Bar = 'Bar';
+}
+
+class EloquentModelDynamicIncrementEachStub extends Model
+{
+    protected $guarded = [];
+
+    public $queryStub;
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->queryStub = new EloquentModelIncrementEachQueryStub;
+    }
+
+    public function newQueryWithoutScopes()
+    {
+        return $this->queryStub;
+    }
+
+    public function newQuery()
+    {
+        return $this->queryStub;
+    }
+}
+
+class EloquentModelIncrementEachQueryStub
+{
+    public $called;
+
+    public function where()
+    {
+        return $this;
+    }
+
+    public function incrementEach($columns, $extra = [])
+    {
+        $this->called = 'incrementEach';
+
+        return 1;
+    }
+
+    public function decrementEach($columns, $extra = [])
+    {
+        $this->called = 'decrementEach';
+
+        return 1;
+    }
+
+    public function __call($name, $arguments)
+    {
+        throw new \BadMethodCallException($name);
+    }
 }
