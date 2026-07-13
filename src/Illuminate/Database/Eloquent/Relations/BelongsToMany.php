@@ -1327,7 +1327,7 @@ class BelongsToMany extends Relation
         // the related model's timestamps, to make sure these all reflect the changes
         // to the parent models. This will help us keep any caching synced up here.
         if (count($ids = $this->allRelatedIds()) > 0) {
-            $this->getRelated()->newQueryWithoutRelationships()->whereKey($ids)->update($columns);
+            $this->getRelated()->newQueryWithoutRelationships()->whereIn($this->getQualifiedRelatedKeyName(), $ids)->update($columns);
         }
     }
 
