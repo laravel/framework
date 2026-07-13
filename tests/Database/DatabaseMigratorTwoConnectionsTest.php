@@ -58,6 +58,9 @@ PHP
         array_map('unlink', glob($this->tmpMigrationsPath.'/*'));
         rmdir($this->tmpMigrationsPath);
 
+        Facade::clearResolvedInstances();
+        Facade::setFacadeApplication(null);
+
         m::close();
 
         parent::tearDown();
