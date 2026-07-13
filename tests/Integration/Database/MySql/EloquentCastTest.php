@@ -49,12 +49,12 @@ class EloquentCastTest extends MySqlTestCase
             'email' => fake()->unique()->email,
         ]);
 
-        $this->assertSame($createdAt, $castUser->created_at->timestamp);
-        $this->assertSame($createdAt, $castUser->updated_at->timestamp);
-        $this->assertSame($createdAt, $attributeUser->created_at->timestamp);
-        $this->assertSame($createdAt, $attributeUser->updated_at->timestamp);
-        $this->assertSame($createdAt, $mutatorUser->created_at->timestamp);
-        $this->assertSame($createdAt, $mutatorUser->updated_at->timestamp);
+        $this->assertSame($createdAt, $castUser->created_at->getTimestamp());
+        $this->assertSame($createdAt, $castUser->updated_at->getTimestamp());
+        $this->assertSame($createdAt, $attributeUser->created_at->getTimestamp());
+        $this->assertSame($createdAt, $attributeUser->updated_at->getTimestamp());
+        $this->assertSame($createdAt, $mutatorUser->created_at->getTimestamp());
+        $this->assertSame($createdAt, $mutatorUser->updated_at->getTimestamp());
 
         $castUser->update([
             'email' => fake()->unique()->email,
@@ -66,15 +66,15 @@ class EloquentCastTest extends MySqlTestCase
             'email' => fake()->unique()->email,
         ]);
 
-        $this->assertSame($createdAt, $castUser->created_at->timestamp);
-        $this->assertSame($createdAt, $castUser->updated_at->timestamp);
-        $this->assertSame($createdAt, $castUser->fresh()->updated_at->timestamp);
-        $this->assertSame($createdAt, $attributeUser->created_at->timestamp);
-        $this->assertSame($createdAt, $attributeUser->updated_at->timestamp);
-        $this->assertSame($createdAt, $attributeUser->fresh()->updated_at->timestamp);
-        $this->assertSame($createdAt, $mutatorUser->created_at->timestamp);
-        $this->assertSame($createdAt, $mutatorUser->updated_at->timestamp);
-        $this->assertSame($createdAt, $mutatorUser->fresh()->updated_at->timestamp);
+        $this->assertSame($createdAt, $castUser->created_at->getTimestamp());
+        $this->assertSame($createdAt, $castUser->updated_at->getTimestamp());
+        $this->assertSame($createdAt, $castUser->fresh()->updated_at->getTimestamp());
+        $this->assertSame($createdAt, $attributeUser->created_at->getTimestamp());
+        $this->assertSame($createdAt, $attributeUser->updated_at->getTimestamp());
+        $this->assertSame($createdAt, $attributeUser->fresh()->updated_at->getTimestamp());
+        $this->assertSame($createdAt, $mutatorUser->created_at->getTimestamp());
+        $this->assertSame($createdAt, $mutatorUser->updated_at->getTimestamp());
+        $this->assertSame($createdAt, $mutatorUser->fresh()->updated_at->getTimestamp());
     }
 
     public function testItCastTimestampsCreatedByTheBuilderWhenTimeHasPassed()
@@ -92,12 +92,12 @@ class EloquentCastTest extends MySqlTestCase
             'email' => fake()->unique()->email,
         ]);
 
-        $this->assertSame($createdAt, $castUser->created_at->timestamp);
-        $this->assertSame($createdAt, $castUser->updated_at->timestamp);
-        $this->assertSame($createdAt, $attributeUser->created_at->timestamp);
-        $this->assertSame($createdAt, $attributeUser->updated_at->timestamp);
-        $this->assertSame($createdAt, $mutatorUser->created_at->timestamp);
-        $this->assertSame($createdAt, $mutatorUser->updated_at->timestamp);
+        $this->assertSame($createdAt, $castUser->created_at->getTimestamp());
+        $this->assertSame($createdAt, $castUser->updated_at->getTimestamp());
+        $this->assertSame($createdAt, $attributeUser->created_at->getTimestamp());
+        $this->assertSame($createdAt, $attributeUser->updated_at->getTimestamp());
+        $this->assertSame($createdAt, $mutatorUser->created_at->getTimestamp());
+        $this->assertSame($createdAt, $mutatorUser->updated_at->getTimestamp());
 
         Carbon::setTestNow(Carbon::now()->addSecond());
         $updatedAt = Carbon::now()->getTimestamp();
@@ -112,15 +112,15 @@ class EloquentCastTest extends MySqlTestCase
             'email' => fake()->unique()->email,
         ]);
 
-        $this->assertSame($createdAt, $castUser->created_at->timestamp);
-        $this->assertSame($updatedAt, $castUser->updated_at->timestamp);
-        $this->assertSame($updatedAt, $castUser->fresh()->updated_at->timestamp);
-        $this->assertSame($createdAt, $attributeUser->created_at->timestamp);
-        $this->assertSame($updatedAt, $attributeUser->updated_at->timestamp);
-        $this->assertSame($updatedAt, $attributeUser->fresh()->updated_at->timestamp);
-        $this->assertSame($createdAt, $mutatorUser->created_at->timestamp);
-        $this->assertSame($updatedAt, $mutatorUser->updated_at->timestamp);
-        $this->assertSame($updatedAt, $mutatorUser->fresh()->updated_at->timestamp);
+        $this->assertSame($createdAt, $castUser->created_at->getTimestamp());
+        $this->assertSame($updatedAt, $castUser->updated_at->getTimestamp());
+        $this->assertSame($updatedAt, $castUser->fresh()->updated_at->getTimestamp());
+        $this->assertSame($createdAt, $attributeUser->created_at->getTimestamp());
+        $this->assertSame($updatedAt, $attributeUser->updated_at->getTimestamp());
+        $this->assertSame($updatedAt, $attributeUser->fresh()->updated_at->getTimestamp());
+        $this->assertSame($createdAt, $mutatorUser->created_at->getTimestamp());
+        $this->assertSame($updatedAt, $mutatorUser->updated_at->getTimestamp());
+        $this->assertSame($updatedAt, $mutatorUser->fresh()->updated_at->getTimestamp());
     }
 
     public function testItCastTimestampsUpdatedByAMutator()
@@ -140,8 +140,8 @@ class EloquentCastTest extends MySqlTestCase
             'email' => fake()->unique()->email,
         ]);
 
-        $this->assertSame($updatedAt, $mutatorUser->updated_at->timestamp);
-        $this->assertSame($updatedAt, $mutatorUser->fresh()->updated_at->timestamp);
+        $this->assertSame($updatedAt, $mutatorUser->updated_at->getTimestamp());
+        $this->assertSame($updatedAt, $mutatorUser->fresh()->updated_at->getTimestamp());
     }
 }
 

@@ -108,8 +108,6 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         $user->shouldReceive('getEmailForPasswordReset')->once()->andReturn('email');
 
         $this->assertTrue($repo->recentlyCreatedToken($user));
-
-        Carbon::setTestNow();
     }
 
     public function testRecentlyCreatedReturnsFalseIfValidRecordExists()
@@ -125,8 +123,6 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         $user->shouldReceive('getEmailForPasswordReset')->once()->andReturn('email');
 
         $this->assertFalse($repo->recentlyCreatedToken($user));
-
-        Carbon::setTestNow();
     }
 
     public function testDeleteMethodDeletesByToken()

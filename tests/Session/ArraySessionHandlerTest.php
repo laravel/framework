@@ -9,13 +9,6 @@ use SessionHandlerInterface;
 
 class ArraySessionHandlerTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow();
-
-        parent::tearDown();
-    }
-
     public function test_it_implements_the_session_handler_interface()
     {
         $this->assertInstanceOf(SessionHandlerInterface::class, new ArraySessionHandler(10));

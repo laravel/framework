@@ -50,7 +50,6 @@ class QueuePauseResumeTest extends TestCase
 
     public function testPauseQueueWithTTL()
     {
-        Carbon::setTestNow();
         $this->manager->pauseFor('redis', 'default', 30);
 
         $this->assertTrue($this->manager->isPaused('redis', 'default'));
@@ -61,7 +60,6 @@ class QueuePauseResumeTest extends TestCase
 
     public function testPauseQueueIndefinitely()
     {
-        Carbon::setTestNow();
         $this->manager->pause('redis', 'default');
 
         $this->assertTrue($this->manager->isPaused('redis', 'default'));

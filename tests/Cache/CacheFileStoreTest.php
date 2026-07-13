@@ -14,13 +14,6 @@ use RuntimeException;
 
 class CacheFileStoreTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow();
-
-        parent::tearDown();
-    }
-
     public function testNullIsReturnedIfFileDoesntExist()
     {
         $files = $this->mockFilesystem();

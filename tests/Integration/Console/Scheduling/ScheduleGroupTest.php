@@ -186,8 +186,6 @@ class ScheduleGroupTest extends TestCase
                 "[$description] $task should ".($expected[$task] ? 'run' : 'not run')
             );
         }
-
-        Carbon::setTestNow();
     }
 
     private function assertTaskExecution($event, $app, $expected, $message): void

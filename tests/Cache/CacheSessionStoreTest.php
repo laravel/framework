@@ -11,13 +11,6 @@ use stdClass;
 
 class CacheSessionStoreTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow();
-
-        parent::tearDown();
-    }
-
     public function testItemsCanBeSetAndRetrieved()
     {
         $store = new SessionStore(self::getSession());

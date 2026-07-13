@@ -10,13 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class CacheStorageStoreTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow();
-
-        parent::tearDown();
-    }
-
     public function testValuesCanBeStoredAndRetrieved()
     {
         $disk = new ArrayFilesystem;
