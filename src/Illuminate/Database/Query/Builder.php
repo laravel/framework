@@ -1311,6 +1311,16 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Force the query to return no results.
+     *
+     * @return $this
+     */
+    public function none()
+    {
+        return $this->whereRaw('0 = 1');
+    }
+
+    /**
      * Add a "where like" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column

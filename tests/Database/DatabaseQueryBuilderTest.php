@@ -1621,6 +1621,22 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => 'foo'], $builder->getBindings());
     }
 
+    public function testNone()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->none();
+        $this->assertSame('select * from "users" where 0 = 1', $builder->toSql());
+        $this->assertSame([], $builder->getBindings());
+    }
+
+    public function testNoneWithExistingWheres()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('active', true)->none();
+        $this->assertSame('select * from "users" where "active" = ? and 0 = 1', $builder->toSql());
+        $this->assertEquals([true], $builder->getBindings());
+    }
+
     public function testBasicWhereIns()
     {
         $builder = $this->getBuilder();
