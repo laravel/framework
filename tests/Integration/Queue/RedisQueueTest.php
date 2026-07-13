@@ -182,10 +182,10 @@ class RedisQueueTest extends TestCase
      * @param  string  $driver
      */
     #[DataProvider('redisDriverProvider')]
-    public function testPopReservesJobsBasedOnTheJobTimeoutWhenRetryAfterIsAuto($driver)
+    public function testPopReservesJobsBasedOnTheJobTimeoutWhenExpireAfterTimeoutIsEnabled($driver)
     {
         $default = config('queue.connections.redis.queue', 'default');
-        $this->queue = new RedisQueue($this->redis[$driver], $default, null, 'auto');
+        $this->queue = new RedisQueue($this->redis[$driver], $default, null, 90, expireAfterTimeout: true);
         $this->queue->setContainer($this->container = m::spy(Container::class));
         $redisKey = $this->getQueueRedisKey($default);
 
@@ -207,15 +207,15 @@ class RedisQueueTest extends TestCase
         $this->queue->push($job);
         $this->assertSame($time->getTimestamp() + 25 + 10, $getJobExpirationTimestamp());
 
-        // No timeout on the job, timeout on the queue worker wasn't shared, so the default of 60 seconds is used
+        // No timeout on the job, no timeout shared by the queue worker: retry_after is used
         $this->queue->push(new RedisQueueIntegrationTestJob(123));
-        $this->assertSame($time->getTimestamp() + 60 + 10, $getJobExpirationTimestamp());
+        $this->assertSame($time->getTimestamp() + 90, $getJobExpirationTimestamp());
 
-        // Timeout of 0 on the job, the default of 60 seconds is used
+        // Timeout of 0 on the job is ignored: retry_after is used
         $job = new RedisQueueIntegrationTestJob(123);
         $job->timeout = 0;
         $this->queue->push($job);
-        $this->assertSame($time->getTimestamp() + 60 + 10, $getJobExpirationTimestamp());
+        $this->assertSame($time->getTimestamp() + 90, $getJobExpirationTimestamp());
 
         // No timeout on the job, the queue worker's timeout is used
         $this->queue->setWorkerTimeout(15);

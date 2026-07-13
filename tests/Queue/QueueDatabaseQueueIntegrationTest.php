@@ -156,11 +156,11 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
         $this->assertEquals(1, $popped_job->attempts(), 'The "attempts" attribute of the Job object was not updated by pop!');
     }
 
-    public function testPoppedJobsAreReservedBasedOnTheJobTimeoutWhenRetryAfterIsAuto()
+    public function testPoppedJobsAreReservedBasedOnTheJobTimeoutWhenExpireAfterTimeoutIsEnabled()
     {
         Carbon::setTestNow($time = Carbon::now());
 
-        $queue = new DatabaseQueue($this->connection(), $this->table, 'default', 'auto');
+        $queue = new DatabaseQueue($this->connection(), $this->table, 'default', 90, expireAfterTimeout: true);
         $queue->setContainer($this->container);
 
         $getJobReservedAt = function ($timeout) use ($queue) {
@@ -182,20 +182,20 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
             return $reservedAt;
         };
 
-        // 600-second timeout on the job, + 10-second buffer - 300-second grace period
-        $this->assertSame($time->getTimestamp() + 600 + 10 - 300, $getJobReservedAt(600));
+        // "reserved_at" holds the expiry (job timeout + 10-second buffer) minus the retry_after window
+        $this->assertSame($time->getTimestamp() + 600 + 10 - 90, $getJobReservedAt(timeout: 600));
 
-        // If the job doesn't define a timeout and the worker timeout is unknown, then the 60-second default is used
-        $this->assertSame($time->getTimestamp() + 60 + 10 - 300, $getJobReservedAt(null));
-        $this->assertSame($time->getTimestamp() + 60 + 10 - 300, $getJobReservedAt(0));
+        // No timeout on the job, no worker timeout known
+        $this->assertSame($time->getTimestamp(), $getJobReservedAt(timeout: null));
+        $this->assertSame($time->getTimestamp(), $getJobReservedAt(timeout: 0));
 
         // Worker timeout is used if the job doesn't define a timeout
         $queue->setWorkerTimeout(120);
-        $this->assertSame($time->getTimestamp() + 120 + 10 - 300, $getJobReservedAt(null));
-        $this->assertSame($time->getTimestamp() + 120 + 10 - 300, $getJobReservedAt(0));
+        $this->assertSame($time->getTimestamp() + 120 + 10 - 90, $getJobReservedAt(timeout: null));
+        $this->assertSame($time->getTimestamp() + 120 + 10 - 90, $getJobReservedAt(timeout: 0));
 
         // Timeout on the job takes precedence over the queue worker timeout
-        $this->assertSame($time->getTimestamp() + 45 + 10 - 300, $getJobReservedAt(45));
+        $this->assertSame($time->getTimestamp() + 45 + 10 - 90, $getJobReservedAt(timeout: 45));
 
         Carbon::setTestNow();
     }
