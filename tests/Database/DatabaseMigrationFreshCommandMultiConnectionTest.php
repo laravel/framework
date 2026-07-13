@@ -49,7 +49,7 @@ class DatabaseMigrationFreshCommandMultiConnectionTest extends TestCase
             ->once()
             ->andReturn(true);
 
-        $migrator->shouldReceive('getConnectionsForPendingMigrations')
+        $migrator->shouldReceive('getConnectionsForMigrations')
             ->once()
             ->andReturn(['mysql', 'mysql2']);
 

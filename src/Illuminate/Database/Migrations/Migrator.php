@@ -872,24 +872,27 @@ class Migrator
     }
 
     /**
-     * Get connections from migrations.
+     * Get the unique database connection names used by the migration files.
      *
      * @param  array  $paths
      * @return array
      */
-    public function getConnectionsForPendingMigrations(array $paths): array
+    public function getConnectionsForMigrations(array $paths): array
     {
+        $connections = [];
+
         $files = $this->getMigrationFiles($paths);
 
-        $this->requireFiles($migrations = $this->pendingMigrations(
-            $files, $this->repository->getRan()
-        ));
+        foreach ($files as $file) {
+            $migration = $this->resolve($file);
 
-        return collect($migrations)
-            ->map(fn ($file) => $this->resolvePath($file))
-            ->map(fn ($migration) => $migration->getConnection() ?: $this->resolver->getDefaultConnection())
-            ->unique()
-            ->values()
-            ->all();
+            $connectionName = $migration->getConnection()
+                ?: $this->connection
+                    ?: $this->resolver->getDefaultConnection();
+
+            $connections[] = $connectionName;
+        }
+
+        return array_values(array_unique($connections));
     }
 }

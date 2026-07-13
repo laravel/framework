@@ -66,7 +66,7 @@ class FreshCommand extends BaseCommand
 
         $connections = array_values(array_unique(array_filter(array_merge(
             [$database],
-            $this->migrator->getConnectionsForPendingMigrations($this->getMigrationPaths())
+            $this->migrator->getConnectionsForMigrations($this->getMigrationPaths())
         ))));
 
         $this->migrator->usingConnection($database, function () use ($connections) {
