@@ -69,6 +69,10 @@ class FreshCommand extends BaseCommand
             $this->migrator->getConnectionsForMigrations($this->getMigrationPaths())
         ))));
 
+        if (empty($connections)) {
+            $connections = [$database];
+        }
+
         $this->migrator->usingConnection($database, function () use ($connections) {
             try {
                 $repositoryExists = $this->migrator->repositoryExists();
