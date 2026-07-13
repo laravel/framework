@@ -399,8 +399,8 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Build entries, raise queueing events, dispatch chunks, and raise queued events with SQS message IDs.
      *
-     * Once a chunk fails, no further chunks are dispatched, and the earliest
-     * failure is thrown after every in-flight request has settled.
+     * The first failed chunk aborts the dispatch: its exception is rethrown
+     * and chunks that have not been dispatched yet will never be sent.
      *
      * @param  array  $messages
      * @param  string|null  $queue
@@ -423,15 +423,9 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
 
         $chunks = $this->chunkBatchEntries($entries);
 
-        [$results, $failures, $halted] = [[], [], false];
-
         // Requests are created lazily so a failure stops any further chunks from being dispatched...
-        $requests = function () use ($chunks, $queueUrl, &$halted) {
+        $requests = function () use ($chunks, $queueUrl) {
             foreach ($chunks as $index => $chunk) {
-                if ($halted) {
-                    return;
-                }
-
                 yield $index => $this->sqs->sendMessageBatchAsync([
                     'QueueUrl' => $queueUrl,
                     'Entries' => $chunk,
@@ -442,40 +436,18 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
         // FIFO queues require ordering, so chunks are dispatched one at a time and later messages
         // cannot arrive ahead of unsent ones. Standard queues make no ordering guarantees, so
         // their chunks may be dispatched concurrently for much higher total throughput...
-        Each::ofLimit(
+        Each::ofLimitAll(
             $requests(),
             str_ends_with($queueUrl, '.fifo') ? 1 : static::MAX_CONCURRENT_BATCH_REQUESTS,
-            function ($result, $index) use (&$results, &$halted) {
-                $results[$index] = $result;
+            function ($result, $index, $aggregate) use ($chunks, $messages, $queue, $queueUrl) {
+                $this->raiseJobQueuedEventsForBatchResult($result, $messages, $queue);
 
-                $halted = $halted || ! empty($result['Failed']);
-            },
-            function ($reason, $index) use (&$failures, &$halted) {
-                $failures[$index] = $reason;
-
-                $halted = true;
+                // A batch can return HTTP 200 while rejecting entries, so surface those failures as an SqsException...
+                if (! empty($result['Failed'])) {
+                    $aggregate->reject($this->toBatchEntriesFailedException($result, $chunks[$index], $queueUrl));
+                }
             },
         )->wait();
-
-        ksort($results);
-
-        // Every message accepted by SQS raises a queued event, even when another chunk failed...
-        foreach ($results as $result) {
-            $this->raiseJobQueuedEventsForBatchResult($result, $messages, $queue);
-        }
-
-        // A batch can return HTTP 200 while rejecting entries, so surface those failures as an SqsException...
-        foreach ($results as $index => $result) {
-            if (! empty($result['Failed'])) {
-                $failures[$index] = $this->toBatchEntriesFailedException($result, $chunks[$index], $queueUrl);
-            }
-        }
-
-        if (! empty($failures)) {
-            ksort($failures);
-
-            throw reset($failures);
-        }
     }
 
     /**

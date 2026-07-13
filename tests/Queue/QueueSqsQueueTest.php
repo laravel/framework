@@ -1396,7 +1396,7 @@ class QueueSqsQueueTest extends TestCase
 
         $queue->bulk(range(1, 15), 'data', $this->queueName);
 
-        // Queued events are raised in message order once every chunk has settled...
+        // Queued events are raised for each chunk as it settles...
         $queuedEvents = array_values(array_filter($dispatched, fn ($e) => $e instanceof \Illuminate\Queue\Events\JobQueued));
 
         $this->assertCount(15, $queuedEvents);
@@ -1408,23 +1408,11 @@ class QueueSqsQueueTest extends TestCase
 
     public function testBulkStopsLaunchingBatchesAfterAFailureOnStandardQueues()
     {
-        $events = m::mock(\Illuminate\Contracts\Events\Dispatcher::class);
-        $dispatched = [];
-        $events->shouldReceive('dispatch')->andReturnUsing(function ($event) use (&$dispatched) {
-            $dispatched[] = $event;
-        });
-
-        $container = m::mock(Container::class);
-        $container->shouldReceive('bound')->with('events')->andReturn(true);
-        $container->shouldReceive('bound')->with('db.transactions')->andReturn(false);
-        $container->shouldReceive('offsetGet')->with('events')->andReturn($events);
-
         $queue = $this->getMockBuilder(SqsQueue::class)
             ->onlyMethods(['getQueue', 'createPayload'])
             ->setConstructorArgs([$this->sqs, $this->queueName, $this->account])
             ->getMock();
-        $queue->setContainer($container);
-        $queue->setConnectionName('sqs');
+        $queue->setContainer(m::spy(Container::class));
         $queue->expects($this->once())->method('getQueue')->willReturn($this->queueUrl);
         $queue->method('createPayload')->willReturnCallback(fn ($job) => "payload-{$job}");
 
@@ -1432,18 +1420,12 @@ class QueueSqsQueueTest extends TestCase
 
         // Eleven chunks are prepared, but only the first ten may be launched: the first request's
         // failure must prevent the final chunk from ever being dispatched...
-        $this->sqs->shouldReceive('sendMessageBatchAsync')->times(10)->andReturnUsing(function ($args) use (&$calls) {
+        $this->sqs->shouldReceive('sendMessageBatchAsync')->times(10)->andReturnUsing(function () use (&$calls) {
             if ($calls++ === 0) {
                 return Create::rejectionFor(new RuntimeException('SQS is down'));
             }
 
-            return Create::promiseFor(new Result([
-                'Successful' => array_map(
-                    fn ($entry) => ['Id' => $entry['Id'], 'MessageId' => 'mid-'.$entry['Id']],
-                    $args['Entries']
-                ),
-                'Failed' => [],
-            ]));
+            return Create::promiseFor(new Result(['Successful' => [], 'Failed' => []]));
         });
 
         try {
@@ -1454,13 +1436,11 @@ class QueueSqsQueueTest extends TestCase
             $this->assertSame('SQS is down', $e->getMessage());
         }
 
-        // The nine in-flight chunks settled successfully, so their queued events must have fired...
-        $queuedEvents = array_filter($dispatched, fn ($e) => $e instanceof \Illuminate\Queue\Events\JobQueued);
-
-        $this->assertCount(90, $queuedEvents);
+        // Only the initial concurrent window of requests may ever be launched...
+        $this->assertSame(10, $calls);
     }
 
-    public function testBulkThrowsForFailedEntriesAfterStandardChunksSettle()
+    public function testBulkThrowsForFailedEntriesOnStandardQueues()
     {
         $events = m::mock(\Illuminate\Contracts\Events\Dispatcher::class);
         $dispatched = [];
@@ -1515,7 +1495,7 @@ class QueueSqsQueueTest extends TestCase
             );
         }
 
-        // Every accepted message raises a queued event, including the second chunk's, before the failure is thrown...
+        // Messages accepted before the failure was observed still raise queued events...
         $queuedEvents = array_values(array_filter($dispatched, fn ($e) => $e instanceof \Illuminate\Queue\Events\JobQueued));
 
         $this->assertCount(14, $queuedEvents);
