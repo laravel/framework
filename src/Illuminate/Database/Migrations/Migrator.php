@@ -884,7 +884,7 @@ class Migrator
         $files = $this->getMigrationFiles($paths);
 
         foreach ($files as $file) {
-            $migration = $this->resolve($file);
+            $migration = $this->resolvePath($file);
 
             $connectionName = $migration->getConnection()
                 ?: $this->connection
