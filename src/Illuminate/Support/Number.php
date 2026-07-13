@@ -290,7 +290,12 @@ class Number
             case (float) $number === 0.0:
                 return $precision > 0 ? static::format(0, $precision, $maxPrecision) : '0';
             case $number < 0:
-                return sprintf('-%s', static::summarize(abs($number), $precision, $maxPrecision, $units));
+                $summary = static::summarize(abs($number), $precision, $maxPrecision, $units);
+
+                // Avoid a spurious "-0" when the magnitude rounds down to zero at the given precision...
+                return $summary === static::summarize(0, $precision, $maxPrecision, $units)
+                    ? $summary
+                    : sprintf('-%s', $summary);
             case $number >= 1e15:
                 return sprintf('%s'.end($units), static::summarize($number / 1e15, $precision, $maxPrecision, $units));
         }
