@@ -189,7 +189,7 @@ class RedisQueueTest extends TestCase
         $this->queue->setContainer($this->container = m::spy(Container::class));
         $redisKey = $this->getQueueRedisKey($default);
 
-        $getJobExpirationTimestamp = function () use ($driver, $default, $redisKey) {
+        $getJobExpirationTimestamp = function () use ($driver, $redisKey) {
             $this->queue->pop();
 
             $result = $this->redis[$driver]->connection()->zrangebyscore("$redisKey:reserved", -INF, INF, ['withscores' => true]);
