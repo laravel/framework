@@ -57,7 +57,11 @@ class DevCommands
 
         self::artisan('serve --host=localhost', 'server');
         self::artisan('queue:listen --tries=1 --timeout=0', 'queue');
-        self::artisan('pail --timeout=0', 'logs');
+
+        if (function_exists('pcntl_fork')) {
+            self::artisan('pail --timeout=0', 'logs');
+        }
+
         self::node('dev', 'vite');
     }
 
