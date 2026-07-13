@@ -1418,9 +1418,9 @@ class QueueSqsQueueTest extends TestCase
 
         $calls = 0;
 
-        // Eleven chunks are prepared, but only the first ten may be launched: the first request's
-        // failure must prevent the final chunk from ever being dispatched...
-        $this->sqs->shouldReceive('sendMessageBatchAsync')->times(10)->andReturnUsing(function () use (&$calls) {
+        // One more chunk is prepared than the concurrency limit allows in flight: the first
+        // request's failure must prevent the final chunk from ever being dispatched...
+        $this->sqs->shouldReceive('sendMessageBatchAsync')->times(SqsQueue::MAX_CONCURRENT_BATCH_REQUESTS)->andReturnUsing(function () use (&$calls) {
             if ($calls++ === 0) {
                 return Create::rejectionFor(new RuntimeException('SQS is down'));
             }
@@ -1429,7 +1429,11 @@ class QueueSqsQueueTest extends TestCase
         });
 
         try {
-            $queue->bulk(range(1, 110), 'data', $this->queueName);
+            $queue->bulk(
+                range(1, (SqsQueue::MAX_CONCURRENT_BATCH_REQUESTS + 1) * SqsQueue::MAX_MESSAGES_PER_BATCH),
+                'data',
+                $this->queueName
+            );
 
             $this->fail('RuntimeException was not thrown.');
         } catch (RuntimeException $e) {
@@ -1437,7 +1441,7 @@ class QueueSqsQueueTest extends TestCase
         }
 
         // Only the initial concurrent window of requests may ever be launched...
-        $this->assertSame(10, $calls);
+        $this->assertSame(SqsQueue::MAX_CONCURRENT_BATCH_REQUESTS, $calls);
     }
 
     public function testBulkThrowsForFailedEntriesOnStandardQueues()

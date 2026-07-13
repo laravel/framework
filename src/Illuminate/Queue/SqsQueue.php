@@ -34,7 +34,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @var int
      */
-    const MAX_CONCURRENT_BATCH_REQUESTS = 10;
+    const MAX_CONCURRENT_BATCH_REQUESTS = 50;
 
     /**
      * The cache key prefix for extended SQS payloads.
