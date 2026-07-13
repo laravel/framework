@@ -103,6 +103,48 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler->report(new ContextProvidingException('Exception message'));
     }
 
+    public function testHandlerMergesInlineContextIntoLogContext()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldReceive('error')->withArgs(['Exception message', m::subset(['from' => 'user@example.com', 'subject' => 'Hello'])])->once();
+
+        $this->handler->report(new RuntimeException('Exception message'), [
+            'from' => 'user@example.com',
+            'subject' => 'Hello',
+        ]);
+    }
+
+    public function testHandlerInlineContextOverridesExceptionContext()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldReceive('error')->withArgs(['Exception message', m::subset(['foo' => 'overridden'])])->once();
+
+        $this->handler->report(new ContextProvidingException('Exception message'), [
+            'foo' => 'overridden',
+        ]);
+    }
+
+    public function testReportableCallbackReceivesInlineContext()
+    {
+        $receivedContext = null;
+
+        $this->handler->reportable(function (\Throwable $e, array $context) use (&$receivedContext) {
+            $receivedContext = $context;
+
+            return false;
+        });
+
+        $this->handler->report(new RuntimeException('Exception message'), [
+            'from' => 'user@example.com',
+        ]);
+
+        $this->assertIsArray($receivedContext);
+        $this->assertSame('user@example.com', $receivedContext['from']);
+        $this->assertArrayHasKey('exception', $receivedContext);
+    }
+
     public function testHandlerReportsExceptionWhenUnReportable()
     {
         $logger = m::mock(LoggerInterface::class);

@@ -12,7 +12,7 @@ class ReportableHandler
     /**
      * The underlying callback.
      *
-     * @var callable
+     * @var callable(Throwable, array): ?bool
      */
     protected $callback;
 
@@ -26,7 +26,7 @@ class ReportableHandler
     /**
      * Create a new reportable handler instance.
      *
-     * @param  callable  $callback
+     * @param  callable(\Throwable, array): ?bool  $callback
      */
     public function __construct(callable $callback)
     {
@@ -37,11 +37,12 @@ class ReportableHandler
      * Invoke the handler.
      *
      * @param  \Throwable  $e
+     * @param  array<string, mixed>  $context
      * @return bool
      */
-    public function __invoke(Throwable $e)
+    public function __invoke(Throwable $e, array $context = [])
     {
-        $result = call_user_func($this->callback, $e);
+        $result = call_user_func($this->callback, $e, $context);
 
         if ($result === false) {
             return false;

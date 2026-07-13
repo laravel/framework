@@ -19,7 +19,7 @@ use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
  * @method static bool shouldStopRetries(\Throwable $e)
  * @method static \Illuminate\Foundation\Exceptions\Handler dontFlash(array|string $attributes)
  * @method static \Illuminate\Foundation\Exceptions\Handler level(string $type, string $level)
- * @method static void report(\Throwable $e)
+ * @method static void report(\Throwable $e, array<string, mixed> $context = [])
  * @method static bool isReporting(\Throwable $e)
  * @method static bool shouldReport(\Throwable $e)
  * @method static \Illuminate\Foundation\Exceptions\Handler throttleUsing(callable $throttleUsing)

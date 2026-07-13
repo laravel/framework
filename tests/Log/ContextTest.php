@@ -699,6 +699,91 @@ class ContextTest extends TestCase
         Context::rememberHidden('foo', $closure);
         $this->assertSame(1, $closureRunCount);
     }
+
+    public function test_report_helper_adds_context_to_exception_context()
+    {
+        $path = storage_path('logs/laravel.log');
+        file_put_contents($path, '');
+
+        report(new Exception('Whoops!'), ['foo' => 'bar', 'baz' => 123]);
+
+        $log = Str::after(file_get_contents($path), '] ');
+
+        $this->assertStringContainsString('"foo":"bar"', $log);
+        $this->assertStringContainsString('"baz":123', $log);
+
+        file_put_contents($path, '');
+    }
+
+    public function test_report_context_is_separate_from_global_context()
+    {
+        $path = storage_path('logs/laravel.log');
+        file_put_contents($path, '');
+
+        Context::add('global_key', 'global_value');
+
+        report(new Exception('Whoops!'), ['report_key' => 'report_value']);
+
+        $log = Str::after(file_get_contents($path), '] ');
+
+        // Report context is in exception context (before the global context extra)
+        $this->assertStringContainsString('"report_key":"report_value"', $log);
+        // Global context is in extra (at the end of the log line)
+        $this->assertStringEndsWith(' {"global_key":"global_value"}', trim($log));
+
+        file_put_contents($path, '');
+        Context::flush();
+    }
+
+    public function test_report_helper_without_context_does_not_add_context()
+    {
+        $path = storage_path('logs/laravel.log');
+        file_put_contents($path, '');
+
+        report(new Exception('Whoops!'));
+
+        $log = Str::after(file_get_contents($path), '] ');
+
+        $this->assertStringNotContainsString('"foo"', $log);
+        $this->assertStringNotContainsString('"bar"', $log);
+
+        file_put_contents($path, '');
+    }
+
+    public function test_report_if_helper_adds_context_when_condition_is_true()
+    {
+        $path = storage_path('logs/laravel.log');
+        file_put_contents($path, '');
+
+        report_if(true, new Exception('Whoops!'), ['foo' => 'bar']);
+
+        $log = Str::after(file_get_contents($path), '] ');
+
+        $this->assertStringContainsString('"foo":"bar"', $log);
+
+        file_put_contents($path, '');
+    }
+
+    public function test_report_unless_helper_adds_context_when_condition_is_false()
+    {
+        $path = storage_path('logs/laravel.log');
+        file_put_contents($path, '');
+
+        report_unless(false, new Exception('Whoops!'), ['foo' => 'bar']);
+
+        $log = Str::after(file_get_contents($path), '] ');
+
+        $this->assertStringContainsString('"foo":"bar"', $log);
+
+        file_put_contents($path, '');
+    }
+
+    public function test_report_context_does_not_leak_to_global_context()
+    {
+        report(new Exception('Whoops!'), ['leaked' => 'value']);
+
+        $this->assertNull(Context::get('leaked'));
+    }
 }
 
 enum Suit
