@@ -13,7 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Throwable;
 
 #[AsCommand(name: 'migrate:fresh')]
-class FreshCommand extends Command
+class FreshCommand extends BaseCommand
 {
     use ConfirmableTrait, Prohibitable;
 
@@ -64,7 +64,12 @@ class FreshCommand extends Command
 
         $database = $this->input->getOption('database');
 
-        $this->migrator->usingConnection($database, function () use ($database) {
+        $connections = array_values(array_unique(array_filter(array_merge(
+            [$database],
+            $this->migrator->getConnectionsForPendingMigrations($this->getMigrationPaths())
+        ))));
+
+        $this->migrator->usingConnection($database, function () use ($connections) {
             try {
                 $repositoryExists = $this->migrator->repositoryExists();
             } catch (Throwable) {
@@ -74,12 +79,17 @@ class FreshCommand extends Command
             if ($repositoryExists) {
                 $this->newLine();
 
-                $this->components->task('Dropping all tables', fn () => $this->callSilent('db:wipe', array_filter([
-                    '--database' => $database,
-                    '--drop-views' => $this->option('drop-views'),
-                    '--drop-types' => $this->option('drop-types'),
-                    '--force' => true,
-                ])) == 0);
+                foreach ($connections as $connection) {
+                    $this->components->task(
+                        "Dropping all tables [{$connection}]",
+                        fn () => $this->callSilent('db:wipe', array_filter([
+                                '--database' => $connection,
+                                '--drop-views' => $this->option('drop-views'),
+                                '--drop-types' => $this->option('drop-types'),
+                                '--force' => true,
+                            ])) == 0
+                    );
+                }
             }
         });
 

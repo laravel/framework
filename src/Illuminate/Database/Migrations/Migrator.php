@@ -870,4 +870,26 @@ class Migrator
     {
         $this->events?->dispatch($event);
     }
+
+    /**
+     * Get connections from migrations
+     *
+     * @param  array  $paths
+     * @return  array
+     */
+    public function getConnectionsForPendingMigrations(array $paths): array
+    {
+        $files = $this->getMigrationFiles($paths);
+
+        $this->requireFiles($migrations = $this->pendingMigrations(
+            $files, $this->repository->getRan()
+        ));
+
+        return collect($migrations)
+            ->map(fn ($file) => $this->resolvePath($file))
+            ->map(fn ($migration) => $migration->getConnection() ?: $this->resolver->getDefaultConnection())
+            ->unique()
+            ->values()
+            ->all();
+    }
 }
