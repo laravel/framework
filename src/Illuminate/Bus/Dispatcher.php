@@ -165,15 +165,30 @@ class Dispatcher implements QueueingDispatcher
                 ?? $this->resolveQueueFromQueueRoute($job)
                 ?? null;
 
-            $groups[$connection.':'.$queue]['connection'] = $connection;
-            $groups[$connection.':'.$queue]['queue'] = $queue;
-            $groups[$connection.':'.$queue]['jobs'][] = $job;
+            $groupId = $connection.':'.$queue;
+
+            $groups[$groupId]['connection'] = $connection;
+            $groups[$groupId]['queue'] = $queue;
+
+            $delay = $this->getAttributeValue($job, Delay::class, 'delay');
+
+            if (isset($delay)) {
+                $groups[$groupId]['delayed'][] = [$job, $delay];
+            } else {
+                $groups[$groupId]['jobs'][] = $job;
+            }
         }
 
         foreach ($groups as $group) {
-            ($this->queueResolver)($group['connection'])->bulk(
-                $group['jobs'], '', $group['queue']
-            );
+            $queue = ($this->queueResolver)($group['connection']);
+
+            if (! empty($group['jobs'])) {
+                $queue->bulk($group['jobs'], '', $group['queue']);
+            }
+
+            foreach ($group['delayed'] ?? [] as [$job, $delay]) {
+                $queue->later($delay, $job, '', $group['queue']);
+            }
         }
     }
 

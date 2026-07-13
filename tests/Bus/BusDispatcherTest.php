@@ -15,6 +15,13 @@ use RuntimeException;
 
 class BusDispatcherTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        Container::setInstance(null);
+    }
+
     public function testCommandsThatShouldQueueIsQueued()
     {
         $container = new Container;
@@ -30,8 +37,6 @@ class BusDispatcherTest extends TestCase
         });
 
         $dispatcher->dispatch(m::mock(ShouldQueue::class));
-
-        Container::setInstance(null);
     }
 
     public function testCommandsThatShouldQueueIsQueuedUsingCustomHandler()
@@ -49,8 +54,6 @@ class BusDispatcherTest extends TestCase
         });
 
         $dispatcher->dispatch(new BusDispatcherTestCustomQueueCommand);
-
-        Container::setInstance(null);
     }
 
     public function testCommandsThatShouldQueueIsQueuedUsingCustomQueueAndDelay()
@@ -68,8 +71,6 @@ class BusDispatcherTest extends TestCase
         });
 
         $dispatcher->dispatch(new BusDispatcherTestSpecificQueueAndDelayCommand);
-
-        Container::setInstance(null);
     }
 
     public function testCommandsAreDispatchedWithQueueRoute()
@@ -87,8 +88,6 @@ class BusDispatcherTest extends TestCase
         });
 
         $dispatcher->dispatch(new BusDispatcherQueueable);
-
-        Container::setInstance(null);
     }
 
     public function testDispatchNowShouldNeverQueue()
@@ -146,8 +145,6 @@ class BusDispatcherTest extends TestCase
         $job = (new ShouldNotBeDispatched)->onConnection('null');
 
         $dispatcher->dispatch($job);
-
-        Container::setInstance(null);
     }
 
     public function testDispatchBulk()
@@ -169,8 +166,30 @@ class BusDispatcherTest extends TestCase
             new BusDispatcherQueueable,
             new BusDispatcherTestSpecificQueueCommand,
         ]);
+    }
 
-        Container::setInstance(null);
+    public function testDispatchBulkHonorsPerJobDelay(): void
+    {
+        $container = new Container;
+        $container->instance('queue.routes', $queueRoutes = m::mock());
+        $queueRoutes->shouldReceive('getQueue')->andReturn(null);
+        $queueRoutes->shouldReceive('getConnection')->andReturn(null);
+        Container::setInstance($container);
+
+        $mock = m::mock(Queue::class);
+        $mock->shouldReceive('bulk')->once()->with(
+            m::on(fn ($jobs) => count($jobs) === 1), '', null
+        );
+        $mock->shouldReceive('later')->once()->with(
+            10, m::type(BusDispatcherTestSpecificQueueAndDelayCommand::class), '', 'foo'
+        );
+
+        $dispatcher = new Dispatcher($container, fn () => $mock);
+
+        $dispatcher->bulk([
+            new BusDispatcherQueueable,
+            new BusDispatcherTestSpecificQueueAndDelayCommand,
+        ]);
     }
 }
 
