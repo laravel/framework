@@ -301,7 +301,7 @@ class Number
         }
 
         $numberExponent = floor(log10($number));
-        $displayExponent = $numberExponent - ($numberExponent % 3);
+        $displayExponent = max(0, $numberExponent - ($numberExponent % 3));
         $number /= pow(10, $displayExponent);
 
         $formatted = static::format($number, $precision, $maxPrecision);
