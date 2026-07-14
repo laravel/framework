@@ -312,7 +312,7 @@ trait ResolvesJsonApiElements
             ->mapWithKeys(fn ($relationResolver) => [$relationResolver->relationName => $relationResolver])
             ->filter(fn ($value, $key) => in_array($key, array_keys($relation->getRelations())))
             ->each(function ($relationResolver, $key) use ($relation, $request) {
-                $this->compileResourceRelationshipUsingResolver($request, $relation, $relationResolver, $relation->getRelation($key));
+                $this->compileResourceRelationshipUsingResolver($request, $relation, $relationResolver, $relationResolver->handle($relation));
             });
     }
 

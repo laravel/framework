@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 
 class PostResource extends JsonApiResource
@@ -11,8 +12,14 @@ class PostResource extends JsonApiResource
         'content',
     ];
 
-    protected array $relationships = [
-        'author' => AuthorResource::class,
-        'comments',
-    ];
+    #[\Override]
+    public function toRelationships(Request $request)
+    {
+        return [
+            'author' => AuthorResource::class,
+            'comments' => fn () => CommentResource::collection(
+                $this->comments->where('content', '!=', 'private')
+            ),
+        ];
+    }
 }
