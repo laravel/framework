@@ -1,6 +1,11 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.63.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.64.0...12.x)
+
+## [v12.64.0](https://github.com/laravel/framework/compare/v12.63.0...v12.64.0) - 2026-07-14
+
+* [12.x] Enum as queue overlap key by [@finagin](https://github.com/finagin) in https://github.com/laravel/framework/pull/60722
+* [12.x] Add capitalize parameter to Stringable::initials() by [@irabbi360](https://github.com/irabbi360) in https://github.com/laravel/framework/pull/60741
 
 ## [v12.63.0](https://github.com/laravel/framework/compare/v12.62.0...v12.63.0) - 2026-07-07
 
