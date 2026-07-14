@@ -97,6 +97,47 @@ class UploadedFile extends SymfonyUploadedFile
     }
 
     /**
+     * Store the uploaded file on a filesystem disk and return a StorageUri.
+     *
+     * @param  string  $path
+     * @param  array|string  $options
+     * @return \Illuminate\Support\StorageUri|false
+     */
+    public function storeUri($path = '', $options = [])
+    {
+        return $this->storeUriAs($path, $this->hashName(), $this->parseOptions($options));
+    }
+
+    /**
+     * Store the uploaded file on a filesystem disk and return a StorageUri.
+     *
+     * @param  string  $path
+     * @param  array|string|null  $name
+     * @param  array|string  $options
+     * @return \Illuminate\Support\StorageUri|false
+     */
+    public function storeUriAs($path, $name = null, $options = [])
+    {
+        if (is_null($name) || is_array($name)) {
+            [$path, $name, $options] = ['', $path, $name ?? []];
+        }
+
+        $options = $this->parseOptions($options);
+
+        $disk = Arr::pull($options, 'disk');
+
+        $filesystem = Container::getInstance()->make(FilesystemFactory::class)->disk($disk);
+
+        $storedPath = $filesystem->putFileAs($path, $this, $name, $options);
+
+        if ($storedPath === false) {
+            return false;
+        }
+
+        return $filesystem->uri($storedPath);
+    }
+
+    /**
      * Get the contents of the uploaded file.
      *
      * @return false|string
