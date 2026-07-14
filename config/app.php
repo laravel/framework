@@ -46,6 +46,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Hide Validation Errors
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, detailed validation error messages and field names will
+    | not be included in JSON error responses. This prevents attackers from
+    | discovering your API's expected fields by sending empty requests.
+    |
+    */
+
+    'hide_validation_errors' => (bool) env('HIDE_VALIDATION_ERRORS', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application URL
     |--------------------------------------------------------------------------
     |
