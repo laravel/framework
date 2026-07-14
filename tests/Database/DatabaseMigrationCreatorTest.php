@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -78,6 +79,25 @@ class DatabaseMigrationCreatorTest extends TestCase
         $creator->getFilesystem()->shouldReceive('requireOnce')->once()->with('foo/foo_create_bar.php');
 
         $creator->create('create_bar', 'foo', 'baz', true);
+    }
+
+    public function testDatePrefixIsBumpedWhenMigrationWithSamePrefixAlreadyExists()
+    {
+        Carbon::setTestNow(Carbon::create(2026, 7, 14, 12, 0, 0));
+
+        $creator = new MigrationCreator(m::mock(Filesystem::class), 'stubs');
+
+        $creator->getFilesystem()->shouldReceive('glob')->once()->with('foo/2026_07_14_120000_*.php')->andReturn(['foo/2026_07_14_120000_create_bar.php']);
+        $creator->getFilesystem()->shouldReceive('glob')->once()->with('foo/2026_07_14_120001_*.php')->andReturn([]);
+        $creator->getFilesystem()->shouldReceive('glob')->once()->with('foo/*.php')->andReturn([]);
+        $creator->getFilesystem()->shouldReceive('exists')->once()->with('stubs/migration.stub')->andReturn(false);
+        $creator->getFilesystem()->shouldReceive('get')->once()->with($creator->stubPath().'/migration.stub')->andReturn('return new class');
+        $creator->getFilesystem()->shouldReceive('ensureDirectoryExists')->once()->with('foo');
+        $creator->getFilesystem()->shouldReceive('put')->once()->with('foo/2026_07_14_120001_create_baz.php', 'return new class');
+
+        $this->assertSame('foo/2026_07_14_120001_create_baz.php', $creator->create('create_baz', 'foo'));
+
+        Carbon::setTestNow();
     }
 
     public function testTableUpdateMigrationWontCreateDuplicateClass()
