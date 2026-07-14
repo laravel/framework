@@ -835,6 +835,30 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['foo'], $results);
     }
 
+    public function testWithoutEagerLoadRemovesOnlySpecifiedRelationsFromTheBuilderState()
+    {
+        $builder = m::mock(Builder::class.'[eagerLoadRelation]', [$this->getMockQueryBuilder()]);
+        $builder->setEagerLoads([
+            'comments' => function () {
+                return 'comments';
+            },
+            'posts' => function () {
+                return 'posts';
+            },
+        ]);
+
+        $model = m::mock(Model::class);
+        $model->shouldReceive('getRelations')->zeroOrMoreTimes()->andReturn([]);
+        $model->shouldReceive('getTable')->once()->andReturn('table');
+        $builder->getQuery()->shouldReceive('from')->once()->with('table');
+        $builder->setModel($model);
+
+        $builder->withoutEagerLoad(['comments']);
+
+        $this->assertArrayNotHasKey('comments', $builder->getEagerLoads());
+        $this->assertArrayHasKey('posts', $builder->getEagerLoads());
+    }
+
     public function testEagerLoadRelationsCanBeFlushed()
     {
         $builder = m::mock(Builder::class.'[eagerLoadRelation]', [$this->getMockQueryBuilder()]);

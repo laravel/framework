@@ -2071,9 +2071,7 @@ class Builder implements BuilderContract
      */
     public function withoutEagerLoad(array $relations)
     {
-        $relations = array_diff(array_keys($this->model->getRelations()), $relations);
-
-        return $this->with($relations);
+        return $this->without($relations);
     }
 
     /**
