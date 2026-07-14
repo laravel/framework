@@ -4,6 +4,7 @@ namespace Illuminate\Database\Migrations;
 
 use Closure;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
@@ -170,7 +171,7 @@ class MigrationCreator
      */
     protected function getPath($name, $path)
     {
-        return $path.'/'.$this->getDatePrefix().'_'.$name.'.php';
+        return $path.'/'.$this->getDatePrefix($path).'_'.$name.'.php';
     }
 
     /**
@@ -201,11 +202,20 @@ class MigrationCreator
     /**
      * Get the date prefix for the migration.
      *
+     * @param  string|null  $path
      * @return string
      */
-    protected function getDatePrefix()
+    protected function getDatePrefix($path = null)
     {
-        return date('Y_m_d_His');
+        $date = Carbon::now();
+
+        if (! empty($path)) {
+            while (! empty($this->files->glob($path.'/'.$date->format('Y_m_d_His').'_*.php'))) {
+                $date = $date->addSecond();
+            }
+        }
+
+        return $date->format('Y_m_d_His');
     }
 
     /**
