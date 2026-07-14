@@ -112,7 +112,7 @@ class TrustProxies
     }
 
     /**
-     * Set the trusted proxies to all IP addresses in the forwarded chain + the calling IP.
+     * Set the trusted proxies to catchall addresses for IPv4 and IPv6.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return void
