@@ -95,7 +95,6 @@ class QueueDatabaseQueueUnitTest extends TestCase
 
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
-        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 
@@ -232,7 +231,6 @@ class QueueDatabaseQueueUnitTest extends TestCase
 
         $queue->bulk(['foo', 'bar'], ['data'], 'queue');
 
-        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 

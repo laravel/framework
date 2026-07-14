@@ -18,13 +18,6 @@ class NotificationDatabaseChannelTest extends TestCase
         Carbon::setTestNow(Carbon::now());
     }
 
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow();
-
-        parent::tearDown();
-    }
-
     public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
     {
         $notification = new NotificationDatabaseChannelTestNotification;

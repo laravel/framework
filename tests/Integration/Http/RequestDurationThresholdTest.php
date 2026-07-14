@@ -24,10 +24,10 @@ class RequestDurationThresholdTest extends TestCase
             $called = true;
         });
 
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
         $kernel->handle($request);
 
-        Carbon::setTestNow(Carbon::now()->addSecond()->addMillisecond());
+        Carbon::setTestNow($now->addSecond()->addMillisecond());
         $kernel->terminate($request, $response);
 
         $this->assertTrue($called);
@@ -44,10 +44,10 @@ class RequestDurationThresholdTest extends TestCase
             $called = true;
         });
 
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
         $kernel->handle($request);
 
-        Carbon::setTestNow(Carbon::now()->addSecond());
+        Carbon::setTestNow($now->addSecond());
         $kernel->terminate($request, $response);
 
         $this->assertFalse($called);
@@ -64,10 +64,10 @@ class RequestDurationThresholdTest extends TestCase
             $url = $request->url();
         });
 
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
         $kernel->handle($request);
 
-        Carbon::setTestNow(Carbon::now()->addSeconds(2));
+        Carbon::setTestNow($now->addSeconds(2));
         $kernel->terminate($request, $response);
 
         $this->assertSame('http://localhost/test-route', $url);
@@ -84,9 +84,9 @@ class RequestDurationThresholdTest extends TestCase
         });
 
         Config::set('app.timezone', 'Australia/Melbourne');
-        Carbon::setTestNow(Carbon::now()->startOfDay());
+        Carbon::setTestNow($now = Carbon::now()->startOfDay());
         $kernel->handle($request = Request::create('http://localhost/test-route'));
-        Carbon::setTestNow(Carbon::now()->addMinute());
+        Carbon::setTestNow($now->addMinute());
         $kernel->terminate($request, new Response);
 
         $this->assertSame('Australia/Melbourne', $startedAt->timezone->getName());
@@ -103,10 +103,10 @@ class RequestDurationThresholdTest extends TestCase
             $called = true;
         });
 
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
         $kernel->handle($request);
 
-        Carbon::setTestNow(Carbon::now()->addSecond()->addMillisecond());
+        Carbon::setTestNow($now->addSecond()->addMillisecond());
         $kernel->terminate($request, $response);
 
         $this->assertTrue($called);
@@ -123,10 +123,10 @@ class RequestDurationThresholdTest extends TestCase
             $called = true;
         });
 
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
         $kernel->handle($request);
 
-        Carbon::setTestNow(Carbon::now()->addSecond());
+        Carbon::setTestNow($now->addSecond());
         $kernel->terminate($request, $response);
 
         $this->assertFalse($called);
@@ -143,10 +143,10 @@ class RequestDurationThresholdTest extends TestCase
             $called = true;
         });
 
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
         $kernel->handle($request);
 
-        Carbon::setTestNow(Carbon::now()->addSecond()->addMillisecond());
+        Carbon::setTestNow($now->addSecond()->addMillisecond());
         $kernel->terminate($request, $response);
 
         $this->assertTrue($called);
@@ -163,10 +163,10 @@ class RequestDurationThresholdTest extends TestCase
             $called = true;
         });
 
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
         $kernel->handle($request);
 
-        Carbon::setTestNow(Carbon::now()->addSecond());
+        Carbon::setTestNow($now->addSecond());
         $kernel->terminate($request, $response);
 
         $this->assertFalse($called);
@@ -179,9 +179,9 @@ class RequestDurationThresholdTest extends TestCase
         $request = Request::create('http://localhost/test-route');
         $response = new Response();
 
-        Carbon::setTestNow(Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
         $kernel->handle($request);
-        $this->assertTrue(Carbon::now()->eq($kernel->requestStartedAt()));
+        $this->assertTrue($now->eq($kernel->requestStartedAt()));
 
         $kernel->terminate($request, $response);
         $this->assertNull($kernel->requestStartedAt());

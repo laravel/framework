@@ -23,13 +23,6 @@ class ScheduleRunCommandTest extends TestCase
         Carbon::setTestNow(Carbon::now());
     }
 
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow();
-
-        parent::tearDown();
-    }
-
     /**
      * @throws BindingResolutionException
      */
@@ -272,7 +265,7 @@ class ScheduleRunCommandTest extends TestCase
         $reflection = new ReflectionProperty($command, 'startedAt');
         $startedAt = $reflection->getValue($command);
 
-        $originalTimestamp = $startedAt->timestamp;
+        $originalTimestamp = $startedAt->getTimestamp();
         $originalMicro = $startedAt->micro;
 
         // Call repeatEvents with an empty collection so it exits immediately
@@ -285,7 +278,7 @@ class ScheduleRunCommandTest extends TestCase
 
         // startedAt should not have been mutated to end of minute
         $startedAtAfter = (new ReflectionProperty($command, 'startedAt'))->getValue($command);
-        $this->assertEquals($originalTimestamp, $startedAtAfter->timestamp);
+        $this->assertEquals($originalTimestamp, $startedAtAfter->getTimestamp());
         $this->assertEquals($originalMicro, $startedAtAfter->micro);
     }
 }

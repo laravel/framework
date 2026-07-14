@@ -142,8 +142,6 @@ class SendingNotificationsWithLocaleTest extends TestCase
         $this->assertTrue($this->app->isLocale('en'));
 
         $this->assertSame('en', Carbon::getLocale());
-
-        Carbon::setTestNow();
     }
 
     public function testLocaleIsSentWithNotifiablePreferredLocale()
