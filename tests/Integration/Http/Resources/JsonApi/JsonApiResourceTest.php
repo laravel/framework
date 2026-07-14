@@ -421,6 +421,39 @@ class JsonApiResourceTest extends TestCase
             ->assertJsonMissing(['jsonapi']);
     }
 
+    public function testItCanResolveNestedRelationshipThroughClosureReturningResourceCollection()
+    {
+        $user = User::factory()->create();
+
+        $publicPost = Post::factory()->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        $privatePost = Post::factory()->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        $publicComment = Comment::factory()->create([
+            'content' => 'public',
+            'post_id' => $publicPost->getKey(),
+            'user_id' => $user->getKey(),
+        ]);
+
+        $privateComment = Comment::factory()->create([
+            'content' => 'private',
+            'post_id' => $privatePost->getKey(),
+            'user_id' => $user->getKey(),
+        ]);
+
+        $response = $this->getJson("/users/{$user->getKey()}?".http_build_query(['include' => 'posts.comments']))
+            ->assertJsonPath('data.relationships.posts.data.0.id', (string) $publicPost->getKey())
+            ->assertJsonPath('included.0.relationships.comments.data.0.id', (string) $publicComment->getKey());
+
+        $this->assertFalse(collect($response->json('included'))->contains(
+            fn ($included) => $included['type'] === 'comments' && $included['id'] === (string) $privateComment->getKey()
+        ));
+    }
+
     public function testItCanResolveRelationshipWithRecursiveNestedRelationship()
     {
         $now = $this->freezeSecond();
