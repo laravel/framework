@@ -32,7 +32,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Symfony\Component\HttpFoundation\Response respondWithRoute(string $name)
  * @method static \Symfony\Component\HttpFoundation\Response dispatch(\Illuminate\Http\Request $request)
  * @method static \Symfony\Component\HttpFoundation\Response dispatchToRoute(\Illuminate\Http\Request $request)
- * @method static array gatherRouteMiddleware(\Illuminate\Routing\Route $route)
+ * @method static array gatherRouteMiddleware(\Illuminate\Routing\Route $route, \Illuminate\Http\Request|null $request = null)
  * @method static array resolveMiddleware(array $middleware, array $excluded = [])
  * @method static \Symfony\Component\HttpFoundation\Response prepareResponse(\Symfony\Component\HttpFoundation\Request $request, mixed $response)
  * @method static \Symfony\Component\HttpFoundation\Response toResponse(\Symfony\Component\HttpFoundation\Request $request, mixed $response)
