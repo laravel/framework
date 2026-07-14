@@ -176,15 +176,9 @@ class MigrationCreator
      * @param  string  $path
      * @return string
      */
-    protected function getCollisionFreePath($name, $path)
+    protected function getPath($name, $path)
     {
-        $this->currentMigrationPath = $path;
-
-        $path = $this->getPath($name, $path);
-
-        $this->currentMigrationPath = null;
-
-        return $path;
+        return $path.'/'.$this->getDatePrefix().'_'.$name.'.php';
     }
 
     /**
@@ -194,9 +188,15 @@ class MigrationCreator
      * @param  string  $path
      * @return string
      */
-    protected function getPath($name, $path)
+    protected function getCollisionFreePath($name, $path)
     {
-        return $path.'/'.$this->getDatePrefix().'_'.$name.'.php';
+        $this->currentMigrationPath = $path;
+
+        $path = $this->getPath($name, $path);
+
+        $this->currentMigrationPath = null;
+
+        return $path;
     }
 
     /**
