@@ -1,6 +1,47 @@
 # Release Notes for 13.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v13.19.0...13.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v13.20.0...13.x)
+
+## [v13.20.0](https://github.com/laravel/framework/compare/v13.19.0...v13.20.0) - 2026-07-14
+
+* [13.x] Add missing $separator parameter to Storage facade append/prepend docblocks by [@ferhatolmez](https://github.com/ferhatolmez) in https://github.com/laravel/framework/pull/60693
+* [13.x] `beforePushing` and `afterPushing` methods on `QueueFake` class by [@gdebrauwer](https://github.com/gdebrauwer) in https://github.com/laravel/framework/pull/60689
+* [13.x] Add memory usage to WorkerStopping by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60613
+* [13.x] Add `assertEmpty` to the Storage facade by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60658
+* [13.x] Adds first-party support for `image` processing by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/framework/pull/59276
+* [13.x] Fix operator precedence in SqsQueue size fallbacks by [@daffa-aditya-p](https://github.com/daffa-aditya-p) in https://github.com/laravel/framework/pull/60702
+* Add separator params to Storage facade docblocks by [@Muhtasim-Munif-Fahim](https://github.com/Muhtasim-Munif-Fahim) in https://github.com/laravel/framework/pull/60703
+* [13.x] Add test for the scheduler's quarterlyOn method by [@dfinchenko](https://github.com/dfinchenko) in https://github.com/laravel/framework/pull/60712
+* Make MailFake::assertQueuedTimes() public by [@Tresor-Kasenda](https://github.com/Tresor-Kasenda) in https://github.com/laravel/framework/pull/60710
+* [13.x] Sync more getter return types with their property generics by [@dfinchenko](https://github.com/dfinchenko) in https://github.com/laravel/framework/pull/60699
+* [13.x] Fix guessResourceName() namespace collision when class name is a substring of a parent namespace segment by [@Rubrasum](https://github.com/Rubrasum) in https://github.com/laravel/framework/pull/60707
+* [13.x] Add WithoutMiddleware controller middleware attribute by [@JurianArie](https://github.com/JurianArie) in https://github.com/laravel/framework/pull/60709
+* [13.x] Add incrementEachQuietly and decrementEachQuietly to Eloquent models by [@shanerbaner82](https://github.com/shanerbaner82) in https://github.com/laravel/framework/pull/60720
+* [13.x] Normalize HTTP client request header lookups by [@Button99](https://github.com/Button99) in https://github.com/laravel/framework/pull/60734
+* [12.x] Enum as queue overlap key by [@finagin](https://github.com/finagin) in https://github.com/laravel/framework/pull/60722
+* [13.x] Support null for shortcut field in return type array for HasParameters::getOptions (#60723) by [@wimski](https://github.com/wimski) in https://github.com/laravel/framework/pull/60728
+* [13.x] Ability to set session prefix for Redis by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60700
+* [13.x] Add `#[SensitiveParameter]` to parameters carrying secrets by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/60753
+* [13.x] Optimize by using contains or doesntContain  by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/60745
+* [13.x] Remove redundant Mockery::close() calls by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/60743
+* [13.x] Only register pail in DevCommands when `pcntl_fork` is available by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/60749
+* [13.x] Use PHPUnit rector sets instead of individual rules by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/60744
+* [13.x] Replace manual all/any foreach loops with array_all/array_any by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/60742
+* [13.x] Add test for the Uri toStringable method by [@dfinchenko](https://github.com/dfinchenko) in https://github.com/laravel/framework/pull/60739
+* [13.x] Fix Str::containsAll() returning true for an empty needles array by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/60746
+* [13.x] Fix stale transformations being reapplied when branching an Image after toBytes() by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/60748
+* [13.x] Fix Number::forHumans() and abbreviate() returning "-0" for tiny negative values by [@semx](https://github.com/semx) in https://github.com/laravel/framework/pull/60736
+* [13.x] Add test for the Email rule's strict method by [@dfinchenko](https://github.com/dfinchenko) in https://github.com/laravel/framework/pull/60740
+* [13.x] fix: providesTemporaryUploadUrls should return true for s3 driver by [@joostdebruijn](https://github.com/joostdebruijn) in https://github.com/laravel/framework/pull/60755
+* [12.x] Add capitalize parameter to Stringable::initials() by [@irabbi360](https://github.com/irabbi360) in https://github.com/laravel/framework/pull/60741
+* [13.x] Fix dynamic calls to incrementEachQuietly and decrementEachQuietly by [@daffa-aditya-p](https://github.com/daffa-aditya-p) in https://github.com/laravel/framework/pull/60737
+* Fix BelongsToMany::touch() when related key is not `id` by [@Peeterush](https://github.com/Peeterush) in https://github.com/laravel/framework/pull/60708
+* Merge branch '12.x' into 13.x by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/60773
+* [13.x] Fix Number::forHumans() and abbreviate() scaling tiny decimals by [@daffa-aditya-p](https://github.com/daffa-aditya-p) in https://github.com/laravel/framework/pull/60768
+* [13.x] Reset fake time globally after each test, drop redundant Carbon::setTestNow() cleanup by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/60761
+* [13.x] Ensure `make:migration` generates collision-free, ordered timestamps prefixes by [@NickSdot](https://github.com/NickSdot) in https://github.com/laravel/framework/pull/60771
+* [13.x] Fix JsonApiResource relationships resolved through a closure by [@markwalet](https://github.com/markwalet) in https://github.com/laravel/framework/pull/60752
+* [13.x] Fix TrustProxies at:* when multiple proxies are used by [@mattford](https://github.com/mattford) in https://github.com/laravel/framework/pull/60726
 
 ## [v13.19.0](https://github.com/laravel/framework/compare/v13.18.1...v13.19.0) - 2026-07-07
 
