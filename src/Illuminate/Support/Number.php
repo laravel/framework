@@ -301,15 +301,7 @@ class Number
         }
 
         $numberExponent = floor(log10($number));
-        $displayExponent = $numberExponent - ($numberExponent % 3);
-
-        // Values below 1 have a negative exponent that has no corresponding unit,
-        // so clamp it to zero to avoid scaling the number up without a suffix
-        // (e.g. 0.005 would otherwise be rendered as "5" instead of "0").
-        if ($displayExponent < 0) {
-            $displayExponent = 0;
-        }
-
+        $displayExponent = max(0, $numberExponent - ($numberExponent % 3));
         $number /= pow(10, $displayExponent);
 
         $formatted = static::format($number, $precision, $maxPrecision);
