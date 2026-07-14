@@ -580,6 +580,7 @@ class Filesystem
      *
      * @param  string  $directory
      * @param  bool  $hidden
+     * @param  string|int|string[]|int[]  $depth
      * @return \Symfony\Component\Finder\SplFileInfo[]
      */
     public function files($directory, $hidden = false, array|string|int $depth = 0)
@@ -606,6 +607,7 @@ class Filesystem
      * Get all of the directories within a given directory.
      *
      * @param  string  $directory
+     * @param  string|int|string[]|int[]  $depth
      * @return array
      */
     public function directories($directory, array|string|int $depth = 0)
@@ -622,7 +624,7 @@ class Filesystem
     /**
      * Get all the directories within a given directory (recursive).
      *
-     * @return array
+     * @return string[]
      */
     public function allDirectories(string $directory): array
     {
