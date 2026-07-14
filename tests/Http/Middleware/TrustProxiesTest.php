@@ -80,6 +80,24 @@ class TrustProxiesTest extends TestCase
     }
 
     /**
+     * Test that the wildcard trusts proxies in an IPv6 forwarded chain, so the
+     * left-most client IP is returned rather than an intermediate IPv6 proxy.
+     */
+    public function test_trusted_proxy_sets_trusted_proxies_with_wildcard_and_ipv6_chain()
+    {
+        $trustedProxy = $this->createTrustedProxy($this->headerAll, '*');
+        $request = $this->createProxiedRequest([
+            'REMOTE_ADDR' => '2001:db8::1',
+            'HTTP_X_FORWARDED_FOR' => '173.174.200.38, 2001:db8::2, 2001:db8::3',
+        ]);
+
+        $trustedProxy->handle($request, function ($request) {
+            $this->assertSame('173.174.200.38', $request->getClientIp(),
+                'Assert IPv6 proxies in the forwarded chain are trusted with wildcard proxy setting');
+        });
+    }
+
+    /**
      * Test the next most typical usage of TrustedProxies:
      * Trusted X-Forwarded-For header, REMOTE_ADDR for TrustedProxies.
      */

@@ -4,7 +4,6 @@ namespace Illuminate\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\HeaderUtils;
 
 class TrustProxies
 {
@@ -120,39 +119,7 @@ class TrustProxies
      */
     protected function setTrustedProxyIpAddressesToTheCallingIp(Request $request)
     {
-        $trustedIps = collect($this->gatherProxyIpAddresses($request))
-            ->concat([$request->server->get('REMOTE_ADDR')])
-            ->unique()
-            ->values()
-            ->all();
-        $request->setTrustedProxies($trustedIps, $this->getTrustedHeaderNames());
-    }
-
-    /**
-     * Gather a list of IP addresses from the X-FORWARDED-FOR/X-FORWARDED headers.
-     *
-     * @param  Request  $request
-     * @return array
-     */
-    private function gatherProxyIpAddresses(Request $request)
-    {
-        $forwardedForIps = collect(explode(',', $request->headers->get('X-FORWARDED-FOR', '')))
-            ->map(fn ($v) => trim($v))
-            ->filter(fn ($v) => ! empty($v))
-            ->values()
-            ->all();
-        $forwardedIps = [];
-
-        $forwarded = $request->header('FORWARDED', '');
-        $parts = HeaderUtils::split($forwarded, ',;=');
-        foreach ($parts as $subParts) {
-            if (null === $v = HeaderUtils::combine($subParts)['for'] ?? null) {
-                continue;
-            }
-            $forwardedIps[] = trim($v);
-        }
-
-        return array_merge($forwardedIps, $forwardedForIps);
+        $request->setTrustedProxies(['0.0.0.0/0', '::/0'], $this->getTrustedHeaderNames());
     }
 
     /**
