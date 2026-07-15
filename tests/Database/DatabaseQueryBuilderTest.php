@@ -1335,31 +1335,31 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame([], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $period = Carbon::now()->startOfDay()->toPeriod(Carbon::now()->addDay()->startOfDay());
+        $period = Carbon::today()->toPeriod(Carbon::now()->addDay()->startOfDay());
         $builder->select('*')->from('users')->whereBetween('created_at', $period);
         $this->assertSame('select * from "users" where "created_at" between ? and ?', $builder->toSql());
-        $this->assertEquals([Carbon::now()->startOfDay(), Carbon::now()->addDay()->startOfDay()], $builder->getBindings());
+        $this->assertEquals([Carbon::today(), Carbon::now()->addDay()->startOfDay()], $builder->getBindings());
 
         // custom long carbon period date
         $builder = $this->getBuilder();
-        $period = Carbon::now()->startOfDay()->toPeriod(Carbon::now()->addMonth()->startOfDay());
+        $period = Carbon::today()->toPeriod(Carbon::now()->addMonth()->startOfDay());
         $builder->select('*')->from('users')->whereBetween('created_at', $period);
         $this->assertSame('select * from "users" where "created_at" between ? and ?', $builder->toSql());
-        $this->assertEquals([Carbon::now()->startOfDay(), Carbon::now()->addMonth()->startOfDay()], $builder->getBindings());
+        $this->assertEquals([Carbon::today(), Carbon::now()->addMonth()->startOfDay()], $builder->getBindings());
 
         // DatePeriod with end date
         $builder = $this->getBuilder();
-        $period = new DatePeriod(Carbon::now()->startOfDay(), new DateInterval('P1D'), Carbon::now()->addDays(5)->startOfDay());
+        $period = new DatePeriod(Carbon::today(), new DateInterval('P1D'), Carbon::now()->addDays(5)->startOfDay());
         $builder->select('*')->from('users')->whereBetween('created_at', $period);
         $this->assertSame('select * from "users" where "created_at" between ? and ?', $builder->toSql());
-        $this->assertEquals([Carbon::now()->startOfDay(), Carbon::now()->addDays(5)->startOfDay()], $builder->getBindings());
+        $this->assertEquals([Carbon::today(), Carbon::now()->addDays(5)->startOfDay()], $builder->getBindings());
 
         // DatePeriod with recurrence count (no end date)
         $builder = $this->getBuilder();
-        $period = new DatePeriod(Carbon::now()->startOfDay(), new DateInterval('P1D'), 5);
+        $period = new DatePeriod(Carbon::today(), new DateInterval('P1D'), 5);
         $builder->select('*')->from('users')->whereBetween('created_at', $period);
         $this->assertSame('select * from "users" where "created_at" between ? and ?', $builder->toSql());
-        $this->assertEquals([Carbon::now()->startOfDay(), Carbon::now()->addDays(5)->startOfDay()], $builder->getBindings());
+        $this->assertEquals([Carbon::today(), Carbon::now()->addDays(5)->startOfDay()], $builder->getBindings());
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereBetween('id', collect([1, 2]));

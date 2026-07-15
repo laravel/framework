@@ -8,7 +8,6 @@ use DateTimeInterface;
 use Exception;
 use Illuminate\Queue\Failed\DynamoDbFailedJobProvider;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -23,8 +22,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
             return $uuid;
         });
 
-        $now = CarbonImmutable::now();
-        Date::setTestNow($now);
+        Carbon::setTestNow($now = CarbonImmutable::now());
 
         $exception = new Exception('Something went wrong.');
 

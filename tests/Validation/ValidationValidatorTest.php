@@ -6467,7 +6467,6 @@ class ValidationValidatorTest extends TestCase
 
     public function testValidateDateAndFormat()
     {
-        date_default_timezone_set('UTC');
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => '2000-01-01'], ['x' => 'date']);
         $this->assertTrue($v->passes());
@@ -6548,7 +6547,6 @@ class ValidationValidatorTest extends TestCase
 
     public function testDateEquals()
     {
-        date_default_timezone_set('UTC');
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => '2000-01-01'], ['x' => 'date_equals:2000-01-01']);
         $this->assertTrue($v->passes());
@@ -6616,7 +6614,6 @@ class ValidationValidatorTest extends TestCase
 
     public function testDateEqualsRespectsCarbonTestNowWhenParameterIsRelative()
     {
-        date_default_timezone_set('UTC');
         $trans = $this->getIlluminateArrayTranslator();
         Carbon::setTestNow(new Carbon('2018-01-01'));
 
@@ -6662,7 +6659,6 @@ class ValidationValidatorTest extends TestCase
 
     public function testBeforeAndAfter()
     {
-        date_default_timezone_set('UTC');
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => '2000-01-01'], ['x' => 'Before:2012-01-01']);
         $this->assertTrue($v->passes());
@@ -6748,7 +6744,6 @@ class ValidationValidatorTest extends TestCase
 
     public function testBeforeAndAfterWithFormat()
     {
-        date_default_timezone_set('UTC');
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => '31/12/2000'], ['x' => 'before:31/02/2012']);
         $this->assertTrue($v->fails());
@@ -6867,7 +6862,6 @@ class ValidationValidatorTest extends TestCase
 
     public function testWeakBeforeAndAfter()
     {
-        date_default_timezone_set('UTC');
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => '2012-01-15'], ['x' => 'before_or_equal:2012-01-15']);
         $this->assertTrue($v->passes());
