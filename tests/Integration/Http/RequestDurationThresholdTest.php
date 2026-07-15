@@ -84,7 +84,7 @@ class RequestDurationThresholdTest extends TestCase
         });
 
         Config::set('app.timezone', 'Australia/Melbourne');
-        Carbon::setTestNow($now = Carbon::now()->startOfDay());
+        Carbon::setTestNow($now = Carbon::today());
         $kernel->handle($request = Request::create('http://localhost/test-route'));
         Carbon::setTestNow($now->addMinute());
         $kernel->terminate($request, new Response);

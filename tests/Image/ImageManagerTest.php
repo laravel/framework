@@ -300,7 +300,8 @@ class ImageManagerTest extends TestCase
                 return $this;
             }
         };
-        $transformation = new class implements Transformation {
+        $transformation = new class implements Transformation
+        {
             //
         };
         $callback = fn () => null;
@@ -331,7 +332,8 @@ class ImageManagerTest extends TestCase
                 return $this;
             }
         };
-        $transformation = new class implements Transformation {
+        $transformation = new class implements Transformation
+        {
             //
         };
         $callback = fn () => null;

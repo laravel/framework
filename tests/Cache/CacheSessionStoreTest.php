@@ -141,7 +141,7 @@ class CacheSessionStoreTest extends TestCase
         $this->assertEquals(1, $store->get('foo'));
 
         // Will be there forever
-        Carbon::setTestNow(Carbon::now()->addYears(10));
+        Carbon::setTestNow(Carbon::now()->addCentury());
         $this->assertEquals(1, $store->get('foo'));
     }
 

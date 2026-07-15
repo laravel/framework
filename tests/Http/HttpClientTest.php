@@ -4202,7 +4202,7 @@ class HttpClientTest extends TestCase
 
     public function testItCanAddGlobalMiddleware()
     {
-        Carbon::setTestNow(Carbon::now()->startOfDay());
+        Carbon::setTestNow(Carbon::today());
         $requests = [];
         $responses = [];
         $this->factory->fake(function ($r) use (&$requests) {

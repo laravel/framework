@@ -17,5 +17,6 @@ final class AfterEachTestSubscriber implements FinishedSubscriber
         }
 
         Carbon::setTestNow();
+        date_default_timezone_set('UTC');
     }
 }

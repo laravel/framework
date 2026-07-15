@@ -17,12 +17,6 @@ use ReflectionProperty;
 
 class ScheduleRunCommandTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Carbon::setTestNow(Carbon::now());
-    }
-
     /**
      * @throws BindingResolutionException
      */
