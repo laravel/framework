@@ -15,7 +15,7 @@ use Traversable;
  *
  * @template-covariant TValue
  *
- * @extends \Illuminate\Contracts\Support\Arrayable<TKey, TValue>
+ * @extends \Illuminate\Contracts\Support\Arrayable<array<TKey, TValue>>
  * @extends \IteratorAggregate<TKey, TValue>
  */
 interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable
@@ -26,8 +26,8 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @template TMakeKey of array-key
      * @template TMakeValue
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable<TMakeKey, TMakeValue>|iterable<TMakeKey, TMakeValue>|null  $items
-     * @return static<TMakeKey, TMakeValue>
+     * @param  \Illuminate\Contracts\Support\Arrayable<array<array-key, mixed>>|iterable<TMakeKey, TMakeValue>|null  $items
+     * @return ($items is \Illuminate\Contracts\Support\Arrayable<array<TMakeKey, TMakeValue>> ? static<TMakeKey, TMakeValue> : static<TMakeKey, TMakeValue>)
      */
     public static function make($items = []);
 
@@ -168,10 +168,9 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Cross join with the given lists, returning all possible permutations.
      *
-     * @template TCrossJoinKey
      * @template TCrossJoinValue
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable<TCrossJoinKey, TCrossJoinValue>|iterable<TCrossJoinKey, TCrossJoinValue>  ...$lists
+     * @param  \Illuminate\Contracts\Support\Arrayable<array<array-key, TCrossJoinValue>>|iterable<array-key, TCrossJoinValue>  ...$lists
      * @return static<int, array<int, TValue|TCrossJoinValue>>
      */
     public function crossJoin(...$lists);

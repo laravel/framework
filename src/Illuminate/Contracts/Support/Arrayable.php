@@ -3,7 +3,7 @@
 namespace Illuminate\Contracts\Support;
 
 /**
- * @template TReturn of array = array<array-key, mixed>
+ * @template-covariant TReturn of array = array<array-key, mixed>
  */
 interface Arrayable
 {
