@@ -808,6 +808,69 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::has([], ['']));
     }
 
+    public function testMissing()
+    {
+        $array = ['products.desk' => ['price' => 100]];
+        $this->assertFalse(Arr::missing($array, 'products.desk'));
+
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        $this->assertFalse(Arr::missing($array, 'products.desk'));
+        $this->assertFalse(Arr::missing($array, 'products.desk.price'));
+        $this->assertTrue(Arr::missing($array, 'products.foo'));
+        $this->assertTrue(Arr::missing($array, 'products.desk.foo'));
+
+        $array = ['foo' => null, 'bar' => ['baz' => null]];
+        $this->assertFalse(Arr::missing($array, 'foo'));
+        $this->assertFalse(Arr::missing($array, 'bar.baz'));
+
+        $array = new ArrayObject(['foo' => 10, 'bar' => new ArrayObject(['baz' => 10])]);
+        $this->assertFalse(Arr::missing($array, 'foo'));
+        $this->assertFalse(Arr::missing($array, 'bar'));
+        $this->assertFalse(Arr::missing($array, 'bar.baz'));
+        $this->assertTrue(Arr::missing($array, 'xxx'));
+        $this->assertTrue(Arr::missing($array, 'xxx.yyy'));
+        $this->assertTrue(Arr::missing($array, 'foo.xxx'));
+        $this->assertTrue(Arr::missing($array, 'bar.xxx'));
+
+        $array = new ArrayObject(['foo' => null, 'bar' => new ArrayObject(['baz' => null])]);
+        $this->assertFalse(Arr::missing($array, 'foo'));
+        $this->assertFalse(Arr::missing($array, 'bar.baz'));
+
+        $array = ['foo', 'bar'];
+        $this->assertTrue(Arr::missing($array, null));
+
+        $this->assertTrue(Arr::missing(null, 'foo'));
+        $this->assertTrue(Arr::missing(false, 'foo'));
+
+        $this->assertTrue(Arr::missing(null, null));
+        $this->assertTrue(Arr::missing([], null));
+
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        $this->assertFalse(Arr::missing($array, ['products.desk']));
+        $this->assertFalse(Arr::missing($array, ['products.desk', 'products.desk.price']));
+        $this->assertFalse(Arr::missing($array, ['products', 'products']));
+        $this->assertTrue(Arr::missing($array, ['foo']));
+        $this->assertTrue(Arr::missing($array, []));
+        $this->assertTrue(Arr::missing($array, ['products.desk', 'products.price']));
+
+        $array = [
+            'products' => [
+                ['name' => 'desk'],
+            ],
+        ];
+        $this->assertFalse(Arr::missing($array, 'products.0.name'));
+        $this->assertTrue(Arr::missing($array, 'products.0.price'));
+
+        $this->assertTrue(Arr::missing([], [null]));
+        $this->assertTrue(Arr::missing(null, [null]));
+
+        $this->assertFalse(Arr::missing(['' => 'some'], ''));
+        $this->assertFalse(Arr::missing(['' => 'some'], ['']));
+        $this->assertTrue(Arr::missing([''], ''));
+        $this->assertTrue(Arr::missing([], ''));
+        $this->assertTrue(Arr::missing([], ['']));
+    }
+
     public function testHasAllMethod()
     {
         $array = ['name' => 'Taylor', 'age' => '', 'city' => null];

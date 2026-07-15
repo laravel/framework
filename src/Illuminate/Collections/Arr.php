@@ -542,6 +542,18 @@ class Arr
     }
 
     /**
+     * Check if an item or one of the items does not exist in an array using "dot" notation.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|array  $keys
+     * @return bool
+     */
+    public static function missing($array, $keys)
+    {
+        return ! static::has($array, $keys);
+    }
+
+    /**
      * Determine if all keys exist in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
