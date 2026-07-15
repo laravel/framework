@@ -382,6 +382,21 @@ class Image implements Stringable
     }
 
     /**
+     * @param  array<string, scalar|\Stringable>  $attributes
+     */
+    public function toHtml(array $attributes = []): string
+    {
+        $attributes = collect([
+            'src' => $this->toDataUri(),
+            'width' => $this->width(),
+            'height' => $this->height(),
+        ])
+            ->merge($attributes)
+            ->map(fn ($value, $key) => sprintf('%s="%s"', $key, $value));
+        return '<img '.$attributes->join(' ').'>';
+    }
+
+    /**
      * Get the file extension based on the MIME type.
      */
     public function extension(): string
