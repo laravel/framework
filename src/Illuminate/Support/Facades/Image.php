@@ -2,8 +2,6 @@
 
 namespace Illuminate\Support\Facades;
 
-use Illuminate\Image\ImageManager;
-
 /**
  * @method static \Illuminate\Image\Image fromBytes(string $contents)
  * @method static \Illuminate\Image\Image fromBase64(string $base64)
