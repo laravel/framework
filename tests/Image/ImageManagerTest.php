@@ -351,6 +351,58 @@ class ImageManagerTest extends TestCase
         return file_get_contents($file->getRealPath());
     }
 
+    public function test_from_bytes_sets_origin()
+    {
+        $origin = (new ImageManager($this->makeApp([])))->fromBytes('contents')->origin();
+
+        $this->assertSame('bytes', $origin->type);
+        $this->assertNull($origin->reference);
+    }
+
+    public function test_from_base64_sets_origin()
+    {
+        $origin = (new ImageManager($this->makeApp([])))->fromBase64('contents')->origin();
+
+        $this->assertSame('base64', $origin->type);
+        $this->assertNull($origin->reference);
+    }
+
+    public function test_from_path_sets_origin()
+    {
+        $origin = (new ImageManager($this->makeApp([])))->fromPath('/tmp/photo.jpg')->origin();
+
+        $this->assertSame('path', $origin->type);
+        $this->assertSame('/tmp/photo.jpg', $origin->reference);
+        $this->assertNull($origin->disk);
+    }
+
+    public function test_from_storage_sets_origin()
+    {
+        $origin = (new ImageManager($this->makeApp([])))->fromStorage('photos/avatar.jpg', 's3')->origin();
+
+        $this->assertSame('storage', $origin->type);
+        $this->assertSame('photos/avatar.jpg', $origin->reference);
+        $this->assertSame('s3', $origin->disk);
+    }
+
+    public function test_from_upload_sets_origin()
+    {
+        $file = UploadedFile::fake()->image('test.jpg');
+
+        $origin = (new ImageManager($this->makeApp([])))->fromUpload($file)->origin();
+
+        $this->assertSame('upload', $origin->type);
+        $this->assertSame('test.jpg', $origin->reference);
+    }
+
+    public function test_from_url_sets_origin()
+    {
+        $origin = (new ImageManager($this->makeApp([])))->fromUrl('https://example.com/photo.jpg')->origin();
+
+        $this->assertSame('url', $origin->type);
+        $this->assertSame('https://example.com/photo.jpg', $origin->reference);
+    }
+
     protected function makeApp(array $config): Application
     {
         $app = m::mock(Application::class, \ArrayAccess::class);

@@ -4,6 +4,7 @@ namespace Illuminate\Http\Concerns;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Image;
+use Illuminate\Image\ImageOrigin;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Dumpable;
@@ -256,7 +257,7 @@ trait InteractsWithInput
             return null;
         }
 
-        return new Image(fn () => $file->getContent(), $file);
+        return new Image(fn () => $file->getContent(), $file, new ImageOrigin('upload', $file->getClientOriginalName()));
     }
 
     /**

@@ -2,9 +2,16 @@
 
 namespace Illuminate\Tests\Image;
 
+use Illuminate\Config\Repository;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Image\Driver;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Image\Events\ImageProcessed;
 use Illuminate\Image\Image;
 use Illuminate\Image\ImageException;
+use Illuminate\Image\ImageManager;
+use Illuminate\Image\ImageOrigin;
 use Illuminate\Image\ImageOutputOptions;
 use Illuminate\Image\ImagePipeline;
 use Illuminate\Image\Transformations\Blur;
@@ -23,6 +30,13 @@ use PHPUnit\Framework\TestCase;
 
 class ImageTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Container::setInstance(null);
+
+        parent::tearDown();
+    }
+
     public function test_cover_returns_new_instance()
     {
         $image = $this->makeImage();
@@ -934,9 +948,143 @@ class ImageTest extends TestCase
         $this->assertInstanceOf(\RuntimeException::class, $exception);
     }
 
+    public function test_to_bytes_dispatches_image_processed_event()
+    {
+        $events = [];
+
+        $this->captureProcessedEvents($events);
+
+        $contents = $this->fakeImageContents();
+        $image = (new Image($contents, origin: new ImageOrigin('bytes')))->cover(50, 50);
+
+        $processed = $image->toBytes();
+
+        $this->assertCount(1, $events);
+        $this->assertSame('bytes', $events[0]->origin->type);
+        $this->assertSame('fake', $events[0]->driver);
+        $this->assertCount(1, $events[0]->pipeline->transformations);
+        $this->assertSame(strlen($contents), $events[0]->inputSize);
+        $this->assertSame(strlen($processed), $events[0]->outputSize);
+        $this->assertGreaterThanOrEqual(0, $events[0]->time);
+    }
+
+    public function test_to_bytes_without_changes_does_not_dispatch_event()
+    {
+        $events = [];
+
+        $this->captureProcessedEvents($events);
+
+        (new Image($this->fakeImageContents()))->toBytes();
+
+        $this->assertCount(0, $events);
+    }
+
+    public function test_to_bytes_dispatches_event_only_once()
+    {
+        $events = [];
+
+        $this->captureProcessedEvents($events);
+
+        $image = (new Image($this->fakeImageContents()))->cover(50, 50);
+
+        $image->toBytes();
+        $image->toBytes();
+
+        $this->assertCount(1, $events);
+    }
+
+    public function test_to_bytes_processes_without_event_dispatcher()
+    {
+        $this->makeProcessingContainer(withEvents: false);
+
+        $image = (new Image($this->fakeImageContents()))->cover(50, 50);
+
+        $this->assertNotEmpty($image->toBytes());
+    }
+
+    public function test_driver_exception_message_contains_origin()
+    {
+        $image = new Image($this->fakeImageContents(), origin: new ImageOrigin('storage', 'photos/avatar.jpg', 's3'));
+
+        $this->expectException(ImageException::class);
+        $this->expectExceptionMessage('Failed to process image [storage:s3:photos/avatar.jpg]:');
+
+        $image->using('nonexistent')->cover(100, 100)->toBytes();
+    }
+
+    public function test_loader_exception_is_wrapped_in_image_exception()
+    {
+        $image = (new Image(fn () => throw new \RuntimeException('File missing.')))->cover(10, 10);
+
+        $this->expectException(ImageException::class);
+        $this->expectExceptionMessage('Failed to process image: File missing.');
+
+        $image->toBytes();
+    }
+
+    public function test_dimensions_exception_message_contains_origin()
+    {
+        $image = new Image('not-an-image', origin: new ImageOrigin('path', '/tmp/photo.jpg'));
+
+        $this->expectException(ImageException::class);
+        $this->expectExceptionMessage('Unable to determine the dimensions of the image [path:/tmp/photo.jpg].');
+
+        $image->dimensions();
+    }
+
+    public function test_origin_is_preserved_on_clones()
+    {
+        $origin = new ImageOrigin('bytes');
+        $image = new Image($this->fakeImageContents(), origin: $origin);
+
+        $this->assertSame($origin, $image->cover(100, 100)->origin());
+    }
+
     protected function makeImage(): Image
     {
         return new Image($this->fakeImageContents());
+    }
+
+    /**
+     * @param  array<int, \Illuminate\Image\Events\ImageProcessed>  $events
+     */
+    protected function captureProcessedEvents(array &$events): void
+    {
+        $container = $this->makeProcessingContainer();
+
+        $container->make('events')->listen(ImageProcessed::class, function (ImageProcessed $event) use (&$events) {
+            $events[] = $event;
+        });
+    }
+
+    protected function makeProcessingContainer(bool $withEvents = true): Container
+    {
+        $container = new Container;
+        $container->instance('config', new Repository(['image' => ['default' => 'fake']]));
+
+        if ($withEvents) {
+            $container->instance('events', new Dispatcher($container));
+        }
+
+        $manager = new ImageManager($container);
+        $manager->extend('fake', fn () => new class implements Driver
+        {
+            public function process(string $contents, ImagePipeline $pipeline): string
+            {
+                return $contents.'-processed';
+            }
+
+            public function transformUsing(string $transformation, callable $callback): static
+            {
+                return $this;
+            }
+        });
+
+        $container->instance('image', $manager);
+
+        Container::setInstance($container);
+
+        return $container;
     }
 
     protected function fakeImageContents(int $width = 100, int $height = 100): string

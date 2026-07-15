@@ -11,6 +11,7 @@ use Illuminate\Http\File;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Image;
+use Illuminate\Image\ImageOrigin;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
@@ -405,7 +406,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function image(string $path): Image
     {
-        return new Image(fn () => $this->get($path));
+        return new Image(fn () => $this->get($path), origin: new ImageOrigin('storage', $path));
     }
 
     /**

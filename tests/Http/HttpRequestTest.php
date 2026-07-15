@@ -1171,7 +1171,11 @@ class HttpRequestTest extends TestCase
             ],
         ];
         $request = Request::create('/', 'GET', [], [], $files);
-        $this->assertInstanceOf(Image::class, $request->image('avatar'));
+        $image = $request->image('avatar');
+
+        $this->assertInstanceOf(Image::class, $image);
+        $this->assertSame('upload', $image->origin()->type);
+        $this->assertSame('avatar.jpg', $image->origin()->reference);
     }
 
     public function testImageMethodReturnsNullForMissingKey()

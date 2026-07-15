@@ -26,7 +26,7 @@ class ImageManager extends Manager
      */
     public function fromBytes(string $contents): Image
     {
-        return new Image($contents);
+        return new Image($contents, origin: new ImageOrigin('bytes'));
     }
 
     /**
@@ -36,6 +36,7 @@ class ImageManager extends Manager
     {
         return new Image(
             fn () => base64_decode($base64, true) ?: throw new ImageException('Invalid base64 image data.'),
+            origin: new ImageOrigin('base64'),
         );
     }
 
@@ -46,6 +47,7 @@ class ImageManager extends Manager
     {
         return new Image(
             fn () => $this->container->make(Filesystem::class)->get($path),
+            origin: new ImageOrigin('path', $path),
         );
     }
 
@@ -56,6 +58,7 @@ class ImageManager extends Manager
     {
         return new Image(
             fn () => $this->container->make(FilesystemFactory::class)->disk($disk)->get($path),
+            origin: new ImageOrigin('storage', $path, $disk),
         );
     }
 
@@ -64,7 +67,7 @@ class ImageManager extends Manager
      */
     public function fromUpload(UploadedFile $file): Image
     {
-        return new Image(fn () => $file->getContent(), $file);
+        return new Image(fn () => $file->getContent(), $file, new ImageOrigin('upload', $file->getClientOriginalName()));
     }
 
     /**
@@ -74,6 +77,7 @@ class ImageManager extends Manager
     {
         return new Image(
             fn () => $this->container->make(HttpFactory::class)->get($url)->body(),
+            origin: new ImageOrigin('url', $url),
         );
     }
 

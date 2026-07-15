@@ -9,6 +9,7 @@ use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Contracts\Image\Transformation;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Image\Events\ImageProcessed;
 use Illuminate\Image\Transformations\Blur;
 use Illuminate\Image\Transformations\Contain;
 use Illuminate\Image\Transformations\Cover;
@@ -57,6 +58,7 @@ class Image implements Stringable
     public function __construct(
         protected Closure|string $contents,
         protected ?UploadedFile $file = null,
+        protected ?ImageOrigin $origin = null,
     ) {
         $this->pipeline = new ImagePipeline;
     }
@@ -348,18 +350,26 @@ class Image implements Stringable
     public function toBytes(): string
     {
         if ($this->pipeline->hasChanges() && ! $this->processed) {
+            $pipeline = $this->pipeline;
+
             try {
-                $this->contents = $this->resolveDriver()->process(
-                    value($this->contents), $this->pipeline
-                );
+                $contents = value($this->contents);
+
+                $startedAt = hrtime(true);
+
+                $this->contents = $this->resolveDriver()->process($contents, $pipeline);
             } catch (ImageException $e) {
                 throw $e;
             } catch (Throwable $e) {
-                throw new ImageException("Failed to process image: {$e->getMessage()}", 0, $e);
+                throw new ImageException("Failed to process image{$this->originContext()}: {$e->getMessage()}", 0, $e);
             }
+
+            $time = round((hrtime(true) - $startedAt) / 1_000_000, 2);
 
             $this->pipeline = new ImagePipeline;
             $this->processed = true;
+
+            $this->dispatchProcessedEvent($pipeline, strlen($contents), strlen($this->contents), $time);
         }
 
         return value($this->contents);
@@ -419,7 +429,7 @@ class Image implements Stringable
             $size = @getimagesizefromstring($this->toBytes());
 
             if ($size === false) {
-                throw new ImageException('Unable to determine the dimensions of the image.');
+                throw new ImageException("Unable to determine the dimensions of the image{$this->originContext()}.");
             }
 
             return [$size[0], $size[1]];
@@ -488,6 +498,43 @@ class Image implements Stringable
     public function file(): ?UploadedFile
     {
         return $this->file;
+    }
+
+    /**
+     * Get the origin of the image.
+     */
+    public function origin(): ?ImageOrigin
+    {
+        return $this->origin;
+    }
+
+    /**
+     * Get the image origin context for exception messages.
+     */
+    protected function originContext(): string
+    {
+        return $this->origin ? " [{$this->origin}]" : '';
+    }
+
+    /**
+     * Dispatch the image processed event.
+     */
+    protected function dispatchProcessedEvent(ImagePipeline $pipeline, int $inputSize, int $outputSize, float $time): void
+    {
+        $container = Container::getInstance();
+
+        if (! $container->bound('events')) {
+            return;
+        }
+
+        $container->make('events')->dispatch(new ImageProcessed(
+            $this->origin,
+            $this->driver ?? $container->make('image')->getDefaultDriver(),
+            $pipeline,
+            $inputSize,
+            $outputSize,
+            $time,
+        ));
     }
 
     /**

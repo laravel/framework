@@ -214,6 +214,8 @@ class FilesystemAdapterTest extends TestCase
 
         $this->assertInstanceOf(Image::class, $image);
         $this->assertSame([100, 100], $image->dimensions());
+        $this->assertSame('storage', $image->origin()->type);
+        $this->assertSame('photo.jpg', $image->origin()->reference);
     }
 
     public function testMimeTypeNotDetected()
