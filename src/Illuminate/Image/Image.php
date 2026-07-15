@@ -8,6 +8,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Image\Driver;
 use Illuminate\Contracts\Image\Transformation;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Image\Transformations\Blur;
 use Illuminate\Image\Transformations\Contain;
@@ -27,7 +28,7 @@ use Illuminate\Support\Traits\Macroable;
 use Stringable;
 use Throwable;
 
-class Image implements Stringable
+class Image implements Htmlable, Stringable
 {
     use Conditionable, Macroable;
 
