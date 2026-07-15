@@ -63,6 +63,7 @@ jobs:
             Illuminate\\Support\\Facades\\Gate \
             Illuminate\\Support\\Facades\\Hash \
             Illuminate\\Support\\Facades\\Http \
+            Illuminate\\Support\\Facades\\Image \
             Illuminate\\Support\\Facades\\Lang \
             Illuminate\\Support\\Facades\\Log \
             Illuminate\\Support\\Facades\\Mail \
