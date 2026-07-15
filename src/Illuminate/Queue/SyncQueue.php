@@ -239,7 +239,7 @@ class SyncQueue extends Queue implements QueueContract
      * Raise the job attempted event.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  \Throwable|null  $exception
+     * @param  \Throwable|null  $exceptionOccurred
      * @return void
      */
     protected function raiseJobAttemptedEvent(Job $job, ?Throwable $exceptionOccurred = null)
