@@ -394,6 +394,7 @@ class Image implements Htmlable, Stringable
         ])
             ->merge($attributes)
             ->map(fn ($value, $key) => sprintf('%s="%s"', $key, $value));
+
         return '<img '.$attributes->join(' ').'>';
     }
 
