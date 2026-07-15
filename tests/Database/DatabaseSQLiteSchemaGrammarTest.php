@@ -54,6 +54,19 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertSame('create temporary table "users" ("id" integer primary key autoincrement not null, "email" varchar not null)', $statements[0]);
     }
 
+    public function testCreateStrictTable()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->create();
+        $blueprint->strict();
+        $blueprint->increments('id');
+        $blueprint->string('email');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create table "users" ("id" integer primary key autoincrement not null, "email" varchar not null) strict', $statements[0]);
+    }
+
     public function testDropTable()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
