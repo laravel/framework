@@ -388,7 +388,7 @@ class ApplicationBuilder
     /**
      * Register and configure the application's exception handler.
      *
-     * @param  callable(\Illuminate\Foundation\Configuration\Exceptions)|null  $using
+     * @param  (callable(\Illuminate\Foundation\Configuration\Exceptions): mixed)|null  $using
      * @return $this
      */
     public function withExceptions(?callable $using = null)

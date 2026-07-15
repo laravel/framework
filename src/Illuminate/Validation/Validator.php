@@ -1643,7 +1643,7 @@ class Validator implements ValidatorContract
     /**
      * Ensure exponents are within range using the given callback.
      *
-     * @param  callable(int $scale, string $attribute, mixed $value)  $callback
+     * @param  callable(int, string, mixed): mixed  $callback
      * @return $this
      */
     public function ensureExponentWithinAllowedRangeUsing($callback)
