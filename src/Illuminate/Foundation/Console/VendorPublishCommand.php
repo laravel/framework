@@ -141,10 +141,7 @@ class VendorPublishCommand extends Command
             )
             : search(
                 label: "Which provider or tag's files would you like to publish?",
-                options: fn ($search) => array_values(array_filter(
-                    $choices,
-                    fn ($choice) => str_contains(strtolower($choice), strtolower($search))
-                )),
+                options: fn ($search) => $this->searchPublishableChoices($choices, $search),
                 placeholder: 'Search...',
                 scroll: 15,
             );
@@ -154,6 +151,83 @@ class VendorPublishCommand extends Command
         }
 
         $this->parseChoice($choice);
+    }
+
+    /**
+     * Search the publishable providers and tags.
+     *
+     * @param  array<int, string>  $choices
+     * @return array<int, string>
+     */
+    protected function searchPublishableChoices(array $choices, string $search)
+    {
+        $search = $this->searchValue($search);
+
+        if ($search === '') {
+            return $choices;
+        }
+
+        return collect($choices)
+            ->mapWithKeys(function ($choice) use ($search) {
+                $value = $this->searchValue($choice);
+
+                if (str_contains(" {$value} ", " {$search} ")) {
+                    return [$choice => 100];
+                }
+
+                if (Str::length(Str::remove(' ', $search)) > 2
+                    && str_contains(Str::remove(' ', $value), Str::remove(' ', $search))) {
+                    return [$choice => 99];
+                }
+
+                if ($this->matchesSearchTerms($value, $search)) {
+                    return [$choice => 98];
+                }
+
+                return [$choice => 0];
+            })
+            ->filter()
+            ->sortDesc()
+            ->keys()
+            ->all();
+    }
+
+    /**
+     * Determine whether every search term matches a value term.
+     */
+    protected function matchesSearchTerms(string $value, string $search)
+    {
+        foreach (explode(' ', $search) as $searchTerm) {
+            $matches = false;
+
+            foreach (explode(' ', $value) as $valueTerm) {
+                similar_text($searchTerm, Str::substr($valueTerm, 0, Str::length($searchTerm)), $similarity);
+
+                if (Str::startsWith($valueTerm, $searchTerm)
+                    || (Str::length($searchTerm) > 2 && Str::contains($valueTerm, $searchTerm))
+                    || $similarity >= 70) {
+                    $matches = true;
+
+                    break;
+                }
+            }
+
+            if (! $matches) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Normalize a value for searching.
+     */
+    protected function searchValue(string $value)
+    {
+        $value = Str::snake(Str::replace('\\', ' ', strip_tags($value)), ' ');
+
+        return Str::squish(preg_replace('/[^\p{L}\p{N}\p{M}]+/u', ' ', Str::lower($value)));
     }
 
     /**
