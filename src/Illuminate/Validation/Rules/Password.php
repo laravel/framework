@@ -467,7 +467,7 @@ class Password implements DataAwareRule, ImplicitRule, IteratorAggregate, Rule, 
     /**
      * Get an iterator for the password validation rules.
      *
-     * @return \ArrayIterator<TKey, TValue>
+     * @return \ArrayIterator<int, mixed>
      */
     public function getIterator(): Traversable
     {

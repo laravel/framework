@@ -251,7 +251,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Load a relationship path for models of the given type if it is not already eager loaded.
      *
-     * @param  array<int, <string, class-string>>  $tuples
+     * @param  array<int, array<string, class-string>>  $tuples
      * @return void
      */
     public function loadMissingRelationshipChain(array $tuples)
