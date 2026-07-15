@@ -819,6 +819,23 @@ class ImageTest extends TestCase
         $this->assertSame(90, $options->quality);
     }
 
+    public function test_to_html()
+    {
+        $image = $this->makeImage();
+        $this->assertSame('<img src="" width="100" height="100">', $options->image->toHtml());
+
+        $result = $image->scale(400, 400);
+        $this->assertSame('<img src="" width="100" height="100">', $options->image->toHtml());
+    }
+
+    public function test_to_html_with_additional_attributes()
+    {
+        $image = $this->makeImage();
+
+        $result = $image->scale(400, 400);
+        $this->assertSame('<img src="" width="100" height="100" alt="My avatar">', $options->image->toHtml(['alt' => 'My avatar']));
+    }
+
     public function test_optimize_throws_for_gif()
     {
         $this->expectException(ImageException::class);
