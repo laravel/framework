@@ -92,6 +92,23 @@ class ValidationRuleCanTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidationPassesFalseyArguments()
+    {
+        $this->gate()->define('update-company', function ($user, ...$arguments) {
+            $this->assertSame([\App\Models\Company::class, 0, false, '0', 0], $arguments);
+
+            return true;
+        });
+
+        $v = new Validator(
+            resolve('translator'),
+            ['company' => 0],
+            ['company' => new Can('update-company', [\App\Models\Company::class, 0, false, '0'])]
+        );
+
+        $this->assertTrue($v->passes());
+    }
+
     public function testCustomMessageUsingDotNotationAndFqcnWorks()
     {
         $v = new Validator(
