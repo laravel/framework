@@ -171,7 +171,13 @@ trait ValidatesAttributes
      */
     public function validateBase64($attribute, $value): bool
     {
-        return is_string($value) && $value !== '' && base64_decode($value, true) !== false;
+        if (! is_string($value) || $value === '') {
+            return false;
+        }
+
+        $decoded = base64_decode($value, true);
+
+        return $decoded !== false && base64_encode($decoded) === $value;
     }
 
     /**
