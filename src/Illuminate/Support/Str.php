@@ -1951,7 +1951,21 @@ class Str
      */
     public static function wordWrap($string, $characters = 75, $break = "\n", $cutLongWords = false)
     {
-        return wordwrap($string, $characters, $break, $cutLongWords);
+        if (static::isAscii($string)) {
+            return wordwrap($string, $characters, $break, $cutLongWords);
+        }
+
+        $replaced = [];
+
+        $skeleton = preg_replace_callback('/[\x80-\xFF][\x80-\xBF]*|\x1A/', function ($match) use (&$replaced) {
+            $replaced[] = $match[0];
+
+            return "\x1A";
+        }, $string);
+
+        return preg_replace_callback('/\x1A/', function () use (&$replaced) {
+            return array_shift($replaced);
+        }, wordwrap($skeleton, $characters, $break, $cutLongWords));
     }
 
     /**
