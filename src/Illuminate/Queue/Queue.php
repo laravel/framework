@@ -136,7 +136,9 @@ abstract class Queue
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new InvalidPayloadException(
-                'Unable to JSON encode payload. Error ('.json_last_error().'): '.json_last_error_msg(), $value
+                sprintf('Unable to JSON encode payload for job [%s] on queue [%s]. Error (%d): %s',
+                    $value['displayName'] ?? 'unknown', $queue ?? 'default', json_last_error(), json_last_error_msg()
+                ), $value
             );
         }
 
