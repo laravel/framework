@@ -37,7 +37,7 @@ abstract class Seeder
      *
      * @var string[]
      */
-    protected $paths = [];
+    protected static $paths = [];
 
     /**
      * Run the given seeder class.
@@ -153,9 +153,9 @@ abstract class Seeder
      * @param  string  $path
      * @return void
      */
-    public function path($path)
+    public static function path($path)
     {
-        $this->paths = array_unique(array_merge($this->paths, [$path]));
+        static::$paths = array_unique(array_merge(static::$paths, [$path]));
     }
 
     /**
@@ -163,9 +163,19 @@ abstract class Seeder
      *
      * @return string[]
      */
-    public function paths()
+    public static function paths()
     {
-        return $this->paths;
+        return static::$paths;
+    }
+
+    /**
+     * Flush the registered seeder paths.
+     *
+     * @return void
+     */
+    public static function flushPaths()
+    {
+        static::$paths = [];
     }
 
     /**

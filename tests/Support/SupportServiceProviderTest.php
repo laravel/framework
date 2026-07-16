@@ -36,6 +36,8 @@ class SupportServiceProviderTest extends TestCase
 
     protected function tearDown(): void
     {
+        Seeder::flushPaths();
+
         if (isset($this->tempFile) && file_exists($this->tempFile)) {
             @unlink($this->tempFile);
         }
@@ -200,36 +202,24 @@ class SupportServiceProviderTest extends TestCase
 
     public function testLoadSeedersFrom()
     {
-        $seeder = m::mock(Seeder::class);
-        $seeder->shouldReceive('path')->once()->with(__DIR__.'/seeders');
-
-        $this->app->shouldReceive('afterResolving')->once()->with(Seeder::class, m::on(function ($callback) use ($seeder) {
-            $callback($seeder);
-
-            return true;
-        }));
-
         $provider = new ServiceProviderForTestingOne($this->app);
         $provider->loadSeedersFrom(__DIR__.'/seeders');
+
+        $this->assertSame([__DIR__.'/seeders'], Seeder::paths());
     }
 
     public function testLoadSeedersFromWithMultiplePaths()
     {
-        $seeder = m::mock(Seeder::class);
-        $seeder->shouldReceive('path')->once()->with(__DIR__.'/seeders');
-        $seeder->shouldReceive('path')->once()->with(__DIR__.'/modules/seeders');
-
-        $this->app->shouldReceive('afterResolving')->once()->with(Seeder::class, m::on(function ($callback) use ($seeder) {
-            $callback($seeder);
-
-            return true;
-        }));
-
         $provider = new ServiceProviderForTestingOne($this->app);
         $provider->loadSeedersFrom([
             __DIR__.'/seeders',
             __DIR__.'/modules/seeders',
         ]);
+
+        $this->assertSame([
+            __DIR__.'/seeders',
+            __DIR__.'/modules/seeders',
+        ], Seeder::paths());
     }
 
     public function test_can_remove_provider()

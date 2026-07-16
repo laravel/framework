@@ -292,11 +292,9 @@ abstract class ServiceProvider
      */
     protected function loadSeedersFrom($paths)
     {
-        $this->callAfterResolving(Seeder::class, function ($seeder) use ($paths) {
-            foreach ((array) $paths as $path) {
-                $seeder->path($path);
-            }
-        });
+        foreach ((array) $paths as $path) {
+            Seeder::path($path);
+        }
     }
 
     /**

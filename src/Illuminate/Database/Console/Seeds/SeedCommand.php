@@ -7,6 +7,7 @@ use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Console\Prohibitable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Seeder;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -88,7 +89,7 @@ class SeedCommand extends Command
         $class = $this->input->getArgument('class') ?? $this->input->getOption('class');
 
         if (! str_contains($class, '\\')) {
-            $class = 'Database\\Seeders\\'.$class;
+            $class = $this->resolveSeederClass($class);
         }
 
         if ($class === 'Database\\Seeders\\DatabaseSeeder' &&
@@ -99,6 +100,52 @@ class SeedCommand extends Command
         return $this->laravel->make($class)
             ->setContainer($this->laravel)
             ->setCommand($this);
+    }
+
+    /**
+     * Resolve the seeder class from the registered seeder paths.
+     *
+     * @param  string  $class
+     * @return string
+     */
+    protected function resolveSeederClass($class)
+    {
+        foreach ($this->getSeederPaths() as $path) {
+            $file = $path.DIRECTORY_SEPARATOR.$class.'.php';
+
+            if (! is_file($file)) {
+                continue;
+            }
+
+            if (preg_match('/^namespace\s+([^;]+);/m', file_get_contents($file), $matches) &&
+                class_exists($namespaced = trim($matches[1]).'\\'.$class)) {
+                return $namespaced;
+            }
+        }
+
+        return 'Database\\Seeders\\'.$class;
+    }
+
+    /**
+     * Get all of the seeder paths.
+     *
+     * @return string[]
+     */
+    protected function getSeederPaths()
+    {
+        return array_merge(
+            Seeder::paths(), [$this->getSeederPath()]
+        );
+    }
+
+    /**
+     * Get the path to the seeder directory.
+     *
+     * @return string
+     */
+    protected function getSeederPath()
+    {
+        return $this->laravel->databasePath().DIRECTORY_SEPARATOR.'seeders';
     }
 
     /**

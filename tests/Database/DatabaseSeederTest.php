@@ -28,6 +28,13 @@ class TestDepsSeeder extends Seeder
 
 class DatabaseSeederTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Seeder::flushPaths();
+
+        parent::tearDown();
+    }
+
     public function testCallResolveTheClassAndCallsRun()
     {
         $seeder = new TestSeeder;
@@ -87,22 +94,20 @@ class DatabaseSeederTest extends TestCase
 
     public function testPath()
     {
-        $seeder = new TestSeeder;
-        $seeder->path(__DIR__.'/seeders');
-        $seeder->path(__DIR__.'/modules/seeders');
+        Seeder::path(__DIR__.'/seeders');
+        Seeder::path(__DIR__.'/modules/seeders');
 
         $this->assertSame([
             __DIR__.'/seeders',
             __DIR__.'/modules/seeders',
-        ], $seeder->paths());
+        ], Seeder::paths());
     }
 
     public function testPathDoesNotRegisterDuplicates()
     {
-        $seeder = new TestSeeder;
-        $seeder->path(__DIR__.'/seeders');
-        $seeder->path(__DIR__.'/seeders');
+        Seeder::path(__DIR__.'/seeders');
+        Seeder::path(__DIR__.'/seeders');
 
-        $this->assertSame([__DIR__.'/seeders'], $seeder->paths());
+        $this->assertSame([__DIR__.'/seeders'], Seeder::paths());
     }
 }
