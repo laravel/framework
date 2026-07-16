@@ -928,7 +928,7 @@ class ImageTest extends TestCase
 
         $result = $image->scale(400, 400);
         $this->assertStringStartsWith('<img src="');
-        $this->assertStringEndsWith('" width="100" height="42">', $image->toHtml(['height' => 42));
+        $this->assertStringEndsWith('" width="100" height="42">', $image->toHtml(['height' => 42]));
     }
 
     public function test_optimize_allows_gif()
