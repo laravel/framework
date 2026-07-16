@@ -22,6 +22,7 @@ use Illuminate\Image\Transformations\Resize;
 use Illuminate\Image\Transformations\Rotate;
 use Illuminate\Image\Transformations\Scale;
 use Illuminate\Image\Transformations\Sharpen;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
@@ -383,7 +384,7 @@ class Image implements Htmlable, Stringable
     }
 
     /**
-     * @param  array<string, scalar|\Stringable>  $attributes
+     * @param  array<string, scalar|\Stringable|bool>&string[]  $attributes
      */
     public function toHtml(array $attributes = []): string
     {
@@ -392,7 +393,15 @@ class Image implements Htmlable, Stringable
             'width' => $this->width(),
             'height' => $this->height(),
         ])
-            ->merge($attributes)
+            ->merge(Arr::mapWithKeys($attributes, function ($value, $key) {
+                if (is_int($key) && is_string($value)) {
+                    return [$value => true];
+                }
+
+                if (is_string($key) && (is_string($value) || $value instanceof Stringable || is_bool($value))) {
+                    return [$key => $value];
+                }
+            }))
             ->map(fn ($value, $key) => sprintf('%s="%s"', e($key), e($value)));
 
         return '<img '.$attributes->join(' ').'>';
