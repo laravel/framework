@@ -10,33 +10,37 @@ use PHPUnit\Framework\TestCase;
 
 class HubTest extends TestCase
 {
-    public function testPipeSendsObjectThroughDefaultPipeline()
-    {
-        $hub = new Hub(new Container);
+    private Hub $hub;
 
-        $hub->defaults(function (Pipeline $pipeline, $object) {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->hub = new Hub(new Container);
+    }
+
+    public function testPipeSendsObjectThroughDefaultPipeline(): void
+    {
+        $this->hub->defaults(function (Pipeline $pipeline, $object) {
             return $pipeline->send($object)->through([])->thenReturn();
         });
 
-        $this->assertSame('foo', $hub->pipe('foo'));
+        $this->assertSame('foo', $this->hub->pipe('foo'));
     }
 
-    public function testPipeSendsObjectThroughNamedPipeline()
+    public function testPipeSendsObjectThroughNamedPipeline(): void
     {
-        $hub = new Hub(new Container);
-
-        $hub->pipeline('named', function (Pipeline $pipeline, $object) {
+        $this->hub->pipeline('named', function (Pipeline $pipeline, $object) {
             return $pipeline->send($object)->through([])->thenReturn();
         });
 
-        $this->assertSame('foo', $hub->pipe('foo', 'named'));
+        $this->assertSame('foo', $this->hub->pipe('foo', 'named'));
     }
 
-    public function testPipeThrowsExceptionForUndefinedPipeline()
+    public function testPipeThrowsExceptionForUndefinedPipeline(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Pipeline [missing] is not defined.');
+        $this->expectExceptionObject(new InvalidArgumentException('Pipeline [missing] is not defined.'));
 
-        (new Hub(new Container))->pipe('foo', 'missing');
+        $this->hub->pipe('foo', 'missing');
     }
 }
