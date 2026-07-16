@@ -835,7 +835,7 @@ class ImageTest extends TestCase
         $image = $this->makeImage();
 
         $result = $image->scale(400, 400);
-        $this->assertSame('<img src="" width="100" height="100" alt="My avatar">', $image->toHtml(['alt' => 'My avatar']));
+        $this->assertSame('<img src="" width="100" height="100" alt="My avatar" hidden>', $image->toHtml(['alt' => 'My avatar', 'hidden']));
     }
 
     public function test_optimize_throws_for_gif()
