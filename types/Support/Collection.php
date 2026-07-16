@@ -5,7 +5,7 @@ use Illuminate\Support\Collection;
 
 use function PHPStan\Testing\assertType;
 
-/** @implements Arrayable<int, User> */
+/** @implements Arrayable<array<int, User>> */
 class Users implements Arrayable
 {
     public function toArray(): array

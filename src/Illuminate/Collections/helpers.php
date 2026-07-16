@@ -10,8 +10,8 @@ if (! function_exists('collect')) {
      * @template TKey of array-key
      * @template TValue
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>|null  $value
-     * @return \Illuminate\Support\Collection<TKey, TValue>
+     * @param  \Illuminate\Contracts\Support\Arrayable<array<array-key, mixed>>|iterable<TKey, TValue>|null  $value
+     * @return ($value is \Illuminate\Contracts\Support\Arrayable<array<TKey, TValue>> ? \Illuminate\Support\Collection<TKey, TValue> : \Illuminate\Support\Collection<TKey, TValue>)
      */
     function collect($value = []): Collection
     {

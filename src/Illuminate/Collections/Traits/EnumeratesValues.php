@@ -113,8 +113,8 @@ trait EnumeratesValues
      * @template TMakeKey of array-key
      * @template TMakeValue
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable<TMakeKey, TMakeValue>|iterable<TMakeKey, TMakeValue>|null  $items
-     * @return static<TMakeKey, TMakeValue>
+     * @param  \Illuminate\Contracts\Support\Arrayable<array<array-key, mixed>>|iterable<TMakeKey, TMakeValue>|null  $items
+     * @return ($items is \Illuminate\Contracts\Support\Arrayable<array<TMakeKey, TMakeValue>> ? static<TMakeKey, TMakeValue> : static<TMakeKey, TMakeValue>)
      */
     public static function make($items = [], ...$args)
     {

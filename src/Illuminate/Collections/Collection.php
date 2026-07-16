@@ -38,7 +38,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Create a new collection.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>|null  $items
+     * @param  \Illuminate\Contracts\Support\Arrayable<array<TKey, TValue>>|iterable<TKey, TValue>|null  $items
      */
     public function __construct($items = [])
     {
@@ -254,10 +254,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Cross join with the given lists, returning all possible permutations.
      *
-     * @template TCrossJoinKey
      * @template TCrossJoinValue
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable<TCrossJoinKey, TCrossJoinValue>|iterable<TCrossJoinKey, TCrossJoinValue>  ...$lists
+     * @param  \Illuminate\Contracts\Support\Arrayable<array<array-key, TCrossJoinValue>>|iterable<array-key, TCrossJoinValue>  ...$lists
      * @return static<int, array<int, TValue|TCrossJoinValue>>
      */
     public function crossJoin(...$lists)

@@ -3,15 +3,14 @@
 namespace Illuminate\Contracts\Support;
 
 /**
- * @template TKey of array-key
- * @template TValue
+ * @template-covariant TReturn of array = array<array-key, mixed>
  */
 interface Arrayable
 {
     /**
      * Get the instance as an array.
      *
-     * @return array<TKey, TValue>
+     * @return TReturn
      */
     public function toArray();
 }
