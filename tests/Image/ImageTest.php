@@ -930,7 +930,7 @@ class ImageTest extends TestCase
         $image = $this->makeImage();
 
         $result = $image->scale(400, 400);
-        $html = $image->toHtml(['height' => 42])
+        $html = $image->toHtml(['height' => 42]);
         $this->assertStringStartsWith('<img src="', $html);
         $this->assertStringEndsWith('" width="100" height="42">', $html);
     }
