@@ -163,6 +163,18 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is a valid Base64 string.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateBase64($attribute, $value): bool
+    {
+        return is_string($value) && $value !== '' && base64_decode($value, true) !== false;
+    }
+
+    /**
      * "Break" on first validation fail.
      *
      * Always returns true, just lets us put "bail" in rules.
