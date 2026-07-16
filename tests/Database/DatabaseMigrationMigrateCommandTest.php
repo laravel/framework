@@ -16,6 +16,13 @@ use Symfony\Component\Console\Output\NullOutput;
 
 class DatabaseMigrationMigrateCommandTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        MigrateCommand::prohibit(false);
+
+        parent::tearDown();
+    }
+
     public function testBasicMigrationsCallMigratorWithProperArguments()
     {
         $command = new MigrateCommand($migrator = m::mock(Migrator::class), $dispatcher = m::mock(Dispatcher::class));
@@ -133,6 +140,22 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
 
         $this->runCommand($command, ['--step' => true]);
+    }
+
+    public function testMigrateCommandExitsWhenProhibited()
+    {
+        $command = new MigrateCommand($migrator = m::mock(Migrator::class), m::mock(Dispatcher::class));
+        $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+
+        MigrateCommand::prohibit();
+
+        $code = $this->runCommand($command);
+
+        $this->assertSame(1, $code);
+
+        $migrator->shouldNotHaveBeenCalled();
     }
 
     protected function runCommand($command, $input = [])

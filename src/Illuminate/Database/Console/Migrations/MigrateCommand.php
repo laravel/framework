@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\ConfirmableTrait;
+use Illuminate\Console\Prohibitable;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\SchemaLoaded;
@@ -20,7 +21,7 @@ use function Laravel\Prompts\confirm;
 #[AsCommand(name: 'migrate')]
 class MigrateCommand extends BaseCommand implements Isolatable
 {
-    use ConfirmableTrait;
+    use ConfirmableTrait, Prohibitable;
 
     /**
      * The name and signature of the console command.
@@ -82,7 +83,8 @@ class MigrateCommand extends BaseCommand implements Isolatable
      */
     public function handle()
     {
-        if (! $this->confirmToProceed()) {
+        if ($this->isProhibited() ||
+            ! $this->confirmToProceed()) {
             return 1;
         }
 
