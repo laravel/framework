@@ -89,6 +89,14 @@ class ImagickDriverTest extends TestCase
             $this->markTestSkipped('The Imagick extension was not compiled with AVIF support.');
         }
 
+        $imagick = new \Imagick;
+        $imagick->newImage(1, 1, 'white');
+        $imagick->setImageFormat('avif');
+
+        if ($imagick->getImageBlob() === '') {
+            $this->markTestSkipped('The Imagick extension cannot encode AVIF images.');
+        }
+
         $driver = new ImagickDriver;
 
         $pipeline = $this->pipeline(format: 'avif');
