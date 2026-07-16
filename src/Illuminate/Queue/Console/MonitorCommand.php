@@ -148,7 +148,7 @@ class MonitorCommand extends Command
     protected function dispatchEvents(Collection $queues)
     {
         foreach ($queues as $queue) {
-            if ($queue['status'] == '<fg=green;options=bold>OK</>') {
+            if ($queue['status'] === '<fg=green;options=bold>OK</>') {
                 continue;
             }
 

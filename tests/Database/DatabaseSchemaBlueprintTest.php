@@ -106,7 +106,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
     public function testDefaultCurrentDate()
     {
         $getSql = function ($grammar, $mysql57 = false) {
-            if ($grammar == 'MySql') {
+            if ($grammar === 'MySql') {
                 $connection = $this->getConnection($grammar);
                 $mysql57 ? $connection->shouldReceive('getServerVersion')->andReturn('5.7') : $connection->shouldReceive('getServerVersion')->andReturn('8.0.13');
                 $connection->shouldReceive('isMaria')->andReturn(false);
@@ -159,7 +159,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
     public function testDefaultCurrentYear()
     {
         $getSql = function ($grammar, $mysql57 = false) {
-            if ($grammar == 'MySql') {
+            if ($grammar === 'MySql') {
                 $connection = $this->getConnection($grammar);
                 $mysql57 ? $connection->shouldReceive('getServerVersion')->andReturn('5.7') : $connection->shouldReceive('getServerVersion')->andReturn('8.0.13');
                 $connection->shouldReceive('isMaria')->andReturn(false);
