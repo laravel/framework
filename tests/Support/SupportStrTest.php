@@ -1506,6 +1506,7 @@ class SupportStrTest extends TestCase
         $this->assertSame("žltý\nkôň", Str::wordWrap('žltý kôň', 4, "\n", true));
         $this->assertSame("žl\ntý", Str::wordWrap('žltý', 2, "\n", true));
         $this->assertSame("😀😀\n😀😀", Str::wordWrap('😀😀😀😀', 2, "\n", true));
+        $this->assertSame("éA\x1ABé", Str::wordWrap('é é', 1, "A\x1AB"));
         $this->assertSame('❤Mu<br />lti<br />Byt<br />e☆❤<br />☆❤☆<br />❤', Str::wordWrap('❤Multi Byte☆❤☆❤☆❤', 3, '<br />', true));
     }
 
