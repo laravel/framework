@@ -393,7 +393,7 @@ class Image implements Htmlable, Stringable
             'height' => $this->height(),
         ])
             ->merge($attributes)
-            ->map(fn ($value, $key) => sprintf('%s="%s"', $key, $value));
+            ->map(fn ($value, $key) => sprintf('%s="%s"', e($key), e($value)));
 
         return '<img '.$attributes->join(' ').'>';
     }
