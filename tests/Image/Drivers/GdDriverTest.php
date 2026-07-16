@@ -63,6 +63,54 @@ class GdDriverTest extends TestCase
         $this->assertSame(IMAGETYPE_JPEG, getimagesizefromstring($result)[2]);
     }
 
+    public function test_processes_optimize_to_png()
+    {
+        $driver = new GdDriver;
+
+        $pipeline = $this->pipeline(format: 'png');
+
+        $result = $driver->process($this->fakeImageContents(), $pipeline);
+
+        $this->assertSame(IMAGETYPE_PNG, getimagesizefromstring($result)[2]);
+    }
+
+    public function test_processes_optimize_to_gif()
+    {
+        $driver = new GdDriver;
+
+        $pipeline = $this->pipeline(format: 'gif');
+
+        $result = $driver->process($this->fakeImageContents(), $pipeline);
+
+        $this->assertSame(IMAGETYPE_GIF, getimagesizefromstring($result)[2]);
+    }
+
+    public function test_processes_optimize_to_avif()
+    {
+        if (! function_exists('imageavif')) {
+            $this->markTestSkipped('The GD extension was not compiled with AVIF support.');
+        }
+
+        $driver = new GdDriver;
+
+        $pipeline = $this->pipeline(format: 'avif');
+
+        $result = $driver->process($this->fakeImageContents(), $pipeline);
+
+        $this->assertSame(IMAGETYPE_AVIF, getimagesizefromstring($result)[2]);
+    }
+
+    public function test_processes_optimize_to_bmp()
+    {
+        $driver = new GdDriver;
+
+        $pipeline = $this->pipeline(format: 'bmp');
+
+        $result = $driver->process($this->fakeImageContents(), $pipeline);
+
+        $this->assertSame(IMAGETYPE_BMP, getimagesizefromstring($result)[2]);
+    }
+
     public function test_processes_cover_and_optimize_together()
     {
         $driver = new GdDriver;

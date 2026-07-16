@@ -12,7 +12,7 @@ class ImageOutputOptions
     /**
      * The output format.
      *
-     * @var 'webp'|'jpg'|'jpeg'|null
+     * @var 'webp'|'jpg'|'jpeg'|'png'|'gif'|'avif'|'bmp'|null
      */
     public ?string $format = null;
 
