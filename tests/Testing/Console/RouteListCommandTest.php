@@ -224,7 +224,7 @@ class RouteListCommandTest extends TestCase
             ->assertSuccessful()
             ->expectsOutput('')
             ->expectsOutput('  GET|HEAD|QUERY       foo/{user} Illuminate\Tests\Testing\Console\FooController@show')
-            ->expectsOutput('  ANY                   redirect Illuminate\Routing\RedirectController')
+            ->expectsOutput('  ANY                  redirect Illuminate\Routing\RedirectController')
             ->expectsOutput('  GET|HEAD|QUERY       view ........................................ ')
             ->expectsOutput('')
             ->expectsOutput('                                                  Showing [3] routes')
