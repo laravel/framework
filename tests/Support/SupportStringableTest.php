@@ -634,6 +634,30 @@ class SupportStringableTest extends TestCase
         $this->assertSame('Hello', (string) $this->stringable('🎂')->transliterate('Hello'));
     }
 
+    public function testTrans()
+    {
+        $originalContainer = Container::getInstance();
+
+        Container::setInstance($container = new Container);
+
+        $container->instance('translator', new class
+        {
+            public function get($key, array $replace = [], $locale = null)
+            {
+                return str_replace(':name', $replace['name'], $key).' '.$locale;
+            }
+        });
+
+        try {
+            $string = $this->stringable('Hello :name')->trans(['name' => 'Taylor'], 'en');
+        } finally {
+            Container::setInstance($originalContainer);
+        }
+
+        $this->assertInstanceOf(Stringable::class, $string);
+        $this->assertSame('hello taylor en', (string) $string->lower());
+    }
+
     public function testNewLine()
     {
         $this->assertSame('Laravel'.PHP_EOL, (string) $this->stringable('Laravel')->newLine());

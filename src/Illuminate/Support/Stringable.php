@@ -924,6 +924,18 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Translate the string and get a new stringable object.
+     *
+     * @param  array  $replace
+     * @param  string|null  $locale
+     * @return static
+     */
+    public function trans($replace = [], $locale = null)
+    {
+        return new static(Str::trans($this->value, $replace, $locale));
+    }
+
+    /**
      * Transliterate a string to its closest ASCII representation.
      *
      * @param  string|null  $unknown
