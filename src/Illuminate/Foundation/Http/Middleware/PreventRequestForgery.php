@@ -119,7 +119,7 @@ class PreventRequestForgery
      */
     protected function isReading($request)
     {
-        return in_array($request->method(), ['HEAD', 'GET', 'OPTIONS']);
+        return in_array($request->method(), ['HEAD', 'GET', 'QUERY', 'OPTIONS']);
     }
 
     /**
