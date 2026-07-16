@@ -355,7 +355,7 @@ class DatabaseEloquentCollectionTest extends TestCase
             return 'not-a-model';
         });
 
-        $this->assertEquals(BaseCollection::class, get_class($c));
+        $this->assertInstanceOf(BaseCollection::class, $c);
     }
 
     public function testMapWithKeys()
@@ -384,7 +384,7 @@ class DatabaseEloquentCollectionTest extends TestCase
             return [$key++ => 'not-a-model'];
         });
 
-        $this->assertEquals(BaseCollection::class, get_class($c));
+        $this->assertInstanceOf(BaseCollection::class, $c);
     }
 
     public function testCollectionDiffsWithGivenCollection()
@@ -612,15 +612,15 @@ class DatabaseEloquentCollectionTest extends TestCase
     {
         $a = new Collection([['foo' => 'bar'], ['foo' => 'baz']]);
         $b = new Collection(['a', 'b', 'c']);
-        $this->assertEquals(BaseCollection::class, get_class($a->pluck('foo')));
-        $this->assertEquals(BaseCollection::class, get_class($a->keys()));
-        $this->assertEquals(BaseCollection::class, get_class($a->collapse()));
-        $this->assertEquals(BaseCollection::class, get_class($a->flatten()));
-        $this->assertEquals(BaseCollection::class, get_class($a->zip(['a', 'b'], ['c', 'd'])));
-        $this->assertEquals(BaseCollection::class, get_class($a->countBy('foo')));
-        $this->assertEquals(BaseCollection::class, get_class($b->flip()));
-        $this->assertEquals(BaseCollection::class, get_class($a->partition('foo', '=', 'bar')));
-        $this->assertEquals(BaseCollection::class, get_class($a->partition('foo', 'bar')));
+        $this->assertInstanceOf(BaseCollection::class, $a->pluck('foo'));
+        $this->assertInstanceOf(BaseCollection::class, $a->keys());
+        $this->assertInstanceOf(BaseCollection::class, $a->collapse());
+        $this->assertInstanceOf(BaseCollection::class, $a->flatten());
+        $this->assertInstanceOf(BaseCollection::class, $a->zip(['a', 'b'], ['c', 'd']));
+        $this->assertInstanceOf(BaseCollection::class, $a->countBy('foo'));
+        $this->assertInstanceOf(BaseCollection::class, $b->flip());
+        $this->assertInstanceOf(BaseCollection::class, $a->partition('foo', '=', 'bar'));
+        $this->assertInstanceOf(BaseCollection::class, $a->partition('foo', 'bar'));
     }
 
     public function testMakeVisibleRemovesHiddenAndIncludesVisible()

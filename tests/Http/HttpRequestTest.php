@@ -11,7 +11,6 @@ use Illuminate\Routing\Route;
 use Illuminate\Session\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Stringable;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use InvalidArgumentException;
 use Mockery as m;
@@ -671,8 +670,8 @@ class HttpRequestTest extends TestCase
             'empty_str' => '',
             'null' => null,
         ]);
-        $this->assertTrue($request->string('int') instanceof Stringable);
-        $this->assertTrue($request->string('unknown_key') instanceof Stringable);
+        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $request->string('int'));
+        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $request->string('unknown_key'));
         $this->assertSame('123', $request->string('int')->value());
         $this->assertSame('456', $request->string('int_str')->value());
         $this->assertSame('123.456', $request->string('float')->value());

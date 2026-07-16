@@ -47,12 +47,7 @@ use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertComparisonToSpecificMetho
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEmptyNullableObjectToAssertInstanceofRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEqualsOrAssertSameFloatParameterToSpecificMethodsTypeRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEqualsToSameRector;
-use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertInstanceOfComparisonRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertIssetToSpecificMethodRector;
-use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertNotOperatorRector;
-use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertSameBoolNullToSpecificMethodRector;
-use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertSameTrueFalseToAssertTrueFalseRector;
-use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertTrueFalseToSpecificMethodRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\ScalarArgumentToExpectedParamTypeRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\StringCastAssertStringContainsStringRector;
 use Rector\PHPUnit\CodeQuality\Rector\StmtsAwareInterface\DeclareStrictTypesTestsRector;
@@ -70,12 +65,7 @@ $skipPHPUnitSetList = [
     AssertEmptyNullableObjectToAssertInstanceofRector::class,
     AssertEqualsOrAssertSameFloatParameterToSpecificMethodsTypeRector::class,
     AssertEqualsToSameRector::class,
-    AssertInstanceOfComparisonRector::class,
     AssertIssetToSpecificMethodRector::class,
-    AssertNotOperatorRector::class,
-    AssertSameBoolNullToSpecificMethodRector::class,
-    AssertSameTrueFalseToAssertTrueFalseRector::class,
-    AssertTrueFalseToSpecificMethodRector::class,
     CreateStubOverCreateMockArgRector::class,
     DataProviderArrayItemsNewLinedRector::class,
     DeclareStrictTypesTestsRector::class,
