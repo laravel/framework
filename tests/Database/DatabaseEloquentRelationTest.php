@@ -232,9 +232,13 @@ class DatabaseEloquentRelationTest extends TestCase
 
     public function testGetMorphAlias()
     {
-        Relation::morphMap(['user' => 'App\User']);
+        Relation::morphMap([
+            'user' => 'App\User',
+            0 => 'App\Admin',
+        ]);
 
         $this->assertSame('user', Relation::getMorphAlias('App\User'));
+        $this->assertSame(0, Relation::getMorphAlias('App\Admin'));
         $this->assertSame('Does\Not\Exist', Relation::getMorphAlias('Does\Not\Exist'));
     }
 

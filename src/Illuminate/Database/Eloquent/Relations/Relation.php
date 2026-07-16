@@ -519,7 +519,9 @@ abstract class Relation implements BuilderContract
      */
     public static function getMorphAlias(string $className)
     {
-        return array_search($className, static::$morphMap, strict: true) ?: $className;
+        $alias = array_search($className, static::$morphMap, strict: true);
+
+        return $alias !== false ? $alias : $className;
     }
 
     /**
