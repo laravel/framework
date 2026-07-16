@@ -136,7 +136,7 @@ class RouteListCommandTest extends TestCase
         $this->withoutDeprecationHandling();
 
         RouteListCommand::resolveTerminalWidthUsing(function () {
-            return 82;
+            return 87;
         });
 
         $this->router->get('/', function () {
@@ -148,10 +148,10 @@ class RouteListCommandTest extends TestCase
             ->assertSuccessful()
             ->expectsOutput('')
             ->expectsOutput(
-                '  GET|HEAD       foo/{user} Illuminate\Tests\Testing\Console\FooController@show'
+                '  GET|HEAD|QUERY       foo/{user} Illuminate\Tests\Testing\Console\FooController@show'
             )->expectsOutput('')
             ->expectsOutput(
-                '                                                              Showing [1] routes'
+                '                                                                   Showing [1] routes'
             )
             ->expectsOutput('');
     }
@@ -223,9 +223,9 @@ class RouteListCommandTest extends TestCase
         $this->artisan(RouteListCommand::class, ['-v' => true, '--except-vendor' => true])
             ->assertSuccessful()
             ->expectsOutput('')
-            ->expectsOutput('  GET|HEAD       foo/{user} Illuminate\Tests\Testing\Console\FooController@show')
-            ->expectsOutput('  ANY            redirect .... Illuminate\Routing\RedirectController')
-            ->expectsOutput('  GET|HEAD       view .............................................. ')
+            ->expectsOutput('  GET|HEAD|QUERY       foo/{user} Illuminate\Tests\Testing\Console\FooController@show')
+            ->expectsOutput('  ANY                   redirect Illuminate\Routing\RedirectController')
+            ->expectsOutput('  GET|HEAD|QUERY       view ........................................ ')
             ->expectsOutput('')
             ->expectsOutput('                                                  Showing [3] routes')
             ->expectsOutput('');

@@ -540,7 +540,7 @@ class RoutingRouteTest extends TestCase
         $response = $router->dispatch(Request::create('foo/bar', 'OPTIONS'));
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertSame('GET,HEAD,POST', $response->headers->get('Allow'));
+        $this->assertSame('GET,HEAD,QUERY,POST', $response->headers->get('Allow'));
     }
 
     public function testHeadDispatcher()
