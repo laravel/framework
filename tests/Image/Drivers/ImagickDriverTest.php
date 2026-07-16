@@ -85,6 +85,10 @@ class ImagickDriverTest extends TestCase
 
     public function test_processes_optimize_to_avif()
     {
+        if (\Imagick::queryFormats('AVIF') === []) {
+            $this->markTestSkipped('The Imagick extension was not compiled with AVIF support.');
+        }
+
         $driver = new ImagickDriver;
 
         $pipeline = $this->pipeline(format: 'avif');
