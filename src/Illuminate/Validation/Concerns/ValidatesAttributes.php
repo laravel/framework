@@ -171,11 +171,7 @@ trait ValidatesAttributes
      */
     public function validateBase64($attribute, $value): bool
     {
-        if (! is_string($value) || $value === '') {
-            return false;
-        }
-
-        return preg_match('/^(?:[a-z\d+\/]{4})*(?:[a-z\d+\/]{2}==|[a-z\d+\/]{3}=|[a-z\d+\/]{4})$/i', $value) === 1;
+        return is_string($value) && $value !== '' && base64_decode($value, true) !== false;
     }
 
     /**
