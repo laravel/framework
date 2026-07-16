@@ -420,6 +420,23 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $this->assertFalse(ModelWithFillableAttribute::isIgnoringTouch());
     }
 
+    public function test_is_ignoring_touch_after_model_is_constructed(): void
+    {
+        new ModelWithTableAndTimestampsFalseAttribute;
+
+        $this->assertTrue(ModelWithTableAndTimestampsFalseAttribute::isIgnoringTouch());
+    }
+
+    public function test_table_and_timestamps_attributes_apply_after_is_ignoring_touch(): void
+    {
+        ModelWithTableAndTimestampsFalseAttribute::isIgnoringTouch();
+
+        $model = new ModelWithTableAndTimestampsFalseAttribute;
+
+        $this->assertSame('collision_table', $model->getTable());
+        $this->assertFalse($model->usesTimestamps());
+    }
+
     public function test_trait_initializer_merges_appends_with_attribute(): void
     {
         $model = new ModelWithAppendsAttributeAndTrait;
@@ -562,6 +579,12 @@ class ModelWithoutTimestampsAttribute extends Model
 class ModelWithTimestampsAttributeAndProperty extends Model
 {
     public $timestamps = false;
+}
+
+#[Table(name: 'collision_table', timestamps: false)]
+class ModelWithTableAndTimestampsFalseAttribute extends Model
+{
+    //
 }
 
 #[Table(dateFormat: 'U')]

@@ -2678,7 +2678,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $class ??= static::class;
 
-        $cacheKey = $class.'@'.$attributeClass;
+        $cacheKey = $class.'@'.$attributeClass.'@'.$property;
 
         if (array_key_exists($cacheKey, static::$classAttributes)) {
             return static::$classAttributes[$cacheKey];
