@@ -33,6 +33,13 @@ abstract class Seeder
     protected static $called = [];
 
     /**
+     * The paths to seeder files.
+     *
+     * @var string[]
+     */
+    protected $paths = [];
+
+    /**
      * Run the given seeder class.
      *
      * @param  array|string  $class
@@ -138,6 +145,27 @@ abstract class Seeder
         }
 
         return $instance;
+    }
+
+    /**
+     * Register a custom seeder path.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function path($path)
+    {
+        $this->paths = array_unique(array_merge($this->paths, [$path]));
+    }
+
+    /**
+     * Get all of the custom seeder paths.
+     *
+     * @return string[]
+     */
+    public function paths()
+    {
+        return $this->paths;
     }
 
     /**

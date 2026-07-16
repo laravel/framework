@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Config\Repository as Config;
+use Illuminate\Database\Seeder;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Translation\Translator;
@@ -197,6 +198,40 @@ class SupportServiceProviderTest extends TestCase
         $provider->loadTranslationsFrom(__DIR__.'/translations', 'namespace');
     }
 
+    public function testLoadSeedersFrom()
+    {
+        $seeder = m::mock(Seeder::class);
+        $seeder->shouldReceive('path')->once()->with(__DIR__.'/seeders');
+
+        $this->app->shouldReceive('afterResolving')->once()->with(Seeder::class, m::on(function ($callback) use ($seeder) {
+            $callback($seeder);
+
+            return true;
+        }));
+
+        $provider = new ServiceProviderForTestingOne($this->app);
+        $provider->loadSeedersFrom(__DIR__.'/seeders');
+    }
+
+    public function testLoadSeedersFromWithMultiplePaths()
+    {
+        $seeder = m::mock(Seeder::class);
+        $seeder->shouldReceive('path')->once()->with(__DIR__.'/seeders');
+        $seeder->shouldReceive('path')->once()->with(__DIR__.'/modules/seeders');
+
+        $this->app->shouldReceive('afterResolving')->once()->with(Seeder::class, m::on(function ($callback) use ($seeder) {
+            $callback($seeder);
+
+            return true;
+        }));
+
+        $provider = new ServiceProviderForTestingOne($this->app);
+        $provider->loadSeedersFrom([
+            __DIR__.'/seeders',
+            __DIR__.'/modules/seeders',
+        ]);
+    }
+
     public function test_can_remove_provider()
     {
         $this->tempFile = __DIR__.'/providers.php';
@@ -263,6 +298,11 @@ class ServiceProviderForTestingOne extends ServiceProvider
         $this->callAfterResolving('translator', fn ($translator) => is_null($namespace)
             ? $translator->addPath($path)
             : $translator->addNamespace($namespace, $path));
+    }
+
+    public function loadSeedersFrom($paths)
+    {
+        parent::loadSeedersFrom($paths);
     }
 }
 

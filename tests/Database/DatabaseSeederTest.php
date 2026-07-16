@@ -84,4 +84,25 @@ class DatabaseSeederTest extends TestCase
 
         $container->shouldHaveReceived('call')->once()->with([$seeder, 'run'], ['test1', 'test2']);
     }
+
+    public function testPath()
+    {
+        $seeder = new TestSeeder;
+        $seeder->path(__DIR__.'/seeders');
+        $seeder->path(__DIR__.'/modules/seeders');
+
+        $this->assertSame([
+            __DIR__.'/seeders',
+            __DIR__.'/modules/seeders',
+        ], $seeder->paths());
+    }
+
+    public function testPathDoesNotRegisterDuplicates()
+    {
+        $seeder = new TestSeeder;
+        $seeder->path(__DIR__.'/seeders');
+        $seeder->path(__DIR__.'/seeders');
+
+        $this->assertSame([__DIR__.'/seeders'], $seeder->paths());
+    }
 }
