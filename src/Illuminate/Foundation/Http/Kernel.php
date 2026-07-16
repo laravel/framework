@@ -557,9 +557,9 @@ class Kernel implements KernelContract
      * @param  \Throwable  $e
      * @return void
      */
-    protected function reportException(Throwable $e)
+    protected function reportException(Throwable $e, array $context = [])
     {
-        $this->app[ExceptionHandler::class]->report($e);
+        $this->app[ExceptionHandler::class]->report($e, $context);
     }
 
     /**

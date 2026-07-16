@@ -158,7 +158,7 @@ class ValidationNotPwnedVerifierTest extends TestCase
         $exception = new ConnectionException();
 
         $exceptionHandler = m::mock(ExceptionHandler::class);
-        $exceptionHandler->shouldReceive('report')->once()->with($exception);
+        $exceptionHandler->shouldReceive('report')->once()->with($exception, []);
         $container->bind(ExceptionHandler::class, function () use ($exceptionHandler) {
             return $exceptionHandler;
         });

@@ -234,7 +234,7 @@ class Handler implements ExceptionHandlerContract
     /**
      * Register a reportable callback.
      *
-     * @param  callable  $reportUsing
+     * @param  callable(Throwable, array): ?bool  $reportUsing
      * @return \Illuminate\Foundation\Exceptions\ReportableHandler
      */
     public function reportable(callable $reportUsing)
@@ -424,11 +424,12 @@ class Handler implements ExceptionHandlerContract
      * Report or log an exception.
      *
      * @param  \Throwable  $e
+     * @param  array<string, mixed>  $context
      * @return void
      *
      * @throws \Throwable
      */
-    public function report(Throwable $e)
+    public function report(Throwable $e, array $context = [])
     {
         $e = $this->mapException($e);
 
@@ -436,18 +437,19 @@ class Handler implements ExceptionHandlerContract
             return;
         }
 
-        $this->reportThrowable($e);
+        $this->reportThrowable($e, $context);
     }
 
     /**
      * Reports error based on report method on exception or to logger.
      *
      * @param  \Throwable  $e
+     * @param  array<string, mixed>  $context
      * @return void
      *
      * @throws \Throwable
      */
-    protected function reportThrowable(Throwable $e): void
+    protected function reportThrowable(Throwable $e, array $context = []): void
     {
         $this->reportedExceptionMap[$e] = true;
 
@@ -456,8 +458,10 @@ class Handler implements ExceptionHandlerContract
             return;
         }
 
+        $context = $this->buildExceptionContext($e, $context);
+
         foreach ($this->reportCallbacks as $reportCallback) {
-            if ($reportCallback->handles($e) && $reportCallback($e) === false) {
+            if ($reportCallback->handles($e) && $reportCallback($e, $context) === false) {
                 return;
             }
         }
@@ -475,8 +479,6 @@ class Handler implements ExceptionHandlerContract
         $this->currentlyReporting = $e;
 
         try {
-            $context = $this->buildExceptionContext($e);
-
             method_exists($logger, $level)
                 ? $logger->{$level}($e->getMessage(), $context)
                 : $logger->log($level, $e->getMessage(), $context);
@@ -617,13 +619,15 @@ class Handler implements ExceptionHandlerContract
      * Create the context array for logging the given exception.
      *
      * @param  \Throwable  $e
+     * @param  array<string, mixed>  $context
      * @return array
      */
-    protected function buildExceptionContext(Throwable $e)
+    protected function buildExceptionContext(Throwable $e, array $context = [])
     {
         return array_merge(
             $this->buildContextForException($e),
             $this->context(),
+            $context,
             ['exception' => $e]
         );
     }
@@ -678,7 +682,7 @@ class Handler implements ExceptionHandlerContract
     /**
      * Register a closure that should be used to build exception context data.
      *
-     * @param  \Closure  $contextCallback
+     * @param  \Closure(\Throwable, array): array  $contextCallback
      * @return $this
      */
     public function buildContextUsing(Closure $contextCallback)

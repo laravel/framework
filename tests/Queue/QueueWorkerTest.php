@@ -797,7 +797,7 @@ class BrokenQueueConnection
 
 class ShouldntRetryExceptionHandler implements ExceptionHandler
 {
-    public function report(\Throwable $e)
+    public function report(\Throwable $e, array $context = [])
     {
         //
     }

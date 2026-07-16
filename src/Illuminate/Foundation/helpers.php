@@ -719,14 +719,15 @@ if (! function_exists('report')) {
      * Report an exception.
      *
      * @param  \Throwable|string  $exception
+     * @param  array<string, mixed>  $context
      */
-    function report($exception): void
+    function report($exception, array $context = []): void
     {
         if (is_string($exception)) {
             $exception = new Exception($exception);
         }
 
-        app(ExceptionHandler::class)->report($exception);
+        app(ExceptionHandler::class)->report($exception, $context);
     }
 }
 
@@ -736,11 +737,12 @@ if (! function_exists('report_if')) {
      *
      * @param  bool  $boolean
      * @param  \Throwable|string  $exception
+     * @param  array<string, mixed>  $context
      */
-    function report_if($boolean, $exception): void
+    function report_if($boolean, $exception, array $context = []): void
     {
         if ($boolean) {
-            report($exception);
+            report($exception, $context);
         }
     }
 }
@@ -751,11 +753,12 @@ if (! function_exists('report_unless')) {
      *
      * @param  bool  $boolean
      * @param  \Throwable|string  $exception
+     * @param  array<string, mixed>  $context
      */
-    function report_unless($boolean, $exception): void
+    function report_unless($boolean, $exception, array $context = []): void
     {
         if (! $boolean) {
-            report($exception);
+            report($exception, $context);
         }
     }
 }
