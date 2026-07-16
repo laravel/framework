@@ -56,6 +56,10 @@ class ArtisanCommandTest extends TestCase
             $this->line('My name is Taylor Otwell');
         });
 
+        Artisan::command('zero', function () {
+            $this->line('0');
+        });
+
         Artisan::command('new-england', function () {
             $this->line('The region of New England consists of the following states:');
             $this->info('Connecticut');
@@ -122,6 +126,26 @@ class ArtisanCommandTest extends TestCase
 
         $this->artisan('contains')
             ->doesntExpectOutputToContain('Taylor Otwell')
+            ->assertExitCode(0);
+    }
+
+    public function test_console_command_that_fails_from_zero_as_unexpected_output()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Output "0" was printed.');
+
+        $this->artisan('zero')
+            ->doesntExpectOutput('0')
+            ->assertExitCode(0);
+    }
+
+    public function test_console_command_that_fails_from_zero_as_unexpected_output_substring()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Output "0" was printed.');
+
+        $this->artisan('zero')
+            ->doesntExpectOutputToContain('0')
             ->assertExitCode(0);
     }
 
