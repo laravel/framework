@@ -384,7 +384,7 @@ class Image implements Htmlable, Stringable
     }
 
     /**
-     * @param  array<string, scalar|\Stringable|bool>&string[]  $attributes
+     * @param  array<string, scalar|\Stringable|true>&string[]  $attributes
      */
     public function toHtml(array $attributes = []): string
     {
@@ -398,7 +398,7 @@ class Image implements Htmlable, Stringable
                     return [$value => true];
                 }
 
-                if (is_string($key) && (is_string($value) || $value instanceof Stringable || is_bool($value))) {
+                if (is_string($key) && (is_string($value) || $value instanceof Stringable || $value === true)) {
                     return [$key => $value];
                 }
             }))
