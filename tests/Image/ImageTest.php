@@ -905,12 +905,14 @@ class ImageTest extends TestCase
     public function test_to_html()
     {
         $image = $this->makeImage();
-        $this->assertStringStartsWith('<img src="');
-        $this->assertStringEndsWith('" width="100" height="100">', $image->toHtml());
+        $html = $image->toHtml();
+        $this->assertStringStartsWith('<img src="', $html);
+        $this->assertStringEndsWith('" width="100" height="100">', $html);
 
         $result = $image->scale(400, 400);
-        $this->assertStringStartsWith('<img src="');
-        $this->assertStringEndsWith('" width="100" height="100">', $image->toHtml());
+        $html = $image->toHtml();
+        $this->assertStringStartsWith('<img src="', $html);
+        $this->assertStringEndsWith('" width="100" height="100">', $html);
     }
 
     public function test_to_html_with_additional_attributes()
@@ -918,8 +920,9 @@ class ImageTest extends TestCase
         $image = $this->makeImage();
 
         $result = $image->scale(400, 400);
-        $this->assertStringStartsWith('<img src="');
-        $this->assertStringEndsWith('" width="100" height="100" alt="My avatar" hidden>', $image->toHtml(['alt' => 'My avatar', 'hidden']));
+        $html = $image->toHtml(['alt' => 'My avatar', 'hidden']);
+        $this->assertStringStartsWith('<img src="', $html);
+        $this->assertStringEndsWith('" width="100" height="100" alt="My avatar" hidden>', $html);
     }
 
     public function test_to_html_attributes_are_overwritable()
@@ -927,8 +930,9 @@ class ImageTest extends TestCase
         $image = $this->makeImage();
 
         $result = $image->scale(400, 400);
-        $this->assertStringStartsWith('<img src="');
-        $this->assertStringEndsWith('" width="100" height="42">', $image->toHtml(['height' => 42]));
+        $html = $image->toHtml(['height' => 42])
+        $this->assertStringStartsWith('<img src="', $html);
+        $this->assertStringEndsWith('" width="100" height="42">', $html);
     }
 
     public function test_optimize_allows_gif()
