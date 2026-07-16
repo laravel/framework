@@ -430,7 +430,7 @@ class Image implements Htmlable, Stringable
                     return [$value => true];
                 }
 
-                if (is_string($key) && (is_string($value) || $value instanceof Stringable || $value === true)) {
+                if (is_string($key) && (is_scalar($value) || $value instanceof Stringable || $value === true)) {
                     return [$key => $value];
                 }
             }))
