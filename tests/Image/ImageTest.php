@@ -822,10 +822,10 @@ class ImageTest extends TestCase
     public function test_to_html()
     {
         $image = $this->makeImage();
-        $this->assertSame('<img src="" width="100" height="100">', $options->image->toHtml());
+        $this->assertSame('<img src="" width="100" height="100">', $image->toHtml());
 
         $result = $image->scale(400, 400);
-        $this->assertSame('<img src="" width="100" height="100">', $options->image->toHtml());
+        $this->assertSame('<img src="" width="100" height="100">', $image->toHtml());
     }
 
     public function test_to_html_with_additional_attributes()
@@ -833,7 +833,7 @@ class ImageTest extends TestCase
         $image = $this->makeImage();
 
         $result = $image->scale(400, 400);
-        $this->assertSame('<img src="" width="100" height="100" alt="My avatar">', $options->image->toHtml(['alt' => 'My avatar']));
+        $this->assertSame('<img src="" width="100" height="100" alt="My avatar">', $image->toHtml(['alt' => 'My avatar']));
     }
 
     public function test_optimize_throws_for_gif()
