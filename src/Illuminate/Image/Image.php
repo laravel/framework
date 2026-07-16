@@ -402,7 +402,7 @@ class Image implements Htmlable, Stringable
                     return [$key => $value];
                 }
             }))
-            ->map(fn ($value, $key) => sprintf('%s="%s"', e($key), e($value)));
+            ->map(fn ($value, $key) => $value === true ? e($key) : sprintf('%s="%s"', e($key), e($value)));
 
         return '<img '.$attributes->join(' ').'>';
     }
