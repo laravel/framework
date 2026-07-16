@@ -30,6 +30,7 @@ use Illuminate\Database\Console\ShowCommand;
 use Illuminate\Database\Console\ShowModelCommand;
 use Illuminate\Database\Console\TableCommand as DatabaseTableCommand;
 use Illuminate\Database\Console\WipeCommand;
+use Illuminate\Filesystem\Console\CreateBucketCommand;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Console\ApiInstallCommand;
 use Illuminate\Foundation\Console\BroadcastingInstallCommand;
@@ -182,6 +183,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'SchedulePause' => SchedulePauseCommand::class,
         'ScheduleResume' => ScheduleResumeCommand::class,
         'ShowModel' => ShowModelCommand::class,
+        'StorageCreateBucket' => CreateBucketCommand::class,
         'StorageLink' => StorageLinkCommand::class,
         'StorageUnlink' => StorageUnlinkCommand::class,
         'Up' => UpCommand::class,
