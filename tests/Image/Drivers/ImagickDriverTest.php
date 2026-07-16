@@ -61,6 +61,66 @@ class ImagickDriverTest extends TestCase
         $this->assertSame(IMAGETYPE_JPEG, getimagesizefromstring($result)[2]);
     }
 
+    public function test_processes_optimize_to_png()
+    {
+        $driver = new ImagickDriver;
+
+        $pipeline = $this->pipeline(format: 'png');
+
+        $result = $driver->process($this->fakeImageContents(), $pipeline);
+
+        $this->assertSame(IMAGETYPE_PNG, getimagesizefromstring($result)[2]);
+    }
+
+    public function test_processes_optimize_to_gif()
+    {
+        $driver = new ImagickDriver;
+
+        $pipeline = $this->pipeline(format: 'gif');
+
+        $result = $driver->process($this->fakeImageContents(), $pipeline);
+
+        $this->assertSame(IMAGETYPE_GIF, getimagesizefromstring($result)[2]);
+    }
+
+    public function test_processes_optimize_to_avif()
+    {
+        if (\Imagick::queryFormats('AVIF') === []) {
+            $this->markTestSkipped('The Imagick extension was not compiled with AVIF support.');
+        }
+
+        $imagick = new \Imagick;
+        $imagick->newImage(1, 1, 'white');
+        $imagick->setImageFormat('avif');
+
+        if ($imagick->getImageBlob() === '') {
+            $this->markTestSkipped('The Imagick extension cannot encode AVIF images.');
+        }
+
+        $driver = new ImagickDriver;
+
+        $pipeline = $this->pipeline(format: 'avif');
+
+        $result = $driver->process($this->fakeImageContents(), $pipeline);
+
+        // PHP's getimagesizefromstring()/finfo AVIF detection varies by the
+        // libavif/libmagic versions installed, so we assert on the ISOBMFF
+        // "ftyp" box and brand directly instead of relying on either.
+        $this->assertStringContainsString('ftyp', substr($result, 0, 16));
+        $this->assertMatchesRegularExpression('/avif|avis|mif1/', substr($result, 0, 32));
+    }
+
+    public function test_processes_optimize_to_bmp()
+    {
+        $driver = new ImagickDriver;
+
+        $pipeline = $this->pipeline(format: 'bmp');
+
+        $result = $driver->process($this->fakeImageContents(), $pipeline);
+
+        $this->assertSame(IMAGETYPE_BMP, getimagesizefromstring($result)[2]);
+    }
+
     public function test_processes_cover_and_optimize_together()
     {
         $driver = new ImagickDriver;

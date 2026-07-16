@@ -2379,6 +2379,21 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateBase64(): void
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['value' => base64_encode('Laravel')], ['value' => 'base64']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['value' => ''], ['value' => 'required|base64']);
+        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['value' => 'not-base64!'], ['value' => 'base64']);
+        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['value' => 'YQ'], ['value' => 'base64']);
+        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['value' => 'YQ=='], ['value' => 'base64']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateConfirmed()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -3300,6 +3315,13 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => ['array']], ['x' => 'hex_color']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateBase64DoesNotThrowOnNonStringValue(): void
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => ['array']], ['x' => 'base64']);
         $this->assertFalse($v->passes());
     }
 

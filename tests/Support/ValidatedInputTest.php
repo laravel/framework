@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Support;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Stringable;
 use Illuminate\Support\ValidatedInput;
 use Illuminate\Tests\Support\Fixtures\StringBackedEnum;
 use PHPUnit\Framework\TestCase;
@@ -338,7 +337,7 @@ class ValidatedInputTest extends TestCase
         $input = new ValidatedInput(['name' => 'Fatih', 'surname' => 'AYDIN', 'foo' => ['bar' => null, 'baz' => '']]);
 
         $this->assertSame('Fatih', $input->input('name'));
-        $this->assertSame(null, $input->input('foo.bar'));
+        $this->assertNull($input->input('foo.bar'));
         $this->assertSame('test', $input->input('foo.bat', 'test'));
     }
 
@@ -356,9 +355,9 @@ class ValidatedInputTest extends TestCase
             'null' => null,
         ]);
 
-        $this->assertTrue($input->str('int') instanceof Stringable);
-        $this->assertTrue($input->str('int') instanceof Stringable);
-        $this->assertTrue($input->str('unknown_key') instanceof Stringable);
+        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $input->str('int'));
+        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $input->str('int'));
+        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $input->str('unknown_key'));
         $this->assertSame('123', $input->str('int')->value());
         $this->assertSame('456', $input->str('int_str')->value());
         $this->assertSame('123.456', $input->str('float')->value());
@@ -384,9 +383,9 @@ class ValidatedInputTest extends TestCase
             'null' => null,
         ]);
 
-        $this->assertTrue($input->string('int') instanceof Stringable);
-        $this->assertTrue($input->string('int') instanceof Stringable);
-        $this->assertTrue($input->string('unknown_key') instanceof Stringable);
+        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $input->string('int'));
+        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $input->string('int'));
+        $this->assertInstanceOf(\Illuminate\Support\Stringable::class, $input->string('unknown_key'));
         $this->assertSame('123', $input->string('int')->value());
         $this->assertSame('456', $input->string('int_str')->value());
         $this->assertSame('123.456', $input->string('float')->value());

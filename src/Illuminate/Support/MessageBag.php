@@ -271,7 +271,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
      */
     protected function transform($messages, $format, $messageKey)
     {
-        if ($format == ':message') {
+        if ($format === ':message') {
             return (array) $messages;
         }
 

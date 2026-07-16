@@ -125,6 +125,34 @@ class ImageTest extends TestCase
         $this->assertNotSame($image, $image->toJpg());
     }
 
+    public function test_to_png_returns_new_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertNotSame($image, $image->toPng());
+    }
+
+    public function test_to_gif_returns_new_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertNotSame($image, $image->toGif());
+    }
+
+    public function test_to_avif_returns_new_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertNotSame($image, $image->toAvif());
+    }
+
+    public function test_to_bmp_returns_new_instance()
+    {
+        $image = $this->makeImage();
+
+        $this->assertNotSame($image, $image->toBmp());
+    }
+
     public function test_using_returns_new_instance()
     {
         $image = $this->makeImage();
@@ -221,6 +249,26 @@ class ImageTest extends TestCase
         $this->assertSame('jpg', $image->extension());
     }
 
+    public function test_extension_returns_avif_for_avif()
+    {
+        if (! extension_loaded('imagick')) {
+            $this->markTestSkipped('The Imagick extension is not available.');
+        }
+
+        $imagick = new \Imagick;
+        $imagick->newImage(10, 10, 'red');
+        $imagick->setImageFormat('avif');
+        $contents = $imagick->getImageBlob();
+
+        if ((new \finfo(FILEINFO_MIME_TYPE))->buffer($contents) !== 'image/avif') {
+            $this->markTestSkipped('The installed fileinfo database does not recognize AVIF.');
+        }
+
+        $image = new Image($contents);
+
+        $this->assertSame('avif', $image->extension());
+    }
+
     public function test_dimensions_returns_width_and_height()
     {
         $image = new Image($this->fakeImageContents(300, 200));
@@ -298,9 +346,9 @@ class ImageTest extends TestCase
         $image = $this->makeImage();
 
         $this->expectException(ImageException::class);
-        $this->expectExceptionMessage('The [bmp] format is not supported.');
+        $this->expectExceptionMessage('The [tiff] format is not supported.');
 
-        $image->optimize('bmp');
+        $image->optimize('tiff');
     }
 
     public function test_quality_sets_option()
@@ -330,6 +378,34 @@ class ImageTest extends TestCase
         $image = $this->makeImage();
 
         $this->assertSame('jpg', $this->getOptions($image->toJpeg())->format);
+    }
+
+    public function test_to_png_sets_format()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame('png', $this->getOptions($image->toPng())->format);
+    }
+
+    public function test_to_gif_sets_format()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame('gif', $this->getOptions($image->toGif())->format);
+    }
+
+    public function test_to_avif_sets_format()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame('avif', $this->getOptions($image->toAvif())->format);
+    }
+
+    public function test_to_bmp_sets_format()
+    {
+        $image = $this->makeImage();
+
+        $this->assertSame('bmp', $this->getOptions($image->toBmp())->format);
     }
 
     public function test_quality_survives_format_conversion()
@@ -620,9 +696,16 @@ class ImageTest extends TestCase
         $image = $this->makeImage();
 
         $this->expectException(ImageException::class);
-        $this->expectExceptionMessage('The [png] format is not supported.');
+        $this->expectExceptionMessage('The [jpge] format is not supported.');
 
-        $image->optimize('png');
+        $image->optimize('jpge');
+    }
+
+    public function test_optimize_allows_png()
+    {
+        $result = $this->makeImage()->optimize('png');
+
+        $this->assertSame('png', $this->getOptions($result)->format);
     }
 
     public function test_serialization_throws_exception()
@@ -848,20 +931,18 @@ class ImageTest extends TestCase
         $this->assertStringEndsWith('" width="100" height="42">', $image->toHtml(['height' => 42));
     }
 
-    public function test_optimize_throws_for_gif()
+    public function test_optimize_allows_gif()
     {
-        $this->expectException(ImageException::class);
-        $this->expectExceptionMessage('The [gif] format is not supported.');
+        $result = $this->makeImage()->optimize('gif');
 
-        $this->makeImage()->optimize('gif');
+        $this->assertSame('gif', $this->getOptions($result)->format);
     }
 
-    public function test_optimize_throws_for_avif()
+    public function test_optimize_allows_avif()
     {
-        $this->expectException(ImageException::class);
-        $this->expectExceptionMessage('The [avif] format is not supported.');
+        $result = $this->makeImage()->optimize('avif');
 
-        $this->makeImage()->optimize('avif');
+        $this->assertSame('avif', $this->getOptions($result)->format);
     }
 
     public function test_optimize_allows_jpeg_spelling()

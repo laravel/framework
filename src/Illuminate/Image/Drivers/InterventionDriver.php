@@ -20,8 +20,12 @@ use Illuminate\Image\Transformations\Rotate;
 use Illuminate\Image\Transformations\Scale;
 use Illuminate\Image\Transformations\Sharpen;
 use Intervention\Image\Direction;
+use Intervention\Image\Encoders\AvifEncoder;
+use Intervention\Image\Encoders\BmpEncoder;
+use Intervention\Image\Encoders\GifEncoder;
 use Intervention\Image\Encoders\JpegEncoder;
 use Intervention\Image\Encoders\MediaTypeEncoder;
+use Intervention\Image\Encoders\PngEncoder;
 use Intervention\Image\Encoders\WebpEncoder;
 use Intervention\Image\ImageManager;
 
@@ -111,6 +115,10 @@ abstract class InterventionDriver implements Driver
                 return $image->encode(match ($pipeline->output->format) {
                     'webp' => new WebpEncoder($quality),
                     'jpg', 'jpeg' => new JpegEncoder($quality),
+                    'png' => new PngEncoder,
+                    'gif' => new GifEncoder,
+                    'avif' => new AvifEncoder($quality),
+                    'bmp' => new BmpEncoder,
                 })->toString();
             }
 

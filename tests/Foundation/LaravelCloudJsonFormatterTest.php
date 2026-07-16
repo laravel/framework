@@ -46,7 +46,7 @@ class LaravelCloudJsonFormatterTest extends TestCase
         $formatted = $formatter->format($this->createRecord());
         $decoded = json_decode($formatted, true);
 
-        $this->assertEquals('550e8400-e29b-41d4-a716-446655440000', $decoded['cloud_request_id']);
+        $this->assertSame('550e8400-e29b-41d4-a716-446655440000', $decoded['cloud_request_id']);
     }
 
     public function test_does_not_add_field_when_no_request_bound()
@@ -91,11 +91,11 @@ class LaravelCloudJsonFormatterTest extends TestCase
         $formatted = $formatter->format($record);
         $decoded = json_decode($formatted, true);
 
-        $this->assertEquals('Test message', $decoded['message']);
-        $this->assertEquals('WARNING', $decoded['level_name']);
-        $this->assertEquals('my-channel', $decoded['channel']);
-        $this->assertEquals('extra_value', $decoded['extra']['extra_field']);
-        $this->assertEquals('context_value', $decoded['context']['context_field']);
-        $this->assertEquals('6ba7b810-9dad-11d1-80b4-00c04fd430c8', $decoded['cloud_request_id']);
+        $this->assertSame('Test message', $decoded['message']);
+        $this->assertSame('WARNING', $decoded['level_name']);
+        $this->assertSame('my-channel', $decoded['channel']);
+        $this->assertSame('extra_value', $decoded['extra']['extra_field']);
+        $this->assertSame('context_value', $decoded['context']['context_field']);
+        $this->assertSame('6ba7b810-9dad-11d1-80b4-00c04fd430c8', $decoded['cloud_request_id']);
     }
 }

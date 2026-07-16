@@ -261,13 +261,45 @@ class Image implements Htmlable, Stringable
     }
 
     /**
+     * Convert the image to PNG format.
+     */
+    public function toPng(): static
+    {
+        return $this->toFormat('png');
+    }
+
+    /**
+     * Convert the image to GIF format.
+     */
+    public function toGif(): static
+    {
+        return $this->toFormat('gif');
+    }
+
+    /**
+     * Convert the image to AVIF format.
+     */
+    public function toAvif(): static
+    {
+        return $this->toFormat('avif');
+    }
+
+    /**
+     * Convert the image to BMP format.
+     */
+    public function toBmp(): static
+    {
+        return $this->toFormat('bmp');
+    }
+
+    /**
      * Set the output format.
      *
      * @throws ImageException
      */
     protected function toFormat(string $format): static
     {
-        if (! in_array($format, ['webp', 'jpg', 'jpeg'])) {
+        if (! in_array($format, ['webp', 'jpg', 'jpeg', 'png', 'gif', 'avif', 'bmp'])) {
             throw new ImageException("The [{$format}] format is not supported.");
         }
 
@@ -417,6 +449,7 @@ class Image implements Htmlable, Stringable
             'image/png' => 'png',
             'image/gif' => 'gif',
             'image/webp' => 'webp',
+            'image/avif' => 'avif',
             'image/bmp' => 'bmp',
             'image/svg+xml' => 'svg',
             'image/tiff' => 'tiff',
