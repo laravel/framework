@@ -245,7 +245,7 @@ class WorkCommand extends Command
                 : ''
         )));
 
-        if ($status == 'starting') {
+        if ($status === 'starting') {
             $this->latestStartedAt = microtime(true);
 
             $dots = max(terminal()->width() - mb_strlen($job->resolveName()) - (

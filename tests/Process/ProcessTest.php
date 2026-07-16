@@ -1045,15 +1045,15 @@ class ProcessTest extends TestCase
         $result = $factory->run('ls -la');
 
         $factory->assertRan(function ($process, $result) {
-            return $process->command == 'ls -la';
+            return $process->command === 'ls -la';
         });
 
         $factory->assertRanTimes(function ($process, $result) {
-            return $process->command == 'ls -la';
+            return $process->command === 'ls -la';
         }, 1);
 
         $factory->assertNotRan(function ($process, $result) {
-            return $process->command == 'cat foo';
+            return $process->command === 'cat foo';
         });
     }
 
