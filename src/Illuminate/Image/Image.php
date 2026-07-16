@@ -433,6 +433,8 @@ class Image implements Htmlable, Stringable
                 if (is_string($key) && (is_scalar($value) || $value instanceof Stringable || $value === true)) {
                     return [$key => $value];
                 }
+
+                return [];
             }))
             ->map(fn ($value, $key) => $value === true ? e($key) : sprintf('%s="%s"', e($key), e($value)));
 
