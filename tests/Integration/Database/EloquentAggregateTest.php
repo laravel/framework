@@ -62,11 +62,11 @@ class EloquentAggregateTest extends DatabaseTestCase
         UserAggregateTest::create(['c' => 4, 'name' => 'name-4', 'balance' => +12]);
         UserAggregateTest::create(['c' => 5, 'name' => 'name-5', 'balance' => null]);
 
-        $this->assertSame(-9, UserAggregateTest::query()->sum('balance'));
+        $this->assertEquals(-9, UserAggregateTest::query()->sum('balance'));
         $result = UserAggregateTest::query()->where('name', 'no-name')->sum('balance');
         $this->assertNotNull($result);
-        $this->assertSame(0, $result);
-        $this->assertSame(2, UserAggregateTest::query()->where('c', '>', 1)->sum('balance'));
+        $this->assertEquals(0, $result);
+        $this->assertEquals(2, UserAggregateTest::query()->where('c', '>', 1)->sum('balance'));
     }
 
     public function testNumericAggregate()

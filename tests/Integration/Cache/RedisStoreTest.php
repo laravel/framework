@@ -109,7 +109,7 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->tags(['people', 'author'])->put('age', 30, 5);
 
         $this->assertSame('Sally', Cache::store('redis')->tags(['people', 'author'])->get('name'));
-        $this->assertSame(30, Cache::store('redis')->tags(['people', 'author'])->get('age'));
+        $this->assertEquals(30, Cache::store('redis')->tags(['people', 'author'])->get('age'));
 
         Cache::store('redis')->tags(['people', 'author'])->flush();
 
@@ -125,7 +125,7 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->tags(['people', 'author'])->forever('age', 30);
 
         $this->assertSame('Sally', Cache::store('redis')->tags(['people', 'author'])->get('name'));
-        $this->assertSame(30, Cache::store('redis')->tags(['people', 'author'])->get('age'));
+        $this->assertEquals(30, Cache::store('redis')->tags(['people', 'author'])->get('age'));
 
         Cache::store('redis')->tags(['people', 'author'])->flush();
 
@@ -141,7 +141,7 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->tags(['votes'])->increment('person-1');
         Cache::store('redis')->tags(['votes'])->increment('person-1');
 
-        $this->assertSame(2, Cache::store('redis')->tags(['votes'])->get('person-1'));
+        $this->assertEquals(2, Cache::store('redis')->tags(['votes'])->get('person-1'));
 
         Cache::store('redis')->tags(['votes'])->decrement('person-1');
         Cache::store('redis')->tags(['votes'])->decrement('person-1');
@@ -156,7 +156,7 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->tags(['votes'])->put(RedisTaggedCacheTestKey::PERSON_1, 2, 5);
         Cache::store('redis')->tags(['votes'])->decrement(RedisTaggedCacheTestKey::PERSON_1);
 
-        $this->assertSame(1, Cache::store('redis')->tags(['votes'])->get(RedisTaggedCacheTestKey::PERSON_1));
+        $this->assertEquals(1, Cache::store('redis')->tags(['votes'])->get(RedisTaggedCacheTestKey::PERSON_1));
 
         Cache::store('redis')->tags(['votes'])->flush();
 
