@@ -22,6 +22,7 @@
         "illuminate/support": "^13.0"
     },
     "suggest": {
+        "ext-fileinfo": "Required to use the Image class.",
         "intervention/image": "Required to use the GD and Imagick image drivers (^4.0)."
     },
     "minimum-stability": "dev",
