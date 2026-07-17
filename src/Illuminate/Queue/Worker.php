@@ -614,7 +614,7 @@ class Worker
                 $job->release($backoff);
 
                 $this->events->dispatch(new JobReleasedAfterException(
-                    $connectionName, $job, $backoff
+                    $connectionName, $job, $backoff, $e
                 ));
             }
         }

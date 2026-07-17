@@ -624,11 +624,12 @@ class QueueWorkerTest extends TestCase
         $worker = $this->getWorker('default', ['queue' => [$job]]);
         $worker->runNextJob('default', 'queue', $this->workerOptions(['backoff' => 10]));
 
-        $this->events->shouldHaveReceived('dispatch')->with(m::on(function ($event) use ($job) {
+        $this->events->shouldHaveReceived('dispatch')->with(m::on(function ($event) use ($job, $e) {
             return $event instanceof JobReleasedAfterException
                 && $event->connectionName === 'default'
                 && $event->job === $job
-                && $event->backoff === 10;
+                && $event->backoff === 10
+                && $event->exception === $e;
         }))->once();
     }
 
