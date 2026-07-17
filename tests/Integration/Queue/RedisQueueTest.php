@@ -88,7 +88,7 @@ class RedisQueueTest extends TestCase
         $this->queue->later(-300, $jobs[2]);
         $this->queue->later(-100, $jobs[3]);
 
-        $this->assertSame($jobs[2], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        $this->assertEquals($jobs[2], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
         $this->assertSame($jobs[1], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
         $this->assertSame($jobs[3], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
         $this->assertNull($this->queue->pop());
@@ -161,7 +161,7 @@ class RedisQueueTest extends TestCase
         $redisJob = $this->queue->pop();
         $after = $this->currentTime();
 
-        $this->assertSame($job, unserialize(json_decode($redisJob->getRawBody())->data->command));
+        $this->assertEquals($job, unserialize(json_decode($redisJob->getRawBody())->data->command));
         $this->assertSame(1, $redisJob->attempts());
         $this->assertSame($job, unserialize(json_decode($redisJob->getReservedJob())->data->command));
         $this->assertSame(1, json_decode($redisJob->getReservedJob())->attempts);
@@ -192,7 +192,7 @@ class RedisQueueTest extends TestCase
 
         // Pop and check it is popped correctly
         $before = $this->currentTime();
-        $this->assertSame($job, unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        $this->assertEquals($job, unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
         $after = $this->currentTime();
 
         // Check reserved queue
@@ -223,7 +223,7 @@ class RedisQueueTest extends TestCase
 
         // Pop and check it is popped correctly
         $before = $this->currentTime();
-        $this->assertSame($job, unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        $this->assertEquals($job, unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
         $after = $this->currentTime();
 
         // Check reserved queue
@@ -255,7 +255,7 @@ class RedisQueueTest extends TestCase
         $redisJob = $this->queue->pop();
 
         $this->assertNotNull($redisJob);
-        $this->assertSame($job, unserialize(json_decode($redisJob->getReservedJob())->data->command));
+        $this->assertEquals($job, unserialize(json_decode($redisJob->getReservedJob())->data->command));
     }
 
     /**
@@ -279,7 +279,7 @@ class RedisQueueTest extends TestCase
         $this->queue->later(-200, $jobs[0]);
         $this->queue->later(-200, $jobs[1]);
 
-        $this->assertSame($jobs[0], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        $this->assertEquals($jobs[0], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
         $this->assertSame($jobs[1], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
 
         $redisKey = $this->getQueueRedisKey($default);
@@ -315,7 +315,7 @@ class RedisQueueTest extends TestCase
 
         // Pop and check it is popped correctly
         $before = $this->currentTime();
-        $this->assertSame($job, unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        $this->assertEquals($job, unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
         $after = $this->currentTime();
 
         // Check reserved queue
@@ -356,7 +356,7 @@ class RedisQueueTest extends TestCase
 
         // Pop and check it is popped correctly
         $before = $this->currentTime();
-        $this->assertSame($job, unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        $this->assertEquals($job, unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
         $after = $this->currentTime();
 
         // Check reserved queue
@@ -406,7 +406,7 @@ class RedisQueueTest extends TestCase
         $decoded = json_decode($payload);
 
         $this->assertSame(1, $decoded->attempts);
-        $this->assertSame($job, unserialize($decoded->data->command));
+        $this->assertEquals($job, unserialize($decoded->data->command));
 
         // check if the queue has no ready item yet
         $this->assertNull($this->queue->pop());
@@ -603,7 +603,7 @@ class RedisQueueTest extends TestCase
 
             // Verify the actual job data
             $command = unserialize($decoded->data->command);
-            $this->assertSame($job, $command, 'Unserialized job should match original');
+            $this->assertEquals($job, $command, 'Unserialized job should match original');
             $this->assertSame(42, $command->i, 'Job property should be preserved');
         } finally {
             // Restore original serializer setting

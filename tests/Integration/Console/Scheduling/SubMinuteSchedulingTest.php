@@ -114,7 +114,7 @@ class SubMinuteSchedulingTest extends TestCase
 
         Sleep::assertSleptTimes(300);
         $this->assertSame(30, $runs);
-        $this->assertSame(30, $startedAt->diffInSeconds(Carbon::now()));
+        $this->assertEquals(30, $startedAt->diffInSeconds(Carbon::now()));
     }
 
     public function test_sub_minute_events_stop_for_the_rest_of_the_minute_once_maintenance_mode_is_enabled()

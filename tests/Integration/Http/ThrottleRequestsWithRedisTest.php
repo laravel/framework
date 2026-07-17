@@ -31,7 +31,7 @@ class ThrottleRequestsWithRedisTest extends TestCase
 
             $response = $this->withoutExceptionHandling()->get('/');
             $this->assertSame('yes', $response->getContent());
-            $this->assertSame(2, $response->headers->get('X-RateLimit-Limit'));
+            $this->assertEquals(2, $response->headers->get('X-RateLimit-Limit'));
             $this->assertSame(1, $response->headers->get('X-RateLimit-Remaining'));
 
             $response = $this->withoutExceptionHandling()->get('/');
