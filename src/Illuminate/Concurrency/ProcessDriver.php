@@ -63,7 +63,7 @@ class ProcessDriver implements Driver
 
             if (! $result['successful']) {
                 throw new $result['exception'](
-                    ...(! empty(array_filter($result['parameters']))
+                    ...(! empty(array_filter($result['parameters'], fn ($parameter) => ! is_null($parameter)))
                         ? $result['parameters']
                         : [$result['message']])
                 );
