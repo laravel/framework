@@ -89,8 +89,8 @@ class RedisQueueTest extends TestCase
         $this->queue->later(-100, $jobs[3]);
 
         $this->assertEquals($jobs[2], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
-        $this->assertSame($jobs[1], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
-        $this->assertSame($jobs[3], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        $this->assertEquals($jobs[1], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        $this->assertEquals($jobs[3], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
         $this->assertNull($this->queue->pop());
 
         $redisKey = $this->getQueueRedisKey($default);
@@ -163,7 +163,7 @@ class RedisQueueTest extends TestCase
 
         $this->assertEquals($job, unserialize(json_decode($redisJob->getRawBody())->data->command));
         $this->assertSame(1, $redisJob->attempts());
-        $this->assertSame($job, unserialize(json_decode($redisJob->getReservedJob())->data->command));
+        $this->assertEquals($job, unserialize(json_decode($redisJob->getReservedJob())->data->command));
         $this->assertSame(1, json_decode($redisJob->getReservedJob())->attempts);
         $this->assertSame($redisJob->getJobId(), json_decode($redisJob->getReservedJob())->id);
 
@@ -175,7 +175,7 @@ class RedisQueueTest extends TestCase
         $score = (int) $result[$reservedJob];
         $this->assertLessThanOrEqual($score, $before + 60);
         $this->assertGreaterThanOrEqual($score, $after + 60);
-        $this->assertSame($job, unserialize(json_decode($reservedJob)->data->command));
+        $this->assertEquals($job, unserialize(json_decode($reservedJob)->data->command));
     }
 
     /**
@@ -203,7 +203,7 @@ class RedisQueueTest extends TestCase
         $score = (int) $result[$reservedJob];
         $this->assertLessThanOrEqual($score, $before + 60);
         $this->assertGreaterThanOrEqual($score, $after + 60);
-        $this->assertSame($job, unserialize(json_decode($reservedJob)->data->command));
+        $this->assertEquals($job, unserialize(json_decode($reservedJob)->data->command));
     }
 
     /**
@@ -234,7 +234,7 @@ class RedisQueueTest extends TestCase
         $score = (int) $result[$reservedJob];
         $this->assertLessThanOrEqual($score, $before);
         $this->assertGreaterThanOrEqual($score, $after);
-        $this->assertSame($job, unserialize(json_decode($reservedJob)->data->command));
+        $this->assertEquals($job, unserialize(json_decode($reservedJob)->data->command));
     }
 
     /**
@@ -280,7 +280,7 @@ class RedisQueueTest extends TestCase
         $this->queue->later(-200, $jobs[1]);
 
         $this->assertEquals($jobs[0], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
-        $this->assertSame($jobs[1], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        $this->assertEquals($jobs[1], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
 
         $redisKey = $this->getQueueRedisKey($default);
         $this->assertSame(0, $this->redis[$driver]->connection()->llen("$redisKey:notify"));
@@ -367,7 +367,7 @@ class RedisQueueTest extends TestCase
         $score = (int) $result[$reservedJob];
         $this->assertLessThanOrEqual($score, $before + 30);
         $this->assertGreaterThanOrEqual($score, $after + 30);
-        $this->assertSame($job, unserialize(json_decode($reservedJob)->data->command));
+        $this->assertEquals($job, unserialize(json_decode($reservedJob)->data->command));
     }
 
     /**

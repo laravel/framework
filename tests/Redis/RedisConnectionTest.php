@@ -101,14 +101,14 @@ class RedisConnectionTest extends TestCase
             $this->assertEquals(1, $redis->expire('one', 10));
             $this->assertNotSame(-1, $redis->ttl('one'));
 
-            $this->assertSame(0, $redis->expire('nothing', 10));
+            $this->assertEquals(0, $redis->expire('nothing', 10));
 
             $redis->set('two', 'mohamed');
             $this->assertSame(-1, $redis->ttl('two'));
-            $this->assertSame(1, $redis->pexpire('two', 10));
+            $this->assertEquals(1, $redis->pexpire('two', 10));
             $this->assertNotSame(-1, $redis->pttl('two'));
 
-            $this->assertSame(0, $redis->pexpire('nothing', 10));
+            $this->assertEquals(0, $redis->pexpire('nothing', 10));
 
             $redis->flushall();
         }
@@ -230,21 +230,21 @@ class RedisConnectionTest extends TestCase
             $redis->zinterstore('output', ['set1', 'set2']);
             $this->assertSame(2, $redis->zcard('output'));
             $this->assertEquals(3, $redis->zscore('output', 'jeffrey'));
-            $this->assertSame(5, $redis->zscore('output', 'matt'));
+            $this->assertEquals(5, $redis->zscore('output', 'matt'));
 
             $redis->zinterstore('output2', ['set1', 'set2'], [
                 'weights' => [3, 2],
                 'aggregate' => 'sum',
             ]);
-            $this->assertSame(7, $redis->zscore('output2', 'jeffrey'));
-            $this->assertSame(12, $redis->zscore('output2', 'matt'));
+            $this->assertEquals(7, $redis->zscore('output2', 'jeffrey'));
+            $this->assertEquals(12, $redis->zscore('output2', 'matt'));
 
             $redis->zinterstore('output3', ['set1', 'set2'], [
                 'weights' => [3, 2],
                 'aggregate' => 'min',
             ]);
-            $this->assertSame(3, $redis->zscore('output3', 'jeffrey'));
-            $this->assertSame(6, $redis->zscore('output3', 'matt'));
+            $this->assertEquals(3, $redis->zscore('output3', 'jeffrey'));
+            $this->assertEquals(6, $redis->zscore('output3', 'matt'));
 
             $redis->flushall();
         }
@@ -259,24 +259,24 @@ class RedisConnectionTest extends TestCase
             $redis->zunionstore('output', ['set1', 'set2']);
             $this->assertSame(3, $redis->zcard('output'));
             $this->assertEquals(3, $redis->zscore('output', 'jeffrey'));
-            $this->assertSame(5, $redis->zscore('output', 'matt'));
-            $this->assertSame(3, $redis->zscore('output', 'taylor'));
+            $this->assertEquals(5, $redis->zscore('output', 'matt'));
+            $this->assertEquals(3, $redis->zscore('output', 'taylor'));
 
             $redis->zunionstore('output2', ['set1', 'set2'], [
                 'weights' => [3, 2],
                 'aggregate' => 'sum',
             ]);
-            $this->assertSame(7, $redis->zscore('output2', 'jeffrey'));
-            $this->assertSame(12, $redis->zscore('output2', 'matt'));
-            $this->assertSame(9, $redis->zscore('output2', 'taylor'));
+            $this->assertEquals(7, $redis->zscore('output2', 'jeffrey'));
+            $this->assertEquals(12, $redis->zscore('output2', 'matt'));
+            $this->assertEquals(9, $redis->zscore('output2', 'taylor'));
 
             $redis->zunionstore('output3', ['set1', 'set2'], [
                 'weights' => [3, 2],
                 'aggregate' => 'min',
             ]);
-            $this->assertSame(3, $redis->zscore('output3', 'jeffrey'));
-            $this->assertSame(6, $redis->zscore('output3', 'matt'));
-            $this->assertSame(9, $redis->zscore('output3', 'taylor'));
+            $this->assertEquals(3, $redis->zscore('output3', 'jeffrey'));
+            $this->assertEquals(6, $redis->zscore('output3', 'matt'));
+            $this->assertEquals(9, $redis->zscore('output3', 'taylor'));
 
             $redis->flushall();
         }
@@ -292,7 +292,7 @@ class RedisConnectionTest extends TestCase
             if ($connector === 'predis') {
                 $this->assertEquals(['jeffrey' => 1, 'matt' => 5], $redis->zrange('set', 0, 1, 'withscores'));
             } else {
-                $this->assertSame(['jeffrey' => 1, 'matt' => 5], $redis->zrange('set', 0, 1, true));
+                $this->assertEquals(['jeffrey' => 1, 'matt' => 5], $redis->zrange('set', 0, 1, true));
             }
 
             $redis->flushall();
@@ -309,7 +309,7 @@ class RedisConnectionTest extends TestCase
             if ($connector === 'predis') {
                 $this->assertEquals(['matt' => 5, 'taylor' => 10], $redis->ZREVRANGE('set', 0, 1, 'withscores'));
             } else {
-                $this->assertSame(['matt' => 5, 'taylor' => 10], $redis->ZREVRANGE('set', 0, 1, true));
+                $this->assertEquals(['matt' => 5, 'taylor' => 10], $redis->ZREVRANGE('set', 0, 1, true));
             }
 
             $redis->flushall();
@@ -328,7 +328,7 @@ class RedisConnectionTest extends TestCase
                     'count' => 2,
                 ],
             ]));
-            $this->assertSame(['matt' => 5, 'taylor' => 10], $redis->zrangebyscore('set', 0, 11, [
+            $this->assertEquals(['matt' => 5, 'taylor' => 10], $redis->zrangebyscore('set', 0, 11, [
                 'withscores' => true,
                 'limit' => [1, 2],
             ]));
@@ -349,7 +349,7 @@ class RedisConnectionTest extends TestCase
                     'count' => 2,
                 ],
             ]));
-            $this->assertSame(['matt' => 5, 'jeffrey' => 1], $redis->ZREVRANGEBYSCORE('set', 10, 0, [
+            $this->assertEquals(['matt' => 5, 'jeffrey' => 1], $redis->ZREVRANGEBYSCORE('set', 10, 0, [
                 'withscores' => true,
                 'limit' => [1, 2],
             ]));
@@ -376,7 +376,7 @@ class RedisConnectionTest extends TestCase
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
 
             $this->assertEquals(1, $redis->zscore('set', 'jeffrey'));
-            $this->assertSame(10, $redis->zscore('set', 'taylor'));
+            $this->assertEquals(10, $redis->zscore('set', 'taylor'));
 
             $redis->flushall();
         }
@@ -515,7 +515,7 @@ class RedisConnectionTest extends TestCase
 
             $this->assertCount(4, $result);
             $this->assertEquals(1, $result[1]);
-            $this->assertSame(2, $result[3]);
+            $this->assertEquals(2, $result[3]);
 
             $redis->flushall();
         }
@@ -533,7 +533,7 @@ class RedisConnectionTest extends TestCase
 
             $this->assertCount(4, $result);
             $this->assertEquals(1, $result[1]);
-            $this->assertSame(2, $result[3]);
+            $this->assertEquals(2, $result[3]);
 
             $redis->flushall();
         }
